@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DllMain">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="EngineStatics">
+      <UniqueIdentifier>{cd715d90-d04f-449b-a482-f01c14ca0573}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSystem">
+      <UniqueIdentifier>{b184018d-d00f-40be-8571-c41ddbbdfadf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSystem\JGHLSLShaderDevice">
+      <UniqueIdentifier>{5113a637-7a1f-4702-ae87-5c414bf1c1e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>DllMain</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGDeviceD.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGRenderSystemStateD.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGRenderTargetD.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGSwapChainD.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGViewportD.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\RenderSystem.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGLog.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JTimerManager.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JThreadManager.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGEngineMain.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGInputEvent.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGHLSLShaderDevice.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGTexture.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShader.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderManager.cpp">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineStatics\Engine.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\EngineMacro.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGDeviceD.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGRenderSystemStateD.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGRenderTargetD.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGSwapChainD.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGViewportD.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\RenderSystem.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\VideoDeviceInfo.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGLog.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JTimerManager.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JThreadManager.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGEngineMain.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGInputEvent.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGHLSLShaderDevice.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGTexture.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShader.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderManager.h">
+      <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

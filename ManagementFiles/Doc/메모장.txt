@@ -1,0 +1,5 @@
+Class Member Param   m_
+Struct               S
+EnumClass            E
+
+// HLSL 대략적인 구조 !!
