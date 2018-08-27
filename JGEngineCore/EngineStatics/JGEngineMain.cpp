@@ -49,6 +49,9 @@ void JGEngineMain::Run()
 			m_bPaused = true;
 		}
 		m_RenderSystem->BeginRendering();
+		// 임시
+		m_RenderSystem->Render();
+		// 임시
 		m_RenderSystem->EndRendering();
 	}
 }

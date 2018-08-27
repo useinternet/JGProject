@@ -14,6 +14,15 @@
     <Filter Include="RenderSystem\JGHLSLShaderDevice">
       <UniqueIdentifier>{5113a637-7a1f-4702-ae87-5c414bf1c1e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderSystem\ShaderCode">
+      <UniqueIdentifier>{88a03c6a-5ddf-486a-a296-9240476643d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSystem\ShaderHLSL">
+      <UniqueIdentifier>{f6bf6020-df59-445c-921a-06743eed2cd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSystem\JGMaterial">
+      <UniqueIdentifier>{361cd771-b6ed-4d50-a126-4cf64e833b1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -73,8 +82,17 @@
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShader.cpp">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderManager.cpp">
+    <ClCompile Include="RenderSystem\ShaderCode\SampleShader.cpp">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGShaderConstructor.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.cpp">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGMaterial\JGMesh.cpp">
+      <Filter>RenderSystem\JGMaterial</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +156,28 @@
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShader.h">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
     </ClInclude>
-    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderManager.h">
+    <ClInclude Include="RenderSystem\JGShaderConstructor.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\SampleShaderDesc.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\SampleShader.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.h">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSystem\JGMaterial\JGMesh.h">
+      <Filter>RenderSystem\JGMaterial</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_vs.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

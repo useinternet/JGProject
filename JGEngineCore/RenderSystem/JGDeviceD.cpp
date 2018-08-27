@@ -8,6 +8,9 @@ JGDeviceD::JGDeviceD()
 }
 JGDeviceD::~JGDeviceD()
 {
+	//Microsoft::WRL::ComPtr<ID3D11Debug> DebugDevice;
+	//m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)DebugDevice.GetAddressOf());
+	//DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 
 }
 bool JGDeviceD::CreateDevice()

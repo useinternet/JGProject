@@ -1,5 +1,11 @@
-Class Member Param   m_
+﻿Class Member Param   m_
 Struct               S
 EnumClass            E
 
 // HLSL 대략적인 구조 !!
+
+
+깊이 스텐실 상태 적용 CreateDepthStencilState
+OMSetDepthStencilState
+OMSetRenderTargets
+RSSetState

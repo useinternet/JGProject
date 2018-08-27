@@ -1,0 +1,74 @@
+#include"JGMesh.h"
+#include"../JGHLSLShaderDevice/JGBufferManager.h"
+#include"../JGHLSLShaderDevice/JGBuffer.h"
+#include"../JGDeviceD.h"
+using namespace std;
+JGMesh::JGMesh()
+{
+}
+
+JGMesh::~JGMesh()
+{
+
+
+}
+
+bool JGMesh::Create_Vertex_Index_Buffer(JGBufferManager* BufferManager, 
+	const std::wstring & MeshName, EJGUsageType VertexUsageType, EJGCPUType VertexCPUType,
+	EJGUsageType IndexUsageType, EJGCPUType IndexCPUType, void* VertexData,
+	size_t DataCount, size_t DataTypeSize)
+{
+	m_BufferManager = BufferManager;
+	bool result = true;
+
+	// 버텍스 버퍼 생성
+	result = m_BufferManager->AddBuffer(MeshName + TT("_VertexBuffer"),
+		EJGBufferType::VertexBuffer, VertexUsageType, VertexCPUType,
+		VertexData, DataCount * DataTypeSize);
+	if (!result)
+	{
+		return false;
+	}
+	m_VertexBuffer.push_back(m_BufferManager->GetBuffer(MeshName + TT("_VertexBuffer"))->Get());
+
+	
+	// 인덱스 버퍼 생성
+	vector<UINT> vIndex;
+	for (UINT i = 0; i < (UINT)DataCount; ++i)
+	{
+		vIndex.push_back(i);
+	}
+	result = m_BufferManager->AddBuffer(MeshName + TT("_IndexBuffer"),
+		EJGBufferType::IndexBuffer, IndexUsageType, IndexCPUType,
+		&vIndex[0], sizeof(UINT) * vIndex.size());
+	if (!result)
+	{
+		return false;
+	}
+	m_IndexBuffer.push_back(m_BufferManager->GetBuffer(MeshName + TT("_IndexBuffer"))->Get());
+
+
+	// 렌더링할 정보를 저장한다.
+	m_Stride.push_back((UINT) DataTypeSize );
+	m_Offset.push_back(0);
+	return true;
+}
+
+bool JGMesh::Create_Vertex_Instance_Buffer(JGBufferManager* BufferManager)
+{
+
+	bUseInstanceBuffer = true;
+	return true;
+}
+
+void JGMesh::Render(JGDeviceD* Device, D3D_PRIMITIVE_TOPOLOGY RenderingType)
+{
+	Device->GetContext()->IASetVertexBuffers(0, (UINT)m_VertexBuffer.size(),
+		&m_VertexBuffer[0], &m_Stride[0], &m_Offset[0]);
+	if (m_IndexBuffer.size() != 0)
+	{
+		Device->GetContext()->IASetIndexBuffer(m_IndexBuffer[0],
+			DXGI_FORMAT_R32_UINT, m_Offset[0]);
+	}
+	Device->GetContext()->IASetPrimitiveTopology(RenderingType);
+}

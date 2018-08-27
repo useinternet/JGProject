@@ -55,16 +55,21 @@ ID3D11ShaderResourceView* JGTexture::Get(const UINT idx)
 	}
 	return m_vTexture[idx];
 }
-ID3D11ShaderResourceView* JGTexture::GetEntry()
+ID3D11ShaderResourceView** JGTexture::GetEntry()
 {
 	if (m_vTexture.size() == 0)
 	{
 		return nullptr;
 	}
-	return m_vTexture[0];
+	return &m_vTexture[0];
 }
 
 D3DX11_IMAGE_INFO& JGTexture::GetInformation(const UINT idx)
 {
 	return m_vTextureInfo[idx];
+}
+
+bool JGTexture::Empty()
+{
+	return m_vTexture.empty();
 }

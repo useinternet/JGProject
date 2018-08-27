@@ -30,9 +30,14 @@ public:
 	ID3D11ShaderResourceView* Get(const UINT idx);
 	/*
 	Exp : 텍스쳐배열의 시작부분을 얻어온다. */
-	ID3D11ShaderResourceView* GetEntry();
+	ID3D11ShaderResourceView** GetEntry();
 	/*
 	Exp : 텍스쳐정보를 얻어온다.
 	@param const UINT idx : 얻어올 텍스쳐정보 인덱스 */
 	D3DX11_IMAGE_INFO& GetInformation(const UINT idx);
+
+
+	/*
+	Exp : 텍스쳐가 비어져있는지 확인 */
+	bool Empty();
 };

@@ -16,7 +16,7 @@ bool JGViewportD::InitViewport(const int Width, const int Height, const float FO
 	m_Height = (float)Height;
 	m_FOV    = FOV;
 	m_FarZ   = FarZ;
-	m_NearZ  = m_NearZ;
+	m_NearZ  = NearZ;
 
 
 	// 뷰포트 생성

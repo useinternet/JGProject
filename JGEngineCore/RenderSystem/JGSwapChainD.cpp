@@ -70,6 +70,7 @@ bool JGSwapChainD::CreateSwapChain(ID3D11Device* Device, HWND hWnd, const bool b
 		// 예외 로그 출력
 		JGLog::Write(ELogLevel::Error, TT("Create SwapChain Failed."));
 	}
+
 	return true;
 }
 
