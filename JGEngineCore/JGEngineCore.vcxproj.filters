@@ -23,6 +23,21 @@
     <Filter Include="RenderSystem\JGMaterial">
       <UniqueIdentifier>{361cd771-b6ed-4d50-a126-4cf64e833b1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineStatics\JMath">
+      <UniqueIdentifier>{0a0cf490-5529-4c8c-863a-63b3a09d1024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineFrameWork">
+      <UniqueIdentifier>{4d5aea11-74e0-40ba-b161-09031155c3cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineFrameWork\2D">
+      <UniqueIdentifier>{37a576da-4fa7-4f41-a79e-37e7fe5192f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineFrameWork\Object">
+      <UniqueIdentifier>{0a5bbc30-f8db-4f14-997e-3fc7ad7cc970}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineFrameWork\Components">
+      <UniqueIdentifier>{0cd7f4aa-9577-4911-a405-3501086550ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -93,6 +108,48 @@
     </ClCompile>
     <ClCompile Include="RenderSystem\JGMaterial\JGMesh.cpp">
       <Filter>RenderSystem\JGMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGVector2D.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGScale2D.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGVector3D.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGScale3D.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGRotator.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGAngle2D.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGMath.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\Object.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Component.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Mesh2DComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +227,48 @@
     </ClInclude>
     <ClInclude Include="RenderSystem\JGMaterial\JGMesh.h">
       <Filter>RenderSystem\JGMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGVector2D.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGScale2D.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGVector3D.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGScale3D.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGRotator.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGAngle2D.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGMath.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\ObjectBase.h">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\Object.h">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\ComponentBase.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Component.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Mesh2DComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

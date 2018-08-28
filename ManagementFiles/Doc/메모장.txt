@@ -2,10 +2,11 @@
 Struct               S
 EnumClass            E
 
-// HLSL 대략적인 구조 !!
 
 
-깊이 스텐실 상태 적용 CreateDepthStencilState
-OMSetDepthStencilState
-OMSetRenderTargets
-RSSetState
+// 작업중 클래스 : Mesh2DComponent
+// 내일 할 일
+// 메쉬 컴포넌트만 완성시키고 렌더링해보자
+// 그담에는2D엑터를 만들어보고 렌더링해보자.
+// 그담에는 텍스쳐 정보로 기반해 렌더링해보자
+// 그리고 계층 구조 이용해서 렌더링 해보자..

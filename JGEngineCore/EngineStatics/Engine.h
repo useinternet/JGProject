@@ -92,7 +92,6 @@
 #include"EngineMacro.h"
 
 
-
 // 익스포트 정의
 #ifdef JGENGINECORE_EXPORTS
 #define ENGINE_EXPORT __declspec(dllexport)

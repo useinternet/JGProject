@@ -30,6 +30,10 @@ public:
 	/*
 	Exp : 비디오 장치 정보를 취득한다 */
 	VideoDeviceInfo* GetVideoDeviceInformation();
+
+	/*
+	Exp : 인스턴스를 가져온다.*/
+	static JGDeviceD* GetInstance();
 };
 
 

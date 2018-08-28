@@ -39,6 +39,9 @@ public:
 	bool AddShader(const std::wstring& name);
 
 	JGShader* GetShader(const std::wstring& name);
+
+
+	static JGHLSLShaderDevice* GetInstance();
 };
 
 

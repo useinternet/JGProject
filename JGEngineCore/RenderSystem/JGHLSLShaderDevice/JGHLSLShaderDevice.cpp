@@ -4,7 +4,7 @@
 #include"../../EngineStatics/JGLog.h"
 using namespace std;
 
-JGHLSLShaderDevice* JGShaderDeviceInstance = nullptr;
+static JGHLSLShaderDevice* JGShaderDeviceInstance = nullptr;
 
 JGHLSLShaderDevice::JGHLSLShaderDevice() {
 	if (JGShaderDeviceInstance == nullptr)
@@ -37,4 +37,10 @@ JGShader * JGHLSLShaderDevice::GetShader(const std::wstring& name)
 
 	return m_mShaders[name].get();
 }
+
+JGHLSLShaderDevice * JGHLSLShaderDevice::GetInstance()
+{
+	return JGShaderDeviceInstance;
+}
+
 

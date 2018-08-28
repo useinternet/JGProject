@@ -358,9 +358,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Mesh2DComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
     <ClCompile Include="EngineStatics\JGEngineMain.cpp" />
     <ClCompile Include="EngineStatics\JGInputEvent.cpp" />
     <ClCompile Include="EngineStatics\JGLog.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGAngle2D.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGMath.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGRotator.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGScale2D.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGScale3D.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGVector2D.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGVector3D.cpp" />
     <ClCompile Include="EngineStatics\JThreadManager.cpp" />
     <ClCompile Include="EngineStatics\JTimerManager.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
@@ -382,11 +396,25 @@
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EngineFrameWork\Components\Component.h" />
+    <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
+    <ClInclude Include="EngineFrameWork\Components\Mesh2DComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
+    <ClInclude Include="EngineFrameWork\Object\Object.h" />
+    <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
     <ClInclude Include="EngineStatics\Engine.h" />
     <ClInclude Include="EngineStatics\EngineMacro.h" />
     <ClInclude Include="EngineStatics\JGEngineMain.h" />
     <ClInclude Include="EngineStatics\JGInputEvent.h" />
     <ClInclude Include="EngineStatics\JGLog.h" />
+    <ClInclude Include="EngineStatics\JMath\JGAngle2D.h" />
+    <ClInclude Include="EngineStatics\JMath\JGMath.h" />
+    <ClInclude Include="EngineStatics\JMath\JGRotator.h" />
+    <ClInclude Include="EngineStatics\JMath\JGScale2D.h" />
+    <ClInclude Include="EngineStatics\JMath\JGScale3D.h" />
+    <ClInclude Include="EngineStatics\JMath\JGVector2D.h" />
+    <ClInclude Include="EngineStatics\JMath\JGVector3D.h" />
     <ClInclude Include="EngineStatics\JThreadManager.h" />
     <ClInclude Include="EngineStatics\JTimerManager.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
