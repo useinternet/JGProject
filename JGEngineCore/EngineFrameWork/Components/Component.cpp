@@ -22,7 +22,10 @@ void Component::Receive(const JGComponentMessage& Message)
 
 void Component::BeginComponent()
 {
-
+	for (auto& iter : m_vChildComponent)
+	{
+		iter->BeginComponent();
+	}
 }
 
 void Component::Tick(const float DeltaTime)

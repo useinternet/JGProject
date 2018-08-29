@@ -360,7 +360,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
-    <ClCompile Include="EngineFrameWork\Components\Mesh2DComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
@@ -370,6 +370,7 @@
     <ClCompile Include="EngineStatics\JGLog.cpp" />
     <ClCompile Include="EngineStatics\JMath\JGAngle2D.cpp" />
     <ClCompile Include="EngineStatics\JMath\JGMath.cpp" />
+    <ClCompile Include="EngineStatics\JMath\JGMatrix.cpp" />
     <ClCompile Include="EngineStatics\JMath\JGRotator.cpp" />
     <ClCompile Include="EngineStatics\JMath\JGScale2D.cpp" />
     <ClCompile Include="EngineStatics\JMath\JGScale3D.cpp" />
@@ -385,6 +386,7 @@
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.cpp" />
     <ClCompile Include="RenderSystem\JGMaterial\JGMesh.cpp" />
+    <ClCompile Include="RenderSystem\JGRenderSuperClass.cpp" />
     <ClCompile Include="RenderSystem\JGRenderSystemStateD.cpp" />
     <ClCompile Include="RenderSystem\JGRenderTargetD.cpp" />
     <ClCompile Include="RenderSystem\JGShaderConstructor.cpp" />
@@ -398,7 +400,7 @@
   <ItemGroup>
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
-    <ClInclude Include="EngineFrameWork\Components\Mesh2DComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
@@ -410,6 +412,7 @@
     <ClInclude Include="EngineStatics\JGLog.h" />
     <ClInclude Include="EngineStatics\JMath\JGAngle2D.h" />
     <ClInclude Include="EngineStatics\JMath\JGMath.h" />
+    <ClInclude Include="EngineStatics\JMath\JGMatrix.h" />
     <ClInclude Include="EngineStatics\JMath\JGRotator.h" />
     <ClInclude Include="EngineStatics\JMath\JGScale2D.h" />
     <ClInclude Include="EngineStatics\JMath\JGScale3D.h" />
@@ -425,6 +428,7 @@
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.h" />
     <ClInclude Include="RenderSystem\JGMaterial\JGMesh.h" />
+    <ClInclude Include="RenderSystem\JGRenderSuperClass.h" />
     <ClInclude Include="RenderSystem\JGRenderSystemStateD.h" />
     <ClInclude Include="RenderSystem\JGRenderTargetD.h" />
     <ClInclude Include="RenderSystem\JGShaderConstructor.h" />

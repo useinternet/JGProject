@@ -129,13 +129,13 @@ void JGRenderSystemStateD::WriteDepthStateDesc(D3D11_DEPTH_STENCIL_DESC& Desc,co
 {
 	// 스텐실 상태의 서술자 작성
 	ZeroMemory(&Desc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-	Desc.DepthEnable = true;
+
+	if (type == EDepthStateType::ZBufferOn)   Desc.DepthEnable = true;
+	if (type == EDepthStateType::ZBufferOff)  Desc.DepthEnable = false;
 	Desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	Desc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	if (type == EDepthStateType::ZBufferOn)   Desc.StencilEnable = true;
-	if (type == EDepthStateType::ZBufferOff)  Desc.StencilEnable = false;
-
+	Desc.StencilEnable = true;
 	Desc.StencilReadMask = 0xFF;
 	Desc.StencilWriteMask = 0xFF;
 

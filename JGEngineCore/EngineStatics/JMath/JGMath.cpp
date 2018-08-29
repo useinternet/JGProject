@@ -1,5 +1,5 @@
 #include"JGMath.h"
-
+#include"JGVector2D.h"
 const float JGMath::ErrorRange = 0.00000005f;
 
 float JGMath::Sqrt(float num)
@@ -41,4 +41,16 @@ float JGMath::Abs(const float num)
 		return -num;
 	else
 		return num;
+}
+
+JGVector2D JGMath::D2DToScreen(const float ScreenWidth, const float ScreenHeight, JGVector2D& vector)
+{
+	return JGVector2D(vector.X() - (ScreenWidth / 2.0f) ,
+		              -vector.Y() + (ScreenHeight / 2.0f));
+}
+
+JGVector2D JGMath::D2DToScreen(const float ScreenWidth, const float ScreenHeight, const float x, const float y)
+{
+	return JGVector2D(x - (ScreenWidth / 2.0f),
+		              -y + (ScreenHeight / 2.0f));
 }

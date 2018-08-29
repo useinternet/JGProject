@@ -11,6 +11,7 @@ Class Name : RenderSystem
 @m std::unique_ptr<class JGBufferManager>      m_JGBufferManager : 버퍼 매니저( 상수버퍼, 정점 버퍼, 인덱스 버퍼)
 @m std::unique_ptr<class JBHLSLShaderDevice>   m_ShaderDevice : hlsl 장치( 셰이더 관리 장치)
 @m std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor : 셰이더 생성 보조 클래스
+@m std::unique_ptr<class JGRenderSuperClass>   m_SuperClass   : 렌더링에 필요한 장치들의 주소값을 담은 클래스(전달용)
 @m HWND m_hWnd           : 윈도우 핸들
 @m int  m_ScreenWidth    : 스크린 가로 길이
 @m int  m_ScreenHeight   : 스크린 세로 길이
@@ -27,6 +28,7 @@ private:
 	std::unique_ptr<class JGBufferManager>      m_JGBufferManager;
 	std::unique_ptr<class JGHLSLShaderDevice>   m_ShaderDevice;
 	std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor;
+	std::unique_ptr<class JGRenderSuperClass>   m_SuperClass;
 	HWND m_hWnd;
 	int  m_ScreenWidth;
 	int  m_ScreenHeight;
@@ -60,15 +62,7 @@ public:
 
 	//임시
 	void TestFunc(HWND hWnd);
-	class JGMesh* m_Mesh;
-	class JGTexture* texture;
-	D3DXMATRIX ViewMatrix;
-	struct VertexType
-	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 tex;
-	};
-	//
+	class StaticMesh2DComponent* SampleComponent;
 
 
 private:

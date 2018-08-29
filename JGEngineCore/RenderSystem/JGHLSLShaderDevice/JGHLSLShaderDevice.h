@@ -41,7 +41,6 @@ public:
 	JGShader* GetShader(const std::wstring& name);
 
 
-	static JGHLSLShaderDevice* GetInstance();
 };
 
 

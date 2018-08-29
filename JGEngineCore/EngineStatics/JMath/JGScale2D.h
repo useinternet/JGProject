@@ -1,7 +1,7 @@
 #pragma once
 #include"../Engine.h"
 
-class JGScale2D
+class ENGINE_EXPORT JGScale2D
 {
 private:
 	friend JGScale2D operator*(JGScale2D& vec, const float scalar);

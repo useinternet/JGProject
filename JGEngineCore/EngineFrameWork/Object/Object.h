@@ -1,6 +1,5 @@
 #pragma once
 #include"ObjectBase.h"
-
 class Component;
 class JGDeviceD;
 class JGHLSLShaderDevice;
@@ -8,10 +7,10 @@ class JGHLSLShaderDevice;
 Class : Object 
 @m std::vector<std::unique_ptr<Component>>  m_vComponents : 컴포넌트 배열 ( 주소 유지용 )
 @m Component* m_RootComponent : 계층 구조 컴포넌트 시작 지점 */
-class Object : public ObjectBase
+class ENGINE_EXPORT Object : public ObjectBase
 {
 private:
-	std::vector<std::unique_ptr<Component>>  m_vComponents;
+	std::vector<std::shared_ptr<Component>> m_vComponents;
 	Component* m_RootComponent;
 	//
 	bool m_bIsFirst = true;
@@ -32,7 +31,7 @@ public:
 	virtual void Tick(const float DeltaTime) override;
 	/*
 	Exp : 렌더링 합니다.(상속받지 말자) */
-	virtual void Render(JGDevice* Device, JGHLSLShaderDevice* HlslDevice) override;
+	virtual void Render() override;
 	/*
 	Exp : 오브젝트를 파괴하기전 최초 한번 실행되는 이벤트입니다.(무조건 부모 클래스의 DestroyObject를 호출한다.) */
 	virtual void DestroyObject() override;

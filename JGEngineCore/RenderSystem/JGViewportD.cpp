@@ -1,10 +1,11 @@
 #include"JGViewportD.h"
+#include"../EngineStatics/JMath/JGMatrix.h"
 using namespace std;
 JGViewportD::JGViewportD()
 {
 	m_Viewport = make_unique<D3D11_VIEWPORT>();
-	m_projectionMatrix = make_unique<D3DXMATRIX>();
-	m_orthoMatrix = make_unique<D3DXMATRIX>();
+	m_projectionMatrix = make_unique<JGMatrix>();
+	m_orthoMatrix = make_unique<JGMatrix>();
 }
 JGViewportD::~JGViewportD()
 {
@@ -32,21 +33,28 @@ D3D11_VIEWPORT * JGViewportD::Get()
 {
 	return m_Viewport.get();
 }
-void JGViewportD::GetProjectionMatrix(D3DXMATRIX* projectionMatrix)
+JGMatrix& JGViewportD::GetProjectionMatrix()
 {
-	*projectionMatrix = *m_projectionMatrix;
+	return *m_projectionMatrix;
 }
 
-void JGViewportD::GetOrthoMatrix(D3DXMATRIX* OrthoMatrix)
+JGMatrix& JGViewportD::GetOrthoMatrix()
 {
-	*OrthoMatrix = *m_orthoMatrix;
+	return *m_orthoMatrix;
 }
 
 const float JGViewportD::GetFOV()
 {
 	return m_FOV;
 }
-
+const float JGViewportD::GetWidth()
+{
+	return m_Width;
+}
+const float JGViewportD::GetHeight()
+{
+	return m_Height;
+}
 void JGViewportD::SetFOV(const float FOV)
 {
 	m_FOV = FOV;
@@ -66,10 +74,9 @@ void JGViewportD::CreateProjectionMatrix()
 	// 화면 비율을 구한다.
 	float ScreenAspect = m_Width / m_Height;
 	// 투영 행렬을 만든다.
-	D3DXMatrixPerspectiveFovLH(m_projectionMatrix.get(), ToRadian(m_FOV), ScreenAspect, m_NearZ, m_FarZ);
+	m_projectionMatrix->MakeProjectionMatrix(m_FOV, ScreenAspect, m_NearZ, m_FarZ);
 }
 void JGViewportD::CreateOrthoMatrix()
 {
-	// 2D 렌더링에 사용될 정사영 행렬을 생성합니다.
-	D3DXMatrixOrthoLH(m_orthoMatrix.get(), m_Width, m_Height, m_NearZ, m_FarZ);
+	m_orthoMatrix->MakeOrthoMatrix(m_Width, m_Height, m_NearZ, m_FarZ);
 }

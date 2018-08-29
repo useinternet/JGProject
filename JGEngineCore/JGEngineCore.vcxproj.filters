@@ -142,13 +142,19 @@
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp">
       <Filter>EngineFrameWork\Object</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\Mesh2DComponent.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
-    </ClCompile>
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\JGRenderSuperClass.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JMath\JGMatrix.cpp">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -261,13 +267,19 @@
     <ClInclude Include="EngineFrameWork\Components\Component.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\Mesh2DComponent.h">
-      <Filter>EngineFrameWork\Components</Filter>
-    </ClInclude>
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGRenderSuperClass.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JMath\JGMatrix.h">
+      <Filter>EngineStatics\JMath</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
   </ItemGroup>

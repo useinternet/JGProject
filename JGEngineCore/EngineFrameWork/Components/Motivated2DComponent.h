@@ -1,22 +1,34 @@
 #pragma once
 #include"MotivatedComponent.h"
 
-class JGVector2D;
-class JGAngle2D;
-class JGScale2D;
 
 
-class Motivated2DComponent : public MotivatedComponent
+
+class ENGINE_EXPORT Motivated2DComponent : public MotivatedComponent
 {
 	std::unique_ptr<JGVector2D> m_Location;
-	std::unique_ptr<JGAngle2D> m_Angle;
-	std::unique_ptr<JGScale2D> m_Scale;
+	std::unique_ptr<JGAngle2D>  m_Angle;
+	std::unique_ptr<JGScale2D>  m_Scale;
+	std::unique_ptr<JGMatrix>   m_WorldMatrix;
 
+
+	std::unique_ptr<JGMatrix>   m_ScaleMatrix;
+	std::unique_ptr<JGMatrix>   m_AngleMatrix;
+	std::unique_ptr<JGMatrix>   m_TranslationMatrix;
+	JGVector2D m_PrevLocation;
+	JGAngle2D m_PrevAngle;
+	JGScale2D m_PrevScale;
+	bool m_bChange = true;
 public:
 	Motivated2DComponent();
 	virtual ~Motivated2DComponent();
+	/*
+	Exp : 컴포넌트가 생성되고 최초 실행되는 함수이다. ( 부모 클래스의 BeginComponent도 호출해야한다. ) */
+	virtual void BeginComponent() override;
 
-
+	/*
+	Exp : 매 프레임 한번 실행되는 함수이다. ( 부모 클래스의 Tick도 호출해야한다. ) */
+	virtual void Tick(const float DeltaTime) override;
 	/*
 	Exp : 컴포넌트에 위치 값을 더한다. */
 	void AddComponentLocation(const float x, const float y);
@@ -78,4 +90,8 @@ public:
 	/*
 	Exp : 컴포넌트 월드 스케일 값을 가져온다. */
 	JGScale2D GetComponentWorldScale();
+
+
+protected:
+	const JGMatrix& GetWorldMatrix();
 };

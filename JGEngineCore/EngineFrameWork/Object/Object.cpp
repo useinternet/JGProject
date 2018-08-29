@@ -5,7 +5,6 @@
 Object::Object()
 {
 	RegisterObjectID(typeid(this));
-	std::unique_ptr<Component> RootComponent;
 }
 
 Object::~Object()
@@ -28,7 +27,7 @@ void Object::Tick(const float DeltaTime)
 
 }
 
-void Object::Render(JGDevice* Device, JGHLSLShaderDevice* HlslDevice)
+void Object::Render()
 {
 
 }
@@ -47,11 +46,13 @@ typename ComponentType* Object::RegisterComponentInObject(std::wstring& Componen
 		m_bIsFirst = false;
 		// 루트 컴포넌트를 만든다.
 		std::unique_ptr<Component> RootComponent = make_unique<Component>();
+		RootComponent->InitComponent(GetRenderSuperClass());
 		m_RootComponent = RootComponent.get();
 		m_vComponents.push_back(move(RootComponent));
 	}
 	// 컴포넌트 생성
 	std::unique_ptr<Component> component = make_unique<ComponentType>();
+	component->InitComponent(GetRenderSuperClass());
 	component->RegisterName(ComponentName);
 
 	// 계층 구조 컴포넌트인지 체크한다.

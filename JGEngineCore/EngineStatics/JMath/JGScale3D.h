@@ -3,7 +3,7 @@
 #include"../Engine.h"
 
 
-class JGScale3D
+class ENGINE_EXPORT JGScale3D
 {
 private:
 	D3DXVECTOR3 m_Scale3D;

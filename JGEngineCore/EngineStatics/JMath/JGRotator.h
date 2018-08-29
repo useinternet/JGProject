@@ -2,7 +2,7 @@
 #include"../Engine.h"
 
 
-class JGRotator
+class ENGINE_EXPORT JGRotator
 {
 private:
 	D3DXVECTOR3 m_Rotation;

@@ -91,3 +91,5 @@ bool JGBufferManager::DuplicateCheck(const std::wstring& name)
 	}
 	return false;
 }
+
+

@@ -1,9 +1,10 @@
 #pragma once
-
+#include"../Engine.h"
 /*
 Class : JMath 
 Exp : 수학 관련 연산 함수들은 다 여기에~~!*/
-class JGMath
+class JGVector2D;
+class ENGINE_EXPORT JGMath
 {
 private:
 	static const float ErrorRange;
@@ -21,4 +22,8 @@ public:
 	Exp : 절대값을 구한다. */
 	static float Abs(const float num);
 
+	/*
+	현제 Direct 2D 좌표계를 스크린 좌표계로 바꾼다. */
+	static JGVector2D D2DToScreen(const float ScreenWidth, const float ScreenHeight,JGVector2D& vector);
+	static JGVector2D D2DToScreen(const float ScreenWidth, const float ScreenHeight,const float x, const float y);
 };

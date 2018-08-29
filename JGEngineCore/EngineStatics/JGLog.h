@@ -9,7 +9,7 @@ EnumClass : ELogLevel
 @e Error   : 에러 로그( 빨간색 )
 @e Progerss: 진행 로그( 초록색 )
 */
-enum class ELogLevel
+enum class ENGINE_EXPORT ELogLevel
 {
 	Default,    // 검은색
 	Warning,    // 노란색

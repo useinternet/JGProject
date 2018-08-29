@@ -12,7 +12,7 @@ Name : EHandleType
 @m ERepeat  : 정해진 카운트만큼 반복한다.
 @m EDefault : 한번 실행한다.
 */
-enum class EHandleType
+enum class ENGINE_EXPORT EHandleType
 {
 	ERepeat, EDefault
 };
@@ -25,7 +25,7 @@ struct : TimerHandleDesc
 @m float        GapTime    : 반복 실행할떄 사이 시간
 @m size_t       Count      : 반복 횟수
 */
-typedef struct TimerHandleDesc
+typedef struct ENGINE_EXPORT TimerHandleDesc
 {
 	TimerEvent   Event;
 	EHandleType HandleType;
@@ -44,7 +44,7 @@ Class : JMainTimer
 @m float             m_StopTime   : 타이머가 멈춰있었던 시간
 @m bool              m_bStop      : 정지 여부
 */
-class JMainTimer
+class ENGINE_EXPORT JMainTimer
 {
 private:
 	JMainTimer() {}
@@ -95,7 +95,7 @@ public:
 Static Class : JTimerEventManager
 @m std::forward_list<JTimerHandle*> m_flTimerHandles : 타이머 핸들 배열 리스트
 */
-class JTimerEventManager
+class ENGINE_EXPORT JTimerEventManager
 {
 private:
 	static std::forward_list<JTimerHandle*> m_flTimerHandles;
@@ -126,7 +126,7 @@ Class : JTimerHandle
 @m	bool  m_bEnd                 : 이벤트 종료 여부
 @m	bool  m_bDestroy             : 타이머 핸들 파괴 여부
 */
-class JTimerHandle
+class ENGINE_EXPORT JTimerHandle
 {
 private:
 	friend class JTimerEventManager;

@@ -1,8 +1,18 @@
 #pragma once
 #include"ComponentBase.h"
+#include"../../EngineStatics/JMath/JGVector3D.h"
+#include"../../EngineStatics/JMath/JGVector2D.h"
+#include"../../EngineStatics/JMath/JGScale3D.h"
+#include"../../EngineStatics/JMath/JGScale2D.h"
+#include"../../EngineStatics/JMath/JGRotator.h"
+#include"../../EngineStatics/JMath/JGMatrix.h"
+#include"../../EngineStatics/JMath/JGMath.h"
+#include"../../EngineStatics/JMath/JGAngle2D.h"
+
 class JGDeviceD;
 class JGHLSLShaderDevice;
-class Component : public ComponentBase
+
+class ENGINE_EXPORT Component : public ComponentBase
 {
 	std::vector<Component*> m_vChildComponent;
 	Component* m_ParentComponent = nullptr;

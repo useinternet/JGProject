@@ -1,9 +1,9 @@
 #pragma once
 #include"../Engine.h"
-
+class JGMatrix;
 /*
 class : JGVector2D */
-class JGVector2D
+class ENGINE_EXPORT JGVector2D
 {
 private:
 	friend JGVector2D operator*(JGVector2D& vec, const float scalar);
@@ -48,6 +48,10 @@ public:
 	JGVector2D operator-(JGVector2D& vec);
 	bool operator==(JGVector2D& vec);
 	bool operator!=(JGVector2D& vec);
+
+	//
+	void TransformCoord(JGMatrix& matrix);
+	void TransformNormal(JGMatrix& matrix);
 };
 // 연산자 오버로딩
 JGVector2D operator*(JGVector2D& vec, const float scalar);

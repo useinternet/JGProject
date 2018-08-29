@@ -11,7 +11,7 @@ Static Class : JThreadManager
 @m std::vector<std::thread> m_vWorker    : 동작 쓰레드 배열
 @m std::atomic<bool>        m_IsWorking  : 클래스 동작 여부
 */
-class JThreadManager
+class ENGINE_EXPORT JThreadManager
 {
 private:
 	/*

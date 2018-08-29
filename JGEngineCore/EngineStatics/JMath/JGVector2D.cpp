@@ -1,5 +1,6 @@
 #include "JGVector2D.h"
 #include"JGMath.h"
+#include"JGMatrix.h"
 JGVector2D::JGVector2D()
 {
 }
@@ -110,7 +111,14 @@ bool JGVector2D::operator!=(JGVector2D & vec)
 	bool result = this->operator==(vec);
 	return !result;
 }
-
+void JGVector2D::TransformCoord(JGMatrix& matrix)
+{
+	D3DXVec3TransformCoord(&m_Vector2D, &m_Vector2D, matrix.GetAddress());
+}
+void JGVector2D::TransformNormal(JGMatrix& matrix)
+{
+	D3DXVec3TransformNormal(&m_Vector2D, &m_Vector2D, matrix.GetAddress());
+}
 JGVector2D operator*(JGVector2D & vec, const float scalar)
 {
 	return JGVector2D(vec.m_Vector2D.x * scalar,vec.m_Vector2D.y * scalar);

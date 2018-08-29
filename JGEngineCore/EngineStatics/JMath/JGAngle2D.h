@@ -1,7 +1,7 @@
 #pragma once
 #include"../Engine.h"
 
-class JGAngle2D
+class ENGINE_EXPORT JGAngle2D
 {
 private:
 	friend JGAngle2D operator+(const float num, JGAngle2D& angle);

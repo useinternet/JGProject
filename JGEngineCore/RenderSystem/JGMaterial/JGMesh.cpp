@@ -61,7 +61,7 @@ bool JGMesh::Create_Vertex_Instance_Buffer(JGBufferManager* BufferManager)
 	return true;
 }
 
-void JGMesh::Render(JGDeviceD* Device, D3D_PRIMITIVE_TOPOLOGY RenderingType)
+void JGMesh::Render(JGDeviceD* Device, ERenderingType RenderingType)
 {
 	Device->GetContext()->IASetVertexBuffers(0, (UINT)m_VertexBuffer.size(),
 		&m_VertexBuffer[0], &m_Stride[0], &m_Offset[0]);
@@ -70,5 +70,24 @@ void JGMesh::Render(JGDeviceD* Device, D3D_PRIMITIVE_TOPOLOGY RenderingType)
 		Device->GetContext()->IASetIndexBuffer(m_IndexBuffer[0],
 			DXGI_FORMAT_R32_UINT, m_Offset[0]);
 	}
-	Device->GetContext()->IASetPrimitiveTopology(RenderingType);
+
+
+	switch (RenderingType)
+	{
+	case ERenderingType::PointList:
+		Device->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		break;
+	case ERenderingType::LineList:
+		Device->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		break;
+	case ERenderingType::LineStrip:
+		Device->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		break;
+	case ERenderingType::TriangleList:
+		Device->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		break;
+	case ERenderingType::TriangleStrip:
+		Device->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		break;
+	}
 }

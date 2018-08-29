@@ -56,4 +56,7 @@ public:
 	/*
 	Exp : 현제 버퍼 매니져에 등록되어져있는 버퍼 이름 인지 체크한다. */
 	bool DuplicateCheck(const std::wstring& name);
+
+
+
 };

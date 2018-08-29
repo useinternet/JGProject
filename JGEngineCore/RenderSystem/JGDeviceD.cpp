@@ -1,12 +1,10 @@
 #include"JGDeviceD.h"
 #include"VideoDeviceInfo.h"
 #include"../EngineStatics/JGLog.h"
-static JGDeviceD* Instance = nullptr;
 
 using namespace std;
 JGDeviceD::JGDeviceD()
 {
-	Instance = this;
 	m_VideoDeviceInfomation = make_unique<VideoDeviceInfo>();
 }
 JGDeviceD::~JGDeviceD()
@@ -91,7 +89,3 @@ VideoDeviceInfo* JGDeviceD::GetVideoDeviceInformation()
 	return nullptr;
 }
 
-JGDeviceD* JGDeviceD::GetInstance()
-{
-	return Instance;
-}
