@@ -12,6 +12,11 @@ Motivated2DComponent::Motivated2DComponent()
 	m_ScaleMatrix = make_unique<JGMatrix>();
 	m_AngleMatrix = make_unique<JGMatrix>();
 	m_TranslationMatrix = make_unique<JGMatrix>();
+
+	// 처음에는 다르게 만들어준다.
+	m_PrevLocation.Set(1, 1);
+	m_PrevAngle.Set(1);
+	m_PrevScale.Set(0);
 }
 Motivated2DComponent::~Motivated2DComponent()
 {
@@ -31,27 +36,47 @@ void Motivated2DComponent::BeginComponent()
 void Motivated2DComponent::Tick(const float DeltaTime)
 {
 	MotivatedComponent::Tick(DeltaTime);
+	m_bIsChangeLocation = false;
+	m_bIsChangeAngle    = false;
+	m_bIsChangeScale    = false;
+	JGVector2D FinalLocation;
+	JGAngle2D  FinalAngle;
 
 	// 스케일, 각도, 위치값이 같으면 행렬은 연산하지 않는다.
+	Motivated2DComponent* Parent = nullptr;
+	if (GetParent())
+	{
+		Parent = dynamic_cast<Motivated2DComponent*>(GetParent());
+		if (Parent)
+		{
+			FinalLocation.Set(Parent->GetComponentWorldLocation());
+			FinalAngle.Set(Parent->GetComponentWorldAngle());
+		}
+	}
 	if (*m_Scale != m_PrevScale)
 	{
 		m_ScaleMatrix->MakeScalingMatirx(*m_Scale);
 		m_PrevScale  = *m_Scale;
 		m_bChange = true;
+		m_bIsChangeScale = true;
 	}
-	if (*m_Angle != m_PrevAngle)
+	if (*m_Angle != m_PrevAngle || (Parent && Parent->IsChangeAngle()))
 	{
-		m_AngleMatrix->MakeAngle2DMatrix(*m_Angle);
+		FinalAngle += *m_Angle;
+		m_AngleMatrix->MakeAngle2DMatrix(FinalAngle);
 		m_PrevAngle = *m_Angle;
 		m_bChange = true;
+		m_bIsChangeAngle = true;
 	}
-	if (*m_Location != m_PrevLocation)
+	if (*m_Location != m_PrevLocation || (Parent && Parent->IsChangeLocation()))
 	{
+		FinalLocation += *m_Location;
 		m_TranslationMatrix->MakeTranslation2DMatrix(
 			GetViewport()->GetWidth(), GetViewport()->GetHeight(), 
-			*m_Location);
+			FinalLocation);
 		m_PrevLocation = *m_Location;
 		m_bChange = true;
+		m_bIsChangeLocation = true;
 	}
 	if (m_bChange)
 	{
@@ -126,10 +151,6 @@ JGAngle2D& Motivated2DComponent::GetComponentLocalAngle()
 {
 	return *m_Angle;
 }
-JGScale2D& Motivated2DComponent::GetComponentLocalScale()
-{
-	return *m_Scale;
-}
 JGVector2D Motivated2DComponent::GetComponentWorldLocation()
 {
 	Component* ParentComp = GetParent();
@@ -156,18 +177,24 @@ JGAngle2D Motivated2DComponent::GetComponentWorldAngle()
 	}
 	return *m_Angle;
 }
-JGScale2D Motivated2DComponent::GetComponentWorldScale()
+JGScale2D& Motivated2DComponent::GetComponentScale()
 {
-	Component* ParentComp = GetParent();
-	if (ParentComp)
-	{
-		Motivated2DComponent*  ParentM2DComp = dynamic_cast<Motivated2DComponent*>(ParentComp);
-		if (ParentM2DComp)
-		{
-			return ParentM2DComp->GetComponentWorldScale() + (*m_Scale);
-		}
-	}
 	return *m_Scale;
+}
+
+bool Motivated2DComponent::IsChangeLocation()
+{
+	return m_bIsChangeLocation;
+}
+
+bool Motivated2DComponent::IsChangeAngle()
+{
+	return m_bIsChangeAngle;
+}
+
+bool Motivated2DComponent::IsChangeScale()
+{
+	return m_bIsChangeScale;
 }
 
 const JGMatrix& Motivated2DComponent::GetWorldMatrix()

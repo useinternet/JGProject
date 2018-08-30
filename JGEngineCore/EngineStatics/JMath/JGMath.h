@@ -9,6 +9,7 @@ class ENGINE_EXPORT JGMath
 private:
 	static const float ErrorRange;
 public:
+
 	/*
 	Exp : 제곱근을 구한다.*/
 	static float Sqrt(float num);

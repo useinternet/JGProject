@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<class JGHLSLShaderDevice>   m_ShaderDevice;
 	std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor;
 	std::unique_ptr<class JGRenderSuperClass>   m_SuperClass;
+	std::unique_ptr<class Object> m_ObjectConstructInit;
 	HWND m_hWnd;
 	int  m_ScreenWidth;
 	int  m_ScreenHeight;
@@ -62,7 +63,7 @@ public:
 
 	//юс╫ц
 	void TestFunc(HWND hWnd);
-	class StaticMesh2DComponent* SampleComponent;
+	class Object* CObject;
 
 
 private:

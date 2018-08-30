@@ -91,7 +91,18 @@ JGVector2D JGVector2D::operator-(JGVector2D& vec)
 	return JGVector2D(m_Vector2D.x - vec.m_Vector2D.x,
 		m_Vector2D.y - vec.m_Vector2D.y);
 }
-
+JGVector2D& JGVector2D::operator+=(JGVector2D& vec)
+{
+	m_Vector2D.x += vec.X();
+	m_Vector2D.y += vec.Y();
+	return *this;
+}
+JGVector2D& JGVector2D::operator-=(JGVector2D& vec)
+{
+	m_Vector2D.x -= vec.X();
+	m_Vector2D.y -= vec.Y();
+	return *this;
+}
 bool JGVector2D::operator==(JGVector2D & vec)
 {
 	if (IsZeroVector() && vec.IsZeroVector())

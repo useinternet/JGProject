@@ -19,6 +19,9 @@ class ENGINE_EXPORT Motivated2DComponent : public MotivatedComponent
 	JGAngle2D m_PrevAngle;
 	JGScale2D m_PrevScale;
 	bool m_bChange = true;
+	bool m_bIsChangeLocation = false;
+	bool m_bIsChangeAngle    = false;
+	bool m_bIsChangeScale    = false;
 public:
 	Motivated2DComponent();
 	virtual ~Motivated2DComponent();
@@ -79,19 +82,25 @@ public:
 	Exp : 컴포넌트 지역 각도 값을 가져온다. */
 	JGAngle2D& GetComponentLocalAngle();
 	/*
-	Exp : 컴포넌트 지역 스케일 값을 가져온다. */
-	JGScale2D& GetComponentLocalScale();
-	/*
 	Exp : 컴포넌트 월드 위치 값을 가져온다. */
 	JGVector2D GetComponentWorldLocation();
 	/*
 	Exp : 컴포넌트 월드 각도 값을 가져온다. */
 	JGAngle2D GetComponentWorldAngle();
 	/*
-	Exp : 컴포넌트 월드 스케일 값을 가져온다. */
-	JGScale2D GetComponentWorldScale();
+	Exp : 컴포넌트 스케일 값을 가져온다. */
+	JGScale2D& GetComponentScale();
 
-
+	/*
+	Exp : 위치 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
+	bool IsChangeLocation();
+	/*
+	Exp : 각도 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
+	bool IsChangeAngle();
+	/*
+	Exp : 스케일 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
+	bool IsChangeScale();
 protected:
 	const JGMatrix& GetWorldMatrix();
+	
 };

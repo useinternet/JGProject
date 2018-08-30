@@ -21,6 +21,15 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="SampleClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="dsf.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="JGClassTypeManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -28,6 +37,9 @@
     </ClCompile>
     <ClCompile Include="ConsoleApplication1.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="JGClassTypeManager.cpp">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

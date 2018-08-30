@@ -4,7 +4,7 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../RenderSystem/JGRenderSuperClass.h"
-const char* ComponentBase::ComponentID;
+JGRenderSuperClass* ComponentBase::m_RenderSuperClass;
 ComponentBase::ComponentBase()
 {
 }
@@ -20,13 +20,7 @@ void ComponentBase::InitComponent(JGRenderSuperClass* SuperClass)
 
 void ComponentBase::RegisterComponentID(const type_info & ID)
 {
-	static bool bInit = false;
-	if (!bInit)
-	{
-		bInit = true;
-		ComponentID = ID.name();
-	}
-
+	ComponentID = ID.name();
 }
 
 const char * ComponentBase::GetID()

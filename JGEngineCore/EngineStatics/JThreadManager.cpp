@@ -55,7 +55,7 @@ void JThreadManager::Work()
 	}
 }
 
-JThreadManager * JThreadManager::GetInstance()
+JThreadManager* JThreadManager::GetInstance()
 {
 	if (Instance == nullptr)
 	{

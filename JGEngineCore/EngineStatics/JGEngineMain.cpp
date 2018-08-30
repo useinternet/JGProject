@@ -4,7 +4,7 @@
 #include"JGLog.h"
 #include"JGInputEvent.h"
 #include"../RenderSystem/RenderSystem.h"
-
+#include"JGConstructHelper.h"
 using namespace std;
 
 JGEngineMain::JGEngineMain()
@@ -16,6 +16,7 @@ JGEngineMain::JGEngineMain()
 	m_EngineLog    = make_unique<JGLog>();
 	m_InputEvent   = make_unique<JGInputEvent>();
 	m_RenderSystem = make_unique<RenderSystem>();
+	m_ConstructHelper = make_unique<JGConstructHelper>();
 }
 JGEngineMain::~JGEngineMain() {}
 bool JGEngineMain::Init(HWND hWnd)

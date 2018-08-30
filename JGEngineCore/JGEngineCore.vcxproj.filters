@@ -157,6 +157,18 @@
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSystem\JGMaterial\JG2DMesh.cpp">
+      <Filter>RenderSystem\JGMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGConstructHelper.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\ExistObject.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -281,6 +293,18 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\JGMaterial\JG2DMesh.h">
+      <Filter>RenderSystem\JGMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGConstructHelper.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\ExistObject.h">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\NonExistObject.h">
+      <Filter>EngineFrameWork\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

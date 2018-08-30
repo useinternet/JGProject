@@ -8,10 +8,12 @@ JGAngle2D::JGAngle2D()
 JGAngle2D::JGAngle2D(float angle)
 {
 	m_Angle = angle;
+	StartState();
 }
 JGAngle2D::JGAngle2D(const JGAngle2D& Angle)
 {
 	m_Angle = Angle.m_Angle;
+	StartState();
 }
 JGAngle2D::~JGAngle2D()
 {
@@ -25,10 +27,12 @@ float JGAngle2D::Get()
 void  JGAngle2D::Set(const float Angle)
 {
 	m_Angle = Angle;
+	StartState();
 }
 void  JGAngle2D::Set(const JGAngle2D& Angle)
 {
 	m_Angle = Angle.m_Angle;
+	StartState();
 }
 void  JGAngle2D::StartState()
 {
@@ -45,43 +49,51 @@ void  JGAngle2D::StartState()
 JGAngle2D& JGAngle2D::operator++()
 {
 	m_Angle += 1.0f;
+	StartState();
 	return *this;
 }
 JGAngle2D JGAngle2D::operator++(const int num)
 {
 	m_Angle += 1.0f;
+	StartState();
 	return JGAngle2D(m_Angle);
 }
 
 JGAngle2D& JGAngle2D::operator+=(JGAngle2D& angle)
 {
 	m_Angle += angle.m_Angle;
+	StartState();
 	return *this;
 }
 JGAngle2D& JGAngle2D::operator-=(JGAngle2D& angle)
 {
 	m_Angle -= angle.m_Angle;
+	StartState();
 	return *this;
 }
 JGAngle2D& JGAngle2D::operator+=(const float num)
 {
 	m_Angle += num;
+	StartState();
 	return *this;
 }
 JGAngle2D& JGAngle2D::operator-=(const float num)
 {
 	m_Angle -= num;
+	StartState();
 	return *this;
 }
 JGAngle2D& JGAngle2D::operator*=(const float num)
 {
 	m_Angle *= num;
+	StartState();
 	return *this;
 }
 
 JGAngle2D& JGAngle2D::operator=(JGAngle2D& angle)
 {
 	m_Angle = angle.m_Angle;
+	StartState();
 	return *this;
 }
 JGAngle2D JGAngle2D::operator+(JGAngle2D& angle)
@@ -95,6 +107,7 @@ JGAngle2D JGAngle2D::operator-(JGAngle2D& angle)
 JGAngle2D& JGAngle2D::operator=(const float num)
 {
 	m_Angle = num;
+	StartState();
 	return *this;
 }
 JGAngle2D JGAngle2D::operator+(const float num)

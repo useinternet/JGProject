@@ -1,6 +1,7 @@
 #pragma once
 #include"ObjectBase.h"
-class Component;
+#include"../Components/MotivatedComponent.h"
+
 class JGDeviceD;
 class JGHLSLShaderDevice;
 /*
@@ -11,7 +12,7 @@ class ENGINE_EXPORT Object : public ObjectBase
 {
 private:
 	std::vector<std::shared_ptr<Component>> m_vComponents;
-	Component* m_RootComponent;
+	Component* m_RootComponent = nullptr;
 	//
 	bool m_bIsFirst = true;
 
@@ -38,6 +39,42 @@ public:
 
 protected:
 	template<typename ComponentType>
-	ComponentType* RegisterComponentInObject(std::wstring& ComponentName);
+	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName);
 };
 
+template<typename ComponentType>
+typename ComponentType* Object::RegisterComponentInObject(const std::wstring& ComponentName)
+{
+	// 만약 처음 등록하는 컴포넌트라면..
+	if (m_bIsFirst)
+	{
+		m_bIsFirst = false;
+		// 루트 컴포넌트를 만든다.
+		std::unique_ptr<Component> RootComponent = std::make_unique<Component>();
+		RootComponent->InitComponent(GetRenderSuperClass());
+		m_RootComponent = RootComponent.get();
+		m_vComponents.push_back(move(RootComponent));
+	}
+	// 컴포넌트 생성
+	std::unique_ptr<Component> component = std::make_unique<ComponentType>();
+	component->RegisterName(ComponentName);
+
+	// 계층 구조 컴포넌트인지 체크한다.
+	MotivatedComponent* Check = dynamic_cast<MotivatedComponent*>(component.get());
+	// 계층 구조 컴포넌트라면.
+	if (Check)
+	{
+		// 루트 컴포넌트 자식으로 컴포넌트를 추가한다.
+		ComponentType* result = dynamic_cast<ComponentType*>(Check);
+		m_RootComponent->AddChild(component.get());
+		m_vComponents.push_back(move(component));
+		return result;
+	}
+	else
+	{
+		// 아니라면 그냥 추가한다.
+		ComponentType* result = dynamic_cast<ComponentType*>(Check);
+		m_vComponents.push_back(move(component));
+		return result;
+	}
+}

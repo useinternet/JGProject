@@ -4,8 +4,7 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../RenderSystem/JGRenderSuperClass.h"
-const char* ObjectBase::ObjectID;
-
+JGRenderSuperClass* ObjectBase::m_RenderSuperClass = nullptr;;
 ObjectBase::ObjectBase()
 {
 
@@ -22,13 +21,7 @@ void ObjectBase::InitObejct(JGRenderSuperClass* SuperClass)
 
 void ObjectBase::RegisterObjectID(const type_info& ID)
 {
-	static bool bInit = false;
-	if (!bInit)
-	{
-		bInit = true;
-		ObjectID = ID.name();
-	}
-
+	ObjectID = ID.name();
 }
 
 const char* ObjectBase::GetID()

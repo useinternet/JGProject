@@ -33,7 +33,8 @@ public:
 	Exp : 매 프레임 한번 실행되는 함수이다. ( 부모 클래스의 Tick도 호출해야한다. ) */
 	virtual void Tick(const float DeltaTime) override;
 	/*
-	Exp : 렌더링 한다. ( 상속받지 마셈. ) */
+	Exp : 렌더링 한다.(셰이더가 다르다면 상속 받아서 커스텀 하셈
+	경고!! : Component의 Render함수를 호출할것..) */
 	virtual void Render() override;
 	/*
 	Exp :  컴포넌트가 파괴되기전 한번 실행되는 함수이다. ( 부모 클래스의 DestoryComponent도 호출해야한다. ) */

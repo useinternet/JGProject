@@ -12,8 +12,8 @@ Class : ObjectBase */
 class ENGINE_EXPORT ObjectBase
 {
 private:
-	static const char* ObjectID;
-	JGRenderSuperClass* m_RenderSuperClass;
+	const char* ObjectID;
+	static JGRenderSuperClass* m_RenderSuperClass;
 public:
 	ObjectBase();
 	virtual ~ObjectBase();
@@ -27,10 +27,10 @@ protected:
 	/*
 	Exp : 오브젝트 타입 고유 아이디를 등록한다. 
 	@param : const type_info& ID : typeid(ObjecType) 형식으로 파라미터를 전달. */
-	static void RegisterObjectID(const type_info& ID);
+	void RegisterObjectID(const type_info& ID);
 	/*
 	Exp : 아이디를 얻어온다. */
-	static const char* GetID();
+	const char* GetID();
 
 	/*
 	Exp : JGDevice 클래스를 얻어온다. */

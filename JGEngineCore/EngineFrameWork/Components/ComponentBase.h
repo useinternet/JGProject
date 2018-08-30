@@ -11,14 +11,14 @@ Class : JGComponentMessage */
 class ENGINE_EXPORT JGComponentMessage
 {
 public:
-	static const char* ComponentID;
+	const char* ComponentID;
 	UINT Flag;
 };
 class ENGINE_EXPORT ComponentBase
 {
 private:
-	static const char* ComponentID;
-	JGRenderSuperClass* m_RenderSuperClass;
+	const char* ComponentID;
+	static JGRenderSuperClass* m_RenderSuperClass;
 public:
 	ComponentBase();
 	virtual ~ComponentBase();
@@ -32,10 +32,10 @@ protected:
 	/*
 	Exp : 컴포넌트 아이디를 등록합니다.
 	@param : const type_info& ID : typeid(ComponentType)으로 파라미터를 전달한다. */
-	static void RegisterComponentID(const type_info& ID);
+	void RegisterComponentID(const type_info& ID);
 	/*
 	Exp : 컴포넌트아이디를 가져옵니다. */
-	static const char* GetID();
+	const char* GetID();
 
 	/*
 	Exp : JGDevice 클래스를 얻어온다. */

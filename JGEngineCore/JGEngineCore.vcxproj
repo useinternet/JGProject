@@ -363,8 +363,11 @@
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\ExistObject.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
+    <ClCompile Include="EngineStatics\JGConstructHelper.cpp" />
     <ClCompile Include="EngineStatics\JGEngineMain.cpp" />
     <ClCompile Include="EngineStatics\JGInputEvent.cpp" />
     <ClCompile Include="EngineStatics\JGLog.cpp" />
@@ -385,6 +388,7 @@
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShader.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.cpp" />
+    <ClCompile Include="RenderSystem\JGMaterial\JG2DMesh.cpp" />
     <ClCompile Include="RenderSystem\JGMaterial\JGMesh.cpp" />
     <ClCompile Include="RenderSystem\JGRenderSuperClass.cpp" />
     <ClCompile Include="RenderSystem\JGRenderSystemStateD.cpp" />
@@ -403,10 +407,13 @@
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
+    <ClInclude Include="EngineFrameWork\Object\ExistObject.h" />
+    <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
     <ClInclude Include="EngineStatics\Engine.h" />
     <ClInclude Include="EngineStatics\EngineMacro.h" />
+    <ClInclude Include="EngineStatics\JGConstructHelper.h" />
     <ClInclude Include="EngineStatics\JGEngineMain.h" />
     <ClInclude Include="EngineStatics\JGInputEvent.h" />
     <ClInclude Include="EngineStatics\JGLog.h" />
@@ -427,6 +434,7 @@
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShader.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderCompiler.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.h" />
+    <ClInclude Include="RenderSystem\JGMaterial\JG2DMesh.h" />
     <ClInclude Include="RenderSystem\JGMaterial\JGMesh.h" />
     <ClInclude Include="RenderSystem\JGRenderSuperClass.h" />
     <ClInclude Include="RenderSystem\JGRenderSystemStateD.h" />

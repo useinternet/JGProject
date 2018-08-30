@@ -46,6 +46,8 @@ public:
 	JGVector2D& operator=(JGVector2D& vec);
 	JGVector2D operator+(JGVector2D& vec);
 	JGVector2D operator-(JGVector2D& vec);
+	JGVector2D& operator+=(JGVector2D& vec);
+	JGVector2D& operator-=(JGVector2D& vec);
 	bool operator==(JGVector2D& vec);
 	bool operator!=(JGVector2D& vec);
 

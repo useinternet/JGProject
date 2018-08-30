@@ -10,9 +10,12 @@
 #include"JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"JGShaderConstructor.h"
 #include"JGRenderSuperClass.h"
+#include"../EngineFrameWork/Object/Object.h"
 
 // 임시 인클루드
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
+#include"../EngineFrameWork/Object/ExistObject.h"
+
 using namespace std;
 
 RenderSystem::RenderSystem()
@@ -26,9 +29,10 @@ RenderSystem::RenderSystem()
 	m_ShaderDevice = make_unique<JGHLSLShaderDevice>();
 	m_ShaderConstructor = make_unique<JGShaderConstructor>();
 	m_SuperClass = make_unique<JGRenderSuperClass>();
+	m_ObjectConstructInit = make_unique<Object>();
 }
 RenderSystem::~RenderSystem() {
-	delete SampleComponent;
+	delete CObject;
 }
 bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int ScreenWidth, const int ScreenHeight,
 	const float FOV, const float FarZ, const float NearZ)
@@ -107,7 +111,8 @@ bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int 
 
 	// 렌더링 슈퍼 클래스 생성
 	m_SuperClass->LinkPointer(m_Device.get(), m_Viewport.get(), m_ShaderDevice.get(), m_JGBufferManager.get());
-
+	// 오브젝트에 렌더링에필요한 포인터 저장
+	m_ObjectConstructInit->InitObejct(m_SuperClass.get());
 
 	// 임시
 	// 임시 적용
@@ -134,14 +139,13 @@ void RenderSystem::EndRendering()
 void RenderSystem::Render()
 {
 	float BlendFactor[4] = { 0.0f,0.0f,0.0f,0.0f };
-	SampleComponent->Tick(0.001f);
-	SampleComponent->SetComponentLocation(960.0f, 500.0f);
+	CObject->Tick(0.001f);
+
 	m_Device->GetContext()->OMSetBlendState(
 		m_RenderState->GetBlendState(EBlendStateType::BlendOn),BlendFactor, 0xffffffff);
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOff), 1);
 
-
-	SampleComponent->Render();
+	CObject->Render();
 
 
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOn), 1);
@@ -151,10 +155,8 @@ void RenderSystem::Render()
 
 void RenderSystem::TestFunc(HWND hWnd)
 {
-	SampleComponent = new StaticMesh2DComponent;
-	SampleComponent->InitComponent(m_SuperClass.get());
-	SampleComponent->BeginComponent();
-	SampleComponent->ConstructMesh2D(TT("../ManagementFiles/Resource/Breath.png"));
+	CObject = new ExistObject;
+	CObject->BeginObject();
 }
 void RenderSystem::ApplicationInDeviceContext()
 {
