@@ -1,17 +1,18 @@
 #pragma once
 #include"../EngineStatics/Engine.h"
-
+class WorldCompare;
 /*
 Class Name : RenderSystem
-@m std::unique_ptr<class JGDeviceD>            m_Device       : Direct 장치
-@m std::unique_ptr<class JGSwapChainD>         m_SwapChain    : 스왑체인
-@m std::unique_ptr<class JGRenderTargetD>      m_RenderTarget : 메인 렌더타겟
-@m std::unique_ptr<class JGRenderSystemStateD> m_RenderState  : 렌더링시스템 상태
-@m std::unique_ptr<class JGViewportD>          m_Viewport     : 뷰포트
-@m std::unique_ptr<class JGBufferManager>      m_JGBufferManager : 버퍼 매니저( 상수버퍼, 정점 버퍼, 인덱스 버퍼)
-@m std::unique_ptr<class JBHLSLShaderDevice>   m_ShaderDevice : hlsl 장치( 셰이더 관리 장치)
-@m std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor : 셰이더 생성 보조 클래스
-@m std::unique_ptr<class JGRenderSuperClass>   m_SuperClass   : 렌더링에 필요한 장치들의 주소값을 담은 클래스(전달용)
+@m unique_ptr<class JGDeviceD>            m_Device              : Direct 장치
+@m unique_ptr<class JGSwapChainD>         m_SwapChain           : 스왑체인
+@m unique_ptr<class JGRenderTargetD>      m_RenderTarget        : 메인 렌더타겟
+@m unique_ptr<class JGRenderSystemStateD> m_RenderState         : 렌더링시스템 상태
+@m unique_ptr<class JGViewportD>          m_Viewport            : 뷰포트
+@m unique_ptr<class JGBufferManager>      m_JGBufferManager     : 버퍼 매니저( 상수버퍼, 정점 버퍼, 인덱스 버퍼)
+@m unique_ptr<class JBHLSLShaderDevice>   m_ShaderDevice        : hlsl 장치( 셰이더 관리 장치)
+@m unique_ptr<class JGShaderConstructor>  m_ShaderConstructor   : 셰이더 생성 보조 클래스
+@m unique_ptr<class JGRenderSuperClass>   m_SuperClass          : 렌더링에 필요한 장치들의 주소값을 담은 클래스(전달용)
+@m unique_ptr<class Object>               m_ObjectConstructInit : 초기화용 오브젝트
 @m HWND m_hWnd           : 윈도우 핸들
 @m int  m_ScreenWidth    : 스크린 가로 길이
 @m int  m_ScreenHeight   : 스크린 세로 길이
@@ -29,7 +30,9 @@ private:
 	std::unique_ptr<class JGHLSLShaderDevice>   m_ShaderDevice;
 	std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor;
 	std::unique_ptr<class JGRenderSuperClass>   m_SuperClass;
-	std::unique_ptr<class Object> m_ObjectConstructInit;
+	std::unique_ptr<class Object>               m_ObjectConstructInit;
+
+	std::list<std::shared_ptr<Object>>* m_RenderingObjectArray;
 	HWND m_hWnd;
 	int  m_ScreenWidth;
 	int  m_ScreenHeight;
@@ -60,12 +63,8 @@ public:
 	Exp : 그리기  */
 	void Render();
 
-
-	//임시
-	void TestFunc(HWND hWnd);
-	class Object* CObject;
-
-
+	void ReceiveObjectArray(std::list<std::shared_ptr<Object>>* Array);
 private:
+	//임시
 	void ApplicationInDeviceContext();
 };

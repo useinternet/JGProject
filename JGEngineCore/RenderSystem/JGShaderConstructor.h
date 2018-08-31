@@ -2,6 +2,9 @@
 #include"../EngineStatics/Engine.h"
 
 class JGHLSLShaderDevice;
+
+
+
 class ENGINE_EXPORT JGShaderConstructor
 {
 public:

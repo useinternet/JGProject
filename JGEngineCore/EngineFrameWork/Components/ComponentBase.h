@@ -49,4 +49,5 @@ protected:
 	/*
 	Exp : JGViewportD 클래스를 얻어온다. */
 	JGViewportD* GetViewport();
+
 };

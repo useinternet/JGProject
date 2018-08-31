@@ -5,6 +5,7 @@
 #include"JGInputEvent.h"
 #include"../RenderSystem/RenderSystem.h"
 #include"JGConstructHelper.h"
+#include"../EngineFrameWork/GameLoop.h"
 using namespace std;
 
 JGEngineMain::JGEngineMain()
@@ -17,11 +18,13 @@ JGEngineMain::JGEngineMain()
 	m_InputEvent   = make_unique<JGInputEvent>();
 	m_RenderSystem = make_unique<RenderSystem>();
 	m_ConstructHelper = make_unique<JGConstructHelper>();
+	m_GameLoop = make_unique<GameLoop>();
 }
 JGEngineMain::~JGEngineMain() {}
 bool JGEngineMain::Init(HWND hWnd)
 {
 	bool result = true;
+	m_EngineTimer->Start();
 	// 로그 초기화
 	m_EngineLog->InitLog();
 
@@ -32,6 +35,9 @@ bool JGEngineMain::Init(HWND hWnd)
 		//예외처리
 		return false;
 	}
+
+	// 게임 루프 초기화
+	m_GameLoop->InitGameLoop(m_RenderSystem.get());
 	return true;
 }
 void JGEngineMain::Run()
@@ -49,11 +55,9 @@ void JGEngineMain::Run()
 		{
 			m_bPaused = true;
 		}
-		m_RenderSystem->BeginRendering();
-		// 임시
+		m_EngineTimer->Tick();
+		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_RenderSystem->Render();
-		// 임시
-		m_RenderSystem->EndRendering();
 	}
 }
 void JGEngineMain::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)

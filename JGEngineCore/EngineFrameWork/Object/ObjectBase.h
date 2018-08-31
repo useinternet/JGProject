@@ -13,6 +13,7 @@ class ENGINE_EXPORT ObjectBase
 {
 private:
 	const char* ObjectID;
+	int ZOrder = 0;
 	static JGRenderSuperClass* m_RenderSuperClass;
 public:
 	ObjectBase();
@@ -21,8 +22,16 @@ public:
 	virtual void Send(JGComponentMessage& Message) = 0;
 	virtual void Tick(const float DeltaTime) = 0;
 	virtual void Render() = 0;
-	virtual void DestroyObject() = 0;
+	virtual void EndObject() = 0;
 	void InitObejct(JGRenderSuperClass* SuperClass);
+
+
+	/*
+	Exp : ZOrder 값을 불러온다. */
+	int GetZOrder();
+	/*
+	Exp : ZOrder 값을 설정한다. */
+	void SetZOrder(int Num);
 protected:
 	/*
 	Exp : 오브젝트 타입 고유 아이디를 등록한다. 
@@ -47,5 +56,6 @@ protected:
 	/*
 	Exp : JGViewportD 클래스를 얻어온다. */
 	JGRenderSuperClass* GetRenderSuperClass();
+
 
 };

@@ -38,6 +38,15 @@
     <Filter Include="EngineFrameWork\Components">
       <UniqueIdentifier>{0cd7f4aa-9577-4911-a405-3501086550ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineFrameWork\World">
+      <UniqueIdentifier>{c1c35870-2f76-487e-b7e4-6194bbe3d7c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineFrameWork\2D\Text">
+      <UniqueIdentifier>{d9f300fa-d4c7-4f81-83e5-9b8f24b8e6cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputSystem">
+      <UniqueIdentifier>{b1335abb-0999-4d09-bb0c-089d9e411fb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -168,6 +177,21 @@
     </ClCompile>
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp">
       <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\GameLoop.cpp">
+      <Filter>EngineFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\World\World.cpp">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\World\WorldManager.cpp">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\World\WorldCompare.cpp">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Text\JGFont.cpp">
+      <Filter>EngineFrameWork\2D\Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +329,21 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h">
       <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\GameLoop.h">
+      <Filter>EngineFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\World\World.h">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\World\WorldManager.h">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\World\WorldCompare.h">
+      <Filter>EngineFrameWork\World</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Text\JGFont.h">
+      <Filter>EngineFrameWork\2D\Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

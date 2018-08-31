@@ -51,7 +51,7 @@ private:
 	DepthSV            m_DepthStencilView;
 	ERenderTargetType  m_RenderTargetType;
 
-	int m_Width = 0;
+	int m_Width  = 0;
 	int m_Height = 0;
 public:
 	JGRenderTargetD();

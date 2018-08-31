@@ -3,7 +3,23 @@
 
 
 
-
+/*
+Class : Motivated2DComponent 
+Exp : 계층구조를 가지고있는 2D 컴포넌트 
+@m unique_ptr<JGVector2D> m_Location : 위치 좌표
+@m unique_ptr<JGAngle2D> m_Angle     : 각도 
+@m unique_ptr<JGScale2D> m_Scale     : 스케일 
+@m unique_ptr<JGMatrix>  m_WorldMatrix : 월드 상에 나타낼 값(위치,각도,스케일)을 연산하기위한 행렬 
+@m unique_ptr<JGMatrix>  m_ScaleMatrix : 스케일 값을 나타낼 행렬 
+@m unique_ptr<JGMatrix>  m_AngleMatrix : 각도 값을 나타낼 행렬 
+@m unique_ptr<JGMatrix>  m_TranslationMatrix : 이동 값을 나타낼 행렬 
+@m JGVector2D m_PrevLocation : 위치 좌표 이전 값
+@m JGAngle2D m_PrevAngle  : 각도 이전 값
+@m JGScale2D m_PrevScale : 스케일 이전 값
+@m m_bChange : 위치, 각도, 스케일중 하나라도 바뀌었는지 여부 (Rendering용)
+@m m_bIsChangeLocation : 위치 변동 여부 
+@m m_bIsChangeAngle : 각도 변동 여부 
+@m m_bIsChangeScale : 스케일 변동 여부 */
 class ENGINE_EXPORT Motivated2DComponent : public MotivatedComponent
 {
 	std::unique_ptr<JGVector2D> m_Location;
@@ -101,6 +117,8 @@ public:
 	Exp : 스케일 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
 	bool IsChangeScale();
 protected:
+	/*
+	Exp : 이 컴포넌트의 월드 행렬을 가져온다. */
 	const JGMatrix& GetWorldMatrix();
 	
 };

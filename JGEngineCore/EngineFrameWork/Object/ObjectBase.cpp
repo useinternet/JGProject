@@ -18,6 +18,14 @@ void ObjectBase::InitObejct(JGRenderSuperClass* SuperClass)
 {
 	m_RenderSuperClass = SuperClass;
 }
+int ObjectBase::GetZOrder()
+{
+	return ZOrder;
+}
+void ObjectBase::SetZOrder(int Num)
+{
+	ZOrder = Num;
+}
 
 void ObjectBase::RegisterObjectID(const type_info& ID)
 {

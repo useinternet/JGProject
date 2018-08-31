@@ -25,8 +25,7 @@ JGConstructHelper* JGConstructHelper::GetInstance()
 
 
 JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const wstring& ComponentName,
-	EPivot pivot, const wstring& TexturePath, int ZOrder,
-	const wstring& ShaderName)
+	EPivot pivot, const wstring& TexturePath, const wstring& ShaderName)
 {
 	// 오브젝트 동적할당..
 	unique_ptr<StaticMesh2DObject> TempObject = make_unique<StaticMesh2DObject>();
@@ -43,7 +42,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	result = TempObject->Mesh->Construct2DMesh(
 		BufferManager, ComponentName,
 		(float)TempObject->Texture->GetInformation(0).Width,
-		(float)TempObject->Texture->GetInformation(0).Height, ZOrder, pivot);
+		(float)TempObject->Texture->GetInformation(0).Height, pivot);
 	if (!result)
 	{
 		Success = false;

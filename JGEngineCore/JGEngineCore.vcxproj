@@ -358,15 +358,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Text\JGFont.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\GameLoop.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
+    <ClCompile Include="EngineFrameWork\World\World.cpp" />
+    <ClCompile Include="EngineFrameWork\World\WorldCompare.cpp" />
+    <ClCompile Include="EngineFrameWork\World\WorldManager.cpp" />
     <ClCompile Include="EngineStatics\JGConstructHelper.cpp" />
     <ClCompile Include="EngineStatics\JGEngineMain.cpp" />
     <ClCompile Include="EngineStatics\JGInputEvent.cpp" />
@@ -402,15 +407,20 @@
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EngineFrameWork\2D\Text\JGFont.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
+    <ClInclude Include="EngineFrameWork\GameLoop.h" />
     <ClInclude Include="EngineFrameWork\Object\ExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
+    <ClInclude Include="EngineFrameWork\World\World.h" />
+    <ClInclude Include="EngineFrameWork\World\WorldCompare.h" />
+    <ClInclude Include="EngineFrameWork\World\WorldManager.h" />
     <ClInclude Include="EngineStatics\Engine.h" />
     <ClInclude Include="EngineStatics\EngineMacro.h" />
     <ClInclude Include="EngineStatics\JGConstructHelper.h" />

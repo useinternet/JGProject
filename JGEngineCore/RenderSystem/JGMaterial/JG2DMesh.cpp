@@ -12,7 +12,7 @@ JG2DMesh::~JG2DMesh()
 
 }
 bool JG2DMesh::Construct2DMesh(JGBufferManager* BufferManager,const std::wstring& ComponentName,
-	const float Width, const float Height, int ZOrder, EPivot Pivot)
+	const float Width, const float Height,EPivot Pivot)
 {
 	m_Width = Width;
 	m_Height = Height;
@@ -84,26 +84,22 @@ bool JG2DMesh::Construct2DMesh(JGBufferManager* BufferManager,const std::wstring
 		break;
 	}
 
-
-	float fZOrder = (float)ZOrder;
-
-
-	Vertex.position = D3DXVECTOR3(TopLeft.x, TopLeft.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(TopLeft.x, TopLeft.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(0.0f, 0.0f);
 	vVertexArray.push_back(Vertex);
-	Vertex.position = D3DXVECTOR3(BottomRight.x, BottomRight.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(BottomRight.x, BottomRight.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(1.0f, 1.0f);
 	vVertexArray.push_back(Vertex);
-	Vertex.position = D3DXVECTOR3(BottomLeft.x, BottomLeft.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(BottomLeft.x, BottomLeft.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(0.0f, 1.0f);
 	vVertexArray.push_back(Vertex);
-	Vertex.position = D3DXVECTOR3(TopLeft.x, TopLeft.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(TopLeft.x, TopLeft.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(0.0f, 0.0f);
 	vVertexArray.push_back(Vertex);
-	Vertex.position = D3DXVECTOR3(TopRight.x, TopRight.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(TopRight.x, TopRight.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(1.0f, 0.0f);
 	vVertexArray.push_back(Vertex);
-	Vertex.position = D3DXVECTOR3(BottomRight.x, BottomRight.y, fZOrder);
+	Vertex.position = D3DXVECTOR3(BottomRight.x, BottomRight.y, 0.0f);
 	Vertex.tex = D3DXVECTOR2(1.0f, 1.0f);
 	vVertexArray.push_back(Vertex);
 

@@ -133,20 +133,20 @@ void JGRenderSystemStateD::WriteDepthStateDesc(D3D11_DEPTH_STENCIL_DESC& Desc,co
 	if (type == EDepthStateType::ZBufferOn)   Desc.DepthEnable = true;
 	if (type == EDepthStateType::ZBufferOff)  Desc.DepthEnable = false;
 	Desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	Desc.DepthFunc = D3D11_COMPARISON_LESS;
+	Desc.DepthFunc      = D3D11_COMPARISON_LESS;
 
-	Desc.StencilEnable = true;
-	Desc.StencilReadMask = 0xFF;
+	Desc.StencilEnable    = true;
+	Desc.StencilReadMask  = 0xFF;
 	Desc.StencilWriteMask = 0xFF;
 
-	Desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	Desc.FrontFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
 	Desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	Desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	Desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	Desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	Desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	Desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	Desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	Desc.FrontFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
+	Desc.FrontFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
+	Desc.BackFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
+	Desc.BackFace.StencilDepthFailOp  = D3D11_STENCIL_OP_DECR;
+	Desc.BackFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
+	Desc.BackFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
 }
 
 void JGRenderSystemStateD::WriteBlendStateDesc(D3D11_BLEND_DESC& Desc, const EBlendStateType type)
@@ -155,12 +155,12 @@ void JGRenderSystemStateD::WriteBlendStateDesc(D3D11_BLEND_DESC& Desc, const EBl
 
 	if (type == EBlendStateType::BlendOn) Desc.RenderTarget[0].BlendEnable = true;
 	if (type == EBlendStateType::BlendOff) Desc.RenderTarget[0].BlendEnable = false;
-	Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	Desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	Desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	Desc.RenderTarget[0].SrcBlend       = D3D11_BLEND_SRC_ALPHA;
+	Desc.RenderTarget[0].DestBlend      = D3D11_BLEND_INV_SRC_ALPHA;
+	Desc.RenderTarget[0].BlendOp        = D3D11_BLEND_OP_ADD;
+	Desc.RenderTarget[0].SrcBlendAlpha  = D3D11_BLEND_ZERO;
 	Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-	Desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	Desc.RenderTarget[0].BlendOpAlpha   = D3D11_BLEND_OP_ADD;
 	Desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL & ~D3D11_COLOR_WRITE_ENABLE_ALPHA;//0x0f;
 }
 
@@ -168,13 +168,13 @@ void JGRenderSystemStateD::WriteRasterStateDesc(D3D11_RASTERIZER_DESC& Desc, con
 {
 	if( type == EFillModeType::Solid)     Desc.FillMode = D3D11_FILL_SOLID;
 	if( type == EFillModeType::WireFrame) Desc.FillMode = D3D11_FILL_WIREFRAME;
-	Desc.CullMode = D3D11_CULL_BACK;
+	Desc.CullMode              = D3D11_CULL_BACK;
 	Desc.AntialiasedLineEnable = false;
-	Desc.DepthBias = 0;
-	Desc.DepthBiasClamp = 0.0f;
-	Desc.DepthClipEnable = true;
+	Desc.DepthBias             = 0;
+	Desc.DepthBiasClamp        = 0.0f;
+	Desc.DepthClipEnable       = true;
 	Desc.FrontCounterClockwise = false;
-	Desc.MultisampleEnable = false;
-	Desc.ScissorEnable = false;
-	Desc.SlopeScaledDepthBias = 0.0f;
+	Desc.MultisampleEnable     = false;
+	Desc.ScissorEnable         = false;
+	Desc.SlopeScaledDepthBias  = 0.0f;
 }

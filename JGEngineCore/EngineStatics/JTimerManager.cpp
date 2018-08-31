@@ -36,6 +36,13 @@ void  JMainTimer::Stop()
 }
 void  JMainTimer::Tick()
 {
+	// 처음 Tick함수는 전의 자료가 없으므로 1프레임 텀을 두고 이함수를 실행
+	static int num = 0;
+	if (num == 0)
+	{
+		num++;
+		return;
+	}
 	Clock::time_point CurrentTime = Clock::now();
 
 

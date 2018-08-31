@@ -4,6 +4,15 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
+
+/*
+EnumClass : 오브젝트 상태 */
+enum class EObjectState
+{
+	Active = 0,
+	Behind    = 1,
+	Destory   = 2
+};
 /*
 Class : Object 
 @m std::vector<std::unique_ptr<Component>>  m_vComponents : 컴포넌트 배열 ( 주소 유지용 )
@@ -15,7 +24,7 @@ private:
 	Component* m_RootComponent = nullptr;
 	//
 	bool m_bIsFirst = true;
-
+	EObjectState m_ObjectState;
 public:
 	Object();
 	virtual ~Object();
@@ -35,22 +44,34 @@ public:
 	virtual void Render() override;
 	/*
 	Exp : 오브젝트를 파괴하기전 최초 한번 실행되는 이벤트입니다.(무조건 부모 클래스의 DestroyObject를 호출한다.) */
-	virtual void DestroyObject() override;
+	virtual void EndObject() override;
 
+	/*
+	Exp : 오브젝트 상태를 가져온다.*/
+	EObjectState GetObjectState();
+	/*
+	Exp : 오브젝트를 파괴한다. */
+	void DestoryObject();
+	/*
+	Exp : 오브젝트를 숨긴다. */
+	void BehindObject();
+	/*
+	Exp : 오브젝트를 활성화시킨다. */
+	void ActiveObject();
 protected:
 	template<typename ComponentType>
 	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName);
 };
 
 template<typename ComponentType>
-typename ComponentType* Object::RegisterComponentInObject(const std::wstring& ComponentName)
+inline ComponentType* Object::RegisterComponentInObject(const std::wstring& ComponentName)
 {
 	// 만약 처음 등록하는 컴포넌트라면..
 	if (m_bIsFirst)
 	{
 		m_bIsFirst = false;
 		// 루트 컴포넌트를 만든다.
-		std::unique_ptr<Component> RootComponent = std::make_unique<Component>();
+		std::unique_ptr<Component> RootComponent = std::make_unique<MotivatedComponent>();
 		RootComponent->InitComponent(GetRenderSuperClass());
 		m_RootComponent = RootComponent.get();
 		m_vComponents.push_back(move(RootComponent));

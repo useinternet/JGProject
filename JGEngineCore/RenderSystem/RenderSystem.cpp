@@ -11,6 +11,7 @@
 #include"JGShaderConstructor.h"
 #include"JGRenderSuperClass.h"
 #include"../EngineFrameWork/Object/Object.h"
+#include"../EngineFrameWork/World/WorldCompare.h"
 
 // 임시 인클루드
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
@@ -31,9 +32,7 @@ RenderSystem::RenderSystem()
 	m_SuperClass = make_unique<JGRenderSuperClass>();
 	m_ObjectConstructInit = make_unique<Object>();
 }
-RenderSystem::~RenderSystem() {
-	delete CObject;
-}
+RenderSystem::~RenderSystem() {}
 bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int ScreenWidth, const int ScreenHeight,
 	const float FOV, const float FarZ, const float NearZ)
 {
@@ -114,12 +113,11 @@ bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int 
 	// 오브젝트에 렌더링에필요한 포인터 저장
 	m_ObjectConstructInit->InitObejct(m_SuperClass.get());
 
+
 	// 임시
 	// 임시 적용
 	ApplicationInDeviceContext();
 
-	//임시 함수
-	TestFunc(hWnd);
 	//
 	JGLog::Write(ELogLevel::Progress, TT("RenderSystem Init Complete...."));
 	return true;
@@ -138,26 +136,47 @@ void RenderSystem::EndRendering()
 }
 void RenderSystem::Render()
 {
+	BeginRendering();
 	float BlendFactor[4] = { 0.0f,0.0f,0.0f,0.0f };
-	CObject->Tick(0.001f);
-
+	
+	// 블렌딩 및 Z버퍼 셋팅
 	m_Device->GetContext()->OMSetBlendState(
 		m_RenderState->GetBlendState(EBlendStateType::BlendOn),BlendFactor, 0xffffffff);
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOff), 1);
 
-	CObject->Render();
+	m_RenderingObjectArray->sort([](
+		shared_ptr<Object>& object1, shared_ptr<Object>& object2)->bool
+	{
+		if (object1->GetZOrder() < object2->GetZOrder())
+		{
+			return true;
+		}
+		return false;
+	});
 
 
+	// 렌더링
+	for (auto& object : *m_RenderingObjectArray)
+	{
+		if (object->GetObjectState() == EObjectState::Active)
+		{
+			object->Render();
+		}
+	}
+
+	// 블렌딩 off 및 Z버퍼 셋팅
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOn), 1);
 	m_Device->GetContext()->OMSetBlendState(
 		m_RenderState->GetBlendState(EBlendStateType::BlendOff), BlendFactor, 0xffffffff);
+
+	EndRendering();
 }
 
-void RenderSystem::TestFunc(HWND hWnd)
+void RenderSystem::ReceiveObjectArray(list<shared_ptr<Object>>* Array)
 {
-	CObject = new ExistObject;
-	CObject->BeginObject();
+	m_RenderingObjectArray = Array;
 }
+
 void RenderSystem::ApplicationInDeviceContext()
 {
 	// 임시 적용

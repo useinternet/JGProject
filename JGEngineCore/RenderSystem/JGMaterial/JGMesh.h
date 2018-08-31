@@ -24,6 +24,14 @@ enum class ENGINE_EXPORT ERenderingType
 	TriangleList = 3,
 	TriangleStrip = 4
 };
+/*
+Class : JGMesh
+@m vector<UINT> m_Stride : 데이터 사이즈값 배열
+@m vector<UINT> m_Offset : 데이터 위치 값 배열
+@m vector<ID3D11Buffer*> m_VertexBuffer : 정점 버퍼 포인터 배열
+@m vector<ID3D11Buffer*> m_IndexBuffer : 인덱스 버퍼 포인터 배열
+@m JGBufferManager* m_BufferManager : 버퍼 매니저 포인터
+@m bUseInstanceBuffer : 인스턴스용 변수(미구현) */
 class ENGINE_EXPORT JGMesh
 {
 private:
@@ -32,14 +40,23 @@ private:
 	std::vector<ID3D11Buffer*> m_VertexBuffer;
 	std::vector<ID3D11Buffer*> m_IndexBuffer;
 	JGBufferManager* m_BufferManager = nullptr;
-	bool bUseInstanceBuffer = false;
+	bool bUseInstanceBuffer          = false;
 public:
 	JGMesh(const JGMesh& copy) = delete;
 	JGMesh();
 	virtual ~JGMesh();
 
 	/*
-	Exp : 정점 / 인덱스 버퍼 생성 */
+	Exp : 정점 / 인덱스 버퍼 생성 
+	@param JGBufferManager* BufferManager   : 버퍼 매니저 
+	@param const wstring    MeshName        : 메시 이름
+	@param EJGUsageType     VertexUsageType : 정점 용도 타입
+	@param EJCPUType        VertexCPUType   : 정점 CPU 타입
+	@param EJGUsageType     IndexUsageType  : 인덱스 용도 타입 
+	@param EJGCPUType       IndexCPUType    : 인덱스 CPU 타입
+	@param void*  VertexData   : 정점 데이터
+	@param size_t DataCount    : 데이터 갯수
+	@param size_t DataTypeSize : 데이터 타입 사이즈*/
 	bool Create_Vertex_Index_Buffer(JGBufferManager* BufferManager,const std::wstring& MeshName,
 		EJGUsageType VertexUsageType, EJGCPUType VertexCPUType, EJGUsageType IndexUsageType, EJGCPUType IndexCPUType,
 		void* VertexData,size_t DataCount, size_t DataTypeSize);

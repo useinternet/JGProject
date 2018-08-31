@@ -17,7 +17,6 @@ void ComponentBase::InitComponent(JGRenderSuperClass* SuperClass)
 {
 	m_RenderSuperClass = SuperClass;
 }
-
 void ComponentBase::RegisterComponentID(const type_info & ID)
 {
 	ComponentID = ID.name();
@@ -42,7 +41,8 @@ JGBufferManager* ComponentBase::GetBufferManager()
 	return m_RenderSuperClass->GetBufferManager();
 }
 
-JGViewportD * ComponentBase::GetViewport()
+JGViewportD* ComponentBase::GetViewport()
 {
 	return m_RenderSuperClass->GetViewport();
 }
+

@@ -28,6 +28,26 @@ ExistObject::ExistObject()
 		Test->SetStaticMesh2DComponent(TestTexture.Object);
 	}
 	Breath->AddChild(Test);
+
+	static int count = 0;
+	if (count == 0)
+	{
+		Breath->SetComponentLocation(0.0f, 0.0f);
+		Test->SetComponentLocation(0.0f, 0.0f);
+		SetZOrder(10);
+	}
+	else if (count == 1)
+	{
+		Breath->SetComponentLocation(300.0f, 300.0f);
+		Test->SetComponentLocation(300.0f, 0.0f);
+	}
+	else if (count == 2)
+	{
+		Breath->SetComponentLocation(1000, 600.0f);
+		Test->SetComponentLocation(100.0f, 0.0f);
+	}
+	count++;
+
 }
 ExistObject::~ExistObject()
 {
@@ -38,8 +58,9 @@ ExistObject::~ExistObject()
 void ExistObject::BeginObject()
 {
 	Object::BeginObject();
-	Breath->SetComponentLocation(800.0f, 500.0f);
-	Test->SetComponentLocation(100.0f, 100.0f);
+
+
+
 }
 
 void ExistObject::Tick(const float DeltaTime)

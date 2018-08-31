@@ -4,11 +4,12 @@
 Object::Object()
 {
 	RegisterObjectID(typeid(this));
+	m_ObjectState = EObjectState::Active;
 }
 
 Object::~Object()
 {
-
+	int num = 0;
 }
 
 void Object::BeginObject()
@@ -40,12 +41,27 @@ void Object::Render()
 	}
 }
 
-void Object::DestroyObject()
+void Object::EndObject()
 {
 	if (m_RootComponent)
 	{
 		m_RootComponent->DestoryComponent();
 	}
 }
+EObjectState Object::GetObjectState()
+{
+	return m_ObjectState;
+}
+void Object::DestoryObject()
+{
+	m_ObjectState = EObjectState::Destory;
+}
+void Object::BehindObject()
+{
+	m_ObjectState = EObjectState::Behind;
+}
 
-
+void Object::ActiveObject()
+{
+	m_ObjectState = EObjectState::Active;
+}
