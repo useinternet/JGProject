@@ -3,6 +3,8 @@
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../2D/Text/JGFontLoader.h"
 #include"../../RenderSystem/JGTexture.h"
+#include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
+#include"../../RenderSystem/JGHLSLShaderDevice/JGShaderData.h"
 using namespace std;
 
 TextComponent::TextComponent()
@@ -10,7 +12,7 @@ TextComponent::TextComponent()
 	RegisterComponentID(typeid(this));
 	// 텍스트 컴포넌트꺼 초기화
 	m_Text = make_unique<wstring>();
-
+	m_TextBufferDesc = make_unique<STextBuffer_PS>();
 	*m_Text = TT("None");
 	m_TextSize = 20.0f;
 	m_FramePerSecond = 10.0f;
@@ -52,6 +54,16 @@ void TextComponent::SetText(const wchar_t* Text, ...)
 
 	*m_Text = str;
 }
+void TextComponent::SetTextColor(const float r, const float g, const float b)
+{
+	m_TextBufferDesc->TextColor.x = r;
+	m_TextBufferDesc->TextColor.y = g;
+	m_TextBufferDesc->TextColor.z = b;
+}
+void TextComponent::SetTextAplha(const float a)
+{
+	m_TextBufferDesc->TextColor.w = a;
+}
 void TextComponent::SetFramePerSecond(float Frame)
 {
 	m_FramePerSecond = Frame;
@@ -60,6 +72,11 @@ void TextComponent::SetFramePerSecond(float Frame)
 void TextComponent::SetTextSize(const float TextSize)
 {
 	m_TextSize = TextSize;
+}
+
+void TextComponent::ShaderParamSetting(JGShaderData* Data)
+{
+	Data->InsertData(TT("TextBuffer"), m_TextBufferDesc.get());
 }
 
 bool TextComponent::CreateTextMesh()

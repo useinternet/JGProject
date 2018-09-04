@@ -8,6 +8,9 @@ class TextComponent : public StaticMesh2DComponent
 private:
 	std::unique_ptr<std::wstring> m_Text;
 	std::unique_ptr<JG2DMesh> m_TextMesh;
+	std::unique_ptr<struct STextBuffer_PS> m_TextBufferDesc;
+
+
 
 	std::string m_FontPath;
 	float m_TextSize = 0.0f;
@@ -30,11 +33,22 @@ public:
 	Exp : 텍스트컴포넌트에 입력한다. */
 	void SetText(const wchar_t* Text, ...);
 	/*
+	Exp: 텍스트 색상을 설정한다. */
+	void SetTextColor(const float r, const float g, const float b);
+	/*
+	Exp : 텍스트 알파값을 설정한다. */
+	void SetTextAplha(const float a);
+	/*
 	Exp : 텍스트를 1초당 몇번 업데이트 시킬것인지 정한다.*/
 	void SetFramePerSecond(float Frame);
 	/*
 	Exp : 텍스트 사이즈를 정한다. */
 	void SetTextSize(const float TextSize);
 private:
+	/*
+	Exp : 셰이더 상수버퍼의 파라미터들을 설정한다. ( 상속 받아서 쓰세요 / 부모 함수 호출 안해도되요.. */
+	virtual void ShaderParamSetting(JGShaderData* Data);
+
+
 	bool CreateTextMesh();
 };

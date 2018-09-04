@@ -25,7 +25,7 @@ float4 main(PixelInputType input) : SV_TARGET
 
     color = Texture.Sample(WrapSamplerState, input.tex);
 	color.xyz = color.xyz * TextColor.xyz;
-	color.a = TextColor.a;
+	color.a = TextColor.w;
 
 	return color;
 }

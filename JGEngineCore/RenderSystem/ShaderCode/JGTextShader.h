@@ -10,11 +10,11 @@
 
 
 
-class JGTextureShader : public JGShader
+class JGTextShader : public JGShader
 {
 public:
-	JGTextureShader();
-	virtual ~JGTextureShader();
+	JGTextShader();
+	virtual ~JGTextShader();
 
 protected:
 	virtual bool CreateShader() override;

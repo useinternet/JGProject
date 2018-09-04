@@ -21,7 +21,7 @@ ExistObject::ExistObject()
 	{
 		Breath->SetConstructObject(BreathMesh.Object);
 	}
-
+	Breath->SetColorRize(0.0f, 0.0f, 1.0f);
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
 	const JGConstructHelper::TextFont FrameMesh(
 		GetDevice(),  "../ManagementFiles/Resource/Font/Godic.fnt",
@@ -30,6 +30,7 @@ ExistObject::ExistObject()
 	{
 		Frame->SetConstructObject(FrameMesh.Object);
 	}
+	Frame->SetTextColor(1.0f, 0.0f, 0.0f);
 }
 ExistObject::~ExistObject()
 {

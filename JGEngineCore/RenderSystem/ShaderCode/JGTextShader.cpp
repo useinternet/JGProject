@@ -1,18 +1,18 @@
-#include "JGTextureShader.h"
+#include"JGTextShader.h"
 #include "HLSLConstantBufferDesc.h"
 #include"../JGHLSLShaderDevice/JGShaderCompiler.h"
 #include"../JGHLSLShaderDevice/JGBuffer.h"
 #include"../JGDeviceD.h"
 #include"../JGTexture.h"
-JGTextureShader::JGTextureShader()
+JGTextShader::JGTextShader()
 {
 }
 
-JGTextureShader::~JGTextureShader()
+JGTextShader::~JGTextShader()
 {
 }
 
-bool JGTextureShader::CreateShader()
+bool JGTextShader::CreateShader()
 {
 	bool result = true;
 	AddInputElement("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
@@ -40,7 +40,7 @@ bool JGTextureShader::CreateShader()
 	return true;
 }
 
-void JGTextureShader::JGShaderDataSetting(JGShaderData* Data)
+void JGTextShader::JGShaderDataSetting(JGShaderData* Data)
 {
 	//
 	Write_RegisterBuffer(TT("MatrixBuffer"), Data, EJGMapType::Write_Discard,
@@ -49,7 +49,7 @@ void JGTextureShader::JGShaderDataSetting(JGShaderData* Data)
 		ERegisterType::Pixel);
 }
 
-void JGTextureShader::JGTextureSetting(JGTexture* Texture)
+void JGTextShader::JGTextureSetting(JGTexture* Texture)
 {
 	GetJGDevice()->GetContext()->PSSetShaderResources(0, 1, Texture->GetEntry());
 }

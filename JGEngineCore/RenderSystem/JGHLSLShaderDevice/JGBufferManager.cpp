@@ -3,9 +3,9 @@
 #include"JGBuffer.h"
 #include"../../EngineStatics/JGLog.h"
 using namespace std;
-
-JGBufferManager::JGBufferManager() {}
-JGBufferManager::~JGBufferManager() {}
+static JGBufferManager* IsExistClass = nullptr;
+JGBufferManager::JGBufferManager() { IsExistClass = this; }
+JGBufferManager::~JGBufferManager() { IsExistClass = nullptr; }
 
 
 void JGBufferManager::InitBufferManager(JGDeviceD* Device)
@@ -94,16 +94,18 @@ bool JGBufferManager::DuplicateCheck(const std::wstring& name)
 
 void JGBufferManager::DestroyBuffer(const wstring& BufferName)
 {
-	auto iter = m_JGBuffers.find(BufferName);
-	if (iter != m_JGBuffers.end())
+	if (IsExistClass)
 	{
-		m_JGBuffers.erase(iter);
+		auto iter = m_JGBuffers.find(BufferName);
+		if (iter != m_JGBuffers.end())
+		{
+			m_JGBuffers.erase(iter);
+		}
+		else
+		{
+			JGLog::Write(ELogLevel::Warning, TT("%s is not exist."), BufferName);
+		}
 	}
-	else
-	{
-		JGLog::Write(ELogLevel::Warning, TT("%s is not exist."), BufferName);
-	}
-
 }
 
 

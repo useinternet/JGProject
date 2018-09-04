@@ -73,7 +73,7 @@ public:
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
-			EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("SampleShader"));
+			EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
 	};
 	class TextFont
 	{
@@ -89,6 +89,6 @@ public:
 		@param const wstring& FontTexturePath : 폰트 텍스쳐 경로 
 		@param const wstring& ShaderName : 폰트에 적용할 셰이더 이름. */
 		TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
-			const std::wstring& ShaderName = TT("SampleShader"));
+			const std::wstring& ShaderName = TT("TextShader"));
 	};
 };

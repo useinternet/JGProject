@@ -6,13 +6,15 @@
 #include"../../RenderSystem/JGMaterial/JG2DMesh.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBuffer.h"
 #include"../../RenderSystem/JGDeviceD.h"
-#include"../../RenderSystem/ShaderCode/SampleShaderDesc.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../EngineStatics/JGConstructHelper.h"
+#include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
 using namespace std;
 StaticMesh2DComponent::StaticMesh2DComponent()
 {
 	RegisterComponentID(typeid(this));
+	m_MatrixBufferDesc = make_unique<SMatrixBuffer_VS>();
+	m_2DSpriteBufferDesc = make_unique<S2DSpriteBuffer_PS>();
 }
 StaticMesh2DComponent::~StaticMesh2DComponent()
 {
@@ -45,28 +47,51 @@ float StaticMesh2DComponent::GetTextureHeight()
 	return 0.0f;
 }
 
+void StaticMesh2DComponent::SpriteSwichOn(const float r, const float g, const float b)
+{
+	m_2DSpriteBufferDesc->IsSprite = 1.0f;
+	m_2DSpriteBufferDesc->SprietColor = { r,g,b };
+}
+void StaticMesh2DComponent::SpriteSwichOn(JGVector3D& color)
+{
+	m_2DSpriteBufferDesc->IsSprite = 1.0f;
+	m_2DSpriteBufferDesc->SprietColor = { color.Get() };
+}
+void StaticMesh2DComponent::SetColorRize(const float r, const float g, const float b)
+{
+	m_2DSpriteBufferDesc->ColorRize.x = r;
+	m_2DSpriteBufferDesc->ColorRize.y = g;
+	m_2DSpriteBufferDesc->ColorRize.z = b;
+}
+void StaticMesh2DComponent::SetColorRize(JGVector3D& color)
+{
+	m_2DSpriteBufferDesc->ColorRize.x = color.X();
+	m_2DSpriteBufferDesc->ColorRize.y = color.Y();
+	m_2DSpriteBufferDesc->ColorRize.z = color.Z();
+}
+void StaticMesh2DComponent::SetAlphaBlend(const float a)
+{
+	m_2DSpriteBufferDesc->ColorRize.w = a;
+}
 void StaticMesh2DComponent::Render()
 {
 	Component::Render();
 
 	JGMatrix worldMatrix = GetWorldMatrix();
-	JGMatrix projectionMatrix = GetOrthoMatrix();
+	JGMatrix orthoMatrix = GetOrthoMatrix();
 	JGMatrix viewMatrix = GetViewMatrix();
 
 	worldMatrix.Transpose();
 	viewMatrix.Transpose();
-	projectionMatrix.Transpose();
+	orthoMatrix.Transpose();
 
 
-	//셰이더용 데이터 생성
+	m_MatrixBufferDesc->WoldViewProjectionMatrix = (orthoMatrix * viewMatrix * worldMatrix).Get();
+
+
 	JGShaderData Data;
-	SMatrixBuffer desc;
-	desc.worldMatrix = worldMatrix.Get();
-	desc.projectionMatirx = projectionMatrix.Get();
-	desc.viewMatrix = viewMatrix.Get();
-	// 세이더용 데이터 삽입
-	Data.InsertData(TT("MatrixBuffer"), (void*)&desc);
-	//
+	Data.InsertData(TT("MatrixBuffer"), m_MatrixBufferDesc.get());
+	ShaderParamSetting(&Data);
 	// 메쉬 렌더링
 	if (m_Mesh)
 	{
@@ -77,7 +102,11 @@ void StaticMesh2DComponent::Render()
 			GetHLSLDevice()->Render(m_ShaderName, &Data, m_Texture, m_Mesh->GetIndexCount());
 		}
 	}
+}
 
+void StaticMesh2DComponent::ShaderParamSetting(JGShaderData* Data)
+{
+	Data->InsertData(TT("2DSpriteBuffer"), m_2DSpriteBufferDesc.get());
 }
 
 JG2DMesh* StaticMesh2DComponent::GetMesh()

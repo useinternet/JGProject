@@ -196,8 +196,26 @@
     <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem\ShaderCode\JGTextureShader.cpp">
+    <ClCompile Include="RenderSystem\ShaderCode\JGTextShader.cpp">
       <Filter>RenderSystem\ShaderCode</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\InputSystem.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\ShaderCode\JG2DAnimationShader.cpp">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\JGPressManager.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\JGCommand.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\JGCommandManager.cpp">
+      <Filter>InputSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -357,8 +375,26 @@
     <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClInclude>
-    <ClInclude Include="RenderSystem\ShaderCode\JGTextureShader.h">
+    <ClInclude Include="RenderSystem\ShaderCode\JGTextShader.h">
       <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem\InputSystem.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\JG2DAnimationShader.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem\JGPressManager.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem\JGCommand.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem\JGCommandManager.h">
+      <Filter>InputSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

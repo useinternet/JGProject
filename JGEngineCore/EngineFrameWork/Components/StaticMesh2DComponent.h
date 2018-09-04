@@ -2,13 +2,12 @@
 #include"Motivated2DComponent.h"
 class JG2DMesh;
 class JGTexture;
-
+class JGShaderData;
 class ConsructObject;
 
 // 내일 할 일
 // 그담에는2D엑터를 만들어보고 렌더링해보자.
 // 그리고 계층 구조 이용해서 렌더링 해보자..
-
 
 
 /*
@@ -23,6 +22,9 @@ private:
 	std::wstring m_ShaderName = TT("None");
 	JGTexture* m_Texture = nullptr;
 	JG2DMesh* m_Mesh     = nullptr;
+
+	std::unique_ptr<struct SMatrixBuffer_VS>   m_MatrixBufferDesc;
+	std::unique_ptr<struct S2DSpriteBuffer_PS> m_2DSpriteBufferDesc;
 public:
 	StaticMesh2DComponent();
 	virtual ~StaticMesh2DComponent();
@@ -36,14 +38,30 @@ public:
 	/*
 	Exp : 텍스쳐의 세로 길이를 가져온다. */
 	float GetTextureHeight();
-
+	/*
+	Exp : 스프라이트 설정을 키고 스프라이트 색을 정한다. */
+	void SpriteSwichOn(const float r, const float g, const float b);
+	/*
+	Exp : 스프라이트 설정을 키고 스프라이트 색을 정한다. */
+	void SpriteSwichOn(JGVector3D& color);
+	/*
+	Exp : 컬러라이즈를 설정한다. */
+	void SetColorRize(const float r, const float g, const float b);
+	/*
+	Exp : 컬러라이즈를 설정한다. */
+	void SetColorRize(JGVector3D& color);
+	/*
+	Exp : 알파값을 설정한다. */
+	void SetAlphaBlend(const float a);
 public:
 	/*
 	Exp : 렌더링 한다.(셰이더가 다르다면 상속 받아서 커스텀 하셈 
 	경고!! : Component의 Render함수를 호출할것..) */
 	virtual void Render() override;
-	
 protected:
+	/*
+	Exp : 셰이더 상수버퍼의 파라미터들을 설정한다. ( 상속 받아서 쓰세요 / 부모 함수 호출 안해도되요.. */
+	virtual void ShaderParamSetting(JGShaderData* Data);
 	/*
 	Exp : 메시를 가져온다. */
 	JG2DMesh * GetMesh();

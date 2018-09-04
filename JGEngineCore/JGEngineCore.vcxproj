@@ -359,6 +359,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Text\JGFontLoader.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
@@ -386,6 +387,10 @@
     <ClCompile Include="EngineStatics\JMath\JGVector3D.cpp" />
     <ClCompile Include="EngineStatics\JThreadManager.cpp" />
     <ClCompile Include="EngineStatics\JTimerManager.cpp" />
+    <ClCompile Include="InputSystem\InputSystem.cpp" />
+    <ClCompile Include="InputSystem\JGCommand.cpp" />
+    <ClCompile Include="InputSystem\JGCommandManager.cpp" />
+    <ClCompile Include="InputSystem\JGPressManager.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -403,13 +408,15 @@
     <ClCompile Include="RenderSystem\JGTexture.cpp" />
     <ClCompile Include="RenderSystem\JGViewportD.cpp" />
     <ClCompile Include="RenderSystem\RenderSystem.cpp" />
+    <ClCompile Include="RenderSystem\ShaderCode\JG2DAnimationShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp" />
-    <ClCompile Include="RenderSystem\ShaderCode\JGTextureShader.cpp" />
+    <ClCompile Include="RenderSystem\ShaderCode\JGTextShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\SampleShader.cpp" />
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h" />
+    <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
@@ -439,6 +446,10 @@
     <ClInclude Include="EngineStatics\JMath\JGVector3D.h" />
     <ClInclude Include="EngineStatics\JThreadManager.h" />
     <ClInclude Include="EngineStatics\JTimerManager.h" />
+    <ClInclude Include="InputSystem\InputSystem.h" />
+    <ClInclude Include="InputSystem\JGCommand.h" />
+    <ClInclude Include="InputSystem\JGCommandManager.h" />
+    <ClInclude Include="InputSystem\JGPressManager.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />
@@ -457,8 +468,9 @@
     <ClInclude Include="RenderSystem\JGViewportD.h" />
     <ClInclude Include="RenderSystem\RenderSystem.h" />
     <ClInclude Include="RenderSystem\ShaderCode\HLSLConstantBufferDesc.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\JG2DAnimationShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h" />
-    <ClInclude Include="RenderSystem\ShaderCode\JGTextureShader.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\JGTextShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\SampleShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\SampleShaderDesc.h" />
     <ClInclude Include="RenderSystem\VideoDeviceInfo.h" />
