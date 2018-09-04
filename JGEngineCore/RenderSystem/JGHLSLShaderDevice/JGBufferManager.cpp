@@ -92,4 +92,18 @@ bool JGBufferManager::DuplicateCheck(const std::wstring& name)
 	return false;
 }
 
+void JGBufferManager::DestroyBuffer(const wstring& BufferName)
+{
+	auto iter = m_JGBuffers.find(BufferName);
+	if (iter != m_JGBuffers.end())
+	{
+		m_JGBuffers.erase(iter);
+	}
+	else
+	{
+		JGLog::Write(ELogLevel::Warning, TT("%s is not exist."), BufferName);
+	}
+
+}
+
 

@@ -2,6 +2,7 @@
 #include"../../EngineStatics/Engine.h"
 
 class JGDeviceD;
+
 /*
 EnumClass : EJGBufferType
 @e ConstantBuffer :  상수 버퍼
@@ -59,6 +60,7 @@ Class : JGBuffer
 @m ComPtr<ID3D11Buffer> m_Buffer     : 버퍼
 @m D3D11_BUFFER_DESC    m_BufferDesc : 버퍼 설정 목록
 @m EJGBufferType        m_BufferType : 버퍼 타입
+@m EJGBufferState       m_BufferCurrentState : 현제 버퍼 상태
 @m size_t m_BindDataSize : 바인딩된 데이터 크기
 */
 class ENGINE_EXPORT JGBuffer
@@ -67,7 +69,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 	D3D11_BUFFER_DESC m_BufferDesc;
 	EJGBufferType     m_BufferType;
-
 
 	size_t m_BindDataSize;
 	JGDeviceD* m_pDevice = nullptr;

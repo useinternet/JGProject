@@ -18,24 +18,15 @@ StaticMesh2DComponent::~StaticMesh2DComponent()
 {
 }
 
-bool StaticMesh2DComponent::ConstructMesh2D(const std::wstring & TexturePath)
+void StaticMesh2DComponent::SetConstructObject(ConsructObject* Object)
 {
-	
-	static JGConstructHelper::StaticMesh2D TempMesh2DComponent(
-		GetDevice(), GetBufferManager(), GetComponentName(),EPivot::MiddleMiddle,
-		TexturePath);
-	if (TempMesh2DComponent.Success)
+	StaticMesh2DObject* object = dynamic_cast<StaticMesh2DObject*>(Object);
+	if (object)
 	{
-		SetStaticMesh2DComponent(TempMesh2DComponent.Object);
+		m_ShaderName = object->ShaderName;
+		m_Texture = object->Texture.get();
+		m_Mesh = object->Mesh.get();
 	}
-
-	return true;
-}
-void StaticMesh2DComponent::SetStaticMesh2DComponent(StaticMesh2DObject* Object)
-{
-	m_ShaderName = Object->ShaderName;
-	m_Texture    = Object->Texture.get();
-	m_Mesh       = Object->Mesh.get();
 }
 float StaticMesh2DComponent::GetTextureWdith()
 {
@@ -53,14 +44,7 @@ float StaticMesh2DComponent::GetTextureHeight()
 	}
 	return 0.0f;
 }
-JG2DMesh* StaticMesh2DComponent::GetMesh()
-{
-	return m_Mesh;
-}
-JGTexture* StaticMesh2DComponent::GetTexture()
-{
-	return m_Texture;
-}
+
 void StaticMesh2DComponent::Render()
 {
 	Component::Render();
@@ -87,7 +71,36 @@ void StaticMesh2DComponent::Render()
 	if (m_Mesh)
 	{
 		m_Mesh->Render(GetDevice(), ERenderingType::TriangleList);
+		// ¼ÎÀÌ´õ ·»´õ¸µ
+		if (m_ShaderName != TT("None"))
+		{
+			GetHLSLDevice()->Render(m_ShaderName, &Data, m_Texture, m_Mesh->GetIndexCount());
+		}
 	}
-	// ¼ÎÀÌ´õ ·»´õ¸µ
-	GetHLSLDevice()->Render(m_ShaderName, &Data, m_Texture, 6);
+
+}
+
+JG2DMesh* StaticMesh2DComponent::GetMesh()
+{
+	return m_Mesh;
+}
+void StaticMesh2DComponent::SetMesh(JG2DMesh* mesh)
+{
+	m_Mesh = mesh;
+}
+JGTexture* StaticMesh2DComponent::GetTexture()
+{
+	return m_Texture;
+}
+void StaticMesh2DComponent::SetTexture(JGTexture* texture)
+{
+	m_Texture = texture;
+}
+std::wstring& StaticMesh2DComponent::GetShaderName()
+{
+	return m_ShaderName;
+}
+void StaticMesh2DComponent::SetShaderName(const wstring & ShaderName)
+{
+	m_ShaderName = ShaderName;
 }

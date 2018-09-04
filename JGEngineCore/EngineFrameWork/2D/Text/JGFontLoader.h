@@ -1,29 +1,38 @@
 #pragma once
 #include"../../../EngineStatics/Engine.h"
-
+#include"../../../RenderSystem/JGMaterial/JG2DMesh.h"
 
 
 class JGTexture;
-class JG2DMesh;
 class JGDeviceD;
 class JGBufferManager;
+
+class ENGINE_EXPORT JGFontVertexInformation
+{
+public:
+	float Width = 0.0f;
+	float Height = 0.0f;
+	float TexWidth = 0.0f;
+	float TexHeight = 0.0f;
+	float TexU = 0.0f;
+	float TexV = 0.0f;
+	float XAdvance = 0.0f;
+	bool Space = false;
+};
 
 class ENGINE_EXPORT JGFontLoader
 {
 private:
-	struct FontMesh;
-	struct FontInformation;
-	struct FontCommonType;
-	struct FontType;
-	struct KerningType;
+	class Font;
+public:
+	struct SFontMesh;
+	struct SFontInformation;
+	struct SFontCommonType;
+	struct SFontType;
+	struct SKerningType;
 	typedef unsigned int CharID;
 	typedef std::pair<const CharID, const CharID> PairID;
-	struct FontVertex
-	{
-		D3DXVECTOR3 position = { 0.0f,0.0f,0.0f };
-		D3DXVECTOR2 texture = { 0.0f,0.0f };
-	};
-	struct FontInformation
+	typedef struct SFontInformation
 	{
 		/*
 		FontName : 실제 타입 폰트의 이름입니다.
@@ -51,8 +60,8 @@ private:
 		int padding[4];
 		int spacing[2];
 		size_t outline;
-	};
-	struct FontCommonType
+	}SFontInformation;
+	typedef struct SFontCommonType
 	{
 		/*
 		lineHeight : 각 텍스트 행 사이의 거리 (픽셀 단위)입니다.
@@ -80,8 +89,8 @@ private:
 		float blueChnl;
 		float pageID;
 		std::string FileName;
-	};
-	struct FontType
+	}SFontCommonType;
+	typedef struct SFontType
 	{
 		/*
 		ID      : 문자 ID입니다.
@@ -106,9 +115,8 @@ private:
 		float XAdvance;
 		float Page;
 		float chnl;
-		std::vector<FontVertex> Mesh;
-	};
-	struct KerningType
+	}SFontType;
+	typedef struct SKerningType
 	{
 		/*
 		first  : 첫 번째 문자 ID입니다.
@@ -118,19 +126,35 @@ private:
 		CharID first;
 		CharID second;
 		float amount;
-	};
-	std::unique_ptr<FontInformation> m_FontInformation;
-	std::unique_ptr<FontCommonType>  m_FontCommonInformation;
-	std::map<const CharID, FontType> m_Font;
-	std::map<PairID, const float> m_KerningInformation;
-	size_t CharCount;
-	size_t KerningCount;
-	float m_Size;
+	}SKerningType;
+private:
+	std::map<const std::string, std::shared_ptr<Font>> m_mFonts;
+	std::map< const std::string, const std::wstring> m_mFontPath;
 public:
 	JGFontLoader();
 	~JGFontLoader();
+	static JGFontLoader* GetInstance();
+	bool LoadFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath);
+	void OutputVertexInformation(const std::string& FontPath,const std::wstring& Text, float TextSize,std::vector<JGFontVertexInformation>* Array);
+private:
+	void LoadFontInformation(std::ifstream& fin,Font* font);
+	void LoadFontCommonInformation(std::ifstream& fin, Font* font);
+	void LoadFontData(std::ifstream& fin, Font* font);
+	void LoadKerningInformation(std::ifstream& fin, Font* font);
+	void EqualLoop(std::ifstream& fin);
+private:
+	class Font
+	{
+	public:
+		std::unique_ptr<JGTexture> Texture;
+		std::unique_ptr<SFontInformation> FontInformation;
+		std::unique_ptr<SFontCommonType>  FontCommonInformation;
+		std::map<const CharID, SFontType> mFontType;
+		std::map<PairID, const float> KerningInformation;
+		size_t CharCount;
+		size_t KerningCount;
 
-	bool LoadFont(JGDeviceD* Device, JGBufferManager* BufferManager, const std::string& FontPath,
-		const std::string& FontTexturePath, size_t FontSize);
-	// 폰트만드는데 필요한거.( 폰트 정보 경로, 폰트 텍스쳐 경로, 폰트 크기)
+		Font();
+		~Font();
+	};
 };

@@ -3,6 +3,7 @@
 #include"../RenderSystem/JGMaterial/JG2DMesh.h"
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
 #include"../EngineStatics/JGLog.h"
+#include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 using namespace std;
 
 static JGConstructHelper* Instance = nullptr;
@@ -57,3 +58,41 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	JGConstructHelper::GetInstance()->m_vStaticMesh2DObject.push_back(move(TempObject));
 }
 
+
+
+JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
+	const wstring& ShaderName)
+{
+	unique_ptr<TextObject> TempObject = make_unique<TextObject>();
+	TempObject->Texture = make_unique<JGTexture>();
+	// 폰트 텍스쳐 저장
+	bool result = TempObject->Texture->Add(Device, FontTexturePath);
+	if (!result)
+	{
+		Success = false;
+	}
+	// 폰트 생성
+	result = JGFontLoader::GetInstance()->LoadFont(Device, FontPath, FontTexturePath);
+	if (!result)
+	{
+		Success = false;
+	}
+	// 셰이더 이름 저장.
+	TempObject->ShaderName = ShaderName;
+	TempObject->FontPath = FontPath;
+	// 포인터 저장
+	Object = TempObject.get();
+	JGConstructHelper::GetInstance()->m_vStaticMesh2DObject.push_back(move(TempObject));
+}
+
+StaticMesh2DObject::~StaticMesh2DObject()
+{
+}
+
+TextObject::~TextObject()
+{
+}
+
+ConsructObject::~ConsructObject()
+{
+}

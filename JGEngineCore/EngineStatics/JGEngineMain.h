@@ -9,6 +9,7 @@ class JThreadManager;
 class JGLog;
 class JGInputEvent;
 class RenderSystem;
+class JGFontLoader;
 class JGConstructHelper;
 class GameLoop;
 class ENGINE_EXPORT JGEngineMain
@@ -20,6 +21,7 @@ private: // 초기화 우선순위 별
 	std::unique_ptr<JGLog>        m_EngineLog;
 	std::unique_ptr<JGInputEvent> m_InputEvent;
 	std::unique_ptr<RenderSystem> m_RenderSystem;
+	std::unique_ptr<JGFontLoader> m_FontLoader;
 	std::unique_ptr<JGConstructHelper> m_ConstructHelper;
 	std::unique_ptr<GameLoop>     m_GameLoop;
 	bool m_bPaused = false;

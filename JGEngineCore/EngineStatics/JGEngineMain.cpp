@@ -4,6 +4,7 @@
 #include"JGLog.h"
 #include"JGInputEvent.h"
 #include"../RenderSystem/RenderSystem.h"
+#include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 #include"JGConstructHelper.h"
 #include"../EngineFrameWork/GameLoop.h"
 using namespace std;
@@ -13,10 +14,10 @@ JGEngineMain::JGEngineMain()
 	m_EngineTimer   = JMainTimer::GetInstance();
 	m_ThreadManager = JThreadManager::GetInstance();
 
-
 	m_EngineLog    = make_unique<JGLog>();
 	m_InputEvent   = make_unique<JGInputEvent>();
 	m_RenderSystem = make_unique<RenderSystem>();
+	m_FontLoader   = make_unique<JGFontLoader>();
 	m_ConstructHelper = make_unique<JGConstructHelper>();
 	m_GameLoop = make_unique<GameLoop>();
 }

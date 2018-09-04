@@ -8,14 +8,6 @@ World::World(const std::wstring& Name)
 	shared_ptr<Object> object = make_unique<ExistObject>();
 	object->BeginObject();
 	m_sObjects.push_back(move(object));
-	// 임시로 그냥 생성한다.
-	shared_ptr<Object> object2 = make_unique<ExistObject>();
-	object2->BeginObject();
-	m_sObjects.push_back(move(object2));
-	// 임시로 그냥 생성한다.
-	shared_ptr<Object> object3 = make_unique<ExistObject>();
-	object3->BeginObject();
-	m_sObjects.push_back(move(object3));
 }
 World::~World()
 {

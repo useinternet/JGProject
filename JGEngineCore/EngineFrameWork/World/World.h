@@ -1,6 +1,5 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
-#include"WorldCompare.h"
 
 class Object;
 class RenderSystem;

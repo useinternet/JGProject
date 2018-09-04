@@ -2,6 +2,10 @@
 #include"../Components/StaticMesh2DComponent.h"
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/JGMaterial/JG2DMesh.h"
+#include"../Components/TextComponent.h"
+
+//이밋
+#include"../2D/Text/JGFontLoader.h"
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
@@ -12,42 +16,20 @@ ExistObject::ExistObject()
 
 	const JGConstructHelper::StaticMesh2D BreathMesh(GetDevice(),
 		GetBufferManager(), Breath->GetComponentName(),
-		EPivot::MiddleMiddle, TT("../ManagementFiles/Resource/Breath.png"));
+		EPivot::TopLeft, TT("../ManagementFiles/Resource/Breath.png"));
 	if (BreathMesh.Success)
 	{
-		Breath->SetStaticMesh2DComponent(BreathMesh.Object);
+		Breath->SetConstructObject(BreathMesh.Object);
 	}
-	// 등록
-	Test = RegisterComponentInObject<StaticMesh2DComponent>(TT("Test"));
 
-	const JGConstructHelper::StaticMesh2D TestTexture(GetDevice(),
-		GetBufferManager(), Breath->GetComponentName(), EPivot::MiddleMiddle,
-		TT("../ManagementFiles/Resource/Sample.jpg"));
-	if (TestTexture.Success)
+	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
+	const JGConstructHelper::TextFont FrameMesh(
+		GetDevice(),  "../ManagementFiles/Resource/Font/Godic.fnt",
+		TT("../ManagementFiles/Resource/Font/Godic_0.png"));
+	if (FrameMesh.Success)
 	{
-		Test->SetStaticMesh2DComponent(TestTexture.Object);
+		Frame->SetConstructObject(FrameMesh.Object);
 	}
-	Breath->AddChild(Test);
-
-	static int count = 0;
-	if (count == 0)
-	{
-		Breath->SetComponentLocation(0.0f, 0.0f);
-		Test->SetComponentLocation(0.0f, 0.0f);
-		SetZOrder(10);
-	}
-	else if (count == 1)
-	{
-		Breath->SetComponentLocation(300.0f, 300.0f);
-		Test->SetComponentLocation(300.0f, 0.0f);
-	}
-	else if (count == 2)
-	{
-		Breath->SetComponentLocation(1000, 600.0f);
-		Test->SetComponentLocation(100.0f, 0.0f);
-	}
-	count++;
-
 }
 ExistObject::~ExistObject()
 {
@@ -58,15 +40,16 @@ ExistObject::~ExistObject()
 void ExistObject::BeginObject()
 {
 	Object::BeginObject();
-
-
+	Frame->SetComponentLocation(300.0f, 500.0f);
 
 }
 
 void ExistObject::Tick(const float DeltaTime)
 {
+	// 임시 프레임 알아보기
+	float FPS = 1.0f / DeltaTime;
+	Frame->SetText(TT("FPS : %d"),(int)FPS);
 	Object::Tick(DeltaTime);
-	Breath->AddComponentAngle(DeltaTime*3);
-	Test->AddComponentAngle(DeltaTime * 2);
-
+	Breath->AddComponentAngle(DeltaTime*5.0f);
+	//Test->AddComponentAngle(DeltaTime * 2);
 }

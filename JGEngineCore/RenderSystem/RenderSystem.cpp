@@ -11,7 +11,6 @@
 #include"JGShaderConstructor.h"
 #include"JGRenderSuperClass.h"
 #include"../EngineFrameWork/Object/Object.h"
-#include"../EngineFrameWork/World/WorldCompare.h"
 
 // 임시 인클루드
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"

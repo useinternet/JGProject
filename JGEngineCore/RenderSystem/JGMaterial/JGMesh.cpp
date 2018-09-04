@@ -9,12 +9,15 @@ JGMesh::JGMesh()
 
 JGMesh::~JGMesh()
 {
-
-
+	for (auto& iter : m_vMeshName)
+	{
+		m_BufferManager->DestroyBuffer(iter + TT("_VertexBuffer"));
+		m_BufferManager->DestroyBuffer(iter + TT("_IndexBuffer"));
+	}
 }
 
 bool JGMesh::Create_Vertex_Index_Buffer(JGBufferManager* BufferManager, 
-	const std::wstring & MeshName, EJGUsageType VertexUsageType, EJGCPUType VertexCPUType,
+	const std::wstring& MeshName, EJGUsageType VertexUsageType, EJGCPUType VertexCPUType,
 	EJGUsageType IndexUsageType, EJGCPUType IndexCPUType, void* VertexData,
 	size_t DataCount, size_t DataTypeSize)
 {
@@ -22,6 +25,7 @@ bool JGMesh::Create_Vertex_Index_Buffer(JGBufferManager* BufferManager,
 	bool result = true;
 
 	// 버텍스 버퍼 생성
+	m_vMeshName.push_back(MeshName);
 	result = m_BufferManager->AddBuffer(MeshName + TT("_VertexBuffer"),
 		EJGBufferType::VertexBuffer, VertexUsageType, VertexCPUType,
 		VertexData, DataCount * DataTypeSize);
@@ -70,8 +74,6 @@ void JGMesh::Render(JGDeviceD* Device, ERenderingType RenderingType)
 		Device->GetContext()->IASetIndexBuffer(m_IndexBuffer[0],
 			DXGI_FORMAT_R32_UINT, m_Offset[0]);
 	}
-
-
 	switch (RenderingType)
 	{
 	case ERenderingType::PointList:

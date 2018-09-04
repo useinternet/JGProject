@@ -8,6 +8,9 @@ class ENGINE_EXPORT GameLoop
 private:
 	std::unique_ptr<WorldManager> m_WorldManager;
 	RenderSystem* m_pRenderSystem;
+
+
+	
 public:
 	GameLoop();
 	~GameLoop();

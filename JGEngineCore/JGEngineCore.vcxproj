@@ -358,19 +358,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="EngineFrameWork\2D\Text\JGFont.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Text\JGFontLoader.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\TextComponent.cpp" />
     <ClCompile Include="EngineFrameWork\GameLoop.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
     <ClCompile Include="EngineFrameWork\World\World.cpp" />
-    <ClCompile Include="EngineFrameWork\World\WorldCompare.cpp" />
     <ClCompile Include="EngineFrameWork\World\WorldManager.cpp" />
     <ClCompile Include="EngineStatics\JGConstructHelper.cpp" />
     <ClCompile Include="EngineStatics\JGEngineMain.cpp" />
@@ -403,23 +403,25 @@
     <ClCompile Include="RenderSystem\JGTexture.cpp" />
     <ClCompile Include="RenderSystem\JGViewportD.cpp" />
     <ClCompile Include="RenderSystem\RenderSystem.cpp" />
+    <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp" />
+    <ClCompile Include="RenderSystem\ShaderCode\JGTextureShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\SampleShader.cpp" />
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EngineFrameWork\2D\Text\JGFont.h" />
+    <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\TextComponent.h" />
     <ClInclude Include="EngineFrameWork\GameLoop.h" />
     <ClInclude Include="EngineFrameWork\Object\ExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
     <ClInclude Include="EngineFrameWork\World\World.h" />
-    <ClInclude Include="EngineFrameWork\World\WorldCompare.h" />
     <ClInclude Include="EngineFrameWork\World\WorldManager.h" />
     <ClInclude Include="EngineStatics\Engine.h" />
     <ClInclude Include="EngineStatics\EngineMacro.h" />
@@ -454,11 +456,58 @@
     <ClInclude Include="RenderSystem\JGTexture.h" />
     <ClInclude Include="RenderSystem\JGViewportD.h" />
     <ClInclude Include="RenderSystem\RenderSystem.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\HLSLConstantBufferDesc.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\JGTextureShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\SampleShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\SampleShaderDesc.h" />
     <ClInclude Include="RenderSystem\VideoDeviceInfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_ps.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Pixel</ShaderType>
@@ -501,6 +550,50 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>

@@ -18,4 +18,5 @@ public:
 	JGShaderData(const JGShaderData& copy) = delete;
 	void InsertData(const std::wstring& wstring, void* data);
 	void* GetData(const std::wstring& DataName);
+	//UINT GetSlot
 };

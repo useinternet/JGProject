@@ -57,6 +57,7 @@ public:
 	Exp : 현제 버퍼 매니져에 등록되어져있는 버퍼 이름 인지 체크한다. */
 	bool DuplicateCheck(const std::wstring& name);
 
-
-
+	/*
+	Exp : 해당 버퍼를 삭제한다. */
+	void DestroyBuffer(const std::wstring& BufferName);
 };

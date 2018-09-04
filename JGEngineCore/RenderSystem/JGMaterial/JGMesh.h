@@ -9,6 +9,7 @@ enum class EJGUsageType;
 enum class EJGCPUType;
 enum class EJGMapType;
 
+
 /*
 EnumClass : ERenderingType 
 @e PointList : 점 목록 타입
@@ -39,6 +40,7 @@ private:
 	std::vector<UINT> m_Offset;
 	std::vector<ID3D11Buffer*> m_VertexBuffer;
 	std::vector<ID3D11Buffer*> m_IndexBuffer;
+	std::vector<std::wstring> m_vMeshName;
 	JGBufferManager* m_BufferManager = nullptr;
 	bool bUseInstanceBuffer          = false;
 public:
@@ -65,5 +67,7 @@ public:
 	Exp : 미구현 (추후 구현할 것)*/
 	bool Create_Vertex_Instance_Buffer(JGBufferManager* BufferManager);
 
+
+	// 렌더링
 	void Render(JGDeviceD* Device, ERenderingType RenderingType);
 };

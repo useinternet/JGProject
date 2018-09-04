@@ -2,7 +2,7 @@
 #include"JGMesh.h"
 
 class JGBufferManager;
-
+class JGFontVertexInformation;
 
 /*
 EnumClass : EPivot
@@ -34,6 +34,7 @@ class ENGINE_EXPORT JG2DMesh : public JGMesh
 {
 private:
 	const UINT m_2DVertexCount = 6;
+public:
 	typedef struct S2DVertexType
 	{
 		D3DXVECTOR3 position;
@@ -44,9 +45,15 @@ private:
 		float x;
 		float y;
 	}SPivotPoint;
+	typedef struct STexInformaton
+	{
+		SPivotPoint TopLeft = { 0.0f,0.0f };
+		float Width = 1.0f;
+		float Height = 1.0f;
+	}STexInformaton;
 private:
-	float m_Width;
-	float m_Height;
+	std::vector<S2DVertexType> m_vVertexArray;
+	EPivot m_Pivot;
 public:
 	JG2DMesh();
 	virtual ~JG2DMesh();
@@ -58,5 +65,21 @@ public:
 	@param const float Height : 텍스쳐 세로길이
 	@param EPivot Pivot : 중심 위치 */
 	bool Construct2DMesh(JGBufferManager* BufferManager,const std::wstring& ComponentName, 
-		const float Width, const float Height,EPivot Pivot = EPivot::TopLeft);
+		const float Width, const float Height,EPivot Pivot = EPivot::TopLeft,const STexInformaton& TexInformation = STexInformaton());
+	/*
+	Exp : 텍스트용 메쉬를 생성한다. 
+	@param JGBufferManager* BufferManager : 버퍼 매니저 포인터
+	@param const wstring& ComponentName  : 컴포넌트 이름
+	@param const vector<JGFontVertexInformation>& VertexInformation : 폰트 정점 정보
+	@param EPivot Pivot : 중심 위치 */
+	bool ConstructTextMesh(JGBufferManager* BufferManager, const std::wstring& ComponentName,const std::vector<JGFontVertexInformation>& VertexInformation, EPivot Pivot = EPivot::TopLeft);
+	/*
+	Exp : 정점 갯수를 가져온다. */ //( 이거 메시로 옮긴다. )
+	size_t GetIndexCount();
+
+	/*
+	Exp : 구현중*/
+	void WriteTextMesh(const std::vector<JGFontVertexInformation>& VertexInformation);
+private:
+	void CreateVertexArray(const float Width, const float Height, EPivot Pivot, const STexInformaton& TexInformation, float AccX = 0.0f,float AccY = 0.0f);
 };

@@ -187,11 +187,17 @@
     <ClCompile Include="EngineFrameWork\World\WorldManager.cpp">
       <Filter>EngineFrameWork\World</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\World\WorldCompare.cpp">
-      <Filter>EngineFrameWork\World</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineFrameWork\2D\Text\JGFont.cpp">
+    <ClCompile Include="EngineFrameWork\2D\Text\JGFontLoader.cpp">
       <Filter>EngineFrameWork\2D\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\TextComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem\ShaderCode\JGTextureShader.cpp">
+      <Filter>RenderSystem\ShaderCode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -339,11 +345,20 @@
     <ClInclude Include="EngineFrameWork\World\WorldManager.h">
       <Filter>EngineFrameWork\World</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\World\WorldCompare.h">
-      <Filter>EngineFrameWork\World</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineFrameWork\2D\Text\JGFont.h">
+    <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h">
       <Filter>EngineFrameWork\2D\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\TextComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\HLSLConstantBufferDesc.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\JGTextureShader.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -351,6 +366,18 @@
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_vs.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_vs.hlsl">
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
   </ItemGroup>
