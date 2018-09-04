@@ -106,9 +106,6 @@
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGShader.cpp">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem\ShaderCode\SampleShader.cpp">
-      <Filter>RenderSystem\ShaderCode</Filter>
-    </ClCompile>
     <ClCompile Include="RenderSystem\JGShaderConstructor.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
@@ -217,6 +214,12 @@
     <ClCompile Include="InputSystem\JGCommandManager.cpp">
       <Filter>InputSystem</Filter>
     </ClCompile>
+    <ClCompile Include="InputSystem\JGKeyCommand.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\JGAxisCommand.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -281,12 +284,6 @@
     </ClInclude>
     <ClInclude Include="RenderSystem\JGShaderConstructor.h">
       <Filter>RenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderSystem\ShaderCode\SampleShaderDesc.h">
-      <Filter>RenderSystem\ShaderCode</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderSystem\ShaderCode\SampleShader.h">
-      <Filter>RenderSystem\ShaderCode</Filter>
     </ClInclude>
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGShaderData.h">
       <Filter>RenderSystem\JGHLSLShaderDevice</Filter>
@@ -396,14 +393,14 @@
     <ClInclude Include="InputSystem\JGCommandManager.h">
       <Filter>InputSystem</Filter>
     </ClInclude>
+    <ClInclude Include="InputSystem\JGKeyCommand.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem\JGAxisCommand.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_vs.hlsl">
-      <Filter>RenderSystem\ShaderHLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="RenderSystem\ShaderHLSL\SampleShader_ps.hlsl">
-      <Filter>RenderSystem\ShaderHLSL</Filter>
-    </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_ps.hlsl">
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>

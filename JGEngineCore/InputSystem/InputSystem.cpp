@@ -99,7 +99,8 @@ bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd, int width, int h
 		return false;
 	}
 
-
+	// JGPressManager에 키보드 상태를 넘겨준다.
+	m_PressManager->LinkInputSystemKeyBoardState(m_KeyBoardState,&m_MouseState);
 	return true;
 }
 void InputSystem::Tick(const float DeltaTime)

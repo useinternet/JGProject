@@ -11,9 +11,10 @@ JGPressManager::~JGPressManager()
 
 }
 
-void JGPressManager::LinkInputSystemKeyBoardState(KeyBoardState* state)
+void JGPressManager::LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState)
 {
 	m_pKeyBoardState = state;
+	m_pMouseState = MouseState;
 }
 
 bool JGPressManager::IsPressed(const EKey Key)
@@ -241,19 +242,33 @@ bool JGPressManager::IsPressed(const EKey Key)
 	case EKey::Z:
 		if (m_pKeyBoardState[DIK_Z] & 0x80) return true;
 		break;
+		//if(diMouseState.rgbButtons[0] & 0x80)
+		// 마우스 상태
+	case EKey::MouseLButton:
+		if (m_pMouseState->rgbButtons[0] & 0x80) return true;
+		break;
+	case EKey::MouseRButton:
+		if (m_pMouseState->rgbButtons[1] & 0x80) return true;
+		break;
+	case EKey::MouseWheelClick:
+		if (m_pMouseState->rgbButtons[2] & 0x80) return true;
+		break;
 	default:
 		return false;
 	}
 	return false;
-
-
 }
-
-bool JGPressManager::IsMultiPressed(const EKey key1, const EKey key2)
+float JGPressManager::GetAxisKey(const EKey Key)
 {
-	if (IsPressed(key1) && IsPressed(key2))
+	switch (Key)
 	{
-		return true;
+	case EKey::MouseXAxis:
+		return (float)m_pMouseState->lX;
+	case EKey::MouseYAxis:
+		return (float)m_pMouseState->lY;
+	case EKey::MouseWheelAxis:
+		return (float)m_pMouseState->lZ;
+	default:
+		return 0.0f;
 	}
-	return false;
 }

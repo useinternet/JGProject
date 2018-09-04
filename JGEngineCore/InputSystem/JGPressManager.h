@@ -16,21 +16,26 @@ enum class ENGINE_EXPORT EKey
 	Escape, Delete, End, Home, Insert, PgDn, PgUp,
 	Shift, Ctrl, Alt, CapsLock, Tab,
 	// 알파벳 키
-	A, B, C, D, E, F, G, H, I, J, K, L, N, M, O, P, Q, R, S, T, U, V, W, X, Y, Z
+	A, B, C, D, E, F, G, H, I, J, K, L, N, M, O, P, Q, R, S, T,
+	U, V, W, X, Y, Z,
+	// 마우스
+	MouseXAxis, MouseYAxis, MouseLButton, MouseRButton,
+	MouseHweelClick, MouseHweelMove
 };
 
 class ENGINE_EXPORT JGPressManager
 {
+	typedef DIMOUSESTATE  MouseState;
 	typedef unsigned char KeyBoardState;
 private:
 	KeyBoardState* m_pKeyBoardState = nullptr;
-
+	MouseState* m_pMouseState = nullptr;
 public:
 	JGPressManager();
 	~JGPressManager();
 
-	void LinkInputSystemKeyBoardState(KeyBoardState* state);
+	void LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState);
 
 	bool IsPressed(const EKey Key);
-	bool IsMultiPressed(const EKey key1, const EKey key2);
+	float GetMouseAxis(const EKey Key);
 };
