@@ -5,10 +5,6 @@ class JGTexture;
 class JGShaderData;
 class ConsructObject;
 
-// 내일 할 일
-// 그담에는2D엑터를 만들어보고 렌더링해보자.
-// 그리고 계층 구조 이용해서 렌더링 해보자..
-
 
 /*
 Class : StaticMesh2DComponent 
@@ -80,4 +76,7 @@ protected:
 	/*
 	Exp : 셰이더이름을 셋팅한다. */
 	void SetShaderName(const std::wstring& ShaderName);
+
+private:
+	virtual bool Render2DCurling() override;
 };

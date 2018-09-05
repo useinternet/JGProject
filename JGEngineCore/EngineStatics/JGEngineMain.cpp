@@ -78,10 +78,12 @@ void JGEngineMain::Run()
 		{
 			m_bPaused = true;
 		}
+
 		m_EngineTimer->Tick();
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
 		m_RenderSystem->Render();
+
 	}
 }
 void JGEngineMain::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)

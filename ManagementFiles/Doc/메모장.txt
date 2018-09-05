@@ -2,14 +2,13 @@
 Struct               S
 EnumClass            E
 
-0. 코드 검수 및 주석처리 
-1. 2D 용 컬링 시스템 만든다.
+- 애니메이션 시스템도 만들기..
 2. 사운드(fomd) 시스템 만든다.
 3. 맵툴도 만들공.. 
 4. ui 시스템(widget)
 5. 2dbox 물리 라이브러리 좀 알아보기..
 -- world 관리는 GameLogic 에서 관리한다.(WorldManager()는EngineCore 에서담당)
-
+6. 2d 용 파티클 시스템도 만들어보기...
 
 GameLoop
 WorldManager <- 월드 관리 및 게임 세이브 파일

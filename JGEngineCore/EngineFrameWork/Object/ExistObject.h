@@ -18,6 +18,8 @@ public:
 	virtual void BeginObject() override;
 
 	virtual void Tick(const float DeltaTime) override;
-
-	void Move();
+	void Right();
+	void Left();
+	void Up();
+	void Down();
 };

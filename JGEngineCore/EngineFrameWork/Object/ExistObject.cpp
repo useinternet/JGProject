@@ -52,8 +52,14 @@ void ExistObject::BeginObject()
 {
 	Object::BeginObject();
 	Frame->SetComponentLocation(300.0f, 500.0f);
-	Input->BindKeyCommand(TT("SampleCommand"), EKeyState::Down,
-		bind(&ExistObject::Move, this));
+	Input->BindKeyCommand(TT("Right"), EKeyState::Down,
+		bind(&ExistObject::Right, this));
+	Input->BindKeyCommand(TT("Left"), EKeyState::Down,
+		bind(&ExistObject::Left, this));
+	Input->BindKeyCommand(TT("Up"), EKeyState::Down,
+		bind(&ExistObject::Up, this));
+	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
+		bind(&ExistObject::Down, this));
 }
 
 void ExistObject::Tick(const float DeltaTime)
@@ -62,10 +68,21 @@ void ExistObject::Tick(const float DeltaTime)
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"),(int)FPS);
 	Object::Tick(DeltaTime);
-	Breath->AddComponentAngle(DeltaTime*5.0f);
-	//Test->AddComponentAngle(DeltaTime * 2);
+	//Breath->AddComponentAngle(DeltaTime*5.0f);
 }
-void ExistObject::Move()
+void ExistObject::Right()
 {
-	Breath->AddComponentLocation(1.0f, 1.0f);
+	Breath->AddComponentLocation(1.0f, 0.0f);
+}
+void ExistObject::Left()
+{
+	Breath->AddComponentLocation(-1.0f, 0.0f);
+}
+void ExistObject::Up()
+{
+	Breath->AddComponentLocation(0.0f, -1.0f);
+}
+void ExistObject::Down()
+{
+	Breath->AddComponentLocation(0.0f, 1.0f);
 }

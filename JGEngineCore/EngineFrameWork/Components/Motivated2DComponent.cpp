@@ -202,4 +202,9 @@ const JGMatrix& Motivated2DComponent::GetWorldMatrix()
 	return *m_WorldMatrix;
 }
 
+bool Motivated2DComponent::Render2DCurling()
+{
+	return true;
+}
+
 

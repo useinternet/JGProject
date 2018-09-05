@@ -2,6 +2,16 @@
 #include"../EngineStatics/Engine.h"
 class WorldCompare;
 
+// 렌더링 컬링시스템 대략적인 생각
+// ObjectBase에 2d 3d 나눠서 저장하자( motivedobejct 에서 나누자..)
+// 2D 컬링과 3D 컬링을따로 해야함..
+// 렌더링 모드가 2D인경우..
+// 2D 컬링에 필요한거..
+// 좌표 값을 얻어온다.( pivot에따라 다르게 측정해야한다. ) 
+// 그러기 위해서는 오브젝트의 가로길이 세로길이를 가져와야한다. 
+// 현제 클라이언트 크기와 비교한다.
+// 넘어가면 그리지 않는다.
+
 class JGSuperClass;
 /*
 Class Name : RenderSystem

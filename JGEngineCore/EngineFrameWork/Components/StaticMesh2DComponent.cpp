@@ -9,6 +9,9 @@
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
+
+// юс╫ц
+#include"../../EngineStatics/JGLog.h"
 using namespace std;
 StaticMesh2DComponent::StaticMesh2DComponent()
 {
@@ -76,7 +79,10 @@ void StaticMesh2DComponent::SetAlphaBlend(const float a)
 void StaticMesh2DComponent::Render()
 {
 	Component::Render();
-
+	if (Render2DCurling())
+	{
+		return;
+	}
 	JGMatrix worldMatrix = GetWorldMatrix();
 	JGMatrix orthoMatrix = GetOrthoMatrix();
 	JGMatrix viewMatrix = GetViewMatrix();
@@ -132,4 +138,64 @@ std::wstring& StaticMesh2DComponent::GetShaderName()
 void StaticMesh2DComponent::SetShaderName(const wstring & ShaderName)
 {
 	m_ShaderName = ShaderName;
+}
+
+bool StaticMesh2DComponent::Render2DCurling()
+{
+	if (!m_Mesh)
+	{
+		return true;
+	}
+	float ScreenWidth = GetViewport()->GetWidth();
+	float ScreenHeight = GetViewport()->GetHeight();
+
+	float LocationX = GetComponentWorldLocation().X();
+	float LocationY = GetComponentWorldLocation().Y();
+	float MeshWidth = m_Mesh->GetMeshWidth();
+	float MeshHeight = m_Mesh->GetMeshHeight();
+	EPivot MeshPivot = m_Mesh->GetPivot();
+
+	switch (MeshPivot)
+	{
+	case EPivot::TopLeft:
+		break;
+	case EPivot::TopMiddle:
+		LocationX -= (MeshWidth / 2);
+		break;
+	case EPivot::TopRight:
+		LocationX -= MeshWidth;
+		break;
+	case EPivot::MiddleLeft:
+		LocationY += (MeshHeight / 2);
+		break;
+	case EPivot::MiddleMiddle:
+		LocationX -= (MeshWidth / 2);
+		LocationY += (MeshHeight / 2);
+		break;
+	case EPivot::MiddleRight:
+		LocationY += (MeshHeight / 2);
+		LocationX -= MeshWidth;
+		break;
+	case EPivot::BottomLeft:
+		LocationY += MeshHeight;
+		break;
+	case EPivot::BottomMiddle:
+		LocationY += MeshHeight;
+		LocationX -= (MeshWidth / 2);
+		break;
+	case EPivot::BottomRight:
+		LocationY += MeshHeight;
+		LocationX -= MeshWidth;
+		break;
+	}
+
+	if (LocationX + MeshWidth < 0 || LocationY + MeshHeight < 0)
+	{
+		return true;
+	}
+	else if (LocationX > ScreenWidth || LocationY > ScreenHeight)
+	{
+		return true;
+	}
+	return false;
 }

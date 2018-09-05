@@ -48,6 +48,7 @@ public:
 	/*
 	Exp : 매 프레임 한번 실행되는 함수이다. ( 부모 클래스의 Tick도 호출해야한다. ) */
 	virtual void Tick(const float DeltaTime) override;
+
 	/*
 	Exp : 컴포넌트에 위치 값을 더한다. */
 	void AddComponentLocation(const float x, const float y);
@@ -106,7 +107,7 @@ public:
 	/*
 	Exp : 컴포넌트 스케일 값을 가져온다. */
 	JGScale2D& GetComponentScale();
-
+	
 	/*
 	Exp : 위치 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
 	bool IsChangeLocation();
@@ -114,11 +115,13 @@ public:
 	Exp : 각도 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
 	bool IsChangeAngle();
 	/*
-	Exp : 스케일 값이 바뀌었으면 true를 그대로이면 false를 반환한다. */
+	Exp : 스케일 값이 바뀌었으면 true를 그대b로이면 false를 반환한다. */
 	bool IsChangeScale();
 protected:
 	/*
 	Exp : 이 컴포넌트의 월드 행렬을 가져온다. */
 	const JGMatrix& GetWorldMatrix();
-	
+
+private:
+	virtual bool Render2DCurling();
 };

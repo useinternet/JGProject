@@ -15,6 +15,8 @@ JG2DMesh::~JG2DMesh()
 bool JG2DMesh::Construct2DMesh(JGBufferManager* BufferManager,const std::wstring& ComponentName,
 	const float Width, const float Height,EPivot Pivot, const STexInformaton& TexInformation)
 {
+	m_MeshWidth = Width;
+	m_MeshHeight = Height;
 	m_Pivot = Pivot;
 	CreateVertexArray(Width, Height, Pivot, TexInformation);
 	// 五習 持失
@@ -44,6 +46,10 @@ bool JG2DMesh::ConstructTextMesh(JGBufferManager* BufferManager, const wstring& 
 
 		CreateVertexArray(VertexInformation[i].Width, VertexInformation[i].Height,
 			Pivot, TexInfor, VertexInformation[i].XAdvance);
+
+
+		m_MeshWidth += VertexInformation[i].Width;
+		m_MeshHeight += VertexInformation[i].Height;
 	}
 
 	// 五習 持失
@@ -62,6 +68,18 @@ bool JG2DMesh::ConstructTextMesh(JGBufferManager* BufferManager, const wstring& 
 size_t JG2DMesh::GetIndexCount()
 {
 	return m_vVertexArray.size();
+}
+EPivot JG2DMesh::GetPivot()
+{
+	return m_Pivot;
+}
+float JG2DMesh::GetMeshWidth()
+{
+	return m_MeshWidth;
+}
+float JG2DMesh::GetMeshHeight()
+{
+	return m_MeshHeight;
 }
 void JG2DMesh::WriteTextMesh(const vector<JGFontVertexInformation>& VertexInformation)
 {

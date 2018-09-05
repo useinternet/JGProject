@@ -54,6 +54,8 @@ public:
 private:
 	std::vector<S2DVertexType> m_vVertexArray;
 	EPivot m_Pivot;
+	float m_MeshWidth = 0.0f;
+	float m_MeshHeight = 0.0f;
 public:
 	JG2DMesh();
 	virtual ~JG2DMesh();
@@ -76,6 +78,16 @@ public:
 	/*
 	Exp : 정점 갯수를 가져온다. */ //( 이거 메시로 옮긴다. )
 	size_t GetIndexCount();
+
+	/*
+	Exp : 메시 Pivot을 가져온다.*/
+	EPivot GetPivot();
+	/*
+	Exp : 메시 가로길이를 가져온다.*/
+	float GetMeshWidth();
+	/*
+	Exp : 메시 세로길이를 가져온다.*/
+	float GetMeshHeight();
 
 	/*
 	Exp : 구현중*/
