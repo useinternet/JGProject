@@ -3,8 +3,8 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
-#include"../../RenderSystem/JGRenderSuperClass.h"
-JGRenderSuperClass* ComponentBase::m_RenderSuperClass;
+#include"../../EngineStatics/JGSuperClass.h"
+JGSuperClass* ComponentBase::m_SuperClass;
 ComponentBase::ComponentBase()
 {
 }
@@ -13,9 +13,9 @@ ComponentBase::~ComponentBase()
 {
 }
 
-void ComponentBase::InitComponent(JGRenderSuperClass* SuperClass)
+void ComponentBase::InitComponent(JGSuperClass* SuperClass)
 {
-	m_RenderSuperClass = SuperClass;
+	m_SuperClass = SuperClass;
 }
 void ComponentBase::RegisterComponentID(const type_info & ID)
 {
@@ -30,19 +30,24 @@ const char * ComponentBase::GetID()
 
 JGDeviceD* ComponentBase::GetDevice()
 {
-	return m_RenderSuperClass->GetDevice();
+	return m_SuperClass->GetDevice();
 }
 JGHLSLShaderDevice* ComponentBase::GetHLSLDevice()
 {
-	return m_RenderSuperClass->GetHLSLDevice();
+	return m_SuperClass->GetHLSLDevice();
 }
 JGBufferManager* ComponentBase::GetBufferManager()
 {
-	return m_RenderSuperClass->GetBufferManager();
+	return m_SuperClass->GetBufferManager();
 }
 
 JGViewportD* ComponentBase::GetViewport()
 {
-	return m_RenderSuperClass->GetViewport();
+	return m_SuperClass->GetViewport();
+}
+
+JGCommandManager* ComponentBase::GetCommandManager()
+{
+	return m_SuperClass->GetCommandManager();
 }
 

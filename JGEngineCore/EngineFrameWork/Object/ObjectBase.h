@@ -4,7 +4,7 @@
 class JGDeviceD;
 class JGHLSLShaderDevice;
 class JGBufferManager;
-class JGRenderSuperClass;
+class JGSuperClass;
 class JGComponentMessage;
 class JGViewportD;
 /*
@@ -14,7 +14,7 @@ class ENGINE_EXPORT ObjectBase
 private:
 	const char* ObjectID;
 	int ZOrder = 0;
-	static JGRenderSuperClass* m_RenderSuperClass;
+	static JGSuperClass* m_RenderSuperClass;
 public:
 	ObjectBase();
 	virtual ~ObjectBase();
@@ -23,7 +23,7 @@ public:
 	virtual void Tick(const float DeltaTime) = 0;
 	virtual void Render() = 0;
 	virtual void EndObject() = 0;
-	void InitObejct(JGRenderSuperClass* SuperClass);
+	void InitObejct(JGSuperClass* SuperClass);
 
 
 	/*
@@ -55,7 +55,7 @@ protected:
 	JGViewportD* GetViewport();
 	/*
 	Exp : JGViewportD 클래스를 얻어온다. */
-	JGRenderSuperClass* GetRenderSuperClass();
+	JGSuperClass* GetRenderSuperClass();
 
 
 };

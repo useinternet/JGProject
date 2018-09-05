@@ -9,7 +9,7 @@
 #include"JGHLSLShaderDevice/JGBufferManager.h"
 #include"JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"JGShaderConstructor.h"
-#include"JGRenderSuperClass.h"
+#include"../EngineStatics/JGSuperClass.h"
 #include"../EngineFrameWork/Object/Object.h"
 
 // 임시 인클루드
@@ -28,7 +28,7 @@ RenderSystem::RenderSystem()
 	m_JGBufferManager = make_unique<JGBufferManager>();
 	m_ShaderDevice = make_unique<JGHLSLShaderDevice>();
 	m_ShaderConstructor = make_unique<JGShaderConstructor>();
-	m_SuperClass = make_unique<JGRenderSuperClass>();
+
 	m_ObjectConstructInit = make_unique<Object>();
 }
 RenderSystem::~RenderSystem() {}
@@ -105,14 +105,6 @@ bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int 
 	 //셰이더 생성 보조자와 셰이더 시스템과 연결
 	m_ShaderConstructor->LinkHLSLDevice(m_ShaderDevice.get());
 	JGLog::Write(ELogLevel::Default, TT("RenderSystemAssist ConnectComplete..."));
-
-
-	// 렌더링 슈퍼 클래스 생성
-	m_SuperClass->LinkPointer(m_Device.get(), m_Viewport.get(), m_ShaderDevice.get(), m_JGBufferManager.get());
-	// 오브젝트에 렌더링에필요한 포인터 저장
-	m_ObjectConstructInit->InitObejct(m_SuperClass.get());
-
-
 	// 임시
 	// 임시 적용
 	ApplicationInDeviceContext();
@@ -170,12 +162,31 @@ void RenderSystem::Render()
 
 	EndRendering();
 }
-
+void RenderSystem::InitObjectProtoType(JGSuperClass* SuperClass)
+{
+	// 오브젝트에 렌더링에필요한 포인터 저장
+	m_ObjectConstructInit->InitObejct(SuperClass);
+}
 void RenderSystem::ReceiveObjectArray(list<shared_ptr<Object>>* Array)
 {
 	m_RenderingObjectArray = Array;
 }
-
+JGDeviceD*          RenderSystem::GetDevice()
+{
+	return m_Device.get();
+}
+JGViewportD*        RenderSystem::GetViewPort()
+{
+	return m_Viewport.get();
+}
+JGHLSLShaderDevice* RenderSystem::GetShaderDevice()
+{
+	return m_ShaderDevice.get();
+}
+JGBufferManager*    RenderSystem::GetBufferManager()
+{
+	return m_JGBufferManager.get();
+}
 void RenderSystem::ApplicationInDeviceContext()
 {
 	// 임시 적용

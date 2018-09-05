@@ -17,7 +17,7 @@ void JGCommand::RegisterCommand(JGPressManager* PressManager, const EKey key, co
 	*m_CommandName = CommandName;
 	m_pPressManager = PressManager;
 }
-void JGCommand::Tick(const float DeltaTime)
+void JGCommand::Tick()
 {
 	m_bIsPressed = m_pPressManager->IsPressed(m_Key);
 }
@@ -41,4 +41,9 @@ const wstring& JGCommand::GetCommandName()
 void JGCommand::SetCommandName(const wstring & CommandName)
 {
 	*m_CommandName = CommandName;
+}
+
+JGPressManager * JGCommand::GetPressManager()
+{
+	return m_pPressManager;
 }

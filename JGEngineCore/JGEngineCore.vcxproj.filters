@@ -47,6 +47,15 @@
     <Filter Include="InputSystem">
       <UniqueIdentifier>{b1335abb-0999-4d09-bb0c-089d9e411fb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineStatics\JsonCpp">
+      <UniqueIdentifier>{ed3b0066-29fe-4a86-9353-08ffa879c24d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineStatics\Config">
+      <UniqueIdentifier>{0bde9c20-7a54-4871-aea1-0e2f04f4defe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineStatics\JGConfigLoader">
+      <UniqueIdentifier>{2e15a53c-3e93-46ae-a694-b30f2f8cbba5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -154,9 +163,6 @@
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem\JGRenderSuperClass.cpp">
-      <Filter>RenderSystem</Filter>
-    </ClCompile>
     <ClCompile Include="EngineStatics\JMath\JGMatrix.cpp">
       <Filter>EngineStatics\JMath</Filter>
     </ClCompile>
@@ -219,6 +225,24 @@
     </ClCompile>
     <ClCompile Include="InputSystem\JGAxisCommand.cpp">
       <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGSuperClass.cpp">
+      <Filter>EngineStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\InputComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JsonCpp\jsoncpp.cpp">
+      <Filter>EngineStatics\JsonCpp</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGConfigLoader\JGConfigLoader.cpp">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGConfigLoader\JGInputConfigLoader.cpp">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineStatics\JGConfigLoader\JGConfigLoaderManager.cpp">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -330,9 +354,6 @@
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
-    <ClInclude Include="RenderSystem\JGRenderSuperClass.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="EngineStatics\JMath\JGMatrix.h">
       <Filter>EngineStatics\JMath</Filter>
     </ClInclude>
@@ -399,6 +420,27 @@
     <ClInclude Include="InputSystem\JGAxisCommand.h">
       <Filter>InputSystem</Filter>
     </ClInclude>
+    <ClInclude Include="EngineStatics\JGSuperClass.h">
+      <Filter>EngineStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\InputComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JsonCpp\json.h">
+      <Filter>EngineStatics\JsonCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JsonCpp\json-forwards.h">
+      <Filter>EngineStatics\JsonCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGConfigLoader\JGConfigLoader.h">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGConfigLoader\JGInputConfigLoader.h">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineStatics\JGConfigLoader\JGConfigLoaderManager.h">
+      <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_ps.hlsl">
@@ -413,5 +455,10 @@
     <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_vs.hlsl">
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EngineStatics\Config\InputConfig.Json">
+      <Filter>EngineStatics\Config</Filter>
+    </None>
   </ItemGroup>
 </Project>

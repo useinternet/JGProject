@@ -1,10 +1,13 @@
 #include"InputSystem.h"
 #include"JGPressManager.h"
+#include"JGCommandManager.h"
 #include"../EngineStatics/JGLog.h"
+
 using namespace std;
 InputSystem::InputSystem()
 {
 	m_PressManager = make_unique<JGPressManager>();
+	m_CommandManager = make_unique<JGCommandManager>();
 }
 InputSystem::~InputSystem()
 {
@@ -26,7 +29,7 @@ InputSystem::~InputSystem()
 		m_DirectInput = nullptr;
 	}
 }
-bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd, int width, int height)
+bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd,const int width,const int height)
 {
 	m_hWnd = hWnd;
 	m_ScreenWidth = (float)width;
@@ -101,12 +104,19 @@ bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd, int width, int h
 
 	// JGPressManager에 키보드 상태를 넘겨준다.
 	m_PressManager->LinkInputSystemKeyBoardState(m_KeyBoardState,&m_MouseState);
+	m_CommandManager->InitCommandManager(m_PressManager.get());
 	return true;
 }
-void InputSystem::Tick(const float DeltaTime)
+void InputSystem::Tick()
 {
 	ReadKeyboard();
 	ReadMouse();
+	m_CommandManager->Tick();
+}
+
+JGCommandManager* InputSystem::GetCommandManager()
+{
+	return m_CommandManager.get();
 }
 
 bool InputSystem::ReadKeyboard()

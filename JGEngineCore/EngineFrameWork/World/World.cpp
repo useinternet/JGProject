@@ -33,14 +33,3 @@ list<shared_ptr<Object>>* World::GetObjectArray()
 {
 	return &m_sObjects;
 }
-
-/*
-for (it = numbers.begin(); it != numbers.end(); ) 
-{ 
-    if (*it % 2 == 0)
-	{ 
-	   it = numbers.erase(it);
-	} 
-	else { ++it; } 
-}
-*/

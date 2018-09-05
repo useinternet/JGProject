@@ -4,25 +4,32 @@
 #include"JGLog.h"
 #include"JGInputEvent.h"
 #include"../RenderSystem/RenderSystem.h"
+#include"../InputSystem/InputSystem.h"
+#include"JGSuperClass.h"
+#include"JGConfigLoader/JGConfigLoaderManager.h"
 #include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 #include"JGConstructHelper.h"
 #include"../EngineFrameWork/GameLoop.h"
+
 using namespace std;
 
 JGEngineMain::JGEngineMain()
 {
 	m_EngineTimer   = JMainTimer::GetInstance();
 	m_ThreadManager = JThreadManager::GetInstance();
-
 	m_EngineLog    = make_unique<JGLog>();
 	m_InputEvent   = make_unique<JGInputEvent>();
 	m_RenderSystem = make_unique<RenderSystem>();
+	m_InputSystem  = make_unique<InputSystem>();
+	m_SuperClass = make_unique<JGSuperClass>();
+	m_ConfigManager = make_unique<JGConfigLoaderManager>();
 	m_FontLoader   = make_unique<JGFontLoader>();
 	m_ConstructHelper = make_unique<JGConstructHelper>();
 	m_GameLoop = make_unique<GameLoop>();
+
 }
 JGEngineMain::~JGEngineMain() {}
-bool JGEngineMain::Init(HWND hWnd)
+bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 {
 	bool result = true;
 	m_EngineTimer->Start();
@@ -36,9 +43,24 @@ bool JGEngineMain::Init(HWND hWnd)
 		//예외처리
 		return false;
 	}
+	result = m_InputSystem->CreateInputDevice(Instance, hWnd, 1920, 1080);
+	if (!result)
+	{
+		return false;
+	}
+	// 렌더링 슈퍼 클래스 생성
+	m_SuperClass->LinkPointer(m_RenderSystem->GetDevice(),
+		m_RenderSystem->GetViewPort(),
+		m_RenderSystem->GetShaderDevice(),
+		m_RenderSystem->GetBufferManager(),
+		m_InputSystem->GetCommandManager());
+	m_RenderSystem->InitObjectProtoType(m_SuperClass.get());
 
+	// 설정파일들 초기화...
+	m_ConfigManager->LoadConfig(m_SuperClass.get());
 	// 게임 루프 초기화
 	m_GameLoop->InitGameLoop(m_RenderSystem.get());
+
 	return true;
 }
 void JGEngineMain::Run()
@@ -58,6 +80,7 @@ void JGEngineMain::Run()
 		}
 		m_EngineTimer->Tick();
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
+		m_InputSystem->Tick();
 		m_RenderSystem->Render();
 	}
 }

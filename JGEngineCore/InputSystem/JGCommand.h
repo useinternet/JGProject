@@ -38,7 +38,7 @@ public:
 	void RegisterCommand(JGPressManager* PressManager, const EKey key, const std::wstring& CommandName);
 	/*
 	Exp : 1프레임당 한번 호출하는 함수. */
-	virtual void Tick(const float DeltaTime);
+	virtual void Tick();
 	/*
 	Exp : 바인딩 된 Key를 가져온다. */
 	EKey GetKey();
@@ -54,4 +54,7 @@ public:
 	/*
 	Exp : 바인딩 할 커맨드 이름 셋팅한다.*/
 	void SetCommandName(const std::wstring& CommandName);
+	/*
+	Exp : PressManager를 가져온다. */
+	JGPressManager* GetPressManager();
 };

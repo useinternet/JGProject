@@ -1,10 +1,10 @@
 #include"Sample.h"
 
 
-void  SampleClass::Init(HWND hWnd)
+void  SampleClass::Init(HINSTANCE Instance, HWND hWnd)
 {
 	System = new JGEngineMain;
-	System->Init(hWnd);
+	System->Init(Instance,hWnd);
 }
 void  SampleClass::Run()
 {

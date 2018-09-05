@@ -4,8 +4,9 @@
 class JGDeviceD;
 class JGHLSLShaderDevice;
 class JGBufferManager;
-class JGRenderSuperClass;
+class JGSuperClass;
 class JGViewportD;
+class JGCommandManager;
 /*
 Class : JGComponentMessage */
 class ENGINE_EXPORT JGComponentMessage
@@ -18,7 +19,7 @@ class ENGINE_EXPORT ComponentBase
 {
 private:
 	const char* ComponentID;
-	static JGRenderSuperClass* m_RenderSuperClass;
+	static JGSuperClass* m_SuperClass;
 public:
 	ComponentBase();
 	virtual ~ComponentBase();
@@ -27,7 +28,7 @@ public:
 	virtual void Tick(const float DeltaTime) = 0;
 	virtual void Render() = 0;
 	virtual void DestoryComponent() = 0;
-	void InitComponent(JGRenderSuperClass* SuperClass);
+	void InitComponent(JGSuperClass* SuperClass);
 protected:
 	/*
 	Exp : 컴포넌트 아이디를 등록합니다.
@@ -49,5 +50,8 @@ protected:
 	/*
 	Exp : JGViewportD 클래스를 얻어온다. */
 	JGViewportD* GetViewport();
+	/*
+	Exp : CommandManager 클래스를 얻어온다. */
+	JGCommandManager* GetCommandManager();
 
 };

@@ -3,8 +3,8 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
-#include"../../RenderSystem/JGRenderSuperClass.h"
-JGRenderSuperClass* ObjectBase::m_RenderSuperClass = nullptr;;
+#include"../../EngineStatics/JGSuperClass.h"
+JGSuperClass* ObjectBase::m_RenderSuperClass = nullptr;;
 ObjectBase::ObjectBase()
 {
 
@@ -14,7 +14,7 @@ ObjectBase::~ObjectBase()
 }
 
 
-void ObjectBase::InitObejct(JGRenderSuperClass* SuperClass)
+void ObjectBase::InitObejct(JGSuperClass* SuperClass)
 {
 	m_RenderSuperClass = SuperClass;
 }
@@ -56,7 +56,7 @@ JGViewportD * ObjectBase::GetViewport()
 	return m_RenderSuperClass->GetViewport();
 }
 
-JGRenderSuperClass * ObjectBase::GetRenderSuperClass()
+JGSuperClass * ObjectBase::GetRenderSuperClass()
 {
 	return m_RenderSuperClass;
 }

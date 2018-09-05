@@ -2,7 +2,9 @@
 #include"../EngineStatics/Engine.h"
 
 
-
+/*
+EnumClass : EKey 
+Exp : 키 목록 (Axis가 붙어있는 enum값은 Axis전용 함수를따로 이용하여 바인딩해야한다.)*/
 enum class ENGINE_EXPORT EKey
 {
 	// 숫자 키
@@ -20,9 +22,12 @@ enum class ENGINE_EXPORT EKey
 	U, V, W, X, Y, Z,
 	// 마우스
 	MouseXAxis, MouseYAxis, MouseLButton, MouseRButton,
-	MouseHweelClick, MouseHweelMove
+	MouseWheelClick, MouseWheelAxis
 };
-
+/*
+Class : JGPressManager
+@m KeyBoardState* m_pKeyBoardState : 현제 키보드 상황( 어느키가 눌렸는지..)
+@m MouseState* m_pMouseState : 마우스 상태( 마우스 버튼이 눌렀는지.. 움직인정도좌표값 등등)  */
 class ENGINE_EXPORT JGPressManager
 {
 	typedef DIMOUSESTATE  MouseState;
@@ -33,9 +38,15 @@ private:
 public:
 	JGPressManager();
 	~JGPressManager();
-
+	/*
+	Exp : InputSystem 에서 생성한 키보드 및 마우스 장치 연결후 이 클래에다 키보드상태와 마우스상태를 넘겨준다. 
+	@param KeyBoardState* state : 키보드상태 주소값
+	@param MouseState* MouseSate : 마우스 상태 주소값 */
 	void LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState);
-
+	/*
+	Exp : 해당 키가 눌렀는지 여부*/
 	bool IsPressed(const EKey Key);
-	float GetMouseAxis(const EKey Key);
+	/*
+	Exp : Axis 입력의 출려값을 가져온다. */
+	float GetAxisKey(const EKey Key);
 };

@@ -14,7 +14,7 @@
 extern "C"
 {
 	BridgeExport SampleClass* g_sample = nullptr;
-	BridgeExport void InitEngine(HWND hWnd, int ScreenWidth, int ScreenHeight);
+	BridgeExport void InitEngine(HINSTANCE Instance, HWND hWnd, int ScreenWidth, int ScreenHeight);
 
 	BridgeExport void Start();
 

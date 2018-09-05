@@ -10,6 +10,7 @@ private:
 	// 실험을 해보자..
 	class StaticMesh2DComponent* Breath;
 	class TextComponent* Frame;
+	class InputComponent* Input;
 public:
 	ExistObject();
 	virtual ~ExistObject();
@@ -17,4 +18,6 @@ public:
 	virtual void BeginObject() override;
 
 	virtual void Tick(const float DeltaTime) override;
+
+	void Move();
 };

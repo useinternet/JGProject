@@ -16,7 +16,7 @@ class GAME_LOGIC_EXPORT SampleClass
 private:
 	JGEngineMain * System;
 public:
-	void Init(HWND hWnd);
+	void Init(HINSTANCE Instance,HWND hWnd);
 	void Run();
 	void DoEvent(UINT message, WPARAM wParam, LPARAM lParam);
 	void Destroy();

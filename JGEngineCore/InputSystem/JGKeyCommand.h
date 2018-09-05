@@ -17,22 +17,27 @@ enum class ENGINE_EXPORT EKeyState
 Class : JGKeyCommand 
 @m EKeyState m_KeyState : 키 상태
 @m EKeyState m_EventTriggerKeyState : 이벤트를 발생시킬 키 조건..
-@m std::function<void()> m_BindEvent : 바인딩된 이벤트
+@m function<void()> m_BindKeyDownEvent : 키를 눌렀을떄 이벤트
+@m function<void()> m_BIndKeyUpEvent : 키 똇을때 이벤트
 @m bool m_bKeyVariance : 키상태에 변화가 있었는지 여부
-@m bool m_PrevPressed  : 이전 키누름상태 */
+@m bool m_PrevPressed  : 이전 키누름상태 
+@m bool m_bIsBindKeyDownEvent : 키 눌림 이벤트가 바인딩 됬는지 여부 
+@m bool m_bIsBindKeyUpEvent : 키 똄 이벤트가 바인딩 됬는지 여부 */
 class ENGINE_EXPORT JGKeyCommand : public JGCommand
 {
 private:
 	EKeyState m_KeyState;
-	EKeyState m_EventTriggerKeyState;
-	std::function<void()> m_BindEvent;
+	std::function<void()> m_BindKeyDownEvent;
+	std::function<void()> m_BIndKeyUpEvent;
 	bool m_bKeyVariance = false;
 	bool m_PrevPressed  = false;
+	bool m_bIsBindKeyDownEvent = false;
+	bool m_bIsBindKeyUpEvent = false;
 public:
 	JGKeyCommand(const JGKeyCommand& copy) = delete;
 	JGKeyCommand();
 	virtual ~JGKeyCommand();
-	virtual void Tick(const float DeltaTime) override;
+	virtual void Tick() override;
 
 	/*
 	Exp : JGKeyCommand에 키상태와 이벤트(함수)를 바인딩한다. (함수의 형식은 = void() 형식이다.)

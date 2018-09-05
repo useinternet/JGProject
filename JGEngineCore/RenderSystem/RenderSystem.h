@@ -1,6 +1,8 @@
 #pragma once
 #include"../EngineStatics/Engine.h"
 class WorldCompare;
+
+class JGSuperClass;
 /*
 Class Name : RenderSystem
 @m unique_ptr<class JGDeviceD>            m_Device              : Direct 장치
@@ -11,7 +13,7 @@ Class Name : RenderSystem
 @m unique_ptr<class JGBufferManager>      m_JGBufferManager     : 버퍼 매니저( 상수버퍼, 정점 버퍼, 인덱스 버퍼)
 @m unique_ptr<class JBHLSLShaderDevice>   m_ShaderDevice        : hlsl 장치( 셰이더 관리 장치)
 @m unique_ptr<class JGShaderConstructor>  m_ShaderConstructor   : 셰이더 생성 보조 클래스
-@m unique_ptr<class JGRenderSuperClass>   m_SuperClass          : 렌더링에 필요한 장치들의 주소값을 담은 클래스(전달용)
+@m unique_ptr<class JGSuperClass>   m_SuperClass          : 렌더링에 필요한 장치들의 주소값을 담은 클래스(전달용)
 @m unique_ptr<class Object>               m_ObjectConstructInit : 초기화용 오브젝트
 @m HWND m_hWnd           : 윈도우 핸들
 @m int  m_ScreenWidth    : 스크린 가로 길이
@@ -29,9 +31,7 @@ private:
 	std::unique_ptr<class JGBufferManager>      m_JGBufferManager;
 	std::unique_ptr<class JGHLSLShaderDevice>   m_ShaderDevice;
 	std::unique_ptr<class JGShaderConstructor>  m_ShaderConstructor;
-	std::unique_ptr<class JGRenderSuperClass>   m_SuperClass;
 	std::unique_ptr<class Object>               m_ObjectConstructInit;
-
 	std::list<std::shared_ptr<Object>>* m_RenderingObjectArray;
 	HWND m_hWnd;
 	int  m_ScreenWidth;
@@ -63,7 +63,13 @@ public:
 	Exp : 그리기  */
 	void Render();
 
+	void InitObjectProtoType(JGSuperClass* SuperClass);
 	void ReceiveObjectArray(std::list<std::shared_ptr<Object>>* Array);
+
+	JGDeviceD*          GetDevice();
+	JGViewportD*        GetViewPort();
+	JGHLSLShaderDevice* GetShaderDevice();
+	JGBufferManager*    GetBufferManager();
 private:
 	//임시
 	void ApplicationInDeviceContext();

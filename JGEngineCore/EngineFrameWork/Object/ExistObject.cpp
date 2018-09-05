@@ -6,6 +6,11 @@
 
 //이밋
 #include"../2D/Text/JGFontLoader.h"
+#include"../Components/InputComponent.h"
+#include"../../EngineStatics/JGLog.h"
+
+
+using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
@@ -31,6 +36,11 @@ ExistObject::ExistObject()
 		Frame->SetConstructObject(FrameMesh.Object);
 	}
 	Frame->SetTextColor(1.0f, 0.0f, 0.0f);
+
+
+
+	// 입력 실험
+	Input = RegisterComponentInObject<InputComponent>(TT("SampleInput"));
 }
 ExistObject::~ExistObject()
 {
@@ -42,7 +52,8 @@ void ExistObject::BeginObject()
 {
 	Object::BeginObject();
 	Frame->SetComponentLocation(300.0f, 500.0f);
-
+	Input->BindKeyCommand(TT("SampleCommand"), EKeyState::Down,
+		bind(&ExistObject::Move, this));
 }
 
 void ExistObject::Tick(const float DeltaTime)
@@ -53,4 +64,8 @@ void ExistObject::Tick(const float DeltaTime)
 	Object::Tick(DeltaTime);
 	Breath->AddComponentAngle(DeltaTime*5.0f);
 	//Test->AddComponentAngle(DeltaTime * 2);
+}
+void ExistObject::Move()
+{
+	Breath->AddComponentLocation(1.0f, 1.0f);
 }

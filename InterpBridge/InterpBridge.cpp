@@ -3,10 +3,10 @@
 
 
 
-void InitEngine(HWND hWnd, int ScreenWidth, int ScreenHeight)
+void InitEngine(HINSTANCE Instance, HWND hWnd, int ScreenWidth, int ScreenHeight)
 {
 	g_sample = new SampleClass;
-	g_sample->Init(hWnd);
+	g_sample->Init(Instance,hWnd);
 }
 void Start()
 {
