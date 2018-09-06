@@ -7,6 +7,13 @@
 using namespace std;
 
 static JGConstructHelper* Instance = nullptr;
+ConsructObject::~ConsructObject() {}
+StaticMesh2DObject::~StaticMesh2DObject() {}
+AnimationMesh2DObject::~AnimationMesh2DObject() {}
+TextObject::~TextObject() {}
+
+
+
 
 JGConstructHelper::JGConstructHelper()
 {
@@ -59,7 +66,49 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 }
 
 
+JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
+	JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
+	EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
+	const std::wstring& TexturePath, const std::wstring& ShaderName = TT(""))
+{
+	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
+	TempObject->Texture = make_unique<JGTexture>();
+	TempObject->Mesh = make_unique<JG2DMesh>();
+	// 텍스쳐 로드
+	bool result = TempObject->Texture->Add(Device, TexturePath);
+	if (!result)
+	{
+		Success = false;
+	}
+	// 애니메이션 한장의 크기를 구한다.
+	float MeshWidth  = TempObject->Texture->GetInformation(0).Width / WidthFrame;
+	float MeshHeight = TempObject->Texture->GetInformation(0).Height / HeightFrame;
+	float TexWidth =  1.0f / (float)WidthFrame;
+	float TexHeight = 1.0f / (float)HeightFrame;
+	JG2DMesh::STexInformaton Information;
+	Information.Height = TexHeight;
+	Information.Width = TexWidth;
 
+	// 한장의 크기를 구한 구격으로 메쉬를 생성
+	result = TempObject->Mesh->Construct2DMesh(BufferManager, ComponentName,
+		MeshWidth, MeshHeight, pivot, Information);
+	if (!result)
+	{
+		Success = false;
+	}
+	// 각 정보들 저장
+	TempObject->ShaderName = ShaderName;
+	TempObject->TotalFrame = TotalFrame;
+	TempObject->WidthFrame = WidthFrame;
+	TempObject->HeightFrame = HeightFrame;
+
+
+
+
+
+
+
+}
 JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
 	const wstring& ShaderName)
 {
@@ -85,14 +134,4 @@ JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& Font
 	JGConstructHelper::GetInstance()->m_vStaticMesh2DObject.push_back(move(TempObject));
 }
 
-StaticMesh2DObject::~StaticMesh2DObject()
-{
-}
 
-TextObject::~TextObject()
-{
-}
-
-ConsructObject::~ConsructObject()
-{
-}

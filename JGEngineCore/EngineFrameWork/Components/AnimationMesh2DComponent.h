@@ -50,9 +50,10 @@ public:
 	AnimationMesh2DComponent(const AnimationMesh2DComponent& copy) = delete;
 	AnimationMesh2DComponent();
 	~AnimationMesh2DComponent();
-
+	/*
+	Exp : 셰이더 상수버퍼의 파라미터들을 설정한다. ( 상속 받아서 쓰세요 / 부모 함수 호출 안해도되요.. */
+	virtual void ShaderParamSetting(JGShaderData* Data);
 	virtual void Tick(const float DeltaTime) override;
-	virtual void Render() override;
 	void SetAnimation(const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame, const float AnimationDelay,
 		const float TextureWidth, const float TextureHeight);
 	void AnimationRepeatOn(const size_t StartFrame, const size_t EndFrame, const size_t RepeatCount);

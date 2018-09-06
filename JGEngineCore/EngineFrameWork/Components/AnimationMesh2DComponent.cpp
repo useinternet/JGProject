@@ -7,6 +7,12 @@ AnimationMesh2DComponent::AnimationMesh2DComponent()
 AnimationMesh2DComponent::~AnimationMesh2DComponent()
 {
 }
+void AnimationMesh2DComponent::ShaderParamSetting(JGShaderData * Data)
+{
+	m_CurrentFrame++;
+
+
+}
 void AnimationMesh2DComponent::Tick(const float DeltaTime)
 {
 	StaticMesh2DComponent::Tick(DeltaTime);
@@ -22,14 +28,6 @@ void AnimationMesh2DComponent::Tick(const float DeltaTime)
 		m_AccTime = 0.0f;
 		AnimationCalulation();
 	}
-}
-void AnimationMesh2DComponent::Render()
-{
-	Component::Render();
-	m_CurrentFrame++;
-
-
-
 }
 void AnimationMesh2DComponent::SetAnimation(const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame, const float AnimationDelay,
 	const float TextureWidth, const float TextureHeight)

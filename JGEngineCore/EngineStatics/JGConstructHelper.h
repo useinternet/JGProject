@@ -30,6 +30,14 @@ public:
 	std::shared_ptr<JG2DMesh>  Mesh;
 	virtual ~StaticMesh2DObject();
 };
+class ENGINE_EXPORT AnimationMesh2DObject : public StaticMesh2DObject
+{
+public:
+	size_t TotalFrame;
+	size_t WidthFrame;
+	size_t HeightFrame;
+	virtual ~AnimationMesh2DObject();
+};
 /*
 Class : TextObject 
 Exp : 텍스트 컴포넌트에게 전달하기위한 오브젝트 
@@ -74,6 +82,18 @@ public:
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
 			EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
+	};
+	class AnimationMesh2D
+	{
+	public:
+		AnimationMesh2DObject * Object;
+		bool Success = true;
+	public:
+		AnimationMesh2D() = delete;
+		AnimationMesh2D(const AnimationMesh2D& copy) = delete;
+		AnimationMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager,const std::wstring& ComponentName,
+			EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
+			const std::wstring& TexturePath, const std::wstring& ShaderName = TT(""));
 	};
 	class TextFont
 	{
