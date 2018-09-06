@@ -1,13 +1,18 @@
 #pragma once
-#include"JG2DSpriteShader.h"
+#include"../JGHLSLShaderDevice/JGShader.h"
 
 
 
-class JG2DAnimationShader : public JG2DSpriteShader
+class JG2DAnimationShader : public JGShader
 {
-private:
-
-
-
 public:
+	JG2DAnimationShader();
+	virtual ~JG2DAnimationShader();
+
+
+protected:
+	virtual bool CreateShader() override;
+	virtual void JGShaderDataSetting(JGShaderData* Data) override;
+	virtual void JGTextureSetting(JGTexture* Texture) override;
+
 };

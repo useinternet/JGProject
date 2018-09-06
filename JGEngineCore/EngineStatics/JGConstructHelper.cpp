@@ -62,14 +62,14 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	Object = TempObject.get();
 
 	// 주소 유지 배열에 저장
-	JGConstructHelper::GetInstance()->m_vStaticMesh2DObject.push_back(move(TempObject));
+	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
 }
 
 
 JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
 	EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-	const std::wstring& TexturePath, const std::wstring& ShaderName = TT(""))
+	const std::wstring& TexturePath, const std::wstring& ShaderName)
 {
 	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
 	TempObject->Texture = make_unique<JGTexture>();
@@ -81,8 +81,8 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 		Success = false;
 	}
 	// 애니메이션 한장의 크기를 구한다.
-	float MeshWidth  = TempObject->Texture->GetInformation(0).Width / WidthFrame;
-	float MeshHeight = TempObject->Texture->GetInformation(0).Height / HeightFrame;
+	float MeshWidth  = (float)TempObject->Texture->GetInformation(0).Width / WidthFrame;
+	float MeshHeight = (float)TempObject->Texture->GetInformation(0).Height / HeightFrame;
 	float TexWidth =  1.0f / (float)WidthFrame;
 	float TexHeight = 1.0f / (float)HeightFrame;
 	JG2DMesh::STexInformaton Information;
@@ -101,13 +101,14 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	TempObject->TotalFrame = TotalFrame;
 	TempObject->WidthFrame = WidthFrame;
 	TempObject->HeightFrame = HeightFrame;
+	TempObject->IncreaseWidth = TexWidth;
+	TempObject->IncreaseHeight = TexHeight;
 
 
+	Object = TempObject.get();
 
 
-
-
-
+	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
 }
 JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
 	const wstring& ShaderName)
@@ -131,7 +132,7 @@ JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& Font
 	TempObject->FontPath = FontPath;
 	// 포인터 저장
 	Object = TempObject.get();
-	JGConstructHelper::GetInstance()->m_vStaticMesh2DObject.push_back(move(TempObject));
+	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
 }
 
 

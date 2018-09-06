@@ -18,3 +18,10 @@ typedef struct STextBuffer_PS
 {
 	D3DXVECTOR4 TextColor = { 1.0f,1.0f,1.0f,1.0f };
 }STextBuffer;
+
+typedef struct SAnimationIncrementBuffer_VS
+{
+	float WidthIncrement = 0.0f;
+	float HeightIncrement = 0.0f;
+	D3DXVECTOR2 Padding = { 0.0f,0.0f };
+}SAnimationIncrementBuffer_VS;

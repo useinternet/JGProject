@@ -11,17 +11,14 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
-
 class ENGINE_EXPORT Component : public ComponentBase
 {
 	std::vector<Component*> m_vChildComponent;
 	Component* m_ParentComponent = nullptr;
 	std::wstring m_ComponentName = TT("None");
-
 public:
 	Component();
 	virtual ~Component();
-
 
 	/*
 	Exp : 메세지를 받는다. ( 부모 클래스의 Receive도 호출해야한다. ) */

@@ -5,11 +5,11 @@ using namespace std;
 Component::Component()
 {
 	RegisterComponentID(typeid(this));
-
 }
 
 Component::~Component()
 {
+
 }
 
 void Component::Receive(const JGComponentMessage& Message)

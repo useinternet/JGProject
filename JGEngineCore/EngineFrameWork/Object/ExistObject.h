@@ -8,7 +8,7 @@ class ExistObject : public Object
 {
 private:
 	// 실험을 해보자..
-	class StaticMesh2DComponent* Breath;
+	class AnimationMesh2DComponent* Breath;
 	class TextComponent* Frame;
 	class InputComponent* Input;
 public:

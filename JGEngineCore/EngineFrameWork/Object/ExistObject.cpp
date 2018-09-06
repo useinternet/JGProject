@@ -8,7 +8,7 @@
 #include"../2D/Text/JGFontLoader.h"
 #include"../Components/InputComponent.h"
 #include"../../EngineStatics/JGLog.h"
-
+#include"../Components/AnimationMesh2DComponent.h"
 
 using namespace std;
 ExistObject::ExistObject()
@@ -16,17 +16,17 @@ ExistObject::ExistObject()
 	RegisterObjectID(typeid(this));
 
 	// 등록
-	Breath = RegisterComponentInObject<StaticMesh2DComponent>(TT("Breath"));
+	Breath = RegisterComponentInObject<AnimationMesh2DComponent>(TT("Breath"));
 	
 
-	const JGConstructHelper::StaticMesh2D BreathMesh(GetDevice(),
+	const JGConstructHelper::AnimationMesh2D BreathMesh(GetDevice(),
 		GetBufferManager(), Breath->GetComponentName(),
-		EPivot::TopLeft, TT("../ManagementFiles/Resource/Breath.png"));
+		EPivot::TopLeft,23,5,5,
+		TT("../ManagementFiles/Resource/Water1.png"),TT("2DAnimationShader"));
 	if (BreathMesh.Success)
 	{
 		Breath->SetConstructObject(BreathMesh.Object);
 	}
-	Breath->SetColorRize(0.0f, 0.0f, 1.0f);
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
 	const JGConstructHelper::TextFont FrameMesh(
 		GetDevice(),  "../ManagementFiles/Resource/Font/Godic.fnt",
@@ -64,10 +64,10 @@ void ExistObject::BeginObject()
 
 void ExistObject::Tick(const float DeltaTime)
 {
+	Object::Tick(DeltaTime);
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"),(int)FPS);
-	Object::Tick(DeltaTime);
 	//Breath->AddComponentAngle(DeltaTime*5.0f);
 }
 void ExistObject::Right()

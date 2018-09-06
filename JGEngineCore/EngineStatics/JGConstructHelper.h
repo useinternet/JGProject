@@ -36,6 +36,8 @@ public:
 	size_t TotalFrame;
 	size_t WidthFrame;
 	size_t HeightFrame;
+	float IncreaseWidth;
+	float IncreaseHeight;
 	virtual ~AnimationMesh2DObject();
 };
 /*
@@ -59,7 +61,7 @@ Class : JGConstructHelper
 class ENGINE_EXPORT JGConstructHelper
 {
 public:
-	std::vector<std::shared_ptr<ConsructObject>> m_vStaticMesh2DObject;
+	std::vector<std::shared_ptr<ConsructObject>> m_vConsructObject;
 public:
 	JGConstructHelper();
 	static JGConstructHelper* GetInstance();

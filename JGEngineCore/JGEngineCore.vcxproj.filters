@@ -455,6 +455,12 @@
     <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_vs.hlsl">
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DAnimationShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\2DAnimationShader_vs.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineStatics\Config\InputConfig.Json">
