@@ -7,10 +7,10 @@ Exp : 화면상에 그려지는 오브젝트.. */
 class ExistObject : public Object
 {
 private:
-	// 실험을 해보자..
-	class AnimationMesh2DComponent* Breath;
+	class AnimationMesh2DComponent* Sample;
 	class TextComponent* Frame;
 	class InputComponent* Input;
+	class TestAnim* TestAnimation;
 public:
 	ExistObject();
 	virtual ~ExistObject();
@@ -23,3 +23,4 @@ public:
 	void Up();
 	void Down();
 };
+

@@ -36,8 +36,6 @@ public:
 	/*
 	Exp :  컴포넌트가 파괴되기전 한번 실행되는 함수이다. ( 부모 클래스의 DestoryComponent도 호출해야한다. ) */
 	virtual void DestoryComponent() override;
-
-
 public:
 	/*
 	Exp : 컴포넌트 이름을 등록한다. (컴포넌트를 탐색할때 쓰인다.)

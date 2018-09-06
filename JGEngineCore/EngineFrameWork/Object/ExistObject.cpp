@@ -9,27 +9,31 @@
 #include"../Components/InputComponent.h"
 #include"../../EngineStatics/JGLog.h"
 #include"../Components/AnimationMesh2DComponent.h"
-
+#include"../../Test/TestAnim.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
 
-	// 등록
-	Breath = RegisterComponentInObject<AnimationMesh2DComponent>(TT("Breath"));
-	
+	TestAnimation = RegisterComponentInObject<TestAnim>(TT("Animation"));
+	TestAnimation->SetCurrentState(AnimationState::Idle);
 
-	const JGConstructHelper::AnimationMesh2D BreathMesh(GetDevice(),
-		GetBufferManager(), Breath->GetComponentName(),
-		EPivot::TopLeft,23,5,5,
-		TT("../ManagementFiles/Resource/Water1.png"),TT("2DAnimationShader"));
-	if (BreathMesh.Success)
+	Sample = RegisterComponentInObject<AnimationMesh2DComponent>(TT("SampleAnimation"));
+	static JGConstructHelper::AnimationMesh2D SampleMesh(
+		GetDevice(), GetBufferManager(), Sample->GetComponentName(),
+		EPivot::TopLeft, 26, 5, 6, TT("../ManagementFiles/Resource/Fire3.png"),
+		TT("2DAnimationShader")
+	);
+	if (SampleMesh.Success)
 	{
-		Breath->SetConstructObject(BreathMesh.Object);
+		Sample->SetConstructObject(SampleMesh.Object);
 	}
+
+
+
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
-	const JGConstructHelper::TextFont FrameMesh(
-		GetDevice(),  "../ManagementFiles/Resource/Font/Godic.fnt",
+	static JGConstructHelper::TextFont FrameMesh(
+		GetDevice(), "../ManagementFiles/Resource/Font/Godic.fnt",
 		TT("../ManagementFiles/Resource/Font/Godic_0.png"));
 	if (FrameMesh.Success)
 	{
@@ -67,22 +71,31 @@ void ExistObject::Tick(const float DeltaTime)
 	Object::Tick(DeltaTime);
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
-	Frame->SetText(TT("FPS : %d"),(int)FPS);
+	Frame->SetText(TT("FPS : %d"), (int)FPS);
 	//Breath->AddComponentAngle(DeltaTime*5.0f);
 }
 void ExistObject::Right()
 {
-	Breath->AddComponentLocation(1.0f, 0.0f);
+	TestAnimation->AddComponentLocation(1.0f, 0.0f);
+	TestAnimation->SetCurrentState(AnimationState::Right);
 }
 void ExistObject::Left()
 {
-	Breath->AddComponentLocation(-1.0f, 0.0f);
+	TestAnimation->AddComponentLocation(-1.0f, 0.0f);
+	TestAnimation->SetCurrentState(AnimationState::Left);
 }
 void ExistObject::Up()
 {
-	Breath->AddComponentLocation(0.0f, -1.0f);
+	TestAnimation->AddComponentLocation(0.0f, -1.0f);
+	TestAnimation->SetCurrentState(AnimationState::Up);
 }
 void ExistObject::Down()
 {
-	Breath->AddComponentLocation(0.0f, 1.0f);
+	TestAnimation->AddComponentLocation(0.0f, 1.0f);
+	TestAnimation->SetCurrentState(AnimationState::Down);
 }
+
+
+
+
+

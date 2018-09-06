@@ -49,6 +49,13 @@ bool AnimationMesh2DComponent::AnimationIsFrame(const size_t Frame)
 	}
 	return false;
 }
+void AnimationMesh2DComponent::InitAnimationSetting()
+{
+	m_AnimationEnd = false;
+	m_CurrentFrame = 1;
+	m_CurrentIncreaseWidth = 0.0f;
+	m_CurrentIncreaseHeight = 0.0f;
+}
 void AnimationMesh2DComponent::SetConstructObject(ConsructObject* Object)
 {
 	AnimationMesh2DObject* object = dynamic_cast<AnimationMesh2DObject*>(Object);
@@ -69,10 +76,8 @@ void AnimationMesh2DComponent::AnimationCalulation()
 
 	if (m_CurrentFrame > m_TotalFrame)
 	{
+		InitAnimationSetting();
 		m_AnimationEnd = true;
-		m_CurrentFrame = 1;
-		m_CurrentIncreaseWidth = 0.0f;
-		m_CurrentIncreaseHeight = 0.0f;
 		return;
 	}
 	m_AnimationEnd = false;

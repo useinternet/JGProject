@@ -56,6 +56,9 @@
     <Filter Include="EngineStatics\JGConfigLoader">
       <UniqueIdentifier>{2e15a53c-3e93-46ae-a694-b30f2f8cbba5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{1076f4ef-3e12-4705-99d9-c3fb015c03fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -243,6 +246,12 @@
     </ClCompile>
     <ClCompile Include="EngineStatics\JGConfigLoader\JGConfigLoaderManager.cpp">
       <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\TestAnim.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -440,6 +449,12 @@
     </ClInclude>
     <ClInclude Include="EngineStatics\JGConfigLoader\JGConfigLoaderManager.h">
       <Filter>EngineStatics\JGConfigLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\TestAnim.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -35,9 +35,8 @@ private:
 	bool m_AnimationEnd = false;
 	std::unique_ptr<struct SAnimationIncrementBuffer_VS> m_AnimationBuffer;
 public:
-	AnimationMesh2DComponent(const AnimationMesh2DComponent& copy) = delete;
 	AnimationMesh2DComponent();
-	~AnimationMesh2DComponent();
+	virtual ~AnimationMesh2DComponent();
 	/*
 	Exp : 셰이더 상수버퍼의 파라미터들을 설정한다. ( 상속 받아서 쓰세요 / 부모 함수 호출 안해도되요.. */
 	virtual void ShaderParamSetting(JGShaderData* Data);
@@ -52,7 +51,9 @@ public:
 	/*
 	Exp : 해당 프레임일떄 */
 	bool AnimationIsFrame(const size_t Frame);
-
+	/*
+	Exp : 애니메이션 셋팅을 초기화한다. */
+	void InitAnimationSetting();
 
 	virtual void SetConstructObject(ConsructObject* Object) override;
 private:
