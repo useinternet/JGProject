@@ -11,6 +11,8 @@ private:
 	class TextComponent* Frame;
 	class InputComponent* Input;
 	class TestAnim* TestAnimation;
+
+	class JGSound* sound;
 public:
 	ExistObject();
 	virtual ~ExistObject();

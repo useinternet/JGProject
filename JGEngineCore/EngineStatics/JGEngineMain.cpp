@@ -4,6 +4,7 @@
 #include"JGLog.h"
 #include"JGInputEvent.h"
 #include"../RenderSystem/RenderSystem.h"
+#include"../SoundSystem/SoundSystem.h"
 #include"../InputSystem/InputSystem.h"
 #include"JGSuperClass.h"
 #include"JGConfigLoader/JGConfigLoaderManager.h"
@@ -11,6 +12,10 @@
 #include"JGConstructHelper.h"
 #include"../EngineFrameWork/GameLoop.h"
 
+
+
+// 임시 
+#include"../SoundSystem/JGSound.h"
 using namespace std;
 
 JGEngineMain::JGEngineMain()
@@ -20,6 +25,7 @@ JGEngineMain::JGEngineMain()
 	m_EngineLog    = make_unique<JGLog>();
 	m_InputEvent   = make_unique<JGInputEvent>();
 	m_RenderSystem = make_unique<RenderSystem>();
+	m_SoundSystem = make_unique<SoundSystem>();
 	m_InputSystem  = make_unique<InputSystem>();
 	m_SuperClass = make_unique<JGSuperClass>();
 	m_ConfigManager = make_unique<JGConfigLoaderManager>();
@@ -48,6 +54,16 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	{
 		return false;
 	}
+	result = m_SoundSystem->CreateSoundSystem();
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Sound = make_unique<JGSound>();
+	m_Sound->CreateSound(m_SoundSystem->GetSoundDevice(), ESoundMode::Sound2D,
+		"../ManagementFiles/Resource/Music/Always-_2_.wav");
+	m_Sound->Play();
 	// 렌더링 슈퍼 클래스 생성
 	m_SuperClass->LinkPointer(m_RenderSystem->GetDevice(),
 		m_RenderSystem->GetViewPort(),
@@ -80,6 +96,7 @@ void JGEngineMain::Run()
 		}
 
 		m_EngineTimer->Tick();
+		m_SoundSystem->Tick();
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
 		m_RenderSystem->Render();

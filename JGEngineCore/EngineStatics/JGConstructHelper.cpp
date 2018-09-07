@@ -3,15 +3,16 @@
 #include"../RenderSystem/JGMaterial/JG2DMesh.h"
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
 #include"../EngineStatics/JGLog.h"
+#include"../SoundSystem/JGSound.h"
 #include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 using namespace std;
 
 static JGConstructHelper* Instance = nullptr;
-ConsructObject::~ConsructObject() {}
+ConstructObject::~ConstructObject() {}
 StaticMesh2DObject::~StaticMesh2DObject() {}
 AnimationMesh2DObject::~AnimationMesh2DObject() {}
 TextObject::~TextObject() {}
-
+SoundObject::~SoundObject() {}
 
 
 
@@ -62,7 +63,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	Object = TempObject.get();
 
 	// 주소 유지 배열에 저장
-	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
+	JGConstructHelper::GetInstance()->m_vConstructObject.push_back(move(TempObject));
 }
 
 
@@ -108,7 +109,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	Object = TempObject.get();
 
 
-	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
+	JGConstructHelper::GetInstance()->m_vConstructObject.push_back(move(TempObject));
 }
 JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
 	const wstring& ShaderName)
@@ -132,7 +133,7 @@ JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& Font
 	TempObject->FontPath = FontPath;
 	// 포인터 저장
 	Object = TempObject.get();
-	JGConstructHelper::GetInstance()->m_vConsructObject.push_back(move(TempObject));
+	JGConstructHelper::GetInstance()->m_vConstructObject.push_back(move(TempObject));
 }
 
 

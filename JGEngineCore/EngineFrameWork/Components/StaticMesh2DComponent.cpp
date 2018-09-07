@@ -23,7 +23,7 @@ StaticMesh2DComponent::~StaticMesh2DComponent()
 {
 }
 
-void StaticMesh2DComponent::SetConstructObject(ConsructObject* Object)
+void StaticMesh2DComponent::SetConstructObject(ConstructObject* Object)
 {
 	StaticMesh2DObject* object = dynamic_cast<StaticMesh2DObject*>(Object);
 	if (object)

@@ -3,7 +3,7 @@
 class JG2DMesh;
 class JGTexture;
 class JGShaderData;
-class ConsructObject;
+class ConstructObject;
 
 
 /*
@@ -27,7 +27,7 @@ public:
 	/*
 	Exp : StaticMesh2DComponent의 변수들을 셋팅한다. 
 	@param StaticMesh2DObject* Object : JGConstructHelper::StaticMesh2D 클래스가 생성해준 오브젝트 포인터 */
-	virtual void SetConstructObject(ConsructObject* Object);
+	virtual void SetConstructObject(ConstructObject* Object);
 	/*
 	Exp : 텍스쳐의 가로 길이를 가져온다. */
 	float GetTextureWdith();

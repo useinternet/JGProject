@@ -33,7 +33,7 @@ void TextComponent::Tick(const float DeltaTime)
 		CreateTextMesh();
 	}
 }
-void TextComponent::SetConstructObject(ConsructObject* Object)
+void TextComponent::SetConstructObject(ConstructObject* Object)
 {
 	TextObject* object = dynamic_cast<TextObject*>(Object);
 	if (object)

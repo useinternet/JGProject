@@ -59,6 +59,9 @@
     <Filter Include="Test">
       <UniqueIdentifier>{1076f4ef-3e12-4705-99d9-c3fb015c03fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SoundSystem">
+      <UniqueIdentifier>{709ba0a8-2404-42b0-9d9c-2ccdcfecf348}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -252,6 +255,12 @@
     </ClCompile>
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundSystem\SoundSystem.cpp">
+      <Filter>SoundSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundSystem\JGSound.cpp">
+      <Filter>SoundSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -455,6 +464,12 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundSystem\SoundSystem.h">
+      <Filter>SoundSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundSystem\JGSound.h">
+      <Filter>SoundSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

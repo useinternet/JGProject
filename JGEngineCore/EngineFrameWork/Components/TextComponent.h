@@ -28,7 +28,7 @@ public:
 	/*
 	Exp : 생성자 오브젝트를 셋팅한다. 
 	@param ConstructObject* Object : 생성자 오브젝트 */
-	virtual void SetConstructObject(ConsructObject* Object);
+	virtual void SetConstructObject(ConstructObject* Object);
 	/*
 	Exp : 텍스트컴포넌트에 입력한다. */
 	void SetText(const wchar_t* Text, ...);

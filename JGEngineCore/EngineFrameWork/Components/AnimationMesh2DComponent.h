@@ -4,12 +4,8 @@
 Class : AnimationMesh2DComponent 
 @m float m_AnimationDelay : 애니메이션 딜레이 값.
 @m size_t m_TotalFrame : 총 프레임
-@m	size_t m_WidthFrame : 가로 프레임
-@m	size_t m_HeightFrame : 세로 프레임
-@m	bool m_IsRepeat : 애니메이션 반복 여부
-@m	size_t m_RepeatStartFrame : 반복 시작 구간
-@m	size_t m_RepeatEndFrame : 반복 끝 구간
-@m	size_t m_RepeatCount : 반복 횟수(-1이면 무한반복)
+@m size_t m_WidthFrame : 가로 프레임
+@m size_t m_HeightFrame : 세로 프레임
 @m float m_AccTime : 누적 시간
 @m size_t m_CurrentFrame : 현재 프레임
 @m float m_IncreaseWidth : 가로 1프레임 증가량
@@ -55,7 +51,7 @@ public:
 	Exp : 애니메이션 셋팅을 초기화한다. */
 	void InitAnimationSetting();
 
-	virtual void SetConstructObject(ConsructObject* Object) override;
+	virtual void SetConstructObject(ConstructObject* Object) override;
 private:
 	void AnimationCalulation();
 };

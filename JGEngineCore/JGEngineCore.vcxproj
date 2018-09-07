@@ -420,6 +420,8 @@
     <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\JGTextShader.cpp" />
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
+    <ClCompile Include="SoundSystem\JGSound.cpp" />
+    <ClCompile Include="SoundSystem\SoundSystem.cpp" />
     <ClCompile Include="Test\TestAnim.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -489,6 +491,8 @@
     <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\JGTextShader.h" />
     <ClInclude Include="RenderSystem\VideoDeviceInfo.h" />
+    <ClInclude Include="SoundSystem\JGSound.h" />
+    <ClInclude Include="SoundSystem\SoundSystem.h" />
     <ClInclude Include="Test\TestAnim.h" />
   </ItemGroup>
   <ItemGroup>

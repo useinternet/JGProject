@@ -56,7 +56,7 @@ void AnimationMesh2DComponent::InitAnimationSetting()
 	m_CurrentIncreaseWidth = 0.0f;
 	m_CurrentIncreaseHeight = 0.0f;
 }
-void AnimationMesh2DComponent::SetConstructObject(ConsructObject* Object)
+void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 {
 	AnimationMesh2DObject* object = dynamic_cast<AnimationMesh2DObject*>(Object);
 	if (object)

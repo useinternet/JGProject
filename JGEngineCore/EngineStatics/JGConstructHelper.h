@@ -8,13 +8,14 @@ class JG2DMesh;
 class JGDeviceD;
 class JGBufferManager;
 class JGFontLoader;
+class JGSound;
 enum class EPivot;
 
 
-class ENGINE_EXPORT ConsructObject
+class ENGINE_EXPORT ConstructObject
 {
 public:
-	virtual ~ConsructObject();
+	virtual ~ConstructObject();
 };
 /*
 Class : StaticMesh2DObject 
@@ -22,7 +23,7 @@ Exp : 정적 2DMesh / 컴포넌트에 전달하기위한 클래스.
 @m wstring               ShaderName : 적용할 셰이더 이름
 @m shared_ptr<JGTexture> Texture    : 텍스쳐 
 @m shared_ptr<JG2DMesh>  Mesh       : 메쉬 */
-class ENGINE_EXPORT StaticMesh2DObject : public ConsructObject
+class ENGINE_EXPORT StaticMesh2DObject : public ConstructObject
 {
 public:
 	std::wstring ShaderName = TT("None");
@@ -46,7 +47,7 @@ Exp : 텍스트 컴포넌트에게 전달하기위한 오브젝트
 @m wstring ShaderName : 적용할 셰이더 이름
 @m shared_ptr<JGTexture> Texture : 적용할 폰트 텍스쳐
 @m string FontPath : 적용할 폰트 정보 경로 */
-class ENGINE_EXPORT TextObject : public ConsructObject
+class ENGINE_EXPORT TextObject : public ConstructObject
 {
 public:
 	std::wstring ShaderName = TT("None");
@@ -55,13 +56,20 @@ public:
 	virtual ~TextObject();
 };
 
+class ENGINE_EXPORT SoundObject : public ConstructObject
+{
+public:
+	virtual ~SoundObject();
+};
+
+
 /*
 Class : JGConstructHelper 
 @m vector<shared_ptr<StaticMesh2DObject>> m_vStaticMesh2DObject : 스테틱 2DMesh의 주소값을 보관하기 위한 배열 */
 class ENGINE_EXPORT JGConstructHelper
 {
 public:
-	std::vector<std::shared_ptr<ConsructObject>> m_vConsructObject;
+	std::vector<std::shared_ptr<ConstructObject>> m_vConstructObject;
 public:
 	JGConstructHelper();
 	static JGConstructHelper* GetInstance();
@@ -85,6 +93,7 @@ public:
 		StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
 			EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
 	};
+
 	class AnimationMesh2D
 	{
 	public:
@@ -93,9 +102,19 @@ public:
 	public:
 		AnimationMesh2D() = delete;
 		AnimationMesh2D(const AnimationMesh2D& copy) = delete;
+		/*
+		@param JGDevice* Device : GetDevice() 호출
+		@param JGBufferManager : GetBufferManager() 호출
+		@param const wstring& ComponentName : GetComponentName() 호출
+		@param EPivot pivot : 기준점
+		@param const size_t TotalFrame : 총 프레임 수
+		@param const size_t WidthFrame : 가로 프레임 수
+		@param const size_t HeightFrame :  세로 프레임 수
+		@param const std::wstring& TexturePath : 텍스쳐 경로
+		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		AnimationMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager,const std::wstring& ComponentName,
 			EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-			const std::wstring& TexturePath, const std::wstring& ShaderName = TT(""));
+			const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DAnimationShader"));
 	};
 	class TextFont
 	{

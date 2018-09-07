@@ -21,9 +21,7 @@ ExistObject::ExistObject()
 	Sample = RegisterComponentInObject<AnimationMesh2DComponent>(TT("SampleAnimation"));
 	static JGConstructHelper::AnimationMesh2D SampleMesh(
 		GetDevice(), GetBufferManager(), Sample->GetComponentName(),
-		EPivot::TopLeft, 26, 5, 6, TT("../ManagementFiles/Resource/Fire3.png"),
-		TT("2DAnimationShader")
-	);
+		EPivot::TopLeft, 26, 5, 6, TT("../ManagementFiles/Resource/Fire3.png"));
 	if (SampleMesh.Success)
 	{
 		Sample->SetConstructObject(SampleMesh.Object);

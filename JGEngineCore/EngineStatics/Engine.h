@@ -11,6 +11,8 @@
 #include"../../ManagementFiles/Include/DirectX/D3D11Shader.h"
 #include"../../ManagementFiles/Include/DirectX/dinput.h"
 #include"../../ManagementFiles/Include/DirectX/d3dx11async.h"
+#include"../../ManagementFiles/Include/FMODInclude_LowLevel/fmod.h"
+#include"../../ManagementFiles/Include/FMODInclude_LowLevel/fmod.hpp"
 #pragma warning(default: 4005)
 
 /* 라이브러리 링크 */
@@ -47,6 +49,8 @@
 #endif
 
 #endif
+// 사운드 FOMD 라이브러리 불러오기 
+#pragma comment(lib,"../ManagementFiles/Library/FMODLib_LowLevel/fmod64_vc.lib")
 
 /* 경고 무시 */
 #pragma warning(disable: 4251)
