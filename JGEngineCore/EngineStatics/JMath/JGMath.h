@@ -24,6 +24,9 @@ public:
 	static float Abs(const float num);
 
 	/*
+	Exp : 범위를 정한다.. */
+	static void DrawRegion(float& target,const float min, const float max);
+	/*
 	현제 Direct 2D 좌표계를 스크린 좌표계로 바꾼다. */
 	static JGVector2D D2DToScreen(const float ScreenWidth, const float ScreenHeight,JGVector2D& vector);
 	static JGVector2D D2DToScreen(const float ScreenWidth, const float ScreenHeight,const float x, const float y);

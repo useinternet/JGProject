@@ -13,6 +13,8 @@
 #include"../../ManagementFiles/Include/DirectX/d3dx11async.h"
 #include"../../ManagementFiles/Include/FMODInclude_LowLevel/fmod.h"
 #include"../../ManagementFiles/Include/FMODInclude_LowLevel/fmod.hpp"
+#include"../../ManagementFiles/Include/Box2D/Box2D.h"
+
 #pragma warning(default: 4005)
 
 /* 라이브러리 링크 */
@@ -26,10 +28,12 @@
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx11d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx10d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/D3dx9d.lib")
+#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2Dd.lib")
 #else          
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx11.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx10.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/D3dx9.lib")
+#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2D.lib")
 #endif
 
 #else
@@ -42,10 +46,12 @@
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/d3dx11d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/d3dx10d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/D3dx9d.lib")
+#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2Dd.lib")
 #else          
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/d3dx11.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/d3dx10.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win32/D3dx9.lib")
+#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2D.lib")
 #endif
 
 #endif

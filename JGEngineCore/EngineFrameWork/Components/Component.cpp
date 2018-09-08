@@ -5,6 +5,7 @@ using namespace std;
 Component::Component()
 {
 	RegisterComponentID(typeid(this));
+	m_ComponentState = EComponentState::Active;
 }
 
 Component::~Component()
@@ -38,9 +39,21 @@ void Component::Tick(const float DeltaTime)
 
 void Component::Render()
 {
+	sort(m_vChildComponent.begin(),m_vChildComponent.end(),
+		[](Component* comp1, Component* comp2)->bool
+	{
+		if (comp1->GetZOrder() < comp2->GetZOrder())
+		{
+			return true;
+		}
+		return false;
+	});
 	for (auto& iter : m_vChildComponent)
 	{
-		iter->Render();
+		if (iter->GetComponentState() == EComponentState::Active)
+		{
+			iter->Render();
+		}
 	}
 }
 
@@ -141,6 +154,31 @@ Component* Component::GetChild(const size_t index)
 		return nullptr;
 	}
 	return m_vChildComponent[index];
+}
+
+void Component::SetZOrder(const int zorder)
+{
+	m_zOrder = zorder;
+}
+
+int Component::GetZOrder()
+{
+	return m_zOrder;
+}
+
+void Component::BehindComponent()
+{
+	m_ComponentState = EComponentState::Behind;
+}
+
+void Component::ActiveComponent()
+{
+	m_ComponentState = EComponentState::Active;
+}
+
+EComponentState Component::GetComponentState()
+{
+	return m_ComponentState;
 }
 
 void Component::SetParent(Component* Parent)

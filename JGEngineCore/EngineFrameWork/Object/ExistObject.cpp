@@ -10,6 +10,8 @@
 #include"../../EngineStatics/JGLog.h"
 #include"../Components/AnimationMesh2DComponent.h"
 #include"../../Test/TestAnim.h"
+#include"../Components/SoundComponent.h"
+#include"../2D/Widget/ImageBox.h"
 using namespace std;
 ExistObject::ExistObject()
 {
@@ -17,16 +19,6 @@ ExistObject::ExistObject()
 
 	TestAnimation = RegisterComponentInObject<TestAnim>(TT("Animation"));
 	TestAnimation->SetCurrentState(AnimationState::Idle);
-
-	Sample = RegisterComponentInObject<AnimationMesh2DComponent>(TT("SampleAnimation"));
-	static JGConstructHelper::AnimationMesh2D SampleMesh(
-		GetDevice(), GetBufferManager(), Sample->GetComponentName(),
-		EPivot::TopLeft, 26, 5, 6, TT("../ManagementFiles/Resource/Fire3.png"));
-	if (SampleMesh.Success)
-	{
-		Sample->SetConstructObject(SampleMesh.Object);
-	}
-
 
 
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
@@ -43,6 +35,11 @@ ExistObject::ExistObject()
 
 	// 입력 실험
 	Input = RegisterComponentInObject<InputComponent>(TT("SampleInput"));
+	sound = RegisterComponentInObject<SoundComponent>(TT("SoundSampleComponent"));
+	sound->CreateSound("../ManagementFiles/Resource/Music/Always-_2_.wav", ESoundMode::Stream2D);
+
+	image = RegisterComponentInObject<ImageBox>(TT("SampleImageBox"));
+	image->CreateImage(TT("../ManagementFiles/Resource/Breath.png"), EPivot::TopLeft);
 }
 ExistObject::~ExistObject()
 {
@@ -62,6 +59,7 @@ void ExistObject::BeginObject()
 		bind(&ExistObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
+	sound->Play();
 }
 
 void ExistObject::Tick(const float DeltaTime)
@@ -70,7 +68,18 @@ void ExistObject::Tick(const float DeltaTime)
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"), (int)FPS);
-	//Breath->AddComponentAngle(DeltaTime*5.0f);
+
+	static float acctime = 0;
+	acctime += DeltaTime;
+	if (acctime >= 5.0f)
+	{
+		sound->Pause();
+	}
+	if (acctime >= 10.0f)
+	{
+		sound->Play();
+	}
+	image->AddBlend(DeltaTime * (-0.3f));
 }
 void ExistObject::Right()
 {

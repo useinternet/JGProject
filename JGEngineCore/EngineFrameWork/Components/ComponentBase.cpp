@@ -51,3 +51,8 @@ JGCommandManager* ComponentBase::GetCommandManager()
 	return m_SuperClass->GetCommandManager();
 }
 
+SoundSystem* ComponentBase::GetSoundSystem()
+{
+	return m_SuperClass->GetSoundSystem();
+}
+

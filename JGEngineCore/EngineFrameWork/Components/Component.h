@@ -11,11 +11,19 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
+enum class EComponentState
+{
+	Active,
+	Behind
+};
+
 class ENGINE_EXPORT Component : public ComponentBase
 {
 	std::vector<Component*> m_vChildComponent;
 	Component* m_ParentComponent = nullptr;
 	std::wstring m_ComponentName = TT("None");
+	EComponentState m_ComponentState;
+	int m_zOrder = 0;
 public:
 	Component();
 	virtual ~Component();
@@ -73,6 +81,22 @@ public:
 	Exp : index위치에 존재하는 자식 컴포넌트를 가져온다. 
 	@param : const size_T index : 자식 컴포넌트 인덱스 */
 	Component* GetChild(const size_t index);
+
+	/*
+	Exp : Zorder값을 셋팅한다. ( 그리는 순서. zorder 값이 클수록 나중에 그린다.) */
+	void SetZOrder(const int zorder);
+	/*
+	Exp : Zorder값을 가져온다.*/
+	int GetZOrder();
+	/*
+	Exp : 컴포넌트를 숨김니다. */
+	void BehindComponent();
+	/*
+	Exp : 컴포넌트를 활성화합니다. */
+	void ActiveComponent();
+	/*
+	Exp : 현재 컴포넌트 상태를 가져옵니다. */
+	EComponentState GetComponentState();
 private:
 	void SetParent(Component* Parent);
 };

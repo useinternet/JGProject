@@ -6,6 +6,7 @@ class JGViewportD;
 class JGHLSLShaderDevice;
 class JGBufferManager;
 class JGCommandManager;
+class SoundSystem;
 /*
 Class : JGSuperClass
 Exp : 렌더링 시스템에서 초기화한 장치들의 포인터 모음집!! */
@@ -17,13 +18,15 @@ private:
 	JGHLSLShaderDevice* m_HLSLDevice;
 	JGBufferManager* m_BufferManager;
 	JGCommandManager* m_CommandManager;
+	SoundSystem* m_SoundSystem;
 public:
 	void LinkPointer(JGDeviceD* Device, JGViewportD* Viewport, JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager,
-		JGCommandManager* CommandManager);
+		JGCommandManager* CommandManager, SoundSystem* soundSystem);
 
 	JGDeviceD*          GetDevice();
 	JGViewportD*        GetViewport();
 	JGHLSLShaderDevice* GetHLSLDevice();
 	JGBufferManager*    GetBufferManager();
 	JGCommandManager*   GetCommandManager();
+	SoundSystem* GetSoundSystem();
 };

@@ -7,6 +7,7 @@ class JGBufferManager;
 class JGSuperClass;
 class JGViewportD;
 class JGCommandManager;
+class SoundSystem;
 /*
 Class : JGComponentMessage */
 class ENGINE_EXPORT JGComponentMessage
@@ -53,5 +54,7 @@ protected:
 	/*
 	Exp : CommandManager 클래스를 얻어온다. */
 	JGCommandManager* GetCommandManager();
-
+	/*
+	Exp : SoundSystem 을 불러온다. */
+	SoundSystem* GetSoundSystem();
 };

@@ -62,6 +62,9 @@
     <Filter Include="SoundSystem">
       <UniqueIdentifier>{709ba0a8-2404-42b0-9d9c-2ccdcfecf348}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineFrameWork\2D\Widget">
+      <UniqueIdentifier>{4cc541cc-db1d-45cd-8654-7653d2b12c85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -261,6 +264,33 @@
     </ClCompile>
     <ClCompile Include="SoundSystem\JGSound.cpp">
       <Filter>SoundSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\SoundComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\SoundQueComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\ImageBox.cpp">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\Widget.cpp">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\UserWidget.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\Button.cpp">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\Text.cpp">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\Progressbar.cpp">
+      <Filter>DllMain</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Widget\Progressbar.cpp">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -470,6 +500,30 @@
     </ClInclude>
     <ClInclude Include="SoundSystem\JGSound.h">
       <Filter>SoundSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\SoundComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\SoundQueComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Widget\ImageBox.h">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Widget\Widget.h">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\UserWidget.h">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Widget\Button.h">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Widget\Progressbar.h">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Widget\Text.h">
+      <Filter>EngineFrameWork\2D\Widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -41,7 +41,7 @@ bool JGSound::CreateSound(FMOD::System* System, const ESoundMode Mode, const std
 }
 void JGSound::Play()
 {
-	m_pSystem->playSound(m_Sound, nullptr, true, &m_Channel);
+	m_pSystem->playSound(m_Sound, nullptr, false, &m_Channel);
 	m_Channel->setVolume(m_Volume);
 }
 void JGSound::Pause(bool pause)

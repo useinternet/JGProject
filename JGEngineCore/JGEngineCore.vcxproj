@@ -359,11 +359,18 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Text\JGFontLoader.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Widget\Button.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Widget\ImageBox.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Widget\Progressbar.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Widget\Text.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Widget\Widget.cpp" />
     <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\InputComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\SoundComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\SoundQueComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
@@ -373,6 +380,7 @@
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\UserWidget.cpp" />
     <ClCompile Include="EngineFrameWork\World\World.cpp" />
     <ClCompile Include="EngineFrameWork\World\WorldManager.cpp" />
     <ClCompile Include="EngineStatics\JGConfigLoader\JGConfigLoader.cpp" />
@@ -426,11 +434,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h" />
+    <ClInclude Include="EngineFrameWork\2D\Widget\Button.h" />
+    <ClInclude Include="EngineFrameWork\2D\Widget\ImageBox.h" />
+    <ClInclude Include="EngineFrameWork\2D\Widget\Progressbar.h" />
+    <ClInclude Include="EngineFrameWork\2D\Widget\Text.h" />
+    <ClInclude Include="EngineFrameWork\2D\Widget\Widget.h" />
     <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\InputComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\SoundComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\SoundQueComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
@@ -440,6 +455,7 @@
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
+    <ClInclude Include="EngineFrameWork\Object\UserWidget.h" />
     <ClInclude Include="EngineFrameWork\World\World.h" />
     <ClInclude Include="EngineFrameWork\World\WorldManager.h" />
     <ClInclude Include="EngineStatics\Engine.h" />

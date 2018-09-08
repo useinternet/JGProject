@@ -43,6 +43,18 @@ float JGMath::Abs(const float num)
 		return num;
 }
 
+void JGMath::DrawRegion(float& target, const float min, const float max)
+{
+	if (target < min)
+	{
+		target = min;
+	}
+	else if (target > max)
+	{
+		target = max;
+	}
+}
+
 JGVector2D JGMath::D2DToScreen(const float ScreenWidth, const float ScreenHeight, JGVector2D& vector)
 {
 	return JGVector2D(vector.X() - (ScreenWidth / 2.0f) ,

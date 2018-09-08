@@ -33,7 +33,6 @@ private: // 초기화 우선순위 별
 	std::unique_ptr<JGFontLoader> m_FontLoader;
 	std::unique_ptr<JGConstructHelper> m_ConstructHelper;
 	std::unique_ptr<GameLoop>     m_GameLoop;
-	std::unique_ptr<class JGSound> m_Sound;
 	bool m_bPaused = false;
 public:
 	JGEngineMain();

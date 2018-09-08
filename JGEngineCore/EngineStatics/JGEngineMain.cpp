@@ -59,17 +59,13 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	{
 		return false;
 	}
-
-	m_Sound = make_unique<JGSound>();
-	m_Sound->CreateSound(m_SoundSystem->GetSoundDevice(), ESoundMode::Sound2D,
-		"../ManagementFiles/Resource/Music/Always-_2_.wav");
-	m_Sound->Play();
 	// 렌더링 슈퍼 클래스 생성
 	m_SuperClass->LinkPointer(m_RenderSystem->GetDevice(),
 		m_RenderSystem->GetViewPort(),
 		m_RenderSystem->GetShaderDevice(),
 		m_RenderSystem->GetBufferManager(),
-		m_InputSystem->GetCommandManager());
+		m_InputSystem->GetCommandManager(),
+		m_SoundSystem.get());
 	m_RenderSystem->InitObjectProtoType(m_SuperClass.get());
 
 	// 설정파일들 초기화...
@@ -94,13 +90,11 @@ void JGEngineMain::Run()
 		{
 			m_bPaused = true;
 		}
-
 		m_EngineTimer->Tick();
 		m_SoundSystem->Tick();
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
 		m_RenderSystem->Render();
-
 	}
 }
 void JGEngineMain::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)

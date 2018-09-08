@@ -12,7 +12,7 @@ private:
 	FMOD::Sound* m_Sound  = nullptr;
 	FMOD::Channel* m_Channel = nullptr;
 	ESoundMode m_SoundMode;
-	float m_Volume = 100.0f;
+	float m_Volume = 1.0f;
 
 	FMOD::System* m_pSystem = nullptr;
 public:

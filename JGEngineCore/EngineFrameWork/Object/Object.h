@@ -94,7 +94,7 @@ inline ComponentType* Object::RegisterComponentInObject(const std::wstring& Comp
 	else
 	{
 		// 아니라면 그냥 추가한다.
-		ComponentType* result = dynamic_cast<ComponentType*>(Check);
+		ComponentType* result = dynamic_cast<ComponentType*>(component.get());
 		m_vComponents.push_back(move(component));
 		return result;
 	}
