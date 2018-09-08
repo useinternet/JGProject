@@ -73,6 +73,7 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	// 게임 루프 초기화
 	m_GameLoop->InitGameLoop(m_RenderSystem.get());
 
+
 	return true;
 }
 void JGEngineMain::Run()

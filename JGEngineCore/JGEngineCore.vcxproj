@@ -408,6 +408,7 @@
     <ClCompile Include="InputSystem\JGCommandManager.cpp" />
     <ClCompile Include="InputSystem\JGKeyCommand.cpp" />
     <ClCompile Include="InputSystem\JGPressManager.cpp" />
+    <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -486,6 +487,7 @@
     <ClInclude Include="InputSystem\JGCommandManager.h" />
     <ClInclude Include="InputSystem\JGKeyCommand.h" />
     <ClInclude Include="InputSystem\JGPressManager.h" />
+    <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />

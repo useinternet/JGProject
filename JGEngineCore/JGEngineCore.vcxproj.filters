@@ -65,6 +65,9 @@
     <Filter Include="EngineFrameWork\2D\Widget">
       <UniqueIdentifier>{4cc541cc-db1d-45cd-8654-7653d2b12c85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PhysicsSystem">
+      <UniqueIdentifier>{49e236cf-fa6c-49cb-bbb9-2bae20c3e771}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -291,6 +294,9 @@
     </ClCompile>
     <ClCompile Include="EngineFrameWork\2D\Widget\Progressbar.cpp">
       <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp">
+      <Filter>PhysicsSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -524,6 +530,9 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\2D\Widget\Text.h">
       <Filter>EngineFrameWork\2D\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\PhysicsSystem.h">
+      <Filter>PhysicsSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

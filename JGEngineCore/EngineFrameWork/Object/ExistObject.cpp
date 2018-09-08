@@ -17,6 +17,18 @@ ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
 
+
+	Ground = RegisterComponentInObject<StaticMesh2DComponent>(TT("Ground"));
+
+	static JGConstructHelper::StaticMesh2D GroundMesh(
+		GetDevice(), GetBufferManager(), Ground->GetComponentName(),
+		EPivot::TopLeft, TT("../ManagementFiles/Resource/SampleGround.png"));
+	if (GroundMesh.Success)
+	{
+		Ground->SetConstructObject(GroundMesh.Object);
+	}
+
+
 	TestAnimation = RegisterComponentInObject<TestAnim>(TT("Animation"));
 	TestAnimation->SetCurrentState(AnimationState::Idle);
 
@@ -40,6 +52,11 @@ ExistObject::ExistObject()
 
 	image = RegisterComponentInObject<ImageBox>(TT("SampleImageBox"));
 	image->CreateImage(TT("../ManagementFiles/Resource/Breath.png"), EPivot::TopLeft);
+
+
+
+
+
 }
 ExistObject::~ExistObject()
 {
@@ -60,6 +77,41 @@ void ExistObject::BeginObject()
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
 	sound->Play();
+
+	Ground->SetComponentLocation(0.0f, 1000.0f);
+	Ground->SetComponentScale(2.0f, 1.0f);
+
+
+
+	// 물리 실험
+	b2Vec2 gravity(0.0f, 10.0f);
+	sampleworld = make_unique<b2World>(gravity);
+
+	GroundBodyDef = make_unique<b2BodyDef>();
+	GroundBox = make_unique<b2PolygonShape>();
+
+
+	GroundBodyDef->position.Set(
+		Ground->GetComponentWorldLocation().X(), Ground->GetComponentWorldLocation().Y());
+	GroundBody = sampleworld->CreateBody(GroundBodyDef.get());
+	GroundBox->SetAsBox(
+		(float)Ground->GetTextureWdith() / 2, (float)Ground->GetTextureHeight() / 2);
+	GroundBody->CreateFixture(GroundBox.get(), 0.0f);
+
+	AnimBodyDef = make_unique<b2BodyDef>();
+	AnimBodyDef->type = b2_dynamicBody;
+	AnimBodyDef->position.Set(TestAnimation->GetComponentWorldLocation().X(),
+		TestAnimation->GetComponentWorldLocation().Y());
+
+	AnimBody = sampleworld->CreateBody(AnimBodyDef.get());
+	AnimBodyBox = make_unique<b2PolygonShape>();
+	AnimBodyBox->SetAsBox(50.0f, 50.0f);
+	fixtureDef = make_unique<b2FixtureDef>();
+	fixtureDef->shape = AnimBodyBox.get();
+	fixtureDef->density = 1.0f;
+	fixtureDef->friction = 0.3f;
+	fixtureDef->restitution = 0.5f;
+	fixture = AnimBody->CreateFixture(fixtureDef.get());
 }
 
 void ExistObject::Tick(const float DeltaTime)
@@ -80,6 +132,13 @@ void ExistObject::Tick(const float DeltaTime)
 		sound->Play();
 	}
 	image->AddBlend(DeltaTime * (-0.3f));
+
+	sampleworld->Step((float)1 / (float)60, 8, 2);
+	b2Vec2 position = GroundBody->GetPosition();
+	Ground->SetComponentLocation(position.x, position.y);
+	b2Vec2 position2 = AnimBody->GetPosition();
+	TestAnimation->SetComponentLocation(
+		TestAnimation->GetComponentWorldLocation().X(), position2.y);
 }
 void ExistObject::Right()
 {
@@ -93,6 +152,15 @@ void ExistObject::Left()
 }
 void ExistObject::Up()
 {
+	b2Vec2 velocity = AnimBody->GetLinearVelocity();
+	velocity.y = -50.0f;
+	AnimBody->SetLinearVelocity(velocity);
+	int remainingJumpSteps = 0;
+	remainingJumpSteps = 10;
+	if (remainingJumpSteps > 0) {
+		AnimBody->ApplyForce(b2Vec2(0, 500), AnimBody->GetWorldCenter(), true);
+		remainingJumpSteps--;
+	}
 	TestAnimation->AddComponentLocation(0.0f, -1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Up);
 }
