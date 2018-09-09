@@ -1,5 +1,5 @@
 #include"JGPressManager.h"
-
+#include"../EngineStatics/JMath/JGVector2D.h"
 
 
 JGPressManager::JGPressManager()
@@ -11,10 +11,11 @@ JGPressManager::~JGPressManager()
 
 }
 
-void JGPressManager::LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState)
+void JGPressManager::LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState, JGVector2D* MousePosPointer)
 {
 	m_pKeyBoardState = state;
 	m_pMouseState = MouseState;
+	m_pMousePos = MousePosPointer;
 }
 
 bool JGPressManager::IsPressed(const EKey Key)
@@ -271,4 +272,9 @@ float JGPressManager::GetAxisKey(const EKey Key)
 	default:
 		return 0.0f;
 	}
+}
+
+JGVector2D& JGPressManager::GetMouseLocation()
+{
+	return *m_pMousePos;
 }

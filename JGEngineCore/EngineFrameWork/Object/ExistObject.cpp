@@ -12,10 +12,13 @@
 #include"../../Test/TestAnim.h"
 #include"../Components/SoundComponent.h"
 #include"../2D/Widget/ImageBox.h"
+#include"../../EngineStatics/JGSuperClass.h"
+#include"../2D/Widget/Button.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
+
 
 
 	Ground = RegisterComponentInObject<StaticMesh2DComponent>(TT("Ground"));
@@ -44,26 +47,38 @@ ExistObject::ExistObject()
 	Frame->SetTextColor(1.0f, 0.0f, 0.0f);
 
 
+	MousePosText = RegisterComponentInObject<TextComponent>(TT("MousePos"));
+	static JGConstructHelper::TextFont MousePosMesh(
+		GetDevice(), "../ManagementFiles/Resource/Font/Godic.fnt",
+		TT("../ManagementFiles/Resource/Font/Godic_0.png"));
+	if (MousePosMesh.Success)
+	{
+		MousePosText->SetConstructObject(MousePosMesh.Object);
+	}
+
+
+	TestAnimationPosText = RegisterComponentInObject<TextComponent>(TT("TestAnimationPosText"));
+	static JGConstructHelper::TextFont TestAnimationPosTextMesh(
+		GetDevice(), "../ManagementFiles/Resource/Font/Godic.fnt",
+		TT("../ManagementFiles/Resource/Font/Godic_0.png"));
+	if (TestAnimationPosTextMesh.Success)
+	{
+		TestAnimationPosText->SetConstructObject(MousePosMesh.Object);
+	}
+	TestAnimationPosText->SetComponentLocation(0.0f, 50.0f);
 
 	// 입력 실험
 	Input = RegisterComponentInObject<InputComponent>(TT("SampleInput"));
-	sound = RegisterComponentInObject<SoundComponent>(TT("SoundSampleComponent"));
-	sound->CreateSound("../ManagementFiles/Resource/Music/Always-_2_.wav", ESoundMode::Stream2D);
+	
 
 	image = RegisterComponentInObject<ImageBox>(TT("SampleImageBox"));
 	image->CreateImage(TT("../ManagementFiles/Resource/Breath.png"), EPivot::TopLeft);
-
-
-
-
-
 }
 ExistObject::~ExistObject()
 {
 
 
 }
-
 void ExistObject::BeginObject()
 {
 	Object::BeginObject();
@@ -76,15 +91,15 @@ void ExistObject::BeginObject()
 		bind(&ExistObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
-	sound->Play();
+
 
 	Ground->SetComponentLocation(0.0f, 1000.0f);
 	Ground->SetComponentScale(2.0f, 1.0f);
 
 
-
+	
 	// 물리 실험
-	b2Vec2 gravity(0.0f, 10.0f);
+	b2Vec2 gravity(0.0f, 50.0f);
 	sampleworld = make_unique<b2World>(gravity);
 
 	GroundBodyDef = make_unique<b2BodyDef>();
@@ -108,7 +123,7 @@ void ExistObject::BeginObject()
 	AnimBodyBox->SetAsBox(50.0f, 50.0f);
 	fixtureDef = make_unique<b2FixtureDef>();
 	fixtureDef->shape = AnimBodyBox.get();
-	fixtureDef->density = 1.0f;
+	fixtureDef->density = 1000.0f;
 	fixtureDef->friction = 0.3f;
 	fixtureDef->restitution = 0.5f;
 	fixture = AnimBody->CreateFixture(fixtureDef.get());
@@ -120,17 +135,11 @@ void ExistObject::Tick(const float DeltaTime)
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"), (int)FPS);
-
-	static float acctime = 0;
-	acctime += DeltaTime;
-	if (acctime >= 5.0f)
-	{
-		sound->Pause();
-	}
-	if (acctime >= 10.0f)
-	{
-		sound->Play();
-	}
+	JGVector2D animPos = TestAnimation->GetComponentWorldLocation();
+	JGVector2D MousePos = GetRenderSuperClass()->GetCommandManager()->GetMouseLocation();
+	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
+	MousePosText->SetText(TT("Mouse X : %d  , Mouse Y : %d  "), (int)MousePos.X(), (int)MousePos.Y());
+	
 	image->AddBlend(DeltaTime * (-0.3f));
 
 	sampleworld->Step((float)1 / (float)60, 8, 2);
@@ -153,7 +162,7 @@ void ExistObject::Left()
 void ExistObject::Up()
 {
 	b2Vec2 velocity = AnimBody->GetLinearVelocity();
-	velocity.y = -50.0f;
+	velocity.y = -100.0f;
 	AnimBody->SetLinearVelocity(velocity);
 	int remainingJumpSteps = 0;
 	remainingJumpSteps = 10;

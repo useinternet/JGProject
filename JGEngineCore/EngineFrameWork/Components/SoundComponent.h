@@ -8,6 +8,8 @@ class ENGINE_EXPORT SoundComponent : public Component
 private:
 	std::unique_ptr<JGSound> m_Sound;
 	bool m_Paused = false;
+	bool m_Play = false;
+	bool m_Stop = false;
 	float Volume = 1.0f;
 public:
 	SoundComponent();

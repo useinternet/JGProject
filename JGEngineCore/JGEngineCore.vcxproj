@@ -432,6 +432,7 @@
     <ClCompile Include="SoundSystem\JGSound.cpp" />
     <ClCompile Include="SoundSystem\SoundSystem.cpp" />
     <ClCompile Include="Test\TestAnim.cpp" />
+    <ClCompile Include="Test\TestWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h" />
@@ -512,6 +513,7 @@
     <ClInclude Include="SoundSystem\JGSound.h" />
     <ClInclude Include="SoundSystem\SoundSystem.h" />
     <ClInclude Include="Test\TestAnim.h" />
+    <ClInclude Include="Test\TestWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="RenderSystem\ShaderHLSL\2DAnimationShader_ps.hlsl">

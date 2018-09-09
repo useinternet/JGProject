@@ -3,6 +3,7 @@
 
 class JGPressManager;
 class JGCommand;
+class JGVector2D;
 enum class EKey;
 enum class EKeyState;
 
@@ -39,4 +40,10 @@ public:
 	@param const wstring& CommandName : 바인딩한 커맨드 이름
 	@param const function<void(const float)>& Event : void(const float) 형 바인딩할 이벤트 */
 	void BindAxisCommand(const std::wstring& CommandName, const std::function<void(const float)>& Event);
+
+
+
+	/*
+	Exp : 마우스 좌표를 가져온다. */
+	JGVector2D& GetMouseLocation();
 };

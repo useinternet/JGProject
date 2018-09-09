@@ -2,12 +2,13 @@
 #include"JGPressManager.h"
 #include"JGCommandManager.h"
 #include"../EngineStatics/JGLog.h"
-
+#include"../EngineStatics/JMath/JGVector2D.h"
 using namespace std;
 InputSystem::InputSystem()
 {
 	m_PressManager = make_unique<JGPressManager>();
 	m_CommandManager = make_unique<JGCommandManager>();
+	m_MousePos = make_unique<JGVector2D>();
 }
 InputSystem::~InputSystem()
 {
@@ -29,12 +30,11 @@ InputSystem::~InputSystem()
 		m_DirectInput = nullptr;
 	}
 }
-bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd,const int width,const int height)
+bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd, const int width,const int height)
 {
 	m_hWnd = hWnd;
 	m_ScreenWidth = (float)width;
 	m_ScreenHeight = (float)height;
-
 	HRESULT result = S_OK;
 
 	/** 다이렉트 장치 */
@@ -103,7 +103,7 @@ bool InputSystem::CreateInputDevice(HINSTANCE hinst, HWND hWnd,const int width,c
 	}
 
 	// JGPressManager에 키보드 상태를 넘겨준다.
-	m_PressManager->LinkInputSystemKeyBoardState(m_KeyBoardState,&m_MouseState);
+	m_PressManager->LinkInputSystemKeyBoardState(m_KeyBoardState,&m_MouseState,m_MousePos.get());
 	m_CommandManager->InitCommandManager(m_PressManager.get());
 	return true;
 }
@@ -114,10 +114,46 @@ void InputSystem::Tick()
 	m_CommandManager->Tick();
 }
 
+void InputSystem::ReceiveInputEvent(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// 마우스 좌표를 가져온다.
+	POINT point;
+	GetCursorPos(&point);
+	ScreenToClient(m_hWnd, &point);
+
+
+	// 해상도에 맞춰 마우스 포인터의좌표를 수정한다.
+	RECT ClientRect;
+	GetClientRect(m_hWnd, &ClientRect);
+	float WidthAspect = m_ScreenWidth / (float)(ClientRect.right - ClientRect.left);
+	float HeightAspect = m_ScreenHeight / (float)(ClientRect.bottom - ClientRect.top);
+	float x = (float)point.x * WidthAspect;
+	float y = (float)point.y * HeightAspect;
+	if (x < 0.0f)
+	{
+		x = 0.0f;
+	}
+	else if (x > m_ScreenWidth)
+	{
+		x = m_ScreenWidth;
+	}
+	else if (y < 0.0f)
+	{
+		y = 0.0f;
+	}
+	else if (y > m_ScreenHeight)
+	{
+		y = m_ScreenHeight;
+	}
+	m_MousePos->Set(x,y);
+}
+
 JGCommandManager* InputSystem::GetCommandManager()
 {
 	return m_CommandManager.get();
 }
+
+
 
 bool InputSystem::ReadKeyboard()
 {

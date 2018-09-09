@@ -1,7 +1,7 @@
 #pragma once
 #include"../EngineStatics/Engine.h"
 
-
+class JGVector2D;
 /*
 EnumClass : EKey 
 Exp : 키 목록 (Axis가 붙어있는 enum값은 Axis전용 함수를따로 이용하여 바인딩해야한다.)*/
@@ -35,18 +35,24 @@ class ENGINE_EXPORT JGPressManager
 private:
 	KeyBoardState* m_pKeyBoardState = nullptr;
 	MouseState* m_pMouseState = nullptr;
+	JGVector2D* m_pMousePos = nullptr;
 public:
 	JGPressManager();
 	~JGPressManager();
 	/*
 	Exp : InputSystem 에서 생성한 키보드 및 마우스 장치 연결후 이 클래에다 키보드상태와 마우스상태를 넘겨준다. 
 	@param KeyBoardState* state : 키보드상태 주소값
-	@param MouseState* MouseSate : 마우스 상태 주소값 */
-	void LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState);
+	@param MouseState* MouseSate : 마우스 상태 주소값 
+	@param JGVector2D* MousePosPointer : 마우스 좌표 값 */
+	void LinkInputSystemKeyBoardState(KeyBoardState* state, MouseState* MouseState,JGVector2D* MousePosPointer);
 	/*
 	Exp : 해당 키가 눌렀는지 여부*/
 	bool IsPressed(const EKey Key);
 	/*
 	Exp : Axis 입력의 출려값을 가져온다. */
 	float GetAxisKey(const EKey Key);
+
+	/*
+	Exp : 마우스 좌표를 가져온다. */
+	JGVector2D& GetMouseLocation();
 };

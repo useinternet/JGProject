@@ -49,7 +49,7 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 		//예외처리
 		return false;
 	}
-	result = m_InputSystem->CreateInputDevice(Instance, hWnd, 1920, 1080);
+	result = m_InputSystem->CreateInputDevice(Instance, hWnd,1920, 1080);
 	if (!result)
 	{
 		return false;
@@ -72,7 +72,8 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	m_ConfigManager->LoadConfig(m_SuperClass.get());
 	// 게임 루프 초기화
 	m_GameLoop->InitGameLoop(m_RenderSystem.get());
-
+	//
+	m_InputEvent->LinkInputSystem(m_InputSystem.get());
 
 	return true;
 }
@@ -100,7 +101,10 @@ void JGEngineMain::Run()
 }
 void JGEngineMain::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	m_InputEvent->DoEvent(message, wParam, lParam);
+	if (m_InputEvent.get())
+	{
+		m_InputEvent->DoEvent(message, wParam, lParam);
+	}
 }
 void JGEngineMain::Destroy()
 {

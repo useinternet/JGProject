@@ -13,12 +13,11 @@ private:
 	class TextComponent* Frame;
 	class InputComponent* Input;
 	class TestAnim* TestAnimation;
-	class SoundComponent* sound;
+
 	class ImageBox* image;
 	class StaticMesh2DComponent* Ground;
-
-
-
+	class TextComponent* MousePosText;
+	class TextComponent* TestAnimationPosText;
 
 	std::unique_ptr<b2World> sampleworld;
 	std::unique_ptr<b2BodyDef> GroundBodyDef;

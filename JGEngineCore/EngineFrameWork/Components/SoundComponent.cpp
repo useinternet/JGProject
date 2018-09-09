@@ -27,26 +27,32 @@ void SoundComponent::Play()
 	{
 		m_Paused = false;
 		m_Sound->Pause(false);
+		m_Play = true;
 		return;
 	}
 	m_Sound->Play();
+	m_Play = true;
 }
-void SoundComponent::Pause()
+void SoundComponent::Pause() 
 {
+	m_Play = false;
 	m_Paused = true;
 	m_Sound->Pause(true);
 }
 void SoundComponent::Stop()
 {
+	m_Stop = true;
+	m_Play = false;
+	m_Paused = false;
 	m_Sound->Stop();
 }
 bool SoundComponent::IsPause()
 {
-	return m_Sound->IsPause();
+	return m_Paused;
 }
 bool SoundComponent::IsPlaying()
 {
-	return m_Sound->IsPlaying();
+	return m_Play;
 }
 void SoundComponent::SetVolume(const float Volume)
 {

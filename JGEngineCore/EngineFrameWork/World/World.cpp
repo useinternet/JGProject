@@ -1,6 +1,7 @@
 #include"World.h"
 #include"../Object/Object.h"
 #include"../Object/ExistObject.h"
+#include"../../Test/TestWidget.h"
 using namespace std;
 World::World(const std::wstring& Name)
 {
@@ -8,6 +9,11 @@ World::World(const std::wstring& Name)
 	shared_ptr<Object> object = make_unique<ExistObject>();
 	object->BeginObject();
 	m_sObjects.push_back(move(object));
+	shared_ptr<Object> Widget = make_unique<TestWidget>();
+	Widget->BeginObject();
+	Widget->ActiveObject();
+	m_sObjects.push_back(move(Widget));
+
 }
 World::~World()
 {

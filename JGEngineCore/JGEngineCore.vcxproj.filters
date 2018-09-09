@@ -298,6 +298,9 @@
     <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp">
       <Filter>PhysicsSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Test\TestWidget.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -533,6 +536,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\PhysicsSystem.h">
       <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\TestWidget.h">
+      <Filter>Test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

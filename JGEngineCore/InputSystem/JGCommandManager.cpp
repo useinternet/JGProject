@@ -1,7 +1,8 @@
 #include"JGCommandManager.h"
 #include"JGKeyCommand.h"
 #include"JGAxisCommand.h"
-
+#include"../EngineStatics/JMath/JGVector2D.h"
+#include"JGPressManager.h"
 
 using namespace std;
 JGCommandManager::JGCommandManager()
@@ -45,4 +46,9 @@ void JGCommandManager::BindAxisCommand(const wstring& CommandName,const function
 	{
 		Command->BindAxisCommand(Event);
 	}
+}
+
+JGVector2D& JGCommandManager::GetMouseLocation()
+{
+	return m_pPressManager->GetMouseLocation();
 }

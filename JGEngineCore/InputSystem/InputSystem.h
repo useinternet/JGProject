@@ -3,7 +3,7 @@
 
 class JGPressManager;
 class JGCommandManager;
-
+class JGVector2D;
 
 /*
 Class : InputSystem
@@ -28,8 +28,9 @@ private:
 	KeyBoardState m_KeyBoardState[256];
 
 	HWND m_hWnd;
-	float m_ScreenWidth;
-	float m_ScreenHeight;
+	float m_ScreenWidth  = 0.0f;
+	float m_ScreenHeight = 0.0f;
+	std::unique_ptr<JGVector2D> m_MousePos;
 public:
 	InputSystem();
 	~InputSystem();
@@ -41,7 +42,7 @@ public:
 	@param const int height : 클라이언트 세로길이*/
 	bool CreateInputDevice(HINSTANCE hinst, HWND hWnd,const int width,const int height);
 	void Tick();
-
+	void ReceiveInputEvent(UINT message, WPARAM wParam, LPARAM lParam);
 
 	JGCommandManager* GetCommandManager();
 private:

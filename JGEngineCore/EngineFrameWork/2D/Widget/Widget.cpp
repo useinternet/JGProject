@@ -3,12 +3,13 @@
 
 Widget::Widget()
 {
-	m_CurrentState = WidgetState::Active;
+	RegisterComponentID(typeid(this));
 }
 Widget::~Widget()
 {
 
 }
+
 
 
 
@@ -22,11 +23,3 @@ Object* Widget::GetBindingObject()
 }
 
 
-void Widget::BehindWidget()
-{
-	m_CurrentState = WidgetState::Active;
-}
-void Widget::ViewWidget()
-{
-	m_CurrentState = WidgetState::Behind;
-}
