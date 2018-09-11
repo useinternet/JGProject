@@ -41,7 +41,7 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	m_EngineTimer->Start();
 	// 로그 초기화
 	m_EngineLog->InitLog();
-
+	
 	// 렌더링 나머지 여부는 나중에 JSon파일로 받아와서 설정한다.
 	result = m_RenderSystem->InitRenderSystem(hWnd, false, 1920, 1080, 45.0f, 1000.0f, 0.1f);
 	if (!result)
@@ -74,7 +74,6 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	m_GameLoop->InitGameLoop(m_RenderSystem.get());
 	//
 	m_InputEvent->LinkInputSystem(m_InputSystem.get());
-
 	return true;
 }
 void JGEngineMain::Run()

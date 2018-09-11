@@ -28,8 +28,8 @@ private:
 	float m_FOV    = 0.0f;
 	float m_FarZ   = 0.0f;
 	float m_NearZ  = 0.0f;
-	float m_Width  = 0.0f;
-	float m_Height = 0.0f;
+	static float m_Width;
+	static float m_Height;
 public:
 	JGViewportD();
 	~JGViewportD();
@@ -57,10 +57,13 @@ public:
 	const float GetFOV();
 	/*
 	Exp : 가로길이를 가져온다. */
-	const float GetWidth();
+	static const float GetWidth();
 	/*
 	Exp : 세로길이를 가져온다. */
-	const float GetHeight();
+	static const float GetHeight();
+
+	static const float GetPTM_Width();
+	static const float GetPTM_Height();
 	/*
 	Exp : 시야각을 셋팅한다. */
 	void SetFOV(const float FOV);

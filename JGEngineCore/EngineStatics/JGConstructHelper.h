@@ -9,6 +9,7 @@ class JGDeviceD;
 class JGBufferManager;
 class JGFontLoader;
 class JGSound;
+class JGVector2D;
 enum class EPivot;
 
 
@@ -29,6 +30,7 @@ public:
 	std::wstring ShaderName = TT("None");
 	std::shared_ptr<JGTexture> Texture;
 	std::shared_ptr<JG2DMesh>  Mesh;
+	std::unique_ptr<EPivot> Pivot;
 	virtual ~StaticMesh2DObject();
 };
 class ENGINE_EXPORT AnimationMesh2DObject : public StaticMesh2DObject

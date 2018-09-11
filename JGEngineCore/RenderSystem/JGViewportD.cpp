@@ -1,5 +1,8 @@
 #include"JGViewportD.h"
 #include"../EngineStatics/JMath/JGMatrix.h"
+float JGViewportD::m_Width = 0.0f;
+float JGViewportD::m_Height = 0.0f;
+
 using namespace std;
 JGViewportD::JGViewportD()
 {
@@ -59,6 +62,15 @@ void JGViewportD::SetFOV(const float FOV)
 {
 	m_FOV = FOV;
 	CreateProjectionMatrix();
+}
+
+const float JGViewportD::GetPTM_Width()
+{
+	return m_Width / 10;
+}
+const float JGViewportD::GetPTM_Height()
+{
+	return m_Height / 10;
 }
 void JGViewportD::CreateViewport(const float MinDepth, const float MaxDepth, const float TopLeftX, const float TopLeftY)
 {

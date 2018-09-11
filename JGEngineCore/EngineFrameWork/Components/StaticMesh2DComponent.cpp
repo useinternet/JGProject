@@ -31,6 +31,7 @@ void StaticMesh2DComponent::SetConstructObject(ConstructObject* Object)
 		m_ShaderName = object->ShaderName;
 		m_Texture = object->Texture.get();
 		m_Mesh = object->Mesh.get();
+		m_pPivot = object->Pivot.get();
 	}
 }
 float StaticMesh2DComponent::GetTextureWdith()
@@ -75,6 +76,44 @@ void StaticMesh2DComponent::SetColorRize(JGVector3D& color)
 void StaticMesh2DComponent::SetAlphaBlend(const float a)
 {
 	m_2DSpriteBufferDesc->ColorRize.w = a;
+}
+JGVector2D StaticMesh2DComponent::GetCenterPoint()
+{
+	float HalfWidth = GetTextureWdith() / 2;
+	float HalfHeight = GetTextureHeight() / 2;
+	JGVector2D vec;
+	switch (GetPivot())
+	{
+	case EPivot::TopLeft:
+		vec.Set(HalfWidth, HalfHeight);
+		break;
+	case EPivot::TopMiddle:
+		vec.Set(0.0f, HalfHeight);
+		break;
+	case EPivot::TopRight:
+		vec.Set(-HalfWidth, HalfHeight);
+		break;
+	case EPivot::MiddleLeft:
+		vec.Set(HalfWidth, 0.0f);
+		break;
+	case EPivot::MiddleMiddle:
+		vec.Set(0.0f, 0.0f);
+		break;
+	case EPivot::MiddleRight:
+		vec.Set(-HalfWidth, 0.0f);
+		break;
+	case EPivot::BottomLeft:
+		vec.Set(HalfWidth, -HalfHeight);
+		break;
+	case EPivot::BottomMiddle:
+		vec.Set(0.0f, -HalfHeight);
+		break;
+	case EPivot::BottomRight:
+		vec.Set(-HalfWidth, -HalfHeight);
+		break;
+
+	}
+	return GetComponentWorldLocation() + vec;
 }
 void StaticMesh2DComponent::Render()
 {
@@ -140,6 +179,16 @@ void StaticMesh2DComponent::SetShaderName(const wstring & ShaderName)
 	m_ShaderName = ShaderName;
 }
 
+
+EPivot StaticMesh2DComponent::GetPivot()
+{
+	return *m_pPivot;
+}
+
+void StaticMesh2DComponent::SetPivot(EPivot* pivot)
+{
+	m_pPivot = pivot;
+}
 bool StaticMesh2DComponent::Render2DCurling()
 {
 	if (!m_Mesh)

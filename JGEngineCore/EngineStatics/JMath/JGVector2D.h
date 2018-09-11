@@ -1,6 +1,32 @@
 #pragma once
 #include"../Engine.h"
 class JGMatrix;
+
+
+
+/*
+PTMWidth = ScreenWidth / 10;
+PTMHeight = ScreenHeight / 10;
+
+
+Dx, Dy;
+Bx, By;
+*/
+// DirectX -> Box2D 좌표
+/*
+Bx = (Dx - (ScreenWidth / 2)) / PTMWidth;
+By = -((Dy - (ScreenHeight / 2) / PTMHeight);
+*/
+// Box2D -> DirectX 좌표
+/*
+Dx = (Bx * PTMWidth) + (ScreenWidth / 2);
+Dy = -((By * PTMHeight) - (ScreenHeight / 2));
+
+*/
+// ex ) Dx = 350.0f, Dy = 590.0f;
+// Bx = -3.177083333333333;
+// By = -0.462962962962963
+/*
 /*
 class : JGVector2D */
 class ENGINE_EXPORT JGVector2D
@@ -15,6 +41,7 @@ public:
 	JGVector2D();
 	JGVector2D(const float x, const float y);
 	JGVector2D(const JGVector2D& copy);
+	JGVector2D(const b2Vec2& copy);
 	~JGVector2D();
 
 	/*
@@ -35,6 +62,10 @@ public:
 	// x,y값 반환
 	float X();
 	float Y();
+
+	// Box2D용 벡터로 변형
+	b2Vec2 GetBox2DVec();
+	void SetBox2DVec(const b2Vec2& vec);
 	/*
 	Exp : 이 벡터값 대입.*/
 	void Set(const float x, const float y);

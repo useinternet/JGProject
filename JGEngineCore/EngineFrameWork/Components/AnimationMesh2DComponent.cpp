@@ -2,6 +2,7 @@
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGShaderData.h"
+#include"../../RenderSystem/JGMaterial/JG2DMesh.h"
 using namespace std;
 AnimationMesh2DComponent::AnimationMesh2DComponent()
 {
@@ -56,6 +57,7 @@ void AnimationMesh2DComponent::InitAnimationSetting()
 	m_CurrentIncreaseWidth = 0.0f;
 	m_CurrentIncreaseHeight = 0.0f;
 }
+
 void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 {
 	AnimationMesh2DObject* object = dynamic_cast<AnimationMesh2DObject*>(Object);
@@ -64,11 +66,13 @@ void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 		SetTexture(object->Texture.get());
 		SetMesh(object->Mesh.get());
 		SetShaderName(object->ShaderName);
+		SetPivot(object->Pivot.get());
 		m_TotalFrame = object->TotalFrame;
 		m_WidthFrame = object->WidthFrame;
 		m_HeightFrame = object->HeightFrame;
 		m_IncreaseWidth = object->IncreaseWidth;
 		m_IncreaseHeight = object->IncreaseHeight;
+		
 	}
 }
 void AnimationMesh2DComponent::AnimationCalulation()

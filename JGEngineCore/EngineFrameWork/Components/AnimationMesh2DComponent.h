@@ -51,6 +51,7 @@ public:
 	Exp : 애니메이션 셋팅을 초기화한다. */
 	void InitAnimationSetting();
 
+
 	virtual void SetConstructObject(ConstructObject* Object) override;
 private:
 	void AnimationCalulation();

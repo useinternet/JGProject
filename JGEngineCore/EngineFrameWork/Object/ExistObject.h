@@ -3,6 +3,12 @@
 
 
 
+// 점프력
+// 속도
+// 피벗에 따른 디버그 렌더링
+// 중심 좌표
+
+
 
 /*
 Class : ExistObject 
@@ -18,17 +24,6 @@ private:
 	class StaticMesh2DComponent* Ground;
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
-
-	std::unique_ptr<b2World> sampleworld;
-	std::unique_ptr<b2BodyDef> GroundBodyDef;
-	b2Body* GroundBody = nullptr;
-	std::unique_ptr<b2PolygonShape> GroundBox;
-
-	std::unique_ptr<b2BodyDef> AnimBodyDef;
-	b2Body* AnimBody;
-	std::unique_ptr<b2PolygonShape> AnimBodyBox;
-	std::unique_ptr<b2FixtureDef> fixtureDef;
-	b2Fixture* fixture;
 public:
 	ExistObject();
 	virtual ~ExistObject();

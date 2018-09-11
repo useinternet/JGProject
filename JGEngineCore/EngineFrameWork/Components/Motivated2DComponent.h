@@ -117,6 +117,7 @@ public:
 	/*
 	Exp : 스케일 값이 바뀌었으면 true를 그대b로이면 false를 반환한다. */
 	bool IsChangeScale();
+
 protected:
 	/*
 	Exp : 이 컴포넌트의 월드 행렬을 가져온다. */

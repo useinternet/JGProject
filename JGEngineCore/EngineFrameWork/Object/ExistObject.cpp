@@ -14,13 +14,11 @@
 #include"../2D/Widget/ImageBox.h"
 #include"../../EngineStatics/JGSuperClass.h"
 #include"../2D/Widget/Button.h"
+#include"../../RenderSystem/JGViewportD.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
-
-
-
 	Ground = RegisterComponentInObject<StaticMesh2DComponent>(TT("Ground"));
 
 	static JGConstructHelper::StaticMesh2D GroundMesh(
@@ -67,6 +65,7 @@ ExistObject::ExistObject()
 	}
 	TestAnimationPosText->SetComponentLocation(0.0f, 50.0f);
 
+
 	// 입력 실험
 	Input = RegisterComponentInObject<InputComponent>(TT("SampleInput"));
 	
@@ -82,6 +81,7 @@ ExistObject::~ExistObject()
 void ExistObject::BeginObject()
 {
 	Object::BeginObject();
+	TestAnimation->SetComponentLocation(400.0f, 0.0f);
 	Frame->SetComponentLocation(300.0f, 500.0f);
 	Input->BindKeyCommand(TT("Right"), EKeyState::Down,
 		bind(&ExistObject::Right, this));
@@ -91,63 +91,27 @@ void ExistObject::BeginObject()
 		bind(&ExistObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
-
-
-	Ground->SetComponentLocation(0.0f, 1000.0f);
-	Ground->SetComponentScale(2.0f, 1.0f);
-
-
-	
-	// 물리 실험
-	b2Vec2 gravity(0.0f, 50.0f);
-	sampleworld = make_unique<b2World>(gravity);
-
-	GroundBodyDef = make_unique<b2BodyDef>();
-	GroundBox = make_unique<b2PolygonShape>();
-
-
-	GroundBodyDef->position.Set(
-		Ground->GetComponentWorldLocation().X(), Ground->GetComponentWorldLocation().Y());
-	GroundBody = sampleworld->CreateBody(GroundBodyDef.get());
-	GroundBox->SetAsBox(
-		(float)Ground->GetTextureWdith() / 2, (float)Ground->GetTextureHeight() / 2);
-	GroundBody->CreateFixture(GroundBox.get(), 0.0f);
-
-	AnimBodyDef = make_unique<b2BodyDef>();
-	AnimBodyDef->type = b2_dynamicBody;
-	AnimBodyDef->position.Set(TestAnimation->GetComponentWorldLocation().X(),
-		TestAnimation->GetComponentWorldLocation().Y());
-
-	AnimBody = sampleworld->CreateBody(AnimBodyDef.get());
-	AnimBodyBox = make_unique<b2PolygonShape>();
-	AnimBodyBox->SetAsBox(50.0f, 50.0f);
-	fixtureDef = make_unique<b2FixtureDef>();
-	fixtureDef->shape = AnimBodyBox.get();
-	fixtureDef->density = 1000.0f;
-	fixtureDef->friction = 0.3f;
-	fixtureDef->restitution = 0.5f;
-	fixture = AnimBody->CreateFixture(fixtureDef.get());
+	Ground->SetComponentLocation(100.0f, 900.0f);
 }
 
 void ExistObject::Tick(const float DeltaTime)
 {
 	Object::Tick(DeltaTime);
+
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"), (int)FPS);
 	JGVector2D animPos = TestAnimation->GetComponentWorldLocation();
 	JGVector2D MousePos = GetRenderSuperClass()->GetCommandManager()->GetMouseLocation();
-	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
-	MousePosText->SetText(TT("Mouse X : %d  , Mouse Y : %d  "), (int)MousePos.X(), (int)MousePos.Y());
-	
 	image->AddBlend(DeltaTime * (-0.3f));
+	
+	b2Vec2 BoxLocation = animPos.GetBox2DVec();
+	float BX = BoxLocation.x * 1000.0f;
+	float BY = BoxLocation.y * 1000.0f;
 
-	sampleworld->Step((float)1 / (float)60, 8, 2);
-	b2Vec2 position = GroundBody->GetPosition();
-	Ground->SetComponentLocation(position.x, position.y);
-	b2Vec2 position2 = AnimBody->GetPosition();
-	TestAnimation->SetComponentLocation(
-		TestAnimation->GetComponentWorldLocation().X(), position2.y);
+	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
+	//MousePosText->SetText(TT("Box2D X : %d , Box2D Y : %d"), (int)BX, (int)BY);
+	MousePosText->SetText(TT("Box2D X : %d , Box2D Y : %d"), (int)MousePos.X(), (int)MousePos.Y());
 }
 void ExistObject::Right()
 {
@@ -161,15 +125,6 @@ void ExistObject::Left()
 }
 void ExistObject::Up()
 {
-	b2Vec2 velocity = AnimBody->GetLinearVelocity();
-	velocity.y = -100.0f;
-	AnimBody->SetLinearVelocity(velocity);
-	int remainingJumpSteps = 0;
-	remainingJumpSteps = 10;
-	if (remainingJumpSteps > 0) {
-		AnimBody->ApplyForce(b2Vec2(0, 500), AnimBody->GetWorldCenter(), true);
-		remainingJumpSteps--;
-	}
 	TestAnimation->AddComponentLocation(0.0f, -1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Up);
 }

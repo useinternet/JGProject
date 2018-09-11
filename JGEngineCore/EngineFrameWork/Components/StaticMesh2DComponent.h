@@ -4,7 +4,7 @@ class JG2DMesh;
 class JGTexture;
 class JGShaderData;
 class ConstructObject;
-
+enum class EPivot;
 
 /*
 Class : StaticMesh2DComponent 
@@ -18,7 +18,7 @@ private:
 	std::wstring m_ShaderName = TT("None");
 	JGTexture* m_Texture = nullptr;
 	JG2DMesh* m_Mesh     = nullptr;
-
+	EPivot*  m_pPivot    = nullptr;
 	std::unique_ptr<struct SMatrixBuffer_VS>   m_MatrixBufferDesc;
 	std::unique_ptr<struct S2DSpriteBuffer_PS> m_2DSpriteBufferDesc;
 public:
@@ -49,6 +49,10 @@ public:
 	/*
 	Exp : 알파값을 설정한다. */
 	void SetAlphaBlend(const float a);
+
+	/*
+	Exp : 해당 매쉬의 중심점을 가져온다. */
+	virtual JGVector2D GetCenterPoint();
 public:
 	/*
 	Exp : 렌더링 한다.(셰이더가 다르다면 상속 받아서 커스텀 하셈 
@@ -77,6 +81,13 @@ protected:
 	Exp : 셰이더이름을 셋팅한다. */
 	void SetShaderName(const std::wstring& ShaderName);
 
+
+	/*
+	Exp : 적용중인 Pivot을 가져온다. */
+	EPivot GetPivot();
+	/*
+	Exp : 적용중인 Pivot을 셋팅한다. */
+	void SetPivot(EPivot* pivot);
 private:
 	virtual bool Render2DCurling() override;
 };

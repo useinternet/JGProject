@@ -5,6 +5,11 @@
 #include"../EngineStatics/JGConstructHelper.h"
 #include"../EngineFrameWork/2D/Widget/Text.h"
 #include"../EngineFrameWork/Components/SoundComponent.h"
+#include"../EngineStatics/JGSuperClass.h"
+#include"../InputSystem/JGCommandManager.h"
+#include"../InputSystem/JGPressManager.h"
+#include"../EngineFrameWork/Components/InputComponent.h"
+static bool test = false;
 TestWidget::TestWidget()
 {
 	RegisterObjectID(typeid(this));
@@ -32,14 +37,13 @@ TestWidget::TestWidget()
 	MusicText->SetFont(
 		"../ManagementFiles/Resource/Font/Godic.fnt", TT("../ManagementFiles/Resource/Font/Godic_0.png"));
 	MusicText->Get()->SetTextSize(20.0f);
-	MusicText->Get()->SetText(TT("Àç»ý / ¸ØÃã"));
+	MusicText->Get()->SetText(TT("ºê±ÝÄÑ±â F1"));
 	TestButton->AddChild(MusicText);
 	MusicText->SetComponentLocation(5.0f, 90.0f);
 
 
 	sound = RegisterComponentInObject<SoundComponent>(TT("SoundSampleComponent"));
 	sound->CreateSound("../ManagementFiles/Resource/Music/Always-_2_.wav", ESoundMode::Stream2D);
-	//sound->Play();
 }
 
 TestWidget::~TestWidget()
@@ -73,6 +77,5 @@ void TestWidget::Tick(const float DeltaTime)
 	{
 		test = false;
 	}
-
 
 }

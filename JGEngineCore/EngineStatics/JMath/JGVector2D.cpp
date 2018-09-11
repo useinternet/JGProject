@@ -1,6 +1,7 @@
 #include "JGVector2D.h"
 #include"JGMath.h"
 #include"JGMatrix.h"
+#include"../../RenderSystem/JGViewportD.h"
 JGVector2D::JGVector2D()
 {
 }
@@ -14,6 +15,12 @@ JGVector2D::JGVector2D(const float x, const float y)
 JGVector2D::JGVector2D(const JGVector2D & copy)
 {
 	m_Vector2D = copy.m_Vector2D;
+}
+
+JGVector2D::JGVector2D(const b2Vec2& copy)
+{
+	m_Vector2D.x = (copy.x * JGViewportD::GetPTM_Width()) + (JGViewportD::GetWidth() / 2);
+	m_Vector2D.y = -((copy.y * JGViewportD::GetPTM_Height()) - (JGViewportD::GetHeight() / 2));
 }
 
 JGVector2D::~JGVector2D()
@@ -64,7 +71,17 @@ float JGVector2D::Y()
 {
 	return m_Vector2D.y;
 }
-
+b2Vec2 JGVector2D::GetBox2DVec()
+{
+	return b2Vec2(
+		(m_Vector2D.x - (JGViewportD::GetWidth() / 2)) / JGViewportD::GetPTM_Width(),
+		-((m_Vector2D.y - (JGViewportD::GetHeight() / 2)) / JGViewportD::GetPTM_Height()));
+}
+void JGVector2D::SetBox2DVec(const b2Vec2& vec)
+{
+	m_Vector2D.x = (vec.x * JGViewportD::GetPTM_Width()) + (JGViewportD::GetWidth() / 2);
+	m_Vector2D.y = -((vec.y * JGViewportD::GetPTM_Height()) - (JGViewportD::GetHeight() / 2));
+}
 void JGVector2D::Set(const float x, const float y)
 {
 	m_Vector2D.x = x;

@@ -1,7 +1,6 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
 
-
 typedef struct SMatrixBuffer_VS
 {
 	D3DXMATRIX WoldViewProjectionMatrix;

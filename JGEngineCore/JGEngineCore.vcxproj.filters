@@ -301,6 +301,18 @@
     <ClCompile Include="Test\TestWidget.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSystem\ShaderCode\JGColorShader.cpp">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\PyhicsBody2D.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\PhysicsBodyType.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\Physics2DWorld.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -540,6 +552,18 @@
     <ClInclude Include="Test\TestWidget.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSystem\ShaderCode\JGColorShader.h">
+      <Filter>RenderSystem\ShaderCode</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\PyhicsBody2D.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\PhysicsBodyType.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\Physics2DWorld.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="RenderSystem\ShaderHLSL\2DSpriteShader_ps.hlsl">
@@ -558,6 +582,12 @@
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\2DAnimationShader_vs.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\ColorShader_ps.hlsl">
+      <Filter>RenderSystem\ShaderHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\ColorShader_vs.hlsl">
       <Filter>RenderSystem\ShaderHLSL</Filter>
     </FxCompile>
   </ItemGroup>

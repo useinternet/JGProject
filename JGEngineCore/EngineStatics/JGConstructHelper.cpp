@@ -5,6 +5,7 @@
 #include"../EngineStatics/JGLog.h"
 #include"../SoundSystem/JGSound.h"
 #include"../EngineFrameWork/2D/Text/JGFontLoader.h"
+#include"JMath/JGVector2D.h"
 using namespace std;
 
 static JGConstructHelper* Instance = nullptr;
@@ -40,6 +41,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	unique_ptr<StaticMesh2DObject> TempObject = make_unique<StaticMesh2DObject>();
 	TempObject->Texture = make_unique<JGTexture>();
 	TempObject->Mesh = make_unique<JG2DMesh>();
+	TempObject->Pivot = make_unique<EPivot>();
 
 	// 텍스쳐 로드
 	bool result = TempObject->Texture->Add(Device, TexturePath);
@@ -58,7 +60,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	}
 	// 셰이더 이름 저장
 	TempObject->ShaderName = ShaderName;
-
+	(*TempObject->Pivot) = pivot;
 	// 포인터 저장
 	Object = TempObject.get();
 
@@ -75,6 +77,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
 	TempObject->Texture = make_unique<JGTexture>();
 	TempObject->Mesh = make_unique<JG2DMesh>();
+	TempObject->Pivot = make_unique<EPivot>();
 	// 텍스쳐 로드
 	bool result = TempObject->Texture->Add(Device, TexturePath);
 	if (!result)
@@ -105,7 +108,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	TempObject->IncreaseWidth = TexWidth;
 	TempObject->IncreaseHeight = TexHeight;
 
-
+	(*TempObject->Pivot) = pivot;
 	Object = TempObject.get();
 
 

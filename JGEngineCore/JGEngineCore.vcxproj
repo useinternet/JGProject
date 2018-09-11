@@ -408,7 +408,10 @@
     <ClCompile Include="InputSystem\JGCommandManager.cpp" />
     <ClCompile Include="InputSystem\JGKeyCommand.cpp" />
     <ClCompile Include="InputSystem\JGPressManager.cpp" />
+    <ClCompile Include="PhysicsSystem\PhysicsBodyType.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
+    <ClCompile Include="PhysicsSystem\Physics2DWorld.cpp" />
+    <ClCompile Include="PhysicsSystem\PyhicsBody2D.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -427,6 +430,7 @@
     <ClCompile Include="RenderSystem\RenderSystem.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\JG2DAnimationShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\JG2DSpriteShader.cpp" />
+    <ClCompile Include="RenderSystem\ShaderCode\JGColorShader.cpp" />
     <ClCompile Include="RenderSystem\ShaderCode\JGTextShader.cpp" />
     <ClCompile Include="RenderSystem\VideoDeviceInfo.cpp" />
     <ClCompile Include="SoundSystem\JGSound.cpp" />
@@ -488,7 +492,10 @@
     <ClInclude Include="InputSystem\JGCommandManager.h" />
     <ClInclude Include="InputSystem\JGKeyCommand.h" />
     <ClInclude Include="InputSystem\JGPressManager.h" />
+    <ClInclude Include="PhysicsSystem\PhysicsBodyType.h" />
     <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
+    <ClInclude Include="PhysicsSystem\Physics2DWorld.h" />
+    <ClInclude Include="PhysicsSystem\PyhicsBody2D.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />
@@ -508,6 +515,7 @@
     <ClInclude Include="RenderSystem\ShaderCode\HLSLConstantBufferDesc.h" />
     <ClInclude Include="RenderSystem\ShaderCode\JG2DAnimationShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\JG2DSpriteShader.h" />
+    <ClInclude Include="RenderSystem\ShaderCode\JGColorShader.h" />
     <ClInclude Include="RenderSystem\ShaderCode\JGTextShader.h" />
     <ClInclude Include="RenderSystem\VideoDeviceInfo.h" />
     <ClInclude Include="SoundSystem\JGSound.h" />
@@ -601,6 +609,26 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\ColorShader_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RenderSystem\ShaderHLSL\ColorShader_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
     </FxCompile>

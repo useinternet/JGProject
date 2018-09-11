@@ -197,6 +197,8 @@ bool Motivated2DComponent::IsChangeScale()
 	return m_bIsChangeScale;
 }
 
+
+
 const JGMatrix& Motivated2DComponent::GetWorldMatrix()
 {
 	return *m_WorldMatrix;
