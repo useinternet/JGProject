@@ -4,6 +4,7 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../EngineStatics/JGSuperClass.h"
+#include"../World/World.h"
 JGSuperClass* ComponentBase::m_SuperClass;
 ComponentBase::ComponentBase()
 {
@@ -11,6 +12,7 @@ ComponentBase::ComponentBase()
 
 ComponentBase::~ComponentBase()
 {
+
 }
 
 void ComponentBase::InitComponent(JGSuperClass* SuperClass)

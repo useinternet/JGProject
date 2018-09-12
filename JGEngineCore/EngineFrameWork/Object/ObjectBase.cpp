@@ -4,6 +4,7 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGBufferManager.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../EngineStatics/JGSuperClass.h"
+#include"../World/World.h"
 JGSuperClass* ObjectBase::m_RenderSuperClass = nullptr;;
 ObjectBase::ObjectBase()
 {

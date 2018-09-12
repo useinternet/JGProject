@@ -43,7 +43,7 @@ public:
 	virtual ~Motivated2DComponent();
 	/*
 	Exp : 컴포넌트가 생성되고 최초 실행되는 함수이다. ( 부모 클래스의 BeginComponent도 호출해야한다. ) */
-	virtual void BeginComponent() override;
+	virtual void BeginComponent(World* world) override;
 
 	/*
 	Exp : 매 프레임 한번 실행되는 함수이다. ( 부모 클래스의 Tick도 호출해야한다. ) */

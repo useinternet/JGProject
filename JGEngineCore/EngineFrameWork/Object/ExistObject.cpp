@@ -15,24 +15,30 @@
 #include"../../EngineStatics/JGSuperClass.h"
 #include"../2D/Widget/Button.h"
 #include"../../RenderSystem/JGViewportD.h"
+#include"../Components/Box2DCollisionComponent.h"
+#include"../../PhysicsSystem/PhysicsWorld.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
-	Ground = RegisterComponentInObject<StaticMesh2DComponent>(TT("Ground"));
 
-	static JGConstructHelper::StaticMesh2D GroundMesh(
-		GetDevice(), GetBufferManager(), Ground->GetComponentName(),
-		EPivot::TopLeft, TT("../ManagementFiles/Resource/SampleGround.png"));
-	if (GroundMesh.Success)
-	{
-		Ground->SetConstructObject(GroundMesh.Object);
-	}
+	world = make_unique<PhysicsWorld>();
+
+	Ground = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground"));
+	Ground->SetComponentLocation(100.0f, 900.0f);
+	Ground->SettingCollision(50.0f, 50.0f, E2DBodyType::Static);
+	Ground->DebugRenderingOn();
+
+
+	SampleCollison = RegisterComponentInObject<Box2DCollisionComponent>(TT("SampleCollison"));
+	SampleCollison->SettingCollision(50.0f, 50.0f, E2DBodyType::Dyanamic);
+	SampleCollison->DebugRenderingOn();
+	SampleCollison->SetComponentLocation(200.f, 0.0f);
 
 
 	TestAnimation = RegisterComponentInObject<TestAnim>(TT("Animation"));
 	TestAnimation->SetCurrentState(AnimationState::Idle);
-
+	SampleCollison->AddChild(TestAnimation);
 
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
 	static JGConstructHelper::TextFont FrameMesh(
@@ -78,10 +84,9 @@ ExistObject::~ExistObject()
 
 
 }
-void ExistObject::BeginObject()
+void ExistObject::BeginObject(World* world)
 {
-	Object::BeginObject();
-	TestAnimation->SetComponentLocation(400.0f, 0.0f);
+	Object::BeginObject(world);
 	Frame->SetComponentLocation(300.0f, 500.0f);
 	Input->BindKeyCommand(TT("Right"), EKeyState::Down,
 		bind(&ExistObject::Right, this));
@@ -91,46 +96,42 @@ void ExistObject::BeginObject()
 		bind(&ExistObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
-	Ground->SetComponentLocation(100.0f, 900.0f);
+
 }
 
 void ExistObject::Tick(const float DeltaTime)
 {
 	Object::Tick(DeltaTime);
-
+	world->Tick(DeltaTime, DeltaTime);
+	TestAnimation->AddComponentAngle(DeltaTime * 10);
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;
 	Frame->SetText(TT("FPS : %d"), (int)FPS);
 	JGVector2D animPos = TestAnimation->GetComponentWorldLocation();
 	JGVector2D MousePos = GetRenderSuperClass()->GetCommandManager()->GetMouseLocation();
 	image->AddBlend(DeltaTime * (-0.3f));
-	
-	b2Vec2 BoxLocation = animPos.GetBox2DVec();
-	float BX = BoxLocation.x * 1000.0f;
-	float BY = BoxLocation.y * 1000.0f;
-
+	JGVector2D vec = SampleCollison->GetComponentWorldLocation();
 	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
-	//MousePosText->SetText(TT("Box2D X : %d , Box2D Y : %d"), (int)BX, (int)BY);
-	MousePosText->SetText(TT("Box2D X : %d , Box2D Y : %d"), (int)MousePos.X(), (int)MousePos.Y());
+	MousePosText->SetText(TT("Mouse X : %d , Mouse Y : %d"), (int)vec.X(), (int)vec.Y());
 }
 void ExistObject::Right()
 {
-	TestAnimation->AddComponentLocation(1.0f, 0.0f);
+	SampleCollison->AddComponentLocation(1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Right);
 }
 void ExistObject::Left()
 {
-	TestAnimation->AddComponentLocation(-1.0f, 0.0f);
+	SampleCollison->AddComponentLocation(-1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Left);
 }
 void ExistObject::Up()
 {
-	TestAnimation->AddComponentLocation(0.0f, -1.0f);
+	SampleCollison->AddComponentLocation(0.0f, -1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Up);
 }
 void ExistObject::Down()
 {
-	TestAnimation->AddComponentLocation(0.0f, 1.0f);
+	SampleCollison->AddComponentLocation(0.0f, 1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Down);
 }
 

@@ -1,6 +1,7 @@
 #include "Component.h"
 #include"../../RenderSystem/JGDeviceD.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGHLSLShaderDevice.h"
+#include"../World/World.h"
 using namespace std;
 Component::Component()
 {
@@ -21,11 +22,12 @@ void Component::Receive(const JGComponentMessage& Message)
 	}
 }
 
-void Component::BeginComponent()
+void Component::BeginComponent(World* world)
 {
+	m_pWorld = world;
 	for (auto& iter : m_vChildComponent)
 	{
-		iter->BeginComponent();
+		iter->BeginComponent(world);
 	}
 }
 
@@ -179,6 +181,11 @@ void Component::ActiveComponent()
 EComponentState Component::GetComponentState()
 {
 	return m_ComponentState;
+}
+
+World* Component::GetWorld()
+{
+	return m_pWorld;
 }
 
 void Component::SetParent(Component* Parent)

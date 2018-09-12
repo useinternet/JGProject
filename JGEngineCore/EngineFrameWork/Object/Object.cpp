@@ -1,5 +1,6 @@
 #include"Object.h"
 #include"../Components/MotivatedComponent.h"
+#include"../World/World.h"
 
 Object::Object()
 {
@@ -12,11 +13,12 @@ Object::~Object()
 	int num = 0;
 }
 
-void Object::BeginObject()
+void Object::BeginObject(World* world)
 {
+	m_pWorld = world;
 	if (m_RootComponent)
 	{
-		m_RootComponent->BeginComponent();
+		m_RootComponent->BeginComponent(world);
 	}
 }
 
@@ -47,6 +49,10 @@ void Object::EndObject()
 	{
 		m_RootComponent->DestoryComponent();
 	}
+}
+World* Object::GetWorld()
+{
+	return m_pWorld;
 }
 EObjectState Object::GetObjectState()
 {

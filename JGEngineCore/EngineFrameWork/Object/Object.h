@@ -4,7 +4,7 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
-
+class World;
 /*
 EnumClass : 오브젝트 상태 */
 enum class EObjectState
@@ -25,13 +25,14 @@ private:
 	//
 	bool m_bIsFirst = true;
 	EObjectState m_ObjectState;
+	World* m_pWorld = nullptr;
 public:
 	Object();
 	virtual ~Object();
 
 	/*
 	Exp : 오브젝트가 생성되고 나서 최초 한번 실행되는 이벤트입니다. (무조건 부모 클래스의 BeginObject를 호출한다.)*/
-	virtual void BeginObject() override;
+	virtual void BeginObject(World* world) override;
 	/*
 	Exp : 컴포넌트 메세지를 보냅니다. 
 	@param : JGComponentMessage& Message : 컴포넌트 메시지 클래스 (무조건 부모 클래스의 Send를 호출한다.)*/
@@ -45,7 +46,9 @@ public:
 	/*
 	Exp : 오브젝트를 파괴하기전 최초 한번 실행되는 이벤트입니다.(무조건 부모 클래스의 DestroyObject를 호출한다.) */
 	virtual void EndObject() override;
-
+	/*
+	Exp : 오브젝트가 속한 월드를 불러온다. */
+	World* GetWorld();
 	/*
 	Exp : 오브젝트 상태를 가져온다.*/
 	EObjectState GetObjectState();

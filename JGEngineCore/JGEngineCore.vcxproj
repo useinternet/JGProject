@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DevelopEngine|Win32">
@@ -366,6 +366,8 @@
     <ClCompile Include="EngineFrameWork\2D\Widget\Widget.cpp" />
     <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\InputComponent.cpp" />
@@ -408,10 +410,11 @@
     <ClCompile Include="InputSystem\JGCommandManager.cpp" />
     <ClCompile Include="InputSystem\JGKeyCommand.cpp" />
     <ClCompile Include="InputSystem\JGPressManager.cpp" />
-    <ClCompile Include="PhysicsSystem\PhysicsBodyType.cpp" />
+    <ClCompile Include="PhysicsSystem\JG2DBody.cpp" />
+    <ClCompile Include="PhysicsSystem\JGRectangle.cpp" />
+    <ClCompile Include="PhysicsSystem\JGShape.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
-    <ClCompile Include="PhysicsSystem\Physics2DWorld.cpp" />
-    <ClCompile Include="PhysicsSystem\PyhicsBody2D.cpp" />
+    <ClCompile Include="PhysicsSystem\PhysicsWorld.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -447,6 +450,8 @@
     <ClInclude Include="EngineFrameWork\2D\Widget\Widget.h" />
     <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\InputComponent.h" />
@@ -492,10 +497,11 @@
     <ClInclude Include="InputSystem\JGCommandManager.h" />
     <ClInclude Include="InputSystem\JGKeyCommand.h" />
     <ClInclude Include="InputSystem\JGPressManager.h" />
-    <ClInclude Include="PhysicsSystem\PhysicsBodyType.h" />
+    <ClInclude Include="PhysicsSystem\JG2DBody.h" />
+    <ClInclude Include="PhysicsSystem\JGRectangle.h" />
+    <ClInclude Include="PhysicsSystem\JGShape.h" />
     <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
-    <ClInclude Include="PhysicsSystem\Physics2DWorld.h" />
-    <ClInclude Include="PhysicsSystem\PyhicsBody2D.h" />
+    <ClInclude Include="PhysicsSystem\PhysicsWorld.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />

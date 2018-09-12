@@ -304,13 +304,22 @@
     <ClCompile Include="RenderSystem\ShaderCode\JGColorShader.cpp">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSystem\PyhicsBody2D.cpp">
+    <ClCompile Include="PhysicsSystem\JGShape.cpp">
       <Filter>PhysicsSystem</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSystem\PhysicsBodyType.cpp">
+    <ClCompile Include="PhysicsSystem\JGRectangle.cpp">
       <Filter>PhysicsSystem</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSystem\Physics2DWorld.cpp">
+    <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\PhysicsWorld.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JG2DBody.cpp">
       <Filter>PhysicsSystem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -555,13 +564,22 @@
     <ClInclude Include="RenderSystem\ShaderCode\JGColorShader.h">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSystem\PyhicsBody2D.h">
+    <ClInclude Include="PhysicsSystem\JGShape.h">
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSystem\PhysicsBodyType.h">
+    <ClInclude Include="PhysicsSystem\JGRectangle.h">
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSystem\Physics2DWorld.h">
+    <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\PhysicsWorld.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JG2DBody.h">
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
   </ItemGroup>

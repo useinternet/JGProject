@@ -22,9 +22,9 @@ Motivated2DComponent::~Motivated2DComponent()
 {
 	
 }
-void Motivated2DComponent::BeginComponent()
+void Motivated2DComponent::BeginComponent(World* world)
 {
-	MotivatedComponent::BeginComponent();
+	MotivatedComponent::BeginComponent(world);
 	// 행렬 초기화
 	m_WorldMatrix->Identity();
 	m_ScaleMatrix->MakeScalingMatirx(*m_Scale);

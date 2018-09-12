@@ -8,6 +8,7 @@ class JGSuperClass;
 class JGViewportD;
 class JGCommandManager;
 class SoundSystem;
+class World;
 /*
 Class : JGComponentMessage */
 class ENGINE_EXPORT JGComponentMessage
@@ -21,11 +22,12 @@ class ENGINE_EXPORT ComponentBase
 private:
 	const char* ComponentID;
 	static JGSuperClass* m_SuperClass;
+
 public:
 	ComponentBase();
 	virtual ~ComponentBase();
 	virtual void Receive(const JGComponentMessage& Message) = 0;
-	virtual void BeginComponent() = 0;
+	virtual void BeginComponent(World* world) = 0;
 	virtual void Tick(const float DeltaTime) = 0;
 	virtual void Render() = 0;
 	virtual void DestoryComponent() = 0;

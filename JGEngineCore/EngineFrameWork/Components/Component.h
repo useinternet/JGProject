@@ -21,6 +21,7 @@ class ENGINE_EXPORT Component : public ComponentBase
 {
 	std::vector<Component*> m_vChildComponent;
 	Component* m_ParentComponent = nullptr;
+	World* m_pWorld = nullptr;
 	std::wstring m_ComponentName = TT("None");
 	EComponentState m_ComponentState;
 	int m_zOrder = 0;
@@ -33,7 +34,7 @@ public:
 	virtual void Receive(const JGComponentMessage& Message) override;
 	/*
 	Exp : 컴포넌트가 생성되고 최초 실행되는 함수이다. ( 부모 클래스의 BeginComponent도 호출해야한다. ) */
-	virtual void BeginComponent() override;
+	virtual void BeginComponent(World* world) override;
 	/*
 	Exp : 매 프레임 한번 실행되는 함수이다. ( 부모 클래스의 Tick도 호출해야한다. ) */
 	virtual void Tick(const float DeltaTime) override;
@@ -97,6 +98,10 @@ public:
 	/*
 	Exp : 현재 컴포넌트 상태를 가져옵니다. */
 	EComponentState GetComponentState();
+
+	/*
+	Exp : 컴포넌트가 속한 월드를 가져온다. */
+	World* GetWorld();
 private:
 	void SetParent(Component* Parent);
 };
