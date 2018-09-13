@@ -411,8 +411,10 @@
     <ClCompile Include="InputSystem\JGKeyCommand.cpp" />
     <ClCompile Include="InputSystem\JGPressManager.cpp" />
     <ClCompile Include="PhysicsSystem\JG2DBody.cpp" />
-    <ClCompile Include="PhysicsSystem\JGRectangle.cpp" />
-    <ClCompile Include="PhysicsSystem\JGShape.cpp" />
+    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.cpp" />
+    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.cpp" />
+    <ClCompile Include="PhysicsSystem\JGShape\JGRectangle.cpp" />
+    <ClCompile Include="PhysicsSystem\JGShape\JGShape.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsWorld.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
@@ -498,8 +500,10 @@
     <ClInclude Include="InputSystem\JGKeyCommand.h" />
     <ClInclude Include="InputSystem\JGPressManager.h" />
     <ClInclude Include="PhysicsSystem\JG2DBody.h" />
-    <ClInclude Include="PhysicsSystem\JGRectangle.h" />
-    <ClInclude Include="PhysicsSystem\JGShape.h" />
+    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.h" />
+    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.h" />
+    <ClInclude Include="PhysicsSystem\JGShape\JGRectangle.h" />
+    <ClInclude Include="PhysicsSystem\JGShape\JGShape.h" />
     <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
     <ClInclude Include="PhysicsSystem\PhysicsWorld.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />

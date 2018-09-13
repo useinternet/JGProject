@@ -68,6 +68,12 @@
     <Filter Include="PhysicsSystem">
       <UniqueIdentifier>{49e236cf-fa6c-49cb-bbb9-2bae20c3e771}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PhysicsSystem\JGShape">
+      <UniqueIdentifier>{b9562d2e-0b88-40c8-b04b-cdfc89466526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsSystem\JGCollisionCheckManager">
+      <UniqueIdentifier>{5f0d80a9-5be2-4bc8-af0a-7099e071fb7b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -304,12 +310,6 @@
     <ClCompile Include="RenderSystem\ShaderCode\JGColorShader.cpp">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSystem\JGShape.cpp">
-      <Filter>PhysicsSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsSystem\JGRectangle.cpp">
-      <Filter>PhysicsSystem</Filter>
-    </ClCompile>
     <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
@@ -321,6 +321,18 @@
     </ClCompile>
     <ClCompile Include="PhysicsSystem\JG2DBody.cpp">
       <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGShape\JGRectangle.cpp">
+      <Filter>PhysicsSystem\JGShape</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGShape\JGShape.cpp">
+      <Filter>PhysicsSystem\JGShape</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.cpp">
+      <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.cpp">
+      <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -564,12 +576,6 @@
     <ClInclude Include="RenderSystem\ShaderCode\JGColorShader.h">
       <Filter>RenderSystem\ShaderCode</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSystem\JGShape.h">
-      <Filter>PhysicsSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsSystem\JGRectangle.h">
-      <Filter>PhysicsSystem</Filter>
-    </ClInclude>
     <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
@@ -581,6 +587,18 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\JG2DBody.h">
       <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGShape\JGRectangle.h">
+      <Filter>PhysicsSystem\JGShape</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGShape\JGShape.h">
+      <Filter>PhysicsSystem\JGShape</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.h">
+      <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.h">
+      <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

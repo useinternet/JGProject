@@ -25,13 +25,14 @@ ExistObject::ExistObject()
 	world = make_unique<PhysicsWorld>();
 
 	Ground = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground"));
-	Ground->SetComponentLocation(100.0f, 900.0f);
-	Ground->SettingCollision(50.0f, 50.0f, E2DBodyType::Static);
+	Ground->SetComponentLocation(960.0f, 900.0f);
+	Ground->SetBox(900.0f, 10.0f);
 	Ground->DebugRenderingOn();
 
 
 	SampleCollison = RegisterComponentInObject<Box2DCollisionComponent>(TT("SampleCollison"));
-	SampleCollison->SettingCollision(50.0f, 50.0f, E2DBodyType::Dyanamic);
+	SampleCollison->SetBox(50.0f, 50.0f);
+	SampleCollison->SetCollisionType(E2DBodyType::Dyanamic);
 	SampleCollison->DebugRenderingOn();
 	SampleCollison->SetComponentLocation(200.f, 0.0f);
 

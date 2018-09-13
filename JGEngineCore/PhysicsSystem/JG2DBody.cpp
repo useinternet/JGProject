@@ -1,6 +1,6 @@
 #include"JG2DBody.h"
-#include"JGShape.h"
-#include"JGRectangle.h"
+#include"JGShape/JGShape.h"
+#include"JGShape/JGRectangle.h"
 #include"PhysicsWorld.h"
 #include"../EngineStatics/JMath/JGVector2D.h"
 using namespace std;
@@ -27,7 +27,6 @@ void JG2DBody::Tick(const float DeltaTime)
 	{
 		m_Acceleration = m_pWorld->GetGravity() * DeltaTime;
 		m_Velocity += m_Acceleration;
-		m_pShape->Tick();
 		JGVector2D vec(0.0f, m_Velocity);
 		m_pShape->AddLocation(vec);
 	}
