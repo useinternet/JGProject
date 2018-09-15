@@ -6,7 +6,6 @@ class ENGINE_EXPORT JGRectangle : public JGShape
 private:
 	std::unique_ptr<JGVector2D> m_LeftTop;
 	std::unique_ptr<JGVector2D> m_RightBottom;
-	std::unique_ptr<JGVector2D> m_PrevLocation;
 	float m_half_Width = 0.0f;
 	float m_half_Height = 0.0f;
 	float m_Prev_half_Width = 0.0f;

@@ -49,7 +49,7 @@ public:
 	bool IsZeroVector();
 	/*
 	Exp : 내적을 구한다. */
-	JGVector2D  Dot(JGVector2D& Vector);
+	float  Dot(JGVector2D& Vector);
 	/*
 	Exp : 이 벡터를 정규화한다.*/
 	void  Normalize();

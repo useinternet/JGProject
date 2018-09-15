@@ -6,7 +6,7 @@ Exp : 수학 관련 연산 함수들은 다 여기에~~!*/
 class JGVector2D;
 class ENGINE_EXPORT JGMath
 {
-private:
+public:
 	static const float ErrorRange;
 public:
 	/*

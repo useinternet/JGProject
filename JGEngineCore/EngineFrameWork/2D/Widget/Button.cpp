@@ -61,6 +61,8 @@ void Button::Tick(const float DeltaTime)
 		break;
 	}
 }
+
+
 void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, const wstring& ButtonClickPath, const wstring& MousePointerInButtonImagePath)
 {
 	// 평상시일때의 버튼 이미지 메쉬 생성..

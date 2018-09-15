@@ -19,11 +19,13 @@ Box2DCollisionComponent::Box2DCollisionComponent()
 
 Box2DCollisionComponent::~Box2DCollisionComponent()
 {
+
 }
 void Box2DCollisionComponent::BeginComponent(World* world)
 {
 	CollisionComponent::BeginComponent(world);
-	m_Body = GetWorld()->GetPhysicsWorld()->CreateBody(m_2DBox.get(), m_BodyType, SJG2DBodyDesc{ 1.0f,1.0f,0.0f });
+	m_Body = GetWorld()->GetPhysicsWorld()->CreateBody(m_2DBox.get(), m_BodyType);
+	m_Body->CreateCollisionChecker();
 	if (m_bDebugRender)
 	{
 		InitDebugBoxResource();
@@ -40,7 +42,6 @@ void Box2DCollisionComponent::Tick(const float DeltaTime)
 		float aspectHeight = m_2DBox->GetHalfHeight() / (DebugBoxHeight / 2);
 		m_DebugRenderMesh->SetComponentScale(aspectWidth, aspectHeight);
 	}
-	JGLog::Write(ELogLevel::Default, TT("¼Óµµ : %d "), (int)(m_Body->GetVelocity()*100.0f));
 }
 void Box2DCollisionComponent::SetBox(const float h_Width, const float h_Height)
 {

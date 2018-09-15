@@ -16,7 +16,6 @@ World::World(const std::wstring& Name)
 	Widget->BeginObject(this);
 	Widget->ActiveObject();
 	m_sObjects.push_back(move(Widget));
-
 }
 World::~World()
 {

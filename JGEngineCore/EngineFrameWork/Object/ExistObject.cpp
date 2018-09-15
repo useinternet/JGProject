@@ -16,17 +16,15 @@
 #include"../2D/Widget/Button.h"
 #include"../../RenderSystem/JGViewportD.h"
 #include"../Components/Box2DCollisionComponent.h"
-#include"../../PhysicsSystem/PhysicsWorld.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
 
-	world = make_unique<PhysicsWorld>();
 
 	Ground = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground"));
-	Ground->SetComponentLocation(960.0f, 900.0f);
-	Ground->SetBox(900.0f, 10.0f);
+	Ground->SetComponentLocation(960.0f, 880.0f);
+	Ground->SetBox(900.0f, 50.0f);
 	Ground->DebugRenderingOn();
 
 
@@ -97,13 +95,11 @@ void ExistObject::BeginObject(World* world)
 		bind(&ExistObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&ExistObject::Down, this));
-
 }
 
 void ExistObject::Tick(const float DeltaTime)
 {
 	Object::Tick(DeltaTime);
-	world->Tick(DeltaTime, DeltaTime);
 	TestAnimation->AddComponentAngle(DeltaTime * 10);
 	// 임시 프레임 알아보기
 	float FPS = 1.0f / DeltaTime;

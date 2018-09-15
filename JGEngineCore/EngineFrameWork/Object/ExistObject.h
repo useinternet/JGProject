@@ -9,7 +9,6 @@
 // 중심 좌표
 
 
-class PhysicsWorld;
 /*
 Class : ExistObject 
 Exp : 화면상에 그려지는 오브젝트.. */
@@ -25,7 +24,6 @@ private:
 	class Box2DCollisionComponent* Ground;
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
-	std::unique_ptr<PhysicsWorld> world;
 public:
 	ExistObject();
 	virtual ~ExistObject();

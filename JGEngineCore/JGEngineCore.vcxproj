@@ -415,6 +415,7 @@
     <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.cpp" />
     <ClCompile Include="PhysicsSystem\JGShape\JGRectangle.cpp" />
     <ClCompile Include="PhysicsSystem\JGShape\JGShape.cpp" />
+    <ClCompile Include="PhysicsSystem\PhysicsCalculationSystem.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
     <ClCompile Include="PhysicsSystem\PhysicsWorld.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
@@ -504,6 +505,7 @@
     <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.h" />
     <ClInclude Include="PhysicsSystem\JGShape\JGRectangle.h" />
     <ClInclude Include="PhysicsSystem\JGShape\JGShape.h" />
+    <ClInclude Include="PhysicsSystem\PhysicsCalculationSystem.h" />
     <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
     <ClInclude Include="PhysicsSystem\PhysicsWorld.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />

@@ -36,9 +36,9 @@ bool JGVector2D::IsZeroVector()
 	}
 	return false;
 }
-JGVector2D  JGVector2D::Dot(JGVector2D& Vector)
+float  JGVector2D::Dot(JGVector2D& Vector)
 {
-	return JGVector2D(Vector.m_Vector2D.x * m_Vector2D.x, Vector.m_Vector2D.y * m_Vector2D.y);
+	return (Vector.m_Vector2D.x * m_Vector2D.x) +  (Vector.m_Vector2D.y * m_Vector2D.y);
 }
 void JGVector2D::Normalize()
 {

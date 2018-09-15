@@ -6,7 +6,6 @@ JGRectangle::JGRectangle(EShapeType type, JGVector2D* pVector, JGAngle2D* pAngle
 {
 	m_LeftTop = make_unique<JGVector2D>();
 	m_RightBottom = make_unique<JGVector2D>();
-	m_PrevLocation = make_unique<JGVector2D>();
 }
 
 JGRectangle::~JGRectangle()
@@ -18,9 +17,8 @@ void JGRectangle::Tick()
 {
 	JGShape::Tick();
 	m_bTransSize = false;
-	if (*m_PrevLocation != GetLocation())
+	if (IsTransLocation())
 	{
-		*m_PrevLocation = GetLocation();
 		SetRectangle(m_half_Width, m_half_Height);
 	}
 	if (m_half_Width != m_Prev_half_Width || m_half_Height != m_Prev_half_Height)

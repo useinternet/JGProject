@@ -334,6 +334,9 @@
     <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.cpp">
       <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsSystem\PhysicsCalculationSystem.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -599,6 +602,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.h">
       <Filter>PhysicsSystem\JGCollisionCheckManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\PhysicsCalculationSystem.h">
+      <Filter>PhysicsSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

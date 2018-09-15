@@ -24,14 +24,29 @@ private:
 	EShapeType m_ShapeType;
 	JGVector2D* m_Location = nullptr;
 	JGAngle2D*  m_Angle = nullptr;
+
+	std::unique_ptr<JGVector2D> m_PrevLocation;
+	std::unique_ptr<JGAngle2D> m_PrevAngle;
+
+	bool m_bIsTransLocation = false;
+	bool m_bIsTransAngle = false;
 public:
 	JGShape() = delete;
 	JGShape(EShapeType type,JGVector2D* pVector, JGAngle2D* pAngle);
 	virtual ~JGShape();
 	virtual void Tick();
+
+
 	EShapeType  GetShapeType();
 	JGVector2D& GetLocation();
 	JGAngle2D&  GetAngle();
+
+	JGVector2D& GetPrevLocation();
+	JGAngle2D& GetPrevAngle();
+
+	bool IsTransLocation();
+	bool IsTransAngle();
+
 
 	void AddLocation(JGVector2D& vec);
 	void AddAngle(JGAngle2D& angle);

@@ -3,6 +3,7 @@
 
 class PhysicsWorld;
 class JGShape;
+class JG2DBody;
 enum class EShapeType;
 class ENGINE_EXPORT JGCollisionCheckManager
 {
@@ -14,9 +15,8 @@ public:
 	~JGCollisionCheckManager();
 
 	void Tick();
-
 private:
-	bool CollisionCheck(JGShape* Shape1, JGShape* Shape2);
+	bool CollisionCheck(JG2DBody* Body1, JG2DBody* Body2);
 	bool RectToRectCollisionCheck(JGShape* Rect1, JGShape* Rect2);
 	bool RectToDotCollisionCheck();
 	bool RectToLineCollisionCheck();
