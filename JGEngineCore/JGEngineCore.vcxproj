@@ -366,7 +366,6 @@
     <ClCompile Include="EngineFrameWork\2D\Widget\Widget.cpp" />
     <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
-    <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
@@ -410,14 +409,6 @@
     <ClCompile Include="InputSystem\JGCommandManager.cpp" />
     <ClCompile Include="InputSystem\JGKeyCommand.cpp" />
     <ClCompile Include="InputSystem\JGPressManager.cpp" />
-    <ClCompile Include="PhysicsSystem\JG2DBody.cpp" />
-    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.cpp" />
-    <ClCompile Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.cpp" />
-    <ClCompile Include="PhysicsSystem\JGShape\JGRectangle.cpp" />
-    <ClCompile Include="PhysicsSystem\JGShape\JGShape.cpp" />
-    <ClCompile Include="PhysicsSystem\PhysicsCalculationSystem.cpp" />
-    <ClCompile Include="PhysicsSystem\PhysicsSystem.cpp" />
-    <ClCompile Include="PhysicsSystem\PhysicsWorld.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -453,7 +444,6 @@
     <ClInclude Include="EngineFrameWork\2D\Widget\Widget.h" />
     <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
-    <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
@@ -500,14 +490,6 @@
     <ClInclude Include="InputSystem\JGCommandManager.h" />
     <ClInclude Include="InputSystem\JGKeyCommand.h" />
     <ClInclude Include="InputSystem\JGPressManager.h" />
-    <ClInclude Include="PhysicsSystem\JG2DBody.h" />
-    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheck.h" />
-    <ClInclude Include="PhysicsSystem\JGCollisionCheckManager\JGCollisionCheckManager.h" />
-    <ClInclude Include="PhysicsSystem\JGShape\JGRectangle.h" />
-    <ClInclude Include="PhysicsSystem\JGShape\JGShape.h" />
-    <ClInclude Include="PhysicsSystem\PhysicsCalculationSystem.h" />
-    <ClInclude Include="PhysicsSystem\PhysicsSystem.h" />
-    <ClInclude Include="PhysicsSystem\PhysicsWorld.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />

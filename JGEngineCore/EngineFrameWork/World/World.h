@@ -3,7 +3,6 @@
 
 class Object;
 class RenderSystem;
-class PhysicsWorld;
 /*
 Class : World 
 @m m_WorldName : 월드 이름 
@@ -13,7 +12,6 @@ class ENGINE_EXPORT World
 private:
 	std::wstring m_WorldName = TT("None");
 	std::list<std::shared_ptr<Object>> m_sObjects;
-	std::unique_ptr<PhysicsWorld> m_PhysicsWorld;
 public:
 	World() = delete;
 	World(const std::wstring& Name);
@@ -24,7 +22,4 @@ public:
 	/*
 	Exp : 현제 월드 상에 존재하는 오브젝의 배열을 가져온다. */
 	std::list<std::shared_ptr<Object>>* GetObjectArray();
-	/*
-	Exp : 월드안에 있는 물리적 세계클래스를 가져온다. */
-	PhysicsWorld* GetPhysicsWorld();
 };

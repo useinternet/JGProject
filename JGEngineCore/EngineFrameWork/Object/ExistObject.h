@@ -19,9 +19,7 @@ private:
 	class InputComponent* Input;
 	class TestAnim* TestAnimation;
 
-	class Box2DCollisionComponent* SampleCollison;
 	class ImageBox* image;
-	class Box2DCollisionComponent* Ground;
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
 public:

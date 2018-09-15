@@ -15,29 +15,13 @@
 #include"../../EngineStatics/JGSuperClass.h"
 #include"../2D/Widget/Button.h"
 #include"../../RenderSystem/JGViewportD.h"
-#include"../Components/Box2DCollisionComponent.h"
 using namespace std;
 ExistObject::ExistObject()
 {
 	RegisterObjectID(typeid(this));
 
-
-	Ground = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground"));
-	Ground->SetComponentLocation(960.0f, 880.0f);
-	Ground->SetBox(900.0f, 50.0f);
-	Ground->DebugRenderingOn();
-
-
-	SampleCollison = RegisterComponentInObject<Box2DCollisionComponent>(TT("SampleCollison"));
-	SampleCollison->SetBox(50.0f, 50.0f);
-	SampleCollison->SetCollisionType(E2DBodyType::Dyanamic);
-	SampleCollison->DebugRenderingOn();
-	SampleCollison->SetComponentLocation(200.f, 0.0f);
-
-
 	TestAnimation = RegisterComponentInObject<TestAnim>(TT("Animation"));
 	TestAnimation->SetCurrentState(AnimationState::Idle);
-	SampleCollison->AddChild(TestAnimation);
 
 	Frame = RegisterComponentInObject<TextComponent>(TT("Text"));
 	static JGConstructHelper::TextFont FrameMesh(
@@ -107,28 +91,27 @@ void ExistObject::Tick(const float DeltaTime)
 	JGVector2D animPos = TestAnimation->GetComponentWorldLocation();
 	JGVector2D MousePos = GetRenderSuperClass()->GetCommandManager()->GetMouseLocation();
 	image->AddBlend(DeltaTime * (-0.3f));
-	JGVector2D vec = SampleCollison->GetComponentWorldLocation();
 	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
-	MousePosText->SetText(TT("Mouse X : %d , Mouse Y : %d"), (int)vec.X(), (int)vec.Y());
+	MousePosText->SetText(TT("Mouse X : %d , Mouse Y : %d"), (int)MousePos.X(), (int)MousePos.Y());
 }
 void ExistObject::Right()
 {
-	SampleCollison->AddComponentLocation(1.0f, 0.0f);
+	TestAnimation->AddComponentLocation(1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Right);
 }
 void ExistObject::Left()
 {
-	SampleCollison->AddComponentLocation(-1.0f, 0.0f);
+	TestAnimation->AddComponentLocation(-1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Left);
 }
 void ExistObject::Up()
 {
-	SampleCollison->AddComponentLocation(0.0f, -1.0f);
+	TestAnimation->AddComponentLocation(0.0f, -1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Up);
 }
 void ExistObject::Down()
 {
-	SampleCollison->AddComponentLocation(0.0f, 1.0f);
+	TestAnimation->AddComponentLocation(0.0f, 1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Down);
 }
 
