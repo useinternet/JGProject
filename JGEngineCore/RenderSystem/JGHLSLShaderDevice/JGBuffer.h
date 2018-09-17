@@ -90,6 +90,7 @@ public:
 	@param : EJGMapType type : 락 타입 
 	@param : void* InData : 대체할 데이터 */
 	bool Write(EJGMapType type,void* InData);
+
 	/*
 	Exp : 미구현 */
 	bool Read(EJGMapType type, void* OutData);

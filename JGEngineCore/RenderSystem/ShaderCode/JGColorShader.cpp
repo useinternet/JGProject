@@ -33,9 +33,6 @@ bool JGColorShader::CreateShader()
 	}
 	// 상수 버퍼 추가
 	AddConstantBuffer(TT("MatrixBuffer"), sizeof(SMatrixBuffer_VS));
-
-	// 샘플러 추가
-	AddSamplerState(GetJGDevice(), TT("WrapSampler"), ESamplerType::Wrap);
 	return true;
 }
 

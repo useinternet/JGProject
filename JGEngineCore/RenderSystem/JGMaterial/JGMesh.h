@@ -67,7 +67,9 @@ public:
 	Exp : 미구현 (추후 구현할 것)*/
 	bool Create_Vertex_Instance_Buffer(JGBufferManager* BufferManager);
 
-
+	/*
+	Exp : 메쉬 쓰기..*/
+	bool MeshWrite(const std::wstring& MeshName,const EJGMapType type,void* VertexData);
 	// 렌더링
 	void Render(JGDeviceD* Device, ERenderingType RenderingType);
 };

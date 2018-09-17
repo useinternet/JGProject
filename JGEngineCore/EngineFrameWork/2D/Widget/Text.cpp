@@ -16,7 +16,7 @@ bool Text::SetFont(const std::string & FontPath, const std::wstring & FontTextur
 	m_Text = make_unique<TextComponent>();
 	m_Text->RegisterName(GetComponentName() + TT("_Text"));
 	JGConstructHelper::TextFont FontMesh(
-		GetDevice(), FontPath, FontTexturePath);
+		FontPath, FontTexturePath);
 	if (FontMesh.Success)
 	{
 		m_Text->SetConstructObject(FontMesh.Object);

@@ -52,6 +52,7 @@ bool JGBufferManager::Write(const wstring& name, EJGMapType type, void* InData)
 	}
 	return true;
 }
+
 JGBuffer* JGBufferManager::GetBuffer(const std::wstring& name)
 {
 #ifdef _DEBUG

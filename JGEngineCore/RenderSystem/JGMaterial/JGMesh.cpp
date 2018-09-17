@@ -65,6 +65,19 @@ bool JGMesh::Create_Vertex_Instance_Buffer(JGBufferManager* BufferManager)
 	return true;
 }
 
+bool JGMesh::MeshWrite(const wstring& MeshName, const EJGMapType type, void* VertexData)
+{
+	for (auto& iter : m_vMeshName)
+	{
+		if (iter == MeshName)
+		{
+			m_BufferManager->Write(MeshName + TT("_VertexBuffer"), type,VertexData);
+			return true;
+		}
+	}
+	return false;
+}
+
 void JGMesh::Render(JGDeviceD* Device, ERenderingType RenderingType)
 {
 	Device->GetContext()->IASetVertexBuffers(0, (UINT)m_VertexBuffer.size(),

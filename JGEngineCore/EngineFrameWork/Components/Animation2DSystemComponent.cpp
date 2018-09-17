@@ -22,10 +22,6 @@ void Animation2DSystemComponent::Tick(const float DeltaTime)
 
 void Animation2DSystemComponent::Render()
 {
-	if (m_CurrentState == 2)
-	{
-		int num = 0;
-	}
 	m_mAnimation[m_CurrentState]->Render();
 }
 void Animation2DSystemComponent::LinkObject(Object* object)

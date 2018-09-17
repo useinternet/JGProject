@@ -46,8 +46,8 @@ public:
 	@param : EJGMapType type : 락 타입
 	@param : void* InData : 대체할 데이터 */
 	bool Write(const std::wstring& name, EJGMapType type, void* InData);
-	/*
-	Exp : 해당 이름의 버퍼를 얻어온다.
+
+	/*Exp : 해당 이름의 버퍼를 얻어온다.
 	@param const std::wstring& name : 버퍼 이름 */
 	JGBuffer* GetBuffer(const std::wstring& name);
 	/*

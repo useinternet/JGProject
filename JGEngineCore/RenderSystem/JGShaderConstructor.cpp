@@ -3,7 +3,7 @@
 #include"ShaderCode/JG2DSpriteShader.h"
 #include"ShaderCode/JGTextShader.h"
 #include"ShaderCode/JG2DAnimationShader.h"
-
+#include"ShaderCode/JGColorShader.h"
 using namespace std;
 JGShaderConstructor::JGShaderConstructor()
 {
@@ -20,4 +20,5 @@ void JGShaderConstructor::LinkHLSLDevice(JGHLSLShaderDevice* Device)
 	Device->AddShader<JG2DSpriteShader>(TT("2DSpriteShader"));
 	Device->AddShader<JGTextShader>(TT("TextShader"));
 	Device->AddShader<JG2DAnimationShader>(TT("2DAnimationShader"));
+	Device->AddShader<JGColorShader>(TT("ColorShader"));
 }

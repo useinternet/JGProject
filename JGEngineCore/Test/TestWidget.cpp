@@ -24,7 +24,7 @@ TestWidget::TestWidget()
 
 	ButtonPos = RegisterComponentInObject<TextComponent>(TT("ButtonPosText"));
 	static JGConstructHelper::TextFont ButtonPosMesh(
-		GetDevice(), "../ManagementFiles/Resource/Font/Godic.fnt",
+		"../ManagementFiles/Resource/Font/Godic.fnt",
 		TT("../ManagementFiles/Resource/Font/Godic_0.png"));
 	if (ButtonPosMesh.Success)
 	{

@@ -71,8 +71,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 	m_OrdinaryImage->RegisterName(GetComponentName() + TT("_Ordinary"));
 
 	JGConstructHelper::StaticMesh2D OrdinaryImageMesh(
-		GetDevice(), GetBufferManager(), m_OrdinaryImage->GetComponentName(),
-		pivot, OrdinaryImagePath);
+		m_OrdinaryImage->GetComponentName(),pivot, OrdinaryImagePath);
 	if (OrdinaryImageMesh.Success)
 	{
 		m_OrdinaryImage->SetConstructObject(OrdinaryImageMesh.Object);
@@ -86,8 +85,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 	if (ButtonClickPath != TT("None"))
 	{
 		JGConstructHelper::StaticMesh2D ClickImageMesh(
-			GetDevice(), GetBufferManager(), m_ButtonClickImage->GetComponentName(),
-			pivot, ButtonClickPath);
+			m_ButtonClickImage->GetComponentName(), pivot, ButtonClickPath);
 		if (ClickImageMesh.Success)
 		{
 			m_ButtonClickImage->SetConstructObject(ClickImageMesh.Object);
@@ -108,7 +106,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 	if (MousePointerInButtonImagePath != TT("None"))
 	{
 		JGConstructHelper::StaticMesh2D MousePointerInButtonImageMesh(
-			GetDevice(), GetBufferManager(), m_MousePointerInButtonImage->GetComponentName(),
+			m_MousePointerInButtonImage->GetComponentName(),
 			pivot, MousePointerInButtonImagePath);
 		if (MousePointerInButtonImageMesh.Success)
 		{

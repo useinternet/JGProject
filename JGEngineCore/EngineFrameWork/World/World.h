@@ -22,4 +22,17 @@ public:
 	/*
 	Exp : 현제 월드 상에 존재하는 오브젝의 배열을 가져온다. */
 	std::list<std::shared_ptr<Object>>* GetObjectArray();
+
+	template<typename ObjectType>
+	Object* SpawnObject();
 };
+
+template<typename ObjectType>
+inline Object* World::SpawnObject()
+{
+	std::shared_ptr<Object> object = make_unique<TestObject>();
+	object->BeginObject(this);
+	Object* result = object.get();
+	m_sObjects.push_back(move(object));
+	return result;
+}

@@ -15,7 +15,8 @@
 // 임시 인클루드
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
 #include"../EngineFrameWork/Object/ExistObject.h"
-
+#include"../PhysicsSystem/JGBox2D/JGCommon/JGCollisionDebugDraw.h"
+#include"../EngineStatics/JMath/JGMatrix.h"
 using namespace std;
 
 RenderSystem::RenderSystem()
@@ -31,7 +32,7 @@ RenderSystem::RenderSystem()
 
 	m_ObjectConstructInit = make_unique<Object>();
 }
-RenderSystem::~RenderSystem() {}
+RenderSystem::~RenderSystem() { delete draw; }
 bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int ScreenWidth, const int ScreenHeight,
 	const float FOV, const float FarZ, const float NearZ)
 {
@@ -109,11 +110,28 @@ bool RenderSystem::InitRenderSystem(HWND hWnd, const bool bFullScreen,const int 
 	// 임시 적용
 	ApplicationInDeviceContext();
 
+	JGMatrix matrix;
+	TempViewMatrix(&matrix);
+	draw = new JGCollisionDebugDraw;
+	draw->InitCollisionDebugDraw(m_Device.get(),m_hWnd, m_ShaderDevice.get(), m_JGBufferManager.get(),
+		m_Viewport.get(), matrix);
+
 	//
 	JGLog::Write(ELogLevel::Progress, TT("RenderSystem Init Complete...."));
 	return true;
 }
+void RenderSystem::TempViewMatrix(JGMatrix* matrix)
+{
+	JGVector3D up(0.0f, 1.0f, 0.0f), position(0.0f, 0.0f, -10.0f), lookAt(0.0f, 0.0f, 1.0f);
+	JGMatrix rotationMatrix;
 
+	rotationMatrix.MakeRotationMatirx(0.0f, 0.0f, 0.0f);
+	lookAt.TransformCoord(rotationMatrix);
+	up.TransformCoord(rotationMatrix);
+
+
+	matrix->MakeViewMatrix(&position, &lookAt, &up);
+}
 void RenderSystem::BeginRendering()
 {
 	float Color[4] = { 0.0f,0.0f,0.0f,0.0f};
@@ -144,8 +162,13 @@ void RenderSystem::Render()
 		}
 		return false;
 	});
-
-
+	b2Vec2 SampleVec1[4];
+	b2PolygonShape s;
+	SampleVec1[0].Set(-1.0f, -1.0f);
+	SampleVec1[1].Set(1.0f, -1.0f);
+	SampleVec1[2].Set(1.0f, 1.0f);
+	SampleVec1[3].Set(-1.0f, 1.0f);
+	draw->DrawPolygon(SampleVec1, 4, b2Color(1.0f,1.0f,1.0f,1.0f));
 	// 렌더링
 	for (auto& object : *m_RenderingObjectArray)
 	{

@@ -7,7 +7,8 @@
 #include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 #include"JMath/JGVector2D.h"
 using namespace std;
-
+JGDeviceD* JGConstructHelper::m_pDevice = nullptr;
+JGBufferManager* JGConstructHelper::m_BufferManager = nullptr;
 static JGConstructHelper* Instance = nullptr;
 ConstructObject::~ConstructObject() {}
 StaticMesh2DObject::~StaticMesh2DObject() {}
@@ -17,11 +18,13 @@ SoundObject::~SoundObject() {}
 
 
 
-JGConstructHelper::JGConstructHelper()
+JGConstructHelper::JGConstructHelper(JGDeviceD* Device, JGBufferManager* BufferManager)
 {
 	if (Instance == nullptr)
 	{
 		Instance = this;
+		m_pDevice = Device;
+		m_BufferManager = BufferManager;
 	}
 	else
 	{
@@ -34,7 +37,7 @@ JGConstructHelper* JGConstructHelper::GetInstance()
 }
 
 
-JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const wstring& ComponentName,
+JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
 	EPivot pivot, const wstring& TexturePath, const wstring& ShaderName)
 {
 	// 오브젝트 동적할당..
@@ -44,14 +47,14 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 	TempObject->Pivot = make_unique<EPivot>();
 
 	// 텍스쳐 로드
-	bool result = TempObject->Texture->Add(Device, TexturePath);
+	bool result = TempObject->Texture->Add(JGConstructHelper::m_pDevice, TexturePath);
 	if (!result)
 	{
 		Success = false;
 	}
 	// 메쉬 로드
 	result = TempObject->Mesh->Construct2DMesh(
-		BufferManager, ComponentName,
+		JGConstructHelper::m_BufferManager, ComponentName,
 		(float)TempObject->Texture->GetInformation(0).Width,
 		(float)TempObject->Texture->GetInformation(0).Height, pivot);
 	if (!result)
@@ -70,8 +73,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(JGDeviceD* Device, JGBufferManager
 
 
 JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
-	JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
-	EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
+	const std::wstring& ComponentName, EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
 	const std::wstring& TexturePath, const std::wstring& ShaderName)
 {
 	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
@@ -79,7 +81,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	TempObject->Mesh = make_unique<JG2DMesh>();
 	TempObject->Pivot = make_unique<EPivot>();
 	// 텍스쳐 로드
-	bool result = TempObject->Texture->Add(Device, TexturePath);
+	bool result = TempObject->Texture->Add(JGConstructHelper::m_pDevice, TexturePath);
 	if (!result)
 	{
 		Success = false;
@@ -94,7 +96,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	Information.Width = TexWidth;
 
 	// 한장의 크기를 구한 구격으로 메쉬를 생성
-	result = TempObject->Mesh->Construct2DMesh(BufferManager, ComponentName,
+	result = TempObject->Mesh->Construct2DMesh(JGConstructHelper::m_BufferManager, ComponentName,
 		MeshWidth, MeshHeight, pivot, Information);
 	if (!result)
 	{
@@ -114,19 +116,19 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 
 	JGConstructHelper::GetInstance()->m_vConstructObject.push_back(move(TempObject));
 }
-JGConstructHelper::TextFont::TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
+JGConstructHelper::TextFont::TextFont(const std::string& FontPath, const std::wstring& FontTexturePath,
 	const wstring& ShaderName)
 {
 	unique_ptr<TextObject> TempObject = make_unique<TextObject>();
 	TempObject->Texture = make_unique<JGTexture>();
 	// 폰트 텍스쳐 저장
-	bool result = TempObject->Texture->Add(Device, FontTexturePath);
+	bool result = TempObject->Texture->Add(m_pDevice, FontTexturePath);
 	if (!result)
 	{
 		Success = false;
 	}
 	// 폰트 생성
-	result = JGFontLoader::GetInstance()->LoadFont(Device, FontPath, FontTexturePath);
+	result = JGFontLoader::GetInstance()->LoadFont(JGConstructHelper::m_pDevice, FontPath, FontTexturePath);
 	if (!result)
 	{
 		Success = false;

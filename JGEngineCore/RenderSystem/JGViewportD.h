@@ -62,8 +62,6 @@ public:
 	Exp : 세로길이를 가져온다. */
 	static const float GetHeight();
 
-	static const float GetPTM_Width();
-	static const float GetPTM_Height();
 	/*
 	Exp : 시야각을 셋팅한다. */
 	void SetFOV(const float FOV);

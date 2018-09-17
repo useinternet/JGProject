@@ -30,7 +30,7 @@ JGEngineMain::JGEngineMain()
 	m_SuperClass = make_unique<JGSuperClass>();
 	m_ConfigManager = make_unique<JGConfigLoaderManager>();
 	m_FontLoader   = make_unique<JGFontLoader>();
-	m_ConstructHelper = make_unique<JGConstructHelper>();
+
 	m_GameLoop = make_unique<GameLoop>();
 
 }
@@ -49,6 +49,8 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 		//예외처리
 		return false;
 	}
+	m_ConstructHelper = make_unique<JGConstructHelper>(m_RenderSystem->GetDevice(),
+		m_RenderSystem->GetBufferManager());
 	result = m_InputSystem->CreateInputDevice(Instance, hWnd,1920, 1080);
 	if (!result)
 	{
@@ -74,6 +76,11 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	m_GameLoop->InitGameLoop(m_RenderSystem.get());
 	//
 	m_InputEvent->LinkInputSystem(m_InputSystem.get());
+
+
+
+	//
+
 	return true;
 }
 void JGEngineMain::Run()

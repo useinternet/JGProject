@@ -64,14 +64,6 @@ void JGViewportD::SetFOV(const float FOV)
 	CreateProjectionMatrix();
 }
 
-const float JGViewportD::GetPTM_Width()
-{
-	return m_Width / 10;
-}
-const float JGViewportD::GetPTM_Height()
-{
-	return m_Height / 10;
-}
 void JGViewportD::CreateViewport(const float MinDepth, const float MaxDepth, const float TopLeftX, const float TopLeftY)
 {
 	m_Viewport->Width = m_Width;

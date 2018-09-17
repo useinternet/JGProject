@@ -21,7 +21,7 @@ bool ImageBox::CreateImage(const std::wstring & ImagePath, const EPivot pivot)
 	m_Image->RegisterName(GetComponentName());
 
 	JGConstructHelper::StaticMesh2D ImageMesh(
-		GetDevice(), GetBufferManager(), m_Image->GetComponentName(),
+		m_Image->GetComponentName(),
 		pivot, ImagePath);
 	if (ImageMesh.Success)
 	{

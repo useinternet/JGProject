@@ -70,14 +70,21 @@ Class : JGConstructHelper
 @m vector<shared_ptr<StaticMesh2DObject>> m_vStaticMesh2DObject : 스테틱 2DMesh의 주소값을 보관하기 위한 배열 */
 class ENGINE_EXPORT JGConstructHelper
 {
+private:
+	static JGDeviceD* m_pDevice;
+	static JGBufferManager* m_BufferManager;
+
 public:
 	std::vector<std::shared_ptr<ConstructObject>> m_vConstructObject;
 public:
-	JGConstructHelper();
+	JGConstructHelper() = delete;
+	JGConstructHelper(JGDeviceD* Device, JGBufferManager* BufferManager);
 	static JGConstructHelper* GetInstance();
 public:
 	class StaticMesh2D
 	{
+	private:
+		friend JGConstructHelper;
 	public:
 		StaticMesh2DObject* Object;
 		bool Success = true;
@@ -92,12 +99,13 @@ public:
 		@param EPivot pivot : 기준점
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
-		StaticMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager, const std::wstring& ComponentName,
-			EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
+		StaticMesh2D(const std::wstring& ComponentName, EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
 	};
 
 	class AnimationMesh2D
 	{
+	private:
+		friend JGConstructHelper;
 	public:
 		AnimationMesh2DObject * Object;
 		bool Success = true;
@@ -114,12 +122,13 @@ public:
 		@param const size_t HeightFrame :  세로 프레임 수
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
-		AnimationMesh2D(JGDeviceD* Device, JGBufferManager* BufferManager,const std::wstring& ComponentName,
-			EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
+		AnimationMesh2D(const std::wstring& ComponentName, EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
 			const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DAnimationShader"));
 	};
 	class TextFont
 	{
+	private:
+		friend JGConstructHelper;
 	public:
 		TextObject* Object;
 		bool Success = true;
@@ -131,7 +140,6 @@ public:
 		@param const string& FontPath :  폰트 정보 경로 
 		@param const wstring& FontTexturePath : 폰트 텍스쳐 경로 
 		@param const wstring& ShaderName : 폰트에 적용할 셰이더 이름. */
-		TextFont(JGDeviceD* Device, const std::string& FontPath, const std::wstring& FontTexturePath,
-			const std::wstring& ShaderName = TT("TextShader"));
+		TextFont(const std::string& FontPath, const std::wstring& FontTexturePath, const std::wstring& ShaderName = TT("TextShader"));
 	};
 };
