@@ -7,6 +7,7 @@
 #include"../SoundSystem/SoundSystem.h"
 #include"../InputSystem/InputSystem.h"
 #include"JGSuperClass.h"
+#include"../PhysicsSystem/JGBox2D/JGPhysicsSystem.h"
 #include"JGConfigLoader/JGConfigLoaderManager.h"
 #include"../EngineFrameWork/2D/Text/JGFontLoader.h"
 #include"JGConstructHelper.h"
@@ -28,11 +29,11 @@ JGEngineMain::JGEngineMain()
 	m_SoundSystem = make_unique<SoundSystem>();
 	m_InputSystem  = make_unique<InputSystem>();
 	m_SuperClass = make_unique<JGSuperClass>();
+	m_PhysicsSystem = make_unique<JGPhysicsSystem>();
 	m_ConfigManager = make_unique<JGConfigLoaderManager>();
 	m_FontLoader   = make_unique<JGFontLoader>();
 
 	m_GameLoop = make_unique<GameLoop>();
-
 }
 JGEngineMain::~JGEngineMain() {}
 bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
@@ -70,10 +71,12 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 		m_SoundSystem.get());
 	m_RenderSystem->InitObjectProtoType(m_SuperClass.get());
 
+	m_PhysicsSystem->InitPhysicsSystem(hWnd, m_SuperClass.get());
+
 	// 설정파일들 초기화...
 	m_ConfigManager->LoadConfig(m_SuperClass.get());
 	// 게임 루프 초기화
-	m_GameLoop->InitGameLoop(m_RenderSystem.get());
+	m_GameLoop->InitGameLoop(m_RenderSystem.get(),m_PhysicsSystem.get());
 	//
 	m_InputEvent->LinkInputSystem(m_InputSystem.get());
 

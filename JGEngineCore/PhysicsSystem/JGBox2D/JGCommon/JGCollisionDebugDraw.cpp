@@ -13,6 +13,7 @@ using namespace std;
 #pragma warning (disable : 4996)
 JGCollisionDebugDraw::JGCollisionDebugDraw()
 {
+	SetFlags(e_shapeBit);
 	m_WorldMatrix = make_unique<JGMatrix>();
 	m_OthroMatrix = make_unique<JGMatrix>();
 	m_ViewMatrix = make_unique<JGMatrix>();
@@ -27,15 +28,18 @@ JGCollisionDebugDraw::JGCollisionDebugDraw()
 JGCollisionDebugDraw::~JGCollisionDebugDraw()
 {
 }
-void JGCollisionDebugDraw::InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd, JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager, JGViewportD* viewPort, const JGMatrix& ViewMatrix)
+void JGCollisionDebugDraw::InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd, JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager, JGViewportD* viewPort)
 {
 	m_pDevice = Device;
 	m_pHLSLDevice = HLSLDevice;
 	m_pBufferManager = BufferManager;
 	m_pViewPort = viewPort;
-	*m_ViewMatrix = ViewMatrix;
 	*m_OthroMatrix = m_pViewPort->GetOrthoMatrix();
 	InitDebugMesh();
+}
+void JGCollisionDebugDraw::SetViewMatrix(const JGMatrix& viewMatrix)
+{
+	*m_ViewMatrix = viewMatrix;
 }
 void JGCollisionDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {

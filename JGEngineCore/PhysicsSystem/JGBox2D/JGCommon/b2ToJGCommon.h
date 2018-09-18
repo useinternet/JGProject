@@ -25,3 +25,11 @@ inline JGVector2D b2ToJG_Vector(b2Vec2& vec)
 		-((vec.y * PTM) - (g_ScreenHeight / 2)));
 	return result;
 }
+inline b2Vec2 JGTob2_Unit(JGVector2D& vec)
+{
+	b2Vec2 result;
+	result.x = vec.X() / PTM;
+	result.y = -vec.Y() / PTM;
+
+	return result;
+}

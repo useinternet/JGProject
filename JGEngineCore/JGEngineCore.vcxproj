@@ -458,7 +458,11 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGCommon\b2ToJGCommon.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGShape.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.cpp" />
     <ClCompile Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.cpp" />
@@ -591,7 +595,11 @@
     <ClInclude Include="PhysicsSystem\JGBox2D\JGCommon\b2ToJGCommon.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGShape.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBuffer.h" />
     <ClInclude Include="RenderSystem\JGHLSLShaderDevice\JGBufferManager.h" />

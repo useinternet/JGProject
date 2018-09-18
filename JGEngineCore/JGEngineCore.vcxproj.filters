@@ -101,6 +101,9 @@
     <Filter Include="PhysicsSystem\JGBox2D\JGCommon">
       <UniqueIdentifier>{7d2b7e36-a4da-481f-b9bd-959e5599f160}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PhysicsSystem\JGBox2D\JGShape">
+      <UniqueIdentifier>{377ea165-fdea-4854-89ed-cb19262350c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -489,6 +492,18 @@
     </ClCompile>
     <ClCompile Include="Test\TestObject.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.cpp">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.cpp">
+      <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGShape.cpp">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.cpp">
+      <Filter>PhysicsSystem\JGBox2D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -887,6 +902,18 @@
     </ClInclude>
     <ClInclude Include="Test\TestObject.h">
       <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.h">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.h">
+      <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGShape.h">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.h">
+      <Filter>PhysicsSystem\JGBox2D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

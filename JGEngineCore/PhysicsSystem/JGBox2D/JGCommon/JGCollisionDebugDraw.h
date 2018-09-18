@@ -46,7 +46,8 @@ private:
 public:
 	JGCollisionDebugDraw();
 	~JGCollisionDebugDraw();
-	void InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd,JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager, JGViewportD* viewPort,const JGMatrix& ViewMatrix);
+	void InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd,JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager, JGViewportD* viewPort);
+	void SetViewMatrix(const JGMatrix& viewMatrix);
 	virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 	virtual void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 	virtual void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color);

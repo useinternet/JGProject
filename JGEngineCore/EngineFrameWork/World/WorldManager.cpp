@@ -1,5 +1,8 @@
 #include"WorldManager.h"
 #include"World.h"
+#include"../../PhysicsSystem/JGBox2D/JGPhysicsSystem.h"
+#include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
+#include"../../EngineStatics/JMath/JGVector2D.h"
 using namespace std;
 
 WorldManager::WorldManager()
@@ -9,6 +12,11 @@ WorldManager::WorldManager()
 WorldManager::~WorldManager()
 {
 
+}
+
+void WorldManager::InitWorldManager(JGPhysicsSystem* pySystem)
+{
+	m_pPhysicsSystem = pySystem;
 }
 
 
@@ -33,17 +41,23 @@ void WorldManager::SelectWorld(const std::wstring& worldName)
 }
 void WorldManager::AddWorld(const wstring& worldName)
 {
-	std::unique_ptr<World> world = make_unique<World>(worldName);
+	JGVector2D Gravity(0.0f, 9.8f);
+	JGPhysicsWorld* pyWorld = m_pPhysicsSystem->AddPhysicsWorld(worldName, Gravity);
+	unique_ptr<World> world = make_unique<World>(worldName, pyWorld);
 
 	m_mWorlds.insert(pair <const wstring, shared_ptr<World>>(worldName, move(world)));
 }
-World* WorldManager::GetWorld(const std::wstring& WorldName)
+World* WorldManager::GetWorld(const wstring& WorldName)
 {
 	return m_mWorlds[WorldName].get();
 }
 World* WorldManager::GetCurrentWorld()
 {
 	return m_mWorlds[m_CurrentWorld].get();
+}
+const wstring& WorldManager::GetCurrentWorldName()
+{
+	return m_CurrentWorld;
 }
 bool WorldManager::GetIsChangeWorld()
 {

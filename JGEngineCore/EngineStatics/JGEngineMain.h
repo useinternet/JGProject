@@ -12,6 +12,7 @@ class RenderSystem;
 class SoundSystem;
 class InputSystem;
 class JGSuperClass;
+class JGPhysicsSystem;
 class JGConfigLoaderManager;
 class JGFontLoader;
 class JGConstructHelper;
@@ -29,6 +30,7 @@ private: // 초기화 우선순위 별
 	std::unique_ptr<SoundSystem>  m_SoundSystem;
 	std::unique_ptr<InputSystem>  m_InputSystem;
 	std::unique_ptr<JGSuperClass> m_SuperClass;
+	std::unique_ptr<JGPhysicsSystem> m_PhysicsSystem;
 	std::unique_ptr<JGConfigLoaderManager> m_ConfigManager;
 	std::unique_ptr<JGFontLoader> m_FontLoader;
 	std::unique_ptr<JGConstructHelper> m_ConstructHelper;

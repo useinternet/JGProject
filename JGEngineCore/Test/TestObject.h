@@ -1,6 +1,10 @@
 #pragma once
 #include"../EngineFrameWork/Object/ExistObject.h"
 
+#include"../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
+#include"../PhysicsSystem/JGBox2D/JGDynamics/JG2DBody.h"
+#include"../PhysicsSystem/JGBox2D/JGDynamics/JGFixture.h"
+#include"../PhysicsSystem/JGBox2D/JGShape/JGPolygonShape.h"
 
 class ENGINE_EXPORT TestObject : public ExistObject
 {
@@ -11,6 +15,9 @@ private:
 	class ImageBox* image;
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
+
+
+	// 물리 실험..
 public:
 	TestObject();
 	virtual ~TestObject();

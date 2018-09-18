@@ -3,6 +3,8 @@
 
 class Object;
 class RenderSystem;
+class JGMatrix;
+class JGPhysicsWorld;
 /*
 Class : World 
 @m m_WorldName : 월드 이름 
@@ -12,10 +14,13 @@ class ENGINE_EXPORT World
 private:
 	std::wstring m_WorldName = TT("None");
 	std::list<std::shared_ptr<Object>> m_sObjects;
+	JGPhysicsWorld* m_pyWorld = nullptr;
+	std::unique_ptr<JGMatrix> m_ViewMatrix;
 public:
 	World() = delete;
-	World(const std::wstring& Name);
+	World(const std::wstring& Name, JGPhysicsWorld* pyWorld);
 	~World();
+
 	/*
 	Exp : 프레임 1당 호출되는 함수 */
 	void Tick(const float DeltaTime);
@@ -25,6 +30,10 @@ public:
 
 	template<typename ObjectType>
 	Object* SpawnObject();
+
+	void TempViewMatrixInit();
+	JGMatrix& GetViewMatrix();
+	JGPhysicsWorld* GetPyWorld();
 };
 
 template<typename ObjectType>

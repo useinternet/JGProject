@@ -1,6 +1,5 @@
 #pragma once
 #include"../EngineStatics/Engine.h"
-class WorldCompare;
 
 
 
@@ -74,9 +73,6 @@ public:
 	JGBufferManager*    GetBufferManager();
 
 
-	// 임시
-	class JGCollisionDebugDraw* draw;
-	void TempViewMatrix(class JGMatrix* matrix);
 private:
 	//임시
 	void ApplicationInDeviceContext();
