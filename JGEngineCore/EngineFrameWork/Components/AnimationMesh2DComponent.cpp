@@ -8,7 +8,7 @@ AnimationMesh2DComponent::AnimationMesh2DComponent()
 {
 	RegisterComponentID(typeid(this));
 	m_AnimationBuffer = make_unique<SAnimationIncrementBuffer_VS>();
-	m_AnimationDelay = 0.2f;
+	m_AnimationDelay  = 0.2f;
 }
 
 AnimationMesh2DComponent::~AnimationMesh2DComponent()
@@ -18,8 +18,6 @@ void AnimationMesh2DComponent::ShaderParamSetting(JGShaderData * Data)
 {
 	StaticMesh2DComponent::ShaderParamSetting(Data);
 	Data->InsertData(TT("AnimationIncrementBuffer"), m_AnimationBuffer.get());
-
-	// 셰이더 ...데이터 작성
 }
 void AnimationMesh2DComponent::Tick(const float DeltaTime)
 {
@@ -67,10 +65,11 @@ void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 		SetMesh(object->Mesh.get());
 		SetShaderName(object->ShaderName);
 		SetPivot(object->Pivot.get());
-		m_TotalFrame = object->TotalFrame;
-		m_WidthFrame = object->WidthFrame;
-		m_HeightFrame = object->HeightFrame;
-		m_IncreaseWidth = object->IncreaseWidth;
+
+		m_TotalFrame     = object->TotalFrame;
+		m_WidthFrame     = object->WidthFrame;
+		m_HeightFrame    = object->HeightFrame;
+		m_IncreaseWidth  = object->IncreaseWidth;
 		m_IncreaseHeight = object->IncreaseHeight;
 		
 	}
@@ -84,7 +83,9 @@ void AnimationMesh2DComponent::AnimationCalulation()
 		m_AnimationEnd = true;
 		return;
 	}
+
 	m_AnimationEnd = false;
+
 	// 현제 프레임 % 가로프레임 == 1 
 	if (m_CurrentFrame % m_WidthFrame == 1)
 	{

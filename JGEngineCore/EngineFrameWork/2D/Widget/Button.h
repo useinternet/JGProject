@@ -8,12 +8,12 @@ enum class EPivot;
 
 /*
 EnumClas : EButtonImageType
-@e Ordinary : 평상시 버튼 이미지
-@e ButtonClick : 버튼 클릭 시 이미지
+@e Ordinary             : 평상시 버튼 이미지
+@e ButtonClick          : 버튼 클릭 시 이미지
 @e MousePointerInButton : 마우스 포인터가 버튼 안에 있을 시의 이미지 */
 enum class EButtonImageType
 {
-	Ordinary,
+	Ordinary = 0,
 	ButtonClick,
 	MousePointerInButton
 };
@@ -27,6 +27,9 @@ Class : Button
 @m EButtonImageType m_ButtonImageType : 버튼 이미지 타입  */
 class ENGINE_EXPORT Button : public Widget
 {
+	/*
+	Struct : SButtonRect 
+	Exp : 버튼 마우스 이벤트용 사각형 정보 구조체 */
 	typedef struct SButtonRect
 	{
 		float Top;
@@ -38,10 +41,10 @@ private:
 	std::unique_ptr<StaticMesh2DComponent> m_OrdinaryImage;
 	std::unique_ptr<StaticMesh2DComponent> m_ButtonClickImage;
 	std::unique_ptr<StaticMesh2DComponent> m_MousePointerInButtonImage;
-	std::unique_ptr<InputComponent> m_InputComponent;
-	std::unique_ptr<SButtonRect> m_ButtonRect;
+	std::unique_ptr<InputComponent>        m_InputComponent;
+	std::unique_ptr<SButtonRect>           m_ButtonRect;
 	EButtonImageType m_ButtonImageType;
-
+	/// 클래스 1회용 변수...
 	bool m_bPosInit = false;
 public:
 	Button();
@@ -51,7 +54,7 @@ public:
 	/*
 	Exp : 버튼 생성
 	@param const EPivot pivot
-	@param cosnt wstring& OrdinaryImagePath : 평상시 버튼 이미지 경로
+	@param cosnt wstring& OrdinaryImagePath    : 평상시 버튼 이미지 경로
 	@param const wstring& ButtonClickImagePath : 버튼 클릭시 이미지 경로
 	@param const wstring& MousePointerInButtonImagePath : 마우스 포인터가 버튼 사각형안에 있을시 이미지 경로*/
 	void CreateButton(const EPivot pivot,const std::wstring& OrdinaryImagePath, const std::wstring& ButtonClickPath = TT("None"), const std::wstring& MousePointerInButtonImagePath = TT("None"));
@@ -66,9 +69,8 @@ public:
 	/*
 	Exp : 버튼 이미지 타입 셋팅 */
 	void SetButtonImage(const EButtonImageType type);
-
 	/*
-	Exp : 현제 마우스 포인터가 버튼 충돌 사각혀 안에 있는지 여부 */
+	Exp : 현제 마우스 포인터가 버튼 충돌 사각형 안에 있는지 여부 */
 	bool IsMousePointerInButton();
 	/*
 	Exp : 버튼클릭 여부 */

@@ -19,7 +19,7 @@ bool ImageBox::CreateImage(const std::wstring & ImagePath, const EPivot pivot)
 {
 	AddChild(m_Image.get());
 	m_Image->RegisterName(GetComponentName());
-
+	/// 리소스 오브젝트 생성..
 	JGConstructHelper::StaticMesh2D ImageMesh(
 		m_Image->GetComponentName(),
 		pivot, ImagePath);

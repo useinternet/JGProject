@@ -11,6 +11,10 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
+/*
+EnumClass : EComponentState 
+@e Active : È°¼ºÈ­
+@e Behind : ¼û±è  */
 enum class EComponentState
 {
 	Active,
@@ -20,11 +24,11 @@ enum class EComponentState
 class ENGINE_EXPORT Component : public ComponentBase
 {
 	std::vector<Component*> m_vChildComponent;
+	std::wstring            m_ComponentName = TT("None");
+	EComponentState         m_ComponentState;
 	Component* m_ParentComponent = nullptr;
-	World* m_pWorld = nullptr;
-	std::wstring m_ComponentName = TT("None");
-	EComponentState m_ComponentState;
-	int m_zOrder = 0;
+	World*     m_pWorld = nullptr;
+	int        m_zOrder = 0;
 public:
 	Component();
 	virtual ~Component();

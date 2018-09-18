@@ -10,8 +10,8 @@ enum class EPivot;
 Class : StaticMesh2DComponent 
 @m wstring m_ShaderName : 적용할 셰이더 이름
 @m JGTexture& m_Texture : 텍스쳐
-@m JG2DMesh m_Mesh : 메시 
-@m int m_ZOrder : 그리는 순서(값이 작을수록 나중에 그려진다.) */
+@m JG2DMesh m_Mesh   : 메시 
+@m EPivot*  m_pPivot : 메시 기준점 */
 class ENGINE_EXPORT StaticMesh2DComponent : public Motivated2DComponent
 {
 private:
@@ -19,6 +19,8 @@ private:
 	JGTexture* m_Texture = nullptr;
 	JG2DMesh* m_Mesh     = nullptr;
 	EPivot*  m_pPivot    = nullptr;
+
+	/// 셰이더 데이터 용 변수
 	std::unique_ptr<struct SMatrixBuffer_VS>   m_MatrixBufferDesc;
 	std::unique_ptr<struct S2DSpriteBuffer_PS> m_2DSpriteBufferDesc;
 public:
@@ -80,8 +82,6 @@ protected:
 	/*
 	Exp : 셰이더이름을 셋팅한다. */
 	void SetShaderName(const std::wstring& ShaderName);
-
-
 	/*
 	Exp : 적용중인 Pivot을 가져온다. */
 	EPivot GetPivot();

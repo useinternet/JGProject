@@ -118,6 +118,8 @@ public:
 	Exp : 스케일 값이 바뀌었으면 true를 그대b로이면 false를 반환한다. */
 	bool IsChangeScale();
 
+	/*
+	Exp :*/
 	JGVector2D* GetComponentLocationAddress();
 	JGAngle2D*  GetComponentAngleAddress();
 

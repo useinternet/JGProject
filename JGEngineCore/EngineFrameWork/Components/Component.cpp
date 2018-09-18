@@ -77,11 +77,11 @@ const wstring& Component::GetComponentName()
 void Component::AddChild(Component* Child)
 {
 	Component* ParentOfChild = Child->GetParent();
-	// 만약 추가해야할 자식 컴포넌트에 부모 컴포넌트가 있다면.. 
+	/// 만약 추가해야할 자식 컴포넌트에 부모 컴포넌트가 있다면.. 
 	if (ParentOfChild)
 	{
 		Component* TempChild = Child;
-		// 부모 컴포넌트에있는 자식배열에서 삭제한다. 그후..
+		/// 부모 컴포넌트에있는 자식배열에서 삭제한다. 그후..
 		for (auto iter = ParentOfChild->GetChildArray().begin();
 			      iter < ParentOfChild->GetChildArray().end(); )
 		{
@@ -94,12 +94,12 @@ void Component::AddChild(Component* Child)
 				++iter;
 			}
 		}
-		// 현재 자기 자식 컴포넌트 배열에 이 자식 컴포넌트를 추가하고
+		/// 현재 자기 자식 컴포넌트 배열에 이 자식 컴포넌트를 추가하고
 		m_vChildComponent.push_back(TempChild);
-		// 자식컴포넌트의 부모 컴포넌트는 내가 된다.
+		/// 자식컴포넌트의 부모 컴포넌트는 내가 된다.
 		TempChild->SetParent(this);
 	}
-	// 아니면 그냥 추가..
+	/// 아니면 그냥 추가..
 	else
 	{
 		m_vChildComponent.push_back(Child);

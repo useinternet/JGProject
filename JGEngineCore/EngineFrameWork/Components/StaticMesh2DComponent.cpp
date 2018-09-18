@@ -10,13 +10,11 @@
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
 
-// юс╫ц
-#include"../../EngineStatics/JGLog.h"
 using namespace std;
 StaticMesh2DComponent::StaticMesh2DComponent()
 {
 	RegisterComponentID(typeid(this));
-	m_MatrixBufferDesc = make_unique<SMatrixBuffer_VS>();
+	m_MatrixBufferDesc  = make_unique<SMatrixBuffer_VS>();
 	m_2DSpriteBufferDesc = make_unique<S2DSpriteBuffer_PS>();
 }
 StaticMesh2DComponent::~StaticMesh2DComponent()
@@ -29,9 +27,9 @@ void StaticMesh2DComponent::SetConstructObject(ConstructObject* Object)
 	if (object)
 	{
 		m_ShaderName = object->ShaderName;
-		m_Texture = object->Texture.get();
-		m_Mesh = object->Mesh.get();
-		m_pPivot = object->Pivot.get();
+		m_Texture    = object->Texture.get();
+		m_Mesh       = object->Mesh.get();
+		m_pPivot     = object->Pivot.get();
 	}
 }
 float StaticMesh2DComponent::GetTextureWdith()
