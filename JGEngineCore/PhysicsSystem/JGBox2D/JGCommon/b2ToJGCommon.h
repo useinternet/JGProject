@@ -29,6 +29,20 @@ inline b2Vec2 JGTob2_Unit(JGVector2D& vec)
 {
 	b2Vec2 result;
 	result.x = vec.X() / PTM;
+	result.y = vec.Y() / PTM;
+
+	return result;
+}
+inline JGVector2D b2ToJG_Unit(b2Vec2& vec)
+{
+	JGVector2D result;
+	result.Set(vec.x*PTM, vec.y * PTM);
+	return result;
+}
+inline b2Vec2 JGTob2_Force(JGVector2D& vec)
+{
+	b2Vec2 result;
+	result.x = vec.X() / PTM;
 	result.y = -vec.Y() / PTM;
 
 	return result;

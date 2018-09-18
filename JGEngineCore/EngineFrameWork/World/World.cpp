@@ -22,6 +22,7 @@ World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld)
 }
 World::~World()
 {
+
 }
 void World::Tick(const float DeltaTime)
 {

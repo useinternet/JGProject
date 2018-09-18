@@ -41,7 +41,7 @@ void WorldManager::SelectWorld(const std::wstring& worldName)
 }
 void WorldManager::AddWorld(const wstring& worldName)
 {
-	JGVector2D Gravity(0.0f, 9.8f);
+	JGVector2D Gravity(0.0f, 98.0f);
 	JGPhysicsWorld* pyWorld = m_pPhysicsSystem->AddPhysicsWorld(worldName, Gravity);
 	unique_ptr<World> world = make_unique<World>(worldName, pyWorld);
 

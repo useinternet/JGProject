@@ -4,6 +4,7 @@
 #include"../JGShape/JGShape.h"
 #include"../../../EngineStatics/JMath/JGVector2D.h"
 #include"../../../EngineStatics/JMath/JGAngle2D.h"
+#include"../../../EngineStatics/JGLog.h"
 using namespace std;
 b2FixtureDef JG2DBody::m_FixtureDef;
 
@@ -44,6 +45,13 @@ E2DBodyState JG2DBody::GetBodyState()
 
 void JG2DBody::Tick()
 {
+	static int num = 0;
+	num++;
+	if (num > 1000)
+	{
+		num = 0;
+		JGLog::Write(ELogLevel::Default, TT("x : %d , y : %d"),(int)m_Body->GetPosition().x, (int)m_Body->GetPosition().y);
+	}
 }
 
 void JG2DBody::CreateBody(b2Body* body, JGVector2D* LinkLocation, JGAngle2D* LinkAngle)

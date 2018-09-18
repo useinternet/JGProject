@@ -19,14 +19,12 @@ JGCollisionDebugDraw::JGCollisionDebugDraw()
 	m_ViewMatrix = make_unique<JGMatrix>();
 	m_MatrixBufferDesc = make_unique<SMatrixBuffer_VS>();
 	m_WorldMatrix->Identity();
-	JGVector2D vec(0.0f, 0.0f);
-	JGMatrix TransMatrix;
-	TransMatrix.MakeTranslation2DMatrix(m_pViewPort->GetWidth(),
-		m_pViewPort->GetHeight(), vec);
-	*m_WorldMatrix = (*m_WorldMatrix) * TransMatrix;
+
+
 }
 JGCollisionDebugDraw::~JGCollisionDebugDraw()
 {
+
 }
 void JGCollisionDebugDraw::InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd, JGHLSLShaderDevice* HLSLDevice, JGBufferManager* BufferManager, JGViewportD* viewPort)
 {
@@ -36,6 +34,11 @@ void JGCollisionDebugDraw::InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd, 
 	m_pViewPort = viewPort;
 	*m_OthroMatrix = m_pViewPort->GetOrthoMatrix();
 	InitDebugMesh();
+	JGMatrix TransMatrix;
+	JGVector2D vec(0.0f, 0.0f);
+	TransMatrix.MakeTranslation2DMatrix(m_pViewPort->GetWidth(),
+		m_pViewPort->GetHeight(), vec);
+	*m_WorldMatrix = (*m_WorldMatrix) * TransMatrix;
 }
 void JGCollisionDebugDraw::SetViewMatrix(const JGMatrix& viewMatrix)
 {
@@ -44,6 +47,7 @@ void JGCollisionDebugDraw::SetViewMatrix(const JGMatrix& viewMatrix)
 void JGCollisionDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	SCollisionDebugVertex* vertex = new SCollisionDebugVertex[vertexCount + 1];
+
 	for (int32 i = 0; i < vertexCount; ++i)
 	{
 		b2Vec2 vec = vertices[i];

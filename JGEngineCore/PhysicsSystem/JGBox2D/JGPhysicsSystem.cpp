@@ -7,7 +7,6 @@ using namespace std;
 JGPhysicsSystem::JGPhysicsSystem()
 {
 	m_DebugDraw = make_unique<JGCollisionDebugDraw>();
-	//m_DebugDraw->InitCollisionDebugDraw()
 }
 
 JGPhysicsSystem::~JGPhysicsSystem()

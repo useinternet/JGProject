@@ -122,7 +122,6 @@ void RenderSystem::EndRendering()
 }
 void RenderSystem::Render()
 {
-	BeginRendering();
 	float BlendFactor[4] = { 0.0f,0.0f,0.0f,0.0f };
 	
 	// 블렌딩 및 Z버퍼 셋팅
@@ -152,8 +151,6 @@ void RenderSystem::Render()
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOn), 1);
 	m_Device->GetContext()->OMSetBlendState(
 		m_RenderState->GetBlendState(EBlendStateType::BlendOff), BlendFactor, 0xffffffff);
-
-	EndRendering();
 }
 void RenderSystem::InitObjectProtoType(JGSuperClass* SuperClass)
 {

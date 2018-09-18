@@ -102,10 +102,14 @@ void JGEngineMain::Run()
 			m_bPaused = true;
 		}
 		m_EngineTimer->Tick();
+		m_PhysicsSystem->Step(m_EngineTimer->GetDeltaTime());
 		m_SoundSystem->Tick();
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
+		m_RenderSystem->BeginRendering();
+		m_PhysicsSystem->Render();
 		m_RenderSystem->Render();
+		m_RenderSystem->EndRendering();
 	}
 }
 void JGEngineMain::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)

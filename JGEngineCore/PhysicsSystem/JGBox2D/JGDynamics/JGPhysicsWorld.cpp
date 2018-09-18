@@ -8,7 +8,7 @@ using namespace std;
 b2BodyDef JGPhysicsWorld::m_BodyDef;
 JGPhysicsWorld::JGPhysicsWorld(b2Draw* DebugDraw, JGVector2D& Gravity)
 {
-	m_World = make_unique<b2World>(JGTob2_Unit(Gravity));
+	m_World = make_unique<b2World>(JGTob2_Force(Gravity));
 	m_World->SetDebugDraw(DebugDraw);
 }
 JGPhysicsWorld::~JGPhysicsWorld()
@@ -33,9 +33,24 @@ JG2DBody* JGPhysicsWorld::Create2DBody(const E2DBodyType type, JGVector2D* LinkL
 		m_BodyDef.type = b2_kinematicBody;
 		break;
 	}
-	b2Vec2 vec = JGTob2_Vector(*LinkLocation);
+	b2Vec2 vec;
+	if (LinkLocation)
+	{
+		vec = JGTob2_Vector(*LinkLocation);
+	}
+	else
+	{
+		vec.Set(0.0f, 0.0f);
+	}
 	m_BodyDef.position = vec;
-	m_BodyDef.angle = ToRadian(LinkAngle->Get());
+	if (LinkAngle)
+	{
+		m_BodyDef.angle = ToRadian(LinkAngle->Get());
+	}
+	else
+	{
+		m_BodyDef.angle = 0.0f;
+	}
 
 	unique_ptr<JG2DBody> body = make_unique<JG2DBody>();
 	result = body.get();

@@ -11,11 +11,13 @@
 #include"../EngineFrameWork/Components/AnimationMesh2DComponent.h"
 #include"TestAnim.h"
 #include"../EngineFrameWork/Components/SoundComponent.h"
-#include"../EngineFrameWork/2D/Widget/ImageBox.h"
 #include"../EngineStatics/JGSuperClass.h"
-#include"../EngineFrameWork/2D/Widget/Button.h"
-#include"../RenderSystem/JGViewportD.h"
-#include"../PhysicsSystem/JGBox2D/JGCommon/JGCollisionDebugDraw.h"
+#include"../EngineFrameWork/2D/Widget/ImageBox.h"
+#include"../EngineFrameWork/World/World.h"
+#include"../PhysicsSystem/JGBox2D/JGPhysicsSystem.h"
+#include"../PhysicsSystem/JGBox2D/JGDynamics/JG2DBody.h"
+#include"../PhysicsSystem/JGBox2D/JGShape/JGPolygonShape.h"
+
 using namespace std;
 TestObject::TestObject()
 {
@@ -32,7 +34,6 @@ TestObject::TestObject()
 		Frame->SetConstructObject(FrameMesh.Object);
 	}
 	Frame->SetTextColor(1.0f, 0.0f, 0.0f);
-
 
 	MousePosText = RegisterComponentInObject<TextComponent>(TT("MousePos"));
 	static JGConstructHelper::TextFont MousePosMesh("../ManagementFiles/Resource/Font/Godic.fnt",
@@ -76,6 +77,20 @@ void TestObject::BeginObject(World* world)
 		bind(&TestObject::Up, this));
 	Input->BindKeyCommand(TT("Down"), EKeyState::Down,
 		bind(&TestObject::Down, this));
+	JGVector2D vec(960.0f, 900.0f);
+	JGAngle2D angle(0.0f);
+	JG2DBody* body = GetWorld()->GetPyWorld()->Create2DBody(E2DBodyType::Static,&vec, &angle);
+	JGPolygonShape shape;
+	shape.SetAsBox(900.0f, 10.0f);
+
+	body->CreateFixture(&shape);
+
+
+	vec.Set(960.0f, 0.0f);
+	angle.Set(0.0f);
+	JG2DBody* body2 = GetWorld()->GetPyWorld()->Create2DBody(E2DBodyType::Dynamic, &vec, &angle);
+	shape.SetAsBox(50.0f, 50.0f);
+	body2->CreateFixture(&shape,0.3f,0.3f,1.0f);
 }
 
 void TestObject::Tick(const float DeltaTime)
