@@ -1,7 +1,7 @@
 #include"Object.h"
 #include"../Components/MotivatedComponent.h"
 #include"../World/World.h"
-
+float Object::m_DeltaTime = 0.0f;
 Object::Object()
 {
 	RegisterObjectID(typeid(this));
@@ -29,6 +29,7 @@ void Object::Send(JGComponentMessage & Message)
 
 void Object::Tick(const float DeltaTime)
 {
+	m_DeltaTime = DeltaTime;
 	if (m_RootComponent)
 	{
 		m_RootComponent->Tick(DeltaTime);
@@ -70,4 +71,9 @@ void Object::BehindObject()
 void Object::ActiveObject()
 {
 	m_ObjectState = EObjectState::Active;
+}
+
+float Object::GetDeltaTime()
+{
+	return m_DeltaTime;
 }

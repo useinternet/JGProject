@@ -39,6 +39,10 @@
     {
       "CommandName": "Down",
       "BindKey": "S"
+    },
+    {
+      "CommandName": "Spawn",
+      "BindKey": "F"
     }
   ]
 }

@@ -99,8 +99,6 @@ void JGCollisionDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, cons
 
 	delete vertex;
 	vertex = nullptr;
-
-
 }
 
 void JGCollisionDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2 & axis, const b2Color & color)

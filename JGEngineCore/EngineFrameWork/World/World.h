@@ -39,7 +39,7 @@ public:
 template<typename ObjectType>
 inline Object* World::SpawnObject()
 {
-	std::shared_ptr<Object> object = make_unique<TestObject>();
+	std::shared_ptr<Object> object = std::make_unique<ObjectType>();
 	object->BeginObject(this);
 	Object* result = object.get();
 	m_sObjects.push_back(move(object));

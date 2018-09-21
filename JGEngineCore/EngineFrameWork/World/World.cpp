@@ -4,7 +4,7 @@
 #include"../Object/Object.h"
 #include"../../Test/TestObject.h"
 #include"../../Test/TestWidget.h"
-
+#include"../../Test/TestGround.h"
 using namespace std;
 World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld)
 {
@@ -15,6 +15,9 @@ World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld)
 	shared_ptr<Object> object = make_unique<TestObject>();
 	object->BeginObject(this);
 	m_sObjects.push_back(move(object));
+	shared_ptr<Object> Ground = make_unique<TestGround>();
+	Ground->BeginObject(this);
+	m_sObjects.push_back(move(Ground));
 	shared_ptr<Object> Widget = make_unique<TestWidget>();
 	Widget->BeginObject(this);
 	Widget->ActiveObject();

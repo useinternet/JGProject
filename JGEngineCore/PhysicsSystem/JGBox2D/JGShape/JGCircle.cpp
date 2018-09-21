@@ -14,6 +14,5 @@ JGCircle::~JGCircle()
 
 void JGCircle::SetCircle(const float Radius)
 {
-
 	m_Circle->m_radius = Radius / PTM;
 }

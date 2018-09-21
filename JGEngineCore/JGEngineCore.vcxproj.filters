@@ -514,6 +514,15 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.cpp">
       <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
     </ClCompile>
+    <ClCompile Include="Test\TestCircle.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Circle2DCollisionComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\TestGround.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -932,6 +941,15 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.h">
       <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\TestCircle.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Circle2DCollisionComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\TestGround.h">
+      <Filter>Test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

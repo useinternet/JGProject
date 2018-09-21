@@ -16,7 +16,8 @@ private:
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
 	class Box2DCollisionComponent* BoxComponent;
-
+	bool sample = false;
+	bool PrevSample = false;
 	// 물리 실험..
 public:
 	TestObject();
@@ -29,4 +30,5 @@ public:
 	void Left();
 	void Up();
 	void Down();
+	void Spawn();
 };

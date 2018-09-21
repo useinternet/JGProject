@@ -367,6 +367,7 @@
     <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Circle2DCollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
@@ -490,6 +491,8 @@
     <ClCompile Include="SoundSystem\JGSound.cpp" />
     <ClCompile Include="SoundSystem\SoundSystem.cpp" />
     <ClCompile Include="Test\TestAnim.cpp" />
+    <ClCompile Include="Test\TestCircle.cpp" />
+    <ClCompile Include="Test\TestGround.cpp" />
     <ClCompile Include="Test\TestObject.cpp" />
     <ClCompile Include="Test\TestWidget.cpp" />
   </ItemGroup>
@@ -503,6 +506,7 @@
     <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\Circle2DCollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
@@ -631,6 +635,8 @@
     <ClInclude Include="SoundSystem\JGSound.h" />
     <ClInclude Include="SoundSystem\SoundSystem.h" />
     <ClInclude Include="Test\TestAnim.h" />
+    <ClInclude Include="Test\TestCircle.h" />
+    <ClInclude Include="Test\TestGround.h" />
     <ClInclude Include="Test\TestObject.h" />
     <ClInclude Include="Test\TestWidget.h" />
   </ItemGroup>

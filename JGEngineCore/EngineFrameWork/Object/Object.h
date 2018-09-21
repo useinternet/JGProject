@@ -26,6 +26,7 @@ private:
 	bool m_bIsFirst = true;
 	EObjectState m_ObjectState;
 	World* m_pWorld = nullptr;
+	static float m_DeltaTime;
 public:
 	Object();
 	virtual ~Object();
@@ -61,6 +62,9 @@ public:
 	/*
 	Exp : 오브젝트를 활성화시킨다. */
 	void ActiveObject();
+
+
+	float GetDeltaTime();
 protected:
 	template<typename ComponentType>
 	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName);
