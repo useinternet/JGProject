@@ -15,7 +15,7 @@ private:
 	class ImageBox* image;
 	class TextComponent* MousePosText;
 	class TextComponent* TestAnimationPosText;
-
+	class Box2DCollisionComponent* BoxComponent;
 
 	// 물리 실험..
 public:

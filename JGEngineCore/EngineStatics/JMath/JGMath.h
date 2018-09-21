@@ -21,7 +21,12 @@ public:
 	/*
 	Exp : 절대값을 구한다. */
 	static float Abs(const float num);
-
+	/*
+	Exp : 최대값 을 구한다.  */
+	static float Max(const float num1, const float num2);
+	/*
+	Exp : 최솟값을 구한다. */
+	static float Min(const float num1, const float num2);
 	/*
 	Exp : 범위를 정한다.. */
 	static void DrawRegion(float& target,const float min, const float max);

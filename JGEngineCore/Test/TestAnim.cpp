@@ -4,6 +4,7 @@
 
 TestAnim::TestAnim()
 {
+
 	RegisterComponentID(typeid(this));
 
 	IdleAnimation = AddAnimation(Idle,TT("Idle"));

@@ -8,7 +8,7 @@ using namespace std;
 ImageBox::ImageBox()
 {
 	RegisterComponentID(typeid(this));
-	m_Image = make_unique<StaticMesh2DComponent>();
+
 }
 
 ImageBox::~ImageBox()
@@ -17,6 +17,8 @@ ImageBox::~ImageBox()
 }
 bool ImageBox::CreateImage(const std::wstring & ImagePath, const EPivot pivot)
 {
+	m_Image = make_unique<StaticMesh2DComponent>();
+	m_Image->SetOwnerObject(GetOwnerObject());
 	AddChild(m_Image.get());
 	m_Image->RegisterName(GetComponentName());
 	/// 리소스 오브젝트 생성..

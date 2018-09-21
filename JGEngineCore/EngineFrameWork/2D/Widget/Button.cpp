@@ -70,6 +70,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 {
 	/// 평상시일때의 버튼 이미지 메쉬 생성..
 	m_OrdinaryImage = make_unique<StaticMesh2DComponent>();
+	m_OrdinaryImage->SetOwnerObject(GetOwnerObject());
 	/// 컴포넌트 등록..
 	AddChild(m_OrdinaryImage.get());
 	m_OrdinaryImage->RegisterName(GetComponentName() + TT("_Ordinary"));
@@ -85,6 +86,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 
 	/// 버튼 눌렀을떄 이미지 생성
 	m_ButtonClickImage = make_unique<StaticMesh2DComponent>();
+	m_ButtonClickImage->SetOwnerObject(GetOwnerObject());
 	/// 컴포넌트 등록..
 	AddChild(m_ButtonClickImage.get());
 	m_ButtonClickImage->BehindComponent();
@@ -111,6 +113,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 
 	/// 마우스를 데었을때 이미지 생성.
 	m_MousePointerInButtonImage = make_unique<StaticMesh2DComponent>();
+	m_MousePointerInButtonImage->SetOwnerObject(GetOwnerObject());
 	/// 컴포넌트 등록..
 	AddChild(m_MousePointerInButtonImage.get());
 	m_MousePointerInButtonImage->BehindComponent();
@@ -138,6 +141,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 
 	/// 마우스 버튼 관련해서 키 등록
 	m_InputComponent = make_unique<InputComponent>();
+	m_InputComponent->SetOwnerObject(GetOwnerObject());
 	m_InputComponent->RegisterName(GetComponentName() + TT("InputEvent"));
 	GetCommandManager()->RegisterKeyCommand(EKey::MouseLButton, m_InputComponent->GetComponentName());
 	// 바인딩된 키 이벤트 함수 등록..

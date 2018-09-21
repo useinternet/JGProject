@@ -10,6 +10,15 @@ Animation2DSystemComponent::~Animation2DSystemComponent()
 {
 }
 
+void Animation2DSystemComponent::BeginComponent(World* world)
+{
+	Motivated2DComponent::BeginComponent(world);
+	for (auto& iter : m_mAnimation)
+	{
+		iter.second->SetOwnerObject(GetOwnerObject());
+	}
+}
+
 void Animation2DSystemComponent::Tick(const float DeltaTime)
 {
 	Motivated2DComponent::Tick(DeltaTime);
@@ -19,15 +28,6 @@ void Animation2DSystemComponent::Tick(const float DeltaTime)
 void Animation2DSystemComponent::Render()
 {
 	m_mAnimation[m_CurrentState]->Render();
-}
-void Animation2DSystemComponent::LinkObject(Object* object)
-{
-	m_pLinkObject = object;
-}
-Object* Animation2DSystemComponent::GetLinkObject()
-{
-	
-	return m_pLinkObject;
 }
 void Animation2DSystemComponent::SetCurrentState(const EnumState State)
 {
@@ -40,6 +40,7 @@ EnumState Animation2DSystemComponent::GetCurrentState()
 AnimationMesh2DComponent* Animation2DSystemComponent::AddAnimation(const EnumState State, const std::wstring& AnimationName)
 {
 	unique_ptr<AnimationMesh2DComponent> AnimationComponent = make_unique<AnimationMesh2DComponent>();
+	AnimationComponent->SetOwnerObject(GetOwnerObject());
 
 	AnimationComponent->RegisterName(AnimationName);
 	AddChild(AnimationComponent.get());

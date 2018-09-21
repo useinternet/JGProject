@@ -1,6 +1,7 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
 #include"../Box2D/Box2D.h"
+class JGContactListener;
 class JGCollisionDebugDraw;
 class JGPhysicsWorld;
 class JGVector2D;
@@ -11,6 +12,8 @@ class ENGINE_EXPORT JGPhysicsSystem
 private:
 	std::map<const std::wstring, std::shared_ptr<JGPhysicsWorld>> m_mPhysicsWorlds;
 	std::unique_ptr<JGCollisionDebugDraw> m_DebugDraw;
+	std::unique_ptr<JGContactListener> m_Listener;
+
 	std::wstring m_CurrentWorld = TT("None");
 	int32 m_velocityIterations = 8;
 	int32 m_positionIterations = 3;

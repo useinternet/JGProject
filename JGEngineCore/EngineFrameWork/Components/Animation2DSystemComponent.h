@@ -33,13 +33,13 @@ private:
 private:
 	std::map<EnumState,std::shared_ptr<AnimationMesh2DComponent>> m_mAnimation;
 	std::map<const std::wstring, SAnimNotify> m_mNotifys;
-	Object*   m_pLinkObject = nullptr;
 	EnumState m_CurrentState;
 public:
 	Animation2DSystemComponent(const Animation2DSystemComponent& copy) = delete;
 	Animation2DSystemComponent();
 	virtual ~Animation2DSystemComponent();
 	/// Component 에 상속 받은 가상 함수들..(자세한건 Component 클래스 참조)
+	virtual void BeginComponent(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
 	virtual void Render() override;
 	//

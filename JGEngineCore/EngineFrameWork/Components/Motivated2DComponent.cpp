@@ -196,14 +196,17 @@ bool Motivated2DComponent::IsChangeScale()
 {
 	return m_bIsChangeScale;
 }
+
 JGVector2D* Motivated2DComponent::GetComponentLocationAddress()
 {
 	return m_Location.get();
 }
-JGAngle2D*  Motivated2DComponent::GetComponentAngleAddress()
+
+JGAngle2D* Motivated2DComponent::GetComponentAngleAddress()
 {
 	return m_Angle.get();
 }
+
 
 
 const JGMatrix& Motivated2DComponent::GetWorldMatrix()

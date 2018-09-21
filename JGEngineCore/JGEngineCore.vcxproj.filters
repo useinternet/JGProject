@@ -505,6 +505,15 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.cpp">
       <Filter>PhysicsSystem\JGBox2D</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.cpp">
+      <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.cpp">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -914,6 +923,15 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.h">
       <Filter>PhysicsSystem\JGBox2D</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.h">
+      <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.h">
+      <Filter>PhysicsSystem\JGBox2D\JGShape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

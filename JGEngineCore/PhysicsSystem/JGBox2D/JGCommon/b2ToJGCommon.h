@@ -47,3 +47,11 @@ inline b2Vec2 JGTob2_Force(JGVector2D& vec)
 
 	return result;
 }
+
+inline JGVector2D b2ToJG_Force(b2Vec2& vec)
+{
+	JGVector2D result;
+	result.Set(vec.x* PTM, -vec.y * PTM);
+
+	return result;
+}

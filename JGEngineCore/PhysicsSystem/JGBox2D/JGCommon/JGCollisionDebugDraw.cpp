@@ -77,14 +77,35 @@ void JGCollisionDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertex
 	DrawPolygon(vertices, vertexCount, color);
 }
 
-void JGCollisionDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color & color)
+void JGCollisionDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
+	b2Vec2 b2Center = center;
+	JGVector2D JGCenter = b2ToJG_Vector(b2Center);
+	radius = radius * PTM;
+	SCollisionDebugVertex* vertex = new SCollisionDebugVertex[36 + 1];
+	int count = 0;
+	for (int32 i = 0; i < 37; ++i)
+	{
+		float cosSeta = cosf(ToRadian(10 * (float)i));
+		float sinSeta = sinf(ToRadian(10 * (float)i));
+
+		vertex[i].position = { JGCenter.X() + (radius * cosSeta) ,  -JGCenter.Y() + (radius * sinSeta) ,0.0f };
+		vertex[i].color = { color.r,color.g,color.b,color.a };
+	}
+
+	m_vDebugMeshs[Circle]->MeshWrite(TT("CircleMesh"),EJGMapType::Write_Discard, vertex);
+	MeshDraw((CollisionMeshType)Circle);
+
+
+	delete vertex;
+	vertex = nullptr;
+
 
 }
 
 void JGCollisionDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2 & axis, const b2Color & color)
 {
-
+	DrawCircle(center, radius, color);
 }
 
 void JGCollisionDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2 & p2, const b2Color & color)
@@ -106,7 +127,19 @@ void JGCollisionDebugDraw::InitDebugMesh()
 {
 	// 추후  원 메쉬 초기화.
 	std::unique_ptr<JGMesh> CircleMesh = make_unique<JGMesh>();
+	SCollisionDebugVertex* vertex = new SCollisionDebugVertex[36 + 1];
+
+	CircleMesh->Create_Vertex_Index_Buffer(m_pBufferManager,
+		TT("CircleMesh"), EJGUsageType::Dynamic,
+		EJGCPUType::Access_Write, EJGUsageType::Static, EJGCPUType::None, vertex,
+		37, sizeof(SCollisionDebugVertex));
+
+	delete vertex;
+	vertex = nullptr;
+
 	m_vDebugMeshs.push_back(move(CircleMesh));
+
+
 
 	// 폴리곤 1~8 점
 	AddInitPolygonMesh(1);
@@ -156,6 +189,10 @@ void JGCollisionDebugDraw::MeshDraw(CollisionMeshType type)
 	if (type != Circle)
 	{
 		m_pHLSLDevice->Render(TT("ColorShader"), &data, nullptr, type + 1);
+	}
+	else
+	{
+		m_pHLSLDevice->Render(TT("ColorShader"), &data, nullptr, 36 + 1);
 	}
 }
 

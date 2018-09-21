@@ -2,11 +2,13 @@
 #include"../../RenderSystem/JGDeviceD.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"../World/World.h"
+#include"../Object/Object.h"
 using namespace std;
 Component::Component()
 {
 	RegisterComponentID(typeid(this));
 	m_ComponentState = EComponentState::Active;
+	
 }
 
 Component::~Component()
@@ -188,7 +190,17 @@ World* Component::GetWorld()
 	return m_pWorld;
 }
 
+Object * Component::GetOwnerObject()
+{
+	return m_OwnerObject;
+}
+
 void Component::SetParent(Component* Parent)
 {
 	m_ParentComponent = Parent;
+}
+
+void Component::SetOwnerObject(Object* object)
+{
+	m_OwnerObject = object;
 }

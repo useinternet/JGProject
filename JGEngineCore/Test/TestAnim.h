@@ -21,6 +21,4 @@ public:
 	TestAnim();
 	virtual ~TestAnim();
 
-	
-
 };

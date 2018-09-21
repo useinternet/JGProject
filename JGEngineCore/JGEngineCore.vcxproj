@@ -366,6 +366,7 @@
     <ClCompile Include="EngineFrameWork\2D\Widget\Widget.cpp" />
     <ClCompile Include="EngineFrameWork\Components\AnimationMesh2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
@@ -458,9 +459,11 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGCommon\b2ToJGCommon.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGShape\JGShape.cpp" />
     <ClCompile Include="RenderSystem\JGDeviceD.cpp" />
@@ -499,6 +502,7 @@
     <ClInclude Include="EngineFrameWork\2D\Widget\Widget.h" />
     <ClInclude Include="EngineFrameWork\Components\AnimationMesh2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
@@ -595,9 +599,11 @@
     <ClInclude Include="PhysicsSystem\JGBox2D\JGCommon\b2ToJGCommon.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGCircle.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGPolygonShape.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGShape\JGShape.h" />
     <ClInclude Include="RenderSystem\JGDeviceD.h" />
@@ -726,6 +732,12 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\ColorShader_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGameDebug|Win32'">Vertex</ShaderType>
@@ -736,6 +748,12 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DistributeGame|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Developing(SendEG2ED)|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="RenderSystem\ShaderHLSL\TextShader_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DistributeGame|Win32'">Pixel</ShaderType>

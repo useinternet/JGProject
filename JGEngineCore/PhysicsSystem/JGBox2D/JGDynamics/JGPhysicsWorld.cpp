@@ -6,10 +6,13 @@
 #include"JG2DBody.h"
 using namespace std;
 b2BodyDef JGPhysicsWorld::m_BodyDef;
-JGPhysicsWorld::JGPhysicsWorld(b2Draw* DebugDraw, JGVector2D& Gravity)
+JGPhysicsWorld::JGPhysicsWorld(b2ContactListener* listner, b2Draw* DebugDraw, JGVector2D& Gravity)
 {
+	m_Gravity = make_unique<JGVector2D>();
+	m_Gravity->Set(Gravity);
 	m_World = make_unique<b2World>(JGTob2_Force(Gravity));
 	m_World->SetDebugDraw(DebugDraw);
+	m_World->SetContactListener(listner);
 }
 JGPhysicsWorld::~JGPhysicsWorld()
 {
@@ -18,6 +21,8 @@ JGPhysicsWorld::~JGPhysicsWorld()
 		m_World->DestroyBody(iter->m_Body);
 	}
 }
+//b2BodyDef s;
+//s.fixedRotation = false;
 JG2DBody* JGPhysicsWorld::Create2DBody(const E2DBodyType type, JGVector2D* LinkLocation, JGAngle2D * LinkAngle)
 {
 	JG2DBody* result = nullptr;
@@ -87,4 +92,9 @@ void JGPhysicsWorld::Step(const float DeltaTime, int32 velocityIterations, int32
 void JGPhysicsWorld::DebugRender()
 {
 	m_World->DrawDebugData();
+}
+
+JGVector2D& JGPhysicsWorld::GetGravity()
+{
+	return *m_Gravity;
 }

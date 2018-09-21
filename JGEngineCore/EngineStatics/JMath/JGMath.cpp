@@ -43,6 +43,16 @@ float JGMath::Abs(const float num)
 		return num;
 }
 
+float JGMath::Max(const float num1, const float num2)
+{
+	return num1 < num2 ? num2 : num1;
+}
+
+float JGMath::Min(const float num1, const float num2)
+{
+	return num1 < num2 ? num1: num2;
+}
+
 void JGMath::DrawRegion(float& target, const float min, const float max)
 {
 	if (target < min)

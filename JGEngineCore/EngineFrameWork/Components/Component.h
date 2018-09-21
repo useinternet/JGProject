@@ -11,6 +11,7 @@
 
 class JGDeviceD;
 class JGHLSLShaderDevice;
+class Object;
 /*
 EnumClass : EComponentState 
 @e Active : 활성화
@@ -27,10 +28,12 @@ class ENGINE_EXPORT Component : public ComponentBase
 	std::wstring            m_ComponentName = TT("None");
 	EComponentState         m_ComponentState;
 	Component* m_ParentComponent = nullptr;
-	World*     m_pWorld = nullptr;
+	World*     m_pWorld      = nullptr;
+	Object*    m_OwnerObject = nullptr;
 	int        m_zOrder = 0;
 public:
 	Component();
+
 	virtual ~Component();
 
 	/*
@@ -106,6 +109,11 @@ public:
 	/*
 	Exp : 컴포넌트가 속한 월드를 가져온다. */
 	World* GetWorld();
+
+
+	Object* GetOwnerObject();
+	void SetOwnerObject(Object* object);
 private:
 	void SetParent(Component* Parent);
+
 };

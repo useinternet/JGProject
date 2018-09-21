@@ -51,37 +51,37 @@ public:
 
 	/*
 	Exp : 컴포넌트에 위치 값을 더한다. */
-	void AddComponentLocation(const float x, const float y);
+	virtual void AddComponentLocation(const float x, const float y);
 	/*
 	Exp : 컴포넌트에 위치 값을 더한다. */
-	void AddComponentLocation(JGVector2D& vector);
+	virtual void AddComponentLocation(JGVector2D& vector);
 	/*
 	Exp : 컴포넌트에 각도 값을 더한다. */
-	void AddComponentAngle(const float angle);
+	virtual void AddComponentAngle(const float angle);
 	/*
 	Exp : 컴포넌트에 각도 값을 더한다. */
-	void AddComponentAngle(JGAngle2D& angle);
+	virtual void AddComponentAngle(JGAngle2D& angle);
 	/*
 	Exp : 컴포넌트에 스케일 값을 더한다. */
-	void AddComponentScale(const float flatNum);
+	virtual void AddComponentScale(const float flatNum);
 	/*
 	Exp : 컴포넌트에 스케일 값을 더한다. */
-	void AddComponentScale(const float x, const float y);
+	virtual void AddComponentScale(const float x, const float y);
 	/*
 	Exp : 컴포넌트에 스케일 값을 더한다. */
-	void AddComponentScale(JGScale2D& scale);
+	virtual void AddComponentScale(JGScale2D& scale);
 	/*
 	Exp : 컴포넌트 지역 위치 값을 대입한다. */
-	void SetComponentLocation(const float x, const float y);
+	virtual void SetComponentLocation(const float x, const float y);
 	/*
 	Exp : 컴포넌트 지역 위치 값을 대입한다. */
-	void SetComponentLocation(const JGVector2D& vector);
+	virtual void SetComponentLocation(const JGVector2D& vector);
 	/*
 	Exp : 컴포넌트 지역 각도 값을 대입한다. */
-	void SetComponentAngle(const float angle);
+	virtual void SetComponentAngle(const float angle);
 	/*
 	Exp : 컴포넌트 지역 각도 값을 대입한다. */
-	void SetComponentAngle(const JGAngle2D& angle);
+	virtual void SetComponentAngle(const JGAngle2D& angle);
 	/*
 	Exp : 컴포넌트 지역 스케일 값을 대입한다. */
 	void SetComponentScale(const float flatNum);
@@ -118,11 +118,9 @@ public:
 	Exp : 스케일 값이 바뀌었으면 true를 그대b로이면 false를 반환한다. */
 	bool IsChangeScale();
 
-	/*
-	Exp :*/
+
 	JGVector2D* GetComponentLocationAddress();
 	JGAngle2D*  GetComponentAngleAddress();
-
 protected:
 	/*
 	Exp : 이 컴포넌트의 월드 행렬을 가져온다. */

@@ -17,7 +17,8 @@
 #include"../PhysicsSystem/JGBox2D/JGPhysicsSystem.h"
 #include"../PhysicsSystem/JGBox2D/JGDynamics/JG2DBody.h"
 #include"../PhysicsSystem/JGBox2D/JGShape/JGPolygonShape.h"
-
+#include"../EngineFrameWork/Components/Box2DCollisionComponent.h"
+#include"../PhysicsSystem/JGBox2D/JGShape/JGCircle.h"
 using namespace std;
 TestObject::TestObject()
 {
@@ -60,6 +61,16 @@ TestObject::TestObject()
 
 	image = RegisterComponentInObject<ImageBox>(TT("SampleImageBox"));
 	image->CreateImage(TT("../ManagementFiles/Resource/Breath.png"), EPivot::TopLeft);
+
+
+
+
+	// 물리 실험
+	BoxComponent = RegisterComponentInObject<Box2DCollisionComponent>(TT("SampleCollision"));
+	BoxComponent->SetAsBox(50.0f, 50.0f);
+	BoxComponent->SetDensity(100.0f);
+	BoxComponent->SetComponentLocation(800.0f, 10.0f);
+	BoxComponent->AddChild(TestAnimation);
 }
 TestObject::~TestObject()
 {
@@ -82,15 +93,19 @@ void TestObject::BeginObject(World* world)
 	JG2DBody* body = GetWorld()->GetPyWorld()->Create2DBody(E2DBodyType::Static,&vec, &angle);
 	JGPolygonShape shape;
 	shape.SetAsBox(900.0f, 10.0f);
-
-	body->CreateFixture(&shape);
+	JGCircle circle;
+	circle.SetCircle(50.0f);
+	body->CreateFixture(nullptr,&shape);
 
 
 	vec.Set(960.0f, 0.0f);
 	angle.Set(0.0f);
 	JG2DBody* body2 = GetWorld()->GetPyWorld()->Create2DBody(E2DBodyType::Dynamic, &vec, &angle);
 	shape.SetAsBox(50.0f, 50.0f);
-	body2->CreateFixture(&shape,0.3f,0.3f,1.0f);
+	body2->CreateFixture(nullptr,&circle, 1.0f,0.3f,0.3f);
+
+
+	BoxComponent->GetBody()->PhysicsOff();
 }
 
 void TestObject::Tick(const float DeltaTime)
@@ -106,25 +121,40 @@ void TestObject::Tick(const float DeltaTime)
 	TestAnimationPosText->SetText(TT(" X : %d  ,  Y : %d  "), (int)animPos.X(), (int)animPos.Y());
 	MousePosText->SetText(TT("Mouse X : %d , Mouse Y : %d"), (int)MousePos.X(), (int)MousePos.Y());
 
+
+
+
+	JGVector2D gravity = GetWorld()->GetPyWorld()->GetGravity();
+	JGVector2D vel = BoxComponent->GetBody()->GetLinearVelocity();
+	float velChangeX = BoxComponent->GetVelocity().X() - vel.X();
+	JGVector2D Impulse(BoxComponent->GetBody()->GetMass() * velChangeX,0.0f);
+	BoxComponent->GetBody()->ApplyLinearImpulse(Impulse);
 }
 void TestObject::Right()
 {
-	TestAnimation->AddComponentLocation(1.0f, 0.0f);
+	JGVector2D vel(100.0f, 0.0f);
+	BoxComponent->SetVelocity(vel);
+	BoxComponent->AddComponentLocation(1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Right);
+
 }
 void TestObject::Left()
 {
-	TestAnimation->AddComponentLocation(-1.0f, 0.0f);
+	JGVector2D vel(-100.0f, 0.0f);
+	BoxComponent->SetVelocity(vel);
+	BoxComponent->AddComponentLocation(-1.0f, 0.0f);
 	TestAnimation->SetCurrentState(AnimationState::Left);
 }
 void TestObject::Up()
 {
-	TestAnimation->AddComponentLocation(0.0f, -1.0f);
+	JGVector2D Impulse(0.0f, BoxComponent->GetBody()->GetMass() * -10.0f);
+	BoxComponent->GetBody()->ApplyLinearImpulse(Impulse);
+	BoxComponent->AddComponentLocation(0.0f, -1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Up);
 }
 void TestObject::Down()
 {
-	TestAnimation->AddComponentLocation(0.0f, 1.0f);
+	BoxComponent->AddComponentLocation(0.0f, 1.0f);
 	TestAnimation->SetCurrentState(AnimationState::Down);
 }
 
