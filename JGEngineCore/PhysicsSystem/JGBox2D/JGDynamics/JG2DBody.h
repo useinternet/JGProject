@@ -7,6 +7,7 @@ class JGVector2D;
 class JGAngle2D;
 class JGFixture;
 class JGShape;
+class JG2DFilter;
 enum class ENGINE_EXPORT E2DBodyType
 {
 	Dynamic,
@@ -41,6 +42,7 @@ public:
 		const float friction = 0.2f,const float restitution = 0.0f, const bool isSensor = false);
 	void  PhysicsOff();
 	void  PhysicsOn(bool IsFixedRotation = false);
+	void  SetBodyFilter(JG2DFilter& filter);
 	void  SetLinearVelocity(JGVector2D& velocity);
 	void  ApplyForce(JGVector2D& force,bool wake = true);
 	void  ApplyLinearImpulse(JGVector2D& impulse, bool wake = true);

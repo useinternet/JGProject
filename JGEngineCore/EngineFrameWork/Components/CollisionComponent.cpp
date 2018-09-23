@@ -1,6 +1,6 @@
 #include"CollisionComponent.h"
 #include"../Object/Object.h"
-#include"../../EngineStatics/JGLog.h"
+
 using namespace std;
 
 
@@ -22,12 +22,6 @@ CollisionComponent::~CollisionComponent()
 void CollisionComponent::BeginComponent(World* world)
 {
 	Motivated2DComponent::BeginComponent(world);
-
-	
-
-
-
-
 }
 
 void CollisionComponent::Tick(const float DeltaTime)
@@ -68,6 +62,7 @@ void CollisionComponent::Tick(const float DeltaTime)
 		m_bBeginOverlap = false;
 	}
 }
+
 void CollisionComponent::SetBeginOverlapEvent(const function<void(Object*)>& Event)
 {
 	m_BeginOverlapEvent = Event;
@@ -129,6 +124,10 @@ float CollisionComponent::GetRestitution()
 {
 	return m_Restitution;
 }
+JG2DFilter& CollisionComponent::GetFilter()
+{
+	return m_BodyFilter;
+}
 void CollisionComponent::SetBodyType(E2DBodyType type)
 {
 	m_BodyType = type;
@@ -149,7 +148,10 @@ void CollisionComponent::SetRestitution(const float Restitution)
 {
 	m_Restitution = Restitution;
 }
-
+void CollisionComponent::SetFilter(JG2DFilter filter)
+{
+	m_BodyFilter = filter;
+}
 
 
 

@@ -20,6 +20,7 @@ void Circle2DCollisionComponent::BeginComponent(World* world)
 		GetComponentLocationAddress(), GetComponentAngleAddress()));
 	m_Circle->SetCircle(m_Radius);
 	GetBody()->CreateFixture(this, m_Circle.get(), GetDensity(), GetFriction(), GetRestitution());
+	GetBody()->SetBodyFilter(GetFilter());
 }
 void Circle2DCollisionComponent::SetRadius(const float Radius)
 {

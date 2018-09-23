@@ -6,6 +6,7 @@
 #include"../../../EngineStatics/JMath/JGAngle2D.h"
 #include"../JGCommon/b2ToJGCommon.h"
 #include"../../../EngineFrameWork/Components/CollisionComponent.h"
+#include"JG2DFilter.h"
 using namespace std;
 b2FixtureDef JG2DBody::m_FixtureDef;
 
@@ -22,6 +23,7 @@ JG2DBody::~JG2DBody()
 JGFixture* JG2DBody::CreateFixture(CollisionComponent* Collision,JGShape* shape, const float density,
 	const float friction, const float restitution, const bool isSensor)
 {
+	JG2DFilter DefaultFilter;
 	JGFixture* result = nullptr;
 	unique_ptr<JGFixture> fixture = make_unique<JGFixture>();
 
@@ -31,13 +33,11 @@ JGFixture* JG2DBody::CreateFixture(CollisionComponent* Collision,JGShape* shape,
 	m_FixtureDef.restitution = restitution;
 	m_FixtureDef.density     = density;
 	m_FixtureDef.userData    = (void*)Collision;
-	// 나중에 필터 작업..
-	//m_FixtureDef.filter
+	m_FixtureDef.filter = DefaultFilter.Get();
 	fixture->Set(m_Body->CreateFixture(&m_FixtureDef));
 
 	result = fixture.get();
 	m_vFixtures.push_back(move(fixture));
-
 	return result;
 }
 
@@ -54,7 +54,13 @@ void JG2DBody::PhysicsOn(bool IsFixedRotation)
 	m_Body->SetGravityScale(1.0f);
 	m_Body->SetFixedRotation(IsFixedRotation);
 }
-
+void JG2DBody::SetBodyFilter(JG2DFilter& filter)
+{
+	for (auto& iter : m_vFixtures)
+	{
+		iter->Get()->SetFilterData(filter.Get());
+	}
+}
 void JG2DBody::SetLinearVelocity(JGVector2D& velocity)
 {
 	b2Vec2 vec = JGTob2_Force(velocity);

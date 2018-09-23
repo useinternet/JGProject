@@ -461,6 +461,7 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.cpp" />
+    <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DFilter.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.cpp" />
     <ClCompile Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.cpp" />
@@ -604,6 +605,7 @@
     <ClInclude Include="PhysicsSystem\JGBox2D\JGCommon\JGCollisionDebugDraw.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DBody.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGContactListener.h" />
+    <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DFilter.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGFixture.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JGPhysicsWorld.h" />
     <ClInclude Include="PhysicsSystem\JGBox2D\JGPhysicsSystem.h" />

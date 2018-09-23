@@ -19,6 +19,7 @@
 #include"../PhysicsSystem/JGBox2D/JGShape/JGPolygonShape.h"
 #include"../EngineFrameWork/Components/Box2DCollisionComponent.h"
 #include"../PhysicsSystem/JGBox2D/JGShape/JGCircle.h"
+#include"../PhysicsSystem/JGBox2D/JGDynamics/JG2DFilter.h"
 #include"TestCircle.h"
 using namespace std;
 TestObject::TestObject()
@@ -64,16 +65,14 @@ TestObject::TestObject()
 	image->CreateImage(TT("../ManagementFiles/Resource/Breath.png"), EPivot::TopLeft);
 
 
-
-
+	JG2DFilter filter;
+	filter.GetData()->maskBits = 0x0002;
 	// 물리 실험
 	BoxComponent = RegisterComponentInObject<Box2DCollisionComponent>(TT("SampleCollision"));
 	BoxComponent->SetAsBox(50.0f, 50.0f);
 	BoxComponent->SetDensity(100.0f);
 	BoxComponent->SetComponentLocation(800.0f, 10.0f);
 	BoxComponent->AddChild(TestAnimation);
-
-
 }
 TestObject::~TestObject()
 {
