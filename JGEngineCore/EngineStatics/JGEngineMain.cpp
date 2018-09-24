@@ -127,3 +127,8 @@ void JGEngineMain::Destroy()
 	m_ThreadManager->Destroy();
 	m_EngineTimer->Destroy();
 }
+
+GameLoop* JGEngineMain::GetGameLoop()
+{
+	return m_GameLoop.get();
+}

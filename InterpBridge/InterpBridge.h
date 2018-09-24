@@ -1,6 +1,6 @@
 #pragma once
 #include<Windows.h>
-#include"../GameLogic/Sample.h"
+#include"../GameLogic/GameLogic.h"
 
 
 #pragma comment(lib,"GameLogic.lib")
@@ -13,7 +13,7 @@
 
 extern "C"
 {
-	BridgeExport SampleClass* g_sample = nullptr;
+	BridgeExport GameLogic* g_sample = nullptr;
 	BridgeExport void InitEngine(HINSTANCE Instance, HWND hWnd, int ScreenWidth, int ScreenHeight);
 
 	BridgeExport void Start();

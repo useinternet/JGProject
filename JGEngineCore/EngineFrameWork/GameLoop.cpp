@@ -19,15 +19,8 @@ void GameLoop::InitGameLoop(RenderSystem* renderSystem, JGPhysicsSystem* physics
 {
 	m_pRenderSystem = renderSystem;
 	m_pPhysicsSystem = physicsSystem;
-
-	// 임시 
 	m_WorldManager = make_unique<WorldManager>();
 	m_WorldManager->InitWorldManager(physicsSystem);
-	// 임시
-	m_WorldManager->AddWorld(TT("SampleWorld"));
-	m_WorldManager->SelectWorld(TT("SampleWorld"));
-	JGVector2D vec(0.0f, 9.8f);
-	m_pPhysicsSystem->AddPhysicsWorld(TT("SampleWorld"), vec);
 }
 
 void GameLoop::Tick(const float DeltaTime)

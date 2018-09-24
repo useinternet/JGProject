@@ -5,21 +5,39 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Sample">
-      <UniqueIdentifier>{76c92d7f-7f60-4ea4-851c-f9e8dc92a660}</UniqueIdentifier>
+    <Filter Include="GameLogic">
+      <UniqueIdentifier>{252c22ba-b615-4975-87d4-2507688c8bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{8f5556af-cd51-4a94-866c-ca442b840885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\SampleWorld">
+      <UniqueIdentifier>{b2aef688-309a-4e9c-83fc-cfc428590c08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>DllMain</Filter>
     </ClCompile>
-    <ClCompile Include="Sample.cpp">
-      <Filter>Sample</Filter>
+    <ClCompile Include="GameLogic.cpp">
+      <Filter>GameLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStage\GameStage.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStage\SampleWorldSpawner.cpp">
+      <Filter>Game\SampleWorld</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sample.h">
-      <Filter>Sample</Filter>
+    <ClInclude Include="GameLogic.h">
+      <Filter>GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStage\GameStage.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStage\SampleWorldSpawner.h">
+      <Filter>Game\SampleWorld</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

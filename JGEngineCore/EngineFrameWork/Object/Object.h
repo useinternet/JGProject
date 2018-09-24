@@ -63,7 +63,8 @@ public:
 	Exp : 오브젝트를 활성화시킨다. */
 	void ActiveObject();
 
-
+	void SetRootComponent(Component* RootComponent);
+	Component* GetRootComponent();
 	float GetDeltaTime();
 protected:
 	template<typename ComponentType>

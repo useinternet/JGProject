@@ -122,12 +122,17 @@ void RenderSystem::EndRendering()
 }
 void RenderSystem::Render()
 {
+	if (m_RenderingObjectArray == nullptr)
+	{
+		return;
+	}
 	float BlendFactor[4] = { 0.0f,0.0f,0.0f,0.0f };
 	
 	// 블렌딩 및 Z버퍼 셋팅
 	m_Device->GetContext()->OMSetBlendState(
 		m_RenderState->GetBlendState(EBlendStateType::BlendOn),BlendFactor, 0xffffffff);
 	m_Device->GetContext()->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOff), 1);
+
 
 	m_RenderingObjectArray->sort([](
 		shared_ptr<Object>& object1, shared_ptr<Object>& object2)->bool

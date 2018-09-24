@@ -43,4 +43,5 @@ public:
 	void Run();
 	void DoEvent(UINT message, WPARAM wParam, LPARAM lParam);
 	void Destroy();
+	GameLoop* GetGameLoop();
 };

@@ -53,6 +53,10 @@ void JGPhysicsSystem::Step(const float DeltaTime)
 
 void JGPhysicsSystem::Render()
 {
+	if (m_CurrentWorld == TT("None"))
+	{
+		return;
+	}
 	m_mPhysicsWorlds[m_CurrentWorld]->DebugRender();
 }
 

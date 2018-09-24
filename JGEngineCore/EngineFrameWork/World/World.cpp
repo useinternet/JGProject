@@ -11,17 +11,6 @@ World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld)
 	m_pyWorld = pyWorld;
 	m_ViewMatrix = make_unique<JGMatrix>();
 	TempViewMatrixInit();
-	// 임시로 그냥 생성한다.
-	shared_ptr<Object> object = make_unique<TestObject>();
-	object->BeginObject(this);
-	m_sObjects.push_back(move(object));
-	shared_ptr<Object> Ground = make_unique<TestGround>();
-	Ground->BeginObject(this);
-	m_sObjects.push_back(move(Ground));
-	shared_ptr<Object> Widget = make_unique<TestWidget>();
-	Widget->BeginObject(this);
-	Widget->ActiveObject();
-	m_sObjects.push_back(move(Widget));
 }
 World::~World()
 {

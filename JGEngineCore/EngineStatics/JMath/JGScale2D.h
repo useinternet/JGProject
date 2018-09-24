@@ -1,6 +1,5 @@
 #pragma once
 #include"../Engine.h"
-
 class ENGINE_EXPORT JGScale2D
 {
 private:

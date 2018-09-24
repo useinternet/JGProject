@@ -73,6 +73,15 @@ void Object::ActiveObject()
 	m_ObjectState = EObjectState::Active;
 }
 
+void Object::SetRootComponent(Component* RootComponent)
+{
+	m_RootComponent = RootComponent;
+}
+Component* Object::GetRootComponent()
+{
+	return m_RootComponent;
+}
+
 float Object::GetDeltaTime()
 {
 	return m_DeltaTime;
