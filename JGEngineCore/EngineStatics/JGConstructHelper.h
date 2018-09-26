@@ -11,7 +11,12 @@ class JGFontLoader;
 class JGSound;
 class JGVector2D;
 enum class EPivot;
-
+enum class ENGINE_EXPORT EReverse
+{
+	RL,
+	UD,
+	Default
+};
 
 class ENGINE_EXPORT ConstructObject
 {
@@ -81,7 +86,7 @@ public:
 	JGConstructHelper(JGDeviceD* Device, JGBufferManager* BufferManager);
 	static JGConstructHelper* GetInstance();
 public:
-	class StaticMesh2D
+	class ENGINE_EXPORT StaticMesh2D
 	{
 	private:
 		friend JGConstructHelper;
@@ -99,10 +104,11 @@ public:
 		@param EPivot pivot : 기준점
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
-		StaticMesh2D(const std::wstring& ComponentName, EPivot pivot, const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DSpriteShader"));
+		StaticMesh2D(const std::wstring& ComponentName, EPivot pivot, const std::wstring& TexturePath, EReverse Reverse = EReverse::Default,
+			const std::wstring& ShaderName = TT("2DSpriteShader"));
 	};
 
-	class AnimationMesh2D
+	class ENGINE_EXPORT AnimationMesh2D
 	{
 	private:
 		friend JGConstructHelper;
@@ -123,9 +129,9 @@ public:
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		AnimationMesh2D(const std::wstring& ComponentName, EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-			const std::wstring& TexturePath, const std::wstring& ShaderName = TT("2DAnimationShader"));
+			const std::wstring& TexturePath, EReverse Reverse = EReverse::Default, const std::wstring& ShaderName = TT("2DAnimationShader"));
 	};
-	class TextFont
+	class ENGINE_EXPORT TextFont
 	{
 	private:
 		friend JGConstructHelper;

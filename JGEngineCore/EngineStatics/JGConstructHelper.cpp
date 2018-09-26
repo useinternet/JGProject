@@ -38,7 +38,7 @@ JGConstructHelper* JGConstructHelper::GetInstance()
 
 
 JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
-	EPivot pivot, const wstring& TexturePath, const wstring& ShaderName)
+	EPivot pivot, const wstring& TexturePath, EReverse Reverse, const wstring& ShaderName)
 {
 	// 오브젝트 동적할당..
 	unique_ptr<StaticMesh2DObject> TempObject = make_unique<StaticMesh2DObject>();
@@ -52,11 +52,31 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
 	{
 		Success = false;
 	}
-	// 메쉬 로드
+
+	JG2DMesh::STexInformaton Information;
+	float TexScaleX = 1.0f;
+	float TexScaleY = 1.0f;
+	switch (Reverse)
+	{
+	case EReverse::Default:
+		TexScaleX = 1.0f;
+		TexScaleY = 1.0f;
+		break;
+	case EReverse::RL:
+		TexScaleX = -1.0f;
+		TexScaleY = 1.0f;
+		break;
+	case EReverse::UD:
+		TexScaleX = 1.0f;
+		TexScaleY = -1.0f;
+		break;
+	}
+	Information.Width  = TexScaleX;
+	Information.Height = TexScaleX;
 	result = TempObject->Mesh->Construct2DMesh(
 		JGConstructHelper::m_BufferManager, ComponentName,
 		(float)TempObject->Texture->GetInformation(0).Width,
-		(float)TempObject->Texture->GetInformation(0).Height, pivot);
+		(float)TempObject->Texture->GetInformation(0).Height, pivot,Information);
 	if (!result)
 	{
 		Success = false;
@@ -74,7 +94,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
 
 JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	const std::wstring& ComponentName, EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-	const std::wstring& TexturePath, const std::wstring& ShaderName)
+	const std::wstring& TexturePath, EReverse Reverse, const std::wstring& ShaderName)
 {
 	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
 	TempObject->Texture = make_unique<JGTexture>();
@@ -86,14 +106,38 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	{
 		Success = false;
 	}
-	// 애니메이션 한장의 크기를 구한다.
-	float MeshWidth  = (float)TempObject->Texture->GetInformation(0).Width / WidthFrame;
-	float MeshHeight = (float)TempObject->Texture->GetInformation(0).Height / HeightFrame;
-	float TexWidth =  1.0f / (float)WidthFrame;
-	float TexHeight = 1.0f / (float)HeightFrame;
+	float MeshWidth = 0.0f;
+	float MeshHeight = 0.0f;
+	float TexWidth = 0.0f;
+	float TexHeight = 0.0f;
+	if (Success)
+	{
+		// 애니메이션 한장의 크기를 구한다.
+		MeshWidth = (float)TempObject->Texture->GetInformation(0).Width / WidthFrame;
+		MeshHeight = (float)TempObject->Texture->GetInformation(0).Height / HeightFrame;
+		TexWidth = 1.0f / (float)WidthFrame;
+		TexHeight = 1.0f / (float)HeightFrame;
+	}
 	JG2DMesh::STexInformaton Information;
-	Information.Height = TexHeight;
-	Information.Width = TexWidth;
+	float TexScaleX = 1.0f;
+	float TexScaleY = 1.0f;
+	switch (Reverse)
+	{
+	case EReverse::Default:
+		TexScaleX = 1.0f;
+		TexScaleY = 1.0f;
+		break;
+	case EReverse::RL:
+		TexScaleX = -1.0f;
+		TexScaleY = 1.0f;
+		break;
+	case EReverse::UD:
+		TexScaleX = 1.0f;
+		TexScaleY = -1.0f;
+		break;
+	}
+	Information.Height = TexHeight * TexScaleY;
+	Information.Width = TexWidth * TexScaleX;
 
 	// 한장의 크기를 구한 구격으로 메쉬를 생성
 	result = TempObject->Mesh->Construct2DMesh(JGConstructHelper::m_BufferManager, ComponentName,
@@ -107,9 +151,8 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	TempObject->TotalFrame = TotalFrame;
 	TempObject->WidthFrame = WidthFrame;
 	TempObject->HeightFrame = HeightFrame;
-	TempObject->IncreaseWidth = TexWidth;
-	TempObject->IncreaseHeight = TexHeight;
-
+	TempObject->IncreaseWidth  = TexWidth * TexScaleX;
+	TempObject->IncreaseHeight = TexHeight * TexScaleY;
 	(*TempObject->Pivot) = pivot;
 	Object = TempObject.get();
 

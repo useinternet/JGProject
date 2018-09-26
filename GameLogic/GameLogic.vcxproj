@@ -172,7 +172,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,7 +189,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -204,7 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -219,7 +219,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -234,7 +234,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);GAME_LOGIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -249,7 +249,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);GAME_LOGIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -264,7 +264,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);GAME_LOGIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -281,7 +281,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;GAMELOGIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);GAME_LOGIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../JGEngineCore</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../JGEngineCore;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -291,12 +291,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Anim\Player\Anim_Player.cpp" />
+    <ClCompile Include="Character\Player.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="GameStage\GameStage.cpp" />
     <ClCompile Include="GameStage\SampleWorldSpawner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Anim\Player\Anim_Player.h" />
+    <ClInclude Include="Character\Player.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="GameStage\GameStage.h" />
     <ClInclude Include="GameStage\SampleWorldSpawner.h" />

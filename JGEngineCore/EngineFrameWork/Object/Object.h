@@ -63,23 +63,30 @@ public:
 	Exp : 오브젝트를 활성화시킨다. */
 	void ActiveObject();
 
-	void SetRootComponent(Component* RootComponent);
-	Component* GetRootComponent();
 	float GetDeltaTime();
+
 protected:
 	template<typename ComponentType>
-	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName);
+	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName, const bool IsRoot = false);
 };
 
 template<typename ComponentType>
-inline ComponentType* Object::RegisterComponentInObject(const std::wstring& ComponentName)
+inline ComponentType* Object::RegisterComponentInObject(const std::wstring& ComponentName, const bool IsRoot)
 {
 	// 만약 처음 등록하는 컴포넌트라면..
 	if (m_bIsFirst)
 	{
 		m_bIsFirst = false;
+		std::unique_ptr<Component> RootComponent;
 		// 루트 컴포넌트를 만든다.
-		std::unique_ptr<Component> RootComponent = std::make_unique<MotivatedComponent>();
+		if (IsRoot)
+		{
+			RootComponent = std::make_unique<ComponentType>();
+		}
+		else
+		{
+			RootComponent = std::make_unique<MotivatedComponent>();
+		}
 		RootComponent->SetOwnerObject(this);
 		RootComponent->InitComponent(GetRenderSuperClass());
 		m_RootComponent = RootComponent.get();

@@ -50,6 +50,7 @@ public:
 		SPivotPoint TopLeft = { 0.0f,0.0f };
 		float Width = 1.0f;
 		float Height = 1.0f;
+		
 	}STexInformaton;
 private:
 	std::vector<S2DVertexType> m_vVertexArray;

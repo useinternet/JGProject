@@ -213,14 +213,14 @@ bool StaticMesh2DComponent::Render2DCurling()
 		LocationX -= MeshWidth;
 		break;
 	case EPivot::MiddleLeft:
-		LocationY += (MeshHeight / 2);
+		LocationY -= (MeshHeight / 2);
 		break;
 	case EPivot::MiddleMiddle:
 		LocationX -= (MeshWidth / 2);
-		LocationY += (MeshHeight / 2);
+		LocationY -= (MeshHeight / 2);
 		break;
 	case EPivot::MiddleRight:
-		LocationY += (MeshHeight / 2);
+		LocationY -= (MeshHeight / 2);
 		LocationX -= MeshWidth;
 		break;
 	case EPivot::BottomLeft:

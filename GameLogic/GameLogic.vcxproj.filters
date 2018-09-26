@@ -14,6 +14,15 @@
     <Filter Include="Game\SampleWorld">
       <UniqueIdentifier>{b2aef688-309a-4e9c-83fc-cfc428590c08}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Anim">
+      <UniqueIdentifier>{9d29732f-f1b1-4833-af26-81c69d0b953c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Anim\Player">
+      <UniqueIdentifier>{f0044eff-04af-468d-8335-60c0ebebe67b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Character">
+      <UniqueIdentifier>{d4d0ab22-1228-4e5a-b2fe-b53690818e6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -28,6 +37,12 @@
     <ClCompile Include="GameStage\SampleWorldSpawner.cpp">
       <Filter>Game\SampleWorld</Filter>
     </ClCompile>
+    <ClCompile Include="Anim\Player\Anim_Player.cpp">
+      <Filter>Game\Anim\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Character\Player.cpp">
+      <Filter>Game\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -38,6 +53,12 @@
     </ClInclude>
     <ClInclude Include="GameStage\SampleWorldSpawner.h">
       <Filter>Game\SampleWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Anim\Player\Anim_Player.h">
+      <Filter>Game\Anim\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Character\Player.h">
+      <Filter>Game\Character</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

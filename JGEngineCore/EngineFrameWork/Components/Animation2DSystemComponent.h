@@ -42,13 +42,7 @@ public:
 	virtual void BeginComponent(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
 	virtual void Render() override;
-	//
-	/*
-	Exp : 이 애니메이션의 정보를 해당 오브젝트와 연결한다. */
-	void LinkObject(Object* object);
-	/*
-	Exp : 이 애니메이션에 연결된 오브젝트를 가져온다. */
-	Object* GetLinkObject();
+
 	/*
 	Exp : 애니메이션 현재 상태를 설정한다. */
 	void SetCurrentState(const EnumState State);
