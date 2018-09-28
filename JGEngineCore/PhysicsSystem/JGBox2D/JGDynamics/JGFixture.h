@@ -14,7 +14,7 @@ public:
 	~JGFixture();
 
 	b2Fixture* Get();
-	
+
 private:
 	void CreateFixture(b2Fixture* fixture);
 	void Set(b2Fixture* fixture);

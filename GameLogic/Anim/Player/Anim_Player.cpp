@@ -2,7 +2,11 @@
 #include"EngineFrameWork/Components/AnimationMesh2DComponent.h"
 #include"RenderSystem/JGMaterial/JG2DMesh.h"
 #include"EngineStatics/JGConstructHelper.h"
+#include"EngineFrameWork/Components/Box2DCollisionComponent.h"
 #include"Character/Player.h"
+
+
+using namespace std;
 Anim_Player::Anim_Player()
 {
 	IdleStart = AddAnimation(EAnimState::Anim_IdleStart, TT("Anim_Player_StartIdle"));
@@ -16,7 +20,7 @@ Anim_Player::Anim_Player()
 			IdleStart->SetConstructObject(Anim_IdleStart_Mesh.Object);
 		}
 	}
-	IdleStart->AnimationSetDelay(0.3f);
+	IdleStart->AnimationSetDelay(0.1f);
 	Idle = AddAnimation(EAnimState::Anim_Idle, TT("Anim_Player_Idle"));
 	if (Idle)
 	{
@@ -28,7 +32,7 @@ Anim_Player::Anim_Player()
 			Idle->SetConstructObject(Anim_Idle_Mesh.Object);
 		}
 	}
-	Idle->AnimationSetDelay(0.3f);
+	Idle->AnimationSetDelay(0.1f);
 	RightMove = AddAnimation(EAnimState::Anim_RightMove, TT("Anim_Player_RightMove"));
 	if (RightMove)
 	{
@@ -40,7 +44,7 @@ Anim_Player::Anim_Player()
 			RightMove->SetConstructObject(Anim_RightMove_Mesh.Object);
 		}
 	}
-	RightMove->AnimationSetDelay(0.3f);
+	RightMove->AnimationSetDelay(0.1f);
 	LeftMove = AddAnimation(EAnimState::Anim_LeftMove, TT("Anim_Player_LeftMove"));
 	if (LeftMove)
 	{
@@ -53,7 +57,7 @@ Anim_Player::Anim_Player()
 			LeftMove->SetConstructObject(Anim_LeftMove_Mesh.Object);
 		}
 	}
-	LeftMove->AnimationSetDelay(0.3f);
+	LeftMove->AnimationSetDelay(0.1f);
 	Jump = AddAnimation(EAnimState::Anim_Jump, TT("Anim_Player_Jump"));
 	if (Jump)
 	{
@@ -65,6 +69,8 @@ Anim_Player::Anim_Player()
 			Jump->SetConstructObject(Anim_Jump_Mesh.Object);
 		}
 	}
+	Jump->AnimationSetDelay(0.1f);
+	SetCurrentState(Anim_IdleStart);
 
 }
 
@@ -78,34 +84,60 @@ void Anim_Player::BeginComponent(World* world)
 {
 	Animation2DSystemComponent::BeginComponent(world);
 
-
+	AddNotifyEvent(TT("Frame_Stop_by_Jump_FallingUp"), Anim_Jump, 3, [this]()
+	{
+		this->GetAnimation(Anim_Jump)->Stop();
+	});
+	AddNotifyEvent(TT("Frame_Stop_by_Jump_FallingDown"), Anim_Jump, 7, [this]()
+	{
+		this->GetAnimation(Anim_Jump)->Stop();
+	});
 }
 
 void Anim_Player::Tick(const float DeltaTime)
 {
 	Animation2DSystemComponent::Tick(DeltaTime);
 
+
 	Player* p = dynamic_cast<Player*>(GetOwnerObject());
+
 	if (p)
 	{
-		switch (p->GetCurrentPlayerState())
+		if (p->GetCurrentPlayerState() == Player_JumpDown && !p->IsFalling())
 		{
-		case EPlayerState::Player_Idle:
-			SetCurrentState(Anim_Idle);
-			break;
-		case EPlayerState::Player_Jump:
-			SetCurrentState(Anim_Jump);
-			break;
-		case EPlayerState::Player_LeftMove:
-			SetCurrentState(Anim_LeftMove);
-			break;
-		case EPlayerState::Player_RightMove:
-			SetCurrentState(Anim_RightMove);
-			break;
-		case EPlayerState::Player_Sit:
-			break;
-
+			p->SetCurrentPlayerState(Player_Idle);
 		}
+		if (PrevPlayerState != p->GetCurrentPlayerState())
+		{
+			switch (p->GetCurrentPlayerState())
+			{
+			case EPlayerState::Player_Idle:
+				SetCurrentState(Anim_Idle);
+				break;
+			case EPlayerState::Player_JumpUp:
+				SetCurrentState(Anim_Jump);
+				break;
+			case EPlayerState::Player_JumpDown:
+				SetCurrentState(Anim_Jump);
+				GetAnimation(Anim_Jump)->SetCurrentFrame(4);
+				GetAnimation(Anim_Jump)->Play();
+				break;
+			case EPlayerState::Player_LeftMove:
+				SetCurrentState(Anim_LeftMove);
+				break;
+			case EPlayerState::Player_RightMove:
+				SetCurrentState(Anim_RightMove);
+				break;
+			case EPlayerState::Player_Sit:
+				break;
+			}
+		}
+
+
+
+
+
+		PrevPlayerState = p->GetCurrentPlayerState();
 	}
 	
 

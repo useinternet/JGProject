@@ -27,8 +27,6 @@ void CollisionComponent::BeginComponent(World* world)
 void CollisionComponent::Tick(const float DeltaTime)
 {
 	Motivated2DComponent::Tick(DeltaTime);
-	
-
 
 	if (m_bEndOverlap)
 	{
@@ -151,6 +149,16 @@ void CollisionComponent::SetRestitution(const float Restitution)
 void CollisionComponent::SetFilter(JG2DFilter filter)
 {
 	m_BodyFilter = filter;
+}
+
+void CollisionComponent::FixAngle()
+{
+	m_Body->origin()->SetFixedRotation(true);
+}
+
+void CollisionComponent::UnFixAngle()
+{
+	m_Body->origin()->SetFixedRotation(false);
 }
 
 

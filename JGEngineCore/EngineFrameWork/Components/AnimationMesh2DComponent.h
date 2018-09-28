@@ -15,6 +15,7 @@ Class : AnimationMesh2DComponent
 class ENGINE_EXPORT AnimationMesh2DComponent : public StaticMesh2DComponent
 {
 private:
+	bool  m_bStop = false;
 	float m_AnimationDelay = 0.0f;
 	size_t m_TotalFrame    = 0;
 	size_t m_WidthFrame    = 0;
@@ -53,6 +54,11 @@ public:
 	Exp : 애니메이션 셋팅을 초기화한다. */
 	void InitAnimationSetting();
 
+
+	void Stop();
+	void Play();
+	bool IsPlaying();
+	void SetCurrentFrame(const size_t CurrentFrame);
 	/// StaticMesh2DComponent 클래스 참조...
 	virtual void SetConstructObject(ConstructObject* Object) override;
 private:

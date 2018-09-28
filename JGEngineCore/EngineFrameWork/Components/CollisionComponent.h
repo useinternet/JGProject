@@ -24,7 +24,7 @@ private:
 	JG2DBody*   m_Body = nullptr;
 	JG2DFilter  m_BodyFilter;
 	float m_Density = 1.0f;
-	float m_Friction = 0.3f;
+	float m_Friction = 0.0f;
 	float m_Restitution = 0.0f;
 public:
 	CollisionComponent();
@@ -56,6 +56,8 @@ public:
 	void SetFriction(const float Friction);
 	void SetRestitution(const float Restitution);
 	void SetFilter(JG2DFilter filter);
+	void FixAngle();
+	void UnFixAngle();
 public:
 	JGVector2D& GetVelocity();
 	void SetVelocity(const JGVector2D& vel);

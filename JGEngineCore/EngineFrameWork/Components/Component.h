@@ -19,7 +19,8 @@ EnumClass : EComponentState
 enum class EComponentState
 {
 	Active,
-	Behind
+	Behind,
+	Tick_Behind
 };
 
 class ENGINE_EXPORT Component : public ComponentBase
@@ -96,6 +97,9 @@ public:
 	/*
 	Exp : Zorder°ªÀ» °¡Á®¿Â´Ù.*/
 	int GetZOrder();
+	/*
+	Exp : ÄÄÆ÷³ÍÆ®¸¦ ¼û±è´Ï´Ù. */
+	void Tick_BegindComponent();
 	/*
 	Exp : ÄÄÆ÷³ÍÆ®¸¦ ¼û±è´Ï´Ù. */
 	void BehindComponent();

@@ -29,6 +29,7 @@ private:
 		EnumState State;
 		size_t    Frame;
 		std::function<void()> Event;
+		bool      bEventPlay = false;
 	};
 private:
 	std::map<EnumState,std::shared_ptr<AnimationMesh2DComponent>> m_mAnimation;

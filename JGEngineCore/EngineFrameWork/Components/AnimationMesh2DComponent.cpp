@@ -25,7 +25,10 @@ void AnimationMesh2DComponent::Tick(const float DeltaTime)
 	m_AccTime += DeltaTime;
 	if (m_AccTime >= m_AnimationDelay)
 	{
-		m_CurrentFrame++;
+		if (!m_bStop)
+		{
+			m_CurrentFrame++;
+		}
 		m_AccTime = 0.0f;
 		AnimationCalulation();
 		m_AnimationBuffer->WidthIncrement = m_CurrentIncreaseWidth;
@@ -55,7 +58,26 @@ void AnimationMesh2DComponent::InitAnimationSetting()
 	m_CurrentIncreaseWidth = 0.0f;
 	m_CurrentIncreaseHeight = 0.0f;
 }
-
+void AnimationMesh2DComponent::Stop()
+{
+	m_bStop = true;
+}
+void AnimationMesh2DComponent::Play()
+{
+	m_bStop = false;
+}
+bool AnimationMesh2DComponent::IsPlaying()
+{
+	if (m_bStop)
+	{
+		return false;
+	}
+	return true;
+}
+void AnimationMesh2DComponent::SetCurrentFrame(const size_t CurrentFrame)
+{
+	m_CurrentFrame = CurrentFrame;
+}
 void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 {
 	AnimationMesh2DObject* object = dynamic_cast<AnimationMesh2DObject*>(Object);

@@ -17,7 +17,11 @@ JG2DBody::JG2DBody()
 }
 JG2DBody::~JG2DBody()
 {
+}
 
+b2Body* JG2DBody::origin()
+{
+	return m_Body;
 }
 
 JGFixture* JG2DBody::CreateFixture(CollisionComponent* Collision,JGShape* shape, const float density,
@@ -39,6 +43,24 @@ JGFixture* JG2DBody::CreateFixture(CollisionComponent* Collision,JGShape* shape,
 	result = fixture.get();
 	m_vFixtures.push_back(move(fixture));
 	return result;
+}
+
+void JG2DBody::DestroyFixture(const size_t idx)
+{
+	if (m_vFixtures.size() < idx + 1)
+	{
+		return;
+	}
+	m_Body->DestroyFixture(m_vFixtures[0]->Get());
+}
+
+bool JG2DBody::IsExistFixture()
+{
+	if (m_vFixtures.size() == 0)
+	{
+		return false;
+	}
+	return true;
 }
 
 void JG2DBody::PhysicsOff()
@@ -109,6 +131,22 @@ void JG2DBody::SetTransform(JGVector2D& Location, JGAngle2D& Angle)
 	m_Body->SetTransform(b2Location, RdAngle);
 	m_Body->SetAwake(true);
 }
+
+JGFixture* JG2DBody::GetFixture(const size_t idx)
+{
+	if (m_vFixtures.size() <= idx)
+	{
+		return nullptr;
+	}
+	return m_vFixtures[idx].get();
+}
+
+vector<shared_ptr<JGFixture>>* JG2DBody::GetFixtureList()
+{
+	return &m_vFixtures;
+}
+
+
 
 void JG2DBody::Tick()
 {

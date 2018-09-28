@@ -1,5 +1,6 @@
 #include"JGFixture.h"
 #include"JG2DBody.h"
+
 JGFixture::JGFixture()
 {
 }

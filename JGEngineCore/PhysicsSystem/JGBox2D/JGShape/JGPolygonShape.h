@@ -10,6 +10,5 @@ private:
 public:
 	JGPolygonShape();
 	virtual ~JGPolygonShape();
-
 	void SetAsBox(const float HalfWidth, const float HalfHeight);
 };

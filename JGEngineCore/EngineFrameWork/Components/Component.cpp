@@ -13,7 +13,7 @@ Component::Component()
 
 Component::~Component()
 {
-
+	DestoryComponent();
 }
 
 void Component::Receive(const JGComponentMessage& Message)
@@ -37,7 +37,11 @@ void Component::Tick(const float DeltaTime)
 {
 	for (auto& iter : m_vChildComponent)
 	{
-		iter->Tick(DeltaTime);
+		if (iter->GetComponentState() != EComponentState::Tick_Behind)
+		{
+			iter->Tick(DeltaTime);
+		}
+		
 	}
 }
 
@@ -63,7 +67,7 @@ void Component::Render()
 
 void Component::DestoryComponent()
 {
-
+	
 }
 
 
@@ -168,6 +172,11 @@ void Component::SetZOrder(const int zorder)
 int Component::GetZOrder()
 {
 	return m_zOrder;
+}
+
+void Component::Tick_BegindComponent()
+{
+	m_ComponentState = EComponentState::Tick_Behind;
 }
 
 void Component::BehindComponent()

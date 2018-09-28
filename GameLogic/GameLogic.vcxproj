@@ -304,6 +304,7 @@
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="GameStage\GameStage.h" />
     <ClInclude Include="GameStage\SampleWorldSpawner.h" />
+    <ClInclude Include="StaticFilter\StaticCollisionFilter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

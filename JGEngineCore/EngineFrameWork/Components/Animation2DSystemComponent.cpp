@@ -17,12 +17,30 @@ void Animation2DSystemComponent::BeginComponent(World* world)
 	{
 		iter.second->SetOwnerObject(GetOwnerObject());
 	}
+	
 }
 
 void Animation2DSystemComponent::Tick(const float DeltaTime)
 {
 	Motivated2DComponent::Tick(DeltaTime);
-	m_mAnimation[m_CurrentState]->Tick(DeltaTime);
+
+	for (auto& notify : m_mNotifys)
+	{
+		SAnimNotify ntfy = notify.second;
+		if (ntfy.bEventPlay && !m_mAnimation[ntfy.State]->AnimationIsFrame(ntfy.Frame))
+		{
+			notify.second.bEventPlay = false;
+		}
+		if (m_mAnimation[ntfy.State]->IsPlaying() && m_mAnimation[ntfy.State]->AnimationIsFrame(ntfy.Frame))
+		{
+			if (!ntfy.bEventPlay)
+			{
+				ntfy.Event();
+				notify.second.bEventPlay = true;
+			}
+		}
+	
+	}
 }
 
 void Animation2DSystemComponent::Render()
@@ -31,7 +49,16 @@ void Animation2DSystemComponent::Render()
 }
 void Animation2DSystemComponent::SetCurrentState(const EnumState State)
 {
+	for (auto& iter : m_mAnimation)
+	{
+		if (iter.first != State)
+		{
+			iter.second->Stop();
+			iter.second->InitAnimationSetting();
+		}
+	}
 	m_CurrentState = State;
+	m_mAnimation[m_CurrentState]->Play();
 }
 EnumState Animation2DSystemComponent::GetCurrentState()
 {
@@ -41,7 +68,6 @@ AnimationMesh2DComponent* Animation2DSystemComponent::AddAnimation(const EnumSta
 {
 	unique_ptr<AnimationMesh2DComponent> AnimationComponent = make_unique<AnimationMesh2DComponent>();
 	AnimationComponent->SetOwnerObject(GetOwnerObject());
-
 	AnimationComponent->RegisterName(AnimationName);
 	AddChild(AnimationComponent.get());
 

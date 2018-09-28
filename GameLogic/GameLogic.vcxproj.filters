@@ -23,6 +23,9 @@
     <Filter Include="Game\Character">
       <UniqueIdentifier>{d4d0ab22-1228-4e5a-b2fe-b53690818e6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\StaticFilter">
+      <UniqueIdentifier>{e491bec8-e173-48f6-b49e-9b5bfe50fa84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -59,6 +62,9 @@
     </ClInclude>
     <ClInclude Include="Character\Player.h">
       <Filter>Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticFilter\StaticCollisionFilter.h">
+      <Filter>Game\StaticFilter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
