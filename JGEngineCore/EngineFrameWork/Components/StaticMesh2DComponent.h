@@ -60,6 +60,8 @@ public:
 	Exp : 렌더링 한다.(셰이더가 다르다면 상속 받아서 커스텀 하셈 
 	경고!! : Component의 Render함수를 호출할것..) */
 	virtual void Render() override;
+
+
 protected:
 	/*
 	Exp : 셰이더 상수버퍼의 파라미터들을 설정한다. ( 상속 받아서 쓰세요 / 부모 함수 호출 안해도되요.. */

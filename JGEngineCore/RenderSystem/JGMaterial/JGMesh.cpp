@@ -1,6 +1,5 @@
 #include"JGMesh.h"
 #include"../JGHLSLShaderDevice/JGBufferManager.h"
-#include"../JGHLSLShaderDevice/JGBuffer.h"
 #include"../JGDeviceD.h"
 using namespace std;
 JGMesh::JGMesh()
@@ -106,3 +105,14 @@ void JGMesh::Render(JGDeviceD* Device, ERenderingType RenderingType)
 		break;
 	}
 }
+
+wstring JGMesh::GetMeshName(const size_t idx)
+{
+	if (m_vMeshName.size() < idx)
+	{
+		return wstring(TT("None"));
+	}
+	return m_vMeshName[idx];
+}
+
+

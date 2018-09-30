@@ -1,13 +1,9 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
-
+#include"../JGHLSLShaderDevice/JGBuffer.h"
 
 class JGBufferManager;
 class JGDeviceD;
-enum class EJGBufferType;
-enum class EJGUsageType;
-enum class EJGCPUType;
-enum class EJGMapType;
 
 
 /*
@@ -24,6 +20,12 @@ enum class ENGINE_EXPORT ERenderingType
 	LineStrip = 2,
 	TriangleList = 3,
 	TriangleStrip = 4
+};
+enum class ENGINE_EXPORT EReverse
+{
+	RL,
+	UD,
+	Default
 };
 /*
 Class : JGMesh
@@ -71,5 +73,10 @@ public:
 	Exp : 메쉬 쓰기..*/
 	bool MeshWrite(const std::wstring& MeshName,const EJGMapType type,void* VertexData);
 	// 렌더링
-	void Render(JGDeviceD* Device, ERenderingType RenderingType);
+	virtual void Render(JGDeviceD* Device, ERenderingType RenderingType);
+
+
+	std::wstring GetMeshName(const size_t idx);
+
+
 };

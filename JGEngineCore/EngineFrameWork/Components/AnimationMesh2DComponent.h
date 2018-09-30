@@ -1,5 +1,6 @@
 #pragma once
 #include"StaticMesh2DComponent.h"
+#include"../../RenderSystem/JGMaterial/JG2DMesh.h"
 /*
 Class : AnimationMesh2DComponent 
 @m float m_AnimationDelay : 애니메이션 딜레이 값.
@@ -20,6 +21,7 @@ private:
 	size_t m_TotalFrame    = 0;
 	size_t m_WidthFrame    = 0;
 	size_t m_HeightFrame   = 0;
+	EReverse m_ReverseType;
 private:
 	float  m_AccTime = 0.0f;
 	size_t m_CurrentFrame = 1;
@@ -59,6 +61,7 @@ public:
 	void Play();
 	bool IsPlaying();
 	void SetCurrentFrame(const size_t CurrentFrame);
+	void Reverse(const EReverse reversetype);
 	/// StaticMesh2DComponent 클래스 참조...
 	virtual void SetConstructObject(ConstructObject* Object) override;
 private:

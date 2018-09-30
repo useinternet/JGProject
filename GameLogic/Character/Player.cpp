@@ -4,51 +4,50 @@
 #include"EngineFrameWork/Components/InputComponent.h"
 #include"PhysicsSystem/JGBox2D/JGDynamics/JG2DFilter.h"
 #include"StaticFilter/StaticCollisionFilter.h"
+#include"EngineFrameWork/Components/StaticMesh2DComponent.h"
+#include"EngineStatics/JGConstructHelper.h"
 #include"EngineStatics/JGLog.h"
 using namespace std;
 Player::Player()
 {
+
+
 	RegisterObjectID(typeid(this));
+
 	// 애니메이션 별 위치 및 박스 크기 설정
 	SPlayerPosByAnim Config;
-	Config = { 60.0f,170.0f,0.0f,-85.0f ,EReSizePivot::Down};
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_IdleStart, Config));
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_Idle, Config));
-	Config = { 60.0f,160.0f,0.0f,-80.0f ,EReSizePivot::Middle };
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_JumpDown, Config));
+	Config = { 60.0f,170.0f,0.0f,-85.0f,1.0f,1.0f };
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_RightIdle, Config));
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_LeftIdle, Config));
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_RightJumpDown, Config));
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_LeftJumpDown, Config));
 	
-	Config = { 60.0f,120.0f,0.0f,-125.0f,EReSizePivot::Down };
+	Config = { 85.0f,135.0f,0.0f,-85.0f,-1.0f,1.0f  };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_RightMove, Config));
+	Config = { 85.0f,135.0f,0.0f,-85.0f, 1.0f,1.0f };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_LeftMove, Config));
 
-	Config = { 60.0f,100.0f,0.0f,-35.0f ,EReSizePivot::Up};
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_JumpUp, Config));
-	
+	Config = { 60.0f,100.0f,0.0f,-35.0f,1.0f,-1.0f  };
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_RightJumpUp, Config));
+	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_LeftJumpUp, Config));
 
 	
 	// 충돌체 설정
-	BoxCollision = RegisterComponentInObject<Box2DCollisionComponent>(TT("Player_BoxCollision"));
-	BoxCollision->SetAsBox(60.0f, 170.0f);
-	BoxCollision->SetBodyType(E2DBodyType::Dynamic);
-	BoxCollision->SetComponentLocation(900.0f, 0.0f);
-
-
-
-
+	GetCollision()->SetAsBox(60.0f, 170.0f);
+	GetCollision()->SetComponentLocation(900.0F, 0.0f);
 	// 애니메이션 컴포넌트
 	AnimPlayer = RegisterComponentInObject<Anim_Player>(TT("Anim_Player"));
-	AnimPlayer->SetCurrentState(EAnimState::Anim_IdleStart);
 	AnimPlayer->SetComponentLocation(0.0f, -85.0f);
 
 	// 자식 추가..
-	BoxCollision->AddChild(AnimPlayer);
+	GetCollision()->AddChild(AnimPlayer);
 
 	// 입력 컴포넌트 추가..
 	InputDevice = RegisterComponentInObject<InputComponent>(TT("InputDevice"));
 
 	// 현제 상태 입력
-	CurrentPlayerState = EPlayerState::Player_IdleStart;
-	PrevPlayerState = EPlayerState::Player_IdleStart;
+	CurrentPlayerState = EPlayerState::Player_RightIdle;
+	PrevPlayerState = EPlayerState::Player_RightIdle;
 }
 
 Player::~Player()
@@ -58,7 +57,7 @@ Player::~Player()
 
 void Player::BeginObject(World* world)
 {
-	ExistObject::BeginObject(world);
+	Unit::BeginObject(world);
 
 	// 입력 이벤트 바인딩..
 	InputDevice->BindKeyCommand(TT("Right"), EKeyState::Down, std::bind(&Player::RightStart,this));
@@ -66,132 +65,136 @@ void Player::BeginObject(World* world)
 	InputDevice->BindKeyCommand(TT("Left"), EKeyState::Down, std::bind(&Player::LeftStart, this));
 	InputDevice->BindKeyCommand(TT("Left"), EKeyState::Up, std::bind(&Player::LeftEnd, this));
 	InputDevice->BindKeyCommand(TT("Up"), EKeyState::Down, std::bind(&Player::Jump, this));
-	InputDevice->BindKeyCommand(TT("Up"), EKeyState::Up, std::bind(&Player::JumpEnd, this));
-	// 물리 끄고 키기..
-	BoxCollision->GetBody()->PhysicsOn();
-	BoxCollision->GetBody()->origin()->SetFixedRotation(true);
 }
 
 void Player::Tick(const float DeltaTime)
 {
-	ExistObject::Tick(DeltaTime);
-	if (AnimPlayer->GetAnimation(EAnimState::Anim_IdleStart)->AnimationIsEnd() && CurrentPlayerState == Player_IdleStart)
-	{
-		CurrentPlayerState = Player_Idle;
-	}
+	Unit::Tick(DeltaTime);
+
 	// 속도에 의해 물체 이동
-	JGVector2D vel = BoxCollision->GetBody()->GetLinearVelocity();
-	JGLog::Write(ELogLevel::Default, TT("x: %d , y : %d "), (int)vel.X(), (int)vel.Y());
+	JGVector2D vel = GetCollision()->GetBody()->GetLinearVelocity();
 	float velChange = desiredVel - vel.X();
-	float impulse = BoxCollision->GetBody()->GetMass() * velChange;
+	float impulse = GetCollision()->GetBody()->GetMass() * velChange;
 	JGVector2D vecImpulse(impulse, 0.0f);
-	BoxCollision->GetBody()->ApplyLinearImpulse(vecImpulse);
-	float DeltaY = BoxCollision->GetComponentLocalLocation().Y() - FallingCheck_Y;
- 
-	if (DeltaY != 0 && !bAnimationChange)
+	GetCollision()->GetBody()->ApplyLinearImpulse(vecImpulse);
+
+	// 추락중일때.. 방향 전환..
+	if (IsFallingDown())
 	{
-		JGLog::Write(ELogLevel::Default, TT("떨어지는중 "));
-		bFalling = true;
-		if (DeltaY > 0)
+		if (IsRight())
 		{
-			CurrentPlayerState = Player_JumpDown;
+			CurrentPlayerState = Player_RightJumpDown;
+		}
+		if (IsLeft())
+		{
+			CurrentPlayerState = Player_LeftJumpDown;
 		}
 	}
-	if (DeltaY == 0 && !bAnimationChange)
+	// 점프하고 떨어지지 않을때..
+	if (!IsFalling())
 	{
-		bFallingDown = false;
-		JGLog::Write(ELogLevel::Default, TT("착지"));
-		bFalling = false;
+		if (CurrentPlayerState == Player_RightJumpDown)
+		{
+			CurrentPlayerState = Player_RightIdle;
+		}
+		if (CurrentPlayerState == Player_LeftJumpDown)
+		{
+			CurrentPlayerState = Player_LeftIdle;
+		}
 	}
-	if(bAnimationChange)
+
+
+	// 상황에따른박스 충돌체 크기 변경
+	if ( (PrevPlayerState != CurrentPlayerState ))
 	{
-		bAnimationChange = false;
-	}
-	// 현제 상태와 전 상태가 다르다면 충돌체 박스크기를 변경한다.
-	if (PrevPlayerState != CurrentPlayerState)
-	{
-		SPlayerPosByAnim Config = m_mBox_Pos_Config[CurrentPlayerState];
-		AnimPlayer->SetComponentLocation(Config.x, Config.y);
-		BoxCollision->SetAsBox(Config.hx, Config.hy, Config.pivot);
+		SPlayerPosByAnim PrevConfig = m_mBox_Pos_Config[PrevPlayerState];
+		SPlayerPosByAnim Config     = m_mBox_Pos_Config[CurrentPlayerState];
+
+		m_CollisionCenter.Set(
+			m_CollisionCenter.X() + PrevConfig.hx - Config.hx,
+			m_CollisionCenter.Y() + PrevConfig.hy - Config.hy );
+
+		JGVector2D Scale(
+			m_CollisionCenter.X() * Config.BoxDeltaScaleX,
+			m_CollisionCenter.Y() * Config.BoxDeltaScaleY);
+
+		GetCollision()->SetAsBox(Config.hx, Config.hy, Scale);
+
+		PlayerStateLog();
+
 		PrevPlayerState = CurrentPlayerState;
-
-		if (CurrentPlayerState == Player_JumpDown)
-		{
-			BoxCollision->AddComponentLocation(0.0f, 45.0f);
-			JGVector2D location = BoxCollision->GetComponentWorldLocation();
-			JGAngle2D angle = BoxCollision->GetComponentWorldAngle();
-			BoxCollision->GetBody()->SetTransform(location, angle);
-		}
-
-
-		bAnimationChange = true;
 	}
-	FallingCheck_Y = BoxCollision->GetComponentLocalLocation().Y();
-
 }
 void Player::RightStart()
 {
-	if (!bFalling && AnimPlayer->GetCurrentState() != Anim_Jump)
+	if (!IsFalling() &&  
+		AnimPlayer->GetCurrentState() != Anim_Jump)
 	{
 		CurrentPlayerState = Player_RightMove;
 	}
-
+	else if (IsFallingUp() &&
+		AnimPlayer->GetCurrentState() == Anim_Jump)
+	{
+		CurrentPlayerState = Player_RightJumpUp;
+	}
+	else if (IsFallingDown() && 
+		AnimPlayer->GetCurrentState() == Anim_Jump)
+	{
+		CurrentPlayerState = Player_RightJumpDown;
+	}
 	desiredVel = Speed;
 }
 void Player::RightEnd()
 {
-	if (!bFalling && AnimPlayer->GetCurrentState() != Anim_Jump)
+	if (!IsFalling() && AnimPlayer->GetCurrentState() != Anim_Jump)
 	{
-		CurrentPlayerState = Player_Idle;
+		CurrentPlayerState = Player_RightIdle;
 	}
-
 	desiredVel = 0;
 }
 void Player::LeftStart()
 {
-	if (!bFalling && AnimPlayer->GetCurrentState() != Anim_Jump)
+	if (!IsFalling() && AnimPlayer->GetCurrentState() != Anim_Jump)
 	{
 		CurrentPlayerState = Player_LeftMove;
+	}
+	else if (IsFallingUp() &&
+		AnimPlayer->GetCurrentState() == Anim_Jump)
+	{
+		CurrentPlayerState = Player_LeftJumpUp;
+	}
+	else if (IsFallingDown() &&
+		AnimPlayer->GetCurrentState() == Anim_Jump)
+	{
+		CurrentPlayerState = Player_LeftJumpDown;
 	}
 	desiredVel = -Speed;
 }
 void Player::LeftEnd()
 {
-	if (!bFalling && AnimPlayer->GetCurrentState() != Anim_Jump)
+	if (!IsFalling() && AnimPlayer->GetCurrentState() != Anim_Jump)
 	{
-		CurrentPlayerState = Player_Idle;
+		CurrentPlayerState = Player_LeftIdle;
 	}
 	desiredVel = 0;
 }
 void Player::Jump()
 {
-	if (!bFalling && !AnimPlayer->GetAnimation(Anim_Jump)->IsPlaying())
+	if (!IsFalling() && AnimPlayer->GetCurrentState() != Anim_Jump)
 	{
-		JGVector2D vel(0.0, -BoxCollision->GetBody()->GetMass() * JumpForce);
-		BoxCollision->GetBody()->ApplyLinearImpulse(vel);
-		CurrentPlayerState = Player_JumpUp;
+		JGVector2D vel(0.0f,0.0f);
+		vel.Set(0.0, -GetCollision()->GetBody()->GetMass() * JumpForce);
+		GetCollision()->GetBody()->ApplyLinearImpulse(vel);
+		if (IsRight())
+		{
+			CurrentPlayerState = Player_RightJumpUp;
+		}
+		else
+		{
+			CurrentPlayerState = Player_LeftJumpUp;
+		}
 	}
 }
-
-void Player::JumpEnd()
-{
-
-}
-
-void Player::SitDownStart()
-{
-
-}
-
-void Player::SitDownEnd()
-{
-}
-
-bool Player::IsFalling()
-{
-	return bFalling;
-}
-
 EPlayerState Player::GetCurrentPlayerState()
 {
 	return CurrentPlayerState;
@@ -200,4 +203,35 @@ EPlayerState Player::GetCurrentPlayerState()
 void Player::SetCurrentPlayerState(EPlayerState State)
 {
 	CurrentPlayerState = State;
+}
+
+void Player::PlayerStateLog()
+{
+	switch (CurrentPlayerState)
+	{
+	case Player_LeftIdle:
+		JGLog::Write(ELogLevel::Default, TT("LeftIdle"));
+		break;
+	case Player_RightIdle:
+		JGLog::Write(ELogLevel::Default, TT("RightIdle"));
+		break;
+	case Player_RightMove:
+		JGLog::Write(ELogLevel::Default, TT("RightMove"));
+		break;
+	case Player_LeftMove:
+		JGLog::Write(ELogLevel::Default, TT("LeftMove"));
+		break;
+	case Player_RightJumpUp:
+		JGLog::Write(ELogLevel::Default, TT("RightJumpUp"));
+		break;
+	case Player_RightJumpDown:
+		JGLog::Write(ELogLevel::Default, TT("RightJumpDown"));
+		break;
+	case Player_LeftJumpUp:
+		JGLog::Write(ELogLevel::Default, TT("LeftJumpUp"));
+		break;
+	case Player_LeftJumpDown:
+		JGLog::Write(ELogLevel::Default, TT("LeftJumpDown"));
+		break;
+	}
 }

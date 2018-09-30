@@ -49,6 +49,7 @@ void Animation2DSystemComponent::Render()
 }
 void Animation2DSystemComponent::SetCurrentState(const EnumState State)
 {
+
 	for (auto& iter : m_mAnimation)
 	{
 		if (iter.first != State)

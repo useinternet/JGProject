@@ -8,22 +8,23 @@
 // 커스텀은 리소스 및 애니메이션..
 enum EAnimState
 {
-	Anim_IdleStart = 0,
 	Anim_Idle,
-	Anim_RightMove,
-	Anim_LeftMove,
-	Anim_Jump
+	Anim_Move,
+	Anim_Jump,
+	Anim_SitDown,
+	Anim_StandUp
 };
 class Anim_Player : public Animation2DSystemComponent
 {
 private:
 	typedef unsigned int PlayerState;
 private:
-	class AnimationMesh2DComponent* IdleStart;
 	class AnimationMesh2DComponent* Idle;
-	class AnimationMesh2DComponent* RightMove;
-	class AnimationMesh2DComponent* LeftMove;
+	class AnimationMesh2DComponent* Move;
 	class AnimationMesh2DComponent* Jump;
+	class AnimationMesh2DComponent* SitDown;
+	class AnimationMesh2DComponent* StandUp;
+
 	PlayerState PrevPlayerState = 0xFFFFFFF;
 public:
 	Anim_Player();
@@ -31,4 +32,11 @@ public:
 
 	virtual void BeginComponent(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
+
+
+
+	void ConfigIdle(EReverse reverse);
+	void ConfigMove(EReverse reverse);
+	void ConfigJumpUp(EReverse reverse);
+	void ConfigJumpDown(EReverse reverse);
 };

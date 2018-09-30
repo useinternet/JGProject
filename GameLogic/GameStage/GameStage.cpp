@@ -21,7 +21,8 @@ void GameStage::InitStage(GameLoop* Loop)
 
 void GameStage::ManagementWorld()
 {
-	m_WorldManager->AddWorld(TT("SampleWorld"));
+	std::wstring name = TT("SampleWorld");
+	m_WorldManager->AddWorld(name);
 	m_WorldManager->SelectWorld(TT("SampleWorld"));
 	m_WorldManager->GetWorld(TT("SampleWorld"))->SpawnObject<SampleWorldSpawner>();
 

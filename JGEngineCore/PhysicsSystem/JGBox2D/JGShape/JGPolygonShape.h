@@ -1,6 +1,7 @@
 #pragma once
 
 #include"JGShape.h"
+class JGVector2D;
 
 class ENGINE_EXPORT JGPolygonShape : public JGShape
 {
@@ -11,4 +12,5 @@ public:
 	JGPolygonShape();
 	virtual ~JGPolygonShape();
 	void SetAsBox(const float HalfWidth, const float HalfHeight);
+	void SetAsBox(const float HalfWidth, const float HalfHeight, const JGVector2D& center);
 };

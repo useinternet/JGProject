@@ -1,6 +1,5 @@
 #include"JGConstructHelper.h"
 #include"../RenderSystem/JGTexture.h"
-#include"../RenderSystem/JGMaterial/JG2DMesh.h"
 #include"../EngineFrameWork/Components/StaticMesh2DComponent.h"
 #include"../EngineStatics/JGLog.h"
 #include"../SoundSystem/JGSound.h"
@@ -38,7 +37,7 @@ JGConstructHelper* JGConstructHelper::GetInstance()
 
 
 JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
-	EPivot pivot, const wstring& TexturePath, EReverse Reverse, const wstring& ShaderName)
+	EPivot pivot, const wstring& TexturePath, EReverse Reverse, const EJGUsageType usageType,const wstring& ShaderName)
 {
 	// 오브젝트 동적할당..
 	unique_ptr<StaticMesh2DObject> TempObject = make_unique<StaticMesh2DObject>();
@@ -72,11 +71,12 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
 		break;
 	}
 	Information.Width  = TexScaleX;
-	Information.Height = TexScaleX;
+	Information.Height = TexScaleY;
 	result = TempObject->Mesh->Construct2DMesh(
 		JGConstructHelper::m_BufferManager, ComponentName,
 		(float)TempObject->Texture->GetInformation(0).Width,
-		(float)TempObject->Texture->GetInformation(0).Height, pivot,Information);
+		(float)TempObject->Texture->GetInformation(0).Height, pivot,Information,
+		usageType);
 	if (!result)
 	{
 		Success = false;
@@ -94,7 +94,7 @@ JGConstructHelper::StaticMesh2D::StaticMesh2D(const wstring& ComponentName,
 
 JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	const std::wstring& ComponentName, EPivot pivot, const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-	const std::wstring& TexturePath, EReverse Reverse, const std::wstring& ShaderName)
+	const std::wstring& TexturePath, EReverse Reverse, const EJGUsageType usageType,const std::wstring& ShaderName)
 {
 	unique_ptr<AnimationMesh2DObject> TempObject = make_unique<AnimationMesh2DObject>();
 	TempObject->Texture = make_unique<JGTexture>();
@@ -141,7 +141,7 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 
 	// 한장의 크기를 구한 구격으로 메쉬를 생성
 	result = TempObject->Mesh->Construct2DMesh(JGConstructHelper::m_BufferManager, ComponentName,
-		MeshWidth, MeshHeight, pivot, Information);
+		MeshWidth, MeshHeight, pivot, Information, usageType);
 	if (!result)
 	{
 		Success = false;
@@ -151,8 +151,9 @@ JGConstructHelper::AnimationMesh2D::AnimationMesh2D(
 	TempObject->TotalFrame = TotalFrame;
 	TempObject->WidthFrame = WidthFrame;
 	TempObject->HeightFrame = HeightFrame;
-	TempObject->IncreaseWidth  = TexWidth * TexScaleX;
-	TempObject->IncreaseHeight = TexHeight * TexScaleY;
+	TempObject->IncreaseWidth = TexWidth;
+	TempObject->IncreaseHeight = TexHeight;
+	TempObject->ReverseType = Reverse;
 	(*TempObject->Pivot) = pivot;
 	Object = TempObject.get();
 

@@ -32,8 +32,8 @@ class : JGVector2D */
 class ENGINE_EXPORT JGVector2D
 {
 private:
-	friend JGVector2D operator*(JGVector2D& vec, const float scalar);
-	friend JGVector2D operator*(const float scalar, JGVector2D& vec);
+	friend JGVector2D ENGINE_EXPORT operator*(JGVector2D& vec, const float scalar);
+	friend JGVector2D ENGINE_EXPORT operator*(const float scalar, JGVector2D& vec);
 private:
 	D3DXVECTOR3 m_Vector2D = { 0.0f,0.0f,0.0f };
 
@@ -82,6 +82,6 @@ public:
 	void TransformNormal(JGMatrix& matrix);
 };
 // 연산자 오버로딩
-JGVector2D operator*(JGVector2D& vec, const float scalar);
-JGVector2D operator*(const float scalar, JGVector2D& vec);
+JGVector2D ENGINE_EXPORT operator*(JGVector2D& vec, const float scalar);
+JGVector2D ENGINE_EXPORT operator*(const float scalar, JGVector2D& vec);
 

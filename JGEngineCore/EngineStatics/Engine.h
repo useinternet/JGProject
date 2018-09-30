@@ -28,12 +28,10 @@
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx11d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx10d.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/D3dx9d.lib")
-#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2Dd.lib")
 #else          
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx11.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/d3dx10.lib")
 #pragma comment(lib,"../ManagementFiles/Library/DirectX/Win64/D3dx9.lib")
-#pragma comment(lib,"../ManagementFiles/Library/Box2D/Box2D.lib")
 #endif
 
 #else

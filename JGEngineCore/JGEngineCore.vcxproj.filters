@@ -526,6 +526,9 @@
     <ClCompile Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DFilter.cpp">
       <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
     </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\Unit.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -956,6 +959,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem\JGBox2D\JGDynamics\JG2DFilter.h">
       <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\Unit.h">
+      <Filter>EngineFrameWork\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

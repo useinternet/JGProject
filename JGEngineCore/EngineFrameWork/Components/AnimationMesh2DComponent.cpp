@@ -2,7 +2,7 @@
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
 #include"../../RenderSystem/JGHLSLShaderDevice/JGShaderData.h"
-#include"../../RenderSystem/JGMaterial/JG2DMesh.h"
+#include"../../EngineStatics/JGLog.h"
 using namespace std;
 AnimationMesh2DComponent::AnimationMesh2DComponent()
 {
@@ -22,6 +22,23 @@ void AnimationMesh2DComponent::ShaderParamSetting(JGShaderData * Data)
 void AnimationMesh2DComponent::Tick(const float DeltaTime)
 {
 	StaticMesh2DComponent::Tick(DeltaTime);
+	float ReverseX = 0.0f;
+	float ReverseY = 0.0f;
+	switch (m_ReverseType)
+	{
+	case EReverse::Default:
+		ReverseX = 0.0f;
+		ReverseY = 0.0f;
+		break;
+	case EReverse::RL:
+		ReverseX = -1.0f + m_IncreaseWidth;
+		ReverseY = 0.0f;
+		break;
+	case EReverse::UD:
+		ReverseX = 0.0f;
+		ReverseY = -1.0f + m_IncreaseHeight;
+		break;
+	}
 	m_AccTime += DeltaTime;
 	if (m_AccTime >= m_AnimationDelay)
 	{
@@ -29,10 +46,11 @@ void AnimationMesh2DComponent::Tick(const float DeltaTime)
 		{
 			m_CurrentFrame++;
 		}
+	
 		m_AccTime = 0.0f;
 		AnimationCalulation();
-		m_AnimationBuffer->WidthIncrement = m_CurrentIncreaseWidth;
-		m_AnimationBuffer->HeightIncrement = m_CurrentIncreaseHeight;
+		m_AnimationBuffer->WidthIncrement  = m_CurrentIncreaseWidth  + ReverseX;
+		m_AnimationBuffer->HeightIncrement = m_CurrentIncreaseHeight + ReverseY;
 	}
 }
 void AnimationMesh2DComponent::AnimationSetDelay(const float Delay)
@@ -78,6 +96,15 @@ void AnimationMesh2DComponent::SetCurrentFrame(const size_t CurrentFrame)
 {
 	m_CurrentFrame = CurrentFrame;
 }
+void AnimationMesh2DComponent::Reverse(const EReverse reversetype)
+{
+	if (GetMesh())
+	{
+		m_AccTime = m_AnimationDelay;
+		GetMesh()->MeshReverse(reversetype);
+		m_ReverseType = reversetype;
+	}
+}
 void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 {
 	AnimationMesh2DObject* object = dynamic_cast<AnimationMesh2DObject*>(Object);
@@ -93,7 +120,7 @@ void AnimationMesh2DComponent::SetConstructObject(ConstructObject* Object)
 		m_HeightFrame    = object->HeightFrame;
 		m_IncreaseWidth  = object->IncreaseWidth;
 		m_IncreaseHeight = object->IncreaseHeight;
-		
+		m_ReverseType = object->ReverseType;
 	}
 }
 void AnimationMesh2DComponent::AnimationCalulation()

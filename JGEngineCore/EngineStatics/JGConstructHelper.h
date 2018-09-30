@@ -1,22 +1,15 @@
 #pragma once
 #include"Engine.h"
-
-
+#include"../RenderSystem/JGMaterial/JG2DMesh.h"
 class StaticMesh2DComponent;
 class JGTexture;
-class JG2DMesh;
 class JGDeviceD;
 class JGBufferManager;
 class JGFontLoader;
 class JGSound;
 class JGVector2D;
 enum class EPivot;
-enum class ENGINE_EXPORT EReverse
-{
-	RL,
-	UD,
-	Default
-};
+
 
 class ENGINE_EXPORT ConstructObject
 {
@@ -46,6 +39,7 @@ public:
 	size_t HeightFrame;
 	float IncreaseWidth;
 	float IncreaseHeight;
+	EReverse ReverseType;
 	virtual ~AnimationMesh2DObject();
 };
 /*
@@ -105,7 +99,7 @@ public:
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		StaticMesh2D(const std::wstring& ComponentName, EPivot pivot, const std::wstring& TexturePath, EReverse Reverse = EReverse::Default,
-			const std::wstring& ShaderName = TT("2DSpriteShader"));
+			const EJGUsageType usageType = EJGUsageType::Static,const std::wstring& ShaderName = TT("2DSpriteShader"));
 	};
 
 	class ENGINE_EXPORT AnimationMesh2D
@@ -129,7 +123,7 @@ public:
 		@param const std::wstring& TexturePath : 텍스쳐 경로
 		@param const std::wstring& ShaderName = 적용할 셰이더 이름(기본적으로 각각에 맞게 설정되어있음) */
 		AnimationMesh2D(const std::wstring& ComponentName, EPivot pivot,const size_t TotalFrame, const size_t WidthFrame, const size_t HeightFrame,
-			const std::wstring& TexturePath, EReverse Reverse = EReverse::Default, const std::wstring& ShaderName = TT("2DAnimationShader"));
+			const std::wstring& TexturePath, EReverse Reverse = EReverse::Default,const EJGUsageType usageType = EJGUsageType::Static, const std::wstring& ShaderName = TT("2DAnimationShader"));
 	};
 	class ENGINE_EXPORT TextFont
 	{

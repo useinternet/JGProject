@@ -1,6 +1,6 @@
 #include"JGMath.h"
 #include"JGVector2D.h"
-const float JGMath::ErrorRange = 0.00000005f;
+const float JGMath::ErrorRange = 0.00005f;
 
 float JGMath::Sqrt(float num)
 {
@@ -19,6 +19,15 @@ float JGMath::Sqrt(float num)
 bool JGMath::IsZero(const float num)
 {
 	if (-ErrorRange < num && num < ErrorRange)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool JGMath::IsZero(const float num, const float CustomErrorRange)
+{
+	if (-CustomErrorRange < num && num < CustomErrorRange)
 	{
 		return true;
 	}

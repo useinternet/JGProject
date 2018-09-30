@@ -13,23 +13,44 @@ JG2DMesh::~JG2DMesh()
 
 }
 bool JG2DMesh::Construct2DMesh(JGBufferManager* BufferManager,const std::wstring& ComponentName,
-	const float Width, const float Height,EPivot Pivot, const STexInformaton& TexInformation)
+	const float Width, const float Height,EPivot Pivot, const STexInformaton& TexInformation,
+	const EJGUsageType UsageType)
 {
 	m_MeshWidth = Width;
 	m_MeshHeight = Height;
 	m_Pivot = Pivot;
 	CreateVertexArray(Width, Height, Pivot, TexInformation);
-	// 五習 持失
-	bool result = Create_Vertex_Index_Buffer(
-		BufferManager,
-		ComponentName,
-		EJGUsageType::Static, EJGCPUType::None,
-		EJGUsageType::Static, EJGCPUType::None,
-		&m_vVertexArray[0], m_2DVertexCount, sizeof(S2DVertexType));
-	if (!result)
+	bool result = false;
+	switch (UsageType)
 	{
-		return false;
+	case EJGUsageType::Dynamic:
+		// 五習 持失
+		result = Create_Vertex_Index_Buffer(
+			BufferManager,
+			ComponentName,
+			EJGUsageType::Dynamic, EJGCPUType::Access_Write,
+			EJGUsageType::Static, EJGCPUType::None,
+			&m_vVertexArray[0], m_2DVertexCount, sizeof(S2DVertexType));
+		if (!result)
+		{
+			return false;
+		}
+		break;
+	case EJGUsageType::Static:
+		// 五習 持失
+		result = Create_Vertex_Index_Buffer(
+			BufferManager,
+			ComponentName,
+			EJGUsageType::Static, EJGCPUType::None,
+			EJGUsageType::Static, EJGCPUType::None,
+			&m_vVertexArray[0], m_2DVertexCount, sizeof(S2DVertexType));
+		if (!result)
+		{
+			return false;
+		}
+		break;
 	}
+
 
 	return true;
 }
@@ -80,6 +101,15 @@ float JG2DMesh::GetMeshWidth()
 float JG2DMesh::GetMeshHeight()
 {
 	return m_MeshHeight;
+}
+void JG2DMesh::Render(JGDeviceD* Device, ERenderingType RenderingType)
+{
+	if (m_ChangingMesh)
+	{
+		MeshWrite(GetMeshName(0), EJGMapType::Write_Discard, &m_vVertexArray[0]);
+		m_ChangingMesh = false;
+	}
+	JGMesh::Render(Device, RenderingType);
 }
 void JG2DMesh::WriteTextMesh(const vector<JGFontVertexInformation>& VertexInformation)
 {
@@ -188,3 +218,52 @@ void JG2DMesh::CreateVertexArray(const float Width, const float Height, EPivot P
 }
 
 
+void JG2DMesh::MeshReverse(const EReverse reverseType)
+{
+	switch (reverseType)
+	{
+	case EReverse::Default:
+		for (auto& iter : m_vVertexArray)
+		{
+			if (iter.tex.x < 0)
+			{
+				iter.tex.x *= -1.0f;
+			}
+			if (iter.tex.y < 0)
+			{
+				iter.tex.y *= -1.0f;
+			}
+		}
+		break;
+	case EReverse::RL:
+		for (auto& iter : m_vVertexArray)
+		{
+			if (iter.tex.x > 0)
+			{
+				iter.tex.x *= -1.0f;
+			}
+			if (iter.tex.y < 0)
+			{
+				iter.tex.y *= -1.0f;
+			}
+		}
+		break;
+	case EReverse::UD:
+		for (auto& iter : m_vVertexArray)
+		{
+			if (iter.tex.x < 0)
+			{
+				iter.tex.x *= -1.0f;
+			}
+			if (iter.tex.y > 0)
+			{
+				iter.tex.y *= -1.0f;
+			}
+		}
+		break;
+	}
+
+
+
+	m_ChangingMesh = true;
+}

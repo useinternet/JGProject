@@ -57,6 +57,7 @@ private:
 	EPivot m_Pivot;
 	float m_MeshWidth = 0.0f;
 	float m_MeshHeight = 0.0f;
+	bool  m_ChangingMesh = false;
 public:
 	JG2DMesh();
 	virtual ~JG2DMesh();
@@ -68,7 +69,8 @@ public:
 	@param const float Height : 텍스쳐 세로길이
 	@param EPivot Pivot : 중심 위치 */
 	bool Construct2DMesh(JGBufferManager* BufferManager,const std::wstring& ComponentName, 
-		const float Width, const float Height,EPivot Pivot = EPivot::TopLeft,const STexInformaton& TexInformation = STexInformaton());
+		const float Width, const float Height,EPivot Pivot = EPivot::TopLeft,const STexInformaton& TexInformation = STexInformaton(),
+		const EJGUsageType UsageType = EJGUsageType::Static);
 	/*
 	Exp : 텍스트용 메쉬를 생성한다. 
 	@param JGBufferManager* BufferManager : 버퍼 매니저 포인터
@@ -89,7 +91,10 @@ public:
 	/*
 	Exp : 메시 세로길이를 가져온다.*/
 	float GetMeshHeight();
-
+	//
+	void MeshReverse(const EReverse reverseType);
+	// 렌더링
+	virtual void Render(JGDeviceD* Device, ERenderingType RenderingType);
 	/*
 	Exp : 구현중*/
 	void WriteTextMesh(const std::vector<JGFontVertexInformation>& VertexInformation);

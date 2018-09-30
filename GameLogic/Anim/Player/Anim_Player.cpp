@@ -9,69 +9,74 @@
 using namespace std;
 Anim_Player::Anim_Player()
 {
-	IdleStart = AddAnimation(EAnimState::Anim_IdleStart, TT("Anim_Player_StartIdle"));
-	if (IdleStart)
-	{
-		static JGConstructHelper::AnimationMesh2D Anim_IdleStart_Mesh(
-			IdleStart->GetComponentName(), EPivot::MiddleMiddle, 9, 3, 3,
-			TT("../GameLogic/Contents/Player/Idle1-1/AnimSheet_Player_Idle 1-1.png"));
-		if (Anim_IdleStart_Mesh.Success)
-		{
-			IdleStart->SetConstructObject(Anim_IdleStart_Mesh.Object);
-		}
-	}
-	IdleStart->AnimationSetDelay(0.1f);
 	Idle = AddAnimation(EAnimState::Anim_Idle, TT("Anim_Player_Idle"));
 	if (Idle)
 	{
 		static JGConstructHelper::AnimationMesh2D Anim_Idle_Mesh(
 			Idle->GetComponentName(), EPivot::MiddleMiddle, 8, 4, 2,
-			TT("../GameLogic/Contents/Player/Idle1-2/AnimSheet_Idle 1-2.png"));
+			TT("../Contents/Player/Idle1-2/AnimSheet_Idle 1-2.png"),
+			EReverse::Default,EJGUsageType::Dynamic);
 		if (Anim_Idle_Mesh.Success)
 		{
 			Idle->SetConstructObject(Anim_Idle_Mesh.Object);
 		}
+		Idle->AnimationSetDelay(0.1f);
 	}
-	Idle->AnimationSetDelay(0.1f);
-	RightMove = AddAnimation(EAnimState::Anim_RightMove, TT("Anim_Player_RightMove"));
-	if (RightMove)
-	{
-		static JGConstructHelper::AnimationMesh2D Anim_RightMove_Mesh(
-			RightMove->GetComponentName(), EPivot::MiddleMiddle, 6, 3, 2,
-			TT("../GameLogic/Contents/Player/Move/AnimSheet_Move.png"));
-		if (Anim_RightMove_Mesh.Success)
-		{
-			RightMove->SetConstructObject(Anim_RightMove_Mesh.Object);
-		}
-	}
-	RightMove->AnimationSetDelay(0.1f);
-	LeftMove = AddAnimation(EAnimState::Anim_LeftMove, TT("Anim_Player_LeftMove"));
-	if (LeftMove)
+
+	Move = AddAnimation(EAnimState::Anim_Move, TT("Anim_Player_Move"));
+	if (Move)
 	{
 		static JGConstructHelper::AnimationMesh2D Anim_LeftMove_Mesh(
-			LeftMove->GetComponentName(), EPivot::MiddleMiddle,6,3,2,
-			TT("../GameLogic/Contents/Player/Move/AnimSheet_Move.png"),
-			EReverse::RL);
+			Move->GetComponentName(), EPivot::MiddleMiddle,6,3,2,
+			TT("../Contents/Player/Move/AnimSheet_Move.png"),EReverse::Default,
+			EJGUsageType::Dynamic);
 		if (Anim_LeftMove_Mesh.Success)
 		{
-			LeftMove->SetConstructObject(Anim_LeftMove_Mesh.Object);
+			Move->SetConstructObject(Anim_LeftMove_Mesh.Object);
 		}
+		Move->AnimationSetDelay(0.1f);
 	}
-	LeftMove->AnimationSetDelay(0.1f);
+
 	Jump = AddAnimation(EAnimState::Anim_Jump, TT("Anim_Player_Jump"));
 	if (Jump)
 	{
 		static JGConstructHelper::AnimationMesh2D Anim_Jump_Mesh(
 			Jump->GetComponentName(), EPivot::MiddleMiddle, 7, 4, 2,
-			TT("../GameLogic/Contents/Player/Jump/AnimSheet_Player_Jump.png"));
+			TT("../Contents/Player/Jump/AnimSheet_Player_Jump.png"),
+			EReverse::Default,EJGUsageType::Dynamic);
 		if (Anim_Jump_Mesh.Success)
 		{
 			Jump->SetConstructObject(Anim_Jump_Mesh.Object);
 		}
+		Jump->AnimationSetDelay(0.1f);
 	}
-	Jump->AnimationSetDelay(0.1f);
-	SetCurrentState(Anim_IdleStart);
-
+	SitDown = AddAnimation(EAnimState::Anim_SitDown, TT("Anim_Player_SitDown"));
+	if (SitDown)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_SitDown_Mesh(
+			SitDown->GetComponentName(), EPivot::MiddleMiddle, 4, 4, 1,
+			TT("../Contents/Player/Sit/AnimSheet_Player_SitDown.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_SitDown_Mesh.Success)
+		{
+			SitDown->SetConstructObject(Anim_SitDown_Mesh.Object);
+		}
+		SitDown->AnimationSetDelay(0.1f);
+	}
+	StandUp = AddAnimation(EAnimState::Anim_StandUp, TT("Anim_Player_StandUp"));
+	if (StandUp)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_StandUp_Mesh(
+			StandUp->GetComponentName(), EPivot::MiddleMiddle,4,4,1,
+			TT("../Contents/Player/Sit/AnimSheet_Player_StandUp.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_StandUp_Mesh.Success)
+		{
+			StandUp->SetConstructObject(Anim_StandUp_Mesh.Object);
+		}
+		StandUp->AnimationSetDelay(0.1f);
+	}
+	SetCurrentState(Anim_Idle);
 }
 
 Anim_Player::~Anim_Player()
@@ -103,43 +108,65 @@ void Anim_Player::Tick(const float DeltaTime)
 
 	if (p)
 	{
-		if (p->GetCurrentPlayerState() == Player_JumpDown && !p->IsFalling())
-		{
-			p->SetCurrentPlayerState(Player_Idle);
-		}
 		if (PrevPlayerState != p->GetCurrentPlayerState())
 		{
 			switch (p->GetCurrentPlayerState())
 			{
-			case EPlayerState::Player_Idle:
-				SetCurrentState(Anim_Idle);
+			case EPlayerState::Player_RightIdle:
+				ConfigIdle(EReverse::Default);
 				break;
-			case EPlayerState::Player_JumpUp:
-				SetCurrentState(Anim_Jump);
+			case EPlayerState::Player_LeftIdle:
+				ConfigIdle(EReverse::RL);
 				break;
-			case EPlayerState::Player_JumpDown:
-				SetCurrentState(Anim_Jump);
-				GetAnimation(Anim_Jump)->SetCurrentFrame(4);
-				GetAnimation(Anim_Jump)->Play();
+			case EPlayerState::Player_RightJumpUp:
+				ConfigJumpUp(EReverse::Default);
+				break;
+			case EPlayerState::Player_LeftJumpUp:
+				ConfigJumpUp(EReverse::RL);
+				break;
+			case EPlayerState::Player_RightJumpDown:
+				ConfigJumpDown(EReverse::Default);
+				break;
+			case EPlayerState::Player_LeftJumpDown:
+				ConfigJumpDown(EReverse::RL);
 				break;
 			case EPlayerState::Player_LeftMove:
-				SetCurrentState(Anim_LeftMove);
+				ConfigMove(EReverse::RL);
 				break;
 			case EPlayerState::Player_RightMove:
-				SetCurrentState(Anim_RightMove);
-				break;
-			case EPlayerState::Player_Sit:
+				ConfigMove(EReverse::Default);
 				break;
 			}
 		}
-
-
-
-
-
 		PrevPlayerState = p->GetCurrentPlayerState();
 	}
 	
 
 
+}
+
+void Anim_Player::ConfigIdle(EReverse reverse)
+{
+	GetAnimation(Anim_Idle)->Reverse(reverse);
+	SetCurrentState(Anim_Idle);
+}
+
+void Anim_Player::ConfigMove(EReverse reverse)
+{
+	GetAnimation(Anim_Move)->Reverse(reverse);
+	SetCurrentState(Anim_Move);
+}
+
+void Anim_Player::ConfigJumpUp(EReverse reverse)
+{
+	GetAnimation(Anim_Jump)->Reverse(reverse);
+	SetCurrentState(Anim_Jump);
+}
+
+void Anim_Player::ConfigJumpDown(EReverse reverse)
+{
+	GetAnimation(Anim_Jump)->Reverse(reverse);
+	SetCurrentState(Anim_Jump);
+	GetAnimation(Anim_Jump)->SetCurrentFrame(4);
+	GetAnimation(Anim_Jump)->Play();
 }

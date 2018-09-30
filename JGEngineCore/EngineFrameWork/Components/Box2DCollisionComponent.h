@@ -20,10 +20,11 @@ private:
 	std::unique_ptr<JGPolygonShape> m_Shape;
 	float m_HalfWidth   = 50.0f;
 	float m_HalfHeight  = 50.0f;
+	JGVector2D m_CenterPos;
 	bool  m_bInit = false;
 public:
 	Box2DCollisionComponent();
 	virtual ~Box2DCollisionComponent();
 	virtual void BeginComponent(World* world) override;
-	void SetAsBox(const float hw, const float hh, EReSizePivot Pivot = EReSizePivot::Down);
+	void SetAsBox(const float hw, const float hh, JGVector2D center = { 0.0f,0.0f });
 };
