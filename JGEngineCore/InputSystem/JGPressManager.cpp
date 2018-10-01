@@ -254,6 +254,18 @@ bool JGPressManager::IsPressed(const EKey Key)
 	case EKey::MouseWheelClick:
 		if (m_pMouseState->rgbButtons[2] & 0x80) return true;
 		break;
+	case EKey::Up:
+		if (m_pKeyBoardState[DIK_UP] & 0x80) return true;
+		break;
+	case EKey::Down:
+		if (m_pKeyBoardState[DIK_DOWN] & 0x80) return true;
+		break;
+	case EKey::Right:
+		if (m_pKeyBoardState[DIK_RIGHT] & 0x80) return true;
+		break;
+	case EKey::Left:
+		if (m_pKeyBoardState[DIK_LEFT] & 0x80) return true;
+		break;
 	default:
 		return false;
 	}

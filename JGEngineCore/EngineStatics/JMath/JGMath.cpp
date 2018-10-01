@@ -1,7 +1,8 @@
 #include"JGMath.h"
 #include"JGVector2D.h"
+using namespace std;
 const float JGMath::ErrorRange = 0.00005f;
-
+random_device JGMath::rd;
 float JGMath::Sqrt(float num)
 {
 	float x = 1;
@@ -72,6 +73,13 @@ void JGMath::DrawRegion(float& target, const float min, const float max)
 	{
 		target = max;
 	}
+}
+
+int JGMath::RandomDraw(const int minRange, const int maxRange)
+{
+	mt19937_64 rng(rd());
+	uniform_int_distribution<int> num(minRange, maxRange);
+	return num(rng);
 }
 
 JGVector2D JGMath::D2DToScreen(const float ScreenWidth, const float ScreenHeight, JGVector2D& vector)

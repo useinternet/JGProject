@@ -22,7 +22,10 @@ enum class ENGINE_EXPORT EKey
 	U, V, W, X, Y, Z,
 	// 마우스
 	MouseXAxis, MouseYAxis, MouseLButton, MouseRButton,
-	MouseWheelClick, MouseWheelAxis
+	MouseWheelClick, MouseWheelAxis,
+
+	// 화살표
+	Up,Down,Left,Right
 };
 /*
 Class : JGPressManager

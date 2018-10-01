@@ -68,6 +68,13 @@ public:
 	Exp : 이 벡터값 대입.*/
 	void Set(const JGVector2D& vec);
 
+	void SetX(const float x);
+	void SetY(const float y);
+
+	void SetNegativeY();
+	void SetNegativeX();
+	void SetNegative();
+
 	// 연산자 오버로딩
 	JGVector2D& operator=(JGVector2D& vec);
 	JGVector2D operator+(JGVector2D& vec);

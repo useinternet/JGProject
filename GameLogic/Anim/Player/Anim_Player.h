@@ -6,13 +6,17 @@
 // right Move와 left move 를 합치자..
 // 그다음에 player와 따로 커스텀 플레이어로 분리..( 플레이어 이동하고.. 충돌체 관리)
 // 커스텀은 리소스 및 애니메이션..
+
+class Player;
 enum EAnimState
 {
 	Anim_Idle,
 	Anim_Move,
 	Anim_Jump,
 	Anim_SitDown,
-	Anim_StandUp
+	Anim_StandUp,
+	Anim_DefaultAttack_1,
+	Anim_DefaultAttack_2
 };
 class Anim_Player : public Animation2DSystemComponent
 {
@@ -24,7 +28,8 @@ private:
 	class AnimationMesh2DComponent* Jump;
 	class AnimationMesh2DComponent* SitDown;
 	class AnimationMesh2DComponent* StandUp;
-
+	class AnimationMesh2DComponent* DefaultAttack_1;
+	class AnimationMesh2DComponent* DefaultAttack_2;
 	PlayerState PrevPlayerState = 0xFFFFFFF;
 public:
 	Anim_Player();
@@ -32,11 +37,7 @@ public:
 
 	virtual void BeginComponent(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
-
-
-
-	void ConfigIdle(EReverse reverse);
-	void ConfigMove(EReverse reverse);
-	void ConfigJumpUp(EReverse reverse);
-	void ConfigJumpDown(EReverse reverse);
+	void ConfigDefault(Player* p, EAnimState state);
+	void ConfigJump(Player* p);
+	void ConfigAttack(Player* p);
 };

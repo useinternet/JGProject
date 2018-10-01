@@ -529,6 +529,9 @@
     <ClCompile Include="EngineFrameWork\Object\Unit.cpp">
       <Filter>EngineFrameWork\Object</Filter>
     </ClCompile>
+    <ClCompile Include="EngineFrameWork\Object\Side_Scroll_Unit.cpp">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -961,6 +964,9 @@
       <Filter>PhysicsSystem\JGBox2D\JGDynamics</Filter>
     </ClInclude>
     <ClInclude Include="EngineFrameWork\Object\Unit.h">
+      <Filter>EngineFrameWork\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Object\Side_Scroll_Unit.h">
       <Filter>EngineFrameWork\Object</Filter>
     </ClInclude>
   </ItemGroup>

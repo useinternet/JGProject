@@ -383,6 +383,7 @@
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\Side_Scroll_Unit.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Unit.cpp" />
     <ClCompile Include="EngineFrameWork\Object\UserWidget.cpp" />
     <ClCompile Include="EngineFrameWork\World\World.cpp" />
@@ -524,6 +525,7 @@
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
+    <ClInclude Include="EngineFrameWork\Object\Side_Scroll_Unit.h" />
     <ClInclude Include="EngineFrameWork\Object\Unit.h" />
     <ClInclude Include="EngineFrameWork\Object\UserWidget.h" />
     <ClInclude Include="EngineFrameWork\World\World.h" />

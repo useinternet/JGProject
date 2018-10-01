@@ -16,7 +16,9 @@
 	U, V, W, X, Y, Z,
 	// ¸¶¿ì½º
 	MouseXAxis, MouseYAxis, MouseLButton, MouseRButton,
-	MouseWheelClick, MouseWheelAxis
+	MouseWheelClick, MouseWheelAxis,
+
+  Up,Down,Left,Right
 };
 
   */
@@ -26,24 +28,35 @@
   "CommandList": [
     {
       "CommandName": "Right",
-      "BindKey": "D"
+      "BindKey": "Right"
     },
     {
       "CommandName": "Left",
-      "BindKey": "A"
+      "BindKey": "Left"
     },
     {
-      "CommandName": "Up",
+      "CommandName": "Jump",
+      "BindKey": "Up"
+    },
+    {
+      "CommandName": "Sit_Stand",
+      "BindKey": "Down"
+    },
+    {
+      "CommandName": "DefaultAttack",
+      "BindKey": "Q"
+    },
+    {
+      "CommandName": "DefaultSkill",
       "BindKey": "W"
     },
     {
-      "CommandName": "Down",
-      "BindKey": "S"
+      "CommandName": "AssistantSkill",
+      "BindKey": "E"
     },
     {
-      "CommandName": "Spawn",
-      "BindKey": "F"
+      "CommandName": "SpecialSkill",
+      "BindKey": "R"
     }
   ]
 }
-

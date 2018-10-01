@@ -75,6 +75,27 @@ void JGVector2D::Set(const JGVector2D & vec)
 	m_Vector2D.x = vec.m_Vector2D.x;
 	m_Vector2D.y = vec.m_Vector2D.y;
 }
+void JGVector2D::SetX(const float x)
+{
+	m_Vector2D.x = x;
+}
+void JGVector2D::SetY(const float y)
+{
+	m_Vector2D.y = y;
+}
+void JGVector2D::SetNegativeY()
+{
+	m_Vector2D.y = -m_Vector2D.y;
+}
+void JGVector2D::SetNegativeX()
+{
+	m_Vector2D.x = -m_Vector2D.x;
+}
+void JGVector2D::SetNegative()
+{
+	m_Vector2D.x = -m_Vector2D.x;
+	m_Vector2D.y = -m_Vector2D.y;
+}
 JGVector2D& JGVector2D::operator=(JGVector2D& vec)
 {
 	m_Vector2D = vec.m_Vector2D;

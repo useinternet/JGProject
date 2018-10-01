@@ -1,5 +1,6 @@
 #pragma once
 #include"../Engine.h"
+#include<random>
 /*
 Class : JMath 
 Exp : 수학 관련 연산 함수들은 다 여기에~~!*/
@@ -8,6 +9,7 @@ class ENGINE_EXPORT JGMath
 {
 public:
 	static const float ErrorRange;
+	static std::random_device rd;
 public:
 	/*
 	Exp : 제곱근을 구한다.*/
@@ -31,6 +33,10 @@ public:
 	/*
 	Exp : 범위를 정한다.. */
 	static void DrawRegion(float& target,const float min, const float max);
+
+	/*
+	Exp : 해당 범위에서 랜덤으로 숫자가 리턴된다.*/
+	static int RandomDraw(const int minRange, const int maxRange);
 	/*
 	현제 Direct 2D 좌표계를 스크린 좌표계로 바꾼다. */
 	static JGVector2D D2DToScreen(const float ScreenWidth, const float ScreenHeight,JGVector2D& vector);

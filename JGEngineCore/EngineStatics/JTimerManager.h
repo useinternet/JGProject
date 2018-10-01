@@ -1,7 +1,7 @@
 #pragma once
 #include"Engine.h"
 
-// 개발일지
+
 class JTimerHandle;
 typedef std::function<void()>        TimerEvent;
 typedef std::chrono::system_clock    Clock;

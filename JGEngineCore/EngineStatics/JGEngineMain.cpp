@@ -104,6 +104,7 @@ void JGEngineMain::Run()
 		m_EngineTimer->Tick();
 		m_PhysicsSystem->Step(m_EngineTimer->GetDeltaTime());
 		m_SoundSystem->Tick();
+		JTimerEventManager::Tick(m_EngineTimer->GetDeltaTime());
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
 		m_RenderSystem->BeginRendering();

@@ -132,4 +132,8 @@ void JGInputConfigLoader::InitStringToEnum()
 	m_StringToEnums.insert(pair<const string, const EKey>("MouseRButton", EKey::MouseRButton));
 	m_StringToEnums.insert(pair<const string, const EKey>("MouseWheelClick", EKey::MouseWheelClick));
 	m_StringToEnums.insert(pair<const string, const EKey>("MouseWheelAxis", EKey::MouseWheelAxis));
+	m_StringToEnums.insert(pair<const string, const EKey>("Up", EKey::Up));
+	m_StringToEnums.insert(pair<const string, const EKey>("Down", EKey::Down));
+	m_StringToEnums.insert(pair<const string, const EKey>("Right", EKey::Right));
+	m_StringToEnums.insert(pair<const string, const EKey>("Left", EKey::Left));
 }

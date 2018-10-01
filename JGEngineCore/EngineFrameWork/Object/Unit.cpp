@@ -10,9 +10,6 @@ Unit::Unit()
 
 	m_Collision = RegisterComponentInObject<Box2DCollisionComponent>(TT("UnitBoxCollision"));
 	m_Collision->SetBodyType(E2DBodyType::Dynamic);
-	m_FallingCheck = FallingCheck::None;
-	m_CurrentDirection = DirectionCheck::Right;
-
 }
 
 Unit::~Unit()
@@ -30,87 +27,71 @@ void Unit::BeginObject(World* world)
 void Unit::Tick(const float DeltaTime)
 {
 	ExistObject::Tick(DeltaTime);
-
-	int VelY = (int)m_Collision->GetBody()->GetLinearVelocity().Y();
-	int VelX = (int)m_Collision->GetBody()->GetLinearVelocity().X();
-
-
-	if (VelY > 0)
+	if (m_PrevDirection != m_CurrentDirection ||
+		m_PrevFallingCheck != m_FallingCheck)
 	{
-		m_FallingCheck = FallingCheck::Down;
-	}
-	else if (VelY < 0)
-	{
-		m_FallingCheck = FallingCheck::Up;
+		m_PrevFallingCheck = m_FallingCheck;
+		m_PrevDirection = m_CurrentDirection;
+		m_bWorking = true;
 	}
 	else
 	{
-		m_FallingCheck = FallingCheck::None;
+		m_bWorking = false;
+	}
 
-	}
-	if (VelX > 0)
-	{
-		m_CurrentDirection = DirectionCheck::Right;
-		m_bStill = false;
-	}
-	else if (VelX < 0)
-	{
-		m_CurrentDirection = DirectionCheck::Left;
-		m_bStill = false;
-	}
-	else
-	{
-		m_bStill = true;
-	}
+	DefineMove();
+	DefineDirection();
 }
-
+void Unit::DefineDirection() {}
+void Unit::DefineMove() {}
 Box2DCollisionComponent* Unit::GetCollision()
 {
 	return m_Collision;
 }
 
 
-bool Unit::IsRight()
+bool Unit::IsWorking()
 {
-	if (m_CurrentDirection == DirectionCheck::Right)
-	{
-		return true;
-	}
-	return false;
+	return m_bWorking;
 }
-bool Unit::IsLeft()
+
+
+FallingCheck Unit::GetFallingCheck()
 {
-	if (m_CurrentDirection == DirectionCheck::Left)
-	{
-		return true;
-	}
-	return false;
+	return m_FallingCheck;
 }
-bool Unit::IsStill()
+DirectionCheck Unit::GetDirectionCheck()
 {
-	return m_bStill;
+	return m_CurrentDirection;
 }
-bool Unit::IsFalling()
+void Unit::SetFallingCheck(FallingCheck check)
 {
-	if (m_FallingCheck == FallingCheck::None)
-	{
-		return false;
-	}
-	return true;
+	m_FallingCheck = check;
 }
-bool Unit::IsFallingDown()
+void Unit::SetDirectionCheck(DirectionCheck check)
 {
-	if (m_FallingCheck == FallingCheck::Down)
-	{
-		return true;
-	}
-	return false;
+	m_CurrentDirection = check;
 }
-bool Unit::IsFallingUp()
+void Unit::SetVelocity(const JGVector2D& vel)
 {
-	if (m_FallingCheck == FallingCheck::Up)
-	{
-		return true;
-	}
-	return false;
+	m_Velocity.Set(vel);
 }
+
+void Unit::SetVelocityX(const float velX)
+{
+	m_Velocity.SetX(velX);
+}
+
+void Unit::SetVelocityY(const float velY)
+{
+	m_Velocity.SetY(velY);
+}
+
+JGVector2D& Unit::GetVelocity()
+{
+	return m_Velocity;
+}
+
+
+
+
