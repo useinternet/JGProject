@@ -111,7 +111,7 @@ public:
 	@param EHandleType    HandleType        : 핸들 타입( 한번 호출, 반복 호출 등등..)
 	@param const float    Delay             : 최초 시작 딜레이 시간
 	@param const float    GapTime           : 이벤트 반복 호출 사이 딜레이 시간
-	@param const size_t   Count             : 이벤트 반복 횟수
+	@param const size_t   Count             : 이벤트 반복 횟수(-1이면 무한 반복)
 	*/
 	static void CreateTimerEvent(JTimerHandle** handle,const TimerEvent& Event, EHandleType HandleType,
 		const float Delay, const float GapTime, const size_t Count);

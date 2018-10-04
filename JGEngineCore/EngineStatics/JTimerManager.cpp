@@ -149,7 +149,9 @@ void JTimerEventManager::EventUpdate(const float DeltaTime)
 			desc.Delay -= DeltaTime;
 			break;
 		case EHandleType::ERepeat:
-			if (desc.Count > 0 && desc.Delay <= 0 && iter->DummyTime <=0)
+			if ((desc.Count > 0 || desc.Count == -1)
+				&& desc.Delay <= 0 && 
+				iter->DummyTime <=0)
 			{
 				desc.Event();
 				// 이벤트 실행 마다 카운트 감소 / 딜레이 감소
@@ -162,7 +164,7 @@ void JTimerEventManager::EventUpdate(const float DeltaTime)
 				iter->DummyTime -= DeltaTime;
 			}
 			// 반복횟수를 다채웠을 경우 이벤트 종료
-			if (desc.Count <= 0)
+			if (desc.Count == 0)
 			{
 				iter->m_bEnd = true;
 			}

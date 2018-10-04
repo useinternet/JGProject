@@ -16,7 +16,13 @@ enum EAnimState
 	Anim_SitDown,
 	Anim_StandUp,
 	Anim_DefaultAttack_1,
-	Anim_DefaultAttack_2
+	Anim_DefaultAttack_2,
+	Anim_DefaultSkill,
+	Anim_SpecialSkill,
+	Anim_JumpDefaultAttack,
+	Anim_SitDefaultAttack_1,
+	Anim_SitDefaultAttack_2,
+	Anim_SitDownSkill
 };
 class Anim_Player : public Animation2DSystemComponent
 {
@@ -28,8 +34,21 @@ private:
 	class AnimationMesh2DComponent* Jump;
 	class AnimationMesh2DComponent* SitDown;
 	class AnimationMesh2DComponent* StandUp;
+
+	// 스탠딩 상태 공격
 	class AnimationMesh2DComponent* DefaultAttack_1;
 	class AnimationMesh2DComponent* DefaultAttack_2;
+	class AnimationMesh2DComponent* DefaultSkill;
+	class AnimationMesh2DComponent* SpecialSkill;
+
+	// 점프 상태 공격
+	class AnimationMesh2DComponent* JumpDefaultAttack;
+
+	// 앉기 상태 공격
+	class AnimationMesh2DComponent* SitDefaultAttack_1;
+	class AnimationMesh2DComponent* SitDefaultAttack_2;
+	class AnimationMesh2DComponent* SitDownSkill;
+
 	PlayerState PrevPlayerState = 0xFFFFFFF;
 public:
 	Anim_Player();
@@ -38,6 +57,11 @@ public:
 	virtual void BeginComponent(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
 	void ConfigDefault(Player* p, EAnimState state);
+	void ConfigSitDown(Player* p);
 	void ConfigJump(Player* p);
 	void ConfigAttack(Player* p);
+	void ConfigSitAttack(Player* p);
+	void AttackChangeIdleFromEnd();
+	void SitAttackChangeSitDownFromEnd();
+	void JumpAttackChangeJumpDownFromEnd();
 };

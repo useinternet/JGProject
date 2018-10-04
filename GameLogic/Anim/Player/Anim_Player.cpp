@@ -86,7 +86,7 @@ Anim_Player::Anim_Player()
 		{
 			DefaultAttack_1->SetConstructObject(Anim_DefaultAttack_1_Mesh.Object);
 		}
-		DefaultAttack_1->AnimationSetDelay(0.05f);
+		DefaultAttack_1->AnimationSetDelay(0.075f);
 	}
 	DefaultAttack_2 = AddAnimation(EAnimState::Anim_DefaultAttack_2, TT("Anim_Player_DefaultAttack_2"));
 	if (DefaultAttack_2)
@@ -99,10 +99,86 @@ Anim_Player::Anim_Player()
 		{
 			DefaultAttack_2->SetConstructObject(Anim_DefaultAttack_2_Mesh.Object);
 		}
-		DefaultAttack_2->AnimationSetDelay(0.05f);
+		DefaultAttack_2->AnimationSetDelay(0.075f);
 	}
-
-
+	DefaultSkill = AddAnimation(EAnimState::Anim_DefaultSkill, TT("Anim_Player_DefaultSkill"));
+	if (DefaultSkill)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_DefaultSkill_Mesh(
+			DefaultSkill->GetComponentName(), EPivot::MiddleMiddle, 6, 3, 2,
+			TT("../Contents/Player/DefaultSkill/AnimSheet_Player_DefaultSkill.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_DefaultSkill_Mesh.Success)
+		{
+			DefaultSkill->SetConstructObject(Anim_DefaultSkill_Mesh.Object);
+		}
+		DefaultSkill->AnimationSetDelay(0.1f);
+	}
+	SpecialSkill = AddAnimation(EAnimState::Anim_SpecialSkill, TT("Anim_Player_SpecialSkill"));
+	if (SpecialSkill)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_SpecialSkill_Mesh(
+			SpecialSkill->GetComponentName(), EPivot::MiddleMiddle, 11, 4, 3,
+			TT("../Contents/Player/SpecialSkill/AnimSheet_Player_SpecialSkill.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_SpecialSkill_Mesh.Success)
+		{
+			SpecialSkill->SetConstructObject(Anim_SpecialSkill_Mesh.Object);
+		}
+		SpecialSkill->AnimationSetDelay(0.1f);
+	}
+	JumpDefaultAttack = AddAnimation(EAnimState::Anim_JumpDefaultAttack,TT("Anim_Player_JumpDefaultAttack_1"));
+	if (JumpDefaultAttack)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_JumpDefaultAttack_Mesh(
+			JumpDefaultAttack->GetComponentName(), EPivot::MiddleMiddle, 4, 4, 1,
+			TT("../Contents/Player/JumpDefaultAttack/AnimSheet_Player_JumpDefaultAttack_1.png"),
+			EReverse::Default,EJGUsageType::Dynamic);
+		if (Anim_JumpDefaultAttack_Mesh.Success)
+		{
+			JumpDefaultAttack->SetConstructObject(Anim_JumpDefaultAttack_Mesh.Object);
+		}
+		JumpDefaultAttack->AnimationSetDelay(0.1f);
+	}
+	SitDefaultAttack_1 = AddAnimation(EAnimState::Anim_SitDefaultAttack_1, TT("Anim_Player_SitDefaultAttack_1"));
+	if (SitDefaultAttack_1)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_SitDefaultAttack_1_Mesh(
+			SitDefaultAttack_1->GetComponentName(), EPivot::MiddleMiddle, 5, 3, 2,
+			TT("../Contents/Player/SitDefaultAttack/AnimSheet_Player_SitDefaultAttack_1.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_SitDefaultAttack_1_Mesh.Success)
+		{
+			SitDefaultAttack_1->SetConstructObject(Anim_SitDefaultAttack_1_Mesh.Object);
+		}
+		SitDefaultAttack_1->AnimationSetDelay(0.1f);
+	}
+	SitDefaultAttack_2 = AddAnimation(EAnimState::Anim_SitDefaultAttack_2, TT("Anim_Player_SitDefaultAttack_2"));
+	if (SitDefaultAttack_2)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_SitDefaultAttack_2_Mesh(
+			SitDefaultAttack_2->GetComponentName(), EPivot::MiddleMiddle, 4, 4, 1,
+			TT("../Contents/Player/SitDefaultAttack/AnimSheet_Player_SitDefaultAttack_2.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_SitDefaultAttack_2_Mesh.Success)
+		{
+			SitDefaultAttack_2->SetConstructObject(Anim_SitDefaultAttack_2_Mesh.Object);
+		}
+		SitDefaultAttack_2->AnimationSetDelay(0.1f);
+	}
+	SitDownSkill = AddAnimation(EAnimState::Anim_SitDownSkill, TT("Anim_Player_SitDownSkill"));
+	if (SitDownSkill)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_SitDownSkill_Mesh(
+			SitDownSkill->GetComponentName(), EPivot::MiddleMiddle, 7, 4, 2,
+			TT("../Contents/Player/SitSkill/AnimSheet_Player_SitSkill.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_SitDownSkill_Mesh.Success)
+		{
+			SitDownSkill->SetConstructObject(Anim_SitDownSkill_Mesh.Object);
+		}
+		SitDownSkill->AnimationSetDelay(0.1f);
+	}
 	SetCurrentState(Anim_Idle);
 }
 
@@ -137,6 +213,46 @@ void Anim_Player::BeginComponent(World* world)
 		}
 		this->GetAnimation(Anim_StandUp)->Stop();
 	});
+	AddNotifyEvent(TT("DefaultAttack_1_To_Idle"), Anim_DefaultAttack_1, 6, [this]()
+	{
+		AttackChangeIdleFromEnd();
+		this->GetAnimation(Anim_DefaultAttack_1)->Stop();
+	});
+	AddNotifyEvent(TT("DefaultAttack_2_To_Idle"), Anim_DefaultAttack_2, 5, [this]()
+	{
+		AttackChangeIdleFromEnd();
+		this->GetAnimation(Anim_DefaultAttack_2)->Stop();
+	});
+	AddNotifyEvent(TT("DefaultSkill_To_Idle"), Anim_DefaultSkill, 6, [this]()
+	{
+		AttackChangeIdleFromEnd();
+		this->GetAnimation(Anim_DefaultSkill)->Stop();
+	});
+	AddNotifyEvent(TT("SpecialSkill_To_Idle"), Anim_SpecialSkill, 11, [this]()
+	{
+		AttackChangeIdleFromEnd();
+		this->GetAnimation(Anim_SpecialSkill)->Stop();
+	});
+	AddNotifyEvent(TT("SitDefaultAttack_1_To_SitDown"), Anim_SitDefaultAttack_1, 5, [this]()
+	{
+		SitAttackChangeSitDownFromEnd();
+		this->GetAnimation(Anim_SitDefaultAttack_1)->Stop();
+	});
+	AddNotifyEvent(TT("SitDefaultAttack_2_To_SitDown"), Anim_SitDefaultAttack_2, 4, [this]()
+	{
+		SitAttackChangeSitDownFromEnd();
+		this->GetAnimation(Anim_SitDefaultAttack_2)->Stop();
+	});
+	AddNotifyEvent(TT("SitDownSkill_To_SitDown"),Anim_SitDownSkill,7,[this]()
+	{
+		SitAttackChangeSitDownFromEnd();
+		this->GetAnimation(Anim_SitDownSkill)->Stop();
+	});
+	AddNotifyEvent(TT("JumpAttack_To_JumpDown"), Anim_JumpDefaultAttack, 4, [this]()
+	{
+		JumpAttackChangeJumpDownFromEnd();
+		this->GetAnimation(Anim_JumpDefaultAttack)->Stop();
+	});
 }
 
 void Anim_Player::Tick(const float DeltaTime)
@@ -158,14 +274,32 @@ void Anim_Player::Tick(const float DeltaTime)
 				ConfigDefault(p,Anim_Move);
 				break;
 			case EPlayerState::Player_SitDown:
-				ConfigDefault(p, Anim_SitDown);
+				ConfigSitDown(p);
 				break;
 			case EPlayerState::Player_StandUp:
 				ConfigDefault(p, Anim_StandUp);
 				break;
+			case EPlayerState::Player_DefaultAttack:
+				ConfigAttack(p);
+				break;
+			case EPlayerState::Player_SitAttack:
+				ConfigSitAttack(p);
+				break;
+			case EPlayerState::Player_SitSkill:
+				ConfigDefault(p, Anim_SitDownSkill);
+				break;
+			case EPlayerState::Player_DefaultSkill:
+				ConfigDefault(p, Anim_DefaultSkill);
+				break;
+			case EPlayerState::Player_SpecialSkill:
+				ConfigDefault(p, Anim_SpecialSkill);
+				break;
 			case EPlayerState::Player_JumpUp:
 			case EPlayerState::Player_JumpDown:
 				ConfigJump(p);
+				break;
+			case EPlayerState::Player_JumpAttack:
+				ConfigDefault(p, Anim_JumpDefaultAttack);
 				break;
 			}
 		}
@@ -187,7 +321,17 @@ void Anim_Player::ConfigDefault(Player * p, EAnimState state)
 	}
 	SetCurrentState(state);
 }
-void Anim_Player::ConfigJump(Player * p)
+void Anim_Player::ConfigSitDown(Player* p)
+{
+	ConfigDefault(p, Anim_SitDown);
+	if (p->IsCompulsoryDirection())
+	{
+		GetAnimation(Anim_SitDown)->SetCurrentFrame(4);
+		GetAnimation(Anim_SitDown)->Stop();
+		p->NotifySolveCompulsoryDirection();
+	}
+}
+void Anim_Player::ConfigJump(Player* p)
 {
 	if (p->GetCurrentPlayerState() == Player_JumpDown)
 	{
@@ -223,5 +367,55 @@ void Anim_Player::ConfigJump(Player * p)
 
 void Anim_Player::ConfigAttack(Player* p)
 {
+	int num = JGMath::RandomDraw(0, 1);
+	if (num == 0)
+	{
+		ConfigDefault(p, Anim_DefaultAttack_1);
+	}
+	else
+	{
+		ConfigDefault(p, Anim_DefaultAttack_2);
+	}
+}
 
+void Anim_Player::ConfigSitAttack(Player * p)
+{
+	int num = JGMath::RandomDraw(0, 1);
+	if (num == 0)
+	{
+		ConfigDefault(p, Anim_SitDefaultAttack_1);
+	}
+	else
+	{
+		ConfigDefault(p, Anim_SitDefaultAttack_2);
+	}
+}
+void Anim_Player::AttackChangeIdleFromEnd()
+{
+	Player* p = dynamic_cast<Player*>(this->GetOwnerObject());
+	if (p)
+	{
+		p->NotifyAttackComplete();
+		p->SetCurrentPlayerState(Player_Idle);
+	}
+}
+
+void Anim_Player::SitAttackChangeSitDownFromEnd()
+{
+	Player* p = dynamic_cast<Player*>(this->GetOwnerObject());
+	if (p)
+	{
+		p->NotifyAttackComplete();
+		p->SetCurrentPlayerState(Player_SitDown);
+	}
+}
+
+void Anim_Player::JumpAttackChangeJumpDownFromEnd()
+{
+	Player* p = dynamic_cast<Player*>(this->GetOwnerObject());
+	if (p)
+	{
+		p->NotifyAttackComplete();
+		p->SetCurrentPlayerState(Player_JumpDown);
+	}
 }

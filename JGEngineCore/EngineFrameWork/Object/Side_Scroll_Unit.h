@@ -17,6 +17,7 @@ private:
 		Left
 	};
 	bool m_bStill = false;
+	bool m_bCompulsoryDirection = false;
 public:
 	Side_Scroll_Unit();
 	virtual ~Side_Scroll_Unit();
@@ -30,6 +31,10 @@ public:
 	bool IsFalling();
 	bool IsFallingDown();
 	bool IsFallingUp();
+	void NotifyCompulsoryRight();
+	void NotifyCompulsoryLeft();
+	bool IsCompulsoryDirection();
+	void NotifySolveCompulsoryDirection();
 	void PushUp(const float ContantForce);
 
 

@@ -17,7 +17,10 @@ void Animation2DSystemComponent::BeginComponent(World* world)
 	{
 		iter.second->SetOwnerObject(GetOwnerObject());
 	}
-	
+	for (auto& iter : m_mAnimation)
+	{
+		iter.second->Render();
+	}
 }
 
 void Animation2DSystemComponent::Tick(const float DeltaTime)

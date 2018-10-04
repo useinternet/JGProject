@@ -14,5 +14,5 @@ void SampleWorldSpawner::BeginObject(World * world)
 {
 	Object::BeginObject(world);
 	world->SpawnObject<TestGround>();
-	world->SpawnObject<Player>();
+	//world->SpawnObject<Player>();
 }

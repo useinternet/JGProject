@@ -101,6 +101,28 @@ bool Side_Scroll_Unit::IsFallingUp()
 	return false;
 }
 
+void Side_Scroll_Unit::NotifyCompulsoryRight()
+{
+	SetDirectionCheck(EDirectionCheck::Right);
+	m_bCompulsoryDirection = true;
+}
+
+void Side_Scroll_Unit::NotifyCompulsoryLeft()
+{
+	SetDirectionCheck(EDirectionCheck::Left);
+	m_bCompulsoryDirection = true;
+}
+
+bool Side_Scroll_Unit::IsCompulsoryDirection()
+{
+	return m_bCompulsoryDirection;
+}
+
+void Side_Scroll_Unit::NotifySolveCompulsoryDirection()
+{
+	m_bCompulsoryDirection = false;
+}
+
 void Side_Scroll_Unit::PushUp(const float ContantForce)
 {
 	JGVector2D vel(0.0f, 0.0f);
