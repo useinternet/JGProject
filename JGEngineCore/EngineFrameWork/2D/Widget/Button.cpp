@@ -5,6 +5,7 @@
 #include"../../../InputSystem/JGCommandManager.h"
 #include"../../Components/InputComponent.h"
 #include"../../../InputSystem/JGPressManager.h"
+#include"../../../EngineStatics/JGLog.h"
 using namespace std;
 Button::Button()
 {
@@ -20,16 +21,27 @@ Button::~Button()
 void Button::Tick(const float DeltaTime)
 {
 	Widget::Tick(DeltaTime);
-	
+	m_IsButtonClick = false;
+
+	if (IsChangeScale())
+	{
+		m_OrdinaryImage->SetComponentScale(GetComponentScale());
+		m_ButtonClickImage->SetComponentScale(GetComponentScale());
+		m_MousePointerInButtonImage->SetComponentScale(GetComponentScale());
+	}
 	if (IsChangeLocation())
 	{
+		JGVector2D center = m_OrdinaryImage->GetCenterPoint();
+		float height = m_OrdinaryImage->GetTextureHeight() * GetComponentScale().Y();
+		float width = m_OrdinaryImage->GetTextureWdith()   * GetComponentScale().X();
 		/// 버튼 충돌 사각형 초기화
-		m_ButtonRect->Top = GetComponentWorldLocation().Y();
-		m_ButtonRect->Left = GetComponentWorldLocation().X();
-		m_ButtonRect->Right = m_ButtonRect->Left + m_OrdinaryImage->GetTextureWdith();
-		m_ButtonRect->Bottom = m_ButtonRect->Top + m_OrdinaryImage->GetTextureHeight();
+		m_ButtonRect->Top = center.Y() - (height / 2);
+		m_ButtonRect->Left = center.X() - (width / 2);
+		m_ButtonRect->Right = center.X() + (width / 2);
+		m_ButtonRect->Bottom = center.Y() + (height / 2);
 
 	}
+
 	/// 버튼 충돌 체크( 충돌이면 마우스 PutMouse 모드로.. 아니면 Ordinary모드로..
 	bool result = CollisionCheck();
 	if (result && m_ButtonImageType != EButtonImageType::ButtonClick)
@@ -62,6 +74,16 @@ void Button::Tick(const float DeltaTime)
 		m_OrdinaryImage->BehindComponent();
 		m_ButtonClickImage->BehindComponent();
 		break;
+	}
+	if (m_ButtonImageType != m_PrevButtonImageType)
+	{
+		if (m_ButtonImageType == EButtonImageType::MousePointerInButton &&
+			m_PrevButtonImageType == EButtonImageType::ButtonClick)
+		{
+			m_IsButtonClick = true;
+		}
+		m_PrevButtonImageType = m_ButtonImageType;
+
 	}
 }
 
@@ -214,7 +236,7 @@ bool Button::IsMousePointerInButton()
 	}
 	return false;
 }
-bool Button::IsMouseClickInButton()
+bool Button::IsMousePressedInButton()
 {
 	if (m_ButtonImageType == EButtonImageType::ButtonClick)
 	{
@@ -229,4 +251,9 @@ bool Button::IsNoneInButton()
 		return true;
 	}
 	return false;
+}
+
+bool Button::IsButtonClick()
+{
+	return m_IsButtonClick;
 }

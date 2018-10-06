@@ -21,6 +21,7 @@ class ENGINE_EXPORT Object : public ObjectBase
 {
 private:
 	std::vector<std::shared_ptr<Component>> m_vComponents;
+	std::vector<Component*> m_vSystemComponents;
 	Component* m_RootComponent = nullptr;
 	//
 	bool m_bIsFirst = true;
@@ -96,6 +97,8 @@ inline ComponentType* Object::RegisterComponentInObject(const std::wstring& Comp
 	std::unique_ptr<Component> component = std::make_unique<ComponentType>();
 	component->SetOwnerObject(this);
 	component->RegisterName(ComponentName);
+	m_RootComponent->AddChild(component.get());
+
 	// 계층 구조 컴포넌트인지 체크한다.
 	MotivatedComponent* Check = dynamic_cast<MotivatedComponent*>(component.get());
 	// 계층 구조 컴포넌트라면.
@@ -111,6 +114,7 @@ inline ComponentType* Object::RegisterComponentInObject(const std::wstring& Comp
 	{
 		// 아니라면 그냥 추가한다.
 		ComponentType* result = dynamic_cast<ComponentType*>(component.get());
+		m_vSystemComponents.push_back(component.get());
 		m_vComponents.push_back(move(component));
 		return result;
 	}

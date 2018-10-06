@@ -4,7 +4,6 @@
 
 class TextComponent;
 
-
 // º¸·ù
 class ENGINE_EXPORT Text : public Widget
 {

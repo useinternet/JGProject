@@ -301,7 +301,11 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="GameStage\GameStage.cpp" />
-    <ClCompile Include="GameStage\SampleWorldSpawner.cpp" />
+    <ClCompile Include="Widget\LoadingWidget\LoadingWidget.cpp" />
+    <ClCompile Include="Widget\StartMainWidget\StartMainWidget.cpp" />
+    <ClCompile Include="WorldSpawner\DemoWorld\DemoWorldSpawner.cpp" />
+    <ClCompile Include="WorldSpawner\LoadingWorld\LoadingSpawner.cpp" />
+    <ClCompile Include="WorldSpawner\StartMainMenu\StartMainMenuSpawner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Anim\Player\Anim_Player.h" />
@@ -313,8 +317,12 @@
     <ClInclude Include="Character\Skill\SpecialSkillComponent.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="GameStage\GameStage.h" />
-    <ClInclude Include="GameStage\SampleWorldSpawner.h" />
     <ClInclude Include="StaticFilter\StaticCollisionFilter.h" />
+    <ClInclude Include="Widget\LoadingWidget\LoadingWidget.h" />
+    <ClInclude Include="Widget\StartMainWidget\StartMainWidget.h" />
+    <ClInclude Include="WorldSpawner\DemoWorld\DemoWorldSpawner.h" />
+    <ClInclude Include="WorldSpawner\LoadingWorld\LoadingSpawner.h" />
+    <ClInclude Include="WorldSpawner\StartMainMenu\StartMainMenuSpawner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

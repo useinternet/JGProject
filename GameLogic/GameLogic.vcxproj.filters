@@ -11,9 +11,6 @@
     <Filter Include="Game">
       <UniqueIdentifier>{8f5556af-cd51-4a94-866c-ca442b840885}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\SampleWorld">
-      <UniqueIdentifier>{b2aef688-309a-4e9c-83fc-cfc428590c08}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Anim">
       <UniqueIdentifier>{9d29732f-f1b1-4833-af26-81c69d0b953c}</UniqueIdentifier>
     </Filter>
@@ -29,6 +26,27 @@
     <Filter Include="Game\Character\Skill">
       <UniqueIdentifier>{1475c01f-2f36-4d4f-9fd3-3a0eedd5fe15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Widget">
+      <UniqueIdentifier>{bc5e4498-3be8-4cb1-8b82-77b3376eff77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Widget\StartMainWidget">
+      <UniqueIdentifier>{216ae750-2c82-4cea-9c0b-090efac1d2b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldSpawner">
+      <UniqueIdentifier>{beeb6870-6a30-4fc0-8418-354ed438aff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldSpawner\StartMainMenu">
+      <UniqueIdentifier>{56b3b6ea-5189-42f6-a779-496f1497df30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldSpawner\LoadingWorld">
+      <UniqueIdentifier>{6cea59ef-0371-4ee8-a94c-bcbbefd9c635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Widget\LoadingWidget">
+      <UniqueIdentifier>{69e8a326-ac53-4560-b5b4-525b2dc9309c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldSpawner\DemoWorld">
+      <UniqueIdentifier>{97ade016-da32-4d14-8950-39f5a130147e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -39,9 +57,6 @@
     </ClCompile>
     <ClCompile Include="GameStage\GameStage.cpp">
       <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="GameStage\SampleWorldSpawner.cpp">
-      <Filter>Game\SampleWorld</Filter>
     </ClCompile>
     <ClCompile Include="Anim\Player\Anim_Player.cpp">
       <Filter>Game\Anim\Player</Filter>
@@ -64,6 +79,21 @@
     <ClCompile Include="Character\Skill\SitSkillComponent.cpp">
       <Filter>Game\Character\Skill</Filter>
     </ClCompile>
+    <ClCompile Include="Widget\StartMainWidget\StartMainWidget.cpp">
+      <Filter>Game\Widget\StartMainWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldSpawner\StartMainMenu\StartMainMenuSpawner.cpp">
+      <Filter>Game\WorldSpawner\StartMainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldSpawner\LoadingWorld\LoadingSpawner.cpp">
+      <Filter>Game\WorldSpawner\LoadingWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\LoadingWidget\LoadingWidget.cpp">
+      <Filter>Game\Widget\LoadingWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldSpawner\DemoWorld\DemoWorldSpawner.cpp">
+      <Filter>Game\WorldSpawner\DemoWorld</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -71,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="GameStage\GameStage.h">
       <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="GameStage\SampleWorldSpawner.h">
-      <Filter>Game\SampleWorld</Filter>
     </ClInclude>
     <ClInclude Include="Anim\Player\Anim_Player.h">
       <Filter>Game\Anim\Player</Filter>
@@ -98,6 +125,21 @@
     </ClInclude>
     <ClInclude Include="Character\Skill\SitSkillComponent.h">
       <Filter>Game\Character\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget\StartMainWidget\StartMainWidget.h">
+      <Filter>Game\Widget\StartMainWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldSpawner\StartMainMenu\StartMainMenuSpawner.h">
+      <Filter>Game\WorldSpawner\StartMainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldSpawner\LoadingWorld\LoadingSpawner.h">
+      <Filter>Game\WorldSpawner\LoadingWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget\LoadingWidget\LoadingWidget.h">
+      <Filter>Game\Widget\LoadingWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldSpawner\DemoWorld\DemoWorldSpawner.h">
+      <Filter>Game\WorldSpawner\DemoWorld</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -16,6 +16,10 @@ Object::~Object()
 void Object::BeginObject(World* world)
 {
 	m_pWorld = world;
+	for (auto& iter : m_vSystemComponents)
+	{
+		iter->BeginComponent(world);
+	}
 	if (m_RootComponent)
 	{
 		m_RootComponent->BeginComponent(world);
@@ -30,6 +34,10 @@ void Object::Send(JGComponentMessage & Message)
 void Object::Tick(const float DeltaTime)
 {
 	m_DeltaTime = DeltaTime;
+	for (auto& iter : m_vSystemComponents)
+	{
+		iter->Tick(DeltaTime);
+	}
 	if (m_RootComponent)
 	{
 		m_RootComponent->Tick(DeltaTime);
@@ -38,6 +46,10 @@ void Object::Tick(const float DeltaTime)
 
 void Object::Render()
 {
+	for (auto& iter : m_vSystemComponents)
+	{
+		iter->Render();
+	}
 	if (m_RootComponent)
 	{
 		m_RootComponent->Render();
@@ -46,6 +58,10 @@ void Object::Render()
 
 void Object::EndObject()
 {
+	for (auto& iter : m_vSystemComponents)
+	{
+		iter->DestoryComponent();
+	}
 	if (m_RootComponent)
 	{
 		m_RootComponent->DestoryComponent();

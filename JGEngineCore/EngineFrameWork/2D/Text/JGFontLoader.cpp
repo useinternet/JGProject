@@ -301,6 +301,10 @@ void JGFontLoader::LoadKerningInformation(std::ifstream& fin,Font* font)
 
 	/// KerningCount;
 	fin >> font->KerningCount;
+	if (font->KerningCount == 0)
+	{
+		return;
+	}
 	EqualLoop(fin);
 
 	for (size_t i = 0; i < font->KerningCount; ++i)

@@ -44,4 +44,7 @@ public:
 	@param : const EKeyState KeyState : 바인딩할 트리거용 키상태
 	@param : const function<void()>& Event : void() 형 함수 (클래스멤버변수일경우에는 std::bind 함수를 이용하자 ) */
 	void BindKeyCommand(const EKeyState KeyState, const std::function<void()>& Event);
+
+
+	void KillCommand();
 };

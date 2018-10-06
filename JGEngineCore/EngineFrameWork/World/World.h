@@ -5,6 +5,7 @@ class Object;
 class RenderSystem;
 class JGMatrix;
 class JGPhysicsWorld;
+class WorldManager;
 /*
 Class : World 
 @m m_WorldName : 월드 이름 
@@ -12,13 +13,15 @@ Class : World
 class ENGINE_EXPORT World
 {
 private:
+	WorldManager* m_WorldManager;
+private:
 	std::wstring m_WorldName = TT("None");
 	std::list<std::shared_ptr<Object>> m_sObjects;
 	JGPhysicsWorld* m_pyWorld = nullptr;
 	std::unique_ptr<JGMatrix> m_ViewMatrix;
 public:
 	World() = delete;
-	World(const std::wstring& Name, JGPhysicsWorld* pyWorld);
+	World(const std::wstring& Name, JGPhysicsWorld* pyWorld,WorldManager* manager);
 	~World();
 
 	/*
@@ -34,6 +37,8 @@ public:
 	void TempViewMatrixInit();
 	JGMatrix& GetViewMatrix();
 	JGPhysicsWorld* GetPyWorld();
+	void Clear();
+	WorldManager* GetManager();
 };
 
 template<typename ObjectType>

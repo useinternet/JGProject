@@ -20,4 +20,6 @@ public:
 	/*
 	Exp : JGAxisCommand에 void(const float) 형태의 함수로 바인딩한다. */
 	void BindAxisCommand(const std::function<void(const float)>& Event);
+
+	void KillCommand();
 };

@@ -1,13 +1,12 @@
 #include"World.h"
 #include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
+#include"WorldManager.h"
 #include"../../EngineStatics/JMath/JGMatrix.h"
 #include"../Object/Object.h"
-#include"../../Test/TestObject.h"
-#include"../../Test/TestWidget.h"
-#include"../../Test/TestGround.h"
 using namespace std;
-World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld)
+World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld, WorldManager* manager)
 {
+	m_WorldManager = manager;
 	m_pyWorld = pyWorld;
 	m_ViewMatrix = make_unique<JGMatrix>();
 	TempViewMatrixInit();
@@ -57,4 +56,12 @@ JGMatrix& World::GetViewMatrix()
 JGPhysicsWorld* World::GetPyWorld()
 {
 	return m_pyWorld;
+}
+void World::Clear()
+{
+	m_sObjects.clear();
+}
+WorldManager* World::GetManager()
+{
+	return m_WorldManager;
 }

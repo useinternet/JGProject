@@ -48,6 +48,24 @@ void JGCommandManager::BindAxisCommand(const wstring& CommandName,const function
 	}
 }
 
+void JGCommandManager::KillKeyCommand(const std::wstring & CommandName)
+{
+	JGKeyCommand* Command = dynamic_cast<JGKeyCommand*>(m_mCommands[CommandName].get());
+	if (Command)
+	{
+		Command->KillCommand();
+	}
+}
+
+void JGCommandManager::KillAxisCommand(const std::wstring & CommandName)
+{
+	JGAxisCommand* Command = dynamic_cast<JGAxisCommand*>(m_mCommands[CommandName].get());
+	if (Command)
+	{
+		Command->KillCommand();
+	}
+}
+
 JGVector2D& JGCommandManager::GetMouseLocation()
 {
 	return m_pPressManager->GetMouseLocation();

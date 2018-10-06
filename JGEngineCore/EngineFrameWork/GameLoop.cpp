@@ -27,6 +27,7 @@ void GameLoop::Tick(const float DeltaTime)
 {
 	if (m_WorldManager)
 	{
+		m_WorldManager->Tick(DeltaTime);
 		if (m_WorldManager->GetIsChangeWorld())
 		{
 			m_pRenderSystem->ReceiveObjectArray(
@@ -37,7 +38,6 @@ void GameLoop::Tick(const float DeltaTime)
 			m_pPhysicsSystem->DebugDrawSetViewMatrix(
 				m_WorldManager->GetCurrentWorld()->GetViewMatrix());
 		}
-		m_WorldManager->Tick(DeltaTime);
 	}
 }
 

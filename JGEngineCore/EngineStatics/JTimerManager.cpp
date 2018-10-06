@@ -21,6 +21,7 @@ void JMainTimer::Destroy()
 {
 	if (Instance)
 	{
+		JTimerEventManager::Destroy();
 		delete Instance;
 		Instance = nullptr;
 	}
@@ -174,6 +175,18 @@ void JTimerEventManager::EventUpdate(const float DeltaTime)
 			break;
 		}
 
+	}
+}
+
+void JTimerEventManager::Destroy()
+{
+	for (auto& iter : m_flTimerHandles)
+	{
+		if (iter)
+		{
+			delete iter;
+			iter = nullptr;
+		}
 	}
 }
 

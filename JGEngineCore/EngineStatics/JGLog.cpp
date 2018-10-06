@@ -1,10 +1,10 @@
 #include"JGLog.h"
 #include"JThreadManager.h"
-
 using namespace std;
 #ifdef _DEBUG
 std::queue<JGLog::SLogMessage> JGLog::m_MessageQue_1;
 std::queue<JGLog::SLogMessage> JGLog::m_MessageQue_2;
+wofstream JGLog::m_LogFile;
 bool JGLog::m_bWorking_1 = false;
 bool JGLog::m_bWorking_2 = true;
 JGLog::CurrentWorkingQue JGLog::m_CurrentWorkingQue = JGLog::CurrentWorkingQue::MessageQue_2;
@@ -36,6 +36,8 @@ void JGLog::InitLog()
 			Tick();
 		}
 	});
+	m_LogFile.open(TT("../JGLogEngine/JGLogOuput.txt"));
+	m_LogFile.close();
 #endif
 }
 void JGLog::Write(ELogLevel level, const wchar_t* LogMessage, ...)
@@ -100,7 +102,7 @@ void JGLog::Tick()
 			while (!m_MessageQue_1.empty())
 			{
 				// 로그 출력(일단 밑 출력창으로 출력
-				OutputDebugString(m_MessageQue_1.front().Message.c_str());
+				OutputMessage(m_MessageQue_1.front());
 				m_MessageQue_1.pop();
 			}
 			m_bWorking_2 = false;
@@ -116,7 +118,7 @@ void JGLog::Tick()
 			while (!m_MessageQue_2.empty())
 			{
 				// 로그 출력(일단 밑 출력창으로 출력
-				OutputDebugString(m_MessageQue_2.front().Message.c_str());
+				OutputMessage(m_MessageQue_2.front());
 				m_MessageQue_2.pop();
 			}
 			m_bWorking_1 = false;
@@ -124,4 +126,12 @@ void JGLog::Tick()
 	}
 #endif
 }
+void JGLog::OutputMessage(SLogMessage& log)
+{
+	m_LogFile.open(TT("../JGLogEngine/JGLogOuput.txt"), ios::app);
+	m_LogFile << log.Color.r << log.Color.g << log.Color.b << log.Color.a << endl;
+	m_LogFile << log.Message;
+	m_LogFile.close();
+}
+
 

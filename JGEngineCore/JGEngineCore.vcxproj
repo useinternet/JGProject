@@ -372,6 +372,7 @@
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
     <ClCompile Include="EngineFrameWork\Components\ComponentBase.cpp" />
     <ClCompile Include="EngineFrameWork\Components\InputComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\LoadingComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\SoundComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\SoundQueComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\StaticMesh2DComponent.cpp" />
@@ -383,6 +384,7 @@
     <ClCompile Include="EngineFrameWork\Object\NonExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Object.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ObjectBase.cpp" />
+    <ClCompile Include="EngineFrameWork\Object\ObjectSpawner.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Side_Scroll_Unit.cpp" />
     <ClCompile Include="EngineFrameWork\Object\Unit.cpp" />
     <ClCompile Include="EngineFrameWork\Object\UserWidget.cpp" />
@@ -514,6 +516,7 @@
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
     <ClInclude Include="EngineFrameWork\Components\ComponentBase.h" />
     <ClInclude Include="EngineFrameWork\Components\InputComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\LoadingComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\SoundComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\SoundQueComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\StaticMesh2DComponent.h" />
@@ -525,6 +528,7 @@
     <ClInclude Include="EngineFrameWork\Object\NonExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\Object.h" />
     <ClInclude Include="EngineFrameWork\Object\ObjectBase.h" />
+    <ClInclude Include="EngineFrameWork\Object\ObjectSpawner.h" />
     <ClInclude Include="EngineFrameWork\Object\Side_Scroll_Unit.h" />
     <ClInclude Include="EngineFrameWork\Object\Unit.h" />
     <ClInclude Include="EngineFrameWork\Object\UserWidget.h" />

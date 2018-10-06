@@ -23,7 +23,6 @@ private:
 	EKey  m_Key;
 	bool m_bIsPressed = false;
 
-
 	JGPressManager* m_pPressManager = nullptr;
 public:
 	JGCommand(const JGCommand& copy) = delete;

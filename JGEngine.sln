@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{9F618C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JGEngineEditor", "JGEngineEditor\JGEngineEditor.csproj", "{D15A966A-7331-4A70-B290-DAA667596D86}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGLogEngine", "JGLogEngine\JGLogEngine.vcxproj", "{27EDDC69-4E09-43FB-822C-AB3383C71F9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		DevelopEngine|Any CPU = DevelopEngine|Any CPU
@@ -163,6 +165,36 @@ Global
 		{D15A966A-7331-4A70-B290-DAA667596D86}.DistributeGameDebug|Any CPU.Build.0 = Debug|Any CPU
 		{D15A966A-7331-4A70-B290-DAA667596D86}.DistributeGameDebug|x64.ActiveCfg = Debug|Any CPU
 		{D15A966A-7331-4A70-B290-DAA667596D86}.DistributeGameDebug|x86.ActiveCfg = Debug|Any CPU
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|Any CPU.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|Any CPU.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|x64.ActiveCfg = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|x64.Build.0 = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|x86.ActiveCfg = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopEngine|x86.Build.0 = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|Any CPU.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|Any CPU.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|x64.ActiveCfg = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|x64.Build.0 = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|x86.ActiveCfg = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DevelopGame|x86.Build.0 = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|Any CPU.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|Any CPU.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|x64.ActiveCfg = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|x64.Build.0 = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|x86.ActiveCfg = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.Developing(SendEG2ED)|x86.Build.0 = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|Any CPU.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|Any CPU.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|x64.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|x64.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|x86.ActiveCfg = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGame|x86.Build.0 = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|Any CPU.ActiveCfg = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|Any CPU.Build.0 = Release|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|x64.ActiveCfg = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|x64.Build.0 = Debug|x64
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|x86.ActiveCfg = Debug|Win32
+		{27EDDC69-4E09-43FB-822C-AB3383C71F9D}.DistributeGameDebug|x86.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

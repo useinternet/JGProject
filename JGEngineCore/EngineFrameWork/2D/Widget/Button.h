@@ -44,13 +44,14 @@ private:
 	std::unique_ptr<InputComponent>        m_InputComponent;
 	std::unique_ptr<SButtonRect>           m_ButtonRect;
 	EButtonImageType m_ButtonImageType;
+	EButtonImageType m_PrevButtonImageType;
+	bool m_IsButtonClick = false;
 	/// 클래스 1회용 변수...
 	bool m_bPosInit = false;
 public:
 	Button();
 	virtual ~Button();
 	virtual void Tick(const float DeltaTime) override;
-
 	/*
 	Exp : 버튼 생성
 	@param const EPivot pivot
@@ -74,8 +75,12 @@ public:
 	bool IsMousePointerInButton();
 	/*
 	Exp : 버튼클릭 여부 */
-	bool IsMouseClickInButton();
+	bool IsMousePressedInButton();
 	/*
 	Exp : 평상시 여부 */
 	bool IsNoneInButton();
+
+	/*
+	*/
+	bool IsButtonClick();
 };

@@ -98,6 +98,7 @@ Static Class : JTimerEventManager
 class ENGINE_EXPORT JTimerEventManager
 {
 private:
+	friend JMainTimer;
 	static std::forward_list<JTimerHandle*> m_flTimerHandles;
 public:
 	/*
@@ -117,6 +118,7 @@ public:
 		const float Delay, const float GapTime, const size_t Count);
 private:
 	static void EventUpdate(const float DeltaTime);
+	static void Destroy();
 };
 
 /*

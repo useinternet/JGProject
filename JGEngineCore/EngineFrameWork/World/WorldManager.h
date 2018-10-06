@@ -3,6 +3,7 @@
 
 class World;
 class JGPhysicsSystem;
+class ObjectSpawner;
 /*
 Class : WorldManager 
 @m map<const wstring, shared_ptr<World>> m_mWorlds : 존재하는 월드 배열
@@ -13,6 +14,7 @@ class ENGINE_EXPORT WorldManager
 {
 private:
 	std::map<const std::wstring, std::shared_ptr<World>> m_mWorlds;
+	std::map<const std::wstring, ObjectSpawner*>         m_mWorldSpawners;
 	std::wstring m_CurrentWorld = TT("None");
 	std::wstring m_PrevWorld    = TT("None");
 	JGPhysicsSystem* m_pPhysicsSystem;
@@ -26,10 +28,13 @@ public:
 	void Tick(const float DeltaTime);
 	/*
 	Exp : 현제 월드를 정한다. */
-	void SelectWorld(const std::wstring& worldName);
+	void SelectWorld(const std::wstring& worldName,const bool spawn = true);
+	/*
+	Exp : 오픈 월드*/
+	void OpenWorld(const std::wstring& worldName);
 	/*
 	Exp : 월드를 추가한다. */
-	void AddWorld(const std::wstring& worldName);
+	void AddWorld(const std::wstring& worldName,ObjectSpawner* spawner);
 	/*
 	Exp : 해당이름을 가진 월드를 가져온다.. */
 	World* GetWorld(const std::wstring& WorldName);

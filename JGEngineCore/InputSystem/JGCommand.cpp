@@ -38,7 +38,7 @@ const wstring& JGCommand::GetCommandName()
 	return *m_CommandName;
 }
 
-void JGCommand::SetCommandName(const wstring & CommandName)
+void JGCommand::SetCommandName(const wstring& CommandName)
 {
 	*m_CommandName = CommandName;
 }

@@ -324,6 +324,11 @@ void Anim_Player::ConfigDefault(Player * p, EAnimState state)
 void Anim_Player::ConfigSitDown(Player* p)
 {
 	ConfigDefault(p, Anim_SitDown);
+	if (p->IsSitting())
+	{
+		GetAnimation(Anim_SitDown)->SetCurrentFrame(4);
+		GetAnimation(Anim_SitDown)->Stop();
+	}
 	if (p->IsCompulsoryDirection())
 	{
 		GetAnimation(Anim_SitDown)->SetCurrentFrame(4);

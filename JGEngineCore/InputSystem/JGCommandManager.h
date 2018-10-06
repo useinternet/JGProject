@@ -42,7 +42,8 @@ public:
 	void BindAxisCommand(const std::wstring& CommandName, const std::function<void(const float)>& Event);
 
 
-
+	void KillKeyCommand(const std::wstring& CommandName);
+	void KillAxisCommand(const std::wstring& CommandName);
 	/*
 	Exp : 마우스 좌표를 가져온다. */
 	JGVector2D& GetMouseLocation();

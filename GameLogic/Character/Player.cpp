@@ -43,7 +43,7 @@ Player::Player()
 	AnimPlayer = RegisterComponentInObject<Anim_Player>(TT("Anim_Player"));
 	AnimPlayer->SetComponentLocation(0.0f, -85.0f);
 
-	// 자식 추가..
+	 // 자식 추가..
 	GetCollision()->AddChild(AnimPlayer);
 
 	// 공격 추가..
@@ -227,7 +227,7 @@ void Player::func_Jump()
 }
 void Player::func_SitDown()
 {
-	if (!IsJumping() && !m_bPlayerFix)
+	if (!IsJumping() && !m_bPlayerFix && !IsMoving())
 	{
 		CurrentPlayerState = Player_SitDown;
 	}

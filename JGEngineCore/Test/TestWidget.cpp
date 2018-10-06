@@ -60,7 +60,7 @@ void TestWidget::Tick(const float DeltaTime)
 
 	static bool test = false;
 
-	if (TestButton->IsMouseClickInButton())
+	/*if (TestButton->IsMouseClickInButton())
 	{
 		if (!sound->IsPlaying() && !test)
 		{
@@ -76,6 +76,6 @@ void TestWidget::Tick(const float DeltaTime)
 	else
 	{
 		test = false;
-	}
+	}*/
 
 }

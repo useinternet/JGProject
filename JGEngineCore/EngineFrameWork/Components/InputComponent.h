@@ -6,12 +6,16 @@
 
 class ENGINE_EXPORT InputComponent : public Component
 {
+	enum ECommandType
+	{
+		Key,Axis
+	};
 private:
-	
+	std::map<const std::wstring, ECommandType> m_mCommand;
 public:
 	InputComponent(const InputComponent& copy) = delete;
 	InputComponent();
-	~InputComponent();
+	virtual ~InputComponent();
 
 	/*
 	Exp : 키 관련 커맨드를 이벤트 바인딩한다.

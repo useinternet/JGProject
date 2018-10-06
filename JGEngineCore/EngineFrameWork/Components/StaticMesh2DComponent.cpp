@@ -77,8 +77,8 @@ void StaticMesh2DComponent::SetAlphaBlend(const float a)
 }
 JGVector2D StaticMesh2DComponent::GetCenterPoint()
 {
-	float HalfWidth = GetTextureWdith() / 2;
-	float HalfHeight = GetTextureHeight() / 2;
+	float HalfWidth = (GetTextureWdith() / 2) * GetComponentScale().X();
+	float HalfHeight = (GetTextureHeight() / 2) * GetComponentScale().Y();
 	JGVector2D vec;
 	switch (GetPivot())
 	{

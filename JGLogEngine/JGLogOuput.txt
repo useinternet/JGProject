@@ -1,0 +1,232 @@
+0101
+Progress : RenderSystem Init Start....
+0001
+Log : JGDeviceD Init Start....
+0001
+Log : JGDeviceD Init Complete....
+0001
+Log : SwapChain Init Start....
+0001
+Log : SwapChain Init Complete....
+0001
+Log : MainJGRenderTargetD Init Start....
+0001
+Log : MainJGRenderTargetD Init Complete....
+0001
+Log : JGRenderSystemStateD Init Start....
+0001
+Log : JGRenderSystemStateD Init Complete....
+0001
+Log : JGMainViewport Init Start....
+0001
+Log : JGMainViewport Init Complete....
+0001
+Log : RenderSystemAssist Connecting...
+0001
+Log : RenderSystemAssist ConnectComplete...
+0101
+Progress : RenderSystem Init Complete....
+1001
+Error :  Object Begin error
+0001
+Log : Progress : 20 %
+0001
+Log : Progress : 40 %
+0001
+Log : Progress : 60 %
+0001
+Log : Progress : 80 %
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Move
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : Player_SpecialSkill
+0001
+Log : Player_Idle

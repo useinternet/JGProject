@@ -1,6 +1,6 @@
 #pragma once
 #include"Engine.h"
-
+#include<fstream>
 
 /*
 EnumClass : ELogLevel
@@ -39,8 +39,8 @@ private:
 #ifdef _DEBUG
 	static std::queue<SLogMessage> m_MessageQue_1;
 	static std::queue<SLogMessage> m_MessageQue_2;
+	static std::wofstream m_LogFile;
 	bool m_IsRunning = true;
-
 #endif
 public:
 	JGLog();
@@ -59,7 +59,7 @@ public:
 	void Destory();
 private:
 	void Tick();
-	void OutputMessage();
+	void OutputMessage(SLogMessage& log);
 private: // 로그 설정 전역 변수들..
 	static bool m_bWorking_1;
 	static bool m_bWorking_2;

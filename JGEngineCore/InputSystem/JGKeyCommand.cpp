@@ -62,3 +62,9 @@ void JGKeyCommand::BindKeyCommand(const EKeyState KeyState, const std::function<
 		break;
 	}
 }
+
+void JGKeyCommand::KillCommand()
+{
+	m_bIsBindKeyDownEvent = false;
+	m_bIsBindKeyUpEvent = false;
+}

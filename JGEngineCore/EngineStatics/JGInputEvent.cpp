@@ -19,7 +19,6 @@ void JGInputEvent::DoEvent(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_LBUTTONDOWN:
-		JGLog::Write(ELogLevel::Default, TT("마우스 클릭"));
 		break;
 	}
 }

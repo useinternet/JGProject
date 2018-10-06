@@ -22,3 +22,8 @@ void JGAxisCommand::BindAxisCommand(const std::function<void(const float)>& Even
 	bIsBindEvent = true;
 	m_BindEvent = Event;
 }
+
+void JGAxisCommand::KillCommand()
+{
+	bIsBindEvent = false;
+}

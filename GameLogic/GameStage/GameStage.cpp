@@ -3,8 +3,9 @@
 #include"EngineFrameWork/GameLoop.h"
 #include"EngineFrameWork/World/WorldManager.h"
 #include"EngineFrameWork/World/World.h"
-#include"SampleWorldSpawner.h"
-
+#include"WorldSpawner/StartMainMenu/StartMainMenuSpawner.h"
+#include"WorldSpawner/LoadingWorld/LoadingSpawner.h"
+#include"WorldSpawner/DemoWorld/DemoWorldSpawner.h"
 GameStage::GameStage()
 {
 
@@ -21,11 +22,11 @@ void GameStage::InitStage(GameLoop* Loop)
 
 void GameStage::ManagementWorld()
 {
-	std::wstring name = TT("SampleWorld");
-	m_WorldManager->AddWorld(name);
-	m_WorldManager->SelectWorld(TT("SampleWorld"));
-	m_WorldManager->GetWorld(TT("SampleWorld"))->SpawnObject<SampleWorldSpawner>();
-
-
-
+	m_WorldManager->AddWorld(TT("StartMainMenu"),
+		CreateObjectSpawner<StartMainMenuSpawner>());
+	m_WorldManager->AddWorld(TT("Loading"),
+		CreateObjectSpawner<LoadingSpawner>());
+	m_WorldManager->AddWorld(TT("DemoWorld"),
+		CreateObjectSpawner<DemoWorldSpawner>());
+	m_WorldManager->SelectWorld(TT("StartMainMenu"));
 }

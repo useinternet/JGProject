@@ -3,7 +3,7 @@
 
 /*
 Class : TextComponent */
-class TextComponent : public StaticMesh2DComponent
+class ENGINE_EXPORT TextComponent : public StaticMesh2DComponent
 {
 private:
 	std::unique_ptr<std::wstring> m_Text;
