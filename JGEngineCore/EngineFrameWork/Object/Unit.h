@@ -39,4 +39,6 @@ public:
 	void SetVelocityX(const float velX);
 	void SetVelocityY(const float velY);
 	JGVector2D& GetVelocity();
+
+	JGVector2D GetObjectLocation();
 };

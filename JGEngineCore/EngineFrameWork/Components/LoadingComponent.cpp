@@ -19,6 +19,7 @@ void LoadingComponent::Tick(const float DeltaTime)
 	if (m_LoadingComplete && m_CurrentProgress >= 0.9f)
 	{
 		m_CurrentProgress = 1.0f;
+		JGLog::Write(ELogLevel::Default, TT("Loading : %d %%"), 100);
 	}
 }
 

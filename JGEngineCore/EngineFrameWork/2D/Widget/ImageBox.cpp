@@ -15,11 +15,18 @@ ImageBox::~ImageBox()
 {
 
 }
+void ImageBox::BeginComponent(World* world)
+{
+	Widget::BeginComponent(world);
+
+	m_Image->SetOwnerObject(GetOwnerObject());
+
+}
 bool ImageBox::CreateImage(const std::wstring& ImagePath, const EPivot pivot)
 {
 
 	m_Image = make_unique<StaticMesh2DComponent>();
-	m_Image->SetOwnerObject(GetOwnerObject());
+	
 	AddChild(m_Image.get());
 	m_Image->RegisterName(GetComponentName());
 

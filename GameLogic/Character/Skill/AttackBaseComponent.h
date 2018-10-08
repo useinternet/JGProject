@@ -15,7 +15,8 @@ public:
 	void SetAttackDelay(const float Delay);
 	float GetAttackDelay();
 	bool IsEnableAttack();
-	void Attack();
+	virtual void Attack(const JGVector2D& Location);
+	virtual void Attack(const float x, const float y);
 private:
 	void AttackTimerEvent();
 };

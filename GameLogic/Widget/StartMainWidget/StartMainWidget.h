@@ -6,6 +6,7 @@
 class StartMainWidget : public UserWidget
 {
 private:
+
 	class ImageBox* MainBackGround;
 	class Button*   StartButton;
 	class Button*   ConfigButton;
@@ -14,7 +15,6 @@ private:
 	class Text*     GameStart;
 	class Text*     GameExp;
 	class Text*     GameConfig;
-
 
 	bool m_ButtonClick = false;
 	bool m_PrevButtonClick = false;

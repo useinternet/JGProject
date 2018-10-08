@@ -1,4 +1,8 @@
 0101
+Progress : EngineTimer Init Complete...
+0101
+Progress : InputEvent Init Complete...
+0101
 Progress : RenderSystem Init Start....
 0001
 Log : JGDeviceD Init Start....
@@ -26,48 +30,44 @@ Log : RenderSystemAssist Connecting...
 Log : RenderSystemAssist ConnectComplete...
 0101
 Progress : RenderSystem Init Complete....
-1001
-Error :  Object Begin error
+0101
+Progress : SoundSystem Init Complete...
+0101
+Progress : PhysicsSystem Init Complete...
+0101
+Progress : ConfigLoad Complete...
+0101
+Progress : GameLoop Init Complete...
+0101
+Progress : Start JGEngine!
 0001
-Log : Progress : 20 %
+Log : StartMain World Start!
 0001
-Log : Progress : 40 %
+Log : Loading World Start!
 0001
-Log : Progress : 60 %
+Log : Loading : 10 %
 0001
-Log : Progress : 80 %
+Log : Loading : 20 %
 0001
-Log : Player_JumpDown
+Log : Loading : 30 %
 0001
-Log : Player_JumpDown
+Log : Loading : 40 %
 0001
-Log : Player_Idle
+Log : Loading : 50 %
 0001
-Log : Player_Idle
+Log : Loading : 60 %
 0001
-Log : Player_Move
+Log : Loading : 70 %
 0001
-Log : Player_Move
+Log : Loading : 80 %
 0001
-Log : Player_JumpUp
+Log : Loading : 100 %
 0001
-Log : Player_JumpUp
+Log : Loading : 100 %
 0001
-Log : Player_JumpUp
+Log : Loading Compelete
 0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
+Log : Demo World Start!
 0001
 Log : Player_JumpDown
 0001
@@ -75,61 +75,61 @@ Log : Player_JumpDown
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
-0001
-Log : Player_SitDown
-0001
-Log : Player_StandUp
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_SitDown
-0001
-Log : Player_StandUp
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
 Log : Player_Idle
 0001
 Log : Player_Move
 0001
-Log : Player_JumpDown
+Log : Player_Move
 0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
+Log : Player_Move
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
@@ -141,77 +141,17 @@ Log : Player_JumpUp
 0001
 Log : Player_JumpUp
 0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
 Log : Player_JumpUp
 0001
 Log : Player_JumpDown
 0001
-Log : Player_JumpDown
+Log : SetAttackSpawnLocation
 0001
-Log : Player_Idle
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_StandUp
-0001
-Log : Player_Move
+Log : Player_JumpAttack
 0001
 Log : Player_JumpDown
 0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_SitDown
-0001
-Log : Player_StandUp
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
+Log : SetAttackSpawnLocation
 0001
 Log : Player_JumpAttack
 0001
@@ -225,8 +165,32 @@ Log : Player_Idle
 0001
 Log : Player_Move
 0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
 Log : Player_Idle
 0001
-Log : Player_SpecialSkill
+Log : Player_Move
 0001
 Log : Player_Idle

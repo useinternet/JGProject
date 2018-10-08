@@ -3,6 +3,7 @@
 #include"../../RenderSystem/JGHLSLShaderDevice/JGHLSLShaderDevice.h"
 #include"../World/World.h"
 #include"../Object/Object.h"
+#include"../../EngineStatics/JGLog.h"
 using namespace std;
 Component::Component()
 {
@@ -62,6 +63,7 @@ void Component::Render()
 		{
 			iter->Render();
 		}
+
 	}
 }
 

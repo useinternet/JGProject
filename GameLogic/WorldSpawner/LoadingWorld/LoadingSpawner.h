@@ -7,7 +7,6 @@ class LoadingSpawner : public ObjectSpawner
 private:
 
 
-
 public:
 	LoadingSpawner();
 	virtual ~LoadingSpawner();

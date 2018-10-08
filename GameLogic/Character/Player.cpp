@@ -6,7 +6,7 @@
 #include"Skill/DefaultSkillComponent.h"
 #include"Skill/SpecialSkillComponent.h"
 #include"Skill/SitSkillComponent.h"
-
+#include"PhysicsSystem/JGBox2D/JGDynamics/JG2DFilter.h"
 
 #include"EngineStatics/JGLog.h"
 using namespace std;
@@ -37,8 +37,12 @@ Player::Player()
 	Config = { 60.0f,120.0f,0.0f,-85.0f,1.0f,1.0f };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_StandUp, Config));
 	// 충돌체 설정
+	JG2DFilter filter;
+	filter.Get().categoryBits = 0x00002;
+	filter.Get().maskBits = 0x00001;
 	GetCollision()->SetAsBox(60.0f, 170.0f);
 	GetCollision()->SetComponentLocation(900.0F, 0.0f);
+	GetCollision()->SetFilter(filter);
 	// 애니메이션 컴포넌트
 	AnimPlayer = RegisterComponentInObject<Anim_Player>(TT("Anim_Player"));
 	AnimPlayer->SetComponentLocation(0.0f, -85.0f);
@@ -173,7 +177,9 @@ void Player::Attack(AttackBaseComponent* com, EPlayerState skill)
 {
 	if (com->IsEnableAttack())
 	{
-		com->Attack();
+		JGVector2D location = GetCollision()->GetComponentWorldLocation();
+		location.SetX(location.X() + 50.0f);
+		com->Attack(location);
 		CurrentPlayerState = skill;
 		m_bPlayerFix = true;
 	}
@@ -326,6 +332,7 @@ void Player::PlayerStateLog()
 		break;
 	}
 }
+
 
 
 

@@ -11,6 +11,7 @@ Circle2DCollisionComponent::Circle2DCollisionComponent()
 
 Circle2DCollisionComponent::~Circle2DCollisionComponent()
 {
+	GetWorld()->GetPyWorld()->DestoryBody(GetBody());
 }
 
 void Circle2DCollisionComponent::BeginComponent(World* world)

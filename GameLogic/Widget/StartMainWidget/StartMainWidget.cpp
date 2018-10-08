@@ -6,6 +6,10 @@
 #include"EngineFrameWork/World/World.h"
 #include"EngineFrameWork/World/WorldManager.h"
 #include"EngineStatics/JGLog.h"
+
+
+// юс╫ц
+#include"EngineFrameWork/2D/Widget/Progressbar.h"
 using namespace std;
 
 static const wstring ButtonDefaultImagePath = TT("../Contents/MainStartWidget/buttonLong_beige.png");
@@ -77,6 +81,7 @@ StartMainWidget::StartMainWidget()
 	ExpButton->SetComponentLocation(ExpButtonLocation);
 
 	ActiveObject();
+
 }
 
 StartMainWidget::~StartMainWidget()

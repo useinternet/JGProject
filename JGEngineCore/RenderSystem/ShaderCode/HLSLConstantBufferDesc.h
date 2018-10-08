@@ -11,6 +11,8 @@ typedef struct S2DSpriteBuffer_PS
 	D3DXVECTOR3 SprietColor = { 0.0f,0.0f,0.0f };
 	float IsSprite = 0.0f;
 	D3DXVECTOR4 ColorRize = { 1.0f,1.0f,1.0f,1.0f };
+	D3DXVECTOR2 StartDrawTex = { 0.0f,0.0f };
+	D3DXVECTOR2 EndDrawTex   = { 1.0f,1.0f };
 }S2DSpriteBuffer;
 
 typedef struct STextBuffer_PS

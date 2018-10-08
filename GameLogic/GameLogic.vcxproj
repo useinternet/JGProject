@@ -293,12 +293,14 @@
   <ItemGroup>
     <ClCompile Include="Anim\Player\Anim_Player.cpp" />
     <ClCompile Include="Character\Player.cpp" />
+    <ClCompile Include="Character\SkillObject\DefaultAttackObject.cpp" />
     <ClCompile Include="Character\Skill\AttackBaseComponent.cpp" />
     <ClCompile Include="Character\Skill\DefaultAttackComponent.cpp" />
     <ClCompile Include="Character\Skill\DefaultSkillComponent.cpp" />
     <ClCompile Include="Character\Skill\SitSkillComponent.cpp" />
     <ClCompile Include="Character\Skill\SpecialSkillComponent.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EnemyUnit\EnemyUnitBase.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="GameStage\GameStage.cpp" />
     <ClCompile Include="Widget\LoadingWidget\LoadingWidget.cpp" />
@@ -310,11 +312,13 @@
   <ItemGroup>
     <ClInclude Include="Anim\Player\Anim_Player.h" />
     <ClInclude Include="Character\Player.h" />
+    <ClInclude Include="Character\SkillObject\DefaultAttackObject.h" />
     <ClInclude Include="Character\Skill\AttackBaseComponent.h" />
     <ClInclude Include="Character\Skill\DefaultAttackComponent.h" />
     <ClInclude Include="Character\Skill\DefaultSkillComponent.h" />
     <ClInclude Include="Character\Skill\SitSkillComponent.h" />
     <ClInclude Include="Character\Skill\SpecialSkillComponent.h" />
+    <ClInclude Include="EnemyUnit\EnemyUnitBase.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="GameStage\GameStage.h" />
     <ClInclude Include="StaticFilter\StaticCollisionFilter.h" />

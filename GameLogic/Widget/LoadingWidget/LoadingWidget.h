@@ -7,6 +7,8 @@ class LoadingWidget : public UserWidget
 private:
 	class ImageBox* LoadingBackGroundImage;
 	class LoadingComponent* LoadingSupporter;
+
+	class Progressbar* SampleBar;
 	bool ChangeWorld = false;
 public:
 	LoadingWidget();

@@ -75,6 +75,14 @@ void StaticMesh2DComponent::SetAlphaBlend(const float a)
 {
 	m_2DSpriteBufferDesc->ColorRize.w = a;
 }
+void StaticMesh2DComponent::SetStartDrawTex(const float x, const float y)
+{
+	m_2DSpriteBufferDesc->StartDrawTex = { x,y };
+}
+void StaticMesh2DComponent::SetEndDrawTex(const float x, const float y)
+{
+	m_2DSpriteBufferDesc->EndDrawTex = { x,y };
+}
 JGVector2D StaticMesh2DComponent::GetCenterPoint()
 {
 	float HalfWidth = (GetTextureWdith() / 2) * GetComponentScale().X();

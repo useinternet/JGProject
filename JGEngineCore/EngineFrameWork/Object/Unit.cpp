@@ -92,6 +92,11 @@ JGVector2D& Unit::GetVelocity()
 	return m_Velocity;
 }
 
+JGVector2D Unit::GetObjectLocation()
+{
+	return m_Collision->GetComponentWorldLocation();
+}
+
 
 
 

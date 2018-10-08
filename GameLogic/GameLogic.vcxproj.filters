@@ -47,6 +47,12 @@
     <Filter Include="Game\WorldSpawner\DemoWorld">
       <UniqueIdentifier>{97ade016-da32-4d14-8950-39f5a130147e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Character\SkillObject">
+      <UniqueIdentifier>{e5bbaf2c-4d1d-4dc5-af10-481a9c58a41a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\EnemyUnit">
+      <UniqueIdentifier>{01a9db74-71d5-482d-a67c-a9ef4e99fad9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -94,6 +100,12 @@
     <ClCompile Include="WorldSpawner\DemoWorld\DemoWorldSpawner.cpp">
       <Filter>Game\WorldSpawner\DemoWorld</Filter>
     </ClCompile>
+    <ClCompile Include="Character\SkillObject\DefaultAttackObject.cpp">
+      <Filter>Game\Character\SkillObject</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyUnit\EnemyUnitBase.cpp">
+      <Filter>Game\EnemyUnit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -140,6 +152,12 @@
     </ClInclude>
     <ClInclude Include="WorldSpawner\DemoWorld\DemoWorldSpawner.h">
       <Filter>Game\WorldSpawner\DemoWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Character\SkillObject\DefaultAttackObject.h">
+      <Filter>Game\Character\SkillObject</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyUnit\EnemyUnitBase.h">
+      <Filter>Game\EnemyUnit</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

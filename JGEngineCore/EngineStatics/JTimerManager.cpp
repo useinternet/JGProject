@@ -135,6 +135,7 @@ void JTimerEventManager::EventUpdate(const float DeltaTime)
 		// 이벤트가 끝난 타이머 핸들은 무시한다.
 		if (iter->m_bEnd)
 		{
+			iter->Destory();
 			continue;
 		}
 		TimerHandleDesc& desc = iter->m_HandleDesc;

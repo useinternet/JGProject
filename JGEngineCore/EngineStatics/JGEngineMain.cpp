@@ -42,7 +42,11 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 	m_EngineTimer->Start();
 	// 로그 초기화
 	m_EngineLog->InitLog();
-	
+	//
+	JGLog::Write(ELogLevel::Progress, TT("EngineTimer Init Complete..."));
+	JGLog::Write(ELogLevel::Progress, TT("InputEvent Init Complete..."));
+
+	//
 	// 렌더링 나머지 여부는 나중에 JSon파일로 받아와서 설정한다.
 	result = m_RenderSystem->InitRenderSystem(hWnd, false, 1920, 1080, 45.0f, 1000.0f, 0.1f);
 	if (!result)
@@ -58,8 +62,10 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 		return false;
 	}
 	result = m_SoundSystem->CreateSoundSystem();
+	JGLog::Write(ELogLevel::Progress, TT("SoundSystem Init Complete..."));
 	if (!result)
 	{
+		JGLog::Write(ELogLevel::Error, TT("SoundSystem Init Falied..."));
 		return false;
 	}
 	// 렌더링 슈퍼 클래스 생성
@@ -71,19 +77,23 @@ bool JGEngineMain::Init(HINSTANCE Instance,HWND hWnd)
 		m_SoundSystem.get());
 	m_RenderSystem->InitObjectProtoType(m_SuperClass.get());
 
-	m_PhysicsSystem->InitPhysicsSystem(hWnd, m_SuperClass.get());
 
+	m_PhysicsSystem->InitPhysicsSystem(hWnd, m_SuperClass.get());
+	JGLog::Write(ELogLevel::Progress, TT("PhysicsSystem Init Complete..."));
 	// 설정파일들 초기화...
+
 	m_ConfigManager->LoadConfig(m_SuperClass.get());
+	JGLog::Write(ELogLevel::Progress, TT("ConfigLoad Complete..."));
 	// 게임 루프 초기화
 	m_GameLoop->InitGameLoop(m_RenderSystem.get(),m_PhysicsSystem.get());
+	JGLog::Write(ELogLevel::Progress, TT("GameLoop Init Complete..."));
 	//
 	m_InputEvent->LinkInputSystem(m_InputSystem.get());
 
 
 
 	//
-
+	JGLog::Write(ELogLevel::Progress, TT("Start JGEngine!"));
 	return true;
 }
 void JGEngineMain::Run()

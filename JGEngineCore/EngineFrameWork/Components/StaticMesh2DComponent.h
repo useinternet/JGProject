@@ -51,7 +51,10 @@ public:
 	/*
 	Exp : 알파값을 설정한다. */
 	void SetAlphaBlend(const float a);
-
+	/*
+	Exp : 그리는 구간을 정한다.(범위는 0.0f ~ 1.0f */
+	void SetStartDrawTex(const float x, const float y);
+	void SetEndDrawTex(const float x, const float y);
 	/*
 	Exp : 해당 매쉬의 중심점을 가져온다. */
 	virtual JGVector2D GetCenterPoint();
