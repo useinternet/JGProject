@@ -53,6 +53,12 @@
     <Filter Include="Game\EnemyUnit">
       <UniqueIdentifier>{01a9db74-71d5-482d-a67c-a9ef4e99fad9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\GameMode">
+      <UniqueIdentifier>{5c6c8354-41f6-4d42-9b1d-1bdf1a693105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Widget\GameWidget">
+      <UniqueIdentifier>{5a2c29a2-f845-43f9-90e7-7cbf1d406cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -106,6 +112,15 @@
     <ClCompile Include="EnemyUnit\EnemyUnitBase.cpp">
       <Filter>Game\EnemyUnit</Filter>
     </ClCompile>
+    <ClCompile Include="Character\PlayerStatus.cpp">
+      <Filter>Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\GameWidget\PlayerStatusWidget.cpp">
+      <Filter>Game\Widget\GameWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMode\GameModeBase.cpp">
+      <Filter>Game\GameMode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -158,6 +173,15 @@
     </ClInclude>
     <ClInclude Include="EnemyUnit\EnemyUnitBase.h">
       <Filter>Game\EnemyUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="Character\PlayerStatus.h">
+      <Filter>Game\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget\GameWidget\PlayerStatusWidget.h">
+      <Filter>Game\Widget\GameWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMode\GameModeBase.h">
+      <Filter>Game\GameMode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

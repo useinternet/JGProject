@@ -3,18 +3,18 @@
 #include"EngineFrameWork/Components/Circle2DCollisionComponent.h"
 #include"EngineStatics/JGConstructHelper.h"
 #include"EngineStatics/JTimerManager.h"
-#include"PhysicsSystem/JGBox2D/JGDynamics/JG2DFilter.h"
+#include"StaticFilter/StaticCollisionFilter.h"
 #include"EngineStatics/JGLog.h"
 DefaultAttackObject::DefaultAttackObject()
 {
 	RegisterObjectID(typeid(this));
 
-	JG2DFilter filter;
-	filter.Get().maskBits = 0x000001;
 	CircleCollison = RegisterComponentInObject<Circle2DCollisionComponent>(TT("CircleCollision"));
-	CircleCollison->SetFilter(filter);
+	CircleCollison->SetCategoryFilter(Filter_PlayerAttack);
+	CircleCollison->SetMaskFilter(Filter_Enemy);
+
 	CircleCollison->SetBodyType(E2DBodyType::Kinematic);
-	CircleCollison->SetRadius(10.0f);
+	CircleCollison->SetRadius(20.0f);
 
 	JTimerEventManager::CreateTimerEvent(&DestroyTimerHandle,
 		std::bind(&DefaultAttackObject::DestoryObject,this), EHandleType::EDefault,
@@ -38,7 +38,7 @@ void DefaultAttackObject::Tick(const float DeltaTime)
 {
 	ExistObject::Tick(DeltaTime);
 
-	CircleCollison->AddComponentLocation(100.0f*DeltaTime, 0.0f);
+	CircleCollison->AddComponentLocation(1000.0f*DeltaTime, 0.0f);
 }
 
 void DefaultAttackObject::SetAttackSpawnLocation(const float x, const float y)

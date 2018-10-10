@@ -22,7 +22,8 @@ enum EAnimState
 	Anim_JumpDefaultAttack,
 	Anim_SitDefaultAttack_1,
 	Anim_SitDefaultAttack_2,
-	Anim_SitDownSkill
+	Anim_SitDownSkill,
+	Anim_Dead
 };
 class Anim_Player : public Animation2DSystemComponent
 {
@@ -49,6 +50,13 @@ private:
 	class AnimationMesh2DComponent* SitDefaultAttack_2;
 	class AnimationMesh2DComponent* SitDownSkill;
 
+	// 죽음
+	class AnimationMesh2DComponent* Dead;
+	class JTimerHandle* DeadTimerHandle;
+	bool  bDeadAnimationEnd = false;
+
+	// 일회성 변수
+	float DeadAnimAlpha = 1.0f;
 	PlayerState PrevPlayerState = 0xFFFFFFF;
 public:
 	Anim_Player();

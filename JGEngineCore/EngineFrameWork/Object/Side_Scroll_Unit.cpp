@@ -14,6 +14,10 @@ Side_Scroll_Unit::~Side_Scroll_Unit()
 
 void Side_Scroll_Unit::DefineDirection()
 {
+	if (!GetCollision()->GetBody())
+	{
+		return;
+	}
 	JGVector2D vel = GetCollision()->GetBody()->GetLinearVelocity();
 	int velnX = (int)vel.X();
 	int velnY = (int)vel.Y();
@@ -49,6 +53,10 @@ void Side_Scroll_Unit::DefineDirection()
 
 void Side_Scroll_Unit::DefineMove()
 {
+	if (!GetCollision()->GetBody())
+	{
+		return;
+	}
 	JGVector2D vel = GetCollision()->GetBody()->GetLinearVelocity();
 	float velChangeX = GetVelocity().X() - vel.X();
 	JGVector2D vecImpulse(GetCollision()->GetBody()->GetMass() * velChangeX, 0.0f);
@@ -125,6 +133,10 @@ void Side_Scroll_Unit::NotifySolveCompulsoryDirection()
 
 void Side_Scroll_Unit::PushUp(const float ContantForce)
 {
+	if (!GetCollision()->GetBody())
+	{
+		return;
+	}
 	JGVector2D vel(0.0f, 0.0f);
 	vel.Set(0.0, -GetCollision()->GetBody()->GetMass() * ContantForce);
 	GetCollision()->GetBody()->ApplyLinearImpulse(vel);

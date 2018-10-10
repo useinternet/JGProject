@@ -19,7 +19,8 @@ enum EPlayerState
 	Player_SpecialSkill,
 	Player_JumpAttack,
 	Player_SitAttack,
-	Player_SitSkill
+	Player_SitSkill,
+	Player_Dead
 };
 
 // 애니메이션 별 위치 및 박스 크기 설정 구조체
@@ -34,7 +35,6 @@ struct SPlayerPosByAnim
 };
 class Player : public Side_Scroll_Unit
 {
-
 private:
 	// 애니메이션
 	class Anim_Player* AnimPlayer;
@@ -47,6 +47,7 @@ private:
 	// 환경 변수..
 	float JumpForce   = 500.0f;
 	float Speed       = 500.0f;
+	bool  RealDead = false;
 	// 애니메이션 위치 변수
 	std::map<EPlayerState, SPlayerPosByAnim> m_mBox_Pos_Config;
 	JGVector2D m_CollisionCenter;
@@ -56,6 +57,8 @@ private:
 	class DefaultSkillComponent*  defaultSkill;
 	class SpecialSkillComponent*  specialSkill;
 	class SitSkillComponent*      sitSkill;
+	// 스탯
+	class PlayerStatus* playerStatus;
 public:
 	Player();
 	virtual ~Player();
@@ -70,6 +73,7 @@ public:
 	bool IsJumping();
 	bool IsSitting();
 	bool IsMoving();
+	bool IsDead();
 	void NotifyAttackComplete();
 	// 단축키에 대한 행동
 	void Move();
@@ -83,6 +87,13 @@ public:
 	void func_DefaultAttack();
 	void func_DefaultSkill();
 	void func_SpeicalSkill();
+
+
+	// 스탯 
+	PlayerStatus* GetStatus();
+	void YouDie();
+	bool IsDie();
 	// 임시..
 	void PlayerStateLog();
+	
 };

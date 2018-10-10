@@ -6,6 +6,7 @@
 #include"WorldSpawner/StartMainMenu/StartMainMenuSpawner.h"
 #include"WorldSpawner/LoadingWorld/LoadingSpawner.h"
 #include"WorldSpawner/DemoWorld/DemoWorldSpawner.h"
+#include"GameMode/GameModeBase.h"
 GameStage::GameStage()
 {
 
@@ -26,7 +27,12 @@ void GameStage::ManagementWorld()
 		CreateObjectSpawner<StartMainMenuSpawner>());
 	m_WorldManager->AddWorld(TT("Loading"),
 		CreateObjectSpawner<LoadingSpawner>());
+
+
 	m_WorldManager->AddWorld(TT("DemoWorld"),
 		CreateObjectSpawner<DemoWorldSpawner>());
+	m_WorldManager->GetWorld(TT("DemoWorld"))->SetGameMode<GameModeBase>();
+
+
 	m_WorldManager->SelectWorld(TT("StartMainMenu"));
 }

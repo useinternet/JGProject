@@ -1,6 +1,7 @@
 #include"CollisionComponent.h"
 #include"../Object/Object.h"
-
+#include"../World/World.h"
+#include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
 using namespace std;
 
 
@@ -27,7 +28,10 @@ void CollisionComponent::BeginComponent(World* world)
 void CollisionComponent::Tick(const float DeltaTime)
 {
 	Motivated2DComponent::Tick(DeltaTime);
-
+	if (m_bDestory)
+	{
+		return;
+	}
 	if (m_bEndOverlap)
 	{
 		m_EndOverlapEvent(m_EndOverlapObject);
@@ -151,6 +155,21 @@ void CollisionComponent::SetFilter(JG2DFilter filter)
 	m_BodyFilter = filter;
 }
 
+void CollisionComponent::SetCategoryFilter(const CollisionFilter filter)
+{
+	m_BodyFilter.Get().categoryBits = filter;
+}
+
+void CollisionComponent::SetMaskFilter(const CollisionFilter filter)
+{
+	m_BodyFilter.Get().maskBits = filter;
+}
+
+void CollisionComponent::AddMaskFilter(const CollisionFilter filter)
+{
+	m_BodyFilter.Get().maskBits |= filter;
+}
+
 void CollisionComponent::FixAngle()
 {
 	m_Body->origin()->SetFixedRotation(true);
@@ -159,6 +178,17 @@ void CollisionComponent::FixAngle()
 void CollisionComponent::UnFixAngle()
 {
 	m_Body->origin()->SetFixedRotation(false);
+}
+
+void CollisionComponent::DestroyCollison()
+{
+	if (m_Body == nullptr)
+	{
+		return;
+	}
+	GetWorld()->GetPyWorld()->DestoryBody(m_Body);
+	m_Body = nullptr;
+	m_bDestory = true;
 }
 
 

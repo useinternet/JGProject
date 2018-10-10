@@ -4,6 +4,7 @@
 #include"EngineStatics/JGConstructHelper.h"
 #include"EngineFrameWork/Components/Box2DCollisionComponent.h"
 #include"Character/Player.h"
+#include"EngineStatics/JTimerManager.h"
 #include"EngineStatics/JGLog.h"
 using namespace std;
 Anim_Player::Anim_Player()
@@ -179,6 +180,21 @@ Anim_Player::Anim_Player()
 		}
 		SitDownSkill->AnimationSetDelay(0.1f);
 	}
+	Dead = AddAnimation(EAnimState::Anim_Dead, TT("Anim_Player_Dead"));
+	if (Dead)
+	{
+		static JGConstructHelper::AnimationMesh2D Anim_Dead_Mesh(
+			Dead->GetComponentName(), EPivot::MiddleMiddle, 8, 4, 2,
+			TT("../Contents/Player/Dead/AnimSheet_Player_Dead.png"),
+			EReverse::Default, EJGUsageType::Dynamic);
+		if (Anim_Dead_Mesh.Success)
+		{
+			Dead->SetConstructObject(Anim_Dead_Mesh.Object);
+		}
+		Dead->AnimationSetDelay(0.15f);
+	}
+
+
 	SetCurrentState(Anim_Idle);
 }
 
@@ -253,6 +269,20 @@ void Anim_Player::BeginComponent(World* world)
 		JumpAttackChangeJumpDownFromEnd();
 		this->GetAnimation(Anim_JumpDefaultAttack)->Stop();
 	});
+	AddNotifyEvent(TT("PlayerDead"), Anim_Dead, 8, [this]()
+	{
+		this->GetAnimation(Anim_Dead)->Stop();
+		JTimerEventManager::CreateTimerEvent(&DeadTimerHandle, [this]()
+		{
+			DeadAnimAlpha -= 0.025f;
+			this->GetAnimation(Anim_Dead)->SetAlphaBlend(DeadAnimAlpha);
+			if (DeadAnimAlpha <= 0.0f)
+			{
+				DeadTimerHandle->Destory();
+				bDeadAnimationEnd = true;
+			}
+		}, EHandleType::ERepeat, 2.0f, 0.1f, -1);
+	});
 }
 
 void Anim_Player::Tick(const float DeltaTime)
@@ -263,6 +293,10 @@ void Anim_Player::Tick(const float DeltaTime)
 	Player* p = dynamic_cast<Player*>(GetOwnerObject());
 	if (p)
 	{
+		if (bDeadAnimationEnd)
+		{
+			p->YouDie();
+		}
 		if (PrevPlayerState != p->GetCurrentPlayerState() || p->IsWorking())
 		{
 			switch (p->GetCurrentPlayerState())
@@ -300,6 +334,9 @@ void Anim_Player::Tick(const float DeltaTime)
 				break;
 			case EPlayerState::Player_JumpAttack:
 				ConfigDefault(p, Anim_JumpDefaultAttack);
+				break;
+			case EPlayerState::Player_Dead:
+				ConfigDefault(p, Anim_Dead);
 				break;
 			}
 		}

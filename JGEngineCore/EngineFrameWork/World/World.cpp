@@ -1,13 +1,16 @@
 #include"World.h"
-#include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
 #include"WorldManager.h"
+#include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
 #include"../../EngineStatics/JMath/JGMatrix.h"
 #include"../Object/Object.h"
+#include"../Object/GameMode.h"
 using namespace std;
 World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld, WorldManager* manager)
 {
 	m_WorldManager = manager;
 	m_pyWorld = pyWorld;
+
+
 	m_ViewMatrix = make_unique<JGMatrix>();
 	TempViewMatrixInit();
 }
@@ -17,6 +20,16 @@ World::~World()
 }
 void World::Tick(const float DeltaTime)
 {
+	if (m_GameMode.get())
+	{
+		if (m_GameMode->IsGameEnd())
+		{
+			m_GameMode->GameEndEvent(DeltaTime);
+			return;
+		}
+		m_GameMode->Tick(DeltaTime);
+	}
+	
 	for (auto object = m_sObjects.begin(); object != m_sObjects.end();)
 	{
 		if ((*object)->GetObjectState() != EObjectState::Destory)
@@ -46,6 +59,11 @@ void World::TempViewMatrixInit()
 
 
 	m_ViewMatrix->MakeViewMatrix(&position, &lookAt, &up);
+}
+
+GameMode* World::GetGameMode()
+{
+	return m_GameMode.get();
 }
 
 JGMatrix& World::GetViewMatrix()

@@ -48,6 +48,8 @@ Log : Loading World Start!
 Log : Loading : 10 %
 0001
 Log : Loading : 20 %
+0101
+Progress : mode connect
 0001
 Log : Loading : 30 %
 0001
@@ -73,7 +75,43 @@ Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
+Log : Player_JumpDown
+0001
 Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
@@ -103,39 +141,69 @@ Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
 Log : SetAttackSpawnLocation
 0001
-Log : Player_DefaultAttack
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
 0001
 Log : Player_Idle
 0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
 Log : SetAttackSpawnLocation
 0001
-Log : Player_DefaultAttack
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
 0001
 Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
 Log : Player_Move
 0001
 Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
 0001
 Log : Player_JumpUp
 0001
@@ -159,7 +227,65 @@ Log : Player_JumpDown
 0001
 Log : Player_Idle
 0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
 Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
@@ -177,20 +303,8 @@ Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
 Log : Player_JumpDown
 0001
 Log : Player_Idle
-0001
-Log : Player_Move
 0001
 Log : Player_Idle

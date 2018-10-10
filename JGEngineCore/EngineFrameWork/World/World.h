@@ -6,6 +6,7 @@ class RenderSystem;
 class JGMatrix;
 class JGPhysicsWorld;
 class WorldManager;
+class GameMode;
 /*
 Class : World 
 @m m_WorldName : 월드 이름 
@@ -17,6 +18,8 @@ private:
 private:
 	std::wstring m_WorldName = TT("None");
 	std::list<std::shared_ptr<Object>> m_sObjects;
+	std::unique_ptr<GameMode> m_GameMode;
+
 	JGPhysicsWorld* m_pyWorld = nullptr;
 	std::unique_ptr<JGMatrix> m_ViewMatrix;
 public:
@@ -33,8 +36,13 @@ public:
 
 	template<typename ObjectType>
 	Object* SpawnObject();
+	template<typename GameModeType>
+	void SetGameMode();
+
+
 
 	void TempViewMatrixInit();
+	GameMode* GetGameMode();
 	JGMatrix& GetViewMatrix();
 	JGPhysicsWorld* GetPyWorld();
 	void Clear();
@@ -49,4 +57,10 @@ inline Object* World::SpawnObject()
 	Object* result = object.get();
 	m_sObjects.push_back(move(object));
 	return result;
+}
+template<typename GameModeType>
+inline void World::SetGameMode()
+{
+	m_GameMode = std::make_unique<GameModeType>();
+	m_GameMode->BeginObject(this);
 }

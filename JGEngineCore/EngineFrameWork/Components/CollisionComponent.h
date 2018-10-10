@@ -8,6 +8,7 @@
 
 class ENGINE_EXPORT CollisionComponent : public Motivated2DComponent
 {
+	typedef uint16 CollisionFilter;
 private:
 	bool m_bBeginOverlap = false;
 	bool m_bEndOverlap   = false;
@@ -26,6 +27,8 @@ private:
 	float m_Density = 1.0f;
 	float m_Friction = 0.0f;
 	float m_Restitution = 0.0f;
+
+	bool m_bDestory = false;
 public:
 	CollisionComponent();
 	virtual ~CollisionComponent();
@@ -56,8 +59,12 @@ public:
 	void SetFriction(const float Friction);
 	void SetRestitution(const float Restitution);
 	void SetFilter(JG2DFilter filter);
+	void SetCategoryFilter(const CollisionFilter filter);
+	void SetMaskFilter(const CollisionFilter filter);
+	void AddMaskFilter(const CollisionFilter filter);
 	void FixAngle();
 	void UnFixAngle();
+	void DestroyCollison();
 public:
 	JGVector2D& GetVelocity();
 	void SetVelocity(const JGVector2D& vel);

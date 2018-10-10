@@ -3,8 +3,8 @@
 
 class EnemyUnitBase : public Side_Scroll_Unit
 {
-private:
-
+private: 
+	
 public:
 	EnemyUnitBase();
 	virtual ~EnemyUnitBase();

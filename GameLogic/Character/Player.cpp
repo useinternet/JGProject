@@ -2,12 +2,15 @@
 #include"Anim/Player/Anim_Player.h"
 #include"EngineFrameWork/Components/Box2DCollisionComponent.h"
 #include"EngineFrameWork/Components/InputComponent.h"
+#include"Character/PlayerStatus.h"
 #include"Skill/DefaultAttackComponent.h"
 #include"Skill/DefaultSkillComponent.h"
 #include"Skill/SpecialSkillComponent.h"
 #include"Skill/SitSkillComponent.h"
 #include"PhysicsSystem/JGBox2D/JGDynamics/JG2DFilter.h"
-
+#include"StaticFilter/StaticCollisionFilter.h"
+#include"GameMode/GameModeBase.h"
+#include"EngineFrameWork/World/World.h"
 #include"EngineStatics/JGLog.h"
 using namespace std;
 Player::Player()
@@ -37,12 +40,12 @@ Player::Player()
 	Config = { 60.0f,120.0f,0.0f,-85.0f,1.0f,1.0f };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_StandUp, Config));
 	// 충돌체 설정
-	JG2DFilter filter;
-	filter.Get().categoryBits = 0x00002;
-	filter.Get().maskBits = 0x00001;
+	GetCollision()->SetCategoryFilter(Filter_PlayerCollision);
+	GetCollision()->SetMaskFilter(Filter_Ground | Filter_Enemy | Filter_EnemyAttack);
+
+
 	GetCollision()->SetAsBox(60.0f, 170.0f);
 	GetCollision()->SetComponentLocation(900.0F, 0.0f);
-	GetCollision()->SetFilter(filter);
 	// 애니메이션 컴포넌트
 	AnimPlayer = RegisterComponentInObject<Anim_Player>(TT("Anim_Player"));
 	AnimPlayer->SetComponentLocation(0.0f, -85.0f);
@@ -59,9 +62,16 @@ Player::Player()
 	// 입력 컴포넌트 추가..
 	InputDevice = RegisterComponentInObject<InputComponent>(TT("InputDevice"));
 
+
+
+
+	// 플레이어 스탯
+	playerStatus = RegisterComponentInObject<PlayerStatus>(TT("PlayerStatus"));
+
 	// 현제 상태 입력
 	CurrentPlayerState = EPlayerState::Player_Idle;
 	PrevPlayerState = EPlayerState::Player_Idle;
+
 }
 
 Player::~Player()
@@ -83,11 +93,26 @@ void Player::BeginObject(World* world)
 	InputDevice->BindKeyCommand(TT("DefaultAttack"), EKeyState::Down, bind(&Player::func_DefaultAttack, this));
 	InputDevice->BindKeyCommand(TT("DefaultSkill"), EKeyState::Down, bind(&Player::func_DefaultSkill, this));
 	InputDevice->BindKeyCommand(TT("SpecialSkill"), EKeyState::Down, bind(&Player::func_SpeicalSkill, this));
+
+	GameModeBase* mode = dynamic_cast<GameModeBase*>(world->GetGameMode());
+	if (mode)
+	{
+		mode->SetPlayer(this);
+	}
 }
 void Player::Tick(const float DeltaTime)
 {
 	Side_Scroll_Unit::Tick(DeltaTime);
-
+	if (IsDead())
+	{
+		GetCollision()->DestroyCollison();
+		return;
+	}
+	if (playerStatus->GetHp() <= 0)
+	{
+		CurrentPlayerState = Player_Dead;
+	}
+	playerStatus->AddCurrentHp(-50 * DeltaTime);
 	if (!IsFalling() && (CurrentPlayerState == Player_JumpDown || CurrentPlayerState == Player_JumpAttack))
 	{
 		m_bPlayerFix = false;
@@ -98,7 +123,7 @@ void Player::Tick(const float DeltaTime)
 		CurrentPlayerState = Player_JumpDown;
 	}
 	// 상황에따른박스 충돌체 크기 변경
-	if ( (PrevPlayerState != CurrentPlayerState ) || IsWorking())
+	if ( ((PrevPlayerState != CurrentPlayerState ) || IsWorking()) && !IsDead())
 	{
 	
 		SPlayerPosByAnim PrevConfig = m_mBox_Pos_Config[PrevPlayerState];
@@ -162,6 +187,14 @@ bool Player::IsMoving()
 	}
 	return false;
 }
+bool Player::IsDead()
+{
+	if (CurrentPlayerState == Player_Dead)
+	{
+		return true;
+	}
+	return false;
+}
 void Player::NotifyAttackComplete()
 {
 	m_bPlayerFix = false;
@@ -178,7 +211,8 @@ void Player::Attack(AttackBaseComponent* com, EPlayerState skill)
 	if (com->IsEnableAttack())
 	{
 		JGVector2D location = GetCollision()->GetComponentWorldLocation();
-		location.SetX(location.X() + 50.0f);
+		location.SetY(location.Y() - 100.0f);
+		location.SetX(location.X() + 100.0f);
 		com->Attack(location);
 		CurrentPlayerState = skill;
 		m_bPlayerFix = true;
@@ -186,6 +220,8 @@ void Player::Attack(AttackBaseComponent* com, EPlayerState skill)
 }
 void Player::func_Stop()
 {
+	if (IsDead()) return;
+
 	if (!IsJumping() && !m_bPlayerFix && !IsSitting())
 	{
 		CurrentPlayerState = Player_Idle;
@@ -194,6 +230,7 @@ void Player::func_Stop()
 }
 void Player::func_RightMove()
 {
+	if (IsDead()) return;
 	if (!IsSitting() && !m_bPlayerFix)
 	{
 		Move();
@@ -210,6 +247,7 @@ void Player::func_RightMove()
 }
 void Player::func_LeftMove()
 {
+	if (IsDead()) return;
 	if (!IsSitting() &&  !m_bPlayerFix)
 	{
 		Move();
@@ -225,6 +263,7 @@ void Player::func_LeftMove()
 }
 void Player::func_Jump()
 {
+	if (IsDead()) return;
 	if (!IsJumping() && !m_bPlayerFix)
 	{
 		PushUp(JumpForce);
@@ -233,6 +272,7 @@ void Player::func_Jump()
 }
 void Player::func_SitDown()
 {
+	if (IsDead()) return;
 	if (!IsJumping() && !m_bPlayerFix && !IsMoving())
 	{
 		CurrentPlayerState = Player_SitDown;
@@ -240,6 +280,7 @@ void Player::func_SitDown()
 }
 void Player::func_StandUp()
 {
+	if (IsDead()) return;
 	if (!IsJumping() && CurrentPlayerState == Player_SitDown)
 	{
 		CurrentPlayerState = Player_StandUp;
@@ -247,6 +288,7 @@ void Player::func_StandUp()
 }
 void Player::func_DefaultAttack()
 {
+	if (IsDead()) return;
 	if (IsMoving() || m_bPlayerFix)
 	{
 		return;
@@ -269,6 +311,7 @@ void Player::func_DefaultAttack()
 }
 void Player::func_DefaultSkill()
 {
+	if (IsDead()) return;
 	if (IsJumping() || IsMoving() || m_bPlayerFix)
 	{
 		return;
@@ -284,11 +327,24 @@ void Player::func_DefaultSkill()
 }
 void Player::func_SpeicalSkill()
 {
+	if (IsDead()) return;
 	if (IsJumping() || IsSitting() || IsMoving() || m_bPlayerFix)
 	{
 		return;
 	}
 	Attack(specialSkill, Player_SpecialSkill);
+}
+PlayerStatus* Player::GetStatus()
+{
+	return playerStatus;
+}
+void Player::YouDie()
+{
+	RealDead = true;
+}
+bool Player::IsDie()
+{
+	return RealDead;
 }
 void Player::PlayerStateLog()
 {

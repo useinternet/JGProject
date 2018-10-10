@@ -10,6 +10,12 @@ TestGround::TestGround()
 	Ground4 = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground4"));
 	Ground5 = RegisterComponentInObject<Box2DCollisionComponent>(TT("Ground5"));
 
+	Ground1->SetCategoryFilter(0x00000008);
+	Ground2->SetCategoryFilter(0x00000008);
+	Ground3->SetCategoryFilter(0x00000008);
+	Ground4->SetCategoryFilter(0x00000008);
+	Ground5->SetCategoryFilter(0x00000008);
+
 	Ground1->SetAsBox(900.0f, 10.0f);
 	Ground2->SetAsBox(10.0F, 500.0f);
 	Ground3->SetAsBox(10.0F, 500.0f);
