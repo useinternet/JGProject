@@ -1,10 +1,10 @@
 #include"BehaviorTreeComponent.h"
-#include"BT_Root.h"
+#include"../AI/BT_Root.h"
 using namespace std;
 BehaviorTreeComponent::BehaviorTreeComponent()
 {
 	RegisterComponentID(typeid(this));
-	m_TreeRoot = make_unique<BT_Root>();
+	m_Root = make_unique<BT_Root>();
 }
 
 BehaviorTreeComponent::~BehaviorTreeComponent()
@@ -12,7 +12,49 @@ BehaviorTreeComponent::~BehaviorTreeComponent()
 
 }
 
-void BehaviorTreeComponent::Tick(const float DeltaTime)
+void BehaviorTreeComponent::BeginComponent(World* world)
+{
+	m_Root->InitNode();
+	m_Root->RegisterName(GetComponentName()+TT("_BT_Root"));
+	MakeAITreeSpace();
+}
+
+void BehaviorTreeComponent::MakeAITreeSpace()
 {
 
+}
+
+BT_Selector* BehaviorTreeComponent::CreateSelector(const wstring& nodeName)
+{
+	unique_ptr<BT_Selector> selector = make_unique<BT_Selector>();
+	selector->InitNode();
+	selector->RegisterName(nodeName);
+	BT_Selector* result = selector.get();
+
+
+	m_vBTNodes.push_back(move(selector));
+
+	return result;
+}
+
+BT_Sequence* BehaviorTreeComponent::CreateSequence(const wstring& nodeName)
+{
+	unique_ptr<BT_Sequence> sequence = make_unique<BT_Sequence>();
+	sequence->InitNode();
+	sequence->RegisterName(nodeName);
+	BT_Sequence* result = sequence.get();
+
+	m_vBTNodes.push_back(move(sequence));
+
+	return result;
+}
+
+BT_MiddleNode* BehaviorTreeComponent::GetRoot()
+{
+	return m_Root.get();
+}
+
+void BehaviorTreeComponent::Tick(const float DeltaTime)
+{
+	m_Root->Behavior(DeltaTime);
 }

@@ -104,6 +104,9 @@
     <Filter Include="PhysicsSystem\JGBox2D\JGShape">
       <UniqueIdentifier>{377ea165-fdea-4854-89ed-cb19262350c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineFrameWork\AI">
+      <UniqueIdentifier>{7447adbf-a9f8-4776-9c91-9c4da0aa4489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -547,20 +550,26 @@
     <ClCompile Include="EngineFrameWork\Components\BehaviorTreeComponent.cpp">
       <Filter>EngineFrameWork\Components</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\BT_Task.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClCompile Include="EngineFrameWork\AI\BT_Node.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\BT_Selector.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClCompile Include="EngineFrameWork\AI\BT_Root.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\BT_Sequence.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClCompile Include="EngineFrameWork\AI\BT_Selector.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\BT_Node.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClCompile Include="EngineFrameWork\AI\BT_Sequence.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClCompile>
-    <ClCompile Include="EngineFrameWork\Components\BT_Root.cpp">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClCompile Include="EngineFrameWork\AI\BT_Task.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\AI\BT_InformationBoard.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\AI\BT_MiddleNode.cpp">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1014,20 +1023,26 @@
     <ClInclude Include="EngineFrameWork\Components\BehaviorTreeComponent.h">
       <Filter>EngineFrameWork\Components</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\BT_Task.h">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClInclude Include="EngineFrameWork\AI\BT_Node.h">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\BT_Selector.h">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClInclude Include="EngineFrameWork\AI\BT_Root.h">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\BT_Sequence.h">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClInclude Include="EngineFrameWork\AI\BT_Selector.h">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\BT_Node.h">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClInclude Include="EngineFrameWork\AI\BT_Sequence.h">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClInclude>
-    <ClInclude Include="EngineFrameWork\Components\BT_Root.h">
-      <Filter>EngineFrameWork\Components</Filter>
+    <ClInclude Include="EngineFrameWork\AI\BT_Task.h">
+      <Filter>EngineFrameWork\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\AI\BT_InformationBoard.h">
+      <Filter>EngineFrameWork\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\AI\BT_MiddleNode.h">
+      <Filter>EngineFrameWork\AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
