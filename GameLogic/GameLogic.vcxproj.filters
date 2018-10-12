@@ -59,6 +59,18 @@
     <Filter Include="Game\Widget\GameWidget">
       <UniqueIdentifier>{5a2c29a2-f845-43f9-90e7-7cbf1d406cc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\EnemyUnit\AI">
+      <UniqueIdentifier>{7eb53d86-2ad9-4f92-8e23-7a7ce07e8f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\EnemyUnit\AI\Board">
+      <UniqueIdentifier>{c507c0ce-a309-4bb7-a4d7-7a6044a98537}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\EnemyUnit\AI\BehaviorTree">
+      <UniqueIdentifier>{02742cc5-17e2-4702-818b-ce7dc5234cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\EnemyUnit\AI\Task">
+      <UniqueIdentifier>{122cab31-2d2a-4ff3-8e3a-22e10874d91f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -121,6 +133,12 @@
     <ClCompile Include="GameMode\GameModeBase.cpp">
       <Filter>Game\GameMode</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyUnit\AI\BehaviorTree\BT_EnemyAIBase.cpp">
+      <Filter>Game\EnemyUnit\AI\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.cpp">
+      <Filter>Game\EnemyUnit\AI\Board</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -182,6 +200,12 @@
     </ClInclude>
     <ClInclude Include="GameMode\GameModeBase.h">
       <Filter>Game\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyUnit\AI\BehaviorTree\BT_EnemyAIBase.h">
+      <Filter>Game\EnemyUnit\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.h">
+      <Filter>Game\EnemyUnit\AI\Board</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

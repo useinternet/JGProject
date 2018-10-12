@@ -18,12 +18,10 @@ void BehaviorTreeComponent::BeginComponent(World* world)
 	m_Root->RegisterName(GetComponentName()+TT("_BT_Root"));
 	MakeAITreeSpace();
 }
-
 void BehaviorTreeComponent::MakeAITreeSpace()
 {
 
 }
-
 BT_Selector* BehaviorTreeComponent::CreateSelector(const wstring& nodeName)
 {
 	unique_ptr<BT_Selector> selector = make_unique<BT_Selector>();
@@ -32,7 +30,8 @@ BT_Selector* BehaviorTreeComponent::CreateSelector(const wstring& nodeName)
 	BT_Selector* result = selector.get();
 
 
-	m_vBTNodes.push_back(move(selector));
+	m_mBTNodes.insert(
+		pair<const std::wstring, std::unique_ptr<BT_Node>>(nodeName, move(selector)));
 
 	return result;
 }
@@ -44,7 +43,8 @@ BT_Sequence* BehaviorTreeComponent::CreateSequence(const wstring& nodeName)
 	sequence->RegisterName(nodeName);
 	BT_Sequence* result = sequence.get();
 
-	m_vBTNodes.push_back(move(sequence));
+	m_mBTNodes.insert(
+		pair<const std::wstring, std::unique_ptr<BT_Node>>(nodeName, move(sequence)));
 
 	return result;
 }

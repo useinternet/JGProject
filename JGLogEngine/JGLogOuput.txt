@@ -51,19 +51,17 @@ Log : Loading : 20 %
 0101
 Progress : mode connect
 0001
-Log : Loading : 25 %
+Log : Loading : 30 %
 0001
-Log : Loading : 35 %
+Log : Loading : 40 %
 0001
-Log : Loading : 45 %
+Log : Loading : 50 %
 0001
-Log : Loading : 55 %
+Log : Loading : 60 %
 0001
-Log : Loading : 65 %
+Log : Loading : 70 %
 0001
-Log : Loading : 75 %
-0001
-Log : Loading : 85 %
+Log : Loading : 80 %
 0001
 Log : Loading : 100 %
 0001
@@ -87,178 +85,6 @@ Log : Player_JumpUp
 0001
 Log : Player_JumpUp
 0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : Player_SpecialSkill
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
 Log : Player_JumpUp
 0001
 Log : Player_JumpDown
@@ -279,48 +105,42 @@ Log : Player_Idle
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
+Log : SetAttackSpawnLocation
 0001
-Log : Player_Move
+Log : Player_DefaultAttack
 0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
+Log : Player_Idle
 0001
 Log : SetAttackSpawnLocation
 0001
-Log : Player_JumpAttack
+Log : Player_DefaultAttack
 0001
-Log : Player_JumpDown
+Log : Player_Idle
 0001
 Log : SetAttackSpawnLocation
 0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
 Log : Player_Move
 0001
-Log : Player_Move
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
+Log : SetAttackSpawnLocation
 0001
-Log : Player_Move
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
+Log : SetAttackSpawnLocation
 0001
-Log : Player_Move
+Log : Player_DefaultAttack
 0001
 Log : Player_Idle

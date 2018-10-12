@@ -60,15 +60,6 @@ void BT_MiddleNode::DeleteChildNode(const wstring& name)
 	});
 }
 
-void BT_MiddleNode::SetBoard(BT_InformationBoard* board)
-{
-	BT_Node::SetBoard(board);
-	for (auto& iter : m_ChildNodes)
-	{
-		iter->SetBoard(board);
-	}
-}
-
 BT_Node* BT_MiddleNode::GetChildNode(const wstring& name)
 {
 	auto childNode = find_if(m_ChildNodes.begin(), m_ChildNodes.end(), [name](BT_Node* node)

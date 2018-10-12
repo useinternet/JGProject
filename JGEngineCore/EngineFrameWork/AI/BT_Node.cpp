@@ -46,17 +46,6 @@ BT_MiddleNode* BT_Node::GetParentNode()
 {
 	return m_ParentNode;
 }
-
-BT_InformationBoard* BT_Node::GetBoard()
-{
-	return m_InforBoard;
-}
-
-void BT_Node::SetBoard(BT_InformationBoard* board)
-{
-	m_InforBoard = board;
-}
-
 void BT_Node::ThisIsMyParent(BT_MiddleNode* node)
 {
 	m_ParentNode = node;

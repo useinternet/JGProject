@@ -4,8 +4,6 @@
 
 class ENGINE_EXPORT BT_InformationBoard
 {
-private:
-
 public:
 	BT_InformationBoard();
 	virtual ~BT_InformationBoard();

@@ -10,7 +10,6 @@ private:
 	std::wstring        m_NodeName = TT("None");
 
 	class BT_MiddleNode* m_ParentNode = nullptr;
-	class BT_InformationBoard* m_InforBoard = nullptr;
 protected:
 	enum class EBTNodeType
 	{
@@ -34,9 +33,7 @@ public:
 	void NoPass();
 
 	BT_MiddleNode* GetParentNode();                              // 부모노드 가져오기
-	BT_InformationBoard* GetBoard();
 	virtual EBTNodeType GetNodeType();
-	const std::wstring& GetNodeName();
-	virtual void SetBoard(BT_InformationBoard* board);             
+	const std::wstring& GetNodeName();      
 	void ThisIsMyParent(BT_MiddleNode* node);                    // 부모 노드 설정
 };
