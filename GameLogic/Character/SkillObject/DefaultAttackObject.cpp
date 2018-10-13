@@ -2,8 +2,10 @@
 #include"EngineFrameWork/Components/StaticMesh2DComponent.h"
 #include"EngineFrameWork/Components/Circle2DCollisionComponent.h"
 #include"EngineStatics/JGConstructHelper.h"
+#include"EnemyUnit/EnemyUnitBase.h"
 #include"EngineStatics/JTimerManager.h"
 #include"StaticFilter/StaticCollisionFilter.h"
+#include"EngineFrameWork/DamageInformation/SingleDamage.h"
 #include"EngineStatics/JGLog.h"
 DefaultAttackObject::DefaultAttackObject()
 {
@@ -15,7 +17,16 @@ DefaultAttackObject::DefaultAttackObject()
 
 	CircleCollison->SetBodyType(E2DBodyType::Kinematic);
 	CircleCollison->SetRadius(20.0f);
-
+	CircleCollison->SetBeginOverlapEvent([](Object* obj)
+	{
+		EnemyUnitBase* enemy = dynamic_cast<EnemyUnitBase*>(obj);
+		if (enemy)
+		{
+			SingleDamage dmg;
+			dmg.Damage = 10.0f;
+			enemy->SendDamage(dmg);
+		}
+	});
 	JTimerEventManager::CreateTimerEvent(&DestroyTimerHandle,
 		std::bind(&DefaultAttackObject::DestoryObject,this), EHandleType::EDefault,
 		ObjectLife, 0.0f, 1);

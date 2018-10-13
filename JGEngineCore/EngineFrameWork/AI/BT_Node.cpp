@@ -50,8 +50,7 @@ void BT_Node::ThisIsMyParent(BT_MiddleNode* node)
 {
 	m_ParentNode = node;
 }
-
-BT_Node::EBTNodeType BT_Node::GetNodeType()
+EBTNodeType BT_Node::GetNodeType()
 {
 	return EBTNodeType(EBTNodeType::None);
 }

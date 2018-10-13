@@ -1,5 +1,6 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
+#include"../DamageInformation/DamageInformationBase.h"
 #include"ExistObject.h"
 
 typedef unsigned int FallingCheck;
@@ -20,6 +21,8 @@ private:
 
 
 	bool m_bWorking = false;
+	bool m_bDamaged = false;
+	std::queue<DamageInformationBase> m_qDamageInfor;
 public:
 	Unit();
 	virtual ~Unit();
@@ -41,4 +44,15 @@ public:
 	JGVector2D& GetVelocity();
 
 	JGVector2D GetObjectLocation();
+
+	virtual void BeginOverlap(Object* obj);
+	virtual void EndOverlap(Object* obj);
+	virtual void Overlapping(const std::vector<Object*>& ObjList);
+
+
+	void SendDamage(const DamageInformationBase& dmg);
+	void ReceiveDamage();
+
+	virtual void ReceiveSingleDamageProcess(class SingleDamage* dmg);
+	virtual void ReceiveSplashDamageProcess(class SplashDamage* dmg);
 };

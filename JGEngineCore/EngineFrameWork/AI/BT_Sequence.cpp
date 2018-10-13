@@ -50,7 +50,7 @@ void BT_Sequence::Behavior(const float DeltaTime)
 	}
 }
 
-BT_Sequence::EBTNodeType BT_Sequence::GetNodeType()
+EBTNodeType BT_Sequence::GetNodeType()
 {
 	return m_NodeType;
 }

@@ -80,14 +80,22 @@ StartMainWidget::StartMainWidget()
 	ConfigButton->SetComponentLocation(ConfigButtonLocation);
 	ExpButton->SetComponentLocation(ExpButtonLocation);
 
+
+	
+
+
 	ActiveObject();
 
 }
 
 StartMainWidget::~StartMainWidget()
 {
-}
 
+}
+void StartMainWidget::BeginObject(World* world)
+{
+	UserWidget::BeginObject(world);
+}
 void StartMainWidget::Tick(const float DeltaTime)
 {
 	UserWidget::Tick(DeltaTime);
@@ -100,7 +108,6 @@ void StartMainWidget::Tick(const float DeltaTime)
 		GetWorld()->GetManager()->SelectWorld(TT("Loading"));
 	}
 }
-
 void StartMainWidget::ChangeTextLocationWithButtonClick(Button* button, Text* text, const JGVector2D& TextLocation)
 {
 	if (button->IsMousePressedInButton())

@@ -55,6 +55,9 @@ void Progressbar::CreateProgressBar(const std::wstring& FullBarPath, const std::
 
 	m_EmptyBar->SetStartDrawTex(m_Aspect, 0.0f);
 	m_EmptyBar->SetEndDrawTex(1.0f, 1.0f);
+
+	m_FullBar->UseDefaultViewMatrix();
+	m_EmptyBar->UseDefaultViewMatrix();
 }
 
 

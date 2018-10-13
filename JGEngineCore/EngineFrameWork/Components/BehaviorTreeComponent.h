@@ -18,12 +18,12 @@ public:
 	BehaviorTreeComponent();
 	virtual ~BehaviorTreeComponent();
 	virtual void BeginComponent(World* world) override;
+protected:
+	virtual void InformationBoardInitSpace();
 	virtual void MakeAITreeSpace();
-
 
 	template<typename UserBoard>
 	UserBoard* CreateBoard(const std::wstring& TaskName);
-
 
 	template<typename UserTask>
 	UserTask* CreateTask(const std::wstring& nodeName);
@@ -61,7 +61,7 @@ inline UserTask* BehaviorTreeComponent::CreateTask(const std::wstring& nodeName)
 	std::unique_ptr<UserTask> task = std::make_unique<UserTask>();
 	task->InitNode();
 	task->RegisterName(nodeName);
-
+	task->BeginTask();
 	UserTask* result = task.get();
 	m_mBTNodes.insert(
 		std::pair<const std::wstring, std::unique_ptr<BT_Node>>(nodeName, std::move(task)));

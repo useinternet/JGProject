@@ -9,12 +9,11 @@ class ENGINE_EXPORT MotivatedComponent : public Component
 public:
 	MotivatedComponent();
 	virtual ~MotivatedComponent();
-
-
+	bool m_bDefaultView = false;
 protected:
-	const JGMatrix& GetViewMatrix();
+	virtual const JGMatrix& GetViewMatrix();
 	const JGMatrix& GetProjectionMatrix();
 	const JGMatrix& GetOrthoMatrix();
-
-
+public:
+	void UseDefaultViewMatrix();
 };

@@ -21,7 +21,8 @@ private:
 	std::unique_ptr<GameMode> m_GameMode;
 
 	JGPhysicsWorld* m_pyWorld = nullptr;
-	std::unique_ptr<JGMatrix> m_ViewMatrix;
+	JGMatrix* m_ViewMatrix    = nullptr;
+	std::unique_ptr<JGMatrix> m_DefaultCamera;
 public:
 	World() = delete;
 	World(const std::wstring& Name, JGPhysicsWorld* pyWorld,WorldManager* manager);
@@ -38,12 +39,13 @@ public:
 	Object* SpawnObject();
 	template<typename GameModeType>
 	void SetGameMode();
-
+	void SetCurrentViewCamera(class Component* component);
 
 
 	void TempViewMatrixInit();
 	GameMode* GetGameMode();
 	JGMatrix& GetViewMatrix();
+	JGMatrix& GetDefaultViewMatrix();
 	JGPhysicsWorld* GetPyWorld();
 	void Clear();
 	WorldManager* GetManager();

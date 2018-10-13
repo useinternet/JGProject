@@ -97,7 +97,6 @@ inline ComponentType* Object::RegisterComponentInObject(const std::wstring& Comp
 	std::unique_ptr<Component> component = std::make_unique<ComponentType>();
 	component->SetOwnerObject(this);
 	component->RegisterName(ComponentName);
-	m_RootComponent->AddChild(component.get());
 
 	// 계층 구조 컴포넌트인지 체크한다.
 	MotivatedComponent* Check = dynamic_cast<MotivatedComponent*>(component.get());

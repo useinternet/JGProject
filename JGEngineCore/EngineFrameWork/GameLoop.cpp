@@ -35,9 +35,9 @@ void GameLoop::Tick(const float DeltaTime)
 			);
 			m_pPhysicsSystem->SetCurrentPhysicsWorld(
 				m_WorldManager->GetCurrentWorldName());
-			m_pPhysicsSystem->DebugDrawSetViewMatrix(
-				m_WorldManager->GetCurrentWorld()->GetViewMatrix());
 		}
+		m_pPhysicsSystem->DebugDrawSetViewMatrix(
+			m_WorldManager->GetCurrentWorld()->GetViewMatrix());
 	}
 }
 

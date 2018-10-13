@@ -6,15 +6,21 @@ MotivatedComponent::MotivatedComponent()
 {
 	RegisterComponentID(typeid(this));
 }
-
 MotivatedComponent::~MotivatedComponent()
 {
 
 }
-
 const JGMatrix& MotivatedComponent::GetViewMatrix()
 {
-	return GetWorld()->GetViewMatrix();
+	if (m_bDefaultView)
+	{
+		return GetWorld()->GetDefaultViewMatrix();
+	}
+	else
+	{
+		return GetWorld()->GetViewMatrix();
+	}
+
 }
 const JGMatrix& MotivatedComponent::GetProjectionMatrix()
 {
@@ -23,6 +29,11 @@ const JGMatrix& MotivatedComponent::GetProjectionMatrix()
 const JGMatrix & MotivatedComponent::GetOrthoMatrix()
 {
 	return GetViewport()->GetOrthoMatrix();
+}
+
+void MotivatedComponent::UseDefaultViewMatrix()
+{
+	m_bDefaultView = true;
 }
 
 

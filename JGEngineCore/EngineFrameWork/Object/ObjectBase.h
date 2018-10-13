@@ -33,7 +33,7 @@ public:
 	/*
 	Exp : ZOrder 값을 설정한다. */
 	void SetZOrder(int Num);
-protected:
+	protected:
 	/*
 	Exp : 오브젝트 타입 고유 아이디를 등록한다. 
 	@param : const type_info& ID : typeid(ObjecType) 형식으로 파라미터를 전달. */

@@ -375,6 +375,7 @@
     <ClCompile Include="EngineFrameWork\Components\Animation2DSystemComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\BehaviorTreeComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Box2DCollisionComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\Components\Camera2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Circle2DCollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\CollisionComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\Component.cpp" />
@@ -387,6 +388,9 @@
     <ClCompile Include="EngineFrameWork\Components\Motivated2DComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\MotivatedComponent.cpp" />
     <ClCompile Include="EngineFrameWork\Components\TextComponent.cpp" />
+    <ClCompile Include="EngineFrameWork\DamageInformation\DamageInformationBase.cpp" />
+    <ClCompile Include="EngineFrameWork\DamageInformation\SingleDamage.cpp" />
+    <ClCompile Include="EngineFrameWork\DamageInformation\SplashDamage.cpp" />
     <ClCompile Include="EngineFrameWork\GameLoop.cpp" />
     <ClCompile Include="EngineFrameWork\Object\ExistObject.cpp" />
     <ClCompile Include="EngineFrameWork\Object\GameInstance.cpp" />
@@ -529,6 +533,7 @@
     <ClInclude Include="EngineFrameWork\Components\Animation2DSystemComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\BehaviorTreeComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Box2DCollisionComponent.h" />
+    <ClInclude Include="EngineFrameWork\Components\Camera2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Circle2DCollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\CollisionComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\Component.h" />
@@ -541,6 +546,9 @@
     <ClInclude Include="EngineFrameWork\Components\Motivated2DComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\MotivatedComponent.h" />
     <ClInclude Include="EngineFrameWork\Components\TextComponent.h" />
+    <ClInclude Include="EngineFrameWork\DamageInformation\DamageInformationBase.h" />
+    <ClInclude Include="EngineFrameWork\DamageInformation\SingleDamage.h" />
+    <ClInclude Include="EngineFrameWork\DamageInformation\SplashDamage.h" />
     <ClInclude Include="EngineFrameWork\GameLoop.h" />
     <ClInclude Include="EngineFrameWork\Object\ExistObject.h" />
     <ClInclude Include="EngineFrameWork\Object\GameInstance.h" />

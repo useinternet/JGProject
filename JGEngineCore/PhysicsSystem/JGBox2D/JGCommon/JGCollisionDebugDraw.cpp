@@ -36,6 +36,8 @@ void JGCollisionDebugDraw::InitCollisionDebugDraw(JGDeviceD* Device, HWND hWnd, 
 	InitDebugMesh();
 	JGMatrix TransMatrix;
 	JGVector2D vec(0.0f, 0.0f);
+
+
 	TransMatrix.MakeTranslation2DMatrix(m_pViewPort->GetWidth(),
 		m_pViewPort->GetHeight(), vec);
 	*m_WorldMatrix = (*m_WorldMatrix) * TransMatrix;

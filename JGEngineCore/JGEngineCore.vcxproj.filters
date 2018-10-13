@@ -107,6 +107,9 @@
     <Filter Include="EngineFrameWork\AI">
       <UniqueIdentifier>{7447adbf-a9f8-4776-9c91-9c4da0aa4489}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineFrameWork\DamageInformation">
+      <UniqueIdentifier>{5d36479f-8cb1-445c-99f1-428a1456fe8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -570,6 +573,18 @@
     </ClCompile>
     <ClCompile Include="EngineFrameWork\AI\BT_MiddleNode.cpp">
       <Filter>EngineFrameWork\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\Components\Camera2DComponent.cpp">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\DamageInformation\DamageInformationBase.cpp">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\DamageInformation\SplashDamage.cpp">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\DamageInformation\SingleDamage.cpp">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1043,6 +1058,18 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\AI\BT_MiddleNode.h">
       <Filter>EngineFrameWork\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\Components\Camera2DComponent.h">
+      <Filter>EngineFrameWork\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\DamageInformation\DamageInformationBase.h">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\DamageInformation\SplashDamage.h">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\DamageInformation\SingleDamage.h">
+      <Filter>EngineFrameWork\DamageInformation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

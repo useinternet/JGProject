@@ -48,7 +48,7 @@ void BT_Selector::Behavior(const float DeltaTime)
 		NoPass();
 	}
 }
-BT_Selector::EBTNodeType BT_Selector::GetNodeType()
+EBTNodeType BT_Selector::GetNodeType()
 {
 	return m_NodeType;
 }

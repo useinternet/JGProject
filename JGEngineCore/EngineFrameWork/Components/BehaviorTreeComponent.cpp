@@ -6,17 +6,20 @@ BehaviorTreeComponent::BehaviorTreeComponent()
 	RegisterComponentID(typeid(this));
 	m_Root = make_unique<BT_Root>();
 }
-
 BehaviorTreeComponent::~BehaviorTreeComponent()
 {
 
 }
-
 void BehaviorTreeComponent::BeginComponent(World* world)
 {
 	m_Root->InitNode();
 	m_Root->RegisterName(GetComponentName()+TT("_BT_Root"));
+	InformationBoardInitSpace();
 	MakeAITreeSpace();
+}
+void BehaviorTreeComponent::InformationBoardInitSpace()
+{
+
 }
 void BehaviorTreeComponent::MakeAITreeSpace()
 {

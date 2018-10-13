@@ -1,7 +1,14 @@
 #pragma once
 #include"../../EngineStatics/Engine.h"
 
-
+enum class ENGINE_EXPORT EBTNodeType
+{
+	None,
+	Task,
+	Root,
+	Sequence,
+	Selector
+};
 
 // Task 노드한테 필요한거      이름, 타입, 인포메이션 보드, 부모 노드
 class ENGINE_EXPORT BT_Node
@@ -11,14 +18,7 @@ private:
 
 	class BT_MiddleNode* m_ParentNode = nullptr;
 protected:
-	enum class EBTNodeType
-	{
-		None,
-		Task,
-		Root,
-		Sequence,
-		Selector
-	};
+
 	bool m_IsPass = false;
 public:
 	BT_Node();

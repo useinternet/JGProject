@@ -96,6 +96,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 	/// 컴포넌트 등록..
 	AddChild(m_OrdinaryImage.get());
 	m_OrdinaryImage->RegisterName(GetComponentName() + TT("_Ordinary"));
+	m_OrdinaryImage->UseDefaultViewMatrix();
 	/// 리소스 오브젝트 생성..
 	JGConstructHelper::StaticMesh2D OrdinaryImageMesh(
 		m_OrdinaryImage->GetComponentName(),pivot, OrdinaryImagePath);
@@ -130,7 +131,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 			m_ButtonClickImage->SetConstructObject(OrdinaryImageMesh.Object);
 		}
 	}
-
+	m_ButtonClickImage->UseDefaultViewMatrix();
 
 
 	/// 마우스를 데었을때 이미지 생성.
@@ -158,7 +159,7 @@ void Button::CreateButton(const EPivot pivot, const wstring& OrdinaryImagePath, 
 			m_MousePointerInButtonImage->SetConstructObject(OrdinaryImageMesh.Object);
 		}
 	}
-
+	m_MousePointerInButtonImage->UseDefaultViewMatrix();
 
 
 	/// 마우스 버튼 관련해서 키 등록

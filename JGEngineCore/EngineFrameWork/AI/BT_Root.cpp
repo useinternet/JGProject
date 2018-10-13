@@ -34,7 +34,7 @@ void BT_Root::Behavior(const float DeltaTime)
 }
 
 
-BT_Root::EBTNodeType BT_Root::GetNodeType()
+EBTNodeType BT_Root::GetNodeType()
 {
 	return m_NodeType;
 }

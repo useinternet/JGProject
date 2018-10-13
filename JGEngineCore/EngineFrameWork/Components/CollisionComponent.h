@@ -42,8 +42,6 @@ public:
 	void SetEndOverlapEvent(const std::function<void(Object*)>& Event);
 	void SetOverlappingEvent(const std::function<void(const std::vector<Object*>&)>& Event);
 
-
-
 	void AddOverlapObject(Object* overlapObject);
 	void DeleteOverlapObject(Object* overlapObject);
 
@@ -68,6 +66,4 @@ public:
 public:
 	JGVector2D& GetVelocity();
 	void SetVelocity(const JGVector2D& vel);
-
-
 };

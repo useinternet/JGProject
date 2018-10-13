@@ -29,7 +29,7 @@ bool ImageBox::CreateImage(const std::wstring& ImagePath, const EPivot pivot)
 	
 	AddChild(m_Image.get());
 	m_Image->RegisterName(GetComponentName());
-
+	m_Image->UseDefaultViewMatrix();
 
 
 	auto iter = m_mImagePath.find(ImagePath);

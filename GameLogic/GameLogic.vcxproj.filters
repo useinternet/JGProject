@@ -139,6 +139,9 @@
     <ClCompile Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.cpp">
       <Filter>Game\EnemyUnit\AI\Board</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyUnit\AI\Task\BTT_MoveTo.cpp">
+      <Filter>Game\EnemyUnit\AI\Task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -206,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.h">
       <Filter>Game\EnemyUnit\AI\Board</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyUnit\AI\Task\BTT_MoveTo.h">
+      <Filter>Game\EnemyUnit\AI\Task</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

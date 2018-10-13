@@ -11,7 +11,9 @@
 #include"StaticFilter/StaticCollisionFilter.h"
 #include"GameMode/GameModeBase.h"
 #include"EngineFrameWork/World/World.h"
+#include"EngineFrameWork/Components/Camera2DComponent.h"
 #include"EngineStatics/JGLog.h"
+
 using namespace std;
 Player::Player()
 {
@@ -42,8 +44,6 @@ Player::Player()
 	// 충돌체 설정
 	GetCollision()->SetCategoryFilter(Filter_PlayerCollision);
 	GetCollision()->SetMaskFilter(Filter_Ground | Filter_Enemy | Filter_EnemyAttack);
-
-
 	GetCollision()->SetAsBox(60.0f, 170.0f);
 	GetCollision()->SetComponentLocation(900.0F, 0.0f);
 	// 애니메이션 컴포넌트
@@ -61,6 +61,7 @@ Player::Player()
 
 	// 입력 컴포넌트 추가..
 	InputDevice = RegisterComponentInObject<InputComponent>(TT("InputDevice"));
+	PlayerCamera = RegisterComponentInObject<Camera2DComponent>(TT("PlayerCamera"));
 
 
 
@@ -93,7 +94,7 @@ void Player::BeginObject(World* world)
 	InputDevice->BindKeyCommand(TT("DefaultAttack"), EKeyState::Down, bind(&Player::func_DefaultAttack, this));
 	InputDevice->BindKeyCommand(TT("DefaultSkill"), EKeyState::Down, bind(&Player::func_DefaultSkill, this));
 	InputDevice->BindKeyCommand(TT("SpecialSkill"), EKeyState::Down, bind(&Player::func_SpeicalSkill, this));
-
+	world->SetCurrentViewCamera(PlayerCamera);
 	GameModeBase* mode = dynamic_cast<GameModeBase*>(world->GetGameMode());
 	if (mode)
 	{
@@ -103,6 +104,9 @@ void Player::BeginObject(World* world)
 void Player::Tick(const float DeltaTime)
 {
 	Side_Scroll_Unit::Tick(DeltaTime);
+	JGVector2D vector = GetCollision()->GetComponentWorldLocation();
+	vector.SetY(vector.Y() - 200.0f);
+	PlayerCamera->SetComponentLocation(vector);
 	if (IsDead())
 	{
 		GetCollision()->DestroyCollison();

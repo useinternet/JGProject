@@ -59,6 +59,8 @@ private:
 	class SitSkillComponent*      sitSkill;
 	// 스탯
 	class PlayerStatus* playerStatus;
+	// 카메라
+	class Camera2DComponent* PlayerCamera;
 public:
 	Player();
 	virtual ~Player();

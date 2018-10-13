@@ -1,5 +1,7 @@
 #include"World.h"
 #include"WorldManager.h"
+#include"../Components/Component.h"
+#include"../Components/Camera2DComponent.h"
 #include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
 #include"../../EngineStatics/JMath/JGMatrix.h"
 #include"../Object/Object.h"
@@ -9,9 +11,7 @@ World::World(const std::wstring& Name, JGPhysicsWorld* pyWorld, WorldManager* ma
 {
 	m_WorldManager = manager;
 	m_pyWorld = pyWorld;
-
-
-	m_ViewMatrix = make_unique<JGMatrix>();
+	m_DefaultCamera = make_unique<JGMatrix>();
 	TempViewMatrixInit();
 }
 World::~World()
@@ -48,6 +48,15 @@ list<shared_ptr<Object>>* World::GetObjectArray()
 {
 	return &m_sObjects;
 }
+void World::SetCurrentViewCamera(Component* component)
+{
+	Camera2DComponent* camera = dynamic_cast<Camera2DComponent*>(component);
+	if (camera == nullptr)
+	{
+		return;
+	}
+	m_ViewMatrix = camera->GetViewMatrixPointer();
+}
 void World::TempViewMatrixInit()
 {
 	JGVector3D up(0.0f, 1.0f, 0.0f), position(0.0f, 0.0f, -10.0f), lookAt(0.0f, 0.0f, 1.0f);
@@ -58,7 +67,7 @@ void World::TempViewMatrixInit()
 	up.TransformCoord(rotationMatrix);
 
 
-	m_ViewMatrix->MakeViewMatrix(&position, &lookAt, &up);
+	m_DefaultCamera->MakeViewMatrix(&position, &lookAt, &up);
 }
 
 GameMode* World::GetGameMode()
@@ -68,7 +77,16 @@ GameMode* World::GetGameMode()
 
 JGMatrix& World::GetViewMatrix()
 {
+	if (m_ViewMatrix == nullptr)
+	{
+		return *m_DefaultCamera;
+	}
 	return *m_ViewMatrix;
+}
+
+JGMatrix& World::GetDefaultViewMatrix()
+{
+	return *m_DefaultCamera;
 }
 
 JGPhysicsWorld* World::GetPyWorld()

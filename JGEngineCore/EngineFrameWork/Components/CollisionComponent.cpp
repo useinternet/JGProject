@@ -2,6 +2,7 @@
 #include"../Object/Object.h"
 #include"../World/World.h"
 #include"../../PhysicsSystem/JGBox2D/JGDynamics/JGPhysicsWorld.h"
+#include"../../EngineStatics/JGLog.h"
 using namespace std;
 
 
@@ -13,13 +14,11 @@ CollisionComponent::CollisionComponent()
 	SetOverlappingEvent([](const vector<Object*>&) {});
 	SetEndOverlapEvent([](Object* object) {});
 }
-
 CollisionComponent::~CollisionComponent()
 {
 
 
 }
-
 void CollisionComponent::BeginComponent(World* world)
 {
 	Motivated2DComponent::BeginComponent(world);

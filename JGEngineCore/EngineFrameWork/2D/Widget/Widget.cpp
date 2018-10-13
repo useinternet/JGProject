@@ -1,5 +1,5 @@
 #include"Widget.h"
-
+#include"../../World/World.h"
 
 Widget::Widget()
 {
@@ -8,18 +8,6 @@ Widget::Widget()
 Widget::~Widget()
 {
 
-}
-
-
-
-
-void Widget::BindingObject(Object* object)
-{
-	m_pObject = object;
-}
-Object* Widget::GetBindingObject()
-{
-	return m_pObject;
 }
 
 

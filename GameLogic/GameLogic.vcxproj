@@ -303,6 +303,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EnemyUnit\AI\BehaviorTree\BT_EnemyAIBase.cpp" />
     <ClCompile Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.cpp" />
+    <ClCompile Include="EnemyUnit\AI\Task\BTT_MoveTo.cpp" />
     <ClCompile Include="EnemyUnit\EnemyUnitBase.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="GameMode\GameModeBase.cpp" />
@@ -326,6 +327,7 @@
     <ClInclude Include="Character\Skill\SpecialSkillComponent.h" />
     <ClInclude Include="EnemyUnit\AI\BehaviorTree\BT_EnemyAIBase.h" />
     <ClInclude Include="EnemyUnit\AI\Board\BTIB_EnemyBoard.h" />
+    <ClInclude Include="EnemyUnit\AI\Task\BTT_MoveTo.h" />
     <ClInclude Include="EnemyUnit\EnemyUnitBase.h" />
     <ClInclude Include="GameLogic.h" />
     <ClInclude Include="GameMode\GameModeBase.h" />

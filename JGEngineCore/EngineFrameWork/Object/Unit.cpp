@@ -1,9 +1,11 @@
 #include"Unit.h"
 #include"../Components/Box2DCollisionComponent.h"
+#include"../DamageInformation/SingleDamage.h"
+#include"../DamageInformation/SplashDamage.h"
 #include"../../EngineStatics/JMath/JGMath.h"
 #include"../../EngineStatics/JGLog.h"
+using namespace std;
 
-static const float FallingErrorRange = 0.05f;
 Unit::Unit()
 {
 	RegisterObjectID(typeid(this));
@@ -14,14 +16,23 @@ Unit::Unit()
 
 Unit::~Unit()
 {
-}
 
+}
 void Unit::BeginObject(World* world)
 {
 	ExistObject::BeginObject(world);
 	// 물리 끄고 키기..
 	m_Collision->GetBody()->PhysicsOn();
 	m_Collision->FixAngle();
+	m_Collision->SetBeginOverlapEvent([this](Object* obj) {
+		this->BeginOverlap(obj);
+	});
+	m_Collision->SetEndOverlapEvent([this](Object* obj) {
+		this->EndOverlap(obj);
+	});
+	m_Collision->SetOverlappingEvent([this](const std::vector<Object*>& ObjList) {
+		this->Overlapping(ObjList);
+	});
 }
 
 void Unit::Tick(const float DeltaTime)
@@ -41,6 +52,11 @@ void Unit::Tick(const float DeltaTime)
 
 	DefineMove();
 	DefineDirection();
+	if (m_bDamaged)
+	{
+		m_bDamaged = false;
+		ReceiveDamage();
+	}
 }
 void Unit::DefineDirection() {}
 void Unit::DefineMove() {}
@@ -95,6 +111,57 @@ JGVector2D& Unit::GetVelocity()
 JGVector2D Unit::GetObjectLocation()
 {
 	return m_Collision->GetComponentWorldLocation();
+}
+
+void Unit::BeginOverlap(Object* obj)
+{
+
+}
+void Unit::EndOverlap(Object* obj)
+{
+
+}
+void Unit::Overlapping(const vector<Object*>& ObjList)
+{
+}
+
+void Unit::SendDamage(const DamageInformationBase& dmg)
+{
+	m_bDamaged = true;
+	m_qDamageInfor.push(dmg);
+}
+void Unit::ReceiveDamage()
+{
+	while (!m_qDamageInfor.empty())
+	{
+
+		SingleDamage* singleDmg = nullptr;
+		SplashDamage* splashDmg = nullptr;
+		switch (m_qDamageInfor.front().GetType())
+		{
+		case EDamageType::Single:
+			singleDmg = dynamic_cast<SingleDamage*>(&m_qDamageInfor.front());
+			ReceiveSingleDamageProcess(singleDmg);
+			break;
+		case EDamageType::Splash:
+			splashDmg = dynamic_cast<SplashDamage*>(&m_qDamageInfor.front());
+			ReceiveSplashDamageProcess(splashDmg);
+			break;
+		}
+
+
+		m_qDamageInfor.pop();
+	}
+
+}
+void Unit::ReceiveSingleDamageProcess(SingleDamage* dmg)
+{
+
+}
+void Unit::ReceiveSplashDamageProcess(SplashDamage* dmg)
+{
+
+
 }
 
 

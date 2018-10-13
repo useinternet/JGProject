@@ -15,14 +15,13 @@ private:
 	class Text*     GameStart;
 	class Text*     GameExp;
 	class Text*     GameConfig;
-
 	bool m_ButtonClick = false;
 	bool m_PrevButtonClick = false;
 public:
 	StartMainWidget();
 	virtual ~StartMainWidget();
 
-
+	virtual void BeginObject(World* world) override;
 	virtual void Tick(const float DeltaTime) override;
 
 	void ChangeTextLocationWithButtonClick(Button* button,Text* text,const JGVector2D& TextLocation);
