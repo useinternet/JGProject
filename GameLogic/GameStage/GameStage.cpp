@@ -6,6 +6,7 @@
 #include"WorldSpawner/StartMainMenu/StartMainMenuSpawner.h"
 #include"WorldSpawner/LoadingWorld/LoadingSpawner.h"
 #include"WorldSpawner/DemoWorld/DemoWorldSpawner.h"
+#include"WorldSpawner/BattleMap/BattleMapSpawner.h"
 #include"GameMode/GameModeBase.h"
 GameStage::GameStage()
 {
@@ -23,16 +24,14 @@ void GameStage::InitStage(GameLoop* Loop)
 
 void GameStage::ManagementWorld()
 {
-	m_WorldManager->AddWorld(TT("StartMainMenu"),
-		CreateObjectSpawner<StartMainMenuSpawner>());
-	m_WorldManager->AddWorld(TT("Loading"),
-		CreateObjectSpawner<LoadingSpawner>());
-
-
-	m_WorldManager->AddWorld(TT("DemoWorld"),
-		CreateObjectSpawner<DemoWorldSpawner>());
-	m_WorldManager->GetWorld(TT("DemoWorld"))->SetGameMode<GameModeBase>();
-
-
-	m_WorldManager->SelectWorld(TT("StartMainMenu"));
+	m_WorldManager->AddWorld(TT("BattleMap"),
+		CreateObjectSpawner<BattleMapSpawner>());
+	//m_WorldManager->AddWorld(TT("StartMainMenu"),
+	//	CreateObjectSpawner<StartMainMenuSpawner>());
+	//m_WorldManager->AddWorld(TT("Loading"),
+	//	CreateObjectSpawner<LoadingSpawner>());
+	//m_WorldManager->AddWorld(TT("DemoWorld"),
+	//	CreateObjectSpawner<DemoWorldSpawner>());
+	m_WorldManager->GetWorld(TT("BattleMap"))->SetGameMode<GameModeBase>();
+	m_WorldManager->SelectWorld(TT("BattleMap"));
 }

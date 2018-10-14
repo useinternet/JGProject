@@ -125,10 +125,25 @@ void Unit::Overlapping(const vector<Object*>& ObjList)
 {
 }
 
-void Unit::SendDamage(const DamageInformationBase& dmg)
+void Unit::SendDamage(DamageInformationBase* dmg)
 {
 	m_bDamaged = true;
-	m_qDamageInfor.push(dmg);
+	SingleDamage* singleDmg = nullptr;
+	SplashDamage* splashDmg = nullptr;
+	unique_ptr<DamageInformationBase> Damage;
+	switch (dmg->GetType())
+	{
+	case EDamageType::Single:
+		singleDmg = dynamic_cast<SingleDamage*>(dmg);
+		Damage = make_unique<SingleDamage>(*singleDmg);
+		break;
+	case EDamageType::Splash:
+		splashDmg = dynamic_cast<SplashDamage*>(dmg);
+		Damage = make_unique<SplashDamage>(*splashDmg);
+		break;
+	}
+
+	m_qDamageInfor.push(move(Damage));
 }
 void Unit::ReceiveDamage()
 {
@@ -137,14 +152,14 @@ void Unit::ReceiveDamage()
 
 		SingleDamage* singleDmg = nullptr;
 		SplashDamage* splashDmg = nullptr;
-		switch (m_qDamageInfor.front().GetType())
+		switch (m_qDamageInfor.front()->GetType())
 		{
 		case EDamageType::Single:
-			singleDmg = dynamic_cast<SingleDamage*>(&m_qDamageInfor.front());
+			singleDmg = dynamic_cast<SingleDamage*>(m_qDamageInfor.front().get());
 			ReceiveSingleDamageProcess(singleDmg);
 			break;
 		case EDamageType::Splash:
-			splashDmg = dynamic_cast<SplashDamage*>(&m_qDamageInfor.front());
+			splashDmg = dynamic_cast<SplashDamage*>(m_qDamageInfor.front().get());
 			ReceiveSplashDamageProcess(splashDmg);
 			break;
 		}

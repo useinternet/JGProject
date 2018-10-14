@@ -40,42 +40,18 @@ Progress : ConfigLoad Complete...
 Progress : GameLoop Init Complete...
 0101
 Progress : Start JGEngine!
-0001
-Log : StartMain World Start!
-0001
-Log : Loading World Start!
-0001
-Log : Loading : 10 %
 0101
 Progress : mode connect
 0001
-Log : Loading : 20 %
-0001
-Log : Loading : 30 %
-0001
-Log : Loading : 40 %
-0001
-Log : Loading : 50 %
-0001
-Log : Loading : 60 %
-0001
-Log : Loading : 70 %
-0001
-Log : Loading : 80 %
-0001
-Log : Loading : 100 %
-0001
-Log : Loading Compelete
-0001
-Log : Demo World Start!
-0001
-Log : Player_JumpDown
-0001
 Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
 Log : Player_Idle
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
 0001
 Log : Player_Move
 0001
@@ -88,6 +64,10 @@ Log : SetAttackSpawnLocation
 Log : Player_DefaultAttack
 0001
 Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 90
 0001
 Log : SetAttackSpawnLocation
 0001
@@ -95,17 +75,187 @@ Log : Player_DefaultAttack
 0001
 Log : Player_Idle
 1001
-Error : Dmg!! 10
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
+Error : 10
 1001
-Error : Dmg!! 10
+Error : 80
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 70
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 60
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 50
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 40
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+1001
+Error : 10
+1001
+Error : 30
+0001
+Log : Player_Idle
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+1001
+Error : 10
+1001
+Error : 20
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 10
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_DefaultAttack
+0001
+Log : Player_Idle
+1001
+Error : 10
+1001
+Error : 0
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : SetAttackSpawnLocation
+0001
+Log : Player_JumpAttack
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
 0001
 Log : Player_JumpUp
 0001
@@ -125,188 +275,4 @@ Log : Player_JumpDown
 0001
 Log : Player_Idle
 0001
-Log : Player_Move
-0001
-Log : Player_SitDown
-1001
-Error : Dmg!! 10
-1001
-Error : Dmg!! 10
-1001
-Error : Dmg!! 10
-1001
-Error : Dmg!! 10
-1001
-Error : Dmg!! 10
-0001
-Log : Player_StandUp
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
 Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : Player_SpecialSkill
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : Player_DefaultSkill
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : Dmg!! 10
-0001
-Log : Player_SitDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_SitAttack
-0001
-Log : Player_SitDown
-1001
-Error : Dmg!! 10
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_SitAttack
-0001
-Log : Player_SitDown
-1001
-Error : Dmg!! 10
-0001
-Log : Player_SitDown
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
-Log : Player_JumpDown
-1001
-Error : Dmg!! 10
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-1001
-Error : Dmg!! 10
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-1001
-Error : Dmg!! 10
-0001
-Log : Player_Idle
-1001
-Error : Dmg!! 10
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-1001
-Error : Dmg!! 10
-0001
-Log : Player_Idle
-1001
-Error : Dmg!! 10

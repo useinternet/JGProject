@@ -15,16 +15,17 @@ DefaultAttackObject::DefaultAttackObject()
 	CircleCollison->SetCategoryFilter(Filter_PlayerAttack);
 	CircleCollison->SetMaskFilter(Filter_Enemy);
 
-	CircleCollison->SetBodyType(E2DBodyType::Kinematic);
+	CircleCollison->SetBodyType(E2DBodyType::Dynamic);
 	CircleCollison->SetRadius(20.0f);
-	CircleCollison->SetBeginOverlapEvent([](Object* obj)
+	CircleCollison->SetBeginOverlapEvent([this](Object* obj)
 	{
 		EnemyUnitBase* enemy = dynamic_cast<EnemyUnitBase*>(obj);
 		if (enemy)
 		{
 			SingleDamage dmg;
 			dmg.Damage = 10.0f;
-			enemy->SendDamage(dmg);
+			enemy->SendDamage(&dmg);
+			this->DestoryObject();
 		}
 	});
 	JTimerEventManager::CreateTimerEvent(&DestroyTimerHandle,

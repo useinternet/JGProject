@@ -359,6 +359,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Text\JGFontLoader.cpp" />
+    <ClCompile Include="EngineFrameWork\2D\Tile\Block.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Widget\Button.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Widget\ImageBox.cpp" />
     <ClCompile Include="EngineFrameWork\2D\Widget\Progressbar.cpp" />
@@ -517,6 +518,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineFrameWork\2D\Text\JGFontLoader.h" />
+    <ClInclude Include="EngineFrameWork\2D\Tile\Block.h" />
     <ClInclude Include="EngineFrameWork\2D\Widget\Button.h" />
     <ClInclude Include="EngineFrameWork\2D\Widget\ImageBox.h" />
     <ClInclude Include="EngineFrameWork\2D\Widget\Progressbar.h" />

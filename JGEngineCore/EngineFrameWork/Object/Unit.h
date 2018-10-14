@@ -22,7 +22,7 @@ private:
 
 	bool m_bWorking = false;
 	bool m_bDamaged = false;
-	std::queue<DamageInformationBase> m_qDamageInfor;
+	std::queue<std::shared_ptr<DamageInformationBase>> m_qDamageInfor;
 public:
 	Unit();
 	virtual ~Unit();
@@ -50,7 +50,7 @@ public:
 	virtual void Overlapping(const std::vector<Object*>& ObjList);
 
 
-	void SendDamage(const DamageInformationBase& dmg);
+	void SendDamage(DamageInformationBase* dmg);
 	void ReceiveDamage();
 
 	virtual void ReceiveSingleDamageProcess(class SingleDamage* dmg);

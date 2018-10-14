@@ -21,7 +21,7 @@ private:
 	std::unique_ptr<GameMode> m_GameMode;
 
 	JGPhysicsWorld* m_pyWorld = nullptr;
-	JGMatrix* m_ViewMatrix    = nullptr;
+	class Camera2DComponent* m_Camera = nullptr;
 	std::unique_ptr<JGMatrix> m_DefaultCamera;
 public:
 	World() = delete;
@@ -46,6 +46,7 @@ public:
 	GameMode* GetGameMode();
 	JGMatrix& GetViewMatrix();
 	JGMatrix& GetDefaultViewMatrix();
+	Camera2DComponent* GetCurrentCamera();
 	JGPhysicsWorld* GetPyWorld();
 	void Clear();
 	WorldManager* GetManager();

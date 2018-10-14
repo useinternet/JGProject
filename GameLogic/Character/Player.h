@@ -18,8 +18,6 @@ enum EPlayerState
 	Player_DefaultSkill,
 	Player_SpecialSkill,
 	Player_JumpAttack,
-	Player_SitAttack,
-	Player_SitSkill,
 	Player_Dead
 };
 
@@ -56,7 +54,6 @@ private:
 	class DefaultAttackComponent* defaultAttack;
 	class DefaultSkillComponent*  defaultSkill;
 	class SpecialSkillComponent*  specialSkill;
-	class SitSkillComponent*      sitSkill;
 	// ½ºÅÈ
 	class PlayerStatus* playerStatus;
 	// Ä«¸Þ¶ó

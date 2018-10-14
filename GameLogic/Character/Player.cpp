@@ -37,8 +37,6 @@ Player::Player()
 
 	Config = { 60.0f,100.0f,0.0f,-85.0f,1.0f,1.0f };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_SitDown, Config));
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_SitAttack, Config));
-	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_SitSkill, Config));
 	Config = { 60.0f,120.0f,0.0f,-85.0f,1.0f,1.0f };
 	m_mBox_Pos_Config.insert(pair<EPlayerState, SPlayerPosByAnim>(Player_StandUp, Config));
 	// 충돌체 설정
@@ -57,7 +55,7 @@ Player::Player()
 	defaultAttack = RegisterComponentInObject<DefaultAttackComponent>(TT("Player_DefaultAttack"));
 	defaultSkill = RegisterComponentInObject<DefaultSkillComponent>(TT("Player_DefaultSkill"));
 	specialSkill = RegisterComponentInObject<SpecialSkillComponent>(TT("Player_SpecialSkill"));
-	sitSkill     = RegisterComponentInObject<SitSkillComponent>(TT("Player_SitSkill"));
+
 
 	// 입력 컴포넌트 추가..
 	InputDevice = RegisterComponentInObject<InputComponent>(TT("InputDevice"));
@@ -89,11 +87,12 @@ void Player::BeginObject(World* world)
 	InputDevice->BindKeyCommand(TT("Left"), EKeyState::Down, bind(&Player::func_LeftMove, this));
 	InputDevice->BindKeyCommand(TT("Left"), EKeyState::Up, bind(&Player::func_Stop, this));
 	InputDevice->BindKeyCommand(TT("Jump"), EKeyState::Down, bind(&Player::func_Jump, this));
-	InputDevice->BindKeyCommand(TT("Sit_Stand"), EKeyState::Down, bind(&Player::func_SitDown, this));
-	InputDevice->BindKeyCommand(TT("Sit_Stand"), EKeyState::Up, bind(&Player::func_StandUp, this));
+	
 	InputDevice->BindKeyCommand(TT("DefaultAttack"), EKeyState::Down, bind(&Player::func_DefaultAttack, this));
 	InputDevice->BindKeyCommand(TT("DefaultSkill"), EKeyState::Down, bind(&Player::func_DefaultSkill, this));
 	InputDevice->BindKeyCommand(TT("SpecialSkill"), EKeyState::Down, bind(&Player::func_SpeicalSkill, this));
+	InputDevice->BindKeyCommand(TT("Sit_Stand"), EKeyState::Down, bind(&Player::func_SitDown, this));
+	InputDevice->BindKeyCommand(TT("Sit_Stand"), EKeyState::Up, bind(&Player::func_StandUp, this));
 	world->SetCurrentViewCamera(PlayerCamera);
 	GameModeBase* mode = dynamic_cast<GameModeBase*>(world->GetGameMode());
 	if (mode)
@@ -116,7 +115,7 @@ void Player::Tick(const float DeltaTime)
 	{
 		CurrentPlayerState = Player_Dead;
 	}
-	playerStatus->AddCurrentHp(-50 * DeltaTime);
+	//playerStatus->AddCurrentHp(-50 * DeltaTime);
 	if (!IsFalling() && (CurrentPlayerState == Player_JumpDown || CurrentPlayerState == Player_JumpAttack))
 	{
 		m_bPlayerFix = false;
@@ -176,8 +175,7 @@ bool Player::IsJumping()
 }
 bool Player::IsSitting()
 {
-	if (CurrentPlayerState == Player_SitDown ||
-		CurrentPlayerState == Player_SitAttack)
+	if (CurrentPlayerState == Player_SitDown)
 	{
 		return true;
 	}
@@ -214,11 +212,14 @@ void Player::Attack(AttackBaseComponent* com, EPlayerState skill)
 {
 	if (com->IsEnableAttack())
 	{
+
+		CurrentPlayerState = skill;
 		JGVector2D location = GetCollision()->GetComponentWorldLocation();
 		location.SetY(location.Y() - 100.0f);
 		location.SetX(location.X() + 100.0f);
+	
+
 		com->Attack(location);
-		CurrentPlayerState = skill;
 		m_bPlayerFix = true;
 	}
 }
@@ -293,7 +294,7 @@ void Player::func_StandUp()
 void Player::func_DefaultAttack()
 {
 	if (IsDead()) return;
-	if (IsMoving() || m_bPlayerFix)
+	if (IsMoving() || m_bPlayerFix || IsSitting())
 	{
 		return;
 	}
@@ -304,10 +305,6 @@ void Player::func_DefaultAttack()
 			Attack(defaultAttack, Player_JumpAttack);
 		}
 	}
-	else if (IsSitting())
-	{
-		Attack(defaultAttack, Player_SitAttack);
-	}
 	else
 	{
 		Attack(defaultAttack, Player_DefaultAttack);
@@ -316,13 +313,9 @@ void Player::func_DefaultAttack()
 void Player::func_DefaultSkill()
 {
 	if (IsDead()) return;
-	if (IsJumping() || IsMoving() || m_bPlayerFix)
+	if (IsJumping() || IsMoving() || m_bPlayerFix || IsSitting())
 	{
 		return;
-	}
-	else if (IsSitting())
-	{
-		Attack(sitSkill, Player_SitSkill);
 	}
 	else
 	{
@@ -383,12 +376,6 @@ void Player::PlayerStateLog()
 		break;
 	case Player_JumpAttack:
 		JGLog::Write(ELogLevel::Default, TT("Player_JumpAttack"));
-		break;
-	case Player_SitAttack:
-		JGLog::Write(ELogLevel::Default, TT("Player_SitAttack"));
-		break;
-	case Player_SitSkill:
-		JGLog::Write(ELogLevel::Default, TT("Player_SitSkill"));
 		break;
 	}
 }

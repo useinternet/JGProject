@@ -9,7 +9,9 @@
 #include"../../RenderSystem/JGViewportD.h"
 #include"../../EngineStatics/JGConstructHelper.h"
 #include"../../RenderSystem/ShaderCode/HLSLConstantBufferDesc.h"
-
+#include"../Object/Object.h"
+#include"../World/World.h"
+#include"Camera2DComponent.h"
 using namespace std;
 StaticMesh2DComponent::StaticMesh2DComponent()
 {
@@ -201,15 +203,18 @@ bool StaticMesh2DComponent::Render2DCurling()
 	{
 		return true;
 	}
-	float ScreenWidth = GetViewport()->GetWidth();
-	float ScreenHeight = GetViewport()->GetHeight();
+	if (GetOwnerObject() && GetOwnerObject()->IsCullingIgnore())
+	{
+		return false;
+	}
 
 	float LocationX = GetComponentWorldLocation().X();
 	float LocationY = GetComponentWorldLocation().Y();
 	float MeshWidth = m_Mesh->GetMeshWidth();
 	float MeshHeight = m_Mesh->GetMeshHeight();
 	EPivot MeshPivot = m_Mesh->GetPivot();
-
+	float ScreenWidth = GetViewport()->GetWidth();
+	float ScreenHeight = GetViewport()->GetHeight();
 	switch (MeshPivot)
 	{
 	case EPivot::TopLeft:
@@ -243,12 +248,14 @@ bool StaticMesh2DComponent::Render2DCurling()
 		LocationX -= MeshWidth;
 		break;
 	}
-
-	if (LocationX + MeshWidth < 0 || LocationY + MeshHeight < 0)
+	JGVector2D CameraLocation = GetWorld()->GetCurrentCamera()->GetComponentWorldLocation();
+	float ZeroX = CameraLocation.X() - (ScreenWidth / 2);
+	float ZeroY = CameraLocation.Y() - (ScreenHeight / 2);
+	if (LocationX + MeshWidth < ZeroX || LocationY + MeshHeight < ZeroY)
 	{
 		return true;
 	}
-	else if (LocationX > ScreenWidth || LocationY > ScreenHeight)
+	else if (LocationX > ScreenWidth + CameraLocation.X() || LocationY > ScreenHeight + CameraLocation.Y())
 	{
 		return true;
 	}

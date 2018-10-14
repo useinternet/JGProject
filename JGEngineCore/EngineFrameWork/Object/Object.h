@@ -25,6 +25,7 @@ private:
 	Component* m_RootComponent = nullptr;
 	//
 	bool m_bIsFirst = true;
+	bool m_bCullingignore = false;
 	EObjectState m_ObjectState;
 	World* m_pWorld = nullptr;
 	static float m_DeltaTime;
@@ -66,6 +67,9 @@ public:
 
 	float GetDeltaTime();
 
+	bool IsCullingIgnore();
+	void CullingIgnore();
+	void NotCullingIgnore();
 protected:
 	template<typename ComponentType>
 	ComponentType* RegisterComponentInObject(const std::wstring& ComponentName, const bool IsRoot = false);

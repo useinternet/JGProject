@@ -20,9 +20,6 @@ enum EAnimState
 	Anim_DefaultSkill,
 	Anim_SpecialSkill,
 	Anim_JumpDefaultAttack,
-	Anim_SitDefaultAttack_1,
-	Anim_SitDefaultAttack_2,
-	Anim_SitDownSkill,
 	Anim_Dead
 };
 class Anim_Player : public Animation2DSystemComponent
@@ -45,11 +42,6 @@ private:
 	// 점프 상태 공격
 	class AnimationMesh2DComponent* JumpDefaultAttack;
 
-	// 앉기 상태 공격
-	class AnimationMesh2DComponent* SitDefaultAttack_1;
-	class AnimationMesh2DComponent* SitDefaultAttack_2;
-	class AnimationMesh2DComponent* SitDownSkill;
-
 	// 죽음
 	class AnimationMesh2DComponent* Dead;
 	class JTimerHandle* DeadTimerHandle;
@@ -68,7 +60,6 @@ public:
 	void ConfigSitDown(Player* p);
 	void ConfigJump(Player* p);
 	void ConfigAttack(Player* p);
-	void ConfigSitAttack(Player* p);
 	void AttackChangeIdleFromEnd();
 	void SitAttackChangeSitDownFromEnd();
 	void JumpAttackChangeJumpDownFromEnd();

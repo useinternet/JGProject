@@ -71,6 +71,12 @@
     <Filter Include="Game\EnemyUnit\AI\Task">
       <UniqueIdentifier>{122cab31-2d2a-4ff3-8e3a-22e10874d91f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Map">
+      <UniqueIdentifier>{9ca17a96-3007-4f5d-b2cf-40c7219625c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldSpawner\BattleMap">
+      <UniqueIdentifier>{bfc20710-c35f-479b-ae31-0d640416ed8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -142,6 +148,15 @@
     <ClCompile Include="EnemyUnit\AI\Task\BTT_MoveTo.cpp">
       <Filter>Game\EnemyUnit\AI\Task</Filter>
     </ClCompile>
+    <ClCompile Include="Map\BattleMap_00.cpp">
+      <Filter>Game\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldSpawner\BattleMap\BattleMapSpawner.cpp">
+      <Filter>Game\WorldSpawner\BattleMap</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyUnit\EnemyStatus.cpp">
+      <Filter>Game\EnemyUnit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameLogic.h">
@@ -212,6 +227,15 @@
     </ClInclude>
     <ClInclude Include="EnemyUnit\AI\Task\BTT_MoveTo.h">
       <Filter>Game\EnemyUnit\AI\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="Map\BattleMap_00.h">
+      <Filter>Game\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldSpawner\BattleMap\BattleMapSpawner.h">
+      <Filter>Game\WorldSpawner\BattleMap</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyUnit\EnemyStatus.h">
+      <Filter>Game\EnemyUnit</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

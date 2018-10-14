@@ -110,6 +110,9 @@
     <Filter Include="EngineFrameWork\DamageInformation">
       <UniqueIdentifier>{5d36479f-8cb1-445c-99f1-428a1456fe8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineFrameWork\2D\Tile">
+      <UniqueIdentifier>{d8f80d5c-1b07-45a4-9d50-1f16083ac2e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -585,6 +588,9 @@
     </ClCompile>
     <ClCompile Include="EngineFrameWork\DamageInformation\SingleDamage.cpp">
       <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Tile\Block.cpp">
+      <Filter>EngineFrameWork\2D\Tile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1070,6 +1076,9 @@
     </ClInclude>
     <ClInclude Include="EngineFrameWork\DamageInformation\SingleDamage.h">
       <Filter>EngineFrameWork\DamageInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Tile\Block.h">
+      <Filter>EngineFrameWork\2D\Tile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

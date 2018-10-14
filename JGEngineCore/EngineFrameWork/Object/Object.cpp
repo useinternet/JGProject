@@ -93,3 +93,15 @@ float Object::GetDeltaTime()
 {
 	return m_DeltaTime;
 }
+bool Object::IsCullingIgnore()
+{
+	return m_bCullingignore;
+}
+void Object::CullingIgnore()
+{
+	m_bCullingignore = true;
+}
+void Object::NotCullingIgnore()
+{
+	m_bCullingignore = false;
+}

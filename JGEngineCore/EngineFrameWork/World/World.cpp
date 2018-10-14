@@ -55,7 +55,7 @@ void World::SetCurrentViewCamera(Component* component)
 	{
 		return;
 	}
-	m_ViewMatrix = camera->GetViewMatrixPointer();
+	m_Camera = camera;
 }
 void World::TempViewMatrixInit()
 {
@@ -77,16 +77,21 @@ GameMode* World::GetGameMode()
 
 JGMatrix& World::GetViewMatrix()
 {
-	if (m_ViewMatrix == nullptr)
+	if (m_Camera == nullptr)
 	{
 		return *m_DefaultCamera;
 	}
-	return *m_ViewMatrix;
+	return *m_Camera->GetViewMatrixPointer();
 }
 
 JGMatrix& World::GetDefaultViewMatrix()
 {
 	return *m_DefaultCamera;
+}
+
+Camera2DComponent* World::GetCurrentCamera()
+{
+	return m_Camera;
 }
 
 JGPhysicsWorld* World::GetPyWorld()

@@ -166,6 +166,10 @@ void CollisionComponent::SetMaskFilter(const CollisionFilter filter)
 
 void CollisionComponent::AddMaskFilter(const CollisionFilter filter)
 {
+	if (m_BodyFilter.Get().maskBits == 0xFFFF)
+	{
+		m_BodyFilter.Get().maskBits = 0x0000;
+	}
 	m_BodyFilter.Get().maskBits |= filter;
 }
 

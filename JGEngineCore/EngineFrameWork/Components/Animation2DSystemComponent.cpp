@@ -1,4 +1,5 @@
 #include"Animation2DSystemComponent.h"
+#include"../../EngineStatics/JGLog.h"
 #include"../Object/Object.h"
 using namespace std;
 Animation2DSystemComponent::Animation2DSystemComponent()
@@ -22,7 +23,6 @@ void Animation2DSystemComponent::BeginComponent(World* world)
 void Animation2DSystemComponent::Tick(const float DeltaTime)
 {
 	Motivated2DComponent::Tick(DeltaTime);
-
 	for (auto& notify : m_mNotifys)
 	{
 		SAnimNotify ntfy = notify.second;
@@ -48,7 +48,6 @@ void Animation2DSystemComponent::Render()
 }
 void Animation2DSystemComponent::SetCurrentState(const EnumState State)
 {
-
 	for (auto& iter : m_mAnimation)
 	{
 		if (iter.first != State)
