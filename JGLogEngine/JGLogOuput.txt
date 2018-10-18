@@ -55,159 +55,9 @@ Log : Player_Move
 0001
 Log : Player_Move
 0001
-Log : Player_Move
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 90
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 80
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 70
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 60
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 50
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 40
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-1001
-Error : 10
-1001
-Error : 30
-0001
-Log : Player_Idle
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-1001
-Error : 10
-1001
-Error : 20
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 10
-0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_DefaultAttack
-0001
-Log : Player_Idle
-1001
-Error : 10
-1001
-Error : 0
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
 Log : Player_Idle
 0001
 Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
-0001
-Log : Player_Idle
-0001
-Log : Player_Move
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpUp
-0001
-Log : Player_JumpDown
-0001
-Log : Player_JumpDown
-0001
-Log : Player_Idle
 0001
 Log : Player_Move
 0001
@@ -235,21 +85,91 @@ Log : Player_JumpUp
 0001
 Log : Player_JumpUp
 0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
 Log : Player_JumpUp
 0001
 Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
-Log : SetAttackSpawnLocation
+Log : Player_JumpDown
 0001
-Log : Player_JumpAttack
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
 0001
 Log : Player_JumpDown
 0001
-Log : SetAttackSpawnLocation
+Log : Player_JumpDown
 0001
-Log : Player_JumpAttack
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_SitDown
+0001
+Log : Player_StandUp
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
@@ -261,18 +181,148 @@ Log : Player_JumpUp
 0001
 Log : Player_JumpDown
 0001
-Log : SetAttackSpawnLocation
-0001
-Log : Player_JumpAttack
-0001
 Log : Player_JumpDown
 0001
-Log : SetAttackSpawnLocation
+Log : Player_Idle
 0001
-Log : Player_JumpAttack
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
 0001
 Log : Player_JumpDown
 0001
 Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpUp
+0001
+Log : Player_JumpDown
+0001
+Log : Player_JumpDown
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
+0001
+Log : Player_Idle
+0001
+Log : Player_Move
+0001
+Log : Player_Move
 0001
 Log : Player_Idle

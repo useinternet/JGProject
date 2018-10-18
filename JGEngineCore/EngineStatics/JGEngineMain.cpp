@@ -118,8 +118,8 @@ void JGEngineMain::Run()
 		m_GameLoop->Tick(m_EngineTimer->GetDeltaTime());
 		m_InputSystem->Tick();
 		m_RenderSystem->BeginRendering();
-		m_PhysicsSystem->Render();
 		m_RenderSystem->Render();
+		m_PhysicsSystem->Render();
 		m_RenderSystem->EndRendering();
 	}
 }

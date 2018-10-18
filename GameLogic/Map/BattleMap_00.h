@@ -7,8 +7,10 @@ class BattlMap_00 : public ExistObject
 private:
 	class Block* BasicBlock;
 	class Block* LeftWall;
-
+	class ImageBox* img;
 public:
 	BattlMap_00();
 	virtual ~BattlMap_00();
+	virtual void BeginObject(World* world) override;
+	virtual void Tick(const float DeltaTime) override;
 };

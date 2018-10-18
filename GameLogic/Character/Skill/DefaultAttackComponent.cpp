@@ -16,30 +16,28 @@ DefaultAttackComponent::~DefaultAttackComponent()
 
 }
 
-void DefaultAttackComponent::Attack(const JGVector2D& Location)
+void DefaultAttackComponent::Attack(const JGVector2D& Location, const float VelScale)
 {
-	AttackBaseComponent::Attack(Location);
+	AttackBaseComponent::Attack(Location,VelScale);
 	Object* obj = GetWorld()->SpawnObject<DefaultAttackObject>();
 
 	DefaultAttackObject* AttackObject = dynamic_cast<DefaultAttackObject*>(obj);
 	if (AttackObject)
 	{
-		AttackObject->SetAttackSpawnLocation(Location);
-		JGLog::Write(ELogLevel::Default, TT("SetAttackSpawnLocation"));
+		AttackObject->SetAttackSpawnLocation(Location,VelScale);
 	}
 
 }
 
-void DefaultAttackComponent::Attack(const float x, const float y)
+void DefaultAttackComponent::Attack(const float x, const float y, const float VelScale)
 {
-	AttackBaseComponent::Attack(x,y);
+	AttackBaseComponent::Attack(x,y,VelScale);
 	Object* obj = GetWorld()->SpawnObject<DefaultAttackObject>();
 
 	DefaultAttackObject* AttackObject = dynamic_cast<DefaultAttackObject*>(obj);
 	if (AttackObject)
 	{
-		AttackObject->SetAttackSpawnLocation(x,y);
-		JGLog::Write(ELogLevel::Default, TT("SetAttackSpawnLocation"));
+		AttackObject->SetAttackSpawnLocation(x,y, VelScale);
 	}
 }
 

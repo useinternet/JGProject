@@ -215,11 +215,19 @@ void Player::Attack(AttackBaseComponent* com, EPlayerState skill)
 
 		CurrentPlayerState = skill;
 		JGVector2D location = GetCollision()->GetComponentWorldLocation();
-		location.SetY(location.Y() - 100.0f);
-		location.SetX(location.X() + 100.0f);
 	
+		location.SetY(location.Y() - 100.0f);
+		if (IsRight())
+		{
+			location.SetX(location.X() + 100.0f);
+			com->Attack(location);
+		}
+		else
+		{
+			location.SetX(location.X() - 100.0f);
+			com->Attack(location,-1.0f);
+		}
 
-		com->Attack(location);
 		m_bPlayerFix = true;
 	}
 }

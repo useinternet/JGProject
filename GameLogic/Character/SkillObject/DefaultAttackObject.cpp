@@ -50,25 +50,25 @@ void DefaultAttackObject::Tick(const float DeltaTime)
 {
 	ExistObject::Tick(DeltaTime);
 
-	CircleCollison->AddComponentLocation(1000.0f*DeltaTime, 0.0f);
+	CircleCollison->AddComponentLocation(1000.0f*DeltaTime * m_VelScale, 0.0f);
 }
 
-void DefaultAttackObject::SetAttackSpawnLocation(const float x, const float y)
+void DefaultAttackObject::SetAttackSpawnLocation(const float x, const float y, const float VelScale)
 {
 	CircleCollison->SetComponentLocation(x, y);
 	JGVector2D location = CircleCollison->GetComponentWorldLocation();
 	JGAngle2D  angle = CircleCollison->GetComponentWorldAngle();
 
-
+	m_VelScale = VelScale;
 	CircleCollison->GetBody()->SetTransform(location, angle);
 }
 
-void DefaultAttackObject::SetAttackSpawnLocation(const JGVector2D& vec)
+void DefaultAttackObject::SetAttackSpawnLocation(const JGVector2D& vec, const float VelScale)
 {
 	CircleCollison->SetComponentLocation(vec);
 	JGVector2D location = CircleCollison->GetComponentWorldLocation();
 	JGAngle2D  angle = CircleCollison->GetComponentWorldAngle();
 
-
+	m_VelScale = VelScale;
 	CircleCollison->GetBody()->SetTransform(location, angle);
 }

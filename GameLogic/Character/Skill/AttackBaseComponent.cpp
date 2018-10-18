@@ -32,11 +32,11 @@ bool AttackBaseComponent::IsEnableAttack()
 {
 	return bEnableAttack;
 }
-void AttackBaseComponent::Attack(const JGVector2D& Location)
+void AttackBaseComponent::Attack(const JGVector2D& Location, const float IsRight)
 {
 	bEnableAttack = false;
 }
-void AttackBaseComponent::Attack(const float x, const float y)
+void AttackBaseComponent::Attack(const float x, const float y, const float IsRight)
 {
 	Attack(JGVector2D(x, y));
 }

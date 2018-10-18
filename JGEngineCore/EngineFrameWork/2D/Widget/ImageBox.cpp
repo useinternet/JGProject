@@ -22,6 +22,19 @@ void ImageBox::BeginComponent(World* world)
 	m_Image->SetOwnerObject(GetOwnerObject());
 
 }
+void ImageBox::Tick(const float DeltaTime)
+{
+	Widget::Tick(DeltaTime);
+
+	if (IsChangeScale())
+	{
+		m_Image->SetComponentScale(GetComponentScale());
+	}
+
+
+
+
+}
 bool ImageBox::CreateImage(const std::wstring& ImagePath, const EPivot pivot)
 {
 

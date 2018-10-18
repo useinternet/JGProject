@@ -19,6 +19,7 @@ public:
 	ImageBox();
 	virtual ~ImageBox();
 	virtual void BeginComponent(World* world) override;
+	virtual void Tick(const float DeltaTime) override;
 	/*
 	Exp : 이미지 박스를 생성합니다. 
 	@param const wstring& ImagePath : 이미지 경로 

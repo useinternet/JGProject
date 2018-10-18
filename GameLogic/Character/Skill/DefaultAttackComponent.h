@@ -8,6 +8,6 @@ public:
 	DefaultAttackComponent();
 	virtual ~DefaultAttackComponent();
 
-	virtual void Attack(const JGVector2D& Location) override;
-	virtual void Attack(const float x, const float y) override;
+	virtual void Attack(const JGVector2D& Location, const float VelScale = 1.0f) override;
+	virtual void Attack(const float x, const float y, const float VelScale = 1.0f) override;
 };

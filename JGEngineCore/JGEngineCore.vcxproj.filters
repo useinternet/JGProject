@@ -592,6 +592,9 @@
     <ClCompile Include="EngineFrameWork\2D\Tile\Block.cpp">
       <Filter>EngineFrameWork\2D\Tile</Filter>
     </ClCompile>
+    <ClCompile Include="EngineFrameWork\2D\Tile\BackGround.cpp">
+      <Filter>EngineFrameWork\2D\Tile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStatics\Engine.h">
@@ -1078,6 +1081,9 @@
       <Filter>EngineFrameWork\DamageInformation</Filter>
     </ClInclude>
     <ClInclude Include="EngineFrameWork\2D\Tile\Block.h">
+      <Filter>EngineFrameWork\2D\Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFrameWork\2D\Tile\BackGround.h">
       <Filter>EngineFrameWork\2D\Tile</Filter>
     </ClInclude>
   </ItemGroup>
