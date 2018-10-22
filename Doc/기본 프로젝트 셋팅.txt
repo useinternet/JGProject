@@ -1,0 +1,16 @@
+// 기본
+
+1. 출력 디렉토리 :  $(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/
+2. 중간 디렉토리 :  $(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/
+3. 추가 포함 디렉토리 : ./workingDirectory
+4. 링커 - 일반 - 출력 파일 : $(OutDir)$(TargetName)d$(TargetExt)
+5. 구성 속성 - 디버깅 - 명령 : $(OutDir)$(TargetName)d$(TargetExt)
+6. 작업 디렉토리 : $(OutDir)\
+7. 미리 컴파일된 헤더 사용 안함
+
+// 라이브러리 제작시 (JGLibrary)
+1. 출력 디렉토리 :  Lib\$(Configuration)\$(Platform)/
+2. 중간 디렉토리 :  $(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/
+3. 추가 포함 디렉토리 : ./Include
+4. 작업 디렉토리 : $(OutDir)\
+5. 미리 컴파일된 헤더 사용 안함
