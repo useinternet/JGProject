@@ -30,11 +30,11 @@ real jgVec2::squardLength() const noexcept
 {
 	return x * x + y * y;
 }
-real jgVec2::distance(const jgVec2& vec) noexcept
+real jgVec2::distance(const jgVec2& vec) const noexcept
 {
 	return (*this - vec).length();
 }
-real jgVec2::squardDistance(const jgVec2& vec) noexcept
+real jgVec2::squardDistance(const jgVec2& vec) const noexcept
 {
 	return (*this - vec).squardLength();
 }
@@ -172,15 +172,15 @@ real jgVec3::squardLength() const noexcept
 {
 	return x * x + y * y + z * z;
 }
-real jgVec3::distance(const jgVec3& vec) noexcept
+real jgVec3::distance(const jgVec3& vec) const noexcept
 {
 	return (*this - vec).length();
 }
-real jgVec3::squardDistance(const jgVec3& vec) noexcept
+real jgVec3::squardDistance(const jgVec3& vec) const noexcept
 {
 	return (*this - vec).squardLength();
 }
-real jgVec3::dot(const jgVec3& vec) noexcept
+real jgVec3::dot(const jgVec3& vec) const noexcept
 {
 	return x * vec.x + y * vec.y + z * vec.z;
 }
@@ -227,23 +227,23 @@ jgVec3& jgVec3::operator=(const jgVec3& vec) noexcept
 	x = vec.x; y = vec.y; z = vec.z;
 	return *this;
 }
-jgVec3  jgVec3::operator+(const jgVec3& vec) noexcept
+jgVec3  jgVec3::operator+(const jgVec3& vec) const noexcept
 {
 	return jgVec3(x + vec.x, y + vec.y, z + vec.z);
 }
-jgVec3  jgVec3::operator-(const jgVec3& vec) noexcept
+jgVec3  jgVec3::operator-(const jgVec3& vec) const noexcept
 {
 	return jgVec3(x - vec.x, y - vec.y, z - vec.z);
 }
-jgVec3  jgVec3::operator*(const jgVec3& vec) noexcept
+jgVec3  jgVec3::operator*(const jgVec3& vec) const noexcept
 {
 	return jgVec3(x*vec.x, y*vec.y, z*vec.z);
 }
-jgVec3  jgVec3::operator*(const real scalar) noexcept
+jgVec3  jgVec3::operator*(const real scalar) const noexcept
 {
 	return jgVec3(x*scalar, y*scalar, z*scalar);
 }
-jgVec3  jgVec3::operator/(const real scalar) noexcept
+jgVec3  jgVec3::operator/(const real scalar) const noexcept
 {
 	return jgVec3(x/scalar, y/scalar, z/scalar);
 }
@@ -1105,12 +1105,12 @@ void jgMatrix4x4::translation(const jgVec3& vec) noexcept
 	identity();
 	mat[3][0] = vec.x; mat[3][1] = vec.y; mat[3][2] = vec.z;
 }
-void jgMatrix4x4::translation(const real x, const real y, const real z)
+void jgMatrix4x4::translation(const real x, const real y, const real z) noexcept
 {
 	identity();
 	mat[3][0] = x; mat[3][1] = y; mat[3][2] = z;
 }
-void jgMatrix4x4::rotationX(const real roll)
+void jgMatrix4x4::rotationX(const real roll) noexcept
 {
 	identity();
 	real rcos = COS(roll);
@@ -1118,7 +1118,7 @@ void jgMatrix4x4::rotationX(const real roll)
 	mat[1][1] = rcos; mat[1][2] = rsin;
 	mat[2][1] = -rsin; mat[2][2] = rcos;
 }
-void jgMatrix4x4::rotationY(const real pitch)
+void jgMatrix4x4::rotationY(const real pitch) noexcept
 {
 	identity();
 	real pcos = COS(pitch);
@@ -1126,7 +1126,7 @@ void jgMatrix4x4::rotationY(const real pitch)
 	mat[0][0] = pcos; mat[0][2] = -psin;
 	mat[2][0] = psin; mat[2][2] = pcos;
 }
-void jgMatrix4x4::rotationZ(const real yaw)
+void jgMatrix4x4::rotationZ(const real yaw) noexcept
 {
 	identity();
 	real ycos = COS(yaw);
@@ -1135,7 +1135,7 @@ void jgMatrix4x4::rotationZ(const real yaw)
 	mat[1][0] = -ysin; mat[1][1] = ycos;
 
 }
-void jgMatrix4x4::rotationYawPitchRoll(const real yaw, const real pitch, const real roll)
+void jgMatrix4x4::rotationYawPitchRoll(const real yaw, const real pitch, const real roll) noexcept
 {
 	real cr = COS(roll);  real sr = SIN(roll);
 	real cy = COS(yaw);   real sy = SIN(yaw);
@@ -1145,15 +1145,50 @@ void jgMatrix4x4::rotationYawPitchRoll(const real yaw, const real pitch, const r
 	mat[1][0] = (-sr * cy) + (cr * sp * sy); 	mat[1][1] = cr * cp;   mat[1][2] = (sr * sy) + (cr * sp * cy);
 	mat[2][0] = cp * sy;                        mat[2][1] = -sp;       mat[2][2] = cp * cy;
 }
-void jgMatrix4x4::scaling(const real x, const real y, const real z)
+void jgMatrix4x4::scaling(const real x, const real y, const real z) noexcept
 {
 	identity();
 	mat[0][0] = x; mat[1][1] = y; mat[2][2] = z;
 }
-void jgMatrix4x4::scaling(const real n)
+void jgMatrix4x4::scaling(const real n) noexcept
 {
 	identity();
 	mat[0][0] = n; mat[1][1] = n; mat[2][2] = n;
+}
+void jgMatrix4x4::lookAtLH(const jgVec3& eye, const jgVec3& lookAt, const jgVec3& up) noexcept
+{
+	clear();
+	jgVec3 viewDir(lookAt - eye);
+	jgVec3 viewSide;
+	jgVec3 viewUp;
+	viewDir.normalize();
+	viewUp = up - up.dot(viewDir) * viewDir;
+	viewUp.normalize();
+	viewSide = viewUp.cross(viewDir);
+
+	// 행렬 구성
+	mat[0][0] = viewSide.x; mat[0][1] = viewSide.y; mat[0][2] = viewSide.z;
+	mat[1][0] = viewUp.x;   mat[1][1] = viewUp.y;   mat[1][2] = viewUp.z;
+	mat[2][0] = viewDir.x;  mat[2][1] = viewDir.y;  mat[2][2] = viewDir.z;
+	mat[3][0] = eye.x;      mat[3][1] = eye.y;      mat[3][2] = eye.z;
+	mat[3][3] = 1;
+}
+void jgMatrix4x4::perspectiveFovLH(const real fov, const real aspect, const real near, const real far)
+{
+	clear();
+	real d = COT(fov / 2);
+	mat[0][0] = d / aspect;
+	mat[1][1] = d;
+	mat[2][2] = far / (far - near); 	mat[2][3] = 1; 
+	mat[3][2] = -((near * far) / (far - near));
+}
+void jgMatrix4x4::orthoLH(const real width, const real height, const real near, const real far)
+{
+	clear();
+	mat[0][0] = 2 / width;
+	mat[1][1] = 2 / height;
+	mat[2][2] = 1 / (far - near);
+	mat[3][2] = near / (near - far); 	mat[3][3] = 1;
 }
 real& jgMatrix4x4::operator()(const uint row, const uint col) noexcept
 {
@@ -1321,25 +1356,48 @@ void jgMatrix4x4::print_cpp() const noexcept
 		}
 	}
 }
+//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////   jgLine   ////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+jgLine::jgLine()
+{
 
+}
+jgLine::~jgLine()
+{
+
+
+}
 //////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////   jgPlane   ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
-jgPlane::jgPlane(const jgVec3& vec1, const jgVec3& vec2, const jgVec3& vec3)
+jgPlane::jgPlane(const jgVec3& normal, const jgVec3& vec)
 {
-	jgVec3 v1 = vec1; jgVec3 v2 = vec2; jgVec3 v3 = vec3;
-	jgVec3 v = v3 - v1; jgVec3 u = v2 - v1;
+	n = normal;
+	n.normalize();
+	d = -(n.x * vec.x) - (n.y * vec.y) - (n.z * vec.z);
+}
+jgPlane::jgPlane(const jgVec3& v1, const jgVec3& v2, const jgVec3& v3)
+{
+	jgVec3 v = v2 - v1; jgVec3 u = v3 - v1;
 
 	n = v.cross(u);
+	n.normalize();
 	d = -(n.x * v1.x) + -(n.y * v1.y) + -(n.z * v1.z);
 }
 jgPlane::jgPlane(const jgPlane& copy)
 {
-
+	n = copy.n; d = copy.d;
 }
-jgPlane::~jgPlane()
-{
+jgPlane::~jgPlane() {}
 
+real jgPlane::distance(const jgVec3& dot)
+{
+	return ABS(n.x * dot.x + n.y * dot.y + n.z * dot.z + d) / n.length();
+}
+real jgPlane::dotAssign(const jgVec3& dot)
+{
+	return (n.x * dot.x + n.y * dot.y + n.z * dot.z + d);
 }
 void jgPlane::print_cpp() const noexcept
 {

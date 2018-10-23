@@ -25,8 +25,8 @@ namespace JGCommon
 	public: //
 		real length() const noexcept;
 		real squardLength() const noexcept;
-		real distance(const jgVec2& vec) noexcept;
-		real squardDistance(const jgVec2& vec) noexcept;
+		real distance(const jgVec2& vec) const noexcept;
+		real squardDistance(const jgVec2& vec) const noexcept;
 		real dot(const jgVec2& vec) const noexcept;
 		void clear() noexcept;
 		void normalize() noexcept;
@@ -72,9 +72,9 @@ namespace JGCommon
 	public:  // 
 		real length() const noexcept;
 		real squardLength() const noexcept;
-		real distance(const jgVec3& vec) noexcept;
-		real squardDistance(const jgVec3& vec) noexcept;
-		real dot(const jgVec3& vec) noexcept;
+		real distance(const jgVec3& vec) const noexcept;
+		real squardDistance(const jgVec3& vec) const noexcept;
+		real dot(const jgVec3& vec) const noexcept;
 		void clear() noexcept;
 		void normalize() noexcept;
 		jgVec3 cross(const jgVec3& vec) noexcept;
@@ -83,11 +83,11 @@ namespace JGCommon
 		bool is_equal(const jgVec3& vec, const real errorRange = 0) const noexcept;
 	public: // ¿¬»êÀÚ
 		jgVec3& operator=(const jgVec3& vec) noexcept;
-		jgVec3  operator+(const jgVec3& vec) noexcept;
-		jgVec3  operator-(const jgVec3& vec) noexcept;
-		jgVec3  operator*(const jgVec3& vec) noexcept;
-		jgVec3  operator*(const real scalar) noexcept;
-		jgVec3  operator/(const real scalar) noexcept;
+		jgVec3  operator+(const jgVec3& vec) const noexcept;
+		jgVec3  operator-(const jgVec3& vec) const noexcept;
+		jgVec3  operator*(const jgVec3& vec) const noexcept;
+		jgVec3  operator*(const real scalar) const noexcept;
+		jgVec3  operator/(const real scalar) const noexcept;
 		friend 	jgVec3 operator*(const real scalar, const jgVec3& vec) noexcept;
 	public:
 		jgVec3& operator+=(const jgVec3& vec) noexcept;
@@ -253,13 +253,16 @@ namespace JGCommon
 		jgVec3 mulVector(const jgVec3& vec) noexcept;
 	public:
 		void translation(const jgVec3& vec) noexcept;
-		void translation(const real x, const real y, const real z);
-		void rotationX(const real roll);
-		void rotationY(const real pitch);
-		void rotationZ(const real yaw);
-		void rotationYawPitchRoll(const real yaw, const real pitch, const real roll);
-		void scaling(const real x, const real y, const real z);
-		void scaling(const real n);
+		void translation(const real x, const real y, const real z) noexcept;
+		void rotationX(const real roll) noexcept;
+		void rotationY(const real pitch) noexcept;
+		void rotationZ(const real yaw) noexcept;
+		void rotationYawPitchRoll(const real yaw, const real pitch, const real roll) noexcept;
+		void scaling(const real x, const real y, const real z) noexcept;
+		void scaling(const real n) noexcept;
+		void lookAtLH(const jgVec3& eye, const jgVec3& lookAt, const jgVec3& up) noexcept;
+		void perspectiveFovLH(const real fov, const real aspect, const real near, const real far);
+		void orthoLH(const real width, const real height, const real near, const real far);
 	public:
 		real& operator()(const uint row, const uint col) noexcept;
 		real cofactor(const uint row, const uint col) noexcept;
@@ -280,18 +283,26 @@ namespace JGCommon
 	};
 	jgMatrix4x4 operator*(const real scalar, const jgMatrix4x4& m) noexcept;
 
-
+	class jgLine
+	{
+	public:
+		jgLine();
+		~jgLine();
+	};
 
 	class jgPlane
 	{
-	private:
-		jgVec3 n;
-		real d;
 	public:
-		jgPlane(const jgVec3& vec1, const jgVec3& vec2, const jgVec3& vec3);
+		jgVec3 n;
+		real   d;
+	public:
+		jgPlane(const jgVec3& normal, const jgVec3& vec);
+		jgPlane(const jgVec3& v1, const jgVec3& v2, const jgVec3& v3);
 		jgPlane(const jgPlane& copy);
 		~jgPlane();
-
+	public:
+		real distance(const jgVec3& dot);
+		real dotAssign(const jgVec3& dot);
 	public:
 		void print_cpp() const noexcept;
 	};

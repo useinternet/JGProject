@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="main\Include">
+      <UniqueIdentifier>{8beaf72b-5404-4bfa-9bd1-ff069b908da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main\Source">
+      <UniqueIdentifier>{52ab56d7-1674-43b5-b0a7-c44dc4c2f379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory">
+      <UniqueIdentifier>{27d7f13c-4014-4da6-b4e5-fc76ce010883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory\Interface">
+      <UniqueIdentifier>{cfae7a0b-d73c-4ab6-8067-37b150c5cf9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory\Common">
+      <UniqueIdentifier>{474eb474-afdc-48ea-91d9-935c03894c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory\DirectX">
+      <UniqueIdentifier>{5664261e-53d0-4cb2-baac-2eae2711a6c9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory\DirectX\DirectX.cpp">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory\DirectX\JGDevice.cpp">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory\DirectX\JGSwapChain.cpp">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory\DirectX\JGRenderTarget.cpp">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory\DirectX\JGRenderState.cpp">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="workingDirectory\Interface\JGRenderCoreBase.h">
+      <Filter>workingDirectory\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\Common\JGRCCommon.h">
+      <Filter>workingDirectory\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\DirectX\DirectX.h">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\DirectX\JGDevice.h">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\DirectX\JGSwapChain.h">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\JGRederConfig.h">
+      <Filter>main\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\JGInitConfig.h">
+      <Filter>main\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\DirectX\JGRenderTarget.h">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory\DirectX\JGRenderState.h">
+      <Filter>workingDirectory\DirectX</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
