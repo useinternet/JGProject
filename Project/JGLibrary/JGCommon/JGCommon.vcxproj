@@ -22,9 +22,13 @@
     <ClInclude Include="Include\common.h" />
     <ClInclude Include="Include\commonMath.h" />
     <ClInclude Include="Include\coordinateMath.h" />
+    <ClInclude Include="Include\JGCommon.h" />
+    <ClInclude Include="Include\JGDesign\JGAbstractFactory.h" />
+    <ClInclude Include="Include\StringUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\coordinateMath.cpp" />
+    <ClCompile Include="Source\StringUtil.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

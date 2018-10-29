@@ -74,21 +74,29 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
+    <IncludePath>$(SolutionDir)\Common\DirectX\Include;$(SolutionDir)\Common\JGCommon\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Common\DirectX\Lib\x64\;$(SolutionDir)\Common\JGCommon\Lib\$(Configuration)\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
+    <IncludePath>$(SolutionDir)\Common\DirectX\Include;$(SolutionDir)\Common\JGCommon\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Common\DirectX\Lib\x64\;$(SolutionDir)\Common\JGCommon\Lib\$(Configuration)\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
+    <IncludePath>$(SolutionDir)\Common\DirectX\Include;$(SolutionDir)\Common\JGCommon\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Common\DirectX\Lib\x64\;$(SolutionDir)\Common\JGCommon\Lib\$(Configuration)\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
+    <IncludePath>$(SolutionDir)\Common\DirectX\Include;$(SolutionDir)\Common\JGCommon\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Common\DirectX\Lib\x64\;$(SolutionDir)\Common\JGCommon\Lib\$(Configuration)\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -98,12 +106,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;USEDIRECTX;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./workingDirectory</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./workingDirectory_DirectX;./Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)" "../CoreTest/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -113,12 +125,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions) </PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./workingDirectory</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./workingDirectory_DirectX;./Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)" "../CoreTest/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -130,14 +146,18 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./workingDirectory</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./workingDirectory_DirectX;./Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)" "../CoreTest/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,33 +169,91 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;USEDIRECTX;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./workingDirectory</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./workingDirectory_DirectX;./Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)" "../CoreTest/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="workingDirectory\DirectX\DirectX.cpp" />
-    <ClCompile Include="workingDirectory\DirectX\JGDevice.cpp" />
-    <ClCompile Include="workingDirectory\DirectX\JGRenderState.cpp" />
-    <ClCompile Include="workingDirectory\DirectX\JGRenderTarget.cpp" />
-    <ClCompile Include="workingDirectory\DirectX\JGSwapChain.cpp" />
+    <ClCompile Include="Source\JGRenderCore.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBuffer.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\DirectX.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGDevice.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderState.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\TestClass\TestModel.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\TestClass\TestShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\JGInitConfig.h" />
-    <ClInclude Include="Include\JGRederConfig.h" />
-    <ClInclude Include="workingDirectory\Common\JGRCCommon.h" />
-    <ClInclude Include="workingDirectory\DirectX\DirectX.h" />
-    <ClInclude Include="workingDirectory\DirectX\JGDevice.h" />
-    <ClInclude Include="workingDirectory\DirectX\JGRenderState.h" />
-    <ClInclude Include="workingDirectory\DirectX\JGRenderTarget.h" />
-    <ClInclude Include="workingDirectory\DirectX\JGSwapChain.h" />
-    <ClInclude Include="workingDirectory\Interface\JGRenderCoreBase.h" />
+    <ClInclude Include="Include\Common\dllExportDefine.h" />
+    <ClInclude Include="Include\Common\JGInitConfig.h" />
+    <ClInclude Include="Include\Common\JGRCCommon.h" />
+    <ClInclude Include="Include\Common\JGRenderConfig.h" />
+    <ClInclude Include="Include\Common\RenderConfigEnum.h" />
+    <ClInclude Include="Include\JGRenderCore.h" />
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h" />
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h" />
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectXCommon.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\DirectX.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGDevice.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderState.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\TestClass\TestModel.h" />
+    <ClInclude Include="workingDirectory_DirectX\TestClass\TestShader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\CoreTest\HLSL\Common_ps.hlsli" />
+    <None Include="..\CoreTest\HLSL\Common_vs.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\CoreTest\HLSL\CommonShader_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\CoreTest\HLSL\CommonShader_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

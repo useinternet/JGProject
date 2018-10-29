@@ -1,5 +1,4 @@
 #include"coordinateMath.h"
-using namespace JGCommon;
 using namespace std;
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////   jgVec2   ////////////////////////////////////////
@@ -94,7 +93,7 @@ jgVec2  jgVec2::operator/(const real scalar) const noexcept
 {
 	return jgVec2(x/scalar, y/scalar);
 }
-jgVec2 JGCommon::operator*(const real scalar, const jgVec2& vec) noexcept
+jgVec2 operator*(const real scalar, const jgVec2& vec) noexcept
 {
 	return jgVec2(scalar*vec.x, scalar*vec.y);
 }
@@ -196,7 +195,7 @@ void jgVec3::normalize() noexcept
 	y = y / len;
 	z = z / len;
 }
-jgVec3 jgVec3::cross(const jgVec3& vec) noexcept
+jgVec3 jgVec3::cross(const jgVec3& vec) const noexcept
 {
 	return jgVec3(y * vec.z - vec.y * z,
 		          z * vec.x - vec.z * x, 
@@ -247,7 +246,7 @@ jgVec3  jgVec3::operator/(const real scalar) const noexcept
 {
 	return jgVec3(x/scalar, y/scalar, z/scalar);
 }
-jgVec3 JGCommon::operator*(const real scalar, const jgVec3& vec) noexcept
+jgVec3 operator*(const real scalar, const jgVec3& vec) noexcept
 {
 	return jgVec3(scalar*vec.x, scalar*vec.y, scalar*vec.z);
 }
@@ -359,7 +358,7 @@ jgVec4  jgVec4::operator/(const real scalar) const noexcept
 {
 	return jgVec4(x/scalar, y/scalar, z/scalar, w/scalar);
 }
-jgVec4 JGCommon::operator*(const real scalar, const jgVec4& vec) noexcept
+jgVec4 operator*(const real scalar, const jgVec4& vec) noexcept
 {
 	return jgVec4(scalar*vec.x, scalar*vec.y, scalar*vec.z, scalar*vec.w);
 }
@@ -570,7 +569,7 @@ jgMatrix2x2  jgMatrix2x2::operator*(const real scalar) const noexcept
 	}
 	return result;
 }
-jgMatrix2x2 JGCommon::operator*(const real scalar, const jgMatrix2x2& m) noexcept
+jgMatrix2x2 operator*(const real scalar, const jgMatrix2x2& m) noexcept
 {
 	jgMatrix2x2 result;
 	for (uint row = 0; row < 2; ++row)
@@ -869,7 +868,7 @@ jgMatrix3x3  jgMatrix3x3::operator*(const real scalar) const noexcept
 	}
 	return result;
 }
-jgMatrix3x3 JGCommon::operator*(const real scalar, const jgMatrix3x3& m) noexcept
+jgMatrix3x3 operator*(const real scalar, const jgMatrix3x3& m) noexcept
 {
 	jgMatrix3x3 result;
 	for (uint row = 0; row < 3; ++row)
@@ -1158,19 +1157,24 @@ void jgMatrix4x4::scaling(const real n) noexcept
 void jgMatrix4x4::lookAtLH(const jgVec3& eye, const jgVec3& lookAt, const jgVec3& up) noexcept
 {
 	clear();
-	jgVec3 viewDir(lookAt - eye);
-	jgVec3 viewSide;
-	jgVec3 viewUp;
-	viewDir.normalize();
-	viewUp = up - up.dot(viewDir) * viewDir;
-	viewUp.normalize();
-	viewSide = viewUp.cross(viewDir);
+	jgVec3 zaxis = lookAt - eye;
+	zaxis.normalize();
 
+	jgVec3 xaxis = up.cross(zaxis);
+	xaxis.normalize();
+
+	jgVec3 yaxis = zaxis.cross(xaxis);
+	/*
+ xaxis.x           yaxis.x           zaxis.x          0
+ xaxis.y           yaxis.y           zaxis.y          0
+ xaxis.z           yaxis.z           zaxis.z          0
+-dot(xaxis, eye)  -dot(yaxis, eye)  -dot(zaxis, eye)  1
+	*/
 	// 행렬 구성
-	mat[0][0] = viewSide.x; mat[0][1] = viewSide.y; mat[0][2] = viewSide.z;
-	mat[1][0] = viewUp.x;   mat[1][1] = viewUp.y;   mat[1][2] = viewUp.z;
-	mat[2][0] = viewDir.x;  mat[2][1] = viewDir.y;  mat[2][2] = viewDir.z;
-	mat[3][0] = eye.x;      mat[3][1] = eye.y;      mat[3][2] = eye.z;
+	mat[0][0] = xaxis.x;              mat[0][1] = yaxis.x;              mat[0][2] = zaxis.x;
+	mat[1][0] = xaxis.y;              mat[1][1] = yaxis.y;              mat[1][2] = zaxis.y;
+	mat[2][0] = xaxis.z;              mat[2][1] = yaxis.z;              mat[2][2] = zaxis.z;
+	mat[3][0] = -xaxis.dot(eye);      mat[3][1] = -yaxis.dot(eye);      mat[3][2] = -zaxis.dot(eye);
 	mat[3][3] = 1;
 }
 void jgMatrix4x4::perspectiveFovLH(const real fov, const real aspect, const real near, const real far)
@@ -1282,7 +1286,7 @@ jgMatrix4x4  jgMatrix4x4::operator*(const real scalar) noexcept
 	}
 	return result;
 }
-jgMatrix4x4 JGCommon::operator*(const real scalar, const jgMatrix4x4& m) noexcept
+jgMatrix4x4 operator*(const real scalar, const jgMatrix4x4& m) noexcept
 {
 	jgMatrix4x4 result;
 	for (uint row = 0; row < 4; ++row)

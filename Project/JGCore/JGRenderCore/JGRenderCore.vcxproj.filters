@@ -11,66 +11,184 @@
     <Filter Include="main\Source">
       <UniqueIdentifier>{52ab56d7-1674-43b5-b0a7-c44dc4c2f379}</UniqueIdentifier>
     </Filter>
-    <Filter Include="workingDirectory">
+    <Filter Include="main\Include\Common">
+      <UniqueIdentifier>{92733651-989f-43dd-9829-40c93b50247b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX">
       <UniqueIdentifier>{27d7f13c-4014-4da6-b4e5-fc76ce010883}</UniqueIdentifier>
     </Filter>
-    <Filter Include="workingDirectory\Interface">
-      <UniqueIdentifier>{cfae7a0b-d73c-4ab6-8067-37b150c5cf9e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="workingDirectory\Common">
-      <UniqueIdentifier>{474eb474-afdc-48ea-91d9-935c03894c5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="workingDirectory\DirectX">
+    <Filter Include="workingDirectory_DirectX\DirectX">
       <UniqueIdentifier>{5664261e-53d0-4cb2-baac-2eae2711a6c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\MaterialSystem">
+      <UniqueIdentifier>{40b7efc3-5113-405e-bf4d-2422b5c930f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader">
+      <UniqueIdentifier>{5cf7ffa5-d376-4e04-9ce8-ab3f5d944333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\BufferSystem">
+      <UniqueIdentifier>{393ee4bc-2ab7-43bc-b98f-73284112ed44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\TestClass">
+      <UniqueIdentifier>{3232b7e6-e391-44c7-bdd0-56cbe31d91e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestHLSL">
+      <UniqueIdentifier>{cc4da46f-9ffb-4fb6-90f3-20c42df5cfd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze">
+      <UniqueIdentifier>{519306cc-b8af-41bb-8e06-1efed0ee5d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool">
+      <UniqueIdentifier>{bcc1032a-b172-4f05-9ac9-8068ad198ab4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory\DirectX\DirectX.cpp">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClCompile Include="Source\JGRenderCore.cpp">
+      <Filter>main\Source</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory\DirectX\JGDevice.cpp">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\DirectX.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory\DirectX\JGSwapChain.cpp">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGDevice.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory\DirectX\JGRenderTarget.cpp">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderState.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory\DirectX\JGRenderState.cpp">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBuffer.cpp">
+      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.cpp">
+      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\TestClass\TestModel.cpp">
+      <Filter>workingDirectory_DirectX\TestClass</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\TestClass\TestShader.cpp">
+      <Filter>workingDirectory_DirectX\TestClass</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="workingDirectory\Interface\JGRenderCoreBase.h">
-      <Filter>workingDirectory\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory\Common\JGRCCommon.h">
-      <Filter>workingDirectory\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory\DirectX\DirectX.h">
-      <Filter>workingDirectory\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory\DirectX\JGDevice.h">
-      <Filter>workingDirectory\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory\DirectX\JGSwapChain.h">
-      <Filter>workingDirectory\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\JGRederConfig.h">
+    <ClInclude Include="Include\JGRenderCore.h">
       <Filter>main\Include</Filter>
     </ClInclude>
-    <ClInclude Include="Include\JGInitConfig.h">
-      <Filter>main\Include</Filter>
+    <ClInclude Include="Include\Common\dllExportDefine.h">
+      <Filter>main\Include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory\DirectX\JGRenderTarget.h">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClInclude Include="Include\Common\JGInitConfig.h">
+      <Filter>main\Include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory\DirectX\JGRenderState.h">
-      <Filter>workingDirectory\DirectX</Filter>
+    <ClInclude Include="Include\Common\JGRCCommon.h">
+      <Filter>main\Include\Common</Filter>
     </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectXCommon.h">
+      <Filter>workingDirectory_DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\DirectX.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGDevice.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderState.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Common\RenderConfigEnum.h">
+      <Filter>main\Include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Common\JGRenderConfig.h">
+      <Filter>main\Include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h">
+      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h">
+      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.h">
+      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\TestClass\TestModel.h">
+      <Filter>workingDirectory_DirectX\TestClass</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\TestClass\TestShader.h">
+      <Filter>workingDirectory_DirectX\TestClass</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\CoreTest\HLSL\CommonShader_vs.hlsl">
+      <Filter>TestHLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\CoreTest\HLSL\CommonShader_ps.hlsl">
+      <Filter>TestHLSL</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\CoreTest\HLSL\Common_ps.hlsli">
+      <Filter>TestHLSL</Filter>
+    </None>
+    <None Include="..\CoreTest\HLSL\Common_vs.hlsli">
+      <Filter>TestHLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>
