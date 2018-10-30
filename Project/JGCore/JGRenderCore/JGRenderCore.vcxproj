@@ -193,8 +193,12 @@
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp" />
@@ -219,8 +223,12 @@
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h" />

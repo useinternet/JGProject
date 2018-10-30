@@ -1,13 +1,11 @@
 #include"Common_ps.hlsli"
-SamplerState SampleType;
-
 cbuffer LightBuffer
 {
 	float4 ambientColor;
 	float4 diffuseColor;
 	float3 lightDirection;
 	float padding;
-}
+};
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
@@ -32,5 +30,4 @@ float4 main(PixelInputType input) : SV_TARGET
     color = saturate(color);
 
 	return color;
-	//return float4(Sample, Sample, Sample, Sample);
 }

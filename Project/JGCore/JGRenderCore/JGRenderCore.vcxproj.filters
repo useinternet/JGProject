@@ -97,6 +97,18 @@
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
     </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\JGRenderCore.h">
@@ -172,6 +184,18 @@
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
     </ClInclude>
   </ItemGroup>

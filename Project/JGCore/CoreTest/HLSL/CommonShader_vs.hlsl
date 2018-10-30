@@ -8,11 +8,13 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-INPUTLAYOUT
+INPUTLAYOUT  // Ω««Ë¡ﬂ ¿‘¥œ¥Â
+// Ω««È¡ﬂ ¿‘¥œ¥Â.
 struct VertexInputType
 {
-	INPUTSLOT(0)
-	float3 position : POSITION;
+	INPUTSLOT(0) /*
+         Ω««È¡ﬂ¿‘¥œ¥Â.
+	*/ float3 position : POSITION; // Ω««Ë¡ﬂ ¿‘¥œ¥Ÿ.
 	float3 normal : NORMAL;
 	float2 tex : TEXCOORD0;
 };

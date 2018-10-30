@@ -1,6 +1,5 @@
 #pragma once
-#include"Common/JGRCCommon.h"
-#include"DirectXCommon.h"
+#include"ShaderInformation.h"
 
 // 버텍스 레이아웃은 #define으로 설정
 // 레이아웃 정보
@@ -15,39 +14,37 @@
 
 namespace JGRC
 {
-	class CORE_EXPORT Layout
-	{
-	public:
-		std::string sementicName;
-		uint sementicNum;
-		DXGI_FORMAT format;
-		uint inputSlot;
-		uint offset;
-		D3D11_INPUT_CLASSIFICATION inputClass;
-		uint InstanceDataStepRate;
-	};
-	class CORE_EXPORT LayoutInformation
+
+	class CORE_EXPORT LayoutInformation : public ShaderInformation
 	{
 	private:
-		static const std::string INPUTLAYOUT;
-		static const std::string INPUTSLOT;
-		static const std::string INSTNACE;
-		static const std::string FLOAT;
-		static const std::string FLOAT2;
-		static const std::string FLOAT3;
-		static const std::string FLOAT4;
+		class Layout
+		{
+		public:
+			std::string sementicName;
+			uint sementicNum;
+			DXGI_FORMAT format;
+			uint inputSlot;
+			uint offset;
+			D3D11_INPUT_CLASSIFICATION inputClass;
+			uint InstanceDataStepRate;
+		};
 	private:
-		std::vector<Layout> m_vLayout;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vLayout;
 		bool   m_bIsInstance = false;
-		bool   m_bIsProgressing = false;
-		uint   inputSlot = 0;
+		uint   m_InstanceDataSR = 1;
+		//
+		uint   m_inputSlot = 0;
+		uint   m_pvInputSlot = 0;
+		//
+		uint   m_accOffset = 0;
 	public:
 		LayoutInformation();
-		~LayoutInformation();
-		bool IsProgressing() const;
-		void AnalyzeSentence(std::string& sentence);
-	private:
-		uint ExtractionBracketNumber(const std::string& s);
+		virtual ~LayoutInformation();
+		virtual void AnalyzeSentence(std::string& sentence) override;
+		D3D11_INPUT_ELEMENT_DESC& GetDesc(const uint idx);
+		D3D11_INPUT_ELEMENT_DESC* GetDescAddress();
+		uint Size();
 	};
 
 }

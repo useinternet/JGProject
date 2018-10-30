@@ -57,8 +57,8 @@ void JGRenderCore::Init(HWND hWnd)
 	m_DX->RegistorDrawEvent(e);
 
 
-	ShaderAnalyzer sample;
-	sample.Analyze("./HLSL/CommonShader_vs.hlsl", EShaderType::Vertex);
+	ShaderAnalyzer s;
+	s.Analyze("./HLSL/CommonShader_vs.hlsl", EShaderType::Vertex);
 }
 void JGRenderCore::Draw()
 {
