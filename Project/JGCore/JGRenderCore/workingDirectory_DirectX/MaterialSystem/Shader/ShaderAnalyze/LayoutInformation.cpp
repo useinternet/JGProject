@@ -1,14 +1,16 @@
 #include"LayoutInformation.h"
+#include"MaterialSystem/Shader/ShaderTool/InputLayout.h"
 using namespace std;
 using namespace JGRC;
-
 
 LayoutInformation::LayoutInformation()
 {
 
+
 }
 LayoutInformation::~LayoutInformation()
 {
+
 
 }
 void LayoutInformation::AnalyzeSentence(string& sentence)
@@ -28,6 +30,7 @@ void LayoutInformation::AnalyzeSentence(string& sentence)
 	// 입력 슬롯 추가
 	else if (StringUtil::FindString(sentence, hlslType::INPUTSLOT.c_str()))
 	{
+		m_bIsInstance = false;
 		m_inputSlot = ExtractionBracketNumber(sentence);
 		if (m_inputSlot != m_pvInputSlot)
 		{
@@ -42,15 +45,15 @@ void LayoutInformation::AnalyzeSentence(string& sentence)
 	}
 	else if (StringUtil::FindString(sentence,":"))
 	{
-		D3D11_INPUT_ELEMENT_DESC ly;
+		LayoutDesc ly;
 		// 입력 슬롯 / 오프셋 / 입력 클래스 설정
-		ly.InputSlot = m_inputSlot;
-		ly.AlignedByteOffset = m_accOffset;
+		ly.InputSlot = (UINT)m_inputSlot;
+		ly.AlignedByteOffset = (UINT)m_accOffset;
 		// 인스턴스와 버텍스 입력 레이아웃에 각각 서로 다르게 입력
 		if (m_bIsInstance)
 		{
 			ly.InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
-			ly.InstanceDataStepRate = m_InstanceDataSR;
+			ly.InstanceDataStepRate = (UINT)m_InstanceDataSR;
 			m_bIsInstance = false;
 		}
 		else
@@ -97,19 +100,31 @@ void LayoutInformation::AnalyzeSentence(string& sentence)
 		{
 			ly.SemanticIndex = 0;
 		}
-		ly.SemanticName = smName.c_str();
+		
+	
+		ly.SemanticName = move(smName);
 		// 입력 레이아웃 만들기 최종..
 		m_vLayout.push_back(ly);
 	}
 	
 }
-D3D11_INPUT_ELEMENT_DESC& LayoutInformation::GetDesc(const uint idx)
+bool LayoutInformation::Decryptable(const std::string& sentence)
 {
-	return m_vLayout[idx];
+	if (StringUtil::FindString(sentence, hlslType::INPUTLAYOUT.c_str()) || IsProgressing())
+	{
+		return true;
+	}
+	return false;
 }
-D3D11_INPUT_ELEMENT_DESC* LayoutInformation::GetDescAddress()
+
+void LayoutInformation::MakeInputLayoutArray(class InputLayout* layout)
 {
-	return &m_vLayout[0];
+	for (auto& iter : m_vLayout)
+	{
+		layout->AddInputLayout(
+			iter.SemanticName.c_str(), iter.SemanticIndex, iter.Format, iter.InputSlot,
+			iter.AlignedByteOffset, iter.InputSlotClass, iter.InstanceDataStepRate);
+	}
 }
 uint LayoutInformation::Size()
 {

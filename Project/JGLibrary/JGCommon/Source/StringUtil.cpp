@@ -31,6 +31,8 @@ void StringUtil::DelString(string& str, const char* delstr)
 	uint count = 0;
 	string result;                  // 탐색할때 임시 문자열
 	string tmpStr;
+
+
 	for (uint i = 0; i < len; ++i)
 	{
 		// 문자가 같으면 탐색 시작.
@@ -43,20 +45,19 @@ void StringUtil::DelString(string& str, const char* delstr)
 		// 아니면 초기화
 		else
 		{
-			// 탐색 중이었고 지울 문자가 아니었을때 임시로 저장하고있었던 문자열을 덧붙인다.
-			// 그게 아니라면 그냥 추가 하지 않는다.
 			if (bSearching && count < dellen)
 			{
 				result += tmpStr;
-				tmpStr = "";
+
 			}
-			else
-			{
-				result += str[i];
-			}
+			result += str[i];
+			tmpStr = "";
 			bSearching = false;
 			count = 0;
 		}
+		// 탐색 중이었고 지울 문자가 아니었을때 임시로 저장하고있었던 문자열을 덧붙인다.
+		// 그게 아니라면 그냥 추가 하지 않는다.
+
 	}
 	str = result;
 }

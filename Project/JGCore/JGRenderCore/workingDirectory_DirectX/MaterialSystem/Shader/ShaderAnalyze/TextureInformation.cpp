@@ -29,6 +29,14 @@ void TextureInformation::AnalyzeSentence(std::string& sentence)
 		ExtractionTextureName(sentence);
 	}
 }
+bool TextureInformation::Decryptable(const std::string& sentence)
+{
+	if (StringUtil::FindString(sentence, hlslType::TEXTURE_Start.c_str()) || IsProgressing())
+	{
+		return true;
+	}
+	return false;
+}
 const string& TextureInformation::GetTextureName(const uint idx) const
 {
 	return m_mInformation.at(idx);

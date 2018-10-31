@@ -4,6 +4,7 @@
 
 namespace JGRC
 {
+	class ShaderAnalyzer;
 	class TestShader
 	{
 	private:
@@ -26,9 +27,12 @@ namespace JGRC
 	private:
 		std::vector<real> LightArray;
 		std::vector<real> MatrixArray;
+
 		class JGBuffer* MatrixBuffer;
 		class JGBuffer* LightBuffer;
 		struct ShaderObject* VertexShader;
 		struct ShaderObject* PixelShader;
+		std::unique_ptr<ShaderAnalyzer> VSAyzer;
+		std::unique_ptr<ShaderAnalyzer> PSAyzer;
 	};
 }

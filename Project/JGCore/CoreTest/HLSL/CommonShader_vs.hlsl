@@ -12,11 +12,10 @@ INPUTLAYOUT  // Ω««Ë¡ﬂ ¿‘¥œ¥Â
 // Ω««È¡ﬂ ¿‘¥œ¥Â.
 struct VertexInputType
 {
-	INPUTSLOT(0) /*
-         Ω««È¡ﬂ¿‘¥œ¥Â.
-	*/ float3 position : POSITION; // Ω««Ë¡ﬂ ¿‘¥œ¥Ÿ.
-	float3 normal : NORMAL;
-	float2 tex : TEXCOORD0;
+	INPUTSLOT(0) 
+	float3 position : POSITION;
+	float2 tex      : TEXCOORD0;
+	float3 normal   : NORMAL;
 };
 struct PixelInputType
 {

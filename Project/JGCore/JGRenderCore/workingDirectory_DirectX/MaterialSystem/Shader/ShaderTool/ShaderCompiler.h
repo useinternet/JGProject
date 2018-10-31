@@ -14,7 +14,7 @@
 namespace JGRC
 {
 	typedef UINT CompileFlag;
-
+	class InputLayout;
 
 	class ShaderCompiler
 	{
@@ -32,10 +32,10 @@ namespace JGRC
 		bool Success = false;
 	public:
 		ShaderCompiler() {}
-		ShaderCompiler(const std::wstring& hlslPath,ShaderObject* object);
+		ShaderCompiler(const std::wstring& hlslPath,ShaderObject* object, InputLayout* layout);
 		~ShaderCompiler();
 	private:
-		bool Compile(const std::wstring& hlslPath, ShaderObject* object);
+		bool Compile(const std::wstring& hlslPath, ShaderObject* object, InputLayout* layout);
 	private:
 		static void ShaderInitialSetting(HWND hWnd, const std::string& functionName, const std::string& shaderVersion,
 			const CompileFlag flag);

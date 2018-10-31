@@ -10,16 +10,16 @@ string ShaderCompiler::VSVersion     = "vs_5_0";
 string ShaderCompiler::PSVersion     = "ps_5_0";
 CompileFlag  ShaderCompiler::Flags   = D3D10_SHADER_ENABLE_STRICTNESS;
 DirectX* ShaderCompiler::m_pDirectX = nullptr;
-ShaderCompiler::ShaderCompiler(const std::wstring& hlslPath, ShaderObject* object)
+ShaderCompiler::ShaderCompiler(const std::wstring& hlslPath, ShaderObject* object, InputLayout* layout)
 {
 	m_pDirectX = DirectX::GetInstance();
-	Success = Compile(hlslPath, object);
+	Success = Compile(hlslPath, object,layout);
 }
 ShaderCompiler::~ShaderCompiler()
 {
 
 }
-bool ShaderCompiler::Compile(const std::wstring& hlslPath, ShaderObject* object)
+bool ShaderCompiler::Compile(const std::wstring& hlslPath, ShaderObject* object, InputLayout* layout)
 {
 	ID3D10Blob* Shader = nullptr;
 	ID3D10Blob* Error  = nullptr;
@@ -55,8 +55,6 @@ bool ShaderCompiler::Compile(const std::wstring& hlslPath, ShaderObject* object)
 	case EShaderType::Vertex:
 		result = m_pDirectX->GetDevice()->CreateVertexShader( Shader->GetBufferPointer(), Shader->GetBufferSize(),
 			nullptr, (ID3D11VertexShader**)&(object->ShaderBuffer));
-		m_pDirectX->GetDevice()->CreateInputLayout(InputLayout::Get(), InputLayout::Size(),
-			Shader->GetBufferPointer(), Shader->GetBufferSize(), &object->Layout);
 		break;
 	case EShaderType::Pixel:
 		result = m_pDirectX->GetDevice()->CreatePixelShader(Shader->GetBufferPointer(), Shader->GetBufferSize(),
@@ -69,6 +67,11 @@ bool ShaderCompiler::Compile(const std::wstring& hlslPath, ShaderObject* object)
 	if (FAILED(result))
 	{
 		return false;
+	}
+	if (layout)
+	{
+		m_pDirectX->GetDevice()->CreateInputLayout(layout->Get(), layout->Size(),
+			Shader->GetBufferPointer(), Shader->GetBufferSize(), &object->Layout);
 	}
 	return true;
 }

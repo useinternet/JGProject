@@ -44,6 +44,14 @@ void SamplerInformation::AnalyzeSentence(std::string& sentence)
 		SamplerCustomMode(sentence);
 	}
 }
+bool SamplerInformation::Decryptable(const std::string& sentence)
+{
+	if (StringUtil::FindString(sentence, hlslType::SAMPLER_Start.c_str()) || IsProgressing())
+	{
+		return true;
+	}
+	return false;
+}
 D3D11_SAMPLER_DESC SamplerInformation::GetDesc(const uint idx) const
 {
 	return m_vSamplerDescs[idx];

@@ -129,7 +129,6 @@ bool TestModel::InitializeBuffers(ID3D11Device* device)
 		m_Sample.push_back(m_model[i].nx);
 		m_Sample.push_back(m_model[i].ny);
 		m_Sample.push_back(m_model[i].nz);
-
 		indices[i] = i;
 	}
 	VertexBuffer = JGBufferManager::GetInstance()->CreateBuffer(EBufferType::VertexBuffer,

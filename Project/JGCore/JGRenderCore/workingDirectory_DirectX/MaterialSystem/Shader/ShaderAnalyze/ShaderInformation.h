@@ -42,7 +42,6 @@ namespace JGRC
 		static const std::string TEXTURE_Config = "TEXTURE_CONFIG";
 	}
 	//
-
 	class CORE_EXPORT ShaderInformation
 	{
 	protected:
@@ -54,7 +53,8 @@ namespace JGRC
 		virtual ~ShaderInformation() {}
 
 		bool IsProgressing() const { return m_Progressing; }
-		virtual void AnalyzeSentence(std::string& sentence) = 0;
+		virtual void AnalyzeSentence(std::string& sentence) {};
+		virtual bool Decryptable(const std::string& sentence) { return false; };
 
 	protected:
 		inline void Start() { m_Progressing = true; }

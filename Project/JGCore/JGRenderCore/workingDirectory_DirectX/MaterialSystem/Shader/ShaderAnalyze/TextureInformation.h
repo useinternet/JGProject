@@ -13,6 +13,7 @@ namespace JGRC
 		virtual ~TextureInformation();
 
 		virtual void AnalyzeSentence(std::string& sentence) override;
+		virtual bool Decryptable(const std::string& sentence) override;
 		const std::string& GetTextureName(const uint idx) const;
 		uint Size() const;
 	private:

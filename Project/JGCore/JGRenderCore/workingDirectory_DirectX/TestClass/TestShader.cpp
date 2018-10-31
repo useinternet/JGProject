@@ -1,4 +1,5 @@
 #include"TestShader.h"
+#include"MaterialSystem/Shader/ShaderAnalyze/ShaderAnalyzer.h"
 #include"MaterialSystem/Shader/ShaderTool/InputLayout.h"
 #include"MaterialSystem/Shader/ShaderTool/SamplerState.h"
 #include"MaterialSystem/Shader/ShaderTool/ShaderCompiler.h"
@@ -10,6 +11,8 @@ using namespace std;
 using namespace JGRC;
 TestShader::TestShader()
 {
+	VSAyzer = make_unique<ShaderAnalyzer>();
+	PSAyzer = make_unique<ShaderAnalyzer>();
 	real Light[12] = { 0.15f, 0.15f, 0.15f, 1.0f ,1.0f, 1.0f, 1.0f, 1.0f ,0.0f, 0.0f, 1.0f };
 	for (int i = 0; i < 12; ++i)
 	{
@@ -54,24 +57,27 @@ bool TestShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, jgMa
 }
 bool TestShader::InitializeShader(ID3D11Device* device, HWND hwnd, const WCHAR* vsFilename, const WCHAR* psFilename)
 {
+	VSAyzer->Analyze("./HLSL/CommonShader_vs.hlsl",EShaderType::Vertex);
+	PSAyzer->Analyze("./HLSL/CommonShader_ps.hlsl", EShaderType::Pixel);
+
 	VertexShader = ShaderObjectManager::GetInstance()->CreateShaderObject(EShaderType::Vertex);
 	PixelShader = ShaderObjectManager::GetInstance()->CreateShaderObject(EShaderType::Pixel);
-	InputLayout::AddInputLayout("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA,
-		0);
-	InputLayout::AddInputLayout("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA,
-		0);
-	InputLayout::AddInputLayout("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA,
-		0);
 
+	InputLayout ly;
+	VSAyzer->MakeInputLayoutArray(&ly);
 
 	ShaderCompiler init;
 	init.hWnd = hwnd;
-	ShaderCompiler VertexCompile(TT("./HLSL/CommonShader_vs.hlsl"), VertexShader);
-	ShaderCompiler PixelCompile(TT("./HLSL/CommonShader_ps.hlsl"), PixelShader);
+	ShaderCompiler VertexCompile(TT("./HLSL/CommonShader_vs.hlsl"), VertexShader,&ly);
+	ShaderCompiler PixelCompile(TT("./HLSL/CommonShader_ps.hlsl"), PixelShader,nullptr);
+
+
+	VSAyzer->CreateConstantBuffers();
+	PSAyzer->CreateConstantBuffers();
 
 
 	MatrixBuffer = JGBufferManager::GetInstance()->CreateBuffer(EBufferType::ConstantBuffer,
-		EUsageType::Dynamic, ECPUType::Access_Write, nullptr, sizeof(MatrixBufferType), 1);
+		EUsageType::Dynamic, ECPUType::Access_Write, nullptr, sizeof(real), 48);
 	LightBuffer = JGBufferManager::GetInstance()->CreateBuffer(EBufferType::ConstantBuffer,
 		EUsageType::Dynamic, ECPUType::Access_Write, nullptr, sizeof(real), 12);
 
@@ -81,26 +87,26 @@ bool TestShader::InitializeShader(ID3D11Device* device, HWND hwnd, const WCHAR* 
 bool TestShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, jgMatrix4x4 worldMatrix, jgMatrix4x4 viewMatrix,
 	jgMatrix4x4 projectionMatrix, ID3D11ShaderResourceView* texture)
 {
-	MatrixBufferType dataPtr;
-	unsigned int bufferNumber = 0;
 
 	worldMatrix.transpose();
 	viewMatrix.transpose();
 	projectionMatrix.transpose();
 
-	dataPtr.world = worldMatrix;
-	dataPtr.view = viewMatrix;
-	dataPtr.projection = projectionMatrix;
+	VSAyzer->SetParam("worldMatrix", &worldMatrix);
+	VSAyzer->SetParam("viewMatrix", &viewMatrix);
+	VSAyzer->SetParam("projectionMatrix", &projectionMatrix);
+	VSAyzer->WriteConstantBuffers();
 
+	jgVec4 Color(0.15f, 0.15f, 0.15f, 1.0f);
+	PSAyzer->SetParam("ambientColor", &Color);
+	Color.set(1.0f, 1.0f, 1.0f, 1.0f);
+	PSAyzer->SetParam("diffuseColor", &Color);
+	jgVec3 d(1.0f, 0.0f, 0.0f);
+	PSAyzer->SetParam("lightDirection", &d);
+	real pad = 0.0f;
+	PSAyzer->SetParam("padding", &pad);
+	PSAyzer->WriteConstantBuffers();
 
-	MatrixBuffer->Write(EMapType::Write_Discard, &dataPtr);
-
-	LightBuffer->Write(EMapType::Write_Discard, &LightArray[0]);
-
-	// Now set the constant buffer in the vertex shader with the updated values.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, MatrixBuffer->GetAddress());
-
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, LightBuffer->GetAddress());
 	return true;
 }
 void TestShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)

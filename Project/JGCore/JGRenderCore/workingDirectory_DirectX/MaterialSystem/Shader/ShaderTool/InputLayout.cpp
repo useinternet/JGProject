@@ -3,7 +3,6 @@
 #include"DirectX/JGDevice.h"
 using namespace JGRC;
 using namespace Microsoft::WRL;
-std::vector<D3D11_INPUT_ELEMENT_DESC> InputLayout::m_vLayoutDescs;
 InputLayout::InputLayout()
 {
 

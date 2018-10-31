@@ -3,6 +3,10 @@
 #include"CBufferInformation.h"
 #include"SamplerInformation.h"
 #include"TextureInformation.h"
+#include"MaterialSystem/Shader/ShaderTool/InputLayout.h"
+#include"BufferSystem/JGBufferManager.h"
+#include"BufferSystem/JGBuffer.h"
+#include"DirectX/DirectX.h"
 using namespace JGRC;
 using namespace std;
 
@@ -11,7 +15,8 @@ using namespace std;
 
 ShaderAnalyzer::ShaderAnalyzer()
 {
-
+	m_BufferMG = JGBufferManager::GetInstance();
+	m_DirectX  = DirectX::GetInstance();
 	m_InputLayoutInfor = make_unique<LayoutInformation>();
 	m_CBufferInfor     = make_unique<CBufferInformation>();
 	m_SamplerInfor     = make_unique<SamplerInformation>();
@@ -19,11 +24,14 @@ ShaderAnalyzer::ShaderAnalyzer()
 }
 ShaderAnalyzer::~ShaderAnalyzer()
 {
-
-
+	for (auto& iter : m_vBuffers)
+	{
+		m_BufferMG->DeleteBuffer(iter);
+	}
 }
 bool ShaderAnalyzer::Analyze(const string& hlslPath, const EShaderType ShaderType)
 {
+	m_ShaderType = ShaderType;
 	fstream fin;
 	string buffer; // 입력 받아올 문자열
 	string path;   // 패쓰
@@ -48,26 +56,72 @@ bool ShaderAnalyzer::Analyze(const string& hlslPath, const EShaderType ShaderTyp
 			Analyze(path, ShaderType);
 		}
 		// 입력 레이아웃 정보 저장
-		else if (StringUtil::FindString(buffer, hlslType::INPUTLAYOUT.c_str()) || m_InputLayoutInfor->IsProgressing())
+		else if (m_InputLayoutInfor->Decryptable(buffer))
 		{
 			m_InputLayoutInfor->AnalyzeSentence(buffer);
 		}
 		// 상수 버퍼 저장
-		else if (StringUtil::FindString(buffer, hlslType::CBUFFER.c_str()) || m_CBufferInfor->IsProgressing())
+		else if (m_CBufferInfor->Decryptable(buffer))
 		{
 			m_CBufferInfor->AnalyzeSentence(buffer);
 		}
-		else if (StringUtil::FindString(buffer, hlslType::SAMPLER_Start.c_str()) || m_SamplerInfor->IsProgressing())
+		else if (m_SamplerInfor->Decryptable(buffer))
 		{
 			m_SamplerInfor->AnalyzeSentence(buffer);
 		}
-		else if (StringUtil::FindString(buffer, hlslType::TEXTURE_Start.c_str()) || m_TextureInfor->IsProgressing())
+		else if (m_TextureInfor->Decryptable(buffer))
 		{
 			m_TextureInfor->AnalyzeSentence(buffer);
 		}
 	}
 	fin.close();
 	return true;
+}
+void ShaderAnalyzer::CreateConstantBuffers()
+{
+	for (uint i = 0; i < m_CBufferInfor->GetCBufferCount(); ++i)
+	{
+		CBuffer* cbf = m_CBufferInfor->GetCBuffer(i);
+		JGBuffer* buffer = m_BufferMG->CreateBuffer(
+			EBufferType::ConstantBuffer, EUsageType::Dynamic, ECPUType::Access_Write,
+			nullptr, cbf->size(), 1);
+		m_vBuffers.push_back(buffer);
+	}
+}
+void ShaderAnalyzer::WriteConstantBuffers()
+{
+	for (uint i = 0; i < m_CBufferInfor->GetCBufferCount(); ++i)
+	{
+		CBuffer* cbf = m_CBufferInfor->GetCBuffer(i);
+		std::vector<real> data;
+		cbf->getData(&data);
+		m_vBuffers[i]->Write(EMapType::Write_Discard, &data[0]);
+		switch (m_ShaderType)
+		{
+		case EShaderType::Pixel:
+			m_DirectX->GetContext()->PSSetConstantBuffers((UINT)i, 1, m_vBuffers[i]->GetAddress());
+			break;
+		case EShaderType::Vertex:
+			m_DirectX->GetContext()->VSSetConstantBuffers((UINT)i, 1, m_vBuffers[i]->GetAddress());
+			break;
+		}
+	}
+}
+void ShaderAnalyzer::MakeInputLayoutArray(class InputLayout* ly)
+{
+	m_InputLayoutInfor->MakeInputLayoutArray(ly);
+}
+float*   ShaderAnalyzer::GetParam(const std::string& paramName)
+{
+	return m_CBufferInfor->GetParam(paramName);
+}
+void     ShaderAnalyzer::SetParam(const std::string& paramName, void* value)
+{
+	m_CBufferInfor->SetParam(paramName, value);
+}
+uint     ShaderAnalyzer::GetParamSize(const std::string& paramName)
+{
+	return m_CBufferInfor->GetParamSize(paramName);
 }
 bool ShaderAnalyzer::RemoveRemark(std::string& sentence)
 {

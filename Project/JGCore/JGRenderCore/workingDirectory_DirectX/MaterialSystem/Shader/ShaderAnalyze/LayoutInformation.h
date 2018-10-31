@@ -14,36 +14,39 @@
 
 namespace JGRC
 {
-
+	/*
+	Exp : hlsl 파일을 해독하여 입력 레이아웃 정보를 가져온다. */
 	class CORE_EXPORT LayoutInformation : public ShaderInformation
 	{
-	private:
-		class Layout
+		class LayoutDesc
 		{
 		public:
-			std::string sementicName;
-			uint sementicNum;
-			DXGI_FORMAT format;
-			uint inputSlot;
-			uint offset;
-			D3D11_INPUT_CLASSIFICATION inputClass;
-			uint InstanceDataStepRate;
+			std::string SemanticName;
+			UINT SemanticIndex;
+			DXGI_FORMAT Format;
+			UINT InputSlot;
+			UINT AlignedByteOffset;
+			D3D11_INPUT_CLASSIFICATION InputSlotClass;
+			UINT InstanceDataStepRate;
 		};
 	private:
-		std::vector<D3D11_INPUT_ELEMENT_DESC> m_vLayout;
-		bool   m_bIsInstance = false;
-		uint   m_InstanceDataSR = 1;
+		std::vector<LayoutDesc> m_vLayout;  // 레이아웃 목록 배열
+		bool   m_bIsInstance = false;                     // 인스턴스 변수를 저장하는지 여부 
+		uint   m_InstanceDataSR = 1;                      // 인스턴스 DataSetpRate 를 저장하기 위한 변수
 		//
-		uint   m_inputSlot = 0;
-		uint   m_pvInputSlot = 0;
+		uint   m_inputSlot = 0;                           //  현재 입력 슬롯
+		uint   m_pvInputSlot = 0;                         //  전 입력 슬롯
 		//
-		uint   m_accOffset = 0;
+		uint   m_accOffset = 0;                           // 누적 오프셋
 	public:
 		LayoutInformation();
 		virtual ~LayoutInformation();
 		virtual void AnalyzeSentence(std::string& sentence) override;
-		D3D11_INPUT_ELEMENT_DESC& GetDesc(const uint idx);
-		D3D11_INPUT_ELEMENT_DESC* GetDescAddress();
+		virtual bool Decryptable(const std::string& sentence) override;
+
+		void MakeInputLayoutArray(class InputLayout* layout);
+		/*
+		Exp : 목록 사이즈를 가져온다. */
 		uint Size();
 	};
 
