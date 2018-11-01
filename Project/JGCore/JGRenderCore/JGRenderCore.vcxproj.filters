@@ -32,9 +32,6 @@
     <Filter Include="workingDirectory_DirectX\TestClass">
       <UniqueIdentifier>{3232b7e6-e391-44c7-bdd0-56cbe31d91e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TestHLSL">
-      <UniqueIdentifier>{cc4da46f-9ffb-4fb6-90f3-20c42df5cfd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze">
       <UniqueIdentifier>{519306cc-b8af-41bb-8e06-1efed0ee5d1c}</UniqueIdentifier>
     </Filter>
@@ -198,21 +195,5 @@
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\CoreTest\HLSL\CommonShader_vs.hlsl">
-      <Filter>TestHLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\CoreTest\HLSL\CommonShader_ps.hlsl">
-      <Filter>TestHLSL</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\CoreTest\HLSL\Common_ps.hlsli">
-      <Filter>TestHLSL</Filter>
-    </None>
-    <None Include="..\CoreTest\HLSL\Common_vs.hlsli">
-      <Filter>TestHLSL</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -7,9 +7,6 @@
     <Filter Include="Source">
       <UniqueIdentifier>{b8e6516e-1da9-48de-8229-732ede585610}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Include\JGDesign">
-      <UniqueIdentifier>{7ef5d410-d76f-4d0f-bc9b-5c7c57a76a05}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\common.h">
@@ -23,9 +20,6 @@
     </ClInclude>
     <ClInclude Include="Include\JGCommon.h">
       <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\JGDesign\JGAbstractFactory.h">
-      <Filter>Include\JGDesign</Filter>
     </ClInclude>
     <ClInclude Include="Include\StringUtil.h">
       <Filter>Include</Filter>

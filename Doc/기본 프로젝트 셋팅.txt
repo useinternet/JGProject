@@ -3,26 +3,18 @@
 1. 출력 디렉토리 :  $(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/
 2. 중간 디렉토리 :  $(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/
 3. 추가 포함 디렉토리 : ./workingDirectory
-4. 링커 - 일반 - 출력 파일 : $(OutDir)$(TargetName)d$(TargetExt)
-5. 구성 속성 - 디버깅 - 명령 : $(OutDir)$(TargetName)d$(TargetExt)
-6. 작업 디렉토리 : $(OutDir)\
-7. 미리 컴파일된 헤더 사용 안함
+4. 작업 디렉토리 : $(OutDir)\
+5. 미리 컴파일된 헤더 사용 안함
 
 // 라이브러리 제작시 (JGLibrary)
-1. 출력 디렉토리 :  Lib\$(Configuration)\$(Platform)/
+1. 출력 디렉토리 :  Lib\
 2. 중간 디렉토리 :  $(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/
 3. 추가 포함 디렉토리 : ./Include
 4. 작업 디렉토리 : $(OutDir)\
 5. 미리 컴파일된 헤더 사용 안함
 
 
+1.$(SolutionDir)\Common\Include;$(IncludePath)
 
-// 라이브러리가 필요할 경우
-1. 다이렉트 x
-참조 디렉토리 : $(SolutionDir)\Common\DirectX\Include\
-참조 라이브러리 : $(SolutionDir)\Common\DirectX\Lib\x64\;
-
-2. JGCommon
-참조 디렉토리 :  $(SolutionDir)\Common\JGCommon\Include\
-참조 라이브러리 : $(SolutionDir)\Common\JGCommon\Lib\$(Configuration)\$(Platform)\
+2.$(SolutionDir)\Common\Lib;$(LibraryPath)
 

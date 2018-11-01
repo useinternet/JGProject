@@ -116,7 +116,7 @@ bool TestModel::InitializeBuffers(ID3D11Device* device)
 	indices = new unsigned long[m_indexCount];
 	if (!indices)
 	{
-		return false;
+		return false; 
 	}
 
 	for (int i = 0; i < m_vertexCount; ++i)

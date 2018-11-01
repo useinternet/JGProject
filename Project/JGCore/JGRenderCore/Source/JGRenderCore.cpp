@@ -55,12 +55,6 @@ void JGRenderCore::Init(HWND hWnd)
 	e.rank = 0;
 	e.func = bind(&JGRenderCore::modelDraw,this);
 	m_DX->RegistorDrawEvent(e);
-
-
-	//ShaderAnalyzer s;
-	//s.Analyze("./HLSL/CommonShader_vs.hlsl", EShaderType::Vertex);
-	//ShaderAnalyzer p;
-	//p.Analyze("./HLSL/CommonShader_ps.hlsl", EShaderType::Pixel);
 }
 void JGRenderCore::Draw()
 {

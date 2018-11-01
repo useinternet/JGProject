@@ -72,31 +72,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>.\bin\$(ProjectName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
-    <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Project\JGLibrary\JGCommon\Lib\Debug\x64;$(LibraryPath)</LibraryPath>
-    <IncludePath>..\JGCommon\Include\;C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Boost;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/Common/Lib/;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)/Common/Include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>.\bin\$(ProjectName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
-    <IncludePath>..\JGCommon\Include\;C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Boost;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Project\JGLibrary\JGCommon\Lib\Debug\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)/Common/Include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/Common/Lib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>.\bin\$(ProjectName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
-    <IncludePath>..\JGCommon\Include\;C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Boost;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Project\JGLibrary\JGCommon\Lib\Debug\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)/Common/Include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/Common/Lib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\bin\$(ProjectName)\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>.\bin\$(ProjectName)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
-    <IncludePath>..\JGCommon\Include\;C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Boost;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Project\JGLibrary\JGCommon\Lib\Debug\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)/Common/Include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/Common/Lib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\boost_1_68_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -128,7 +128,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\boost_1_68_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\boost_1_68_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -170,7 +170,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>JGCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\boost_1_68_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

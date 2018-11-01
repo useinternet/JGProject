@@ -153,5 +153,6 @@ CBufferVar* CBufferInformation::FindVar(const std::string& name)
 			}
 		}
 	}
+	return nullptr;
 }
 

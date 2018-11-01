@@ -1,0 +1,44 @@
+
+
+// 텍스쳐
+// 
+#define TEXTURE_START
+#define TEXTURE_END
+#define TEXTURE_CONFIG(Slot , TextureName) // (uint,string)
+
+// D3D11_FILTER_MIN_MAG_MIP_POINT                          = 0,
+// D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR                   = 1,
+// D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT             = 4,
+// D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR                   = 5,
+// D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT                   = 16,
+// D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR            = 17,
+// D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT                   = 20,
+// D3D11_FILTER_MIN_MAG_MIP_LINEAR                         = 21,
+// D3D11_FILTER_ANISOTROPIC                                = 85,
+// D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT               = 128,
+// D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR        = 129,
+// D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT  = 132,
+// D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR        = 133,
+// D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT        = 144,
+// D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR = 145,
+// D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT        = 148,
+// D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR              = 149,
+// D3D11_FILTER_COMPARISON_ANISOTROPIC                     = 213
+
+// 샘플러 상태 모드
+// WRAP = 1, MIRROR = 2, CLAMP = 3, BORDER = 4, MIRROR_ONCE = 5
+
+
+#define SAMPLERSTATE_CONFIG_START
+#define SAMPLERSTATE_Filter(x)                 // 필터 (D3D11_FILTER)
+#define SAMPLERSTATE_TextureMode(u,v,w)        // 샘플러 상태 모드 (D3D11_TEXTURE_ADDRESS_MODE)
+#define SAMPLERSTATE_MipLODBias(x)             // MipLODBias (FLOAT)
+#define SAMPLERSTATE_MaxAnisotropy(x)          // MaxAnisotropy (UINT)
+#define SAMPLERSTATE_BoderColor(r,g,b,a)       // BoderColor (FLOAT4)
+#define SAMPLERSTATE_MinLOD(x)                 // MinLOD (FLOAT)
+#define SAMPLERSTATE_MaxLOD(x)                 // MaxLOD (FLOAT)
+#define SAMPLERSTATE_CONFIG_END
+
+
+#define SAMPLERSTATE_DEFAULT_WRAPMODE
+#define SAMPLERSTATE_DEFAULT_CLAMPMODE
