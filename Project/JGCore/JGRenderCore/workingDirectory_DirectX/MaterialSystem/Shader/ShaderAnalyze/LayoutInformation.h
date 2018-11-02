@@ -1,17 +1,6 @@
 #pragma once
 #include"ShaderInformation.h"
 
-// 버텍스 레이아웃은 #define으로 설정
-// 레이아웃 정보
-// 첫번째 이름 으로 저장
-// 시멘틱 번호 저장
-// 포맷 형식 -> float , float2, float3, float4  이렇게 4개
-// 입력 슬롯 <- 이거는 메타 데이터로 번역해서 저장..
-// 오프셋은 순차적으로
-// 버텍스 형식인지
-// 인스턴스 0,
-
-
 namespace JGRC
 {
 	/*
@@ -43,11 +32,7 @@ namespace JGRC
 		virtual ~LayoutInformation();
 		virtual void AnalyzeSentence(std::string& sentence) override;
 		virtual bool Decryptable(const std::string& sentence) override;
-
-		void MakeInputLayoutArray(class InputLayout* layout);
-		/*
-		Exp : 목록 사이즈를 가져온다. */
-		uint Size();
+		virtual void WriteShaderData(std::ofstream& fout) override;
 	};
 
 }

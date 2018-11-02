@@ -11,8 +11,8 @@ using namespace std;
 using namespace JGRC;
 TestShader::TestShader()
 {
-	VSAyzer = make_unique<ShaderAnalyzer>();
-	PSAyzer = make_unique<ShaderAnalyzer>();
+	//VSAyzer = make_unique<ShaderAnalyzer>();
+	//PSAyzer = make_unique<ShaderAnalyzer>();
 	real Light[12] = { 0.15f, 0.15f, 0.15f, 1.0f ,1.0f, 1.0f, 1.0f, 1.0f ,0.0f, 0.0f, 1.0f };
 	for (int i = 0; i < 12; ++i)
 	{
@@ -57,7 +57,7 @@ bool TestShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, jgMa
 }
 bool TestShader::InitializeShader(ID3D11Device* device, HWND hwnd, const WCHAR* vsFilename, const WCHAR* psFilename)
 {
-	VSAyzer->Analyze("./HLSL/CommonShader_vs.hlsl",EShaderType::Vertex);
+	/*VSAyzer->Analyze("./HLSL/CommonShader_vs.hlsl",EShaderType::Vertex);
 	PSAyzer->Analyze("./HLSL/CommonShader_ps.hlsl", EShaderType::Pixel);
 
 	VertexShader = ShaderObjectManager::GetInstance()->CreateShaderObject(EShaderType::Vertex);
@@ -81,7 +81,7 @@ bool TestShader::InitializeShader(ID3D11Device* device, HWND hwnd, const WCHAR* 
 	LightBuffer = JGBufferManager::GetInstance()->CreateBuffer(EBufferType::ConstantBuffer,
 		EUsageType::Dynamic, ECPUType::Access_Write, nullptr, sizeof(real), 12);
 
-	SamplerState::GetInstance()->AddSampler(TT("Wrap"), ESamplerType::Wrap, D3D11_FILTER_MIN_MAG_MIP_LINEAR);
+	SamplerState::GetInstance()->AddSampler(TT("Wrap"), ESamplerType::Wrap, D3D11_FILTER_MIN_MAG_MIP_LINEAR);*/
 	return true;
 }
 bool TestShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, jgMatrix4x4 worldMatrix, jgMatrix4x4 viewMatrix,
@@ -92,37 +92,37 @@ bool TestShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, jgMatri
 	viewMatrix.transpose();
 	projectionMatrix.transpose();
 
-	VSAyzer->SetParam("worldMatrix", &worldMatrix);
-	VSAyzer->SetParam("viewMatrix", &viewMatrix);
-	VSAyzer->SetParam("projectionMatrix", &projectionMatrix);
-	VSAyzer->WriteConstantBuffers();
+	//VSAyzer->SetParam("worldMatrix", &worldMatrix);
+	//VSAyzer->SetParam("viewMatrix", &viewMatrix);
+	//VSAyzer->SetParam("projectionMatrix", &projectionMatrix);
+	//VSAyzer->WriteConstantBuffers();
 
-	jgVec4 Color(0.15f, 0.15f, 0.15f, 1.0f);
-	PSAyzer->SetParam("ambientColor", &Color);
-	Color.set(1.0f, 1.0f, 1.0f, 1.0f);
-	PSAyzer->SetParam("diffuseColor", &Color);
-	jgVec3 d(1.0f, 0.0f, 0.0f);
-	PSAyzer->SetParam("lightDirection", &d);
-	real pad = 0.0f;
-	PSAyzer->SetParam("padding", &pad);
-	PSAyzer->WriteConstantBuffers();
+	//jgVec4 Color(0.15f, 0.15f, 0.15f, 1.0f);
+	//PSAyzer->SetParam("ambientColor", &Color);
+	//Color.set(1.0f, 1.0f, 1.0f, 1.0f);
+	//PSAyzer->SetParam("diffuseColor", &Color);
+	//jgVec3 d(1.0f, 0.0f, 0.0f);
+	//PSAyzer->SetParam("lightDirection", &d);
+	//real pad = 0.0f;
+	//PSAyzer->SetParam("padding", &pad);
+	//PSAyzer->WriteConstantBuffers();
 
 	return true;
 }
 void TestShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
-	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(VertexShader->Layout);
+	//// Set the vertex input layout.
+	//deviceContext->IASetInputLayout(VertexShader->Layout);
 
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader((ID3D11VertexShader*)(VertexShader->ShaderBuffer), NULL, 0);
-	deviceContext->PSSetShader((ID3D11PixelShader*)(PixelShader->ShaderBuffer), NULL, 0);
+	//// Set the vertex and pixel shaders that will be used to render this triangle.
+	//deviceContext->VSSetShader((ID3D11VertexShader*)(VertexShader->ShaderBuffer), NULL, 0);
+	//deviceContext->PSSetShader((ID3D11PixelShader*)(PixelShader->ShaderBuffer), NULL, 0);
 
-	// Set the sampler state in the pixel shader.
-	deviceContext->PSSetSamplers(0, 1, SamplerState::GetInstance()->GetAddress(TT("Wrap")));
+	//// Set the sampler state in the pixel shader.
+	//deviceContext->PSSetSamplers(0, 1, SamplerState::GetInstance()->GetAddress(TT("Wrap")));
 
-	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	//// Render the triangle.
+	//deviceContext->DrawIndexed(indexCount, 0, 0);
 
 	return;
 }

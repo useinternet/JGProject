@@ -10,5 +10,13 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>main</Filter>
     </ClCompile>
+    <ClCompile Include="EngineBridge.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineBridge.h">
+      <Filter>main</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

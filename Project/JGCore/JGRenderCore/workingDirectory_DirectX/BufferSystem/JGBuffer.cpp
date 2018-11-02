@@ -68,6 +68,7 @@ bool JGBuffer::CreateBuffer(EBufferType bufferType, EUsageType usage, ECPUType C
 		result = m_pDirectX->GetDevice()->CreateBuffer(&m_BufferDesc, &pSourceData, m_Buffer.GetAddressOf());
 		if (FAILED(result))
 		{
+			JGLOG(log_Error, "JGRC::JGBuffer", "Failed Create JGBuffer");
 			return false;
 		}
 	}
@@ -76,6 +77,7 @@ bool JGBuffer::CreateBuffer(EBufferType bufferType, EUsageType usage, ECPUType C
 		result = m_pDirectX->GetDevice()->CreateBuffer(&m_BufferDesc, nullptr , m_Buffer.GetAddressOf());
 		if (FAILED(result))
 		{
+			JGLOG(log_Error, "JGRC::JGBuffer", "Failed Create JGBuffer");
 			return false;
 		}
 	}
@@ -87,20 +89,24 @@ bool JGBuffer::Write(EMapType type, void* InData)
 	// 타입 체크
 	if (type == EMapType::Read)
 	{
+		JGLOG(log_Error, "JGRC::JGBuffer", "type is EMapType::Read but Try Write JGBuffer");
 		return false;
 	}
 	// CPU 플래그 체크
 	if (m_BufferDesc.CPUAccessFlags != D3D11_CPU_ACCESS_WRITE)
 	{
+		JGLOG(log_Error, "JGRC::JGBuffer", "type is not ECPUType::Access_Write but Try Write JGBuffer");
 		return false;
 	}
 	// 호환성 체크
 	if (type == EMapType::Write_Discard && m_BufferDesc.Usage != D3D11_USAGE_DYNAMIC)
 	{
+		JGLOG(log_Error, "JGRC::JGBuffer", "JGBuffer's type is EMapType::Write_Discard but UsageType is not UsageType::Dynamic");
 		return false;
 	}
 	if (type == EMapType::Write_NoOverWrite && m_BufferType != EBufferType::ConstantBuffer)
 	{
+		JGLOG(log_Error, "JGRC::JGBuffer", "JGBuffer's type is EMapType::Write_NoOverWrite but UsageType is not ConstantBuffer");
 		return false;
 	}
 	HRESULT result = S_OK;
@@ -130,6 +136,7 @@ bool JGBuffer::Write(EMapType type, void* InData)
 	result = m_pDirectX->GetContext()->Map(m_Buffer.Get(), 0, MapFlag, 0, &mappedResource);
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGBuffer", "Falied try JGBuffer Lock");
 		return false;
 	}
 	void* DataPtr = (void*)mappedResource.pData;
@@ -141,6 +148,7 @@ bool JGBuffer::Write(EMapType type, void* InData)
 bool JGBuffer::Read(EMapType type, void* OutData)
 {
 	// 미구현
+	JGLOG(log_Warning, "JGRC::JGBuffer", "JGBuffer::Read is not implemented");
 	return true;
 }
 ID3D11Buffer* JGBuffer::Get()
@@ -149,6 +157,7 @@ ID3D11Buffer* JGBuffer::Get()
 	{
 		return m_Buffer.Get();
 	}
+	JGLOG(log_Error, "JGRC::JGBuffer", "JGBuffer is nullptr");
 	return nullptr;
 }
 ID3D11Buffer** JGBuffer::GetAddress()
@@ -157,6 +166,7 @@ ID3D11Buffer** JGBuffer::GetAddress()
 	{
 		return m_Buffer.GetAddressOf();
 	}
+	JGLOG(log_Error, "JGRC::JGBuffer", "JGBuffer is nullptr");
 	return nullptr;
 }
 EBufferType JGBuffer::GetType()

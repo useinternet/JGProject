@@ -38,6 +38,9 @@
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool">
       <UniqueIdentifier>{bcc1032a-b172-4f05-9ac9-8068ad198ab4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="workingDirectory_DirectX\MaterialSystem\Data">
+      <UniqueIdentifier>{84293553-e6b9-48b8-a318-2284763d87d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -106,6 +109,15 @@
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
     </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\JGRenderCore.h">
@@ -142,9 +154,6 @@
       <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Include\Common\RenderConfigEnum.h">
-      <Filter>main\Include\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Common\JGRenderConfig.h">
       <Filter>main\Include\Common</Filter>
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h">
@@ -194,6 +203,12 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

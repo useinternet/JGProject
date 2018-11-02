@@ -1,0 +1,46 @@
+ShaderType : 0
+Hlsl Path : ./HLSL/CommonShader_ps.hlsl
+@@ InputLayout
+Count : 0
+@@
+@@ CBuffer
+Count : 1
+BufferNumber : 0
+BufferName : LightBuffer
+BufferSize : 48
+Var : ambientColor 4
+Var : diffuseColor 4
+Var : lightDirection 3
+Var : padding 1
+@@
+@@ SamplerState
+Count : 0
+@@
+@@ Texture
+TextureCount : 0
+@@
+
+ShaderType : 1
+Hlsl Path : ./HLSL/CommonShader_vs.hlsl
+@@ InputLayout
+Count : 3
+POSITION 0 6 0 0 0 0
+TEXCOORD 0 16 0 12 0 0
+NORMAL 0 6 0 20 0 0
+@@
+@@ CBuffer
+Count : 1
+BufferNumber : 0
+BufferName : MatrixBuffer
+BufferSize : 192
+Var : worldMatrix 16
+Var : viewMatrix 16
+Var : projectionMatrix 16
+@@
+@@ SamplerState
+Count : 0
+@@
+@@ Texture
+TextureCount : 0
+@@
+

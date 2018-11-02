@@ -16,8 +16,11 @@ JGBufferManager* JGBufferManager::GetInstance()
 }
 void JGBufferManager::Release()
 {
-	delete Instance;
-	Instance = nullptr;
+	if (Instance)
+	{
+		delete Instance;
+		Instance = nullptr;
+	}
 }
 JGBuffer* JGBufferManager::CreateBuffer(const EBufferType BufferType, const EUsageType UsageType, const ECPUType CpuType,  void* data, const uint DataSize, const uint DataCount)
 {
@@ -26,6 +29,7 @@ JGBuffer* JGBufferManager::CreateBuffer(const EBufferType BufferType, const EUsa
 	bool result = buffer->CreateBuffer(BufferType, UsageType, CpuType, data, DataSize * DataCount);
 	if (!result)
 	{
+		JGLOG(log_Error, "JGRC::JGBufferManager", "Failed Create JGBuffer");
 		return resultBuffer;
 	}
 	resultBuffer = buffer.get();

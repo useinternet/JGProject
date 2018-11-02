@@ -15,7 +15,7 @@ LayoutInformation::~LayoutInformation()
 }
 void LayoutInformation::AnalyzeSentence(string& sentence)
 {
-	if (StringUtil::FindString(sentence, "#define"))
+	if (!Decryptable(sentence) || StringUtil::FindString(sentence, "#define"))
 	{
 		return;
 	}
@@ -116,17 +116,15 @@ bool LayoutInformation::Decryptable(const std::string& sentence)
 	}
 	return false;
 }
-
-void LayoutInformation::MakeInputLayoutArray(class InputLayout* layout)
+void LayoutInformation::WriteShaderData(std::ofstream& fout)
 {
+	fout << "@@ InputLayout" << endl;
+	fout << "Count : " << m_vLayout.size() << endl;
 	for (auto& iter : m_vLayout)
 	{
-		layout->AddInputLayout(
-			iter.SemanticName.c_str(), iter.SemanticIndex, iter.Format, iter.InputSlot,
-			iter.AlignedByteOffset, iter.InputSlotClass, iter.InstanceDataStepRate);
+		fout << iter.SemanticName << " " << iter.SemanticIndex << " " << iter.Format << " "
+			 << iter.InputSlot << " " << iter.AlignedByteOffset << " " << iter.InputSlotClass << " "
+			 << iter.InstanceDataStepRate << endl;
 	}
-}
-uint LayoutInformation::Size()
-{
-	return m_vLayout.size();
+	fout << "@@" << endl;
 }

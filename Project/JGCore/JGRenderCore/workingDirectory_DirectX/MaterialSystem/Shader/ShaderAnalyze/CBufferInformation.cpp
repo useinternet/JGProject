@@ -11,16 +11,6 @@ uint CBuffer::size() const
 	}
 	return result;
 }
-void  CBuffer::getData(std::vector<float>* dataArray)
-{
-	for (auto& iter : mVars)
-	{
-		for (auto& var : iter.second.vValue)
-		{
-			dataArray->push_back(var);
-		}
-	}
-}
 CBufferInformation::CBufferInformation()
 {
 
@@ -32,6 +22,10 @@ CBufferInformation::~CBufferInformation()
 
 void CBufferInformation::AnalyzeSentence(std::string& sentence)
 {
+	if (!Decryptable(sentence))
+	{
+		return;
+	}
 	Start();
 	if (StringUtil::FindString(sentence, "struct") || sentence == "{" || sentence == "};" || sentence == "}")
 	{
@@ -57,33 +51,30 @@ void CBufferInformation::AnalyzeSentence(std::string& sentence)
 		// 형식을 알아낸다.( 변수 사이즈와 값 )
 		if (StringUtil::FindString(sentence, hlslType::MATRIX.c_str()))
 		{
-			var.VarSize = sizeof(float) * 16;
+			var.VarCount = 16;
 			StringUtil::DelString(var.VarName, hlslType::MATRIX.c_str());
 		}
 		else if (StringUtil::FindString(sentence, hlslType::FLOAT4.c_str()))
 		{
-			var.VarSize = sizeof(float) * 4;
+			var.VarCount = 4;
 			StringUtil::DelString(var.VarName, hlslType::FLOAT4.c_str());
 		}
 		else if (StringUtil::FindString(sentence, hlslType::FLOAT3.c_str()))
 		{
-			var.VarSize = sizeof(float) * 3;
+			var.VarCount = 3;
 			StringUtil::DelString(var.VarName, hlslType::FLOAT3.c_str());
 		}
 		else if (StringUtil::FindString(sentence, hlslType::FLOAT2.c_str()))
 		{
-			var.VarSize = sizeof(float) * 2;
+			var.VarCount = 2;
 			StringUtil::DelString(var.VarName, hlslType::FLOAT2.c_str());
 		}
 		else if (StringUtil::FindString(sentence, hlslType::FLOAT.c_str()))
 		{
-			var.VarSize = sizeof(float);
+			var.VarCount = 1;
 			StringUtil::DelString(var.VarName, hlslType::FLOAT.c_str());
 		}
-		for (uint i = 0; i < (var.VarSize / sizeof(float)); ++i)
-		{
-			var.vValue.push_back(0.0f);
-		}
+		var.VarSize = sizeof(float) * var.VarCount;
 		// 변수 이름 추출
 		StringUtil::DelChar(var.VarName, '\t');
 		StringUtil::DelString(var.VarName, ";");
@@ -101,27 +92,23 @@ bool CBufferInformation::Decryptable(const std::string& sentence)
 	}
 	return false;
 }
-CBuffer* CBufferInformation::GetCBuffer(const uint idx)
+void CBufferInformation::WriteShaderData(ofstream& fout)
 {
-	return &m_mCBuffers[idx];
-}
-float*  CBufferInformation::GetParam(const std::string& paramName) 
-{
-	return &FindVar(paramName)->vValue[0];
-}
-void   CBufferInformation::SetParam(const std::string& paramName, void* value)
-{
-	// ptr 예외 처리
-	CBufferVar* ptr = FindVar(paramName);
-	memcpy(&ptr->vValue[0], value, ptr->VarSize);
-}
-uint   CBufferInformation::GetParamSize(const std::string& paramName)
-{
-	return FindVar(paramName)->VarSize;
-}
-uint   CBufferInformation::GetCBufferCount()
-{
-	return m_mCBuffers.size();
+	fout << "@@ CBuffer" << endl;
+	fout << "Count : " << m_mCBuffers.size() << endl;
+
+	for (auto& iter : m_mCBuffers)
+	{
+		fout << "BufferNumber : " << iter.first << endl;
+		fout << "BufferName : " << iter.second.CBufferName << endl;
+		fout << "BufferSize : " << iter.second.size() << endl;
+		for (auto& var : iter.second.mVars)
+		{
+			fout << "Var : " << var.second.VarName << " " << var.second.VarCount << endl;
+		}
+	}
+
+	fout << "@@" << endl;
 }
 bool CBufferInformation::BlankCheck(const std::string& sentence)
 {

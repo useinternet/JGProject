@@ -14,8 +14,7 @@ namespace JGRC
 
 		virtual void AnalyzeSentence(std::string& sentence) override;
 		virtual bool Decryptable(const std::string& sentence) override;
-		const std::string& GetTextureName(const uint idx) const;
-		uint Size() const;
+		virtual void WriteShaderData(std::ofstream& fout) override;
 	private:
 		void ExtractionTextureName(std::string& s);
 	};

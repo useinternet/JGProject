@@ -1,5 +1,7 @@
 #include"JGMainCore.h"
 #include"JGRenderCore.h"
+#include<JGCommon/JGCommon.h>
+#include<JGCommon/JThreadManager.h>
 using namespace JGRC;
 
 JGMainCore::JGMainCore() {}
@@ -7,6 +9,7 @@ JGMainCore::~JGMainCore() {}
 
 bool JGMainCore::InitCore(HWND hWnd)
 {
+	JGLOGINIT("EngineCoreLog.log");
 	m_JGRC = new JGRenderCore;
 	m_JGRC->Init(hWnd);
 	return true;
@@ -27,6 +30,10 @@ void JGMainCore::Run()
 		}
 		m_JGRC->Draw();
 	}
+}
+void JGMainCore::Run_Edt()
+{
+	m_JGRC->Draw();
 }
 void JGMainCore::Destroy()
 {

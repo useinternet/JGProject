@@ -27,17 +27,7 @@ namespace JGRC
 		virtual ~SamplerInformation();
 		virtual void AnalyzeSentence(std::string& sentence) override;
 		virtual bool Decryptable(const std::string& sentence) override;
-		/*
-		Exp : 샘플러 목록을 가져온다. 
-		@param idx : 목록 인덱스 */
-		D3D11_SAMPLER_DESC GetDesc(const uint idx) const;
-		/*
-		Exp : 샘플러 모드를 가져온다. 
-		@param idx : 목록 인덱스 */
-		ESamplerMode GetModeType(const uint idx) const;
-		/*
-		Exp : 샘플러 사이즈를 가져온다. */
-		uint Size() const;
+		virtual void WriteShaderData(std::ofstream& fout) override;
 	private:
 		void SamplerCustomMode(std::string& sentence);
 		void SamplerDefault_WrapMode();

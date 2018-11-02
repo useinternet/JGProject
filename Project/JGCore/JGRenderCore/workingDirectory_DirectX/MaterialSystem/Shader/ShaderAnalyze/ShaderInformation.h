@@ -55,7 +55,7 @@ namespace JGRC
 		bool IsProgressing() const { return m_Progressing; }
 		virtual void AnalyzeSentence(std::string& sentence) {};
 		virtual bool Decryptable(const std::string& sentence) { return false; };
-
+		virtual void WriteShaderData(std::ofstream& fout) {};
 	protected:
 		inline void Start() { m_Progressing = true; }
 		inline void Stop() { m_Progressing = false; }

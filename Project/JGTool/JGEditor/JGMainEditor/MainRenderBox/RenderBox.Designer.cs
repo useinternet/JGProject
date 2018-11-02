@@ -29,31 +29,27 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RenderBox));
-            this.RenderImage = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.RenderImage)).BeginInit();
+            this.RenderPannel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
-            // RenderImage
+            // RenderPannel
             // 
-            this.RenderImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            resources.ApplyResources(this.RenderImage, "RenderImage");
-            this.RenderImage.Name = "RenderImage";
-            this.RenderImage.TabStop = false;
+            resources.ApplyResources(this.RenderPannel, "RenderPannel");
+            this.RenderPannel.Name = "RenderPannel";
             // 
-            // MainRenderBox
+            // RenderBox
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.RenderImage);
-            this.Name = "MainRenderBox";
-            ((System.ComponentModel.ISupportInitialize)(this.RenderImage)).EndInit();
+            this.Controls.Add(this.RenderPannel);
+            this.Name = "RenderBox";
+            this.Click += new System.EventHandler(this.RenderBox_Click);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.PictureBox RenderImage;
+        private System.Windows.Forms.Panel RenderPannel;
     }
 }
 

@@ -3,42 +3,36 @@
 #include"CBufferInformation.h"
 #include"SamplerInformation.h"
 #include"TextureInformation.h"
-#include"MaterialSystem/Shader/ShaderTool/InputLayout.h"
-#include"BufferSystem/JGBufferManager.h"
-#include"BufferSystem/JGBuffer.h"
-#include"DirectX/DirectX.h"
 using namespace JGRC;
 using namespace std;
-
-
-
-
-ShaderAnalyzer::ShaderAnalyzer()
+ShaderAnalyzer::AyzInformation::AyzInformation()
 {
-	m_BufferMG = JGBufferManager::GetInstance();
-	m_DirectX  = DirectX::GetInstance();
-	m_InputLayoutInfor = make_unique<LayoutInformation>();
-	m_CBufferInfor     = make_unique<CBufferInformation>();
-	m_SamplerInfor     = make_unique<SamplerInformation>();
-	m_TextureInfor     = make_unique<TextureInformation>();
+	InputLayout = make_unique<LayoutInformation>();
+	CBuffer = make_unique<CBufferInformation>();
+	SamplerState = make_unique<SamplerInformation>();
+	Texture = make_unique<TextureInformation>();
 }
-ShaderAnalyzer::~ShaderAnalyzer()
+bool ShaderAnalyzer::Analyze(const std::string& hlslPath, const EShaderType ShaderType)
 {
-	for (auto& iter : m_vBuffers)
+	AyzInformation infor;
+	infor.hlslPath = hlslPath;
+	if (ReadShader(hlslPath, &infor))
 	{
-		m_BufferMG->DeleteBuffer(iter);
+		m_mInformation.insert(pair<EShaderType, AyzInformation>(ShaderType, move(infor)));
+		return true;
 	}
+	return false;
 }
-bool ShaderAnalyzer::Analyze(const string& hlslPath, const EShaderType ShaderType)
+bool ShaderAnalyzer::ReadShader(const std::string& hlslPath, AyzInformation* infor)
 {
-	m_ShaderType = ShaderType;
 	fstream fin;
 	string buffer; // 입력 받아올 문자열
 	string path;   // 패쓰
-
+				   // 파일 열기
 	fin.open(hlslPath.c_str());
 	if (!fin.is_open())
 	{
+		JGLOG(log_Error, "JGRC::ShaderAnalyzer::Analyze", hlslPath);
 		return false;
 	}
 	while (!fin.eof())
@@ -48,80 +42,43 @@ bool ShaderAnalyzer::Analyze(const string& hlslPath, const EShaderType ShaderTyp
 		{
 			continue;
 		}
-
 		// 인크루드한 헤더 hlsl파일을 재귀 탐색한다.
-		if (StringUtil::FindString(buffer, hlslType::INCLUDE.c_str() ))
+		if (StringUtil::FindString(buffer, hlslType::INCLUDE.c_str()))
 		{
-			path = IncludeAyz(hlslPath,buffer);
-			Analyze(path, ShaderType);
+			path = IncludeAyz(hlslPath, buffer);
+			ReadShader(path, infor);
 		}
-		// 입력 레이아웃 정보 저장
-		else if (m_InputLayoutInfor->Decryptable(buffer))
-		{
-			m_InputLayoutInfor->AnalyzeSentence(buffer);
-		}
-		// 상수 버퍼 저장
-		else if (m_CBufferInfor->Decryptable(buffer))
-		{
-			m_CBufferInfor->AnalyzeSentence(buffer);
-		}
-		else if (m_SamplerInfor->Decryptable(buffer))
-		{
-			m_SamplerInfor->AnalyzeSentence(buffer);
-		}
-		else if (m_TextureInfor->Decryptable(buffer))
-		{
-			m_TextureInfor->AnalyzeSentence(buffer);
-		}
+		infor->InputLayout->AnalyzeSentence(buffer);
+		infor->CBuffer->AnalyzeSentence(buffer);
+		infor->SamplerState->AnalyzeSentence(buffer);
+		infor->Texture->AnalyzeSentence(buffer);
 	}
 	fin.close();
 	return true;
 }
-void ShaderAnalyzer::CreateConstantBuffers()
+bool ShaderAnalyzer::OutputShaderData(const std::string& name)
 {
-	for (uint i = 0; i < m_CBufferInfor->GetCBufferCount(); ++i)
+	string filename = name + ".material";
+
+	ofstream fout;
+	fout.open(filename);
+	if (!fout.is_open())
 	{
-		CBuffer* cbf = m_CBufferInfor->GetCBuffer(i);
-		JGBuffer* buffer = m_BufferMG->CreateBuffer(
-			EBufferType::ConstantBuffer, EUsageType::Dynamic, ECPUType::Access_Write,
-			nullptr, cbf->size(), 1);
-		m_vBuffers.push_back(buffer);
+		JGLOG(log_Warning, "ShaderAnalyzer::OutputShaderData", filename);
+		return false;
 	}
-}
-void ShaderAnalyzer::WriteConstantBuffers()
-{
-	for (uint i = 0; i < m_CBufferInfor->GetCBufferCount(); ++i)
+	
+	for (auto& iter : m_mInformation)
 	{
-		CBuffer* cbf = m_CBufferInfor->GetCBuffer(i);
-		std::vector<real> data;
-		cbf->getData(&data);
-		m_vBuffers[i]->Write(EMapType::Write_Discard, &data[0]);
-		switch (m_ShaderType)
-		{
-		case EShaderType::Pixel:
-			m_DirectX->GetContext()->PSSetConstantBuffers((UINT)i, 1, m_vBuffers[i]->GetAddress());
-			break;
-		case EShaderType::Vertex:
-			m_DirectX->GetContext()->VSSetConstantBuffers((UINT)i, 1, m_vBuffers[i]->GetAddress());
-			break;
-		}
+		fout << "ShaderType : " << (int)iter.first << endl;
+		fout << "Hlsl Path : " << iter.second.hlslPath << endl;
+		iter.second.InputLayout->WriteShaderData(fout);
+		iter.second.CBuffer->WriteShaderData(fout);
+		iter.second.SamplerState->WriteShaderData(fout);
+		iter.second.Texture->WriteShaderData(fout);
+		fout << endl;
 	}
-}
-void ShaderAnalyzer::MakeInputLayoutArray(class InputLayout* ly)
-{
-	m_InputLayoutInfor->MakeInputLayoutArray(ly);
-}
-float*   ShaderAnalyzer::GetParam(const std::string& paramName)
-{
-	return m_CBufferInfor->GetParam(paramName);
-}
-void     ShaderAnalyzer::SetParam(const std::string& paramName, void* value)
-{
-	m_CBufferInfor->SetParam(paramName, value);
-}
-uint     ShaderAnalyzer::GetParamSize(const std::string& paramName)
-{
-	return m_CBufferInfor->GetParamSize(paramName);
+	return true;
 }
 bool ShaderAnalyzer::RemoveRemark(std::string& sentence)
 {

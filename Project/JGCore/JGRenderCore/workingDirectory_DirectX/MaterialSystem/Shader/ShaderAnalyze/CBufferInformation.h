@@ -12,7 +12,7 @@ namespace JGRC
 	public:
 		std::string       VarName;
 		uint              VarSize;
-		std::vector<float> vValue;
+		uint              VarCount;
 	};
 	/*
 	Exp : 상수 버퍼 */
@@ -23,7 +23,6 @@ namespace JGRC
 		std::map<uint, CBufferVar> mVars;
 	public:
 		uint  size() const;
-		void  getData(std::vector<float>* dataArray);
 	};
 	class CORE_EXPORT CBufferInformation : public ShaderInformation
 	{
@@ -39,16 +38,7 @@ namespace JGRC
 
 		virtual void AnalyzeSentence(std::string& sentence) override;
 		virtual bool Decryptable(const std::string& sentence) override;
-		/*
-		Exp : 상수 버퍼 정보를 얻어 온다. 
-		@param idx : 버퍼 인덱스 */
-		CBuffer* GetCBuffer(const uint idx);
-
-
-		float*   GetParam(const std::string& paramName);
-		void     SetParam(const std::string& paramName, void* value);
-		uint     GetParamSize(const std::string& paramName);
-		uint     GetCBufferCount();
+		virtual void WriteShaderData(std::ofstream& fout) override;
 	private:
 		bool BlankCheck(const std::string& sentence);
 		void CBufferClear();

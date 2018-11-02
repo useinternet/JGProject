@@ -32,7 +32,7 @@ namespace JGRC
 		class JGBuffer* LightBuffer;
 		struct ShaderObject* VertexShader;
 		struct ShaderObject* PixelShader;
-		std::unique_ptr<ShaderAnalyzer> VSAyzer;
-		std::unique_ptr<ShaderAnalyzer> PSAyzer;
+		//std::unique_ptr<ShaderAnalyzer> VSAyzer;
+		//std::unique_ptr<ShaderAnalyzer> PSAyzer;
 	};
 }

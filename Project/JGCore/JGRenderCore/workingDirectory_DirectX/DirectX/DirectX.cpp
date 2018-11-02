@@ -5,6 +5,7 @@
 #include"JGRenderState.h"
 #include"JGViewport.h"
 #include"Common/JGInitConfig.h"
+
 using namespace JGRC;
 using namespace std;
 DirectX* DirectX::Instance = nullptr;
@@ -32,36 +33,44 @@ DirectX* DirectX::GetInstance()
 }
 void  DirectX::Release()
 {
-	delete Instance;
-	Instance = nullptr;
+	if (Instance)
+	{
+		delete Instance;
+		Instance = nullptr;
+	}
 }
 bool DirectX::Init(const JGInitConfig& config)
 {
+	JGLOG(log_Info, "JGRC::DirectX", "Creating DirectXApp..");
 	bool result = true;
 	result = m_Device->CreateDevice();
 	if (!result)
 	{
+		JGLOG(log_Critical, "JGRC::DirectX", "Failed DirectXApp..");
 		return false;
 	}
-
 	result = m_SwapChain->CreateSwapChain(m_Device->GetDevice(), config.hWnd, config.bFullScreen,
 		config.ScreenWidth, config.ScreenHeight);
 	if (!result)
 	{
+		JGLOG(log_Critical, "JGRC::DirectX", "Failed SwapChain..");
 		return false;
 	}
 	result = m_RenderTarget->CreateRenderTarget(m_Device->GetDevice(), m_SwapChain->Get(),
 		config.ScreenWidth, config.ScreenHeight);
 	if (!result)
 	{
+		JGLOG(log_Critical, "JGRC::DirectX", "Failed RenderTarget");
 		return false;
 	}
 	result = m_RenderState->RenderStateInit(m_Device->GetDevice());
 	if (!result)
 	{
+		JGLOG(log_Critical, "JGRC::DirectX", "Failed RenderState");
 		return false;
 	}
 	result = m_Viewport->InitViewport(config.ScreenWidth, config.ScreenHeight, config.Fov, config.FarZ, config.NearZ);
+	JGLOG(log_Info, "JGRC::DirectX", "Create DirectXApp. Complete");
 	return true;
 }
 void DirectX::Draw()

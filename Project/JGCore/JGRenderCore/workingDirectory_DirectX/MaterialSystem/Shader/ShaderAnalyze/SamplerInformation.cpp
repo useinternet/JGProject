@@ -14,8 +14,7 @@ SamplerInformation::~SamplerInformation()
 }
 void SamplerInformation::AnalyzeSentence(std::string& sentence)
 {
-	// 정의 구문이면 바로 함수 에서 탈출
-	if (StringUtil::FindString(sentence, "#define"))
+	if (!Decryptable(sentence) || StringUtil::FindString(sentence, "#define"))
 	{
 		return;
 	}
@@ -52,17 +51,21 @@ bool SamplerInformation::Decryptable(const std::string& sentence)
 	}
 	return false;
 }
-D3D11_SAMPLER_DESC SamplerInformation::GetDesc(const uint idx) const
+void SamplerInformation::WriteShaderData(ofstream& fout)
 {
-	return m_vSamplerDescs[idx];
-}
-ESamplerMode SamplerInformation::GetModeType(const uint idx) const
-{
-	return m_vModes[idx];
-}
-uint SamplerInformation::Size() const
-{
-	return m_vSamplerDescs.size();
+	uint count = 0;
+	fout << "@@ SamplerState" << endl;
+	fout << "Count : " << m_vSamplerDescs.size() << endl;
+	for (auto& iter : m_vSamplerDescs)
+	{
+		fout << "SamplerMode : " << (int)m_vModes[count] << endl;
+		fout << iter.Filter << " " << iter.AddressU << " " << iter.AddressV << " " << iter.AddressW << " "
+			 << iter.MipLODBias << " " << iter.MaxAnisotropy << " " << iter.BorderColor[0] << " "
+			 << iter.BorderColor[1] << " " << iter.BorderColor[2] << " " << iter.BorderColor[3] << " "
+			 << iter.MinLOD << " " << iter.MaxLOD << endl;
+		count++;
+	}
+	fout << "@@" << endl;
 }
 void SamplerInformation::SamplerCustomMode(string& sentence)
 {

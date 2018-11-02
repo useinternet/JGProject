@@ -8,6 +8,7 @@ JGSwapChain::~JGSwapChain() {}
 bool JGSwapChain::CreateSwapChain(ID3D11Device* Device, HWND hWnd, const bool bFullScreen,
 	const int ScreenWidth, const int ScreenHeight)
 {
+	JGLOG(log_Info, "JGRC::JGSwapChain", "Creating SwapChain..");
 	HRESULT result;
 	ComPtr<IDXGIDevice1>  DXGIDevice;
 	ComPtr<IDXGIAdapter>  DXGIAdapter;
@@ -17,16 +18,19 @@ bool JGSwapChain::CreateSwapChain(ID3D11Device* Device, HWND hWnd, const bool bF
 	result = Device->QueryInterface(__uuidof(IDXGIDevice1), (void**)DXGIDevice.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Critical, "JGRC::JGSwapChain", "Failed QueryInterface of Device..");
 		return false;
 	}
 	result = DXGIDevice->GetAdapter(DXGIAdapter.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Critical, "JGRC::JGSwapChain", "Failed Adapter of Device..");
 		return false;
 	}
 	result = DXGIAdapter->GetParent(__uuidof(IDXGIFactory1), (void**)DXGIFactory.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Critical, "JGRC::JGSwapChain", "Failed Factory of Device..");
 		return false;
 	}
 	
@@ -66,9 +70,10 @@ bool JGSwapChain::CreateSwapChain(ID3D11Device* Device, HWND hWnd, const bool bF
 	result = DXGIFactory->CreateSwapChain(Device, &SwapChainDesc, m_SwapChain.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Critical, "JGRC::JGSwapChain", "Failed CreateSwapChain");
 		// 예외 로그 출력
 	}
-
+	JGLOG(log_Info, "JGRC::JGSwapChain", "Create CreateSwapChain Complete");
 	return true;
 }
 
@@ -78,5 +83,6 @@ IDXGISwapChain * JGSwapChain::Get()
 	{
 		return m_SwapChain.Get();
 	}
+	JGLOG(log_Error, "JGRC::JGSwapChain", "SwapChain is nullptr");
 	return nullptr;
 }

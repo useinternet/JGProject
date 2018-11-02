@@ -6,34 +6,64 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
-using MainRenderBox;
+using System.Runtime.InteropServices;
 using JGLog;
+
 namespace MainEditor
 {
+    public delegate void MainEditorEvent();
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PeekMsg
+    {
+        public IntPtr hWnd;
+        public Message msg;
+        public IntPtr wParam;
+        public IntPtr lParam;
+        public uint time;
+        public System.Drawing.Point p;
+    }
     public partial class MainEditor : Form
     {
-        RenderBox m_RenderBox;
-        Log       m_Log;
+        // PeekMessage 임포트
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern bool PeekMessage(out PeekMsg msg, IntPtr hWnd,
+         uint messageFilterMin, uint messageFilterMax, uint flags);
+        // 에디터 이벤트 핸들러
+        private MainEditorEvent MainEditorEventHandler;
+        // 에디터 루프
+        public void EditLoop(object sender, EventArgs e)
+        {
+            PeekMsg msg;
+            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
+            {
+                if (MainEditorEventHandler != null)
+                {
+                    MainEditorEventHandler();
+                }
+            }
+        }
+
+        // 각 컨트롤 초기화
         public MainEditor()
         {
             InitializeComponent();
+            CreateJGLog();
+            CreateRenderBox();
+            JGEngineCore.InitEngine(m_RenderBox.PannelHandle);
+            MainEditorEventHandler += JGEngineCore.CoreRun;
         }
+        // 이벤트 처리
         private void MainEditor_Shown(object sender, EventArgs e)
         {
-            // 렌더 박스 추가
-            m_RenderBox = new RenderBox();
-            m_RenderBox.Width  = 800;
-            m_RenderBox.Height = 600;
-            m_RenderBox.TopLevel = false;
-            m_RenderBox.Show();
-            MainTabPage.Controls.Add(m_RenderBox);
-            // 로그 추가
-            m_Log = new Log();
-            m_Log.Dock = DockStyle.Right;
-            m_Log.TopLevel = false;
-            m_Log.Show();
-            MainTabPage.Controls.Add(m_Log);
+            
+
+
+        }
+        private void MainEditor_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            JGEngineCore.Destroy();
         }
     }
 }

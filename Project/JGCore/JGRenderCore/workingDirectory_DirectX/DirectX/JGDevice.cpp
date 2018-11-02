@@ -12,6 +12,7 @@ JGDevice::JGDevice()
 JGDevice::~JGDevice() {}
 bool JGDevice::CreateDevice()
 {
+	JGLOG(log_Info, "JGRC::JGDevice", "Createing JGDevice..");
 	UINT CreateDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if defined(_DEBUG)
 	CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -42,12 +43,16 @@ bool JGDevice::CreateDevice()
 	);
 	if (FAILED(result))
 	{
+		JGLOG(log_Critical, "JGRC::JGDevice", "Failed JGDevice..");
 		return false;
 	}
 	if (HighestLevel != D3D_FEATURE_LEVEL_11_0)
 	{
+		JGLOG(log_Error, "JGRC::JGDevice", "HighestLevel is not D3D_FEATURE_LEVEL_11_0..");
 		// 예외처리 로그 출력
 	}
+
+	JGLOG(log_Info, "JGRC::JGDevice", "Create JGDevice Complete.");
 	return true;
 }
 void JGDevice::BindRederTarget(JGRenderTarget* renderTarget, const UINT numViews)
@@ -77,6 +82,7 @@ ID3D11Device* JGDevice::GetDevice()
 		return m_Device.Get();
 	}
 	// 오류 출력
+	JGLOG(log_Error, "JGRC::JGDevice", "Device is nullptr.");
 	return nullptr;
 }
 ID3D11DeviceContext* JGDevice::GetContext()
@@ -86,6 +92,7 @@ ID3D11DeviceContext* JGDevice::GetContext()
 		return m_DeviceContext.Get();
 	}
 	// 오류 출력
+	JGLOG(log_Error, "JGRC::JGDevice", "DeviceContext is nullptr.");
 	return nullptr;
 }
 

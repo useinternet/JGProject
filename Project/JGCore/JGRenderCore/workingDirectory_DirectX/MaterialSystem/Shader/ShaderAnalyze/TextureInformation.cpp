@@ -13,8 +13,7 @@ TextureInformation::~TextureInformation()
 }
 void TextureInformation::AnalyzeSentence(std::string& sentence)
 {
-	// 정의 구문이면 바로 함수 에서 탈출
-	if (StringUtil::FindString(sentence, "#define"))
+	if (!Decryptable(sentence) || StringUtil::FindString(sentence, "#define"))
 	{
 		return;
 	}
@@ -37,13 +36,16 @@ bool TextureInformation::Decryptable(const std::string& sentence)
 	}
 	return false;
 }
-const string& TextureInformation::GetTextureName(const uint idx) const
+void TextureInformation::WriteShaderData(ofstream& fout)
 {
-	return m_mInformation.at(idx);
-}
-uint TextureInformation::Size() const
-{
-	return m_mInformation.size();
+	uint count = 0;
+	fout << "@@ Texture" << endl;
+	fout << "TextureCount : " << m_mInformation.size() << endl;
+	for (auto& iter : m_mInformation)
+	{
+		fout << count << " " << iter.second << endl;
+	}
+	fout << "@@" << endl;
 }
 void TextureInformation::ExtractionTextureName(std::string& s)
 {

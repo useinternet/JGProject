@@ -8,34 +8,27 @@ namespace JGRC
 	// enum class EShaderType;
 	class CORE_EXPORT ShaderAnalyzer
 	{
+		class AyzInformation
+		{
+		public:
+			std::string hlslPath;
+			std::shared_ptr<class LayoutInformation>  InputLayout;
+			std::shared_ptr<class CBufferInformation> CBuffer;
+			std::shared_ptr<class SamplerInformation> SamplerState;
+			std::shared_ptr<class TextureInformation> Texture;
+
+			AyzInformation();
+		};
 	private:
-		class JGBufferManager* m_BufferMG;
-		class DirectX*         m_DirectX;
-	private:
-		// hlsl path
-		// 입력 레이아웃정보
-		// 상수 버퍼
-		std::unique_ptr<class LayoutInformation>  m_InputLayoutInfor;
-		std::unique_ptr<class CBufferInformation> m_CBufferInfor;
-		std::unique_ptr<class SamplerInformation> m_SamplerInfor;
-		std::unique_ptr<class TextureInformation> m_TextureInfor;
-		std::vector<class JGBuffer*> m_vBuffers;
-		EShaderType m_ShaderType;
+		std::map<EShaderType, AyzInformation> m_mInformation;
 		bool m_bIgnore = false;
 	public:
-		ShaderAnalyzer();
-		~ShaderAnalyzer();
-
 		bool Analyze(const std::string& hlslPath, const EShaderType ShaderType);
-		void CreateConstantBuffers();
-		void WriteConstantBuffers();
-		/*
-		Exp : 입력 레이아웃 배열을 만듭니다. */
-		void MakeInputLayoutArray(class InputLayout* ly);
-		float*   GetParam(const std::string& paramName);
-		void     SetParam(const std::string& paramName, void* value);
-		uint     GetParamSize(const std::string& paramName);
+
+		// 나중에 이거 ofstream 매개변수로 받아서 이어서쓰기로.. ( 이거는 셰이더 관련만쓰는걸로..)
+		bool OutputShaderData(const std::string& name);
 	private:
+		bool ReadShader(const std::string& hlslPath, AyzInformation* infor);
 		bool RemoveRemark(std::string& sentence);
 		std::string IncludeAyz(std::string hlslPath, std::string& sentence);
 	};

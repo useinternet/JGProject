@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>Lib\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
     <IncludePath>$(SolutionDir)\Common\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Common\Lib;$(LibraryPath)</LibraryPath>
@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>Lib\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
     <IncludePath>$(SolutionDir)\Common\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Common\Lib;$(LibraryPath)</LibraryPath>
@@ -88,14 +88,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>Lib\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
     <IncludePath>$(SolutionDir)\Common\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Common\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>Lib\$(Configuration)\$(Platform)/</OutDir>
+    <OutDir>Lib\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\$(Platform)/</IntDir>
     <IncludePath>$(SolutionDir)\Common\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Common\Lib;$(LibraryPath)</LibraryPath>
@@ -116,10 +116,15 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "../JGMainCore/"
-copy "$(TargetDir)*.lib" "../JGMainCore/"
-copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -139,10 +144,15 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "../JGMainCore/"
-copy "$(TargetDir)*.lib" "../JGMainCore/"
-copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -166,10 +176,16 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "../JGMainCore/"
-copy "$(TargetDir)*.lib" "../JGMainCore/"
-copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -192,10 +208,16 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "../JGMainCore/"
-copy "$(TargetDir)*.lib" "../JGMainCore/"
-copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -209,6 +231,8 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp" />
@@ -218,6 +242,7 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp" />
     <ClCompile Include="workingDirectory_DirectX\TestClass\TestModel.cpp" />
     <ClCompile Include="workingDirectory_DirectX\TestClass\TestShader.cpp" />
@@ -226,7 +251,6 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
     <ClInclude Include="Include\Common\dllExportDefine.h" />
     <ClInclude Include="Include\Common\JGInitConfig.h" />
     <ClInclude Include="Include\Common\JGRCCommon.h" />
-    <ClInclude Include="Include\Common\JGRenderConfig.h" />
     <ClInclude Include="Include\Common\RenderConfigEnum.h" />
     <ClInclude Include="Include\JGRenderCore.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h" />
@@ -239,6 +263,8 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h" />

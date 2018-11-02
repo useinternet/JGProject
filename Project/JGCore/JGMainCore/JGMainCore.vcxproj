@@ -108,15 +108,19 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;JGMAINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/" 
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -127,15 +131,19 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;JGMAINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.dll" "$(SolutionDir)/Project/JGEngine/"
-copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/" 
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,7 +156,7 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;JGMAINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,6 +164,14 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/" 
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -167,7 +183,7 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;JGMAINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,6 +191,14 @@ copy "$(TargetDir)*.lib" "$(SolutionDir)/Project/JGEngine/"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/" 
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
+copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

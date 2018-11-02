@@ -8,6 +8,7 @@
 #include"TestClass/TestShader.h"
 #include"DirectX/JGViewport.h"
 #include"MaterialSystem/Shader/ShaderAnalyze/ShaderAnalyzer.h"
+
 using namespace JGRC;
 using namespace std;
 
@@ -28,6 +29,7 @@ JGRenderCore::~JGRenderCore()
 }
 void JGRenderCore::Init(HWND hWnd)
 {
+	JGLOGINIT("JGRenderCoreLog.log");
 	JGInitConfig config;
 	config.bFullScreen = false;
 	config.FarZ = 1000.0f;
@@ -55,6 +57,10 @@ void JGRenderCore::Init(HWND hWnd)
 	e.rank = 0;
 	e.func = bind(&JGRenderCore::modelDraw,this);
 	m_DX->RegistorDrawEvent(e);
+	ShaderAnalyzer Sample;
+	Sample.Analyze("./HLSL/CommonShader_vs.hlsl", EShaderType::Vertex);
+	Sample.Analyze("./HLSL/CommonShader_ps.hlsl", EShaderType::Pixel);
+	Sample.OutputShaderData("SampleMaterial");
 }
 void JGRenderCore::Draw()
 {

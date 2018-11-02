@@ -15,6 +15,7 @@ JGRenderTarget::~JGRenderTarget()
 bool JGRenderTarget::CreateRenderTarget(ID3D11Device* Device,IDXGISwapChain* SwapChain,
 	const int Width, const int Height)
 {
+	JGLOG(log_Info, "JGRC::JGRenderTarget", "Creating Main RenderTarget");
 	m_Width = Width; m_Height = Height;
 
 	HRESULT result = S_OK;
@@ -27,6 +28,7 @@ bool JGRenderTarget::CreateRenderTarget(ID3D11Device* Device,IDXGISwapChain* Swa
 		(void**)m_D3DTexture2D[static_cast<int>(ERenderTextureType::RenderTarget)].GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderTarget", "Failed GetBackBuffer of SwapChain");
 		return false;
 	}
 	// 백버퍼의 포인터로 렌더타겟 뷰를 생성합니다.
@@ -34,6 +36,7 @@ bool JGRenderTarget::CreateRenderTarget(ID3D11Device* Device,IDXGISwapChain* Swa
 		nullptr, m_RenderTarget.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderTarget", "Failed CreateRenderTargetView");
 		return false;
 	}
 
@@ -43,6 +46,7 @@ bool JGRenderTarget::CreateRenderTarget(ID3D11Device* Device,IDXGISwapChain* Swa
 		m_D3DTexture2D[static_cast<int>(ERenderTextureType::DepthBuffer)].GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderTarget", "Failed CreateDepthBufferTexture");
 		return false;
 	}
 
@@ -52,8 +56,14 @@ bool JGRenderTarget::CreateRenderTarget(ID3D11Device* Device,IDXGISwapChain* Swa
 		&DepthViewDesc, m_DepthStencilView.GetAddressOf());
 	if (FAILED(result))
 	{
+		if (FAILED(result))
+		{
+			JGLOG(log_Error, "JGRC::JGRenderTarget", "Failed Create DepthStencilView");
+			return false;
+		}
 		return false;
 	}
+	JGLOG(log_Info, "JGRC::JGRenderTarget", "Create Main RenderTarget Complete");
 	return true;
 }
 ID3D11RenderTargetView* JGRenderTarget::Get()
@@ -62,6 +72,7 @@ ID3D11RenderTargetView* JGRenderTarget::Get()
 	{
 		return m_RenderTarget.Get();
 	}
+	JGLOG(log_Error, "JGRC::JGRenderTarget", "RenderTargetView is nullptr");
 	return nullptr;
 }
 ID3D11RenderTargetView ** JGRenderTarget::GetAddress()
@@ -74,6 +85,7 @@ ID3D11Texture2D* JGRenderTarget::GetD3DTexture2D(const ERenderTextureType type)
 	{
 		return m_D3DTexture2D[static_cast<int>(type)].Get();
 	}
+	JGLOG(log_Error, "JGRC::JGRenderTarget", "DepthBufferTexture is nullptr");
 	return nullptr;
 }
 ID3D11DepthStencilView* JGRenderTarget::GetDepthStencilView()
@@ -82,6 +94,7 @@ ID3D11DepthStencilView* JGRenderTarget::GetDepthStencilView()
 	{
 		return m_DepthStencilView.Get();
 	}
+	JGLOG(log_Error, "JGRC::JGRenderTarget", "DepthStencilView is nullptr");
 	return nullptr;
 }
 ID3D11DepthStencilView ** JGRenderTarget::GetDepthStencilViewAddress()

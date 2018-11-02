@@ -26,7 +26,7 @@ bool JGViewport::InitViewport(const int Width, const int Height, const real FOV,
 	CreateProjectionMatrix();
 	// 정사영 행렬 생성
 	CreateOrthoMatrix();
-
+	JGLOG(log_Info, "JGRC::JGViewport", "Create ViewPort.");
 	return true;
 }
 D3D11_VIEWPORT* JGViewport::Get()

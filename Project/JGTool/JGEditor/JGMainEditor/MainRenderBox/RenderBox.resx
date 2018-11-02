@@ -118,30 +118,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="RenderImage.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+  <data name="RenderPannel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="RenderImage.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="RenderPannel.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
-  <data name="RenderImage.Size" type="System.Drawing.Size, System.Drawing">
-    <value>800, 450</value>
+  <data name="RenderPannel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>782, 553</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="RenderImage.TabIndex" type="System.Int32, mscorlib">
+  <data name="RenderPannel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="&gt;&gt;RenderImage.Name" xml:space="preserve">
-    <value>RenderImage</value>
+  <data name="&gt;&gt;RenderPannel.Name" xml:space="preserve">
+    <value>RenderPannel</value>
   </data>
-  <data name="&gt;&gt;RenderImage.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;RenderPannel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;RenderImage.Parent" xml:space="preserve">
+  <data name="&gt;&gt;RenderPannel.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;RenderImage.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;RenderPannel.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -151,13 +151,13 @@
     <value>8, 15</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>800, 450</value>
+    <value>782, 553</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Edit</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>MainRenderBox</value>
+    <value>RenderBox</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

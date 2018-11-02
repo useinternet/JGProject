@@ -24,12 +24,24 @@
     <ClInclude Include="Include\StringUtil.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\JGLog.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\JThreadManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\coordinateMath.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\StringUtil.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JGLog.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JThreadManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -16,7 +16,9 @@ namespace MainEditor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainEditor());
+            MainEditor Main = new MainEditor();
+            Application.Idle += (Main.EditLoop);
+            Application.Run(Main);
         }
     }
 }

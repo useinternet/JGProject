@@ -33,8 +33,11 @@
             // 
             // LogBox
             // 
+            this.LogBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.LogBox.BackColor = System.Drawing.SystemColors.ScrollBar;
-            this.LogBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LogBox.ForeColor = System.Drawing.Color.Black;
             this.LogBox.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.LogBox.Location = new System.Drawing.Point(0, 0);
             this.LogBox.Name = "LogBox";
@@ -44,16 +47,18 @@
             this.LogBox.TabIndex = 1;
             this.LogBox.Text = "";
             // 
-            // JGLog
+            // Log
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(782, 553);
             this.Controls.Add(this.LogBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.Name = "JGLog";
+            this.Name = "Log";
             this.Text = "JGLog";
-            this.Load += new System.EventHandler(this.JGLog_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Log_FormClosing);
+            this.Click += new System.EventHandler(this.Log_Click);
             this.ResumeLayout(false);
 
         }

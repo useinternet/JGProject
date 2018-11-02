@@ -8,12 +8,13 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	D3D11_BLEND_DESC         BlendStateDesc;
 	D3D11_RASTERIZER_DESC    RasterStateDesc;
 
-
+	JGLOG(log_Info, "JGRC::JGRenderState", "Creating RenderState");
 	// ZBuffer On 모드 깊이 상태 생성
 	WriteDepthStateDesc(DepthStateDesc, EDepthStateType::ZBufferOn);
 	result = Device->CreateDepthStencilState(&DepthStateDesc, m_DepthState_Zon.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed DepthState ZBuffer On");
 		return false;
 	}
 	// ZBuffer Off 모드 깊이 상태 생성
@@ -21,6 +22,7 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	result = Device->CreateDepthStencilState(&DepthStateDesc, m_DepthState_Zoff.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed DepthState ZBuffer Off");
 		return false;
 	}
 
@@ -29,6 +31,7 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	result = Device->CreateBlendState(&BlendStateDesc, m_BlendState_on.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed Blend On");
 		return false;
 	}
 	// Blend Off 모드 블렌드 상태 생성
@@ -36,6 +39,7 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	result = Device->CreateBlendState(&BlendStateDesc, m_BlendState_off.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed Blend Off");
 		return false;
 	}
 
@@ -45,6 +49,7 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	result = Device->CreateRasterizerState(&RasterStateDesc, m_RasterState_FS.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed Solid Raster");
 		return false;
 	}
 
@@ -55,9 +60,10 @@ bool JGRenderState::RenderStateInit(ID3D11Device* Device)
 	result = Device->CreateRasterizerState(&RasterStateDesc, m_RasterState_WF.GetAddressOf());
 	if (FAILED(result))
 	{
+		JGLOG(log_Error, "JGRC::JGRenderState", "Failed WireFrame Raster");
 		return false;
 	}
-
+	JGLOG(log_Info, "JGRC::JGRenderState", "Create RenderState(ZBuffer , BlendState, RasgerMode) Complete");
 	return true;
 }
 ID3D11DepthStencilState* JGRenderState::GetDepthState(const EDepthStateType type)
@@ -75,6 +81,7 @@ ID3D11DepthStencilState* JGRenderState::GetDepthState(const EDepthStateType type
 			return m_DepthState_Zoff.Get();
 		}
 	default:
+		JGLOG(log_Error, "JGRC::JGRenderState", "ZBuffer State is nullptr");
 		return nullptr;
 	}
 }
@@ -93,6 +100,7 @@ ID3D11BlendState* JGRenderState::GetBlendState(const EBlendStateType type)
 			return m_BlendState_off.Get();
 		}
 	default:
+		JGLOG(log_Error, "JGRC::JGRenderState", "Blend State is nullptr");
 		return nullptr;
 	}
 }
@@ -111,6 +119,7 @@ ID3D11RasterizerState* JGRenderState::GetRasterizerState(const EFillModeType typ
 			return m_RasterState_WF.Get();
 		}
 	default:
+		JGLOG(log_Error, "JGRC::JGRenderState", "RasterState is nullptr");
 		return nullptr;
 	}
 }
