@@ -1,5 +1,4 @@
 #include"LayoutInformation.h"
-#include"MaterialSystem/Shader/ShaderTool/InputLayout.h"
 using namespace std;
 using namespace JGRC;
 
@@ -118,8 +117,8 @@ bool LayoutInformation::Decryptable(const std::string& sentence)
 }
 void LayoutInformation::WriteShaderData(std::ofstream& fout)
 {
-	fout << "@@ InputLayout" << endl;
-	fout << "Count : " << m_vLayout.size() << endl;
+	fout << "@@InputLayout" << endl;
+	fout << "%Count : " << m_vLayout.size() << endl;
 	for (auto& iter : m_vLayout)
 	{
 		fout << iter.SemanticName << " " << iter.SemanticIndex << " " << iter.Format << " "

@@ -122,10 +122,7 @@ copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
-copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
-
-
-</Command>
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -150,10 +147,7 @@ copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
-copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
-
-
-</Command>
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -182,10 +176,7 @@ copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
-copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
-
-
-</Command>
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -214,10 +205,7 @@ copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/EngineBridge/"
-copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"
-
-
-</Command>
+copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/JGMainEditor/MainEditor/bin/$(Configuration)/"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -232,20 +220,21 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.cpp" />
     <ClCompile Include="workingDirectory_DirectX\TestClass\TestModel.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\TestClass\TestShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Common\dllExportDefine.h" />
@@ -264,20 +253,22 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\InputLayout.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\SamplerState.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.h" />
     <ClInclude Include="workingDirectory_DirectX\TestClass\TestModel.h" />
-    <ClInclude Include="workingDirectory_DirectX\TestClass\TestShader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

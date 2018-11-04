@@ -1,0 +1,49 @@
+%ShaderType : 0
+%Hlsl Path : ./HLSL/Ground_ps.hlsl
+@@InputLayout
+%Count : 0
+@@
+@@CBuffer
+%Count : 1
+%BufferName : LightBuffer
+%BufferSize : 48
+%VarCount : 4
+%Var : ambientColor 4
+%Var : diffuseColor 4
+%Var : lightDirection 3
+%Var : padding 1
+@@
+@@SamplerState
+%Count : 1
+%SamplerMode : 2
+21 1 1 1 0 1 0 0 0 0 0 3.40282e+38
+@@
+@@Texture
+%TextureCount : 1
+0 Default
+@@
+%%End
+%ShaderType : 1
+%Hlsl Path : ./HLSL/Ground_vs.hlsl
+@@InputLayout
+%Count : 3
+POSITION 0 6 0 0 0 0
+TEXCOORD 0 16 0 12 0 0
+NORMAL 0 6 0 20 0 0
+@@
+@@CBuffer
+%Count : 1
+%BufferName : MatrixBuffer
+%BufferSize : 192
+%VarCount : 3
+%Var : worldMatrix 16
+%Var : viewMatrix 16
+%Var : projectionMatrix 16
+@@
+@@SamplerState
+%Count : 0
+@@
+@@Texture
+%TextureCount : 0
+@@
+%%End

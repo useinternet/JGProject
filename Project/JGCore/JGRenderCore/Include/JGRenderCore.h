@@ -4,15 +4,12 @@
 namespace JGRC
 {
 	class DirectX;
-	class JGInitConfig;
-	class TestShader;
-	class TestModel;
 	class CORE_EXPORT JGRenderCore
 	{
 	private:
 		DirectX* m_DX;
-		TestShader* shader;
-		TestModel*  model;
+		class Material* mt;
+		class Material* plane;
 	public:
 		JGRenderCore();
 		virtual ~JGRenderCore();

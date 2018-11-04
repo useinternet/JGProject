@@ -8,20 +8,26 @@ ShaderObjectManager::~ShaderObjectManager()
 {
 	for (auto& iter : m_vShaderObjects)
 	{
-	
-		switch (iter->ShaderType)
+		if (iter->Buffer)
 		{
-		case EShaderType::Vertex:
-			iter->Layout->Release();
-			((ID3D11VertexShader*)iter->ShaderBuffer)->Release();
-			break;
-		case EShaderType::Pixel:
-			((ID3D11PixelShader*)iter->ShaderBuffer)->Release();
-			break;
-		default:
-			break;
+			switch (iter->Type)
+			{
+			case EShaderType::Vertex:
+				((ID3D11VertexShader*)iter->Buffer)->Release();
+				break;
+			case EShaderType::Pixel:
+				((ID3D11PixelShader*)iter->Buffer)->Release();
+				break;
+			default:
+				break;
+			}
 		}
-		iter->ShaderBuffer = nullptr;
+		iter->Buffer = nullptr;
+		if (iter->InputLayout)
+		{
+			iter->InputLayout->Release();
+			iter->InputLayout = nullptr;
+		}
 	}
 }
 
@@ -41,8 +47,7 @@ void ShaderObjectManager::Release()
 ShaderObject* ShaderObjectManager::CreateShaderObject(EShaderType type)
 {
 	std::unique_ptr<ShaderObject> object = make_unique<ShaderObject>();
-	object->ShaderType   = type;
-	object->ShaderBuffer = nullptr;
+	object->Type = type;
 	ShaderObject* result = object.get();
 	m_vShaderObjects.push_back(move(object));
 	return result;

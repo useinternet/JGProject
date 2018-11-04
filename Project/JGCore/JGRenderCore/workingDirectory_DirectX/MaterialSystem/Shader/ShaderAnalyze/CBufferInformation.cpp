@@ -94,17 +94,18 @@ bool CBufferInformation::Decryptable(const std::string& sentence)
 }
 void CBufferInformation::WriteShaderData(ofstream& fout)
 {
-	fout << "@@ CBuffer" << endl;
-	fout << "Count : " << m_mCBuffers.size() << endl;
+	fout << "@@CBuffer" << endl;
+	fout << "%Count : " << m_mCBuffers.size() << endl;
 
 	for (auto& iter : m_mCBuffers)
 	{
-		fout << "BufferNumber : " << iter.first << endl;
-		fout << "BufferName : " << iter.second.CBufferName << endl;
-		fout << "BufferSize : " << iter.second.size() << endl;
+	
+		fout << "%BufferName : " << iter.second.CBufferName << endl;
+		fout << "%BufferSize : " << iter.second.size() << endl;
+		fout << "%VarCount : " << iter.second.mVars.size() << endl;
 		for (auto& var : iter.second.mVars)
 		{
-			fout << "Var : " << var.second.VarName << " " << var.second.VarCount << endl;
+			fout << "%Var : " << var.second.VarName << " " << var.second.VarCount << endl;
 		}
 	}
 

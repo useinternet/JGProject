@@ -39,11 +39,11 @@ bool TextureInformation::Decryptable(const std::string& sentence)
 void TextureInformation::WriteShaderData(ofstream& fout)
 {
 	uint count = 0;
-	fout << "@@ Texture" << endl;
-	fout << "TextureCount : " << m_mInformation.size() << endl;
+	fout << "@@Texture" << endl;
+	fout << "%TextureCount : " << m_mInformation.size() << endl;
 	for (auto& iter : m_mInformation)
 	{
-		fout << count << " " << iter.second << endl;
+		fout << count++ << " " << iter.second << endl;
 	}
 	fout << "@@" << endl;
 }
@@ -63,9 +63,9 @@ void TextureInformation::ExtractionTextureName(std::string& s)
 			StartPos = true;
 	}
 	StringUtil::DelBlank(tmpStr);
-	uint Pos = s.find(',');
+	uint Pos = tmpStr.find(',');
 	
-	uint number = atoi(s.substr(0, Pos - 1).c_str());
-	string name = s.substr(Pos + 1, s.length() - 2);
+	uint number = atoi(tmpStr.substr(0, Pos).c_str());
+	string name = tmpStr.substr(Pos + 1, tmpStr.length() - 2);
 	m_mInformation.insert(pair<uint, string>(number, name));
 }

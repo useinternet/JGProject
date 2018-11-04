@@ -20,7 +20,7 @@ namespace JGRC
 		TestModel();
 		~TestModel();
 
-		bool Initialize(ID3D11Device*, const char*, const WCHAR*);
+		bool Initialize(ID3D11Device*, const char*, bool bump);
 		void Shutdown();
 		void Render(ID3D11DeviceContext*);
 
@@ -29,6 +29,7 @@ namespace JGRC
 	private:
 		bool InitializeBuffers(ID3D11Device*);
 	private:
+		bool bBump = false;
 		int m_vertexCount, m_indexCount;
 		std::vector<real> m_Sample;
 		ModelType* m_model;
@@ -37,5 +38,7 @@ namespace JGRC
 		class JGBuffer* TexBuffer;
 		class JGBuffer* NormalBuffer;
 		class JGBuffer* IndexBuffer;
+	private:
+		void MakeBump();
 	};
 }

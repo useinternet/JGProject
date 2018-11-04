@@ -3,6 +3,12 @@
 #include"BufferSystem/JGBuffer.h"
 using namespace std;
 using namespace JGRC;
+
+void CalculationTangentVector(jgVec3 vector[3], jgVec2 Tex[3])
+{
+
+}
+
 TestModel::TestModel()
 {
 	m_model = 0;
@@ -10,10 +16,10 @@ TestModel::TestModel()
 TestModel::~TestModel()
 {
 }
-bool TestModel::Initialize(ID3D11Device* device, const char* mdoelpath, const WCHAR* textureFilename)
+bool TestModel::Initialize(ID3D11Device* device, const char* mdoelpath, bool bump)
 {
 	bool result;
-
+	bBump = bump;
 	result = LoadModel(mdoelpath);
 	if (!result)
 	{
@@ -41,8 +47,15 @@ void TestModel::Render(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
 	unsigned int offset;
+	if (!bBump)
+	{
+		stride = sizeof(real) * 8;
+	}
+	else
+	{
+		stride = sizeof(real) * 14;
+	}
 
-	stride = sizeof(real) * 8;
 	offset = 0;
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	deviceContext->IASetVertexBuffers(0, 1, VertexBuffer->GetAddress(), &stride, &offset);
@@ -118,18 +131,29 @@ bool TestModel::InitializeBuffers(ID3D11Device* device)
 	{
 		return false; 
 	}
-
-	for (int i = 0; i < m_vertexCount; ++i)
+	if (!bBump)
 	{
-		m_Sample.push_back(m_model[i].x);
-		m_Sample.push_back(m_model[i].y);
-		m_Sample.push_back(m_model[i].z);
-		m_Sample.push_back(m_model[i].tu);
-		m_Sample.push_back(m_model[i].tv);
-		m_Sample.push_back(m_model[i].nx);
-		m_Sample.push_back(m_model[i].ny);
-		m_Sample.push_back(m_model[i].nz);
-		indices[i] = i;
+		for (int i = 0; i < m_vertexCount; ++i)
+		{
+			m_Sample.push_back(m_model[i].x);
+			m_Sample.push_back(m_model[i].y);
+			m_Sample.push_back(m_model[i].z);
+			m_Sample.push_back(m_model[i].tu);
+			m_Sample.push_back(m_model[i].tv);
+			//
+			m_Sample.push_back(m_model[i].nx);
+			m_Sample.push_back(m_model[i].ny);
+			m_Sample.push_back(m_model[i].nz);
+			indices[i] = i;
+		}
+	}
+	else
+	{
+		MakeBump();
+		for (int i = 0; i < m_vertexCount; ++i)
+		{
+			indices[i] = i;
+		}
 	}
 	VertexBuffer = JGBufferManager::GetInstance()->CreateBuffer(EBufferType::VertexBuffer,
 		EUsageType::Static, ECPUType::None, &m_Sample[0], sizeof(real), m_Sample.size());
@@ -142,4 +166,59 @@ bool TestModel::InitializeBuffers(ID3D11Device* device)
 	indices = 0;
 
 	return true;
+}
+
+void TestModel::MakeBump()
+{
+	std::vector<jgVec3> Pos;
+	std::vector<jgVec2> UV;
+	for (uint i = 0; i < m_vertexCount; i++)
+	{
+		Pos.push_back(jgVec3(m_model[i].x, m_model[i].y, m_model[i].z));
+		UV.push_back(jgVec2(m_model[i].tu, m_model[i].tv));
+	}
+	vector<jgVec3> vTangent;
+	vector<jgVec3> vBinormal;
+	for (uint i = 0; i < m_vertexCount;)
+	{
+		jgVec3 v1 = Pos[i+1] - Pos[i];
+		jgVec3 v2 = Pos[i+2] - Pos[i];
+
+		jgVec2 t1 = UV[i+1] - UV[i];
+		jgVec2 t2 = UV[i+2] - UV[i];
+
+		// 
+		real den = 1.0f / ((t1.x * t2.y) - (t2.x * t1.y));
+		//
+		jgVec3 Tangent;
+		Tangent = ((t2.y * v1) - (t1.y * v2)) * den;
+		Tangent.normalize();
+		vTangent.push_back(Tangent);
+		//
+		jgVec3 Binormal;
+		Binormal = ((t1.x * v2) - (t2.x * v1)) * den;
+		Binormal.normalize();
+		vBinormal.push_back(Binormal);
+		i += 3;
+	}
+	for (uint i = 0; i < m_vertexCount; ++i )
+	{
+		m_Sample.push_back(m_model[i].x);
+		m_Sample.push_back(m_model[i].y);
+		m_Sample.push_back(m_model[i].z);
+		m_Sample.push_back(m_model[i].tu);
+		m_Sample.push_back(m_model[i].tv);
+
+		m_Sample.push_back(m_model[i].nx);
+		m_Sample.push_back(m_model[i].ny);
+		m_Sample.push_back(m_model[i].nz);
+
+		m_Sample.push_back(vTangent[i % 3].x);
+		m_Sample.push_back(vTangent[i % 3].y);
+		m_Sample.push_back(vTangent[i % 3].z);
+		//
+		m_Sample.push_back(vBinormal[i % 3].x);
+		m_Sample.push_back(vBinormal[i % 3].y);
+		m_Sample.push_back(vBinormal[i % 3].z);
+	}
 }

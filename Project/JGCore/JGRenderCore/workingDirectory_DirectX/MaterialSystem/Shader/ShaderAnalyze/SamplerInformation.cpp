@@ -54,11 +54,11 @@ bool SamplerInformation::Decryptable(const std::string& sentence)
 void SamplerInformation::WriteShaderData(ofstream& fout)
 {
 	uint count = 0;
-	fout << "@@ SamplerState" << endl;
-	fout << "Count : " << m_vSamplerDescs.size() << endl;
+	fout << "@@SamplerState" << endl;
+	fout << "%Count : " << m_vSamplerDescs.size() << endl;
 	for (auto& iter : m_vSamplerDescs)
 	{
-		fout << "SamplerMode : " << (int)m_vModes[count] << endl;
+		fout << "%SamplerMode : " << (int)m_vModes[count] << endl;
 		fout << iter.Filter << " " << iter.AddressU << " " << iter.AddressV << " " << iter.AddressW << " "
 			 << iter.MipLODBias << " " << iter.MaxAnisotropy << " " << iter.BorderColor[0] << " "
 			 << iter.BorderColor[1] << " " << iter.BorderColor[2] << " " << iter.BorderColor[3] << " "

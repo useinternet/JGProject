@@ -1,16 +1,20 @@
 #pragma once
+#include"Common/JGRCCommon.h"
+#include"DirectXCommon.h"
+#include"MaterialSystem/Data/ShaderData.h"
 namespace JGRC
 {
 	enum class EShaderType
 	{
 		Pixel,
 		Vertex,
-		Header
+		Header,
 	};
-	typedef struct ShaderObject
+	class CORE_EXPORT ShaderObject
 	{
-		void* ShaderBuffer;
-		EShaderType ShaderType;
-		ID3D11InputLayout* Layout;
-	}ShaderObject;
+	public:
+		ID3D11InputLayout* InputLayout = nullptr;
+		EShaderType Type;
+		void* Buffer;
+	};
 }

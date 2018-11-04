@@ -8,8 +8,14 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-INPUTLAYOUT  // 실험중 입니닷
-// 실헙중 입니닷.
+
+cbuffer CameraBuffer
+{
+	float3 cameraPosition;
+	float  padding;
+};
+
+INPUTLAYOUT  
 struct VertexInputType
 {
 	INPUTSLOT(0) 
@@ -22,6 +28,7 @@ struct PixelInputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 viewDir : TEXCOORD1;
 };
 PixelInputType main(VertexInputType input)
 {
@@ -41,6 +48,11 @@ PixelInputType main(VertexInputType input)
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
 
+	// 보는 방향 계산
+	float4 worldPosition;
+	worldPosition = mul(input.position, worldMatrix);
+	output.viewDir = cameraPosition.xyz - worldPosition.xyz;
+	output.viewDir = normalize(output.viewDir);
 
 	return output;
 }

@@ -1,15 +1,9 @@
 #pragma once
 #include"ShaderInformation.h"
+#include"MaterialSystem/Data/ShaderData.h"
 namespace JGRC
 {
-	/*
-	Exp : 샘플러 모드, Wrap, Clamp, 커스텀 모드가 있다. */
-	enum class CORE_EXPORT ESamplerMode
-	{
-		Default_Wrap,
-		Default_Clamp,
-		Custom
-	};
+
 	/*
 	Exp : hlsl 파일로 부터 샘플러 정보를 해독한다. */
 	class CORE_EXPORT SamplerInformation : public ShaderInformation

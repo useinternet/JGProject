@@ -70,13 +70,13 @@ bool ShaderAnalyzer::OutputShaderData(const std::string& name)
 	
 	for (auto& iter : m_mInformation)
 	{
-		fout << "ShaderType : " << (int)iter.first << endl;
-		fout << "Hlsl Path : " << iter.second.hlslPath << endl;
+		fout << "%ShaderType : " << (int)iter.first << endl;
+		fout << "%Hlsl Path : " << iter.second.hlslPath << endl;
 		iter.second.InputLayout->WriteShaderData(fout);
 		iter.second.CBuffer->WriteShaderData(fout);
 		iter.second.SamplerState->WriteShaderData(fout);
 		iter.second.Texture->WriteShaderData(fout);
-		fout << endl;
+		fout << "%%End" << endl;
 	}
 	return true;
 }

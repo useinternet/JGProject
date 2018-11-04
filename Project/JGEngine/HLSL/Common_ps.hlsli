@@ -1,5 +1,5 @@
 
-
+///
 // ÅØ½ºÃÄ
 // 
 #define TEXTURE_START
@@ -42,3 +42,8 @@
 
 #define SAMPLERSTATE_DEFAULT_WRAPMODE
 #define SAMPLERSTATE_DEFAULT_CLAMPMODE
+
+
+
+
+
