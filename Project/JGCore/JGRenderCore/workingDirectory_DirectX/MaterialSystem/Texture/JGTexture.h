@@ -14,9 +14,10 @@ namespace JGRC
 	public:
 		JGTexture();
 		~JGTexture();
-
+		void AddTexture(ID3D11ShaderResourceView* srv);
 		void AddTexture(const std::string& TexturePath);
 		ID3D11ShaderResourceView** GetAddress(const uint idx);
+		std::vector<ID3D11ShaderResourceView*>& GetArray();
 		uint Size();
 	};
 }

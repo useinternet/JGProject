@@ -3,7 +3,7 @@
 #include"Shader/ShaderTool/ShaderCompiler.h"
 #include"Shader/ShaderTool/ShaderObjectManager.h"
 #include"MaterialSystem.h"
-
+#include"SceneRenderSystem/SRSMaterial.h"
 using namespace JGRC;
 using namespace std;
 MaterialSystem* MaterialReader::m_MtSys = nullptr;
@@ -19,15 +19,37 @@ MaterialReader::~MaterialReader()
 }
 Material* MaterialReader::Read(const string& materialPath)
 {
+	Material* mt = m_MtSys->CreateMaterial();
+
+	ReadMaterialFile(materialPath, mt);
+
+	return mt;
+}
+bool  MaterialReader::SRS_Read(const std::string& materialPath, SRSMaterial* mt)
+{
+	Material* mtial = (Material*)mt;
+	ReadMaterialFile(materialPath, mtial);
+
+	if (mtial)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+void MaterialReader::ReadMaterialFile(const string& materialPath, Material* mt)
+{
 	fstream fin;
 	fin.open(materialPath);
 	string buffer;
 	if (!fin.is_open())
 	{
 		JGLOG(log_Error, "JGRC::MaterialReader", materialPath + "Failed Read MaterialFile");
-		return nullptr;
+		mt = nullptr;
+		return;
 	}
-	Material* mt = m_MtSys->CreateMaterial();
 	uint loopCount = 0;
 	while (!fin.eof())
 	{
@@ -68,10 +90,9 @@ Material* MaterialReader::Read(const string& materialPath)
 	if (!mt->ShaderCompile())
 	{
 		JGLOG(log_Error, "JGRC::MaterialReader", materialPath + "Failed MaterialShaderCompile");
-		return nullptr;
+		mt = nullptr;
+		return;
 	}
-
-	return mt;
 }
 bool MaterialReader::ReadShaderType(const string& buffer, fstream& fin, EShaderType* type)
 {
@@ -121,6 +142,14 @@ bool MaterialReader::ReadInputLayout(const string& buffer, fstream& fin, Materia
 		desc.InputSlotClass = (D3D11_INPUT_CLASSIFICATION)InputSlotClass;
 		data.vSementicNames.push_back(move(SementicName));
 		data.vDescs.push_back(move(desc));
+	}
+	uint stride = 1;
+	while (true)
+	{
+		fin >> stride;
+		if (stride == 0)
+			break;
+		data.vStrides.push_back(stride);
 	}
 	mt->SetInputLayout(data);
 	return true;

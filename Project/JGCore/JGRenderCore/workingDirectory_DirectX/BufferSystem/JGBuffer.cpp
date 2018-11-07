@@ -73,7 +73,7 @@ bool JGBuffer::CreateBuffer(EBufferType bufferType, EUsageType usage, ECPUType C
 		}
 	}
 	else
-	{
+	{ 
 		result = m_pDirectX->GetDevice()->CreateBuffer(&m_BufferDesc, nullptr , m_Buffer.GetAddressOf());
 		if (FAILED(result))
 		{

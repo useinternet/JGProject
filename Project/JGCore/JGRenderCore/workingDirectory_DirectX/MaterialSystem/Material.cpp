@@ -6,9 +6,8 @@
 #include"BufferSystem/JGBuffer.h"
 #include"BufferSystem/JGBufferManager.h"
 #include"Texture/TextureManager.h"
-//임시 인크루드
-#include"TestClass/TestModel.h"
-
+#include"Mesh/Mesh.h"
+#include"SceneRenderSystem/SRSMaterial.h"
 
 //
 using namespace JGRC;
@@ -23,8 +22,6 @@ Material::Material()
 	m_InputLayoutData  = make_unique<InputLayoutData>();
 	m_SamplerStateData = make_unique<SamplerStateData>();
 	m_TextureData      = make_unique<TextureData>();
-
-	m_Model = make_unique<TestModel>();
 
 }
 Material::Material(Material&& m)
@@ -47,8 +44,6 @@ Material::~Material()
 			m_BfManager->DeleteBuffer(buffer);
 		}
 	}
-	m_Model->Shutdown();
-
 	//  임시 //
 	if (m_Sampler)
 	{
@@ -56,76 +51,29 @@ Material::~Material()
 		m_Sampler = nullptr;
 	}
 }
-void  Material::LoadModel(const char* modelPath,bool bump)
+void  Material::SetMesh(Mesh* mesh)
 {
-	m_Model->Initialize(m_DirectX->GetDevice(), modelPath, bump);
+	m_Mesh = mesh;
+	m_Mesh->CreateBuffer(m_InputLayoutData.get());
 }
 void  Material::Render()
 {
-	m_Model->Render(m_DirectX->GetContext());
-	
-	// 상수 버퍼 작성
-	for (auto& type : m_mJGBuffers)
-	{
-		UINT count = 0;
-		for (auto& buffer : type.second)
-		{
-			buffer->Write(EMapType::Write_Discard, m_mCBufferData[type.first][count]->getData());
-			switch (type.first)
-			{
-			case EShaderType::Pixel:
-				m_DirectX->GetContext()->PSSetConstantBuffers(count++, 1, buffer->GetAddress());
-				break;
-			case EShaderType::Vertex:
-				m_DirectX->GetContext()->VSSetConstantBuffers(count++, 1, buffer->GetAddress());
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	// 임시
-	if (m_TextureData.get())
-	{
-		uint count = 0;
-		for (auto& texture : m_TextureData->vTexture)
-		{
-			m_DirectX->GetContext()->PSSetShaderResources(count++, 1, texture->GetAddress(0));
-		}
-	}
-	// 임시
+	bool result = true;
 
-	// 셰이더 입력
-	for (auto obj : m_vShaderObj)
-	{
-		switch (obj->Type)
-		{
-		case EShaderType::Pixel:
-			obj->Buffer ?
-				m_DirectX->GetContext()->PSSetShader((ID3D11PixelShader*)(obj->Buffer), nullptr, 0) :
-				JGLOG(log_Error, "JGRC::Material", " obj's Buffer is nullptr When PSSetShader");
-			break;
-		case EShaderType::Vertex:
-			obj->InputLayout ?
-				m_DirectX->GetContext()->IASetInputLayout(obj->InputLayout) :
-				JGLOG(log_Error, "JGRC::Material", " obj's InputLayout is nullptr When IASetInputLayout");
-			obj->Buffer ?
-				m_DirectX->GetContext()->VSSetShader((ID3D11VertexShader*)(obj->Buffer), nullptr, 0) :
-				JGLOG(log_Error, "JGRC::Material", " obj's Buffer is nullptr When PSSetShader");
-			break;
-		default:
-			JGLOG(log_Warning, "JGRC::Material", "ShaderObjType is none or header type When Rendering");
-			break;
-		}
-	}
+	result = MeshRendering();
+	if (!result) return;
 
-	// 임시 //
-	if (m_Sampler)
-	{
-		m_DirectX->GetContext()->PSSetSamplers(0, 1, &m_Sampler);
-	}
-	// 임시 //
-	m_DirectX->GetContext()->DrawIndexed(m_Model->GetIndexCount(), 0, 0);
+	result = WriteConstantBuffer();
+	if (!result) return;
+
+	result = InputShaderResource();
+	if (!result) return;
+
+	result = InputShader_Sampler();
+	if (!result) return;
+
+	result = Draw();
+	if (!result) return;
 }
 real* Material::GetParam(const std::string& paramName)
 {
@@ -273,4 +221,112 @@ void Material::AddTexturePath(const string& TexturePath)
 		m_TextureData->vTexture.push_back(tt);
 	}
 
+}
+
+bool Material::MeshRendering()
+{
+	if (!m_Mesh)
+	{
+		JGLOG(log_Error, "JGRC::Material", "This Material's mesh is nullptr");
+		return false;
+	}
+	m_Mesh->Render();
+	return true;
+}
+bool Material::WriteConstantBuffer()
+{
+	// 상수 버퍼 작성
+	for (auto& type : m_mJGBuffers)
+	{
+		UINT count = 0;
+		for (auto& buffer : type.second)
+		{
+			buffer->Write(EMapType::Write_Discard, m_mCBufferData[type.first][count]->getData());
+			switch (type.first)
+			{
+			case EShaderType::Pixel:
+				m_DirectX->GetContext()->PSSetConstantBuffers(count++, 1, buffer->GetAddress());
+				break;
+			case EShaderType::Vertex:
+				m_DirectX->GetContext()->VSSetConstantBuffers(count++, 1, buffer->GetAddress());
+				break;
+			default:
+				return false;
+			}
+		}
+	}
+	return true;
+}
+bool Material::InputShaderResource()
+{
+	// 임시
+	if (m_TextureData.get())
+	{
+		uint count = 0;
+		for (auto& texture : m_TextureData->vTexture)
+		{
+			m_DirectX->GetContext()->PSSetShaderResources((UINT)count++, 1, texture->GetAddress(0));
+		}
+	}
+	// 임시
+
+	return true;
+}
+bool Material::InputShader_Sampler()
+{
+	// 셰이더 입력
+	for (auto obj : m_vShaderObj)
+	{
+		switch (obj->Type)
+		{
+		case EShaderType::Pixel:
+			if (obj->Buffer)
+			{
+				m_DirectX->GetContext()->PSSetShader((ID3D11PixelShader*)(obj->Buffer), nullptr, 0);
+			}
+			else
+			{
+				JGLOG(log_Error, "JGRC::Material", " obj's Buffer is nullptr When PSSetShader")
+				return false;
+			}
+			break;
+		case EShaderType::Vertex:
+			if (obj->InputLayout)
+			{
+				m_DirectX->GetContext()->IASetInputLayout(obj->InputLayout);
+			}
+			else
+			{
+				JGLOG(log_Error, "JGRC::Material", " obj's InputLayout is nullptr When IASetInputLayout")
+				return false;
+			}
+			if (obj->Buffer)
+			{
+				m_DirectX->GetContext()->VSSetShader((ID3D11VertexShader*)(obj->Buffer), nullptr, 0);
+			}
+			else
+			{
+				JGLOG(log_Error, "JGRC::Material", " obj's Buffer is nullptr When PSSetShader")
+				return false;
+			}
+			break;
+		default:
+			JGLOG(log_Warning, "JGRC::Material", "ShaderObjType is none or header type When Rendering")
+			return false;
+				break;
+		}
+	}
+
+	// 임시 //
+	if (m_Sampler)
+	{
+		m_DirectX->GetContext()->PSSetSamplers(0, 1, &m_Sampler);
+	}
+	return true;
+}
+bool Material::Draw()
+{
+	// 임시 //
+	m_DirectX->GetContext()->DrawIndexed((UINT)m_Mesh->getIndexCount(), 0, 0);
+	return true;
 }

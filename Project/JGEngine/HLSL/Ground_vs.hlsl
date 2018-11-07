@@ -40,6 +40,10 @@ PixelInputType main(VertexInputType input)
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
 
+
+	output.normal = input.normal;
+	output.tangent = input.tangent;
+	output.binormal = input.binormal;
 	//// 노말 벡터 는 월드 매트릭스만 계산
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);

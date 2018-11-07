@@ -24,12 +24,14 @@
     <ClInclude Include="Include\coordinateMath.h" />
     <ClInclude Include="Include\JGCommon.h" />
     <ClInclude Include="Include\JGLog.h" />
+    <ClInclude Include="Include\JGPath.h" />
     <ClInclude Include="Include\JThreadManager.h" />
     <ClInclude Include="Include\StringUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\coordinateMath.cpp" />
     <ClCompile Include="Source\JGLog.cpp" />
+    <ClCompile Include="Source\JGPath.cpp" />
     <ClCompile Include="Source\JThreadManager.cpp" />
     <ClCompile Include="Source\StringUtil.cpp" />
   </ItemGroup>

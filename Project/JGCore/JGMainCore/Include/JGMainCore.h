@@ -1,6 +1,5 @@
 #pragma once
 #include<Windows.h>
-
 // 익스포트 정의
 #ifdef JGMAINCORE_EXPORTS
 #define MAINCORE_EXPORT __declspec(dllexport)

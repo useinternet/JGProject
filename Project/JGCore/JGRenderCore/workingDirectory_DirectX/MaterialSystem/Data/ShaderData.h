@@ -17,6 +17,7 @@ namespace JGRC
 	public:
 		std::vector<std::string> vSementicNames;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vDescs;
+		std::vector<uint> vStrides;
 	public:
 		D3D11_INPUT_ELEMENT_DESC* Get();
 	};

@@ -1,0 +1,14 @@
+1. 일단 지연 렌더링 완료
+2. 구체적인 렌더링을 생각하자( 라이트 받아오는것까지)
+ex)  다이렉트 라이트, 위치 라이트 두개로 나눠서
+
+addDirectionLight();
+addLight(); <- 요런식
+
+ 
+3. RenderCore에서 추가할수있또록 수정
+
+ex) void Render( Material* m);
+ex) void addRenderWindow(HWND hWnd); <- 요런식
+
+$&$&$&$&$ 렌더링 코어는 진짜로 렌더링만 하는거!!!!( 섞어 쓰지 말자!!!! )

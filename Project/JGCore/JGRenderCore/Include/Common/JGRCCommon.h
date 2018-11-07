@@ -1,8 +1,5 @@
 #pragma once
-
-
-
-
+#pragma warning (disable : 4996 4005 4251)
 #include<JGCommon/JGCommon.h>
 #ifdef _DEBUG
 #pragma comment(lib,"JGCommon/JGCommon_d.lib")
@@ -13,7 +10,7 @@
 
 /* 윈도우즈 헤더파일  */
 //Windows
-#pragma warning (disable : 4996 4005 4251)
+
 #include<Windows.h>
 #include<wrl.h>
 //C++
@@ -47,5 +44,15 @@
 
 //- C언어
 #include<stdlib.h>
+
+
+
+// 임시
+namespace Game
+{
+	static JGPath::Path path("../../../../../../../Contents");
+	//static JGPath::Path path("../../Contents");
+}
+
 
 

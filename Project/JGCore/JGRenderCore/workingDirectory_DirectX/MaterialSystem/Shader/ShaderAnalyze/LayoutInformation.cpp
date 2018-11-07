@@ -23,7 +23,10 @@ void LayoutInformation::AnalyzeSentence(string& sentence)
 	if (StringUtil::FindString(sentence, "struct") || sentence == "{" || sentence == "};")
 	{
 		if (sentence == "};")
-			Stop(); 
+		{
+			m_vStride.push_back(m_accOffset);
+			Stop();
+		}
 		return;
 	}
 	// 입력 슬롯 추가
@@ -33,6 +36,7 @@ void LayoutInformation::AnalyzeSentence(string& sentence)
 		m_inputSlot = ExtractionBracketNumber(sentence);
 		if (m_inputSlot != m_pvInputSlot)
 		{
+			m_vStride.push_back(m_accOffset);
 			m_accOffset = 0;
 		}
 	}
@@ -125,5 +129,10 @@ void LayoutInformation::WriteShaderData(std::ofstream& fout)
 			 << iter.InputSlot << " " << iter.AlignedByteOffset << " " << iter.InputSlotClass << " "
 			 << iter.InstanceDataStepRate << endl;
 	}
+	for (auto& iter : m_vStride)
+	{
+		fout << iter << " ";
+	}
+	fout << 0 << endl;
 	fout << "@@" << endl;
 }

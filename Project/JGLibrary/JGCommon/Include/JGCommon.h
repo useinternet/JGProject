@@ -5,4 +5,5 @@
 #include"StringUtil.h"
 #include"JThreadManager.h"
 #include"JGLog.h"
+#include"JGPath.h"
 

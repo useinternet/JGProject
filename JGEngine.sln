@@ -75,6 +75,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HLSL", "HLSL", "{DFFF42BC-5
 		Contents\HLSL\CommonShader_vs.hlsl = Contents\HLSL\CommonShader_vs.hlsl
 		Contents\HLSL\Ground_ps.hlsl = Contents\HLSL\Ground_ps.hlsl
 		Contents\HLSL\Ground_vs.hlsl = Contents\HLSL\Ground_vs.hlsl
+		Contents\HLSL\SRS_PostProcessing_ps.hlsl = Contents\HLSL\SRS_PostProcessing_ps.hlsl
+		Contents\HLSL\SRS_PostProcessing_vs.hlsl = Contents\HLSL\SRS_PostProcessing_vs.hlsl
+		Contents\HLSL\SRS_ps.hlsl = Contents\HLSL\SRS_ps.hlsl
+		Contents\HLSL\SRS_vs.hlsl = Contents\HLSL\SRS_vs.hlsl
 	EndProjectSection
 EndProject
 Global

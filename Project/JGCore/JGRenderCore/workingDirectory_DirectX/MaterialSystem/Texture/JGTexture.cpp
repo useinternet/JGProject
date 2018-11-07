@@ -17,7 +17,10 @@ JGTexture::~JGTexture()
 		iter = nullptr;
 	}
 }
-
+void JGTexture::AddTexture(ID3D11ShaderResourceView* srv)
+{
+	m_vSRV.push_back(srv);
+}
 void JGTexture::AddTexture(const std::string& TexturePath)
 {
 	auto check = m_umSRVs.find(TexturePath);
@@ -42,6 +45,10 @@ void JGTexture::AddTexture(const std::string& TexturePath)
 ID3D11ShaderResourceView** JGTexture::GetAddress(const uint idx)
 {
 	return &m_vSRV[idx];
+}
+vector<ID3D11ShaderResourceView*>& JGTexture::GetArray()
+{
+	return m_vSRV;
 }
 uint JGTexture::Size()
 {

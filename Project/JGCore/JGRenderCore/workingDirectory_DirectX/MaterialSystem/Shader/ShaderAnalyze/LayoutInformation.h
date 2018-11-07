@@ -20,6 +20,7 @@ namespace JGRC
 		};
 	private:
 		std::vector<LayoutDesc> m_vLayout;  // 레이아웃 목록 배열
+		std::vector<uint>       m_vStride;
 		bool   m_bIsInstance = false;                     // 인스턴스 변수를 저장하는지 여부 
 		uint   m_InstanceDataSR = 1;                      // 인스턴스 DataSetpRate 를 저장하기 위한 변수
 		//

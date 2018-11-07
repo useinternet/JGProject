@@ -9,6 +9,7 @@ JGMainCore::~JGMainCore() {}
 
 bool JGMainCore::InitCore(HWND hWnd)
 {
+	
 	JGLOGINIT("EngineCoreLog.log");
 	m_JGRC = new JGRenderCore;
 	m_JGRC->Init(hWnd);

@@ -36,24 +36,22 @@ float4 main(PixelInputType input) : SV_TARGET
 	float4 textureColor = Default_Texture.Sample(Default_WrapSampler, input.tex);
 	float4 normalMap = Normal_Texture.Sample(Default_WrapSampler, input.tex);
 	float3 normalVec;
-	// 노멀 맵의 법선 정보를 받아온다.
+	//// 노멀 맵의 법선 정보를 받아온다.
 	normalMap = normalize((normalMap * 2) - 1.0f);
 
 	// 노멀 맵의 법선 정보를 토대로 법선벡터 생성
 	normalVec = input.normal + normalMap.x * input.tangent + normalMap.y * input.binormal;
 	normalVec = normalize(normalVec);
-
-
 	//
     color = ambientColor;
 
     lightDir = -lightDirection;
 
-    lightIntensity = saturate(dot(normalVec,lightDir));
-    if (lightIntensity > 0.0f)
-    {     
+	lightIntensity = saturate(dot(normalVec, lightDir));
+	if (lightIntensity > 0.0f)
+	{
 		color += (diffuseColor * lightIntensity);
-    }
-	color = saturate(color) * textureColor;
-	return color;
+		color = saturate(color) * textureColor;
+	}
+	return color * normalMap.a;
 }

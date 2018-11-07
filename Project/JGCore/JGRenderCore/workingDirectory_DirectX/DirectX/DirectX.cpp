@@ -105,10 +105,9 @@ ID3D11DeviceContext* DirectX::GetContext() const
 void DirectX::SetDefaultDirectState()
 {
 	ID3D11DeviceContext* context = GetContext();
-	context->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
+	SetDefautRenderTarget();
 	context->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOn),1);
 	context->RSSetState(m_RenderState->GetRasterizerState(EFillModeType::Solid));
-	context->RSSetViewports(1, m_Viewport->Get());
 }
 JGViewport* DirectX::GetViewport() const
 {
@@ -140,4 +139,10 @@ void DirectX::SetBlendFactor(const real a1, const real a2, const real a3, const 
 void DirectX::SetSampleMask(const uint mask)
 {
 	m_SampleMask = mask;
+}
+void DirectX::SetDefautRenderTarget()
+{
+	ID3D11DeviceContext* context = GetContext();
+	context->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
+	context->RSSetViewports(1, m_Viewport->Get());
 }

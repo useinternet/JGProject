@@ -102,7 +102,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>IF EXIST "$(SolutionDir)Contents" DEL "$(ProjectDir)bin\$(ConfigurationName)\"
-xcopy "$(SolutionDir)Contents" "$(ProjectDir)bin\$(ConfigurationName)\" /Y /D /E</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

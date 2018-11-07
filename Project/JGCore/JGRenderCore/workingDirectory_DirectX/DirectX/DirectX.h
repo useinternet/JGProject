@@ -53,5 +53,7 @@ namespace JGRC
 		void SetDirectState(const EStateType StateType, const uint ConfigType);
 		void SetBlendFactor(const real a1, const real a2, const real a3, const real a4);
 		void SetSampleMask(const uint mask);
+		void SetDefautRenderTarget();
+
 	};
 }

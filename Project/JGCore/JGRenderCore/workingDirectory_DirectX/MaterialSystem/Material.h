@@ -8,14 +8,14 @@ namespace JGRC
 	enum class EShaderType;
 	class MaterialReader;
 	class JGBuffer;
+	class Mesh;
 	class CORE_EXPORT Material
 	{
 	private:
-		// 임시 모델..
-		std::unique_ptr<class TestModel> m_Model;
+		Mesh* m_Mesh = nullptr;
 	private:
 		friend MaterialReader;
-	private:
+	protected:
 		typedef std::vector<std::shared_ptr<CBufferData>> CBufferDataArray;
 		typedef std::vector<JGBuffer*> JGBufferArray;
 		static class JGBufferManager* m_BfManager;
@@ -34,13 +34,12 @@ namespace JGRC
 	public:
 		Material();
 		Material(Material&& m);
-		~Material();
-		void  LoadModel(const char* modelPath,bool bump);
+		virtual ~Material();
+		void  SetMesh(Mesh* mesh);
 		void  Render();
 		real* GetParam(const std::string& paramName);
 		void  SetParam(const std::string& paramName, void* Data);
 		uint  GetParamCount(const std::string& paramName);
-
 		// 임시 텍스쳐 경로 //
 		void AddTexturePath(const std::string& TexturePath);
 	private:
@@ -49,10 +48,15 @@ namespace JGRC
 		void AddShaderObject(ShaderObject* obj);
 		void SetInputLayout(const InputLayoutData& data);
 		void SetSamplerState(const SamplerStateData& data);
-		void SetTexture(const TextureData& data);
 		void AddCBuffer(const CBufferData& data,const EShaderType type);
-	private:
+		void SetTexture(const TextureData& data);
+	protected:
 		bool ShaderCompile();
+		bool MeshRendering();
+		bool WriteConstantBuffer();
+		bool InputShaderResource();
+		bool InputShader_Sampler();
+		bool Draw();
 	};
 }
 

@@ -21,8 +21,9 @@ namespace JGRC
 		~MaterialReader();
 
 		class Material* Read(const std::string& materialPath);
-
+		bool  SRS_Read(const std::string& materialPath,class SRSMaterial* mt);
 	private:
+		void ReadMaterialFile(const std::string& materialPath, Material* mt);
 		bool ReadShaderType(const std::string& buffer, std::fstream& fin, EShaderType* type);
 		bool ReadHlslPath(const std::string& buffer, std::fstream& fin, std::string* path);
 		bool ReadInputLayout(const std::string& buffer, std::fstream& fin, class Material* mt);

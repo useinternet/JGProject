@@ -3,16 +3,8 @@
 
 cbuffer MatrixBuffer
 {
+	matrix wvpMatrix;
 	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-};
-
-
-cbuffer CameraBuffer
-{
-	float3 cameraPosition;
-	float  padding;
 };
 
 INPUTLAYOUT  
@@ -27,8 +19,8 @@ struct PixelInputType
 {
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
+	float4 worldPos : TEXCOORD1;
 	float3 normal : NORMAL;
-	float3 viewDir : TEXCOORD1;
 };
 PixelInputType main(VertexInputType input)
 {
@@ -41,18 +33,15 @@ PixelInputType main(VertexInputType input)
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
 
+	// 월드 좌표
+	output.worldPos = mul(position, worldMatrix);
+
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
 
 	// 노말 벡터 는 월드 매트릭스만 계산
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
-
-	// 보는 방향 계산
-	float4 worldPosition;
-	worldPosition = mul(input.position, worldMatrix);
-	output.viewDir = cameraPosition.xyz - worldPosition.xyz;
-	output.viewDir = normalize(output.viewDir);
 
 	return output;
 }
