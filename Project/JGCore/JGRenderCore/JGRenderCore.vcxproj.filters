@@ -144,9 +144,6 @@
     <ClInclude Include="Include\Common\dllExportDefine.h">
       <Filter>main\Include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Common\JGInitConfig.h">
-      <Filter>main\Include\Common</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Common\JGRCCommon.h">
       <Filter>main\Include\Common</Filter>
     </ClInclude>
@@ -170,9 +167,6 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h">
       <Filter>workingDirectory_DirectX\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Common\RenderConfigEnum.h">
-      <Filter>main\Include\Common</Filter>
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h">
       <Filter>workingDirectory_DirectX\BufferSystem</Filter>
@@ -242,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.h">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Common\JGRCGlobalType.h">
+      <Filter>main\Include\Common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

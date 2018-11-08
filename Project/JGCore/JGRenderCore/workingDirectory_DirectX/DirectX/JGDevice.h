@@ -1,6 +1,5 @@
 #pragma once
 #include"Common/JGRCCommon.h"
-#include"Common/RenderConfigEnum.h"
 #include"DirectXCommon.h"
 
 /*

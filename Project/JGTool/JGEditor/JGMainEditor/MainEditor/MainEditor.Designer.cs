@@ -28,52 +28,100 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.MainEditorTab = new System.Windows.Forms.TabControl();
-            this.MainTabPage = new System.Windows.Forms.TabPage();
-            this.MainEditorTab.SuspendLayout();
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainEditor));
+            this.RenderPanel = new System.Windows.Forms.Panel();
+            this.EngineLog = new System.Windows.Forms.RichTextBox();
+            this.DirFileList = new System.Windows.Forms.ListView();
+            this.SearchBox = new System.Windows.Forms.TextBox();
+            this.DirectoryViewer = new System.Windows.Forms.TreeView();
+            this.FileIcons = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
-            // MainEditorTab
+            // RenderPanel
             // 
-            this.MainEditorTab.Controls.Add(this.MainTabPage);
-            this.MainEditorTab.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainEditorTab.Location = new System.Drawing.Point(0, 0);
-            this.MainEditorTab.Name = "MainEditorTab";
-            this.MainEditorTab.SelectedIndex = 0;
-            this.MainEditorTab.Size = new System.Drawing.Size(800, 450);
-            this.MainEditorTab.TabIndex = 0;
+            this.RenderPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RenderPanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.RenderPanel.Location = new System.Drawing.Point(0, 0);
+            this.RenderPanel.Name = "RenderPanel";
+            this.RenderPanel.Size = new System.Drawing.Size(900, 510);
+            this.RenderPanel.TabIndex = 0;
             // 
-            // MainTabPage
+            // EngineLog
             // 
-            this.MainTabPage.Location = new System.Drawing.Point(4, 25);
-            this.MainTabPage.Name = "MainTabPage";
-            this.MainTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MainTabPage.Size = new System.Drawing.Size(792, 421);
-            this.MainTabPage.TabIndex = 0;
-            this.MainTabPage.Text = "Main";
-            this.MainTabPage.UseVisualStyleBackColor = true;
+            this.EngineLog.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.EngineLog.Location = new System.Drawing.Point(0, 516);
+            this.EngineLog.Name = "EngineLog";
+            this.EngineLog.ReadOnly = true;
+            this.EngineLog.Size = new System.Drawing.Size(518, 277);
+            this.EngineLog.TabIndex = 1;
+            this.EngineLog.Text = "";
+            // 
+            // DirFileList
+            // 
+            this.DirFileList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DirFileList.Location = new System.Drawing.Point(744, 516);
+            this.DirFileList.Name = "DirFileList";
+            this.DirFileList.Size = new System.Drawing.Size(773, 277);
+            this.DirFileList.TabIndex = 2;
+            this.DirFileList.UseCompatibleStateImageBehavior = false;
+            this.DirFileList.DoubleClick += new System.EventHandler(this.DirFileList_DoubleClick);
+            // 
+            // SearchBox
+            // 
+            this.SearchBox.Location = new System.Drawing.Point(524, 519);
+            this.SearchBox.Name = "SearchBox";
+            this.SearchBox.Size = new System.Drawing.Size(214, 25);
+            this.SearchBox.TabIndex = 5;
+            // 
+            // DirectoryViewer
+            // 
+            this.DirectoryViewer.Location = new System.Drawing.Point(524, 550);
+            this.DirectoryViewer.Name = "DirectoryViewer";
+            this.DirectoryViewer.Size = new System.Drawing.Size(214, 243);
+            this.DirectoryViewer.TabIndex = 6;
+            this.DirectoryViewer.DoubleClick += new System.EventHandler(this.DirectoryViewer_DoubleClick);
+            // 
+            // FileIcons
+            // 
+            this.FileIcons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FileIcons.ImageStream")));
+            this.FileIcons.TransparentColor = System.Drawing.Color.Transparent;
+            this.FileIcons.Images.SetKeyName(0, "floder_Icon.png");
+            this.FileIcons.Images.SetKeyName(1, "MaterialIcon.ico");
             // 
             // MainEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.MainEditorTab);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(1518, 794);
+            this.Controls.Add(this.DirectoryViewer);
+            this.Controls.Add(this.SearchBox);
+            this.Controls.Add(this.DirFileList);
+            this.Controls.Add(this.EngineLog);
+            this.Controls.Add(this.RenderPanel);
+            this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MainEditor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JGEngine";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainEditor_FormClosing);
-            this.Shown += new System.EventHandler(this.MainEditor_Shown);
-            this.MainEditorTab.ResumeLayout(false);
+            this.SizeChanged += new System.EventHandler(this.MainEditor_SizeChanged);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TabControl MainEditorTab;
-        private System.Windows.Forms.TabPage MainTabPage;
+        private System.Windows.Forms.Panel RenderPanel;
+        private System.Windows.Forms.RichTextBox EngineLog;
+        private System.Windows.Forms.ListView DirFileList;
+        private System.Windows.Forms.TextBox SearchBox;
+        private System.Windows.Forms.TreeView DirectoryViewer;
+        private System.Windows.Forms.ImageList FileIcons;
     }
 }
 

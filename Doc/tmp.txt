@@ -1,0 +1,119 @@
+	//// 셰이더 분석
+	ShaderAnalyzer Sample;
+	Sample.Analyze(Game::path / "HLSL/CommonShader_vs.hlsl", EShaderType::Vertex);
+	Sample.Analyze(Game::path / "HLSL/CommonShader_ps.hlsl", EShaderType::Pixel);
+	Sample.OutputShaderData(Game::path / "SampleMaterial");
+	
+	ShaderAnalyzer GroundAyz;
+	GroundAyz.Analyze(Game::path / "HLSL/SRS_vs.hlsl", EShaderType::Vertex);
+	GroundAyz.Analyze(Game::path / "HLSL/SRS_ps.hlsl", EShaderType::Pixel);
+	GroundAyz.OutputShaderData(Game::path / "SamplerGround");
+
+	// 메쉬 생성
+	rabbit = make_unique<Mesh>();
+	rabbit->LoadModel(Game::path / "bunny.txt", false);
+	ground = make_unique<Mesh>();
+	ground->LoadModel(Game::path / "cube.txt");
+	// 머터리얼 읽기
+	MaterialReader rd;
+	mt = rd.Read(Game::path / "SampleMaterial.material");
+	mt->SetMesh(rabbit.get());
+	plane = rd.Read(Game::path / "SamplerGround.material");
+	plane->SetMesh(ground.get());
+	plane->AddTexturePath(Game::path / "Texture/T_Water_M.png");
+	plane->AddTexturePath(Game::path / "Texture/T_Water_N.png");
+
+	// 실험 렌더 타겟
+	RTT = new SRSRenderTarget;
+	RTT->CreateSRSRenderTarget(1920, 1080);
+
+	// 실험 씬
+	scene = new SRSScene;
+	scene->CreateScene(1920, 1080);
+}
+void JGRenderCore::Draw()
+{
+	modelDraw();
+	m_DX->Draw();
+
+}
+void JGRenderCore::SceneDraw()
+{
+	scene->Render(RTT);
+}
+void JGRenderCore::modelDraw()
+{
+	RTT->BindingRenderTarget();
+	RTT->ClearRenderTarget();
+	/////////////////////////// 토끼 /////////////////////////////////////
+	static real yaw = 0;
+	yaw += 0.001f;
+	if (yaw > 360.0f)
+	{
+		yaw -= 360.0f;
+	}
+	rabbitDraw(yaw);
+	groundDraw(yaw);
+
+
+
+	m_DX->SetDefautRenderTarget();
+}
+void JGRenderCore::rabbitDraw(float yaw)
+{
+	jgVec3 CameraPos(0.0f, 5.0f, -10.0f);
+
+	// 월드 매트릭스
+	jgMatrix4x4 worldMatrix;
+	worldMatrix.identity();
+	worldMatrix.rotationY(yaw);
+	worldMatrix.transpose();
+
+	jgMatrix4x4 viewMatrix;
+	viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
+	viewMatrix.transpose();
+
+
+	jgMatrix4x4 projectionMatrix = m_DX->GetViewport()->GetProjectionMatrix();
+	projectionMatrix.transpose();
+
+
+	real color[4] = { 1.0f,1.0f,1.0f,1.0f };
+
+	mt->SetParam("worldMatrix", &worldMatrix);
+
+	worldMatrix = projectionMatrix * viewMatrix * worldMatrix;
+	mt->SetParam("wvpMatrix", &worldMatrix);
+	mt->SetParam("AmbientColor", color);
+	mt->Render();
+}
+void JGRenderCore::groundDraw(float yaw)
+{
+	jgVec3 CameraPos(0.0f, 5.0f, -10.0f);
+	jgMatrix4x4 worldMatrix;
+	worldMatrix.identity();
+	jgMatrix4x4 transMatrix;
+	transMatrix.translation(jgVec3(0.0, -1.0f, 0.0f));
+	jgMatrix4x4 scaleMatrix;
+	scaleMatrix.scaling(5.0f, 0.2f, 5.0);
+	jgMatrix4x4 rotationMatrix;
+	rotationMatrix.rotationY(yaw);
+
+	worldMatrix = worldMatrix * scaleMatrix * rotationMatrix * transMatrix;
+	worldMatrix.transpose();
+	jgMatrix4x4 viewMatrix;
+	viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
+	viewMatrix.transpose();
+
+
+	jgMatrix4x4 projectionMatrix = m_DX->GetViewport()->GetProjectionMatrix();
+	projectionMatrix.transpose();
+
+	
+
+
+	plane->SetParam("worldMatrix", &worldMatrix);
+	worldMatrix = projectionMatrix * viewMatrix * worldMatrix;
+	plane->SetParam("wvpMatrix", &worldMatrix);
+	plane->Render();
+}

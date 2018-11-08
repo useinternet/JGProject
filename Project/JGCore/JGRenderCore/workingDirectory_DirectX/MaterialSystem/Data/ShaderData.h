@@ -12,7 +12,7 @@ namespace JGRC
 		Default_Clamp,
 		Custom
 	};
-	class InputLayoutData
+	class CORE_EXPORT InputLayoutData
 	{
 	public:
 		std::vector<std::string> vSementicNames;
@@ -22,7 +22,7 @@ namespace JGRC
 		D3D11_INPUT_ELEMENT_DESC* Get();
 	};
 
-	class CBufferData
+	class CORE_EXPORT CBufferData
 	{
 	public:
 		class Var
@@ -51,7 +51,7 @@ namespace JGRC
 	private:
 		std::vector<real> Data;
 	};
-	class SamplerStateData
+	class CORE_EXPORT SamplerStateData
 	{
 	public:
 		std::vector<D3D11_SAMPLER_DESC> vDescs;
@@ -60,7 +60,7 @@ namespace JGRC
 		D3D11_SAMPLER_DESC* GetDescs(const uint idx);
 	};
 
-	class TextureData
+	class CORE_EXPORT TextureData
 	{
 	public:
 		std::vector<std::string> vNames;

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Threading;
-namespace JGLog
+
+namespace MainEditor.JGLog
 {
     public class LogLoader
     {
@@ -21,7 +21,7 @@ namespace JGLog
         public bool Read(ref string log)
         {
 #if DEBUG
-            if(LogReader.EndOfStream)
+            if (LogReader.EndOfStream)
             {
                 return false;
             }

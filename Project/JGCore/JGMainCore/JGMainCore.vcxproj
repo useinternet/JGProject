@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;JGMAINCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Include;..\JGRenderCore\Include;./workingDirectory;../JGLogicCore/Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

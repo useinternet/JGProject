@@ -19,7 +19,7 @@ struct PixelOutput
 	float4 normal   : SV_Target2;
 	float4 depth    : SV_Target3;
 };
-float4 main(PixelInputType input) 
+PixelOutput main(PixelInputType input)
 {
 	PixelOutput output;
 
@@ -29,7 +29,7 @@ float4 main(PixelInputType input)
 
 	output.worldPos = input.worldPos;
 	output.albedo = AmbientColor;
-	output.normal = input.normal;
+	output.normal = float4(input.normal,1.0f);
 	output.depth = float4(depthValue, depthValue, depthValue, 1.0f);
 	return output;
 }

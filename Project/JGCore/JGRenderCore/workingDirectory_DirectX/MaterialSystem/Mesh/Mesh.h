@@ -10,7 +10,7 @@ namespace JGRC
 	버퍼 만드는 과정 다시 고치자..
 	*/
 	typedef unsigned int index;
-	enum class MeshType
+	enum class CORE_EXPORT MeshType
 	{
 		Default, Instance
 	};
@@ -20,11 +20,11 @@ namespace JGRC
 		static class DirectX* m_Dx;
 		typedef std::vector<real> Data;
 	private:
-		std::string        m_Path;
+		std::string         m_Path;
 		std::vector<index>  m_Stride;
 		std::vector<index>  m_Offset;
 		std::vector<index>  m_IndexData;
-		std::vector<Data>  m_OuputData;
+		std::vector<Data>   m_OuputData;
 		std::vector<class JGBuffer*> m_vVertexBuffers;
 		class JGBuffer* m_IndexBuffer = nullptr;
 	public:

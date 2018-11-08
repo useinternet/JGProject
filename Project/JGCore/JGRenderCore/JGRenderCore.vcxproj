@@ -118,6 +118,8 @@
     <PostBuildEvent>
       <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
 copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "../JGLogicCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGLogicCore/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
@@ -143,6 +145,8 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <PostBuildEvent>
       <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
 copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "../JGLogicCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGLogicCore/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
@@ -172,6 +176,8 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <PostBuildEvent>
       <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
 copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "../JGLogicCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGLogicCore/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
@@ -201,6 +207,8 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <PostBuildEvent>
       <Command>copy /y "$(TargetDir)$(TargetName).lib" "../JGMainCore/"
 copy /y "$(TargetDir)$(TargetName).dll" "../JGMainCore/"
+copy /y "$(TargetDir)$(TargetName).lib" "../JGLogicCore/"
+copy /y "$(TargetDir)$(TargetName).dll" "../JGLogicCore/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGEngine/"
 copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)/Project/JGTool/EngineBridge/"
@@ -241,9 +249,8 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Common\dllExportDefine.h" />
-    <ClInclude Include="Include\Common\JGInitConfig.h" />
+    <ClInclude Include="Include\Common\JGRCGlobalType.h" />
     <ClInclude Include="Include\Common\JGRCCommon.h" />
-    <ClInclude Include="Include\Common\RenderConfigEnum.h" />
     <ClInclude Include="Include\JGRenderCore.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h" />

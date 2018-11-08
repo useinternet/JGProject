@@ -1,18 +1,19 @@
 #include"JGMainCore.h"
 #include"JGRenderCore.h"
+#include"JGLogicCore.h"
 #include<JGCommon/JGCommon.h>
-#include<JGCommon/JThreadManager.h>
 using namespace JGRC;
-
+using namespace JGLC;
 JGMainCore::JGMainCore() {}
 JGMainCore::~JGMainCore() {}
 
 bool JGMainCore::InitCore(HWND hWnd)
 {
-	
 	JGLOGINIT("EngineCoreLog.log");
 	m_JGRC = new JGRenderCore;
 	m_JGRC->Init(hWnd);
+	m_JGLC = new JGLogicCore;
+	m_JGLC->TestInit(m_JGRC);
 	return true;
 }
 void JGMainCore::Run()
@@ -29,15 +30,23 @@ void JGMainCore::Run()
 		{
 			m_Paused = true;
 		}
+		m_JGLC->TestTick();
 		m_JGRC->Draw();
 	}
 }
 void JGMainCore::Run_Edt()
 {
+	m_JGLC->TestTick();
 	m_JGRC->Draw();
 }
 void JGMainCore::Destroy()
 {
 	delete m_JGRC;
 	m_JGRC = nullptr;
+	delete m_JGLC;
+	m_JGLC = nullptr;
+}
+void JGMainCore::TestPage()
+{
+
 }

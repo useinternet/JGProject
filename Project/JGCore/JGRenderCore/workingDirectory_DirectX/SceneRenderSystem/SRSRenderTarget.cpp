@@ -12,25 +12,7 @@ SRSRenderTarget::SRSRenderTarget()
 }
 SRSRenderTarget::~SRSRenderTarget()
 {
-	for (auto& iter : m_SRV)
-	{
-		iter->Release();
-		iter = nullptr;
-	}
-	for (auto& iter : m_RTTexture)
-	{
-		iter->Release();
-		iter = nullptr;
-	}
-	for (auto& iter : m_RTV)
-	{
-		iter->Release();
-		iter = nullptr;
-	}
-	m_DSVTexture->Release();
-	m_DSVTexture = nullptr;
-	m_DSV->Release();
-	m_DSV = nullptr;
+
 }
 
 bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
@@ -55,9 +37,9 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	// 坊歹 鸥百 咆胶媚 积己
 	for (uint i = 0; i < BufferCount; ++i)
 	{
-		ID3D11Texture2D* RttTex;
+		Texture2D RttTex;
 		result = m_Dx->GetDevice()->CreateTexture2D(
-			&TextureDesc, nullptr, &RttTex);
+			&TextureDesc, nullptr, RttTex.GetAddressOf());
 		if (FAILED(result))
 		{
 			JGLOG(log_Critical, "JGRC::SRSRenderTarget", "Failed Create RenderTargetTexture");
@@ -76,9 +58,9 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	// 坊歹 鸥百 轰 积己
 	for (uint i = 0; i < BufferCount; ++i)
 	{
-		ID3D11RenderTargetView* RTV;
+		RenderTargetView RTV;
 		result = m_Dx->GetDevice()->CreateRenderTargetView(
-			m_RTTexture[i], &RTVDesc, &RTV);
+			m_RTTexture[i].Get(), &RTVDesc, RTV.GetAddressOf());
 		if (FAILED(result))
 		{
 			JGLOG(log_Critical, "JGRC::SRSRenderTarget", "Failed Create RenderTarget");
@@ -96,9 +78,9 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	// 嘉捞歹 府家胶轰 积己
 	for (uint i = 0; i < BufferCount; ++i)
 	{
-		ID3D11ShaderResourceView* SRV;
+		ShaderResourceView SRV;
 		result = m_Dx->GetDevice()->CreateShaderResourceView(
-			m_RTTexture[i], &SRVDesc, &SRV);
+			m_RTTexture[i].Get(), &SRVDesc, SRV.GetAddressOf());
 		if (FAILED(result))
 		{
 			JGLOG(log_Critical, "JGRC::SRSRenderTarget", "Failed Create ShaderResourceView")
@@ -123,7 +105,7 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	DSVTextureDesc.CPUAccessFlags = 0;
 	DSVTextureDesc.MiscFlags = 0;
 
-	result = m_Dx->GetDevice()->CreateTexture2D(&DSVTextureDesc, nullptr, &m_DSVTexture);
+	result = m_Dx->GetDevice()->CreateTexture2D(&DSVTextureDesc, nullptr, m_DSVTexture.GetAddressOf());
 	if (FAILED(result))
 	{
 		JGLOG(log_Critical, "JGRC::SRSRenderTarget", "Failed Create DepthTexture")
@@ -136,7 +118,7 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	DSVDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	DSVDesc.Texture2D.MipSlice = 0;
 
-	result = m_Dx->GetDevice()->CreateDepthStencilView(m_DSVTexture, &DSVDesc, &m_DSV);
+	result = m_Dx->GetDevice()->CreateDepthStencilView(m_DSVTexture.Get(), &DSVDesc, m_DSV.GetAddressOf());
 	if (FAILED(result))
 	{
 		JGLOG(log_Critical, "JGRC::SRSRenderTarget", "Failed Create DepthStencilView")
@@ -150,9 +132,9 @@ void SRSRenderTarget::BindingRenderTarget()
 	vector<ID3D11RenderTargetView*> vRTVarr;
 	for (uint i = 0; i < BufferCount; ++i)
 	{
-		vRTVarr.push_back(m_RTV[i]);
+		vRTVarr.push_back(m_RTV[i].Get());
 	}
-	m_Dx->GetContext()->OMSetRenderTargets(BufferCount, &vRTVarr[0], m_DSV);
+	m_Dx->GetContext()->OMSetRenderTargets(BufferCount, &vRTVarr[0], m_DSV.Get());
 	m_Dx->GetContext()->RSSetViewports(1, m_viewPort->Get());
 }
 void SRSRenderTarget::ClearRenderTarget(const real r, const real g, const real b, const real a)
@@ -160,11 +142,11 @@ void SRSRenderTarget::ClearRenderTarget(const real r, const real g, const real b
 	real color[4] = { r,g,b,a };
 	for (uint i = 0; i < BufferCount; ++i)
 	{
-		m_Dx->GetContext()->ClearRenderTargetView(m_RTV[i], color);
+		m_Dx->GetContext()->ClearRenderTargetView(m_RTV[i].Get(), color);
 	}
-	m_Dx->GetContext()->ClearDepthStencilView(m_DSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_Dx->GetContext()->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 ID3D11ShaderResourceView* SRSRenderTarget::GetShaderResourceView(const ERTType type)
 {
-	return m_SRV[(int)type];
+	return m_SRV[(int)type].Get();
 }

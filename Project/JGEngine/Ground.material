@@ -1,0 +1,46 @@
+%ShaderType : 0
+%Hlsl Path : ../../../../../../../Contents/HLSL/SRS_ps.hlsl
+@@InputLayout
+%Count : 0
+0
+@@
+@@CBuffer
+%Count : 0
+@@
+@@SamplerState
+%Count : 1
+%SamplerMode : 2
+21 1 1 1 0 1 0 0 0 0 0 3.40282e+38
+@@
+@@Texture
+%TextureCount : 2
+0 Default
+1 Normal
+@@
+%%End
+%ShaderType : 1
+%Hlsl Path : ../../../../../../../Contents/HLSL/SRS_vs.hlsl
+@@InputLayout
+%Count : 5
+POSITION 0 6 0 0 0 0
+TEXCOORD 0 16 0 12 0 0
+NORMAL 0 6 0 20 0 0
+TANGENT 0 6 0 32 0 0
+BINORMAL 0 6 0 44 0 0
+56 0
+@@
+@@CBuffer
+%Count : 1
+%BufferName : MatrixBuffer
+%BufferSize : 128
+%VarCount : 2
+%Var : wvpMatrix 16
+%Var : worldMatrix 16
+@@
+@@SamplerState
+%Count : 0
+@@
+@@Texture
+%TextureCount : 0
+@@
+%%End

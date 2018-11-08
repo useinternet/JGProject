@@ -1,4 +1,5 @@
 #pragma once
+
 #ifdef JGRENDERCORE_EXPORTS 
 #define CORE_EXPORT __declspec(dllexport)
 #else

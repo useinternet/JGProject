@@ -16,7 +16,7 @@ namespace JGRC
 	3. ·»´õ Å¸±ê Å¬¸®¾î
 	*/
 	class JGViewport;
-	class SRSRenderTarget
+	class CORE_EXPORT SRSRenderTarget
 	{
 		typedef Microsoft::WRL::ComPtr<ID3D11Texture2D> Texture2D;
 		typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
@@ -27,12 +27,12 @@ namespace JGRC
 
 	private:
 		static class DirectX* m_Dx;
-		std::vector<ID3D11Texture2D*>          m_RTTexture;
-		std::vector<ID3D11RenderTargetView*>   m_RTV;
-		std::vector<ID3D11ShaderResourceView*> m_SRV;
+		std::vector<Texture2D>          m_RTTexture;
+		std::vector<RenderTargetView>   m_RTV;
+		std::vector<ShaderResourceView> m_SRV;
 
-		ID3D11Texture2D* m_DSVTexture;
-		ID3D11DepthStencilView* m_DSV;
+		Texture2D m_DSVTexture;
+		DepthStencilView m_DSV;
 
 		int m_TextureWidth;
 		int m_TextureHeight;

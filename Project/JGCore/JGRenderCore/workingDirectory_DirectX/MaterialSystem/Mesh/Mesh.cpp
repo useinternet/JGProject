@@ -118,12 +118,11 @@ void Mesh::Render(D3D_PRIMITIVE_TOPOLOGY set)
 	//  stride, offset ¼³Á¤
 	//
 	std::vector<ID3D11Buffer*> bufferArrray;
-
+	if (m_vVertexBuffers.size() == 0) return;
 	for (uint i = 0; i < m_vVertexBuffers.size(); ++i)
 	{
 		bufferArrray.push_back(m_vVertexBuffers[i]->Get());
 	}
-
 
 	m_Dx->GetContext()->IASetVertexBuffers(0, (UINT)bufferArrray.size(), &bufferArrray[0], &m_Stride[0], &m_Offset[0]);
 	if (m_IndexBuffer)

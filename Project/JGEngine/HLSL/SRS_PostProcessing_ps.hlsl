@@ -25,8 +25,9 @@ float4 main(PixelInputType input) : SV_TARGET
 	float4 normal   = T_Normal.Sample(ClampSampler, input.tex);
 	float4 depth    = T_Depth.Sample(ClampSampler, input.tex);
 
-
+	// 후 처리
+	// 주변광, 및 그림자 후 처리( 나중에 블러 처리도 생각 )
 
 	// 위치값 
-	return depth;
+	return normal;
 }

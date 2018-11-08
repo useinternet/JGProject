@@ -4,12 +4,6 @@
 #include"MaterialSystem/Data/ShaderData.h"
 namespace JGRC
 {
-	enum class EShaderType
-	{
-		Pixel,
-		Vertex,
-		Header,
-	};
 	class CORE_EXPORT ShaderObject
 	{
 	public:

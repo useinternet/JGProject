@@ -1,53 +1,49 @@
 #include"JGSRSystem.h"
-#include"SRSRenderTarget.h"
 #include"DirectX/DirectX.h"
+#include"SRSRenderTarget.h"
+#include"SRSScene.h"
+#include"MaterialSystem/Material.h"
 using namespace std;
 using namespace JGRC;
 
 JGSRSystem::JGSRSystem()
 {
 	m_Dx = DirectX::GetInstance();
-	m_SRSRT = make_unique<SRSRenderTarget>();
-	for (uint i = 0; i < 4; ++i)
-	{
-		m_ClearColor.push_back(0);
-	}
-
+	m_Scene = make_unique<SRSScene>();
+	m_SRSRTT = make_unique<SRSRenderTarget>();
 }
 JGSRSystem::~JGSRSystem()
 {
 
 }
-void JGSRSystem::BindingRenderFunc(const function<void()>& func)
+bool JGSRSystem::Init(const int width, const int height)
 {
-	m_RenderFunc = func;
+	m_Scene->CreateScene(width, height);
+	bool result = m_SRSRTT->CreateSRSRenderTarget(width, height);
+	return result;
 }
-bool JGSRSystem::InitSRSystem(const int width, const int height)
+void JGSRSystem::push_Material(Material* mt)
 {
-	bool result = m_SRSRT->CreateSRSRenderTarget(width, height);
-	if (!result)
+	m_matQue.push(mt);
+}
+void JGSRSystem::Draw()
+{
+	m_SRSRTT->BindingRenderTarget();
+	m_SRSRTT->ClearRenderTarget();
+	while (!m_matQue.empty())
 	{
-		return false;
+		Material* mt = m_matQue.front();
+		if (mt)
+		{
+			mt->Render();
+		}
+		m_matQue.pop();
 	}
-	return true;
-}
-void JGSRSystem::Render()
-{
-	m_SRSRT->BindingRenderTarget();
-	m_SRSRT->ClearRenderTarget(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]);
-
-	m_RenderFunc();
-
 	m_Dx->SetDefautRenderTarget();
 }
-void JGSRSystem::SetClearColor(const real r, const real g, const real b, const real a)
+void JGSRSystem::SceneDraw()
 {
-	m_ClearColor[0] = r;
-	m_ClearColor[1] = g;
-	m_ClearColor[2] = b;
-	m_ClearColor[3] = a;
-}
-SRSRenderTarget* JGSRSystem::GetRenderTarget() const
-{
-	return m_SRSRT.get();
+	m_Dx->BeginDraw();
+	m_Scene->Render(m_SRSRTT.get());
+	m_Dx->EndDraw();
 }

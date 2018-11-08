@@ -5,7 +5,7 @@
 
 namespace JGRC
 {
-	class ShaderObjectManager
+	class CORE_EXPORT ShaderObjectManager
 	{
 	private:
 		static ShaderObjectManager* Instance;

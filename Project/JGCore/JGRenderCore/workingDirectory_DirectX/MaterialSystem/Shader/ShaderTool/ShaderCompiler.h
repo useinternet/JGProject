@@ -7,7 +7,7 @@ namespace JGRC
 {
 	typedef UINT CompileFlag;
 	class InputLayoutData;
-	class ShaderCompiler
+	class CORE_EXPORT ShaderCompiler
 	{
 	private:
 		friend class JGRenderCore;

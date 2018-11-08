@@ -1,0 +1,44 @@
+%ShaderType : 0
+%Hlsl Path : ../../../../../../../Contents/HLSL/CommonShader_ps.hlsl
+@@InputLayout
+%Count : 0
+0
+@@
+@@CBuffer
+%Count : 1
+%BufferName : Color
+%BufferSize : 16
+%VarCount : 1
+%Var : AmbientColor 4
+@@
+@@SamplerState
+%Count : 0
+@@
+@@Texture
+%TextureCount : 0
+@@
+%%End
+%ShaderType : 1
+%Hlsl Path : ../../../../../../../Contents/HLSL/CommonShader_vs.hlsl
+@@InputLayout
+%Count : 3
+POSITION 0 6 0 0 0 0
+TEXCOORD 0 16 0 12 0 0
+NORMAL 0 6 0 20 0 0
+32 0
+@@
+@@CBuffer
+%Count : 1
+%BufferName : MatrixBuffer
+%BufferSize : 128
+%VarCount : 2
+%Var : wvpMatrix 16
+%Var : worldMatrix 16
+@@
+@@SamplerState
+%Count : 0
+@@
+@@Texture
+%TextureCount : 0
+@@
+%%End

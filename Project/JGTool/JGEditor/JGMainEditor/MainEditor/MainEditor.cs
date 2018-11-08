@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using JGLog;
 
 namespace MainEditor
 {
@@ -43,27 +42,31 @@ namespace MainEditor
                     MainEditorEventHandler();
                 }
             }
-        }
 
+        }
         // 각 컨트롤 초기화
         public MainEditor()
         {
             InitializeComponent();
-            CreateJGLog();
-            CreateRenderBox();
-            JGEngineCore.InitEngine(m_RenderBox.PannelHandle);
+            JGEngineCore.InitEngine(RenderPanel.Handle);
             MainEditorEventHandler += JGEngineCore.CoreRun;
+            EngineLog_Init();
+            Directory_Init();
         }
         // 이벤트 처리
-        private void MainEditor_Shown(object sender, EventArgs e)
-        {
-            
-
-
-        }
         private void MainEditor_FormClosing(object sender, FormClosingEventArgs e)
         {
             JGEngineCore.Destroy();
+            EngineLog_Close();
+        }
+        private void MainEditor_SizeChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SearchBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

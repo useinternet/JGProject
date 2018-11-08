@@ -6,6 +6,7 @@
 #else
 #pragma comment(lib,"JGCommon/JGCommon.lib")
 #endif
+#include"Common/JGRCGlobalType.h"
 #include"dllExportDefine.h"
 
 /* 윈도우즈 헤더파일  */

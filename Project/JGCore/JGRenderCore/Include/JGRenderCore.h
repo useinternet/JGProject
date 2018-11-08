@@ -1,32 +1,37 @@
 #pragma once
-#include"Common/dllExportDefine.h"
+#include"Common/JGRCGlobalType.h"
+#include<JGCommon/JGCommon.h>
 #include<Windows.h>
-#include<memory>
+#include<string>
 namespace JGRC
 {
-	class DirectX;
+	// 나중에 스왑체인으로 (윈도우) 나누기
 	class CORE_EXPORT JGRenderCore
 	{
 	private:
-		DirectX* m_DX;
-		class Material* mt;
-		class Material* plane;
-		class SRSScene*  scene;
-		class SRSRenderTarget* RTT;
-		std::unique_ptr<class Mesh> rabbit;
-		std::unique_ptr<class Mesh> ground;
+		class DirectX* m_DX;
+		class JGSRSystem* m_SRSytsem;
+	private:
+		JGRenderCore(const JGRenderCore& copy) = delete;
+		JGRenderCore& operator=(const JGRenderCore& rc) = delete;
 	public:
 		JGRenderCore();
 		virtual ~JGRenderCore();
 
 		void Init(HWND hWnd);
+		void Push(class Material* mt);
 		void Draw();
+		bool OutputMaterialData(std::string* hlslPath,EShaderType* type,const UINT Count,const std::string& OuputMaterial);
+		class Material* CreateMaterial(const std::string& mtPath);
+
+
 	private:
-		// 샘플
-		void SceneDraw();
-		void modelDraw();
-		void rabbitDraw(float yaw);
-		void groundDraw(float yaw);
+		void ManagerInit();
+
+
+		// 임시
+	public:
+		jgMatrix4x4 GetProjectionMatrix();
 	};
 }
 

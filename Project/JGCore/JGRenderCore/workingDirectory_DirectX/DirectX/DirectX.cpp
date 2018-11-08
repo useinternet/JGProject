@@ -4,7 +4,6 @@
 #include"JGRenderTarget.h"
 #include"JGRenderState.h"
 #include"JGViewport.h"
-#include"Common/JGInitConfig.h"
 
 using namespace JGRC;
 using namespace std;
@@ -73,26 +72,14 @@ bool DirectX::Init(const JGInitConfig& config)
 	JGLOG(log_Info, "JGRC::DirectX", "Create DirectXApp. Complete");
 	return true;
 }
-void DirectX::Draw()
+void DirectX::BeginDraw()
 {
 	m_Device->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), m_BackColor);
 	m_Device->GetContext()->ClearDepthStencilView(m_RenderTarget->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	// 랭크 크기 오름차순으로 정렬
-	sort(m_vDrawEvent.begin(), m_vDrawEvent.end(), 
-		[](const DrawEvent& e1, const DrawEvent& e2) -> bool
-	{
-		return (e1.rank < e2.rank);
-	});
-
-	for (auto& iter : m_vDrawEvent)
-	{
-		iter.func();
-	}
-	m_SwapChain->Get()->Present(0, 0);
 }
-void DirectX::RegistorDrawEvent(const DrawEvent& drawEvent)
+void DirectX::EndDraw()
 {
-	m_vDrawEvent.push_back(drawEvent);
+	m_SwapChain->Get()->Present(0, 0);
 }
 ID3D11Device* DirectX::GetDevice() const
 {

@@ -3,7 +3,7 @@
 
 namespace JGRC
 {
-	class SRSMaterial : private Material
+	class CORE_EXPORT SRSMaterial : private Material
 	{
 	private:
 		std::unique_ptr<jgMatrix4x4> m_wvpMatrix;
