@@ -1,8 +1,16 @@
 #pragma once
 #include"Common/JGRCCommon.h"
 #include"DirectXCommon.h"
+#include"DxWindow.h"
 namespace JGRC
 {
+	/* 윈도우 하나에 필요한 것들 
+	윈도우 핸들
+	스왑 체인
+	렌더 타겟
+	렌더 상태
+	뷰포트
+	*/
 	class JGInitConfig;
 	enum class EStateType
 	{
@@ -33,6 +41,7 @@ namespace JGRC
 		static void  Release();
 	public:
 		bool Init(const JGInitConfig& config);
+		bool AddDxWindow(const JGInitConfig& config);
 		void BeginDraw();
 		void EndDraw();
 	public:

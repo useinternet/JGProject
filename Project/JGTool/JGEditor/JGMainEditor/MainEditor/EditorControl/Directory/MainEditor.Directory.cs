@@ -5,8 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+// 파일 선택 했을때 다른 메뉴
+// 파일 선택 안했을때 다른 메뉴
 namespace MainEditor
 {
+    // 파일 이동 자유롭게..
     public partial class MainEditor : Form
     {
         private string RootEntryPath = "../../../../../../..";
@@ -23,6 +26,7 @@ namespace MainEditor
             DirectoryViewer.Nodes.Add(RootNode);
             DirectoryViewer.ImageList = FileIcons;
             DirFileList.LargeImageList = FileIcons;
+            DirFileList.ContextMenuStrip = DirFileListMenu;
         }
         private string GetCurrentPath(TreeNode node, string CurPath)
         {
@@ -71,6 +75,18 @@ namespace MainEditor
                 item.Text = file.Name;
                 DirFileList.Items.Add(item);
 
+            }
+        }
+        private void DirFileList_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                DirFileList.ContextMenuStrip = DirFileListMenu;
+                DirFileList.ContextMenuStrip.Show(e.X,e.Y);
+            }
+            else
+            {
+                DirFileList.ContextMenuStrip.Visible = false;
             }
         }
         private void DirectoryViewer_DoubleClick(object sender, EventArgs e)

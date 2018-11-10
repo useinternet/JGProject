@@ -5,7 +5,15 @@
 0
 @@
 @@CBuffer
-%Count : 0
+%Count : 1
+%BufferName : DirectionalLight
+%BufferSize : 80
+%VarCount : 5
+%Var : DL_AmbientDown 4
+%Var : DL_AmbientUp 4
+%Var : DL_LightDir 4
+%Var : DL_LightColor 4
+%Var : DL_CameraPos 4
 @@
 @@SamplerState
 %Count : 1

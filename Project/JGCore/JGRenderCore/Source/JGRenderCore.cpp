@@ -9,7 +9,7 @@
 #include"MaterialSystem/Material.h"
 #include"MaterialSystem/Shader/ShaderTool/ShaderCompiler.h"
 #include"MaterialSystem/Shader/ShaderAnalyze/ShaderAnalyzer.h"
-#include"MaterialSystem/MaterialReader.h";
+#include"MaterialSystem/MaterialReader.h"
 
 //юс╫ц
 #include"DirectX/JGViewport.h"

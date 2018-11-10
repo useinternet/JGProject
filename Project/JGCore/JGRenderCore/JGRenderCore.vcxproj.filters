@@ -47,6 +47,9 @@
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Mesh">
       <UniqueIdentifier>{803fba5d-00c8-437b-a5e8-b2fe76fa0c63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="workingDirectory_DirectX\Light">
+      <UniqueIdentifier>{907b6d39-b93d-49db-bf30-e29f2bbf3167}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -135,6 +138,15 @@
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.cpp">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\DxWindow.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\DirectX\JGRCObject.cpp">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -239,6 +251,15 @@
     </ClInclude>
     <ClInclude Include="Include\Common\JGRCGlobalType.h">
       <Filter>main\Include\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Light\Light.h">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\DxWindow.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\DirectX\JGRCObject.h">
+      <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

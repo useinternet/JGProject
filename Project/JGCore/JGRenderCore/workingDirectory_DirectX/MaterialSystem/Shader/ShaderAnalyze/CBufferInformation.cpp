@@ -78,6 +78,8 @@ void CBufferInformation::AnalyzeSentence(std::string& sentence)
 		// 변수 이름 추출
 		StringUtil::DelChar(var.VarName, '\t');
 		StringUtil::DelString(var.VarName, ";");
+		int pos = var.VarName.find(':');
+		var.VarName = var.VarName.substr(0, pos - 1);
 		StringUtil::DelBlank(var.VarName);
 
 		// 변수 상수버퍼에 삽입.

@@ -19,6 +19,12 @@ namespace JGRC
 		virtual ~JGRenderCore();
 
 		void Init(HWND hWnd);
+		bool AddDxWindow(HWND hWnd, const JGInitConfig& config);
+
+
+
+
+
 		void Push(class Material* mt);
 		void Draw();
 		bool OutputMaterialData(std::string* hlslPath,EShaderType* type,const UINT Count,const std::string& OuputMaterial);

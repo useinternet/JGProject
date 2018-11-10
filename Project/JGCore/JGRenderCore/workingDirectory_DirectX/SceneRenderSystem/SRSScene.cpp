@@ -84,11 +84,27 @@ void SRSScene::CreateScene(const int width, const int height)
 		JGLOG(log_Critical, "JGRC::SRScene", "Falied Create SRSScene / Failed Read Material");
 		return;
 	}
+
+
+	////////// ½ÇÇè
 	m_Material->SetMesh(m_Mesh.get());
 	m_Material->SetParam("wvpMatrix", m_wvpMatrix.get());
+	jgVec4 AD(0.1f, 0.1f, 0.1f,1.0f);
+	jgVec4 AU(0.2f, 0.2f, 0.2f, 1.0f);
+	jgVec4 Color(0.8f, 0.8f, 0.8f, 1.0f);
+	m_Material->SetParam("DL_AmbientDown", &AD);
+	m_Material->SetParam("DL_AmbientUp", &AU);
+	m_Material->SetParam("DL_LightColor", &Color);
+	jgVec4 CameraPos(0.0f, 0.0f, -5.0f, 1.0f);
+	m_Material->SetParam("DL_CameraPos", &CameraPos);
+
 }
 void SRSScene::Render(SRSRenderTarget* SRST)
 {
+	static jgVec4 Dir(-0.0f, -1.0f, 0.0,1.0f);
+
+	m_Material->SetParam("DL_LightDir", &Dir);
+	
 	DirectX::GetInstance()->SetDirectState(EStateType::DepthState, (uint)EDepthStateType::ZBufferOff);
 	m_Material->Render(
 		SRST->GetShaderResourceView(ERTType::Position),
