@@ -1,16 +1,12 @@
-#include"Common_ps.hlsli"
 
-TEXTURE_START
-TEXTURE_CONFIG(0, Default)
+
+
 Texture2D Default_Texture;
-TEXTURE_CONFIG(1, Normal)
 Texture2D Normal_Texture;
-TEXTURE_END
 
-SAMPLERSTATE_CONFIG_START
-SAMPLERSTATE_DEFAULT_WRAPMODE
+
+
 SamplerState Default_WrapSampler;
-SAMPLERSTATE_CONFIG_END
 
 
 cbuffer LightBuffer

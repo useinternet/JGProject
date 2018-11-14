@@ -10,13 +10,6 @@ namespace JGRC
 {
 	class CORE_EXPORT DxWindow : public JGRCObject
 	{
-		/* 윈도우 하나에 필요한 것들
-		윈도우 핸들
-		스왑 체인
-		렌더 타겟
-		렌더 상태
-		뷰포트
-		*/
 		typedef std::function<void()> DrawEvent;
 	private:
 		class DirectX* m_Dx = nullptr;
@@ -32,10 +25,8 @@ namespace JGRC
 	public:
 		DxWindow();
 		virtual ~DxWindow();
-		bool Init(const JGInitConfig& config);
+		bool Init(const DxWinConfig& config);
 		void Draw();
-	public:
-		void ResigisterRenderTarget();
 	public:
 		void AddSubEvent(const DrawEvent& evt)  { m_SubEvent.push_back(evt); }
 		void AddMainEvent(const DrawEvent& evt) { m_MainEvent.push_back(evt); }

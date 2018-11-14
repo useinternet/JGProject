@@ -18,26 +18,11 @@ namespace JGRC
 		JGRenderCore();
 		virtual ~JGRenderCore();
 
-		void Init(HWND hWnd);
-		bool AddDxWindow(HWND hWnd, const JGInitConfig& config);
-
-
-
-
-
-		void Push(class Material* mt);
+		void Init();
+		class DxWindow* AddDxWindow(const DxWinConfig& config) const;
+		class DxWindow* GetDxWindow(HWND hWnd);
+		class HlslEditor* GetHlslEditor(const EShaderType type, const std::string& path) const;
 		void Draw();
-		bool OutputMaterialData(std::string* hlslPath,EShaderType* type,const UINT Count,const std::string& OuputMaterial);
-		class Material* CreateMaterial(const std::string& mtPath);
-
-
-	private:
-		void ManagerInit();
-
-
-		// юс╫ц
-	public:
-		jgMatrix4x4 GetProjectionMatrix();
 	};
 }
 

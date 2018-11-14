@@ -10,7 +10,7 @@ void Path::SetPath(const string& path)
 Path::Path(const std::string& path)
 {
 	SetPath(path);
-}
+} 
 std::string Path::operator/(const std::string& path)
 {
 	return m_Path + "/" + path;

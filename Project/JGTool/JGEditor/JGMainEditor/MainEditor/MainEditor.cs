@@ -49,14 +49,14 @@ namespace MainEditor
         {
             InitializeComponent();
             JGEngineCore.InitEngine(RenderPanel.Handle);
-            MainEditorEventHandler += JGEngineCore.CoreRun;
+            MainEditorEventHandler += JGEngineCore.Run;
             EngineLog_Init();
             Directory_Init();
         }
         // 이벤트 처리
         private void MainEditor_FormClosing(object sender, FormClosingEventArgs e)
         {
-            JGEngineCore.Destroy();
+            JGEngineCore.End();
             EngineLog_Close();
         }
         private void MainEditor_SizeChanged(object sender, EventArgs e)
@@ -69,6 +69,9 @@ namespace MainEditor
 
         }
 
+        private void 머터리얼생성ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 }

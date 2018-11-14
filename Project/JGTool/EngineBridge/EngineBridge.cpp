@@ -20,11 +20,11 @@ void End()
 	g_Engine = nullptr;
 }
 
-void EG2ED_SendCommand(const char* Command, void* Data, unsigned int Size)
+void EG2ED_SendCommand(const unsigned int Command, void* Data, unsigned int Size)
 {
-
+	
 }
-void ED2EG_SendCommand(const char* Command, void* Data, unsigned int Size)
+void ED2EG_SendCommand(const unsigned int Command, void* Data, unsigned int Size)
 {
-
+	g_Engine->ReceiveCommand(Command, Data, Size);
 }

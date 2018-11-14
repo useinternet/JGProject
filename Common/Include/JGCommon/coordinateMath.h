@@ -159,6 +159,7 @@ public:
 	real det() noexcept;
 	jgVec2 mulVector(const jgVec2& vec) noexcept;
 public:
+	real & operator[](const uint idx);
 	real & operator()(const uint row, const uint col) noexcept;
 public:
 	jgMatrix2x2 & operator=(const jgMatrix2x2& m) noexcept;
@@ -202,6 +203,7 @@ public:
 	real det() noexcept;
 	jgVec3 mulVector(const jgVec3& vec) noexcept;
 public:
+	real& operator[](const uint idx);
 	real  cofactor(const uint row, const uint col) noexcept;
 	real& operator()(const uint row, const uint col) noexcept;
 public:
@@ -260,6 +262,7 @@ public:
 	void perspectiveFovLH(const real fov, const real aspect, const real near, const real far);
 	void orthoLH(const real width, const real height, const real near, const real far);
 public:
+	real& operator[](const uint idx);
 	real& operator()(const uint row, const uint col) noexcept;
 	real cofactor(const uint row, const uint col) noexcept;
 public:

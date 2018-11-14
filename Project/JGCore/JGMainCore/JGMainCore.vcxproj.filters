@@ -19,9 +19,18 @@
     <ClCompile Include="Source\JGMainCore.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ED_JGRCCommand.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\JGMainCore.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EditorCommand.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ED_JGRCCommand.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

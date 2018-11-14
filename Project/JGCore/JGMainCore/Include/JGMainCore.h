@@ -27,9 +27,12 @@ namespace JGLC { class JGLogicCore; }
 class MAINCORE_EXPORT JGMainCore
 {
 private:
+	bool m_bEdit  = false;
 	bool m_Paused = false;
 	JGRC::JGRenderCore* m_JGRC;
 	JGLC::JGLogicCore* m_JGLC;
+	// 실험요
+	HWND hWnd;
 public:
 	JGMainCore();
 	~JGMainCore();
@@ -40,5 +43,5 @@ public:
 
 	// 에디터 용
 	void Run_Edt();
-	void TestPage();
+	void ReceiveCommand(const unsigned int Command, void* Data, unsigned int size);
 };

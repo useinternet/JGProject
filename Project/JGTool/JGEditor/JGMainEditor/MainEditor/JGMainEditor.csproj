@@ -36,6 +36,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JGEditControls">
+      <HintPath>..\..\JGEditControls\obj\Debug\JGEditControls.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,6 +62,12 @@
     <Compile Include="EditorControl\MainEditor.RenderPanel.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="EditorForm\MaterialEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorForm\MaterialEditForm.Designer.cs">
+      <DependentUpon>MaterialEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="JGEngineCore.cs" />
     <Compile Include="MainEditor.cs">
       <SubType>Form</SubType>
@@ -68,6 +77,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="EditorForm\MaterialEditForm.resx">
+      <DependentUpon>MaterialEditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainEditor.resx">
       <DependentUpon>MainEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -93,9 +105,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EditorForm\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

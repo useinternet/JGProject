@@ -1,9 +1,8 @@
 #include"DirectX.h"
+#include"BufferSystem/JGBuffer.h"
 #include"JGDevice.h"
-#include"JGSwapChain.h"
-#include"JGRenderTarget.h"
 #include"JGRenderState.h"
-#include"JGViewport.h"
+
 
 using namespace JGRC;
 using namespace std;
@@ -11,17 +10,16 @@ DirectX* DirectX::Instance = nullptr;
 DirectX::DirectX()
 {
 	m_Device = make_unique<JGDevice>();
-	m_SwapChain = make_unique<JGSwapChain>();
-	m_RenderTarget = make_unique<JGRenderTarget>();
 	m_RenderState = make_unique<JGRenderState>();
-	m_Viewport = make_unique<JGViewport>();
 	for (int i = 0; i < 4; ++i)
 	{
-		m_BackColor[i] = 0.0f;
 		m_BlendFactor[i] = 0.0f;
 	}
 }
-DirectX::~DirectX() {}
+DirectX::~DirectX()
+{
+
+}
 DirectX* DirectX::GetInstance()
 {
 	if (Instance == nullptr)
@@ -38,7 +36,14 @@ void  DirectX::Release()
 		Instance = nullptr;
 	}
 }
-bool DirectX::Init(const JGInitConfig& config)
+void DirectX::Draw()
+{
+	for (auto& window : m_mDxWindow)
+	{
+		window.second->Draw();
+	}
+}
+bool DirectX::Init()
 {
 	JGLOG(log_Info, "JGRC::DirectX", "Creating DirectXApp..");
 	bool result = true;
@@ -48,38 +53,53 @@ bool DirectX::Init(const JGInitConfig& config)
 		JGLOG(log_Critical, "JGRC::DirectX", "Failed DirectXApp..");
 		return false;
 	}
-	result = m_SwapChain->CreateSwapChain(m_Device->GetDevice(), config.hWnd, config.bFullScreen,
-		config.ScreenWidth, config.ScreenHeight);
-	if (!result)
-	{
-		JGLOG(log_Critical, "JGRC::DirectX", "Failed SwapChain..");
-		return false;
-	}
-	result = m_RenderTarget->CreateRenderTarget(m_Device->GetDevice(), m_SwapChain->Get(),
-		config.ScreenWidth, config.ScreenHeight);
-	if (!result)
-	{
-		JGLOG(log_Critical, "JGRC::DirectX", "Failed RenderTarget");
-		return false;
-	}
 	result = m_RenderState->RenderStateInit(m_Device->GetDevice());
 	if (!result)
 	{
 		JGLOG(log_Critical, "JGRC::DirectX", "Failed RenderState");
 		return false;
 	}
-	result = m_Viewport->InitViewport(config.ScreenWidth, config.ScreenHeight, config.Fov, config.FarZ, config.NearZ);
-	JGLOG(log_Info, "JGRC::DirectX", "Create DirectXApp. Complete");
 	return true;
 }
-void DirectX::BeginDraw()
+DxWindow* DirectX::AddDxWindow(const DxWinConfig& config)
 {
-	m_Device->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), m_BackColor);
-	m_Device->GetContext()->ClearDepthStencilView(m_RenderTarget->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	DxWindow* window = CreateObject<DxWindow>();
+	
+	bool result = window->Init(config);
+	if (!result)
+	{
+		DeleteObject(window);
+		return nullptr;
+	}
+	m_mDxWindow.insert(DxWindowPair(config.hWnd, window));
+	return window;
 }
-void DirectX::EndDraw()
+void DirectX::DeleteDxWindow(HWND hWnd)
 {
-	m_SwapChain->Get()->Present(0, 0);
+	auto check = m_mDxWindow.find(hWnd);
+	if (check != m_mDxWindow.end())
+	{
+		JGLOG(log_Info, "JGRC::DirectX", to_string((int)hWnd) + "'s Delete DxWindow");
+		DeleteObject(m_mDxWindow[hWnd]);
+	}
+}
+DxWindow* DirectX::GetWindow(HWND hWnd)
+{
+	auto check = m_mDxWindow.find(hWnd);
+	if (check == m_mDxWindow.end())
+	{
+		JGLOG(log_Error, "JGRC::DirectX", to_string((int)hWnd) + "'s Handle is not exist");
+		return nullptr;
+	}
+	return m_mDxWindow[hWnd];
+}
+void DirectX::DeleteObject(JGRCObject* obj)
+{
+	if (m_usObjects.empty())
+	{
+		return;
+	}
+	m_usObjects.erase(obj);
 }
 ID3D11Device* DirectX::GetDevice() const
 {
@@ -92,17 +112,8 @@ ID3D11DeviceContext* DirectX::GetContext() const
 void DirectX::SetDefaultDirectState()
 {
 	ID3D11DeviceContext* context = GetContext();
-	SetDefautRenderTarget();
 	context->OMSetDepthStencilState(m_RenderState->GetDepthState(EDepthStateType::ZBufferOn),1);
 	context->RSSetState(m_RenderState->GetRasterizerState(EFillModeType::Solid));
-}
-JGViewport* DirectX::GetViewport() const
-{
-	return m_Viewport.get();
-}
-void DirectX::SetBackColor(const real r, const real g, const real b, const real a)
-{
-	m_BackColor[0] = r; m_BackColor[1] = g; m_BackColor[2] = b; m_BackColor[3] = a;
 }
 void DirectX::SetDirectState(const EStateType StateType, const uint ConfigType)
 {
@@ -126,10 +137,4 @@ void DirectX::SetBlendFactor(const real a1, const real a2, const real a3, const 
 void DirectX::SetSampleMask(const uint mask)
 {
 	m_SampleMask = mask;
-}
-void DirectX::SetDefautRenderTarget()
-{
-	ID3D11DeviceContext* context = GetContext();
-	context->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
-	context->RSSetViewports(1, m_Viewport->Get());
 }

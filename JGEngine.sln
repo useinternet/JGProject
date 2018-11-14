@@ -62,6 +62,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HLSL", "HLSL", "{DFFF42BC-5
 		Contents\HLSL\CommonShader_vs.hlsl = Contents\HLSL\CommonShader_vs.hlsl
 		Contents\HLSL\Ground_ps.hlsl = Contents\HLSL\Ground_ps.hlsl
 		Contents\HLSL\Ground_vs.hlsl = Contents\HLSL\Ground_vs.hlsl
+		Contents\HLSL\Sample_ps.hlsl = Contents\HLSL\Sample_ps.hlsl
+		Contents\HLSL\Sample_vs.hlsl = Contents\HLSL\Sample_vs.hlsl
 		Contents\HLSL\SRS_PostProcessing_ps.hlsl = Contents\HLSL\SRS_PostProcessing_ps.hlsl
 		Contents\HLSL\SRS_PostProcessing_vs.hlsl = Contents\HLSL\SRS_PostProcessing_vs.hlsl
 		Contents\HLSL\SRS_ps.hlsl = Contents\HLSL\SRS_ps.hlsl
@@ -69,6 +71,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HLSL", "HLSL", "{DFFF42BC-5
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGLogicCore", "Project\JGCore\JGLogicCore\JGLogicCore.vcxproj", "{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JGControls", "JGControls", "{54BA2266-5432-40B2-9139-9FC00DF28A2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JGEditControls", "Project\JGTool\JGEditor\JGEditControls\JGEditControls.csproj", "{B3BA97C0-09AA-4988-B23D-8A229777D1CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +168,18 @@ Global
 		{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5}.Release|x64.Build.0 = Release|x64
 		{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5}.Release|x86.ActiveCfg = Release|Win32
 		{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5}.Release|x86.Build.0 = Release|Win32
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|x64.Build.0 = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Debug|x86.Build.0 = Debug|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|x64.ActiveCfg = Release|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|x64.Build.0 = Release|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +194,8 @@ Global
 		{4AEE2B81-ACBD-4E55-8E55-D30467B2A79F} = {6696993E-150B-4019-B5B8-087D8002DDC2}
 		{F27E11ED-4388-4D7B-8804-D4513B3EF335} = {6B0D3F05-4E85-4D83-BB61-93B126738996}
 		{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5} = {D81FB318-751E-432E-81E3-65D23247F062}
+		{54BA2266-5432-40B2-9139-9FC00DF28A2C} = {E3C30FCF-1947-4BEE-A7C0-8DEB2766FAA7}
+		{B3BA97C0-09AA-4988-B23D-8A229777D1CB} = {54BA2266-5432-40B2-9139-9FC00DF28A2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75AB24B6-C5B9-4AB0-8F08-FFA9B468B038}

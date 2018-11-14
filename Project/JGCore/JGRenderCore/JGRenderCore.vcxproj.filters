@@ -29,12 +29,6 @@
     <Filter Include="workingDirectory_DirectX\BufferSystem">
       <UniqueIdentifier>{393ee4bc-2ab7-43bc-b98f-73284112ed44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze">
-      <UniqueIdentifier>{519306cc-b8af-41bb-8e06-1efed0ee5d1c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool">
-      <UniqueIdentifier>{bcc1032a-b172-4f05-9ac9-8068ad198ab4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Data">
       <UniqueIdentifier>{84293553-e6b9-48b8-a318-2284763d87d5}</UniqueIdentifier>
     </Filter>
@@ -79,65 +73,14 @@
     <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBuffer.cpp">
       <Filter>workingDirectory_DirectX\BufferSystem</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.cpp">
-      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp">
       <Filter>workingDirectory_DirectX\Light</Filter>
@@ -147,6 +90,18 @@
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGRCObject.cpp">
       <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,68 +141,14 @@
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h">
       <Filter>workingDirectory_DirectX\BufferSystem</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.h">
-      <Filter>workingDirectory_DirectX\BufferSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
-    </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="Include\Common\JGRCGlobalType.h">
       <Filter>main\Include\Common</Filter>
@@ -260,6 +161,18 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRCObject.h">
       <Filter>workingDirectory_DirectX\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

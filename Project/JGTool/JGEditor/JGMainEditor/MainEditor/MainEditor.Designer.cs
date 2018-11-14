@@ -113,6 +113,7 @@
             this.머터리얼생성ToolStripMenuItem.Name = "머터리얼생성ToolStripMenuItem";
             this.머터리얼생성ToolStripMenuItem.Size = new System.Drawing.Size(173, 24);
             this.머터리얼생성ToolStripMenuItem.Text = "머터리얼 생성";
+            this.머터리얼생성ToolStripMenuItem.Click += new System.EventHandler(this.머터리얼생성ToolStripMenuItem_Click);
             // 
             // panel1
             // 

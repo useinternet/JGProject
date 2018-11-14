@@ -1,7 +1,7 @@
 #pragma once
 
-
-
+#include<JGCommon/JGCommon.h>
+#include<Windows.h>
 #pragma once
 #ifdef JGLOGICCORE_EXPORTS 
 #define LOGICCORE_EXPORT __declspec(dllexport)
@@ -22,29 +22,28 @@
 #endif
 
 
+
+#include<vector>
 namespace JGRC { 
 	class JGRenderCore;
-	class Material;
 	class Mesh;
+	class JGShader;
 }
 
 namespace JGLC
 {
 	class LOGICCORE_EXPORT JGLogicCore
 	{
-	private:
-		JGRC::JGRenderCore* m_RenderCore;
-		class JGRC::Material* ground_M;
-		class JGRC::Mesh* groundMesh;
-		class JGRC::Material* rabbit_M;
-		class JGRC::Mesh* rabbitMesh;
+	public:
+		JGRC::JGRenderCore * Rc;
+		std::vector<JGRC::JGShader*> arr;
+		JGRC::Mesh* Cube = nullptr;
+		HWND hWnd;
 	public:
 		~JGLogicCore();
-		void TestInit(JGRC::JGRenderCore* Rc);
+		void TestInit(JGRC::JGRenderCore* Rc,HWND hWnd);
 		void TestTick();
 
-		void GroundSetting(float yaw);
-		void RabbitSetting(float yaw);
 	};
 
 }

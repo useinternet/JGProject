@@ -505,6 +505,10 @@ jgVec2 jgMatrix2x2::mulVector(const jgVec2& vec) noexcept
 	return jgVec2((vec.x * mat[0][0]) + (vec.y * mat[1][0]),
 		          (vec.x * mat[0][1]) + (vec.y * mat[1][1]));
 }
+real & jgMatrix2x2::operator[](const uint idx)
+{
+	return mat[idx / 2][idx % 2];
+}
 real& jgMatrix2x2::operator()(const uint row, const uint col) noexcept
 {
 	assert(row >= 1 || row <= 2); assert(col >= 1 || col <= 2);
@@ -778,6 +782,10 @@ jgVec3 jgMatrix3x3::mulVector(const jgVec3& vec) noexcept
 		vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0],
 		vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1],
 		vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2]);
+}
+real & jgMatrix3x3::operator[](const uint idx)
+{
+	return mat[idx / 3][idx % 3];
 }
 real  jgMatrix3x3::cofactor(const uint row, const uint col) noexcept
 {
@@ -1193,6 +1201,10 @@ void jgMatrix4x4::orthoLH(const real width, const real height, const real near, 
 	mat[1][1] = 2 / height;
 	mat[2][2] = 1 / (far - near);
 	mat[3][2] = near / (near - far); 	mat[3][3] = 1;
+}
+real& jgMatrix4x4::operator[](const uint idx)
+{
+	return mat[idx / 4][idx % 4];
 }
 real& jgMatrix4x4::operator()(const uint row, const uint col) noexcept
 {

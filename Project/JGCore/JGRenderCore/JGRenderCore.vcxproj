@@ -220,7 +220,6 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Source\JGRenderCore.cpp" />
     <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBuffer.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\DirectX.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\DxWindow.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGDevice.cpp" />
@@ -230,25 +229,13 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
     <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Common\dllExportDefine.h" />
@@ -257,7 +244,6 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="Include\JGRenderCore.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h" />
-    <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferManager.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectXCommon.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\DirectX.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRCObject.h" />
@@ -268,26 +254,13 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
     <ClInclude Include="workingDirectory_DirectX\Light\Light.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Data\ShaderData.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialReader.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\MaterialSystem.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\CBufferInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\LayoutInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\SamplerInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderAnalyzer.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\ShaderInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderAnalyze\TextureInformation.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderCompiler.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObject.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderTool\ShaderObjectManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\JGSRSystem.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSMaterial.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,9 @@
+hlsl 편집기로 셰이더 정보 저장 -> ShaderWriter로 파일 작성
+
+ShaderReader 로 셰이더 정보 읽고 컴파일후 Shader 생성
+Shader는 이름으로 값을 변경해서 Mesh값만 주면 바로 렌더링 가능 <- 테스트하고 바로
+머터리얼 툴 작성 시도..
+
+Shader에서 아주 기본적인 파람( 행렬 ) 특히 vs 를 제외하고 ps에서 Material 값을 변경할수있는
+클래스가
+Material  <- 

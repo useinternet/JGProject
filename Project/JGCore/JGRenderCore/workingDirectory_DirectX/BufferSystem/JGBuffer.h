@@ -1,7 +1,6 @@
 #pragma once
-#include"Common/JGRCCommon.h"
+#include"DirectX/JGRCObject.h"
 #include"JGBufferEnum.h"
-#include"DirectXCommon.h"
 namespace JGRC
 {
 	/*
@@ -13,7 +12,7 @@ namespace JGRC
 	@m size_t m_BindDataSize : 바인딩된 데이터 크기
 	*/
 	class DirectX;
-	class CORE_EXPORT JGBuffer
+	class CORE_EXPORT JGBuffer : public JGRCObject
 	{
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;

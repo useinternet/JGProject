@@ -19,11 +19,12 @@ DxWindow::~DxWindow()
 {
 
 }
-bool DxWindow::Init(const JGInitConfig& config)
+bool DxWindow::Init(const DxWinConfig& config)
 {
 	bool result = true;
+	m_hWnd = config.hWnd;
 	string hwndNumber = to_string((int)config.hWnd);
-	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : dx윈도우 생성 시작")
+	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : Create DxWindow Start")
 	result = m_SwapChain->CreateSwapChain(m_Dx->GetDevice(), config.hWnd, config.bFullScreen,
 		config.ScreenWidth, config.ScreenHeight);
 	if (!result)
@@ -40,7 +41,7 @@ bool DxWindow::Init(const JGInitConfig& config)
 	}
 	result = m_Viewport->InitViewport(config.ScreenWidth, config.ScreenHeight, config.Fov, config.FarZ, config.NearZ);
 
-	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : dx윈도우 생성 완료")
+	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : Create DxWindow Complete")
 	return true;
 }
 void DxWindow::Draw()
@@ -50,6 +51,8 @@ void DxWindow::Draw()
 		evt();
 	}
 	float color[4] = { m_BackColor.x,m_BackColor.y,m_BackColor.z,m_BackColor.w };
+	m_Dx->GetContext()->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
+	m_Dx->GetContext()->RSSetViewports(1, m_Viewport->Get());
 	m_Dx->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), color);
 	m_Dx->GetContext()->ClearDepthStencilView(m_RenderTarget->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -59,11 +62,6 @@ void DxWindow::Draw()
 	}
 
 	m_SwapChain->Get()->Present(0, 0);
-}
-void DxWindow::ResigisterRenderTarget()
-{
-	m_Dx->GetContext()->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
-	m_Dx->GetContext()->RSSetViewports(1, m_Viewport->Get());
 }
 jgMatrix4x4& DxWindow::GetProjectionMatrix()
 {

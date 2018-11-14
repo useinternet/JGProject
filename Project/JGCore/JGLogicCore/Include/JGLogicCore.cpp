@@ -1,110 +1,113 @@
 #include"JGLogicCore.h"
 #include"JGRenderCore.h"
-#include"MaterialSystem/Material.h"
 #include"MaterialSystem/Mesh/Mesh.h"
+#include"MaterialSystem/Shader/HlslEditor.h"
+#include"MaterialSystem/Shader/ShaderWriter.h"
+#include"MaterialSystem/Shader/ShaderReader.h"
+#include"MaterialSystem/Shader/JGShader.h"
+#include"DirectX/DxWindow.h"
+#include"MaterialSystem/Mesh/Mesh.h"
+#include"JGRenderCore.h"
+#include"DirectX/DirectX.h"
 using namespace JGLC;
 using namespace JGRC;
 using namespace std;
 JGLogicCore::~JGLogicCore()
 {
-	//if (groundMesh)
-	//{
-	//	delete groundMesh;
-	//	groundMesh = nullptr;
-	//}
-	//if (rabbitMesh)
-	//{
-	//	delete rabbitMesh;
-	//	rabbitMesh = nullptr;
-	//}
+	delete Cube;
 }
-void JGLogicCore::TestInit(JGRenderCore* Rc)
+void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 {
-	//m_RenderCore = Rc;
-	//string path[2] = { Game::path / "HLSL/SRS_vs.hlsl" ,Game::path / "HLSL/SRS_ps.hlsl" };
-	//EShaderType type[2] = { EShaderType::Vertex, EShaderType::Pixel };
-	//string mtPath = Game::path / "Ground";
-	//m_RenderCore->OutputMaterialData(path, type, 2, mtPath);
-	//ground_M = m_RenderCore->CreateMaterial(Game::path / "Ground.material");
-	//groundMesh = new Mesh;
-	//groundMesh->LoadModel(Game::path / "cube.txt");
-	//ground_M->AddTexturePath(Game::path / "Texture/T_Water_M.png");
-	//ground_M->AddTexturePath(Game::path / "Texture/T_Water_N.png");
-	//ground_M->SetMesh(groundMesh);
+	this->hWnd = hWnd;
+	this->Rc = Rc;
+	HlslEditor* VertexHlsl = Rc->GetHlslEditor(EShaderType::Vertex, Game::path / "HLSL/Sample_vs.hlsl");
+	
+
+	// 입력 레이아웃
+	InputLayout* Vertex_Il = VertexHlsl->CreateInputLayout();
+	Vertex_Il->AddDesc("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0);
+	Vertex_Il->AddDesc("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0);
+	Vertex_Il->AddDesc("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0);
+	Vertex_Il->AddDesc("TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0);
+	Vertex_Il->AddDesc("BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0);
+	
+	CBuffer* Cbf = VertexHlsl->CreateCBuffer();
+	Cbf->SetName("MatrixBuffer");
+	Cbf->AddVar("worldMatrix", 0, 15);
+	Cbf->AddVar("viewMatrix", 16, 31);
+	Cbf->AddVar("projectionMatrix", 32, 47);
+
+	HlslEditor* PixelHlsl = Rc->GetHlslEditor(EShaderType::Pixel, Game::path / "HLSL/Sample_ps.hlsl");
+	
+
+	Texture2D* texture = PixelHlsl->CreateTexture2D();
+	texture->Add("Default_Texture");
+
+	SamplerState* Sampler = PixelHlsl->CreateSamplerState();
+	Sampler->AddDefaultWrapMode();
+
+	ShaderWriter writer;
+	writer.AddEditor(VertexHlsl);
+	writer.AddEditor(PixelHlsl);
+	writer.Write(Game::path / "Engine/Shader/Shader/Sample");
+	ShaderReader reader(hWnd);
+	arr = reader.ReadShader(Game::path / "Engine/Shader/Shader/Sample.shader");
 
 
-	//string R_path[2] = { Game::path / "HLSL/CommonShader_vs.hlsl" ,Game::path / "HLSL/CommonShader_ps.hlsl" };
-	//string R_mtPath = Game::path / "Rabbit";
-	//m_RenderCore->OutputMaterialData(R_path, type, 2, R_mtPath);
-	//rabbit_M = m_RenderCore->CreateMaterial(Game::path / "Rabbit.material");
-	//rabbitMesh = new Mesh;
-	//rabbitMesh->LoadModel(Game::path / "bunny.txt",false);
-	//rabbit_M->SetMesh(rabbitMesh);
+
+	// 설정
+
+
+	Mesh* Cube = new Mesh;
+	Cube->LoadModel(Game::path / "cube.txt");
+	Cube->CreateBuffer();
+	DxWindow* wn = Rc->GetDxWindow(hWnd);
+	wn->AddMainEvent([Cube,this]()
+	{
+		Cube->Render();
+		for (auto& shader : this->arr)
+		{
+			shader->Render();
+		}
+		DirectX::GetInstance()->GetContext()->DrawIndexed(Cube->getIndexCount(), 0, 0);
+	});
+	int num = 0;
 }
 void JGLogicCore::TestTick()
 {
-	//static real yaw = 0.0f;
-	//yaw += 0.001f;
+	static real yaw = 0;
+	yaw += 0.0001f;
+	jgMatrix4x4 rotation;
+	rotation.rotationY(yaw);
 
-	//GroundSetting(yaw);
-	//RabbitSetting(yaw);
-}
-
-void JGLogicCore::GroundSetting(float yaw)
-{
-	//jgVec3 CameraPos(0.0f, 5.0f, -10.0f);
-	//jgMatrix4x4 worldMatrix;
-	//worldMatrix.identity();
-	//jgMatrix4x4 transMatrix;
-	//transMatrix.translation(jgVec3(0.0, -1.0f, 0.0f));
-	//jgMatrix4x4 scaleMatrix;
-	//scaleMatrix.scaling(5.0f, 0.2f, 5.0);
-	//jgMatrix4x4 rotationMatrix;
-	//rotationMatrix.rotationY(yaw);
-
-	//worldMatrix = worldMatrix * scaleMatrix * rotationMatrix * transMatrix;
-	//worldMatrix.transpose();
-	//jgMatrix4x4 viewMatrix;
-	//viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
-	//viewMatrix.transpose();
+	jgMatrix4x4 worldMatrix;
+	worldMatrix.identity();
+	worldMatrix = worldMatrix * rotation;
+	worldMatrix.transpose();
 
 
-	//jgMatrix4x4 projectionMatrix = m_RenderCore->GetProjectionMatrix();
-	//projectionMatrix.transpose();
+	jgMatrix4x4 viewMatrix;
+	viewMatrix.lookAtLH(jgVec3(0.0f, 0.0f, -5.0f), jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
+	viewMatrix.transpose();
+	DxWindow* wn = Rc->GetDxWindow(hWnd);
+	jgMatrix4x4 projectionMatrix;
+
+	projectionMatrix = wn->GetProjectionMatrix();
+	projectionMatrix.transpose();
+	for (auto& iter : arr)
+	{
+		iter->SetParam("worldMatrix", &worldMatrix, 16);
+		iter->SetParam("viewMatrix", &viewMatrix, 16);
+		iter->SetParam("projectionMatrix", &projectionMatrix, 16);
+	}
 
 
 
 
-	//ground_M->SetParam("worldMatrix", &worldMatrix);
-	//worldMatrix = projectionMatrix * viewMatrix * worldMatrix;
-	//ground_M->SetParam("wvpMatrix", &worldMatrix);
-	//m_RenderCore->Push(ground_M);
-}
-void JGLogicCore::RabbitSetting(float yaw)
-{
-	//jgVec3 CameraPos(0.0f, 5.0f, -10.0f);
-
-	//// 월드 매트릭스
-	//jgMatrix4x4 worldMatrix;
-	//worldMatrix.identity();
-	//worldMatrix.rotationY(yaw);
-	//worldMatrix.transpose();
-
-	//jgMatrix4x4 viewMatrix;
-	//viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
-	//viewMatrix.transpose();
 
 
-	//jgMatrix4x4 projectionMatrix = m_RenderCore->GetProjectionMatrix();
-	//projectionMatrix.transpose();
 
 
-	//real color[4] = { 1.0f,1.0f,1.0f,1.0f };
 
-	//rabbit_M->SetParam("worldMatrix", &worldMatrix);
 
-	//worldMatrix = projectionMatrix * viewMatrix * worldMatrix;
-	//rabbit_M->SetParam("wvpMatrix", &worldMatrix);
-	//rabbit_M->SetParam("AmbientColor", color);
-	//m_RenderCore->Push(rabbit_M);
 }

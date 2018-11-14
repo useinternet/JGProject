@@ -2,7 +2,6 @@
 #include"Common/JGRCCommon.h"
 #include"DirectXCommon.h"
 #include"BufferSystem/JGBufferEnum.h"
-#include"MaterialSystem/Data/ShaderData.h"
 
 namespace JGRC
 {
@@ -16,27 +15,19 @@ namespace JGRC
 	};
 	class CORE_EXPORT Mesh
 	{
-		static class JGBufferManager* m_BfManager;
 		static class DirectX* m_Dx;
 		typedef std::vector<real> Data;
 	private:
 		std::string         m_Path;
-		std::vector<index>  m_Stride;
-		std::vector<index>  m_Offset;
 		std::vector<index>  m_IndexData;
-		std::vector<Data>   m_OuputData;
-		std::vector<class JGBuffer*> m_vVertexBuffers;
+		Data                m_OutputData;
+		class JGBuffer* m_VertexBuffer = nullptr;
 		class JGBuffer* m_IndexBuffer = nullptr;
 	public:
 		Mesh();
-		Mesh(const Mesh& copy);
-		Mesh(Mesh&& mesh);
 		~Mesh();
 	public:
-		Mesh& operator=(const Mesh& mesh);
-		Mesh& operator=(Mesh&& mesh);
-	public:
-		void CreateBuffer(InputLayoutData* data);
+		void CreateBuffer();
 		void Render(D3D_PRIMITIVE_TOPOLOGY set = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		uint getIndexCount();
 	public:

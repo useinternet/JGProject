@@ -32,9 +32,7 @@ namespace JGRC
 		Solid = 0,
 		WireFrame = 1
 	};
-
-
-	class CORE_EXPORT JGInitConfig
+	class CORE_EXPORT DxWinConfig
 	{
 	public:
 		HWND hWnd;
