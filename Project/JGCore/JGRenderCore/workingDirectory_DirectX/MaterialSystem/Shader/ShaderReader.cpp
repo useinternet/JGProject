@@ -8,16 +8,18 @@ ShaderReader::ShaderReader(HWND hWnd)
 	m_hWnd = hWnd;
 	m_Dx = DirectX::GetInstance();
 }
-std::vector<JGShader*> ShaderReader::ReadShader(const std::string& path)
+JGShaderArray* ShaderReader::ReadShader(const std::string& path)
 {
 	fstream fin;
 	fin.open(path);
-	vector<JGShader*> result;
+	JGShaderArray* result = nullptr;
 	if (!fin.is_open())
 	{
 		JGLOG(log_Error, "JGRC::ShaderReader", "Failed read ShaderData   | " + path);
 		return result;
 	}
+	result = m_Dx->CreateObject<JGShaderArray>();
+
 	string buffer;
 	fin >> buffer >> buffer;
 	int Count = 0;
@@ -26,7 +28,7 @@ std::vector<JGShader*> ShaderReader::ReadShader(const std::string& path)
 	{
 		JGShader* Shader = m_Dx->CreateObject<JGShader>();
 		Read(fin,Shader);
-		result.push_back(Shader);
+		result->AddShader(Shader);
 	}
 	return result;
 }
@@ -102,9 +104,10 @@ void ShaderReader::Read(std::fstream& fin, JGShader* Shader)
 	fin >> buffer;
 	fin >> buffer >> buffer >> num;
 	int Filter; int adsU; int adsV; int adsW;
-	float MipLODBias; int MasAnisotropy; int CompareFunc;
-	float color1; float color2; float color3; float color4;
-	float MinLod; float MaxLod;
+	string MipLODBias; int MasAnisotropy; int CompareFunc;
+	string color1; string color2; string color3; string color4;
+	string MinLod; string MaxLod;
+	
 	for (int i = 0; i < num; ++i)
 	{
 		fin >> Filter >> adsU >> adsV >> adsW >> MipLODBias >> MasAnisotropy
@@ -114,12 +117,12 @@ void ShaderReader::Read(std::fstream& fin, JGShader* Shader)
 		desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)adsU; 
 		desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)adsV;
 		desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)adsW;
-		desc.MipLODBias = MipLODBias;
+		desc.MipLODBias = atof(MipLODBias.c_str());
 		desc.MaxAnisotropy = MasAnisotropy;
 		desc.ComparisonFunc = (D3D11_COMPARISON_FUNC)CompareFunc;
-		desc.BorderColor[0] = color1; 	desc.BorderColor[1] = color2;
-		desc.BorderColor[2] = color3; 	desc.BorderColor[3] = color4;
-		desc.MinLOD = MinLod; desc.MaxLOD = MaxLod;
+		desc.BorderColor[0] = atof(color1.c_str()); 	desc.BorderColor[1] = atof(color2.c_str());
+		desc.BorderColor[2] = atof(color3.c_str()); 	desc.BorderColor[3] = atof(color4.c_str());
+		desc.MinLOD = atof(MinLod.c_str()); desc.MaxLOD = atof(MaxLod.c_str());
 		Shader->GetSamplerState()->AddCustomMode(desc);
 	}
 	if (!Shader->GetSamplerState()->CreateSamplerState())

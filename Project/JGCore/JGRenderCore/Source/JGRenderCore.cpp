@@ -11,9 +11,9 @@ JGRenderCore::JGRenderCore()
 }
 JGRenderCore::~JGRenderCore()
 {
-	DirectX::Release();
 	string str = to_string(JGRCObject::GetCount());
 	JGLOG(log_Info, "Count", str);
+	DirectX::Release();
 }
 void JGRenderCore::Init()
 {

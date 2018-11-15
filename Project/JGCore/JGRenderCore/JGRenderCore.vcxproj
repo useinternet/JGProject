@@ -229,13 +229,17 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
     <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShaderArray.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Common\dllExportDefine.h" />
@@ -254,13 +258,17 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
     <ClInclude Include="workingDirectory_DirectX\Light\Light.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShader.h" />
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShaderArray.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h" />
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

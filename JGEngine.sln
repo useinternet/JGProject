@@ -56,18 +56,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineBridge", "Project\JGT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HLSL", "HLSL", "{DFFF42BC-5C1A-4AA1-B032-DC76D513A3A3}"
 	ProjectSection(SolutionItems) = preProject
-		Contents\HLSL\Common_ps.hlsli = Contents\HLSL\Common_ps.hlsli
-		Contents\HLSL\Common_vs.hlsli = Contents\HLSL\Common_vs.hlsli
-		Contents\HLSL\CommonShader_ps.hlsl = Contents\HLSL\CommonShader_ps.hlsl
-		Contents\HLSL\CommonShader_vs.hlsl = Contents\HLSL\CommonShader_vs.hlsl
-		Contents\HLSL\Ground_ps.hlsl = Contents\HLSL\Ground_ps.hlsl
-		Contents\HLSL\Ground_vs.hlsl = Contents\HLSL\Ground_vs.hlsl
-		Contents\HLSL\Sample_ps.hlsl = Contents\HLSL\Sample_ps.hlsl
-		Contents\HLSL\Sample_vs.hlsl = Contents\HLSL\Sample_vs.hlsl
-		Contents\HLSL\SRS_PostProcessing_ps.hlsl = Contents\HLSL\SRS_PostProcessing_ps.hlsl
-		Contents\HLSL\SRS_PostProcessing_vs.hlsl = Contents\HLSL\SRS_PostProcessing_vs.hlsl
-		Contents\HLSL\SRS_ps.hlsl = Contents\HLSL\SRS_ps.hlsl
-		Contents\HLSL\SRS_vs.hlsl = Contents\HLSL\SRS_vs.hlsl
+		Contents\Engine\Shader\HLSL\Common.hlsli = Contents\Engine\Shader\HLSL\Common.hlsli
+		Contents\Engine\Shader\HLSL\LightPass_ps.hlsl = Contents\Engine\Shader\HLSL\LightPass_ps.hlsl
+		Contents\Engine\Shader\HLSL\LightPass_vs.hlsl = Contents\Engine\Shader\HLSL\LightPass_vs.hlsl
+		Contents\Engine\Shader\HLSL\StandardShader_ps.hlsl = Contents\Engine\Shader\HLSL\StandardShader_ps.hlsl
+		Contents\Engine\Shader\HLSL\StandardShader_vs.hlsl = Contents\Engine\Shader\HLSL\StandardShader_vs.hlsl
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGLogicCore", "Project\JGCore\JGLogicCore\JGLogicCore.vcxproj", "{ED138DEE-FAD3-4430-8AA2-BD78D7950BE5}"

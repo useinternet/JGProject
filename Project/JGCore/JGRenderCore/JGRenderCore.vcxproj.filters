@@ -29,9 +29,6 @@
     <Filter Include="workingDirectory_DirectX\BufferSystem">
       <UniqueIdentifier>{393ee4bc-2ab7-43bc-b98f-73284112ed44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="workingDirectory_DirectX\MaterialSystem\Data">
-      <UniqueIdentifier>{84293553-e6b9-48b8-a318-2284763d87d5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Texture">
       <UniqueIdentifier>{f7732662-0e5a-4f13-a112-33b52d76eb91}</UniqueIdentifier>
     </Filter>
@@ -76,9 +73,6 @@
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.cpp">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
-    </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Mesh</Filter>
     </ClCompile>
@@ -102,6 +96,21 @@
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShaderArray.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp">
+      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,9 +153,6 @@
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\TextureManager.h">
-      <Filter>workingDirectory_DirectX\MaterialSystem\Texture</Filter>
-    </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Mesh</Filter>
     </ClInclude>
@@ -173,6 +179,21 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.h">
       <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\JGShaderArray.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h">
+      <Filter>workingDirectory_DirectX\MaterialSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -23,11 +23,10 @@
 
 
 
-#include<vector>
 namespace JGRC { 
 	class JGRenderCore;
 	class Mesh;
-	class JGShader;
+	class JGShaderArray;
 }
 
 namespace JGLC
@@ -36,7 +35,7 @@ namespace JGLC
 	{
 	public:
 		JGRC::JGRenderCore * Rc;
-		std::vector<JGRC::JGShader*> arr;
+		JGRC::JGShaderArray* arr;
 		JGRC::Mesh* Cube = nullptr;
 		HWND hWnd;
 	public:

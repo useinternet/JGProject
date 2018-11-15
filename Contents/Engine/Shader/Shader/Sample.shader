@@ -1,6 +1,6 @@
 ##Count : 2
 ##ShaderType : 1
-##HlslPath : ../../../../../../../Contents/HLSL/Sample_vs.hlsl
+##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader_vs.hlsl
 ##InputLayout
 ##Count : 5
 POSITION 0 6 0 0 0 0
@@ -20,7 +20,7 @@ BINORMAL 0 6 0 44 0 0
 ##SamplerState
 ##Count : 0
 ##ShaderType : 0
-##HlslPath : ../../../../../../../Contents/HLSL/Sample_ps.hlsl
+##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader_ps.hlsl
 ##InputLayout
 ##Count : 0
 ##CBuffers
@@ -30,4 +30,4 @@ BINORMAL 0 6 0 44 0 0
 Default_Texture
 ##SamplerState
 ##Count : 1
-21 1 1 1 0 1 0 0 0 0 0 3.40282e+38 
+21 1 1 1 0 1 -858993460 0 0 0 0 0 3.40282e+38 

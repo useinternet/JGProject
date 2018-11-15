@@ -1,5 +1,5 @@
 #pragma once
-#include"JGShader.h"
+#include"JGShaderArray.h"
 
 namespace JGRC
 {
@@ -11,8 +11,7 @@ namespace JGRC
 
 	public:
 		ShaderReader(HWND hWnd);
-		std::vector<JGShader*> ReadShader(const std::string& path);
-
+		JGShaderArray* ReadShader(const std::string& path);
 	private:
 		void Read(std::fstream& fin, JGShader* Shader);
 	};

@@ -150,8 +150,8 @@ void HlslEditor::WriteData(std::ofstream& fout)
 	fout << "##Count : ";
 	if (m_Textures)
 	{
-		fout << m_Textures->Size() << endl;
-		for (auto& tex : m_Textures->GetArray())
+		fout << m_Textures->NameSize() << endl;
+		for (auto& tex : m_Textures->GetNameArray())
 		{
 			fout << tex << endl;
 		}
@@ -169,6 +169,7 @@ void HlslEditor::WriteData(std::ofstream& fout)
 		{
 			fout << sampler.Filter   << " " << sampler.AddressU   << " " << sampler.AddressV      << " "
 				 << sampler.AddressW << " " << sampler.MipLODBias << " " << sampler.MaxAnisotropy << " "
+				 << sampler.ComparisonFunc << " "
 				 << sampler.BorderColor[0] << " " << sampler.BorderColor[1] << " " << sampler.BorderColor[2] << " "
 				 << sampler.BorderColor[3] << " " << sampler.MinLOD         << " " << sampler.MaxLOD         << " " 
 				 << endl;
@@ -250,6 +251,20 @@ void Texture2D::Add(const string& Name)
 {
 	m_TextureNames.push_back(Name);
 }
+void Texture2D::SetResource(ID3D11ShaderResourceView* srv, const std::string& name)
+{
+	uint count = 0;
+	for (auto& iter : m_TextureNames)
+	{
+		if (iter == name)
+		{
+			m_SRVs[count] = srv;
+			return;
+		}
+		count++;
+	}
+	JGLOG(log_Error, "JGRC::Texture2D", name + " is not exist");
+}
 ID3D11ShaderResourceView* Texture2D::GetResource(const std::string& name)
 {
 	uint count = 0;
@@ -276,20 +291,7 @@ ID3D11ShaderResourceView** Texture2D::GetResourceAddress(const std::string& name
 	}
 	return nullptr;
 }
-void Texture2D::SetResource(ID3D11ShaderResourceView* srv, const std::string& name)
-{
-	uint count = 0;
-	for (auto& iter : m_TextureNames)
-	{
-		if (iter == name)
-		{
-			m_SRVs[count] = srv;
-			return;
-		}
-		count++;
-	}
-	JGLOG(log_Error, "JGRC::Texture2D", name + " is not exist");
-}
+
 ////////////////////////////////////////////
 ////////////// SamplerState ////////////////
 ////////////////////////////////////////////

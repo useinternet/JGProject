@@ -3,13 +3,16 @@
 #include"ShaderReader.h"
 using namespace std;
 using namespace JGRC;
+uint   JGShader::RefCount = 0;
+JGShader::unSRVArray JGShader::m_umSRVs;
 string JGShader::FunctionName = "main";
-string JGShader::VSVersion ="vs_5_0";
+string JGShader::VSVersion = "vs_5_0";
 string JGShader::PSVersion = "ps_5_0";
 UINT   JGShader::Flags = D3D10_SHADER_ENABLE_STRICTNESS;
 
 JGShader::~JGShader()
 {
+	RefCount--;
 	if (ShaderBuffer)
 	{
 		switch (m_ShaderType)
@@ -34,13 +37,54 @@ JGShader::~JGShader()
 	{
 		GetDx()->DeleteObject(buffer);
 	}
+	// 참조 카운트가 0이 되면
+	if (RefCount == 0)
+	{
+		for (auto& srv : m_umSRVs)
+		{
+			srv.second->Release();
+			srv.second = nullptr;
+		}
+	}
+}
+bool  JGShader::AddTexture(const std::string& name, const std::string& path)
+{
+	if (m_Texture2D == nullptr)
+	{
+		JGLOG(log_Warning, "JGRC::JGShader", m_Path + " is Shader's Texture2D is nullptr when Add Texture | " + path);
+		return false;
+	}
+	if (m_umSRVs.find(path) != m_umSRVs.end())
+	{
+		m_Texture2D->AddResource(m_umSRVs[path]);
+		return true;
+	}
+
+	ID3D11ShaderResourceView* view = nullptr;
+	HRESULT result = S_OK;
+	wstring wpath;
+	wpath.assign(path.begin(), path.end());
+	result = D3DX11CreateShaderResourceViewFromFile(GetDx()->GetDevice(),
+		wpath.c_str(), nullptr, nullptr, &view, nullptr);
+	if (FAILED(result))
+	{
+		JGLOG(log_Error,"JGRC::JGShader", "Failed Create ResourceView When AddTexture in " + m_Path)
+		return false;
+	}
+	m_umSRVs.insert(unSRVPair(path, view));
+	m_Texture2D->AddResource(view);
+	return true;
+}
+bool  JGShader::AddTexture(ID3D11ShaderResourceView* srv)
+{
+	return true;
 }
 uint  JGShader::GetParam(const string& VarName, real* outData)
 {
 	uint result = 0;
 	for (auto& buffer : m_CBufferValue)
 	{
-		result = buffer->GetParam(VarName, data);
+		result = buffer->GetParam(VarName, outData);
 		if (result != 0)
 		{
 			break;
@@ -48,11 +92,11 @@ uint  JGShader::GetParam(const string& VarName, real* outData)
 	}
 	return result;
 }
-void  JGShader::SetParam(const std::string& VarName, void* data, const uint Size)
+void  JGShader::SetParam(const std::string& VarName, void* data, const uint Count)
 {
 	for (auto& buffer : m_CBufferValue)
 	{
-		if (buffer->SetParam(VarName, data, Size))
+		if (buffer->SetParam(VarName, data, Count))
 		{
 			break;
 		}
@@ -80,9 +124,9 @@ void  JGShader::Render()
 	}
 	if (m_Texture2D)
 	{
-		for (uint i = 0; i < m_Texture2D->Size(); ++i)
+		for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
 		{
-			//GetDx()->GetContext()->PSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			GetDx()->GetContext()->PSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
 		}
 	}
 	if (ShaderBuffer)

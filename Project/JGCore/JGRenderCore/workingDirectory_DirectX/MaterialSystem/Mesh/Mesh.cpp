@@ -8,7 +8,6 @@ Mesh::Mesh()
 {
 	m_Dx = DirectX::GetInstance();
 	m_Path = "None";
-
 }
 Mesh::~Mesh()
 {

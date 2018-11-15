@@ -4,10 +4,9 @@
 #include"JGRenderTarget.h"
 #include"JGRenderState.h"
 #include"JGViewport.h"
+#include"SceneRenderSystem/SRSScene.h"
 using namespace JGRC;
 using namespace std;
-
-
 DxWindow::DxWindow()
 {
 	m_Dx = DirectX::GetInstance();
@@ -55,6 +54,8 @@ void DxWindow::Draw()
 	m_Dx->GetContext()->RSSetViewports(1, m_Viewport->Get());
 	m_Dx->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), color);
 	m_Dx->GetContext()->ClearDepthStencilView(m_RenderTarget->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+
 
 	for (auto& evt : m_MainEvent)
 	{

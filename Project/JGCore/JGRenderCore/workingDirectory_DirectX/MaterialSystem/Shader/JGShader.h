@@ -5,7 +5,11 @@ namespace JGRC
 {
 	class CORE_EXPORT JGShader : public JGRCObject
 	{
+		typedef std::unordered_map<std::string, ID3D11ShaderResourceView*> unSRVArray;
+		typedef std::pair<std::string, ID3D11ShaderResourceView*>          unSRVPair;
 	private:
+		static uint RefCount;
+		static unSRVArray m_umSRVs;
 		friend class ShaderReader;
 	public:
 		/*
@@ -15,6 +19,11 @@ namespace JGRC
 		static std::string PSVersion;
 		static UINT Flags;
 	private:
+		JGShader(const JGShader& copy) = delete;
+		JGShader(JGShader&& shader)    = delete;
+		JGShader& operator=(const JGShader& copy)    = delete;
+		JGShader& operator=(const JGShader&& shader) = delete;
+	private:
 		EShaderType m_ShaderType;
 		void* ShaderBuffer;
 		/*
@@ -23,13 +32,15 @@ namespace JGRC
 		std::vector<JGBuffer*> m_ConstantBuffer;
 		/*
 		셰이더를 구성하고 있는 데이터 */
-		InputLayout* m_InputLayout   = nullptr;
-		CBufferArray m_CBufferValue;
-		Texture2D*   m_Texture2D     = nullptr;
-		SamplerState* m_SamplerState = nullptr;
+		InputLayout*  m_InputLayout   = nullptr;
+		CBufferArray  m_CBufferValue;
+		Texture2D*    m_Texture2D     = nullptr;
+		SamplerState* m_SamplerState  = nullptr;
 	public:
-		JGShader() {}
+		JGShader() { RefCount++; }
 		virtual ~JGShader();
+		bool  AddTexture(const std::string& name,const std::string& path);
+		bool  AddTexture(ID3D11ShaderResourceView* srv);
 		/*
 		Exp : 현재 셰이더가 참조하고있는 hlsl 경로를 가져온다. */
 		const std::string& GetPath() { return m_Path; }
@@ -38,8 +49,17 @@ namespace JGRC
 		@param VarName : 변수 이름 
 		@param outData : 출력 데이터 */
 		uint  GetParam(const std::string& VarName, real* outData);
-		void  SetParam(const std::string& VarName, void* data, const uint Size);
+		/*
+		Exp :  변수값을 변경한다. 
+		@param varName : 변수 이름 
+		@param data    : 변수 데이터 
+		@param Count   : 변수 데이터 갯수(real 갯수) */
+		void  SetParam(const std::string& VarName, void* data, const uint Count);
+		/*
+		Exp : 렌더링 */
 		void  Render();
+
+		EShaderType GetType() { return m_ShaderType; }
 	private:
 		void SetPath(const std::string& path) { m_Path = path; }
 		void SetShaderType(const EShaderType type) { m_ShaderType = type; }

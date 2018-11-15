@@ -4,7 +4,7 @@
 #include"MaterialSystem/Shader/HlslEditor.h"
 #include"MaterialSystem/Shader/ShaderWriter.h"
 #include"MaterialSystem/Shader/ShaderReader.h"
-#include"MaterialSystem/Shader/JGShader.h"
+#include"MaterialSystem/Shader/JGShaderArray.h"
 #include"DirectX/DxWindow.h"
 #include"MaterialSystem/Mesh/Mesh.h"
 #include"JGRenderCore.h"
@@ -20,7 +20,7 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 {
 	this->hWnd = hWnd;
 	this->Rc = Rc;
-	HlslEditor* VertexHlsl = Rc->GetHlslEditor(EShaderType::Vertex, Game::path / "HLSL/Sample_vs.hlsl");
+	HlslEditor* VertexHlsl = Rc->GetHlslEditor(EShaderType::Vertex, Game::path / "Engine/Shader/HLSL/StandardShader_vs.hlsl");
 	
 
 	// 입력 레이아웃
@@ -37,7 +37,7 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 	Cbf->AddVar("viewMatrix", 16, 31);
 	Cbf->AddVar("projectionMatrix", 32, 47);
 
-	HlslEditor* PixelHlsl = Rc->GetHlslEditor(EShaderType::Pixel, Game::path / "HLSL/Sample_ps.hlsl");
+	HlslEditor* PixelHlsl = Rc->GetHlslEditor(EShaderType::Pixel, Game::path / "Engine/Shader/HLSL/StandardShader_ps.hlsl");
 	
 
 	Texture2D* texture = PixelHlsl->CreateTexture2D();
@@ -53,23 +53,17 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 	ShaderReader reader(hWnd);
 	arr = reader.ReadShader(Game::path / "Engine/Shader/Shader/Sample.shader");
 
-
-
+	arr->Get(EShaderType::Pixel)->AddTexture("Default_Texture",Game::path / "Engine/Texture/stone01.dds");
+	arr->Get(EShaderType::Pixel)->AddTexture("Normal_Texture", Game::path / "Engine/Texture/bump01.dds");
 	// 설정
-
-
 	Mesh* Cube = new Mesh;
-	Cube->LoadModel(Game::path / "cube.txt");
+	Cube->LoadModel(Game::path / "cube.txt",true);
 	Cube->CreateBuffer();
 	DxWindow* wn = Rc->GetDxWindow(hWnd);
 	wn->AddMainEvent([Cube,this]()
 	{
 		Cube->Render();
-		for (auto& shader : this->arr)
-		{
-			shader->Render();
-		}
-		DirectX::GetInstance()->GetContext()->DrawIndexed(Cube->getIndexCount(), 0, 0);
+		arr->Render(Cube->getIndexCount());
 	});
 	int num = 0;
 }
@@ -94,20 +88,8 @@ void JGLogicCore::TestTick()
 
 	projectionMatrix = wn->GetProjectionMatrix();
 	projectionMatrix.transpose();
-	for (auto& iter : arr)
-	{
-		iter->SetParam("worldMatrix", &worldMatrix, 16);
-		iter->SetParam("viewMatrix", &viewMatrix, 16);
-		iter->SetParam("projectionMatrix", &projectionMatrix, 16);
-	}
 
-
-
-
-
-
-
-
-
-
+	arr->Get(EShaderType::Vertex)->SetParam("worldMatrix", &worldMatrix, 16);
+	arr->Get(EShaderType::Vertex)->SetParam("viewMatrix", &viewMatrix, 16);
+	arr->Get(EShaderType::Vertex)->SetParam("projectionMatrix", &projectionMatrix, 16);
 }
