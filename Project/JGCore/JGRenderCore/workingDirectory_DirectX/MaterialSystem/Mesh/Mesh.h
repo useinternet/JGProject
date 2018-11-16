@@ -21,13 +21,15 @@ namespace JGRC
 		std::string         m_Path;
 		std::vector<index>  m_IndexData;
 		Data                m_OutputData;
+		std::vector<UINT>   m_Stride;
+		std::vector<UINT>   m_Offset;
 		class JGBuffer* m_VertexBuffer = nullptr;
 		class JGBuffer* m_IndexBuffer = nullptr;
 	public:
 		Mesh();
 		~Mesh();
 	public:
-		void CreateBuffer();
+		void CreateBuffer(class InputLayout* IL);
 		void Render(D3D_PRIMITIVE_TOPOLOGY set = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		uint getIndexCount();
 	public:
@@ -35,7 +37,7 @@ namespace JGRC
 
 		// 임시임시임시
 		bool LoadModel(const std::string& path,bool btangent = true);
-		void CustomModel(const std::vector<real>& vertex, const uint count);
+		void CustomModel(const std::vector<real>& vertex, const uint count, const std::vector<UINT>& Strides, const std::vector<UINT>& Offset);
 	};
 
 }

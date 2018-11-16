@@ -37,12 +37,34 @@ struct PixelInputType
 {
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
+	float4 worldPos  : TEXCOORD1;
 	float3 normal : NORMAL;
 	float3 tangent  : TANGENT;
 	float3 binormal : BINORMAL;
 };
-float4 main(PixelInputType input) : SV_TARGET
+struct PixelOutputType
 {
+	float4 Pos_Depth     : SV_TARGET0;
+	float4 Normal_SpecPw : SV_TARGET1;
+	float4 Albedo_Custom : SV_TARGET2;
+	float4 SpecColor_Pad : SV_TARGET3;
+};
+PixelOutputType main(PixelInputType input) : SV_TARGET
+{
+	PixelOutputType output;
+//////////////////////////////////////////////////////////////////
+///////////////////////  넣어야할 값 선언  ////////////////////////
+//////////////////////////////////////////////////////////////////
+float3 st_WorldPos;   float  st_Depth;
+float3 st_Normal;     float  st_SpecPw;
+float3 st_Albedo;     float  st_Custom;
+float4 st_SpecColor;
+//////////////////////////////////////////////////////////////////
+//////////////////////////  계산  ////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+
 	float4 textureColor = Default_Texture.Sample(Default_WrapSampler, input.tex);
 	float4 normalMap    = Normal_Texture.Sample(Default_WrapSampler, input.tex);
 	float3 normalVec;
@@ -53,8 +75,31 @@ float4 main(PixelInputType input) : SV_TARGET
 	normalVec = input.normal + normalMap.x * input.tangent + normalMap.y * input.binormal;
 	normalVec = normalize(normalVec);
 
-	textureColor *= float4(normalVec,1.0f);
+//////////////////////////////////////////////////////////////////
+////////////////////////   최종 값 대입   /////////////////////////
+//////////////////////////////////////////////////////////////////
+	// Pos_Depth
+	st_WorldPos = input.worldPos.xyz;
+	st_Depth    = input.worldPos.z / input.worldPos.w;
+	// Normal_SpecPw
+	st_Normal = normalVec;
+	st_SpecPw = SpecularPower;
+	// Albedo_Custom
+	st_Albedo = textureColor.xyz;
+	st_Custom = CustomVar;
+	// SpecColor_Pad
+	st_SpecColor = float4(SpecularColor, 1.0f);
+//////////////////////////////////////////////////////////////////
+////////////////// 렌더타겟에 정보 저장 ////////////////////////////
+//////////////////////////////////////////////////////////////////
+	output.Pos_Depth     = float4(st_WorldPos, st_Depth);
+	output.Normal_SpecPw = float4(st_Normal, st_SpecPw);
+	output.Albedo_Custom = float4(st_Albedo, st_Custom);
+	output.SpecColor_Pad = st_SpecColor;
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
 
-	return textureColor;
+
+	return output;
 }

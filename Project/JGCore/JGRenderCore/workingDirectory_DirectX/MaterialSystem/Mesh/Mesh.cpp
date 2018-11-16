@@ -1,6 +1,7 @@
 #include"Mesh.h"
 #include"DirectX/DirectX.h"
 #include"BufferSystem/JGBuffer.h"
+#include"MaterialSystem/Shader/HlslEditor.h"
 using namespace std;
 using namespace JGRC;
 DirectX* Mesh::m_Dx = nullptr;
@@ -13,7 +14,7 @@ Mesh::~Mesh()
 {
 
 }
-void Mesh::CreateBuffer()
+void Mesh::CreateBuffer(InputLayout* IL)
 {
 	m_VertexBuffer = m_Dx->CreateObject<JGBuffer>();
 	m_VertexBuffer->CreateBuffer(EBufferType::VertexBuffer, EUsageType::Static, ECPUType::None,
@@ -22,14 +23,47 @@ void Mesh::CreateBuffer()
 	m_IndexBuffer = m_Dx->CreateObject<JGBuffer>();
 		m_IndexBuffer->CreateBuffer(EBufferType::IndexBuffer, EUsageType::Static,
 		ECPUType::None, &m_IndexData[0], sizeof(index) * m_IndexData.size());
+
+	if (IL == nullptr) return;
+    vector<D3D11_INPUT_ELEMENT_DESC> arr = IL->GetArray();
+	UINT Stride = 0;
+	UINT Offset = 0;
+	UINT PrevInputSlot = 0;
+	for (auto& desc : arr)
+	{
+		if (PrevInputSlot != desc.InputSlot)
+		{
+			m_Offset.push_back(0);
+			m_Stride.push_back(Stride);
+			PrevInputSlot = desc.InputSlot;
+			Stride = 0;
+		}
+		switch (desc.Format)
+		{
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:
+			Stride += 16;
+			break;
+		case DXGI_FORMAT_R32G32B32_FLOAT:
+			Stride += 12;
+			break;
+		case DXGI_FORMAT_R32G32_FLOAT:
+			Stride += 8;
+			break;
+		case DXGI_FORMAT_R32_FLOAT:
+			Stride += 4;
+			break;
+		default:
+			JGLOG(log_Error, "JGRC::Mesh", "InputLayoutDesc's Format is not exist Format in JGRenderCore");
+			break;
+		}
+	}
+	m_Offset.push_back(0);
+	m_Stride.push_back(Stride);
 }
 void Mesh::Render(D3D_PRIMITIVE_TOPOLOGY set)
 {
-	UINT Stride = 56;
-	UINT Offset = 0;
-
 	m_Dx->GetContext()->IASetVertexBuffers(0, (UINT)1, m_VertexBuffer->GetAddress(),
-		&Stride, &Offset);
+		&m_Stride[0], &m_Offset[0]);
 
 	m_Dx->GetContext()->IASetIndexBuffer(m_IndexBuffer->Get(), DXGI_FORMAT_R32_UINT, 0);
 	m_Dx->GetContext()->IASetPrimitiveTopology(set);
@@ -168,11 +202,13 @@ bool Mesh::LoadModel(const string& path, bool btangent)
 
 	return true;
 }
-void Mesh::CustomModel(const std::vector<real>& vertex, const uint count)
+void Mesh::CustomModel(const std::vector<real>& vertex, const uint count, const std::vector<UINT>& Strides, const std::vector<UINT>& Offset)
 {
 	for (index i = 0; i < count; ++i)
 	{
 		m_IndexData.push_back(i);
 	}
 	m_OutputData = move(vertex);
+	m_Stride = Strides;
+	m_Offset = Offset;
 }

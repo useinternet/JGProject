@@ -11,10 +11,9 @@ BINORMAL 0 6 0 44 0 0
 ##CBuffers
 ##Count : 1
 ##BufferName : MatrixBuffer
-##VarCount : 3
+##VarCount : 2
 ##Var : worldMatrix 0 15
-##Var : viewMatrix 16 31
-##Var : projectionMatrix 32 47
+##Var : wvpMatrix 16 31
 ##Texture2D
 ##Count : 0
 ##SamplerState
@@ -24,10 +23,19 @@ BINORMAL 0 6 0 44 0 0
 ##InputLayout
 ##Count : 0
 ##CBuffers
-##Count : 0
-##Texture2D
 ##Count : 1
+##BufferName : Material
+##VarCount : 6
+##Var : Ambient 0 2
+##Var : ReflectIntensity 3 3
+##Var : SpecularColor 4 6
+##Var : SpecularPower 7 7
+##Var : Emissive 8 10
+##Var : CustomVar 11 11
+##Texture2D
+##Count : 2
 Default_Texture
+Normal_Texture
 ##SamplerState
 ##Count : 1
 21 1 1 1 0 1 -858993460 0 0 0 0 0 3.40282e+38 

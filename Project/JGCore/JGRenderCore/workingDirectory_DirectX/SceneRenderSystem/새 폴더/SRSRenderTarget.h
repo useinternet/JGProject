@@ -3,13 +3,18 @@
 #include"DirectXCommon.h"
 namespace JGRC
 {
-	enum class CORE_EXPORT ERTType
+	enum class ERTType
 	{
-		Pos_Depth,
-		Normal_SpecPw,
-		Albedo_pad,
-		SpecColor_pad
+		Position,
+		Albedo,
+		Normal,
+		Depth
 	};
+	/* 필요 함수
+	1. 다이렉트 클래스에 렌더 타겟 바인딩( 갯수만큼 )
+	2. 뷰포트 바인딩
+	3. 렌더 타깃 클리어
+	*/
 	class JGViewport;
 	class CORE_EXPORT SRSRenderTarget
 	{

@@ -14,7 +14,5 @@ namespace JGRC
 	public:
 		Material();
 		virtual ~Material();
-
-
 	};
 }

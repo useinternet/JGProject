@@ -77,6 +77,17 @@ bool  JGShader::AddTexture(const std::string& name, const std::string& path)
 }
 bool  JGShader::AddTexture(ID3D11ShaderResourceView* srv)
 {
+	m_Texture2D->AddResource(srv);
+	return true;
+}
+bool  JGShader::SetTexture(const std::string& name, ID3D11ShaderResourceView* srv)
+{
+	m_Texture2D->SetResource(srv, name);
+	return true;
+}
+bool  JGShader::SetTexture(const uint idx, ID3D11ShaderResourceView* srv)
+{
+	m_Texture2D->SetResource(srv, idx);
 	return true;
 }
 uint  JGShader::GetParam(const string& VarName, real* outData)
@@ -163,7 +174,7 @@ InputLayout* JGShader::GetLayout()
 	{
 		m_InputLayout = GetDx()->CreateObject<InputLayout>();
 	}
-	return m_InputLayout; 
+	return m_InputLayout;
 }
 CBufferArray* JGShader::GetCBufferArray()
 { 

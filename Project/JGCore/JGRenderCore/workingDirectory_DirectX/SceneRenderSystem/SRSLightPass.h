@@ -13,16 +13,14 @@ namespace JGRC
 		class DirectX* m_Dx;
 		class JGShaderArray*  m_Shader;
 		std::unique_ptr<SRSScene>        m_Scene;
-		std::unique_ptr<SRSRenderTarget> m_RenderTarget;
+		SRSRenderTarget* m_RenderTarget = nullptr;
 	public:
 		SRSLightPass();
 		virtual ~SRSLightPass();
-
-		void Init(HWND hWnd,const uint width, const uint height);
+		void Init(const DxWinConfig& config, SRSRenderTarget* SRSRT);
 		// 나중에 라이트클래스도 가져온다.
-		void Render(const jgVec3& CameraPos);
-
+		void Render();
 	private:
-		void InitHlsl();
+		void InitHlsl(const DxWinConfig& config);
 	};
 }

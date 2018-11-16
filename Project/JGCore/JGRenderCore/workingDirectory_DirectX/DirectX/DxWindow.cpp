@@ -4,7 +4,8 @@
 #include"JGRenderTarget.h"
 #include"JGRenderState.h"
 #include"JGViewport.h"
-#include"SceneRenderSystem/SRSScene.h"
+#include"SceneRenderSystem/SRSLightPass.h"
+#include"SceneRenderSystem/SRSRenderTarget.h"
 using namespace JGRC;
 using namespace std;
 DxWindow::DxWindow()
@@ -13,10 +14,11 @@ DxWindow::DxWindow()
 	m_SwapChain    = make_unique<JGSwapChain>();
 	m_RenderTarget = make_unique<JGRenderTarget>();
 	m_Viewport     = make_unique<JGViewport>();
+	m_srsRenderTarget = make_unique<SRSRenderTarget>();
+	m_LightPass = make_unique<SRSLightPass>();
 }
 DxWindow::~DxWindow()
 {
-
 }
 bool DxWindow::Init(const DxWinConfig& config)
 {
@@ -40,24 +42,37 @@ bool DxWindow::Init(const DxWinConfig& config)
 	}
 	result = m_Viewport->InitViewport(config.ScreenWidth, config.ScreenHeight, config.Fov, config.FarZ, config.NearZ);
 
+	if (!m_srsRenderTarget->CreateSRSRenderTarget(config.ScreenWidth, config.ScreenHeight))
+	{
+		JGLOG(log_Error, "JGRC::DxWindow", "Failed Create SRS RenderTarget");
+		return false;
+	}
+	m_LightPass->Init(config,m_srsRenderTarget.get());
+
 	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : Create DxWindow Complete")
 	return true;
 }
 void DxWindow::Draw()
 {
-	for (auto& evt : m_SubEvent)
+	// 기본 렌더링 패스
+	m_srsRenderTarget->BindingRenderTarget();
+	m_srsRenderTarget->ClearRenderTarget();
+
+	for (auto& evt : m_RenderPassEvent)
 	{
 		evt();
 	}
+
 	float color[4] = { m_BackColor.x,m_BackColor.y,m_BackColor.z,m_BackColor.w };
+	// 라이팅 패스
 	m_Dx->GetContext()->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
 	m_Dx->GetContext()->RSSetViewports(1, m_Viewport->Get());
 	m_Dx->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), color);
 	m_Dx->GetContext()->ClearDepthStencilView(m_RenderTarget->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
+	m_LightPass->Render();
 
-
-	for (auto& evt : m_MainEvent)
+	for (auto& evt : m_LightPassEvent)
 	{
 		evt();
 	}

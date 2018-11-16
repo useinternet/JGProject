@@ -43,6 +43,11 @@ namespace JGLC
 		void TestInit(JGRC::JGRenderCore* Rc,HWND hWnd);
 		void TestTick();
 
+
+
+		void HlslInit();
+		void ParamInit();
+
 	};
 
 }

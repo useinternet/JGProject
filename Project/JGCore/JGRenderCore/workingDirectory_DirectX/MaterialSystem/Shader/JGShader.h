@@ -41,6 +41,8 @@ namespace JGRC
 		virtual ~JGShader();
 		bool  AddTexture(const std::string& name,const std::string& path);
 		bool  AddTexture(ID3D11ShaderResourceView* srv);
+		bool  SetTexture(const std::string& name, ID3D11ShaderResourceView* srv);
+		bool  SetTexture(const uint idx, ID3D11ShaderResourceView* srv);
 		/*
 		Exp : 현재 셰이더가 참조하고있는 hlsl 경로를 가져온다. */
 		const std::string& GetPath() { return m_Path; }
@@ -60,10 +62,11 @@ namespace JGRC
 		void  Render();
 
 		EShaderType GetType() { return m_ShaderType; }
+		InputLayout*  GetLayout();
 	private:
 		void SetPath(const std::string& path) { m_Path = path; }
 		void SetShaderType(const EShaderType type) { m_ShaderType = type; }
-		InputLayout*  GetLayout();
+
 		CBufferArray* GetCBufferArray();
 		Texture2D*    GetTexture2D();
 		SamplerState* GetSamplerState();
