@@ -1,5 +1,6 @@
 #pragma once
 #include"Common/JGRCCommon.h"
+#include"Common/JGRCGlobalType.h"
 #include"DirectXCommon.h"
 /*
 기본 머터리얼 viewDirection

@@ -7,9 +7,10 @@ POSITION 0 6 0 0 0 0
 TEXCOORD 0 16 0 12 0 0
 ##CBuffers
 ##Count : 1
-##BufferName : MatrixBuffer
-##VarCount : 1
+##BufferName : PassBuffer
+##VarCount : 2
 ##Var : wvpMatrix 0 15
+##Var : CameraDir 16 19
 ##Texture2D
 ##Count : 0
 ##SamplerState

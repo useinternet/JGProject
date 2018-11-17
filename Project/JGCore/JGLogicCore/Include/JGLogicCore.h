@@ -35,18 +35,31 @@ namespace JGLC
 	{
 	public:
 		JGRC::JGRenderCore * Rc;
-		JGRC::JGShaderArray* arr;
+		JGRC::JGShaderArray* CubeShader;
 		JGRC::Mesh* Cube = nullptr;
+
+		JGRC::Mesh* rabbit = nullptr;
+		JGRC::JGShaderArray* rabbitShader;
 		HWND hWnd;
+
+
+		// 카메라 위치
+		jgVec3 CameraPos;
+
 	public:
 		~JGLogicCore();
 		void TestInit(JGRC::JGRenderCore* Rc,HWND hWnd);
 		void TestTick();
 
 
-
-		void HlslInit();
-		void ParamInit();
+		void GroundInit();
+		void GroundHlslInit();
+		void GroundParamInit();
+		void GroundRender(real yaw);
+		void RabbitInit();
+		void RabiitHlslInit();
+		void RabbitParamInit();
+		void RabbitRender(real yaw);
 
 	};
 

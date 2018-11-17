@@ -12,6 +12,7 @@ struct PixelInputType
 {
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
+	float3 CameraDir : TEXCOORD1;
 };
 float4 main(PixelInputType input) : SV_TARGET
 {
@@ -25,5 +26,5 @@ float4 main(PixelInputType input) : SV_TARGET
 	float3 Normal        = Normal_SpecPow.xyz;
 	float  SpecPow       = Normal_SpecPow.w;
 
-	return float4(Albedo, 1.0f);
+	return float4(input.CameraDir, 1.0f);
 }

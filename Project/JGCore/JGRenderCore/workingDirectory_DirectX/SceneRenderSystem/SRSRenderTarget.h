@@ -7,7 +7,7 @@ namespace JGRC
 	{
 		Pos_Depth,
 		Normal_SpecPw,
-		Albedo_pad,
+		Albedo_SpecIts,
 		SpecColor_pad
 	};
 	class JGViewport;

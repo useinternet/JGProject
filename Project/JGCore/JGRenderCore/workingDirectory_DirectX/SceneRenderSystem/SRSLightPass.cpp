@@ -30,7 +30,7 @@ void SRSLightPass::Init(const DxWinConfig& config, SRSRenderTarget* SRSRT)
 	InitHlsl(config);
 	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Pos_Depth));
 	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Normal_SpecPw));
-	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Albedo_pad));
+	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Albedo_SpecIts));
 	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::SpecColor_pad));
 }
 void SRSLightPass::Render()
@@ -42,7 +42,7 @@ void SRSLightPass::Render()
 	}
 	m_Shader->Get(EShaderType::Pixel)->SetTexture(0, m_RenderTarget->GetShaderResourceView(ERTType::Pos_Depth));
 	m_Shader->Get(EShaderType::Pixel)->SetTexture(1, m_RenderTarget->GetShaderResourceView(ERTType::Normal_SpecPw));
-	m_Shader->Get(EShaderType::Pixel)->SetTexture(2, m_RenderTarget->GetShaderResourceView(ERTType::Albedo_pad));
+	m_Shader->Get(EShaderType::Pixel)->SetTexture(2, m_RenderTarget->GetShaderResourceView(ERTType::Albedo_SpecIts));
 	m_Shader->Get(EShaderType::Pixel)->SetTexture(3, m_RenderTarget->GetShaderResourceView(ERTType::SpecColor_pad));
 	DirectX::GetInstance()->SetDirectState(EStateType::DepthState, (uint)EDepthStateType::ZBufferOff);
 	m_Scene->Render();
@@ -65,8 +65,9 @@ void SRSLightPass::InitHlsl(const DxWinConfig& config)
 	vsIL->AddDesc("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0);
 	vsIL->AddDesc("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0);
 	CBuffer* Cbf = VertexEdit->CreateCBuffer();
-	Cbf->SetName("MatrixBuffer");
+	Cbf->SetName("PassBuffer");
 	Cbf->AddVar("wvpMatrix",0,15);
+	Cbf->AddVar("CameraDir", 16, 19);
 	// ÇÈ¼¿ ¼ÎÀÌ´õ
 	Texture2D* texture = PixelEdit->CreateTexture2D();
 	texture->Add("T_Pos_Depth");
@@ -101,6 +102,8 @@ void SRSLightPass::InitHlsl(const DxWinConfig& config)
 	m_Shader = reader.ReadShader(Game::path / "Engine/Shader/Shader/LightPass.shader");
 	m_Shader->Get(EShaderType::Vertex)->SetParam("wvpMatrix", &wvpMatrix, 16);
 
+	jgVec3 CameraDir(1.0f, 1.0f, 1.0f);
+	m_Shader->Get(EShaderType::Vertex)->SetParam("CameraDir", &CameraDir, 3);
 
 	m_Dx->DeleteObject(VertexEdit);
 	m_Dx->DeleteObject(PixelEdit);

@@ -1,10 +1,6 @@
 
 
 
-Texture2D Default_Texture;
-Texture2D Normal_Texture;
-SamplerState Default_WrapSampler;
-
 cbuffer Material
 {
 	float3 Ambient;           // 기본 1
@@ -30,7 +26,7 @@ case 2 : 반사 맵핑이 아니라면
    1      2      3     4
   |    worldPos     | Depth |   // 월드 좌표, 김피
   |    normal       |SpecPw |   // 노멀 좌표, 정반사광 세기
-  |    albedo       | specIns   |   // 기본 반사색, 반사 세기
+  |    albedo       | pad   |   // 기본 반사색, 반사 세기
   | specularColor   | pad   |   // 정반사광 색 / 
 */
 struct PixelInputType
@@ -39,8 +35,6 @@ struct PixelInputType
 	float2 tex : TEXCOORD0;
 	float4 worldPos  : TEXCOORD1;
 	float3 normal : NORMAL;
-	float3 tangent  : TANGENT;
-	float3 binormal : BINORMAL;
 };
 struct PixelOutputType
 {
@@ -63,18 +57,6 @@ float4 st_SpecColor;
 //////////////////////////  계산  ////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-
-
-	float4 textureColor = Default_Texture.Sample(Default_WrapSampler, input.tex);
-	float4 normalMap    = Normal_Texture.Sample(Default_WrapSampler, input.tex);
-	float3 normalVec;
-	//// 노멀 맵의 법선 정보를 받아온다.
-	normalMap = normalize((normalMap * 2) - 1.0f);
-
-	// 노멀 맵의 법선 정보를 토대로 법선벡터 생성
-	normalVec = input.normal + normalMap.x * input.tangent + normalMap.y * input.binormal;
-	normalVec = normalize(normalVec);
-
 //////////////////////////////////////////////////////////////////
 ////////////////////////   최종 값 대입   /////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -82,10 +64,10 @@ float4 st_SpecColor;
 	st_WorldPos = input.worldPos.xyz;
 	st_Depth    = input.worldPos.z / input.worldPos.w;
 	// Normal_SpecPw
-	st_Normal = normalVec;
+	st_Normal = input.normal;
 	st_SpecPw = SpecularPower;
 	// Albedo_Custom
-	st_Albedo = textureColor.xyz;
+	st_Albedo = Ambient;
 	st_SpecIntensity = SpecularIntensity;
 	// SpecColor_Pad
 	st_SpecColor = float4(SpecularColor, 1.0f);

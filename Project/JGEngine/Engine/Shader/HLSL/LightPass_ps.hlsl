@@ -15,7 +15,7 @@ struct PixelInputType
 };
 float4 main(PixelInputType input) : SV_TARGET
 {
-	float4 Pos_Depth = T_Pos_Depth.Sample(ClampSampler, input.tex);
+	float4 Pos_Depth      = T_Pos_Depth.Sample(ClampSampler, input.tex);
 	float4 Normal_SpecPow = T_Normal_SpecPow.Sample(ClampSampler, input.tex);
 	// °ª ÃßÃâ
 	float3 Albedo        = T_Albedo.Sample(ClampSampler, input.tex).xyz;
