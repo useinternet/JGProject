@@ -9,8 +9,6 @@ struct VertexInputType
 	float3 position : POSITION;
 	float2 tex      : TEXCOORD0;
 	float3 normal   : NORMAL;
-	float3 tangent  : TANGENT;
-	float3 binormal : BINORMAL;
 };
 struct PixelInputType
 {
@@ -18,8 +16,6 @@ struct PixelInputType
 	float2 tex : TEXCOORD0;
 	float4 worldPos  : TEXCOORD1;
 	float3 normal : NORMAL;
-	float3 tangent  : TANGENT;
-	float3 binormal : BINORMAL;
 
 };
 PixelInputType main(VertexInputType input)
@@ -39,12 +35,6 @@ PixelInputType main(VertexInputType input)
 	//// 노말 벡터 는 월드 매트릭스만 계산
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
-
-	output.tangent = mul(input.tangent, (float3x3)worldMatrix);
-	output.tangent = normalize(output.tangent);
-
-	output.binormal = mul(input.binormal, (float3x3)worldMatrix);
-	output.binormal = normalize(output.binormal);
 
 	return output;
 }

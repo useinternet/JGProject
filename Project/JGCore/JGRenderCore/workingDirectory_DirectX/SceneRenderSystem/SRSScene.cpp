@@ -2,6 +2,7 @@
 #include"DirectX/DirectX.h"
 #include"DirectX/JGViewport.h"
 #include"MaterialSystem/Mesh/Mesh.h"
+#include"Camera/Camera.h"
 using namespace JGRC;
 using namespace std;
 
@@ -10,9 +11,10 @@ SRSScene::SRSScene()
 {
 	m_Mesh        = make_unique<Mesh>();
 	m_worldMatrix = make_unique<jgMatrix4x4>();
-	m_viewMatrix  = make_unique<jgMatrix4x4>();
 	m_orthoMatrix = make_unique<jgMatrix4x4>();
 	m_wvpMatrix   = make_unique<jgMatrix4x4>();
+	m_Camera = make_unique<Camera>();
+	m_Camera->SetEye(0.0f, 0.0f, -5.0f);
 }
 SRSScene::~SRSScene()
 {
@@ -20,16 +22,10 @@ SRSScene::~SRSScene()
 }
 void SRSScene::CreateScene(const DxWinConfig& config)
 {
-
 	m_worldMatrix->identity();
-	m_viewMatrix->lookAtLH(jgVec3(0.0f, 0.0f, -5.0f), jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
 	m_orthoMatrix->orthoLH(config.ScreenWidth, config.ScreenHeight, config.NearZ, config.FarZ);
-
-
-	*m_wvpMatrix = (*m_worldMatrix) * (*m_viewMatrix) * (*m_orthoMatrix);
+	*m_wvpMatrix = (*m_worldMatrix) * (m_Camera->GetViewMatrix()) * (*m_orthoMatrix);
 	m_wvpMatrix->transpose();
-
-
 
 	real left = (real)((config.ScreenWidth / 2) * -1);
 	real right = left + (real)config.ScreenWidth;
@@ -73,6 +69,10 @@ void SRSScene::Render()
 uint SRSScene::GetIndexCount()
 {
 	return m_Mesh->getIndexCount();
+}
+Camera* SRSScene::GetCamera()
+{
+	return m_Camera.get();
 }
 jgMatrix4x4& SRSScene::GetwvpMatrix()
 {

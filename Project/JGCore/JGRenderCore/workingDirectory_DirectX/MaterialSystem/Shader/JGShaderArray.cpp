@@ -29,7 +29,7 @@ void JGShaderArray::Render(const uint indexCount)
 	{
 		iter.second->Render();
 	}
-	GetDx()->GetContext()->DrawIndexed(indexCount, 0, 0);
+	GetDx()->GetContext()->DrawIndexed((UINT)indexCount, 0, 0);
 }
 void JGShaderArray::Move(JGShaderArray* mover)
 {

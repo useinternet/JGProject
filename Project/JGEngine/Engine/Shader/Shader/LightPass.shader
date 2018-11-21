@@ -7,9 +7,10 @@ POSITION 0 6 0 0 0 0
 TEXCOORD 0 16 0 12 0 0
 ##CBuffers
 ##Count : 1
-##BufferName : MatrixBuffer
-##VarCount : 1
+##BufferName : PassBuffer
+##VarCount : 2
 ##Var : wvpMatrix 0 15
+##Var : CameraDir 16 19
 ##Texture2D
 ##Count : 0
 ##SamplerState
@@ -19,7 +20,16 @@ TEXCOORD 0 16 0 12 0 0
 ##InputLayout
 ##Count : 0
 ##CBuffers
-##Count : 0
+##Count : 1
+##BufferName : LightBuffer
+##VarCount : 7
+##Var : DirLight 0 15
+##Var : PntLight 16 175
+##Var : SptLight 176 295
+##Var : DirectionLightCount 296 296
+##Var : PointLightCount 297 297
+##Var : SpotLightCount 298 298
+##Var : TempCount2 299 299
 ##Texture2D
 ##Count : 4
 T_Pos_Depth

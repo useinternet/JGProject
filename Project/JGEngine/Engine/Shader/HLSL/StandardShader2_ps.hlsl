@@ -1,10 +1,6 @@
 
 
 
-Texture2D Default_Texture;
-Texture2D Normal_Texture;
-SamplerState Default_WrapSampler;
-
 cbuffer Material
 {
 	float3 Ambient;           // 기본 1
@@ -12,7 +8,7 @@ cbuffer Material
 	float3 SpecularColor;     // 기본 1
 	float  SpecularPower;     // 기본 1
 	float3 Emissive;          // 기본 1
-	float  CustomVar;         // 기본 0
+	float  SpecularIntensity;         // 기본 0
 };
 /* 렌더링 순서도
 1. 기본 머터리얼로 반사 맵핑을 실행하는지 안하는지 검사( reflection = true, false )
@@ -39,14 +35,12 @@ struct PixelInputType
 	float2 tex : TEXCOORD0;
 	float4 worldPos  : TEXCOORD1;
 	float3 normal : NORMAL;
-	float3 tangent  : TANGENT;
-	float3 binormal : BINORMAL;
 };
 struct PixelOutputType
 {
 	float4 Pos_Depth     : SV_TARGET0;
 	float4 Normal_SpecPw : SV_TARGET1;
-	float4 Albedo_Custom : SV_TARGET2;
+	float4 Albedo_SpecIts : SV_TARGET2;
 	float4 SpecColor_Pad : SV_TARGET3;
 };
 PixelOutputType main(PixelInputType input) : SV_TARGET
@@ -57,23 +51,11 @@ PixelOutputType main(PixelInputType input) : SV_TARGET
 //////////////////////////////////////////////////////////////////
 float3 st_WorldPos;   float  st_Depth;
 float3 st_Normal;     float  st_SpecPw;
-float3 st_Albedo;     float  st_Custom;
+float3 st_Albedo;     float  st_SpecIntensity;
 float4 st_SpecColor;
 //////////////////////////////////////////////////////////////////
 //////////////////////////  계산  ////////////////////////////////
 //////////////////////////////////////////////////////////////////
-
-
-
-	float4 textureColor = Default_Texture.Sample(Default_WrapSampler, input.tex);
-	float4 normalMap    = Normal_Texture.Sample(Default_WrapSampler, input.tex);
-	float3 normalVec;
-	//// 노멀 맵의 법선 정보를 받아온다.
-	normalMap = normalize((normalMap * 2) - 1.0f);
-
-	// 노멀 맵의 법선 정보를 토대로 법선벡터 생성
-	normalVec = input.normal + normalMap.x * input.tangent + normalMap.y * input.binormal;
-	normalVec = normalize(normalVec);
 
 //////////////////////////////////////////////////////////////////
 ////////////////////////   최종 값 대입   /////////////////////////
@@ -82,11 +64,11 @@ float4 st_SpecColor;
 	st_WorldPos = input.worldPos.xyz;
 	st_Depth    = input.worldPos.z / input.worldPos.w;
 	// Normal_SpecPw
-	st_Normal = normalVec;
+	st_Normal = input.normal;
 	st_SpecPw = SpecularPower;
 	// Albedo_Custom
-	st_Albedo = textureColor.xyz;
-	st_Custom = CustomVar;
+	st_Albedo = Ambient;
+	st_SpecIntensity = SpecularIntensity;
 	// SpecColor_Pad
 	st_SpecColor = float4(SpecularColor, 1.0f);
 //////////////////////////////////////////////////////////////////
@@ -94,7 +76,7 @@ float4 st_SpecColor;
 //////////////////////////////////////////////////////////////////
 	output.Pos_Depth     = float4(st_WorldPos, st_Depth);
 	output.Normal_SpecPw = float4(st_Normal, st_SpecPw);
-	output.Albedo_Custom = float4(st_Albedo, st_Custom);
+	output.Albedo_SpecIts = float4(st_Albedo, st_SpecIntensity);
 	output.SpecColor_Pad = st_SpecColor;
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////

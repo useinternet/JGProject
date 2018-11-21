@@ -12,7 +12,7 @@ cbuffer Material
 	float3 SpecularColor;     // 기본 1
 	float  SpecularPower;     // 기본 1
 	float3 Emissive;          // 기본 1
-	float  CustomVar;         // 기본 0
+	float  SpecularIntensity;         // 기본 0
 };
 /* 렌더링 순서도
 1. 기본 머터리얼로 반사 맵핑을 실행하는지 안하는지 검사( reflection = true, false )
@@ -30,7 +30,7 @@ case 2 : 반사 맵핑이 아니라면
    1      2      3     4
   |    worldPos     | Depth |   // 월드 좌표, 김피
   |    normal       |SpecPw |   // 노멀 좌표, 정반사광 세기
-  |    albedo       | pad   |   // 기본 반사색, 반사 세기
+  |    albedo       | specIns   |   // 기본 반사색, 반사 세기
   | specularColor   | pad   |   // 정반사광 색 / 
 */
 struct PixelInputType
@@ -46,7 +46,7 @@ struct PixelOutputType
 {
 	float4 Pos_Depth     : SV_TARGET0;
 	float4 Normal_SpecPw : SV_TARGET1;
-	float4 Albedo_Custom : SV_TARGET2;
+	float4 Albedo_SpecIts : SV_TARGET2;
 	float4 SpecColor_Pad : SV_TARGET3;
 };
 PixelOutputType main(PixelInputType input) : SV_TARGET
@@ -57,7 +57,7 @@ PixelOutputType main(PixelInputType input) : SV_TARGET
 //////////////////////////////////////////////////////////////////
 float3 st_WorldPos;   float  st_Depth;
 float3 st_Normal;     float  st_SpecPw;
-float3 st_Albedo;     float  st_Custom;
+float3 st_Albedo;     float  st_SpecIntensity;
 float4 st_SpecColor;
 //////////////////////////////////////////////////////////////////
 //////////////////////////  계산  ////////////////////////////////
@@ -86,7 +86,7 @@ float4 st_SpecColor;
 	st_SpecPw = SpecularPower;
 	// Albedo_Custom
 	st_Albedo = textureColor.xyz;
-	st_Custom = CustomVar;
+	st_SpecIntensity = SpecularIntensity;
 	// SpecColor_Pad
 	st_SpecColor = float4(SpecularColor, 1.0f);
 //////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ float4 st_SpecColor;
 //////////////////////////////////////////////////////////////////
 	output.Pos_Depth     = float4(st_WorldPos, st_Depth);
 	output.Normal_SpecPw = float4(st_Normal, st_SpecPw);
-	output.Albedo_Custom = float4(st_Albedo, st_Custom);
+	output.Albedo_SpecIts = float4(st_Albedo, st_SpecIntensity);
 	output.SpecColor_Pad = st_SpecColor;
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////

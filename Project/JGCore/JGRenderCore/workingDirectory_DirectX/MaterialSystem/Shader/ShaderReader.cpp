@@ -117,12 +117,12 @@ void ShaderReader::Read(std::fstream& fin, JGShader* Shader)
 		desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)adsU; 
 		desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)adsV;
 		desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)adsW;
-		desc.MipLODBias = atof(MipLODBias.c_str());
+		desc.MipLODBias = (FLOAT)atof(MipLODBias.c_str());
 		desc.MaxAnisotropy = MasAnisotropy;
 		desc.ComparisonFunc = (D3D11_COMPARISON_FUNC)CompareFunc;
-		desc.BorderColor[0] = atof(color1.c_str()); 	desc.BorderColor[1] = atof(color2.c_str());
-		desc.BorderColor[2] = atof(color3.c_str()); 	desc.BorderColor[3] = atof(color4.c_str());
-		desc.MinLOD = atof(MinLod.c_str()); desc.MaxLOD = atof(MaxLod.c_str());
+		desc.BorderColor[0] = (FLOAT)atof(color1.c_str()); 	desc.BorderColor[1] = (FLOAT)atof(color2.c_str());
+		desc.BorderColor[2] = (FLOAT)atof(color3.c_str()); 	desc.BorderColor[3] = (FLOAT)atof(color4.c_str());
+		desc.MinLOD = (FLOAT)atof(MinLod.c_str()); desc.MaxLOD = (FLOAT)atof(MaxLod.c_str());
 		Shader->GetSamplerState()->AddCustomMode(desc);
 	}
 	if (!Shader->GetSamplerState()->CreateSamplerState())

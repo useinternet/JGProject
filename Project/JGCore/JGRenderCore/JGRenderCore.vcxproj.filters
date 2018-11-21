@@ -41,6 +41,9 @@
     <Filter Include="workingDirectory_DirectX\Light">
       <UniqueIdentifier>{907b6d39-b93d-49db-bf30-e29f2bbf3167}</UniqueIdentifier>
     </Filter>
+    <Filter Include="workingDirectory_DirectX\Camera">
+      <UniqueIdentifier>{2b4e28d3-d348-483d-bd5d-33beb21cad1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -76,9 +79,6 @@
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp">
       <Filter>workingDirectory_DirectX\MaterialSystem\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp">
-      <Filter>workingDirectory_DirectX\Light</Filter>
-    </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\DirectX\DxWindow.cpp">
       <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClCompile>
@@ -111,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.cpp">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\Camera\Camera.cpp">
+      <Filter>workingDirectory_DirectX\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,9 +162,6 @@
     <ClInclude Include="Include\Common\JGRCGlobalType.h">
       <Filter>main\Include\Common</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\Light\Light.h">
-      <Filter>workingDirectory_DirectX\Light</Filter>
-    </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\DirectX\DxWindow.h">
       <Filter>workingDirectory_DirectX\DirectX</Filter>
     </ClInclude>
@@ -194,6 +194,18 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.h">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Camera\Camera.h">
+      <Filter>workingDirectory_DirectX\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Light\DirectionLight.h">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Light\PointLight.h">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Light\SpotLight.h">
+      <Filter>workingDirectory_DirectX\Light</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

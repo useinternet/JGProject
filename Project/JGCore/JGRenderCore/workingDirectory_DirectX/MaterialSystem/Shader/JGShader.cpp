@@ -164,7 +164,7 @@ void  JGShader::Render()
 	{
 		for (uint i = 0; i < m_SamplerState->Size(); ++i)
 		{
-			GetDx()->GetContext()->PSSetSamplers(i, 1, m_SamplerState->GetAddress(i));
+			GetDx()->GetContext()->PSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
 		}
 	}
 }

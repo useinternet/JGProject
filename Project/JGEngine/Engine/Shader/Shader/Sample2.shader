@@ -1,13 +1,11 @@
 ##Count : 2
 ##ShaderType : 1
-##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader_vs.hlsl
+##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader2_vs.hlsl
 ##InputLayout
-##Count : 5
+##Count : 3
 POSITION 0 6 0 0 0 0
 TEXCOORD 0 16 0 12 0 0
 NORMAL 0 6 0 20 0 0
-TANGENT 0 6 0 32 0 0
-BINORMAL 0 6 0 44 0 0
 ##CBuffers
 ##Count : 1
 ##BufferName : MatrixBuffer
@@ -19,7 +17,7 @@ BINORMAL 0 6 0 44 0 0
 ##SamplerState
 ##Count : 0
 ##ShaderType : 0
-##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader_ps.hlsl
+##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader2_ps.hlsl
 ##InputLayout
 ##Count : 0
 ##CBuffers
@@ -33,9 +31,6 @@ BINORMAL 0 6 0 44 0 0
 ##Var : Emissive 8 10
 ##Var : SpecularIntensity 11 11
 ##Texture2D
-##Count : 2
-Default_Texture
-Normal_Texture
+##Count : 0
 ##SamplerState
-##Count : 1
-21 1 1 1 0 1 -858993460 0 0 0 0 0 3.40282e+38 
+##Count : 0

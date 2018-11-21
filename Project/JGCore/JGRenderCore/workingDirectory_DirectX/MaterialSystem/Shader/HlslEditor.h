@@ -99,7 +99,7 @@ namespace JGRC
 		real* GetData() { return &m_Data[0]; }
 		/*
 		Exp : 실질적인 버퍼 데이터 크기를 가져온다. */
-		uint  GetSize() { return m_Data.capacity() * 4; }
+		uint  GetSize() { return (uint)(m_Data.capacity() * 4); }
 		/*
 		Exp : 설정이 끝난 CBuffer 클래스에게 메모리 할당. */
 		void  AssignMemory() { 
@@ -154,8 +154,8 @@ namespace JGRC
 		ID3D11ShaderResourceView*  GetResource(const std::string& name);
 		ID3D11ShaderResourceView** GetResourceAddress(const std::string& name);
 	
-		uint NameSize() { return m_TextureNames.size(); }
-		uint SRVSize()  { return m_SRVs.size(); }
+		uint NameSize() { return (uint)m_TextureNames.size(); }
+		uint SRVSize()  { return (uint)m_SRVs.size(); }
 	};
 	class CORE_EXPORT SamplerState : public JGRCObject
 	{
@@ -170,6 +170,6 @@ namespace JGRC
 		void AddCustomMode(const D3D11_SAMPLER_DESC& desc);
 		ID3D11SamplerState** GetAddress(const uint idx);
 		ID3D11SamplerState*  Get(const uint idx);
-		uint Size() { return m_SamplerStates.size(); }
+		uint Size() { return (uint)m_SamplerStates.size(); }
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include"JGRCObject.h"
+#include"SceneRenderSystem/SRSLightPass.h"
 namespace JGRC
 {
 	class CORE_EXPORT DxWindow : public JGRCObject
@@ -25,7 +26,8 @@ namespace JGRC
 		void Draw();
 	public:
 		void AddRenderPassEvent(const DrawEvent& evt)  { m_RenderPassEvent.push_back(evt); }
-		void AddLightPassEvent(const DrawEvent& evt) { m_LightPassEvent.push_back(evt); }
+		void AddLightPassEvent(const DrawEvent& evt)   { m_LightPassEvent.push_back(evt); }
+		SRSLightPass* LightPass() { return m_LightPass.get(); }
 	public:
 		HWND GetHandle() { return m_hWnd; }
 		jgMatrix4x4& GetProjectionMatrix();

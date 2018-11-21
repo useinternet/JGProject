@@ -4,7 +4,7 @@
 #include"JGRenderTarget.h"
 #include"JGRenderState.h"
 #include"JGViewport.h"
-#include"SceneRenderSystem/SRSLightPass.h"
+
 #include"SceneRenderSystem/SRSRenderTarget.h"
 using namespace JGRC;
 using namespace std;

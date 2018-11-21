@@ -220,6 +220,7 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Source\JGRenderCore.cpp" />
     <ClCompile Include="workingDirectory_DirectX\BufferSystem\JGBuffer.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\Camera\Camera.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\DirectX.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\DxWindow.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGDevice.cpp" />
@@ -228,7 +229,6 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.cpp" />
@@ -248,6 +248,7 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="Include\JGRenderCore.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBuffer.h" />
     <ClInclude Include="workingDirectory_DirectX\BufferSystem\JGBufferEnum.h" />
+    <ClInclude Include="workingDirectory_DirectX\Camera\Camera.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectXCommon.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\DirectX.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRCObject.h" />
@@ -257,7 +258,9 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
-    <ClInclude Include="workingDirectory_DirectX\Light\Light.h" />
+    <ClInclude Include="workingDirectory_DirectX\Light\DirectionLight.h" />
+    <ClInclude Include="workingDirectory_DirectX\Light\PointLight.h" />
+    <ClInclude Include="workingDirectory_DirectX\Light\SpotLight.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.h" />

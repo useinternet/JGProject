@@ -1,5 +1,6 @@
 #include"JGLogicCore.h"
 #include"JGRenderCore.h"
+
 #include"MaterialSystem/Mesh/Mesh.h"
 #include"MaterialSystem/Shader/ShaderWriter.h"
 #include"MaterialSystem/Shader/ShaderReader.h"
@@ -7,6 +8,7 @@
 #include"DirectX/DxWindow.h"
 #include"JGRenderCore.h"
 #include"DirectX/DirectX.h"
+
 using namespace JGLC;
 using namespace JGRC;
 using namespace std;
@@ -18,10 +20,10 @@ JGLogicCore::~JGLogicCore()
 		delete rabbit;
 		rabbit = nullptr;
 	}
+	delete cam;
 }
 void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 {
-	CameraPos.set(0.0f, 3.0f, -10.0f);
 	this->hWnd = hWnd;
 	this->Rc = Rc;
 	GroundInit();
@@ -34,7 +36,20 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 		this->rabbit->Render();
 		rabbitShader->Render(rabbit->getIndexCount());
 	});
-
+	cam = new Camera;
+	cam->SetEye(0.0f, 3.0f, -10.0f);
+	viewMatrix = cam->GetViewMatrix();
+	wn->LightPass()->BindingCamera(cam);
+	wn->LightPass()->AddDirectionLight();
+	SpotLight* sample = wn->LightPass()->AddSpotLight();
+	sample->SetColor(2.0f, 0.0f, 2.0f);
+	sample->SetOuterCone(45.0f);
+	sample->SetInnerConeRcp(35.0f);
+	PointLight* sample2 = wn->LightPass()->AddPointLight();
+	sample2->SetPosition(-3.0f, 0.0f, 0.0f);
+	sample2->SetRangeRcp(0.1f);
+	sample2->SetColor(0.0f, 1.0f, 1.0f);
+	wn->LightPass()->DeletePointLight(sample2);
 }
 void JGLogicCore::TestTick()
 {
@@ -106,9 +121,9 @@ void JGLogicCore::GroundParamInit()
 	real Ambient[3] = { 1.0f,1.0f,1.0f };
 	real ReflectIntensity = 0.5f;
 	real SpecularColor[3] = { 1.0f,1.0f,1.0f };
-	real SpecularPower = 1.0f;
+	real SpecularPower = 10.0f;
 	real Emissive[3] = { 1.0f,1.0f,1.0f };
-	real CustomVar = 0.5f;
+	real SpecularIntensity = 1.0f;
 
 
 
@@ -117,7 +132,7 @@ void JGLogicCore::GroundParamInit()
 	CubeShader->Get(EShaderType::Pixel)->SetParam("SpecularColor", SpecularColor, 3);
 	CubeShader->Get(EShaderType::Pixel)->SetParam("SpecularPower", &SpecularPower, 1);
 	CubeShader->Get(EShaderType::Pixel)->SetParam("Emissive", Emissive, 3);
-	CubeShader->Get(EShaderType::Pixel)->SetParam("SpecularIntensity", &CustomVar, 1);
+	CubeShader->Get(EShaderType::Pixel)->SetParam("SpecularIntensity", &SpecularIntensity, 1);
 }
 void JGLogicCore::GroundRender(real yaw)
 {
@@ -131,8 +146,7 @@ void JGLogicCore::GroundRender(real yaw)
 	jgMatrix4x4 worldMatrix;
 	worldMatrix.identity();
 	worldMatrix = worldMatrix * scale * rotation * translate;
-	jgMatrix4x4 viewMatrix;
-	viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
+
 	DxWindow* wn = Rc->GetDxWindow(hWnd);
 	jgMatrix4x4 projectionMatrix;
 
@@ -201,7 +215,7 @@ void JGLogicCore::RabbitParamInit()
 	real SpecularColor[3] = { 1.0f,1.0f,1.0f };
 	real SpecularPower = 1.0f;
 	real Emissive[3] = { 1.0f,1.0f,1.0f };
-	real CustomVar = 0.5f;
+	real SpecularIntensity = 0.0f;
 
 
 
@@ -210,7 +224,7 @@ void JGLogicCore::RabbitParamInit()
 	rabbitShader->Get(EShaderType::Pixel)->SetParam("SpecularColor", SpecularColor, 3);
 	rabbitShader->Get(EShaderType::Pixel)->SetParam("SpecularPower", &SpecularPower, 1);
 	rabbitShader->Get(EShaderType::Pixel)->SetParam("Emissive", Emissive, 3);
-	rabbitShader->Get(EShaderType::Pixel)->SetParam("SpecularIntensity", &CustomVar, 1);
+	rabbitShader->Get(EShaderType::Pixel)->SetParam("SpecularIntensity", &SpecularIntensity, 1);
 }
 void JGLogicCore::RabbitRender(real yaw)
 {
@@ -222,8 +236,8 @@ void JGLogicCore::RabbitRender(real yaw)
 	jgMatrix4x4 worldMatrix;
 	worldMatrix.identity();
 	worldMatrix = worldMatrix * rotation * translate;
-	jgMatrix4x4 viewMatrix;
-	viewMatrix.lookAtLH(CameraPos, jgVec3(0.0f, 0.0f, 1.0f), jgVec3(0.0f, 1.0f, 0.0f));
+
+
 	DxWindow* wn = Rc->GetDxWindow(hWnd);
 	jgMatrix4x4 projectionMatrix;
 
