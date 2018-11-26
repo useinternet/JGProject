@@ -1,36 +1,56 @@
 #pragma once
-#include"Common/JGRCCommon.h"
-#include"Common/JGRCGlobalType.h"
-#include"DirectXCommon.h"
-
+#include"Light.h"
 
 
 namespace JGRC
 {
-	class CORE_EXPORT DirectionLight
+	class CORE_EXPORT DirectionLight : public Light
 	{
-	private:
-		jgVec3 AmbientUp;
-		real   padding1;
-		jgVec3 AmbientDown;
-		real   padding2;
-		jgVec3 Direction;
-		real   padding3;
-		jgVec3 Color;
-		real   padding4;
+		// 0~2   AmbientUp
+		// 4~6   AmbientDown
+		// 8~10  Direction
+		// 12~14 Color 
+	public:
+		static uint const ParamCount = 16;
 	public:
 		DirectionLight()
 		{
+			Data.reserve(ParamCount);
+			Data.resize(ParamCount);
 			SetAmbientDown(0.05f, 0.05f, 0.05f);
 			SetAmbientUp(0.15f, 0.15f, 0.15f);
-			SetColor(0.5f, 0.5f, 0.5f);
+			SetColor(1.0f, 1.0f, 1.0f);
 			SetDirection(0.0f, 0.0f, 1.0f);
+			Data[3] = 0.0f; Data[7] = 0.0f; Data[11] = 0.0f; Data[15] = 0.0f;
 		}
-		void SetAmbientUp(const real r, const real g, const real b) { AmbientUp.set(r, g, b); }
-		void SetAmbientDown(const real r, const real g, const real b) { AmbientDown.set(r, g, b); }
-		void SetDirection(const real x, const real y, const real z) { Direction.set(x, y, z); }
-		void SetColor(const real r, const real g, const real b)    { Color.set(r, g, b); }
+		virtual ~DirectionLight() {}
+		virtual real* GetData() override { return &Data[0]; }
+		void SetAmbientUp(const real r, const real g, const real b) {
+			bIsDynamic = true;
+			Data[0] = r; Data[1] = g; Data[2] = b;  }
+		void SetAmbientDown(const real r, const real g, const real b)
+		{
+			bIsDynamic = true;
+			Data[4] = r; Data[5] = g; Data[6] = b; }
+		void SetDirection(const real x, const real y, const real z)
+		{ 
+			bIsDynamic = true;
+			Data[8] = x; Data[9] = y; Data[10] = z; }
+		void SetColor(const real r, const real g, const real b)    
+		{
+			bIsDynamic = true;
+			Data[12] = r; Data[13] = g; Data[14] = b; }
+		virtual void CalcViewProjMatrix() override
+		{
+			ViewMatrix.lookAtLH(jgVec3(0.0f,0.0f,0.0f), jgVec3(-Data[8], -Data[9], -Data[10]), jgVec3(0.0f, 1.0f, 0.0f));
+			ProjMatrix.orthoLH(GetShadowMapWidth(), GetShadowMapHeight(), GetNearZ(), GetFarZ());
+			ViewProjMatrix = ViewMatrix * ProjMatrix;
+			ViewProjMatrix.transpose();
+		}
+		const jgMatrix4x4& GetViewProjMatrix()
+		{
+			return ViewProjMatrix;
+		}
+	private:
 	};
-
-
 }

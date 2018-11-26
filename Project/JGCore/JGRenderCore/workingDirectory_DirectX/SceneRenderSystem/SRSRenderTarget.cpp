@@ -14,10 +14,11 @@ SRSRenderTarget::~SRSRenderTarget()
 {
 
 }
-
-bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
+bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height, const int bufferCount, const DXGI_FORMAT format)
 {
 	HRESULT result = S_OK;
+	BufferCount = bufferCount;
+
 	// 렌더 타겟 텍스쳐 목록 작성
 	D3D11_TEXTURE2D_DESC TextureDesc;
 	ZeroMemory(&TextureDesc, sizeof(TextureDesc));
@@ -25,7 +26,7 @@ bool SRSRenderTarget::CreateSRSRenderTarget(const int width, const int height)
 	TextureDesc.Height = (UINT)height;
 	TextureDesc.MipLevels = 1;
 	TextureDesc.ArraySize = 1;
-	TextureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	TextureDesc.Format = format;
 	TextureDesc.SampleDesc.Count = 1;
 	TextureDesc.SampleDesc.Quality = 0;
 	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -137,6 +138,16 @@ void SRSRenderTarget::BindingRenderTarget()
 	m_Dx->GetContext()->OMSetRenderTargets(BufferCount, &vRTVarr[0], m_DSV.Get());
 	m_Dx->GetContext()->RSSetViewports(1, m_viewPort->Get());
 }
+void SRSRenderTarget::BindingRenderTarget(const uint idx)
+{
+	if (idx >= m_RTV.size())
+	{
+		JGLOG(log_Error, "JGRC::SRSRenderTarget", "Current idx's RenderTarget is not exist in SRSRenderTarget");
+		return;
+	}
+	m_Dx->GetContext()->OMSetRenderTargets(1, m_RTV[idx].GetAddressOf(), m_DSV.Get());
+	m_Dx->GetContext()->RSSetViewports(1, m_viewPort->Get());
+}
 void SRSRenderTarget::ClearRenderTarget(const real r, const real g, const real b, const real a)
 {
 	real color[4] = { r,g,b,a };
@@ -146,7 +157,23 @@ void SRSRenderTarget::ClearRenderTarget(const real r, const real g, const real b
 	}
 	m_Dx->GetContext()->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
-ID3D11ShaderResourceView* SRSRenderTarget::GetShaderResourceView(const ERTType type)
+void SRSRenderTarget::ClearRenderTarget(const uint idx, const real r, const real g, const real b, const real a)
 {
-	return m_SRV[(int)type].Get();
+	if (idx >= m_RTV.size())
+	{
+		JGLOG(log_Error, "JGRC::SRSRenderTarget", "Current idx's RenderTarget is not exist in SRSRenderTarget");
+		return;
+	}
+	real color[4] = { r,g,b,a };
+	m_Dx->GetContext()->ClearRenderTargetView(m_RTV[idx].Get(), color);
+	m_Dx->GetContext()->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+ID3D11ShaderResourceView* SRSRenderTarget::GetShaderResourceView(const uint idx)
+{
+	if (m_SRV.size() <= idx)
+	{
+		JGLOG(log_Error, "JGRC::SRSRenderTarget", "SRVArray vector range over");
+		return nullptr;
+	}
+	return m_SRV[idx].Get();
 }

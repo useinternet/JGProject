@@ -139,6 +139,7 @@ struct PixelInputType
 };
 float4 main(PixelInputType input) : SV_TARGET
 {
+	float3  ShadowMap     = T_ShadowMap.Sample(ClampSampler,input.tex).rgb;
 	float4 Pos_Depth      = T_Pos_Depth.Sample(ClampSampler, input.tex);
 	float4 Normal_SpecPow = T_Normal_SpecPow.Sample(ClampSampler, input.tex);
 	float4 Albedo_SpecInt = T_Albedo.Sample(ClampSampler, input.tex);
@@ -163,10 +164,11 @@ float4 main(PixelInputType input) : SV_TARGET
 	{
 		finalColor += CalcPoint(mat, input.CameraDir, PntLight[i]);
 	}
-	for (int i = 0; i < SpotLightCount; ++i)
+	for (int j = 0; j < SpotLightCount; ++j)
 	{
-		finalColor += CalcSpot(mat, input.CameraDir, SptLight[i]);
+		finalColor += CalcSpot(mat, input.CameraDir, SptLight[j]);
 	}
 	finalColor *= Albedo;
-	return float4(finalColor,1.0f);
+	finalColor = finalColor;
+	return float4(Depth, Depth, Depth, 1.0f);
 }

@@ -17,9 +17,10 @@ namespace JGRC
 		typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 		typedef Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ShaderResourceView;
 		typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilView;
-		const int BufferCount = 4;
-	private:
-
+		
+	protected:
+		uint BufferCount = 4;
+		DXGI_FORMAT RTTFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	private:
 		static class DirectX* m_Dx;
 		std::vector<Texture2D>          m_RTTexture;
@@ -39,9 +40,13 @@ namespace JGRC
 		SRSRenderTarget();
 		~SRSRenderTarget();
 
-		bool CreateSRSRenderTarget(const int width, const int height);
+		bool CreateSRSRenderTarget(const int width, const int height, const int bufferCount = 4,
+			const DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT);
 		void BindingRenderTarget();
+		void BindingRenderTarget(const uint idx);
 		void ClearRenderTarget(const real r = 0, const real g = 0 , const real b = 0, const real a = 0);
-		ID3D11ShaderResourceView* GetShaderResourceView(const ERTType type);
+		void ClearRenderTarget(const uint idx,const real r = 0, const real g = 0, const real b = 0, const real a = 0);
+		ID3D11ShaderResourceView* GetShaderResourceView(const uint idx);
+		uint GetBufferCount() { return BufferCount; }
 	};
 }

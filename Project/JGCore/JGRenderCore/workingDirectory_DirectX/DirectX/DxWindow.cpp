@@ -19,6 +19,7 @@ DxWindow::DxWindow()
 }
 DxWindow::~DxWindow()
 {
+
 }
 bool DxWindow::Init(const DxWinConfig& config)
 {
@@ -47,14 +48,16 @@ bool DxWindow::Init(const DxWinConfig& config)
 		JGLOG(log_Error, "JGRC::DxWindow", "Failed Create SRS RenderTarget");
 		return false;
 	}
-	m_LightPass->Init(config,m_srsRenderTarget.get());
-
+	m_LightPass->Init(config, m_srsRenderTarget.get());
+	
 	JGLOG(log_Info, "JGRC::DxWindow", hwndNumber + " : Create DxWindow Complete")
 	return true;
 }
 void DxWindow::Draw()
 {
 	// 기본 렌더링 패스
+
+	// 머터리얼 패스
 	m_srsRenderTarget->BindingRenderTarget();
 	m_srsRenderTarget->ClearRenderTarget();
 
@@ -62,9 +65,9 @@ void DxWindow::Draw()
 	{
 		evt();
 	}
-
-	float color[4] = { m_BackColor.x,m_BackColor.y,m_BackColor.z,m_BackColor.w };
 	// 라이팅 패스
+	float color[4] = { m_BackColor.x,m_BackColor.y,m_BackColor.z,m_BackColor.w };
+
 	m_Dx->GetContext()->OMSetRenderTargets(1, m_RenderTarget->GetAddress(), m_RenderTarget->GetDepthStencilView());
 	m_Dx->GetContext()->RSSetViewports(1, m_Viewport->Get());
 	m_Dx->GetContext()->ClearRenderTargetView(m_RenderTarget->Get(), color);

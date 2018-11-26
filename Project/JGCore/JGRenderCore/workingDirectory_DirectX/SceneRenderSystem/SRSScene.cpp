@@ -22,15 +22,22 @@ SRSScene::~SRSScene()
 }
 void SRSScene::CreateScene(const DxWinConfig& config)
 {
+	CreateScene(config.ScreenWidth, config.ScreenHeight, config.NearZ, config.FarZ);
+}
+void SRSScene::CreateScene(const int width, const int height, const real nearZ, const real farZ)
+{
 	m_worldMatrix->identity();
-	m_orthoMatrix->orthoLH(config.ScreenWidth, config.ScreenHeight, config.NearZ, config.FarZ);
+	m_orthoMatrix->orthoLH((real)width, (real)height, nearZ, farZ);
 	*m_wvpMatrix = (*m_worldMatrix) * (m_Camera->GetViewMatrix()) * (*m_orthoMatrix);
 	m_wvpMatrix->transpose();
 
-	real left = (real)((config.ScreenWidth / 2) * -1);
-	real right = left + (real)config.ScreenWidth;
-	real top = (real)(config.ScreenHeight / 2);
-	real bottom = top - (real)config.ScreenHeight;
+
+
+
+	real left = (real)((width / 2) * -1);
+	real right = left + (real)width;
+	real top = (real)(height / 2);
+	real bottom = top - (real)height;
 
 	vector<real> Vertex;
 	// // »ï°¢Çü 1
@@ -58,7 +65,7 @@ void SRSScene::CreateScene(const DxWinConfig& config)
 	stride.push_back(20);
 	std::vector<UINT> offset;
 	offset.push_back(0);
-	m_Mesh->CustomModel(Vertex,6, stride,offset);
+	m_Mesh->CustomModel(Vertex, 6, stride, offset);
 	m_Mesh->CreateBuffer(nullptr);
 }
 void SRSScene::Render()
@@ -74,11 +81,7 @@ Camera* SRSScene::GetCamera()
 {
 	return m_Camera.get();
 }
-jgMatrix4x4& SRSScene::GetwvpMatrix()
+const jgMatrix4x4& SRSScene::GetwvpMatrix()
 {
 	return *m_wvpMatrix;
-}
-void SRSScene::SetwvpMatrix(const jgMatrix4x4& wvpMatrix)
-{
-	*m_wvpMatrix = wvpMatrix;
 }

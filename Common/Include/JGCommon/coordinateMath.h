@@ -259,8 +259,8 @@ public:
 	void scaling(const real x, const real y, const real z) noexcept;
 	void scaling(const real n) noexcept;
 	void lookAtLH(const jgVec3& eye, const jgVec3& lookAt, const jgVec3& up) noexcept;
-	void perspectiveFovLH(const real fov, const real aspect, const real near, const real far);
-	void orthoLH(const real width, const real height, const real near, const real far);
+	void perspectiveFovLH(const real fov, const real aspect, const real nearZ, const real farZ);
+	void orthoLH(const real width, const real height, const real nearZ, const real farZ);
 public:
 	real& operator[](const uint idx);
 	real& operator()(const uint row, const uint col) noexcept;

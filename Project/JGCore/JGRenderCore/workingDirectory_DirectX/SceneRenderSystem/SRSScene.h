@@ -17,11 +17,10 @@ namespace JGRC
 		SRSScene();
 		~SRSScene();
 		void CreateScene(const DxWinConfig& config);
-	
+		void CreateScene(const int width, const int height, const real nearZ, const real farZ);
 		void Render();
 		uint GetIndexCount();
 		Camera* GetCamera();
-		jgMatrix4x4& GetwvpMatrix();
-		void SetwvpMatrix(const jgMatrix4x4& wvpMatrix);
+		const jgMatrix4x4&  GetwvpMatrix();
 	};
 }

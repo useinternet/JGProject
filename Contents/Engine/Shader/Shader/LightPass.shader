@@ -22,10 +22,38 @@ TEXCOORD 0 16 0 12 0 0
 ##CBuffers
 ##Count : 1
 ##BufferName : LightBuffer
-##VarCount : 7
+##VarCount : 35
 ##Var : DirLight 0 15
-##Var : PntLight 16 175
-##Var : SptLight 176 295
+##Var : PntLight0 16 23
+##Var : PntLight1 24 31
+##Var : PntLight2 32 39
+##Var : PntLight3 40 47
+##Var : PntLight4 48 55
+##Var : PntLight5 56 63
+##Var : PntLight6 64 71
+##Var : PntLight7 72 79
+##Var : PntLight8 80 87
+##Var : PntLight9 88 95
+##Var : PntLight10 96 103
+##Var : PntLight11 104 111
+##Var : PntLight12 112 119
+##Var : PntLight13 120 127
+##Var : PntLight14 128 135
+##Var : PntLight15 136 143
+##Var : PntLight16 144 151
+##Var : PntLight17 152 159
+##Var : PntLight18 160 167
+##Var : PntLight19 168 175
+##Var : SptLight0 176 187
+##Var : SptLight1 188 199
+##Var : SptLight2 200 211
+##Var : SptLight3 212 223
+##Var : SptLight4 224 235
+##Var : SptLight5 236 247
+##Var : SptLight6 248 259
+##Var : SptLight7 260 271
+##Var : SptLight8 272 283
+##Var : SptLight9 284 295
 ##Var : DirectionLightCount 296 296
 ##Var : PointLightCount 297 297
 ##Var : SpotLightCount 298 298
@@ -38,4 +66,4 @@ T_Albedo
 T_Specular
 ##SamplerState
 ##Count : 1
-21 3 3 3 0 1 -858993460 0 0 0 0 0 3.40282e+38 
+21 3 3 3 0 1 8 0 0 0 0 0 3.40282e+38 

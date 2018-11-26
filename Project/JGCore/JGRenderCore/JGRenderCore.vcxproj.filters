@@ -115,6 +115,15 @@
     <ClCompile Include="workingDirectory_DirectX\Camera\Camera.cpp">
       <Filter>workingDirectory_DirectX\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\JGRenderCore.h">
@@ -206,6 +215,15 @@
     </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\Light\SpotLight.h">
       <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\Light\Light.h">
+      <Filter>workingDirectory_DirectX\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

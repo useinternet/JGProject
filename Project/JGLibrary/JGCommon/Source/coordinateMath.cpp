@@ -1185,22 +1185,22 @@ void jgMatrix4x4::lookAtLH(const jgVec3& eye, const jgVec3& lookAt, const jgVec3
 	mat[3][0] = -xaxis.dot(eye);      mat[3][1] = -yaxis.dot(eye);      mat[3][2] = -zaxis.dot(eye);
 	mat[3][3] = 1;
 }
-void jgMatrix4x4::perspectiveFovLH(const real fov, const real aspect, const real near, const real far)
+void jgMatrix4x4::perspectiveFovLH(const real fov, const real aspect, const real nearZ, const real farZ)
 {
 	clear();
 	real d = COT(fov / 2);
 	mat[0][0] = d / aspect;
 	mat[1][1] = d;
-	mat[2][2] = far / (far - near); 	mat[2][3] = 1; 
-	mat[3][2] = -((near * far) / (far - near));
+	mat[2][2] = farZ / (farZ - nearZ); 	mat[2][3] = 1; 
+	mat[3][2] = -((nearZ * farZ) / (farZ - nearZ));
 }
-void jgMatrix4x4::orthoLH(const real width, const real height, const real near, const real far)
+void jgMatrix4x4::orthoLH(const real width, const real height, const real nearZ, const real farZ)
 {
 	clear();
 	mat[0][0] = 2 / width;
 	mat[1][1] = 2 / height;
-	mat[2][2] = 1 / (far - near);
-	mat[3][2] = near / (near - far); 	mat[3][3] = 1;
+	mat[2][2] = 1 / (farZ - nearZ);
+	mat[3][2] = nearZ / (nearZ - farZ); 	mat[3][3] = 1;
 }
 real& jgMatrix4x4::operator[](const uint idx)
 {

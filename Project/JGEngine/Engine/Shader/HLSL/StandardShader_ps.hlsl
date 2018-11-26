@@ -38,6 +38,7 @@ struct PixelInputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float4 worldPos  : TEXCOORD1;
+	float4 Pos : TEXCOORD2;
 	float3 normal : NORMAL;
 	float3 tangent  : TANGENT;
 	float3 binormal : BINORMAL;
@@ -48,6 +49,7 @@ struct PixelOutputType
 	float4 Normal_SpecPw : SV_TARGET1;
 	float4 Albedo_SpecIts : SV_TARGET2;
 	float4 SpecColor_Pad : SV_TARGET3;
+	float4 DepthTarget   : SV_TARGET4;
 };
 PixelOutputType main(PixelInputType input) : SV_TARGET
 {
@@ -96,6 +98,7 @@ float4 st_SpecColor;
 	output.Normal_SpecPw = float4(st_Normal, st_SpecPw);
 	output.Albedo_SpecIts = float4(st_Albedo, st_SpecIntensity);
 	output.SpecColor_Pad = st_SpecColor;
+	output.DepthTarget = float4(st_Depth, st_Depth, st_Depth, 1.0f);
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 

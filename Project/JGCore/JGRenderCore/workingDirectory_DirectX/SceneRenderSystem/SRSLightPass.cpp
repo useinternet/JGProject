@@ -15,17 +15,7 @@ SRSLightPass::SRSLightPass()
 {
 	m_Dx = DirectX::GetInstance();
 	m_Scene = make_unique<SRSScene>();
-	m_DirectionLight = make_unique<DirectionLight>();
-	for (uint i = 0; i < m_MaxPointLightCount; ++i)
-	{
-		PointLight l;
-		m_PointLightArray.push_back(l);
-	}
-	for (uint i = 0; i < m_MaxSpotLightCount; ++i)
-	{
-		SpotLight l;
-		m_SpotLightArray.push_back(l);
-	}
+	m_LightManager = make_unique<LightPassLightManager>();
 }
 SRSLightPass::~SRSLightPass()
 {
@@ -42,10 +32,12 @@ void SRSLightPass::Init(const DxWinConfig& config, SRSRenderTarget* SRSRT)
 	m_hWnd = config.hWnd;
 	m_Scene->CreateScene(config);
 	InitHlsl(config);
-	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Pos_Depth));
-	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Normal_SpecPw));
-	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::Albedo_SpecIts));
-	m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(ERTType::SpecColor_pad));
+	for (uint i = 0; i < SRSRT->GetBufferCount(); ++i)
+	{
+		m_Shader->Get(EShaderType::Pixel)->AddTexture(SRSRT->GetShaderResourceView(i));
+	}
+	m_Shader->Get(EShaderType::Pixel)->AddTexture(nullptr);
+	m_LightManager->InitManager(m_Shader);
 }
 void SRSLightPass::Render()
 {
@@ -54,10 +46,10 @@ void SRSLightPass::Render()
 		JGLOG(log_Error, "JGRC::SRSLightPass", "SRSRenderTarget is nullptr");
 		return;
 	}
-	m_Shader->Get(EShaderType::Pixel)->SetTexture(0, m_RenderTarget->GetShaderResourceView(ERTType::Pos_Depth));
-	m_Shader->Get(EShaderType::Pixel)->SetTexture(1, m_RenderTarget->GetShaderResourceView(ERTType::Normal_SpecPw));
-	m_Shader->Get(EShaderType::Pixel)->SetTexture(2, m_RenderTarget->GetShaderResourceView(ERTType::Albedo_SpecIts));
-	m_Shader->Get(EShaderType::Pixel)->SetTexture(3, m_RenderTarget->GetShaderResourceView(ERTType::SpecColor_pad));
+	for (uint i = 0; i < m_RenderTarget->GetBufferCount(); ++i)
+	{
+		m_Shader->Get(EShaderType::Pixel)->SetTexture(i, m_RenderTarget->GetShaderResourceView(i));
+	}
 	DirectX::GetInstance()->SetDirectState(EStateType::DepthState, (uint)EDepthStateType::ZBufferOff);
 
 	if (m_Camera)
@@ -70,87 +62,44 @@ void SRSLightPass::Render()
 		m_Shader->Get(EShaderType::Vertex)->SetParam("CameraDir", &temp, 3);
 		JGLOG(log_Warning, "JGRC::SRSLightPass", "Camera is nullptr in SRSLightPass");
 	}
-
-	// ÀÓ½Ã
-	m_Shader->Get(EShaderType::Pixel)->SetParam("DirLight", m_DirectionLight.get(), 16);
-	m_Shader->Get(EShaderType::Pixel)->SetParam("PntLight", &m_PointLightArray[0], 8 * m_MaxPointLightCount);
-	m_Shader->Get(EShaderType::Pixel)->SetParam("SptLight", &m_SpotLightArray[0], 12 * m_MaxSpotLightCount);
-	m_Shader->Get(EShaderType::Pixel)->SetParam("DirectionLightCount", &m_DirectionLightCount, 1);
-	m_Shader->Get(EShaderType::Pixel)->SetParam("PointLightCount", &m_PointLightCount, 1);
-	m_Shader->Get(EShaderType::Pixel)->SetParam("SpotLightCount", &m_SpotLightCount, 1);
+	m_LightManager->ParamSetting();
 
 	m_Scene->Render();
 	m_Shader->Render(m_Scene->GetIndexCount());
 	DirectX::GetInstance()->SetDirectState(EStateType::DepthState, (uint)EDepthStateType::ZBufferOn);
 	// ¼ÎÀÌ´õ ·»´õ¸µ
-	ID3D11ShaderResourceView* null[4] = { nullptr, nullptr, nullptr, nullptr };
-	DirectX::GetInstance()->GetContext()->PSSetShaderResources(0, 4, null);
+	ID3D11ShaderResourceView* null[5] = { nullptr, nullptr, nullptr, nullptr ,nullptr};
+	DirectX::GetInstance()->GetContext()->PSSetShaderResources(0, 5, null);
+}
+DirectionLight* SRSLightPass::GetDirectionLight()
+{
+	return m_LightManager->GetDirectionLight();
 }
 DirectionLight* SRSLightPass::AddDirectionLight()
 {
-	if (m_DirectionLightCount > 1)
-	{
-		JGLOG(log_Error, "JGRC::SRSLightPass", "DirectionLight is over 1 count")
-		return nullptr;
-	}
-	m_DirectionLightCount++;
-	return m_DirectionLight.get();
+	return m_LightManager->AddDirectionLight();
 }
 PointLight* SRSLightPass::AddPointLight()
 {
-	if (m_PointLightCount >= m_MaxPointLightCount)
-	{
-		JGLOG(log_Error,"JGRC::SRSLightPass","Current PointLightCount is over MaxPointLightCount")
-		return  nullptr;
-	}
-	return &m_PointLightArray[m_PointLightCount++];
+	return m_LightManager->AddPointLight();
 }
 SpotLight*  SRSLightPass::AddSpotLight()
 {
-	if (m_SpotLightCount >= m_MaxSpotLightCount)
-	{
-		JGLOG(log_Error, "JGRC::SRSLightPass", "Current SpotLightCount is over MaxSpotLightCount")
-			return  nullptr;
-	}
-	return &m_SpotLightArray[m_SpotLightCount++];
+	return m_LightManager->AddSpotLight();
 }
 void   SRSLightPass::DeletePointLight(PointLight* light)
 {
-	bool find = false;
-	for (int i = 0; i < m_PointLightCount; ++i)
-	{
-		if (&m_PointLightArray[i] == light)
-		{
-			find = true;
-		}
-		if (find && i < m_MaxPointLightCount - 1)
-		{
-			m_PointLightArray[i] = m_PointLightArray[i + 1];
-		}
-	}
-	m_PointLightCount--;
+	m_LightManager->DeletePointLight(light);
 }
 void   SRSLightPass::DeleteSpotLight(SpotLight* light)
 {
-	bool find = false;
-	for (int i = 0; i < m_SpotLightCount; ++i)
-	{
-		if (&m_SpotLightArray[i] == light)
-		{
-			find = true;
-		}
-		if (find && i < m_MaxSpotLightCount - 1)
-		{
-			m_SpotLightArray[i] = m_SpotLightArray[i + 1];
-		}
-	}
-	m_SpotLightCount--;
+	m_LightManager->DeleteSpotLight(light);
 }
 void SRSLightPass::BindingCamera(Camera* cam)
 {
 	m_Camera = cam;
 }
-void SRSLightPass::InitHlsl(const DxWinConfig& config)
+bool SRSLightPass::OutputHlsl()
 {
 	// ¼ÎÀÌ´õ ¾²±â
 	HlslEditor* VertexEdit = m_Dx->CreateObject<HlslEditor>();
@@ -165,24 +114,31 @@ void SRSLightPass::InitHlsl(const DxWinConfig& config)
 	vsIL->AddDesc("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0);
 	CBuffer* Cbf = VertexEdit->CreateCBuffer();
 	Cbf->SetName("PassBuffer");
-	Cbf->AddVar("wvpMatrix",0,15);
+	Cbf->AddVar("wvpMatrix", 0, 15);
 	Cbf->AddVar("CameraDir", 16, 19);
 	// ÇÈ¼¿ ¼ÎÀÌ´õ
 	CBuffer* pCbf = PixelEdit->CreateCBuffer();
 	pCbf->SetName("LightBuffer");
-	unsigned int PntLightSize = 8  * (unsigned int)m_MaxPointLightCount;
-	unsigned int SptLightSize = 12 * (unsigned int)m_MaxSpotLightCount;
-	// ÀÓ½Ã
-	pCbf->AddVar("DirLight", 0, 15);
-	pCbf->AddVar("PntLight", 16, 16 + PntLightSize - 1); 
-	pCbf->AddVar("SptLight", 16 + PntLightSize, 16 + PntLightSize + SptLightSize - 1);
-
-	unsigned int CountStart = 16 + PntLightSize + SptLightSize;
-
-	pCbf->AddVar("DirectionLightCount", CountStart, CountStart);
-	pCbf->AddVar("PointLightCount", CountStart + 1, CountStart + 1);
-	pCbf->AddVar("SpotLightCount", CountStart + 2, CountStart + 2);
-	pCbf->AddVar("TempCount2", CountStart + 3, CountStart + 3);
+	unsigned int start = 0;
+	for (unsigned int i = 0; i < m_LightManager->GetMaxDirectionLightCount(); ++i)
+	{
+		pCbf->AddVar("DirLight", start, start + DirectionLight::ParamCount - 1);
+		start += DirectionLight::ParamCount;
+	}
+	for (unsigned int i = 0; i < m_LightManager->GetMaxPointLightCount(); ++i)
+	{
+		pCbf->AddVar("PntLight" + to_string((int)i), start, start + PointLight::ParamCount - 1);
+		start += PointLight::ParamCount;
+	}
+	for (unsigned int i = 0; i < m_LightManager->GetMaxSpotLightCount(); ++i)
+	{
+		pCbf->AddVar("SptLight" + to_string((int)i), start, start + SpotLight::ParamCount - 1);
+		start += SpotLight::ParamCount;
+	}
+	pCbf->AddVar("DirectionLightCount", start, start);
+	pCbf->AddVar("PointLightCount", start + 1, start + 1);
+	pCbf->AddVar("SpotLightCount", start + 2, start + 2);
+	pCbf->AddVar("TempCount2", start + 3, start + 3);
 
 	Texture2D* texture = PixelEdit->CreateTexture2D();
 	texture->Add("T_Pos_Depth");
@@ -196,8 +152,20 @@ void SRSLightPass::InitHlsl(const DxWinConfig& config)
 
 	ShaderWriter writer;
 	writer.AddEditor(VertexEdit); writer.AddEditor(PixelEdit);
-	writer.Write(Game::path / "Engine/Shader/Shader/LightPass");
+	if (!writer.Write(Game::path / "Engine/Shader/Shader/LightPass"))
+	{
+		JGLOG(log_Error, "JGRC::SRSLightPass", "Failed ShaderWrite in LightPass");
+		return false;
+	}
 
+	m_Dx->DeleteObject(VertexEdit);
+	m_Dx->DeleteObject(PixelEdit);
+
+	return true;
+}
+void SRSLightPass::InitHlsl(const DxWinConfig& config)
+{
+	OutputHlsl();
 
 	// ¼ÎÀÌ´õ ÀÐ±â
 	ShaderReader reader(m_hWnd);
@@ -218,13 +186,4 @@ void SRSLightPass::InitHlsl(const DxWinConfig& config)
 	jgMatrix4x4 wvpMatrix = m_Scene->GetwvpMatrix();
 	m_Shader = reader.ReadShader(Game::path / "Engine/Shader/Shader/LightPass.shader");
 	m_Shader->Get(EShaderType::Vertex)->SetParam("wvpMatrix", &wvpMatrix, 16);
-
-
-	m_Dx->DeleteObject(VertexEdit);
-	m_Dx->DeleteObject(PixelEdit);
-
-
-	// ¶óÀÌÆ® ¼ÂÆÃ
-	
-	m_Shader->Get(EShaderType::Pixel)->SetParam("TempCount2", &m_TempCount2, 1);
 }

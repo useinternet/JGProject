@@ -163,10 +163,11 @@ float4 main(PixelInputType input) : SV_TARGET
 	{
 		finalColor += CalcPoint(mat, input.CameraDir, PntLight[i]);
 	}
-	for (int i = 0; i < SpotLightCount; ++i)
+	for (int j = 0; j < SpotLightCount; ++j)
 	{
-		finalColor += CalcSpot(mat, input.CameraDir, SptLight[i]);
+		finalColor += CalcSpot(mat, input.CameraDir, SptLight[j]);
 	}
 	finalColor *= Albedo;
-	return float4(finalColor,1.0f);
+	finalColor = finalColor;
+	return float4(finalColor, 1.0f);
 }

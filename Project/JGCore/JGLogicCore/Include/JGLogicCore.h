@@ -22,11 +22,11 @@
 #endif
 
 #include"Camera/Camera.h"
-
 namespace JGRC { 
 	class JGRenderCore;
 	class Mesh;
 	class JGShaderArray;
+	class SpotLight;
 }
 namespace JGLC
 {
@@ -40,7 +40,7 @@ namespace JGLC
 		JGRC::Mesh* rabbit = nullptr;
 		JGRC::JGShaderArray* rabbitShader;
 		HWND hWnd;
-
+		JGRC::SpotLight* sample;
 
 		// 카메라 위치
 		jgVec3 CameraPos;

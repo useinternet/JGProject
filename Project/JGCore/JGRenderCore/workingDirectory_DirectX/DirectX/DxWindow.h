@@ -13,8 +13,9 @@ namespace JGRC
 		std::unique_ptr<class JGSwapChain>    m_SwapChain;
 		std::unique_ptr<class JGRenderTarget> m_RenderTarget;
 		std::unique_ptr<class JGViewport>     m_Viewport;
-		std::unique_ptr<class SRSLightPass>   m_LightPass;
-		std::unique_ptr<class SRSRenderTarget>      m_srsRenderTarget;
+
+		std::unique_ptr<SRSLightPass>      m_LightPass;
+		std::unique_ptr<class SRSRenderTarget>   m_srsRenderTarget;
 	private:
 		std::vector<DrawEvent> m_RenderPassEvent;
 		std::vector<DrawEvent> m_LightPassEvent;

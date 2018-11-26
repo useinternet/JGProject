@@ -38,4 +38,4 @@ Default_Texture
 Normal_Texture
 ##SamplerState
 ##Count : 1
-21 1 1 1 0 1 -858993460 0 0 0 0 0 3.40282e+38 
+21 1 1 1 0 1 8 0 0 0 0 0 3.40282e+38 

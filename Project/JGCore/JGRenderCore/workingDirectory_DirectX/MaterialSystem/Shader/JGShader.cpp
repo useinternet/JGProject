@@ -135,9 +135,20 @@ void  JGShader::Render()
 	}
 	if (m_Texture2D)
 	{
-		for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+		switch (m_ShaderType)
 		{
-			GetDx()->GetContext()->PSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+		case EShaderType::Vertex:
+			for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+			{
+				GetDx()->GetContext()->VSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			}
+			break;
+		case EShaderType::Pixel:
+			for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+			{
+				GetDx()->GetContext()->PSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			}
+			break;
 		}
 	}
 	if (ShaderBuffer)
@@ -162,9 +173,20 @@ void  JGShader::Render()
 	}
 	if (m_SamplerState)
 	{
-		for (uint i = 0; i < m_SamplerState->Size(); ++i)
+		switch (m_ShaderType)
 		{
-			GetDx()->GetContext()->PSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+		case EShaderType::Vertex:
+			for (uint i = 0; i < m_SamplerState->Size(); ++i)
+			{
+				GetDx()->GetContext()->VSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+			}
+			break;
+		case EShaderType::Pixel:
+			for (uint i = 0; i < m_SamplerState->Size(); ++i)
+			{
+				GetDx()->GetContext()->PSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+			}
+			break;
 		}
 	}
 }

@@ -324,6 +324,7 @@ void SamplerState::AddDefaultWrapMode()
 	desc.BorderColor[2] = 0; desc.BorderColor[3] = 0;
 	desc.MinLOD = 0;
 	desc.MaxLOD = D3D11_FLOAT32_MAX;
+	desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	Descs.push_back(desc);
 }
 void SamplerState::AddDefaultClampMode()
@@ -339,6 +340,7 @@ void SamplerState::AddDefaultClampMode()
 	desc.BorderColor[2] = 0; desc.BorderColor[3] = 0;
 	desc.MinLOD = 0;
 	desc.MaxLOD = D3D11_FLOAT32_MAX;
+	desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	Descs.push_back(desc);
 }
 void SamplerState::AddCustomMode(const D3D11_SAMPLER_DESC& desc)

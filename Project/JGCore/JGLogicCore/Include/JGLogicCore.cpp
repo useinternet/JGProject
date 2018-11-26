@@ -1,11 +1,11 @@
 #include"JGLogicCore.h"
 #include"JGRenderCore.h"
-
+#include"DirectX/DxWindow.h"
 #include"MaterialSystem/Mesh/Mesh.h"
 #include"MaterialSystem/Shader/ShaderWriter.h"
 #include"MaterialSystem/Shader/ShaderReader.h"
 #include"MaterialSystem/Shader/JGShaderArray.h"
-#include"DirectX/DxWindow.h"
+
 #include"JGRenderCore.h"
 #include"DirectX/DirectX.h"
 
@@ -40,16 +40,26 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 	cam->SetEye(0.0f, 3.0f, -10.0f);
 	viewMatrix = cam->GetViewMatrix();
 	wn->LightPass()->BindingCamera(cam);
-	wn->LightPass()->AddDirectionLight();
-	SpotLight* sample = wn->LightPass()->AddSpotLight();
-	sample->SetColor(2.0f, 0.0f, 2.0f);
-	sample->SetOuterCone(45.0f);
-	sample->SetInnerConeRcp(35.0f);
-	PointLight* sample2 = wn->LightPass()->AddPointLight();
-	sample2->SetPosition(-3.0f, 0.0f, 0.0f);
-	sample2->SetRangeRcp(0.1f);
-	sample2->SetColor(0.0f, 1.0f, 1.0f);
-	wn->LightPass()->DeletePointLight(sample2);
+	DirectionLight* dl = wn->LightPass()->AddDirectionLight();
+	//dl->SetColor(0.8f, 0.8f, 0.8f);
+	//dl->SetDirection(1.0f, -1.0f, 0.0f);
+
+
+	//PointLight* l = wn->LightPass()->AddPointLight();
+	//l->SetPosition(3.0f, 0.0f, 0.0f);
+	//l->SetColor(0.5f, 0.0f, 0.0f);
+
+	//PointLight* l2 = wn->LightPass()->AddPointLight();
+	//l2->SetPosition(-3.0f, 0.0f, 0.0f);
+	//l2->SetColor(0.0f, 0.0f, 0.5f);
+	// //라이팅 추가
+	sample = wn->LightPass()->AddSpotLight();
+	sample->SetPosition(-5.0f, 5.0f, 0.0f);
+	sample->SetLookAt(1.0f, -1.0f, 0.0f);
+	sample->SetColor(1.0f, 1.0f, 1.0f);
+	sample->SetOuterCone(65.0f);
+	sample->SetInnerConeRcp(55.0f);
+	sample->SetRangeRcp(0.0000001f);
 }
 void JGLogicCore::TestTick()
 {

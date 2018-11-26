@@ -129,5 +129,4 @@ void ShaderReader::Read(std::fstream& fin, JGShader* Shader)
 	{
 		JGLOG(log_Error, "JGRC::ShaderReader", "Failed Create SamplerState // " + Shader->GetPath());
 	}
-
 }
