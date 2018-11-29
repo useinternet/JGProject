@@ -4,6 +4,11 @@
 
 namespace JGRC
 {
+	enum class CORE_EXPORT EShaderRenderType
+	{
+		Draw,
+		DrawIndexed
+	};
 	class CORE_EXPORT JGShaderArray : public JGRCObject
 	{
 	private:
@@ -20,7 +25,7 @@ namespace JGRC
 		~JGShaderArray();
 		JGShader* Get(const EShaderType type);
 		void AddShader(JGShader* shader);
-		void Render(const uint indexCount);
+		void Render(const uint indexCount, const EShaderRenderType type = EShaderRenderType::DrawIndexed);
 		void Move(JGShaderArray* mover);
 	};
 }

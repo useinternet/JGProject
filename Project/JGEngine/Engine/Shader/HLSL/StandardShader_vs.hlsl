@@ -17,7 +17,6 @@ struct PixelInputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float4 worldPos  : TEXCOORD1;
-	float4 Pos : TEXCOORD2;
 	float3 normal : NORMAL;
 	float3 tangent  : TANGENT;
 	float3 binormal : BINORMAL;
@@ -31,7 +30,6 @@ PixelInputType main(VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(position, wvpMatrix);
-	output.Pos = output.position;
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
 

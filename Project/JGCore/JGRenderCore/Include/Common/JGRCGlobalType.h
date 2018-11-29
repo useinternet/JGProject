@@ -47,6 +47,8 @@ namespace JGRC
 	{
 		Pixel,
 		Vertex,
-		Header,
+		Hull,
+		Domain,
+		Geometry
 	};
 }

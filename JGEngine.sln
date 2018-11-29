@@ -57,12 +57,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HLSL", "HLSL", "{DFFF42BC-5C1A-4AA1-B032-DC76D513A3A3}"
 	ProjectSection(SolutionItems) = preProject
 		Contents\Engine\Shader\HLSL\Common.hlsli = Contents\Engine\Shader\HLSL\Common.hlsli
-		Contents\Engine\Shader\HLSL\FinalShadowPass_ps.hlsl = Contents\Engine\Shader\HLSL\FinalShadowPass_ps.hlsl
-		Contents\Engine\Shader\HLSL\FinalShadowPass_vs.hlsl = Contents\Engine\Shader\HLSL\FinalShadowPass_vs.hlsl
-		Contents\Engine\Shader\HLSL\LightPass_ps.hlsl = Contents\Engine\Shader\HLSL\LightPass_ps.hlsl
-		Contents\Engine\Shader\HLSL\LightPass_vs.hlsl = Contents\Engine\Shader\HLSL\LightPass_vs.hlsl
-		Contents\Engine\Shader\HLSL\LightShadowPass_ps.hlsl = Contents\Engine\Shader\HLSL\LightShadowPass_ps.hlsl
-		Contents\Engine\Shader\HLSL\LightShadowPass_vs.hlsl = Contents\Engine\Shader\HLSL\LightShadowPass_vs.hlsl
+		Contents\Engine\Shader\HLSL\DirLightPass_ps.hlsl = Contents\Engine\Shader\HLSL\DirLightPass_ps.hlsl
+		Contents\Engine\Shader\HLSL\DirLightPass_vs.hlsl = Contents\Engine\Shader\HLSL\DirLightPass_vs.hlsl
+		Contents\Engine\Shader\HLSL\LightCommon.hlsli = Contents\Engine\Shader\HLSL\LightCommon.hlsli
 		Contents\Engine\Shader\HLSL\StandardShader2_ps.hlsl = Contents\Engine\Shader\HLSL\StandardShader2_ps.hlsl
 		Contents\Engine\Shader\HLSL\StandardShader2_vs.hlsl = Contents\Engine\Shader\HLSL\StandardShader2_vs.hlsl
 		Contents\Engine\Shader\HLSL\StandardShader_ps.hlsl = Contents\Engine\Shader\HLSL\StandardShader_ps.hlsl

@@ -1,6 +1,6 @@
 ##Count : 2
 ##ShaderType : 1
-##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader2_vs.hlsl
+##HlslPath : ../../Contents/Engine/Shader/HLSL/StandardShader2_vs.hlsl
 ##InputLayout
 ##Count : 3
 POSITION 0 6 0 0 0 0
@@ -17,7 +17,7 @@ NORMAL 0 6 0 20 0 0
 ##SamplerState
 ##Count : 0
 ##ShaderType : 0
-##HlslPath : ../../../../../../../Contents/Engine/Shader/HLSL/StandardShader2_ps.hlsl
+##HlslPath : ../../Contents/Engine/Shader/HLSL/StandardShader2_ps.hlsl
 ##InputLayout
 ##Count : 0
 ##CBuffers

@@ -17,6 +17,9 @@ namespace JGRC
 		static std::string FunctionName;
 		static std::string VSVersion;
 		static std::string PSVersion;
+		static std::string HSVersion;
+		static std::string DSVersion;
+		static std::string GSVersion;
 		static UINT Flags;
 	private:
 		JGShader(const JGShader& copy) = delete;
@@ -57,12 +60,16 @@ namespace JGRC
 		@param data    : 변수 데이터 
 		@param Count   : 변수 데이터 갯수(real 갯수) */
 		void  SetParam(const std::string& VarName, void* data, const uint Count);
+
+		Texture2D* GetTexture()    { return m_Texture2D; }
+		SamplerState* GetSampler() { return m_SamplerState; }
 		/*
 		Exp : 렌더링 */
 		void  Render();
 
-		EShaderType GetType() { return m_ShaderType; }
+		EShaderType GetType()   { return m_ShaderType; }
 		InputLayout*  GetLayout();
+		void* GetShaderBuffer() { return ShaderBuffer; }
 	private:
 		void SetPath(const std::string& path) { m_Path = path; }
 		void SetShaderType(const EShaderType type) { m_ShaderType = type; }

@@ -21,7 +21,7 @@
 #pragma comment(lib,"JGRenderCore.lib")
 #endif
 
-#include"Camera/Camera.h"
+
 namespace JGRC { 
 	class JGRenderCore;
 	class Mesh;
@@ -43,8 +43,6 @@ namespace JGLC
 		JGRC::SpotLight* sample;
 
 		// 카메라 위치
-		jgVec3 CameraPos;
-		JGRC::Camera* cam;
 		jgMatrix4x4 viewMatrix;
 	public:
 		~JGLogicCore();

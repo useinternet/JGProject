@@ -38,11 +38,11 @@
     <Filter Include="workingDirectory_DirectX\MaterialSystem\Mesh">
       <UniqueIdentifier>{803fba5d-00c8-437b-a5e8-b2fe76fa0c63}</UniqueIdentifier>
     </Filter>
-    <Filter Include="workingDirectory_DirectX\Light">
-      <UniqueIdentifier>{907b6d39-b93d-49db-bf30-e29f2bbf3167}</UniqueIdentifier>
-    </Filter>
     <Filter Include="workingDirectory_DirectX\Camera">
       <UniqueIdentifier>{2b4e28d3-d348-483d-bd5d-33beb21cad1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workingDirectory_DirectX\SceneRenderSystem\LightPass">
+      <UniqueIdentifier>{c7563e88-438d-488a-b53c-810f987af7d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -109,20 +109,17 @@
     <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClCompile>
     <ClCompile Include="workingDirectory_DirectX\Camera\Camera.cpp">
       <Filter>workingDirectory_DirectX\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.cpp">
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass.cpp">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.cpp">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\DirectionLightPass.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem\LightPass</Filter>
     </ClCompile>
-    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp">
-      <Filter>workingDirectory_DirectX\Light</Filter>
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\PointLightPass.cpp">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem\LightPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -201,29 +198,17 @@
     <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="workingDirectory_DirectX\Camera\Camera.h">
       <Filter>workingDirectory_DirectX\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\Light\DirectionLight.h">
-      <Filter>workingDirectory_DirectX\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\Light\PointLight.h">
-      <Filter>workingDirectory_DirectX\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\Light\SpotLight.h">
-      <Filter>workingDirectory_DirectX\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.h">
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass.h">
       <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\Light\Light.h">
-      <Filter>workingDirectory_DirectX\Light</Filter>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\DirectionLightPass.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem\LightPass</Filter>
     </ClInclude>
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.h">
-      <Filter>workingDirectory_DirectX\SceneRenderSystem</Filter>
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\PointLightPass.h">
+      <Filter>workingDirectory_DirectX\SceneRenderSystem\LightPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

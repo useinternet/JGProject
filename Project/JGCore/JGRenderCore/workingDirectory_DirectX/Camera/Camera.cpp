@@ -4,7 +4,7 @@ using namespace std;
 
 Camera::Camera()
 {
-	m_Eye.set(0.0f, 0.0f, 0.0f);
+	m_Eye.set(0.0f, 0.0f, -5.0f);
 	m_Up.set(0.0f, 1.0f, 0.0f);
 	m_LookAt.set(0.0f, 0.0f, 1.0f);
 	m_viewMatrix = make_unique<jgMatrix4x4>();

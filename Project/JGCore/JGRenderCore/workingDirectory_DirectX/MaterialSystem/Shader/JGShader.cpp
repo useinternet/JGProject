@@ -8,6 +8,9 @@ JGShader::unSRVArray JGShader::m_umSRVs;
 string JGShader::FunctionName = "main";
 string JGShader::VSVersion = "vs_5_0";
 string JGShader::PSVersion = "ps_5_0";
+string JGShader::HSVersion = "hs_5_0";
+string JGShader::DSVersion = "ds_5_0";
+string JGShader::GSVersion = "gs_5_0";
 UINT   JGShader::Flags = D3D10_SHADER_ENABLE_STRICTNESS;
 
 JGShader::~JGShader()
@@ -22,6 +25,15 @@ JGShader::~JGShader()
 			break;
 		case EShaderType::Pixel:
 			((ID3D11PixelShader*)ShaderBuffer)->Release();
+			break;
+		case EShaderType::Hull:
+			((ID3D11HullShader*)ShaderBuffer)->Release();
+			break;
+		case EShaderType::Domain:
+			((ID3D11DomainShader*)ShaderBuffer)->Release();
+			break;
+		case EShaderType::Geometry:
+			((ID3D11GeometryShader*)ShaderBuffer)->Release();
 			break;
 		}
 		ShaderBuffer = nullptr;
@@ -115,6 +127,7 @@ void  JGShader::SetParam(const std::string& VarName, void* data, const uint Coun
 }
 void  JGShader::Render()
 {
+
 	// 상수버퍼 작성
 	for (uint i = 0; i < m_ConstantBuffer.size(); ++i)
 	{
@@ -127,6 +140,15 @@ void  JGShader::Render()
 			break;
 		case EShaderType::Vertex:
 			GetDx()->GetContext()->VSSetConstantBuffers((UINT)i, 1, m_ConstantBuffer[i]->GetAddress());
+			break;
+		case EShaderType::Hull:
+			GetDx()->GetContext()->HSSetConstantBuffers((UINT)i, 1, m_ConstantBuffer[i]->GetAddress());
+			break;
+		case EShaderType::Domain:
+			GetDx()->GetContext()->DSSetConstantBuffers((UINT)i, 1, m_ConstantBuffer[i]->GetAddress());
+			break;
+		case EShaderType::Geometry:
+			GetDx()->GetContext()->GSSetConstantBuffers((UINT)i, 1, m_ConstantBuffer[i]->GetAddress());
 			break;
 		default:
 			JGLOG(log_Error, "JGRC::JGShader", "ShaderType is not exist when ShaderRendering");
@@ -149,8 +171,28 @@ void  JGShader::Render()
 				GetDx()->GetContext()->PSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
 			}
 			break;
+		case EShaderType::Hull:
+			for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+			{
+				GetDx()->GetContext()->HSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			}
+			break;
+		case EShaderType::Domain:
+			for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+			{
+				GetDx()->GetContext()->DSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			}
+			break;
+		case EShaderType::Geometry:
+			for (uint i = 0; i < m_Texture2D->SRVSize(); ++i)
+			{
+				GetDx()->GetContext()->GSSetShaderResources((UINT)i, 1, m_Texture2D->GetResourceAddress(i));
+			}
+			break;
 		}
 	}
+
+
 	if (ShaderBuffer)
 	{
 		switch (m_ShaderType)
@@ -161,6 +203,15 @@ void  JGShader::Render()
 		case EShaderType::Vertex:
 			GetDx()->GetContext()->VSSetShader((ID3D11VertexShader*)(ShaderBuffer), nullptr, 0);
 			break;
+		case EShaderType::Hull:
+			GetDx()->GetContext()->HSSetShader((ID3D11HullShader*)(ShaderBuffer), nullptr, 0);
+			break;
+		case EShaderType::Domain:
+			GetDx()->GetContext()->DSSetShader((ID3D11DomainShader*)(ShaderBuffer), nullptr, 0);
+			break;
+		case EShaderType::Geometry:
+			GetDx()->GetContext()->GSSetShader((ID3D11GeometryShader*)(ShaderBuffer), nullptr, 0);
+			break;
 		}
 	}
 	else
@@ -170,6 +221,10 @@ void  JGShader::Render()
 	if (m_InputLayout)
 	{
 		GetDx()->GetContext()->IASetInputLayout(m_InputLayout->GetLayout());
+	}
+	else
+	{
+		GetDx()->GetContext()->IASetInputLayout(nullptr);
 	}
 	if (m_SamplerState)
 	{
@@ -185,6 +240,24 @@ void  JGShader::Render()
 			for (uint i = 0; i < m_SamplerState->Size(); ++i)
 			{
 				GetDx()->GetContext()->PSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+			}
+			break;
+		case EShaderType::Hull:
+			for (uint i = 0; i < m_SamplerState->Size(); ++i)
+			{
+				GetDx()->GetContext()->HSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+			}
+			break;
+		case EShaderType::Domain:
+			for (uint i = 0; i < m_SamplerState->Size(); ++i)
+			{
+				GetDx()->GetContext()->DSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
+			}
+			break;
+		case EShaderType::Geometry:
+			for (uint i = 0; i < m_SamplerState->Size(); ++i)
+			{
+				GetDx()->GetContext()->GSSetSamplers((UINT)i, 1, m_SamplerState->GetAddress(i));
 			}
 			break;
 		}
@@ -254,6 +327,15 @@ bool JGShader::Compile(HWND hWnd)
 	case EShaderType::Vertex:
 		version = VSVersion;
 		break;
+	case EShaderType::Hull:
+		version = HSVersion;
+		break;
+	case EShaderType::Domain:
+		version = DSVersion;
+		break;
+	case EShaderType::Geometry:
+		version = GSVersion;
+		break;
 	default:
 		JGLOG(log_Error, "JGRC::JGShader", "ShaderType is not exist");
 		break;
@@ -285,6 +367,17 @@ bool JGShader::Compile(HWND hWnd)
 	case EShaderType::Pixel:
 		result = GetDx()->GetDevice()->CreatePixelShader(Shader->GetBufferPointer(), Shader->GetBufferSize(),
 			nullptr, (ID3D11PixelShader**)&(ShaderBuffer));
+		break;
+	case EShaderType::Hull:
+		result = GetDx()->GetDevice()->CreateHullShader(Shader->GetBufferPointer(), Shader->GetBufferSize(),
+			nullptr, (ID3D11HullShader**)&(ShaderBuffer));
+		break;
+	case EShaderType::Domain:
+		result = GetDx()->GetDevice()->CreateDomainShader(Shader->GetBufferPointer(), Shader->GetBufferSize(),
+			nullptr, (ID3D11DomainShader**)&(ShaderBuffer));
+	case EShaderType::Geometry:
+		result = GetDx()->GetDevice()->CreateGeometryShader(Shader->GetBufferPointer(), Shader->GetBufferSize(),
+			nullptr, (ID3D11GeometryShader**)&(ShaderBuffer));
 		break;
 	default:
 		JGLOG(log_Error, "JGRC::JGShader", "ShaderType is not exist");

@@ -1,11 +1,11 @@
 #include"JGLogicCore.h"
 #include"JGRenderCore.h"
+#include"Camera/Camera.h"
 #include"DirectX/DxWindow.h"
 #include"MaterialSystem/Mesh/Mesh.h"
 #include"MaterialSystem/Shader/ShaderWriter.h"
 #include"MaterialSystem/Shader/ShaderReader.h"
 #include"MaterialSystem/Shader/JGShaderArray.h"
-
 #include"JGRenderCore.h"
 #include"DirectX/DirectX.h"
 
@@ -20,7 +20,6 @@ JGLogicCore::~JGLogicCore()
 		delete rabbit;
 		rabbit = nullptr;
 	}
-	delete cam;
 }
 void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 {
@@ -36,35 +35,14 @@ void JGLogicCore::TestInit(JGRenderCore* Rc, HWND hWnd)
 		this->rabbit->Render();
 		rabbitShader->Render(rabbit->getIndexCount());
 	});
-	cam = new Camera;
+	Camera* cam = wn->GetWindowCamera();
 	cam->SetEye(0.0f, 3.0f, -10.0f);
 	viewMatrix = cam->GetViewMatrix();
-	wn->LightPass()->BindingCamera(cam);
-	DirectionLight* dl = wn->LightPass()->AddDirectionLight();
-	//dl->SetColor(0.8f, 0.8f, 0.8f);
-	//dl->SetDirection(1.0f, -1.0f, 0.0f);
-
-
-	//PointLight* l = wn->LightPass()->AddPointLight();
-	//l->SetPosition(3.0f, 0.0f, 0.0f);
-	//l->SetColor(0.5f, 0.0f, 0.0f);
-
-	//PointLight* l2 = wn->LightPass()->AddPointLight();
-	//l2->SetPosition(-3.0f, 0.0f, 0.0f);
-	//l2->SetColor(0.0f, 0.0f, 0.5f);
-	// //라이팅 추가
-	sample = wn->LightPass()->AddSpotLight();
-	sample->SetPosition(-5.0f, 5.0f, 0.0f);
-	sample->SetLookAt(1.0f, -1.0f, 0.0f);
-	sample->SetColor(1.0f, 1.0f, 1.0f);
-	sample->SetOuterCone(65.0f);
-	sample->SetInnerConeRcp(55.0f);
-	sample->SetRangeRcp(0.0000001f);
 }
 void JGLogicCore::TestTick()
 {
 	static real yaw = 0;
-	yaw += 0.0001f;
+	yaw += 0.001f;
 	GroundRender(yaw);
 	RabbitRender(yaw);
 }
@@ -131,7 +109,7 @@ void JGLogicCore::GroundParamInit()
 	real Ambient[3] = { 1.0f,1.0f,1.0f };
 	real ReflectIntensity = 0.5f;
 	real SpecularColor[3] = { 1.0f,1.0f,1.0f };
-	real SpecularPower = 10.0f;
+	real SpecularPower = 1.0f;
 	real Emissive[3] = { 1.0f,1.0f,1.0f };
 	real SpecularIntensity = 1.0f;
 

@@ -229,7 +229,6 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGRenderTarget.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGSwapChain.cpp" />
     <ClCompile Include="workingDirectory_DirectX\DirectX\JGViewport.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\Light\Light.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Material.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.cpp" />
@@ -238,9 +237,9 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.cpp" />
     <ClCompile Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.cpp" />
-    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\DirectionLightPass.cpp" />
+    <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\PointLightPass.cpp" />
     <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.cpp" />
     <ClCompile Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.cpp" />
   </ItemGroup>
@@ -261,10 +260,6 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGRenderTarget.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGSwapChain.h" />
     <ClInclude Include="workingDirectory_DirectX\DirectX\JGViewport.h" />
-    <ClInclude Include="workingDirectory_DirectX\Light\DirectionLight.h" />
-    <ClInclude Include="workingDirectory_DirectX\Light\Light.h" />
-    <ClInclude Include="workingDirectory_DirectX\Light\PointLight.h" />
-    <ClInclude Include="workingDirectory_DirectX\Light\SpotLight.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Material.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Mesh\Mesh.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\HlslEditor.h" />
@@ -273,9 +268,9 @@ copy /y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)/Project/JGTool/JGEditor/
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderReader.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Shader\ShaderWriter.h" />
     <ClInclude Include="workingDirectory_DirectX\MaterialSystem\Texture\JGTexture.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPassLightManager.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSShadowPass.h" />
-    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSLightPass.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\DirectionLightPass.h" />
+    <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\LightPass\PointLightPass.h" />
     <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSRenderTarget.h" />
     <ClInclude Include="workingDirectory_DirectX\SceneRenderSystem\SRSScene.h" />
   </ItemGroup>

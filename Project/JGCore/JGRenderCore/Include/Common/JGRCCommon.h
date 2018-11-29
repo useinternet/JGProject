@@ -51,8 +51,8 @@
 // юс╫ц
 namespace Game
 {
-	static JGPath::Path path("../../../../../../../Contents");
-	//static JGPath::Path path("../../Contents");
+	//static JGPath::Path path("../../../../../../../Contents");
+	static JGPath::Path path("../../Contents");
 }
 
 

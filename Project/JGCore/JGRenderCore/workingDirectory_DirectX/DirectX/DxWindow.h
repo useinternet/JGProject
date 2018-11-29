@@ -1,6 +1,5 @@
 #pragma once
 #include"JGRCObject.h"
-#include"SceneRenderSystem/SRSLightPass.h"
 namespace JGRC
 {
 	class CORE_EXPORT DxWindow : public JGRCObject
@@ -13,12 +12,11 @@ namespace JGRC
 		std::unique_ptr<class JGSwapChain>    m_SwapChain;
 		std::unique_ptr<class JGRenderTarget> m_RenderTarget;
 		std::unique_ptr<class JGViewport>     m_Viewport;
-
-		std::unique_ptr<SRSLightPass>      m_LightPass;
-		std::unique_ptr<class SRSRenderTarget>   m_srsRenderTarget;
+		std::unique_ptr<class Camera>         m_WindowCamera;
+		std::unique_ptr<class LightPass>      m_LightPass;
+		std::unique_ptr<class SRSRenderTarget> m_SRSRT;
 	private:
 		std::vector<DrawEvent> m_RenderPassEvent;
-		std::vector<DrawEvent> m_LightPassEvent;
 		jgVec4 m_BackColor;
 	public:
 		DxWindow();
@@ -27,14 +25,12 @@ namespace JGRC
 		void Draw();
 	public:
 		void AddRenderPassEvent(const DrawEvent& evt)  { m_RenderPassEvent.push_back(evt); }
-		void AddLightPassEvent(const DrawEvent& evt)   { m_LightPassEvent.push_back(evt); }
-		SRSLightPass* LightPass() { return m_LightPass.get(); }
 	public:
 		HWND GetHandle() { return m_hWnd; }
+		Camera* GetWindowCamera();
 		jgMatrix4x4& GetProjectionMatrix();
 		jgMatrix4x4& GetOrhthoMatrix();
 		std::vector<DrawEvent>* GetSubEvent()  { return &m_RenderPassEvent; }
-		std::vector<DrawEvent>* GetMainEvent() { return &m_LightPassEvent; }
 	};
 }
 

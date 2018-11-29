@@ -2,7 +2,6 @@
 #include"ED_JGRCCommand.h"
 #include"JGRenderCore.h"
 #include"JGLogicCore.h"
-
 #include<JGCommon/JGCommon.h>
 using namespace JGRC;
 using namespace JGLC;
@@ -14,7 +13,6 @@ bool JGMainCore::InitCore(HWND hWnd)
 	JGLOGINIT("EngineCoreLog.log");
 	m_JGRC = new JGRenderCore;
 	m_JGRC->Init();
-
 	return true;
 }
 void JGMainCore::Run()
@@ -52,10 +50,10 @@ void JGMainCore::ReceiveCommand(const unsigned int Command, void* Data, unsigned
 	// ½ÇÇè
 	DxWinConfig* config = (DxWinConfig*)Data;
 	hWnd = config->hWnd;
+
 	// 
 	EditCommand ec = { Command,Data,size };
 	ED_JGRCCommand rcCm(&ec, m_JGRC);
-	JGLOG(log_Info, "gdgd", "test");
 
 	m_JGLC = new JGLogicCore;
 	m_JGLC->TestInit(m_JGRC, config->hWnd);
