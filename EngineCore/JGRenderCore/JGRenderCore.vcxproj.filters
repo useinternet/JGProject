@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="DxCommon">
+      <UniqueIdentifier>{d42c7cdf-9c07-450e-aa08-e8430f03ba69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DxCore">
+      <UniqueIdentifier>{b372c73f-3b9e-4749-9705-c82654ff9773}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{534a98e4-57a1-4437-9976-424278f0aac9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostProcessing">
+      <UniqueIdentifier>{8a58b580-8753-4f58-bf2a-146e31438d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManager">
+      <UniqueIdentifier>{b0258a85-343d-48a3-861a-b67e8870e8bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{8a30195a-724a-4eb9-8b20-9711a90df3ba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\dllmain.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\Camera.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\d3dUtil.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\DDSTextureLoader.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\GameTimer.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\GeometryGenerator.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\MathHelper.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCore\DxCore.cpp">
+      <Filter>DxCore</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCore\JGRenderCore.cpp">
+      <Filter>DxCore</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcessing\BlurFilter.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MemoryManager\ResourceManager.cpp">
+      <Filter>MemoryManager</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\PickingSystem.cpp">
+      <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcessing\CubeMap.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\JGMesh.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\JGMaterial.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\EngineFrameResource.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\JGRCObject.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Scene.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Shader\Shader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcessing\ShadowMap.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\JGLight.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\LightManager.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcessing\SSAO.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\CommonData.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\DxCommon\Camera.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\d3dUtil.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\d3dx12.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\DDSTextureLoader.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\GameTimer.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\GeometryGenerator.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\MathHelper.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\UploadBuffer.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\DxCommon.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\DxSetting.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\DxCore.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\JGRenderCore.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\RenderItem.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PostProcessing\BlurFilter.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="source\MemoryManager\ResourceManager.h">
+      <Filter>MemoryManager</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\PickingSystem.h">
+      <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PostProcessing\CubeMap.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\JGMesh.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\JGMaterial.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\EngineFrameResource.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Scene.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\JGRCObject.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\ShaderRootSignature.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\CommonShaderRootSignature.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\BlurShaderRootSignature.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PostProcessing\ShadowMap.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\JGLight.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\LightManager.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PostProcessing\SSAO.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\SSAOShaderRootSignature.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\CommonData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
