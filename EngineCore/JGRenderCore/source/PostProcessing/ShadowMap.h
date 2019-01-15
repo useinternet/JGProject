@@ -2,11 +2,11 @@
 #include"DxCommon/DxCommon.h"
 namespace JGRC
 {
+	enum class ELightExercise;
 	enum class EShadowMapType
 	{
-		Direction,
-		Point,
-		Spot
+		Texture,
+		Cube
 	};
 	class RCORE_EXPORT ShadowMap
 	{
@@ -37,14 +37,13 @@ namespace JGRC
 		ShadowMap(UINT width, UINT height);
 		void UpdateShadowPass(FrameResource* CurrentFrameResource, class JGLight* light);
 		void BuildShadowMap(const std::string& name, EShadowMapType type);
-		void Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
+		void Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, ELightExercise LightExcType);
 		static UINT GetWidth() { return m_Width; }
 		static UINT GetHeight() { return m_Height; }
 		UINT GetSrvIndex() const;
 	private:
 		void BuildResource();
 		void BuildDescriptor(const std::string& name);
-		void Default_Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
 	};
 
 }

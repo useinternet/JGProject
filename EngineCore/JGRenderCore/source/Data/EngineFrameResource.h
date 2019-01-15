@@ -31,15 +31,18 @@ namespace JGRC
 		UINT SSAOTexutreIndex = 0;
 		DirectX::XMFLOAT2 RenderTargetSize = { 0.0f,0.0f };
 		DirectX::XMFLOAT2 InvRenderTargetSize = { 0.0f,0.0f };
-		float NearZ = 0.0f;
-		float FarZ = 0.0f;
 		float TotalTime = 0.0f;
 		float DeltaTime = 0.0f;
-		DirectX::XMFLOAT4 AmbientLight = { 0.0f,0.0f,0.0f,1.0f };
 		UINT SkyBoxIndex      = 0;
 		UINT DirLightCount   = 0;
 		UINT PointLightCount = 0;
 		UINT SpotLightCount  = 0;
+		UINT NormalSceneIndex;
+		UINT AlbedoSceneIndex;
+		UINT WorldPosSceneIndex;
+		UINT DepthSceneIndex;
+		UINT MatSceneIndex;
+		UINT Pad;
 	}cbPassConstant;
 	typedef struct PassData
 	{

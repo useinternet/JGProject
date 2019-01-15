@@ -12,6 +12,7 @@ namespace JGRC
 	enum class EPSOMode
 	{
 		DEFAULT,
+		SCENE,
 		SKYBOX,
 		SHADOW,
 		SSAO,

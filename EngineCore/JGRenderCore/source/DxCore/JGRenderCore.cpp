@@ -35,14 +35,28 @@ bool JGRenderCore::Init(const DxSetting& set)
 	ThrowIfFailed(m_DxCore->CommandList()->Close());
 	ID3D12CommandList* cmdsList[] = { m_DxCore->CommandList() };
 	m_DxCore->CommandQueue()->ExecuteCommandLists(_countof(cmdsList), cmdsList);
+
+
+	for (int i = 0; i < 3; ++i)
+	{
+		m_Scene->Update(GameTimer());
+		m_Scene->Draw();
+	}
+
+
 	return true;
 }
 void JGRenderCore::Update(const GameTimer& gt)
 {
 	Test->OffsetRotation(0.0f, gt.DeltaTime() * 5.0f, 0.0f);
 	InputCamera(gt);
-	DirLight->SetRotation(0.0f, gt.TotalTime() * 5, 0.0f);
+	for (int i = 0; i < 10; ++i)
+	{
+		Obj[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
+		Objarr[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
+	}
 
+	DirLight->SetRotation(0.0f, gt.TotalTime() * 5, 0.0f);
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -75,11 +89,6 @@ void JGRenderCore::Update(const GameTimer& gt)
 	for (int i = 0; i < 4; ++i)
 	{
 		SpotLight[i]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
-	}
-	for (int i = 0; i < 10; ++i)
-	{
-		Obj[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
-		Objarr[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
 	}
 	m_Scene->Update(gt);
 }
@@ -149,13 +158,13 @@ void JGRenderCore::BuildLight()
 	for (int i = 0; i < 4; ++i)
 	{
 		PointSwitch[i] = false;
-		PointLight[i] = m_Scene->AddLight(ELightType::Point);
+		PointLight[i] = m_Scene->AddLight(ELightType::Point,ELightExercise::Dynamic);
 		PointLight[i]->SetFalloffStart(0.0f);
 		PointLight[i]->SetFalloffEnd(50.0f);
-		SpotLight[i] = m_Scene->AddLight(ELightType::Spot);
+		SpotLight[i] = m_Scene->AddLight(ELightType::Spot, ELightExercise::Dynamic);
 		SpotLight[i]->SetFalloffStart(0.0f);
 		SpotLight[i]->SetFalloffEnd(75.0f);
-	
+
 		SpotLight[i]->SetDirection(1.0f, 0.0f, 0.0f);
 		switch (i)
 		{
@@ -174,14 +183,14 @@ void JGRenderCore::BuildLight()
 		case 2:
 			PointLight[i]->SetLightColor(2.0f, 2.0f, 0.0f);
 			PointLight[i]->SetLocation(-150.0f, 5.0f, 0.0f);
-			SpotLight[i]->SetLightColor(2.0f, 0.0f, 0.0f);
+			SpotLight[i]->SetLightColor(2.0f, 2.0f, 2.0f);
 			SpotLight[i]->SetLocation(-100.0f, 5.0f, 0.0f);
 			break;
 		case 3:
 			PointLight[i]->SetLightColor(0.0f, 2.0f, 2.0f);
 			PointLight[i]->SetLocation(0.0f, 5.0f, -150.0f);
 			SpotLight[i]->SetLightColor(2.0f, 0.0f, 2.0f);
-			SpotLight[i]->SetLocation( 0.0f, 5.0f, -100.0f);
+			SpotLight[i]->SetLocation(0.0f, 5.0f, -100.0f);
 			break;
 		}
 	}
@@ -226,6 +235,7 @@ void JGRenderCore::BuildLandGeometry()
 
 	Desc.Name = "SphereMat";
 	Desc.bCubMapDynamic = false;
+	Desc.bReflectionOnlyBackground = false;
 	Desc.bRefraction = false;
 	Desc.bReflection = true;
 	JGMaterial* SphereMat = m_Scene->AddMaterial(Desc);
@@ -238,38 +248,23 @@ void JGRenderCore::BuildLandGeometry()
 
 
 
-	Desc.Name = "WaterMat";
-	Desc.bCubMapDynamic = false;
-	Desc.bRefraction = true;
-	Desc.bReflection = true;
-	Desc.ShaderPath = L"../Contents/Engine/Shaders/Water.hlsl";
-	JGMaterial* WaterMat = m_Scene->AddMaterial(Desc);
-	WaterMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/water1.dds");
-	WaterMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/waves0.dds");
-	WaterMat->SetTexture(ETextureSlot::Custom0, L"../Contents/Engine/Textures/waves1.dds");
-	WaterMat->SetDiffuseAlbedo(0.2f, 0.13f, 0.5f, 1.0f);
-	WaterMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	WaterMat->SetRoughness(0.0f);
-
-
-	// 하늘 박스 머터리얼
-	Desc.Name = "SkyMat";
-	Desc.bReflection = false;
-	Desc.ShaderPath = L"../Contents/Engine/Shaders/Sky.hlsl";
-	Desc.Mode = EPSOMode::SKYBOX;
-
-	JGMaterial* SkyMat = m_Scene->AddMaterial(Desc);
-	SkyMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	SkyMat->SetFresnelR0(0.1f, 0.1f, 0.1f);
-	SkyMat->SetRoughness(0.0f);
-
-
-
+	//Desc.Name = "WaterMat";
+	//Desc.bCubMapDynamic = false;
+	//Desc.bRefraction = true;
+	//Desc.bReflection = true;
+	//Desc.ShaderPath = L"../Contents/Engine/Shaders/Water.hlsl";
+	//JGMaterial* WaterMat = m_Scene->AddMaterial(Desc);
+	//WaterMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/water1.dds");
+	//WaterMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/waves0.dds");
+	//WaterMat->SetTexture(ETextureSlot::Custom0, L"../Contents/Engine/Textures/waves1.dds");
+	//WaterMat->SetDiffuseAlbedo(0.2f, 0.13f, 0.5f, 1.0f);
+	//WaterMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
+	//WaterMat->SetRoughness(0.0f);
 
 	JGRCObject* Obj1 = m_Scene->CreateObject();
 	Obj1->SetLocation(0.0f, -1.0f, 0.0f);
 	Obj1->SetMesh(GroundMesh, "Grid");
-	Obj1->SetMaterial(WaterMat);
+	Obj1->SetMaterial(GroundMat);
 
 	JGRCObject* Obj11 = m_Scene->CreateObject();
 	Obj11->SetLocation(0.0f, -1.0f, 100.0f);
@@ -308,14 +303,14 @@ void JGRenderCore::BuildLandGeometry()
 
 	for (int i = 0; i < 10; ++i)
 	{
-		Obj[i] = m_Scene->CreateObject();
+		Obj[i] = m_Scene->CreateObject(EObjType::Dynamic);
 		Obj[i]->SetLocation(i * 30 + -150.0f, 0.0f, 0.0f);
 		Obj[i]->SetMesh(GroundMesh, "Box");
 		Obj[i]->SetMaterial(BoxMat);
 	}
 	for (int i = 0; i < 10; ++i)
 	{
-		Objarr[i] = m_Scene->CreateObject();
+		Objarr[i] = m_Scene->CreateObject(EObjType::Dynamic);
 		Objarr[i]->SetLocation(0.0f , 0.0f, i * 30 + -150.0f);
 		Objarr[i]->SetMesh(GroundMesh, "Box");
 		Objarr[i]->SetMaterial(BoxMat);
@@ -332,11 +327,12 @@ void JGRenderCore::BuildLandGeometry()
 	Obj6->SetMesh(GroundMesh, "Box");
 	Obj6->SetMaterial(BoxMat);
 
-	JGRCObject* Obj7 = m_Scene->CreateObject();
-	Obj7->SetScale(5000.0f);
-	Obj7->SetMesh(SkyMesh, "Sky");
-	Obj7->SetMaterial(SkyMat);
-
+	//JGRCObject* Obj7 = m_Scene->CreateObject();
+	//Obj7->SetScale(5000.0f);
+	//Obj7->SetMesh(SkyMesh, "Sky");
+	//Obj7->SetMaterial(SkyMat);
+	JGRCObject* SkyBox = m_Scene->CreateSkyBox(L"../Contents/Engine/Textures/sunsetcube1024.dds");
+	m_Scene->SetMainSkyBox(SkyBox);
 }
 void JGRenderCore::DrawRenderItems()
 {

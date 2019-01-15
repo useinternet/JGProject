@@ -19,17 +19,16 @@ namespace JGRC
 		std::vector<std::unique_ptr<JGLight>> m_PointLights;
 		std::vector<std::unique_ptr<JGLight>> m_SpotLights;
 		// 그림자 셰이더
-		std::unique_ptr<class Shader> m_ShadowShader;
+		std::shared_ptr<class Shader> m_ShadowShader;
 		ID3D12PipelineState* m_ShadowPSO;
 	public:
 		LightManager()  = default;
 		~LightManager() = default;
-		void BuildLight();
-		void BuildShadowShader(class CommonShaderRootSignature* CommonSig);
+		void BuildLight(class CommonShaderRootSignature* CommonSig);
 		void Update(FrameResource* CurrFrameResource);
 		void DrawShadowMap(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource);
 
-		JGLight* AddLight(ELightType type);
+		JGLight* AddLight(ELightType type, ELightExercise ExType);
 		JGLight* DeleteLight(JGLight* light);
 		UINT Size() const;
 	};

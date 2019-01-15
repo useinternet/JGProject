@@ -23,7 +23,12 @@ void JGMaterial::Update(class FrameResource* CurrentFrameResource)
 		{
 			auto Data = m_TextureDataQue.front();
 			m_TextureDataQue.pop();
-			UINT idx = CommonData::_ResourceManager()->GetTextureIndex(Data.second);
+			UINT idx;
+			TexturePack* t = CommonData::_ResourceManager()->GetTexturePack(Data.second);
+			if(t->Type == ETextureType::Default)
+				idx = CommonData::_ResourceManager()->GetTextureIndex(Data.second);
+			else
+				idx = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(Data.second);
 			if (idx < 0)
 				continue;
 			m_Data->TextureIndex[(int)Data.first] = idx;
@@ -38,6 +43,7 @@ void JGMaterial::Update(class FrameResource* CurrentFrameResource)
 }
 void JGMaterial::SetTexture(ETextureSlot slot,const std::wstring& TexturePath)
 {
+	m_TexturePaths[slot] = TexturePath;
 	m_TextureDataQue.push(pair<ETextureSlot, wstring>(slot, TexturePath));
 	ClearNotify();
 }
@@ -85,11 +91,9 @@ vector<ShaderMacroPack> JGMaterial::CreateMacroPack()
 
 	return move(v);
 }
-void JGMaterialCreater::BuildMaterial()
+void JGMaterialCreater::BuildMaterial(CommonShaderRootSignature* CommonRootSig)
 {
-	m_RootSignature = make_unique<CommonShaderRootSignature>();
 	// 셰이더 컴파일 및 머터리얼 PSO 등록
-	m_RootSignature->RootSign(CommonData::_Device());
 	for (auto& mat : m_Materials)
 	{
 		MaterialDesc* desc = mat.second->GetDesc();
@@ -97,7 +101,7 @@ void JGMaterialCreater::BuildMaterial()
 
 		mat.second->SetPSO(m_Shaders[desc->ShaderPath]->CompileAndConstrutPSO(
 			desc->Mode,
-			m_RootSignature.get(),
+			CommonRootSig,
 			macro));
 	}
 }
@@ -127,8 +131,4 @@ JGMaterial* JGMaterialCreater::GetMaterial(const string& name)
 	if (m_Materials.end() == m_Materials.find(name))
 		return nullptr;
 	return m_Materials[name].get();
-}
-ID3D12RootSignature* JGMaterialCreater::GetRootSignature()
-{
-	return m_RootSignature->GetRootSignature();
 }

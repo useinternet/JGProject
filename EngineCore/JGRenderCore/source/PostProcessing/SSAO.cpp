@@ -13,7 +13,7 @@ SSAO::SSAO()
 {
 
 }
-void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList)
+void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig)
 {
 	m_Width = width;
 	m_Height = height;
@@ -25,18 +25,15 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 	m_SSAOScissorRect = { 0,0,(int)m_Width / 2, (int)m_Height / 2 };
 	BuildResource(CommandList);
 	BuildDescriptor();
-}
-void SSAO::BuildSSAOShader(CommonShaderRootSignature* RootSig)
-{
+
+
+
 	m_NormalMapShader = make_unique<Shader>();
 	m_NormalMapShader->Init(L"../Contents/Engine/Shaders/DrawNormals.hlsl",
 		{ EShaderType::Vertex, EShaderType::Pixel });
 
-	ShaderMacroPack Pack;
-	Pack.Macro = SHADER_MACRO_DEFINE_TEXTURE_MAX;
-	Pack.Value = to_string(CommonData::_ResourceManager()->GetTextureCount());
 	m_NormalMapPSO = m_NormalMapShader->CompileAndConstrutPSO(EPSOMode::SSAO_NORMALMAP,
-		RootSig, { Pack });
+		RootSig, {  });
 
 	m_SSAORootSig = make_unique<SSAOShaderRootSignature>();
 	m_SSAORootSig->RootSign(CommonData::_Device());
@@ -49,9 +46,10 @@ void SSAO::BuildSSAOShader(CommonShaderRootSignature* RootSig)
 	m_SSAOBlurShader = make_unique<Shader>();
 	m_SSAOBlurShader->Init(L"../Contents/Engine/Shaders/SsaoBlur.hlsl",
 		{ EShaderType::Vertex, EShaderType::Pixel });
-	m_SSAOBlurPSO = m_SSAOBlurShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {} );
+	m_SSAOBlurPSO = m_SSAOBlurShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {});
 }
-void SSAO::OnReSize(UINT width, UINT height, bool Init)
+
+void SSAO::OnReSize(UINT width, UINT height)
 {
 	if (m_Width != width || m_Height != height)
 	{
@@ -309,10 +307,15 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 
 
 	CommandList->SetPipelineState(m_NormalMapPSO);
-	for (auto& obj : CommonData::_Scene()->GetArray(EPSOMode::DEFAULT))
+	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
 	{
 		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
 	}
+	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
+	{
+		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
+	}
+
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_NormalMap,
 		D3D12_RESOURCE_STATE_GENERIC_READ);
 }

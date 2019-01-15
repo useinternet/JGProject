@@ -5,6 +5,7 @@
 #include"Shader/Shader.h"
 #include"Data/Scene.h"
 #include"Data/CommonData.h"
+#include"Data/SceneData.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -21,6 +22,8 @@ void CubeMap::BuildCubeMap(const string& objName, ID3D12GraphicsCommandList* Com
 	m_ObjName = objName;
 	m_ViewPort = { 0.0f,0.0f,(float)m_Width, (float)m_Height,0.0f,1.0f };
 	m_ScissorRect = { 0,0,(int)m_Width, (int)m_Height };
+	m_CubeScene = make_unique<SceneData>();
+	m_CubeScene->BuildSceneData(m_Width, m_Height);
 	BuildResource(CommandList);
 	BuildDescriptors();
 	// 패쓰 데이터 가져오기
@@ -52,8 +55,17 @@ void CubeMap::Update(const GameTimer& gt,FrameResource* CurrentResource)
 		m_CubeMapPass[i]->Data.EyePosW = m_CubeCamera[i].GetPosition3f();
 		m_CubeMapPass[i]->Data.RenderTargetSize = XMFLOAT2((float)m_Width, (float)m_Height);
 		m_CubeMapPass[i]->Data.InvRenderTargetSize = XMFLOAT2(1.0f / m_Width, 1.0f / m_Height);
-		auto currPassCB = CurrentResource->PassCB.get();
 
+		m_CubeMapPass[i]->Data.WorldPosSceneIndex = m_CubeScene->GetWorldPosIndex();
+		m_CubeMapPass[i]->Data.AlbedoSceneIndex = m_CubeScene->GetAlbedoIndex();
+		m_CubeMapPass[i]->Data.NormalSceneIndex = m_CubeScene->GetNormalIndex();
+		m_CubeMapPass[i]->Data.DepthSceneIndex = m_CubeScene->GetDepthIndex();
+		m_CubeMapPass[i]->Data.MatSceneIndex = m_CubeScene->GetMatIndex();
+		if (CommonData::_Scene()->GetMainSkyBox())
+			m_CubeMapPass[i]->Data.SkyBoxIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
+				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
+
+		auto currPassCB = CurrentResource->PassCB.get();
 		currPassCB->CopyData(m_CubeMapPass[i]->PassCBIndex, m_CubeMapPass[i]->Data);
 	}
 }
@@ -65,21 +77,28 @@ void CubeMap::Excute(FrameResource* CurrentResource,ID3D12GraphicsCommandList* C
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
 	for (int i = 0; i < 6; ++i)
 	{
-		CommandList->ClearRenderTargetView(RtvPack[i]->Handle, Colors::LightSteelBlue, 0, nullptr);
-		CommandList->ClearDepthStencilView(DsvPack->Handle,
-			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0F, 0, 0, nullptr);
 
-		CommandList->OMSetRenderTargets(1, &RtvPack[i]->Handle, true, &DsvPack->Handle);
 
 
 		auto passCB = CurrentResource->PassCB->Resource();
 		D3D12_GPU_VIRTUAL_ADDRESS passCBAddress = passCB->GetGPUVirtualAddress() + m_CubeMapPass[i]->PassCBIndex * passCBByteSize;
 
 		CommandList->SetGraphicsRootConstantBufferView((int)ECommonShaderSlot::cbPerPass, passCBAddress);
-		for (auto& obj : CommonData::_Scene()->GetArray())
-		{
-			obj->Draw(CurrentResource, CommandList, EObjRenderMode::CubeMap);
-		}
+
+
+		m_CubeScene->SceneDataExtract(CurrentResource, CommandList);
+
+		CommandList->ClearRenderTargetView(RtvPack[i]->Handle, Colors::LightSteelBlue, 0, nullptr);
+		CommandList->ClearDepthStencilView(DsvPack->Handle,
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0F, 0, 0, nullptr);
+
+		CommandList->OMSetRenderTargets(1, &RtvPack[i]->Handle, true, &DsvPack->Handle);
+
+		CommandList->SetPipelineState(CommonData::_Scene()->GetScenePSO());
+		CommandList->IASetVertexBuffers(0, 0, nullptr);
+		CommandList->IASetIndexBuffer(nullptr);
+		CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		CommandList->DrawInstanced(6, 1, 0, 0);
 	}
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_CubeMap, D3D12_RESOURCE_STATE_GENERIC_READ);
 }

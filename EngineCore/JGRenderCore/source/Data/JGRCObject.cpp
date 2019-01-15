@@ -11,10 +11,11 @@ using namespace std;
 using namespace DirectX;
 UINT64 JGRCObject::Count = 0;
 
-JGRCObject::JGRCObject(UINT Index, const JGRCObjDesc& Desc)
+JGRCObject::JGRCObject(UINT Index, EObjType Type, const JGRCObjDesc& Desc)
 {
 	m_Name = "JGRCObject" + to_string(Index);
 	Count++;
+	this->Type = Type;
 	m_ObjCBIndex = Index;
 	m_Location = Desc.Location;
 	m_Rotation = Desc.Rotation;
@@ -28,8 +29,9 @@ JGRCObject::JGRCObject(UINT Index, const JGRCObjDesc& Desc)
 }
 void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
 {
+	m_bInit = true;
 	MaterialDesc* Desc = m_Material->GetDesc();
-	if(Desc->bCubMapDynamic)
+	if(!Desc->bReflectionOnlyBackground && (Desc->bReflection || Desc->bRefraction))
 	{
 		m_CubeMap = make_unique<CubeMap>();
 		m_CubeMap->BuildCubeMap(m_Name, CommandList);
@@ -54,7 +56,9 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 			objConstants.CubeMapIndex = m_CubeMap->GetCubeMapIndex();
 		}
 		else
-			objConstants.CubeMapIndex = CommonData::_Scene()->GetSkyBoxShaderIndex();
+			objConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
+				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
+		
 		
 		UpdateWorldMatrix();
 		XMMATRIX World = XMLoadFloat4x4(&m_World);
@@ -73,6 +77,8 @@ void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12Graphics
 	if (!m_bVisible)
 		return;
 	MaterialDesc* Desc = m_Material->GetDesc();
+	if (m_CubeMap && !Desc->bCubMapDynamic && !IsCanUpdate())
+		return;
 	if (m_CubeMap)
 	{
 		m_CubeMap->Excute(CurrentFrameResource, CommandList);
@@ -129,42 +135,58 @@ void JGRCObject::SetMaterial(JGMaterial* material)
 }
 void JGRCObject::SetLocation(float x, float y, float z)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Location = { x,y,z };
 	ClearNotify();
 }
 void JGRCObject::SetRotation(float pitch, float yaw, float roll)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Rotation = { pitch, yaw, roll };
 	ClearNotify();
 }
 void JGRCObject::SetScale(float x, float y, float z)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Scale = { x,y,z };
 	ClearNotify();
 }
 void JGRCObject::SetScale(float x)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Scale = { x,x,x };
 	ClearNotify();
 }
 
 void JGRCObject::OffsetLocation(float x, float y, float z)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Location = { m_Location.x + x, m_Location.y + y, m_Location.z + z };
 	ClearNotify();
 }
 void JGRCObject::OffsetRotation(float pitch, float yaw, float roll)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Rotation = { m_Rotation.x + pitch, m_Rotation.y + yaw, m_Rotation.z + roll };
 	ClearNotify();
 }
 void JGRCObject::OffsetScale(float x, float y, float z)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Scale = { m_Scale.x + x, m_Scale.y + y, m_Scale.z + z };
 	ClearNotify();
 }
 void JGRCObject::OffsetScale(float x)
 {
+	if (m_bInit && Type == EObjType::Static)
+		return;
 	m_Scale = { m_Scale.x + x, m_Scale.y + x, m_Scale.z + x };
 	ClearNotify();
 }

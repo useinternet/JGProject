@@ -1,5 +1,6 @@
 #include"Scene.h"
 #include"DxCore/DxCore.h"
+#include"SceneData.h"
 #include"PostProcessing/CubeMap.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
@@ -13,17 +14,40 @@ using namespace DirectX;
 
 Scene::Scene(class DxCore* core)
 {
+	// DX장치 및 환경 설정 불러오기
 	m_DxCore = core;
 	m_SceneConfig = core->GetSettingDesc();
 
+	// 리소스 매니저 초기화
 	m_ResourceManager = make_unique<ResourceManager>();
 	m_ResourceManager->Init(m_DxCore);
 
+
+
+	// 각 씬 데이터 정적 멤버 초기화
 	InitStaticMemberVar();
+
+
+
+	// 프레임 리소스및 머터리얼 생성기 초기화
 	m_FrameResourceManager = make_unique<EngineFrameResourceManager>();
 	m_MaterialCreater = make_unique<JGMaterialCreater>();
+
+
+
+	// 씬데이터 초기화 및 루트서명 / 씬 셰이더, pso 데이터 
+	m_SceneData = make_unique<SceneData>();
+	m_CommonShaderRootSig = make_unique<CommonShaderRootSignature>();
+	m_CommonShaderRootSig->RootSign(m_DxCore->Device());
+	m_SceneShader = make_unique<Shader>();
+	m_SceneShader->Init(L"../Contents/Engine/Shaders/Scene.hlsl",
+		{ EShaderType::Vertex, EShaderType::Pixel });
+	m_ScenePSO = m_SceneShader->CompileAndConstrutPSO(EPSOMode::SCENE, m_CommonShaderRootSig.get(), {});
+
+
+
 	m_LightManager = make_unique<LightManager>();
-	
+
 
 	// 메인 패쓰 추가
 	m_MainPass = AddPassData();
@@ -36,74 +60,55 @@ Scene::Scene(class DxCore* core)
 	m_MainCamera = MainCam.get();
 	m_Cameras.push_back(move(MainCam));
 
+
+
+
+
+
 	// 장면 구 설정( 나중에 크기 조절 가능하게 ) 나중에 모든 오브젝트를 훑어서 자동 으로 늘렷다 줄엿다.
 	m_SceneSphere.Center = { 0.0f,0.0f, 0.0f };
 	m_SceneSphere.Radius = sqrt(200.0f * 200.0f + 200.0f * 200.0f);
 }
 void Scene::BuildScene()
 {
-	CreateDebugObj();
+	// 씬 데이터 빌드
+	m_SceneData->BuildSceneData(m_SceneConfig.Width, m_SceneConfig.Height);
+	m_LightManager->BuildLight(m_CommonShaderRootSig.get());
+	// ssao 빌드
 	m_SSAO = make_unique<SSAO>();
-	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height, m_DxCore->CommandList());
+	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height,
+		m_DxCore->CommandList(), m_CommonShaderRootSig.get());
 
 
-	// 임ㅅㅣ 그림자 PSO 만들기..
-	m_LightManager->BuildLight();
+
+	CreateDebugObj();
 
 	// 오브젝트 분리
 	for (auto& obj : m_ObjectMems)
 	{
 		obj->Build(m_DxCore->CommandList());
 		EPSOMode Mode = obj->GetMaterial()->GetDesc()->Mode;
-		if (Mode == EPSOMode::SKYBOX)
-		{
-			if (m_MainSkyBox)
-				continue;
-			else
-				m_MainSkyBox = obj.get();
-		}
-		m_Objects[Mode].push_back(obj.get());
+		EObjType Type = obj->GetType();
+
+		m_ObjectArray[Type][Mode].push_back(obj.get());
 	}
 	// 메시 생성
 	for (auto& mesh : m_MeshMems)
 		mesh->CreateMesh(m_DxCore->Device(), m_DxCore->CommandList());
 
 
-	std::vector<wstring> CubeTex;
 	// 텍스쳐 추가
 	for (auto& data : m_TextureDatas)
 	{
-		if (data.Type == ETextureType::Cube)
-		{
-			CubeTex.push_back(data.Path);
-			m_TextureName = data.Path;
-		}
-			
 		m_ResourceManager->AddTexture(m_DxCore->CommandList(), data.Path, data.Type);
 	}
 	// 각종 포스트 프로세싱 빌드
 	m_ResourceManager->BuildResourceHeap();
-	m_MaterialCreater->BuildMaterial();
+	m_MaterialCreater->BuildMaterial(m_CommonShaderRootSig.get());
 
-	m_LightManager->BuildShadowShader(m_MaterialCreater->GetCommonShaderRSClass());
-
-
-
-	// 뷰 노멀 맵 셰이더 생성
-	m_SSAO->BuildSSAOShader(m_MaterialCreater->GetCommonShaderRSClass());
+	
 
 
-
-	// 스카이 박스 텍스쳐 핸들 얻어 오기
-	for (auto& sky : CubeTex)
-	{
-		UINT Index = m_ResourceManager->GetTextureIndex(sky);
-		m_SkyCubeTextureHandles.push_back(m_ResourceManager->GetGPUSrvUavHandle(Index));
-	}
-	if (!CubeTex.empty())
-	{
-		m_MainSkyBoxHandle = &m_SkyCubeTextureHandles[0];
-	}
 	m_FrameResourceManager->BuildFrameResource(m_DxCore->Device(), 
 		(UINT)max(1, m_PassDatas.size()), (UINT)max(1, m_ObjectMems.size() + 1),
 		(UINT)max(1, m_MaterialCreater->Size()),
@@ -111,6 +116,7 @@ void Scene::BuildScene()
 }
 void Scene::OnReSize(UINT width, UINT height)
 {
+	m_SceneData->ReSize(width, height);
 	m_SSAO->OnReSize(width, height);
 }
 void Scene::Update(const GameTimer& gt)
@@ -122,21 +128,22 @@ void Scene::Update(const GameTimer& gt)
 	m_MainCamera->UpdateViewMatrix();
 	m_FrameResourceManager->FrameResourcePerFrame(m_DxCore->Fence());
 	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
+	m_SSAO->Update(CurrFrameResource);
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
 		obj->Update(gt, CurrFrameResource);
 	m_DebugObj->Update(gt, CurrFrameResource);
+
+
 	// 머터리얼 업데이트
 	for (auto& mat : m_MaterialCreater->GetArray())
 		mat.second->Update(CurrFrameResource);
 
-	// 임시 그림자 업데이트
+	// 라이트 매니저 
 	m_LightManager->Update(CurrFrameResource);
-
 
 	// 메인 패스 업데이트
 	MainPassUpdate(gt);
-	m_SSAO->Update(CurrFrameResource);
 }
 void Scene::Draw()
 {
@@ -152,74 +159,115 @@ void Scene::Draw()
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_ResourceManager->SrvHeap() };
 	CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	CommandList->SetGraphicsRootSignature(m_MaterialCreater->GetRootSignature());
+
+
+	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
 		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
-
+	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
+		m_ResourceManager->GetGPUCubeMapHandle());
 	auto MatCB = CurrFrameResource->MaterialCB->Resource();
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbMaterialData,
 		MatCB->GetGPUVirtualAddress());
-
 	auto LightCB = CurrFrameResource->LightCB->Resource();
+	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
+		LightCB->GetGPUVirtualAddress());
+	m_SSAO->Draw(CurrFrameResource, CommandList);
+
+
+
+
+
+
+
+
+
+
+
+
+	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
+	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
+		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
+	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
+		m_ResourceManager->GetGPUCubeMapHandle());
+	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbMaterialData,
+		MatCB->GetGPUVirtualAddress());
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
 		LightCB->GetGPUVirtualAddress());
 
 
-	// 패쓰 등
 	m_LightManager->DrawShadowMap(CommandList, CurrFrameResource);
-
-
-	// 노멀 맵 그리기
-	m_SSAO->Draw(CurrFrameResource, CommandList);
 	
-	CommandList->SetGraphicsRootSignature(m_MaterialCreater->GetRootSignature());
-	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
-		m_ResourceManager->GetGPUTexture2DHandle());
 
 
+	for (auto& objarr : m_ObjectArray)
+	{
+		for (auto& obj : objarr.second[EPSOMode::DEFAULT])
+		{
+			obj->CubeMapDraw(CurrFrameResource, CommandList);
+		}
+	}
 
-	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbMaterialData,
-		MatCB->GetGPUVirtualAddress());
 
-	// 큐브맵 등록
-	CommandList->SetGraphicsRootDescriptorTable(
-		(int)ECommonShaderSlot::srvCubeMap, m_ResourceManager->GetGPUCubeMapHandle());
-
-
-	// 큐브맵 그리기
-	for (auto& obj : m_ObjectMems)
-		obj->CubeMapDraw(CurrFrameResource, CommandList);
-
-	// SwapChain에 그리기 시작
-	m_DxCore->StartDraw();
 
 	// 메인 패쓰 등록
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
 		MainPassHandle());
+	m_SceneData->SceneDataExtract(CurrFrameResource, CommandList);
 
-	// 기본 오브젝트 그리기
-	for (auto& obj : m_Objects[EPSOMode::DEFAULT])
-	{
-		obj->Draw(CurrFrameResource, m_DxCore->CommandList());
-	}
-	//m_DebugObj->Draw(CurrFrameResource, m_DxCore->CommandList());
 
-	for (auto& obj : m_Objects[EPSOMode::SKYBOX])
-	{
-		obj->Draw(CurrFrameResource, m_DxCore->CommandList());
-	}
+	// SwapChain에 그리기 시작
+	m_DxCore->StartDraw();
+
+	CommandList->SetPipelineState(m_ScenePSO);
+	CommandList->IASetVertexBuffers(0, 0, nullptr);
+	CommandList->IASetIndexBuffer(nullptr);
+	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	CommandList->DrawInstanced(6, 1, 0, 0);
 
 	// 마무리
 	m_DxCore->EndDraw();
+
 	CurrFrameResource->Fence = m_DxCore->CurrentFence();
 }
-JGRCObject* Scene::CreateObject()
+JGRCObject* Scene::CreateObject(EObjType Type)
 {
-	auto Obj = make_unique<JGRCObject>(++m_ObjIndex);
+	auto Obj = make_unique<JGRCObject>(++m_ObjIndex, Type);
 	JGRCObject* result = Obj.get();
 
 	m_ObjectMems.push_back(move(Obj));
 	return result;
+}
+JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
+{
+	bool result = false;
+	//스카이 박스 머터리얼 및 메쉬 미리 생성
+	for (auto& path : m_TextureDatas)
+		if (texturepath == path.Path)
+		{
+			result = true;
+			break;
+		}
+	if (!result)
+		return nullptr;
+
+
+	// 머터리얼 생성
+	MaterialDesc matDesc;
+	matDesc.Mode = EPSOMode::SKYBOX;
+	matDesc.ShaderPath = m_SkyShaderPath;
+	matDesc.Name = string().assign(m_SkyShaderPath.begin(), m_SkyShaderPath.end());
+	JGMaterial* SkyMat = AddMaterial(matDesc);
+	SkyMat->SetTexture(ETextureSlot::Diffuse, texturepath);
+	// 메쉬 생성
+	JGMesh* SkyMesh = AddMesh();
+	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
+	// 오브젝트 생성
+	JGRCObject* obj = CreateObject();
+	obj->SetMesh(SkyMesh, "Scene_SkyBox_Default_Mesh");
+	obj->SetMaterial(SkyMat);
+	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
+	return obj;
 }
 JGMaterial* Scene::AddMaterial(const MaterialDesc& Desc)
 {
@@ -247,17 +295,13 @@ PassData* Scene::AddPassData()
 	m_PassDatas.push_back(move(passData));
 	return result;
 }
-JGLight*  Scene::AddLight(ELightType type)
+JGLight*  Scene::AddLight(ELightType type, ELightExercise extype)
 {
-	return m_LightManager->AddLight(type);
+	return m_LightManager->AddLight(type, extype);
 }
 void Scene::AddTexture(const wstring& TexturePath, ETextureType type)
 {
 	m_TextureDatas.push_back(TexturePack{ move(TexturePath), nullptr, type });
-}
-UINT  Scene::GetSkyBoxShaderIndex()
-{
-	return m_ResourceManager->GetCubeTextureShaderIndex(m_TextureName);
 }
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {
@@ -269,14 +313,14 @@ D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 
 void Scene::CreateDebugObj()
 {
-	m_DebugObj = make_unique<JGRCObject>(++m_ObjIndex);
+	m_DebugObj = make_unique<JGRCObject>(++m_ObjIndex, EObjType::Static);
 	MaterialDesc desc;
 	desc.Name = "osaidjf";
-	desc.Mode = EPSOMode::DEFAULT;
+	desc.Mode = EPSOMode::SCENE;
 	desc.ShaderPath = L"../Contents/Engine/Shaders/ShadowDebug.hlsl";
 	JGMaterial* debug = AddMaterial(desc);
 	JGMesh* mesh = AddMesh();
-	mesh->AddQuadArg("Debug", 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	mesh->AddQuadArg("Debug", -1.0f, 1.0f, 2.0f, 2.0f, 0.0f);
 	m_DebugObj->SetMesh(mesh, "Debug");
 	m_DebugObj->SetMaterial(debug);
 }
@@ -297,7 +341,7 @@ void Scene::MainPassUpdate(const GameTimer& gt)
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f);
 	XMMATRIX viewProjTex = XMMatrixMultiply(viewProj, T);
-
+	// 기본 행렬 
 	XMStoreFloat4x4(&m_MainPass->Data.View, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&m_MainPass->Data.Proj, XMMatrixTranspose(proj));
 	XMStoreFloat4x4(&m_MainPass->Data.ViewProj, XMMatrixTranspose(viewProj));
@@ -305,17 +349,28 @@ void Scene::MainPassUpdate(const GameTimer& gt)
 	XMStoreFloat4x4(&m_MainPass->Data.InvProj, XMMatrixTranspose(invProj));
 	XMStoreFloat4x4(&m_MainPass->Data.InvViewProj, XMMatrixTranspose(invViewProj));
 	XMStoreFloat4x4(&m_MainPass->Data.ViewProjTex, XMMatrixTranspose(viewProjTex));
+
+	// 카메라 위치
 	m_MainPass->Data.EyePosW = m_MainCamera->GetPosition3f();
-	DxSetting set = m_DxCore->GetSettingDesc();
-	m_MainPass->Data.RenderTargetSize = XMFLOAT2((float)set.Width, (float)set.Height);
-	m_MainPass->Data.InvRenderTargetSize = XMFLOAT2(1 / (float)set.Width, 1 / (float)set.Height);
-	m_MainPass->Data.NearZ = m_DxCore->GetSettingDesc().NearZ;
-	m_MainPass->Data.FarZ = m_DxCore->GetSettingDesc().FarZ;
+
+
+	// 렌더 타겟 사이즈
+	m_MainPass->Data.RenderTargetSize = XMFLOAT2((float)m_SceneConfig.Width, (float)m_SceneConfig.Height);
+	m_MainPass->Data.InvRenderTargetSize = XMFLOAT2(1 / (float)m_SceneConfig.Width, 1 / (float)m_SceneConfig.Height);
+
+	//
 	m_MainPass->Data.TotalTime = gt.TotalTime();
 	m_MainPass->Data.DeltaTime = gt.DeltaTime();
-	m_MainPass->Data.AmbientLight = { 0.1f,0.12f,0.25f,1.0f };
+	// 씬 인덱스
+	m_MainPass->Data.WorldPosSceneIndex = m_SceneData->GetWorldPosIndex();
+	m_MainPass->Data.AlbedoSceneIndex = m_SceneData->GetAlbedoIndex();
+	m_MainPass->Data.NormalSceneIndex = m_SceneData->GetNormalIndex();
+	m_MainPass->Data.DepthSceneIndex = m_SceneData->GetDepthIndex();
+	m_MainPass->Data.MatSceneIndex = m_SceneData->GetMatIndex();
 	m_MainPass->Data.SSAOTexutreIndex = m_SSAO->GetShaderIndex();
-	m_MainPass->Data.SkyBoxIndex = m_ResourceManager->GetCubeTextureShaderIndex(m_TextureName);
+	if(m_MainSkyBox)
+		m_MainPass->Data.SkyBoxIndex = m_ResourceManager->GetCubeTextureShaderIndex(
+			m_MainSkyBox->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
 	auto PassCB = CurrFrameResource->PassCB.get();
 	PassCB->CopyData(m_MainPass->PassCBIndex, m_MainPass->Data);
 }

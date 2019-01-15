@@ -27,6 +27,17 @@ namespace JGRC
 			desc.DSVFormat = DSVFormat;
 			return desc;
 		}
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC SceneDataRenderTarget() 
+		{
+			NumRenderTargets = 4;
+			RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			RTVFormats[2] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			RTVFormats[3] = DXGI_FORMAT_R32_UINT;
+			DSVFormat     = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Get();
+			return desc;
+		}
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC UnUsedRenderTarget() 
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Get();

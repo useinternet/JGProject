@@ -13,7 +13,6 @@ namespace JGRC
 	enum class EObjRenderMode
 	{
 		Default,
-		CubeMap,
 		NonePSO
 	};
 	typedef DirectX::XMFLOAT3 Vec3;
@@ -47,7 +46,7 @@ namespace JGRC
 		std::string m_MeshName = "None";
 		// Å¥ºê¸Ê
 		std::shared_ptr<class CubeMap> m_CubeMap = nullptr;
-		//
+		
 		EObjType    Type = EObjType::Static;
 		std::string m_Name;
 		UINT m_ObjCBIndex = 0;
@@ -59,6 +58,7 @@ namespace JGRC
 		Vec3 m_Rotation;
 		Vec3 m_Scale;
 		//
+		bool m_bInit    = false;
 		bool m_bVisible = true;
 		bool m_bActive  = true;
 		bool m_bCubeMapUpdate = false;
@@ -67,7 +67,7 @@ namespace JGRC
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
 
 	public:
-		JGRCObject(UINT Index, const JGRCObjDesc& Desc = JGRCObjDesc());
+		JGRCObject(UINT Index, EObjType Type, const JGRCObjDesc& Desc = JGRCObjDesc());
 		void Build(ID3D12GraphicsCommandList* CommandList);
 		void Update(const GameTimer& gt, class FrameResource* CurrentFrameResource);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
@@ -77,7 +77,7 @@ namespace JGRC
 		EObjType GetType()              { return Type; }
 		UINT GetCBIndex() const         { return m_ObjCBIndex; }
 		void OffsetIndex(UINT Index)    { m_ObjCBIndex += Index; }
-		void ClearNotify()    { UpdateNotify = CPU_FRAMERESOURCE_NUM; }
+		void ClearNotify()    { UpdateNotify = CPU_FRAMERESOURCE_NUM;}
 		void UpdatePerFrame() { UpdateNotify--; }
 		bool IsCanUpdate()    { return UpdateNotify > 0; }
 	public:

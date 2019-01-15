@@ -226,11 +226,11 @@ struct Light
     DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };  // point/spot light only
     float SpotPower = 1.0f;                            // spot light only
 	DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::Identity4x4();
-	UINT  ShadowMapIndex = 0;
-	
+	UINT  StaticShadowMapIndex  = 0;
+	UINT  DynamicShadowMapIndex = 0;
 	float CosOuterAngle = cosf(DirectX::XMConvertToRadians(60.0f)); // spot light only max 60.0f
 	float CosInnerAngle = cosf(DirectX::XMConvertToRadians(30.0f));
-	float LightPad = 0.0f;
+	
 };
 
 #define MaxLights 16

@@ -17,21 +17,93 @@ ShadowMap::ShadowMap(UINT width, UINT height)
 	m_ScissorRect = { 0,0,(int)width, (int)height };
 }
 
-void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
+void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, ELightExercise LightExcType)
 {
 	CommandList->RSSetViewports(1, &m_Viewport);
 	CommandList->RSSetScissorRects(1, &m_ScissorRect);
-	Default_Draw(CurrentFrameResource, CommandList);
+	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
+	auto PassCB = CurrentFrameResource->PassCB->Resource();
+	D3D12_GPU_VIRTUAL_ADDRESS passCBAddress;
+
+	CommonData::_ResourceManager()->ResourceStateTransition(
+		CommandList,
+		m_ShadowMap,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	switch (m_Type)
+	{
+	case EShadowMapType::Texture:
+		passCBAddress =
+			PassCB->GetGPUVirtualAddress() + (m_ShadowPass->PassCBIndex * passCBByteSize);
+		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
+			passCBAddress);
+		// ±íÀÌ ¹öÆÛ ÃÊ±âÈ­
+		CommandList->ClearDepthStencilView(m_DepthStencilViewPack->Handle,
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+		// ·»´õ Å¸°Ù¿¡ ±íÀÌ ºä¸¸ µî·Ï
+		CommandList->OMSetRenderTargets(0, nullptr, false, &m_DepthStencilViewPack->Handle);
+
+		switch (LightExcType)
+		{
+		case ELightExercise::Static:
+			for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
+			{
+				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
+			}
+			break;
+		case ELightExercise::Dynamic:
+			for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
+			{
+				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
+			}
+			break;
+		}
+		break;
+	case EShadowMapType::Cube:
+		for (int i = 0; i < 6; ++i)
+		{
+			passCBAddress =
+				PassCB->GetGPUVirtualAddress() + (m_CubeShadowPass[i]->PassCBIndex * passCBByteSize);
+			CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
+				passCBAddress);
+
+			CommandList->ClearDepthStencilView(m_CubeDepthStencilViewPack[i]->Handle,
+				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+			//
+			CommandList->OMSetRenderTargets(0, nullptr, false, &m_CubeDepthStencilViewPack[i]->Handle);
+			switch (LightExcType)
+			{
+			case ELightExercise::Static:
+				for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
+				{
+					obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
+				}
+				break;
+			case ELightExercise::Dynamic:
+				for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
+				{
+					obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
+				}
+				break;
+			}
+		}
+		break;
+	}
+	CommonData::_ResourceManager()->ResourceStateTransition(
+		CommandList,
+		m_ShadowMap,
+		D3D12_RESOURCE_STATE_GENERIC_READ);
 }
 void ShadowMap::UpdateShadowPass(FrameResource* CurrentFrameResource, JGLight* light)
 {
 	XMFLOAT4X4 view_f4x4, proj_f4x4;
 	XMMATRIX View, Proj, viewProj;
 	auto PassCB = CurrentFrameResource->PassCB.get();
-	switch (m_Type)
+
+
+	switch (light->GetLightType())
 	{
-	case EShadowMapType::Spot:
-	case EShadowMapType::Direction:
+	case ELightType::Direction:
 		view_f4x4 = light->GetViewMatrix();
 		proj_f4x4 = light->GetProjMatrix();
 		View = XMLoadFloat4x4(&view_f4x4);
@@ -40,7 +112,14 @@ void ShadowMap::UpdateShadowPass(FrameResource* CurrentFrameResource, JGLight* l
 		XMStoreFloat4x4(&m_ShadowPass->Data.ViewProj, XMMatrixTranspose(viewProj));
 		PassCB->CopyData(m_ShadowPass->PassCBIndex, m_ShadowPass->Data);
 		break;
-	case EShadowMapType::Point:	
+	case ELightType::Spot:
+		View = light->GetSpotLightCamera().GetView();
+		Proj = light->GetSpotLightCamera().GetProj();
+		viewProj = XMMatrixMultiply(View, Proj);
+		XMStoreFloat4x4(&m_ShadowPass->Data.ViewProj, XMMatrixTranspose(viewProj));
+		PassCB->CopyData(m_ShadowPass->PassCBIndex, m_ShadowPass->Data);
+		break;
+	case ELightType::Point:
 		for (int i = 0; i < 6; ++i)
 		{
 			View = light->GetPointLightCamera(i).GetView();
@@ -59,11 +138,10 @@ void ShadowMap::BuildShadowMap(const string& name, EShadowMapType type)
 	BuildDescriptor(name);
 	switch (type)
 	{
-	case EShadowMapType::Spot:
-	case EShadowMapType::Direction:
+	case EShadowMapType::Texture:
 		m_ShadowPass = CommonData::_Scene()->AddPassData();
 		break;
-	case EShadowMapType::Point:
+	case EShadowMapType::Cube:
 		for (int i = 0; i < 6; ++i)
 		{
 			m_CubeShadowPass[i] = CommonData::_Scene()->AddPassData();
@@ -75,10 +153,9 @@ UINT ShadowMap::GetSrvIndex() const
 {
 	switch (m_Type)
 	{
-	case EShadowMapType::Direction:
-	case EShadowMapType::Spot:
+	case EShadowMapType::Texture:
 		return  CommonData::_ResourceManager()->GetSrvUavIndex(m_ShadowSrvPack->PackName);
-	case EShadowMapType::Point:
+	case EShadowMapType::Cube:
 		return  CommonData::_ResourceManager()->GetCubeMapShaderIndex(m_ShadowSrvPack->PackName);
 	default:
 		return -1;
@@ -112,11 +189,10 @@ void ShadowMap::BuildResource()
 
 	switch (m_Type) // Æ÷ÀÎÆ® ¶óÀÌÆ® ¼Îµµ¿ì ¸ÊÀº 6 / ´ÙÀÌ·ºÆ®, ½ºÆ÷Æ® ¶óÀÌÆ®´Â 1 ( ±íÀÌ ¹è¿­ )
 	{
-	case EShadowMapType::Direction:
-	case EShadowMapType::Spot:
+	case EShadowMapType::Texture:
 		m_DefaultResourceDesc.DepthOrArraySize = 1;
 		break;
-	case EShadowMapType::Point:
+	case EShadowMapType::Cube:
 		m_DefaultResourceDesc.DepthOrArraySize = 6;
 		break;
 	}
@@ -130,8 +206,7 @@ void ShadowMap::BuildDescriptor(const string& name)
 
 	switch (m_Type) 
 	{
-	case EShadowMapType::Direction:
-	case EShadowMapType::Spot:
+	case EShadowMapType::Texture:
 		// Srv
 		m_SrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		m_SrvDesc.Texture2D.MostDetailedMip = 0;
@@ -146,7 +221,7 @@ void ShadowMap::BuildDescriptor(const string& name)
 		m_DsvDesc.Texture2D.MipSlice = 0;
 		m_DepthStencilViewPack = CommonData::_ResourceManager()->AddDsv(name + "Dsv", m_ShadowMap, &m_DsvDesc);
 		break;
-	case EShadowMapType::Point:
+	case EShadowMapType::Cube:
 		// Srv
 		m_SrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		m_SrvDesc.TextureCube.MostDetailedMip = 0;
@@ -165,58 +240,4 @@ void ShadowMap::BuildDescriptor(const string& name)
 		}
 		break;
 	}
-}
-void ShadowMap::Default_Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
-{
-	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
-	auto PassCB = CurrentFrameResource->PassCB->Resource();
-	D3D12_GPU_VIRTUAL_ADDRESS passCBAddress;
-
-	CommonData::_ResourceManager()->ResourceStateTransition(
-		CommandList,
-		m_ShadowMap,
-		D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	switch (m_Type)
-	{
-	case EShadowMapType::Direction:
-	case EShadowMapType::Spot:
-		passCBAddress =
-			PassCB->GetGPUVirtualAddress() + (m_ShadowPass->PassCBIndex * passCBByteSize);
-		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
-			passCBAddress);
-		// ±íÀÌ ¹öÆÛ ÃÊ±âÈ­
-		CommandList->ClearDepthStencilView(m_DepthStencilViewPack->Handle,
-			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
-		// ·»´õ Å¸°Ù¿¡ ±íÀÌ ºä¸¸ µî·Ï
-		CommandList->OMSetRenderTargets(0, nullptr, false, &m_DepthStencilViewPack->Handle);
-
-		for (auto& obj : CommonData::_Scene()->GetArray())
-		{
-			obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-		}
-		break;
-	case EShadowMapType::Point:
-		for (int i = 0; i < 6; ++i)
-		{
-			passCBAddress =
-				PassCB->GetGPUVirtualAddress() + (m_CubeShadowPass[i]->PassCBIndex * passCBByteSize);
-			CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
-				passCBAddress);
-
-			CommandList->ClearDepthStencilView(m_CubeDepthStencilViewPack[i]->Handle,
-				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-			//
-			CommandList->OMSetRenderTargets(0, nullptr, false, &m_CubeDepthStencilViewPack[i]->Handle);
-			for (auto& obj : CommonData::_Scene()->GetArray())
-			{
-				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-			}
-		}
-		break;
-	}
-	CommonData::_ResourceManager()->ResourceStateTransition(
-		CommandList,
-		m_ShadowMap,
-		D3D12_RESOURCE_STATE_GENERIC_READ);
 }

@@ -28,6 +28,7 @@
     <ClCompile Include="source\Data\JGRCObject.cpp" />
     <ClCompile Include="source\Data\LightManager.cpp" />
     <ClCompile Include="source\Data\Scene.cpp" />
+    <ClCompile Include="source\Data\SceneData.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
     <ClCompile Include="source\DxCommon\Camera.cpp" />
     <ClCompile Include="source\DxCommon\d3dUtil.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="source\Data\JGRCObject.h" />
     <ClInclude Include="source\Data\LightManager.h" />
     <ClInclude Include="source\Data\Scene.h" />
+    <ClInclude Include="source\Data\SceneData.h" />
     <ClInclude Include="source\DxCommon\Camera.h" />
     <ClInclude Include="source\DxCommon\d3dUtil.h" />
     <ClInclude Include="source\DxCommon\d3dx12.h" />

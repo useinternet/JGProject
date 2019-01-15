@@ -24,7 +24,7 @@ namespace JGRC
 		// 패쓰 데이터
 		PassData* m_CubeMapPass[6];
 		// 메인 패스
-
+		std::shared_ptr<class SceneData> m_CubeScene;
 	public:
 		CubeMap() = default;
 		CubeMap(UINT Width, UINT Height);

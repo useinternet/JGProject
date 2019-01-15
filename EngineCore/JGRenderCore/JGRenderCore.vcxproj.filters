@@ -23,6 +23,9 @@
     <Filter Include="Data">
       <UniqueIdentifier>{8a30195a-724a-4eb9-8b20-9711a90df3ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\HLSL">
+      <UniqueIdentifier>{66780849-0310-45cc-94e0-0a6bb20a1e8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dllmain.cpp">
@@ -98,6 +101,9 @@
       <Filter>PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="source\Data\CommonData.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\SceneData.cpp">
       <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -202,6 +208,9 @@
       <Filter>Shader</Filter>
     </ClInclude>
     <ClInclude Include="source\Data\CommonData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\SceneData.h">
       <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>

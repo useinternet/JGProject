@@ -7,8 +7,12 @@ using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 
-void LightManager::BuildLight()
+void LightManager::BuildLight(CommonShaderRootSignature* CommonSig)
 {
+	m_ShadowShader = make_unique<Shader>();
+	m_ShadowShader->Init(Shadow_hlsl_file_path, { EShaderType::Vertex, EShaderType::Pixel });
+	m_ShadowPSO = m_ShadowShader->CompileAndConstrutPSO(EPSOMode::SHADOW, CommonSig,
+		{  });
 	if (m_DirLight)
 		m_DirLight->Build();
 	for (auto& iter : m_PointLights)
@@ -19,14 +23,6 @@ void LightManager::BuildLight()
 	{
 		iter->Build();
 	}
-}
-void LightManager::BuildShadowShader(CommonShaderRootSignature* CommonSig)
-{
-	m_ShadowShader = make_unique<Shader>();
-	m_ShadowShader->Init(Shadow_hlsl_file_path, { EShaderType::Vertex, EShaderType::Pixel });
-	ShaderMacroPack Pack = { SHADER_MACRO_DEFINE_TEXTURE_MAX, "1" };
-	m_ShadowPSO = m_ShadowShader->CompileAndConstrutPSO(EPSOMode::SHADOW, CommonSig,
-		{ Pack });
 }
 void LightManager::Update(FrameResource* CurrFrameResource)
 {
@@ -54,19 +50,19 @@ void LightManager::DrawShadowMap(ID3D12GraphicsCommandList* CommandList, FrameRe
 	CommandList->SetPipelineState(m_ShadowPSO);
 
 	if (m_DirLight)
-		m_DirLight->DrawShadow(CurrFrameResource, CommandList);
+		m_DirLight->BuildShadowMap(CurrFrameResource, CommandList);
 	for (auto& iter : m_PointLights)
 	{
-		iter->DrawShadow(CurrFrameResource, CommandList);
+		iter->BuildShadowMap(CurrFrameResource, CommandList);
 	}
 	for (auto& iter : m_SpotLights)
 	{
-		iter->DrawShadow(CurrFrameResource, CommandList);
+		iter->BuildShadowMap(CurrFrameResource, CommandList);
 	}
 }
-JGLight* LightManager::AddLight(ELightType type)
+JGLight* LightManager::AddLight(ELightType type, ELightExercise ExType)
 {
-	auto l = make_unique<JGLight>(type);
+	auto l = make_unique<JGLight>(type, ExType);
 	JGLight* result = l.get();
 	m_LightCount++;
 	switch (type)

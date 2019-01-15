@@ -30,6 +30,7 @@ namespace JGRC
 		EPSOMode  Mode = EPSOMode::DEFAULT;
 		std::wstring ShaderPath;
 		bool bCubMapDynamic = false;
+		bool bReflectionOnlyBackground = true;
 		bool bReflection    = false;
 		bool bRefraction    = false;
 	};
@@ -45,6 +46,7 @@ namespace JGRC
 		std::unique_ptr<MaterialDesc> m_Desc;
 		// 지연된 텍스쳐 업데이트를 위한 Que
 		std::queue<std::pair<ETextureSlot, std::wstring>> m_TextureDataQue;
+		std::unordered_map<ETextureSlot, std::wstring>    m_TexturePaths;
 		// 프레임 알림이
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
 	private:
@@ -64,6 +66,8 @@ namespace JGRC
 		void SetRefractive(float x);
 		void SetMatTransform(const DirectX::XMFLOAT4X4& mat);
 		void SetPSO(ID3D12PipelineState* PSO);
+	public:
+		const std::wstring& GetTexturePath(ETextureSlot slot) { return m_TexturePaths[slot]; }
 	public:  // 머터리얼 Get접근자
 		MaterialDesc* GetDesc() const    { return m_Desc.get(); }
 		ID3D12PipelineState* GetPSO() const { return m_PSO; }
@@ -83,7 +87,6 @@ namespace JGRC
 		typedef std::unordered_map<std::string,  std::unique_ptr<JGMaterial>> MaterialArray;
 		typedef std::unordered_map<std::wstring, std::unique_ptr<Shader>> ShaderArray;
 	private:
-		std::unique_ptr<CommonShaderRootSignature> m_RootSignature;
 		ShaderArray   m_Shaders;
 		MaterialArray m_Materials;
 		int m_MatCBIndex = -1;
@@ -93,13 +96,11 @@ namespace JGRC
 	public:
 		JGMaterialCreater()  = default;
 		~JGMaterialCreater() = default;
-		void BuildMaterial();
+		void BuildMaterial(CommonShaderRootSignature* CommonRootSig);
 	public: // 머터리얼 생성 및 가져오기
-		JGMaterial* CreateMaterial(const MaterialDesc& Desc);
-		JGMaterial* GetMaterial(const std::string& name);
+		JGMaterial*    CreateMaterial(const MaterialDesc& Desc);
+		JGMaterial*    GetMaterial(const std::string& name);
 		MaterialArray& GetArray() { return m_Materials; }
-		ID3D12RootSignature* GetRootSignature();
-		CommonShaderRootSignature* GetCommonShaderRSClass() const { return m_RootSignature.get(); }
 	public:
 		UINT Size() const { return (UINT)m_Materials.size(); }
 	};

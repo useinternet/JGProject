@@ -34,7 +34,7 @@ namespace JGRC
 		ID3D12Resource*   m_NormalMap        = nullptr;
 		SrvResourcePack*  m_NormalMapPack    = nullptr;
 		RenderTargetPack* m_NormalMapRtvPack = nullptr;
-		std::unique_ptr<class Shader> m_NormalMapShader;
+		std::shared_ptr<class Shader> m_NormalMapShader;
 		ID3D12PipelineState* m_NormalMapPSO  = nullptr;
 		//
 		SrvResourcePack*  m_DepthMapPack = nullptr;
@@ -49,8 +49,8 @@ namespace JGRC
 		//
 		ID3D12PipelineState* m_SSAOPSO     = nullptr;
 		ID3D12PipelineState* m_SSAOBlurPSO = nullptr;
-		std::unique_ptr<class Shader> m_SSAOShader;
-		std::unique_ptr<class Shader> m_SSAOBlurShader;
+		std::shared_ptr<class Shader> m_SSAOShader;
+		std::shared_ptr<class Shader> m_SSAOBlurShader;
 		std::shared_ptr<class SSAOShaderRootSignature> m_SSAORootSig;
 		//
 		ID3D12Resource* m_RandomVectorMap = nullptr;
@@ -71,9 +71,8 @@ namespace JGRC
 	public:
 		SSAO();
 		~SSAO() = default;
-		void BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList);
-		void BuildSSAOShader(class CommonShaderRootSignature* RootSig);
-		void OnReSize(UINT width, UINT height, bool Init = false);
+		void BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList,class  CommonShaderRootSignature* RootSig);
+		void OnReSize(UINT width, UINT height);
 		void Update(FrameResource* CurrFrameResource);
 		void Draw(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList* CommandList);
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetNormalMapGPUHandle();

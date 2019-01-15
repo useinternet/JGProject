@@ -6,31 +6,35 @@ using namespace std;
 using namespace JGRC;
 using namespace DirectX;
 UINT JGLight::Count = 0;
-float JGLight::maxCosAngle = cosf(XMConvertToRadians(60.0f));
-float JGLight::minCosAngle = cosf(XMConvertToRadians(0.0f));
-JGLight::JGLight(ELightType Type)
+float JGLight::maxAngle = 60.0f;
+float JGLight::minAngle = 0.0f;
+JGLight::JGLight(ELightType Type, ELightExercise ExType)
 {
-	m_Type = Type;
-	m_ShadowMap = make_unique<ShadowMap>();
+	m_LightType    = Type;
+	m_LightExcType = ExType;
 	m_Name += to_string(Count++);
-	m_BasicDirection = m_Data.Direction;
+	m_Direction = m_Data.Direction;
 }
 void JGLight::Build()
 {
-	m_SceneMainPass = CommonData::_Scene()->GetMainPass();
-	m_ShadowPass    = CommonData::_Scene()->AddPassData();
-
-	switch (m_Type)
+	m_bInit = true;
+	m_StaticShadowMap  = make_unique<ShadowMap>();
+	m_DynamicShadowMap = make_unique<ShadowMap>();
+	switch (m_LightType)
 	{
 	case ELightType::Direction:
 	case ELightType::Spot:
-		m_ShadowMap->BuildShadowMap(m_Name, EShadowMapType::Direction);
+		m_StaticShadowMap->BuildShadowMap(m_Name  + "Static", EShadowMapType::Texture);
+		m_DynamicShadowMap->BuildShadowMap(m_Name + "Dyanmic", EShadowMapType::Texture);
 		break;
 	case ELightType::Point:
-		m_ShadowMap->BuildShadowMap(m_Name, EShadowMapType::Point);
+		m_StaticShadowMap->BuildShadowMap(m_Name  + "Static", EShadowMapType::Cube);
+		m_DynamicShadowMap->BuildShadowMap(m_Name + "Dyanmic", EShadowMapType::Cube);
 		break;
 	}
-	m_Data.ShadowMapIndex = m_ShadowMap->GetSrvIndex();
+
+	m_Data.StaticShadowMapIndex = m_StaticShadowMap->GetSrvIndex();
+	m_Data.DynamicShadowMapIndex = m_DynamicShadowMap->GetSrvIndex();
 }
 void JGLight::Update(UINT LightCBIndex, FrameResource* CurrentResource)
 {
@@ -38,7 +42,7 @@ void JGLight::Update(UINT LightCBIndex, FrameResource* CurrentResource)
 		return;
 	if (IsCanUpdate())
 	{
-		switch (m_Type)
+		switch (m_LightType)
 		{
 		case ELightType::Direction:
 			Direction_Update();
@@ -48,19 +52,28 @@ void JGLight::Update(UINT LightCBIndex, FrameResource* CurrentResource)
 			break;
 		case ELightType::Spot:
 			Spot_Update();
+			m_Data.CosInnerAngle = cosf(XMConvertToRadians(m_InnerAngle));
+			m_Data.CosOuterAngle = cosf(XMConvertToRadians(m_OuterAngle));
 			break;
 		}
-		m_ShadowMap->UpdateShadowPass(CurrentResource, this);
+		m_StaticShadowMap->UpdateShadowPass(CurrentResource, this);
+		m_DynamicShadowMap->UpdateShadowPass(CurrentResource, this);
 		auto LightCB = CurrentResource->LightCB.get();
 		LightCB->CopyData(LightCBIndex, m_Data);
 		UpdatePerFrame();
 	}
 }
-void JGLight::DrawShadow(FrameResource* CurrentResource, ID3D12GraphicsCommandList* CommandList)
+void JGLight::BuildShadowMap(FrameResource* CurrentResource, ID3D12GraphicsCommandList* CommandList)
 {
 	if (!m_Active)
 		return;
-	m_ShadowMap->Draw(CurrentResource, CommandList);
+
+	m_DynamicShadowMap->Draw(CurrentResource, CommandList, ELightExercise::Dynamic);
+
+	if (m_LightExcType == ELightExercise::Static && m_bDraw)
+		return;
+	m_StaticShadowMap->Draw(CurrentResource, CommandList, ELightExercise::Static);
+	m_bDraw = true;
 }
 void JGLight::SetLightColor(float r, float g, float b)
 {
@@ -69,63 +82,85 @@ void JGLight::SetLightColor(float r, float g, float b)
 }
 void JGLight::SetLocation(float x, float y, float z)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
+	if (m_LightType == ELightType::Direction)
+		return;
+
 	m_Data.Position = { x,y,z };
 	ClearNotify();
 }
 void JGLight::SetDirection(float x, float y, float z)
 {
-	if (m_Type == ELightType::Point)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
-	m_BasicDirection = { x,y,z };
+	if (m_LightType == ELightType::Point)
+		return;
+
+	m_Direction = { x,y,z };
 	ClearNotify();
 }
 void JGLight::SetFalloffStart(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
+	if (m_LightType == ELightType::Direction)
+		return;
+
 	m_Data.FalloffStart = x;
 	ClearNotify();
 }
 void JGLight::SetFalloffEnd(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
+	if (m_LightType == ELightType::Direction)
+		return;
+
 	m_Data.FalloffEnd = x;
 	ClearNotify();
 }
 void JGLight::SetSpotPower(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
+	if (m_LightType == ELightType::Direction)
+		return;
+
 	m_Data.SpotPower = x;
 	ClearNotify();
 }
 void JGLight::SetOuterAngle(float angle)
 {
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
 	if (angle > 60.0f)
 		angle = 60.0f;
 	if (angle < 0)
 		angle = 0;
-	if (m_Type != ELightType::Spot)
+	if (m_LightType != ELightType::Spot)
 		return;
-	m_Data.CosOuterAngle = cosf(XMConvertToRadians(angle));
+
+	m_OuterAngle = angle;
 	ClearNotify();
 }
 void JGLight::SetInnerAngle(float angle)
 {
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
 	if (angle > 60.0f)
 		angle = 60.0f;
 	if (angle < 0)
 		angle = 0;
-	if (m_Type != ELightType::Spot)
+	if (m_LightType != ELightType::Spot)
 		return;
-	m_Data.CosInnerAngle = cosf(XMConvertToRadians(angle));
+	m_InnerAngle = angle;
 	ClearNotify();
 }
 void JGLight::SetRotation(float pitch, float yaw, float roll)
 {
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
 	m_Rotation = { pitch, yaw, roll };
 	ClearNotify();
 }
@@ -138,7 +173,9 @@ void JGLight::OffsetLightColor(float r, float g, float b)
 }
 void JGLight::OffsetLocation(float x, float y, float z)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType == ELightType::Direction)
 		return;
 	m_Data.Position.x += x;
 	m_Data.Position.y += y;
@@ -147,30 +184,38 @@ void JGLight::OffsetLocation(float x, float y, float z)
 }
 void JGLight::OffsetDirection(float x, float y, float z)
 {
-	if (m_Type == ELightType::Point)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
 		return;
-	m_Data.Direction.x += x;
-	m_Data.Direction.y += y;
-	m_Data.Direction.z += z;
+	if (m_LightType == ELightType::Point)
+		return;
+	m_Direction.x += x;
+	m_Direction.y += y;
+	m_Direction.z += z;
 	ClearNotify();
 }
 void JGLight::OffsetFalloffStart(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType == ELightType::Direction)
 		return;
 	m_Data.FalloffStart += x;
 	ClearNotify();
 }
 void JGLight::OffsetFalloffEnd(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType == ELightType::Direction)
 		return;
 	m_Data.FalloffEnd += x;
 	ClearNotify();
 }
 void JGLight::OffsetSpotPower(float x)
 {
-	if (m_Type == ELightType::Direction)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType == ELightType::Direction)
 		return;
 	m_Data.SpotPower += x;
 	ClearNotify();
@@ -178,32 +223,39 @@ void JGLight::OffsetSpotPower(float x)
 
 void JGLight::OffsetOuterAngle(float angle)
 {
-	if (m_Type != ELightType::Spot)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType != ELightType::Spot)
 		return;
 
-	float cosAngle = m_Data.CosOuterAngle - cosf(XMConvertToRadians(angle));
-	if (cosAngle < maxCosAngle)
-		cosAngle = maxCosAngle;
+	m_OuterAngle += angle;
 
-	m_Data.CosOuterAngle = cosAngle;
+	if (m_OuterAngle > 60.0f)
+		m_OuterAngle = 60.0f;
+	if (m_OuterAngle < 0)
+		m_OuterAngle = 0;
 	ClearNotify();
 }
 void JGLight::OffsetInnerAngle(float angle)
 {
-	if (m_Type != ELightType::Spot)
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
+	if (m_LightType != ELightType::Spot)
 		return;
 
-	float cosAngle = m_Data.CosInnerAngle - cosf(XMConvertToRadians(angle));
+	m_InnerAngle += angle;
 
+	if (m_InnerAngle > m_OuterAngle)
+		m_InnerAngle = m_OuterAngle;
+	if (m_InnerAngle < 0)
+		m_InnerAngle = 0;
 
-	if (m_Data.CosOuterAngle > cosAngle)
-		cosAngle = m_Data.CosOuterAngle;
-
-	m_Data.CosInnerAngle = cosAngle;
 	ClearNotify();
 }
 void JGLight::OffsetRotation(float pitch, float yaw, float roll)
 {
+	if (m_bInit && m_LightExcType == ELightExercise::Static)
+		return;
 	m_Rotation.x += pitch;
 	m_Rotation.y += yaw;
 	m_Rotation.z += roll;
@@ -213,8 +265,9 @@ void JGLight::OffsetRotation(float pitch, float yaw, float roll)
 void JGLight::Direction_Update()
 {
 	BoundingSphere SceneSphere = CommonData::_Scene()->GetSceneSphere();
+
 	// 방향 벡터
-	XMVECTOR lightDir = XMLoadFloat3(&m_BasicDirection);
+	XMVECTOR lightDir = XMLoadFloat3(&m_Direction);
 	// 회전 행렬 생성
 	XMMATRIX R = XMMatrixRotationRollPitchYaw(
 		XMConvertToRadians(m_Rotation.x),
@@ -278,8 +331,6 @@ void JGLight::Point_BuildCamera()
 		XMFLOAT3(x, y, z - 1.0f)  // -Z
 	};
 
-	// Use world up vector (0,1,0) for all directions except +Y/-Y.  In these cases, we
-	// are looking down +Y or -Y, so we need a different "up" vector.
 	XMFLOAT3 ups[6] =
 	{
 		XMFLOAT3(0.0f, 1.0f, 0.0f),  // +X
@@ -298,8 +349,7 @@ void JGLight::Point_BuildCamera()
 }
 void JGLight::Spot_Update()
 {
-
-	XMVECTOR lightDir = XMLoadFloat3(&m_BasicDirection);
+	XMVECTOR lightDir = XMLoadFloat3(&m_Direction);
 	XMMATRIX R = XMMatrixRotationRollPitchYaw(
 		XMConvertToRadians(m_Rotation.x),
 		XMConvertToRadians(m_Rotation.y),
