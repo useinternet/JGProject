@@ -23,8 +23,8 @@
     <Filter Include="Data">
       <UniqueIdentifier>{8a30195a-724a-4eb9-8b20-9711a90df3ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader\HLSL">
-      <UniqueIdentifier>{66780849-0310-45cc-94e0-0a6bb20a1e8d}</UniqueIdentifier>
+    <Filter Include="UserInterface">
+      <UniqueIdentifier>{b253159a-441d-4537-9025-a5769c01bb2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +57,6 @@
     </ClCompile>
     <ClCompile Include="source\DxCore\JGRenderCore.cpp">
       <Filter>DxCore</Filter>
-    </ClCompile>
-    <ClCompile Include="source\PostProcessing\BlurFilter.cpp">
-      <Filter>PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="source\MemoryManager\ResourceManager.cpp">
       <Filter>MemoryManager</Filter>
@@ -104,6 +101,12 @@
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="source\Data\SceneData.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcessing\BlurFilter.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\InstanceObject.cpp">
       <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -153,9 +156,6 @@
     <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h">
       <Filter>DxCore</Filter>
     </ClInclude>
-    <ClInclude Include="source\PostProcessing\BlurFilter.h">
-      <Filter>PostProcessing</Filter>
-    </ClInclude>
     <ClInclude Include="source\MemoryManager\ResourceManager.h">
       <Filter>MemoryManager</Filter>
     </ClInclude>
@@ -189,9 +189,6 @@
     <ClInclude Include="source\Shader\Shader.h">
       <Filter>Shader</Filter>
     </ClInclude>
-    <ClInclude Include="source\Shader\BlurShaderRootSignature.h">
-      <Filter>Shader</Filter>
-    </ClInclude>
     <ClInclude Include="source\PostProcessing\ShadowMap.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
@@ -211,6 +208,18 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="source\Data\SceneData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\ShaderPath.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PostProcessing\BlurFilter.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Shader\BlurShaderRootSignature.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\InstanceObject.h">
       <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>

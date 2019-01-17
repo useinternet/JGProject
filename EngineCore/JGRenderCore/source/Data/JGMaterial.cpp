@@ -84,10 +84,13 @@ void JGMaterial::SetPSO(ID3D12PipelineState* PSO)
 vector<ShaderMacroPack> JGMaterial::CreateMacroPack()
 {
 	vector<ShaderMacroPack> v;
-	if(m_Desc->bReflection)
-		v.push_back(ShaderMacroPack{ SHADER_MACRO_DEFINE_REFLECTION, "1" });
-	if (m_Desc->bRefraction)
-		v.push_back(ShaderMacroPack{ SHADER_MACRO_DEFINE_REFRACTION, "1" });
+	if (m_Desc->Mode == EPSOMode::INSTANCE)
+	{
+		ShaderMacroPack Pack;
+		Pack.Macro = SHADER_MACRO_DEFINE_SHADER_INSTANCE_OBJECT;
+		Pack.Value = "1";
+		v.push_back(Pack);
+	}
 
 	return move(v);
 }

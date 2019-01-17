@@ -46,7 +46,7 @@ namespace JGRC
 		}
 		UINT GetInputLayoutSize() const { return (UINT)m_InputLayout.size(); }
 	protected:
-		std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers()
+		std::array<const CD3DX12_STATIC_SAMPLER_DESC, 8> GetStaticSamplers()
 		{
 			// Applications usually only need a handful of samplers.  So just define them all up front
 			// and keep them available as part of the root signature.  
@@ -106,11 +106,20 @@ namespace JGRC
 				16,                                 // maxAnisotropy
 				D3D12_COMPARISON_FUNC_LESS_EQUAL,
 				D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK);
+
+			const CD3DX12_STATIC_SAMPLER_DESC cubewrap(
+				7, // shaderRegister
+				D3D12_FILTER_ANISOTROPIC, // filter
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+				0.0f,                             // mipLODBias
+				8);                               // maxAnisotropy
 			return {
 				pointWrap, pointClamp,
 				linearWrap, linearClamp,
 				anisotropicWrap, anisotropicClamp,
-			    shadow};
+			    shadow,cubewrap };
 		}
 	};
 }

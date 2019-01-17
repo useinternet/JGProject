@@ -5,6 +5,7 @@
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/SSAOShaderRootSignature.h"
 #include"Data/CommonData.h"
+#include"Shader/ShaderPath.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -29,7 +30,7 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 
 
 	m_NormalMapShader = make_unique<Shader>();
-	m_NormalMapShader->Init(L"../Contents/Engine/Shaders/DrawNormals.hlsl",
+	m_NormalMapShader->Init(global_drawnormal_hlsl_path,
 		{ EShaderType::Vertex, EShaderType::Pixel });
 
 	m_NormalMapPSO = m_NormalMapShader->CompileAndConstrutPSO(EPSOMode::SSAO_NORMALMAP,
@@ -38,13 +39,13 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 	m_SSAORootSig = make_unique<SSAOShaderRootSignature>();
 	m_SSAORootSig->RootSign(CommonData::_Device());
 	m_SSAOShader = make_unique<Shader>();
-	m_SSAOShader->Init(L"../Contents/Engine/Shaders/Ssao.hlsl",
+	m_SSAOShader->Init(global_ssao_hlsl_path,
 		{ EShaderType::Vertex, EShaderType::Pixel });
 	m_SSAOPSO = m_SSAOShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {});
 
 
 	m_SSAOBlurShader = make_unique<Shader>();
-	m_SSAOBlurShader->Init(L"../Contents/Engine/Shaders/SsaoBlur.hlsl",
+	m_SSAOBlurShader->Init(global_ssaoblur_hlsl_path,
 		{ EShaderType::Vertex, EShaderType::Pixel });
 	m_SSAOBlurPSO = m_SSAOBlurShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {});
 }

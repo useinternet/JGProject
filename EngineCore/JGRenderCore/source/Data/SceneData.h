@@ -14,7 +14,7 @@ namespace JGRC
 		const DXGI_FORMAT m_AlbedoFormat   = DXGI_FORMAT_R8G8B8A8_UNORM;
 		const DXGI_FORMAT m_NormalFormat   = DXGI_FORMAT_R8G8B8A8_UNORM;
 		const DXGI_FORMAT m_DepthFormat    = DXGI_FORMAT_R24G8_TYPELESS;
-		const DXGI_FORMAT m_MatFormat = DXGI_FORMAT_R32_UINT;
+		const DXGI_FORMAT m_MatFormat      = DXGI_FORMAT_R32G32_UINT;
 
 		D3D12_VIEWPORT m_ViewPort;
 		D3D12_RECT     m_ScissorRect;

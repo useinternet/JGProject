@@ -2,6 +2,7 @@
 #include"Data/Scene.h"
 #include"Data/JGLight.h"
 #include"Data/CommonData.h"
+#include"BlurFilter.h"
 using namespace std;
 using namespace JGRC;
 using namespace DirectX;
@@ -16,7 +17,6 @@ ShadowMap::ShadowMap(UINT width, UINT height)
 	m_Viewport = { 0.0f,0.0f,(float)width, (float)height,0.0f,1.0f };
 	m_ScissorRect = { 0,0,(int)width, (int)height };
 }
-
 void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, ELightExercise LightExcType)
 {
 	CommandList->RSSetViewports(1, &m_Viewport);
@@ -148,6 +148,7 @@ void ShadowMap::BuildShadowMap(const string& name, EShadowMapType type)
 		}
 		break;
 	}
+	
 }
 UINT ShadowMap::GetSrvIndex() const
 {

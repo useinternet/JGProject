@@ -16,7 +16,8 @@ namespace JGRC
 		DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
 		DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 		UINT MaterialIndex = 0;
-		UINT ObjPad[3];
+		UINT CubeMapIndex  = 0;
+		UINT ObjPad[2];
 	}cbInstanceData;
 	typedef struct cbPassConstant
 	{
@@ -55,23 +56,26 @@ namespace JGRC
 		DirectX::XMFLOAT3 FresnelR0 = { 0.0f, 0.0f, 0.0f };
 		float Roughness  = 0.0f;
 		float Refractive = 1.0f;
-		float CustomPad[3] = { 0.0f,0.0f,0.0f };
+		float Reflectivity = 1.0f;
+		float CustomPad[2] = { 0.0f,0.0f };
 		DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 		UINT TextureIndex[8];
 	}MaterialData;
 
 	class RCORE_EXPORT FrameResource
 	{
+
+	private:
 		FrameResource(const FrameResource& rhs) = delete;
 		FrameResource& operator=(const FrameResource& rhs) = delete;
 	public:
 		FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount);
 		~FrameResource() {}
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>   CmdListAlloc;
-		std::unique_ptr<UploadBuffer<cbPassConstant>>    PassCB = nullptr;
-		std::unique_ptr<UploadBuffer<cbObjectConstant>>  ObjectCB = nullptr;
+		std::unique_ptr<UploadBuffer<cbPassConstant>>    PassCB     = nullptr;
+		std::unique_ptr<UploadBuffer<cbObjectConstant>>  ObjectCB   = nullptr;
 		std::unique_ptr<UploadBuffer<MaterialData>>      MaterialCB = nullptr;
-		std::unique_ptr<UploadBuffer<Light>>             LightCB = nullptr;
+		std::unique_ptr<UploadBuffer<Light>>             LightCB    = nullptr;
 		UINT64 Fence = 0;
 	public:
 		void ReSize(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount);

@@ -4,7 +4,9 @@
 #include"PostProcessing/CubeMap.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
+#include"Shader/ShaderPath.h"
 #include"PostProcessing/ShadowMap.h"
+#include"PostProcessing/BlurFilter.h"
 #include"PostProcessing/SSAO.h"
 #include"JGLight.h"
 #include"CommonData.h"
@@ -40,7 +42,7 @@ Scene::Scene(class DxCore* core)
 	m_CommonShaderRootSig = make_unique<CommonShaderRootSignature>();
 	m_CommonShaderRootSig->RootSign(m_DxCore->Device());
 	m_SceneShader = make_unique<Shader>();
-	m_SceneShader->Init(L"../Contents/Engine/Shaders/Scene.hlsl",
+	m_SceneShader->Init(global_scene_hlsl_path,
 		{ EShaderType::Vertex, EShaderType::Pixel });
 	m_ScenePSO = m_SceneShader->CompileAndConstrutPSO(EPSOMode::SCENE, m_CommonShaderRootSig.get(), {});
 
@@ -78,11 +80,7 @@ void Scene::BuildScene()
 	m_SSAO = make_unique<SSAO>();
 	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height,
 		m_DxCore->CommandList(), m_CommonShaderRootSig.get());
-
-
-
-	CreateDebugObj();
-
+	m_Blur = make_unique<BlurFilter>(m_SceneConfig.Width, m_SceneConfig.Height);
 	// 오브젝트 분리
 	for (auto& obj : m_ObjectMems)
 	{
@@ -126,13 +124,13 @@ void Scene::Update(const GameTimer& gt)
 
 	// 메인 카메라 업데이트
 	m_MainCamera->UpdateViewMatrix();
+
 	m_FrameResourceManager->FrameResourcePerFrame(m_DxCore->Fence());
 	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
 	m_SSAO->Update(CurrFrameResource);
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
 		obj->Update(gt, CurrFrameResource);
-	m_DebugObj->Update(gt, CurrFrameResource);
 
 
 	// 머터리얼 업데이트
@@ -172,14 +170,9 @@ void Scene::Draw()
 	auto LightCB = CurrFrameResource->LightCB->Resource();
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
 		LightCB->GetGPUVirtualAddress());
+
+
 	m_SSAO->Draw(CurrFrameResource, CommandList);
-
-
-
-
-
-
-
 
 
 
@@ -224,7 +217,7 @@ void Scene::Draw()
 	CommandList->IASetIndexBuffer(nullptr);
 	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	CommandList->DrawInstanced(6, 1, 0, 0);
-
+	m_Blur->Execute(m_DxCore->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
 	// 마무리
 	m_DxCore->EndDraw();
 
@@ -255,7 +248,7 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	// 머터리얼 생성
 	MaterialDesc matDesc;
 	matDesc.Mode = EPSOMode::SKYBOX;
-	matDesc.ShaderPath = m_SkyShaderPath;
+	matDesc.ShaderPath = global_sky_hlsl_path;
 	matDesc.Name = string().assign(m_SkyShaderPath.begin(), m_SkyShaderPath.end());
 	JGMaterial* SkyMat = AddMaterial(matDesc);
 	SkyMat->SetTexture(ETextureSlot::Diffuse, texturepath);
@@ -303,6 +296,20 @@ void Scene::AddTexture(const wstring& TexturePath, ETextureType type)
 {
 	m_TextureDatas.push_back(TexturePack{ move(TexturePath), nullptr, type });
 }
+void  Scene::SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource)
+{
+	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
+	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
+		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
+	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
+		m_ResourceManager->GetGPUCubeMapHandle());
+	auto MatCB = CurrFrameResource->MaterialCB->Resource();
+	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbMaterialData,
+		MatCB->GetGPUVirtualAddress());
+	auto LightCB = CurrFrameResource->LightCB->Resource();
+	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
+		LightCB->GetGPUVirtualAddress());
+}
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
@@ -310,21 +317,6 @@ D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 	Handle += m_MainPass->PassCBIndex * passCBByteSize;
 	return Handle;
 }
-
-void Scene::CreateDebugObj()
-{
-	m_DebugObj = make_unique<JGRCObject>(++m_ObjIndex, EObjType::Static);
-	MaterialDesc desc;
-	desc.Name = "osaidjf";
-	desc.Mode = EPSOMode::SCENE;
-	desc.ShaderPath = L"../Contents/Engine/Shaders/ShadowDebug.hlsl";
-	JGMaterial* debug = AddMaterial(desc);
-	JGMesh* mesh = AddMesh();
-	mesh->AddQuadArg("Debug", -1.0f, 1.0f, 2.0f, 2.0f, 0.0f);
-	m_DebugObj->SetMesh(mesh, "Debug");
-	m_DebugObj->SetMaterial(debug);
-}
-
 void Scene::MainPassUpdate(const GameTimer& gt)
 {
 	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();

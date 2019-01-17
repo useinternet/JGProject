@@ -86,20 +86,24 @@ void JGRenderCore::Update(const GameTimer& gt)
 				PointLight[i]->OffsetLocation(0.0f, 0.0f, gt.DeltaTime() * 20.0f);
 		}
 	}
-	for (int i = 0; i < 4; ++i)
-	{
-		SpotLight[i]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
-	}
+	SpotLight[0]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
+	SpotLight[1]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
+	SpotLight[2]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
+	SpotLight[3]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
+	//for (int i = 0; i < 4; ++i)
+	//{
+	//	SpotLight[i]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
+	//}
 	m_Scene->Update(gt);
 }
 void JGRenderCore::ScreenReSize(int width, int height)
 {
 	if (width == 0 || height == 0)
 		return;
-	m_DxCore->OnResize(width, height);
-	m_Camera->SetLens(4 / MathHelper::Pi, m_DxCore->AspectRatio(), m_Camera->GetNearZ(),
-		m_Camera->GetFarZ());
-	m_Scene->OnReSize(width, height);
+	//m_DxCore->OnResize(width, height);
+	//m_Camera->SetLens(4 / MathHelper::Pi, m_DxCore->AspectRatio(), m_Camera->GetNearZ(),
+	//	m_Camera->GetFarZ());
+	//m_Scene->OnReSize(width, height);
 }
 void JGRenderCore::Draw()
 {
@@ -150,7 +154,7 @@ void JGRenderCore::BuildTextures()
 void JGRenderCore::BuildLight()
 {
 	DirLight = m_Scene->AddLight(ELightType::Direction);
-	DirLight->SetLightColor(0.55f, 0.34f, 0.3f);
+	DirLight->SetLightColor(0.7f, 0.75f, 0.9f);
 	DirLight->SetDirection(-1.0f, -1.0f, 1.0f);
 
 
@@ -160,37 +164,37 @@ void JGRenderCore::BuildLight()
 		PointSwitch[i] = false;
 		PointLight[i] = m_Scene->AddLight(ELightType::Point,ELightExercise::Dynamic);
 		PointLight[i]->SetFalloffStart(0.0f);
-		PointLight[i]->SetFalloffEnd(50.0f);
+		PointLight[i]->SetFalloffEnd(100.0f);
 		SpotLight[i] = m_Scene->AddLight(ELightType::Spot, ELightExercise::Dynamic);
-		SpotLight[i]->SetFalloffStart(0.0f);
-		SpotLight[i]->SetFalloffEnd(75.0f);
+		SpotLight[i]->SetFalloffStart(50.0f);
+		SpotLight[i]->SetFalloffEnd(100.0f);
 
-		SpotLight[i]->SetDirection(1.0f, 0.0f, 0.0f);
+		SpotLight[i]->SetDirection(1.0f, -1.0f, 0.0f);
 		switch (i)
 		{
 		case 0:
-			PointLight[i]->SetLightColor(2.0f, 0.0f, 0.0f);
+			PointLight[i]->SetLightColor(1.0f, 0.0f, 0.0f);
 			PointLight[i]->SetLocation(150.0f, 5.0f, 0.0f);
-			SpotLight[i]->SetLightColor(0.0f, 2.0f, 0.0f);
-			SpotLight[i]->SetLocation(100.0f, 5.0f, 0.0f);
+			SpotLight[i]->SetLightColor(0.0f, 1.0f, 0.0f);
+			SpotLight[i]->SetLocation(100.0f, 10.0f, 0.0f);
 			break;
 		case 1:
-			PointLight[i]->SetLightColor(0.0f, 2.0f, 0.0f);
+			PointLight[i]->SetLightColor(0.0f, 1.0f, 0.0f);
 			PointLight[i]->SetLocation(0.0f, 5.0f, 150.0f);
-			SpotLight[i]->SetLightColor(0.0f, 0.0f, 2.0f);
-			SpotLight[i]->SetLocation(0.0f, 5.0f, 100.0f);
+			SpotLight[i]->SetLightColor(0.928f, 0.34f, 1.0f);
+			SpotLight[i]->SetLocation(0.0f, 10.0f, 100.0f);
 			break;
 		case 2:
-			PointLight[i]->SetLightColor(2.0f, 2.0f, 0.0f);
+			PointLight[i]->SetLightColor(1.0f, 1.0f, 0.0f);
 			PointLight[i]->SetLocation(-150.0f, 5.0f, 0.0f);
-			SpotLight[i]->SetLightColor(2.0f, 2.0f, 2.0f);
-			SpotLight[i]->SetLocation(-100.0f, 5.0f, 0.0f);
+			SpotLight[i]->SetLightColor(1.0f, 1.0f, 1.0f);
+			SpotLight[i]->SetLocation(-100.0f, 10.0f, 0.0f);
 			break;
 		case 3:
-			PointLight[i]->SetLightColor(0.0f, 2.0f, 2.0f);
+			PointLight[i]->SetLightColor(0.0f, 1.0f, 1.0f);
 			PointLight[i]->SetLocation(0.0f, 5.0f, -150.0f);
-			SpotLight[i]->SetLightColor(2.0f, 0.0f, 2.0f);
-			SpotLight[i]->SetLocation(0.0f, 5.0f, -100.0f);
+			SpotLight[i]->SetLightColor(1.0f, 0.0f, 1.0f);
+			SpotLight[i]->SetLocation(0.0f, 10.0f, -100.0f);
 			break;
 		}
 	}
@@ -230,21 +234,24 @@ void JGRenderCore::BuildLandGeometry()
 	BoxMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/tile.dds");
 	BoxMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/tile_nmap.dds");
 	BoxMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	BoxMat->SetFresnelR0(0.02f, 0.02f, 0.02f);
-	BoxMat->SetRoughness(1.0f);
+	BoxMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
+	BoxMat->SetRoughness(0.0f);
 
 	Desc.Name = "SphereMat";
-	Desc.bCubMapDynamic = false;
-	Desc.bReflectionOnlyBackground = false;
-	Desc.bRefraction = false;
-	Desc.bReflection = true;
+	Desc.bCubeMapStatic = true;
 	JGMaterial* SphereMat = m_Scene->AddMaterial(Desc);
 	SphereMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/bricks2.dds");
 	SphereMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/bricks2_nmap.dds");
-	SphereMat->SetDiffuseAlbedo(0.0f, 0.0f, 0.0f, 1.0f);
+	SphereMat->SetDiffuseAlbedo(1.0f, 0.0f, 0.0f, 1.0f);
 	SphereMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	SphereMat->SetRoughness(0.0f);
+	SphereMat->SetRoughness(0.05f);
 	SphereMat->SetRefractive(1.0f);
+
+
+	Desc.Name = "InstanceMat";
+	Desc.bCubeMapStatic = true;
+	Desc.Mode = EPSOMode::INSTANCE;
+	JGMaterial* InsMat = m_Scene->AddMaterial(Desc);
 
 
 

@@ -22,6 +22,7 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="source\Data\CommonData.cpp" />
     <ClCompile Include="source\Data\EngineFrameResource.cpp" />
+    <ClCompile Include="source\Data\InstanceObject.cpp" />
     <ClCompile Include="source\Data\JGLight.cpp" />
     <ClCompile Include="source\Data\JGMaterial.cpp" />
     <ClCompile Include="source\Data\JGMesh.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="source\Data\CommonData.h" />
     <ClInclude Include="source\Data\EngineFrameResource.h" />
+    <ClInclude Include="source\Data\InstanceObject.h" />
     <ClInclude Include="source\Data\JGLight.h" />
     <ClInclude Include="source\Data\JGMaterial.h" />
     <ClInclude Include="source\Data\JGMesh.h" />
@@ -80,6 +82,7 @@
     <ClInclude Include="source\Shader\BlurShaderRootSignature.h" />
     <ClInclude Include="source\Shader\CommonShaderRootSignature.h" />
     <ClInclude Include="source\Shader\Shader.h" />
+    <ClInclude Include="source\Shader\ShaderPath.h" />
     <ClInclude Include="source\Shader\ShaderRootSignature.h" />
     <ClInclude Include="source\Shader\SSAOShaderRootSignature.h" />
   </ItemGroup>

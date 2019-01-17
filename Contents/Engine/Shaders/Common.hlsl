@@ -8,6 +8,8 @@ SamplerState gsamLinearClamp : register(s3);
 SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
 SamplerComparisonState gsamShadow : register(s6);
+samplerCUBE gCubeSampler : register(s7);
+
 static const float ShadowConstant = 1.3f;
 
 cbuffer cbPerObject : register(b0)
@@ -56,12 +58,23 @@ struct MaterialData
     float3 FresnelR0;
     float Roughness;
     float Refractive;
-    float3 CustomPad;
+    float Reflectivity;
+    float2 CustomPad;
     float4x4 MatTransform;
     uint TextureIndex[8];
 };
+struct InstanceData
+{
+    float4x4 World;
+    float4x4 TexTransform;
+    uint MaterialIndex;
+    uint CubeMapIndex;
+    uint ObjPad[2];
+};
+
 Texture2D                      gTexture[1]   : register(t0, space0);
 StructuredBuffer<MaterialData> gMaterialData : register(t0, space1);
+StructuredBuffer<InstanceData> gInstanceData : register(t0, space2);
 StructuredBuffer<Light>        gLightData    : register(t1, space1);
 TextureCube                    gCubeMap[1]   : register(t2, space1);
 
@@ -133,11 +146,16 @@ float CalcSpotShadowFactor(float4 ShadowPosH, uint StaticIndex, uint DynamicInde
     UVD.xy = 0.5 * UVD.xy + 0.5;
     UVD.y = 1.0f - UVD.y;
 
-    float factor1 = gTexture[StaticIndex].SampleCmpLevelZero(gsamShadow, UVD.xy, UVD.z).r;
-    float factor2 = gTexture[DynamicIndex].SampleCmpLevelZero(gsamShadow, UVD.xy, UVD.z).r;
+    float percentLit1 = 0.0f;
+    float percentLit2 = 0.0f;
 
-	// Compute the hardware PCF value
-    return saturate(factor1 * factor2 * ShadowConstant);
+
+    percentLit1 += gTexture[StaticIndex].SampleCmpLevelZero(gsamShadow,
+			UVD.xy, UVD.z).r;
+    percentLit2 += gTexture[DynamicIndex].SampleCmpLevelZero(gsamShadow,
+			UVD.xy, UVD.z).r;
+
+    return saturate(percentLit1 * percentLit2 * ShadowConstant);
 }
 float CalcPointShadowFactor(float3 PosW, Light l)
 {
@@ -148,11 +166,17 @@ float CalcPointShadowFactor(float3 PosW, Light l)
     float Z = max(ToPixelAbs.x, max(ToPixelAbs.y, ToPixelAbs.z));
     float Depth = (x * Z + y) / Z;
 
-    float factor1 = gCubeMap[l.StaticShadowMapIndex].SampleCmpLevelZero(gsamShadow, ToPixel, Depth).r;
-    float factor2 = gCubeMap[l.DynamicShadowMapIndex].SampleCmpLevelZero(gsamShadow, ToPixel, Depth).r;
+    float percentLit1 = 0.0f;
+    float percentLit2 = 0.0f;
 
+    percentLit1 += gCubeMap[l.StaticShadowMapIndex].SampleCmpLevelZero(gsamShadow,
+			ToPixel.xyz, Depth).r;
+    percentLit2 += gCubeMap[l.DynamicShadowMapIndex].SampleCmpLevelZero(gsamShadow,
+			ToPixel.xyz, Depth).r;
 
-
-    return saturate(factor1 * factor2 * ShadowConstant);
-
+    return saturate(percentLit1 * percentLit2 * ShadowConstant);
 }
+
+
+
+

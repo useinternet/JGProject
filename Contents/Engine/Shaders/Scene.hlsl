@@ -6,7 +6,8 @@ struct SceneData
     float3 Albedo;
     float3 NormalW;
     float  Depth;
-    uint   MatIndex;
+    uint MatIndex;
+    uint CubIndex;
     float  IsBackGround;
 };
 SceneData InstallData(float2 TexC)
@@ -19,7 +20,7 @@ SceneData InstallData(float2 TexC)
     Data.PosW = gTexture[gWorldPosSceneIndex].Sample(gsamAnisotropicWrap, TexC).xyz;
     Data.Depth = gTexture[gDepthSceneIndex].Sample(gsamAnisotropicWrap, TexC).r;
     Data.MatIndex = gTexture[gMatSceneIndex].Sample(gsamAnisotropicWrap, TexC).r - 1;
-
+    Data.CubIndex = gTexture[gMatSceneIndex].Sample(gsamAnisotropicWrap, TexC).g - 1;
     if (Albedo.a < 0.1f)
         clip(Albedo.a - 0.1f);
 
@@ -56,17 +57,19 @@ VS_OUT VS(uint vid : SV_VertexID)
 float4 PS(VS_OUT pin) : SV_Target
 {
     SceneData Data = InstallData(pin.TexC);
-
+    float4 ambient = float4(0.25f, 0.25f, 0.35f, 1.0f);
     if(Data.IsBackGround > 0.1f)
     {
         MaterialData matData = gMaterialData[Data.MatIndex];
-    
-    
-        float3 toEyeW = normalize(gEyePosW - Data.PosW);
-        float4 ambient = float4(Data.Albedo, 1.0f);
 
+        float3 toEyeW = normalize(gEyePosW - Data.PosW);
         const float shininess = 1.0f - matData.Roughness;
-        Material mat = { float4(Data.Albedo, 1.0f), matData.FresnelR0, shininess };
+        // Ambeint 계산 //
+        
+        ambient *= float4(Data.Albedo, 1.0f);
+   
+        ////////////////////////////////// 라이트 계산 //////////////////////////////////////////
+        Material mat = { ambient, matData.FresnelR0, shininess};
         float3 result = 0.0f;
         float ShadowFactor = 1.0f;
         float4 ShadowPosH = float4(Data.PosW, 1.0f);
@@ -76,14 +79,13 @@ float4 PS(VS_OUT pin) : SV_Target
             ShadowFactor = CalcDirectionShadowFactor(ShadowPosH,
         gLightData[0].StaticShadowMapIndex,
         gLightData[0].DynamicShadowMapIndex);
-      
+            
             result += saturate(ShadowFactor * ComputeDirectionalLight(gLightData[0], mat, Data.NormalW, toEyeW));
         }
         int i = gDirLightCount;
         for (i = gDirLightCount; i < gDirLightCount + gPointLightCount; ++i)
         {
             ShadowFactor = CalcPointShadowFactor(Data.PosW, gLightData[i]);
-    
             result += saturate(ShadowFactor * ComputePointLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
 
         }
@@ -95,15 +97,38 @@ float4 PS(VS_OUT pin) : SV_Target
         gLightData[i].StaticShadowMapIndex,
         gLightData[i].DynamicShadowMapIndex);
      
-            result += saturate(ShadowFactor * ComputeSpotLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
+           result += saturate(ShadowFactor * ComputeSpotLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
         }
+        float3 directLight = saturate(result);
+        //////////////////////////////////////////////////////////////////////////////////////////
+        float3 litColor = ambient.rgb + saturate(directLight);
 
-        float4 directLight = float4(result, 0.0f);
-        float4 litColor = ambient + saturate(directLight);        
-        return litColor;
+
+       
+        float3 r = reflect(-toEyeW, Data.NormalW);
+        float3 reflection = gCubeMap[Data.CubIndex].Sample(gsamLinearWrap, r).rgb;
+        float3 fresnel_r = SchlickFresnel(matData.FresnelR0, Data.NormalW, r);
+
+
+        float3 g = refract(-toEyeW, Data.NormalW,matData.Refractive);
+        float3 refraction = reflection;
+        float3 fresnel_g = SchlickFresnel(matData.FresnelR0, Data.NormalW, g);
+
+        reflection = reflection * shininess * fresnel_r;
+        refraction = refraction * shininess * fresnel_g;
+        float3 final = lerp(reflection, refraction, matData.Reflectivity);
+
+        litColor.rgb += saturate(final); 
+
+
+
+        return float4(litColor, 1.0f);
     }
     else
     {
-        return float4(Data.Albedo, 1.0f);
+        if(gDirLightCount > 0)
+            return float4(Data.Albedo , 1.0f);
+        else
+            return ambient;
     }
 }

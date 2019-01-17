@@ -10,10 +10,9 @@ using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 UINT64 JGRCObject::Count = 0;
-
-JGRCObject::JGRCObject(UINT Index, EObjType Type, const JGRCObjDesc& Desc)
+JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name, const JGRCObjDesc& Desc)
 {
-	m_Name = "JGRCObject" + to_string(Index);
+	m_Name += name + to_string(Index);
 	Count++;
 	this->Type = Type;
 	m_ObjCBIndex = Index;
@@ -31,7 +30,7 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
 {
 	m_bInit = true;
 	MaterialDesc* Desc = m_Material->GetDesc();
-	if(!Desc->bReflectionOnlyBackground && (Desc->bReflection || Desc->bRefraction))
+	if((Desc->bCubeMapStatic || Desc->bCubMapDynamic))
 	{
 		m_CubeMap = make_unique<CubeMap>();
 		m_CubeMap->BuildCubeMap(m_Name, CommandList);
@@ -58,17 +57,48 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 		else
 			objConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
 				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
-		
-		
 		UpdateWorldMatrix();
+
 		XMMATRIX World = XMLoadFloat4x4(&m_World);
 		XMMATRIX TexTransform = XMLoadFloat4x4(&m_TexTransform);
 
-	
+
 		XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(World));
 		XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixTranspose(TexTransform));
 		objConstants.MaterialIndex = m_Material->CBIndex();
 		ObjCB->CopyData(m_ObjCBIndex, objConstants);
+
+		UpdatePerFrame();
+	}
+}
+void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB)
+{
+	if (m_CubeMap)
+	{
+		m_CubeMap->Update(gt, CurrentFrameResource);
+	}
+	if (IsCanUpdate())
+	{
+		InstanceData InsConstants;
+		if (m_CubeMap)
+		{
+			m_CubeMap->BuildCamera(m_Location.x, m_Location.y, m_Location.z);
+			InsConstants.CubeMapIndex = m_CubeMap->GetCubeMapIndex();
+		}
+		else
+			InsConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
+				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
+		UpdateWorldMatrix();
+
+		XMMATRIX World = XMLoadFloat4x4(&m_World);
+		XMMATRIX TexTransform = XMLoadFloat4x4(&m_TexTransform);
+
+
+		XMStoreFloat4x4(&InsConstants.World, XMMatrixTranspose(World));
+		XMStoreFloat4x4(&InsConstants.TexTransform, XMMatrixTranspose(TexTransform));
+		InsConstants.MaterialIndex = m_Material->CBIndex();
+
+		InsCB->CopyData(m_ObjCBIndex, InsConstants);
 		UpdatePerFrame();
 	}
 }
@@ -77,6 +107,8 @@ void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12Graphics
 	if (!m_bVisible)
 		return;
 	MaterialDesc* Desc = m_Material->GetDesc();
+
+	// 큐브맵이 존재하고  동적 큐브맵도 아니고 업데이트가 다끝낫다면 그리지 않는다.
 	if (m_CubeMap && !Desc->bCubMapDynamic && !IsCanUpdate())
 		return;
 	if (m_CubeMap)
@@ -86,7 +118,7 @@ void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12Graphics
 }
 void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode)
 {
-	if (!m_bVisible)
+	if (!m_bVisible || Type == EObjType::Instance)
 	{
 		return;
 	}

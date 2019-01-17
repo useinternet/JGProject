@@ -111,7 +111,6 @@ namespace JGRC
 		UINT m_CubeHeapOffset = 0;
 		UINT m_RtvHeapOffset  = 0;
 		UINT m_DsvHeapOffset  = 0;
-		//
 	public:
 		void Init(class DxCore* core);
 	public:

@@ -115,8 +115,15 @@ void Shader::CreateModeDesc(EPSOMode mode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& D
 {
 	switch (mode)
 	{
+	case EPSOMode::INSTANCE:
 	case EPSOMode::DEFAULT:
 		Desc = PipeLineStateSetDesc().SceneDataRenderTarget();
+		Desc.RasterizerState = RSDescList::Default();
+		Desc.BlendState = BSDescList::Default();
+		Desc.DepthStencilState = DSSDescList::Default();
+		break;
+	case EPSOMode::ONETARGET_DEFAULT:
+		Desc = PipeLineStateSetDesc().Get();
 		Desc.RasterizerState = RSDescList::Default();
 		Desc.BlendState = BSDescList::Default();
 		Desc.DepthStencilState = DSSDescList::Default();

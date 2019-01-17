@@ -30,9 +30,7 @@ namespace JGRC
 		EPSOMode  Mode = EPSOMode::DEFAULT;
 		std::wstring ShaderPath;
 		bool bCubMapDynamic = false;
-		bool bReflectionOnlyBackground = true;
-		bool bReflection    = false;
-		bool bRefraction    = false;
+		bool bCubeMapStatic = false;
 	};
 	//
 	class RCORE_EXPORT JGMaterial

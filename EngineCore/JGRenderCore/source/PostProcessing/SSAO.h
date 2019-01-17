@@ -62,12 +62,10 @@ namespace JGRC
 		std::unique_ptr<UploadBuffer<SSAOData>> m_SSAOCB;
 
 		//
-
 		D3D12_VIEWPORT m_Viewport;
 		D3D12_RECT m_ScissorRect;
 		D3D12_VIEWPORT m_SSAOViewport;
 		D3D12_RECT m_SSAOScissorRect;
-
 	public:
 		SSAO();
 		~SSAO() = default;

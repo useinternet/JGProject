@@ -6,17 +6,8 @@
 #include"LightManager.h"
 #include"DxCore/DxSetting.h"
 /*
-라이트 정리
-노멀 적용 물 적용 예제 변경
-그리고 오브젝트 Static, Dynamic 분리
-
-
 --- 해야할거 ( 언제 걸릴지 모른다. ) 
-6. 입방체 맵 특정 상수에의 의하여 블러 처리( 가장자리 블러 아니면 가우스 블러 ) <- 그리고 평면 입방체도 
-적용할수있게끔 수정 ( unitrayDir 에 현재 posW 나 posH 에서 center으로 향하는 벡터 를 너보자 )
-7. 그림자 블러처리 ( 또한 그림자 깊이 편차 값 실시간 으로 수정할수있게 변경)
 8. 인스턴스 오브젝트 구현
-9. 오브젝트 동적 생성 할수있게 리팩토링( 또한 오브젝트 타입별 나누고 PSO 별 나누분류 작업 리펙토링)
 10. 옥트리를 이용한 프리스텀 컬링 및 피킹 시스템 구현
 11. 그 후 로그 및 프로파일링 및 FBX 불러오기 (JGMesh 개편) 
 12. 코드 다듬고 애니메이션( 평평 물체 반사)
@@ -44,6 +35,7 @@ namespace JGRC
 		ID3D12PipelineState* m_ScenePSO = nullptr;
 		//  SSAO
 		std::shared_ptr<class SSAO> m_SSAO;
+		std::shared_ptr<class BlurFilter> m_Blur;
 		// 메인 상수 패스 
 		std::vector<std::unique_ptr<PassData>> m_PassDatas;
 		UINT      m_PassCBIndex = -1;
@@ -77,7 +69,8 @@ namespace JGRC
 
 		// 라이트 
 		std::unique_ptr<LightManager> m_LightManager;
-		std::unique_ptr<JGRCObject>   m_DebugObj;
+
+		//
 	private:
 		Scene(const Scene& rhs) = delete;
 		Scene& operator=(const Scene& rhs) = delete;
@@ -96,7 +89,7 @@ namespace JGRC
 		PassData*   AddPassData();
 		JGLight*    AddLight(ELightType type, ELightExercise extype = ELightExercise::Static);
 		void        AddTexture(const std::wstring& TexturePath, ETextureType type = ETextureType::Default);
-	
+		void        SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource);
 	public:
 		Camera*   GetMainCamera() const      { return m_MainCamera; }
 		void      SetMainCamera(Camera* cam) { m_MainCamera = cam; }
@@ -115,7 +108,6 @@ namespace JGRC
 		std::vector<JGRCObject*>& GetArray(EObjType objType, EPSOMode mode)  
 		{ return m_ObjectArray[objType][mode]; }
 	private:
-		void CreateDebugObj();
 		void MainPassUpdate(const GameTimer& gt);
 		void InitStaticMemberVar();
 	};

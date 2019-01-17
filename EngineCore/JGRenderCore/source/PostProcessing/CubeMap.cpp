@@ -77,9 +77,6 @@ void CubeMap::Excute(FrameResource* CurrentResource,ID3D12GraphicsCommandList* C
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
 	for (int i = 0; i < 6; ++i)
 	{
-
-
-
 		auto passCB = CurrentResource->PassCB->Resource();
 		D3D12_GPU_VIRTUAL_ADDRESS passCBAddress = passCB->GetGPUVirtualAddress() + m_CubeMapPass[i]->PassCBIndex * passCBByteSize;
 
@@ -99,6 +96,8 @@ void CubeMap::Excute(FrameResource* CurrentResource,ID3D12GraphicsCommandList* C
 		CommandList->IASetIndexBuffer(nullptr);
 		CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		CommandList->DrawInstanced(6, 1, 0, 0);
+
+
 	}
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_CubeMap, D3D12_RESOURCE_STATE_GENERIC_READ);
 }

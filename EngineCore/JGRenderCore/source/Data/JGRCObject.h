@@ -8,7 +8,8 @@ namespace JGRC
 	enum class EObjType
 	{
 		Static,
-		Dynamic
+		Dynamic,
+		Instance
 	};
 	enum class EObjRenderMode
 	{
@@ -29,7 +30,7 @@ namespace JGRC
 	{
 		class JGMaterial* Material = nullptr;
 		class JGMesh*     Mesh = nullptr;
-		std::string       MeshName = "None";
+		std::string       MeshName = "";
 		Vec3 Location = { 0.0f,0.0f,0.0f };
 		Vec3 Rotation = { 0.0f,0.0f,0.0f };
 		Vec3 Scale    = { 1.0f,1.0f,1.0f };
@@ -67,9 +68,10 @@ namespace JGRC
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
 
 	public:
-		JGRCObject(UINT Index, EObjType Type, const JGRCObjDesc& Desc = JGRCObjDesc());
+		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject",const JGRCObjDesc& Desc = JGRCObjDesc());
 		void Build(ID3D12GraphicsCommandList* CommandList);
-		void Update(const GameTimer& gt, class FrameResource* CurrentFrameResource);
+		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource);
+		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
 		void Draw(class FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode = EObjRenderMode::Default);
 	public:
