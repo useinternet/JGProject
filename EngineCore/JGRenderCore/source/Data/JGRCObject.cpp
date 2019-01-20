@@ -27,7 +27,7 @@ JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name, const JGRC
 	UpdateWorldMatrix();
 }
 void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
-{
+{	
 	m_bInit = true;
 	MaterialDesc* Desc = m_Material->GetDesc();
 	if((Desc->bCubeMapStatic || Desc->bCubMapDynamic))
@@ -36,6 +36,7 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
 		m_CubeMap->BuildCubeMap(m_Name, CommandList);
 		m_CubeMap->BuildCamera(m_Location.x, m_Location.y, m_Location.z);
 	}
+	m_CullingBox = m_Mesh->Data()->DrawArgs[m_MeshName].Bounds;
 }
 void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 {
@@ -71,12 +72,17 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 		UpdatePerFrame();
 	}
 }
-void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB)
+void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex)
 {
+
+	if (m_bCulling)
+		return;
 	if (m_CubeMap)
 	{
 		m_CubeMap->Update(gt, CurrentFrameResource);
 	}
+	if (m_ObjCBIndex != InsIndex)
+		ClearNotify();
 	if (IsCanUpdate())
 	{
 		InstanceData InsConstants;
@@ -96,15 +102,20 @@ void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource
 
 		XMStoreFloat4x4(&InsConstants.World, XMMatrixTranspose(World));
 		XMStoreFloat4x4(&InsConstants.TexTransform, XMMatrixTranspose(TexTransform));
+
+
 		InsConstants.MaterialIndex = m_Material->CBIndex();
 
+
+
+		m_ObjCBIndex = InsIndex;
 		InsCB->CopyData(m_ObjCBIndex, InsConstants);
 		UpdatePerFrame();
 	}
 }
 void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
 {
-	if (!m_bVisible)
+	if (!m_bVisible || m_bCulling)
 		return;
 	MaterialDesc* Desc = m_Material->GetDesc();
 
@@ -118,11 +129,10 @@ void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12Graphics
 }
 void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode)
 {
-	if (!m_bVisible || Type == EObjType::Instance)
+	if (!m_bVisible || Type == EObjType::Instance || m_bCulling)
 	{
 		return;
 	}
-
 	auto ObjCB = CurrentFrameResource->ObjectCB->Resource();
 	auto MeshData = m_Mesh->Data();
 	UINT ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbObjectConstant));
@@ -153,6 +163,7 @@ void JGRCObject::UpdateWorldMatrix()
 	XMMATRIX Scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	XMMATRIX World = Scale * Rotation * Translation;
 	XMStoreFloat4x4(&m_World, World);
+	m_CullingBox.Transform(m_CullingBox, Scale * Rotation);
 }
 void JGRCObject::SetMesh(JGMesh* mesh, const string& name)
 {

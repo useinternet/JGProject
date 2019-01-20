@@ -118,13 +118,13 @@ float CalcDirectionShadowFactor(float4 shadowPosH, uint StaticIndex, uint Dynami
 
     float percentLit1 = 0.0f;
     float percentLit2 = 0.0f;
+
     const float2 offsets[9] =
     {
         float2(-dx, -dx), float2(0.0f, -dx), float2(dx, -dx),
 		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
 		float2(-dx, +dx), float2(0.0f, +dx), float2(dx, +dx)
     };
-
 	[unroll]
     for (int i = 0; i < 9; ++i)
     {
@@ -135,7 +135,7 @@ float CalcDirectionShadowFactor(float4 shadowPosH, uint StaticIndex, uint Dynami
     }
     percentLit1 /= 9.0f;
     percentLit2 /= 9.0f;
-    return saturate(percentLit1 * percentLit2 * ShadowConstant);
+        return saturate(percentLit1 * percentLit2 * ShadowConstant);
 }
 float CalcSpotShadowFactor(float4 ShadowPosH, uint StaticIndex, uint DynamicIndex)
 {

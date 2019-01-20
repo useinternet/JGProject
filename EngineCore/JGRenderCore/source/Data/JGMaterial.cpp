@@ -72,6 +72,11 @@ void JGMaterial::SetRefractive(float x)
 	m_Data->Refractive = x;
 	ClearNotify();
 }
+void JGMaterial::SetReflectivity(float x)
+{
+	m_Data->Reflectivity = x;
+	ClearNotify();
+}
 void JGMaterial::SetMatTransform(const DirectX::XMFLOAT4X4& mat)
 {
 	m_Data->MatTransform = mat;

@@ -1,13 +1,12 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
-#include"JGRCObject.h"
+#include"InstanceObject.h"
 #include"JGMaterial.h"
 #include"JGMesh.h"
 #include"LightManager.h"
 #include"DxCore/DxSetting.h"
 /*
 --- 해야할거 ( 언제 걸릴지 모른다. ) 
-8. 인스턴스 오브젝트 구현
 10. 옥트리를 이용한 프리스텀 컬링 및 피킹 시스템 구현
 11. 그 후 로그 및 프로파일링 및 FBX 불러오기 (JGMesh 개편) 
 12. 코드 다듬고 애니메이션( 평평 물체 반사)
@@ -47,6 +46,7 @@ namespace JGRC
 
 		// 오브젝트
 		std::vector<std::unique_ptr<JGRCObject>>      m_ObjectMems;
+		std::vector<std::unique_ptr<InstanceObject>>  m_InstanceObjects;
 		ObjectArray m_ObjectArray;
 		UINT m_ObjIndex = -1;
 
@@ -66,10 +66,10 @@ namespace JGRC
 		std::wstring m_SkyShaderPath = L"../Contents/Engine/Shaders/Sky.hlsl";
 		std::unordered_map<std::wstring, JGRCObject*> m_SkyBox;
 		JGRCObject* m_MainSkyBox = nullptr;
-
+		// 프리스텀
+		DirectX::BoundingFrustum m_Frustom;
 		// 라이트 
 		std::unique_ptr<LightManager> m_LightManager;
-
 		//
 	private:
 		Scene(const Scene& rhs) = delete;
@@ -82,6 +82,7 @@ namespace JGRC
 		void Draw();
 	public:
 		JGRCObject* CreateObject(EObjType Type = EObjType::Static);
+		InstanceObject* CreateInstanceObject(JGMesh* Mesh,const std::string& meshname, JGMaterial* mat);
 		JGRCObject* CreateSkyBox(const std::wstring& texturepath);
 		JGMaterial* AddMaterial(const MaterialDesc& Desc);
 		JGMesh*     AddMesh();
@@ -90,6 +91,7 @@ namespace JGRC
 		JGLight*    AddLight(ELightType type, ELightExercise extype = ELightExercise::Static);
 		void        AddTexture(const std::wstring& TexturePath, ETextureType type = ETextureType::Default);
 		void        SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource);
+		bool        ObjCulling(JGRCObject* obj);
 	public:
 		Camera*   GetMainCamera() const      { return m_MainCamera; }
 		void      SetMainCamera(Camera* cam) { m_MainCamera = cam; }
@@ -104,9 +106,8 @@ namespace JGRC
 		PassData*             GetMainPass()            { return m_MainPass; }
 		D3D12_GPU_VIRTUAL_ADDRESS MainPassHandle();
 		const DirectX::BoundingSphere& GetSceneSphere()      const { return m_SceneSphere; }
-		std::vector<std::unique_ptr<JGRCObject>>& GetArray()       { return m_ObjectMems; }
-		std::vector<JGRCObject*>& GetArray(EObjType objType, EPSOMode mode)  
-		{ return m_ObjectArray[objType][mode]; }
+		std::vector<JGRCObject*>& GetArray(EObjType objType, EPSOMode mode);
+		std::vector<std::unique_ptr<InstanceObject>>& GetInstanceArray() { return m_InstanceObjects; }
 	private:
 		void MainPassUpdate(const GameTimer& gt);
 		void InitStaticMemberVar();

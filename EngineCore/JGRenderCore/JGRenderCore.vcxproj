@@ -28,6 +28,8 @@
     <ClCompile Include="source\Data\JGMesh.cpp" />
     <ClCompile Include="source\Data\JGRCObject.cpp" />
     <ClCompile Include="source\Data\LightManager.cpp" />
+    <ClCompile Include="source\Data\Octree.cpp" />
+    <ClCompile Include="source\Data\OctreeNode.cpp" />
     <ClCompile Include="source\Data\Scene.cpp" />
     <ClCompile Include="source\Data\SceneData.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
@@ -57,6 +59,8 @@
     <ClInclude Include="source\Data\JGMesh.h" />
     <ClInclude Include="source\Data\JGRCObject.h" />
     <ClInclude Include="source\Data\LightManager.h" />
+    <ClInclude Include="source\Data\Octree.h" />
+    <ClInclude Include="source\Data\OctreeNode.h" />
     <ClInclude Include="source\Data\Scene.h" />
     <ClInclude Include="source\Data\SceneData.h" />
     <ClInclude Include="source\DxCommon\Camera.h" />
@@ -85,6 +89,15 @@
     <ClInclude Include="source\Shader\ShaderPath.h" />
     <ClInclude Include="source\Shader\ShaderRootSignature.h" />
     <ClInclude Include="source\Shader\SSAOShaderRootSignature.h" />
+    <ClInclude Include="source\UserInterface\Interface_Scene.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneDirectionLight.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneInstanceObject.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneMaterial.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneMesh.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneObject.h" />
+    <ClInclude Include="source\UserInterface\Interface_ScenePointLight.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneSpotLight.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

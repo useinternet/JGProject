@@ -63,10 +63,6 @@ Scene::Scene(class DxCore* core)
 	m_Cameras.push_back(move(MainCam));
 
 
-
-
-
-
 	// 장면 구 설정( 나중에 크기 조절 가능하게 ) 나중에 모든 오브젝트를 훑어서 자동 으로 늘렷다 줄엿다.
 	m_SceneSphere.Center = { 0.0f,0.0f, 0.0f };
 	m_SceneSphere.Radius = sqrt(200.0f * 200.0f + 200.0f * 200.0f);
@@ -90,6 +86,10 @@ void Scene::BuildScene()
 
 		m_ObjectArray[Type][Mode].push_back(obj.get());
 	}
+	for (auto& obj : m_InstanceObjects)
+		obj->Build(m_DxCore->CommandList());
+
+
 	// 메시 생성
 	for (auto& mesh : m_MeshMems)
 		mesh->CreateMesh(m_DxCore->Device(), m_DxCore->CommandList());
@@ -116,6 +116,7 @@ void Scene::OnReSize(UINT width, UINT height)
 {
 	m_SceneData->ReSize(width, height);
 	m_SSAO->OnReSize(width, height);
+	BoundingFrustum::CreateFromMatrix(m_Frustom, m_MainCamera->GetProj());
 }
 void Scene::Update(const GameTimer& gt)
 {
@@ -131,7 +132,8 @@ void Scene::Update(const GameTimer& gt)
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
 		obj->Update(gt, CurrFrameResource);
-
+	for (auto& insObj : m_InstanceObjects)
+		insObj->Update(gt, CurrFrameResource);
 
 	// 머터리얼 업데이트
 	for (auto& mat : m_MaterialCreater->GetArray())
@@ -142,6 +144,18 @@ void Scene::Update(const GameTimer& gt)
 
 	// 메인 패스 업데이트
 	MainPassUpdate(gt);
+
+	// 프리스텀 업데이트
+	BoundingFrustum::CreateFromMatrix(m_Frustom, m_MainCamera->GetProj());
+
+
+	for (auto& objarr : m_ObjectArray)
+	{
+		for (auto& obj : objarr.second[EPSOMode::DEFAULT])
+		{
+			ObjCulling(obj);
+		}
+	}
 }
 void Scene::Draw()
 {
@@ -200,7 +214,10 @@ void Scene::Draw()
 			obj->CubeMapDraw(CurrFrameResource, CommandList);
 		}
 	}
-
+	for (auto& obj : m_InstanceObjects)
+	{
+		obj->CubeDraw(CurrFrameResource, CommandList);
+	}
 
 
 	// 메인 패쓰 등록
@@ -229,6 +246,19 @@ JGRCObject* Scene::CreateObject(EObjType Type)
 	JGRCObject* result = Obj.get();
 
 	m_ObjectMems.push_back(move(Obj));
+	return result;
+}
+InstanceObject* Scene::CreateInstanceObject(JGMesh* Mesh, const std::string& meshname, JGMaterial* mat)
+{
+	if (mat->GetDesc()->Mode != EPSOMode::INSTANCE)
+		return nullptr;
+	auto InsObj = make_unique<InstanceObject>();
+	InstanceObject* result = InsObj.get();
+	m_InstanceObjects.push_back(move(InsObj));
+
+
+	result->SetMaterial(mat);
+	result->SetMesh(Mesh, meshname);
 	return result;
 }
 JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
@@ -310,12 +340,43 @@ void  Scene::SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, F
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
 		LightCB->GetGPUVirtualAddress());
 }
+bool    Scene::ObjCulling(JGRCObject* obj)
+{
+	BoundingFrustum localFrustom;
+	XMMATRIX view    = m_MainCamera->GetView();
+	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
+
+	XMMATRIX World = XMLoadFloat4x4(&obj->GetWorld());
+	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(World), World);
+
+	XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
+	m_Frustom.Transform(localFrustom, viewToLocal);
+
+
+	if ((localFrustom.Contains(obj->GetCullingBox())
+		!= DISJOINT))
+	{
+		obj->ThisIsNotCulling();
+		return false;
+	}
+	else
+	{
+		obj->ThisIsCulling();
+		return true;
+	}
+	
+
+}
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
 	D3D12_GPU_VIRTUAL_ADDRESS Handle = m_FrameResourceManager->CurrentFrameResource()->PassCB->Resource()->GetGPUVirtualAddress();
 	Handle += m_MainPass->PassCBIndex * passCBByteSize;
 	return Handle;
+}
+std::vector<JGRCObject*>& Scene::GetArray(EObjType objType, EPSOMode mode)
+{
+	return m_ObjectArray[objType][mode];
 }
 void Scene::MainPassUpdate(const GameTimer& gt)
 {

@@ -316,7 +316,10 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 	{
 		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
 	}
-
+	for (auto& obj : CommonData::_Scene()->GetInstanceArray())
+	{
+		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
+	}
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_NormalMap,
 		D3D12_RESOURCE_STATE_GENERIC_READ);
 }

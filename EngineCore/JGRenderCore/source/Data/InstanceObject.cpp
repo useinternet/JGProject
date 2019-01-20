@@ -2,6 +2,7 @@
 #include"JGMaterial.h"
 #include"JGMesh.h"
 #include"CommonData.h"
+#include"Scene.h"
 using namespace JGRC;
 using namespace std;
 UINT InstanceObject::Count = 0;
@@ -23,9 +24,12 @@ void InstanceObject::Build(ID3D12GraphicsCommandList* CommandList)
 }
 void InstanceObject::Update(const GameTimer& gt, FrameResource* CurrFrameResource)
 {
-	for (auto& obj : m_InsObjects)
+	m_NotCullingObjCount = 0;
+	for (UINT i = 0; i < m_InsObjects.size(); ++i)
 	{
-		obj->Update(gt, CurrFrameResource, InstanceCB.get());
+		if (!CommonData::_Scene()->ObjCulling(m_InsObjects[i].get()))
+			m_NotCullingObjCount++;
+		m_InsObjects[i]->Update(gt, CurrFrameResource, InstanceCB.get(),i);
 	}
 }
 void InstanceObject::CubeDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
@@ -37,7 +41,6 @@ void InstanceObject::CubeDraw(FrameResource* CurrentFrameResource, ID3D12Graphic
 }
 void InstanceObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode mode)
 {
-	
 	auto InsCB = InstanceCB->Resource();
 	auto MeshData = m_Mesh->Data();
 
@@ -48,12 +51,11 @@ void InstanceObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCom
 	CommandList->IASetVertexBuffers(0, 1, &MeshData->VertexBufferView());
 	CommandList->IASetIndexBuffer(&MeshData->IndexBufferView());
 	CommandList->IASetPrimitiveTopology(m_Desc.PrimitiveType);
-
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbInstanceData,
 		InsCB->GetGPUVirtualAddress());
 	CommandList->DrawIndexedInstanced(
 		MeshData->DrawArgs[m_MeshName].IndexCount,
-		(UINT)m_InsObjects.size(),
+		m_NotCullingObjCount,
 		MeshData->DrawArgs[m_MeshName].StartIndexLocation,
 		MeshData->DrawArgs[m_MeshName].BaseVertexLocation,
 		0);

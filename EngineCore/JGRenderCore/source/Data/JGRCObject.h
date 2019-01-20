@@ -51,6 +51,7 @@ namespace JGRC
 		EObjType    Type = EObjType::Static;
 		std::string m_Name;
 		UINT m_ObjCBIndex = 0;
+		DirectX::BoundingBox m_CullingBox;
 		//
 		DirectX::XMFLOAT4X4 m_World        = MathHelper::Identity4x4();
 		DirectX::XMFLOAT4X4 m_TexTransform = MathHelper::Identity4x4();
@@ -61,8 +62,10 @@ namespace JGRC
 		//
 		bool m_bInit    = false;
 		bool m_bVisible = true;
+		bool m_bCulling = false;
 		bool m_bActive  = true;
 		bool m_bCubeMapUpdate = false;
+
 		//
 		D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
@@ -71,7 +74,7 @@ namespace JGRC
 		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject",const JGRCObjDesc& Desc = JGRCObjDesc());
 		void Build(ID3D12GraphicsCommandList* CommandList);
 		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource);
-		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB);
+		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
 		void Draw(class FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode = EObjRenderMode::Default);
 	public:
@@ -82,6 +85,16 @@ namespace JGRC
 		void ClearNotify()    { UpdateNotify = CPU_FRAMERESOURCE_NUM;}
 		void UpdatePerFrame() { UpdateNotify--; }
 		bool IsCanUpdate()    { return UpdateNotify > 0; }
+		void UnVisible()      { m_bVisible = false; }
+		void Visible()        { m_bVisible = true; }
+		bool IsVisible()      { return m_bVisible; }
+		void Active()         { m_bActive = true; }
+		void DeActive()       { m_bActive = false; }
+		bool IsActive()       { return m_bActive; }
+		void ThisIsCulling()    { m_bCulling = true; }
+		void ThisIsNotCulling() { m_bCulling = false; }
+		bool IsCulling()        { return m_bCulling; }
+		DirectX::BoundingBox& GetCullingBox() { return m_CullingBox; }
 	public:
 		JGMesh*     GetMesh() const { return m_Mesh; }
 		JGMaterial* GetMaterial() const { return m_Material; }
@@ -93,6 +106,7 @@ namespace JGRC
 		Vec3 GetScale()    const { return m_Scale; }
 		const DirectX::XMFLOAT4X4& GetWorld()        { return m_World; }
 		const DirectX::XMFLOAT4X4& GetTexTransform() { return m_TexTransform; }
+		const std::string& GetMeshName() const       { return m_MeshName; }
 	public:
 		void SetLocation(float x, float y, float z);
 		void SetRotation(float pitch, float yaw, float roll);

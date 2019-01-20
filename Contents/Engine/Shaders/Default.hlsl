@@ -135,7 +135,6 @@ SceneData PS(VS_OUT pin)
     diffuseAlbedo *= gTexture[matData.TextureIndex[0]].Sample(gsamAnisotropicWrap, texC);
 
 
-
 	// SceneData에 직접 넣기
     Scene_Albedo = diffuseAlbedo;
     Scene_NormalW = float4(normalize(normalW), 1.0f);

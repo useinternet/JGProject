@@ -109,6 +109,12 @@
     <ClCompile Include="source\Data\InstanceObject.cpp">
       <Filter>Data</Filter>
     </ClCompile>
+    <ClCompile Include="source\Data\Octree.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\OctreeNode.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">
@@ -220,6 +226,39 @@
       <Filter>Shader</Filter>
     </ClInclude>
     <ClInclude Include="source\Data\InstanceObject.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneObject.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneMaterial.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneMesh.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_Scene.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneDirectionLight.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_ScenePointLight.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneSpotLight.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneInstanceObject.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Octree.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\OctreeNode.h">
       <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>

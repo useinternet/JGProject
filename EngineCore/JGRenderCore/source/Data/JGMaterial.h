@@ -62,12 +62,14 @@ namespace JGRC
 		void SetFresnelR0(float x, float y, float z);
 		void SetRoughness(float x);
 		void SetRefractive(float x);
+		void SetReflectivity(float x);
 		void SetMatTransform(const DirectX::XMFLOAT4X4& mat);
 		void SetPSO(ID3D12PipelineState* PSO);
 	public:
 		const std::wstring& GetTexturePath(ETextureSlot slot) { return m_TexturePaths[slot]; }
 	public:  // 머터리얼 Get접근자
-		MaterialDesc* GetDesc() const    { return m_Desc.get(); }
+		MaterialDesc* GetDesc() const       { return m_Desc.get(); }
+		const MaterialData& GetData() const { return *m_Data; }
 		ID3D12PipelineState* GetPSO() const { return m_PSO; }
 		UINT CBIndex() const { return m_MatCBIndex; }
 	private: // 프레임 알림 함수들

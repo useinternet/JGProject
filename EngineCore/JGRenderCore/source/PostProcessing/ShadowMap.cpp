@@ -50,6 +50,10 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 			{
 				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
 			}
+			for (auto& obj : CommonData::_Scene()->GetInstanceArray())
+			{
+				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
+			}
 			break;
 		case ELightExercise::Dynamic:
 			for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))

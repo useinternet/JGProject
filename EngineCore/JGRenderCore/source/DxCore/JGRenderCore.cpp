@@ -246,14 +246,18 @@ void JGRenderCore::BuildLandGeometry()
 	SphereMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
 	SphereMat->SetRoughness(0.05f);
 	SphereMat->SetRefractive(1.0f);
-
+	SphereMat->SetReflectivity(0.99f);
 
 	Desc.Name = "InstanceMat";
 	Desc.bCubeMapStatic = true;
 	Desc.Mode = EPSOMode::INSTANCE;
 	JGMaterial* InsMat = m_Scene->AddMaterial(Desc);
-
-
+	InsMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/bricks2.dds");
+	InsMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/bricks2_nmap.dds");
+	InsMat->SetDiffuseAlbedo(1.0f, 0.0f, 0.0f, 1.0f);
+	InsMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
+	InsMat->SetRoughness(0.05f);
+	InsMat->SetRefractive(1.0f);
 
 	//Desc.Name = "WaterMat";
 	//Desc.bCubMapDynamic = false;
@@ -334,10 +338,16 @@ void JGRenderCore::BuildLandGeometry()
 	Obj6->SetMesh(GroundMesh, "Box");
 	Obj6->SetMaterial(BoxMat);
 
-	//JGRCObject* Obj7 = m_Scene->CreateObject();
-	//Obj7->SetScale(5000.0f);
-	//Obj7->SetMesh(SkyMesh, "Sky");
-	//Obj7->SetMaterial(SkyMat);
+	
+
+	InstanceObject* InsObj = m_Scene->CreateInstanceObject(GroundMesh, "Sphere", InsMat);
+	for (int i = 0; i < 10; ++i)
+	{
+		JGRCObject* InstanceObj1 = InsObj->AddObject();
+		InstanceObj1->SetLocation(i * 10.0f, 20.0f, 0.0f);
+	}
+
+
 	JGRCObject* SkyBox = m_Scene->CreateSkyBox(L"../Contents/Engine/Textures/sunsetcube1024.dds");
 	m_Scene->SetMainSkyBox(SkyBox);
 }

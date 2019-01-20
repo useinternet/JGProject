@@ -104,21 +104,24 @@ float4 PS(VS_OUT pin) : SV_Target
         float3 litColor = ambient.rgb + saturate(directLight);
 
 
-       
+
+  
+
+
         float3 r = reflect(-toEyeW, Data.NormalW);
         float3 reflection = gCubeMap[Data.CubIndex].Sample(gsamLinearWrap, r).rgb;
         float3 fresnel_r = SchlickFresnel(matData.FresnelR0, Data.NormalW, r);
 
 
-        float3 g = refract(-toEyeW, Data.NormalW,matData.Refractive);
-        float3 refraction = reflection;
+        float3 g = refract(-toEyeW, Data.NormalW, matData.Refractive);
+        float3 refraction = gCubeMap[Data.CubIndex].Sample(gsamLinearWrap, g).rgb;
         float3 fresnel_g = SchlickFresnel(matData.FresnelR0, Data.NormalW, g);
 
         reflection = reflection * shininess * fresnel_r;
         refraction = refraction * shininess * fresnel_g;
-        float3 final = lerp(reflection, refraction, matData.Reflectivity);
+        float3 final = lerp(refraction, reflection, matData.Reflectivity);
 
-        litColor.rgb += saturate(final); 
+        litColor.rgb += saturate(final);
 
 
 

@@ -66,6 +66,10 @@ void SceneData::SceneDataExtract(FrameResource* CurrFrameResource, ID3D12Graphic
 	{
 		obj->Draw(CurrFrameResource, CommandList);
 	}
+	for (auto& obj : CommonData::_Scene()->GetInstanceArray())
+	{
+		obj->Draw(CurrFrameResource, CommandList);
+	}
 	if (CommonData::_Scene()->GetMainSkyBox())
 	{
 		CommonData::_Scene()->GetMainSkyBox()->Draw(CurrFrameResource, CommandList);

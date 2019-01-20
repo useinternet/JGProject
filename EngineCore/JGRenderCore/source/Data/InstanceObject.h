@@ -12,6 +12,7 @@ namespace JGRC
 		std::vector<std::shared_ptr<JGRCObject>>    m_InsObjects;
 		std::unique_ptr<UploadBuffer<InstanceData>> InstanceCB;
 		UINT  m_CBIndex = 0;
+		UINT  m_NotCullingObjCount = 0;
 		//
 		class JGMesh* m_Mesh         = nullptr;
 		std::string   m_MeshName = "None";
@@ -21,7 +22,7 @@ namespace JGRC
 		void Build(ID3D12GraphicsCommandList* CommandList);
 		void Update(const GameTimer& gt, FrameResource* CurrFrameResource);
 		void CubeDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
-		void Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode mode);
+		void Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode mode = EObjRenderMode::Default);
 	public:
 		void SetMesh(class JGMesh* mesh, const std::string& name);
 		void SetMaterial(class JGMaterial* mat);
