@@ -1,13 +1,18 @@
 #pragma once
-#include"Data/JGRCObject.h"
+#include"DxCommon/DxCommon.h"
 
 
 namespace JGRC
 {
+	enum class RCORE_EXPORT E_IF_ObjType
+	{
+		Static,
+		Dynamic,
+	};
 	class RCORE_EXPORT Interface_SceneObject
 	{
 	private:
-		JGRCObject* m_ObjectData = nullptr;
+		class JGRCObject* m_ObjectData = nullptr;
 
 
 	public:
@@ -16,42 +21,43 @@ namespace JGRC
 			return this;
 		}
 	public:
+		Interface_SceneObject() = default;
 		Interface_SceneObject(JGRCObject* obj) : m_ObjectData(obj) {}
 		Interface_SceneObject(const Interface_SceneObject& copy)
 		{
 			m_ObjectData = copy.m_ObjectData;
 		}
 	public:
-		Vec3 GetLocation() const { return m_ObjectData->GetLocation(); }
-		Vec3 GetRotation() const { return m_ObjectData->GetRotation(); }
-		Vec3 GetScale()    const { return m_ObjectData->GetScale(); }
+		DirectX::XMFLOAT3 GetLocation() const;
+		DirectX::XMFLOAT3 GetRotation() const;
+		DirectX::XMFLOAT3 GetScale()    const;
 	public:
-		void SetLocation(float x, float y, float z)          { m_ObjectData->SetLocation(x, y, z); }
-		void SetLocation(const Vec3& v)                      { m_ObjectData->SetLocation(v.x, v.y, v.z); }
-		void SetRotation(float pitch, float yaw, float roll) { m_ObjectData->SetRotation(pitch, yaw, roll); }
-		void SetRotation(const Vec3& r)                      { m_ObjectData->SetRotation(r.x, r.y, r.z); }
-		void SetScale(float x, float y, float z)             { m_ObjectData->SetScale(x, y, z); }
-		void SetScale(const Vec3& v)                         { m_ObjectData->SetScale(v.x, v.y, v.z); }
-		void SetScale(float x)                               { m_ObjectData->SetScale(x); }
+		void SetLocation(float x, float y, float z);
+		void SetLocation(const DirectX::XMFLOAT3& v);
+		void SetRotation(float pitch, float yaw, float roll);
+		void SetRotation(const DirectX::XMFLOAT3& r);
+		void SetScale(float x, float y, float z); 
+		void SetScale(const DirectX::XMFLOAT3& v);
+		void SetScale(float x);
 	public:
-		void OffsetLocation(float x, float y, float z)          { m_ObjectData->OffsetLocation(x, y, z); }
-		void OffsetLocation(const Vec3& v)                      { m_ObjectData->OffsetLocation(v.x, v.y, v.z); }
-		void OffsetRotation(float pitch, float yaw, float roll) { m_ObjectData->OffsetRotation(pitch, yaw, roll); }
-		void OffsetRotation(const Vec3& v)                      { m_ObjectData->OffsetRotation(v.x, v.y, v.z); }
-		void OffsetScale(float x, float y, float z)             { m_ObjectData->SetScale(x, y, z); }
-		void OffsetScale(const Vec3& v)                         { m_ObjectData->SetScale(v.x, v.y, v.z); }
-		void OffsetScale(float x)                               { m_ObjectData->SetScale(x); }
+		void OffsetLocation(float x, float y, float z);
+		void OffsetLocation(const DirectX::XMFLOAT3& v);
+		void OffsetRotation(float pitch, float yaw, float roll); 
+		void OffsetRotation(const DirectX::XMFLOAT3& v);
+		void OffsetScale(float x, float y, float z); 
+		void OffsetScale(const DirectX::XMFLOAT3& v);
+		void OffsetScale(float x); 
 	public:
-		void Visible()   { m_ObjectData->Visible(); }
-		void Active()    { m_ObjectData->Active(); }
+		void Visible();
+		void Active();
 		
-		void UnVisible() { m_ObjectData->UnVisible(); }
-		void DeActive()  { m_ObjectData->DeActive(); }
+		void UnVisible();
+		void DeActive();
 
-		bool IsVisible() const { return m_ObjectData->IsVisible(); }
-		bool IsActive()  const { return m_ObjectData->IsActive(); }
+		bool IsVisible() const;
+		bool IsActive()  const;
 
-		EObjType GetType() const { return m_ObjectData->GetType(); }
+		E_IF_ObjType GetType() const;
 	};
 
 	typedef Interface_SceneObject IF_Object;

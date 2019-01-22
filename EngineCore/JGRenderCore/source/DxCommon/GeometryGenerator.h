@@ -51,8 +51,19 @@ public:
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT3 TangentU;
         DirectX::XMFLOAT2 TexC;
-	};
 
+		bool operator==(const Vertex& v)
+		{
+			if (Position.x == v.Position.x && Position.y == v.Position.y && Position.z == v.Position.z &&
+				Normal.x   == v.Normal.x   && Normal.y   == v.Normal.y   && Normal.z   == v.Normal.z   &&
+				TangentU.x == v.TangentU.x && TangentU.y == v.TangentU.y && TangentU.z == v.TangentU.z &&
+				TexC.x     == v.TexC.x     && TexC.y     == v.TexC.y)
+			{
+				return true;
+			}
+			return false;
+		}
+	};
 	struct MeshData
 	{
 		std::vector<Vertex> Vertices;
@@ -109,7 +120,8 @@ public:
 	/// Creates a quad aligned with the screen.  This is useful for postprocessing and screen effects.
 	///</summary>
     MeshData CreateQuad(float x, float y, float w, float h, float depth);
-
+	// Test
+	MeshData CustomMesh(const std::string& path);
 private:
 	void Subdivide(MeshData& meshData);
     Vertex MidPoint(const Vertex& v0, const Vertex& v1);

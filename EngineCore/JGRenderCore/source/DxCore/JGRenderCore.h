@@ -16,14 +16,15 @@ namespace JGRC
 	private:
 		std::unique_ptr<DxCore>      m_DxCore;
 		std::unique_ptr<class Scene> m_Scene;
-		class JGRCObject* Obj[10];
-		class JGRCObject* Objarr[10];
+
 		class JGLight* DirLight = nullptr;
 		class JGLight* PointLight[4];
 		class JGLight* SpotLight[4];
 		bool PointSwitch[4];
-	
-		class JGRCObject* Test = nullptr;
+		class JGRCObject* Obj[10];
+		class JGRCObject* Objarr[10];
+		class JGRCObject* Test;
+		
 		Camera* m_Camera;
 		HWND hWnd;
 	private:

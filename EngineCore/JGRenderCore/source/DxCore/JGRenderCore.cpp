@@ -5,6 +5,7 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace JGRC;
 using namespace std;
+
 JGRenderCore::JGRenderCore()
 {
 
@@ -206,7 +207,9 @@ void JGRenderCore::BuildLandGeometry()
 	GroundMesh->AddGridArg("Grid", 100, 100, 100, 100);
 	GroundMesh->AddSphereArg("Sphere", 5, 3);
 	GroundMesh->AddQuadArg("Debug", 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
+	GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Samba Dancing_binary.fbx");
+	//GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/SampleSamba.txt");
+	//GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Donut2.txt");
 	JGMesh* SkyMesh = m_Scene->AddMesh();
 	SkyMesh->AddBoxArg("Sky", 1.0f, 1.0f, 1.0f, 1);
 
@@ -230,12 +233,13 @@ void JGRenderCore::BuildLandGeometry()
 
 
 	Desc.Name = "BoxMat";
+
 	JGMaterial* BoxMat = m_Scene->AddMaterial(Desc);
 	BoxMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/tile.dds");
 	BoxMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/tile_nmap.dds");
 	BoxMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
 	BoxMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	BoxMat->SetRoughness(0.0f);
+	BoxMat->SetRoughness(0.5f);
 
 	Desc.Name = "SphereMat";
 	Desc.bCubeMapStatic = true;
@@ -259,86 +263,53 @@ void JGRenderCore::BuildLandGeometry()
 	InsMat->SetRoughness(0.05f);
 	InsMat->SetRefractive(1.0f);
 
-	//Desc.Name = "WaterMat";
-	//Desc.bCubMapDynamic = false;
-	//Desc.bRefraction = true;
-	//Desc.bReflection = true;
-	//Desc.ShaderPath = L"../Contents/Engine/Shaders/Water.hlsl";
-	//JGMaterial* WaterMat = m_Scene->AddMaterial(Desc);
-	//WaterMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/water1.dds");
-	//WaterMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/waves0.dds");
-	//WaterMat->SetTexture(ETextureSlot::Custom0, L"../Contents/Engine/Textures/waves1.dds");
-	//WaterMat->SetDiffuseAlbedo(0.2f, 0.13f, 0.5f, 1.0f);
-	//WaterMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	//WaterMat->SetRoughness(0.0f);
 
-	JGRCObject* Obj1 = m_Scene->CreateObject();
+	JGRCObject* Obj1 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
 	Obj1->SetLocation(0.0f, -1.0f, 0.0f);
-	Obj1->SetMesh(GroundMesh, "Grid");
-	Obj1->SetMaterial(GroundMat);
 
-	JGRCObject* Obj11 = m_Scene->CreateObject();
+	JGRCObject* Obj11 = m_Scene->CreateObject(GroundMat2, GroundMesh, "Grid");
 	Obj11->SetLocation(0.0f, -1.0f, 100.0f);
-	Obj11->SetMesh(GroundMesh, "Grid");
-	Obj11->SetMaterial(GroundMat2);
-	JGRCObject* Obj12 = m_Scene->CreateObject();
+;
+JGRCObject* Obj12 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
 	Obj12->SetLocation(0.0f, -1.0f, -100.0f);
-	Obj12->SetMesh(GroundMesh, "Grid");
-	Obj12->SetMaterial(GroundMat);
-	JGRCObject* Obj13 = m_Scene->CreateObject();
-	Obj13->SetLocation(100.0f, -1.0f, 0.0f);
-	Obj13->SetMesh(GroundMesh, "Grid");
-	Obj13->SetMaterial(GroundMat2);
-	JGRCObject* Obj14 = m_Scene->CreateObject();
-	Obj14->SetLocation(-100.0f, -1.0f, 0.0f);
-	Obj14->SetMesh(GroundMesh, "Grid");
-	Obj14->SetMaterial(GroundMat);
 
-	JGRCObject* Obj2 = m_Scene->CreateObject();
+	JGRCObject* Obj13 = m_Scene->CreateObject(GroundMat2, GroundMesh, "Grid");
+	Obj13->SetLocation(100.0f, -1.0f, 0.0f);
+
+	JGRCObject* Obj14 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
+	Obj14->SetLocation(-100.0f, -1.0f, 0.0f);
+
+
+	JGRCObject* Obj2 = m_Scene->CreateObject(BoxMat, GroundMesh, "../Contents/Engine/Meshs/Samba Dancing_binary.fbx");
 	Obj2->SetLocation(-10.0f, -1.0f, 0.0f);
-	Obj2->SetMesh(GroundMesh, "Box");
-	Obj2->SetMaterial(BoxMat);
 	Test = Obj2;
 
-	JGRCObject* Obj3 = m_Scene->CreateObject();
+	JGRCObject* Obj3 = m_Scene->CreateObject(SphereMat, GroundMesh, "Sphere");
 	Obj3->SetLocation(-10.0f, 10.0f, 0.0f);
-	Obj3->SetMesh(GroundMesh, "Sphere");
-	Obj3->SetMaterial(SphereMat);
 
-	JGRCObject* Obj4 = m_Scene->CreateObject();
+	JGRCObject* Obj4 = m_Scene->CreateObject(BoxMat, GroundMesh, "Box");
 	Obj4->SetLocation(20.0f, -1.0f, 0.0f);
 	Obj4->SetScale(0.5f, 5.0f, 0.5f);
-	Obj4->SetMesh(GroundMesh, "Box");
-	Obj4->SetMaterial(BoxMat);
 
 
 	for (int i = 0; i < 10; ++i)
 	{
-		Obj[i] = m_Scene->CreateObject(EObjType::Dynamic);
+		Obj[i] = m_Scene->CreateObject(BoxMat, GroundMesh, "Box", EObjType::Dynamic);
 		Obj[i]->SetLocation(i * 30 + -150.0f, 0.0f, 0.0f);
-		Obj[i]->SetMesh(GroundMesh, "Box");
-		Obj[i]->SetMaterial(BoxMat);
 	}
 	for (int i = 0; i < 10; ++i)
 	{
-		Objarr[i] = m_Scene->CreateObject(EObjType::Dynamic);
+		Objarr[i] = m_Scene->CreateObject(BoxMat, GroundMesh,"Box", EObjType::Dynamic);
 		Objarr[i]->SetLocation(0.0f , 0.0f, i * 30 + -150.0f);
-		Objarr[i]->SetMesh(GroundMesh, "Box");
-		Objarr[i]->SetMaterial(BoxMat);
 	}
-	JGRCObject* Obj5 = m_Scene->CreateObject();
+	JGRCObject* Obj5 = m_Scene->CreateObject(BoxMat, GroundMesh, "Box");
 	Obj5->SetLocation(-20.0f, -1.0f, -10.0f);
 	Obj5->SetScale(0.5f, 5.0f, 0.5f);
-	Obj5->SetMesh(GroundMesh, "Box");
-	Obj5->SetMaterial(BoxMat);
 
-	JGRCObject* Obj6 = m_Scene->CreateObject();
+	JGRCObject* Obj6 = m_Scene->CreateObject(BoxMat , GroundMesh, "Box");
 	Obj6->SetLocation(-20.0f, -1.0f, 20.0f);
 	Obj6->SetScale(0.5f, 5.0f, 0.5f);
-	Obj6->SetMesh(GroundMesh, "Box");
-	Obj6->SetMaterial(BoxMat);
 
-	
 
 	InstanceObject* InsObj = m_Scene->CreateInstanceObject(GroundMesh, "Sphere", InsMat);
 	for (int i = 0; i < 10; ++i)

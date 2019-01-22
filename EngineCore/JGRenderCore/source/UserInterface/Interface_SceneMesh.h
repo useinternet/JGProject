@@ -1,8 +1,6 @@
 #pragma once
 
-#include"Data/JGMesh.h"
-
-
+#include"DxCommon/DxCommon.h"
 
 namespace JGRC
 {

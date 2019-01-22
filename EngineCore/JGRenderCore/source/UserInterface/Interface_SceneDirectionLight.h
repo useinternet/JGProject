@@ -1,5 +1,5 @@
 #pragma once
-#include"Data/JGLight.h"
+#include"DxCommon/DxCommon.h"
 
 
 

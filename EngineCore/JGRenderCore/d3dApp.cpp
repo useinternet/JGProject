@@ -65,10 +65,6 @@ int D3DApp::Run()
 				Update(mTimer);	
                 Draw(mTimer);
 			}
-			else
-			{
-				Sleep(100);
-			}
         }
     }
 

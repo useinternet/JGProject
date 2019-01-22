@@ -240,12 +240,18 @@ void Scene::Draw()
 
 	CurrFrameResource->Fence = m_DxCore->CurrentFence();
 }
-JGRCObject* Scene::CreateObject(EObjType Type)
+JGRCObject* Scene::CreateObject(JGMaterial* mat, JGMesh* mesh, const std::string& meshname, EObjType Type)
 {
+
 	auto Obj = make_unique<JGRCObject>(++m_ObjIndex, Type);
 	JGRCObject* result = Obj.get();
+	Obj->SetMaterial(mat);
+	Obj->SetMesh(mesh, meshname);
+
+
 
 	m_ObjectMems.push_back(move(Obj));
+
 	return result;
 }
 InstanceObject* Scene::CreateInstanceObject(JGMesh* Mesh, const std::string& meshname, JGMaterial* mat)
@@ -286,9 +292,7 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	JGMesh* SkyMesh = AddMesh();
 	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
 	// 오브젝트 생성
-	JGRCObject* obj = CreateObject();
-	obj->SetMesh(SkyMesh, "Scene_SkyBox_Default_Mesh");
-	obj->SetMaterial(SkyMat);
+	JGRCObject* obj = CreateObject(SkyMat, SkyMesh, "Scene_SkyBox_Default_Mesh");
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }

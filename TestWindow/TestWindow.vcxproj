@@ -75,6 +75,7 @@
     <OutDir>$(SolutionDir)$Temp/$(Configuration)\</OutDir>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -87,6 +88,7 @@
     <OutDir>$(SolutionDir)$Temp/$(Configuration)\</OutDir>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <LibraryPath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

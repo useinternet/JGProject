@@ -39,6 +39,7 @@
     <ClCompile Include="source\DxCommon\GameTimer.cpp" />
     <ClCompile Include="source\DxCommon\GeometryGenerator.cpp" />
     <ClCompile Include="source\DxCommon\MathHelper.cpp" />
+    <ClCompile Include="source\DxCommon\ModelLoader.cpp" />
     <ClCompile Include="source\DxCommon\PickingSystem.cpp" />
     <ClCompile Include="source\DxCore\DxCore.cpp" />
     <ClCompile Include="source\DxCore\JGRenderCore.cpp" />
@@ -48,6 +49,16 @@
     <ClCompile Include="source\PostProcessing\ShadowMap.cpp" />
     <ClCompile Include="source\PostProcessing\SSAO.cpp" />
     <ClCompile Include="source\Shader\Shader.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_Scene.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneCamera.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneDirectionLight.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneInstanceObject.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneMaterial.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneObject.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_ScenePointLight.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneSkyBox.cpp" />
+    <ClCompile Include="source\UserInterface\Interface_SceneSpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h" />
@@ -71,6 +82,7 @@
     <ClInclude Include="source\DxCommon\GameTimer.h" />
     <ClInclude Include="source\DxCommon\GeometryGenerator.h" />
     <ClInclude Include="source\DxCommon\MathHelper.h" />
+    <ClInclude Include="source\DxCommon\ModelLoader.h" />
     <ClInclude Include="source\DxCommon\PickingSystem.h" />
     <ClInclude Include="source\DxCommon\UploadBuffer.h" />
     <ClInclude Include="source\DxCore\DxCore.h" />
@@ -90,6 +102,7 @@
     <ClInclude Include="source\Shader\ShaderRootSignature.h" />
     <ClInclude Include="source\Shader\SSAOShaderRootSignature.h" />
     <ClInclude Include="source\UserInterface\Interface_Scene.h" />
+    <ClInclude Include="source\UserInterface\Interface_SceneCamera.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneDirectionLight.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneInstanceObject.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneMaterial.h" />
@@ -98,6 +111,7 @@
     <ClInclude Include="source\UserInterface\Interface_ScenePointLight.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneSpotLight.h" />
+    <ClInclude Include="source\UserInterface\JGRCInterfaceClass.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -159,7 +173,8 @@
     <OutDir>bin/</OutDir>
     <IntDir>$(SolutionDir)Obj/$(ProjectName)/$(Configuration)/</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)Common/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Common/Include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Common/Lib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -168,7 +183,8 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin/</OutDir>
     <IntDir>$(SolutionDir)Obj/$(ProjectName)/$(Configuration)/</IntDir>
-    <IncludePath>$(SolutionDir)Common/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Common/Include/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Common/Lib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

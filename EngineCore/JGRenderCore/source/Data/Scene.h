@@ -1,9 +1,10 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
+#include"LightManager.h"
+#include"UserInterface/JGRCInterfaceClass.h"
 #include"InstanceObject.h"
 #include"JGMaterial.h"
 #include"JGMesh.h"
-#include"LightManager.h"
 #include"DxCore/DxSetting.h"
 /*
 --- 해야할거 ( 언제 걸릴지 모른다. ) 
@@ -81,7 +82,7 @@ namespace JGRC
 		void Update(const GameTimer& gt);
 		void Draw();
 	public:
-		JGRCObject* CreateObject(EObjType Type = EObjType::Static);
+		JGRCObject* CreateObject(JGMaterial* mat, JGMesh* mesh, const std::string& meshname, EObjType Type = EObjType::Static);
 		InstanceObject* CreateInstanceObject(JGMesh* Mesh,const std::string& meshname, JGMaterial* mat);
 		JGRCObject* CreateSkyBox(const std::wstring& texturepath);
 		JGMaterial* AddMaterial(const MaterialDesc& Desc);

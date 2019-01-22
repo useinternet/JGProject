@@ -4,7 +4,7 @@
 
 #include "GeometryGenerator.h"
 #include <algorithm>
-
+#include <fstream>
 using namespace DirectX;
 GeometryGenerator::MeshData GeometryGenerator::CreateBox(float width, float height, float depth, uint32 numSubdivisions)
 {
@@ -653,4 +653,34 @@ GeometryGenerator::MeshData GeometryGenerator::CreateQuad(float x, float y, floa
 	meshData.Indices32[5] = 3;
 
     return meshData;
+}
+GeometryGenerator::MeshData GeometryGenerator::CustomMesh(const std::string& path)
+{
+	MeshData meshData;
+
+	std::ifstream fin;
+	fin.open(path);
+	
+
+	XMFLOAT3 Pos;
+	XMFLOAT3 Normal;
+	XMFLOAT2 TexC;
+
+	int VertexCount = 0;
+	fin >> VertexCount;
+	int IndexCount = 0;
+
+	for (int i = 0; i < VertexCount; ++i)
+	{
+		fin >> Pos.x >> Pos.y >> Pos.z;
+
+		fin >> Normal.x >> Normal.y >> Normal.z;
+		fin >> TexC.x >> TexC.y;
+		TexC.y = 1.0f - TexC.y;
+		meshData.Vertices.push_back(Vertex(Pos, Normal, XMFLOAT3(), TexC));
+		meshData.Indices32.push_back(IndexCount++);
+	}
+	fin.close();
+
+	return meshData;
 }

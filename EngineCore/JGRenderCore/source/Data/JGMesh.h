@@ -4,7 +4,7 @@ namespace JGRC
 {
 	typedef GeometryGenerator::Vertex Vertex;
 	typedef std::vector<Vertex> MeshVertex;
-	typedef std::vector<std::uint16_t> MeshIndex;
+	typedef std::vector<std::uint32_t> MeshIndex;
 	class RCORE_EXPORT JGMesh
 	{
 	private:
@@ -18,6 +18,7 @@ namespace JGRC
 		JGMesh(const std::string& name);
 
 	public:
+		void AddFbxMeshArg(const std::string& path);
 		void AddMeshArg(const std::string& name, const MeshVertex& vertex, const MeshIndex& index);
 		void AddBoxArg(const std::string& name,  float width,  float height,  float depth,  std::uint32_t numSubdivision);
 		void AddSphereArg(const std::string& name, float radius, UINT32 numSubdivision);

@@ -74,7 +74,8 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>temp/</OutDir>
     <IntDir>tempObj/</IntDir>
-    <LibraryPath>../bin/;$(LibraryPath)</LibraryPath>
+    <LibraryPath>../bin/;C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\usein\OneDrive\바탕 화면\프로젝트\JGEngine\Common\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>

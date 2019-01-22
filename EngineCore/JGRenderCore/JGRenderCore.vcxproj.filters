@@ -26,6 +26,12 @@
     <Filter Include="UserInterface">
       <UniqueIdentifier>{b253159a-441d-4537-9025-a5769c01bb2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PBRT">
+      <UniqueIdentifier>{a0998555-c86c-4f71-974b-511bf20a64fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PBRT\PBRTClassBase">
+      <UniqueIdentifier>{9494178c-9755-4915-a9b4-1d795da3ca15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dllmain.cpp">
@@ -114,6 +120,39 @@
     </ClCompile>
     <ClCompile Include="source\Data\OctreeNode.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneObject.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneInstanceObject.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_Scene.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneDirectionLight.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneMaterial.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_ScenePointLight.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneSkyBox.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneSpotLight.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneCamera.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCommon\ModelLoader.cpp">
+      <Filter>DxCommon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -260,6 +299,15 @@
     </ClInclude>
     <ClInclude Include="source\Data\OctreeNode.h">
       <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\JGRCInterfaceClass.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneCamera.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\ModelLoader.h">
+      <Filter>DxCommon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

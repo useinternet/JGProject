@@ -1,6 +1,5 @@
 #pragma once
-#include"Data/JGMaterial.h"
-
+#include"DxCommon/DxCommon.h"
 
 namespace JGRC
 {
