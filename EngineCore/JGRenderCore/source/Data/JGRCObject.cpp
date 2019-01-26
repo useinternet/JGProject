@@ -1,34 +1,28 @@
 #include"JGRCObject.h"
-#include"JGMesh.h"
+#include"Mesh/JGStaticMesh.h"
 #include"JGMaterial.h"
 #include"EngineFrameResource.h"
+#include"Shader/CommonShaderRootSignature.h"
 #include"Scene.h"
 #include"PostProcessing/CubeMap.h"
 #include"CommonData.h"
-#include"Scene.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 UINT64 JGRCObject::Count = 0;
-JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name, const JGRCObjDesc& Desc)
+JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name)
 {
 	m_Name += name + to_string(Index);
 	Count++;
 	this->Type = Type;
 	m_ObjCBIndex = Index;
-	m_Location = Desc.Location;
-	m_Rotation = Desc.Rotation;
-	m_Scale = Desc.Scale;
-	m_bVisible = Desc.bVisible;
-	m_bActive = Desc.bActive;
-	m_PrimitiveType = Desc.PrimitiveType;
-	m_Mesh = Desc.Mesh;
-	m_Material = Desc.Material;
 	UpdateWorldMatrix();
 }
-void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
+void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RoogSig)
 {	
 	m_bInit = true;
+
+	//
 	MaterialDesc* Desc = m_Material->GetDesc();
 	if((Desc->bCubeMapStatic || Desc->bCubMapDynamic))
 	{
@@ -36,7 +30,17 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
 		m_CubeMap->BuildCubeMap(m_Name, CommandList);
 		m_CubeMap->BuildCamera(m_Location.x, m_Location.y, m_Location.z);
 	}
-	m_CullingBox = m_Mesh->Data()->DrawArgs[m_MeshName].Bounds;
+	m_PSOPack.Macro_Merge(m_Material->GetMacroPack());
+	if (m_Mesh->Type() == EMeshType::Skeletal)
+	{
+		Type = EObjType::Dynamic;
+		m_PSOPack.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
+		m_PSOPack.CompilePSO(m_Material->GetDesc()->ShaderPath, m_Material->GetDesc()->Mode, CommonData::_Scene()->GetSkinnedRootSig());
+	}
+	else
+	{
+		m_PSOPack.CompilePSO(m_Material->GetDesc()->ShaderPath, m_Material->GetDesc()->Mode, CommonData::_Scene()->GetRootSig());
+	}
 }
 void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 {
@@ -71,6 +75,7 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 
 		UpdatePerFrame();
 	}
+	m_Mesh->Update(gt, CurrentFrameResource);
 }
 void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex)
 {
@@ -112,6 +117,7 @@ void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource
 		InsCB->CopyData(m_ObjCBIndex, InsConstants);
 		UpdatePerFrame();
 	}
+
 }
 void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
 {
@@ -136,22 +142,28 @@ void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommand
 	auto ObjCB = CurrentFrameResource->ObjectCB->Resource();
 	auto MeshData = m_Mesh->Data();
 	UINT ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbObjectConstant));
-	if(Mode != EObjRenderMode::NonePSO)
-		CommandList->SetPipelineState(m_Material->GetPSO());
 
-	CommandList->IASetVertexBuffers(0, 1, &MeshData->VertexBufferView());
-	CommandList->IASetIndexBuffer(&MeshData->IndexBufferView());
-	CommandList->IASetPrimitiveTopology(m_PrimitiveType);
+	switch (Mode)
+	{
+	case EObjRenderMode::Default:
+		CommandList->SetPipelineState(m_PSOPack.CustomPSO.Get());
+		break;
+	case EObjRenderMode::Shadow:
+		CommandList->SetPipelineState(m_PSOPack.ShadowPSO.Get());
+		break;
+	case EObjRenderMode::ViewNormal:
+		CommandList->SetPipelineState(m_PSOPack.ViewNormalPSO.Get());
+		break;
+	}
+		
+
 	
 	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = ObjCB->GetGPUVirtualAddress();
 	objCBAddress += (m_ObjCBIndex * ObjCBByteSize);
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerObject, objCBAddress);
-	CommandList->DrawIndexedInstanced(
-		MeshData->DrawArgs[m_MeshName].IndexCount,
-		1,
-		MeshData->DrawArgs[m_MeshName].StartIndexLocation,
-		MeshData->DrawArgs[m_MeshName].BaseVertexLocation,
-		0);
+
+
+	m_Mesh->Draw(CommandList, CurrentFrameResource);
 }
 void JGRCObject::UpdateWorldMatrix()
 {
@@ -163,12 +175,10 @@ void JGRCObject::UpdateWorldMatrix()
 	XMMATRIX Scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	XMMATRIX World = Scale * Rotation * Translation;
 	XMStoreFloat4x4(&m_World, World);
-	m_CullingBox.Transform(m_CullingBox, Scale * Rotation);
 }
-void JGRCObject::SetMesh(JGMesh* mesh, const string& name)
+void JGRCObject::SetMesh(JGBaseMesh* mesh)
 {
 	m_Mesh = mesh;
-	m_MeshName = name;
 	ClearNotify();
 }
 void JGRCObject::SetMaterial(JGMaterial* material)

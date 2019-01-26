@@ -4,12 +4,14 @@
 #include"PostProcessing/CubeMap.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
-#include"Shader/ShaderPath.h"
+
 #include"PostProcessing/ShadowMap.h"
 #include"PostProcessing/BlurFilter.h"
 #include"PostProcessing/SSAO.h"
+
 #include"JGLight.h"
 #include"CommonData.h"
+#include"DxCommon/ModelLoader.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -41,10 +43,14 @@ Scene::Scene(class DxCore* core)
 	m_SceneData = make_unique<SceneData>();
 	m_CommonShaderRootSig = make_unique<CommonShaderRootSignature>();
 	m_CommonShaderRootSig->RootSign(m_DxCore->Device());
-	m_SceneShader = make_unique<Shader>();
-	m_SceneShader->Init(global_scene_hlsl_path,
-		{ EShaderType::Vertex, EShaderType::Pixel });
-	m_ScenePSO = m_SceneShader->CompileAndConstrutPSO(EPSOMode::SCENE, m_CommonShaderRootSig.get(), {});
+	m_CommonSkinnedShadeRootSig = make_unique<CommonSkinnedShaderRootSignature>();
+	m_CommonSkinnedShadeRootSig->RootSign(m_DxCore->Device());
+
+
+
+	Shader SceneShader(global_scene_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+
+	m_ScenePSO = SceneShader.CompileAndConstrutPSO(EPSOMode::SCENE, m_CommonShaderRootSig.get());
 
 
 
@@ -65,7 +71,7 @@ Scene::Scene(class DxCore* core)
 
 	// 장면 구 설정( 나중에 크기 조절 가능하게 ) 나중에 모든 오브젝트를 훑어서 자동 으로 늘렷다 줄엿다.
 	m_SceneSphere.Center = { 0.0f,0.0f, 0.0f };
-	m_SceneSphere.Radius = sqrt(200.0f * 200.0f + 200.0f * 200.0f);
+	m_SceneSphere.Radius = sqrt(1000.0f * 1000.0f + 1000.0f * 1000.0f);
 }
 void Scene::BuildScene()
 {
@@ -80,19 +86,17 @@ void Scene::BuildScene()
 	// 오브젝트 분리
 	for (auto& obj : m_ObjectMems)
 	{
-		obj->Build(m_DxCore->CommandList());
+		obj->Build(m_DxCore->CommandList(), m_CommonShaderRootSig.get());
 		EPSOMode Mode = obj->GetMaterial()->GetDesc()->Mode;
 		EObjType Type = obj->GetType();
 
 		m_ObjectArray[Type][Mode].push_back(obj.get());
 	}
-	for (auto& obj : m_InstanceObjects)
-		obj->Build(m_DxCore->CommandList());
 
 
 	// 메시 생성
 	for (auto& mesh : m_MeshMems)
-		mesh->CreateMesh(m_DxCore->Device(), m_DxCore->CommandList());
+		mesh->CreateMesh(m_DxCore->CommandList());
 
 
 	// 텍스쳐 추가
@@ -102,7 +106,6 @@ void Scene::BuildScene()
 	}
 	// 각종 포스트 프로세싱 빌드
 	m_ResourceManager->BuildResourceHeap();
-	m_MaterialCreater->BuildMaterial(m_CommonShaderRootSig.get());
 
 	
 
@@ -116,7 +119,6 @@ void Scene::OnReSize(UINT width, UINT height)
 {
 	m_SceneData->ReSize(width, height);
 	m_SSAO->OnReSize(width, height);
-	BoundingFrustum::CreateFromMatrix(m_Frustom, m_MainCamera->GetProj());
 }
 void Scene::Update(const GameTimer& gt)
 {
@@ -132,8 +134,6 @@ void Scene::Update(const GameTimer& gt)
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
 		obj->Update(gt, CurrFrameResource);
-	for (auto& insObj : m_InstanceObjects)
-		insObj->Update(gt, CurrFrameResource);
 
 	// 머터리얼 업데이트
 	for (auto& mat : m_MaterialCreater->GetArray())
@@ -145,17 +145,6 @@ void Scene::Update(const GameTimer& gt)
 	// 메인 패스 업데이트
 	MainPassUpdate(gt);
 
-	// 프리스텀 업데이트
-	BoundingFrustum::CreateFromMatrix(m_Frustom, m_MainCamera->GetProj());
-
-
-	for (auto& objarr : m_ObjectArray)
-	{
-		for (auto& obj : objarr.second[EPSOMode::DEFAULT])
-		{
-			ObjCulling(obj);
-		}
-	}
 }
 void Scene::Draw()
 {
@@ -214,10 +203,7 @@ void Scene::Draw()
 			obj->CubeMapDraw(CurrFrameResource, CommandList);
 		}
 	}
-	for (auto& obj : m_InstanceObjects)
-	{
-		obj->CubeDraw(CurrFrameResource, CommandList);
-	}
+
 
 
 	// 메인 패쓰 등록
@@ -229,42 +215,53 @@ void Scene::Draw()
 	// SwapChain에 그리기 시작
 	m_DxCore->StartDraw();
 
-	CommandList->SetPipelineState(m_ScenePSO);
+	CommandList->SetPipelineState(m_ScenePSO.Get());
 	CommandList->IASetVertexBuffers(0, 0, nullptr);
 	CommandList->IASetIndexBuffer(nullptr);
 	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	CommandList->DrawInstanced(6, 1, 0, 0);
-	m_Blur->Execute(m_DxCore->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
+	//m_Blur->Execute(m_DxCore->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
 	// 마무리
 	m_DxCore->EndDraw();
 
 	CurrFrameResource->Fence = m_DxCore->CurrentFence();
 }
-JGRCObject* Scene::CreateObject(JGMaterial* mat, JGMesh* mesh, const std::string& meshname, EObjType Type)
+void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+{
+	for (auto& objarr : m_ObjectArray)
+	{
+		for (auto& obj : objarr.second[EPSOMode::DEFAULT])
+		{
+			obj->Draw(CurrFrameResource, CommandList, Mode);
+		}
+	}
+}
+void Scene::SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+{
+	for (auto& obj : m_ObjectArray[EObjType::Static][EPSOMode::DEFAULT])
+	{
+		obj->Draw(CurrFrameResource, CommandList, Mode);
+	}
+}
+void Scene::SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+{
+	for (auto& obj : m_ObjectArray[EObjType::Dynamic][EPSOMode::DEFAULT])
+	{
+		obj->Draw(CurrFrameResource, CommandList, Mode);
+	}
+}
+JGRCObject* Scene::CreateObject(JGMaterial* mat, JGBaseMesh* mesh,EObjType Type)
 {
 
 	auto Obj = make_unique<JGRCObject>(++m_ObjIndex, Type);
 	JGRCObject* result = Obj.get();
 	Obj->SetMaterial(mat);
-	Obj->SetMesh(mesh, meshname);
+	Obj->SetMesh(mesh);
 
 
 
 	m_ObjectMems.push_back(move(Obj));
 
-	return result;
-}
-InstanceObject* Scene::CreateInstanceObject(JGMesh* Mesh, const std::string& meshname, JGMaterial* mat)
-{
-	if (mat->GetDesc()->Mode != EPSOMode::INSTANCE)
-		return nullptr;
-	auto InsObj = make_unique<InstanceObject>();
-	InstanceObject* result = InsObj.get();
-	m_InstanceObjects.push_back(move(InsObj));
-
-
-	result->SetMaterial(mat);
-	result->SetMesh(Mesh, meshname);
 	return result;
 }
 JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
@@ -289,10 +286,10 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	JGMaterial* SkyMat = AddMaterial(matDesc);
 	SkyMat->SetTexture(ETextureSlot::Diffuse, texturepath);
 	// 메쉬 생성
-	JGMesh* SkyMesh = AddMesh();
+	JGStaticMesh* SkyMesh = AddStaticMesh();
 	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
 	// 오브젝트 생성
-	JGRCObject* obj = CreateObject(SkyMat, SkyMesh, "Scene_SkyBox_Default_Mesh");
+	JGRCObject* obj = CreateObject(SkyMat, SkyMesh);
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
@@ -300,12 +297,42 @@ JGMaterial* Scene::AddMaterial(const MaterialDesc& Desc)
 {
 	return m_MaterialCreater->CreateMaterial(Desc);
 }
-JGMesh*     Scene::AddMesh()
+JGStaticMesh*   Scene::AddStaticMesh()
 {
-	auto Mesh = make_unique<JGMesh>("None");
-	JGMesh* result = Mesh.get();
+	auto Mesh = make_unique<JGStaticMesh>("None");
+	JGStaticMesh* result = Mesh.get();
 	m_MeshMems.push_back(move(Mesh));
 	return result;
+}
+JGSkeletalMesh* Scene::AddSkeletalMesh()
+{
+	auto Mesh = make_unique<JGSkeletalMesh>("None");
+	JGSkeletalMesh* result = Mesh.get();
+	m_MeshMems.push_back(move(Mesh));
+	return result;
+}
+vector<string> Scene::AddAnimation(const string& path)
+{
+	vector<JGAnimation> animArr;
+	vector<string> animNames;
+	ModelLoader AnimLoader(path, &animArr);
+	if (!AnimLoader.Success)
+		return animNames;
+	for (UINT i = 0; i < (UINT)animArr.size(); ++i)
+	{
+		auto anim = make_unique<JGAnimation>();
+		*anim = animArr[i];
+		JGAnimation* pAnim = anim.get();
+
+
+		string AnimName = path + " @Name : " + pAnim->Name;
+		if (m_Animations.find(AnimName) != m_Animations.end())
+			continue;
+		m_AnimationMems.push_back(move(anim));
+		m_Animations[AnimName] = pAnim;
+		animNames.push_back(AnimName);
+	}
+	return animNames;
 }
 Camera*     Scene::AddCamera()
 {
@@ -344,32 +371,19 @@ void  Scene::SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, F
 	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
 		LightCB->GetGPUVirtualAddress());
 }
-bool    Scene::ObjCulling(JGRCObject* obj)
+JGAnimation* Scene::GetAnimation(const string& name)
 {
-	BoundingFrustum localFrustom;
-	XMMATRIX view    = m_MainCamera->GetView();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
-
-	XMMATRIX World = XMLoadFloat4x4(&obj->GetWorld());
-	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(World), World);
-
-	XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
-	m_Frustom.Transform(localFrustom, viewToLocal);
-
-
-	if ((localFrustom.Contains(obj->GetCullingBox())
-		!= DISJOINT))
-	{
-		obj->ThisIsNotCulling();
-		return false;
-	}
-	else
-	{
-		obj->ThisIsCulling();
-		return true;
-	}
-	
-
+	if (m_Animations.find(name) == m_Animations.end())
+		return nullptr;
+	return m_Animations[name];
+}
+CommonShaderRootSignature* Scene::GetRootSig()
+{
+	return m_CommonShaderRootSig.get();
+}
+CommonSkinnedShaderRootSignature* Scene::GetSkinnedRootSig()
+{
+	return m_CommonSkinnedShadeRootSig.get();
 }
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {

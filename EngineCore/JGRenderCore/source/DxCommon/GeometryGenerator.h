@@ -13,7 +13,7 @@
 //***************************************************************************************
 
 #pragma once
-
+#include<Windows.h>
 #include <cstdint>
 #include <DirectXMath.h>
 #include <vector>
@@ -51,18 +51,15 @@ public:
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT3 TangentU;
         DirectX::XMFLOAT2 TexC;
-
-		bool operator==(const Vertex& v)
-		{
-			if (Position.x == v.Position.x && Position.y == v.Position.y && Position.z == v.Position.z &&
-				Normal.x   == v.Normal.x   && Normal.y   == v.Normal.y   && Normal.z   == v.Normal.z   &&
-				TangentU.x == v.TangentU.x && TangentU.y == v.TangentU.y && TangentU.z == v.TangentU.z &&
-				TexC.x     == v.TexC.x     && TexC.y     == v.TexC.y)
-			{
-				return true;
-			}
-			return false;
-		}
+	};
+	struct SkinnedVertex
+	{
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 Normal;
+		DirectX::XMFLOAT3 TangentU;
+		DirectX::XMFLOAT2 TexC;
+		DirectX::XMFLOAT4 BoneWeights = { 0.0f,0.0f,0.0f,0.0f };
+		UINT BoneIndices[4] = { 0,0,0,0 };
 	};
 	struct MeshData
 	{
@@ -84,7 +81,24 @@ public:
 	private:
 		std::vector<uint16> mIndices16;
 	};
+	struct SkinnedMeshData
+	{
+		std::vector<SkinnedVertex> Vertices;
+		std::vector<uint32>        Indices32;
+		std::vector<uint16>& GetIndices16()
+		{
+			if (mIndices16.empty())
+			{
+				mIndices16.resize(Indices32.size());
+				for (size_t i = 0; i < Indices32.size(); ++i)
+					mIndices16[i] = static_cast<uint16>(Indices32[i]);
+			}
 
+			return mIndices16;
+		}
+	private:
+		std::vector<uint16> mIndices16;
+	};
 	///<summary>
 	/// Creates a box centered at the origin with the given dimensions, where each
     /// face has m rows and n columns of vertices.

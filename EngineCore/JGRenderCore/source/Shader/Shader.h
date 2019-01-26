@@ -2,14 +2,21 @@
 #include"DxCommon/DxCommon.h"
 #include"DxCore/EnginePipeLineStateDescList.h"
 #include"ShaderRootSignature.h"
+#include"Shader/ShaderPath.h"
 // 매크로 정의
-#define SHADER_MACRO_DEFINE_TEXTURE_MAX "MAX_TEXTURE"
+#define SHADER_MACRO_ONLY_DEFINE 1
 #define SHADER_MACRO_DEFINE_REFLECTION  "REFLECTION"
 #define SHADER_MACRO_DEFINE_REFRACTION  "REFRACTION"
 #define SHADER_MACRO_DEFINE_SHADER_INSTANCE_OBJECT "SHADER_INSTANCE_OBJECT"
+
+#define SHADER_MACRO_DEFINE_USING_DIFFUSEMAP "USING_DIFFUSEMAP"
+#define SHADER_MACRO_DEFINE_USING_NORMALMAP  "USING_NORMALMAP"
+
+#define SHADER_MACRO_DEFINE_SKINNED          "SKINNED"
+#define SHADER_MACRO_DEFINE_SKINNED_MAX_BONE "MAX_BONE"
 namespace JGRC
 {
-	enum class EPSOMode
+	enum class RCORE_EXPORT EPSOMode
 	{
 		DEFAULT,
 		SCENE,
@@ -21,12 +28,6 @@ namespace JGRC
 		INSTANCE,
 		COUNT
 	};
-	enum class EMacroMode
-	{
-		AllOff = 0,
-		Reflection,
-		Refraction
-	};
 	enum class RCORE_EXPORT EShaderType
 	{
 		Vertex,
@@ -36,7 +37,7 @@ namespace JGRC
 		Domain,
 		Compute
 	};
-	typedef struct ShaderMacroPack
+	typedef struct RCORE_EXPORT ShaderMacroPack
 	{
 		std::string Macro;
 		std::string Value;
@@ -49,7 +50,7 @@ namespace JGRC
 		std::wstring m_ShaderPath;
 		ShaderTypeInformation        m_ShaderTypeInfor;
 		ShaderBtCodeArray            m_ShaderBtCodes;
-		std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> m_PSOList;
+		std::vector<ShaderMacroPack> m_Macro;
 	protected:
 		const std::string VS = "VS";
 		const std::string PS = "PS";
@@ -58,14 +59,51 @@ namespace JGRC
 		const std::string DS = "DS";
 		const std::string Version = "5_1";
 	public:
-		void Init(const std::wstring& shaderPath, const ShaderTypeInformation& ShaderTypes);
-		const std::wstring& GetPath() { return m_ShaderPath; }
-		ID3D12PipelineState* CompileAndConstrutPSO(EPSOMode mode, ShaderRootSignatureBase* RootSig, const std::vector<ShaderMacroPack>& Macros);
+		Shader() = default;
+		Shader(const std::wstring& shaderPath, const ShaderTypeInformation& ShaderTypes);
+		void SetPath(const std::wstring& shaderPath, const ShaderTypeInformation& ShaderTypes);
+		void Macro_Push(const std::string& define, UINT value);
+		void Macro_Merge(const std::vector<ShaderMacroPack>& v);
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> CompileAndConstrutPSO(EPSOMode mode, ShaderRootSignatureBase* RootSig);
 	private:
-		void Compile(ShaderRootSignatureBase* RootSig, const std::vector<ShaderMacroPack>& Macros);
+		void Compile(ShaderRootSignatureBase* RootSig);
 		void CreateModeDesc(EPSOMode mode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& Desc);
 	};
 
+	class RCORE_EXPORT CommonPSOPack
+	{
+	private:
+		Shader CustomCompiler;
+		Shader ShadowCompiler;
+		Shader ViewNormalCompiler;
+	public:
+		CommonPSOPack() = default;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> CustomPSO;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> ShadowPSO;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> ViewNormalPSO;
+		void CompilePSO(const std::wstring& path, EPSOMode CustomMode, ShaderRootSignatureBase* RootSig)
+		{
+			CustomCompiler.SetPath(path, { EShaderType::Vertex, EShaderType::Pixel });
+			ShadowCompiler.SetPath(global_shadow_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+			ViewNormalCompiler.SetPath(global_drawnormal_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+			
+			CustomPSO     = CustomCompiler.CompileAndConstrutPSO(CustomMode, RootSig);
+			ShadowPSO     = ShadowCompiler.CompileAndConstrutPSO(EPSOMode::SHADOW, RootSig);
+			ViewNormalPSO = ViewNormalCompiler.CompileAndConstrutPSO(EPSOMode::SSAO_NORMALMAP, RootSig);
+		}
+		void Macro_Push(const std::string& define, UINT value)
+		{
+			CustomCompiler.Macro_Push(define, value);
+			ShadowCompiler.Macro_Push(define, value);
+			ViewNormalCompiler.Macro_Push(define, value);
+		}
+		void Macro_Merge(const std::vector<ShaderMacroPack>& v)
+		{
+			CustomCompiler.Macro_Merge(v);
+			ShadowCompiler.Macro_Merge(v);
+			ViewNormalCompiler.Macro_Merge(v);
+		}
+	};
 	class RCORE_EXPORT ComputeShader
 	{
 	private:

@@ -34,8 +34,6 @@ namespace JGRC
 		ID3D12Resource*   m_NormalMap        = nullptr;
 		SrvResourcePack*  m_NormalMapPack    = nullptr;
 		RenderTargetPack* m_NormalMapRtvPack = nullptr;
-		std::shared_ptr<class Shader> m_NormalMapShader;
-		ID3D12PipelineState* m_NormalMapPSO  = nullptr;
 		//
 		SrvResourcePack*  m_DepthMapPack = nullptr;
 		//
@@ -47,10 +45,9 @@ namespace JGRC
 		SrvResourcePack*  m_SSAOMapPack_1 = nullptr;
 		RenderTargetPack* m_SSAORtvPack_1 = nullptr;
 		//
-		ID3D12PipelineState* m_SSAOPSO     = nullptr;
-		ID3D12PipelineState* m_SSAOBlurPSO = nullptr;
-		std::shared_ptr<class Shader> m_SSAOShader;
-		std::shared_ptr<class Shader> m_SSAOBlurShader;
+
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SSAOPSO     = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SSAOBlurPSO = nullptr;
 		std::shared_ptr<class SSAOShaderRootSignature> m_SSAORootSig;
 		//
 		ID3D12Resource* m_RandomVectorMap = nullptr;

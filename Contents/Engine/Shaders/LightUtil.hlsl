@@ -1,4 +1,4 @@
-#include"GS.hlsl"
+
 struct Light
 {
     float3 Strength;

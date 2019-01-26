@@ -58,18 +58,7 @@ void SceneData::SceneDataExtract(FrameResource* CurrFrameResource, ID3D12Graphic
 	D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle[] = { m_WorldPosRtv->Handle,m_AlbedoRtv->Handle ,m_NormalRtv->Handle, m_MatRtv->Handle };
 	CommandList->OMSetRenderTargets(4, RtvHandle, true, &m_DepthDsv->Handle);
 
-	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static , EPSOMode::DEFAULT))
-	{
-		obj->Draw(CurrFrameResource, CommandList);
-	}
-	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
-	{
-		obj->Draw(CurrFrameResource, CommandList);
-	}
-	for (auto& obj : CommonData::_Scene()->GetInstanceArray())
-	{
-		obj->Draw(CurrFrameResource, CommandList);
-	}
+	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjRenderMode::Default);
 	if (CommonData::_Scene()->GetMainSkyBox())
 	{
 		CommonData::_Scene()->GetMainSkyBox()->Draw(CurrFrameResource, CommandList);

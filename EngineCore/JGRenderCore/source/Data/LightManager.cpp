@@ -3,17 +3,12 @@
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
 #include"CommonData.h"
-#include"Shader/ShaderPath.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 
 void LightManager::BuildLight(CommonShaderRootSignature* CommonSig)
 {
-	m_ShadowShader = make_unique<Shader>();
-	m_ShadowShader->Init(global_shadow_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
-	m_ShadowPSO = m_ShadowShader->CompileAndConstrutPSO(EPSOMode::SHADOW, CommonSig,
-		{  });
 	if (m_DirLight)
 		m_DirLight->Build();
 	for (auto& iter : m_PointLights)
@@ -48,8 +43,6 @@ void LightManager::Update(FrameResource* CurrFrameResource)
 }
 void LightManager::DrawShadowMap(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource)
 {
-	CommandList->SetPipelineState(m_ShadowPSO);
-
 	if (m_DirLight)
 		m_DirLight->BuildShadowMap(CurrFrameResource, CommandList);
 	for (auto& iter : m_PointLights)

@@ -1,7 +1,6 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
 
-
 namespace JGRC
 {
 	// 나중에 Static, Dynamic 오브젝트를 나눌것..
@@ -14,51 +13,31 @@ namespace JGRC
 	enum class EObjRenderMode
 	{
 		Default,
-		NonePSO
+		NonePSO,
+		ViewNormal,
+		Shadow
 	};
 	typedef DirectX::XMFLOAT3 Vec3;
-	/*
-	Exp : 오브젝트 목록 
-	* 머터리얼 
-	* 메쉬
-	* 적용할 메쉬 이름
-	* 위치, 회전, 스케일
-	* 업데이트 여부
-	* 그리기 여부
-	* 그리기 타입 */
-	struct JGRCObjDesc
-	{
-		class JGMaterial* Material = nullptr;
-		class JGMesh*     Mesh = nullptr;
-		std::string       MeshName = "";
-		Vec3 Location = { 0.0f,0.0f,0.0f };
-		Vec3 Rotation = { 0.0f,0.0f,0.0f };
-		Vec3 Scale    = { 1.0f,1.0f,1.0f };
-		bool bVisible = true;
-		bool bActive = true;
-		D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	};
+
 	class RCORE_EXPORT JGRCObject
 	{
 		static UINT64 Count;
 	private:
 		class JGMaterial* m_Material = nullptr;
-		class JGMesh*     m_Mesh     = nullptr;
-		std::string m_MeshName = "None";
+		class JGBaseMesh*     m_Mesh     = nullptr;
 		// 큐브맵
 		std::shared_ptr<class CubeMap> m_CubeMap = nullptr;
-		
+		//
 		EObjType    Type = EObjType::Static;
 		std::string m_Name;
 		UINT m_ObjCBIndex = 0;
-		DirectX::BoundingBox m_CullingBox;
 		//
 		DirectX::XMFLOAT4X4 m_World        = MathHelper::Identity4x4();
 		DirectX::XMFLOAT4X4 m_TexTransform = MathHelper::Identity4x4();
 		//
-		Vec3 m_Location;
-		Vec3 m_Rotation;
-		Vec3 m_Scale;
+		Vec3 m_Location = { 0.0f,0.0f,0.0f };
+		Vec3 m_Rotation = { 0.0f,0.0f,0.0f };
+		Vec3 m_Scale    = { 1.0f,1.0f,1.0f };
 		//
 		bool m_bInit    = false;
 		bool m_bVisible = true;
@@ -68,11 +47,12 @@ namespace JGRC
 
 		//
 		D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		CommonPSOPack m_PSOPack;
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
 
 	public:
-		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject",const JGRCObjDesc& Desc = JGRCObjDesc());
-		void Build(ID3D12GraphicsCommandList* CommandList);
+		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject");
+		void Build(ID3D12GraphicsCommandList* CommandList, class CommonShaderRootSignature* RoogSig);
 		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource);
 		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
@@ -91,14 +71,9 @@ namespace JGRC
 		void Active()         { m_bActive = true; }
 		void DeActive()       { m_bActive = false; }
 		bool IsActive()       { return m_bActive; }
-		void ThisIsCulling()    { m_bCulling = true; }
-		void ThisIsNotCulling() { m_bCulling = false; }
-		bool IsCulling()        { return m_bCulling; }
-		DirectX::BoundingBox& GetCullingBox() { return m_CullingBox; }
 	public:
-		JGMesh*     GetMesh() const { return m_Mesh; }
 		JGMaterial* GetMaterial() const { return m_Material; }
-		void SetMesh(JGMesh* mesh, const std::string& name);
+		void SetMesh(JGBaseMesh* mesh);
 		void SetMaterial(JGMaterial* material);
 	public:
 		Vec3 GetLocation() const { return m_Location; }
@@ -106,7 +81,6 @@ namespace JGRC
 		Vec3 GetScale()    const { return m_Scale; }
 		const DirectX::XMFLOAT4X4& GetWorld()        { return m_World; }
 		const DirectX::XMFLOAT4X4& GetTexTransform() { return m_TexTransform; }
-		const std::string& GetMeshName() const       { return m_MeshName; }
 	public:
 		void SetLocation(float x, float y, float z);
 		void SetRotation(float pitch, float yaw, float roll);

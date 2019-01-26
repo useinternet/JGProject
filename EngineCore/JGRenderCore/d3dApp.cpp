@@ -265,7 +265,7 @@ void D3DApp::CalculateFrameStats()
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
 
-        wstring fpsStr = to_wstring(fps);
+        wstring fpsStr = to_wstring(mTimer.TotalTime());
         wstring mspfStr = to_wstring(mspf);
 
         wstring windowText = mMainWndCaption +

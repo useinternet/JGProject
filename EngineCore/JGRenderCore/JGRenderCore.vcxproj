@@ -20,16 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp" />
+    <ClCompile Include="source\Data\Animation\JGAnimation.cpp" />
     <ClCompile Include="source\Data\CommonData.cpp" />
     <ClCompile Include="source\Data\EngineFrameResource.cpp" />
-    <ClCompile Include="source\Data\InstanceObject.cpp" />
     <ClCompile Include="source\Data\JGLight.cpp" />
     <ClCompile Include="source\Data\JGMaterial.cpp" />
-    <ClCompile Include="source\Data\JGMesh.cpp" />
     <ClCompile Include="source\Data\JGRCObject.cpp" />
     <ClCompile Include="source\Data\LightManager.cpp" />
-    <ClCompile Include="source\Data\Octree.cpp" />
-    <ClCompile Include="source\Data\OctreeNode.cpp" />
+    <ClCompile Include="source\Data\Mesh\JGSkeletalMesh.cpp" />
+    <ClCompile Include="source\Data\Mesh\JGStaticMesh.cpp" />
     <ClCompile Include="source\Data\Scene.cpp" />
     <ClCompile Include="source\Data\SceneData.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
@@ -40,7 +39,6 @@
     <ClCompile Include="source\DxCommon\GeometryGenerator.cpp" />
     <ClCompile Include="source\DxCommon\MathHelper.cpp" />
     <ClCompile Include="source\DxCommon\ModelLoader.cpp" />
-    <ClCompile Include="source\DxCommon\PickingSystem.cpp" />
     <ClCompile Include="source\DxCore\DxCore.cpp" />
     <ClCompile Include="source\DxCore\JGRenderCore.cpp" />
     <ClCompile Include="source\MemoryManager\ResourceManager.cpp" />
@@ -62,16 +60,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h" />
+    <ClInclude Include="source\Data\Animation\JGAnimation.h" />
     <ClInclude Include="source\Data\CommonData.h" />
     <ClInclude Include="source\Data\EngineFrameResource.h" />
-    <ClInclude Include="source\Data\InstanceObject.h" />
     <ClInclude Include="source\Data\JGLight.h" />
     <ClInclude Include="source\Data\JGMaterial.h" />
-    <ClInclude Include="source\Data\JGMesh.h" />
     <ClInclude Include="source\Data\JGRCObject.h" />
     <ClInclude Include="source\Data\LightManager.h" />
-    <ClInclude Include="source\Data\Octree.h" />
-    <ClInclude Include="source\Data\OctreeNode.h" />
+    <ClInclude Include="source\Data\Mesh\JGBaseMesh.h" />
+    <ClInclude Include="source\Data\Mesh\JGSkeletalMesh.h" />
+    <ClInclude Include="source\Data\Mesh\JGStaticMesh.h" />
     <ClInclude Include="source\Data\Scene.h" />
     <ClInclude Include="source\Data\SceneData.h" />
     <ClInclude Include="source\DxCommon\Camera.h" />
@@ -83,7 +81,6 @@
     <ClInclude Include="source\DxCommon\GeometryGenerator.h" />
     <ClInclude Include="source\DxCommon\MathHelper.h" />
     <ClInclude Include="source\DxCommon\ModelLoader.h" />
-    <ClInclude Include="source\DxCommon\PickingSystem.h" />
     <ClInclude Include="source\DxCommon\UploadBuffer.h" />
     <ClInclude Include="source\DxCore\DxCore.h" />
     <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h" />

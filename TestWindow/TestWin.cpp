@@ -16,7 +16,7 @@ bool TestWindow::Initialize()
 	setting.Width = 1920;
 	setting.Height = 1080;
 	setting.hWnd = MainWnd();
-	setting.FarZ = 1000.0f;
+	setting.FarZ = 10000.0f;
 	core = new JGRenderCore;
 	core->Init(setting);
 	Init = true;

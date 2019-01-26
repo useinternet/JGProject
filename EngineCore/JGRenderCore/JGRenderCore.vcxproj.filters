@@ -32,6 +32,12 @@
     <Filter Include="PBRT\PBRTClassBase">
       <UniqueIdentifier>{9494178c-9755-4915-a9b4-1d795da3ca15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Animation">
+      <UniqueIdentifier>{96c5e747-fd3a-42c9-9393-9f63e7587c9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Mesh">
+      <UniqueIdentifier>{11e7bde0-1645-43ac-8f88-7b9b6c73995f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dllmain.cpp">
@@ -67,14 +73,8 @@
     <ClCompile Include="source\MemoryManager\ResourceManager.cpp">
       <Filter>MemoryManager</Filter>
     </ClCompile>
-    <ClCompile Include="source\DxCommon\PickingSystem.cpp">
-      <Filter>DxCommon</Filter>
-    </ClCompile>
     <ClCompile Include="source\PostProcessing\CubeMap.cpp">
       <Filter>PostProcessing</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Data\JGMesh.cpp">
-      <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="source\Data\JGMaterial.cpp">
       <Filter>Data</Filter>
@@ -112,15 +112,6 @@
     <ClCompile Include="source\PostProcessing\BlurFilter.cpp">
       <Filter>PostProcessing</Filter>
     </ClCompile>
-    <ClCompile Include="source\Data\InstanceObject.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Data\Octree.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Data\OctreeNode.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
     <ClCompile Include="source\UserInterface\Interface_SceneObject.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
@@ -153,6 +144,15 @@
     </ClCompile>
     <ClCompile Include="source\DxCommon\ModelLoader.cpp">
       <Filter>DxCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Animation\JGAnimation.cpp">
+      <Filter>Data\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Mesh\JGStaticMesh.cpp">
+      <Filter>Data\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Mesh\JGSkeletalMesh.cpp">
+      <Filter>Data\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,14 +204,8 @@
     <ClInclude Include="source\MemoryManager\ResourceManager.h">
       <Filter>MemoryManager</Filter>
     </ClInclude>
-    <ClInclude Include="source\DxCommon\PickingSystem.h">
-      <Filter>DxCommon</Filter>
-    </ClInclude>
     <ClInclude Include="source\PostProcessing\CubeMap.h">
       <Filter>PostProcessing</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Data\JGMesh.h">
-      <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="source\Data\JGMaterial.h">
       <Filter>Data</Filter>
@@ -264,9 +258,6 @@
     <ClInclude Include="source\Shader\BlurShaderRootSignature.h">
       <Filter>Shader</Filter>
     </ClInclude>
-    <ClInclude Include="source\Data\InstanceObject.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="source\UserInterface\Interface_SceneObject.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
@@ -294,12 +285,6 @@
     <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
-    <ClInclude Include="source\Data\Octree.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Data\OctreeNode.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="source\UserInterface\JGRCInterfaceClass.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
@@ -308,6 +293,18 @@
     </ClInclude>
     <ClInclude Include="source\DxCommon\ModelLoader.h">
       <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Animation\JGAnimation.h">
+      <Filter>Data\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Mesh\JGStaticMesh.h">
+      <Filter>Data\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Mesh\JGSkeletalMesh.h">
+      <Filter>Data\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Mesh\JGBaseMesh.h">
+      <Filter>Data\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

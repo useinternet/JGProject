@@ -5,7 +5,6 @@
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/SSAOShaderRootSignature.h"
 #include"Data/CommonData.h"
-#include"Shader/ShaderPath.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -27,27 +26,16 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 	BuildResource(CommandList);
 	BuildDescriptor();
 
-
-
-	m_NormalMapShader = make_unique<Shader>();
-	m_NormalMapShader->Init(global_drawnormal_hlsl_path,
-		{ EShaderType::Vertex, EShaderType::Pixel });
-
-	m_NormalMapPSO = m_NormalMapShader->CompileAndConstrutPSO(EPSOMode::SSAO_NORMALMAP,
-		RootSig, {  });
-
 	m_SSAORootSig = make_unique<SSAOShaderRootSignature>();
 	m_SSAORootSig->RootSign(CommonData::_Device());
-	m_SSAOShader = make_unique<Shader>();
-	m_SSAOShader->Init(global_ssao_hlsl_path,
-		{ EShaderType::Vertex, EShaderType::Pixel });
-	m_SSAOPSO = m_SSAOShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {});
+
+	Shader SSAOShader(global_ssao_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+	m_SSAOPSO = SSAOShader.CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get());
 
 
-	m_SSAOBlurShader = make_unique<Shader>();
-	m_SSAOBlurShader->Init(global_ssaoblur_hlsl_path,
-		{ EShaderType::Vertex, EShaderType::Pixel });
-	m_SSAOBlurPSO = m_SSAOBlurShader->CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get(), {});
+
+	Shader SSAOBlurShader(global_ssaoblur_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+	m_SSAOBlurPSO = SSAOBlurShader.CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get());
 }
 
 void SSAO::OnReSize(UINT width, UINT height)
@@ -307,19 +295,9 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 		CommonData::_Scene()->MainPassHandle());
 
 
-	CommandList->SetPipelineState(m_NormalMapPSO);
-	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
-	{
-		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
-	}
-	for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
-	{
-		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
-	}
-	for (auto& obj : CommonData::_Scene()->GetInstanceArray())
-	{
-		obj->Draw(CurrFrameResource, CommandList, EObjRenderMode::NonePSO);
-	}
+	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjRenderMode::ViewNormal);
+
+
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_NormalMap,
 		D3D12_RESOURCE_STATE_GENERIC_READ);
 }
@@ -352,7 +330,7 @@ void SSAO::DrawSSAO(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList*
 	// Bind the random vector map.
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ESSAOShaderSlot::RandomVecMap, GetRandomVectorGPUHandle());
 
-	CommandList->SetPipelineState(m_SSAOPSO);
+	CommandList->SetPipelineState(m_SSAOPSO.Get());
 
 	// Draw fullscreen quad.
 	CommandList->IASetVertexBuffers(0, 0, nullptr);
@@ -366,7 +344,7 @@ void SSAO::DrawSSAO(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList*
 void SSAO::BlurSSAOMap(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, int blurCount)
 {
 	// pso 블러 셋팅
-	CommandList->SetPipelineState(m_SSAOBlurPSO);
+	CommandList->SetPipelineState(m_SSAOBlurPSO.Get());
 	auto ssaoCBAddress = m_SSAOCB->Resource()->GetGPUVirtualAddress();
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ESSAOShaderSlot::SSAOData, ssaoCBAddress);
 	for (int i = 0; i < blurCount; ++i)

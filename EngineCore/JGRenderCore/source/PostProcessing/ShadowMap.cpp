@@ -46,20 +46,10 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 		switch (LightExcType)
 		{
 		case ELightExercise::Static:
-			for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
-			{
-				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-			}
-			for (auto& obj : CommonData::_Scene()->GetInstanceArray())
-			{
-				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-			}
+			CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
 			break;
 		case ELightExercise::Dynamic:
-			for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
-			{
-				obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-			}
+			CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
 			break;
 		}
 		break;
@@ -78,16 +68,10 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 			switch (LightExcType)
 			{
 			case ELightExercise::Static:
-				for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Static, EPSOMode::DEFAULT))
-				{
-					obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-				}
+				CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
 				break;
 			case ELightExercise::Dynamic:
-				for (auto& obj : CommonData::_Scene()->GetArray(EObjType::Dynamic, EPSOMode::DEFAULT))
-				{
-					obj->Draw(CurrentFrameResource, CommandList, EObjRenderMode::NonePSO);
-				}
+				CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
 				break;
 			}
 		}

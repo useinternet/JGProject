@@ -5,16 +5,28 @@ using namespace std;
 using namespace JGRC;
 using namespace Microsoft::WRL;
 
-void Shader::Init(const wstring& shaderPath, const ShaderTypeInformation& ShaderTypes)
+Shader::Shader(const wstring& shaderPath, const ShaderTypeInformation& ShaderTypes)
 {
 	m_ShaderPath = shaderPath;
 	m_ShaderTypeInfor = move(ShaderTypes);
 }
-ID3D12PipelineState* Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderRootSignatureBase* RootSig,
-	const vector<ShaderMacroPack>& Macros)
+void Shader::SetPath(const wstring& shaderPath, const ShaderTypeInformation& ShaderTypes)
+{
+	m_ShaderPath = shaderPath;
+	m_ShaderTypeInfor = move(ShaderTypes);
+}
+void Shader::Macro_Push(const string& define, UINT value)
+{
+	m_Macro.push_back(ShaderMacroPack{ define, to_string(value) });
+}
+void Shader::Macro_Merge(const vector<ShaderMacroPack>& v)
+{
+	m_Macro.insert(m_Macro.end(), v.begin(), v.end());
+}
+ComPtr<ID3D12PipelineState> Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderRootSignatureBase* RootSig)
 {
 	m_ShaderBtCodes.clear();
-	Compile(RootSig, Macros);
+	Compile(RootSig);
 	// 모드 목록 작성
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC Desc;
 	CreateModeDesc(mode, Desc);
@@ -71,17 +83,17 @@ ID3D12PipelineState* Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderRootSign
 	ThrowIfFailed(CommonData::_Device()->CreateGraphicsPipelineState(
 		&Desc,
 		IID_PPV_ARGS(pso.GetAddressOf())));
-	ID3D12PipelineState* result = pso.Get();
-	m_PSOList.push_back(move(pso));
-	return result;
+
+	return pso;
 }
-void Shader::Compile(ShaderRootSignatureBase* RootSig, const std::vector<ShaderMacroPack>& Macros)
+void Shader::Compile(ShaderRootSignatureBase* RootSig)
 {
-	std::vector<D3D_SHADER_MACRO> mcro(Macros.size());
+	std::vector<D3D_SHADER_MACRO> mcro(m_Macro.size());
+	
 	for (UINT i = 0; i < mcro.size(); ++i)
 	{
-		mcro[i].Name = Macros[i].Macro.c_str();
-		mcro[i].Definition = Macros[i].Value.c_str();
+		mcro[i].Name = m_Macro[i].Macro.c_str();
+		mcro[i].Definition = m_Macro[i].Value.c_str();
 	}
 	mcro.push_back(D3D_SHADER_MACRO{ nullptr, nullptr });
 	for (auto& type : m_ShaderTypeInfor)

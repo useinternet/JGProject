@@ -19,6 +19,10 @@ namespace JGRC
 		UINT CubeMapIndex  = 0;
 		UINT ObjPad[2];
 	}cbInstanceData;
+	typedef struct SkinnedData
+	{
+		DirectX::XMFLOAT4X4 BoneTransforms[96];
+	}SkinnedData;
 	typedef struct cbPassConstant
 	{
 		DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -75,6 +79,7 @@ namespace JGRC
 		std::unique_ptr<UploadBuffer<cbPassConstant>>    PassCB     = nullptr;
 		std::unique_ptr<UploadBuffer<cbObjectConstant>>  ObjectCB   = nullptr;
 		std::unique_ptr<UploadBuffer<MaterialData>>      MaterialCB = nullptr;
+		std::unique_ptr<UploadBuffer<SkinnedData>>       SkinnedCB  = nullptr;
 		std::unique_ptr<UploadBuffer<Light>>             LightCB    = nullptr;
 		UINT64 Fence = 0;
 	public:

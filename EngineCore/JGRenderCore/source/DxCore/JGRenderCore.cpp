@@ -49,14 +49,7 @@ bool JGRenderCore::Init(const DxSetting& set)
 }
 void JGRenderCore::Update(const GameTimer& gt)
 {
-	Test->OffsetRotation(0.0f, gt.DeltaTime() * 5.0f, 0.0f);
 	InputCamera(gt);
-	for (int i = 0; i < 10; ++i)
-	{
-		Obj[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
-		Objarr[i]->OffsetRotation(0.0, gt.DeltaTime() * 30.0f, 0.0f);
-	}
-
 	DirLight->SetRotation(0.0f, gt.TotalTime() * 5, 0.0f);
 
 	for (int i = 0; i < 4; ++i)
@@ -117,27 +110,27 @@ void JGRenderCore::InputCamera(const GameTimer& gt)
 {
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
-		m_Camera->Walk(40.0f * gt.DeltaTime());
+		m_Camera->Walk(200.0f * gt.DeltaTime());
 	}
 	if (GetAsyncKeyState('S') & 0x8000)
 	{
-		m_Camera->Walk(-40.0f * gt.DeltaTime());
+		m_Camera->Walk(-200.0f * gt.DeltaTime());
 	}
 	if (GetAsyncKeyState('A') & 0x8000)
 	{
-		m_Camera->Strafe(-40.0f * gt.DeltaTime());
+		m_Camera->Strafe(-200.0f * gt.DeltaTime());
 	}
 	if (GetAsyncKeyState('D') & 0x8000)
 	{
-		m_Camera->Strafe(40.0f * gt.DeltaTime());
+		m_Camera->Strafe(200.0f * gt.DeltaTime());
 	}
 	if (GetAsyncKeyState('Q') & 0x8000)
 	{
-		m_Camera->Up(-40.0f * gt.DeltaTime());
+		m_Camera->Up(-200.0f * gt.DeltaTime());
 	}
 	if (GetAsyncKeyState('E') & 0x8000)
 	{
-		m_Camera->Up(40.0f * gt.DeltaTime());
+		m_Camera->Up(200.0f * gt.DeltaTime());
 	}
 }
 void JGRenderCore::BuildTextures()
@@ -150,6 +143,9 @@ void JGRenderCore::BuildTextures()
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/water1.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/waves0.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/waves1.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_DIFF_diffuse.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_NM_normal.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_SPEC_specular.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/sunsetcube1024.dds", ETextureType::Cube);
 }
 void JGRenderCore::BuildLight()
@@ -202,16 +198,30 @@ void JGRenderCore::BuildLight()
 }
 void JGRenderCore::BuildLandGeometry()
 {
-	JGMesh* GroundMesh = m_Scene->AddMesh();
-	GroundMesh->AddBoxArg("Box", 10, 5, 10, 3);
-	GroundMesh->AddGridArg("Grid", 100, 100, 100, 100);
-	GroundMesh->AddSphereArg("Sphere", 5, 3);
-	GroundMesh->AddQuadArg("Debug", 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Samba Dancing_binary.fbx");
-	//GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/SampleSamba.txt");
-	//GroundMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Donut2.txt");
-	JGMesh* SkyMesh = m_Scene->AddMesh();
+	JGStaticMesh* GroundMesh = m_Scene->AddStaticMesh();
+	GroundMesh->AddGridArg("Grid", 1000, 1000, 500, 500);
+
+
+	JGSkeletalMesh* SphereMesh = m_Scene->AddSkeletalMesh();
+	SphereMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Bellydancing.fbx");
+	JGSkeletalMesh* SphereMesh2 = m_Scene->AddSkeletalMesh();
+	SphereMesh2->AddFbxMeshArg("../Contents/Engine/Meshs/Female Tough Walk.fbx");
+	JGSkeletalMesh* SphereMesh3 = m_Scene->AddSkeletalMesh();
+	SphereMesh3->AddFbxMeshArg("../Contents/Engine/Meshs/Hip Hop Dancing.fbx");
+	JGSkeletalMesh* SphereMesh4 = m_Scene->AddSkeletalMesh();
+	SphereMesh4->AddFbxMeshArg("../Contents/Engine/Meshs/Hip Hop Dancing2.fbx");
+	JGStaticMesh* SkyMesh = m_Scene->AddStaticMesh();
 	SkyMesh->AddBoxArg("Sky", 1.0f, 1.0f, 1.0f, 1);
+	
+
+	string AnimName  = m_Scene->AddAnimation("../Contents/Engine/Meshs/Bellydancing.fbx")[0];
+	string AnimName2 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Female Tough Walk.fbx")[0];
+	string AnimName3 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Hip Hop Dancing.fbx")[0];
+	string AnimName4 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Hip Hop Dancing2.fbx")[0];
+	SphereMesh->SetAnimation(AnimName);
+	SphereMesh2->SetAnimation(AnimName2);
+	SphereMesh3->SetAnimation(AnimName3);
+	SphereMesh4->SetAnimation(AnimName4);
 
 	MaterialDesc Desc;
 	Desc.Name = "GroundMat";
@@ -223,34 +233,13 @@ void JGRenderCore::BuildLandGeometry()
 	GroundMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
 	GroundMat->SetRoughness(1.0f);
 
-	Desc.Name = "GroundMat2";
-	JGMaterial* GroundMat2 = m_Scene->AddMaterial(Desc);
-	GroundMat2->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/bricks2.dds");
-	GroundMat2->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/bricks2_nmap.dds");
-	GroundMat2->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	GroundMat2->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	GroundMat2->SetRoughness(1.0f);
-
-
-	Desc.Name = "BoxMat";
-
-	JGMaterial* BoxMat = m_Scene->AddMaterial(Desc);
-	BoxMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/tile.dds");
-	BoxMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/tile_nmap.dds");
-	BoxMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	BoxMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	BoxMat->SetRoughness(0.5f);
 
 	Desc.Name = "SphereMat";
 	Desc.bCubeMapStatic = true;
 	JGMaterial* SphereMat = m_Scene->AddMaterial(Desc);
-	SphereMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/bricks2.dds");
-	SphereMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/bricks2_nmap.dds");
-	SphereMat->SetDiffuseAlbedo(1.0f, 0.0f, 0.0f, 1.0f);
+	SphereMat->SetDiffuseAlbedo(1.0f, 0.0f, 0.4f, 1.0f);
 	SphereMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	SphereMat->SetRoughness(0.05f);
-	SphereMat->SetRefractive(1.0f);
-	SphereMat->SetReflectivity(0.99f);
+	SphereMat->SetRoughness(0.7f);
 
 	Desc.Name = "InstanceMat";
 	Desc.bCubeMapStatic = true;
@@ -264,59 +253,20 @@ void JGRenderCore::BuildLandGeometry()
 	InsMat->SetRefractive(1.0f);
 
 
-	JGRCObject* Obj1 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
+	JGRCObject* Obj1 = m_Scene->CreateObject(GroundMat, GroundMesh);
 	Obj1->SetLocation(0.0f, -1.0f, 0.0f);
 
-	JGRCObject* Obj11 = m_Scene->CreateObject(GroundMat2, GroundMesh, "Grid");
-	Obj11->SetLocation(0.0f, -1.0f, 100.0f);
-;
-JGRCObject* Obj12 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
-	Obj12->SetLocation(0.0f, -1.0f, -100.0f);
+	JGRCObject* Obj2 = m_Scene->CreateObject(SphereMat, SphereMesh);
+	Obj2->SetLocation(0.0f, 0.0f, 0.0f);
 
-	JGRCObject* Obj13 = m_Scene->CreateObject(GroundMat2, GroundMesh, "Grid");
-	Obj13->SetLocation(100.0f, -1.0f, 0.0f);
+	JGRCObject* Obj3 = m_Scene->CreateObject(SphereMat, SphereMesh2);
+	Obj3->SetLocation(-250.0f, 0.0f, 0.0f);
 
-	JGRCObject* Obj14 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
-	Obj14->SetLocation(-100.0f, -1.0f, 0.0f);
+	JGRCObject* Obj4 = m_Scene->CreateObject(SphereMat, SphereMesh3);
+	Obj4->SetLocation(250.0f, 0.0f, 0.0f);
 
-
-	JGRCObject* Obj2 = m_Scene->CreateObject(BoxMat, GroundMesh, "../Contents/Engine/Meshs/Samba Dancing_binary.fbx");
-	Obj2->SetLocation(-10.0f, -1.0f, 0.0f);
-	Test = Obj2;
-
-	JGRCObject* Obj3 = m_Scene->CreateObject(SphereMat, GroundMesh, "Sphere");
-	Obj3->SetLocation(-10.0f, 10.0f, 0.0f);
-
-	JGRCObject* Obj4 = m_Scene->CreateObject(BoxMat, GroundMesh, "Box");
-	Obj4->SetLocation(20.0f, -1.0f, 0.0f);
-	Obj4->SetScale(0.5f, 5.0f, 0.5f);
-
-
-	for (int i = 0; i < 10; ++i)
-	{
-		Obj[i] = m_Scene->CreateObject(BoxMat, GroundMesh, "Box", EObjType::Dynamic);
-		Obj[i]->SetLocation(i * 30 + -150.0f, 0.0f, 0.0f);
-	}
-	for (int i = 0; i < 10; ++i)
-	{
-		Objarr[i] = m_Scene->CreateObject(BoxMat, GroundMesh,"Box", EObjType::Dynamic);
-		Objarr[i]->SetLocation(0.0f , 0.0f, i * 30 + -150.0f);
-	}
-	JGRCObject* Obj5 = m_Scene->CreateObject(BoxMat, GroundMesh, "Box");
-	Obj5->SetLocation(-20.0f, -1.0f, -10.0f);
-	Obj5->SetScale(0.5f, 5.0f, 0.5f);
-
-	JGRCObject* Obj6 = m_Scene->CreateObject(BoxMat , GroundMesh, "Box");
-	Obj6->SetLocation(-20.0f, -1.0f, 20.0f);
-	Obj6->SetScale(0.5f, 5.0f, 0.5f);
-
-
-	InstanceObject* InsObj = m_Scene->CreateInstanceObject(GroundMesh, "Sphere", InsMat);
-	for (int i = 0; i < 10; ++i)
-	{
-		JGRCObject* InstanceObj1 = InsObj->AddObject();
-		InstanceObj1->SetLocation(i * 10.0f, 20.0f, 0.0f);
-	}
+	JGRCObject* Obj5 = m_Scene->CreateObject(SphereMat, SphereMesh4);
+	Obj5->SetLocation(0.0f, 0.0f, -250.0f);
 
 
 	JGRCObject* SkyBox = m_Scene->CreateSkyBox(L"../Contents/Engine/Textures/sunsetcube1024.dds");

@@ -21,9 +21,6 @@ namespace JGRC
 		class JGLight* PointLight[4];
 		class JGLight* SpotLight[4];
 		bool PointSwitch[4];
-		class JGRCObject* Obj[10];
-		class JGRCObject* Objarr[10];
-		class JGRCObject* Test;
 		
 		Camera* m_Camera;
 		HWND hWnd;

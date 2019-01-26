@@ -6,14 +6,7 @@
 
 // Include common HLSL code.
 #include "Common.hlsl"
-
-struct VertexIn
-{
-	float3 PosL    : POSITION;
-    float3 NormalL : NORMAL;
-	float2 TexC    : TEXCOORD;
-	float3 TangentU : TANGENT;
-};
+#include"CommonInputLayout.hlsl"
 
 struct VertexOut
 {
@@ -21,9 +14,26 @@ struct VertexOut
     float3 NormalW  : NORMAL;
 };
 
-VertexOut VS(VertexIn vin)
+VertexOut VS(VS_IN vin)
 {
 	VertexOut vout = (VertexOut)0.0f;
+#ifdef SKINNED
+    float weight[4] = {0.0f,0.0f,0.0f,0.0f};
+    weight[0] = vin.BoneWeights.x;
+    weight[1] = vin.BoneWeights.y;
+    weight[2] = vin.BoneWeights.z;
+    weight[3] = 1.0f - (weight[0] + weight[1] + weight[2]);
+
+    float3 posL = float3(0.0f, 0.0f, 0.0f);
+    float3 normalL = float3(0.0f, 0.0f, 0.0f);
+    for(int i = 0; i < 4; ++i)
+    {
+        posL += weight[i] * mul(float4(vin.PosL, 1.0f), gBoneTransforms[vin.BoneID[i]]).xyz;
+        normalL += weight[i] * mul(vin.NormalL, (float3x3)gBoneTransforms[vin.BoneID[i]]);
+    }
+   vin.PosL     = posL;
+   vin.NormalL  = normalL;
+#endif
 
     // Assumes nonuniform scaling; otherwise, need to use inverse-transpose of world matrix.
     vout.NormalW = mul(vin.NormalL, (float3x3)gWorld);

@@ -52,6 +52,10 @@ cbuffer cbPerPass : register(b1)
     uint gMatSceneIndex;
     uint gPad;
 }
+cbuffer cbSkinnedData : register(b2)
+{
+    float4x4 gBoneTransforms[96];
+}
 struct MaterialData
 {
     float4 DiffuseAlbedo;

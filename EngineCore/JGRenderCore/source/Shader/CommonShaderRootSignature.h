@@ -7,6 +7,7 @@ namespace JGRC
 	{
 		cbPerObject,
 		cbPerPass,
+		cbPerSkinned,
 		sbMaterialData,
 		sbLightData,
 		sbInstanceData,
@@ -31,6 +32,7 @@ namespace JGRC
 			CD3DX12_ROOT_PARAMETER slotParam[(int)ECommonShaderSlot::Count];
 			slotParam[(int)ECommonShaderSlot::cbPerObject].InitAsConstantBufferView(0);
 			slotParam[(int)ECommonShaderSlot::cbPerPass].InitAsConstantBufferView(1);
+			slotParam[(int)ECommonShaderSlot::cbPerSkinned].InitAsConstantBufferView(2);
 			slotParam[(int)ECommonShaderSlot::sbMaterialData].InitAsShaderResourceView(0, 1);
 			slotParam[(int)ECommonShaderSlot::sbLightData].InitAsShaderResourceView(1, 1);
 			slotParam[(int)ECommonShaderSlot::sbInstanceData].InitAsShaderResourceView(0, 2);
@@ -51,6 +53,22 @@ namespace JGRC
 				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+			};
+		}
+	};
+
+	class RCORE_EXPORT CommonSkinnedShaderRootSignature : public CommonShaderRootSignature
+	{
+		virtual void SetInputLayout(InputLayoutDescList& DescList) override
+		{
+			DescList =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			    { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "BONEID", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 60, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 		}
 	};

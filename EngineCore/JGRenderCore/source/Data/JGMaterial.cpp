@@ -5,7 +5,6 @@
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
-
 JGMaterial::JGMaterial(UINT Index, const MaterialDesc& desc)
 {
 	m_Data   = make_unique<MaterialData>();
@@ -40,6 +39,24 @@ void JGMaterial::Update(class FrameResource* CurrentFrameResource)
 		UpdatePerFrame();
 		MaterialCB->CopyData(m_MatCBIndex, Data);
 	}
+}
+vector<ShaderMacroPack> JGMaterial::GetMacroPack()
+{
+	vector<ShaderMacroPack> Pack;
+	ShaderMacroPack p;
+	if (m_TexturePaths.find(ETextureSlot::Diffuse) != m_TexturePaths.end())
+	{
+		p.Macro = SHADER_MACRO_DEFINE_USING_DIFFUSEMAP;
+		p.Value = to_string(SHADER_MACRO_ONLY_DEFINE);
+		Pack.push_back(p);
+	}
+	if (m_TexturePaths.find(ETextureSlot::Normal) != m_TexturePaths.end())
+	{
+		p.Macro = SHADER_MACRO_DEFINE_USING_NORMALMAP;
+		p.Value = to_string(SHADER_MACRO_ONLY_DEFINE);
+		Pack.push_back(p);
+	}
+	return Pack;
 }
 void JGMaterial::SetTexture(ETextureSlot slot,const std::wstring& TexturePath)
 {
@@ -82,51 +99,12 @@ void JGMaterial::SetMatTransform(const DirectX::XMFLOAT4X4& mat)
 	m_Data->MatTransform = mat;
 	ClearNotify();
 }
-void JGMaterial::SetPSO(ID3D12PipelineState* PSO)
-{
-	m_PSO = PSO;
-}
-vector<ShaderMacroPack> JGMaterial::CreateMacroPack()
-{
-	vector<ShaderMacroPack> v;
-	if (m_Desc->Mode == EPSOMode::INSTANCE)
-	{
-		ShaderMacroPack Pack;
-		Pack.Macro = SHADER_MACRO_DEFINE_SHADER_INSTANCE_OBJECT;
-		Pack.Value = "1";
-		v.push_back(Pack);
-	}
-
-	return move(v);
-}
-void JGMaterialCreater::BuildMaterial(CommonShaderRootSignature* CommonRootSig)
-{
-	// 셰이더 컴파일 및 머터리얼 PSO 등록
-	for (auto& mat : m_Materials)
-	{
-		MaterialDesc* desc = mat.second->GetDesc();
-		vector<ShaderMacroPack> macro = mat.second->CreateMacroPack();
-
-		mat.second->SetPSO(m_Shaders[desc->ShaderPath]->CompileAndConstrutPSO(
-			desc->Mode,
-			CommonRootSig,
-			macro));
-	}
-}
 JGMaterial* JGMaterialCreater::CreateMaterial(const MaterialDesc& Desc)
 {
 	// 머터리얼이 이미 있다면 패쓰
 	if (m_Materials.end() != m_Materials.find(Desc.Name))
 		return nullptr;
-	// 처음 등록 하는 셰이더라면 셰이더 배열에 저장
-	if (m_Shaders.end() == m_Shaders.find(Desc.ShaderPath))
-	{
-		auto shader = make_unique<Shader>();
-		shader->Init(
-			Desc.ShaderPath,
-			{ EShaderType::Vertex, EShaderType::Pixel });
-		m_Shaders[Desc.ShaderPath] = move(shader);
-	}
+
 	// 머터리얼 저장
 	auto Mat = make_unique<JGMaterial>(++m_MatCBIndex, Desc);
 	JGMaterial* result = Mat.get();
