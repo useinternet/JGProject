@@ -7,7 +7,7 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
 	PassCB = std::make_unique<UploadBuffer<cbPassConstant>>(device, passCount, true);
 	ObjectCB = std::make_unique<UploadBuffer<cbObjectConstant>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, 10, true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, 100, true);
 	MaterialCB = std::make_unique<UploadBuffer<MaterialData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
 }
@@ -19,7 +19,7 @@ void FrameResource::ReSize(ID3D12Device* device, UINT passCount, UINT objectCoun
 	LightCB.reset();
 	PassCB = std::make_unique<UploadBuffer<cbPassConstant>>(device, passCount, true);
 	ObjectCB = std::make_unique<UploadBuffer<cbObjectConstant>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, 10, true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, 100, true);
 	MaterialCB = std::make_unique<UploadBuffer<MaterialData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
 }

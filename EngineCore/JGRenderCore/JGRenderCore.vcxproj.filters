@@ -17,9 +17,6 @@
     <Filter Include="PostProcessing">
       <UniqueIdentifier>{8a58b580-8753-4f58-bf2a-146e31438d4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MemoryManager">
-      <UniqueIdentifier>{b0258a85-343d-48a3-861a-b67e8870e8bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Data">
       <UniqueIdentifier>{8a30195a-724a-4eb9-8b20-9711a90df3ba}</UniqueIdentifier>
     </Filter>
@@ -37,6 +34,9 @@
     </Filter>
     <Filter Include="Data\Mesh">
       <UniqueIdentifier>{11e7bde0-1645-43ac-8f88-7b9b6c73995f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceManagement">
+      <UniqueIdentifier>{b0258a85-343d-48a3-861a-b67e8870e8bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +69,6 @@
     </ClCompile>
     <ClCompile Include="source\DxCore\JGRenderCore.cpp">
       <Filter>DxCore</Filter>
-    </ClCompile>
-    <ClCompile Include="source\MemoryManager\ResourceManager.cpp">
-      <Filter>MemoryManager</Filter>
     </ClCompile>
     <ClCompile Include="source\PostProcessing\CubeMap.cpp">
       <Filter>PostProcessing</Filter>
@@ -154,6 +151,15 @@
     <ClCompile Include="source\Data\Mesh\JGSkeletalMesh.cpp">
       <Filter>Data\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="source\ResourceManagement\ResourceExtracter.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ResourceManagement\ResourceManager.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ResourceManagement\ResourceReader.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">
@@ -200,9 +206,6 @@
     </ClInclude>
     <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h">
       <Filter>DxCore</Filter>
-    </ClInclude>
-    <ClInclude Include="source\MemoryManager\ResourceManager.h">
-      <Filter>MemoryManager</Filter>
     </ClInclude>
     <ClInclude Include="source\PostProcessing\CubeMap.h">
       <Filter>PostProcessing</Filter>
@@ -305,6 +308,15 @@
     </ClInclude>
     <ClInclude Include="source\Data\Mesh\JGBaseMesh.h">
       <Filter>Data\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\ResourceExtracter.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\ResourceManager.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\ResourceReader.h">
+      <Filter>ResourceManagement</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

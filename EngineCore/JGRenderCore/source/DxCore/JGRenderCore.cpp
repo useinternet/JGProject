@@ -1,6 +1,8 @@
 #include"JGRenderCore.h"
 #include"DxCore.h"
 #include"Data/Scene.h"
+#include"ResourceManagement/ResourceExtracter.h"
+#include"ResourceManagement/ResourceReader.h"
 using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace JGRC;
@@ -84,10 +86,6 @@ void JGRenderCore::Update(const GameTimer& gt)
 	SpotLight[1]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
 	SpotLight[2]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
 	SpotLight[3]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
-	//for (int i = 0; i < 4; ++i)
-	//{
-	//	SpotLight[i]->OffsetRotation(0.0f, gt.DeltaTime() * 40.0f, 0.0f);
-	//}
 	m_Scene->Update(gt);
 }
 void JGRenderCore::ScreenReSize(int width, int height)
@@ -143,9 +141,10 @@ void JGRenderCore::BuildTextures()
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/water1.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/waves0.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/waves1.dds");
-	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_DIFF_diffuse.dds");
-	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_NM_normal.dds");
-	m_Scene->AddTexture(L"../Contents/Engine/Textures/Arissa_SPEC_specular.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/maria_diffuse.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/maria_normal.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/akai_diffuse.dds");
+	m_Scene->AddTexture(L"../Contents/Engine/Textures/akai_normal.dds");
 	m_Scene->AddTexture(L"../Contents/Engine/Textures/sunsetcube1024.dds", ETextureType::Cube);
 }
 void JGRenderCore::BuildLight()
@@ -198,30 +197,29 @@ void JGRenderCore::BuildLight()
 }
 void JGRenderCore::BuildLandGeometry()
 {
+
+
+
 	JGStaticMesh* GroundMesh = m_Scene->AddStaticMesh();
 	GroundMesh->AddGridArg("Grid", 1000, 1000, 500, 500);
 
 
-	JGSkeletalMesh* SphereMesh = m_Scene->AddSkeletalMesh();
-	SphereMesh->AddFbxMeshArg("../Contents/Engine/Meshs/Bellydancing.fbx");
-	JGSkeletalMesh* SphereMesh2 = m_Scene->AddSkeletalMesh();
-	SphereMesh2->AddFbxMeshArg("../Contents/Engine/Meshs/Female Tough Walk.fbx");
-	JGSkeletalMesh* SphereMesh3 = m_Scene->AddSkeletalMesh();
-	SphereMesh3->AddFbxMeshArg("../Contents/Engine/Meshs/Hip Hop Dancing.fbx");
-	JGSkeletalMesh* SphereMesh4 = m_Scene->AddSkeletalMesh();
-	SphereMesh4->AddFbxMeshArg("../Contents/Engine/Meshs/Hip Hop Dancing2.fbx");
-	JGStaticMesh* SkyMesh = m_Scene->AddStaticMesh();
-	SkyMesh->AddBoxArg("Sky", 1.0f, 1.0f, 1.0f, 1);
-	
 
-	string AnimName  = m_Scene->AddAnimation("../Contents/Engine/Meshs/Bellydancing.fbx")[0];
-	string AnimName2 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Female Tough Walk.fbx")[0];
-	string AnimName3 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Hip Hop Dancing.fbx")[0];
-	string AnimName4 = m_Scene->AddAnimation("../Contents/Engine/Meshs/Hip Hop Dancing2.fbx")[0];
-	SphereMesh->SetAnimation(AnimName);
-	SphereMesh2->SetAnimation(AnimName2);
-	SphereMesh3->SetAnimation(AnimName3);
-	SphereMesh4->SetAnimation(AnimName4);
+	string AnimName  = m_Scene->AddAnimation("../Contents/JGUser/Bellydancing.jganimation");
+	string AnimName2 = m_Scene->AddAnimation("../Contents/JGUser/Female Tough Walk.jganimation");
+	string AnimName3 = m_Scene->AddAnimation("../Contents/JGUser/Hip Hop Dancing.jganimation");
+
+
+	JGSkeletalMesh* test = m_Scene->AddSkeletalMesh();
+	test->AddSkeletalMeshArg("../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
+	test->SetAnimation(AnimName);
+	JGSkeletalMesh* test2 = m_Scene->AddSkeletalMesh();
+	test2->AddSkeletalMeshArg("../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
+	test2->SetAnimation(AnimName2);
+	JGSkeletalMesh* test3 = m_Scene->AddSkeletalMesh();
+	test3->AddSkeletalMeshArg("../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
+	test3->SetAnimation(AnimName3);
+
 
 	MaterialDesc Desc;
 	Desc.Name = "GroundMat";
@@ -233,13 +231,15 @@ void JGRenderCore::BuildLandGeometry()
 	GroundMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
 	GroundMat->SetRoughness(1.0f);
 
-
+	
 	Desc.Name = "SphereMat";
 	Desc.bCubeMapStatic = true;
 	JGMaterial* SphereMat = m_Scene->AddMaterial(Desc);
-	SphereMat->SetDiffuseAlbedo(1.0f, 0.0f, 0.4f, 1.0f);
+	SphereMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/maria_diffuse.dds");
+	SphereMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/maria_normal.dds");
+	SphereMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
 	SphereMat->SetFresnelR0(1.0f, 1.0f, 1.0f);
-	SphereMat->SetRoughness(0.7f);
+	SphereMat->SetRoughness(1.0f);
 
 	Desc.Name = "InstanceMat";
 	Desc.bCubeMapStatic = true;
@@ -253,22 +253,20 @@ void JGRenderCore::BuildLandGeometry()
 	InsMat->SetRefractive(1.0f);
 
 
-	JGRCObject* Obj1 = m_Scene->CreateObject(GroundMat, GroundMesh);
+	JGRCObject* Obj1 = m_Scene->CreateObject(GroundMat, GroundMesh, "Grid");
 	Obj1->SetLocation(0.0f, -1.0f, 0.0f);
 
-	JGRCObject* Obj2 = m_Scene->CreateObject(SphereMat, SphereMesh);
+	JGRCObject* Obj2 = m_Scene->CreateObject(SphereMat, test, "../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
 	Obj2->SetLocation(0.0f, 0.0f, 0.0f);
 
-	JGRCObject* Obj3 = m_Scene->CreateObject(SphereMat, SphereMesh2);
+	JGRCObject* Obj3 = m_Scene->CreateObject(SphereMat, test2, "../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
 	Obj3->SetLocation(-250.0f, 0.0f, 0.0f);
 
-	JGRCObject* Obj4 = m_Scene->CreateObject(SphereMat, SphereMesh3);
+	JGRCObject* Obj4 = m_Scene->CreateObject(SphereMat, test3, "../Contents/JGUser/Maria_J_J_Ong.jgskeletalmesh");
 	Obj4->SetLocation(250.0f, 0.0f, 0.0f);
 
-	JGRCObject* Obj5 = m_Scene->CreateObject(SphereMat, SphereMesh4);
-	Obj5->SetLocation(0.0f, 0.0f, -250.0f);
 
-
+	
 	JGRCObject* SkyBox = m_Scene->CreateSkyBox(L"../Contents/Engine/Textures/sunsetcube1024.dds");
 	m_Scene->SetMainSkyBox(SkyBox);
 }

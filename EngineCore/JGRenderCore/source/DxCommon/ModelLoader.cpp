@@ -46,7 +46,8 @@ ModelLoader::ModelLoader(
 		aiProcess_SplitLargeMeshes |            // 거대한 하나의 매쉬를 하위매쉬들로 분활(나눔)
 		aiProcess_Triangulate |                    // 3개 이상의 모서리를 가진 다각형 면을 삼각형으로 만듬(나눔)
 		aiProcess_ConvertToLeftHanded |            // D3D의 왼손좌표계로 변환
-		aiProcess_SortByPType);                    // 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+		aiProcess_SortByPType     |  // 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+		aiProcess_CalcTangentSpace);                    
 
 	if (pScene == nullptr)
 		Success = false;
@@ -80,7 +81,8 @@ ModelLoader::ModelLoader(
 		aiProcess_SplitLargeMeshes |            // 거대한 하나의 매쉬를 하위매쉬들로 분활(나눔)
 		aiProcess_Triangulate |                    // 3개 이상의 모서리를 가진 다각형 면을 삼각형으로 만듬(나눔)
 		aiProcess_ConvertToLeftHanded |            // D3D의 왼손좌표계로 변환
-		aiProcess_SortByPType);                    // 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+		aiProcess_SortByPType |                 // 단일타입의 프리미티브로 구성된 '깨끗한' 매쉬를 만듬
+		aiProcess_CalcTangentSpace );                   
 
 	if (pScene == nullptr)
 		Success = false;
@@ -89,6 +91,7 @@ ModelLoader::ModelLoader(
 		ProcessNode(pScene->mRootNode, pScene, MeshData, bonedatas, MeshName);
 		for (auto& name : *MeshName)
 		{
+			m_NodeIndex = 0;
 			JGBoneNode* Root = JGBoneNode::CreateNode();
 			ProcessBoneHierarchy(pScene->mRootNode, Root, &(*bonedatas)[name]);
 			(*boneHierarchy)[name] = Root;
@@ -233,7 +236,7 @@ void ModelLoader::ProcessMesh(
 			v.TangentU.x = mesh->mTangents[i].x;
 			v.TangentU.y = mesh->mTangents[i].y;
 			v.TangentU.z = mesh->mTangents[i].z;
-			IsTangent = false;
+			IsTangent = true;
 		}
 
 
@@ -294,29 +297,35 @@ void ModelLoader::ProcessBoneHierarchy(
 	JGBoneNode* parent = boneNode;
 	if (node->mParent == nullptr)
 	{
-		boneNode->Data.Name  = "Root Node";
+		boneNode->Data.Name  = "RootNode";
 		boneNode->Data.Index = -1;
 	}
 	for (UINT i = 0; i < node->mNumChildren; ++i)
 	{
 		aiNode* ChildNode = node->mChildren[i];
 		string  ChildName = ChildNode->mName.C_Str();
-		boneNode = JGBoneNode::CreateNode();
-		boneNode->Parent = parent;
-		//
-		aiMatrix4x4 NodeTransform = node->mTransformation;
-		boneNode->Transform = AiToXm(NodeTransform.Transpose());
-
-		for (auto& bone : *bonedatas)
+		if (ChildName.length() != 0 && ChildNode->mNumMeshes == 0)
 		{
-			if (bone.Name == ChildName)
+			boneNode = JGBoneNode::CreateNode();
+			boneNode->Parent = parent;
+			boneNode->NodeIndex = m_NodeIndex++;
+			//
+			aiMatrix4x4 NodeTransform = node->mTransformation;
+			boneNode->Transform = AiToXm(NodeTransform.Transpose());
+
+			for (auto& bone : *bonedatas)
 			{
-				boneNode->bExist = true;
-				boneNode->Data   = bone;
-				break;
+				if (bone.Name == ChildName)
+				{
+					boneNode->bExist = true;
+					boneNode->Data = bone;
+					break;
+				}
 			}
+			boneNode->Data.Name = ChildName;
+			parent->Child.push_back(boneNode);
+	
 		}
-		parent->Child.push_back(boneNode);
 		ProcessBoneHierarchy(node->mChildren[i], boneNode, bonedatas);
 	}
 }

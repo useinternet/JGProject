@@ -4,6 +4,7 @@
 #include"Data/Animation/JGAnimation.h"
 #include"Shader/CommonShaderRootSignature.h"
 #include"Data/Scene.h"
+#include"ResourceManagement/ResourceReader.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -40,16 +41,20 @@ void JGSkeletalMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 	m_MeshData->IndexFormat = DXGI_FORMAT_R32_UINT;
 	m_MeshData->IndexBufferByteSize = ibBtSize;
 }
-void JGSkeletalMesh::Update(const GameTimer& gt, FrameResource* CurrFrameResource)
+void JGSkeletalMesh::Update(const GameTimer& gt, FrameResource* CurrFrameResource, const string& name)
 {
-	if (m_SkeletalAnim)
+    if (m_SkeletalAnim)
 	{
+		if (m_AnimtionHelpers.end() == m_AnimtionHelpers.find(name))
+		{
+			return;
+		}
 		for (auto& bone : m_BoneHierarchy)
 		{
-			m_AnimtionHelpers[bone.first].UpdateAnimatoin(gt, m_SkeletalAnim, bone.second,
-				(UINT)m_BoneDatas[bone.first].size());
-			if (m_AnimtionHelpers[bone.first].IsPlay)
-				CurrFrameResource->SkinnedCB->CopyData(m_SkinnedCBIndex[bone.first], m_AnimtionHelpers[bone.first].Get());
+			m_AnimtionHelpers[name].UpdateAnimatoin(gt, m_SkeletalAnim, bone.second,
+				(UINT)m_BoneDatas[name].size());
+			if (m_AnimtionHelpers[name].IsPlay)
+				CurrFrameResource->SkinnedCB->CopyData(m_SkinnedCBIndex[name], m_AnimtionHelpers[bone.first].Get());
 		}
 	}
 }
@@ -94,18 +99,8 @@ void JGSkeletalMesh::Draw(
 	CommandList->IASetVertexBuffers(0, 1, &m_MeshData->VertexBufferView());
 	CommandList->IASetIndexBuffer(&m_MeshData->IndexBufferView());
 	CommandList->IASetPrimitiveTopology(TopolgyType);
-	bool test = true;
 	for (auto& Arg : m_MeshData->DrawArgs)
 	{
-		//if (test)
-		//{
-		//	test = false;
-		//	continue;
-		//}
-		//
-
-
-
 		if (m_AnimtionHelpers[Arg.first].IsPlay)
 		{
 			UINT skbtSize = d3dUtil::CalcConstantBufferByteSize(sizeof(SkinnedData));
@@ -123,7 +118,7 @@ void JGSkeletalMesh::Draw(
 	}
 	CommandList->SetComputeRootSignature(CommonData::_Scene()->GetRootSig()->GetRootSignature());
 }
-void JGSkeletalMesh::SetAnimation(const std::string& name)
+void JGSkeletalMesh::SetAnimation(const string& name)
 {
 	m_MeshType = EMeshType::Skeletal;
 	m_SkeletalAnim = CommonData::_Scene()->GetAnimation(name);
@@ -139,15 +134,25 @@ void JGSkeletalMesh::AddFbxMeshArg(const string& path)
 	{
 		AddMeshArg(NameArr[i], MeshArray[i].Vertices, MeshArray[i].Indices32);
 		m_SkinnedCBIndex[NameArr[i]] = SkinnedIndex++;
-		// 업로드 버퍼 생성
-		//auto SkinnedCB = make_unique<UploadBuffer<SkinnedData>>(CommonData::_Device(), 1, true);
-		//m_SkinnedCB[NameArr[i]] = move(SkinnedCB);
 
 		// 애니메이션 헬퍼 생성
 		m_AnimtionHelpers[NameArr[i]] = JGAnimationHelper();
 	}
 }
-
+void JGSkeletalMesh::AddSkeletalMeshArg(const string& path)
+{
+	GeometryGenerator::SkinnedMeshData Mesh;
+	BoneArray bone;
+	JGBoneNode* Root = nullptr;
+	ResourceReader reader(path, Mesh, bone, &Root);
+	if (!reader.Success)
+		return;
+	AddMeshArg(path, Mesh.Vertices, Mesh.Indices32);
+	m_BoneDatas[path]       = bone;
+	m_BoneHierarchy[path]   = Root;
+	m_SkinnedCBIndex[path]  = SkinnedIndex++;
+	m_AnimtionHelpers[path] = JGAnimationHelper();
+}
 void JGSkeletalMesh::AddMeshArg(const string& name, const SkeletalMeshVertex& vertex, const SkeletalMeshIndex& index)
 {
 	BoundingBox bounds;

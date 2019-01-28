@@ -6,10 +6,11 @@
 #include"Scene.h"
 #include"PostProcessing/CubeMap.h"
 #include"CommonData.h"
+#include"Animation/JGAnimation.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
-UINT64 JGRCObject::Count = 0;
+UINT64 JGRCObject::Count        = 0;
 JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name)
 {
 	m_Name += name + to_string(Index);
@@ -75,49 +76,7 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 
 		UpdatePerFrame();
 	}
-	m_Mesh->Update(gt, CurrentFrameResource);
-}
-void JGRCObject::Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex)
-{
-
-	if (m_bCulling)
-		return;
-	if (m_CubeMap)
-	{
-		m_CubeMap->Update(gt, CurrentFrameResource);
-	}
-	if (m_ObjCBIndex != InsIndex)
-		ClearNotify();
-	if (IsCanUpdate())
-	{
-		InstanceData InsConstants;
-		if (m_CubeMap)
-		{
-			m_CubeMap->BuildCamera(m_Location.x, m_Location.y, m_Location.z);
-			InsConstants.CubeMapIndex = m_CubeMap->GetCubeMapIndex();
-		}
-		else
-			InsConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
-				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
-		UpdateWorldMatrix();
-
-		XMMATRIX World = XMLoadFloat4x4(&m_World);
-		XMMATRIX TexTransform = XMLoadFloat4x4(&m_TexTransform);
-
-
-		XMStoreFloat4x4(&InsConstants.World, XMMatrixTranspose(World));
-		XMStoreFloat4x4(&InsConstants.TexTransform, XMMatrixTranspose(TexTransform));
-
-
-		InsConstants.MaterialIndex = m_Material->CBIndex();
-
-
-
-		m_ObjCBIndex = InsIndex;
-		InsCB->CopyData(m_ObjCBIndex, InsConstants);
-		UpdatePerFrame();
-	}
-
+	m_Mesh->Update(gt, CurrentFrameResource, m_MeshName);
 }
 void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
 {
@@ -155,15 +114,12 @@ void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommand
 		CommandList->SetPipelineState(m_PSOPack.ViewNormalPSO.Get());
 		break;
 	}
-		
-
-	
 	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = ObjCB->GetGPUVirtualAddress();
 	objCBAddress += (m_ObjCBIndex * ObjCBByteSize);
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerObject, objCBAddress);
 
 
-	m_Mesh->Draw(CommandList, CurrentFrameResource);
+	m_Mesh->ArgDraw(m_MeshName, CommandList, CurrentFrameResource);
 }
 void JGRCObject::UpdateWorldMatrix()
 {
@@ -176,9 +132,10 @@ void JGRCObject::UpdateWorldMatrix()
 	XMMATRIX World = Scale * Rotation * Translation;
 	XMStoreFloat4x4(&m_World, World);
 }
-void JGRCObject::SetMesh(JGBaseMesh* mesh)
+void JGRCObject::SetMesh(JGBaseMesh* mesh, const std::string& meshname)
 {
 	m_Mesh = mesh;
+	m_MeshName = meshname;
 	ClearNotify();
 }
 void JGRCObject::SetMaterial(JGMaterial* material)

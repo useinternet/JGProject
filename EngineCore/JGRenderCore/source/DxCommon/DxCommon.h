@@ -10,6 +10,6 @@
 #include"GeometryGenerator.h"
 #include"UploadBuffer.h"
 #include"GameTimer.h"
-#include"MemoryManager/ResourceManager.h"
+#include"ResourceManagement/ResourceManager.h"
 #include"Data/EngineFrameResource.h"
 #include"Shader/Shader.h"

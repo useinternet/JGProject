@@ -24,7 +24,8 @@ namespace JGRC
 		static UINT64 Count;
 	private:
 		class JGMaterial* m_Material = nullptr;
-		class JGBaseMesh*     m_Mesh     = nullptr;
+		class JGBaseMesh* m_Mesh     = nullptr;
+		std::string       m_MeshName;
 		// Å¥ºê¸Ê
 		std::shared_ptr<class CubeMap> m_CubeMap = nullptr;
 		//
@@ -54,7 +55,6 @@ namespace JGRC
 		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject");
 		void Build(ID3D12GraphicsCommandList* CommandList, class CommonShaderRootSignature* RoogSig);
 		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource);
-		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource, UploadBuffer<InstanceData>* InsCB, UINT InsIndex);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
 		void Draw(class FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode = EObjRenderMode::Default);
 	public:
@@ -73,7 +73,7 @@ namespace JGRC
 		bool IsActive()       { return m_bActive; }
 	public:
 		JGMaterial* GetMaterial() const { return m_Material; }
-		void SetMesh(JGBaseMesh* mesh);
+		void SetMesh(JGBaseMesh* mesh, const std::string& meshname);
 		void SetMaterial(JGMaterial* material);
 	public:
 		Vec3 GetLocation() const { return m_Location; }

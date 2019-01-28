@@ -12,9 +12,9 @@
 --- 해야할거 ( 언제 걸릴지 모른다. ) 
 1. Tangent 계산
 2. Object 당 메시하나 머터리얼 하나
-3. 인터페이스 클래스
-4. JGRenderCore밖에서 샘플 생성
-5. anim, mesh, texture fbx에서 추출
+3. anim, mesh, texture, material fbx에서 추출
+4. 인터페이스 클래스
+5. JGRenderCore밖에서 샘플 생성
 */
 namespace JGRC
 {
@@ -90,12 +90,12 @@ namespace JGRC
 		void SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
 		void SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
 	public:
-		JGRCObject*     CreateObject(JGMaterial* mat, JGBaseMesh* mesh, EObjType Type = EObjType::Static);
+		JGRCObject*     CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const std::string& meshname, EObjType Type = EObjType::Static);
 		JGRCObject*     CreateSkyBox(const std::wstring& texturepath);
 		JGMaterial*     AddMaterial(const MaterialDesc& Desc);
 		JGStaticMesh*   AddStaticMesh();
 		JGSkeletalMesh* AddSkeletalMesh();
-		std::vector<std::string> AddAnimation(const std::string& path);
+		std::string AddAnimation(const std::string& path);
 		Camera*     AddCamera();
 		PassData*   AddPassData();
 		JGLight*    AddLight(ELightType type, ELightExercise extype = ELightExercise::Static);

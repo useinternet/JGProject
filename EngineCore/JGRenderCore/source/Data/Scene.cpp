@@ -11,7 +11,8 @@
 
 #include"JGLight.h"
 #include"CommonData.h"
-#include"DxCommon/ModelLoader.h"
+#include"ResourceManagement/ResourceReader.h"
+
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -250,13 +251,13 @@ void Scene::SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, Frame
 		obj->Draw(CurrFrameResource, CommandList, Mode);
 	}
 }
-JGRCObject* Scene::CreateObject(JGMaterial* mat, JGBaseMesh* mesh,EObjType Type)
+JGRCObject* Scene::CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const string& meshname, EObjType Type)
 {
 
 	auto Obj = make_unique<JGRCObject>(++m_ObjIndex, Type);
 	JGRCObject* result = Obj.get();
 	Obj->SetMaterial(mat);
-	Obj->SetMesh(mesh);
+	Obj->SetMesh(mesh, meshname);
 
 
 
@@ -289,7 +290,7 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	JGStaticMesh* SkyMesh = AddStaticMesh();
 	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
 	// 오브젝트 생성
-	JGRCObject* obj = CreateObject(SkyMat, SkyMesh);
+	JGRCObject* obj = CreateObject(SkyMat, SkyMesh,"Scene_SkyBox_Default_Mesh" );
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
@@ -311,28 +312,15 @@ JGSkeletalMesh* Scene::AddSkeletalMesh()
 	m_MeshMems.push_back(move(Mesh));
 	return result;
 }
-vector<string> Scene::AddAnimation(const string& path)
+string Scene::AddAnimation(const string& path)
 {
-	vector<JGAnimation> animArr;
-	vector<string> animNames;
-	ModelLoader AnimLoader(path, &animArr);
-	if (!AnimLoader.Success)
-		return animNames;
-	for (UINT i = 0; i < (UINT)animArr.size(); ++i)
-	{
-		auto anim = make_unique<JGAnimation>();
-		*anim = animArr[i];
-		JGAnimation* pAnim = anim.get();
+	auto anim = make_unique<JGAnimation>();
+	ResourceReader reader(path, *anim);
+	JGAnimation* result = anim.get();
 
-
-		string AnimName = path + " @Name : " + pAnim->Name;
-		if (m_Animations.find(AnimName) != m_Animations.end())
-			continue;
-		m_AnimationMems.push_back(move(anim));
-		m_Animations[AnimName] = pAnim;
-		animNames.push_back(AnimName);
-	}
-	return animNames;
+	m_AnimationMems.push_back(move(anim));
+	m_Animations[path] = result;
+	return path;
 }
 Camera*     Scene::AddCamera()
 {

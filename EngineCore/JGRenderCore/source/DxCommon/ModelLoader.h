@@ -16,9 +16,10 @@ namespace JGRC
 {
 	class RCORE_EXPORT ModelLoader
 	{
+		int m_NodeIndex = 0;
 	public:
 		bool Success   = true;
-		bool IsTangent = true;
+		bool IsTangent = false;
 	public:
 		// 기본 스태틱 메시 로드
 		ModelLoader(const std::string& path, 
