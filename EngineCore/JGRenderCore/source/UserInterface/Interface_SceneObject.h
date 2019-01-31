@@ -22,7 +22,7 @@ namespace JGRC
 		}
 	public:
 		Interface_SceneObject() = default;
-		Interface_SceneObject(JGRCObject* obj) : m_ObjectData(obj) {}
+		Interface_SceneObject(JGRCObject* obj);
 		Interface_SceneObject(const Interface_SceneObject& copy)
 		{
 			m_ObjectData = copy.m_ObjectData;
@@ -39,6 +39,7 @@ namespace JGRC
 		void SetScale(float x, float y, float z); 
 		void SetScale(const DirectX::XMFLOAT3& v);
 		void SetScale(float x);
+		void SetAnimation(const std::string& name);
 	public:
 		void OffsetLocation(float x, float y, float z);
 		void OffsetLocation(const DirectX::XMFLOAT3& v);

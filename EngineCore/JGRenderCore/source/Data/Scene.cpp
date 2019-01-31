@@ -72,7 +72,7 @@ Scene::Scene(class DxCore* core)
 
 	// 장면 구 설정( 나중에 크기 조절 가능하게 ) 나중에 모든 오브젝트를 훑어서 자동 으로 늘렷다 줄엿다.
 	m_SceneSphere.Center = { 0.0f,0.0f, 0.0f };
-	m_SceneSphere.Radius = sqrt(1000.0f * 1000.0f + 1000.0f * 1000.0f);
+	m_SceneSphere.Radius = sqrt(500.0f * 500.0f + 500.0f * 500.0f);
 }
 void Scene::BuildScene()
 {
@@ -314,6 +314,10 @@ JGSkeletalMesh* Scene::AddSkeletalMesh()
 }
 string Scene::AddAnimation(const string& path)
 {
+	if (m_Animations.find(path) != m_Animations.end())
+		return string("None");
+
+
 	auto anim = make_unique<JGAnimation>();
 	ResourceReader reader(path, *anim);
 	JGAnimation* result = anim.get();

@@ -1,5 +1,6 @@
 #include"JGRCObject.h"
 #include"Mesh/JGStaticMesh.h"
+#include"Mesh/JGSkeletalMesh.h"
 #include"JGMaterial.h"
 #include"EngineFrameResource.h"
 #include"Shader/CommonShaderRootSignature.h"
@@ -11,13 +12,15 @@ using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 UINT64 JGRCObject::Count        = 0;
+UINT JGRCObject::SkinnedIndex = 0;
+UINT JGRCObject::SkinnedCount() { return SkinnedIndex; }
 JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name)
 {
 	m_Name += name + to_string(Index);
-	Count++;
 	this->Type = Type;
 	m_ObjCBIndex = Index;
 	UpdateWorldMatrix();
+	Count++;
 }
 void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RoogSig)
 {	
@@ -25,18 +28,28 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootS
 
 	//
 	MaterialDesc* Desc = m_Material->GetDesc();
+	/* 큐브 맵 활성화시 큐브맵 빌드
+	*/
 	if((Desc->bCubeMapStatic || Desc->bCubMapDynamic))
 	{
 		m_CubeMap = make_unique<CubeMap>();
 		m_CubeMap->BuildCubeMap(m_Name, CommandList);
 		m_CubeMap->BuildCamera(m_Location.x, m_Location.y, m_Location.z);
 	}
+
+	// PipeLineState ( 메시 & 머터리얼 & 오브젝트 상황에 따라서 셰이더에 매크로로 조작 )
 	m_PSOPack.Macro_Merge(m_Material->GetMacroPack());
-	if (m_Mesh->Type() == EMeshType::Skeletal)
+	if (m_Mesh->Type() == EMeshType::Skeletal && m_Anim)
 	{
 		Type = EObjType::Dynamic;
 		m_PSOPack.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
 		m_PSOPack.CompilePSO(m_Material->GetDesc()->ShaderPath, m_Material->GetDesc()->Mode, CommonData::_Scene()->GetSkinnedRootSig());
+		m_SkinnedCBIndex = (UINT)SkinnedIndex++;
+		m_AnimHelper = make_unique<JGAnimationHelper>();
+
+
+		m_SkeletalMesh = dynamic_cast<JGSkeletalMesh*>(m_Mesh);
+		m_AnimHelper->BuildAnimationData(m_Anim, m_SkeletalMesh->GetBoneHierarchy(m_MeshName), (UINT)m_SkeletalMesh->GetBoneData(m_MeshName).size(), m_MeshName);
 	}
 	else
 	{
@@ -47,6 +60,8 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 {
 	if (!m_bActive)
 		return;
+
+	// 큐브맵 & 오브젝트 업데이트
 	auto ObjCB = CurrentFrameResource->ObjectCB.get();
 	if (m_CubeMap)
 	{
@@ -63,6 +78,8 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 		else
 			objConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
 				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
+
+
 		UpdateWorldMatrix();
 
 		XMMATRIX World = XMLoadFloat4x4(&m_World);
@@ -76,11 +93,20 @@ void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
 
 		UpdatePerFrame();
 	}
-	m_Mesh->Update(gt, CurrentFrameResource, m_MeshName);
+
+	// 애니메이션 업데이트
+
+	if (m_Anim && m_Mesh->Type() == EMeshType::Skeletal)
+	{
+		m_AnimHelper->UpdateAnimatoin(gt, m_Anim, m_SkeletalMesh->GetBoneHierarchy(m_MeshName),
+			(UINT)m_SkeletalMesh->GetBoneData(m_MeshName).size());
+		if (m_AnimHelper->IsPlay)
+			CurrentFrameResource->SkinnedCB->CopyData(m_SkinnedCBIndex, m_AnimHelper->Get());
+	}
 }
 void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList)
 {
-	if (!m_bVisible || m_bCulling)
+	if (!m_bVisible)
 		return;
 	MaterialDesc* Desc = m_Material->GetDesc();
 
@@ -94,10 +120,11 @@ void JGRCObject::CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12Graphics
 }
 void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode)
 {
-	if (!m_bVisible || Type == EObjType::Instance || m_bCulling)
+	if (!m_bVisible || Type == EObjType::Instance)
 	{
 		return;
 	}
+	// 각 렌더링상태( 기본 & 그림자 & viewNormal ) 에따라 다르게 PSO를 설정 및 렌더링한다.
 	auto ObjCB = CurrentFrameResource->ObjectCB->Resource();
 	auto MeshData = m_Mesh->Data();
 	UINT ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbObjectConstant));
@@ -118,7 +145,15 @@ void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommand
 	objCBAddress += (m_ObjCBIndex * ObjCBByteSize);
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerObject, objCBAddress);
 
+	// 메시가 스켈레톤 메시 이고 애니메이션이 활성화 되어있는경우 셰이더에 본 트랜스폼 데이터 적재
+	if (m_Mesh->Type() == EMeshType::Skeletal && m_Anim && m_AnimHelper->IsPlay)
+	{
+		UINT skbtSize = d3dUtil::CalcConstantBufferByteSize(sizeof(SkinnedData));
+		D3D12_GPU_VIRTUAL_ADDRESS Address = CurrentFrameResource->SkinnedCB->Resource()->GetGPUVirtualAddress();
+		Address += (m_SkinnedCBIndex * skbtSize);
 
+		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerSkinned, Address);
+	}
 	m_Mesh->ArgDraw(m_MeshName, CommandList, CurrentFrameResource);
 }
 void JGRCObject::UpdateWorldMatrix()
@@ -142,6 +177,10 @@ void JGRCObject::SetMaterial(JGMaterial* material)
 {
 	m_Material = material;
 	ClearNotify();
+}
+void JGRCObject::SetAnimation(const string& name)
+{
+	m_Anim = CommonData::_Scene()->GetAnimation(name);
 }
 void JGRCObject::SetLocation(float x, float y, float z)
 {

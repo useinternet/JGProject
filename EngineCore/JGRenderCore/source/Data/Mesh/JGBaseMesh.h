@@ -29,7 +29,6 @@ namespace JGRC
 		JGBaseMesh() = default;
 		virtual ~JGBaseMesh() = default;
 		virtual void CreateMesh(ID3D12GraphicsCommandList* CommandList) {}
-		virtual void Update(const GameTimer& gt, FrameResource* CurrFrameResource, const std::string& name) {}
 		virtual void ArgDraw(const std::string& name, ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, UINT Count = 1, D3D12_PRIMITIVE_TOPOLOGY TopolgyType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 		{
 			CommandList->IASetVertexBuffers(0, 1, &m_MeshData->VertexBufferView());
@@ -41,21 +40,6 @@ namespace JGRC
 				m_MeshData->DrawArgs[name].StartIndexLocation,
 				m_MeshData->DrawArgs[name].BaseVertexLocation,
 				0);
-		}
-		virtual void Draw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, UINT Count = 1, D3D12_PRIMITIVE_TOPOLOGY TopolgyType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
-		{
-			CommandList->IASetVertexBuffers(0, 1, &m_MeshData->VertexBufferView());
-			CommandList->IASetIndexBuffer(&m_MeshData->IndexBufferView());
-			CommandList->IASetPrimitiveTopology(TopolgyType);
-			for (auto& Arg : m_MeshData->DrawArgs)
-			{
-				CommandList->DrawIndexedInstanced(
-					Arg.second.IndexCount,
-					Count,
-					Arg.second.StartIndexLocation,
-					Arg.second.BaseVertexLocation,
-					0);
-			}
 		}
 	public:
 		MeshGeometry* Data() { return m_MeshData.get(); }

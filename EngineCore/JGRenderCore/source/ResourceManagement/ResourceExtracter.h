@@ -4,12 +4,12 @@
 
 namespace JGRC
 {
-	struct JGVectorFrame;
-	struct JGQuatFrame;
-	struct JGAnimChannel;
-	struct JGBoneData;
-	struct JGBoneNode;
-	class  JGAnimation;
+	struct RCORE_EXPORT JGVectorFrame;
+	struct RCORE_EXPORT JGQuatFrame;
+	struct RCORE_EXPORT JGAnimChannel;
+	struct RCORE_EXPORT JGBoneData;
+	struct RCORE_EXPORT JGBoneNode;
+	class  RCORE_EXPORT JGAnimation;
 	static const std::string global_static_mesh_file_format = ".jgmesh";
 	static const std::string global_static_skeletal_mesh_file_format = ".jgskeletalmesh";
 	static const std::string global_static_animation_file_format = ".jganimation";

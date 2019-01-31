@@ -6,17 +6,6 @@
 // 인스턴스 모드와 매크로 조작을 어케 할지 고민고민.
 namespace JGRC
 {
-	enum class ETextureSlot
-	{
-		Diffuse = 0,
-		Normal  = 1,
-		Custom0,
-		Custom1,
-		Custom2,
-		Custom3,
-		Custom4,
-		Custom5
-	};
 	/*
 	Exp : 머터리얼 목록 
 	* 이름
@@ -24,10 +13,10 @@ namespace JGRC
 	* 셰이더 경로
 	* 반사맵 여부
 	* 굴절맵 여부 */
-	struct MaterialDesc
+	struct RCORE_EXPORT MaterialDesc
 	{
 		std::string  Name;
-		EPSOMode  Mode = EPSOMode::DEFAULT;
+		EPSOMode     Mode = EPSOMode::DEFAULT;
 		std::wstring ShaderPath;
 		bool bCubMapDynamic = false;
 		bool bCubeMapStatic = false;
@@ -62,8 +51,7 @@ namespace JGRC
 		void SetDiffuseAlbedo(float r, float g, float b, float a);
 		void SetFresnelR0(float x, float y, float z);
 		void SetRoughness(float x);
-		void SetRefractive(float x);
-		void SetReflectivity(float x);
+		void SetMetalic(float x);
 		void SetMatTransform(const DirectX::XMFLOAT4X4& mat);
 	public:
 		const std::wstring& GetTexturePath(ETextureSlot slot) { return m_TexturePaths[slot]; }

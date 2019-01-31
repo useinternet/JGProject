@@ -33,6 +33,17 @@ namespace JGRC
 		Default,
 		Cube
 	};
+	enum class ETextureSlot
+	{
+		Diffuse = 0,
+		Normal = 1,
+		Custom0,
+		Custom1,
+		Custom2,
+		Custom3,
+		Custom4,
+		Custom5
+	};
 	/*
 	텍스쳐 팩 
 	* 텍스쳐 데이터 

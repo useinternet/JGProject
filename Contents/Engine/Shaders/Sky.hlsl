@@ -46,7 +46,7 @@ SceneData PS(VertexOut pin) : SV_Target
     SceneData Output;
     Output.PosW     = float4(0.0f, 0.0f, 0.0f, 0.0f);
     Output.NormalW  = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    Output.Albedo   = gCubeMap[gSkyBoxIndex].Sample(gsamLinearWrap, pin.PosL);
+    Output.Albedo = gCubeMap[gSkyBoxIndex].Sample(gsamLinearWrap, pin.PosL);
     Output.MatIndex = 0.0f;
     return Output;
 }

@@ -52,7 +52,6 @@
     <ClCompile Include="source\UserInterface\Interface_Scene.cpp" />
     <ClCompile Include="source\UserInterface\Interface_SceneCamera.cpp" />
     <ClCompile Include="source\UserInterface\Interface_SceneDirectionLight.cpp" />
-    <ClCompile Include="source\UserInterface\Interface_SceneInstanceObject.cpp" />
     <ClCompile Include="source\UserInterface\Interface_SceneMaterial.cpp" />
     <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp" />
     <ClCompile Include="source\UserInterface\Interface_SceneObject.cpp" />
@@ -105,14 +104,12 @@
     <ClInclude Include="source\UserInterface\Interface_Scene.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneCamera.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneDirectionLight.h" />
-    <ClInclude Include="source\UserInterface\Interface_SceneInstanceObject.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneMaterial.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneMesh.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneObject.h" />
     <ClInclude Include="source\UserInterface\Interface_ScenePointLight.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h" />
     <ClInclude Include="source\UserInterface\Interface_SceneSpotLight.h" />
-    <ClInclude Include="source\UserInterface\JGRCInterfaceClass.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

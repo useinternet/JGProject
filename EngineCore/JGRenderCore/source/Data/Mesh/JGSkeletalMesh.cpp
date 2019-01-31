@@ -8,13 +8,12 @@
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
-UINT JGSkeletalMesh::SkinnedIndex = 0;
 vector<unique_ptr<JGBoneNode>> JGBoneNode::BoneMemNodes;
 JGSkeletalMesh::JGSkeletalMesh(const string& name)
 {
 	m_MeshName = name;
 	m_MeshData = make_unique<MeshGeometry>();
-	m_MeshType = EMeshType::Static;
+	m_MeshType = EMeshType::Skeletal;
 }
 void JGSkeletalMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 {
@@ -41,117 +40,25 @@ void JGSkeletalMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 	m_MeshData->IndexFormat = DXGI_FORMAT_R32_UINT;
 	m_MeshData->IndexBufferByteSize = ibBtSize;
 }
-void JGSkeletalMesh::Update(const GameTimer& gt, FrameResource* CurrFrameResource, const string& name)
+JGSkeletalMesh::BoneArray&   JGSkeletalMesh::GetBoneData(const string& name)
 {
-    if (m_SkeletalAnim)
-	{
-		if (m_AnimtionHelpers.end() == m_AnimtionHelpers.find(name))
-		{
-			return;
-		}
-		for (auto& bone : m_BoneHierarchy)
-		{
-			m_AnimtionHelpers[name].UpdateAnimatoin(gt, m_SkeletalAnim, bone.second,
-				(UINT)m_BoneDatas[name].size());
-			if (m_AnimtionHelpers[name].IsPlay)
-				CurrFrameResource->SkinnedCB->CopyData(m_SkinnedCBIndex[name], m_AnimtionHelpers[bone.first].Get());
-		}
-	}
+	return m_BoneDatas[name];
 }
-void JGSkeletalMesh::ArgDraw(
-	const string& name, 
-	ID3D12GraphicsCommandList* CommandList,
-	FrameResource* CurrFrameResource,
-	UINT Count,
-	D3D12_PRIMITIVE_TOPOLOGY TopolgyType)
+JGBoneNode* JGSkeletalMesh::GetBoneHierarchy(const string& name)
 {
-	CommandList->SetComputeRootSignature(CommonData::_Scene()->GetSkinnedRootSig()->GetRootSignature());
-	CommandList->IASetVertexBuffers(0, 1, &m_MeshData->VertexBufferView());
-	CommandList->IASetIndexBuffer(&m_MeshData->IndexBufferView());
-	CommandList->IASetPrimitiveTopology(TopolgyType);
-	//
-	if (m_AnimtionHelpers[name].IsPlay)
-	{
-		UINT skbtSize = d3dUtil::CalcConstantBufferByteSize(sizeof(SkinnedData));
-		D3D12_GPU_VIRTUAL_ADDRESS Address = CurrFrameResource->SkinnedCB->Resource()->GetGPUVirtualAddress();
-		Address += (m_SkinnedCBIndex[name] * skbtSize);
-
-		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerSkinned, Address);
-	}
-
-	//
-	CommandList->DrawIndexedInstanced(
-		m_MeshData->DrawArgs[name].IndexCount,
-		Count,
-		m_MeshData->DrawArgs[name].StartIndexLocation,
-		m_MeshData->DrawArgs[name].BaseVertexLocation,
-		0);
-	CommandList->SetComputeRootSignature(CommonData::_Scene()->GetRootSig()->GetRootSignature());
-}
-void JGSkeletalMesh::Draw(
-	ID3D12GraphicsCommandList* CommandList,
-	FrameResource* CurrFrameResource,
-	UINT Count,
-	D3D12_PRIMITIVE_TOPOLOGY TopolgyType)
-{
-
-	CommandList->SetComputeRootSignature(CommonData::_Scene()->GetSkinnedRootSig()->GetRootSignature());
-	CommandList->IASetVertexBuffers(0, 1, &m_MeshData->VertexBufferView());
-	CommandList->IASetIndexBuffer(&m_MeshData->IndexBufferView());
-	CommandList->IASetPrimitiveTopology(TopolgyType);
-	for (auto& Arg : m_MeshData->DrawArgs)
-	{
-		if (m_AnimtionHelpers[Arg.first].IsPlay)
-		{
-			UINT skbtSize = d3dUtil::CalcConstantBufferByteSize(sizeof(SkinnedData));
-			D3D12_GPU_VIRTUAL_ADDRESS Address = CurrFrameResource->SkinnedCB->Resource()->GetGPUVirtualAddress();
-			Address += (m_SkinnedCBIndex[Arg.first] * skbtSize);
-			CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerSkinned, Address);
-		}
-	
-		CommandList->DrawIndexedInstanced(
-			Arg.second.IndexCount,
-			Count,
-			Arg.second.StartIndexLocation,
-			Arg.second.BaseVertexLocation,
-			0);
-	}
-	CommandList->SetComputeRootSignature(CommonData::_Scene()->GetRootSig()->GetRootSignature());
-}
-void JGSkeletalMesh::SetAnimation(const string& name)
-{
-	m_MeshType = EMeshType::Skeletal;
-	m_SkeletalAnim = CommonData::_Scene()->GetAnimation(name);
-}
-
-void JGSkeletalMesh::AddFbxMeshArg(const string& path)
-{
-	vector<GeometryGenerator::SkinnedMeshData> MeshArray;
-	vector<string> NameArr;
-	ModelLoader MeshLoad(path, &MeshArray, &m_BoneDatas, &m_BoneHierarchy, &NameArr);
-
-	for (UINT i = 0; i < (UINT)MeshArray.size(); ++i)
-	{
-		AddMeshArg(NameArr[i], MeshArray[i].Vertices, MeshArray[i].Indices32);
-		m_SkinnedCBIndex[NameArr[i]] = SkinnedIndex++;
-
-		// 애니메이션 헬퍼 생성
-		m_AnimtionHelpers[NameArr[i]] = JGAnimationHelper();
-	}
+	return m_BoneHierarchy[name];
 }
 void JGSkeletalMesh::AddSkeletalMeshArg(const string& path)
 {
 	GeometryGenerator::SkinnedMeshData Mesh;
-	BoneArray bone;
+	BoneArray   bone;
 	JGBoneNode* Root = nullptr;
 	ResourceReader reader(path, Mesh, bone, &Root);
 	if (!reader.Success)
 		return;
+	m_BoneDatas[path] = bone;
+	m_BoneHierarchy[path] = Root;
 	AddMeshArg(path, Mesh.Vertices, Mesh.Indices32);
-	m_BoneDatas[path]       = bone;
-	m_BoneHierarchy[path]   = Root;
-	m_SkinnedCBIndex[path]  = SkinnedIndex++;
-	m_AnimtionHelpers[path] = JGAnimationHelper();
 }
 void JGSkeletalMesh::AddMeshArg(const string& name, const SkeletalMeshVertex& vertex, const SkeletalMeshIndex& index)
 {

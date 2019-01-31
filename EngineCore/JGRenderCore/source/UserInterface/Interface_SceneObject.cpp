@@ -1,7 +1,9 @@
 #include"Interface_SceneObject.h"
 #include"Data/JGRCObject.h"
 using namespace JGRC;
+using namespace std;
 using namespace DirectX;
+Interface_SceneObject::Interface_SceneObject(JGRCObject* obj) : m_ObjectData(obj) {}
 XMFLOAT3 Interface_SceneObject::GetLocation() const { return m_ObjectData->GetLocation(); }
 XMFLOAT3 Interface_SceneObject::GetRotation() const { return m_ObjectData->GetRotation(); }
 XMFLOAT3 Interface_SceneObject::GetScale()    const { return m_ObjectData->GetScale(); }
@@ -13,7 +15,7 @@ void Interface_SceneObject::SetRotation(const XMFLOAT3& r)                  { m_
 void Interface_SceneObject::SetScale(float x, float y, float z)             { m_ObjectData->SetScale(x, y, z); }
 void Interface_SceneObject::SetScale(const XMFLOAT3& v)                     { m_ObjectData->SetScale(v.x, v.y, v.z); }
 void Interface_SceneObject::SetScale(float x)                               { m_ObjectData->SetScale(x); }
-
+void Interface_SceneObject::SetAnimation(const string& name)                { m_ObjectData->SetAnimation(name); }
 void Interface_SceneObject::OffsetLocation(float x, float y, float z)          { m_ObjectData->OffsetLocation(x, y, z); }
 void Interface_SceneObject::OffsetLocation(const XMFLOAT3& v)                  { m_ObjectData->OffsetLocation(v.x, v.y, v.z); }
 void Interface_SceneObject::OffsetRotation(float pitch, float yaw, float roll) { m_ObjectData->OffsetRotation(pitch, yaw, roll); }

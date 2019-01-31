@@ -1,6 +1,7 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
 #include"DxSetting.h"
+#include"UserInterface/Interface_Scene.h"
 class Camera;
 
 
@@ -9,37 +10,27 @@ class Camera;
 namespace JGRC
 {
 	class DxCore;
-
+	class Scene;
 
 	class RCORE_EXPORT JGRenderCore
 	{
 	private:
 		std::unique_ptr<DxCore>      m_DxCore;
-		std::unique_ptr<class Scene> m_Scene;
+		std::vector<std::unique_ptr<Scene>> m_SceneMems;
+		std::unordered_map<std::string, Scene*> m_Scenes;
 
-		class JGLight* DirLight = nullptr;
-		class JGLight* PointLight[4];
-		class JGLight* SpotLight[4];
-		bool PointSwitch[4];
-		
-		Camera* m_Camera;
-		HWND hWnd;
 	private:
 		JGRenderCore(const JGRenderCore& copy) = delete;
 		JGRenderCore& operator=(const JGRenderCore& copy) = delete;
-		void InputCamera(const GameTimer& gt);
-		void BuildTextures();
-		void BuildLight();
-		void BuildLandGeometry();
-		void DrawRenderItems();
 	public:
 		JGRenderCore();
 		~JGRenderCore();
-
 		bool Init(const DxSetting& set);
+		IF_Scene CreateScene(const std::string& SceneName);
+		IF_Scene GetScene(const std::string& SceneName);
+		void Build(const GameTimer& gt);
 		void Update(const GameTimer& Timer);
-		void ScreenReSize(int width, int height);
-		void UpdateLook(WPARAM btnState, int x, int y, POINT& mLastMousePos);
+		void ReSize(int width, int height);
 		void Draw();
 	};
 }

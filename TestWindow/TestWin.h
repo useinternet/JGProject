@@ -13,6 +13,8 @@ class TestWindow : public D3DApp
 {
 private:
 	JGRenderCore* core = nullptr;
+	IF_Scene scene;
+	IF_Camera cam;
 	POINT mLastMousePos;
 
 	bool Init = false;
@@ -20,6 +22,7 @@ public:
 	TestWindow(HINSTANCE hInst);
 	~TestWindow();
 	virtual bool Initialize();
+
 protected:
 	virtual void OnResize(int width, int height) override;
 	virtual void Update(const GameTimer& gt);
@@ -29,4 +32,6 @@ protected:
 	virtual void OnMouseDown(WPARAM btnState, int x, int y);
 	virtual void OnMouseUp(WPARAM btnState, int x, int y);
 	virtual void OnMouseMove(WPARAM btnState, int x, int y);
+private:
+	void InputCamera(const GameTimer& gt);
 };

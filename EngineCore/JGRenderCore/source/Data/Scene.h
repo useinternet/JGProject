@@ -1,7 +1,6 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
 #include"LightManager.h"
-#include"UserInterface/JGRCInterfaceClass.h"
 #include"JGMaterial.h"
 #include"Animation/JGAnimation.h"
 #include"JGRCObject.h"

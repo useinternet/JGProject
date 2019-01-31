@@ -1,18 +1,19 @@
 #pragma once
-#include"Data/Scene.h"
+#include"DxCommon/DxCommon.h"
 #include"Interface_SceneObject.h"
-#include"Interface_SceneInstanceObject.h"
-#include"Interface_SceneMaterial.h"
-#include"Interface_SceneMesh.h"
+#include"Interface_SceneSkyBox.h"
+#include"Interface_SceneCamera.h"
 #include"Interface_SceneDirectionLight.h"
 #include"Interface_ScenePointLight.h"
 #include"Interface_SceneSpotLight.h"
-#include"Interface_SceneSkyBox.h"
-#include"Interface_SceneCamera.h"
+#include"Interface_SceneMaterial.h"
+#include"Interface_SceneMesh.h"
 namespace JGRC
 {
 	class RCORE_EXPORT Interface_Scene
 	{
+	private:
+		friend Interface_SceneMaterial;
 	private:
 		class Scene* m_Data = nullptr;
 
@@ -30,15 +31,16 @@ namespace JGRC
 		}
 	public:
 		IF_Object         CreateObject(const IF_Material& mat, const IF_Mesh& mesh, const std::string& meshname, E_IF_ObjType type = E_IF_ObjType::Static);
-		IF_InstanceObject CreateInstanceObject(const IF_Material& mat, const IF_Mesh& mesh, const std::string& meshname);
 		IF_SkyBox         CreateSkyBox(const std::wstring& texturePath);
 		IF_Material       AddMaterial(const struct MaterialDesc& desc);
-		IF_Mesh           AddMesh();
+		IF_StaticMesh     AddStaticMesh();
+		IF_SkeletalMesh   AddSkeletalMesh();
 		IF_DirectionLight AddDirLight();
 		IF_PointLight     AddPointLight();
 		IF_SpotLight      AddSpotLight();
 		IF_Camera         AddCamera();
-
+		void       ExtracterResource(UINT flag, const std::string& OutputPath, const std::string& path);
+		std::string       AddAnimation(const std::string& path);
 		void AddTexture(const std::wstring& TexturePath, ETextureType type = ETextureType::Default);
 	public:
 		IF_Camera GetMainCamera() const;

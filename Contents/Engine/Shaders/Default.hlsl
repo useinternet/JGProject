@@ -77,18 +77,14 @@ SceneData PS(VS_OUT pin)
 
 	//
     float4 diffuseAlbedo = matData.DiffuseAlbedo;
-    float3 fresnelR0     = matData.FresnelR0;
-    float  roughness     = matData.Roughness;
-    float shineness = 1 - roughness;
-    float  refractive    = matData.Refractive;
     float3 normalW       = normalize(pin.NormalW);
     float3 posW          = pin.PosW;
     float2 texC          = pin.TexC;
     float3 toEyeW = normalize(gEyePosW - posW);
-    float toEyeDistance = distance(gEyePosW, posW);
+    float  toEyeDistance = distance(gEyePosW, posW);
 
 
-    if (toEyeDistance < 100.0f)
+    if (toEyeDistance < 10000.0f)
     {
         pin.SSAOPosH /= pin.SSAOPosH.w;
         diffuseAlbedo *= gTexture[gSSAOTextureIndex].Sample(gsamAnisotropicWrap, pin.SSAOPosH.xy, 0.0f).r;
@@ -113,8 +109,6 @@ SceneData PS(VS_OUT pin)
     Output.NormalW  = (Scene_NormalW + 1.0f) * 0.5f;
     Output.Albedo = Scene_Albedo;
     Output.DataIndex = float2(gMaterialIndex + 1, gCubeMapIndex + 1);
-
-
 
     return Output;
 }

@@ -81,17 +81,16 @@ void JGMaterial::SetFresnelR0(float x, float y, float z)
 }
 void JGMaterial::SetRoughness(float x)
 {
+	if (x < 0.0f) x = 0.0f;
+	if (x > 1.0f) x = 1.0f;
 	m_Data->Roughness = x;
 	ClearNotify();
 }
-void JGMaterial::SetRefractive(float x)
+void JGMaterial::SetMetalic(float x)
 {
-	m_Data->Refractive = x;
-	ClearNotify();
-}
-void JGMaterial::SetReflectivity(float x)
-{
-	m_Data->Reflectivity = x;
+	if (x < 0.0f) x = 0.0f;
+	if (x > 1.0f) x = 1.0f;
+	m_Data->Metallic = x;
 	ClearNotify();
 }
 void JGMaterial::SetMatTransform(const DirectX::XMFLOAT4X4& mat)

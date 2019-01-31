@@ -59,9 +59,8 @@ namespace JGRC
 		DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f,1.0f,1.0f,1.0f };
 		DirectX::XMFLOAT3 FresnelR0 = { 0.0f, 0.0f, 0.0f };
 		float Roughness  = 0.0f;
-		float Refractive = 1.0f;
-		float Reflectivity = 1.0f;
-		float CustomPad[2] = { 0.0f,0.0f };
+		float Metallic   = 0.0f;
+		float CustomPad[3] = { 0.0f,0.0f,0.0f };
 		DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 		UINT TextureIndex[8];
 	}MaterialData;

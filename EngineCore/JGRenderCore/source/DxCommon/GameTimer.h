@@ -1,11 +1,11 @@
 //***************************************************************************************
 // GameTimer.h by Frank Luna (C) 2011 All Rights Reserved.
 //***************************************************************************************
-
+#include"DxCommon/DxCommon.h"
 #ifndef GAMETIMER_H
 #define GAMETIMER_H
 
-class GameTimer
+class RCORE_EXPORT GameTimer
 {
 public:
 	GameTimer();

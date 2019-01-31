@@ -5,14 +5,27 @@
 using namespace JGRC;
 using namespace std;
 
+unordered_map<string, GeometryGenerator::MeshData> ResourceReader::MeshDatas;
+unordered_map<string, GeometryGenerator::SkinnedMeshData> ResourceReader::SkinnedMeshDatas;
+unordered_map<string, vector<JGBoneData>> ResourceReader::BoneDatas;
+unordered_map<string, JGBoneNode*> ResourceReader::BoneRoots;
+unordered_map<string, JGAnimation> ResourceReader::Animations;
 
 ResourceReader::ResourceReader(
 	const std::string& path,
 	GeometryGenerator::MeshData& MeshData) 
 {
-
-
-
+	if (MeshDatas.find(path) == MeshDatas.end())
+	{
+		ReadStaticMesh(path, MeshData);
+		if(Success)
+			MeshDatas[path] = MeshData;
+	}
+	else
+	{
+		MeshData = MeshDatas[path];
+		Success = true;
+	}
 }
 ResourceReader::ResourceReader(
 	const std::string& path,
@@ -20,21 +33,90 @@ ResourceReader::ResourceReader(
 	vector<JGBoneData>& BoneData,
 	JGBoneNode** Root)
 {
-	*Root = JGBoneNode::CreateNode();
-	(*Root)->bExist = false;
-	(*Root)->NodeIndex = -1;
-	(*Root)->Data.Name = "RootNode";
-	(*Root)->Parent = nullptr;
-	(*Root)->Transform = MathHelper::Identity4x4();
-	ReadSkeletalMesh(path, MeshData, BoneData, *Root);
+	if (SkinnedMeshDatas.find(path) == SkinnedMeshDatas.end())
+	{
+		*Root = JGBoneNode::CreateNode();
+		(*Root)->bExist = false;
+		(*Root)->NodeIndex = -1;
+		(*Root)->Data.Name = "RootNode";
+		(*Root)->Parent = nullptr;
+		(*Root)->Transform = MathHelper::Identity4x4();
+		ReadSkeletalMesh(path, MeshData, BoneData, *Root);
+		if (Success)
+		{
+			SkinnedMeshDatas[path] = MeshData;
+			BoneDatas[path] = BoneData;
+			BoneRoots[path] = *Root;
+		}
+	}
+	else
+	{
+		MeshData = SkinnedMeshDatas[path];
+		BoneData = BoneDatas[path];
+		(*Root)  = BoneRoots[path];
+		Success = true;
+	}
+
 }
 ResourceReader::ResourceReader(
 	const string& path,
 	JGAnimation& Anim)
 {
-	ReadAnimation(path, Anim);
-}
+	if (Animations.find(path) == Animations.end())
+	{
+		ReadAnimation(path, Anim);
+		if (Success)
+		{
+			Animations[path] = Anim;
+		}
+	}
+	else
+	{
+		Anim = Animations[path];
+		Success = true;
+	}
 
+}
+void ResourceReader::ReadStaticMesh(const string& path, GeometryGenerator::MeshData& MeshData)
+{
+	ifstream fin;
+	fin.open(path);
+	if (!fin.is_open())
+	{
+		Success = false;
+		return;
+	}
+	else
+		Success = true;
+
+	string buffer;
+
+	UINT VertexCount = 0;
+	UINT IndexCount = 0;
+
+	fin >> buffer >> buffer >> buffer;
+	fin >> VertexCount;
+	fin >> buffer >> buffer;
+	fin >> IndexCount;
+
+	MeshData.Vertices.resize(VertexCount);
+	MeshData.Indices32.resize(IndexCount);
+
+	for (auto& vertex : MeshData.Vertices)
+	{
+		fin >> vertex.Position.x >> vertex.Position.y >> vertex.Position.z;
+		fin >> vertex.Normal.x >> vertex.Normal.y >> vertex.Normal.z;
+		fin >> vertex.TangentU.x >> vertex.TangentU.y >> vertex.TangentU.z;
+		fin >> vertex.TexC.x >> vertex.TexC.y;
+
+	}
+	for (auto& Index : MeshData.Indices32)
+	{
+		fin >> Index;
+	}
+
+	fin.close();
+}
 void ResourceReader::ReadSkeletalMesh(const string& path, GeometryGenerator::SkinnedMeshData& MeshData, vector<JGBoneData>& BoneData, JGBoneNode* Root)
 {
 	ifstream fin;

@@ -61,9 +61,8 @@ struct MaterialData
     float4 DiffuseAlbedo;
     float3 FresnelR0;
     float Roughness;
-    float Refractive;
-    float Reflectivity;
-    float2 CustomPad;
+    float  Metalic;
+    float3 CustomPad;
     float4x4 MatTransform;
     uint TextureIndex[8];
 };

@@ -5,17 +5,17 @@ namespace JGRC
 {
 	struct JGBoneData;
 	struct JGBoneNode;
-	struct JGVectorFrame
+	struct RCORE_EXPORT JGVectorFrame
 	{
 		float TimePos;
 		DirectX::XMFLOAT3 Value;
 	};
-	struct JGQuatFrame
+	struct RCORE_EXPORT JGQuatFrame
 	{
 		float TimePos;
 		DirectX::XMFLOAT4 Value;
 	};
-	struct JGAnimChannel
+	struct RCORE_EXPORT JGAnimChannel
 	{
 		std::string Name;
 		
@@ -23,7 +23,7 @@ namespace JGRC
 		std::vector<JGVectorFrame> AnimScaleFrames;
 		std::vector<JGQuatFrame>   AnimRotationFrames;
 	};
-	class JGAnimation
+	class RCORE_EXPORT JGAnimation
 	{
 		friend class JGAnimationHelper;
 	public:
@@ -51,15 +51,40 @@ namespace JGRC
 		UINT FindScaleIndex(float TimePos, JGAnimChannel* channel);
 		UINT FindQuatIndex(float TimePos, JGAnimChannel* channel);
 	};
+	class AnimTransKeyPack
+	{
+	public:
+		JGAnimation* Anim;
+		JGBoneNode*  Root;
+		UINT         BoneCount;
+		bool operator==(const AnimTransKeyPack& pack) const
+		{
+			return (pack.Anim == Anim && Root == pack.Root && BoneCount == pack.BoneCount);
+		}
+	};
+	struct AnimTransKeyPackHash
+	{
+		std::size_t operator()(const AnimTransKeyPack& k) const
+		{
+			return ((std::hash<UINT64>()((UINT64)k.Anim)
+				^ (std::hash<UINT64>()((UINT64)k.Root) << 1)) >> 1)
+				^ (std::hash<UINT>()((UINT64)k.BoneCount) << 1);
+		}
+	};
 	class JGAnimationHelper
 	{
+
+		static std::unordered_map<AnimTransKeyPack, std::vector<std::vector<DirectX::XMFLOAT4X4>>, AnimTransKeyPackHash> AnimationTransforms;
 	public:
 		bool  IsPlay = false;
 	private:
 		float TimePos = 0.0f;
+		std::vector<std::vector<DirectX::XMFLOAT4X4>> AnimTransform;
 		std::vector<DirectX::XMFLOAT4X4> FinalTransform;
 	public:
+		void BuildAnimationData(JGAnimation* anim, JGBoneNode* Root, UINT BoneCount, const std::string& meshName);
 		void UpdateAnimatoin(const GameTimer& gt, JGAnimation* anim, JGBoneNode* Root, UINT BoneCount);
 		SkinnedData Get();
 	};
+
 }

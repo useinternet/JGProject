@@ -57,75 +57,95 @@ VS_OUT VS(uint vid : SV_VertexID)
 float4 PS(VS_OUT pin) : SV_Target
 {
     SceneData Data = InstallData(pin.TexC);
-    float4 ambient = float4(0.25f, 0.25f, 0.35f, 1.0f);
+    float4 ambient = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float3 ao      = float3(0.05f, 0.05f, 0.1f);
     if(Data.IsBackGround > 0.1f)
     {
         MaterialData matData = gMaterialData[Data.MatIndex];
 
         float3 toEyeW = normalize(gEyePosW - Data.PosW);
         const float shininess = 1.0f - matData.Roughness;
-        // Ambeint 계산 //
-        
-        ambient *= float4(Data.Albedo, 1.0f);
-   
         ////////////////////////////////// 라이트 계산 //////////////////////////////////////////
-        Material mat = { ambient, matData.FresnelR0, shininess};
         float3 result = 0.0f;
-        float ShadowFactor = 1.0f;
+        float  ShadowFactor = 1.0f;
         float4 ShadowPosH = float4(Data.PosW, 1.0f);
+        float3 N = normalize(Data.NormalW);
+        float3 V = toEyeW;
+
+
+
+        float3 F0 = float3(0.04f, 0.04f, 0.04f);
+        F0 = lerp(F0, Data.Albedo, matData.Metalic);
+
         if (gDirLightCount > 0)
         {
+
             ShadowPosH = mul(ShadowPosH, gLightData[0].ShadowTransform);
             ShadowFactor = CalcDirectionShadowFactor(ShadowPosH,
         gLightData[0].StaticShadowMapIndex,
         gLightData[0].DynamicShadowMapIndex);
-            
-            result += saturate(ShadowFactor * ComputeDirectionalLight(gLightData[0], mat, Data.NormalW, toEyeW));
-        }
-        int i = gDirLightCount;
-        for (i = gDirLightCount; i < gDirLightCount + gPointLightCount; ++i)
-        {
-            ShadowFactor = CalcPointShadowFactor(Data.PosW, gLightData[i]);
-            result += saturate(ShadowFactor * ComputePointLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
 
+            float3 L = normalize(-gLightData[0].Direction);
+            float3 H = normalize(V + L);
+            float NDF = DistributionGGX(N, H, matData.Roughness);
+            float G = GeometrySmith(N, V, L, matData.Roughness);
+            float3 F = FresnelSchlick(max(dot(H, V), 0.0f), F0);
+
+            float3 ks = F;
+            float3 kd = float3(1.0f, 1.0f, 1.0f) - ks;
+            kd *= 1.0f - matData.Metalic;
+
+
+            float3 numerator = NDF * G * F;
+            float denominator = 4.0f * max(dot(N, V), 0.0f) * max(dot(N, L), 0.0f);
+            float3 specular = numerator / max(denominator, 0.001);
+
+            float NdotL = max(dot(N, L), 0.0f);
+            result += ShadowFactor * ((kd * Data.Albedo / JGPI + specular) * gLightData[0].Strength * NdotL);
         }
-        for (i = gDirLightCount + gPointLightCount; i < gDirLightCount + gPointLightCount + gSpotLightCount; ++i)
+
+
+        //
+        float3 R = reflect(-toEyeW, Data.NormalW);
+        float3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0f), F0, matData.Roughness);
+        float3 ks = F;
+        float3 kd = float3(1.0f, 1.0f, 1.0f) - ks;
+        kd *= 1.0f - matData.Metalic;
+        float lod = 0.0f;
+        if(matData.Roughness != 0.0f)
         {
-            ShadowPosH = float4(Data.PosW, 1.0f);
-            ShadowPosH = mul(ShadowPosH, gLightData[i].ShadowTransform);
-            ShadowFactor = CalcSpotShadowFactor(ShadowPosH,
-        gLightData[i].StaticShadowMapIndex,
-        gLightData[i].DynamicShadowMapIndex);
+            lod = matData.Roughness * 7 + 3.0f;
+        }
+        float3 reflection = gCubeMap[gSkyBoxIndex].SampleLevel(gsamLinearWrap, R, lod);
+        float3 specular = saturate(reflection * F);
+        ambient.rgb = saturate((kd * Data.Albedo.rgb));
+
+        float3 finalColor = ambient.rgb * ao + saturate(result) + specular;
+        return float4(lerp((finalColor + 0.05f) * 1.6f, finalColor * 0.6f, matData.Metalic), 1.0f);
+
+        /*
+        half3 plastic = albedo.rgb * light * ec + specular;
+half3 metallic = (specular*albedo + reflection * albedo.rgb) * Luminance(light);
+
+*/
+
+        //int i = gDirLightCount;
+        //for (i = gDirLightCount; i < gDirLightCount + gPointLightCount; ++i)
+        //{
+        //    ShadowFactor = CalcPointShadowFactor(Data.PosW, gLightData[i]);
+        //    result += saturate(ShadowFactor * ComputePointLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
+
+        //}
+        //for (i = gDirLightCount + gPointLightCount; i < gDirLightCount + gPointLightCount + gSpotLightCount; ++i)
+        //{
+        //    ShadowPosH = float4(Data.PosW, 1.0f);
+        //    ShadowPosH = mul(ShadowPosH, gLightData[i].ShadowTransform);
+        //    ShadowFactor = CalcSpotShadowFactor(ShadowPosH,
+        //gLightData[i].StaticShadowMapIndex,
+        //gLightData[i].DynamicShadowMapIndex);
      
-           result += saturate(ShadowFactor * ComputeSpotLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
-        }
-        float3 directLight = saturate(result);
-        //////////////////////////////////////////////////////////////////////////////////////////
-        float3 litColor = ambient.rgb + saturate(directLight);
-
-
-
-  
-
-
-        float3 r = reflect(-toEyeW, Data.NormalW);
-        float3 reflection = gCubeMap[Data.CubIndex].Sample(gsamLinearWrap, r).rgb;
-        float3 fresnel_r = SchlickFresnel(matData.FresnelR0, Data.NormalW, r);
-
-
-        float3 g = refract(-toEyeW, Data.NormalW, matData.Refractive);
-        float3 refraction = gCubeMap[Data.CubIndex].Sample(gsamLinearWrap, g).rgb;
-        float3 fresnel_g = SchlickFresnel(matData.FresnelR0, Data.NormalW, g);
-
-        reflection = reflection * shininess * fresnel_r;
-        refraction = refraction * shininess * fresnel_g;
-        float3 final = lerp(refraction, reflection, matData.Reflectivity);
-
-        litColor.rgb += saturate(final);
-
-
-
-        return float4(litColor, 1.0f);
+        //   result += saturate(ShadowFactor * ComputeSpotLight(gLightData[i], mat, Data.PosW, Data.NormalW, toEyeW));
+        //}
     }
     else
     {

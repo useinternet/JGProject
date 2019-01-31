@@ -178,6 +178,24 @@ UINT JGAnimation::FindQuatIndex(float TimePos, JGAnimChannel* channel)
 }
 
 
+
+unordered_map<AnimTransKeyPack, vector<vector<XMFLOAT4X4>>, AnimTransKeyPackHash> JGAnimationHelper::AnimationTransforms;
+void JGAnimationHelper::BuildAnimationData(JGAnimation* anim, JGBoneNode* Root, UINT BoneCount, const string& meshName)
+{
+	AnimTransKeyPack  Key = { anim, Root, BoneCount };
+	if (AnimationTransforms.find(Key) != AnimationTransforms.end())
+	{
+		AnimTransform = AnimationTransforms[Key];
+		return;
+	}
+	float duration = anim->Duration;
+	AnimTransform.resize((UINT)duration);
+	for (UINT time = 0; time < duration; ++time)
+	{
+		AnimTransform[time] = move(anim->UpdateAnimation((float)time, Root, BoneCount));
+	}
+	AnimationTransforms[Key] = AnimTransform;
+}
 void JGAnimationHelper::UpdateAnimatoin(const GameTimer& gt, JGAnimation* anim, JGBoneNode* Root, UINT BoneCount)
 {
 	if (gt.DeltaTime() < 0.0f)
@@ -191,7 +209,8 @@ void JGAnimationHelper::UpdateAnimatoin(const GameTimer& gt, JGAnimation* anim, 
 	if (TimePos > anim->Duration)
 		TimePos = 0.0f;
 
-	FinalTransform = anim->UpdateAnimation(TimePos, Root , BoneCount);
+	
+	FinalTransform = AnimTransform[(UINT)TimePos];
 }
 SkinnedData JGAnimationHelper::Get()
 {

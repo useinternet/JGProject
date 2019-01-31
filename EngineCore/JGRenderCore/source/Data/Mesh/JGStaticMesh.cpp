@@ -1,9 +1,10 @@
 #include"JGStaticMesh.h"
 #include"Data/CommonData.h"
-#include"DxCommon/ModelLoader.h"
+#include"ResourceManagement/ResourceReader.h"
 using namespace std;
 using namespace JGRC;
 using namespace DirectX;
+unordered_map<string, GeometryGenerator::MeshData> JGStaticMesh::m_StaticMeshs;
 JGStaticMesh::JGStaticMesh(const std::string& name)
 {
 	m_MeshName = name;
@@ -36,16 +37,21 @@ void JGStaticMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 	m_MeshData->IndexBufferByteSize = ibBtSize;
 }
 
-void JGStaticMesh::AddFbxMeshArg(const std::string& path)
+void JGStaticMesh::AddStaticMeshArg(const string& path)
 {
-	std::vector<GeometryGenerator::MeshData> MeshArray;
-	std::vector<std::string> NameArr;
-	ModelLoader MeshLoad(path, &MeshArray, &NameArr);
-
-	for (UINT i = 0; i < (UINT)MeshArray.size(); ++i)
+	GeometryGenerator::MeshData mesh;
+	if (m_StaticMeshs.find(path) != m_StaticMeshs.end())
 	{
-		AddMeshArg(NameArr[i], MeshArray[i].Vertices, MeshArray[i].Indices32);
+		mesh = m_StaticMeshs[path];
+		return;
 	}
+
+	ResourceReader reader(path, mesh);
+	if (!reader.Success)
+		return;
+
+
+	AddMeshArg(path, mesh.Vertices, mesh.Indices32);
 }
 
 void JGStaticMesh::AddBoxArg(const string& name, float width, float height, float depth, uint32_t numSubdivision)

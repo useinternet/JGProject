@@ -112,9 +112,6 @@
     <ClCompile Include="source\UserInterface\Interface_SceneObject.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="source\UserInterface\Interface_SceneInstanceObject.cpp">
-      <Filter>UserInterface</Filter>
-    </ClCompile>
     <ClCompile Include="source\UserInterface\Interface_Scene.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
@@ -122,9 +119,6 @@
       <Filter>UserInterface</Filter>
     </ClCompile>
     <ClCompile Include="source\UserInterface\Interface_SceneMaterial.cpp">
-      <Filter>UserInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
     <ClCompile Include="source\UserInterface\Interface_ScenePointLight.cpp">
@@ -159,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="source\ResourceManagement\ResourceReader.cpp">
       <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp">
+      <Filter>UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -267,9 +264,6 @@
     <ClInclude Include="source\UserInterface\Interface_SceneMaterial.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
-    <ClInclude Include="source\UserInterface\Interface_SceneMesh.h">
-      <Filter>UserInterface</Filter>
-    </ClInclude>
     <ClInclude Include="source\UserInterface\Interface_Scene.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
@@ -282,13 +276,7 @@
     <ClInclude Include="source\UserInterface\Interface_SceneSpotLight.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
-    <ClInclude Include="source\UserInterface\Interface_SceneInstanceObject.h">
-      <Filter>UserInterface</Filter>
-    </ClInclude>
     <ClInclude Include="source\UserInterface\Interface_SceneSkyBox.h">
-      <Filter>UserInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="source\UserInterface\JGRCInterfaceClass.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="source\UserInterface\Interface_SceneCamera.h">
@@ -317,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="source\ResourceManagement\ResourceReader.h">
       <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UserInterface\Interface_SceneMesh.h">
+      <Filter>UserInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
