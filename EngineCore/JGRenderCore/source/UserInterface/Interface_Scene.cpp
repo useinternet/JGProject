@@ -22,6 +22,10 @@ IF_SkyBox         Interface_Scene::CreateSkyBox(const wstring& texturePath)
 {
 	return IF_SkyBox(m_Data->CreateSkyBox(texturePath));
 }
+void              Interface_Scene::DebugBox(IF_Object obj, const DirectX::XMFLOAT3& color, float thickness)
+{
+	m_Data->AddDebugBox(obj.m_ObjectData, color, thickness);
+}
 IF_Material       Interface_Scene::AddMaterial(const MaterialDesc& desc)
 {
 	return IF_Material(m_Data->AddMaterial(desc));

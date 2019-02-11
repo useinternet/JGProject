@@ -1,7 +1,6 @@
 #include"Scene.h"
 #include"DxCore/DxCore.h"
 #include"SceneData.h"
-#include"PostProcessing/CubeMap.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
 
@@ -12,33 +11,31 @@
 #include"JGLight.h"
 #include"CommonData.h"
 #include"ResourceManagement/ResourceReader.h"
-
+#include"Debug/DebugBox.h"
+#include"DxCore/CommandListManager.h"
+#include"DxCore/GpuCpuSynchronizer.h"
+#include"DxCore/ScreenManager.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 
-Scene::Scene(class DxCore* core)
+Scene::Scene(const string& name,
+	DxCore* core, ResourceManager* manager, CommandListManager* cmdManager,
+	ScreenManager* screenManager, GpuCpuSynchronizer* gcs)
 {
-	// DX장치 및 환경 설정 불러오기
+	m_Name = name;
 	m_DxCore = core;
+	m_ResourceManager = manager;
+	m_CmdListManager = cmdManager;
+	m_ScreenManager = screenManager;
+	m_GCS = gcs;
+
+
 	m_SceneConfig = core->GetSettingDesc();
-
-	// 리소스 매니저 초기화
-	m_ResourceManager = make_unique<ResourceManager>();
-	m_ResourceManager->Init(m_DxCore);
-
-
-
 	// 각 씬 데이터 정적 멤버 초기화
 	InitStaticMemberVar();
-
-
-
 	// 프레임 리소스및 머터리얼 생성기 초기화
 	m_FrameResourceManager = make_unique<EngineFrameResourceManager>();
-	m_MaterialCreater = make_unique<JGMaterialCreater>();
-
-
 
 	// 씬데이터 초기화 및 루트서명 / 씬 셰이더, pso 데이터 
 	m_SceneData = make_unique<SceneData>();
@@ -63,8 +60,11 @@ Scene::Scene(class DxCore* core)
 
 	// 카메라 설치
 	auto MainCam = make_unique<Camera>();
-	MainCam->SetLens(4.0f / XM_PI, core->AspectRatio(), core->GetSettingDesc().NearZ,
+	MainCam->SetLens(4.0f / XM_PI,
+		(float)m_SceneConfig.Width / (float)m_SceneConfig.Height,
+		core->GetSettingDesc().NearZ,
 		core->GetSettingDesc().FarZ);
+
 	MainCam->UpdateViewMatrix();
 	m_MainCamera = MainCam.get();
 	m_Cameras.push_back(move(MainCam));
@@ -76,44 +76,36 @@ Scene::Scene(class DxCore* core)
 }
 void Scene::BuildScene()
 {
+	auto CommandList = m_CmdListManager->GetCommandList(0);
+
 	// 씬 데이터 빌드
 	m_SceneData->BuildSceneData(m_SceneConfig.Width, m_SceneConfig.Height);
 	m_LightManager->BuildLight(m_CommonShaderRootSig.get());
 	// ssao 빌드
 	m_SSAO = make_unique<SSAO>();
 	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height,
-		m_DxCore->CommandList(), m_CommonShaderRootSig.get());
+		CommandList, m_CommonShaderRootSig.get());
 	m_Blur = make_unique<BlurFilter>(m_SceneConfig.Width, m_SceneConfig.Height);
 	// 오브젝트 분리
 	for (auto& obj : m_ObjectMems)
 	{
-		obj->Build(m_DxCore->CommandList(), m_CommonShaderRootSig.get());
 		EPSOMode Mode = obj->GetMaterial()->GetDesc()->Mode;
 		EObjType Type = obj->GetType();
 
-		m_ObjectArray[Type][Mode].push_back(obj.get());
+		m_ObjectArray[Type][Mode].push_back(obj);
 	}
-
-
-	// 메시 생성
-	for (auto& mesh : m_MeshMems)
-		mesh->CreateMesh(m_DxCore->CommandList());
-
-
 	// 텍스쳐 추가
 	for (auto& data : m_TextureDatas)
 	{
-		m_ResourceManager->AddTexture(m_DxCore->CommandList(), data.Path, data.Type);
+		m_ResourceManager->AddTexture(CommandList, data.Path, data.Type);
 	}
 	// 각종 포스트 프로세싱 빌드
-	m_ResourceManager->BuildResourceHeap();
-
-	
+	m_ResourceManager->BuildResourceManager(CommandList, m_CommonShaderRootSig.get());
 
 
 	m_FrameResourceManager->BuildFrameResource(m_DxCore->Device(), 
-		(UINT)max(1, m_PassDatas.size()), (UINT)max(1, m_ObjectMems.size() + 1),
-		(UINT)max(1, m_MaterialCreater->Size()),
+		(UINT)max(1, m_ResourceManager->PassDataSize()), (UINT)max(1, m_ResourceManager->JGRCObjectSize() + 1),
+		(UINT)max(1, m_ResourceManager->JGMaterialSize()),
 		(UINT)max(1, m_LightManager->Size()));
 }
 void Scene::OnReSize(UINT width, UINT height)
@@ -129,16 +121,16 @@ void Scene::Update(const GameTimer& gt)
 	// 메인 카메라 업데이트
 	m_MainCamera->UpdateViewMatrix();
 
-	m_FrameResourceManager->FrameResourcePerFrame(m_DxCore->Fence());
+	m_FrameResourceManager->FrameResourcePerFrame(m_GCS->GetFence());
+
 	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
 	m_SSAO->Update(CurrFrameResource);
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
 		obj->Update(gt, CurrFrameResource);
-
 	// 머터리얼 업데이트
-	for (auto& mat : m_MaterialCreater->GetArray())
-		mat.second->Update(CurrFrameResource);
+	for (auto& mat : m_MaterialMems)
+		mat->Update(CurrFrameResource);
 
 	// 라이트 매니저 
 	m_LightManager->Update(CurrFrameResource);
@@ -150,7 +142,7 @@ void Scene::Update(const GameTimer& gt)
 void Scene::Draw()
 {
 	// 각 명령 리스트 및 메모리 초기화
-	auto CommandList = m_DxCore->CommandList();
+	auto CommandList = m_CmdListManager->GetCommandList(0);
 	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
 	auto CmdLisAlloc = CurrFrameResource->CmdListAlloc;
 	ThrowIfFailed(CmdLisAlloc->Reset());
@@ -214,7 +206,7 @@ void Scene::Draw()
 
 
 	// SwapChain에 그리기 시작
-	m_DxCore->StartDraw();
+	m_ScreenManager->ReadyScreen(m_Name, CommandList);
 
 	CommandList->SetPipelineState(m_ScenePSO.Get());
 	CommandList->IASetVertexBuffers(0, 0, nullptr);
@@ -223,11 +215,11 @@ void Scene::Draw()
 	CommandList->DrawInstanced(6, 1, 0, 0);
 	//m_Blur->Execute(m_DxCore->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
 	// 마무리
-	m_DxCore->EndDraw();
+	m_ScreenManager->OutputScreen(m_Name, CommandList);
 
-	CurrFrameResource->Fence = m_DxCore->CurrentFence();
+	CurrFrameResource->Fence = m_GCS->GetOffset();
 }
-void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode, bool bDebug)
 {
 	for (auto& objarr : m_ObjectArray)
 	{
@@ -235,7 +227,15 @@ void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResourc
 		{
 			obj->Draw(CurrFrameResource, CommandList, Mode);
 		}
+		if (bDebug)
+		{
+			for (auto& obj : objarr.second[EPSOMode::DEBUG])
+			{
+				obj->Draw(CurrFrameResource, CommandList, Mode);
+			}
+		}
 	}
+
 }
 void Scene::SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
 {
@@ -253,16 +253,8 @@ void Scene::SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, Frame
 }
 JGRCObject* Scene::CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const string& meshname, EObjType Type)
 {
-
-	auto Obj = make_unique<JGRCObject>(++m_ObjIndex, Type);
-	JGRCObject* result = Obj.get();
-	Obj->SetMaterial(mat);
-	Obj->SetMesh(mesh, meshname);
-
-
-
-	m_ObjectMems.push_back(move(Obj));
-
+	JGRCObject* result = m_ResourceManager->AddJGRCObject(mat, mesh, meshname, Type);
+	m_ObjectMems.push_back(result);
 	return result;
 }
 JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
@@ -294,23 +286,25 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
+void   Scene::AddDebugBox(JGRCObject* obj, const XMFLOAT3& color, float thickness)
+{
+	auto debugBox = make_unique<DebugBox>();
+	debugBox->BindingObject(obj, color, thickness);
+	m_DebugMems.push_back(move(debugBox));
+}
 JGMaterial* Scene::AddMaterial(const MaterialDesc& Desc)
 {
-	return m_MaterialCreater->CreateMaterial(Desc);
+	JGMaterial* mat  = m_ResourceManager->AddMaterial(Desc);
+	m_MaterialMems.push_back(mat);
+	return mat;
 }
 JGStaticMesh*   Scene::AddStaticMesh()
 {
-	auto Mesh = make_unique<JGStaticMesh>("None");
-	JGStaticMesh* result = Mesh.get();
-	m_MeshMems.push_back(move(Mesh));
-	return result;
+	return m_ResourceManager->AddStaticMesh();
 }
 JGSkeletalMesh* Scene::AddSkeletalMesh()
 {
-	auto Mesh = make_unique<JGSkeletalMesh>("None");
-	JGSkeletalMesh* result = Mesh.get();
-	m_MeshMems.push_back(move(Mesh));
-	return result;
+	return m_ResourceManager->AddSkeletalMesh();
 }
 string Scene::AddAnimation(const string& path)
 {
@@ -335,11 +329,7 @@ Camera*     Scene::AddCamera()
 }
 PassData* Scene::AddPassData()
 {
-	auto passData = make_unique<PassData>();
-	passData->PassCBIndex = ++m_PassCBIndex;
-	PassData* result = passData.get();
-	m_PassDatas.push_back(move(passData));
-	return result;
+	return m_ResourceManager->AddPassData();
 }
 JGLight*  Scene::AddLight(ELightType type, ELightExercise extype)
 {
@@ -368,6 +358,10 @@ JGAnimation* Scene::GetAnimation(const string& name)
 	if (m_Animations.find(name) == m_Animations.end())
 		return nullptr;
 	return m_Animations[name];
+}
+SceneData* Scene::GetSceneData() const
+{
+	return m_SceneData.get();
 }
 CommonShaderRootSignature* Scene::GetRootSig()
 {
@@ -439,7 +433,6 @@ void Scene::MainPassUpdate(const GameTimer& gt)
 }
 void Scene::InitStaticMemberVar()
 {
-	CommonData(m_DxCore, this, m_ResourceManager.get());
-	CubeMap(512, 512);
+	CommonData(m_DxCore, this, m_ResourceManager, m_ScreenManager);
 	ShadowMap(2048, 2048);
 }

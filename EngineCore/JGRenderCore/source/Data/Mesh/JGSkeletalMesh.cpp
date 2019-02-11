@@ -4,6 +4,7 @@
 #include"Data/Animation/JGAnimation.h"
 #include"Shader/CommonShaderRootSignature.h"
 #include"Data/Scene.h"
+#include"DxCore/DxCore.h"
 #include"ResourceManagement/ResourceReader.h"
 using namespace JGRC;
 using namespace std;
@@ -31,9 +32,9 @@ void JGSkeletalMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 	CopyMemory(m_MeshData->IndexBufferCPU->GetBufferPointer(), m_Index.data(), ibBtSize);
 
 
-	m_MeshData->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Device(), CommandList,
+	m_MeshData->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Core()->Device(), CommandList,
 		m_Vertex.data(), vbBtSize, m_MeshData->VertexBufferUploader);
-	m_MeshData->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Device(), CommandList,
+	m_MeshData->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Core()->Device(), CommandList,
 		m_Index.data(), ibBtSize, m_MeshData->IndexBufferUploader);
 	m_MeshData->VertexByteStride = vertexSize;
 	m_MeshData->VertexBufferByteSize = vbBtSize;

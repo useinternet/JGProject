@@ -38,22 +38,30 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootS
 	}
 
 	// PipeLineState ( 메시 & 머터리얼 & 오브젝트 상황에 따라서 셰이더에 매크로로 조작 )
-	m_PSOPack.Macro_Merge(m_Material->GetMacroPack());
+	EShaderFlag flag = m_Material->GetFlag();
 	if (m_Mesh->Type() == EMeshType::Skeletal && m_Anim)
 	{
 		Type = EObjType::Dynamic;
-		m_PSOPack.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
-		m_PSOPack.CompilePSO(m_Material->GetDesc()->ShaderPath, m_Material->GetDesc()->Mode, CommonData::_Scene()->GetSkinnedRootSig());
+		flag = flag | Shader_Flag_Skinned;
+
+		m_PSOPack.CompilePSO(
+			m_Material->GetDesc()->ShaderPath,
+			m_Material->GetDesc()->Mode, 
+			CommonData::_Scene()->GetSkinnedRootSig(),
+			flag);
+
 		m_SkinnedCBIndex = (UINT)SkinnedIndex++;
 		m_AnimHelper = make_unique<JGAnimationHelper>();
-
-
 		m_SkeletalMesh = dynamic_cast<JGSkeletalMesh*>(m_Mesh);
 		m_AnimHelper->BuildAnimationData(m_Anim, m_SkeletalMesh->GetBoneHierarchy(m_MeshName), (UINT)m_SkeletalMesh->GetBoneData(m_MeshName).size(), m_MeshName);
 	}
 	else
 	{
-		m_PSOPack.CompilePSO(m_Material->GetDesc()->ShaderPath, m_Material->GetDesc()->Mode, CommonData::_Scene()->GetRootSig());
+		m_PSOPack.CompilePSO(
+			m_Material->GetDesc()->ShaderPath,
+			m_Material->GetDesc()->Mode, 
+			CommonData::_Scene()->GetRootSig(),
+			flag);
 	}
 }
 void JGRCObject::Update(const GameTimer& gt,FrameResource* CurrentFrameResource)
@@ -132,13 +140,13 @@ void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommand
 	switch (Mode)
 	{
 	case EObjRenderMode::Default:
-		CommandList->SetPipelineState(m_PSOPack.CustomPSO.Get());
+		CommandList->SetPipelineState(m_PSOPack.CustomPSO);
 		break;
 	case EObjRenderMode::Shadow:
-		CommandList->SetPipelineState(m_PSOPack.ShadowPSO.Get());
+		CommandList->SetPipelineState(m_PSOPack.ShadowPSO);
 		break;
 	case EObjRenderMode::ViewNormal:
-		CommandList->SetPipelineState(m_PSOPack.ViewNormalPSO.Get());
+		CommandList->SetPipelineState(m_PSOPack.ViewNormalPSO);
 		break;
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = ObjCB->GetGPUVirtualAddress();
@@ -158,13 +166,18 @@ void JGRCObject::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommand
 }
 void JGRCObject::UpdateWorldMatrix()
 {
+
 	XMMATRIX Translation = XMMatrixTranslation(m_Location.x, m_Location.y, m_Location.z);
 	XMMATRIX Rotation = XMMatrixRotationRollPitchYaw(
 		XMConvertToRadians(m_Rotation.x),
 		XMConvertToRadians(m_Rotation.y),
 		XMConvertToRadians(m_Rotation.z));
 	XMMATRIX Scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
-	XMMATRIX World = Scale * Rotation * Translation;
+	XMMATRIX World;
+	(m_Owner) ? 
+		World = Scale * Rotation * Translation * XMLoadFloat4x4(&m_Owner->GetWorld()) :
+		World = Scale * Rotation * Translation;
+	
 	XMStoreFloat4x4(&m_World, World);
 }
 void JGRCObject::SetMesh(JGBaseMesh* mesh, const std::string& meshname)
@@ -181,6 +194,13 @@ void JGRCObject::SetMaterial(JGMaterial* material)
 void JGRCObject::SetAnimation(const string& name)
 {
 	m_Anim = CommonData::_Scene()->GetAnimation(name);
+}
+void JGRCObject::AttachTo(JGRCObject* obj)
+{
+	if (this == obj)
+		nullptr;
+	obj->m_Owner = this;
+
 }
 void JGRCObject::SetLocation(float x, float y, float z)
 {

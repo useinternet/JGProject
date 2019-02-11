@@ -2,7 +2,24 @@
 #include"DxCommon/DxCommon.h"
 namespace JGRC
 {
-	
+	class JGRCObject;
+	class JGMaterial;
+	class JGSkeletalMesh;
+	class JGStaticMesh;
+	class JGBaseMesh;
+	class CommonShaderRootSignature;
+	enum class EObjType;
+	enum class EObjRenderMode;
+	struct MaterialDesc;
+	struct PassData;
+/*
+	Exp : 머터리얼 목록 
+	* 이름
+	* PSO 모드
+	* 셰이더 경로
+	* 반사맵 여부
+	* 굴절맵 여부 */
+
 	/*
 	Exp : ShaderResourceView Pack 
 	* 리소스
@@ -113,6 +130,7 @@ namespace JGRC
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RtvDescriptorHeap;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DsvDescriptorHeap;
+
 		/*
 		* 각종 필요 포인터 및 변수들 */
 		ID3D12Device* m_Device = nullptr;
@@ -122,10 +140,26 @@ namespace JGRC
 		UINT m_CubeHeapOffset = 0;
 		UINT m_RtvHeapOffset  = 0;
 		UINT m_DsvHeapOffset  = 0;
+	    /*
+		JGRCObject */
+		std::vector<std::shared_ptr<JGRCObject>>     m_JGRCObjectMems;
+		UINT m_ObjectCBIndex = -1;
+		/*
+		JGRCMaterial */
+		std::vector<std::shared_ptr<JGMaterial>>     m_JGMaterialMems;
+		UINT m_MaterialCBIndex = -1;
+		/*
+		PassData */
+		std::vector<std::shared_ptr<PassData>>       m_PassDataMems;
+		UINT m_PassCBIndex = -1;
+		/*
+		Mesh */
+		std::vector<std::shared_ptr<JGBaseMesh>>     m_MeshMems;
 	public:
 		void Init(class DxCore* core);
 	public:
 		ID3D12Resource* BuildResource(D3D12_RESOURCE_DESC* desc, const ResourceFlagPack& Pack = ResourceFlagPack(), D3D12_CLEAR_VALUE* ClearValue = nullptr);
+		ID3D12Resource* BuildResource(IDXGISwapChain* swapChain, UINT idx);
 		ID3D12Resource* ReBuildResource(ID3D12Resource* resource, D3D12_RESOURCE_DESC* desc, const ResourceFlagPack& Pack = ResourceFlagPack(), D3D12_CLEAR_VALUE* ClearValue = nullptr);
 	public:
 		/*
@@ -135,12 +169,19 @@ namespace JGRC
 		UavResourcePack* AddUav(const std::string& name, ID3D12Resource* resource, ID3D12Resource* Counterresource, D3D12_UNORDERED_ACCESS_VIEW_DESC* Desc);
 		RenderTargetPack* AddRtv(const std::string& name, ID3D12Resource* RenderResource, D3D12_RENDER_TARGET_VIEW_DESC* Desc);
 		DepthStencilViewPack* AddDsv(const std::string& name, ID3D12Resource* RenderResource, D3D12_DEPTH_STENCIL_VIEW_DESC* Desc);
+		JGRCObject*     AddJGRCObject(JGMaterial* mat, JGBaseMesh* mesh, const std::string& meshname, EObjType type);
+		JGMaterial*     AddMaterial(const MaterialDesc& desc);
+		JGStaticMesh*   AddStaticMesh(const std::string& name = "None");
+		JGSkeletalMesh* AddSkeletalMesh(const std::string& name = "None");
+		PassData*       AddPassData();
 	public:
 		SrvResourcePack* SetSrv(const std::string& name, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* Desc = nullptr);
 		UavResourcePack* SetUav(const std::string& name, ID3D12Resource* resource, ID3D12Resource* Counterresource, D3D12_UNORDERED_ACCESS_VIEW_DESC* Desc = nullptr);
 		RenderTargetPack* SetRtv(const std::string& name, ID3D12Resource* RenderResource, D3D12_RENDER_TARGET_VIEW_DESC* Desc = nullptr);
 		DepthStencilViewPack* SetDsv(const std::string& name, ID3D12Resource* RenderResource, D3D12_DEPTH_STENCIL_VIEW_DESC* Desc = nullptr);
 	public:
+		void BuildResourceManager(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig);
+		void BuildResourceData(ID3D12GraphicsCommandList* CommnadList, CommonShaderRootSignature* RootSig);
 		void BuildResourceHeap();
 	public:
 		/*
@@ -178,6 +219,11 @@ namespace JGRC
 		Exp : TextureCube , Texture2D 시작점 Handle */
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUTexture2DHandle();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUCubeMapHandle();
+	public:
+		UINT JGRCObjectSize()  const;
+		UINT JGMaterialSize()  const;
+		UINT PassDataSize()    const;
+		UINT SkinnedDataSize() const;
 	public:
 		/*
 		Exp : DescriptorHeap 접근자 */

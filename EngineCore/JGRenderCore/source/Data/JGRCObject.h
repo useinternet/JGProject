@@ -27,6 +27,7 @@ namespace JGRC
 		static UINT SkinnedCount();
 	private:
 		// 메쉬 & 머터리얼 & 메쉬 이름 주요 정보
+		class JGRCObject* m_Owner    = nullptr;
 		class JGMaterial* m_Material = nullptr;
 		class JGBaseMesh* m_Mesh     = nullptr;
 		class JGSkeletalMesh* m_SkeletalMesh = nullptr;
@@ -87,9 +88,13 @@ namespace JGRC
 		bool IsActive()       { return m_bActive; }
 	public:
 		JGMaterial* GetMaterial() const { return m_Material; }
+		JGBaseMesh* GetMesh() const { return m_Mesh; };
+		const std::string& GetMeshName() const { return m_MeshName; }
+		const std::string& GetObjName() const  { return m_Name; }
 		void SetMesh(JGBaseMesh* mesh, const std::string& meshname);
 		void SetMaterial(JGMaterial* material);
 		void SetAnimation(const std::string& name);
+		void AttachTo(JGRCObject* obj);
 	public:
 		Vec3 GetLocation() const { return m_Location; }
 		Vec3 GetRotation() const { return m_Rotation; }

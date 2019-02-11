@@ -36,6 +36,14 @@
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 #define CPU_FRAMERESOURCE_NUM 3
+struct pair_hash
+{
+	template <class T1, class T2>
+	std::size_t operator() (const std::pair<T1, T2> &pair) const
+	{
+		return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+	}
+};
 inline void d3dSetDebugName(IDXGIObject* obj, const char* name)
 {
     if(obj)

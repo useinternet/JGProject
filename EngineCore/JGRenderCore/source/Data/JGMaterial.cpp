@@ -40,23 +40,18 @@ void JGMaterial::Update(class FrameResource* CurrentFrameResource)
 		MaterialCB->CopyData(m_MatCBIndex, Data);
 	}
 }
-vector<ShaderMacroPack> JGMaterial::GetMacroPack()
+EShaderFlag JGMaterial::GetFlag()
 {
-	vector<ShaderMacroPack> Pack;
-	ShaderMacroPack p;
+	EShaderFlag result = Shader_Flag_None;
 	if (m_TexturePaths.find(ETextureSlot::Diffuse) != m_TexturePaths.end())
 	{
-		p.Macro = SHADER_MACRO_DEFINE_USING_DIFFUSEMAP;
-		p.Value = to_string(SHADER_MACRO_ONLY_DEFINE);
-		Pack.push_back(p);
+		result = result | Shader_Flag_Use_DiffuseMap;
 	}
 	if (m_TexturePaths.find(ETextureSlot::Normal) != m_TexturePaths.end())
 	{
-		p.Macro = SHADER_MACRO_DEFINE_USING_NORMALMAP;
-		p.Value = to_string(SHADER_MACRO_ONLY_DEFINE);
-		Pack.push_back(p);
+		result = result | Shader_Flag_Use_NormalMap;
 	}
-	return Pack;
+	return result;
 }
 void JGMaterial::SetTexture(ETextureSlot slot,const std::wstring& TexturePath)
 {

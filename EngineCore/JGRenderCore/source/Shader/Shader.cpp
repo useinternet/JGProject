@@ -4,7 +4,8 @@
 using namespace std;
 using namespace JGRC;
 using namespace Microsoft::WRL;
-
+unordered_map<pair<UINT, wstring>, CommonPSOPack::CommonPSOTuple, pair_hash> CommonPSOPack::m_ShaderPSOList;
+UINT CommonPSOPack::PSOCount = 0;
 Shader::Shader(const wstring& shaderPath, const ShaderTypeInformation& ShaderTypes)
 {
 	m_ShaderPath = shaderPath;
@@ -80,7 +81,7 @@ ComPtr<ID3D12PipelineState> Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderR
 			break;
 		}
 	}
-	ThrowIfFailed(CommonData::_Device()->CreateGraphicsPipelineState(
+	ThrowIfFailed(CommonData::_Core()->Device()->CreateGraphicsPipelineState(
 		&Desc,
 		IID_PPV_ARGS(pso.GetAddressOf())));
 
@@ -129,6 +130,7 @@ void Shader::CreateModeDesc(EPSOMode mode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& D
 	{
 	case EPSOMode::INSTANCE:
 	case EPSOMode::DEFAULT:
+	case EPSOMode::DEBUG:
 		Desc = PipeLineStateSetDesc().SceneDataRenderTarget();
 		Desc.RasterizerState = RSDescList::Default();
 		Desc.BlendState = BSDescList::Default();
@@ -173,9 +175,63 @@ void Shader::CreateModeDesc(EPSOMode mode, D3D12_GRAPHICS_PIPELINE_STATE_DESC& D
 	}
 
 }
+CommonPSOPack::CommonPSOPack()
+{
+	PSOCount++;
+}
+CommonPSOPack::~CommonPSOPack()
+{
+	PSOCount--;
+	if (PSOCount == 0)
+	{
+		for (auto& list : m_ShaderPSOList)
+		{
+			list.second.CustomPSO.Reset();
+			list.second.ShadowPSO.Reset();
+			list.second.ViewNormalPSO.Reset();
+		}
+	}
+}
+void CommonPSOPack::CompilePSO(const wstring& path, EPSOMode CustomMode, ShaderRootSignatureBase* RootSig, EShaderFlag flag)
+{
+	pair<UINT, wstring> key = make_pair(flag, path);
+	if (m_ShaderPSOList.find(key) != m_ShaderPSOList.end())
+	{
+		CustomPSO     = m_ShaderPSOList[key].CustomPSO.Get();
+		ShadowPSO     = m_ShaderPSOList[key].ShadowPSO.Get();
+		ViewNormalPSO = m_ShaderPSOList[key].ViewNormalPSO.Get();
+		return;
+	}
+	CustomCompiler.SetPath(path, { EShaderType::Vertex, EShaderType::Pixel });
+	ShadowCompiler.SetPath(global_shadow_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
+	ViewNormalCompiler.SetPath(global_drawnormal_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
 
 
-
+	if (flag & Shader_Flag_Use_DiffuseMap)
+	{
+		CustomCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_DIFFUSEMAP, SHADER_MACRO_ONLY_DEFINE);
+		ShadowCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_DIFFUSEMAP, SHADER_MACRO_ONLY_DEFINE);
+		ViewNormalCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_DIFFUSEMAP, SHADER_MACRO_ONLY_DEFINE);
+	}
+	if (flag & Shader_Flag_Use_NormalMap)
+	{
+		CustomCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_NORMALMAP, SHADER_MACRO_ONLY_DEFINE);
+		ShadowCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_NORMALMAP, SHADER_MACRO_ONLY_DEFINE);
+		ViewNormalCompiler.Macro_Push(SHADER_MACRO_DEFINE_USING_NORMALMAP, SHADER_MACRO_ONLY_DEFINE);
+	}
+	if (flag & Shader_Flag_Skinned)
+	{
+		CustomCompiler.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
+		ShadowCompiler.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
+		ViewNormalCompiler.Macro_Push(SHADER_MACRO_DEFINE_SKINNED, SHADER_MACRO_ONLY_DEFINE);
+	}
+	m_ShaderPSOList[key].CustomPSO = CustomCompiler.CompileAndConstrutPSO(CustomMode, RootSig);
+	m_ShaderPSOList[key].ShadowPSO = ShadowCompiler.CompileAndConstrutPSO(EPSOMode::SHADOW, RootSig);
+	m_ShaderPSOList[key].ViewNormalPSO = ViewNormalCompiler.CompileAndConstrutPSO(EPSOMode::SSAO_NORMALMAP, RootSig);
+	CustomPSO     = m_ShaderPSOList[key].CustomPSO.Get();
+	ShadowPSO     = m_ShaderPSOList[key].ShadowPSO.Get();
+	ViewNormalPSO = m_ShaderPSOList[key].ViewNormalPSO.Get();
+}
 void ComputeShader::Init(DxCore* Core, ShaderRootSignatureBase* RootSig, const wstring& shaderPath,
 	const vector<string>& functionName)
 {

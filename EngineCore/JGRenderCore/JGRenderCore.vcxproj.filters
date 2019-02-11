@@ -38,6 +38,9 @@
     <Filter Include="ResourceManagement">
       <UniqueIdentifier>{b0258a85-343d-48a3-861a-b67e8870e8bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Debug">
+      <UniqueIdentifier>{687709f8-b916-4da9-915c-b2e705b22ab0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dllmain.cpp">
@@ -156,6 +159,18 @@
     </ClCompile>
     <ClCompile Include="source\UserInterface\Interface_SceneMesh.cpp">
       <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Debug\DebugBox.cpp">
+      <Filter>Data\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Debug\DebugScreen.cpp">
+      <Filter>Data\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCore\ScreenManager.cpp">
+      <Filter>DxCore</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCore\CommandListManager.cpp">
+      <Filter>DxCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,6 +323,24 @@
     </ClInclude>
     <ClInclude Include="source\UserInterface\Interface_SceneMesh.h">
       <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Octree.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Debug\DebugBox.h">
+      <Filter>Data\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Debug\DebugScreen.h">
+      <Filter>Data\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\CommandListManager.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\ScreenManager.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\GpuCpuSynchronizer.h">
+      <Filter>DxCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

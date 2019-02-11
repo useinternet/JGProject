@@ -7,18 +7,22 @@
 
 namespace JGRC
 {
+	class Scene;
+	class ScreenManager;
+	class DxCore;
 	class RCORE_EXPORT CommonData
 	{
 	protected:
-		static class Scene*     m_Scene;
-		static class DxCore*    m_DxCore;
+		static Scene*     m_Scene;
+		static DxCore*    m_DxCore;
+		static ScreenManager* m_ScreenManager;
 		static ResourceManager* m_ResourceManager;
 	public:
-		CommonData(DxCore* core, Scene* scene, ResourceManager* manager);
+		CommonData(DxCore* core, Scene* scene, ResourceManager* manager, ScreenManager* screen);
 	public:
 		static Scene* _Scene();
 		static DxCore* _Core();
-		static ID3D12Device* _Device();
+		static ScreenManager* _ScreenManager();
 		static ResourceManager* _ResourceManager();
 	};
 }

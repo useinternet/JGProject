@@ -3,6 +3,8 @@
 #include"DxCommon/GameTimer.h"
 #include"Data/JGMaterial.h"
 #include"ResourceManagement/ResourceExtracter.h"
+#include"Data/Debug/DebugScreen.h"
+#include"ResourceManagement/ResourceExtracter.h"
 TestWindow::TestWindow(HINSTANCE hInst) : D3DApp(hInst)
 {
 
@@ -13,6 +15,8 @@ TestWindow::~TestWindow()
 }
 bool TestWindow::Initialize()
 {
+
+
 	D3DApp::Initialize();
 	DxSetting setting;
 	setting.Width = 1920;
@@ -24,7 +28,7 @@ bool TestWindow::Initialize()
 	Init = true;
 	
 	// ¾À »ý¼º
-	scene = core->CreateScene("TestScene");
+	scene = core->CreateScene("TestScene", setting);
 	
 	cam = scene->AddCamera();
 	cam->SetPosition(0.0f, 30.0f, -100.0f);  	
@@ -61,13 +65,6 @@ bool TestWindow::Initialize()
 	AnimMat2->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
 	AnimMat2->SetRoughness(0.0f);
 	AnimMat2->SetMetalic(0.0f);
-
-
-	//AnimMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/maria_diffuse.dds");
-	//AnimMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/maria_normal.dds");
-
-
-
 	IF_Material TestMat[10][10];
 	for (int i = 0; i < 10; ++i)
 	{
@@ -93,11 +90,16 @@ bool TestWindow::Initialize()
 	IF_Object GridObj = scene->CreateObject(GridMat, gridMesh, "Grid");
 	IF_Object AnimObj = scene->CreateObject(AnimMat2, animMesh, "../Contents/JGUser/Beta_Surface.jgskeletalmesh");
 	AnimObj->SetLocation(0.0f, 0.0f, -200.0f);
+	AnimObj->SetRotation(0.0f, 0.0f, 0.0f);
 	AnimObj->SetAnimation(AnimKey);
 
 	IF_Object AnimObj2 = scene->CreateObject(AnimMat, animMesh, "../Contents/JGUser/Beta_Joints.jgskeletalmesh");
-	AnimObj2->SetLocation(0.0f, 0.0f, -200.0f);
+	AnimObj->AttachTo(AnimObj2);
 	AnimObj2->SetAnimation(AnimKey);
+
+	scene->DebugBox(AnimObj, { 1.0f,0.0f,1.0f }, 0.5f);
+	scene->DebugBox(AnimObj2, { 1.0f,1.0f,1.0f }, 0.5f);
+
 	IF_Object TestObj[10][10];
 	for (int i = 0; i < 10; ++i)
 	{
@@ -105,13 +107,24 @@ bool TestWindow::Initialize()
 		{
 			TestObj[i][j] = scene->CreateObject(TestMat[i][j], gridMesh, "TestSphere");
 			TestObj[i][j]->SetLocation(i * 25.0f - 125.0f, j * 25.0f + 25.0f, 0.0f);
+			scene->DebugBox(TestObj[i][j], { 0.0f,0.0f,0.0f }, 0.5f);
 		}
 
 	}
 	IF_DirectionLight dirLight = scene->AddDirLight();
 	dirLight->SetLightColor(0.88f, 0.88f, 0.95f);
 	dirLight->SetDirection(1.0f, -1.0f, 1.0f);
-
+	IF_PointLight pLight = scene->AddPointLight();
+	pLight->SetFalloffStart(100.0f);
+	pLight->SetFalloffEnd(110.0f);
+	pLight->SetLightColor(0.0f, 2.0f, 2.0f);
+	pLight->SetLocation(0.0f, 10.0f, -50.0f);
+	IF_SpotLight sLight = scene->AddSpotLight();
+	sLight->SetLocation(0.0f, 50.0f, 10.0f);
+	sLight->SetDirection(0.0f, -1.0f, -1.0f);
+	sLight->SetLightColor(2.0f, 2.0f, 0.0f);
+	sLight->SetFalloffStart(100.0f);
+	sLight->SetFalloffEnd(300.0f);
 	core->Build(mTimer);
 	return true;
 }

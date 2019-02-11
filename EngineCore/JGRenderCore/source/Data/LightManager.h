@@ -18,7 +18,6 @@ namespace JGRC
 		std::unique_ptr<JGLight>              m_DirLight;
 		std::vector<std::unique_ptr<JGLight>> m_PointLights;
 		std::vector<std::unique_ptr<JGLight>> m_SpotLights;
-
 	public:
 		LightManager()  = default;
 		~LightManager() = default;

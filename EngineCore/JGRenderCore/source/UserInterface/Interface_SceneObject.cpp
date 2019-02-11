@@ -1,5 +1,6 @@
 #include"Interface_SceneObject.h"
 #include"Data/JGRCObject.h"
+#include"Interface_Scene.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -23,7 +24,7 @@ void Interface_SceneObject::OffsetRotation(const XMFLOAT3& v)                  {
 void Interface_SceneObject::OffsetScale(float x, float y, float z)             { m_ObjectData->SetScale(x, y, z); }
 void Interface_SceneObject::OffsetScale(const XMFLOAT3& v)                     { m_ObjectData->SetScale(v.x, v.y, v.z); }
 void Interface_SceneObject::OffsetScale(float x)                               { m_ObjectData->SetScale(x); }
-
+void Interface_SceneObject::AttachTo(Interface_SceneObject obj) { m_ObjectData->AttachTo(obj.m_ObjectData); }
 void Interface_SceneObject::Visible() { m_ObjectData->Visible(); }
 void Interface_SceneObject::Active()  { m_ObjectData->Active(); }
 

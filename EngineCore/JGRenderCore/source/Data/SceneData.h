@@ -73,6 +73,5 @@ namespace JGRC
 		void ReBuildResource();
 		void RegisterHeap();
 		void ReRegisterHeap();
-	private:
 	};
 }

@@ -1,5 +1,6 @@
 #include"JGStaticMesh.h"
 #include"Data/CommonData.h"
+#include"DxCore/DxCore.h"
 #include"ResourceManagement/ResourceReader.h"
 using namespace std;
 using namespace JGRC;
@@ -27,9 +28,9 @@ void JGStaticMesh::CreateMesh(ID3D12GraphicsCommandList* CommandList)
 	CopyMemory(m_MeshData->IndexBufferCPU->GetBufferPointer(), m_Index.data(), ibBtSize);
 
 
-	m_MeshData->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Device(), CommandList,
+	m_MeshData->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Core()->Device(), CommandList,
 		m_Vertex.data(), vbBtSize, m_MeshData->VertexBufferUploader);
-	m_MeshData->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Device(), CommandList,
+	m_MeshData->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(CommonData::_Core()->Device(), CommandList,
 		m_Index.data(), ibBtSize, m_MeshData->IndexBufferUploader);
 	m_MeshData->VertexByteStride = vertexSize;
 	m_MeshData->VertexBufferByteSize = vbBtSize;
@@ -92,7 +93,6 @@ void JGStaticMesh::AddQuadArg(const string& name, float  x, float y, float w, fl
 	GeometryGenerator::MeshData mesh = DefaultGeo.CreateQuad(x, y, w, h, depth);
 	AddMeshArg(name, mesh.Vertices, mesh.Indices32);
 }
-
 void JGStaticMesh::AddMeshArg(const string& name, const MeshVertex& vertex, const MeshIndex& index)
 {
 	BoundingBox bounds;

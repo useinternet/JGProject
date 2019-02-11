@@ -6,6 +6,8 @@
 #include"JGRCObject.h"
 #include"Mesh/JGStaticMesh.h"
 #include"Mesh/JGSkeletalMesh.h"
+#include"Debug/DebugBox.h"
+#include"Debug/DebugScreen.h"
 #include"DxCore/DxSetting.h"
 /*
 --- 해야할거 ( 언제 걸릴지 모른다. ) 
@@ -17,6 +19,11 @@
 */
 namespace JGRC
 {
+	class SceneData;
+	class CommandListManager;
+	class ScreenManager;
+	class GpuCpuSynchronizer;
+	class DxCore;
 	class RCORE_EXPORT Scene
 	{
 		typedef std::unordered_map<EObjType,
@@ -24,11 +31,15 @@ namespace JGRC
 			    std::vector<JGRCObject*>>>
 			    ObjectArray;
 	private:
-		class DxCore* m_DxCore = nullptr;
+		std::string m_Name;
+		DxCore* m_DxCore = nullptr;
 		DxSetting m_SceneConfig;
 
 		// 메모리 및 프레임 관리자
-		std::unique_ptr<ResourceManager>            m_ResourceManager;
+		ResourceManager*            m_ResourceManager;
+		CommandListManager*         m_CmdListManager;
+		ScreenManager*              m_ScreenManager;
+		GpuCpuSynchronizer*         m_GCS;
 		std::unique_ptr<EngineFrameResourceManager> m_FrameResourceManager;
 		std::shared_ptr<class SceneData>            m_SceneData;
 		std::shared_ptr<class CommonShaderRootSignature> m_CommonShaderRootSig;
@@ -40,26 +51,20 @@ namespace JGRC
 		std::shared_ptr<class BlurFilter> m_Blur;
 
 		// 메인 상수 패스 
-		std::vector<std::unique_ptr<PassData>> m_PassDatas;
-		UINT      m_PassCBIndex = -1;
 		PassData* m_MainPass = nullptr;
 
 		// 카메라
 		std::vector<std::unique_ptr<Camera>> m_Cameras;
 		Camera* m_MainCamera = nullptr;
 
+
 		// 오브젝트
-		std::vector<std::unique_ptr<JGRCObject>>      m_ObjectMems;
+		std::vector<JGRCObject*>      m_ObjectMems;
 		ObjectArray m_ObjectArray;
-		UINT m_ObjIndex = -1;
+		std::vector<std::unique_ptr<DebugBox>> m_DebugMems;
 
 		// 머터리얼
-		std::unique_ptr<JGMaterialCreater>           m_MaterialCreater;
-		std::unordered_map<std::string, JGMaterial*> m_Materials;
-
-		// 메시
-		std::vector<std::unique_ptr<JGBaseMesh>>         m_MeshMems;
-		std::unordered_map<std::string, JGBaseMesh*>     m_Meshs;
+		std::vector<JGMaterial*>           m_MaterialMems;
 
 		// 애니메이션
 		std::vector<std::unique_ptr<JGAnimation>>     m_AnimationMems;
@@ -80,17 +85,20 @@ namespace JGRC
 		Scene(const Scene& rhs) = delete;
 		Scene& operator=(const Scene& rhs) = delete;
 	public:
-		Scene(class DxCore* core);
+		Scene(const std::string& name, DxCore* core, ResourceManager* manager,
+			CommandListManager* cmdManager, ScreenManager* screenManager,
+			GpuCpuSynchronizer* gcs);
 		void BuildScene();
 		void OnReSize(UINT width, UINT height);
 		void Update(const GameTimer& gt);
 		void Draw();
-		void SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
+		void SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode, bool bDebug = false);
 		void SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
 		void SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
 	public:
 		JGRCObject*     CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const std::string& meshname, EObjType Type = EObjType::Static);
 		JGRCObject*     CreateSkyBox(const std::wstring& texturepath);
+		void            AddDebugBox(JGRCObject* obj, const DirectX::XMFLOAT3& color, float thickness = 0);
 		JGMaterial*     AddMaterial(const MaterialDesc& Desc);
 		JGStaticMesh*   AddStaticMesh();
 		JGSkeletalMesh* AddSkeletalMesh();
@@ -108,7 +116,8 @@ namespace JGRC
 		const DxSetting& GetSetting() const              { return m_SceneConfig; }
 		ID3D12PipelineState* GetScenePSO() const         { return m_ScenePSO.Get(); }
 		JGAnimation* GetAnimation(const std::string& name);
-
+		SceneData* GetSceneData() const;
+		const std::string& GetName() const { return m_Name; }
 	public:
 		CommonShaderRootSignature* GetRootSig();
 		CommonSkinnedShaderRootSignature* GetSkinnedRootSig();

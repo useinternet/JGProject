@@ -22,6 +22,8 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="source\Data\Animation\JGAnimation.cpp" />
     <ClCompile Include="source\Data\CommonData.cpp" />
+    <ClCompile Include="source\Data\Debug\DebugBox.cpp" />
+    <ClCompile Include="source\Data\Debug\DebugScreen.cpp" />
     <ClCompile Include="source\Data\EngineFrameResource.cpp" />
     <ClCompile Include="source\Data\JGLight.cpp" />
     <ClCompile Include="source\Data\JGMaterial.cpp" />
@@ -39,8 +41,10 @@
     <ClCompile Include="source\DxCommon\GeometryGenerator.cpp" />
     <ClCompile Include="source\DxCommon\MathHelper.cpp" />
     <ClCompile Include="source\DxCommon\ModelLoader.cpp" />
+    <ClCompile Include="source\DxCore\CommandListManager.cpp" />
     <ClCompile Include="source\DxCore\DxCore.cpp" />
     <ClCompile Include="source\DxCore\JGRenderCore.cpp" />
+    <ClCompile Include="source\DxCore\ScreenManager.cpp" />
     <ClCompile Include="source\PostProcessing\BlurFilter.cpp" />
     <ClCompile Include="source\PostProcessing\CubeMap.cpp" />
     <ClCompile Include="source\PostProcessing\ShadowMap.cpp" />
@@ -63,6 +67,8 @@
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="source\Data\Animation\JGAnimation.h" />
     <ClInclude Include="source\Data\CommonData.h" />
+    <ClInclude Include="source\Data\Debug\DebugBox.h" />
+    <ClInclude Include="source\Data\Debug\DebugScreen.h" />
     <ClInclude Include="source\Data\EngineFrameResource.h" />
     <ClInclude Include="source\Data\JGLight.h" />
     <ClInclude Include="source\Data\JGMaterial.h" />
@@ -71,6 +77,7 @@
     <ClInclude Include="source\Data\Mesh\JGBaseMesh.h" />
     <ClInclude Include="source\Data\Mesh\JGSkeletalMesh.h" />
     <ClInclude Include="source\Data\Mesh\JGStaticMesh.h" />
+    <ClInclude Include="source\Data\Octree.h" />
     <ClInclude Include="source\Data\Scene.h" />
     <ClInclude Include="source\Data\SceneData.h" />
     <ClInclude Include="source\DxCommon\Camera.h" />
@@ -83,11 +90,14 @@
     <ClInclude Include="source\DxCommon\MathHelper.h" />
     <ClInclude Include="source\DxCommon\ModelLoader.h" />
     <ClInclude Include="source\DxCommon\UploadBuffer.h" />
+    <ClInclude Include="source\DxCore\CommandListManager.h" />
     <ClInclude Include="source\DxCore\DxCore.h" />
     <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h" />
+    <ClInclude Include="source\DxCore\GpuCpuSynchronizer.h" />
     <ClInclude Include="source\DxCore\JGRenderCore.h" />
     <ClInclude Include="source\DxCore\DxSetting.h" />
     <ClInclude Include="source\DxCore\RenderItem.h" />
+    <ClInclude Include="source\DxCore\ScreenManager.h" />
     <ClInclude Include="source\PostProcessing\BlurFilter.h" />
     <ClInclude Include="source\PostProcessing\CubeMap.h" />
     <ClInclude Include="source\PostProcessing\ShadowMap.h" />

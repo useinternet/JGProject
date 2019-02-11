@@ -5,6 +5,7 @@
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/SSAOShaderRootSignature.h"
 #include"Data/CommonData.h"
+#include"DxCore/ScreenManager.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -17,7 +18,7 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 {
 	m_Width = width;
 	m_Height = height;
-	m_SSAOCB = make_unique<UploadBuffer<SSAOData>>(CommonData::_Device(), 1, true);
+	m_SSAOCB = make_unique<UploadBuffer<SSAOData>>(CommonData::_Core()->Device(), 1, true);
 	
 	m_Viewport = { 0.0f,0.0f,(float)m_Width, (float)m_Height,0.0f,1.0f };
 	m_ScissorRect = { 0,0,(int)m_Width, (int)m_Height };
@@ -27,7 +28,7 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 	BuildDescriptor();
 
 	m_SSAORootSig = make_unique<SSAOShaderRootSignature>();
-	m_SSAORootSig->RootSign(CommonData::_Device());
+	m_SSAORootSig->RootSign(CommonData::_Core()->Device());
 
 	Shader SSAOShader(global_ssao_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
 	m_SSAOPSO = SSAOShader.CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get());
@@ -241,8 +242,9 @@ void SSAO::BuildDescriptor()
 
 	m_NormalMapPack = CommonData::_ResourceManager()->AddSrv("SSAO_Normal_Srv", m_NormalMap, &srvDesc);
 	// ±íÀÌ ¹öÆÛ
+	ScreenManager::ScreenData data = CommonData::_ScreenManager()->GetScreenData(CommonData::_Scene()->GetName());
 	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	m_DepthMapPack = CommonData::_ResourceManager()->AddSrv("SSAO_Depth_Srv", CommonData::_Core()->DepthStencilBuffer(), &srvDesc);
+	m_DepthMapPack = CommonData::_ResourceManager()->AddSrv("SSAO_Depth_Srv", data.DepthBuffer, &srvDesc);
 
 
 	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -269,8 +271,9 @@ void SSAO::BuildDescriptor()
 }
 void SSAO::ReBuildDescrptor()
 {
+	ScreenManager::ScreenData data = CommonData::_ScreenManager()->GetScreenData(CommonData::_Scene()->GetName());
 	m_NormalMapPack = CommonData::_ResourceManager()->SetSrv(m_NormalMapPack->PackName, m_NormalMap);
-	m_DepthMapPack = CommonData::_ResourceManager()->SetSrv(m_DepthMapPack->PackName, CommonData::_Core()->DepthStencilBuffer());
+	m_DepthMapPack = CommonData::_ResourceManager()->SetSrv(m_DepthMapPack->PackName, data.DepthBuffer);
 	m_SSAOMapPack_0 = CommonData::_ResourceManager()->SetSrv(m_SSAOMapPack_0->PackName, m_SSAOMap_0);
 	m_SSAOMapPack_1 = CommonData::_ResourceManager()->SetSrv(m_SSAOMapPack_1->PackName, m_SSAOMap_1);
 	// ·»´õ Å¸°Ù
@@ -287,9 +290,12 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 		CommandList, m_NormalMap, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	float clearValue[] = { 0.0f,0.0f,1.0f,0.0f };
 	CommandList->ClearRenderTargetView(m_NormalMapRtvPack->Handle, clearValue, 0, nullptr);
-	CommandList->ClearDepthStencilView(CommonData::_Core()->DepthStencilView(), 
+
+	ScreenManager::ScreenData data = CommonData::_ScreenManager()->GetScreenData(CommonData::_Scene()->GetName());
+
+	CommandList->ClearDepthStencilView(data.DsvPack->Handle,
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-	CommandList->OMSetRenderTargets(1, &m_NormalMapRtvPack->Handle, true, &CommonData::_Core()->DepthStencilView());
+	CommandList->OMSetRenderTargets(1, &m_NormalMapRtvPack->Handle, true, &data.DsvPack->Handle);
 	// ¸ÞÀÎ ÆÐ¾² µî·Ï
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
 		CommonData::_Scene()->MainPassHandle());

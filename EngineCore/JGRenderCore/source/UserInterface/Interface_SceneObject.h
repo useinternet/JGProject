@@ -4,6 +4,7 @@
 
 namespace JGRC
 {
+	class Interface_Scene;
 	enum class RCORE_EXPORT E_IF_ObjType
 	{
 		Static,
@@ -11,6 +12,7 @@ namespace JGRC
 	};
 	class RCORE_EXPORT Interface_SceneObject
 	{
+		friend Interface_Scene;
 	private:
 		class JGRCObject* m_ObjectData = nullptr;
 
@@ -48,7 +50,9 @@ namespace JGRC
 		void OffsetScale(float x, float y, float z); 
 		void OffsetScale(const DirectX::XMFLOAT3& v);
 		void OffsetScale(float x); 
+
 	public:
+		void AttachTo(Interface_SceneObject obj);
 		void Visible();
 		void Active();
 		
