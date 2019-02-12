@@ -16,7 +16,7 @@ void ScreenManager::CreateManager(IDXGIFactory4* factory, ResourceManager* manag
 void ScreenManager::AddSwapChain(
 	const string& name,
 	HWND hWnd,
-	const DxSetting& set,
+	const SceneConfig& set,
 	CommandListManager* CmdListManager,
 	UINT CmdIndex)
 {
@@ -129,7 +129,7 @@ const ScreenManager::ScreenData& ScreenManager::GetScreenData(const string& name
 		return dummy;
 	return m_ScreenDatas.at(name);
 }
-DXGI_SWAP_CHAIN_DESC ScreenManager::GetSwapChainDesc(const DxSetting& set)
+DXGI_SWAP_CHAIN_DESC ScreenManager::GetSwapChainDesc(const SceneConfig& set)
 {
 	DXGI_SWAP_CHAIN_DESC desc;
 	desc.BufferDesc.Width = set.Width;
@@ -149,7 +149,7 @@ DXGI_SWAP_CHAIN_DESC ScreenManager::GetSwapChainDesc(const DxSetting& set)
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	return desc;
 }
-D3D12_RESOURCE_DESC ScreenManager::GetDepthResourceDesc(const DxSetting& set)
+D3D12_RESOURCE_DESC ScreenManager::GetDepthResourceDesc(const SceneConfig& set)
 {
 	// Create the depth/stencil buffer and view.
 	D3D12_RESOURCE_DESC desc;

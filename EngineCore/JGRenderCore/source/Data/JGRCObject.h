@@ -69,7 +69,7 @@ namespace JGRC
 
 	public: // ºôµå & ¾÷µ¥ÀÌÆ® & Å¥ºê ¸Ê & ·»´õ¸µ
 		JGRCObject(UINT Index, EObjType Type, const std::string& name = "JGRCObject");
-		void Build(ID3D12GraphicsCommandList* CommandList, class CommonShaderRootSignature* RoogSig);
+		void Build(ID3D12GraphicsCommandList* CommandList);
 		void Update(const GameTimer& gt, FrameResource* CurrentFrameResource);
 		void CubeMapDraw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList);
 		void Draw(class FrameResource* CurrentFrameResource, ID3D12GraphicsCommandList* CommandList, EObjRenderMode Mode = EObjRenderMode::Default);

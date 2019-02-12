@@ -134,7 +134,7 @@ namespace JGRC
 		/*
 		* 각종 필요 포인터 및 변수들 */
 		ID3D12Device* m_Device = nullptr;
-		class DxCore* m_Core = nullptr;
+		class DxDevice* m_DxDevice = nullptr;
 		// 오프셋 저장 변수 
 		UINT m_SrvHeapOffset  = 0;
 		UINT m_CubeHeapOffset = 0;
@@ -156,7 +156,7 @@ namespace JGRC
 		Mesh */
 		std::vector<std::shared_ptr<JGBaseMesh>>     m_MeshMems;
 	public:
-		void Init(class DxCore* core);
+		void Init(class DxDevice* core);
 	public:
 		ID3D12Resource* BuildResource(D3D12_RESOURCE_DESC* desc, const ResourceFlagPack& Pack = ResourceFlagPack(), D3D12_CLEAR_VALUE* ClearValue = nullptr);
 		ID3D12Resource* BuildResource(IDXGISwapChain* swapChain, UINT idx);
@@ -180,8 +180,8 @@ namespace JGRC
 		RenderTargetPack* SetRtv(const std::string& name, ID3D12Resource* RenderResource, D3D12_RENDER_TARGET_VIEW_DESC* Desc = nullptr);
 		DepthStencilViewPack* SetDsv(const std::string& name, ID3D12Resource* RenderResource, D3D12_DEPTH_STENCIL_VIEW_DESC* Desc = nullptr);
 	public:
-		void BuildResourceManager(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig);
-		void BuildResourceData(ID3D12GraphicsCommandList* CommnadList, CommonShaderRootSignature* RootSig);
+		void BuildResourceManager(ID3D12GraphicsCommandList* CommandList);
+		void BuildResourceData(ID3D12GraphicsCommandList* CommnadList);
 		void BuildResourceHeap();
 	public:
 		/*

@@ -48,7 +48,6 @@ namespace JGRC
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SSAOPSO     = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_SSAOBlurPSO = nullptr;
-		std::shared_ptr<class SSAOShaderRootSignature> m_SSAORootSig;
 		//
 		ID3D12Resource* m_RandomVectorMap = nullptr;
 		SrvResourcePack* m_RandomVectorMapPack = nullptr;
@@ -66,7 +65,7 @@ namespace JGRC
 	public:
 		SSAO();
 		~SSAO() = default;
-		void BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList,class  CommonShaderRootSignature* RootSig);
+		void BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList);
 		void OnReSize(UINT width, UINT height);
 		void Update(FrameResource* CurrFrameResource);
 		void Draw(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList* CommandList);

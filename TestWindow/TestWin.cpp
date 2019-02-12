@@ -18,13 +18,13 @@ bool TestWindow::Initialize()
 
 
 	D3DApp::Initialize();
-	DxSetting setting;
+	SceneConfig setting;
 	setting.Width = 1920;
 	setting.Height = 1080;
 	setting.hWnd = MainWnd();
 	setting.FarZ = 10000.0f;
 	core = new JGRenderCore;
-	core->Init(setting);
+	core->CreateCore();
 	Init = true;
 	
 	// ¾À »ý¼º
@@ -63,7 +63,7 @@ bool TestWindow::Initialize()
 	Desc.Name = "AnimMat2";
 	IF_Material AnimMat2 = scene->AddMaterial(Desc);
 	AnimMat2->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	AnimMat2->SetRoughness(0.0f);
+	AnimMat2->SetRoughness(0.5f);
 	AnimMat2->SetMetalic(0.0f);
 	IF_Material TestMat[10][10];
 	for (int i = 0; i < 10; ++i)

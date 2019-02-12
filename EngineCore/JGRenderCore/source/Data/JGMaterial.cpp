@@ -1,5 +1,5 @@
 #include"JGMaterial.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #include"EngineFrameResource.h"
 #include"CommonData.h"
 using namespace JGRC;

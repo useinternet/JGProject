@@ -1,5 +1,5 @@
 #include"Shader.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #include"Data/CommonData.h"
 using namespace std;
 using namespace JGRC;
@@ -38,7 +38,7 @@ ComPtr<ID3D12PipelineState> Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderR
 	{
 		Desc.InputLayout = { RootSig->GetInputLayoutData(), RootSig->GetInputLayoutSize() };
 	}
-	Desc.pRootSignature = RootSig->GetRootSignature();
+	Desc.pRootSignature = RootSig->Get();
 
 	for (auto& shader : m_ShaderBtCodes)
 	{
@@ -81,7 +81,7 @@ ComPtr<ID3D12PipelineState> Shader::CompileAndConstrutPSO(EPSOMode mode, ShaderR
 			break;
 		}
 	}
-	ThrowIfFailed(CommonData::_Core()->Device()->CreateGraphicsPipelineState(
+	ThrowIfFailed(CommonData::_DxDevice()->Get()->CreateGraphicsPipelineState(
 		&Desc,
 		IID_PPV_ARGS(pso.GetAddressOf())));
 
@@ -232,10 +232,10 @@ void CommonPSOPack::CompilePSO(const wstring& path, EPSOMode CustomMode, ShaderR
 	ShadowPSO     = m_ShaderPSOList[key].ShadowPSO.Get();
 	ViewNormalPSO = m_ShaderPSOList[key].ViewNormalPSO.Get();
 }
-void ComputeShader::Init(DxCore* Core, ShaderRootSignatureBase* RootSig, const wstring& shaderPath,
+void ComputeShader::Init(DxDevice* Core, ShaderRootSignatureBase* RootSig, const wstring& shaderPath,
 	const vector<string>& functionName)
 {
-	m_DxCore = Core;
+	m_DxDevice = Core;
 	m_ShaderPath = move(shaderPath);
 	ShaderCompile(functionName);
 	CreatePSO(RootSig);
@@ -263,7 +263,7 @@ void ComputeShader::ShaderCompile(const vector<string>& functionName)
 void ComputeShader::CreatePSO(ShaderRootSignatureBase* RootSig)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC Desc = { };
-	Desc.pRootSignature = RootSig->GetRootSignature();
+	Desc.pRootSignature = RootSig->Get();
 	Desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 	for (auto& shader : m_Shaders)
 	{
@@ -273,7 +273,7 @@ void ComputeShader::CreatePSO(ShaderRootSignatureBase* RootSig)
 			reinterpret_cast<BYTE*>(shader.second->GetBufferPointer()),
 			shader.second->GetBufferSize()
 		};
-		ThrowIfFailed(m_DxCore->Device()->CreateComputePipelineState(
+		ThrowIfFailed(m_DxDevice->Get()->CreateComputePipelineState(
 			&Desc, IID_PPV_ARGS(pso.GetAddressOf())));
 		m_PSOList[shader.first] = move(pso);
 	}

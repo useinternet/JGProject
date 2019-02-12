@@ -1,5 +1,6 @@
 #include"SceneData.h"
 #include"CommonData.h"
+#include"JGRCObject.h"
 #include"Scene.h"
 using namespace std;
 using namespace JGRC;

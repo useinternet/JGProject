@@ -41,6 +41,9 @@
     <Filter Include="Data\Debug">
       <UniqueIdentifier>{687709f8-b916-4da9-915c-b2e705b22ab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Object">
+      <UniqueIdentifier>{51ac728c-8401-49a4-9f05-cbfdd357e36f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dllmain.cpp">
@@ -63,9 +66,6 @@
     </ClCompile>
     <ClCompile Include="source\DxCommon\MathHelper.cpp">
       <Filter>DxCommon</Filter>
-    </ClCompile>
-    <ClCompile Include="source\DxCore\DxCore.cpp">
-      <Filter>DxCore</Filter>
     </ClCompile>
     <ClCompile Include="d3dApp.cpp">
       <Filter>main</Filter>
@@ -172,6 +172,21 @@
     <ClCompile Include="source\DxCore\CommandListManager.cpp">
       <Filter>DxCore</Filter>
     </ClCompile>
+    <ClCompile Include="source\DxCore\DxDevice.cpp">
+      <Filter>DxCore</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DxCore\RootSignatureManager.cpp">
+      <Filter>DxCore</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Object\Object.cpp">
+      <Filter>Data\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Object\SceneObject.cpp">
+      <Filter>Data\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Data\Object\InstanceObject.cpp">
+      <Filter>Data\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">
@@ -200,12 +215,6 @@
     </ClInclude>
     <ClInclude Include="source\DxCommon\DxCommon.h">
       <Filter>DxCommon</Filter>
-    </ClInclude>
-    <ClInclude Include="source\DxCore\DxSetting.h">
-      <Filter>DxCore</Filter>
-    </ClInclude>
-    <ClInclude Include="source\DxCore\DxCore.h">
-      <Filter>DxCore</Filter>
     </ClInclude>
     <ClInclude Include="d3dApp.h">
       <Filter>main</Filter>
@@ -341,6 +350,27 @@
     </ClInclude>
     <ClInclude Include="source\DxCore\GpuCpuSynchronizer.h">
       <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\SceneConfig.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\DxDevice.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCore\RootSignatureManager.h">
+      <Filter>DxCore</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Object\Object.h">
+      <Filter>Data\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Object\ObjectState.h">
+      <Filter>Data\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Object\SceneObject.h">
+      <Filter>Data\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Data\Object\InstanceObject.h">
+      <Filter>Data\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

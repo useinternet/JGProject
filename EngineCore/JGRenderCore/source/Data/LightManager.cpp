@@ -7,7 +7,7 @@ using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 
-void LightManager::BuildLight(CommonShaderRootSignature* CommonSig)
+void LightManager::BuildLight()
 {
 	if (m_DirLight)
 		m_DirLight->Build();

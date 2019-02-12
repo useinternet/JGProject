@@ -1,5 +1,5 @@
 #include"Scene.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #include"SceneData.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
@@ -9,51 +9,39 @@
 #include"PostProcessing/SSAO.h"
 
 #include"JGLight.h"
+#include"JGRCObject.h"
+#include"Mesh/JGStaticMesh.h"
+#include"Mesh/JGSkeletalMesh.h"
+#include"LightManager.h"
+#include"JGMaterial.h"
 #include"CommonData.h"
 #include"ResourceManagement/ResourceReader.h"
 #include"Debug/DebugBox.h"
 #include"DxCore/CommandListManager.h"
 #include"DxCore/GpuCpuSynchronizer.h"
 #include"DxCore/ScreenManager.h"
+#include"DxCore/RootSignatureManager.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
 
-Scene::Scene(const string& name,
-	DxCore* core, ResourceManager* manager, CommandListManager* cmdManager,
-	ScreenManager* screenManager, GpuCpuSynchronizer* gcs)
+Scene::Scene(const string& name, const SceneConfig& config)
 {
 	m_Name = name;
-	m_DxCore = core;
-	m_ResourceManager = manager;
-	m_CmdListManager = cmdManager;
-	m_ScreenManager = screenManager;
-	m_GCS = gcs;
-
-
-	m_SceneConfig = core->GetSettingDesc();
+	m_DxDevice         = CommonData::_DxDevice();
+	m_ResourceManager = CommonData::_ResourceManager();
+	m_CmdListManager  = CommonData::_CmdListManager();
+	m_ScreenManager   = CommonData::_ScreenManager();
+	m_SceneConfig     = config;
 	// 각 씬 데이터 정적 멤버 초기화
-	InitStaticMemberVar();
-	// 프레임 리소스및 머터리얼 생성기 초기화
-	m_FrameResourceManager = make_unique<EngineFrameResourceManager>();
-
-	// 씬데이터 초기화 및 루트서명 / 씬 셰이더, pso 데이터 
+	ShadowMap(config.ShadowWidth, config.ShadowHeight);
 	m_SceneData = make_unique<SceneData>();
-	m_CommonShaderRootSig = make_unique<CommonShaderRootSignature>();
-	m_CommonShaderRootSig->RootSign(m_DxCore->Device());
-	m_CommonSkinnedShadeRootSig = make_unique<CommonSkinnedShaderRootSignature>();
-	m_CommonSkinnedShadeRootSig->RootSign(m_DxCore->Device());
-
+	m_LightManager = make_unique<LightManager>();
 
 
 	Shader SceneShader(global_scene_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
-
-	m_ScenePSO = SceneShader.CompileAndConstrutPSO(EPSOMode::SCENE, m_CommonShaderRootSig.get());
-
-
-
-	m_LightManager = make_unique<LightManager>();
-
+	m_ScenePSO = SceneShader.CompileAndConstrutPSO(
+		EPSOMode::SCENE, CommonData::_RootSigManager()->GetRootSig(ERootSigType::Common));
 
 	// 메인 패쓰 추가
 	m_MainPass = AddPassData();
@@ -62,8 +50,8 @@ Scene::Scene(const string& name,
 	auto MainCam = make_unique<Camera>();
 	MainCam->SetLens(4.0f / XM_PI,
 		(float)m_SceneConfig.Width / (float)m_SceneConfig.Height,
-		core->GetSettingDesc().NearZ,
-		core->GetSettingDesc().FarZ);
+		m_SceneConfig.NearZ,
+		m_SceneConfig.FarZ);
 
 	MainCam->UpdateViewMatrix();
 	m_MainCamera = MainCam.get();
@@ -80,11 +68,10 @@ void Scene::BuildScene()
 
 	// 씬 데이터 빌드
 	m_SceneData->BuildSceneData(m_SceneConfig.Width, m_SceneConfig.Height);
-	m_LightManager->BuildLight(m_CommonShaderRootSig.get());
+	m_LightManager->BuildLight();
 	// ssao 빌드
 	m_SSAO = make_unique<SSAO>();
-	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height,
-		CommandList, m_CommonShaderRootSig.get());
+	m_SSAO->BuildSSAO(m_SceneConfig.Width, m_SceneConfig.Height, CommandList);
 	m_Blur = make_unique<BlurFilter>(m_SceneConfig.Width, m_SceneConfig.Height);
 	// 오브젝트 분리
 	for (auto& obj : m_ObjectMems)
@@ -99,14 +86,6 @@ void Scene::BuildScene()
 	{
 		m_ResourceManager->AddTexture(CommandList, data.Path, data.Type);
 	}
-	// 각종 포스트 프로세싱 빌드
-	m_ResourceManager->BuildResourceManager(CommandList, m_CommonShaderRootSig.get());
-
-
-	m_FrameResourceManager->BuildFrameResource(m_DxCore->Device(), 
-		(UINT)max(1, m_ResourceManager->PassDataSize()), (UINT)max(1, m_ResourceManager->JGRCObjectSize() + 1),
-		(UINT)max(1, m_ResourceManager->JGMaterialSize()),
-		(UINT)max(1, m_LightManager->Size()));
 }
 void Scene::OnReSize(UINT width, UINT height)
 {
@@ -115,15 +94,9 @@ void Scene::OnReSize(UINT width, UINT height)
 }
 void Scene::Update(const GameTimer& gt)
 {
-	// 씬 설정 업데이트
-	m_SceneConfig = m_DxCore->GetSettingDesc();
-
 	// 메인 카메라 업데이트
 	m_MainCamera->UpdateViewMatrix();
-
-	m_FrameResourceManager->FrameResourcePerFrame(m_GCS->GetFence());
-
-	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
+	auto CurrFrameResource = CommonData::_EngineFrameResourceManager()->CurrentFrameResource();
 	m_SSAO->Update(CurrFrameResource);
 	// 오브젝트 업데이트
 	for (auto& obj : m_ObjectMems)
@@ -143,7 +116,7 @@ void Scene::Draw()
 {
 	// 각 명령 리스트 및 메모리 초기화
 	auto CommandList = m_CmdListManager->GetCommandList(0);
-	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
+	auto CurrFrameResource = CommonData::_EngineFrameResourceManager()->CurrentFrameResource();
 	auto CmdLisAlloc = CurrFrameResource->CmdListAlloc;
 	ThrowIfFailed(CmdLisAlloc->Reset());
 	ThrowIfFailed(CommandList->Reset(CmdLisAlloc.Get(), nullptr));
@@ -154,8 +127,8 @@ void Scene::Draw()
 	CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 
-
-	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
+	auto RootSig = CommonData::_RootSigManager()->GetRootSig(ERootSigType::Common);
+	CommandList->SetGraphicsRootSignature(RootSig->Get());
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
 		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
@@ -174,7 +147,7 @@ void Scene::Draw()
 
 
 
-	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
+	CommandList->SetGraphicsRootSignature(RootSig->Get());
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
 		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
 	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
@@ -213,11 +186,9 @@ void Scene::Draw()
 	CommandList->IASetIndexBuffer(nullptr);
 	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	CommandList->DrawInstanced(6, 1, 0, 0);
-	//m_Blur->Execute(m_DxCore->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
+	//m_Blur->Execute(m_DxDevice->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
 	// 마무리
 	m_ScreenManager->OutputScreen(m_Name, CommandList);
-
-	CurrFrameResource->Fence = m_GCS->GetOffset();
 }
 void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode, bool bDebug)
 {
@@ -282,7 +253,7 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	JGStaticMesh* SkyMesh = AddStaticMesh();
 	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
 	// 오브젝트 생성
-	JGRCObject* obj = CreateObject(SkyMat, SkyMesh,"Scene_SkyBox_Default_Mesh" );
+	JGRCObject* obj = CreateObject(SkyMat, SkyMesh,"Scene_SkyBox_Default_Mesh", EObjType::Static );
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
@@ -339,19 +310,14 @@ void Scene::AddTexture(const wstring& TexturePath, ETextureType type)
 {
 	m_TextureDatas.push_back(TexturePack{ move(TexturePath), nullptr, type });
 }
-void  Scene::SettingDefaultSceneBuffer(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource)
+JGRCObject*  Scene::GetMainSkyBox() const
 {
-	CommandList->SetGraphicsRootSignature(m_CommonShaderRootSig->GetRootSignature());
-	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvTexture,
-		m_ResourceManager->SrvHeap()->GetGPUDescriptorHandleForHeapStart());
-	CommandList->SetGraphicsRootDescriptorTable((UINT)ECommonShaderSlot::srvCubeMap,
-		m_ResourceManager->GetGPUCubeMapHandle());
-	auto MatCB = CurrFrameResource->MaterialCB->Resource();
-	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbMaterialData,
-		MatCB->GetGPUVirtualAddress());
-	auto LightCB = CurrFrameResource->LightCB->Resource();
-	CommandList->SetGraphicsRootShaderResourceView((UINT)ECommonShaderSlot::sbLightData,
-		LightCB->GetGPUVirtualAddress());
+	return m_MainSkyBox;
+}
+void         Scene::SetMainSkyBox(JGRCObject* skybox)
+{
+	if(skybox->GetMaterial()->GetDesc()->Mode == EPSOMode::SKYBOX) 	
+		m_MainSkyBox = skybox;
 }
 JGAnimation* Scene::GetAnimation(const string& name)
 {
@@ -363,18 +329,14 @@ SceneData* Scene::GetSceneData() const
 {
 	return m_SceneData.get();
 }
-CommonShaderRootSignature* Scene::GetRootSig()
+LightManager* Scene::GetLightManager()
 {
-	return m_CommonShaderRootSig.get();
-}
-CommonSkinnedShaderRootSignature* Scene::GetSkinnedRootSig()
-{
-	return m_CommonSkinnedShadeRootSig.get();
+	return m_LightManager.get();
 }
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
-	D3D12_GPU_VIRTUAL_ADDRESS Handle = m_FrameResourceManager->CurrentFrameResource()->PassCB->Resource()->GetGPUVirtualAddress();
+	D3D12_GPU_VIRTUAL_ADDRESS Handle = CommonData::_EngineFrameResourceManager()->CurrentFrameResource()->PassCB->Resource()->GetGPUVirtualAddress();
 	Handle += m_MainPass->PassCBIndex * passCBByteSize;
 	return Handle;
 }
@@ -384,7 +346,7 @@ std::vector<JGRCObject*>& Scene::GetArray(EObjType objType, EPSOMode mode)
 }
 void Scene::MainPassUpdate(const GameTimer& gt)
 {
-	auto CurrFrameResource = m_FrameResourceManager->CurrentFrameResource();
+	auto CurrFrameResource = CommonData::_EngineFrameResourceManager()->CurrentFrameResource();
 	XMMATRIX view = m_MainCamera->GetView();
 	XMMATRIX proj = m_MainCamera->GetProj();
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
@@ -430,9 +392,4 @@ void Scene::MainPassUpdate(const GameTimer& gt)
 			m_MainSkyBox->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
 	auto PassCB = CurrFrameResource->PassCB.get();
 	PassCB->CopyData(m_MainPass->PassCBIndex, m_MainPass->Data);
-}
-void Scene::InitStaticMemberVar()
-{
-	CommonData(m_DxCore, this, m_ResourceManager, m_ScreenManager);
-	ShadowMap(2048, 2048);
 }

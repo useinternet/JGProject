@@ -1,7 +1,9 @@
 #include"ShadowMap.h"
 #include"Data/Scene.h"
+#include"Data/JGRCObject.h"
 #include"Data/JGLight.h"
 #include"Data/CommonData.h"
+#include"Shader/CommonShaderRootSignature.h"
 #include"BlurFilter.h"
 using namespace std;
 using namespace JGRC;

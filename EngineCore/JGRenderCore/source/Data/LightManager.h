@@ -21,7 +21,7 @@ namespace JGRC
 	public:
 		LightManager()  = default;
 		~LightManager() = default;
-		void BuildLight(class CommonShaderRootSignature* CommonSig);
+		void BuildLight();
 		void Update(FrameResource* CurrFrameResource);
 		void DrawShadowMap(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource);
 

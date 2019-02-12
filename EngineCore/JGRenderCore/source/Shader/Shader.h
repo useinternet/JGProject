@@ -111,13 +111,13 @@ namespace JGRC
 		ComputeShader& operator=(const ComputeShader& rhs) = delete;
 	private:
 		const std::string Version = "5_1";
-		class DxCore* m_DxCore = nullptr;
+		class DxDevice* m_DxDevice = nullptr;
 		std::wstring m_ShaderPath;
 		std::unordered_map<std::string, ShaderBtCode> m_Shaders;
 		std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>>  m_PSOList;
 	public:
 		ComputeShader() = default;
-		void Init(DxCore* Core, ShaderRootSignatureBase* RootSig, const std::wstring& shaderPath,
+		void Init(DxDevice* Core, ShaderRootSignatureBase* RootSig, const std::wstring& shaderPath,
 			const std::vector<std::string>& functionName);
 		ID3D12PipelineState* GetPSO(const std::string& name);
 	private:

@@ -1,12 +1,14 @@
 #include"JGRenderCore.h"
-#include"DxCore.h"
+#include"DxDevice.h"
 #include"Data/Scene.h"
 #include"ResourceManagement/ResourceExtracter.h"
 #include"ResourceManagement/ResourceReader.h"
+#include"RootSignatureManager.h"
 #include"ScreenManager.h"
 #include"CommandListManager.h"
 #include"GpuCpuSynchronizer.h"
 #include"Data/CommonData.h"
+#include"Data/LightManager.h"
 using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace JGRC;
@@ -14,94 +16,79 @@ using namespace std;
 
 JGRenderCore::JGRenderCore()
 {
-	m_Synchronizer    = make_unique<GpuCpuSynchronizer>();
+	m_GCS             = make_unique<GpuCpuSynchronizer>();
 	m_CmdListManager  = make_unique<CommandListManager>();
 	m_ScreenManager   = make_unique<ScreenManager>();
 	m_ResourceManager = make_unique<ResourceManager>();
+	m_RootSigManager  = make_unique<RootSignatureManager>();
+	m_FrameResourceManager = make_unique<EngineFrameResourceManager>();
 }
-JGRenderCore::~JGRenderCore()
+bool JGRenderCore::CreateCore()
 {
-}
-
-bool JGRenderCore::Init(const DxSetting& set)
-{
-	m_DxCore = make_unique<DxCore>(set);
-	if (!m_DxCore->InitDirect3D())
+	m_DxDevice = make_unique<DxDevice>();
+	if (!m_DxDevice->CreateDevice())
 	{
 		// 예외 처리
 		return false;
 	}
-	
-	//ThrowIfFailed(m_DxCore->CommandList()->Reset(m_DxCore->CommandAllocator(), nullptr));
-	m_CmdListManager->CreateManager(m_DxCore->Device());
-	m_Synchronizer->CreateSynchronizer(m_DxCore->Device());
+	m_CmdListManager->CreateManager(m_DxDevice->Get());
+	m_GCS->CreateSynchronizer(m_DxDevice->Get());
 	m_ScreenManager->CreateManager(
-		m_DxCore->Factory(), 
+		m_DxDevice->Factory(), 
 		m_ResourceManager.get(), 
-		m_Synchronizer.get(),
+		m_GCS.get(),
 		m_CmdListManager.get());
-	m_ResourceManager->Init(m_DxCore.get());
-
+	m_ResourceManager->Init(m_DxDevice.get());
+	m_RootSigManager->CreateManager(m_DxDevice->Get());
 
 	m_CmdListManager->AddCommandList();
+	CommonData(
+		m_DxDevice.get(),
+		nullptr, 
+		m_ResourceManager.get(),
+		m_ScreenManager.get(),
+		m_CmdListManager.get(), 
+		m_GCS.get(),
+		m_RootSigManager.get(),
+		m_FrameResourceManager.get());
 	return true;
 }
-IF_Scene JGRenderCore::CreateScene(const string& SceneName, const DxSetting& set)
+IF_Scene JGRenderCore::CreateScene(const string& SceneName, const SceneConfig& set)
 {
-	if (m_Scenes.find(SceneName) != m_Scenes.end())
-		return IF_Scene(nullptr);
+	if (m_Scene)
+		return IF_Scene(m_Scene.get());
 
-	auto s = make_unique<Scene>(
-		SceneName,
-		m_DxCore.get(), 
-		m_ResourceManager.get(),
-		m_CmdListManager.get(),
-		m_ScreenManager.get(),
-		m_Synchronizer.get());
-	IF_Scene result(s.get());
-	m_Scenes[SceneName] = s.get();
-	m_SceneMems.push_back(move(s));
-
-
-	//
+	m_Scene = make_unique<Scene>(SceneName, set);
 	m_ScreenManager->AddSwapChain(SceneName, set.hWnd, set, m_CmdListManager.get(), 0);
-
-	return result;
+	CommonData::RegisterScene(m_Scene.get());
+	return IF_Scene(m_Scene.get());
 }
-IF_Scene JGRenderCore::GetScene(const string& SceneName)
+IF_Scene JGRenderCore::GetScene()
 {
-	if (m_Scenes.find(SceneName) == m_Scenes.end())
-		return IF_Scene(nullptr);
-	return m_Scenes[SceneName];
+	return IF_Scene(m_Scene.get());
 }
 void JGRenderCore::Build(const GameTimer& gt)
 {
-	for (auto& s : m_SceneMems)
-	{
-		s->BuildScene();
-	}
+	m_Scene->BuildScene();
+	m_ResourceManager->BuildResourceManager(m_CmdListManager->GetCommandList(0));
+	m_FrameResourceManager->BuildFrameResource(m_DxDevice->Get(),
+		(UINT)max(1, m_ResourceManager->PassDataSize()), (UINT)max(1, m_ResourceManager->JGRCObjectSize() + 1),
+		(UINT)max(1, m_ResourceManager->JGMaterialSize()),
+		(UINT)max(1, m_Scene->GetLightManager()->Size()));
 	// 명령 리스트&큐  초기화
 	m_CmdListManager->ExcuteCommandLists();
-	//ThrowIfFailed(m_DxCore->CommandList()->Close());
-	//ID3D12CommandList* cmdsList[] = { m_DxCore->CommandList() };
-	//m_DxCore->CommandQueue()->ExecuteCommandLists(_countof(cmdsList), cmdsList);
 
 
-	for (auto& s : m_SceneMems)
+	for (int i = 0; i < CPU_FRAMERESOURCE_NUM; ++i)
 	{
-		for (int i = 0; i < CPU_FRAMERESOURCE_NUM; ++i)
-		{
-			s->Update(gt);
-			s->Draw();
-		}
+		Update(gt);
+		Draw();
 	}
 }
 void JGRenderCore::Update(const GameTimer& gt)
 {
-	for (auto& s : m_SceneMems)
-	{
-		s->Update(gt);
-	}
+	m_FrameResourceManager->FrameResourcePerFrame(m_GCS->GetFence());
+	m_Scene->Update(gt);
 }
 void JGRenderCore::ReSize(int width, int height)
 {
@@ -109,8 +96,6 @@ void JGRenderCore::ReSize(int width, int height)
 }
 void JGRenderCore::Draw()
 {
-	for (auto& s : m_SceneMems)
-	{
-		s->Draw();
-	}
+	m_Scene->Draw();
+	m_FrameResourceManager->CurrentFrameResource()->Fence = m_GCS->GetOffset();
 }

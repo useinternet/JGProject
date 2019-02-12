@@ -1,7 +1,7 @@
 #pragma once
 
 #include"DxCommon/DxCommon.h"
-#include"DxSetting.h"
+#include"SceneConfig.h"
 namespace JGRC
 {
 	class CommandListManager;
@@ -38,7 +38,7 @@ namespace JGRC
 		void AddSwapChain(
 			const std::string& name,
 			HWND hWnd,
-			const DxSetting& set,
+			const SceneConfig& set,
 			CommandListManager* CmdListManager,
 			UINT CmdIndex);
 		void ReadyScreen(const std::string& name, ID3D12GraphicsCommandList* CmdList);
@@ -46,8 +46,8 @@ namespace JGRC
 		ScreenData& GetScreenData(const std::string& name);
 		const ScreenData& GetScreenData(const std::string& name) const;
 	private:
-		DXGI_SWAP_CHAIN_DESC GetSwapChainDesc(const DxSetting& set);
-		D3D12_RESOURCE_DESC GetDepthResourceDesc(const DxSetting& set);
+		DXGI_SWAP_CHAIN_DESC GetSwapChainDesc(const SceneConfig& set);
+		D3D12_RESOURCE_DESC GetDepthResourceDesc(const SceneConfig& set);
 		D3D12_DEPTH_STENCIL_VIEW_DESC GetDepthViewDesc();
 	};
 }

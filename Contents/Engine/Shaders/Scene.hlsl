@@ -114,8 +114,7 @@ float4 PS(VS_OUT pin) : SV_Target
             lod = matData.Roughness * 7 + 3.0f;
         }
         float3 reflection = gCubeMap[gSkyBoxIndex].SampleLevel(gsamLinearWrap, R, lod);
-      //  float2 envBRDF = IntegrateBRDF(max(dot(N, V), 0.0), matData.Roughness);
-        float3 specular = saturate(reflection * F); //* envBRDF.x + envBRDF.y));
+        float3 specular = saturate(reflection * F); 
         ambient.rgb = saturate((kd * Data.Albedo.rgb));
 
         float3 finalColor = ambient.rgb * ao + saturate(result) + specular;

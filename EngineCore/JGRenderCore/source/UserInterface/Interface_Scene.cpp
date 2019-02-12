@@ -1,5 +1,10 @@
 #include"Interface_Scene.h"
 #include"Data/Scene.h"
+#include"Data/JGRCObject.h"
+#include"Data/JGMaterial.h"
+#include"Data/JGLight.h"
+#include"Data/Mesh/JGSkeletalMesh.h"
+#include"Data/Mesh/JGStaticMesh.h"
 #include"ResourceManagement/ResourceExtracter.h"
 using namespace JGRC;
 using namespace std;
@@ -10,7 +15,7 @@ IF_Object Interface_Scene::CreateObject(const IF_Material& mat, const IF_Mesh& m
 	switch (type)
 	{
 	case E_IF_ObjType::Static:
-		obj = m_Data->CreateObject(mat.m_Data, mesh.m_Data, meshname);
+		obj = m_Data->CreateObject(mat.m_Data, mesh.m_Data, meshname, EObjType::Static);
 		break;
 	case E_IF_ObjType::Dynamic:
 		obj = m_Data->CreateObject(mat.m_Data, mesh.m_Data, meshname, EObjType::Dynamic);
@@ -40,15 +45,15 @@ IF_SkeletalMesh   Interface_Scene::AddSkeletalMesh()
 }
 IF_DirectionLight Interface_Scene::AddDirLight()
 {
-	return IF_DirectionLight(m_Data->AddLight(ELightType::Direction));
+	return IF_DirectionLight(m_Data->AddLight(ELightType::Direction, ELightExercise::Static));
 }
 IF_PointLight     Interface_Scene::AddPointLight()
 {
-	return IF_PointLight(m_Data->AddLight(ELightType::Point));
+	return IF_PointLight(m_Data->AddLight(ELightType::Point, ELightExercise::Static));
 }
 IF_SpotLight      Interface_Scene::AddSpotLight()
 {
-	return IF_SpotLight(m_Data->AddLight(ELightType::Spot));
+	return IF_SpotLight(m_Data->AddLight(ELightType::Spot, ELightExercise::Static));
 }
 IF_Camera         Interface_Scene::AddCamera()
 {

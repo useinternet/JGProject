@@ -1,5 +1,5 @@
 #include "BlurFilter.h"
-#include "DxCore/DxCore.h"
+#include "DxCore/DxDevice.h"
 #include"Shader/BlurShaderRootSignature.h"
 #include"Shader/Shader.h"
 #include"Data/CommonData.h"
@@ -16,7 +16,7 @@ BlurFilter::BlurFilter(UINT width, UINT height)
 	m_RootSig = make_unique<BlurShaderRootSignature>();
 	m_RootSig->RootSign(CommonData::_Device());
 	m_Shader = make_unique<ComputeShader>();
-	m_Shader->Init(CommonData::_Core(), m_RootSig.get(), global_blur_hlsl_path, { "VertBlurCS","HorzBlurCS" });
+	m_Shader->Init(CommonData::_DxDevice(), m_RootSig.get(), global_blur_hlsl_path, { "VertBlurCS","HorzBlurCS" });
 
 
 
@@ -60,7 +60,7 @@ BlurFilter::BlurFilter(UINT width, UINT height, const BlurFilterDesc& desc)
 	m_RootSig = make_unique<BlurShaderRootSignature>();
 	m_RootSig->RootSign(CommonData::_Device());
 	m_Shader = make_unique<ComputeShader>();
-	m_Shader->Init(CommonData::_Core(), m_RootSig.get(), global_blur_hlsl_path, { "VertBlurCS","HorzBlurCS" });
+	m_Shader->Init(CommonData::_DxDevice(), m_RootSig.get(), global_blur_hlsl_path, { "VertBlurCS","HorzBlurCS" });
 
 	ZeroMemory(&m_ResourceDesc, sizeof(D3D12_RESOURCE_DESC));
 	BuildResource();

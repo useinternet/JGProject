@@ -8,6 +8,7 @@
 #include"PostProcessing/CubeMap.h"
 #include"CommonData.h"
 #include"Animation/JGAnimation.h"
+#include"DxCore/RootSignatureManager.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -22,7 +23,7 @@ JGRCObject::JGRCObject(UINT Index, EObjType Type, const string& name)
 	UpdateWorldMatrix();
 	Count++;
 }
-void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RoogSig)
+void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList)
 {	
 	m_bInit = true;
 
@@ -47,7 +48,7 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootS
 		m_PSOPack.CompilePSO(
 			m_Material->GetDesc()->ShaderPath,
 			m_Material->GetDesc()->Mode, 
-			CommonData::_Scene()->GetSkinnedRootSig(),
+			CommonData::_RootSigManager()->GetRootSig(ERootSigType::CommonSkinned),
 			flag);
 
 		m_SkinnedCBIndex = (UINT)SkinnedIndex++;
@@ -60,7 +61,7 @@ void JGRCObject::Build(ID3D12GraphicsCommandList* CommandList, CommonShaderRootS
 		m_PSOPack.CompilePSO(
 			m_Material->GetDesc()->ShaderPath,
 			m_Material->GetDesc()->Mode, 
-			CommonData::_Scene()->GetRootSig(),
+			CommonData::_RootSigManager()->GetRootSig(ERootSigType::Common),
 			flag);
 	}
 }

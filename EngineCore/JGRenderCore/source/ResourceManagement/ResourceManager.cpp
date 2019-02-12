@@ -4,17 +4,17 @@
 #include"Data/Mesh/JGBaseMesh.h"
 #include"Data/Mesh/JGSkeletalMesh.h"
 #include"Data/Mesh/JGStaticMesh.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #include"Shader/CommonShaderRootSignature.h"
 using namespace JGRC;
 using namespace std;
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-void ResourceManager::Init(DxCore* core)
+void ResourceManager::Init(DxDevice* core)
 {
-	m_Core = core;
-	m_Device = core->Device();
+	m_DxDevice = core;
+	m_Device = core->Get();
 }
 ID3D12Resource* ResourceManager::BuildResource(D3D12_RESOURCE_DESC* desc, const ResourceFlagPack& Pack,
 	D3D12_CLEAR_VALUE* ClearValue)
@@ -324,16 +324,16 @@ DepthStencilViewPack* ResourceManager::SetDsv(const string& name, ID3D12Resource
 	m_DepthStencilViews[name].RenderResource = RenderResource;
 	return &m_DepthStencilViews[name];
 }
-void ResourceManager::BuildResourceManager(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig)
+void ResourceManager::BuildResourceManager(ID3D12GraphicsCommandList* CommandList)
 {
-	BuildResourceData(CommandList, RootSig);
+	BuildResourceData(CommandList);
 	BuildResourceHeap();
 }
-void ResourceManager::BuildResourceData(ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig)
+void ResourceManager::BuildResourceData(ID3D12GraphicsCommandList* CommandList)
 {
 	for (auto& obj : m_JGRCObjectMems)
 	{
-		obj->Build(CommandList, RootSig);
+		obj->Build(CommandList);
 	}
 	for (auto& mesh : m_MeshMems)
 		mesh->CreateMesh(CommandList);
@@ -568,27 +568,27 @@ UINT ResourceManager::GetCubeTextureShaderIndex(const std::wstring& name)
 CD3DX12_GPU_DESCRIPTOR_HANDLE ResourceManager::GetGPUSrvUavHandle(const UINT HeapIndex)
 {
 	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-	handle.Offset(HeapIndex, m_Core->CbvSrvUavDescriptorSize());
+	handle.Offset(HeapIndex, m_DxDevice->CbvSrvUavDescriptorSize());
 
 	return handle;
 }
 CD3DX12_CPU_DESCRIPTOR_HANDLE ResourceManager::GetCPUSrvUavHandle(const UINT HeapIndex)
 {
 	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(m_SrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-	handle.Offset(HeapIndex, m_Core->CbvSrvUavDescriptorSize());
+	handle.Offset(HeapIndex, m_DxDevice->CbvSrvUavDescriptorSize());
 
 	return handle;
 }
 CD3DX12_CPU_DESCRIPTOR_HANDLE ResourceManager::GetCPURtvHandle(UINT HeapIndex)
 {
 	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-	handle.Offset(HeapIndex, m_Core->RtvDescriptorSize());
+	handle.Offset(HeapIndex, m_DxDevice->RtvDescriptorSize());
 	return handle;
 }
 CD3DX12_CPU_DESCRIPTOR_HANDLE ResourceManager::GetCPUDsvHandle(UINT HeapIndex)
 {
 	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(m_DsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-	handle.Offset(HeapIndex, m_Core->DsvDescriptorSize());
+	handle.Offset(HeapIndex, m_DxDevice->DsvDescriptorSize());
 	return handle;
 }
 CD3DX12_GPU_DESCRIPTOR_HANDLE ResourceManager::GetGPUTexture2DHandle()

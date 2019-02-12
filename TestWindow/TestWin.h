@@ -1,7 +1,7 @@
 #pragma once
 #include"../d3dApp.h"
 #include"DxCore/JGRenderCore.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #ifdef _DEBUG
 #pragma comment(lib,"JGRenderCore_d.lib")
 #else

@@ -4,9 +4,7 @@
 
 namespace JGRC
 {
-	typedef GeometryGenerator::Vertex        Vertex;
-	typedef std::vector<Vertex>              MeshVertex;
-	typedef std::vector<std::uint32_t>       MeshIndex;
+
 
 	class RCORE_EXPORT JGStaticMesh : public JGBaseMesh
 	{

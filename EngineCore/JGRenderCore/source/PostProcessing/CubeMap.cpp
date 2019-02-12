@@ -1,11 +1,12 @@
 #include"CubeMap.h"
-#include"DxCore/DxCore.h"
-#include"BlurFilter.h"
+#include"DxCore/DxDevice.h"
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/Shader.h"
 #include"Data/Scene.h"
 #include"Data/CommonData.h"
 #include"Data/SceneData.h"
+#include"Data/JGRCObject.h"
+#include"Data/JGMaterial.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;

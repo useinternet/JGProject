@@ -2,6 +2,7 @@
 #include"DxCommon/DxCommon.h"
 namespace JGRC
 {
+	class Scene;
 	class RCORE_EXPORT CubeMap
 	{
 		CubeMap(const CubeMap& rhs) = delete;

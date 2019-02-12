@@ -37,7 +37,7 @@ namespace JGRC
 			RootSignature();
 			SetInputLayout(m_InputLayout);
 		}
-		ID3D12RootSignature* GetRootSignature() const  { return m_RootSignature.Get(); }
+		ID3D12RootSignature* Get() const  { return m_RootSignature.Get(); }
 		D3D12_INPUT_ELEMENT_DESC* GetInputLayoutData() { 
 			if(m_InputLayout.empty())  
 				return nullptr; 

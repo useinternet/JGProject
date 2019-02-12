@@ -31,6 +31,9 @@
     <ClCompile Include="source\Data\LightManager.cpp" />
     <ClCompile Include="source\Data\Mesh\JGSkeletalMesh.cpp" />
     <ClCompile Include="source\Data\Mesh\JGStaticMesh.cpp" />
+    <ClCompile Include="source\Data\Object\InstanceObject.cpp" />
+    <ClCompile Include="source\Data\Object\Object.cpp" />
+    <ClCompile Include="source\Data\Object\SceneObject.cpp" />
     <ClCompile Include="source\Data\Scene.cpp" />
     <ClCompile Include="source\Data\SceneData.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
@@ -42,8 +45,9 @@
     <ClCompile Include="source\DxCommon\MathHelper.cpp" />
     <ClCompile Include="source\DxCommon\ModelLoader.cpp" />
     <ClCompile Include="source\DxCore\CommandListManager.cpp" />
-    <ClCompile Include="source\DxCore\DxCore.cpp" />
+    <ClCompile Include="source\DxCore\DxDevice.cpp" />
     <ClCompile Include="source\DxCore\JGRenderCore.cpp" />
+    <ClCompile Include="source\DxCore\RootSignatureManager.cpp" />
     <ClCompile Include="source\DxCore\ScreenManager.cpp" />
     <ClCompile Include="source\PostProcessing\BlurFilter.cpp" />
     <ClCompile Include="source\PostProcessing\CubeMap.cpp" />
@@ -77,6 +81,10 @@
     <ClInclude Include="source\Data\Mesh\JGBaseMesh.h" />
     <ClInclude Include="source\Data\Mesh\JGSkeletalMesh.h" />
     <ClInclude Include="source\Data\Mesh\JGStaticMesh.h" />
+    <ClInclude Include="source\Data\Object\InstanceObject.h" />
+    <ClInclude Include="source\Data\Object\Object.h" />
+    <ClInclude Include="source\Data\Object\ObjectState.h" />
+    <ClInclude Include="source\Data\Object\SceneObject.h" />
     <ClInclude Include="source\Data\Octree.h" />
     <ClInclude Include="source\Data\Scene.h" />
     <ClInclude Include="source\Data\SceneData.h" />
@@ -91,11 +99,12 @@
     <ClInclude Include="source\DxCommon\ModelLoader.h" />
     <ClInclude Include="source\DxCommon\UploadBuffer.h" />
     <ClInclude Include="source\DxCore\CommandListManager.h" />
-    <ClInclude Include="source\DxCore\DxCore.h" />
+    <ClInclude Include="source\DxCore\DxDevice.h" />
     <ClInclude Include="source\DxCore\EnginePipeLineStateDescList.h" />
     <ClInclude Include="source\DxCore\GpuCpuSynchronizer.h" />
     <ClInclude Include="source\DxCore\JGRenderCore.h" />
-    <ClInclude Include="source\DxCore\DxSetting.h" />
+    <ClInclude Include="source\DxCore\RootSignatureManager.h" />
+    <ClInclude Include="source\DxCore\SceneConfig.h" />
     <ClInclude Include="source\DxCore\RenderItem.h" />
     <ClInclude Include="source\DxCore\ScreenManager.h" />
     <ClInclude Include="source\PostProcessing\BlurFilter.h" />

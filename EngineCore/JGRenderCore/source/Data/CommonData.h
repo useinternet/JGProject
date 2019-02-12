@@ -9,20 +9,40 @@ namespace JGRC
 {
 	class Scene;
 	class ScreenManager;
-	class DxCore;
+	class GpuCpuSynchronizer;
+	class CommandListManager;
+	class DxDevice;
+	class RootSignatureManager;
 	class RCORE_EXPORT CommonData
 	{
 	protected:
-		static Scene*     m_Scene;
-		static DxCore*    m_DxCore;
-		static ScreenManager* m_ScreenManager;
-		static ResourceManager* m_ResourceManager;
+		static Scene*                m_Scene;
+		static DxDevice*             m_DxDevice;
+		static ScreenManager*        m_ScreenManager;
+		static ResourceManager*      m_ResourceManager;
+		static CommandListManager*   m_CommandListManager;
+		static GpuCpuSynchronizer*   m_GCS;
+		static RootSignatureManager* m_RootSigManager;
+		static EngineFrameResourceManager* m_EngineFrameResourceManager;
 	public:
-		CommonData(DxCore* core, Scene* scene, ResourceManager* manager, ScreenManager* screen);
+		CommonData(
+			DxDevice* core,
+			Scene* scene, 
+			ResourceManager* manager,
+			ScreenManager* screen,
+			CommandListManager* cmdManager,
+			GpuCpuSynchronizer* gcs, 
+			RootSignatureManager* RootSigManager,
+			EngineFrameResourceManager* EFRsManager);
 	public:
+		static void RegisterScene(Scene* scene);
 		static Scene* _Scene();
-		static DxCore* _Core();
+		static DxDevice* _DxDevice();
 		static ScreenManager* _ScreenManager();
 		static ResourceManager* _ResourceManager();
+		static CommandListManager* _CmdListManager();
+		static GpuCpuSynchronizer* _GCSynchronizer();
+		static RootSignatureManager* _RootSigManager();
+		static EngineFrameResourceManager* _EngineFrameResourceManager();
 	};
 }

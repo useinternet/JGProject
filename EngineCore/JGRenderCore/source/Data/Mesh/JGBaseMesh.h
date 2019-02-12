@@ -52,4 +52,42 @@ namespace JGRC
 		const std::vector<std::string>& GetArgNames() const  { return m_MeshArgNames; }
 		UINT  GetArgCount() const { return (UINT)m_MeshData->DrawArgs.size(); }
 	};
+
+	typedef GeometryGenerator::Vertex        Vertex;
+	typedef std::vector<Vertex>              MeshVertex;
+	typedef std::vector<std::uint32_t>       MeshIndex;
+	typedef GeometryGenerator::SkinnedVertex SkeletalVertex;
+	typedef std::vector<SkeletalVertex>      SkeletalMeshVertex;
+	typedef std::vector<std::uint32_t>       SkeletalMeshIndex;
+	struct RCORE_EXPORT JGBoneData
+	{
+		std::string Name;
+		int        Index = -1;
+		DirectX::XMFLOAT4X4 Offset = MathHelper::Identity4x4();
+	};
+	struct RCORE_EXPORT JGBoneNode
+	{
+		// Static 메모리 할당에도 불구하고 시스템 종료전에 할당이 해제된다.. 이유가 뭘까..
+	private:
+		static std::vector<std::unique_ptr<JGBoneNode>> BoneMemNodes;
+	public:
+		static JGBoneNode* CreateNode()
+		{
+			auto node = std::make_unique<JGBoneNode>();
+			JGBoneNode* result = node.get();
+			BoneMemNodes.push_back(move(node));
+			return result;
+		}
+	public:
+		JGBoneData  Data;
+		int        NodeIndex = -1;
+		JGBoneNode* Parent = nullptr;
+		std::vector<JGBoneNode*> Child;
+		bool bExist = false;
+		DirectX::XMFLOAT4X4 Transform = MathHelper::Identity4x4();
+	public:
+		JGBoneNode() = default;
+		JGBoneNode(const JGBoneNode& copy) = delete;
+		JGBoneNode& operator=(const JGBoneNode& copy) = delete;
+	};
 }

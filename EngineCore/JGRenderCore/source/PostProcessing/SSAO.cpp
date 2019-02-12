@@ -1,11 +1,13 @@
 #include"SSAO.h"
 #include"Data/Scene.h"
-#include"DxCore/DxCore.h"
+#include"DxCore/DxDevice.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/SSAOShaderRootSignature.h"
 #include"Data/CommonData.h"
+#include"Data/JGRCObject.h"
 #include"DxCore/ScreenManager.h"
+#include"DxCore/RootSignatureManager.h"
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
@@ -14,11 +16,11 @@ SSAO::SSAO()
 {
 
 }
-void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList, CommonShaderRootSignature* RootSig)
+void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* CommandList)
 {
 	m_Width = width;
 	m_Height = height;
-	m_SSAOCB = make_unique<UploadBuffer<SSAOData>>(CommonData::_Core()->Device(), 1, true);
+	m_SSAOCB = make_unique<UploadBuffer<SSAOData>>(CommonData::_DxDevice()->Get(), 1, true);
 	
 	m_Viewport = { 0.0f,0.0f,(float)m_Width, (float)m_Height,0.0f,1.0f };
 	m_ScissorRect = { 0,0,(int)m_Width, (int)m_Height };
@@ -27,16 +29,12 @@ void SSAO::BuildSSAO(UINT width, UINT height, ID3D12GraphicsCommandList* Command
 	BuildResource(CommandList);
 	BuildDescriptor();
 
-	m_SSAORootSig = make_unique<SSAOShaderRootSignature>();
-	m_SSAORootSig->RootSign(CommonData::_Core()->Device());
-
 	Shader SSAOShader(global_ssao_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
-	m_SSAOPSO = SSAOShader.CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get());
-
-
-
+	m_SSAOPSO = SSAOShader.CompileAndConstrutPSO(
+		EPSOMode::SSAO, CommonData::_RootSigManager()->GetRootSig(ERootSigType::SSAO));
 	Shader SSAOBlurShader(global_ssaoblur_hlsl_path, { EShaderType::Vertex, EShaderType::Pixel });
-	m_SSAOBlurPSO = SSAOBlurShader.CompileAndConstrutPSO(EPSOMode::SSAO, m_SSAORootSig.get());
+	m_SSAOBlurPSO = SSAOBlurShader.CompileAndConstrutPSO(
+		EPSOMode::SSAO, CommonData::_RootSigManager()->GetRootSig(ERootSigType::SSAO));
 }
 
 void SSAO::OnReSize(UINT width, UINT height)
@@ -309,7 +307,8 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 }
 void SSAO::DrawSSAO(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList* CommandList)
 {
-	CommandList->SetGraphicsRootSignature(m_SSAORootSig->GetRootSignature());
+	auto RootSig = CommonData::_RootSigManager()->GetRootSig(ERootSigType::SSAO);
+	CommandList->SetGraphicsRootSignature(RootSig->Get());
 	CommandList->RSSetViewports(1, &m_SSAOViewport);
 	CommandList->RSSetScissorRects(1, &m_SSAOScissorRect);
 

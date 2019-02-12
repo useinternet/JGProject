@@ -1,38 +1,35 @@
 #pragma once
 #include"DxCommon/DxCommon.h"
-#include"DxSetting.h"
+#include"SceneConfig.h"
 #include"UserInterface/Interface_Scene.h"
 class Camera;
-
-
-// 인스턴스 로직 고민
-// 판별 후 -> 판별 된 것만 업데이트(UpdateNotify -- 추가 )
 namespace JGRC
 {
-	class DxCore;
+	class DxDevice;
 	class Scene;
 	class ScreenManager;
 	class GpuCpuSynchronizer;
 	class CommandListManager;
+	class RootSignatureManager;
 	class RCORE_EXPORT JGRenderCore
 	{
 	private:
-		std::unique_ptr<DxCore>      m_DxCore;
-		std::unique_ptr<ScreenManager> m_ScreenManager;
-		std::unique_ptr<GpuCpuSynchronizer> m_Synchronizer;
-		std::unique_ptr<CommandListManager> m_CmdListManager;
-		std::unique_ptr<ResourceManager>    m_ResourceManager;
-		std::vector<std::unique_ptr<Scene>> m_SceneMems;
-		std::unordered_map<std::string, Scene*> m_Scenes;
+		std::shared_ptr<DxDevice>                   m_DxDevice;
+		std::shared_ptr<ScreenManager>              m_ScreenManager;
+		std::shared_ptr<GpuCpuSynchronizer>         m_GCS;
+		std::shared_ptr<CommandListManager>         m_CmdListManager;
+		std::shared_ptr<ResourceManager>            m_ResourceManager;
+		std::shared_ptr<RootSignatureManager>       m_RootSigManager;
+		std::shared_ptr<EngineFrameResourceManager> m_FrameResourceManager;
+		std::shared_ptr<Scene> m_Scene;
 	private:
 		JGRenderCore(const JGRenderCore& copy) = delete;
 		JGRenderCore& operator=(const JGRenderCore& copy) = delete;
 	public:
 		JGRenderCore();
-		~JGRenderCore();
-		bool Init(const DxSetting& set);
-		IF_Scene CreateScene(const std::string& SceneName, const DxSetting& set);
-		IF_Scene GetScene(const std::string& SceneName);
+		bool CreateCore();
+		IF_Scene CreateScene(const std::string& SceneName, const SceneConfig& set);
+		IF_Scene GetScene();
 		void Build(const GameTimer& gt);
 		void Update(const GameTimer& Timer);
 		void ReSize(int width, int height);
