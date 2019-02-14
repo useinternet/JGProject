@@ -48,52 +48,56 @@ bool TestWindow::Initialize()
 	Desc.Name = "GridMat";
 	Desc.ShaderPath = L"../Contents/Engine/Shaders/Default.hlsl";
 	IF_Material GridMat = scene->AddMaterial(Desc);
-	GridMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	GridMat->SetFresnelR0(0.25f, 0.25f, 0.25f);
-	GridMat->SetRoughness(0.95f);
 	GridMat->SetTexture(ETextureSlot::Diffuse, L"../Contents/Engine/Textures/bricks2.dds");
 	GridMat->SetTexture(ETextureSlot::Normal, L"../Contents/Engine/Textures/bricks2_nmap.dds");
+	IF_MaterialData GridMatData = GridMat->AddData("GridMatData");
+	GridMatData->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
+	GridMatData->SetFresnelR0(0.25f, 0.25f, 0.25f);
+	GridMatData->SetRoughness(0.95f);
+	
 	std::string AnimKey = scene->AddAnimation("../Contents/JGUser/mixamo.com.jganimation");
 	Desc.Name = "AnimMat";
 	IF_Material AnimMat = scene->AddMaterial(Desc);
-	AnimMat->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	AnimMat->SetRoughness(0.5f);
-	AnimMat->SetMetalic(1.0f);
+	IF_MaterialData AnimMatData = AnimMat->AddData("AnimMatData");
+	AnimMatData->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
+	AnimMatData->SetRoughness(0.5f);
+	AnimMatData->SetMetalic(1.0f);
+	IF_MaterialData AnimMatData2 = AnimMat->AddData("AnimMatData2");
+	AnimMatData2->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
+	AnimMatData2->SetRoughness(0.5f);
+	AnimMatData2->SetMetalic(0.0f);
 
-	Desc.Name = "AnimMat2";
-	IF_Material AnimMat2 = scene->AddMaterial(Desc);
-	AnimMat2->SetDiffuseAlbedo(1.0f, 1.0f, 1.0f, 1.0f);
-	AnimMat2->SetRoughness(0.5f);
-	AnimMat2->SetMetalic(0.0f);
-	IF_Material TestMat[10][10];
+	Desc.Name = "TestMat";
+	IF_Material TestMat = scene->AddMaterial(Desc);
+
+	IF_MaterialData TestMatData[10][10];
 	for (int i = 0; i < 10; ++i)
 	{
 		for (int j = 0; j < 10; ++j)
 		{
-			Desc.Name = "TestMat" + std::to_string(i) + std::to_string(j);
-			TestMat[i][j] = scene->AddMaterial(Desc);
-			TestMat[i][j]->SetDiffuseAlbedo(1.0f, 0.0f, 0.0f, 1.0f);
-			TestMat[i][j]->SetFresnelR0(1.0f, 1.0f, 1.0f);
-			TestMat[i][j]->SetRoughness((float)i /10.0f);
-			TestMat[i][j]->SetMetalic((float)j / 10);
+			TestMatData[i][j] = TestMat->AddData("TestMatData" + std::to_string(i) + std::to_string(j));
+			TestMatData[i][j]->SetDiffuseAlbedo(1.0f, 0.0f, 0.0f, 1.0f);
+			TestMatData[i][j]->SetFresnelR0(1.0f, 1.0f, 1.0f);
+			TestMatData[i][j]->SetRoughness((float)i /10.0f);
+			TestMatData[i][j]->SetMetalic((float)j / 10);
 		}
 	}
 
 	// 메시 추가
-	IF_StaticMesh gridMesh = scene->AddStaticMesh();
+	IF_StaticMesh gridMesh = scene->AddStaticMesh("GridMesh");
 	gridMesh->AddGridArg("Grid", 500.0f, 500.0f, 300, 300);
 	gridMesh->AddSphereArg("TestSphere", 10.0f, 3);
-	IF_SkeletalMesh animMesh = scene->AddSkeletalMesh();
+	IF_SkeletalMesh animMesh = scene->AddSkeletalMesh("AnimMesh");
 	animMesh->AddSkeletalMeshArg("../Contents/JGUser/Beta_Surface.jgskeletalmesh");
 	animMesh->AddSkeletalMeshArg("../Contents/JGUser/Beta_Joints.jgskeletalmesh");
 	// 오브젝트 추가
-	IF_Object GridObj = scene->CreateObject(GridMat, gridMesh, "Grid");
-	IF_Object AnimObj = scene->CreateObject(AnimMat2, animMesh, "../Contents/JGUser/Beta_Surface.jgskeletalmesh");
+	IF_Object GridObj = scene->CreateObject("GridObj", GridMat, GridMatData, gridMesh, "Grid");
+	IF_Object AnimObj = scene->CreateObject("AnimObj", AnimMat, AnimMatData2, animMesh, "../Contents/JGUser/Beta_Surface.jgskeletalmesh", E_IF_ObjType::Dynamic);
 	AnimObj->SetLocation(0.0f, 0.0f, -200.0f);
 	AnimObj->SetRotation(0.0f, 0.0f, 0.0f);
 	AnimObj->SetAnimation(AnimKey);
 
-	IF_Object AnimObj2 = scene->CreateObject(AnimMat, animMesh, "../Contents/JGUser/Beta_Joints.jgskeletalmesh");
+	IF_Object AnimObj2 = scene->CreateObject("AnimObj2", AnimMat, AnimMatData, animMesh, "../Contents/JGUser/Beta_Joints.jgskeletalmesh", E_IF_ObjType::Dynamic);
 	AnimObj->AttachTo(AnimObj2);
 	AnimObj2->SetAnimation(AnimKey);
 
@@ -105,7 +109,8 @@ bool TestWindow::Initialize()
 	{
 		for (int j = 0; j < 10; ++j)
 		{
-			TestObj[i][j] = scene->CreateObject(TestMat[i][j], gridMesh, "TestSphere");
+			TestObj[i][j] = scene->CreateObject("TestObj" + std::to_string(i) + std::to_string(j),
+				TestMat, TestMatData[i][j], gridMesh, "TestSphere");
 			TestObj[i][j]->SetLocation(i * 25.0f - 125.0f, j * 25.0f + 25.0f, 0.0f);
 			scene->DebugBox(TestObj[i][j], { 0.0f,0.0f,0.0f }, 0.5f);
 		}
@@ -114,17 +119,6 @@ bool TestWindow::Initialize()
 	IF_DirectionLight dirLight = scene->AddDirLight();
 	dirLight->SetLightColor(0.88f, 0.88f, 0.95f);
 	dirLight->SetDirection(1.0f, -1.0f, 1.0f);
-	IF_PointLight pLight = scene->AddPointLight();
-	pLight->SetFalloffStart(100.0f);
-	pLight->SetFalloffEnd(110.0f);
-	pLight->SetLightColor(0.0f, 2.0f, 2.0f);
-	pLight->SetLocation(0.0f, 10.0f, -50.0f);
-	IF_SpotLight sLight = scene->AddSpotLight();
-	sLight->SetLocation(0.0f, 50.0f, 10.0f);
-	sLight->SetDirection(0.0f, -1.0f, -1.0f);
-	sLight->SetLightColor(2.0f, 2.0f, 0.0f);
-	sLight->SetFalloffStart(100.0f);
-	sLight->SetFalloffEnd(300.0f);
 	core->Build(mTimer);
 	return true;
 }

@@ -2,18 +2,17 @@
 #include"DxCommon/DxCommon.h"
 
 #include"Animation/JGAnimation.h"
-#include"Debug/DebugBox.h"
-#include"Debug/DebugScreen.h"
 #include"DxCore/SceneConfig.h"
 
 namespace JGRC
 {
+	class DebugBox;
 	class SceneData;
 	class CommandListManager;
 	class ScreenManager;
 	class GpuCpuSynchronizer;
 	class DxDevice;
-	class JGRCObject;
+	class SceneObject;
 	class JGMaterial;
 	class JGStaticMesh;
 	class JGSkeletalMesh;
@@ -22,12 +21,13 @@ namespace JGRC
 
 	enum class ELightType;
 	enum class ELightExercise;
-	enum class EObjType;
+	enum class EObjectType;
+	enum class EObjectRenderMode;
 	class RCORE_EXPORT Scene
 	{
-		typedef std::unordered_map<EObjType,
+		typedef std::unordered_map<EObjectType,
 			    std::unordered_map<EPSOMode,
-			    std::vector<JGRCObject*>>>
+			    std::vector<SceneObject*>>>
 			    ObjectArray;
 	private:
 		std::string m_Name;
@@ -50,9 +50,9 @@ namespace JGRC
 		std::vector<std::unique_ptr<Camera>> m_Cameras;
 		Camera* m_MainCamera = nullptr;
 		// 오브젝트
-		std::vector<JGRCObject*>      m_ObjectMems;
+		std::vector<SceneObject*>      m_ObjectMems;
 		ObjectArray m_ObjectArray;
-		std::vector<std::unique_ptr<DebugBox>> m_DebugMems;
+		std::vector<std::shared_ptr<DebugBox>> m_DebugMems;
 		// 머터리얼
 		std::vector<JGMaterial*>      m_MaterialMems;
 		// 애니메이션
@@ -63,8 +63,8 @@ namespace JGRC
 		// 스카이 박스 및 씬 전체르 감싸는 구
 		DirectX::BoundingSphere m_SceneSphere;
 		std::wstring m_SkyShaderPath = L"../Contents/Engine/Shaders/Sky.hlsl";
-		std::unordered_map<std::wstring, JGRCObject*> m_SkyBox;
-		JGRCObject* m_MainSkyBox = nullptr;
+		std::unordered_map<std::wstring, SceneObject*> m_SkyBox;
+		SceneObject* m_MainSkyBox = nullptr;
 		// 라이트 
 		std::shared_ptr<LightManager> m_LightManager;
 		//
@@ -77,16 +77,16 @@ namespace JGRC
 		void OnReSize(UINT width, UINT height);
 		void Update(const GameTimer& gt);
 		void Draw();
-		void SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode, bool bDebug = false);
-		void SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
-		void SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode);
+		void SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode, bool bDebug = false);
+		void SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode);
+		void SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode);
 	public:
-		JGRCObject*     CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const std::string& meshname, EObjType Type);
-		JGRCObject*     CreateSkyBox(const std::wstring& texturepath);
-		void            AddDebugBox(JGRCObject* obj, const DirectX::XMFLOAT3& color, float thickness = 0);
+		SceneObject*     CreateObject(const std::string& name, JGMaterial* mat, const std::string& matDataName, JGBaseMesh* mesh, const std::string& meshname, EObjectType Type);
+		SceneObject*     CreateSkyBox(const std::wstring& texturepath);
+		void            AddDebugBox(SceneObject* obj, const DirectX::XMFLOAT3& color, float thickness = 0);
 		JGMaterial*     AddMaterial(const MaterialDesc& Desc);
-		JGStaticMesh*   AddStaticMesh();
-		JGSkeletalMesh* AddSkeletalMesh();
+		JGStaticMesh*   AddStaticMesh(const std::string& name);
+		JGSkeletalMesh* AddSkeletalMesh(const std::string& name);
 		std::string     AddAnimation(const std::string& path);
 		Camera*         AddCamera();
 		PassData*       AddPassData();
@@ -95,8 +95,8 @@ namespace JGRC
 	public:
 		Camera*      GetMainCamera() const               { return m_MainCamera; }
 		void         SetMainCamera(Camera* cam)          { m_MainCamera = cam; }
-		JGRCObject*  GetMainSkyBox() const; 
-		void         SetMainSkyBox(JGRCObject* skybox);
+		SceneObject*  GetMainSkyBox() const;
+		void         SetMainSkyBox(SceneObject* skybox);
 		const SceneConfig&   GetConfig() const           { return m_SceneConfig; }
 		ID3D12PipelineState* GetScenePSO() const         { return m_ScenePSO.Get(); }
 		JGAnimation*  GetAnimation(const std::string& name);
@@ -104,11 +104,10 @@ namespace JGRC
 		LightManager* GetLightManager();
 		const std::string& GetName() const { return m_Name; }
 	public:
-		const cbPassConstant& MainPassData()  const    { return m_MainPass->Data; }
+		const PassConstantData& MainPassData()  const    { return m_MainPass->Get(); }
 		PassData*             GetMainPass()            { return m_MainPass; }
 		D3D12_GPU_VIRTUAL_ADDRESS MainPassHandle();
 		const DirectX::BoundingSphere& GetSceneSphere()      const { return m_SceneSphere; }
-		std::vector<JGRCObject*>& GetArray(EObjType objType, EPSOMode mode);
 	private:
 		void MainPassUpdate(const GameTimer& gt);
 	};

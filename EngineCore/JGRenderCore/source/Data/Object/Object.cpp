@@ -2,7 +2,7 @@
 #include"Data/Mesh/JGBaseMesh.h"
 using namespace JGRC;
 using namespace std;
-
+UINT Object::SkinnedIndex = 0;
 Object::Object(EObjectType type, const string& name)
 {
 	m_Type = type;

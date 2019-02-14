@@ -10,7 +10,7 @@ namespace JGRC
 		cbPerSkinned,
 		sbMaterialData,
 		sbLightData,
-		sbInstanceData,
+		sbInstanceConstantData,
 		srvCubeMap,
 		srvTexture,
 		Count
@@ -35,7 +35,7 @@ namespace JGRC
 			slotParam[(int)ECommonShaderSlot::cbPerSkinned].InitAsConstantBufferView(2);
 			slotParam[(int)ECommonShaderSlot::sbMaterialData].InitAsShaderResourceView(0, 1);
 			slotParam[(int)ECommonShaderSlot::sbLightData].InitAsShaderResourceView(1, 1);
-			slotParam[(int)ECommonShaderSlot::sbInstanceData].InitAsShaderResourceView(0, 2);
+			slotParam[(int)ECommonShaderSlot::sbInstanceConstantData].InitAsShaderResourceView(0, 2);
 			slotParam[(int)ECommonShaderSlot::srvCubeMap].InitAsDescriptorTable(1, &CubeMapSlot,  D3D12_SHADER_VISIBILITY_PIXEL);
 			slotParam[(int)ECommonShaderSlot::srvTexture].InitAsDescriptorTable(1, &TextureSlot,  D3D12_SHADER_VISIBILITY_PIXEL);
 			auto staticSamplers = GetStaticSamplers();

@@ -11,6 +11,7 @@ namespace JGRC
 	class GpuCpuSynchronizer;
 	class CommandListManager;
 	class RootSignatureManager;
+	class DataManager;
 	class RCORE_EXPORT JGRenderCore
 	{
 	private:
@@ -18,6 +19,7 @@ namespace JGRC
 		std::shared_ptr<ScreenManager>              m_ScreenManager;
 		std::shared_ptr<GpuCpuSynchronizer>         m_GCS;
 		std::shared_ptr<CommandListManager>         m_CmdListManager;
+		std::shared_ptr<DataManager>                m_DataManager;
 		std::shared_ptr<ResourceManager>            m_ResourceManager;
 		std::shared_ptr<RootSignatureManager>       m_RootSigManager;
 		std::shared_ptr<EngineFrameResourceManager> m_FrameResourceManager;

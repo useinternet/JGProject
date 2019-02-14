@@ -212,9 +212,9 @@ void JGAnimationHelper::UpdateAnimatoin(const GameTimer& gt, JGAnimation* anim, 
 	
 	FinalTransform = AnimTransform[(UINT)TimePos];
 }
-SkinnedData JGAnimationHelper::Get()
+SkinnedConstantData JGAnimationHelper::Get()
 {
-	SkinnedData data;
+	SkinnedConstantData data;
 	copy(FinalTransform.begin(), FinalTransform.end(), &data.BoneTransforms[0]);
 	return data;
 }

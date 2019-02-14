@@ -82,9 +82,6 @@
     <ClCompile Include="source\Data\EngineFrameResource.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="source\Data\JGRCObject.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
     <ClCompile Include="source\Data\Scene.cpp">
       <Filter>Data</Filter>
     </ClCompile>
@@ -187,6 +184,15 @@
     <ClCompile Include="source\Data\Object\InstanceObject.cpp">
       <Filter>Data\Object</Filter>
     </ClCompile>
+    <ClCompile Include="source\ResourceManagement\AssetManager.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ResourceManagement\DataManager.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">
@@ -238,9 +244,6 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="source\Data\Scene.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Data\JGRCObject.h">
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="source\Shader\ShaderRootSignature.h">
@@ -371,6 +374,18 @@
     </ClInclude>
     <ClInclude Include="source\Data\Object\InstanceObject.h">
       <Filter>Data\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\AssetManager.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\DataManager.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\DxHeapManager.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DxCommon\DataType_Define.h">
+      <Filter>DxCommon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

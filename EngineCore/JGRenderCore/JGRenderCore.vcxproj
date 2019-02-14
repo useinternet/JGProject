@@ -27,7 +27,6 @@
     <ClCompile Include="source\Data\EngineFrameResource.cpp" />
     <ClCompile Include="source\Data\JGLight.cpp" />
     <ClCompile Include="source\Data\JGMaterial.cpp" />
-    <ClCompile Include="source\Data\JGRCObject.cpp" />
     <ClCompile Include="source\Data\LightManager.cpp" />
     <ClCompile Include="source\Data\Mesh\JGSkeletalMesh.cpp" />
     <ClCompile Include="source\Data\Mesh\JGStaticMesh.cpp" />
@@ -53,6 +52,9 @@
     <ClCompile Include="source\PostProcessing\CubeMap.cpp" />
     <ClCompile Include="source\PostProcessing\ShadowMap.cpp" />
     <ClCompile Include="source\PostProcessing\SSAO.cpp" />
+    <ClCompile Include="source\ResourceManagement\AssetManager.cpp" />
+    <ClCompile Include="source\ResourceManagement\DataManager.cpp" />
+    <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceExtracter.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceManager.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceReader.cpp" />
@@ -76,7 +78,6 @@
     <ClInclude Include="source\Data\EngineFrameResource.h" />
     <ClInclude Include="source\Data\JGLight.h" />
     <ClInclude Include="source\Data\JGMaterial.h" />
-    <ClInclude Include="source\Data\JGRCObject.h" />
     <ClInclude Include="source\Data\LightManager.h" />
     <ClInclude Include="source\Data\Mesh\JGBaseMesh.h" />
     <ClInclude Include="source\Data\Mesh\JGSkeletalMesh.h" />
@@ -91,6 +92,7 @@
     <ClInclude Include="source\DxCommon\Camera.h" />
     <ClInclude Include="source\DxCommon\d3dUtil.h" />
     <ClInclude Include="source\DxCommon\d3dx12.h" />
+    <ClInclude Include="source\DxCommon\DataType_Define.h" />
     <ClInclude Include="source\DxCommon\DDSTextureLoader.h" />
     <ClInclude Include="source\DxCommon\DxCommon.h" />
     <ClInclude Include="source\DxCommon\GameTimer.h" />
@@ -111,6 +113,9 @@
     <ClInclude Include="source\PostProcessing\CubeMap.h" />
     <ClInclude Include="source\PostProcessing\ShadowMap.h" />
     <ClInclude Include="source\PostProcessing\SSAO.h" />
+    <ClInclude Include="source\ResourceManagement\AssetManager.h" />
+    <ClInclude Include="source\ResourceManagement\DataManager.h" />
+    <ClInclude Include="source\ResourceManagement\DxHeapManager.h" />
     <ClInclude Include="source\ResourceManagement\ResourceExtracter.h" />
     <ClInclude Include="source\ResourceManagement\ResourceManager.h" />
     <ClInclude Include="source\ResourceManagement\ResourceReader.h" />

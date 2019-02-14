@@ -3,6 +3,7 @@
 #include"Data/Scene.h"
 #include"ResourceManagement/ResourceExtracter.h"
 #include"ResourceManagement/ResourceReader.h"
+#include"ResourceManagement/DataManager.h"
 #include"RootSignatureManager.h"
 #include"ScreenManager.h"
 #include"CommandListManager.h"
@@ -19,6 +20,7 @@ JGRenderCore::JGRenderCore()
 	m_GCS             = make_unique<GpuCpuSynchronizer>();
 	m_CmdListManager  = make_unique<CommandListManager>();
 	m_ScreenManager   = make_unique<ScreenManager>();
+	m_DataManager     = make_unique<DataManager>();
 	m_ResourceManager = make_unique<ResourceManager>();
 	m_RootSigManager  = make_unique<RootSignatureManager>();
 	m_FrameResourceManager = make_unique<EngineFrameResourceManager>();
@@ -46,6 +48,7 @@ bool JGRenderCore::CreateCore()
 		m_DxDevice.get(),
 		nullptr, 
 		m_ResourceManager.get(),
+		m_DataManager.get(),
 		m_ScreenManager.get(),
 		m_CmdListManager.get(), 
 		m_GCS.get(),
@@ -71,9 +74,10 @@ void JGRenderCore::Build(const GameTimer& gt)
 {
 	m_Scene->BuildScene();
 	m_ResourceManager->BuildResourceManager(m_CmdListManager->GetCommandList(0));
+	m_DataManager->Build();
 	m_FrameResourceManager->BuildFrameResource(m_DxDevice->Get(),
-		(UINT)max(1, m_ResourceManager->PassDataSize()), (UINT)max(1, m_ResourceManager->JGRCObjectSize() + 1),
-		(UINT)max(1, m_ResourceManager->JGMaterialSize()),
+		(UINT)max(1, m_DataManager->PassDataCount()), (UINT)max(1, m_DataManager->ObjectCount() + 1),
+		(UINT)max(1, m_DataManager->MaterialDataCount()),
 		(UINT)max(1, m_Scene->GetLightManager()->Size()));
 	// 명령 리스트&큐  초기화
 	m_CmdListManager->ExcuteCommandLists();

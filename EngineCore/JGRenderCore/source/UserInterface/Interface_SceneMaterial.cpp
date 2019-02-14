@@ -8,19 +8,31 @@ void Interface_SceneMaterial::SetTexture(ETextureSlot slot, const wstring& Textu
 {
 	m_Data->SetTexture(slot, TexturePath);
 }
-void Interface_SceneMaterial::SetDiffuseAlbedo(float r, float g, float b, float a)
+Interface_SceneMaterialData Interface_SceneMaterial::AddData(const string& name)
 {
-	m_Data->SetDiffuseAlbedo(r, g, b, a);
+	return Interface_SceneMaterialData(m_Data->AddData(name));
 }
-void Interface_SceneMaterial::SetFresnelR0(float x, float y, float z)
+Interface_SceneMaterialData::Interface_SceneMaterialData(MatPersonalData* data)
 {
-	m_Data->SetFresnelR0(x, y, z);
+	m_Data = data;
 }
-void Interface_SceneMaterial::SetRoughness(float x)
+void Interface_SceneMaterialData::SetDiffuseAlbedo(float r, float g, float b, float a)
 {
-	m_Data->SetRoughness(x);
+	m_Data->DiffuseAlbedo = { r, g, b, a };
 }
-void Interface_SceneMaterial::SetMetalic(float x)
+void Interface_SceneMaterialData::SetFresnelR0(float x, float y, float z)
 {
-	m_Data->SetMetalic(x);
+	m_Data->FresnelR0 = { x, y, z };
+}
+void Interface_SceneMaterialData::SetRoughness(float x)
+{
+	m_Data->Roughness = x; 
+}
+void Interface_SceneMaterialData::SetMetalic(float x)
+{
+	m_Data->Metallic = x;
+}
+const std::string& Interface_SceneMaterialData::GetName() const
+{
+	return m_Data->Name;
 }

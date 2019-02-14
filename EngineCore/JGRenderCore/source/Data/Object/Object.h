@@ -5,6 +5,8 @@ namespace JGRC
 {
 	class RCORE_EXPORT Object
 	{
+	public:
+		static UINT SkinnedIndex;
 		struct ObjState
 		{
 			bool Init = false;

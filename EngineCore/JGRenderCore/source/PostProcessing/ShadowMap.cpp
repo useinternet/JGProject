@@ -1,6 +1,6 @@
 #include"ShadowMap.h"
 #include"Data/Scene.h"
-#include"Data/JGRCObject.h"
+#include"Data/Object/SceneObject.h"
 #include"Data/JGLight.h"
 #include"Data/CommonData.h"
 #include"Shader/CommonShaderRootSignature.h"
@@ -23,7 +23,7 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 {
 	CommandList->RSSetViewports(1, &m_Viewport);
 	CommandList->RSSetScissorRects(1, &m_ScissorRect);
-	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
+	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstantData));
 	auto PassCB = CurrentFrameResource->PassCB->Resource();
 	D3D12_GPU_VIRTUAL_ADDRESS passCBAddress;
 
@@ -35,7 +35,7 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 	{
 	case EShadowMapType::Texture:
 		passCBAddress =
-			PassCB->GetGPUVirtualAddress() + (m_ShadowPass->PassCBIndex * passCBByteSize);
+			PassCB->GetGPUVirtualAddress() + (m_ShadowPass->Index() * passCBByteSize);
 		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
 			passCBAddress);
 		// 깊이 버퍼 초기화
@@ -48,10 +48,10 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 		switch (LightExcType)
 		{
 		case ELightExercise::Static:
-			CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
+			CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjectRenderMode::Shadow);
 			break;
 		case ELightExercise::Dynamic:
-			CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
+			CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjectRenderMode::Shadow);
 			break;
 		}
 		break;
@@ -59,7 +59,7 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 		for (int i = 0; i < 6; ++i)
 		{
 			passCBAddress =
-				PassCB->GetGPUVirtualAddress() + (m_CubeShadowPass[i]->PassCBIndex * passCBByteSize);
+				PassCB->GetGPUVirtualAddress() + (m_CubeShadowPass[i]->Index() * passCBByteSize);
 			CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
 				passCBAddress);
 
@@ -70,10 +70,10 @@ void ShadowMap::Draw(FrameResource* CurrentFrameResource, ID3D12GraphicsCommandL
 			switch (LightExcType)
 			{
 			case ELightExercise::Static:
-				CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
+				CommonData::_Scene()->SceneStaticObjectDraw(CommandList, CurrentFrameResource, EObjectRenderMode::Shadow);
 				break;
 			case ELightExercise::Dynamic:
-				CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjRenderMode::Shadow);
+				CommonData::_Scene()->SceneDynamicObjectDraw(CommandList, CurrentFrameResource, EObjectRenderMode::Shadow);
 				break;
 			}
 		}
@@ -99,15 +99,15 @@ void ShadowMap::UpdateShadowPass(FrameResource* CurrentFrameResource, JGLight* l
 		View = XMLoadFloat4x4(&view_f4x4);
 		Proj = XMLoadFloat4x4(&proj_f4x4);
 		viewProj = XMMatrixMultiply(View, Proj);
-		XMStoreFloat4x4(&m_ShadowPass->Data.ViewProj, XMMatrixTranspose(viewProj));
-		PassCB->CopyData(m_ShadowPass->PassCBIndex, m_ShadowPass->Data);
+		XMStoreFloat4x4(&m_ShadowPass->Get().ViewProj, XMMatrixTranspose(viewProj));
+		PassCB->CopyData(m_ShadowPass->Index(), m_ShadowPass->Get());
 		break;
 	case ELightType::Spot:
 		View = light->GetSpotLightCamera().GetView();
 		Proj = light->GetSpotLightCamera().GetProj();
 		viewProj = XMMatrixMultiply(View, Proj);
-		XMStoreFloat4x4(&m_ShadowPass->Data.ViewProj, XMMatrixTranspose(viewProj));
-		PassCB->CopyData(m_ShadowPass->PassCBIndex, m_ShadowPass->Data);
+		XMStoreFloat4x4(&m_ShadowPass->Get().ViewProj, XMMatrixTranspose(viewProj));
+		PassCB->CopyData(m_ShadowPass->Index(), m_ShadowPass->Get());
 		break;
 	case ELightType::Point:
 		for (int i = 0; i < 6; ++i)
@@ -115,8 +115,8 @@ void ShadowMap::UpdateShadowPass(FrameResource* CurrentFrameResource, JGLight* l
 			View = light->GetPointLightCamera(i).GetView();
 			Proj = light->GetPointLightCamera(i).GetProj();
 			viewProj = XMMatrixMultiply(View, Proj);
-			XMStoreFloat4x4(&m_CubeShadowPass[i]->Data.ViewProj, XMMatrixTranspose(viewProj));
-			PassCB->CopyData(m_CubeShadowPass[i]->PassCBIndex, m_CubeShadowPass[i]->Data);
+			XMStoreFloat4x4(&m_CubeShadowPass[i]->Get().ViewProj, XMMatrixTranspose(viewProj));
+			PassCB->CopyData(m_CubeShadowPass[i]->Index(), m_CubeShadowPass[i]->Get());
 		}
 		break;
 	}

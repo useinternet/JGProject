@@ -1,5 +1,4 @@
 #include"ResourceManager.h"
-#include"Data/JGRCObject.h"
 #include"Data/JGMaterial.h"
 #include"Data/Mesh/JGBaseMesh.h"
 #include"Data/Mesh/JGSkeletalMesh.h"
@@ -178,49 +177,6 @@ DepthStencilViewPack* ResourceManager::AddDsv(const string& name, ID3D12Resource
 
 	return &m_DepthStencilViews[name];
 }
-JGRCObject*     ResourceManager::AddJGRCObject(JGMaterial* mat, JGBaseMesh* mesh, const string& meshname, EObjType type)
-{
-	JGRCObject* result = nullptr;
-	auto obj = make_unique<JGRCObject>(++m_ObjectCBIndex, type);
-	obj->SetMaterial(mat);
-	obj->SetMesh(mesh, meshname);
-	result = obj.get();
-
-	m_JGRCObjectMems.push_back(move(obj));
-	return result;
-}
-JGMaterial*     ResourceManager::AddMaterial(const MaterialDesc& desc)
-{
-	auto mat = make_unique<JGMaterial>(++m_MaterialCBIndex, desc);
-	JGMaterial* result = mat.get();
-
-	m_JGMaterialMems.push_back(move(mat));
-	return result;
-}
-JGStaticMesh*   ResourceManager::AddStaticMesh(const string& name)
-{
-	auto mesh = make_unique<JGStaticMesh>(name);
-	JGStaticMesh* result = mesh.get();
-
-	m_MeshMems.push_back(move(mesh));
-	return result;
-}
-JGSkeletalMesh* ResourceManager::AddSkeletalMesh(const string& name)
-{
-	auto mesh = make_unique<JGSkeletalMesh>(name);
-	JGSkeletalMesh* result = mesh.get();
-
-	m_MeshMems.push_back(move(mesh));
-	return result;
-}
-PassData*       ResourceManager::AddPassData()
-{
-	auto passData = make_unique<PassData>();
-	passData->PassCBIndex = ++m_PassCBIndex;
-	PassData* result = passData.get();
-	m_PassDataMems.push_back(move(passData));
-	return result;
-}
 SrvResourcePack* ResourceManager::SetSrv(const string& name, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* Desc)
 {
 	if (m_SrvUavOffsets.end() == m_SrvUavOffsets.find(name))
@@ -326,17 +282,8 @@ DepthStencilViewPack* ResourceManager::SetDsv(const string& name, ID3D12Resource
 }
 void ResourceManager::BuildResourceManager(ID3D12GraphicsCommandList* CommandList)
 {
-	BuildResourceData(CommandList);
+	//BuildResourceData(CommandList);
 	BuildResourceHeap();
-}
-void ResourceManager::BuildResourceData(ID3D12GraphicsCommandList* CommandList)
-{
-	for (auto& obj : m_JGRCObjectMems)
-	{
-		obj->Build(CommandList);
-	}
-	for (auto& mesh : m_MeshMems)
-		mesh->CreateMesh(CommandList);
 }
 void ResourceManager::BuildResourceHeap()
 {
@@ -598,22 +545,6 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE ResourceManager::GetGPUTexture2DHandle()
 CD3DX12_GPU_DESCRIPTOR_HANDLE ResourceManager::GetGPUCubeMapHandle()
 {
 	return GetGPUSrvUavHandle(m_SrvHeapOffset);
-}
-UINT ResourceManager::JGRCObjectSize()  const
-{
-	return (UINT)m_JGRCObjectMems.size();
-}
-UINT ResourceManager::JGMaterialSize()  const
-{
-	return (UINT)m_JGMaterialMems.size();
-}
-UINT ResourceManager::PassDataSize()    const
-{
-	return (UINT)m_PassDataMems.size();
-}
-UINT ResourceManager::SkinnedDataSize() const
-{
-	return (UINT)JGRCObject::SkinnedCount();
 }
 void ResourceManager::Clear()
 {

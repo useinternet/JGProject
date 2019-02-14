@@ -1,5 +1,5 @@
 #include"Interface_SceneSkyBox.h"
-#include"Data/JGRCObject.h"
+#include"Data/Object/SceneObject.h"
 using namespace JGRC;
 
-Interface_SceneSkyBox::Interface_SceneSkyBox(JGRCObject* obj) : m_Data(obj) {}
+Interface_SceneSkyBox::Interface_SceneSkyBox(SceneObject* obj) : m_Data(obj) {}

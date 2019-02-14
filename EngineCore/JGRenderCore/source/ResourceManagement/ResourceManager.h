@@ -11,7 +11,7 @@ namespace JGRC
 	enum class EObjType;
 	enum class EObjRenderMode;
 	struct MaterialDesc;
-	struct PassData;
+	struct MatPersonalData;
 /*
 	Exp : 머터리얼 목록 
 	* 이름
@@ -140,21 +140,6 @@ namespace JGRC
 		UINT m_CubeHeapOffset = 0;
 		UINT m_RtvHeapOffset  = 0;
 		UINT m_DsvHeapOffset  = 0;
-	    /*
-		JGRCObject */
-		std::vector<std::shared_ptr<JGRCObject>>     m_JGRCObjectMems;
-		UINT m_ObjectCBIndex = -1;
-		/*
-		JGRCMaterial */
-		std::vector<std::shared_ptr<JGMaterial>>     m_JGMaterialMems;
-		UINT m_MaterialCBIndex = -1;
-		/*
-		PassData */
-		std::vector<std::shared_ptr<PassData>>       m_PassDataMems;
-		UINT m_PassCBIndex = -1;
-		/*
-		Mesh */
-		std::vector<std::shared_ptr<JGBaseMesh>>     m_MeshMems;
 	public:
 		void Init(class DxDevice* core);
 	public:
@@ -169,11 +154,6 @@ namespace JGRC
 		UavResourcePack* AddUav(const std::string& name, ID3D12Resource* resource, ID3D12Resource* Counterresource, D3D12_UNORDERED_ACCESS_VIEW_DESC* Desc);
 		RenderTargetPack* AddRtv(const std::string& name, ID3D12Resource* RenderResource, D3D12_RENDER_TARGET_VIEW_DESC* Desc);
 		DepthStencilViewPack* AddDsv(const std::string& name, ID3D12Resource* RenderResource, D3D12_DEPTH_STENCIL_VIEW_DESC* Desc);
-		JGRCObject*     AddJGRCObject(JGMaterial* mat, JGBaseMesh* mesh, const std::string& meshname, EObjType type);
-		JGMaterial*     AddMaterial(const MaterialDesc& desc);
-		JGStaticMesh*   AddStaticMesh(const std::string& name = "None");
-		JGSkeletalMesh* AddSkeletalMesh(const std::string& name = "None");
-		PassData*       AddPassData();
 	public:
 		SrvResourcePack* SetSrv(const std::string& name, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* Desc = nullptr);
 		UavResourcePack* SetUav(const std::string& name, ID3D12Resource* resource, ID3D12Resource* Counterresource, D3D12_UNORDERED_ACCESS_VIEW_DESC* Desc = nullptr);
@@ -181,7 +161,6 @@ namespace JGRC
 		DepthStencilViewPack* SetDsv(const std::string& name, ID3D12Resource* RenderResource, D3D12_DEPTH_STENCIL_VIEW_DESC* Desc = nullptr);
 	public:
 		void BuildResourceManager(ID3D12GraphicsCommandList* CommandList);
-		void BuildResourceData(ID3D12GraphicsCommandList* CommnadList);
 		void BuildResourceHeap();
 	public:
 		/*
@@ -219,11 +198,6 @@ namespace JGRC
 		Exp : TextureCube , Texture2D 시작점 Handle */
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUTexture2DHandle();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUCubeMapHandle();
-	public:
-		UINT JGRCObjectSize()  const;
-		UINT JGMaterialSize()  const;
-		UINT PassDataSize()    const;
-		UINT SkinnedDataSize() const;
 	public:
 		/*
 		Exp : DescriptorHeap 접근자 */

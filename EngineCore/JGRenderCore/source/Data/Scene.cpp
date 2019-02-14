@@ -3,19 +3,20 @@
 #include"SceneData.h"
 #include"Shader/Shader.h"
 #include"Shader/CommonShaderRootSignature.h"
-
+#include"Debug/DebugBox.h"
 #include"PostProcessing/ShadowMap.h"
 #include"PostProcessing/BlurFilter.h"
 #include"PostProcessing/SSAO.h"
 
 #include"JGLight.h"
-#include"JGRCObject.h"
+#include"Object/SceneObject.h"
 #include"Mesh/JGStaticMesh.h"
 #include"Mesh/JGSkeletalMesh.h"
 #include"LightManager.h"
 #include"JGMaterial.h"
 #include"CommonData.h"
 #include"ResourceManagement/ResourceReader.h"
+#include"ResourceManagement/DataManager.h"
 #include"Debug/DebugBox.h"
 #include"DxCore/CommandListManager.h"
 #include"DxCore/GpuCpuSynchronizer.h"
@@ -77,8 +78,7 @@ void Scene::BuildScene()
 	for (auto& obj : m_ObjectMems)
 	{
 		EPSOMode Mode = obj->GetMaterial()->GetDesc()->Mode;
-		EObjType Type = obj->GetType();
-
+		EObjectType Type = obj->GetType();
 		m_ObjectArray[Type][Mode].push_back(obj);
 	}
 	// 텍스쳐 추가
@@ -162,13 +162,13 @@ void Scene::Draw()
 	
 
 
-	for (auto& objarr : m_ObjectArray)
-	{
-		for (auto& obj : objarr.second[EPSOMode::DEFAULT])
-		{
-			obj->CubeMapDraw(CurrFrameResource, CommandList);
-		}
-	}
+	//for (auto& objarr : m_ObjectArray)
+	//{
+	//	for (auto& obj : objarr.second[EPSOMode::DEFAULT])
+	//	{
+	//		obj->CubeMapDraw(CurrFrameResource, CommandList);
+	//	}
+	//}
 
 
 
@@ -190,7 +190,7 @@ void Scene::Draw()
 	// 마무리
 	m_ScreenManager->OutputScreen(m_Name, CommandList);
 }
-void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode, bool bDebug)
+void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode, bool bDebug)
 {
 	for (auto& objarr : m_ObjectArray)
 	{
@@ -208,27 +208,27 @@ void Scene::SceneObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResourc
 	}
 
 }
-void Scene::SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+void Scene::SceneStaticObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode)
 {
-	for (auto& obj : m_ObjectArray[EObjType::Static][EPSOMode::DEFAULT])
+	for (auto& obj : m_ObjectArray[EObjectType::Static][EPSOMode::DEFAULT])
 	{
 		obj->Draw(CurrFrameResource, CommandList, Mode);
 	}
 }
-void Scene::SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjRenderMode Mode)
+void Scene::SceneDynamicObjectDraw(ID3D12GraphicsCommandList* CommandList, FrameResource* CurrFrameResource, EObjectRenderMode Mode)
 {
-	for (auto& obj : m_ObjectArray[EObjType::Dynamic][EPSOMode::DEFAULT])
+	for (auto& obj : m_ObjectArray[EObjectType::Dynamic][EPSOMode::DEFAULT])
 	{
 		obj->Draw(CurrFrameResource, CommandList, Mode);
 	}
 }
-JGRCObject* Scene::CreateObject(JGMaterial* mat, JGBaseMesh* mesh, const string& meshname, EObjType Type)
+SceneObject* Scene::CreateObject(const string& name, JGMaterial* mat, const string& matDataName, JGBaseMesh* mesh, const string& meshname, EObjectType Type)
 {
-	JGRCObject* result = m_ResourceManager->AddJGRCObject(mat, mesh, meshname, Type);
+	SceneObject* result = CommonData::_DataManager()->CreateSceneObject(name, mat, matDataName, mesh, meshname, Type);
 	m_ObjectMems.push_back(result);
 	return result;
 }
-JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
+SceneObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 {
 	bool result = false;
 	//스카이 박스 머터리얼 및 메쉬 미리 생성
@@ -248,16 +248,18 @@ JGRCObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 	matDesc.ShaderPath = global_sky_hlsl_path;
 	matDesc.Name = string().assign(m_SkyShaderPath.begin(), m_SkyShaderPath.end());
 	JGMaterial* SkyMat = AddMaterial(matDesc);
+	MatPersonalData* SkyMatData = SkyMat->AddData("SkyMatData");
 	SkyMat->SetTexture(ETextureSlot::Diffuse, texturepath);
 	// 메쉬 생성
-	JGStaticMesh* SkyMesh = AddStaticMesh();
+	JGStaticMesh* SkyMesh = AddStaticMesh("SkyBoxMesh");
 	SkyMesh->AddBoxArg("Scene_SkyBox_Default_Mesh", 1.0f, 1.0f, 1.0f, 0);
+
 	// 오브젝트 생성
-	JGRCObject* obj = CreateObject(SkyMat, SkyMesh,"Scene_SkyBox_Default_Mesh", EObjType::Static );
+	SceneObject* obj = CreateObject("SkyBox", SkyMat, SkyMatData->Name, SkyMesh,"Scene_SkyBox_Default_Mesh", EObjectType::Static );
 	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
-void   Scene::AddDebugBox(JGRCObject* obj, const XMFLOAT3& color, float thickness)
+void   Scene::AddDebugBox(SceneObject* obj, const XMFLOAT3& color, float thickness)
 {
 	auto debugBox = make_unique<DebugBox>();
 	debugBox->BindingObject(obj, color, thickness);
@@ -265,17 +267,17 @@ void   Scene::AddDebugBox(JGRCObject* obj, const XMFLOAT3& color, float thicknes
 }
 JGMaterial* Scene::AddMaterial(const MaterialDesc& Desc)
 {
-	JGMaterial* mat  = m_ResourceManager->AddMaterial(Desc);
+	JGMaterial* mat  = CommonData::_DataManager()->CreateMaterial(Desc);
 	m_MaterialMems.push_back(mat);
 	return mat;
 }
-JGStaticMesh*   Scene::AddStaticMesh()
+JGStaticMesh*   Scene::AddStaticMesh(const std::string& name)
 {
-	return m_ResourceManager->AddStaticMesh();
+	return CommonData::_DataManager()->CreateStaticMesh(name);
 }
-JGSkeletalMesh* Scene::AddSkeletalMesh()
+JGSkeletalMesh* Scene::AddSkeletalMesh(const std::string& name)
 {
-	return m_ResourceManager->AddSkeletalMesh();
+	return CommonData::_DataManager()->CreateSkeletalMesh(name);
 }
 string Scene::AddAnimation(const string& path)
 {
@@ -300,7 +302,7 @@ Camera*     Scene::AddCamera()
 }
 PassData* Scene::AddPassData()
 {
-	return m_ResourceManager->AddPassData();
+	return CommonData::_DataManager()->CreatePassData();
 }
 JGLight*  Scene::AddLight(ELightType type, ELightExercise extype)
 {
@@ -310,11 +312,11 @@ void Scene::AddTexture(const wstring& TexturePath, ETextureType type)
 {
 	m_TextureDatas.push_back(TexturePack{ move(TexturePath), nullptr, type });
 }
-JGRCObject*  Scene::GetMainSkyBox() const
+SceneObject*  Scene::GetMainSkyBox() const
 {
 	return m_MainSkyBox;
 }
-void         Scene::SetMainSkyBox(JGRCObject* skybox)
+void         Scene::SetMainSkyBox(SceneObject* skybox)
 {
 	if(skybox->GetMaterial()->GetDesc()->Mode == EPSOMode::SKYBOX) 	
 		m_MainSkyBox = skybox;
@@ -335,14 +337,10 @@ LightManager* Scene::GetLightManager()
 }
 D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
 {
-	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
+	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstantData));
 	D3D12_GPU_VIRTUAL_ADDRESS Handle = CommonData::_EngineFrameResourceManager()->CurrentFrameResource()->PassCB->Resource()->GetGPUVirtualAddress();
-	Handle += m_MainPass->PassCBIndex * passCBByteSize;
+	Handle += m_MainPass->Index() * passCBByteSize;
 	return Handle;
-}
-std::vector<JGRCObject*>& Scene::GetArray(EObjType objType, EPSOMode mode)
-{
-	return m_ObjectArray[objType][mode];
 }
 void Scene::MainPassUpdate(const GameTimer& gt)
 {
@@ -361,35 +359,35 @@ void Scene::MainPassUpdate(const GameTimer& gt)
 		0.5f, 0.5f, 0.0f, 1.0f);
 	XMMATRIX viewProjTex = XMMatrixMultiply(viewProj, T);
 	// 기본 행렬 
-	XMStoreFloat4x4(&m_MainPass->Data.View, XMMatrixTranspose(view));
-	XMStoreFloat4x4(&m_MainPass->Data.Proj, XMMatrixTranspose(proj));
-	XMStoreFloat4x4(&m_MainPass->Data.ViewProj, XMMatrixTranspose(viewProj));
-	XMStoreFloat4x4(&m_MainPass->Data.InvView, XMMatrixTranspose(invView));
-	XMStoreFloat4x4(&m_MainPass->Data.InvProj, XMMatrixTranspose(invProj));
-	XMStoreFloat4x4(&m_MainPass->Data.InvViewProj, XMMatrixTranspose(invViewProj));
-	XMStoreFloat4x4(&m_MainPass->Data.ViewProjTex, XMMatrixTranspose(viewProjTex));
+	XMStoreFloat4x4(&m_MainPass->Get().View, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&m_MainPass->Get().Proj, XMMatrixTranspose(proj));
+	XMStoreFloat4x4(&m_MainPass->Get().ViewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&m_MainPass->Get().InvView, XMMatrixTranspose(invView));
+	XMStoreFloat4x4(&m_MainPass->Get().InvProj, XMMatrixTranspose(invProj));
+	XMStoreFloat4x4(&m_MainPass->Get().InvViewProj, XMMatrixTranspose(invViewProj));
+	XMStoreFloat4x4(&m_MainPass->Get().ViewProjTex, XMMatrixTranspose(viewProjTex));
 
 	// 카메라 위치
-	m_MainPass->Data.EyePosW = m_MainCamera->GetPosition3f();
+	m_MainPass->Get().EyePosW = m_MainCamera->GetPosition3f();
 
 
 	// 렌더 타겟 사이즈
-	m_MainPass->Data.RenderTargetSize = XMFLOAT2((float)m_SceneConfig.Width, (float)m_SceneConfig.Height);
-	m_MainPass->Data.InvRenderTargetSize = XMFLOAT2(1 / (float)m_SceneConfig.Width, 1 / (float)m_SceneConfig.Height);
+	m_MainPass->Get().RenderTargetSize = XMFLOAT2((float)m_SceneConfig.Width, (float)m_SceneConfig.Height);
+	m_MainPass->Get().InvRenderTargetSize = XMFLOAT2(1 / (float)m_SceneConfig.Width, 1 / (float)m_SceneConfig.Height);
 
 	//
-	m_MainPass->Data.TotalTime = gt.TotalTime();
-	m_MainPass->Data.DeltaTime = gt.DeltaTime();
+	m_MainPass->Get().TotalTime = gt.TotalTime();
+	m_MainPass->Get().DeltaTime = gt.DeltaTime();
 	// 씬 인덱스
-	m_MainPass->Data.WorldPosSceneIndex = m_SceneData->GetWorldPosIndex();
-	m_MainPass->Data.AlbedoSceneIndex = m_SceneData->GetAlbedoIndex();
-	m_MainPass->Data.NormalSceneIndex = m_SceneData->GetNormalIndex();
-	m_MainPass->Data.DepthSceneIndex = m_SceneData->GetDepthIndex();
-	m_MainPass->Data.MatSceneIndex = m_SceneData->GetMatIndex();
-	m_MainPass->Data.SSAOTexutreIndex = m_SSAO->GetShaderIndex();
+	m_MainPass->Get().WorldPosSceneIndex = m_SceneData->GetWorldPosIndex();
+	m_MainPass->Get().AlbedoSceneIndex = m_SceneData->GetAlbedoIndex();
+	m_MainPass->Get().NormalSceneIndex = m_SceneData->GetNormalIndex();
+	m_MainPass->Get().DepthSceneIndex = m_SceneData->GetDepthIndex();
+	m_MainPass->Get().MatSceneIndex = m_SceneData->GetMatIndex();
+	m_MainPass->Get().SSAOTexutreIndex = m_SSAO->GetShaderIndex();
 	if(m_MainSkyBox)
-		m_MainPass->Data.SkyBoxIndex = m_ResourceManager->GetCubeTextureShaderIndex(
+		m_MainPass->Get().SkyBoxIndex = m_ResourceManager->GetCubeTextureShaderIndex(
 			m_MainSkyBox->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
 	auto PassCB = CurrFrameResource->PassCB.get();
-	PassCB->CopyData(m_MainPass->PassCBIndex, m_MainPass->Data);
+	PassCB->CopyData(m_MainPass->Index(), m_MainPass->Get());
 }

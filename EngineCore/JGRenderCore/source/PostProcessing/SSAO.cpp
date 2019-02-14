@@ -5,7 +5,7 @@
 #include"Shader/CommonShaderRootSignature.h"
 #include"Shader/SSAOShaderRootSignature.h"
 #include"Data/CommonData.h"
-#include"Data/JGRCObject.h"
+#include"Data/Object/SceneObject.h"
 #include"DxCore/ScreenManager.h"
 #include"DxCore/RootSignatureManager.h"
 using namespace JGRC;
@@ -56,7 +56,7 @@ void SSAO::Update(FrameResource* CurrFrameResource)
 	SSAOData ssaoCB;
 
 	XMMATRIX P = CommonData::_Scene()->GetMainCamera()->GetProj();
-	cbPassConstant MainPassCB = CommonData::_Scene()->MainPassData();
+	PassConstantData MainPassCB = CommonData::_Scene()->MainPassData();
 	// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
 	XMMATRIX T(
 		0.5f, 0.0f, 0.0f, 0.0f,
@@ -299,7 +299,7 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 		CommonData::_Scene()->MainPassHandle());
 
 
-	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjRenderMode::ViewNormal);
+	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjectRenderMode::ViewNormal);
 
 
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_NormalMap,

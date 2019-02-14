@@ -1,6 +1,6 @@
 #include"SceneData.h"
 #include"CommonData.h"
-#include"JGRCObject.h"
+#include"Object/SceneObject.h"
 #include"Scene.h"
 using namespace std;
 using namespace JGRC;
@@ -59,10 +59,10 @@ void SceneData::SceneDataExtract(FrameResource* CurrFrameResource, ID3D12Graphic
 	D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle[] = { m_WorldPosRtv->Handle,m_AlbedoRtv->Handle ,m_NormalRtv->Handle, m_MatRtv->Handle };
 	CommandList->OMSetRenderTargets(4, RtvHandle, true, &m_DepthDsv->Handle);
 
-	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjRenderMode::Default, true);
+	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjectRenderMode::Default, true);
 	if (CommonData::_Scene()->GetMainSkyBox())
 	{
-		CommonData::_Scene()->GetMainSkyBox()->Draw(CurrFrameResource, CommandList);
+		CommonData::_Scene()->GetMainSkyBox()->Draw(CurrFrameResource, CommandList, EObjectRenderMode::Default);
 	}
 	RsManager->ResourceStateTransition(CommandList, m_WorldPosPack->Resource, D3D12_RESOURCE_STATE_GENERIC_READ);
 	RsManager->ResourceStateTransition(CommandList, m_AlbedoPack->Resource, D3D12_RESOURCE_STATE_GENERIC_READ);

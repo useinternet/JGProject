@@ -84,7 +84,7 @@ namespace JGRC
 	public:
 		void BuildAnimationData(JGAnimation* anim, JGBoneNode* Root, UINT BoneCount, const std::string& meshName);
 		void UpdateAnimatoin(const GameTimer& gt, JGAnimation* anim, JGBoneNode* Root, UINT BoneCount);
-		SkinnedData Get();
+		SkinnedConstantData Get();
 	};
 
 }

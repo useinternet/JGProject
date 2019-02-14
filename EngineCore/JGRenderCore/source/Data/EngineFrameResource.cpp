@@ -1,15 +1,15 @@
 #include"EngineFrameResource.h"
-#include"JGRCObject.h"
+#include"Data/Object/Object.h"
 using namespace std;
 using namespace JGRC;
 FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)
 {
 	ThrowIfFailed(device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
-	PassCB = std::make_unique<UploadBuffer<cbPassConstant>>(device, passCount, true);
-	ObjectCB = std::make_unique<UploadBuffer<cbObjectConstant>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, std::max<UINT>(1,JGRCObject::SkinnedCount()), true);
-	MaterialCB = std::make_unique<UploadBuffer<MaterialData>>(device, materialCount, false);
+	PassCB = std::make_unique<UploadBuffer<PassConstantData>>(device, passCount, true);
+	ObjectCB = std::make_unique<UploadBuffer<ObjectConstantData>>(device, objectCount, true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1,Object::SkinnedIndex), true);
+	MaterialCB = std::make_unique<UploadBuffer<MaterialConstantData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
 }
 void FrameResource::ReSize(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)
@@ -18,10 +18,10 @@ void FrameResource::ReSize(ID3D12Device* device, UINT passCount, UINT objectCoun
 	ObjectCB.reset();
 	MaterialCB.reset();
 	LightCB.reset();
-	PassCB = std::make_unique<UploadBuffer<cbPassConstant>>(device, passCount, true);
-	ObjectCB = std::make_unique<UploadBuffer<cbObjectConstant>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedData>>(device, std::max<UINT>(1, JGRCObject::SkinnedCount()), true);
-	MaterialCB = std::make_unique<UploadBuffer<MaterialData>>(device, materialCount, false);
+	PassCB = std::make_unique<UploadBuffer<PassConstantData>>(device, passCount, true);
+	ObjectCB = std::make_unique<UploadBuffer<ObjectConstantData>>(device, objectCount, true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1, Object::SkinnedIndex), true);
+	MaterialCB = std::make_unique<UploadBuffer<MaterialConstantData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
 }
 void EngineFrameResourceManager::BuildFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)

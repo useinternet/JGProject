@@ -24,9 +24,9 @@ void LightManager::Update(FrameResource* CurrFrameResource)
 {
 	int Count = 0;
 	PassData* MainPassData = CommonData::_Scene()->GetMainPass();
-	MainPassData->Data.DirLightCount   = m_DirectionLightCount;
-	MainPassData->Data.SpotLightCount  = m_SpotLightCount;
-	MainPassData->Data.PointLightCount = m_PointLightCount;
+	MainPassData->Get().DirLightCount   = m_DirectionLightCount;
+	MainPassData->Get().SpotLightCount  = m_SpotLightCount;
+	MainPassData->Get().PointLightCount = m_PointLightCount;
 
 	Count = 0;
 	if (m_DirLight)

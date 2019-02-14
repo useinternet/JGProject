@@ -14,7 +14,7 @@ namespace JGRC
 	{
 		friend Interface_Scene;
 	private:
-		class JGRCObject* m_ObjectData = nullptr;
+		class SceneObject* m_Data = nullptr;
 
 
 	public:
@@ -24,10 +24,10 @@ namespace JGRC
 		}
 	public:
 		Interface_SceneObject() = default;
-		Interface_SceneObject(JGRCObject* obj);
+		Interface_SceneObject(SceneObject* obj);
 		Interface_SceneObject(const Interface_SceneObject& copy)
 		{
-			m_ObjectData = copy.m_ObjectData;
+			m_Data = copy.m_Data;
 		}
 	public:
 		DirectX::XMFLOAT3 GetLocation() const;

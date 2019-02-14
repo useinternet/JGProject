@@ -13,6 +13,7 @@ namespace JGRC
 	class CommandListManager;
 	class DxDevice;
 	class RootSignatureManager;
+	class DataManager;
 	class RCORE_EXPORT CommonData
 	{
 	protected:
@@ -20,6 +21,7 @@ namespace JGRC
 		static DxDevice*             m_DxDevice;
 		static ScreenManager*        m_ScreenManager;
 		static ResourceManager*      m_ResourceManager;
+		static DataManager*          m_DataManager;
 		static CommandListManager*   m_CommandListManager;
 		static GpuCpuSynchronizer*   m_GCS;
 		static RootSignatureManager* m_RootSigManager;
@@ -29,6 +31,7 @@ namespace JGRC
 			DxDevice* core,
 			Scene* scene, 
 			ResourceManager* manager,
+			DataManager*     DataManager,
 			ScreenManager* screen,
 			CommandListManager* cmdManager,
 			GpuCpuSynchronizer* gcs, 
@@ -40,6 +43,7 @@ namespace JGRC
 		static DxDevice* _DxDevice();
 		static ScreenManager* _ScreenManager();
 		static ResourceManager* _ResourceManager();
+		static DataManager* _DataManager();
 		static CommandListManager* _CmdListManager();
 		static GpuCpuSynchronizer* _GCSynchronizer();
 		static RootSignatureManager* _RootSigManager();

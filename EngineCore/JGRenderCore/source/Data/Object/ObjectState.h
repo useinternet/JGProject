@@ -5,14 +5,11 @@
 
 namespace JGRC
 {
-	class JGBaseMesh;
 	enum class EObjectType
 	{
 		Static,
 		Dynamic,
-		Instance
 	};
-
 	enum class EObjectRenderMode
 	{
 		Default,
@@ -20,10 +17,6 @@ namespace JGRC
 		ViewNormal,
 		Shadow
 	};
-	
-
-
-
 }
 
 

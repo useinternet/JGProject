@@ -1,6 +1,6 @@
 #include"Interface_Scene.h"
 #include"Data/Scene.h"
-#include"Data/JGRCObject.h"
+#include"Data/Object/SceneObject.h"
 #include"Data/JGMaterial.h"
 #include"Data/JGLight.h"
 #include"Data/Mesh/JGSkeletalMesh.h"
@@ -9,16 +9,16 @@
 using namespace JGRC;
 using namespace std;
 
-IF_Object Interface_Scene::CreateObject(const IF_Material& mat, const IF_Mesh& mesh, const string& meshname, E_IF_ObjType type)
+IF_Object Interface_Scene::CreateObject(const std::string& name, const IF_Material& mat, const IF_MaterialData& matData, const IF_Mesh& mesh, const string& meshname, E_IF_ObjType type)
 {
-	JGRCObject* obj = nullptr;
+	SceneObject* obj = nullptr;
 	switch (type)
 	{
 	case E_IF_ObjType::Static:
-		obj = m_Data->CreateObject(mat.m_Data, mesh.m_Data, meshname, EObjType::Static);
+		obj = m_Data->CreateObject(name, mat.m_Data, matData.GetName(), mesh.m_Data, meshname, EObjectType::Static);
 		break;
 	case E_IF_ObjType::Dynamic:
-		obj = m_Data->CreateObject(mat.m_Data, mesh.m_Data, meshname, EObjType::Dynamic);
+		obj = m_Data->CreateObject(name, mat.m_Data, matData.GetName(), mesh.m_Data, meshname, EObjectType::Dynamic);
 		break;
 	}
 	return IF_Object(obj);
@@ -29,19 +29,19 @@ IF_SkyBox         Interface_Scene::CreateSkyBox(const wstring& texturePath)
 }
 void              Interface_Scene::DebugBox(IF_Object obj, const DirectX::XMFLOAT3& color, float thickness)
 {
-	m_Data->AddDebugBox(obj.m_ObjectData, color, thickness);
+	m_Data->AddDebugBox(obj.m_Data, color, thickness);
 }
 IF_Material       Interface_Scene::AddMaterial(const MaterialDesc& desc)
 {
 	return IF_Material(m_Data->AddMaterial(desc));
 }
-IF_StaticMesh     Interface_Scene::AddStaticMesh()
+IF_StaticMesh     Interface_Scene::AddStaticMesh(const std::string& name)
 {
-	return IF_StaticMesh(m_Data->AddStaticMesh());
+	return IF_StaticMesh(m_Data->AddStaticMesh(name));
 }
-IF_SkeletalMesh   Interface_Scene::AddSkeletalMesh() 
+IF_SkeletalMesh   Interface_Scene::AddSkeletalMesh(const std::string& name)
 {
-	return IF_SkeletalMesh(m_Data->AddSkeletalMesh());
+	return IF_SkeletalMesh(m_Data->AddSkeletalMesh(name));
 }
 IF_DirectionLight Interface_Scene::AddDirLight()
 {

@@ -7,6 +7,7 @@
 namespace JGRC
 {
 	class JGMaterial;
+	struct MatPersonalData;
 	class JGSkeletalMesh;
 	class JGAnimation;
 	class JGAnimationHelper;
@@ -14,12 +15,13 @@ namespace JGRC
 	{
 	private:
 		static UINT Count;
-		static UINT SkinnedIndex;
 	private:
 		UINT m_ObjCBIndex;
 		UINT m_SkinnedCBIndex;
-		SceneObject*    m_Owner        = nullptr;
-		JGMaterial*     m_Material     = nullptr;
+		SceneObject*    m_Parent = nullptr;
+		std::vector<SceneObject*> m_Child;
+		JGMaterial*     m_Material        = nullptr;
+		MatPersonalData* m_MatPersonalData = nullptr;
 		JGSkeletalMesh* m_SkeletalMesh = nullptr;
 		JGAnimation*    m_Animation    = nullptr;
 		std::shared_ptr<JGAnimationHelper> m_AnimHelper;
@@ -35,6 +37,31 @@ namespace JGRC
 		virtual void Build(ID3D12GraphicsCommandList* CommandList) override;
 		virtual void Update(const GameTimer& gt, FrameResource* CurrFrameResource) override;
 		virtual void Draw(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList* CommandList, EObjectRenderMode Mode) override;
-
+	public:
+		void AttachTo(SceneObject* obj);
+		SceneObject* GetChild(UINT idx) const;
+		SceneObject* GetParent() const;
+	public:
+		JGMaterial* GetMaterial() const;
+		void SetMaterial(JGMaterial* mat, const std::string& matDataName);
+		void SetAnimation(const std::string& name);
+	public:
+		const DirectX::XMFLOAT3&   GetLocation() const { return m_Location; }
+		const DirectX::XMFLOAT3&   GetRotation() const { return m_Rotation; }
+		const DirectX::XMFLOAT3&   GetScale()    const { return m_Scale; }
+		const DirectX::XMFLOAT4X4  GetWorld()    const;
+		const DirectX::XMFLOAT4X4& GetTex()      const { return m_TexTransform; }
+	public:
+		void SetLocation(float x, float y, float z);
+		void SetRotation(float pitch, float yaw, float roll);
+		void SetScale(float x, float y, float z);
+		void SetScale(float x);
+	public:
+		void OffsetLocation(float x, float y, float z);
+		void OffsetRotation(float pitch, float yaw, float roll);
+		void OffsetScale(float x, float y, float z);
+		void OffsetScale(float x);
+	private:
+		void UpdateWorldMatrix();
 	};
 }

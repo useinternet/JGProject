@@ -31,12 +31,12 @@ namespace JGRC
 			m_Data = copy.m_Data;
 		}
 	public:
-		IF_Object         CreateObject(const IF_Material& mat, const IF_Mesh& mesh, const std::string& meshname, E_IF_ObjType type = E_IF_ObjType::Static);
+		IF_Object         CreateObject(const std::string& name, const IF_Material& mat, const IF_MaterialData& matData, const IF_Mesh& mesh, const std::string& meshname, E_IF_ObjType type = E_IF_ObjType::Static);
 		IF_SkyBox         CreateSkyBox(const std::wstring& texturePath);
 		void              DebugBox(IF_Object obj, const DirectX::XMFLOAT3& color, float thickness);
 		IF_Material       AddMaterial(const struct MaterialDesc& desc);
-		IF_StaticMesh     AddStaticMesh();
-		IF_SkeletalMesh   AddSkeletalMesh();
+		IF_StaticMesh     AddStaticMesh(const std::string& name);
+		IF_SkeletalMesh   AddSkeletalMesh(const std::string& name);
 		IF_DirectionLight AddDirLight();
 		IF_PointLight     AddPointLight();
 		IF_SpotLight      AddSpotLight();

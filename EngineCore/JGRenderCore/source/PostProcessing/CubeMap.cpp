@@ -5,7 +5,7 @@
 #include"Data/Scene.h"
 #include"Data/CommonData.h"
 #include"Data/SceneData.h"
-#include"Data/JGRCObject.h"
+#include"Data/Object/SceneObject.h"
 #include"Data/JGMaterial.h"
 using namespace JGRC;
 using namespace std;
@@ -37,7 +37,7 @@ void CubeMap::Update(const GameTimer& gt,FrameResource* CurrentResource)
 {
 	for (int i = 0; i < 6; ++i)
 	{
-		m_CubeMapPass[i]->Data = CommonData::_Scene()->MainPassData();
+		m_CubeMapPass[i]->Get() = CommonData::_Scene()->MainPassData();
 
 		XMMATRIX view = m_CubeCamera[i].GetView();
 		XMMATRIX proj = m_CubeCamera[i].GetProj();
@@ -47,27 +47,27 @@ void CubeMap::Update(const GameTimer& gt,FrameResource* CurrentResource)
 		XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
 		XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.View, XMMatrixTranspose(view));
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.InvView, XMMatrixTranspose(invView));
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.Proj, XMMatrixTranspose(proj));
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.InvProj, XMMatrixTranspose(invProj));
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.ViewProj, XMMatrixTranspose(viewProj));
-		XMStoreFloat4x4(&m_CubeMapPass[i]->Data.InvViewProj, XMMatrixTranspose(invViewProj));
-		m_CubeMapPass[i]->Data.EyePosW = m_CubeCamera[i].GetPosition3f();
-		m_CubeMapPass[i]->Data.RenderTargetSize = XMFLOAT2((float)m_Width, (float)m_Height);
-		m_CubeMapPass[i]->Data.InvRenderTargetSize = XMFLOAT2(1.0f / m_Width, 1.0f / m_Height);
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().View, XMMatrixTranspose(view));
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().InvView, XMMatrixTranspose(invView));
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().Proj, XMMatrixTranspose(proj));
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().InvProj, XMMatrixTranspose(invProj));
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().ViewProj, XMMatrixTranspose(viewProj));
+		XMStoreFloat4x4(&m_CubeMapPass[i]->Get().InvViewProj, XMMatrixTranspose(invViewProj));
+		m_CubeMapPass[i]->Get().EyePosW = m_CubeCamera[i].GetPosition3f();
+		m_CubeMapPass[i]->Get().RenderTargetSize = XMFLOAT2((float)m_Width, (float)m_Height);
+		m_CubeMapPass[i]->Get().InvRenderTargetSize = XMFLOAT2(1.0f / m_Width, 1.0f / m_Height);
 
-		m_CubeMapPass[i]->Data.WorldPosSceneIndex = m_CubeScene->GetWorldPosIndex();
-		m_CubeMapPass[i]->Data.AlbedoSceneIndex = m_CubeScene->GetAlbedoIndex();
-		m_CubeMapPass[i]->Data.NormalSceneIndex = m_CubeScene->GetNormalIndex();
-		m_CubeMapPass[i]->Data.DepthSceneIndex = m_CubeScene->GetDepthIndex();
-		m_CubeMapPass[i]->Data.MatSceneIndex = m_CubeScene->GetMatIndex();
+		m_CubeMapPass[i]->Get().WorldPosSceneIndex = m_CubeScene->GetWorldPosIndex();
+		m_CubeMapPass[i]->Get().AlbedoSceneIndex = m_CubeScene->GetAlbedoIndex();
+		m_CubeMapPass[i]->Get().NormalSceneIndex = m_CubeScene->GetNormalIndex();
+		m_CubeMapPass[i]->Get().DepthSceneIndex = m_CubeScene->GetDepthIndex();
+		m_CubeMapPass[i]->Get().MatSceneIndex = m_CubeScene->GetMatIndex();
 		if (CommonData::_Scene()->GetMainSkyBox())
-			m_CubeMapPass[i]->Data.SkyBoxIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
+			m_CubeMapPass[i]->Get().SkyBoxIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
 				CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));
 
 		auto currPassCB = CurrentResource->PassCB.get();
-		currPassCB->CopyData(m_CubeMapPass[i]->PassCBIndex, m_CubeMapPass[i]->Data);
+		currPassCB->CopyData(m_CubeMapPass[i]->Index(), m_CubeMapPass[i]->Get());
 	}
 }
 void CubeMap::Excute(FrameResource* CurrentResource,ID3D12GraphicsCommandList* CommandList, bool isDynamic)
@@ -75,11 +75,11 @@ void CubeMap::Excute(FrameResource* CurrentResource,ID3D12GraphicsCommandList* C
 	CommandList->RSSetViewports(1, &m_ViewPort);
 	CommandList->RSSetScissorRects(1, &m_ScissorRect);
 	CommonData::_ResourceManager()->ResourceStateTransition(CommandList, m_CubeMap, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(cbPassConstant));
+	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstantData));
 	for (int i = 0; i < 6; ++i)
 	{
 		auto passCB = CurrentResource->PassCB->Resource();
-		D3D12_GPU_VIRTUAL_ADDRESS passCBAddress = passCB->GetGPUVirtualAddress() + m_CubeMapPass[i]->PassCBIndex * passCBByteSize;
+		D3D12_GPU_VIRTUAL_ADDRESS passCBAddress = passCB->GetGPUVirtualAddress() + m_CubeMapPass[i]->Index() * passCBByteSize;
 
 		CommandList->SetGraphicsRootConstantBufferView((int)ECommonShaderSlot::cbPerPass, passCBAddress);
 
