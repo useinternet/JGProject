@@ -193,9 +193,6 @@
     <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp">
       <Filter>ResourceManagement</Filter>
     </ClCompile>
-    <ClCompile Include="source\ResourceManagement\HeapArray.cpp">
-      <Filter>ResourceManagement</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">

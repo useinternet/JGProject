@@ -55,7 +55,6 @@
     <ClCompile Include="source\ResourceManagement\AssetManager.cpp" />
     <ClCompile Include="source\ResourceManagement\DataManager.cpp" />
     <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp" />
-    <ClCompile Include="source\ResourceManagement\HeapArray.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceExtracter.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceManager.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceReader.cpp" />

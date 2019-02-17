@@ -57,6 +57,9 @@
     <ClInclude Include="source\Math\ObjectController\CoordinationController.h">
       <Filter>Math\ObjectController</Filter>
     </ClInclude>
+    <ClInclude Include="source\Data\Hash.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Data\JGData_IO.cpp">

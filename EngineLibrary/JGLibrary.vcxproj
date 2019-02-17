@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Common\Common.h" />
+    <ClInclude Include="source\Data\Hash.h" />
     <ClInclude Include="source\Data\JGData_IO.h" />
     <ClInclude Include="source\Math\CommonMath.h" />
     <ClInclude Include="source\Math\GeoMath.h" />

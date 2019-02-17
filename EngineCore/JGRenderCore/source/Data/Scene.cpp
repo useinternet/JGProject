@@ -22,6 +22,7 @@
 #include"DxCore/GpuCpuSynchronizer.h"
 #include"DxCore/ScreenManager.h"
 #include"DxCore/RootSignatureManager.h"
+
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
