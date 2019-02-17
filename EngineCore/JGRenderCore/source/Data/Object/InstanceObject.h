@@ -11,6 +11,7 @@ namespace JGRC
 		struct RCORE_EXPORT Unit
 		{
 			UINT  ID;
+			InstanceData* Data;
 			Unit* Parent = nullptr;
 			std::vector<Unit*> Child;
 

@@ -9,14 +9,19 @@ namespace JGRC
 	private:
 		bool bIsDead = false;
 		UINT CBIndex;
+		UINT CBSize;
 		T    Data;
 	public:
-		ShaderDataType(UINT index) : CBIndex(index) {}
+		ShaderDataType(UINT index) : CBIndex(index) {
+			CBSize = d3dUtil::CalcConstantBufferByteSize(sizeof(T));
+		}
 		T& Get()      { return Data; }
 		UINT Index()  { return CBIndex; }
+		UINT Size()   { return CBSize; }
 		bool IsDead() { return bIsDead; }
 		void Dead()   { bIsDead = true; }
 		void Live()   { bIsDead = false; }
+
 	};
 	typedef struct ObjectConstantData
 	{
@@ -65,6 +70,10 @@ namespace JGRC
 		UINT MatSceneIndex;
 		UINT Pad;
 	}PassConstantData;
+
+
+
+
 	typedef struct MaterialConstantData
 	{
 		DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f,1.0f,1.0f,1.0f };

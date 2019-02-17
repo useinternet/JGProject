@@ -18,19 +18,23 @@ Interface_SceneMaterialData::Interface_SceneMaterialData(MatPersonalData* data)
 }
 void Interface_SceneMaterialData::SetDiffuseAlbedo(float r, float g, float b, float a)
 {
-	m_Data->DiffuseAlbedo = { r, g, b, a };
+	m_Data->Data->Get().DiffuseAlbedo = { r, g, b, a };
+	m_Data->ClearNotify();
 }
 void Interface_SceneMaterialData::SetFresnelR0(float x, float y, float z)
 {
-	m_Data->FresnelR0 = { x, y, z };
+	m_Data->Data->Get().FresnelR0 = { x, y, z };
+	m_Data->ClearNotify();
 }
 void Interface_SceneMaterialData::SetRoughness(float x)
 {
-	m_Data->Roughness = x; 
+	m_Data->Data->Get().Roughness = x;
+	m_Data->ClearNotify();
 }
 void Interface_SceneMaterialData::SetMetalic(float x)
 {
-	m_Data->Metallic = x;
+	m_Data->Data->Get().Metallic = x;
+	m_Data->ClearNotify();
 }
 const std::string& Interface_SceneMaterialData::GetName() const
 {

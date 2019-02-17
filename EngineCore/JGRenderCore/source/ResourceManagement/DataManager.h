@@ -21,15 +21,15 @@ namespace JGRC
 		std::vector<std::unique_ptr<InstanceData>> m_InstanceDataMems;
 		std::vector<std::unique_ptr<MaterialData>> m_MaterialDataMems;
 	private:
-		std::vector<std::shared_ptr<Object>>     m_ObjectMems;
-		std::vector<std::shared_ptr<JGMaterial>> m_MatMems;
-		std::vector<std::shared_ptr<MatPersonalData>> m_MatDataMems;
+		std::vector<std::shared_ptr<Object>>      m_ObjectMems;
+		std::vector<std::shared_ptr<JGMaterial>>  m_MaterialMems;
 		std::vector<std::shared_ptr<JGBaseMesh>>  m_MeshMems;
 	private:
 		UINT m_ObjectCBIndex   = 0;
 		UINT m_MaterialCBIndex = 0;
 		UINT m_PassDataCBIndex = 0;
 		UINT m_SkinnedCBIndex  = 0;
+		UINT m_InstanceCBIndex = 0;
 	public:
 		DataManager() = default;
 		~DataManager() = default;
@@ -44,16 +44,24 @@ namespace JGRC
 			const std::string& meshName,
 			EObjectType type);
 		JGMaterial*      CreateMaterial(const MaterialDesc& desc);
-		MatPersonalData* CreateMaterialData(const std::string& name);
-		PassData*        CreatePassData();
 		JGStaticMesh*    CreateStaticMesh(const std::string& name);
 		JGSkeletalMesh*  CreateSkeletalMesh(const std::string& name);
 
 		void Build();
+		//void ReBuild();
+	public:
+		ObjectData*   AddObjectData();
+		PassData*     AddPassData();
+		SkinnedData*  AddSkinnedData();
+		InstanceData* AddInstanceData();
+		MaterialData* AddMaterialData();
 	public:
 		UINT ObjectCount();
 		UINT MaterialDataCount();
 		UINT PassDataCount();
+		UINT SkinnedDataCount();
+		UINT InstanceDataCount();
+
 	};
 
 

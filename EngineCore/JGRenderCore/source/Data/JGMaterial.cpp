@@ -34,25 +34,16 @@ void JGMaterial::Update(class FrameResource* CurrentFrameResource)
 		}
 		UpdatePerFrame();
 	}
-	for (auto& data : m_PersonalData)
+	for (auto& data : m_MaterialDatas)
 	{
-		if (data.second->IsCanUpdate())
+		if (data.second.IsCanUpdate())
 		{
-			MaterialConstantData MatData;
-			XMMATRIX matTransform = XMLoadFloat4x4(&data.second->MatTransform);
-			XMStoreFloat4x4(&data.second->MatTransform, matTransform);
-
-
-			MatData.DiffuseAlbedo = data.second->DiffuseAlbedo;
-			MatData.FresnelR0 = data.second->FresnelR0;
-			MatData.Metallic = data.second->Metallic;
-			MatData.Roughness = data.second->Roughness;
 			for (UINT i = 0; i < 8; ++i)
 			{
-				MatData.TextureIndex[i] = m_ShareData.TextureIndex[i];
+				data.second.Data->Get().TextureIndex[i] = m_ShareData.TextureIndex[i];
 			}
-			MaterialCB->CopyData(data.second->CBIndex, MatData);
-			data.second->UpdatePerFrame();
+			MaterialCB->CopyData(data.second.Data->Index(), data.second.Data->Get());
+			data.second.UpdatePerFrame();
 		}
 	}
 }
@@ -71,17 +62,19 @@ EShaderFlag JGMaterial::GetFlag()
 }
 MatPersonalData* JGMaterial::AddData(const string& name)
 {
-	if (m_PersonalData.find(name) != m_PersonalData.end())
+	if (m_MaterialDatas.find(name) != m_MaterialDatas.end())
 		return nullptr;
-	MatPersonalData* data = CommonData::_DataManager()->CreateMaterialData(name);
-	m_PersonalData[name] = data;
-	return data;
+	MatPersonalData result;
+	result.Data = CommonData::_DataManager()->AddMaterialData();
+	result.Name = name;
+	m_MaterialDatas[name] = result;
+	return &m_MaterialDatas[name];
 }
 MatPersonalData* JGMaterial::GetData(const string& name)
 {
-	if (m_PersonalData.find(name) == m_PersonalData.end())
+	if (m_MaterialDatas.find(name) == m_MaterialDatas.end())
 		return nullptr;
-	return m_PersonalData[name];
+	return &m_MaterialDatas[name];
 }
 void JGMaterial::SetTexture(ETextureSlot slot,const std::wstring& TexturePath)
 {

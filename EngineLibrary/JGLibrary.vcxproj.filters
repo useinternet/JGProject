@@ -1,27 +1,78 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Lib">
-      <UniqueIdentifier>{e48f530f-5151-4e3c-99e2-8c013368bcc4}</UniqueIdentifier>
+    <Filter Include="Common">
+      <UniqueIdentifier>{95f04e76-5337-4bc3-a97a-69951fad15eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{74d13fc2-a2e0-4dbb-83ac-f23ebd05dc96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{38c407f9-9346-4c9f-8df7-3e5f9abd57f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{f5b5767c-dd98-49c7-aa62-c6f20dddc3e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\ObjectController">
+      <UniqueIdentifier>{57d65f73-019a-42ed-93ad-fd803ed50565}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Common.h">
-      <Filter>Lib</Filter>
+    <ClInclude Include="source\Common\Common.h">
+      <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="source\JGData_IO.h">
-      <Filter>Lib</Filter>
+    <ClInclude Include="source\Data\JGData_IO.h">
+      <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="source\JGThreadPool.h">
-      <Filter>Lib</Filter>
+    <ClInclude Include="source\Math\CommonMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\GeoMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\GeoMathTest.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\Object_Ingredient.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\Transform.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Thread\ThreadPool.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\ObjectController\Location.h">
+      <Filter>Math\ObjectController</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\ObjectController\Rotation.h">
+      <Filter>Math\ObjectController</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\ObjectController\Scale.h">
+      <Filter>Math\ObjectController</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Math\ObjectController\CoordinationController.h">
+      <Filter>Math\ObjectController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\JGData_IO.cpp">
-      <Filter>Lib</Filter>
+    <ClCompile Include="source\Data\JGData_IO.cpp">
+      <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="source\JGThreadPool.cpp">
-      <Filter>Lib</Filter>
+    <ClCompile Include="source\Math\GeoMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Math\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Math\Transform.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Thread\ThreadPool.cpp">
+      <Filter>Thread</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

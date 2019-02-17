@@ -159,22 +159,10 @@ void Scene::Draw()
 
 
 	m_LightManager->DrawShadowMap(CommandList, CurrFrameResource);
-	
-
-
-	//for (auto& objarr : m_ObjectArray)
-	//{
-	//	for (auto& obj : objarr.second[EPSOMode::DEFAULT])
-	//	{
-	//		obj->CubeMapDraw(CurrFrameResource, CommandList);
-	//	}
-	//}
-
-
 
 	// 메인 패쓰 등록
 	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
-		MainPassHandle());
+		CurrFrameResource->PassCBHeapAddress(m_MainPass));
 	m_SceneData->SceneDataExtract(CurrFrameResource, CommandList);
 
 
@@ -186,6 +174,7 @@ void Scene::Draw()
 	CommandList->IASetIndexBuffer(nullptr);
 	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	CommandList->DrawInstanced(6, 1, 0, 0);
+
 	//m_Blur->Execute(m_DxDevice->CurrentBackBuffer(), CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET, 1);
 	// 마무리
 	m_ScreenManager->OutputScreen(m_Name, CommandList);
@@ -256,7 +245,7 @@ SceneObject* Scene::CreateSkyBox(const std::wstring& texturepath)
 
 	// 오브젝트 생성
 	SceneObject* obj = CreateObject("SkyBox", SkyMat, SkyMatData->Name, SkyMesh,"Scene_SkyBox_Default_Mesh", EObjectType::Static );
-	obj->SetScale(5000.0f, 5000.0f, 5000.0f);
+	obj->GetScale().Set(5000.0f, 5000.0f, 5000.0f);
 	return obj;
 }
 void   Scene::AddDebugBox(SceneObject* obj, const XMFLOAT3& color, float thickness)
@@ -302,7 +291,7 @@ Camera*     Scene::AddCamera()
 }
 PassData* Scene::AddPassData()
 {
-	return CommonData::_DataManager()->CreatePassData();
+	return CommonData::_DataManager()->AddPassData();
 }
 JGLight*  Scene::AddLight(ELightType type, ELightExercise extype)
 {
@@ -334,13 +323,6 @@ SceneData* Scene::GetSceneData() const
 LightManager* Scene::GetLightManager()
 {
 	return m_LightManager.get();
-}
-D3D12_GPU_VIRTUAL_ADDRESS Scene::MainPassHandle()
-{
-	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstantData));
-	D3D12_GPU_VIRTUAL_ADDRESS Handle = CommonData::_EngineFrameResourceManager()->CurrentFrameResource()->PassCB->Resource()->GetGPUVirtualAddress();
-	Handle += m_MainPass->Index() * passCBByteSize;
-	return Handle;
 }
 void Scene::MainPassUpdate(const GameTimer& gt)
 {

@@ -93,8 +93,8 @@ bool TestWindow::Initialize()
 	// 오브젝트 추가
 	IF_Object GridObj = scene->CreateObject("GridObj", GridMat, GridMatData, gridMesh, "Grid");
 	IF_Object AnimObj = scene->CreateObject("AnimObj", AnimMat, AnimMatData2, animMesh, "../Contents/JGUser/Beta_Surface.jgskeletalmesh", E_IF_ObjType::Dynamic);
-	AnimObj->SetLocation(0.0f, 0.0f, -200.0f);
-	AnimObj->SetRotation(0.0f, 0.0f, 0.0f);
+	AnimObj->GetLocation().Set(0.0f, 0.0f, -200.0f);
+	AnimObj->GetRotation().Set(0.0f, 0.0f, 0.0f);
 	AnimObj->SetAnimation(AnimKey);
 
 	IF_Object AnimObj2 = scene->CreateObject("AnimObj2", AnimMat, AnimMatData, animMesh, "../Contents/JGUser/Beta_Joints.jgskeletalmesh", E_IF_ObjType::Dynamic);
@@ -111,7 +111,7 @@ bool TestWindow::Initialize()
 		{
 			TestObj[i][j] = scene->CreateObject("TestObj" + std::to_string(i) + std::to_string(j),
 				TestMat, TestMatData[i][j], gridMesh, "TestSphere");
-			TestObj[i][j]->SetLocation(i * 25.0f - 125.0f, j * 25.0f + 25.0f, 0.0f);
+			TestObj[i][j]->GetLocation().Set(i * 25.0f - 125.0f, j * 25.0f + 25.0f, 0.0f);
 			scene->DebugBox(TestObj[i][j], { 0.0f,0.0f,0.0f }, 0.5f);
 		}
 

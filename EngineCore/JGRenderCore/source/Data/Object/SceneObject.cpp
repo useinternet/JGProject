@@ -1,6 +1,7 @@
 #include"SceneObject.h"
 #include"Data/Mesh/JGSkeletalMesh.h"
 #include"Data/Mesh/JGStaticMesh.h"
+#include"ResourceManagement/DataManager.h"
 #include"Data/JGMaterial.h"
 #include"Data/Animation/JGAnimation.h"
 #include"DxCore/RootSignatureManager.h"
@@ -9,11 +10,14 @@
 using namespace JGRC;
 using namespace std;
 using namespace DirectX;
-
+using namespace JGLibrary;
 UINT SceneObject::Count = 0;
 
-SceneObject::SceneObject(UINT index, EObjectType type, const string& name)
-	: Object(type, name), m_ObjCBIndex(index) {}
+SceneObject::SceneObject(EObjectType type, const string& name)
+	: Object(type, name) 
+{
+	m_Data = CommonData::_DataManager()->AddObjectData();
+}
 void SceneObject::Build(ID3D12GraphicsCommandList* CommandList)
 {
 	GetState().Init = true;
@@ -30,8 +34,7 @@ void SceneObject::Build(ID3D12GraphicsCommandList* CommandList)
 			MatDesc->Mode,
 			CommonData::_RootSigManager()->GetRootSig(ERootSigType::CommonSkinned),
 			flag);
-
-		m_SkinnedCBIndex = (UINT)SkinnedIndex++;
+		m_SkinnedData = CommonData::_DataManager()->AddSkinnedData();
 		m_AnimHelper = make_unique<JGAnimationHelper>();
 		m_SkeletalMesh = dynamic_cast<JGSkeletalMesh*>(GetMesh());
 		m_AnimHelper->BuildAnimationData(
@@ -53,24 +56,28 @@ void SceneObject::Update(const GameTimer& gt, FrameResource* CurrFrameResource)
 {
 	if (!GetState_c().Active)
 		return;
-
+	if (m_Parent && m_Parent->IsCanUpdate() && !IsCanUpdate())
+	{
+		ClearNotify();
+	}
 	auto ObjectCB = CurrFrameResource->ObjectCB.get();
 	if (IsCanUpdate())
 	{
-		ObjectConstantData objConstants;
+		//ObjectConstantData objConstants;
 		/*objConstants.CubeMapIndex = CommonData::_ResourceManager()->GetCubeTextureShaderIndex(
 			CommonData::_Scene()->GetMainSkyBox()->GetMaterial()->GetTexturePath(ETextureSlot::Diffuse));*/
 
 		// 월드 매트릭스 업데이트
-	    UpdateWorldMatrix();
+		m_WorldMatrix.Identity();
+		m_WorldMatrix = GetTransform();
+		m_WorldMatrix.Transpose();
 
-		XMMATRIX World = XMLoadFloat4x4(&m_World);
-		XMMATRIX TexTransform = XMLoadFloat4x4(&m_TexTransform);
-		XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(World));
-		XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixTranspose(TexTransform));
 
-		objConstants.MaterialIndex = m_MatPersonalData->CBIndex;
-		ObjectCB->CopyData(m_ObjCBIndex, objConstants);
+		XMStoreFloat4x4(&m_Data->Get().World, m_WorldMatrix.GetSIMD());
+		XMStoreFloat4x4(&m_Data->Get().TexTransform, XMMatrixTranspose(m_TexMatrix.GetSIMD()));
+
+		m_Data->Get().MaterialIndex = m_MatPersonalData->Data->Index();
+		ObjectCB->CopyData(m_Data->Index(), m_Data->Get());
 		UpdatePerFrame();
 	}
 	// 애니메이션
@@ -79,7 +86,11 @@ void SceneObject::Update(const GameTimer& gt, FrameResource* CurrFrameResource)
 		m_AnimHelper->UpdateAnimatoin(gt, m_Animation, m_SkeletalMesh->GetBoneHierarchy(GetMeshName()),
 			(UINT)m_SkeletalMesh->GetBoneData(GetMeshName()).size());
 		if (m_AnimHelper->IsPlay)
-			CurrFrameResource->SkinnedCB->CopyData(m_SkinnedCBIndex, m_AnimHelper->Get());
+		{
+			m_SkinnedData->Get() = m_AnimHelper->Get();
+			CurrFrameResource->SkinnedCB->CopyData(m_SkinnedData->Index(), m_SkinnedData->Get());
+		}
+			
 	}
 }
 void SceneObject::Draw(FrameResource* CurrFrameResource, ID3D12GraphicsCommandList* CommandList, EObjectRenderMode Mode)
@@ -103,18 +114,16 @@ void SceneObject::Draw(FrameResource* CurrFrameResource, ID3D12GraphicsCommandLi
 		CommandList->SetPipelineState(GetPSOPack_c().ViewNormalPSO);
 		break;
 	}
-	D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = ObjCB->GetGPUVirtualAddress();
-	objCBAddress += (m_ObjCBIndex * ObjCBByteSize);
-	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerObject, objCBAddress);
+	CommandList->SetGraphicsRootConstantBufferView(
+		(UINT)ECommonShaderSlot::cbPerObject,
+		CurrFrameResource->ObjectCBHeapAddress(m_Data));
 
 	// 메시가 스켈레톤 메시 이고 애니메이션이 활성화 되어있는경우 셰이더에 본 트랜스폼 데이터 적재
 	if (m_Animation && m_AnimHelper->IsPlay)
 	{
-		UINT skbtSize = d3dUtil::CalcConstantBufferByteSize(sizeof(SkinnedConstantData));
-		D3D12_GPU_VIRTUAL_ADDRESS Address = CurrFrameResource->SkinnedCB->Resource()->GetGPUVirtualAddress();
-		Address += (m_SkinnedCBIndex * skbtSize);
-
-		CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerSkinned, Address);
+		CommandList->SetGraphicsRootConstantBufferView(
+			(UINT)ECommonShaderSlot::cbPerSkinned, 
+			CurrFrameResource->SkinnedCBHeapAddress(m_SkinnedData));
 	}
 	GetMesh()->ArgDraw(GetMeshName(), CommandList, CurrFrameResource);
 }
@@ -149,87 +158,20 @@ void SceneObject::SetAnimation(const string& name)
 {
 	m_Animation = CommonData::_Scene()->GetAnimation(name);
 }
-const XMFLOAT4X4 SceneObject::GetWorld()    const
+Transform SceneObject::GetTransform()
 {
-	if (m_Parent == nullptr)
-		return m_World;
-	XMFLOAT4X4 result4x4f;
-	XMMATRIX me = XMLoadFloat4x4(&m_World);
-	XMMATRIX parent = XMLoadFloat4x4(&m_Parent->GetWorld());
-	XMMATRIX result = XMMatrixMultiply(me, parent);
-	XMStoreFloat4x4(&result4x4f, result);
-	return result4x4f;
+	if (m_Parent)
+	{
+		Transform result;
+		result = m_CoordinateSystem.GetTransform() * m_Parent->GetTransform();
+		return result;
+	}
+	else
+	{
+		return m_CoordinateSystem.GetTransform();
+	}
 }
-void SceneObject::SetLocation(float x, float y, float z)
+Transform SceneObject::GetTexTransform()
 {
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Location = { x,y,z };
-	ClearNotify();
-}
-void SceneObject::SetRotation(float pitch, float yaw, float roll)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Rotation = { pitch,yaw,roll };
-	ClearNotify();
-}
-void SceneObject::SetScale(float x, float y, float z)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Scale = { x,y,z };
-	ClearNotify();
-}
-
-void SceneObject::SetScale(float x)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Scale = { x,x,x };
-	ClearNotify();
-}
-
-void SceneObject::OffsetLocation(float x, float y, float z)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Location = { m_Location.x + x,m_Location.y + y, m_Location.z + z };
-	ClearNotify();
-}
-void SceneObject::OffsetRotation(float pitch, float yaw, float roll)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Rotation = { m_Rotation.x + pitch , m_Rotation.y + yaw, m_Rotation.z + roll };
-	ClearNotify();
-}
-void SceneObject::OffsetScale(float x, float y, float z)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Scale = { m_Scale.x + x,m_Scale.y + y,m_Scale.z + z };
-	ClearNotify();
-}
-void SceneObject::OffsetScale(float x)
-{
-	if (GetState_c().Init && GetType() == EObjectType::Static)
-		return;
-	m_Scale = { m_Scale.x + x,m_Scale.y + x,m_Scale.z + x};
-	ClearNotify();
-}
-void SceneObject::UpdateWorldMatrix()
-{
-	XMMATRIX Translation = XMMatrixTranslation(m_Location.x, m_Location.y, m_Location.z);
-	XMMATRIX Rotation = XMMatrixRotationRollPitchYaw(
-		XMConvertToRadians(m_Rotation.x),
-		XMConvertToRadians(m_Rotation.y),
-		XMConvertToRadians(m_Rotation.z));
-	XMMATRIX Scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
-	XMMATRIX World;
-	(m_Parent) ?
-		World = Scale * Rotation * Translation * XMLoadFloat4x4(&m_Parent->GetWorld()) :
-		World = Scale * Rotation * Translation;
-
-	XMStoreFloat4x4(&m_World, World);
+	return m_TexMatrix;
 }

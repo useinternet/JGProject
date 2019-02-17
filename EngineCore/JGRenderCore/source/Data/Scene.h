@@ -106,7 +106,6 @@ namespace JGRC
 	public:
 		const PassConstantData& MainPassData()  const    { return m_MainPass->Get(); }
 		PassData*             GetMainPass()            { return m_MainPass; }
-		D3D12_GPU_VIRTUAL_ADDRESS MainPassHandle();
 		const DirectX::BoundingSphere& GetSceneSphere()      const { return m_SceneSphere; }
 	private:
 		void MainPassUpdate(const GameTimer& gt);

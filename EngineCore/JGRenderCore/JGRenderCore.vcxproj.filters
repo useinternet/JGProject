@@ -193,6 +193,9 @@
     <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp">
       <Filter>ResourceManagement</Filter>
     </ClCompile>
+    <ClCompile Include="source\ResourceManagement\HeapArray.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\DxCommon\Camera.h">
@@ -386,6 +389,9 @@
     </ClInclude>
     <ClInclude Include="source\DxCommon\DataType_Define.h">
       <Filter>DxCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ResourceManagement\HeapArray.h">
+      <Filter>ResourceManagement</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

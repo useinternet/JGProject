@@ -13,14 +13,8 @@ namespace JGRC
 	};
 	struct RCORE_EXPORT MatPersonalData
 	{
-		UINT CBIndex = 0;
-		std::string Name;
-		DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f,1.0f,1.0f,1.0f };
-		DirectX::XMFLOAT3 FresnelR0 = { 0.0f, 0.0f, 0.0f };
-		float Roughness = 0.0f;
-		float Metallic  = 0.0f;
-		DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
-
+		std::string   Name;
+		MaterialData* Data;
 		// 프레임 알림이
 		int UpdateNotify = CPU_FRAMERESOURCE_NUM;
 
@@ -37,7 +31,7 @@ namespace JGRC
 	{
 	private:
 		MatShareData m_ShareData;
-		std::unordered_map<std::string, MatPersonalData*> m_PersonalData;
+		std::unordered_map<std::string, MatPersonalData> m_MaterialDatas;
 		std::unique_ptr<MaterialDesc>  m_Desc;
 		// 지연된 텍스쳐 업데이트를 위한 Que
 		std::queue<std::pair<ETextureSlot, std::wstring>> m_TextureDataQue;

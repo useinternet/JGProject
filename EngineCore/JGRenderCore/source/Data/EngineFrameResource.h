@@ -15,15 +15,18 @@ namespace JGRC
 	public:
 		FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount);
 		~FrameResource() {}
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>   CmdListAlloc;
-		std::unique_ptr<UploadBuffer<PassConstantData>>    PassCB     = nullptr;
-		std::unique_ptr<UploadBuffer<ObjectConstantData>>  ObjectCB   = nullptr;
-		std::unique_ptr<UploadBuffer<MaterialConstantData>>      MaterialCB = nullptr;
-		std::unique_ptr<UploadBuffer<SkinnedConstantData>>       SkinnedCB  = nullptr;
-		std::unique_ptr<UploadBuffer<Light>>             LightCB    = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>      CmdListAlloc;
+		std::unique_ptr<UploadBuffer<PassConstantData>>     PassCB     = nullptr;
+		std::unique_ptr<UploadBuffer<ObjectConstantData>>   ObjectCB   = nullptr;
+		std::unique_ptr<UploadBuffer<MaterialConstantData>> MaterialCB = nullptr;
+		std::unique_ptr<UploadBuffer<SkinnedConstantData>>  SkinnedCB  = nullptr;
+		std::unique_ptr<UploadBuffer<Light>>                LightCB    = nullptr;
 		UINT64 Fence = 0;
 	public:
 		void ReSize(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount);
+		D3D12_GPU_VIRTUAL_ADDRESS ObjectCBHeapAddress(ObjectData* Data);
+		D3D12_GPU_VIRTUAL_ADDRESS PassCBHeapAddress(PassData* Data);
+		D3D12_GPU_VIRTUAL_ADDRESS SkinnedCBHeapAddress(SkinnedData* Data);
 	};
 
 	class RCORE_EXPORT EngineFrameResourceManager

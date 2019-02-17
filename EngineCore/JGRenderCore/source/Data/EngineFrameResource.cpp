@@ -1,5 +1,6 @@
 #include"EngineFrameResource.h"
-#include"Data/Object/Object.h"
+#include"ResourceManagement/DataManager.h"
+#include"Data/CommonData.h"
 using namespace std;
 using namespace JGRC;
 FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)
@@ -8,9 +9,11 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 		D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
 	PassCB = std::make_unique<UploadBuffer<PassConstantData>>(device, passCount, true);
 	ObjectCB = std::make_unique<UploadBuffer<ObjectConstantData>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1,Object::SkinnedIndex), true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1,
+		CommonData::_DataManager()->SkinnedDataCount()), true);
 	MaterialCB = std::make_unique<UploadBuffer<MaterialConstantData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
+
 }
 void FrameResource::ReSize(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)
 {
@@ -20,9 +23,27 @@ void FrameResource::ReSize(ID3D12Device* device, UINT passCount, UINT objectCoun
 	LightCB.reset();
 	PassCB = std::make_unique<UploadBuffer<PassConstantData>>(device, passCount, true);
 	ObjectCB = std::make_unique<UploadBuffer<ObjectConstantData>>(device, objectCount, true);
-	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1, Object::SkinnedIndex), true);
+	SkinnedCB = std::make_unique<UploadBuffer<SkinnedConstantData>>(device, std::max<UINT>(1, CommonData::_DataManager()->SkinnedDataCount()), true);
 	MaterialCB = std::make_unique<UploadBuffer<MaterialConstantData>>(device, materialCount, false);
 	LightCB = make_unique<UploadBuffer<Light>>(device, lightCount, false);
+}
+D3D12_GPU_VIRTUAL_ADDRESS FrameResource::ObjectCBHeapAddress(ObjectData* Data)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS result = ObjectCB->Resource()->GetGPUVirtualAddress();
+	result += (Data->Index() * Data->Size());
+	return result;
+}
+D3D12_GPU_VIRTUAL_ADDRESS FrameResource::PassCBHeapAddress(PassData* Data)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS result = PassCB->Resource()->GetGPUVirtualAddress();
+	result += (Data->Index() * Data->Size());
+	return result;
+}
+D3D12_GPU_VIRTUAL_ADDRESS FrameResource::SkinnedCBHeapAddress(SkinnedData* Data)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS result = SkinnedCB->Resource()->GetGPUVirtualAddress();
+	result += (Data->Index() * Data->Size());
+	return result;
 }
 void EngineFrameResourceManager::BuildFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT lightCount)
 {

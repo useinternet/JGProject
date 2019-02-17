@@ -295,8 +295,9 @@ void SSAO::DrawNormalDepthMap(FrameResource* CurrFrameResource, ID3D12GraphicsCo
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 	CommandList->OMSetRenderTargets(1, &m_NormalMapRtvPack->Handle, true, &data.DsvPack->Handle);
 	// 메인 패쓰 등록
-	CommandList->SetGraphicsRootConstantBufferView((UINT)ECommonShaderSlot::cbPerPass,
-		CommonData::_Scene()->MainPassHandle());
+	CommandList->SetGraphicsRootConstantBufferView(
+		(UINT)ECommonShaderSlot::cbPerPass,
+		CurrFrameResource->PassCBHeapAddress(CommonData::_Scene()->GetMainPass()));
 
 
 	CommonData::_Scene()->SceneObjectDraw(CommandList, CurrFrameResource, EObjectRenderMode::ViewNormal);

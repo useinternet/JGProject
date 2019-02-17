@@ -34,7 +34,7 @@ void InstanceObject::Update(const GameTimer& gt, FrameResource* CurrFrameResourc
 		if (unit.IsCanUpdate())
 		{
 			InstanceConstantData InsData;
-			InsData.MaterialIndex = unit.MatData->CBIndex;
+			InsData.MaterialIndex = unit.MatData->Data->Index();
 
 			XMMATRIX World = XMLoadFloat4x4(&unit.World);
 			XMMATRIX TexTransform = XMLoadFloat4x4(&unit.TexTransform);
@@ -53,9 +53,7 @@ void InstanceObject::Draw(
 {
 	if (!GetState_c().Visible)
 		return;
-
-	// 
-
+	//
 	auto MeshData = GetMesh()->Data();
 	switch (Mode)
 	{
@@ -72,7 +70,6 @@ void InstanceObject::Draw(
 	GetMesh()->ArgDraw(GetMeshName(), CommandList, CurrFrameResource,
 		GetUnitCount());
 }
-
 UINT InstanceObject::AddInstanceUnit()
 {
 	Unit unit;

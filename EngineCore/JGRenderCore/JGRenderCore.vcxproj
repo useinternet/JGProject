@@ -55,6 +55,7 @@
     <ClCompile Include="source\ResourceManagement\AssetManager.cpp" />
     <ClCompile Include="source\ResourceManagement\DataManager.cpp" />
     <ClCompile Include="source\ResourceManagement\DxHeapManager.cpp" />
+    <ClCompile Include="source\ResourceManagement\HeapArray.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceExtracter.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceManager.cpp" />
     <ClCompile Include="source\ResourceManagement\ResourceReader.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="source\ResourceManagement\AssetManager.h" />
     <ClInclude Include="source\ResourceManagement\DataManager.h" />
     <ClInclude Include="source\ResourceManagement\DxHeapManager.h" />
+    <ClInclude Include="source\ResourceManagement\HeapArray.h" />
     <ClInclude Include="source\ResourceManagement\ResourceExtracter.h" />
     <ClInclude Include="source\ResourceManagement\ResourceManager.h" />
     <ClInclude Include="source\ResourceManagement\ResourceReader.h" />
@@ -230,7 +232,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;$(SolutionDir)EngineLibrary/source/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -269,7 +271,7 @@ copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)Common/Lib/"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;JGRENDERCORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;$(SolutionDir)EngineLibrary/source/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

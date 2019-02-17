@@ -18,7 +18,7 @@ SceneObject*    DataManager::CreateSceneObject(
 	const string& meshName,
 	EObjectType type)
 {
-	auto Obj = make_unique<SceneObject>(m_ObjectCBIndex++, type, name);
+	auto Obj = make_unique<SceneObject>(type, name);
 	Obj->SetMaterial(mat, matDataName);
 	Obj->SetMesh(mesh, meshName);
 	
@@ -31,25 +31,7 @@ JGMaterial*     DataManager::CreateMaterial(const MaterialDesc& desc)
 {
 	auto mat = make_unique<JGMaterial>(desc);
 	JGMaterial* result = mat.get();
-	m_MatMems.push_back(move(mat));
-	return result;
-}
-MatPersonalData* DataManager::CreateMaterialData(const std::string& name)
-{
-	auto matData = make_unique<MatPersonalData>();
-	MatPersonalData* result = matData.get();
-	m_MatDataMems.push_back(move(matData));
-
-
-	result->Name = name;
-	result->CBIndex = m_MaterialCBIndex++;
-	return result;
-}
-PassData*       DataManager::CreatePassData()
-{
-	auto passData = make_unique<PassData>(m_PassDataCBIndex++);
-	PassData* result = passData.get();
-	m_PassDataMems.push_back(move(passData));
+	m_MaterialMems.push_back(move(mat));
 	return result;
 }
 JGStaticMesh*   DataManager::CreateStaticMesh(const std::string& name)
@@ -80,16 +62,58 @@ void DataManager::Build()
 		mesh->CreateMesh(CommandList);
 	}
 }
-
+ObjectData*   DataManager::AddObjectData()
+{
+	auto Data = make_unique<ObjectData>(m_ObjectCBIndex++);
+	ObjectData* result = Data.get();
+	m_ObjectDataMems.push_back(move(Data));
+	return result;
+}
+PassData*     DataManager::AddPassData()
+{
+	auto Data = make_unique<PassData>(m_PassDataCBIndex++);
+	PassData* result = Data.get();
+	m_PassDataMems.push_back(move(Data));
+	return result;
+}
+SkinnedData*  DataManager::AddSkinnedData()
+{
+	auto Data = make_unique<SkinnedData>(m_SkinnedCBIndex++);
+	SkinnedData* result = Data.get();
+	m_SkinnedDataMems.push_back(move(Data));
+	return result;
+}
+InstanceData* DataManager::AddInstanceData()
+{
+	auto Data = make_unique<InstanceData>(m_InstanceCBIndex++);
+	InstanceData* result = Data.get();
+	m_InstanceDataMems.push_back(move(Data));
+	return result;
+}
+MaterialData* DataManager::AddMaterialData()
+{
+	auto Data = make_unique<MaterialData>(m_MaterialCBIndex++);
+	MaterialData* result = Data.get();
+	m_MaterialDataMems.push_back(move(Data));
+	return result;
+}
 UINT DataManager::ObjectCount()
 {
-	return (UINT)m_ObjectMems.size();
+	return (UINT)m_ObjectDataMems.size();
 }
 UINT DataManager::MaterialDataCount()
 {
-	return (UINT)m_MatDataMems.size();
+	return (UINT)m_MaterialDataMems.size();
 }
 UINT DataManager::PassDataCount()
 {
 	return (UINT)m_PassDataMems.size();
+}
+UINT DataManager::SkinnedDataCount()
+{
+	return (UINT)m_SkinnedDataMems.size();
+}
+UINT DataManager::InstanceDataCount()
+{
+	return (UINT)m_InstanceDataMems.size();
 }

@@ -19,13 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Common.h" />
-    <ClInclude Include="source\JGData_IO.h" />
-    <ClInclude Include="source\JGThreadPool.h" />
+    <ClInclude Include="source\Common\Common.h" />
+    <ClInclude Include="source\Data\JGData_IO.h" />
+    <ClInclude Include="source\Math\CommonMath.h" />
+    <ClInclude Include="source\Math\GeoMath.h" />
+    <ClInclude Include="source\Math\GeoMathTest.h" />
+    <ClInclude Include="source\Math\ObjectController\CoordinationController.h" />
+    <ClInclude Include="source\Math\ObjectController\Location.h" />
+    <ClInclude Include="source\Math\ObjectController\Rotation.h" />
+    <ClInclude Include="source\Math\ObjectController\Scale.h" />
+    <ClInclude Include="source\Math\Object_Ingredient.h" />
+    <ClInclude Include="source\Math\Quaternion.h" />
+    <ClInclude Include="source\Math\Transform.h" />
+    <ClInclude Include="source\Thread\ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\JGData_IO.cpp" />
-    <ClCompile Include="source\JGThreadPool.cpp" />
+    <ClCompile Include="source\Data\JGData_IO.cpp" />
+    <ClCompile Include="source\Math\GeoMath.cpp" />
+    <ClCompile Include="source\Math\Quaternion.cpp" />
+    <ClCompile Include="source\Math\Transform.cpp" />
+    <ClCompile Include="source\Thread\ThreadPool.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -104,11 +117,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>./source/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)Common/Lib/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -152,6 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>./source/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,6 +177,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y "$(TargetDir)$(TargetName).lib" "$(SolutionDir)Common/Lib/"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
