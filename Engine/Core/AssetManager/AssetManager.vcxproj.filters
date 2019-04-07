@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{d14e9bd6-b001-490b-8272-064f5158da75}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetDefine.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetExtracter.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetAnimTransform.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\PCH.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssetExtracter.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetDefine.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetAnimTransform.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Library\PCH.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

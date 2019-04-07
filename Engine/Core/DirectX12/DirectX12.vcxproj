@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DevelopRelease|x64">
+      <Configuration>DevelopRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevelopDebug|x64">
+      <Configuration>DevelopDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Library\PCH.h" />
+    <ClInclude Include="Src\DirectXCommon\d3dx12.h" />
+    <ClInclude Include="Src\DirectXCommon\DDSTextureLoader.h" />
+    <ClInclude Include="Src\DirectXCommon\DirectXCommon.h" />
+    <ClInclude Include="Src\DirectXCommon\Dx12TypeDefines.h" />
+    <ClInclude Include="Src\DirectXCommon\Dx12Exception.h" />
+    <ClInclude Include="Src\DirectXCommon\ScreenGrab12.h" />
+    <ClInclude Include="Src\DirectXCommon\WICTextureLoader12.h" />
+    <ClInclude Include="Src\DirectXObjects\ShaderCommonDefines.h" />
+    <ClInclude Include="Src\DirectXObjects\Dx12Object.h" />
+    <ClInclude Include="Src\DirectXObjects\Material.h" />
+    <ClInclude Include="Src\DirectXObjects\Mesh.h" />
+    <ClInclude Include="Src\DirectXToolKit\BlendState.h" />
+    <ClInclude Include="Src\DirectXToolKit\Buffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\ByteAddressBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\Camera.h" />
+    <ClInclude Include="Src\DirectXToolKit\CommandList.h" />
+    <ClInclude Include="Src\DirectXToolKit\CommandQueue.h" />
+    <ClInclude Include="Src\DirectXToolKit\ConstantBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\CubeRenderTarget.h" />
+    <ClInclude Include="Src\DirectXToolKit\DepthStencilState.h" />
+    <ClInclude Include="Src\DirectXToolKit\DescriptorAllocation.h" />
+    <ClInclude Include="Src\DirectXToolKit\DescriptorAllocator.h" />
+    <ClInclude Include="Src\DirectXToolKit\DescriptorAllocatorPage.h" />
+    <ClInclude Include="Src\DirectXToolKit\DescriptorHeap.h" />
+    <ClInclude Include="Src\DirectXToolKit\DirectXCore.h" />
+    <ClInclude Include="Src\DirectXToolKit\DxUtil.h" />
+    <ClInclude Include="Src\DirectXToolKit\Fence.h" />
+    <ClInclude Include="Src\DirectXToolKit\GenerateMipMapsCS.h" />
+    <ClInclude Include="Src\DirectXToolKit\GeometryGenerator.h" />
+    <ClInclude Include="Src\DirectXToolKit\IndexBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\PSO.h" />
+    <ClInclude Include="Src\DirectXToolKit\RasterizerState.h" />
+    <ClInclude Include="Src\DirectXToolKit\RenderTarget.h" />
+    <ClInclude Include="Src\DirectXToolKit\Resource.h" />
+    <ClInclude Include="Src\DirectXToolKit\ResourceStateMap.h" />
+    <ClInclude Include="Src\DirectXToolKit\RootSigature.h" />
+    <ClInclude Include="Src\DirectXToolKit\SamplerState.h" />
+    <ClInclude Include="Src\DirectXToolKit\ScissorRect.h" />
+    <ClInclude Include="Src\DirectXToolKit\Screen.h" />
+    <ClInclude Include="Src\DirectXToolKit\Shader.h" />
+    <ClInclude Include="Src\DirectXToolKit\StructuredBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\Texture.h" />
+    <ClInclude Include="Src\DirectXToolKit\UploadBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\VertexBuffer.h" />
+    <ClInclude Include="Src\DirectXToolKit\VertexCollection.h" />
+    <ClInclude Include="Src\DirectXToolKit\Viewport.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Library\PCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'">$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'">$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXCommon\DDSTextureLoader.cpp" />
+    <ClCompile Include="Src\DirectXCommon\Dx12Exception.cpp" />
+    <ClCompile Include="Src\DirectXCommon\ScreenGrab12.cpp" />
+    <ClCompile Include="Src\DirectXCommon\WICTextureLoader12.cpp" />
+    <ClCompile Include="Src\DirectXObjects\ShaderCommonDefines.cpp" />
+    <ClCompile Include="Src\DirectXObjects\Dx12Object.cpp" />
+    <ClCompile Include="Src\DirectXObjects\Material.cpp" />
+    <ClCompile Include="Src\DirectXObjects\Mesh.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Buffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\ByteAddressBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Camera.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\CommandList.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\CommandQueue.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\CubeRenderTarget.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DescriptorAllocation.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DescriptorAllocator.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DescriptorAllocatorPage.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DescriptorHeap.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DirectXCore.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\DxUtil.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Fence.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\GenerateMipMapsCS.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\GeometryGenerator.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\IndexBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\PSO.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\RenderTarget.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Resource.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\ResourceStateMap.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\RootSignature.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Screen.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Shader.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\StructuredBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\Texture.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\UploadBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\VertexBuffer.cpp" />
+    <ClCompile Include="Src\DirectXToolKit\VertexCollection.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{438CCCBB-4E37-4B7D-9355-1F246D707B68}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>DirectX12</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\DevelopDebug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\DevelopRelease.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopDebug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>Src/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DIRECTX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>Src/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DIRECTX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopRelease|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>Src/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DIRECTX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)\Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

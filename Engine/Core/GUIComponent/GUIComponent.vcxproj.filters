@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="InformationViewer">
+      <UniqueIdentifier>{5d4a88eb-b9cc-47e3-b207-2e6228d95996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui_Custom">
+      <UniqueIdentifier>{392f8348-8fe1-43e0-b7d2-8ceb9dba02c7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="InformationViewer\Gui_Log.cpp">
+      <Filter>InformationViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="InformationViewer\Gui_SystemInfo.cpp">
+      <Filter>InformationViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="InformationViewer\Gui_DirectroyViewer.cpp">
+      <Filter>InformationViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui_Custom\DirectoryTree.cpp">
+      <Filter>ImGui_Custom</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Library\PCH.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InformationViewer\Gui_Log.h">
+      <Filter>InformationViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiComponent.h" />
+    <ClInclude Include="InformationViewer\Gui_SystemInfo.h">
+      <Filter>InformationViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="InformationViewer\Gui_DirectoryViewer.h">
+      <Filter>InformationViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui_Custom\DirectoryTree.h">
+      <Filter>ImGui_Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Library\PCH.h" />
+  </ItemGroup>
+</Project>
