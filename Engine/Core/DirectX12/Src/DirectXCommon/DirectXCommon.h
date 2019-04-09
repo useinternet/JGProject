@@ -4,12 +4,14 @@
 #include"WICTextureLoader12.h"
 #include"Dx12Exception.h"
 #include"Dx12TypeDefines.h"
-#include"DirectXToolKit/VertexCollection.h"
 #include<dxgi1_5.h>
 #include <d3d12.h>
 #include<Data/Log.h>
 #include<Data/Path.h>
 #include<Math/Transformation.h>
+#include"DirectXToolKit/VertexCollection.h"
+
+
 #ifdef _DEVELOP_DEBUG
 #pragma comment(lib,"Common_develop.lib")
 #pragma comment(lib,"DirectXTex_d.lib")
@@ -37,6 +39,8 @@ REISTER_COMMONPATH
 #define DX12_LOG_WARNING(Contents, ...)  DX12_LOG(Common::Log::Warning, Contents, __VA_ARGS__)
 #define DX12_LOG_ERROR(Contents, ...)    DX12_LOG(Common::Log::Error, Contents, __VA_ARGS__)
 #define DX12_LOG_CRITICAL(Contents, ...) DX12_LOG(Common::Log::Critical, Contents, __VA_ARGS__)
+
+
 
 
 

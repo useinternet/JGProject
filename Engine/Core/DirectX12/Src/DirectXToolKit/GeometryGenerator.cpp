@@ -3,6 +3,7 @@
 #include"VertexCollection.h"
 #include"DirectXObjects/Mesh.h"
 #include"CommandList.h"
+#include<AssetManager.h>
 using namespace std;
 using namespace DirectX;
 namespace Dx12
@@ -16,6 +17,103 @@ namespace Dx12
 		void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint32_t sliceCount,
 			uint32_t stackCount, vector<JgVertex>& vertices, vector<uint32_t>& indices);
 
+
+
+		Mesh CreateMesh(CommandList* commandList, const string& path, bool* result)
+		{
+			fs::path ph(path);
+
+			if (!fs::exists(ph))
+			{
+				if (result)
+					*result = false;
+				DX12_LOG_ERROR("%s is not exsit", path.c_str());
+				return Mesh();
+			}
+			Mesh mesh;
+
+			if (ph.extension() == ASSET_MESH_FILEFORMAT)
+			{
+				JgAsset::AssetMeshStream stream;
+				bool r = false;
+				r = JgAsset::AssetManager::LoadMesh(stream, path);
+
+				if (result)
+					*result = r;
+				if (!r)
+				{
+					DX12_LOG_ERROR("Failed Load Mesh : %s ", path.c_str());
+					return Mesh();
+				}
+
+				if (!stream.MeshData.IsTangents)
+				{
+					DX12_LOG_ERROR("%s is none tangent", path.c_str());
+				}
+				if (!stream.MeshData.IsTexcoords)
+				{
+					DX12_LOG_ERROR("%s is none texcoord", path.c_str());
+				}
+			
+
+				mesh.Inititalize(commandList, stream.MeshData.AssetVertexs, stream.MeshData.AssetIndices, MeshType::Static, stream.MeshName);
+
+				return mesh;
+			}
+			else
+			{
+				DX12_LOG_ERROR("unsupported file format");
+				return Mesh();
+			}
+		}
+		Mesh CreateSkeletalMesh(CommandList* commandList, const string& path, bool* result)
+		{
+			fs::path ph(path);
+
+			if (!fs::exists(ph))
+			{
+				if (result)
+					*result = false;
+				DX12_LOG_ERROR("%s is not exsit", path.c_str());
+				return Mesh();
+			}
+
+			Mesh mesh;
+
+			if (ph.extension() == ASSET_SKELETALMESH_FILEFORMAT)
+			{
+				JgAsset::AssetSkeletalMeshStream stream;
+				bool r = false;
+				r = JgAsset::AssetManager::LoadSkeletalMesh(stream, path);
+
+				if (result)
+					*result = r;
+				if (!r)
+				{
+					DX12_LOG_ERROR("Failed Load Mesh : %s ", path.c_str());
+					return Mesh();
+				}
+
+				if (!stream.MeshData.IsTangents)
+				{
+					DX12_LOG_ERROR("%s is none tangent", path.c_str());
+				}
+				if (!stream.MeshData.IsTexcoords)
+				{
+					DX12_LOG_ERROR("%s is none texcoord", path.c_str());
+				}
+
+
+				mesh.Inititalize(commandList, stream.MeshData.AssetVertexs, stream.MeshData.AssetIndices, MeshType::Skeletal, stream.MeshName);
+
+				return mesh;
+			}
+			else
+			{
+				DX12_LOG_ERROR("unsupported file format");
+				return Mesh();
+			}
+		}
 		Mesh CreateBox(
 			CommandList* commandList,
 			float width, float height, float depth,

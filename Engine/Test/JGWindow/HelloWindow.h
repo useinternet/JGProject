@@ -24,7 +24,8 @@
 #include"DirectXToolKit/Screen.h"
 #include"DirectXObjects/Mesh.h"
 #include"DirectXObjects/Dx12Object.h"
-
+#include<AssetManager.h>
+#include<AssetAnimTransform.h>
 using namespace Dx12;
 
 class HelloWindow : public JGWindow
@@ -41,7 +42,7 @@ private:
 	ScissorRect m_Rect;
 
 	//
-	GraphicsPSO   m_SkyPSO;
+	//GraphicsPSO   m_SkyPSO;
 	Camera m_Camera;
 	PassCB m_PassCB;
 	//
@@ -52,11 +53,12 @@ private:
 	Dx12Object m_Object;
 	Dx12Object m_SkyObject;
 	ObjectFragments* m_InstanceObj1;
+	std::vector< ObjectFragments*> m_InstanceArray;
 	//
-
+	JgAsset::AssetAnimTransformByTimePos m_AnimTransform;
 	int m_PrevMouseX;
 	int m_PrevMouseY;
-
+	int m_OffsetLocation = 0.0f;
 public:
 	HelloWindow(HINSTANCE hInst) : JGWindow(hInst) {}
 	virtual ~HelloWindow() {

@@ -38,7 +38,7 @@ void Camera::RightMove(float speed)
 }
 void Camera::FowardMove(float speed)
 {
-	m_Position.SetZ(m_Position.Z() + speed);
+	m_Position += (GetLookVector() * speed);
 
 	m_bUpdate = true;
 }

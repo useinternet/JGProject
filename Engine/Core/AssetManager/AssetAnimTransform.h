@@ -22,6 +22,9 @@ namespace JgAsset
 		{
 			return &m_Matrixs[0];
 		}
+		uint32_t GetDataSize() const {
+			return (uint32_t)m_Matrixs.size();
+		}
 	private:
 		void ProcessCalcAnimTransform(
 			float TimePos,

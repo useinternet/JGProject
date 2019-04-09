@@ -15,6 +15,10 @@ namespace Dx12
 	class Mesh;
 	namespace GeometryGenerator
 	{
+		Mesh CreateMesh(CommandList* commandList, const std::string& path, bool* result);
+		Mesh CreateSkeletalMesh(CommandList* commandList, const std::string& path, bool* result);
+
+
 		Mesh CreateBox(
 			CommandList* commandList,
 			float width, float height, float depth, 

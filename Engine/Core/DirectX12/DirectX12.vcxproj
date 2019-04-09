@@ -23,6 +23,7 @@
     <ClInclude Include="Src\DirectXCommon\Dx12Exception.h" />
     <ClInclude Include="Src\DirectXCommon\ScreenGrab12.h" />
     <ClInclude Include="Src\DirectXCommon\WICTextureLoader12.h" />
+    <ClInclude Include="Src\DirectXObjects\GBuffer.h" />
     <ClInclude Include="Src\DirectXObjects\ShaderCommonDefines.h" />
     <ClInclude Include="Src\DirectXObjects\Dx12Object.h" />
     <ClInclude Include="Src\DirectXObjects\Material.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="Src\DirectXCommon\Dx12Exception.cpp" />
     <ClCompile Include="Src\DirectXCommon\ScreenGrab12.cpp" />
     <ClCompile Include="Src\DirectXCommon\WICTextureLoader12.cpp" />
+    <ClCompile Include="Src\DirectXObjects\GBuffer.cpp" />
     <ClCompile Include="Src\DirectXObjects\ShaderCommonDefines.cpp" />
     <ClCompile Include="Src\DirectXObjects\Dx12Object.cpp" />
     <ClCompile Include="Src\DirectXObjects\Material.cpp" />

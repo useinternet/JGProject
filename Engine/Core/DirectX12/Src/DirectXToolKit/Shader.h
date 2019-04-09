@@ -1,7 +1,6 @@
 #pragma once
 #include"DirectXCommon/DirectXCommon.h"
-#define SHADER_MACRO_USE_SKINNED "USE_SKINNED"
-#define SHADER_MACRO_DEFINE "1"
+
 namespace Dx12
 {
 	class Shader

@@ -4,7 +4,6 @@
 
 
 
-
 struct ToVs
 {
     float3 PosL : POSITION;
@@ -23,13 +22,14 @@ struct VsToPs
     float3 NormalW : NORMAL;
     float3 TangentW : TANGENT;
     float2 TexC : TEXCOORD;
+    uint InstanceID : INSTANCE;
 };
 VsToPs VS(ToVs vin, uint instanceID : SV_InstanceID)
 {
     VsToPs output;
     ObjectCB obj = gObjects[instanceID];
     float4x4 world = obj.World;
-
+    output.InstanceID = instanceID;
 
 #ifdef USE_SKINNED
     float3 posL = float3(0.0f,0.0f,0.0f);
@@ -51,7 +51,7 @@ VsToPs VS(ToVs vin, uint instanceID : SV_InstanceID)
 
     float4 PosW = mul(float4(vin.PosL, 1.0f), world);
     output.PosH = mul(PosW, gViewProj);
-    output.PosW = PosW;
+    output.PosW = PosW.xyz;
     output.NormalW = mul(vin.NormalL, (float3x3)world);
     output.TangentW = mul(vin.TangentL, (float3x3)world);
     output.TexC = vin.TexC;
@@ -66,11 +66,18 @@ float4 PS(VsToPs pin) : SV_Target
     float3 N = normalize(pin.NormalW);
     float3 T = normalize(pin.TangentW);
     float3 L = normalize(-SunDir);
-
     float NDotL = dot(N, L);
  
-    float3 Surface = float3(1.0f, 1.0f, 1.0f);
-    float4 TextureColor = gDiffuseTexture.Sample(gAnisotropicWrapSampler, pin.TexC);
+    ObjectCB object = gObjects[pin.InstanceID];
 
-    return TextureColor * NDotL;
+    MaterialCB material = gMaterials[object.MaterialIndex];
+
+    
+
+    float4 TextureColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+#ifdef USE_TEXTURE_SLOT0
+    TextureColor = gTexture[0].Sample(gAnisotropicWrapSampler, pin.TexC);
+#endif
+
+    return float4(material.SurfaceColor, 1.0f) * TextureColor * NDotL;
 }

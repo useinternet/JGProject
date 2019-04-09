@@ -27,9 +27,13 @@ namespace Dx12
 	private:
 		RenderTarget m_RenderTargets[CubeFace::Num_Face];
 		Camera       m_Camera[CubeFace::Num_Face];
-		std::vector<Texture> m_Textures;
-
+		Texture      m_Texture;
 	public:
 
+
+
+		const Texture& GetTexture() const {
+			return m_Texture;
+		}
 	};
 }

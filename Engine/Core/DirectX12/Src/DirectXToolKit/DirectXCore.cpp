@@ -94,6 +94,7 @@ namespace Dx12
 
 		void DestroyDevice()
 		{
+			Flush();
 			g_ShaderCommonDefines.reset();
 			g_DescriptorAllocator.clear();
 		

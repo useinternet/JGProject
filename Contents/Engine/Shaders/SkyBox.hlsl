@@ -40,6 +40,9 @@ VertexOut VS(VertexIn vin, uint instanceID : SV_InstanceID)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    float4 color = gCubeMap.Sample(gLinearWrapSampler, pin.PosL);
+    float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+#ifdef USE_CUBETEXTURE_SLOT0
+    color = gCubeMap[0].Sample(gLinearWrapSampler, pin.PosL);
+#endif
     return color;
 }

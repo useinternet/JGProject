@@ -7,7 +7,11 @@ namespace Dx12 {
 	namespace DxDevice {
 		extern std::string g_LogGroupName;
 	}
-
+	template<typename EnumType>
+	EnumType operator|(EnumType e1, EnumType e2)
+	{
+		return (int)e1 | (int)e2;
+	}
 
 
 	typedef int ETextureUsage;
@@ -23,6 +27,39 @@ namespace Dx12 {
 			UnorderedAccess,
 		};
 	}
+
+	typedef int ETextureSlot;
+	namespace TextureSlot
+	{
+		enum
+		{
+			Slot0 = 0,
+			Slot1,
+			Slot2,
+			Slot3,
+			Slot4,
+			Slot5,
+			Slot6,
+			Slot7,
+			NumSlot
+		};
+	}
+	typedef int ECubeTextureSlot;
+	namespace CubeTextureSlot
+	{
+		enum
+		{
+			Slot0 = 0,
+			Slot1,
+			Slot2,
+			Slot3,
+			NumSlot
+		};
+	}
+
+
+
+
 	typedef int EShaderStage;
 	namespace ShaderStage
 	{

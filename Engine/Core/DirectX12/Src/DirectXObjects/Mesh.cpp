@@ -1,5 +1,6 @@
 #include<PCH.h>
 #include"Mesh.h"
+#include"DirectXObjects/ShaderCommonDefines.h"
 #include"DirectXToolKit/Shader.h"
 using namespace Dx12;
 using namespace std;
