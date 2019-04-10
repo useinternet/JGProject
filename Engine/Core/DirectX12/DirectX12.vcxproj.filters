@@ -177,6 +177,9 @@
     <ClInclude Include="Src\DirectXObjects\GBuffer.h">
       <Filter>DirectXObjects</Filter>
     </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\Scene.h">
+      <Filter>DirectXObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DirectXCommon\ScreenGrab12.cpp">
@@ -294,6 +297,9 @@
       <Filter>DirectXObjects</Filter>
     </ClCompile>
     <ClCompile Include="Src\DirectXObjects\GBuffer.cpp">
+      <Filter>DirectXObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\Scene.cpp">
       <Filter>DirectXObjects</Filter>
     </ClCompile>
   </ItemGroup>

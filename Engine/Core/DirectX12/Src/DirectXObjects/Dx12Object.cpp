@@ -134,7 +134,7 @@ void Dx12Object::Update()
 		m_ObjectCBDatas[i].MaterialIndex = m_ObjectFragments[i]->GetMaterial()->GetID();
 	}
 }
-void Dx12Object::Draw(CommandList* commandList)
+void Dx12Object::Draw(CommandList* commandList) const
 {
 	if (!m_BuildOK)
 		return;

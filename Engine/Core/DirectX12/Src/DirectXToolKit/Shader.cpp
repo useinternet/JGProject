@@ -23,7 +23,7 @@ uint32_t D3D_Macro_Hash(const vector<D3D_SHADER_MACRO>& vec, EShaderStage stage,
 	uint32_t seed = (uint32_t)vec.size() + stage;
 	for (auto& i : vec)
 	{
-		uint32_t pair_hash_code = (uint32_t)Util::pair_hash()(pair< LPCSTR, LPCSTR>(i.Name, i.Definition));
+		uint32_t pair_hash_code = (uint32_t)Util::pair_hash()(pair< std::string, std::string>(i.Name, i.Definition));
 		seed ^= pair_hash_code + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 	}
 

@@ -23,6 +23,10 @@
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <dwrite.h>
+
 #include <list>
 #include<map>
 #include<fstream>
@@ -37,6 +41,9 @@
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "WindowsCodecs.lib")
 
 #define INLINE __forceinline
 #if defined(min)

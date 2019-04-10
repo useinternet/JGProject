@@ -25,7 +25,7 @@ void Mesh::RegisterShaderMacro(GraphicsShader& shader)
 		shader.AddMacro(ShaderStage::Vertex, SHADER_MACRO_USE_SKINNED, SHADER_MACRO_DEFINE);
 	}
 }
-void Mesh::Draw(CommandList* commandList, uint32_t instanceCount)
+void Mesh::Draw(CommandList* commandList, uint32_t instanceCount) const
 {
 	commandList->SetPrimitiveTopology(m_TopologyType);
 	commandList->SetVertexBuffer(m_VertexBuffer);

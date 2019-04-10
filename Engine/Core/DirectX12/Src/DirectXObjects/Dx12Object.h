@@ -67,7 +67,7 @@ namespace Dx12
 			       EPreparedPSO pso_version);
 
 		void Update();
-		void Draw(CommandList* commandList);
+		void Draw(CommandList* commandList) const;
 
 		void AddTexture(const Texture& texture);
 		void AddTextures(const std::vector<Texture>& textures);

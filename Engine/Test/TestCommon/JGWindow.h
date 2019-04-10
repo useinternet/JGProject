@@ -8,13 +8,14 @@
 #include<crtdbg.h>
 #include"GameTimer.h"
 #include"DirectXToolKit/DirectXCore.h"
-
+#include"DirectX2DToolKit/Direct2DCore.h"
 #ifdef _DEVELOP_DEBUG
 #pragma comment(lib, "DirectX12_develop.lib")
 #pragma comment(lib, "Common_develop.lib")
 #pragma comment(lib, "imgui_develop.lib")
 #pragma comment(lib, "GUIComponent_develop.lib")
 #pragma comment(lib, "AssetManager_develop.lib")
+#pragma comment(lib, "Direct2D_develop.lib")
 #endif
 
 #ifdef _DEVELOP_RELEASE
@@ -23,6 +24,7 @@
 #pragma comment(lib, "imgui.lib")
 #pragma comment(lib, "GUIComponent_developR.lib")
 #pragma comment(lib, "AssetManager_developR.lib")
+#pragma comment(lib, "Direct2D_developR.lib")
 #endif
 
 #ifdef _RELEASE
@@ -31,6 +33,7 @@
 #pragma comment(lib, "imgui.lib")
 #pragma comment(lib, "GUIComponent.lib")
 #pragma comment(lib, "AssetManager.lib")
+#pragma comment(lib, "Direct2D.lib")
 #endif
 #include<imgui/imgui.h>
 #include<imgui/imgui_impl_dx12.h>

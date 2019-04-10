@@ -10,7 +10,7 @@
 #include<Data/Path.h>
 #include<Math/Transformation.h>
 #include"DirectXToolKit/VertexCollection.h"
-
+#include<wrl.h>
 
 #ifdef _DEVELOP_DEBUG
 #pragma comment(lib,"Common_develop.lib")

@@ -22,15 +22,26 @@ struct MaterialCB
     float  BlankParam[3];
 };
 
+
+
+struct GBufferPack
+{
+    float4 Albedo : SV_TARGET0;
+    float4 Normal   : SV_TARGET1;
+    float4 Specular : SV_TARGET2;
+    float Depth     : SV_TARGET3;
+};
+
+
 //
 StructuredBuffer<ObjectCB>   gObjects : register(t0, space0);
 StructuredBuffer<MaterialCB> gMaterials : register(t0, space1);
 //
 Texture2D   gTexture[8] : register(t0, space2);
 TextureCube gCubeMap[4] : register(t0, space3);
+//
 
-
-
+//
 cbuffer PassCB : register(b0)
 {
     float4x4 gViewProj;

@@ -24,29 +24,23 @@
 #include"DirectXToolKit/Screen.h"
 #include"DirectXObjects/Mesh.h"
 #include"DirectXObjects/Dx12Object.h"
+#include"DirectXObjects/GBuffer.h"
+#include"DirectXObjects/Scene.h"
 #include<AssetManager.h>
 #include<AssetAnimTransform.h>
-using namespace Dx12;
 
+using namespace Dx12;
+using namespace Dx2D;
 class HelloWindow : public JGWindow
 {
 	static const int BackBufferCount = 3;
 private:
 	std::shared_ptr<Screen> m_Screen;
 	CommandQueue* m_CommandQueue;
-	Texture MainBuffer;
-	Texture DepthBuffer;
-	RenderTarget m_RenderTarget;
-//
-	Viewport m_Viewport;
-	ScissorRect m_Rect;
-
-	//
-	//GraphicsPSO   m_SkyPSO;
 	Camera m_Camera;
 	PassCB m_PassCB;
-	//
-
+	std::unique_ptr<GBuffer> m_GBuffer;
+	std::unique_ptr<Scene> m_Scene;
 	Texture m_Texture;
 	Texture m_SkyTexture;
 	//
@@ -58,10 +52,11 @@ private:
 	JgAsset::AssetAnimTransformByTimePos m_AnimTransform;
 	int m_PrevMouseX;
 	int m_PrevMouseY;
-	int m_OffsetLocation = 0.0f;
+	float m_OffsetLocation = 0.0f;
 public:
 	HelloWindow(HINSTANCE hInst) : JGWindow(hInst) {}
 	virtual ~HelloWindow() {
+		Dx2DDevice::DestoryDevice();
 		DxDevice::DestroyDevice();
 	}
 	virtual bool Initialize();

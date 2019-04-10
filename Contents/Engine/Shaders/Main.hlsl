@@ -57,19 +57,24 @@ VsToPs VS(ToVs vin, uint instanceID : SV_InstanceID)
     output.TexC = vin.TexC;
     return output;
 }
-static const float3 SunDir = { 0.0f, 0.0f, 1.0f };
 
 
 
-float4 PS(VsToPs pin) : SV_Target
+
+GBufferPack PS(VsToPs pin) : SV_Target
 {
+    GBufferPack gbuffer;
+
+
     float3 N = normalize(pin.NormalW);
     float3 T = normalize(pin.TangentW);
-    float3 L = normalize(-SunDir);
-    float NDotL = dot(N, L);
+
+
+
+
+
  
     ObjectCB object = gObjects[pin.InstanceID];
-
     MaterialCB material = gMaterials[object.MaterialIndex];
 
     
@@ -79,5 +84,14 @@ float4 PS(VsToPs pin) : SV_Target
     TextureColor = gTexture[0].Sample(gAnisotropicWrapSampler, pin.TexC);
 #endif
 
-    return float4(material.SurfaceColor, 1.0f) * TextureColor * NDotL;
+
+
+
+
+    gbuffer.Albedo = float4(material.SurfaceColor, 1.0f) * TextureColor;
+    gbuffer.Normal = float4((N + 1.0f) * 0.5f, 1.0f);
+    gbuffer.Specular = float4(material.Roughness, material.Roughness, 1.0f, 1.0f);
+    gbuffer.Depth = 0.0f;
+
+    return gbuffer;
 }

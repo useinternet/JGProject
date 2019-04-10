@@ -38,11 +38,18 @@ VertexOut VS(VertexIn vin, uint instanceID : SV_InstanceID)
 }
 
 
-float4 PS(VertexOut pin) : SV_Target
+GBufferPack PS(VertexOut pin) : SV_Target
 {
-    float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    GBufferPack gbuffer;
+    float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 #ifdef USE_CUBETEXTURE_SLOT0
     color = gCubeMap[0].Sample(gLinearWrapSampler, pin.PosL);
 #endif
-    return color;
+
+
+    gbuffer.Albedo = float4(color.xyz, 0.0f);
+    gbuffer.Normal = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    gbuffer.Specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    gbuffer.Depth = 1.0f;
+    return gbuffer;
 }

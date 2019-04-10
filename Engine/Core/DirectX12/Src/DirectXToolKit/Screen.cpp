@@ -48,6 +48,9 @@ void Screen::Resize(uint32_t width, uint32_t height)
 void Screen::Present(const Texture& texture, const DirectX::XMFLOAT4& clearColor)
 {
 	auto commandQue = DxDevice::GetCommandQueue();
+	commandQue->Flush();
+
+
 	auto commandList = commandQue->GetCommandList();
 	int CurrBackBufferIndex = m_SwapChain->GetCurrentBackBufferIndex();
 	auto& BackBuffer = m_BackBuffer[CurrBackBufferIndex];

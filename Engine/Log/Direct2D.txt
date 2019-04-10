@@ -1,0 +1,5 @@
+[ 1043327376 ][ DirectX2D ][ Info ]
+FileName : direct2dcore.cpp
+FuncName : Dx2D::Dx2DDevice::CreateDevice
+Line     : 34
+Contents : 2DDevice Complete

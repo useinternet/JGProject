@@ -5,10 +5,11 @@
 // ºŒ¿Ã¥ı path
 #define MAIN_SHADER_PATH     GLOBAL_SHADER_PATH("Main.hlsl")
 #define SKY_BOX_SHADER_PATH  GLOBAL_SHADER_PATH("SkyBox.hlsl")
+#define SCENE_SHADER_PATH   GLOBAL_SHADER_PATH("Scene.hlsl")
 #define GENERATE_MIPMAP_PATH GLOBAL_SHADER_PATH("GenerateMips_CS.hlsl");
 // Define ¡§¿«
 #define SHADER_MACRO_USE_SKINNED "USE_SKINNED"
-
+// Texture
 #define SHADER_MACRO_USE_TEXTURE_SLOT(x) "USE_TEXTURE_SLOT" + std::to_string(x)
 #define SHADER_MACRO_USE_TEXTURE_SLOT0   "USE_TEXTURE_SLOT0"
 #define SHADER_MACRO_USE_TEXTURE_SLOT1   "USE_TEXTURE_SLOT1"
@@ -18,12 +19,18 @@
 #define SHADER_MACRO_USE_TEXTURE_SLOT5   "USE_TEXTURE_SLOT5"
 #define SHADER_MACRO_USE_TEXTURE_SLOT6   "USE_TEXTURE_SLOT6"
 #define SHADER_MACRO_USE_TEXTURE_SLOT7   "USE_TEXTURE_SLOT7"
-
+// CubeTexture
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT(x) "USE_CUBETEXTURE_SLOT" + std::to_string(x)
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT0   "USE_CUBETEXTURE_SLOT0"
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT1   "USE_CUBETEXTURE_SLOT1"
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT2   "USE_CUBETEXTURE_SLOT2"
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT3   "USE_CUBETEXTURE_SLOT3"
+
+// SceneDebugMode 
+#define SHADER_MACRO_SCENE_DEBUG_MODE_ALBEDO "SCENE_DEBUG_MODE_ALBEDO"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_NORMAL  "SCENE_DEBUG_MODE_NORMAL"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_SPECULAR "SCENE_DEBUG_MODE_SPECULAR"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_DEPTH   "SCENE_DEBUG_MODE_DEPTH"
 
 
 
@@ -107,21 +114,31 @@ namespace Dx12
 		{
 			Main_Static,
 			Main_Skeletal,
-			SkyBox
+			SkyBox,
+			Screen
 		};
 	}
 	class Dx12CommonShaderDefines
 	{
 	private:
 		RootSignature m_MainRootSignature;
+		RootSignature m_SceneRootSignature;
 	public:
 		Dx12CommonShaderDefines();
 	public:
+		const RootSignature& GetRootSig(EPreparedPSO pso) const;
+		const RootSignature& GetSceneRootSig() const {
+			return m_SceneRootSignature;
+		}
 		const RootSignature& GetMainRootSig() const {
 			return m_MainRootSignature;
 		}
 		GraphicsPSO GetPSO(EPreparedPSO pso, const GraphicsShader& shader);
+
+	private:
 		GraphicsPSO GetMainPSO(const GraphicsShader& shader, bool is_skinned = false);
+
 		GraphicsPSO GetSkyBoxPSO(const GraphicsShader& shader);
+		GraphicsPSO GetScreenPSO(const GraphicsShader& shader);
 	};
 }

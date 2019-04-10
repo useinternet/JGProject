@@ -52,7 +52,7 @@ namespace Dx12
 		}
 
 		void RegisterShaderMacro(GraphicsShader& shader);
-		void Draw(CommandList* commandList, uint32_t instanceCount = 1);
+		void Draw(CommandList* commandList, uint32_t instanceCount = 1) const;
 
 
 	public:

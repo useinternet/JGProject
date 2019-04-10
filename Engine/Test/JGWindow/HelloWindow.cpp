@@ -6,58 +6,40 @@
 using namespace std;
 using namespace DirectX;
 using namespace Common;
+
 bool HelloWindow::Initialize()
 {
 	if (!JGWindow::Initialize())
 		return false;
 	DxDevice::CreateDevice(DX12_LOG_PATH);
-
+	Dx2D::Dx2DDevice::CreateDevice();
 	m_CommandQueue = DxDevice::GetCommandQueue();
-	m_Viewport.Set((float)mClientWidth, (float)mClientHeight);
-	m_Rect.Set(mClientWidth, mClientHeight);
-
 	auto commandList = m_CommandQueue->GetCommandList();
 
-
+	// 스크린 생성
 	m_Screen = make_unique<Screen>();
 	m_Screen->InitScreen(mhMainWnd, mClientWidth, mClientHeight);
+	// GBuffer 및 씬 생성
+	m_GBuffer = make_unique<GBuffer>(mClientWidth, mClientHeight);
+	m_Scene = make_unique<Scene>(mClientWidth, mClientHeight);
 
-	// 도화지 생성
-	{
-		D3D12_CLEAR_VALUE clearColor;
-		clearColor.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		clearColor.Color[0] = 0.0f;
-		clearColor.Color[1] = 0.0f;
-		clearColor.Color[2] = 0.0f;
-		clearColor.Color[3] = 1.0f;
-		MainBuffer = move(Texture(
-			TextureUsage::RenderTarget,
-			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, mClientWidth, mClientHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-			&clearColor,
-			"MainBuffer"));
-
-
-		D3D12_CLEAR_VALUE clearValue;
-		clearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		clearValue.DepthStencil.Depth = 1.0f;
-		clearValue.DepthStencil.Stencil = 0;
-		DepthBuffer = move(Texture(
-			TextureUsage::DepthStencil,
-			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D24_UNORM_S8_UINT, mClientWidth, mClientHeight, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-			&clearValue, "DepthBuffer"));
-	}
-
+	// 애니메이션 불러오기
 	JgAsset::AssetManager::CreateAnimationTransformsByTimePos(
 		m_AnimTransform, GLOBAL_PATH / "Contents/Maria_J_J_Ong.skmesh", GLOBAL_PATH / "Contents/mixamo.com.anim",
 		GLOBAL_PATH / "Contents/Bellydancing.skeletal");
+
+
+	// 카메라 설정
 	{
 		m_Camera.SetLens(0.25f * JG_PI, (float)mClientWidth, (float)mClientHeight, 1.0f, 100000.0f);
 		m_Camera.SetPosition({ 0.0f, 50.0f, -200.0f });
 	}
+	// 텍스쳐 불러오기
 	{
 		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("UV_Test_Pattern.png"), m_Texture, TextureUsage::Albedo);
 		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("grasscube1024.dds"), m_SkyTexture, TextureUsage::Albedo);
 	}
+	// 오브젝트 설정
 	{
 		m_Object.SetMesh(
 			GeometryGenerator::CreateSkeletalMesh(
@@ -112,12 +94,9 @@ void HelloWindow::OnResize(int width, int height)
 	JGWindow::OnResize(width, height);
 
 	m_Screen->Resize(width, height);
-	MainBuffer.Resize(width, height);
-	DepthBuffer.Resize(width, height);
-
+	m_Scene->ReSize(width, height);
+	m_GBuffer->Resize(width, height);
 	m_Camera.SetLens(0.25f * JG_PI, (float)width, (float)height, 1.0f, 100000.0f);
-	m_Viewport.Set((float)width, (float)height);
-	m_Rect.Set(width, height);
 	DxDevice::Flush();
 }
 void HelloWindow::Update()
@@ -147,7 +126,7 @@ void HelloWindow::Update()
 	m_Object.Update();
 	
 
-
+	
 
 	m_SkyObject.Update();
 	m_PassCB.ViewProj = m_Camera.GetHlslMatrix().Get();
@@ -156,36 +135,20 @@ void HelloWindow::Update()
 }
 void HelloWindow::Draw()
 {
+
+
+
+    m_CommandQueue->Flush();
 	auto commandList = m_CommandQueue->GetCommandList();
 
+	m_GBuffer->Draw(commandList, { &m_SkyObject, &m_Object }, m_PassCB);
 
-	Dx12::RenderTarget rendertarget;
-	rendertarget.AttachTexture(RtvSlot::Slot_0, MainBuffer);
-	rendertarget.AttachTexture(RtvSlot::DepthStencil, DepthBuffer);
-
-	
-	rendertarget.SetRenderTargetClearColor(RtvSlot::Slot_0, { 0.0f,0.0f,0.0f,1.0f });
-
-
-	commandList->SetViewport(m_Viewport);
-	commandList->SetScissorRect(m_Rect);
-	commandList->ClearRenderTarget(rendertarget);
-	commandList->SetRenderTarget(rendertarget);
-
-	commandList->SetGraphicsRootSignature(DxDevice::GetShaderCommonDefines()->GetMainRootSig());
-	commandList->SetGraphicsConstantBufferView(CommonRootParam::PassCB, &m_PassCB);
-	commandList->SetGraphicsShaderResourceView(CommonRootParam::MaterialCB, Material::GetMaterialCBArray());
-
-	m_SkyObject.Draw(commandList);
-	m_Object.Draw(commandList);
-
+	m_Scene->Draw(commandList, m_GBuffer.get());
 
 	commandList->Close();
     m_CommandQueue->ExcuteCommandList(commandList);
-    m_CommandQueue->Flush();
 
-
-	m_Screen->Present(MainBuffer);
+	m_Screen->Present(m_Scene->GetTexture());
 }
 
 void HelloWindow::OnMouseDown(WPARAM btnState, int x, int y)
@@ -224,22 +187,22 @@ void HelloWindow::KeyDown(WPARAM wparam)
 	{
 	case 'W':
 		m_Camera.FowardMove(3.0f);
-		//m_InstanceObj1->GetTransform()._Rotation().OffsetPitch(3.0f);
+	
 		break;
 
 	case 'S':
 		m_Camera.FowardMove(-3.0f);
-		//m_InstanceObj1->GetTransform()._Rotation().OffsetPitch(-3.0f);
+	
 		break;
 
 	case 'A':
 		m_Camera.RightMove(-3.0f);
-		//m_InstanceObj1->GetTransform()._Rotation().OffsetYaw(3.0f);
+		
 		break;
 
 	case 'D':
 		m_Camera.RightMove(3.0f);
-		//m_InstanceObj1->GetTransform()._Rotation().OffsetYaw(-3.0f);
+
 		break;
 
 	case 'E':
@@ -265,6 +228,20 @@ void HelloWindow::KeyDown(WPARAM wparam)
 		m_OffsetLocation -= 100;
 		m_InstanceArray.pop_back();
 		break;
+	case '1':
+		m_Scene->DebugModeOn(GBufferTexture::Albedo);
+		break;
+	case '2':
+		m_Scene->DebugModeOn(GBufferTexture::Normal);
+		break;
+	case '3':
+		m_Scene->DebugModeOn(GBufferTexture::Specular);
+		break;
+	case '4':
+		m_Scene->DebugModeOn(GBufferTexture::Depth);
+		break;
+	case '0':
+		m_Scene->DebugModeOff();
 	}
 	
 }
