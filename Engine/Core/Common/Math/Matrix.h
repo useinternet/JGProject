@@ -96,6 +96,7 @@ namespace Common
 		void RotationAxis(const JVector3& axis, float angle);
 		void Scaling(const JVector3& v);
 		void LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
+		void Inverse();
 		JVector3 TransformPoint(const JVector3& v) const;
 		JVector3 TransformVector(const JVector3& v) const;
 	public:
@@ -144,7 +145,24 @@ namespace Common
 		}
 	};
 
-
+	JMatrix4x4 Identity();
+	JMatrix4x4 Translation(float x, float y, float z);
+	JMatrix4x4 Rotation(float pitch, float yaw, float roll);
+	JMatrix4x4 RotationX(float x);
+	JMatrix4x4 RotationY(float y);
+	JMatrix4x4 RotationZ(float z);
+	JMatrix4x4 Scaling(float x, float y, float z);
+	JMatrix4x4 PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ);
+	JMatrix4x4 OrthographicLH(float width, float height, float nearZ, float farZ);
+	JMatrix4x4 Transpose(const JMatrix4x4& matrix);
+	JMatrix4x4 Translation(const JVector3& v);
+	JMatrix4x4 Rotation(const JVector3& v);
+	JMatrix4x4 RotationAxis(const JVector3& axis, float angle);
+	JMatrix4x4 Scaling(const JVector3& v);
+	JMatrix4x4 LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
+	JMatrix4x4 Inverse(const JMatrix4x4& matrix);
+	JVector3 TransformPoint(const JMatrix4x4& m, const JVector3& v);
+	JVector3 TransformVector(const JMatrix4x4& m ,const JVector3& v);
 
 
 }

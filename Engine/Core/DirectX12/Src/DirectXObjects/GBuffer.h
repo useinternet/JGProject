@@ -36,7 +36,7 @@ RTV4    |depth|     |     |  DXGI_FORMAT_R8
 		static const DXGI_FORMAT ms_AlebdoFormat   = DXGI_FORMAT_R8G8B8A8_UNORM;
 		static const DXGI_FORMAT ms_NormalFormat   = DXGI_FORMAT_R8G8B8A8_UNORM;
 		static const DXGI_FORMAT ms_SpecularFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-		static const DXGI_FORMAT ms_DepthFormat    = DXGI_FORMAT_R8_UNORM;
+		static const DXGI_FORMAT ms_DepthFormat    = DXGI_FORMAT_R32_FLOAT;
 		static std::vector<DXGI_FORMAT> ms_RtvFormatArray;
 	public:
 		static const std::vector<DXGI_FORMAT>& GetRtvFormatArray();

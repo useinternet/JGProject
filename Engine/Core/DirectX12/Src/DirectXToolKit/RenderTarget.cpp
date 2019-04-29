@@ -14,21 +14,79 @@ RenderTarget::RenderTarget()
 
 RenderTarget::RenderTarget(const RenderTarget& copy)
 {
+	m_RtvDescs.resize(RtvSlot::DepthStencil);
 	m_Textures = copy.m_Textures;
+	for (int i = 0; i < RtvSlot::DepthStencil; ++i)
+	{
+		if(copy.m_RtvDescs[i])
+			m_RtvDescs[i] = make_unique<D3D12_RENDER_TARGET_VIEW_DESC>(*copy.m_RtvDescs[i]);
+	
+	}
+		
+	if (copy.m_DsvDesc)
+	{
+		m_DsvDesc = make_unique<D3D12_DEPTH_STENCIL_VIEW_DESC>(*copy.m_DsvDesc);
+	}
+	m_RtvClearColors = copy.m_RtvClearColors;
+	m_DsvClearDepth = copy.m_DsvClearDepth;
+	m_DsvClearStencil = copy.m_DsvClearStencil;
+	m_DsvClearFlag = copy.m_DsvClearFlag;
 }
 RenderTarget::RenderTarget(RenderTarget&& rhs)
 {
 	m_Textures = move(rhs.m_Textures);
+	m_RtvDescs = move(rhs.m_RtvDescs);
+	m_DsvDesc = move(rhs.m_DsvDesc);
+	m_RtvClearColors = move(rhs.m_RtvClearColors);
+	m_DsvClearDepth = rhs.m_DsvClearDepth;
+	m_DsvClearStencil = rhs.m_DsvClearStencil;
+	m_DsvClearFlag = rhs.m_DsvClearFlag;
+
+	rhs.m_DsvClearDepth = 1.0f;
+	rhs.m_DsvClearStencil = 0;
+	rhs.m_DsvClearFlag = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL;
+
+	rhs.m_Textures.resize(RtvSlot::NumRtvSlot);
+	rhs.m_RtvDescs.resize(RtvSlot::DepthStencil);
+	rhs.m_RtvClearColors.resize(RtvSlot::DepthStencil);
 }
 
 RenderTarget& RenderTarget::operator=(const RenderTarget& rhs)
 {
 	m_Textures = rhs.m_Textures;
+	for (int i = 0; i < RtvSlot::DepthStencil; ++i)
+	{
+		if (rhs.m_RtvDescs[i])
+			m_RtvDescs[i] = make_unique<D3D12_RENDER_TARGET_VIEW_DESC>(*rhs.m_RtvDescs[i]);
+
+	}
+	if (rhs.m_DsvDesc)
+	{
+		m_DsvDesc = make_unique<D3D12_DEPTH_STENCIL_VIEW_DESC>(*rhs.m_DsvDesc);
+	}
+	m_RtvClearColors = rhs.m_RtvClearColors;
+	m_DsvClearDepth = rhs.m_DsvClearDepth;
+	m_DsvClearStencil = rhs.m_DsvClearStencil;
+	m_DsvClearFlag = rhs.m_DsvClearFlag;
 	return *this;
 }
 RenderTarget& RenderTarget::operator=(RenderTarget&& rhs)
 {
 	m_Textures = move(rhs.m_Textures);
+	m_RtvDescs = move(rhs.m_RtvDescs);
+	m_DsvDesc = move(rhs.m_DsvDesc);
+	m_RtvClearColors = move(rhs.m_RtvClearColors);
+	m_DsvClearDepth = rhs.m_DsvClearDepth;
+	m_DsvClearStencil = rhs.m_DsvClearStencil;
+	m_DsvClearFlag = rhs.m_DsvClearFlag;
+
+	rhs.m_DsvClearDepth = 1.0f;
+	rhs.m_DsvClearStencil = 0;
+	rhs.m_DsvClearFlag = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL;
+
+	rhs.m_Textures.resize(RtvSlot::NumRtvSlot);
+	rhs.m_RtvDescs.resize(RtvSlot::DepthStencil);
+	rhs.m_RtvClearColors.resize(RtvSlot::DepthStencil);
 	return *this;
 }
 

@@ -4,10 +4,7 @@
 
 namespace Dx2D
 {
-	namespace Dx2DDevice
-	{
-		extern std::string g_LogGroupName;
-	}
+	extern std::string g_LogGroupName;
 
 	template<typename T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;

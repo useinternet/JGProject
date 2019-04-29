@@ -28,7 +28,7 @@
 #include"DirectXObjects/Scene.h"
 #include<AssetManager.h>
 #include<AssetAnimTransform.h>
-
+#include"DirectXObjects/CubeMap.h"
 using namespace Dx12;
 using namespace Dx2D;
 class HelloWindow : public JGWindow
@@ -41,18 +41,21 @@ private:
 	PassCB m_PassCB;
 	std::unique_ptr<GBuffer> m_GBuffer;
 	std::unique_ptr<Scene> m_Scene;
+	//
 	Texture m_Texture;
 	Texture m_SkyTexture;
+	Texture m_GridTexture;
+	Texture m_GridNormalTexture;
 	//
 	Dx12Object m_Object;
+	Dx12Object m_GridObject;
 	Dx12Object m_SkyObject;
-	ObjectFragments* m_InstanceObj1;
-	std::vector< ObjectFragments*> m_InstanceArray;
 	//
-	JgAsset::AssetAnimTransformByTimePos m_AnimTransform;
 	int m_PrevMouseX;
 	int m_PrevMouseY;
-	float m_OffsetLocation = 0.0f;
+	//
+	std::unique_ptr<CubeMap> m_CubeMap;
+	//
 public:
 	HelloWindow(HINSTANCE hInst) : JGWindow(hInst) {}
 	virtual ~HelloWindow() {

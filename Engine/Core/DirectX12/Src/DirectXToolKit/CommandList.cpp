@@ -161,31 +161,77 @@ void CommandList::AliasingBarrier(const Resource& beforeResource, const Resource
 		beforeResource.Get(), afterResource.Get()));
 }
 
-void CommandList::GenerateMipMaps(const Texture& texture)
+void CommandList::GenerateMipMaps(const Texture& texture, bool isCubeMap)
 {
 	auto resourceDesc = texture.GetDesc();
 
 	if (resourceDesc.MipLevels == 1)
 		return;
 
-	if (resourceDesc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D ||
-		resourceDesc.DepthOrArraySize != 1)
+	if  (resourceDesc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D ||
+		(resourceDesc.DepthOrArraySize != 1 && !isCubeMap) ||
+		(resourceDesc.DepthOrArraySize == 1 && isCubeMap))
 	{
 		DX12_LOG_ERROR("Generate Mips only supports 2D Textures.");
 		return;
 	}
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(srvDesc));
 
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = resourceDesc.Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+	srvDesc.Texture2DArray.ArraySize = 1;
+	srvDesc.Texture2DArray.MipLevels = resourceDesc.MipLevels;
+	srvDesc.Texture2DArray.MostDetailedMip = 0;
+	srvDesc.Texture2DArray.ResourceMinLODClamp = 0.0f;
+	srvDesc.Texture2DArray.PlaneSlice = 0;
+	
 	if (Texture::IsUAVCompatibleFormat(resourceDesc.Format))
 	{
-		GenerateMipMaps_UAV(texture);
+		if (isCubeMap)
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				srvDesc.Texture2DArray.FirstArraySlice = i;
+				GenerateMipMaps_UAV(texture, &srvDesc);
+			}
+		}
+		else
+		{
+			GenerateMipMaps_UAV(texture, nullptr);
+		}
+	
 	}
 	else if (Texture::IsBGRFormat(resourceDesc.Format))
 	{
-		GenerateMipMaps_BGR(texture);
+		if (isCubeMap)
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				srvDesc.Texture2DArray.FirstArraySlice = i;
+				GenerateMipMaps_BGR(texture, &srvDesc);
+			}
+		}
+		else
+		{
+			GenerateMipMaps_BGR(texture, nullptr);
+		}
 	}
 	else if (Texture::IsSRGBFormat(resourceDesc.Format))
 	{
-		GenerateMipMaps_SRGB(texture);
+		if (isCubeMap)
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				srvDesc.Texture2DArray.FirstArraySlice = i;
+				GenerateMipMaps_SRGB(texture, &srvDesc);
+			}
+		}
+		else
+		{
+			GenerateMipMaps_SRGB(texture, nullptr);
+		}
 	}
 	else
 	{
@@ -575,7 +621,7 @@ void CommandList::TrackResource(const ComPtr<ID3D12Object>& object)
 	m_TrackObjects.push_back(object);
 }
 
-void CommandList::GenerateMipMaps_UAV(const Texture& texture)
+void CommandList::GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
 {
 	if (!m_GenerateMipMapsCS)
 	{
@@ -640,7 +686,7 @@ void CommandList::GenerateMipMaps_UAV(const Texture& texture)
 		mipCB.TexelSize.y = 1.0f / (float)dstHeight;
 
 		SetComputeConstants(GenerateMips::GenerateMipsCB, mipCB);
-		SetComputeDescriptorTable(GenerateMips::SrcMip, stagingTexture.GetShaderResourceView());
+		SetComputeDescriptorTable(GenerateMips::SrcMip, stagingTexture.GetShaderResourceView(srvDesc));
 
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> outputHandles(4);
 		for (uint32_t mip = 0; mip < mipCount; ++mip)
@@ -671,7 +717,7 @@ void CommandList::GenerateMipMaps_UAV(const Texture& texture)
 	}
 	
 }
-void CommandList::GenerateMipMaps_BGR(const Texture& texture)
+void CommandList::GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
 {
 	auto device = DxDevice::GetDevice();
 
@@ -729,7 +775,17 @@ void CommandList::GenerateMipMaps_BGR(const Texture& texture)
 
 	CopyResource(aliasTexture, texture);
 	AliasingBarrier(aliasTexture, copyTexture);
-	GenerateMipMaps_UAV(copyTexture);
+
+
+	// 추가한 부분
+	if (srvDesc)
+		srvDesc->Format = copyDesc.Format;
+	//
+
+
+
+
+	GenerateMipMaps_UAV(copyTexture, srvDesc);
 
 	AliasingBarrier(copyTexture, aliasTexture);
 	CopyResource(texture, aliasTexture);
@@ -739,7 +795,7 @@ void CommandList::GenerateMipMaps_BGR(const Texture& texture)
 	TrackResource(aliasTexture);
 	TrackResource(texture);
 }
-void CommandList::GenerateMipMaps_SRGB(const Texture& texture)
+void CommandList::GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
 {
 	auto device = DxDevice::GetDevice();
 	auto resourceDesc = texture.GetDesc();
@@ -797,7 +853,14 @@ void CommandList::GenerateMipMaps_SRGB(const Texture& texture)
 	CopyResource(aliasTexture, texture);
 
 	AliasingBarrier(aliasTexture, copyTexture);
-	GenerateMipMaps_UAV(copyTexture);
+
+
+	// 추가한 부분
+	if (srvDesc)
+		srvDesc->Format = copyDesc.Format;
+	//
+
+	GenerateMipMaps_UAV(copyTexture, srvDesc);
 
 	AliasingBarrier(copyTexture, aliasTexture);
 	CopyResource(texture, aliasTexture);

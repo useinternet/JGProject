@@ -10,7 +10,7 @@ namespace Common
 	class Transformation
 	{
 		Location m_Location;
-		Rotation m_Rotation;
+		Rotator m_Rotation;
 	    Scale    m_Scale;
 		mutable JMatrix4x4 m_FinalMatrix;
 		mutable bool       m_bUpdate = true;
@@ -22,10 +22,10 @@ namespace Common
 			m_bUpdate = true;
 			return m_Location;
 		}
-		const Rotation& _Rotation_c() const {
+		const Rotator& _Rotation_c() const {
 			return m_Rotation;
 		}
-		Rotation& _Rotation() {
+		Rotator& _Rotation() {
 			m_bUpdate = true;
 			return m_Rotation;
 		}

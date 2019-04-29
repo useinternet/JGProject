@@ -33,15 +33,6 @@
 #define SHADER_MACRO_SCENE_DEBUG_MODE_DEPTH   "SCENE_DEBUG_MODE_DEPTH"
 
 
-
-
-
-
-
-
-
-
-
 #define SHADER_MACRO_DEFINE "1"
 #define SHADER_MACRO_UNDEFINE "0"
 
@@ -49,6 +40,7 @@ namespace Dx12
 {
 	class Shader;
 	class GraphicsPSO;
+	class Camera;
 	class GraphicsShader;
 	namespace CommonRootParam
 	{
@@ -90,11 +82,19 @@ namespace Dx12
 	struct PassCB
 	{
 		DirectX::XMFLOAT4X4 ViewProj;
-		DirectX::XMFLOAT3   ToEye = { 0.0f,0.0f,0.0f };
-		float DeltaTime = 0.0f;
+		DirectX::XMFLOAT4X4 InvViewProj;
+		DirectX::XMFLOAT4X4 View;
+		DirectX::XMFLOAT4X4 InvView;
+		DirectX::XMFLOAT4X4 Proj;
+		DirectX::XMFLOAT4X4 InvProj;
+		DirectX::XMFLOAT3 ToEye;
+		float FarZ;
+		float NearZ;
+		DirectX::XMFLOAT3 padding;
 		PassCB() {
 			DirectX::XMStoreFloat4x4(&ViewProj, DirectX::XMMatrixIdentity());
 		}
+		void Set(const Camera& cam);
 	};
 	struct SkinnedCB
 	{
@@ -115,21 +115,16 @@ namespace Dx12
 			Main_Static,
 			Main_Skeletal,
 			SkyBox,
-			Screen
+			Scene
 		};
 	}
 	class Dx12CommonShaderDefines
 	{
 	private:
 		RootSignature m_MainRootSignature;
-		RootSignature m_SceneRootSignature;
 	public:
 		Dx12CommonShaderDefines();
 	public:
-		const RootSignature& GetRootSig(EPreparedPSO pso) const;
-		const RootSignature& GetSceneRootSig() const {
-			return m_SceneRootSignature;
-		}
 		const RootSignature& GetMainRootSig() const {
 			return m_MainRootSignature;
 		}
@@ -139,6 +134,6 @@ namespace Dx12
 		GraphicsPSO GetMainPSO(const GraphicsShader& shader, bool is_skinned = false);
 
 		GraphicsPSO GetSkyBoxPSO(const GraphicsShader& shader);
-		GraphicsPSO GetScreenPSO(const GraphicsShader& shader);
+		GraphicsPSO GetScenePSO(const GraphicsShader& shader);
 	};
 }

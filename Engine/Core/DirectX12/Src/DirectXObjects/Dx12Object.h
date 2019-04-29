@@ -123,10 +123,10 @@ namespace Dx12
 		const Common::Location& GetLocation() const {
 			return m_Transform._Location_c();
 		}
-		Common::Rotation& GetRotation() {
+		Common::Rotator& GetRotation() {
 			return m_Transform._Rotation();
 		}
-		const Common::Rotation& GetRotation_c() const {
+		const Common::Rotator& GetRotation_c() const {
 			return m_Transform._Rotation_c();
 		}
 		Common::Scale& GetScale() {

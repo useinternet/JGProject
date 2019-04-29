@@ -18,10 +18,11 @@ struct ToVs
 struct VsToPs
 {
     float4 PosH : SV_POSITION;
-    float3 PosW : POSITION;
+    float3 PosW : POSITION0;
     float3 NormalW : NORMAL;
     float3 TangentW : TANGENT;
     float2 TexC : TEXCOORD;
+    float Depth : DEPTH;
     uint InstanceID : INSTANCE;
 };
 VsToPs VS(ToVs vin, uint instanceID : SV_InstanceID)
@@ -50,16 +51,16 @@ VsToPs VS(ToVs vin, uint instanceID : SV_InstanceID)
 
 
     float4 PosW = mul(float4(vin.PosL, 1.0f), world);
+
+
     output.PosH = mul(PosW, gViewProj);
     output.PosW = PosW.xyz;
     output.NormalW = mul(vin.NormalL, (float3x3)world);
     output.TangentW = mul(vin.TangentL, (float3x3)world);
     output.TexC = vin.TexC;
+    output.Depth = output.PosH.z / output.PosH.w;
     return output;
 }
-
-
-
 
 GBufferPack PS(VsToPs pin) : SV_Target
 {
@@ -76,22 +77,29 @@ GBufferPack PS(VsToPs pin) : SV_Target
  
     ObjectCB object = gObjects[pin.InstanceID];
     MaterialCB material = gMaterials[object.MaterialIndex];
-
-    
-
     float4 TextureColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+   // reflect(-toEyeW, pin.NormalW);
+    float3 r = reflect(-gToEye, N);
+    float4 rcolor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+#ifdef USE_CUBETEXTURE_SLOT0
+    rcolor = gCubeMap[0].Sample(gLinearWrapSampler, r);
+#endif
 #ifdef USE_TEXTURE_SLOT0
-    TextureColor = gTexture[0].Sample(gAnisotropicWrapSampler, pin.TexC);
+    TextureColor = gTexture[0].SampleLevel(gAnisotropicWrapSampler, pin.TexC, padding.x);
 #endif
 
 
 
 
 
-    gbuffer.Albedo = float4(material.SurfaceColor, 1.0f) * TextureColor;
-    gbuffer.Normal = float4((N + 1.0f) * 0.5f, 1.0f);
-    gbuffer.Specular = float4(material.Roughness, material.Roughness, 1.0f, 1.0f);
-    gbuffer.Depth = 0.0f;
+
+
+    gbuffer.Albedo = float4(material.SurfaceColor, 1.0f) * TextureColor * rcolor;
+    gbuffer.Normal   = float4((N + 1.0f) * 0.5f, 1.0f);
+    gbuffer.Specular = float4(0.0f,0.0f, 1.0f, 1.0f);
+    gbuffer.Depth    = pin.Depth;
 
     return gbuffer;
 }

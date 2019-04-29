@@ -33,8 +33,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Direct2D", "Engine\Core\Dir
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		DevelopDebug|x64 = DevelopDebug|x64
 		DevelopDebug|x86 = DevelopDebug|x86
 		DevelopRelease|x64 = DevelopRelease|x64
@@ -43,10 +41,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Debug|x64.Build.0 = DevelopDebug|x64
-		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Debug|x86.ActiveCfg = Release|x64
-		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Debug|x86.Build.0 = Release|x64
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64
@@ -56,10 +50,6 @@ Global
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Release|x64.ActiveCfg = Release|x64
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Release|x64.Build.0 = Release|x64
 		{438CCCBB-4E37-4B7D-9355-1F246D707B68}.Release|x86.ActiveCfg = Release|x64
-		{7DD9B001-D989-490D-9979-589988642A2B}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{7DD9B001-D989-490D-9979-589988642A2B}.Debug|x64.Build.0 = DevelopDebug|x64
-		{7DD9B001-D989-490D-9979-589988642A2B}.Debug|x86.ActiveCfg = Release|x64
-		{7DD9B001-D989-490D-9979-589988642A2B}.Debug|x86.Build.0 = Release|x64
 		{7DD9B001-D989-490D-9979-589988642A2B}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{7DD9B001-D989-490D-9979-589988642A2B}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{7DD9B001-D989-490D-9979-589988642A2B}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64
@@ -69,10 +59,6 @@ Global
 		{7DD9B001-D989-490D-9979-589988642A2B}.Release|x64.ActiveCfg = Release|x64
 		{7DD9B001-D989-490D-9979-589988642A2B}.Release|x64.Build.0 = Release|x64
 		{7DD9B001-D989-490D-9979-589988642A2B}.Release|x86.ActiveCfg = Release|x64
-		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Debug|x64.Build.0 = DevelopDebug|x64
-		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Debug|x86.ActiveCfg = Release|x64
-		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Debug|x86.Build.0 = Release|x64
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64
@@ -82,10 +68,6 @@ Global
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Release|x64.ActiveCfg = Release|x64
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Release|x64.Build.0 = Release|x64
 		{4AF117D6-C80F-4760-B029-86BD7EE52CD5}.Release|x86.ActiveCfg = Release|x64
-		{9039669A-0470-4E38-A166-3734B073B7B0}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{9039669A-0470-4E38-A166-3734B073B7B0}.Debug|x64.Build.0 = DevelopDebug|x64
-		{9039669A-0470-4E38-A166-3734B073B7B0}.Debug|x86.ActiveCfg = Release|x64
-		{9039669A-0470-4E38-A166-3734B073B7B0}.Debug|x86.Build.0 = Release|x64
 		{9039669A-0470-4E38-A166-3734B073B7B0}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{9039669A-0470-4E38-A166-3734B073B7B0}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{9039669A-0470-4E38-A166-3734B073B7B0}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64
@@ -95,10 +77,6 @@ Global
 		{9039669A-0470-4E38-A166-3734B073B7B0}.Release|x64.ActiveCfg = Release|x64
 		{9039669A-0470-4E38-A166-3734B073B7B0}.Release|x64.Build.0 = Release|x64
 		{9039669A-0470-4E38-A166-3734B073B7B0}.Release|x86.ActiveCfg = Release|x64
-		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Debug|x64.Build.0 = DevelopDebug|x64
-		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Debug|x86.ActiveCfg = Release|x64
-		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Debug|x86.Build.0 = Release|x64
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64
@@ -108,10 +86,6 @@ Global
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Release|x64.ActiveCfg = Release|x64
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Release|x64.Build.0 = Release|x64
 		{6263AF71-7CE8-4EA7-8D56-6494FBB8E78A}.Release|x86.ActiveCfg = Release|x64
-		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.Debug|x64.ActiveCfg = DevelopDebug|x64
-		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.Debug|x64.Build.0 = DevelopDebug|x64
-		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.Debug|x86.ActiveCfg = DevelopDebug|x64
-		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.Debug|x86.Build.0 = DevelopDebug|x64
 		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.DevelopDebug|x64.ActiveCfg = DevelopDebug|x64
 		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.DevelopDebug|x64.Build.0 = DevelopDebug|x64
 		{E2CD76F6-9063-4AA8-9D39-8411F2655741}.DevelopDebug|x86.ActiveCfg = DevelopDebug|x64

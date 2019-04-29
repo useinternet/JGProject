@@ -6,12 +6,12 @@
 #include"GBuffer.h"
 #include"ShaderCommonDefines.h"
 #include"DirectXToolKit/Shader.h"
+#include"DirectXToolKit/Camera.h"
 using namespace Dx12;
 using namespace std;
 
 Scene::Scene(int width, int height)
 {
-	m_ChangedDebug = false;
 	m_Viewport.Set((float)width, (float)height);
 	m_ScissorRect.Set(width, height);
 
@@ -46,10 +46,15 @@ Scene::Scene(int width, int height)
 	m_RenderTarget.SetRenderTargetClearColor(RtvSlot::Slot_0, { 0.0f,0.0f,0.0f,1.0f });
 	m_RenderTarget.SetDepthStencilClearColor(1.0f, 0, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL);
 }
+Scene::Scene(int width, int height, const RenderTarget& rendertarget) : m_RenderTarget(rendertarget)
+{
+	m_Viewport.Set((float)width, (float)height);
+	m_ScissorRect.Set(width, height);
+
+	DebugModeOff();
+}
 void  Scene::DebugModeOn(int GbufferSlot)  
 {
-	if (m_ChangedDebug)
-		return;
 	EGBufferTexture textureSlot = GbufferSlot;
 	GraphicsShader shader;
 	shader.AddShaderPaths({ ShaderStage::Pixel, ShaderStage::Vertex }, SCENE_SHADER_PATH);
@@ -72,8 +77,7 @@ void  Scene::DebugModeOn(int GbufferSlot)
 		return;
 	}
 	shader.Compile();
-	m_ScreenPSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Screen, shader);
-	m_ChangedDebug = true;
+	m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
 }
 void  Scene::DebugModeOff() 
 {
@@ -81,7 +85,7 @@ void  Scene::DebugModeOff()
 	shader.AddShaderPaths({ ShaderStage::Pixel, ShaderStage::Vertex }, SCENE_SHADER_PATH);
 	shader.Compile();
 
-	m_ScreenPSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Screen, shader);
+	m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
 }
 void  Scene::ReSize(int width, int height)
 {
@@ -96,30 +100,32 @@ void  Scene::Draw(CommandList* commandList, GBuffer* gbuffer)
 	commandList->ClearRenderTarget(m_RenderTarget);
 	commandList->SetRenderTarget(m_RenderTarget);
 
-	commandList->SetGraphicsRootSignature(DxDevice::GetShaderCommonDefines()->GetSceneRootSig());
+	commandList->SetGraphicsRootSignature(DxDevice::GetShaderCommonDefines()->GetMainRootSig());
 	if (gbuffer)
 	{
-		commandList->SetGraphicsDescriptorTable(
-			GBufferTexture::Albedo,
-			gbuffer->GetTexture(GBufferTexture::Albedo).GetShaderResourceView());
-		commandList->SetGraphicsDescriptorTable(
-			GBufferTexture::Normal,
-			gbuffer->GetTexture(GBufferTexture::Normal).GetShaderResourceView());
-		commandList->SetGraphicsDescriptorTable(
-			GBufferTexture::Specular,
-			gbuffer->GetTexture(GBufferTexture::Specular).GetShaderResourceView());
-		commandList->SetGraphicsDescriptorTable(
-			GBufferTexture::Depth,
-			gbuffer->GetTexture(GBufferTexture::Depth).GetShaderResourceView());
-	}
+		D3D12_CPU_DESCRIPTOR_HANDLE handle[] = {
+			gbuffer->GetTexture(GBufferTexture::Albedo).GetShaderResourceView(),
+			gbuffer->GetTexture(GBufferTexture::Normal).GetShaderResourceView(),
+			gbuffer->GetTexture(GBufferTexture::Specular).GetShaderResourceView(),
+			gbuffer->GetTexture(GBufferTexture::Depth).GetShaderResourceView()
+		};
 
-	commandList->SetPipelineState(m_ScreenPSO);
+		commandList->SetGraphicsDescriptorTables(CommonRootParam::Texture,
+			4, handle);
+
+	}
+	commandList->SetPipelineState(m_ScenePSO);
 	commandList->SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	commandList->Draw(6);
-	m_ChangedDebug = false;
 }
-const  Texture& Scene::GetTexture()
+const  Texture& Scene::GetTexture() const
 {
 	return m_RenderTarget.GetTexture(RtvSlot::Slot_0);
+}
+const RenderTarget& Scene::GetRenderTarget() const {
+	return m_RenderTarget;
+}
+RenderTarget& Scene::GetRenderTarget() {
+	return m_RenderTarget;
 }

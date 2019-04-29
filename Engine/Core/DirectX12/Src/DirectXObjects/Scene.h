@@ -9,23 +9,25 @@ namespace Dx12
 {
 	class Screen;
 	class GBuffer;
-
+	class Camera;
 	class Scene
 	{
 	private:
-		GraphicsPSO  m_ScreenPSO;
+		GraphicsPSO  m_ScenePSO;
 		RenderTarget m_RenderTarget;
 		Viewport     m_Viewport;
 		ScissorRect  m_ScissorRect;
-		bool m_ChangedDebug;
 	public:
 		Scene(int width, int height);
+		Scene(int width, int height, const RenderTarget& rendertarget);
 	public:
 		void  DebugModeOn(int GbufferSlot);
 		void  DebugModeOff();
-
 		void  ReSize(int width, int height);
 		void  Draw(CommandList* commandList,GBuffer* gbuffer);
-		const Texture& GetTexture();
+		const Texture& GetTexture() const;
+		const RenderTarget& GetRenderTarget() const;
+		RenderTarget& GetRenderTarget();
+		
 	};
 }

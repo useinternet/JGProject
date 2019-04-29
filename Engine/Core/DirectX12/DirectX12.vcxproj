@@ -23,6 +23,7 @@
     <ClInclude Include="Src\DirectXCommon\Dx12Exception.h" />
     <ClInclude Include="Src\DirectXCommon\ScreenGrab12.h" />
     <ClInclude Include="Src\DirectXCommon\WICTextureLoader12.h" />
+    <ClInclude Include="Src\DirectXObjects\CubeMap.h" />
     <ClInclude Include="Src\DirectXObjects\GBuffer.h" />
     <ClInclude Include="Src\DirectXObjects\Scene.h" />
     <ClInclude Include="Src\DirectXObjects\ShaderCommonDefines.h" />
@@ -36,7 +37,6 @@
     <ClInclude Include="Src\DirectXToolKit\CommandList.h" />
     <ClInclude Include="Src\DirectXToolKit\CommandQueue.h" />
     <ClInclude Include="Src\DirectXToolKit\ConstantBuffer.h" />
-    <ClInclude Include="Src\DirectXToolKit\CubeRenderTarget.h" />
     <ClInclude Include="Src\DirectXToolKit\DepthStencilState.h" />
     <ClInclude Include="Src\DirectXToolKit\DescriptorAllocation.h" />
     <ClInclude Include="Src\DirectXToolKit\DescriptorAllocator.h" />
@@ -78,6 +78,7 @@
     <ClCompile Include="Src\DirectXCommon\Dx12Exception.cpp" />
     <ClCompile Include="Src\DirectXCommon\ScreenGrab12.cpp" />
     <ClCompile Include="Src\DirectXCommon\WICTextureLoader12.cpp" />
+    <ClCompile Include="Src\DirectXObjects\CubeMap.cpp" />
     <ClCompile Include="Src\DirectXObjects\GBuffer.cpp" />
     <ClCompile Include="Src\DirectXObjects\Scene.cpp" />
     <ClCompile Include="Src\DirectXObjects\ShaderCommonDefines.cpp" />
@@ -90,7 +91,6 @@
     <ClCompile Include="Src\DirectXToolKit\CommandList.cpp" />
     <ClCompile Include="Src\DirectXToolKit\CommandQueue.cpp" />
     <ClCompile Include="Src\DirectXToolKit\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\DirectXToolKit\CubeRenderTarget.cpp" />
     <ClCompile Include="Src\DirectXToolKit\DescriptorAllocation.cpp" />
     <ClCompile Include="Src\DirectXToolKit\DescriptorAllocator.cpp" />
     <ClCompile Include="Src\DirectXToolKit\DescriptorAllocatorPage.cpp" />

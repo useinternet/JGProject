@@ -6,19 +6,19 @@
 namespace Common
 {
 	class Transformation;
-	class Rotation
+	class Rotator
 	{
 		friend Transformation;
 	private:
 		JVector3   m_Rotation;
 		JMatrix4x4 m_RotationMatrix;
 	public:
-		Rotation() : m_Rotation(0.0f, 0.0f, 0.0f) {}
-		Rotation(const Rotation& copy) = default;
-		Rotation(Rotation&& copy) = default;
-		Rotation& operator=(const Rotation& rhs) = default;
-		Rotation& operator=(Rotation&& rhs) = default;
-		Rotation(const JVector3& v) : m_Rotation(v) {}
+		Rotator() : m_Rotation(0.0f, 0.0f, 0.0f) {}
+		Rotator(const Rotator& copy) = default;
+		Rotator(Rotator&& copy) = default;
+		Rotator& operator=(const Rotator& rhs) = default;
+		Rotator& operator=(Rotator&& rhs) = default;
+		Rotator(const JVector3& v) : m_Rotation(v) {}
 	public:
 		void Set(const JVector3& v) {
 			m_Rotation = v;
@@ -68,63 +68,63 @@ namespace Common
 			return m_Rotation.Z();
 		}
 	public:
-		bool operator==(const Rotation& pos) const {
+		bool operator==(const Rotator& pos) const {
 			return m_Rotation == pos.m_Rotation;
 		}
-		bool operator!=(const Rotation& pos) const {
+		bool operator!=(const Rotator& pos) const {
 			return m_Rotation != pos.m_Rotation;
 		}
 	public:
-		Rotation operator+(const Rotation& pos) const {
-			return Rotation(m_Rotation + pos.m_Rotation);
+		Rotator operator+(const Rotator& pos) const {
+			return Rotator(m_Rotation + pos.m_Rotation);
 		}
-		Rotation operator+(float k) const {
+		Rotator operator+(float k) const {
 			JVector3 result = m_Rotation;
 			result.AddScalar(k);
-			return Rotation(result);
+			return Rotator(result);
 		}
-		Rotation operator-(const Rotation& pos) const {
-			return Rotation(m_Rotation - pos.m_Rotation);
+		Rotator operator-(const Rotator& pos) const {
+			return Rotator(m_Rotation - pos.m_Rotation);
 		}
-		Rotation operator-(float k) const {
+		Rotator operator-(float k) const {
 			JVector3 result = m_Rotation;
 			result.AddScalar(-k);
-			return Rotation(result);
+			return Rotator(result);
 		}
 	public:
-		Rotation& operator+=(const Rotation& pos) {
+		Rotator& operator+=(const Rotator& pos) {
 			m_Rotation += pos.m_Rotation;
 			UpdateMatrix();
 			return *this;
 		}
-		Rotation& operator+=(float k) {
+		Rotator& operator+=(float k) {
 			m_Rotation.AddScalar(k);
 			UpdateMatrix();
 			return *this;
 		}
-		Rotation& operator-=(const Rotation& pos) {
+		Rotator& operator-=(const Rotator& pos) {
 			m_Rotation -= pos.m_Rotation;
 			UpdateMatrix();
 			return *this;
 		}
-		Rotation& operator-=(float k) {
+		Rotator& operator-=(float k) {
 			m_Rotation.AddScalar(-k);
 			UpdateMatrix();
 			return *this;
 		}
 	public:
-		Rotation operator*(float k) const {
-			return Rotation(m_Rotation * k);
+		Rotator operator*(float k) const {
+			return Rotator(m_Rotation * k);
 		}
-		Rotation operator/(float k) const {
-			return Rotation(m_Rotation / k);
+		Rotator operator/(float k) const {
+			return Rotator(m_Rotation / k);
 		}
-		Rotation& operator*=(float k) {
+		Rotator& operator*=(float k) {
 			m_Rotation *= k;
 			UpdateMatrix();
 			return *this;
 		}
-		Rotation& operator/=(float k) {
+		Rotator& operator/=(float k) {
 			m_Rotation /= k;
 			UpdateMatrix();
 			return *this;

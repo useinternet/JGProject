@@ -18,12 +18,14 @@
 #include <wrl.h>
 #include<dxgi1_5.h>
 #include <d3d12.h>
+#include <d3d11.h>
+#include <d3d11on12.h>
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
-#include <d2d1.h>
+#include <d2d1_3.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
 
@@ -40,6 +42,7 @@
 #pragma warning(disable : 4996)
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
+#pragma comment(lib, "D3D11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")

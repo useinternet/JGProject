@@ -73,7 +73,7 @@ namespace Dx12
 		void UAVBarrier(const Resource& resource);
 		void AliasingBarrier(const Resource& beforeResource, const Resource& afterResource);
 
-		void GenerateMipMaps(const Texture& texture);
+		void GenerateMipMaps(const Texture& texture, bool isCubeMap = false);
 	public:
 		void SetGraphicsConstants(uint32_t rootparam, uint32_t num32BitValues,const void* srcData);
 		void SetGraphicsConstantBufferView(uint32_t rootparam, uint32_t sizeInbyte,const void* data);
@@ -146,8 +146,8 @@ namespace Dx12
 		void SetDescriptorHeap(const DescriptorHeap& heap);
 		void TrackResource(const Resource& resource);
 		void TrackResource(const ComPtr<ID3D12Object>& object);
-		void GenerateMipMaps_UAV(const Texture& texture);
-		void GenerateMipMaps_BGR(const Texture& texture);
-		void GenerateMipMaps_SRGB(const Texture& texture);
+		void GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
+		void GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
+		void GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
 	};
 }

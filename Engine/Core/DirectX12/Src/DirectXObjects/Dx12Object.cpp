@@ -124,10 +124,7 @@ void Dx12Object::Update()
 	{
 		Build();
 	}
-	if (m_InstanceCount == 0)
-	{
-		AddObjectFragments();
-	}
+
 	for (uint32_t i = 0; i < m_InstanceCount; ++i)
 	{
 		m_ObjectCBDatas[i].World = m_ObjectFragments[i]->GetTransform_c().GetHlslMatrix().Get();
@@ -268,8 +265,15 @@ void Dx12Object::SetCubeTexture(ECubeTextureSlot slot, const Texture& texture)
 		DX12_LOG_ERROR("%s 's Texture is not register slot", m_Name.c_str());
 		return;
 	}
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+	srvDesc.TextureCube.MostDetailedMip = 0;
+	srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = texture.GetDesc().Format;
+	srvDesc.TextureCube.MipLevels = texture.GetDesc().MipLevels;
 	m_CubeTextures[slot] = texture;
-	m_CubeTextureSRVHandles[slot] = texture.GetShaderResourceView();
+	m_CubeTextureSRVHandles[slot] = texture.GetShaderResourceView(&srvDesc);
 }
 
 
@@ -296,5 +300,9 @@ void Dx12Object::Build()
 	else
 	{
 		m_PSO = DxDevice::GetShaderCommonDefines()->GetPSO(m_PreparedPSO, shader);
+	}
+	if (m_InstanceCount == 0)
+	{
+		AddObjectFragments();
 	}
 }

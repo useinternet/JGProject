@@ -159,9 +159,6 @@
     <ClInclude Include="Src\DirectXToolKit\ByteAddressBuffer.h">
       <Filter>DirectXToolKit\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Src\DirectXToolKit\CubeRenderTarget.h">
-      <Filter>DirectXToolKit\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Src\DirectXObjects\Mesh.h">
       <Filter>DirectXObjects</Filter>
     </ClInclude>
@@ -178,6 +175,9 @@
       <Filter>DirectXObjects</Filter>
     </ClInclude>
     <ClInclude Include="Src\DirectXObjects\Scene.h">
+      <Filter>DirectXObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\CubeMap.h">
       <Filter>DirectXObjects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -281,9 +281,6 @@
     <ClCompile Include="Src\DirectXToolKit\ByteAddressBuffer.cpp">
       <Filter>DirectXToolKit\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DirectXToolKit\CubeRenderTarget.cpp">
-      <Filter>DirectXToolKit\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="Src\DirectXObjects\Mesh.cpp">
       <Filter>DirectXObjects</Filter>
     </ClCompile>
@@ -300,6 +297,9 @@
       <Filter>DirectXObjects</Filter>
     </ClCompile>
     <ClCompile Include="Src\DirectXObjects\Scene.cpp">
+      <Filter>DirectXObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\CubeMap.cpp">
       <Filter>DirectXObjects</Filter>
     </ClCompile>
   </ItemGroup>

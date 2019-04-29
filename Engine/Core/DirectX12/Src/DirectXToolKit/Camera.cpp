@@ -65,6 +65,8 @@ void Camera::RotationRoll(float roll)
 }
 void Camera::SetLens(float fov, float width, float height, float nearZ, float farZ)
 {
+	m_Near = nearZ;
+	m_Far = farZ;
 	m_ProjMatrix.PerspectiveFovLH(fov, width / height, nearZ, farZ);
 	m_bUpdate = true;
 }
@@ -73,6 +75,16 @@ const JMatrix4x4& Camera::GetMatrix() const
 	UpdateMatrix();
 	return m_ViewProjMatrix;
 }
+const Common::JMatrix4x4& Camera::GetViewMatrix() const
+{
+	UpdateMatrix();
+	return m_ViewMatrix;
+}
+const Common::JMatrix4x4& Camera::GetProjMatrix() const
+{
+	UpdateMatrix();
+	return m_ProjMatrix;
+}
 JMatrix4x4 Camera::GetHlslMatrix() const
 {
 	UpdateMatrix();
@@ -80,6 +92,20 @@ JMatrix4x4 Camera::GetHlslMatrix() const
 	result.Transpose();
 
 
+	return result;
+}
+Common::JMatrix4x4 Camera::GetHlslViewMatrix() const
+{
+	UpdateMatrix();
+	JMatrix4x4 result = m_ViewMatrix;
+	result.Transpose();
+	return result;
+}
+Common::JMatrix4x4 Camera::GetHlslProjMatrix() const
+{
+	UpdateMatrix();
+	JMatrix4x4 result = m_ProjMatrix;
+	result.Transpose();
 	return result;
 }
 void Camera::UpdateMatrix() const

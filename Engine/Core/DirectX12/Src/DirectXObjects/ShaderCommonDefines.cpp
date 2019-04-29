@@ -7,10 +7,32 @@
 #include"DirectXToolKit/BlendState.h"
 #include"DirectXToolKit/RasterizerState.h"
 #include"GBuffer.h"
+#include"DirectXToolKit/Camera.h"
 using namespace Dx12;
 using namespace std;
+using namespace Common;
+void PassCB::Set(const Camera& cam)
+{
+	auto view = cam.GetHlslViewMatrix();
+	auto proj = cam.GetHlslProjMatrix();
+	auto viewproj = cam.GetHlslMatrix();
 
 
+	ViewProj = viewproj.Get();
+	InvViewProj = Inverse(viewproj).Get();
+
+	View = view.Get(); 
+	InvView = Inverse(view).Get();
+
+
+	Proj = proj.Get();
+	InvProj = Inverse(proj).Get();
+
+
+	ToEye = cam.GetPosition().Get();
+	FarZ  = cam.GetFarZ();
+	NearZ = cam.GetNearZ();
+}
 Dx12CommonShaderDefines::Dx12CommonShaderDefines()
 {
 	m_MainRootSignature.InitAsShaderResourceView(0, 0); // ObjectCB
@@ -28,37 +50,7 @@ Dx12CommonShaderDefines::Dx12CommonShaderDefines()
 	m_MainRootSignature.AddSampler(SamplerState::AnisotropicWrap(4));
 	m_MainRootSignature.AddSampler(SamplerState::AnisotropicClamp(5));
 
-	// Create
 	m_MainRootSignature.Finalize();
-
-
-
-
-
-
-	m_SceneRootSignature.InitAsDescriptor(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-	m_SceneRootSignature.InitAsDescriptor(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-	m_SceneRootSignature.InitAsDescriptor(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-	m_SceneRootSignature.InitAsDescriptor(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
-	m_SceneRootSignature.AddSampler(SamplerState::AnisotropicWrap(0));
-	m_SceneRootSignature.Finalize();
-}
-const RootSignature& Dx12CommonShaderDefines::GetRootSig(EPreparedPSO pso) const
-{
-	switch (pso)
-	{
-	case PreparedPSO::Main_Static:
-	case PreparedPSO::Main_Skeletal:
-	case PreparedPSO::SkyBox:
-		return m_MainRootSignature;
-	case PreparedPSO::Screen:
-		return m_SceneRootSignature;
-
-	default:
-		return m_MainRootSignature;
-	}
-
-
 }
 GraphicsPSO Dx12CommonShaderDefines::GetPSO(EPreparedPSO pso, const GraphicsShader& shader)
 {
@@ -70,8 +62,8 @@ GraphicsPSO Dx12CommonShaderDefines::GetPSO(EPreparedPSO pso, const GraphicsShad
 		return GetMainPSO(shader, true);
 	case PreparedPSO::SkyBox:
 		return GetSkyBoxPSO(shader);
-	case PreparedPSO::Screen:
-		return GetScreenPSO(shader);
+	case PreparedPSO::Scene:
+		return GetScenePSO(shader);
 	}
 	return GraphicsPSO();
 }
@@ -113,12 +105,12 @@ GraphicsPSO Dx12CommonShaderDefines::GetSkyBoxPSO(const GraphicsShader& shader)
 	return pso;
 }
 
-GraphicsPSO Dx12CommonShaderDefines::GetScreenPSO(const GraphicsShader& shader)
+GraphicsPSO Dx12CommonShaderDefines::GetScenePSO(const GraphicsShader& shader)
 {
 	GraphicsPSO pso;
 	pso.SetRenderTargetFormat(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-	pso.SetRootSig(m_SceneRootSignature.Get());
+	pso.SetRootSig(m_MainRootSignature.Get());
 	pso.SetVertexShader(shader);
 	pso.SetPixelShader(shader);
 	pso.SetInputLayout(JgVertex::GetNumInputLayout(), JgVertex::GetInputLayoutDesc());
