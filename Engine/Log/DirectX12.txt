@@ -1,259 +1,49 @@
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : directxcore.cpp
 FuncName : Dx12::DxDevice::CreateDevice
-Line     : 91
+Line     : 90
 Contents : DX12 Device Init Success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/Scene.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/Scene.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/SkyBox.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/SkyBox.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Error ]
-FileName : resourcestatemap.cpp
-FuncName : Dx12::ResourceStateMap::GetResourceState
-Line     : 53
-Contents : this resource is not exsit in ResourceStateMap
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146
 Contents : ../../../Contents/Engine/Shaders/GenerateMips_CS.hlsl : shader compile success..
-[ 3889530248 ][ DirectX12 ][ Info ]
+[ 2536315623 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
 Line     : 146

@@ -17,6 +17,7 @@ namespace Dx12
 	{
 	private:
 		D3D12_RENDER_TARGET_VIEW_DESC m_RTVDescs[6];
+		D3D12_DEPTH_STENCIL_VIEW_DESC m_DSVDescs[6];
 		std::unique_ptr<GBuffer> m_GBuffer;
 		std::unique_ptr<Scene>   m_Scene[6];
 		Camera m_Camera[6];
@@ -37,6 +38,7 @@ namespace Dx12
 		void Resize(uint32_t width, uint32_t height);
 		void SetPosition(const Common::JVector3& v);
 		void SetCameraFarNear(float farZ, float nearZ);
+	
 		const Texture& GetTexture() const;
 	private:
 		void Build();

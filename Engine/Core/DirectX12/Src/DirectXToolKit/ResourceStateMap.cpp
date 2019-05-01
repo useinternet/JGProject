@@ -18,6 +18,10 @@ void ResourceStateMap::AddResourceState(ID3D12Resource* resource, D3D12_RESOURCE
 }
 void ResourceStateMap::TransitionResourceState(ID3D12Resource* resource, D3D12_RESOURCE_STATES state)
 {
+	if (!resource)
+	{
+		return;
+	}
 	lock_guard<mutex> lock(ms_ResourceStateMapMutex);
 	if (ms_ResourceStateMap.find(resource) == ms_ResourceStateMap.end())
 	{
@@ -42,6 +46,8 @@ void ResourceStateMap::RemoveResourceState(ID3D12Resource* resource)
 
 D3D12_RESOURCE_STATES ResourceStateMap::GetResourceState(ID3D12Resource* resource)
 {
+	if(!resource)
+		return D3D12_RESOURCE_STATE_COMMON;
 	lock_guard<mutex> lock(ms_ResourceStateMapMutex);
 
 	if (ms_ResourceStateMap.find(resource) != ms_ResourceStateMap.end())

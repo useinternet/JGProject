@@ -132,7 +132,6 @@ namespace Dx12
 
 	private:
 		GraphicsPSO GetMainPSO(const GraphicsShader& shader, bool is_skinned = false);
-
 		GraphicsPSO GetSkyBoxPSO(const GraphicsShader& shader);
 		GraphicsPSO GetScenePSO(const GraphicsShader& shader);
 	};

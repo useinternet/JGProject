@@ -15,8 +15,6 @@ namespace Dx2D
 
 		bool CreateDevice(ID3D12Device* dx12device, ComPtr<ID3D12CommandQueue> cmdQueue, const string& logpath)
 		{
-			REGISTER_LOG(g_LogGroupName, logpath);
-
 
 			D2D1_FACTORY_OPTIONS d2dFactoryOptions = {};
 #if defined(_DEVELOP_DEBUG) || defined(_DEVELOP_RELEASE)

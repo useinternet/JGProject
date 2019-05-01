@@ -1,10 +1,11 @@
 #include<PCH.h>
 #include"Log.h"
+#include"Path.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include"Util/StringUtil.h"
-
+REISTER_COMMONPATH
 using namespace std;
 namespace Common
 {
@@ -31,7 +32,9 @@ namespace Common
 			const char* Contents, ...)
 		{
 			if (g_Logs.find(GroupName) == g_Logs.end())
-				return;
+			{
+				CreateLog(GroupName, GLOBAL_PATH / "Engine/Log/" + GroupName + ".txt");
+			}
 			char buf[512] = { 0, };
 
 			// 가변인자 처리
@@ -59,7 +62,7 @@ namespace Common
 			}
 			// 메세지 큐에 담기
 			{
-				LogMessage msg = { std::string(GroupName),level,hashCode,logMsg };
+				LogMessage msg = { std::string(GroupName), filename, funcname, lineNumber, level, hashCode, buf };
 				g_MsgQueue.Push(msg);
 			}
 

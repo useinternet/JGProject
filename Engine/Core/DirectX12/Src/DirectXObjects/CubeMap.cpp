@@ -77,7 +77,7 @@ void CubeMap::ResourceBuild()
 	Texture texture = Texture(
 		TextureUsage::RenderTarget,
 		CD3DX12_RESOURCE_DESC::Tex2D(
-			m_Format, m_Width, m_Height, 6, 1, 1, 0,
+			m_Format, m_Width, m_Height, 6, 0, 1, 0,
 			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
 		&clearColor,
 		"CubeMapTexture");
@@ -92,7 +92,7 @@ void CubeMap::ResourceBuild()
 			DXGI_FORMAT_D24_UNORM_S8_UINT,
 			m_Width,
 			m_Height,
-			6, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+			6, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		&clearColor,
 		"CubeMapDepthTexture");
 
@@ -105,6 +105,13 @@ void CubeMap::ResourceBuild()
 		m_RTVDescs[i].Texture2DArray.MipSlice = 0;
 		m_RTVDescs[i].Texture2DArray.PlaneSlice = 0;
 		m_RTVDescs[i].Texture2DArray.FirstArraySlice = i;
+
+
+		m_DSVDescs[i].Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		m_DSVDescs[i].ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+		m_DSVDescs[i].Texture2DArray.ArraySize = 1;
+		m_DSVDescs[i].Texture2DArray.FirstArraySlice = i;
+		m_DSVDescs[i].Texture2DArray.MipSlice = 0;
 	}
 
 	renserTarget.AttachTexture(RtvSlot::Slot_0, texture);
@@ -116,6 +123,7 @@ void CubeMap::ResourceBuild()
 	{
 		m_Scene[i] = make_unique<Scene>(m_Width, m_Height, renserTarget);
 		m_Scene[i]->GetRenderTarget().SetRenderTargetDesc(RtvSlot::Slot_0, &m_RTVDescs[i]);
+		m_Scene[i]->GetRenderTarget().SetDepthStencilDesc(&m_DSVDescs[i]);
 	}
 	m_GBuffer = make_unique<GBuffer>(m_Width, m_Height);
 }

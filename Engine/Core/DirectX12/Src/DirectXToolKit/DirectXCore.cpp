@@ -42,7 +42,6 @@ namespace Dx12
 		bool CreateDevice(const string& logpath)
 		{
 			UINT FactoryFlags = 0;
-			REGISTER_LOG(g_LogGroupName, logpath);
 			if (g_IsInitDevice) {
 				// log error
 				return false;

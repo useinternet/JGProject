@@ -419,7 +419,6 @@ namespace Dx12
 					vertices[i*n + j].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 					vertices[i*n + j].tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
 
-					// Stretch texture over grid.
 					vertices[i*n + j].tex.x = j * du;
 					vertices[i*n + j].tex.y = i * dv;
 				}

@@ -45,7 +45,7 @@ void Gui_Log::NewFrame()
 
 		auto txt = make_unique<Text>();
 		txt->Color = m_ColorByLogLevel[msg.level];
-		txt->Str   = msg.str;
+		txt->Str   = msg.contents;
 		txt->line  = m_LineOffset++;
 		txt->Level = msg.level;
 		txt->GroupName = msg.groupName;

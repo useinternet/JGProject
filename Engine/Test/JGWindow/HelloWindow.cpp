@@ -31,8 +31,8 @@ bool HelloWindow::Initialize()
 	// 텍스쳐 불러오기
 	{
 		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("UV_Test_Pattern.png"), m_Texture, TextureUsage::Albedo);
-		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("bricks2.dds"), m_GridTexture, TextureUsage::Albedo);
-		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("bricks2_nmap.dds"), m_GridNormalTexture, TextureUsage::Normal);
+		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("tile.dds"), m_GridTexture, TextureUsage::Albedo);
+		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("tile_nmap.dds"), m_GridNormalTexture, TextureUsage::Normal);
 		commandList->LoadTextureFromFile(GLOBAL_TEXTURE_PATH("grasscube1024.dds"), m_SkyTexture, TextureUsage::Albedo);
 	}
 	// 오브젝트 설정
@@ -88,7 +88,7 @@ bool HelloWindow::Initialize()
 	cmdList->Close();
 	DxDevice::GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)->ExcuteCommandList(cmdList);
 	DxDevice::GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)->Flush();
-
+	//m_Object.AddTexture(m_Texture);
 	m_Object.AddCubeTexture(m_CubeMap->GetTexture());
 	return true;
 }
@@ -128,6 +128,8 @@ void HelloWindow::Draw()
 
 	m_CubeMap->Draw(commandList, { &m_SkyObject ,&m_GridObject });
 
+
+	commandList->TransitionBarrier(m_CubeMap->GetTexture(), D3D12_RESOURCE_STATE_COMMON);
 	commandList->Close();
     m_CommandQueue->ExcuteCommandList(commandList);
 

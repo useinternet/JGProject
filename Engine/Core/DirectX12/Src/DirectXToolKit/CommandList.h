@@ -146,8 +146,8 @@ namespace Dx12
 		void SetDescriptorHeap(const DescriptorHeap& heap);
 		void TrackResource(const Resource& resource);
 		void TrackResource(const ComPtr<ID3D12Object>& object);
-		void GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
-		void GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
-		void GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc);
+		void GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap);
+		void GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap);
+		void GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap);
 	};
 }

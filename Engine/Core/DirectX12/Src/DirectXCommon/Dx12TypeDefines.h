@@ -41,7 +41,9 @@ namespace Dx12 {
 			Slot5,
 			Slot6,
 			Slot7,
-			NumSlot
+			NumSlot,
+			Diffuse = Slot0,
+			Normal  = Slot1
 		};
 	}
 	typedef int ECubeTextureSlot;
@@ -53,7 +55,8 @@ namespace Dx12 {
 			Slot1,
 			Slot2,
 			Slot3,
-			NumSlot
+			NumSlot,
+			Reflection = Slot0
 		};
 	}
 

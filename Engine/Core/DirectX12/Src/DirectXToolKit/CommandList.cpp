@@ -194,12 +194,12 @@ void CommandList::GenerateMipMaps(const Texture& texture, bool isCubeMap)
 			for (int i = 0; i < 6; ++i)
 			{
 				srvDesc.Texture2DArray.FirstArraySlice = i;
-				GenerateMipMaps_UAV(texture, &srvDesc);
+				GenerateMipMaps_UAV(texture, &srvDesc, isCubeMap);
 			}
 		}
 		else
 		{
-			GenerateMipMaps_UAV(texture, nullptr);
+			GenerateMipMaps_UAV(texture, nullptr, isCubeMap);
 		}
 	
 	}
@@ -210,12 +210,12 @@ void CommandList::GenerateMipMaps(const Texture& texture, bool isCubeMap)
 			for (int i = 0; i < 6; ++i)
 			{
 				srvDesc.Texture2DArray.FirstArraySlice = i;
-				GenerateMipMaps_BGR(texture, &srvDesc);
+				GenerateMipMaps_BGR(texture, &srvDesc, isCubeMap);
 			}
 		}
 		else
 		{
-			GenerateMipMaps_BGR(texture, nullptr);
+			GenerateMipMaps_BGR(texture, nullptr, isCubeMap);
 		}
 	}
 	else if (Texture::IsSRGBFormat(resourceDesc.Format))
@@ -225,12 +225,12 @@ void CommandList::GenerateMipMaps(const Texture& texture, bool isCubeMap)
 			for (int i = 0; i < 6; ++i)
 			{
 				srvDesc.Texture2DArray.FirstArraySlice = i;
-				GenerateMipMaps_SRGB(texture, &srvDesc);
+				GenerateMipMaps_SRGB(texture, &srvDesc, isCubeMap);
 			}
 		}
 		else
 		{
-			GenerateMipMaps_SRGB(texture, nullptr);
+			GenerateMipMaps_SRGB(texture, nullptr, isCubeMap);
 		}
 	}
 	else
@@ -621,7 +621,7 @@ void CommandList::TrackResource(const ComPtr<ID3D12Object>& object)
 	m_TrackObjects.push_back(object);
 }
 
-void CommandList::GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
+void CommandList::GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap)
 {
 	if (!m_GenerateMipMapsCS)
 	{
@@ -692,9 +692,22 @@ void CommandList::GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOU
 		for (uint32_t mip = 0; mip < mipCount; ++mip)
 		{
 			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-			uavDesc.Format = resourceDesc.Format;
-			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-			uavDesc.Texture2D.MipSlice = srcMip + mip + 1;
+			if (isCubeMap && srvDesc)
+			{
+				uavDesc.Format = resourceDesc.Format;
+				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+				uavDesc.Texture2DArray.ArraySize = 1;
+				uavDesc.Texture2DArray.MipSlice = srcMip + mip + 1;
+				uavDesc.Texture2DArray.PlaneSlice = 0;
+				uavDesc.Texture2DArray.FirstArraySlice = srvDesc->Texture2DArray.FirstArraySlice;
+			}
+			else
+			{
+				uavDesc.Format = resourceDesc.Format;
+				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+				uavDesc.Texture2D.MipSlice = srcMip + mip + 1;
+			}
+	
 			outputHandles[mip] = stagingTexture.GetUnorderedAccessView(&uavDesc);
 		}
 		for (uint32_t mip = mipCount; mip < 4; ++mip)
@@ -717,7 +730,7 @@ void CommandList::GenerateMipMaps_UAV(const Texture& texture, D3D12_SHADER_RESOU
 	}
 	
 }
-void CommandList::GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
+void CommandList::GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap)
 {
 	auto device = DxDevice::GetDevice();
 
@@ -785,7 +798,7 @@ void CommandList::GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOU
 
 
 
-	GenerateMipMaps_UAV(copyTexture, srvDesc);
+	GenerateMipMaps_UAV(copyTexture, srvDesc, isCubeMap);
 
 	AliasingBarrier(copyTexture, aliasTexture);
 	CopyResource(texture, aliasTexture);
@@ -795,7 +808,7 @@ void CommandList::GenerateMipMaps_BGR(const Texture& texture, D3D12_SHADER_RESOU
 	TrackResource(aliasTexture);
 	TrackResource(texture);
 }
-void CommandList::GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
+void CommandList::GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, bool isCubeMap)
 {
 	auto device = DxDevice::GetDevice();
 	auto resourceDesc = texture.GetDesc();
@@ -860,7 +873,7 @@ void CommandList::GenerateMipMaps_SRGB(const Texture& texture, D3D12_SHADER_RESO
 		srvDesc->Format = copyDesc.Format;
 	//
 
-	GenerateMipMaps_UAV(copyTexture, srvDesc);
+	GenerateMipMaps_UAV(copyTexture, srvDesc, isCubeMap);
 
 	AliasingBarrier(copyTexture, aliasTexture);
 	CopyResource(texture, aliasTexture);

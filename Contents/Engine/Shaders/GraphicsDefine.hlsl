@@ -89,3 +89,19 @@ float ConvertLinearDepth(float depth)
     return proj_B / (depth - proj_A);
     return gProj._34 / (depth + gProj._33);
 }
+
+
+float3 CalcBumpNormal(float3 normalMap, float3 normalW, float3 tangentW)
+{
+    float3 normalT = 2.0f * normalMap - 1.0f;
+
+    float3 N = normalW;
+    float3 T = normalize(tangentW - dot(tangentW, N) * N);
+    float3 B = cross(N, T);
+
+    float3x3 TBN = float3x3(T, B, N);
+
+    float3 bumpedNormalW = mul(normalT, TBN);
+
+    return bumpedNormalW;
+}

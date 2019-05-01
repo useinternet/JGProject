@@ -84,11 +84,18 @@ GBufferPack PS(VsToPs pin) : SV_Target
     float3 r = reflect(-gToEye, N);
     float4 rcolor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 #ifdef USE_CUBETEXTURE_SLOT0
-    rcolor = gCubeMap[0].Sample(gLinearWrapSampler, r);
+    rcolor = gCubeMap[0].SampleLevel(gLinearWrapSampler, r, padding.x);
 #endif
+    
+    // diffuse
 #ifdef USE_TEXTURE_SLOT0
     TextureColor = gTexture[0].SampleLevel(gAnisotropicWrapSampler, pin.TexC, padding.x);
 #endif
+    // normal
+#ifdef USE_TEXTURE_SLOT1
+    float3 normalMap = gTexture[1].Sample(gAnisotropicWrapSampler, pin.TexC).xyz;
+    N = CalcBumpNormal(normalMap, N, T);
+#endif
 
 
 
@@ -96,7 +103,7 @@ GBufferPack PS(VsToPs pin) : SV_Target
 
 
 
-    gbuffer.Albedo = float4(material.SurfaceColor, 1.0f) * TextureColor * rcolor;
+    gbuffer.Albedo = float4(material.SurfaceColor, 1.0f) * TextureColor * rcolor * 1.4f;
     gbuffer.Normal   = float4((N + 1.0f) * 0.5f, 1.0f);
     gbuffer.Specular = float4(0.0f,0.0f, 1.0f, 1.0f);
     gbuffer.Depth    = pin.Depth;

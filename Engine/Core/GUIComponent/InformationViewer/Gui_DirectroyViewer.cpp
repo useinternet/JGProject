@@ -18,11 +18,6 @@ Gui_DirectoryViewer::Gui_DirectoryViewer(const std::string& name)
 	m_RootNode->path = GLOBAL_PATH / "Contents\\";
 
 	SearchRecursiveDirectoryNode(directoryIter, m_RootNode);
-
-
-
-
-	REGISTER_LOG("Gui_DirectoryViewer", "./");
 }
 Gui_DirectoryViewer::~Gui_DirectoryViewer()
 {
