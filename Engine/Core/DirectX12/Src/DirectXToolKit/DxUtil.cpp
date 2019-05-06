@@ -51,59 +51,6 @@ namespace Dx12
 			return result;
 		}
 
-		ComPtr<IDXGISwapChain4> CreateSwapChain(
-			ID3D12CommandQueue* CmdQue,
-			HWND hWnd,
-			int width, int height,
-			int bufferCount,
-			DXGI_FORMAT format)
-		{
-			auto Device = DxDevice::GetDevice();
-
-
-			ComPtr<IDXGISwapChain4> dxgiSwapChain4;
-			ComPtr<IDXGIFactory4>   dxgiFactory4;
-			UINT createFactoryFlags = 0;
-#if defined(_DEVELOP_DEBUG)
-			createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-#endif
-
-			ThrowIfFailed(CreateDXGIFactory2(
-				createFactoryFlags, 
-				IID_PPV_ARGS(&dxgiFactory4)));
-
-			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-			swapChainDesc.Width = width;
-			swapChainDesc.Height = height;
-			swapChainDesc.Format = format;
-			swapChainDesc.Stereo = FALSE;
-			swapChainDesc.SampleDesc = { 1, 0 };
-			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapChainDesc.BufferCount = bufferCount;
-			swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-			swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-			//
-			swapChainDesc.Flags = 0;
-	
-
-			ComPtr<IDXGISwapChain1> swapChain1;
-			ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-				CmdQue,
-				hWnd,
-				&swapChainDesc,
-				nullptr,
-				nullptr,
-				&swapChain1));
-
-	
-
-			ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
-
-			ThrowIfFailed(swapChain1.As(&dxgiSwapChain4));
-			return dxgiSwapChain4;
-		}
-
 		ComPtr<ID3DBlob> CompileShader(
 			const wstring& filename,
 			const D3D_SHADER_MACRO* defines,

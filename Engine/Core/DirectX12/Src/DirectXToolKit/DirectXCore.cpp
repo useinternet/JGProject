@@ -39,7 +39,7 @@ namespace Dx12
 
 
 		// 인터페이스 함수들 
-		bool CreateDevice(const string& logpath)
+		bool CreateDevice()
 		{
 			UINT FactoryFlags = 0;
 			if (g_IsInitDevice) {

@@ -31,6 +31,18 @@
     <Filter Include="DirectXToolKit\RenderState">
       <UniqueIdentifier>{3601b73d-474b-48c0-b9c6-58f9dc52d783}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DirectXFunction">
+      <UniqueIdentifier>{8cde1327-ac16-48d6-b9ee-1f6ab1ab003c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXFunction\Filter">
+      <UniqueIdentifier>{8f0a39ea-584a-4484-b7ff-837f2287ecdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXFunction\Particle">
+      <UniqueIdentifier>{0fd77e25-175d-4ef5-9f18-10473fa44218}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXObjects\CubeMap">
+      <UniqueIdentifier>{83be8a75-8edf-4e8a-b53f-fd885cf1f5ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\DirectXCommon\d3dx12.h">
@@ -177,7 +189,28 @@
     <ClInclude Include="Src\DirectXObjects\Scene.h">
       <Filter>DirectXObjects</Filter>
     </ClInclude>
+    <ClInclude Include="Src\DirectXFunction\Filter\GaussianFilter.h">
+      <Filter>DirectXFunction\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXFunction\Filter\DxFilter.h">
+      <Filter>DirectXFunction\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\Light.h">
+      <Filter>DirectXObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\IrradianceMap.h">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\ReflectionMap.h">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClInclude>
     <ClInclude Include="Src\DirectXObjects\CubeMap.h">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\PrefilterMap.h">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DirectXObjects\IntegratedBRDFTexture.h">
       <Filter>DirectXObjects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -299,7 +332,28 @@
     <ClCompile Include="Src\DirectXObjects\Scene.cpp">
       <Filter>DirectXObjects</Filter>
     </ClCompile>
+    <ClCompile Include="Src\DirectXFunction\Filter\GaussianFilter.cpp">
+      <Filter>DirectXFunction\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXFunction\Filter\DxFilter.cpp">
+      <Filter>DirectXFunction\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\Light.cpp">
+      <Filter>DirectXObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\IrradianceMap.cpp">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\ReflectionMap.cpp">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClCompile>
     <ClCompile Include="Src\DirectXObjects\CubeMap.cpp">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\PrefilterMap.cpp">
+      <Filter>DirectXObjects\CubeMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DirectXObjects\IntegratedBRDFTexture.cpp">
       <Filter>DirectXObjects</Filter>
     </ClCompile>
   </ItemGroup>

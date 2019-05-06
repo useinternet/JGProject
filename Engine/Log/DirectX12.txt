@@ -1,50 +1,70 @@
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : directxcore.cpp
 FuncName : Dx12::DxDevice::CreateDevice
 Line     : 90
 Contents : DX12 Device Init Success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
+Line     : 93
 Contents : ../../../Contents/Engine/Shaders/Scene.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
+Line     : 93
 Contents : ../../../Contents/Engine/Shaders/Scene.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
-Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/GBuffer.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
-Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/GBuffer.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
-Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/GBuffer.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
+Line     : 93
 Contents : ../../../Contents/Engine/Shaders/SkyBox.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
+Line     : 93
 Contents : ../../../Contents/Engine/Shaders/SkyBox.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/IrradianceMap.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
+FileName : dxutil.cpp
+FuncName : Dx12::DxUtil::CompileShader
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/IrradianceMap.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
+FileName : dxutil.cpp
+FuncName : Dx12::DxUtil::CompileShader
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/PrefilterMap.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
+FileName : dxutil.cpp
+FuncName : Dx12::DxUtil::CompileShader
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/PrefilterMap.hlsl : shader compile success..
+[ 1430535276 ][ DirectX12 ][ Info ]
+FileName : dxutil.cpp
+FuncName : Dx12::DxUtil::CompileShader
+Line     : 93
 Contents : ../../../Contents/Engine/Shaders/GenerateMips_CS.hlsl : shader compile success..
-[ 2536315623 ][ DirectX12 ][ Info ]
+[ 1430535276 ][ DirectX12 ][ Info ]
 FileName : dxutil.cpp
 FuncName : Dx12::DxUtil::CompileShader
-Line     : 146
-Contents : ../../../Contents/Engine/Shaders/Main.hlsl : shader compile success..
+Line     : 93
+Contents : ../../../Contents/Engine/Shaders/GBuffer.hlsl : shader compile success..

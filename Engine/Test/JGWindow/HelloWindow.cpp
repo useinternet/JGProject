@@ -11,7 +11,7 @@ bool HelloWindow::Initialize()
 {
 	if (!JGWindow::Initialize())
 		return false;
-	DxDevice::CreateDevice(DX12_LOG_PATH);
+	DxDevice::CreateDevice();
 	Dx2D::Dx2DDevice::CreateDevice(DxDevice::GetDevice(), DxDevice::GetCommandQueue()->Get());
 	m_CommandQueue = DxDevice::GetCommandQueue();
 	auto commandList = m_CommandQueue->GetCommandList();
@@ -38,58 +38,79 @@ bool HelloWindow::Initialize()
 	// 오브젝트 설정
 	{
 		m_PassCB.padding.x = 0.0f;
-
+		m_PassCB.padding.y = 0.0f;
 
 		m_Object.SetMesh(GeometryGenerator::CreateSphere(
 			commandList, 10, 20, 20));
 		//m_Object.AddTexture(m_Texture);
 
 		m_Object.Build(
-			MAIN_SHADER_PATH,
+			GBUFFER_SHADER_PATH,
 			{ ShaderStage::Vertex, ShaderStage::Pixel },
 			PreparedPSO::Main_Static);
 		m_Object.GetObjectFragments(0)->GetMaterial()->Get().Roughness = 0.0f;
-
+		m_Object.GetObjectFragments(0)->GetMaterial()->Get().SurfaceColor = { 1.0f,0.0f,0.0f };
 
 
 		m_GridObject.SetMesh(GeometryGenerator::CreateGrid(
 			commandList, 100, 100, 10, 10));
 		m_GridObject.AddTexture(m_GridTexture);
 		m_GridObject.AddTexture(m_GridNormalTexture);
-		m_GridObject.Build(MAIN_SHADER_PATH,
+		m_GridObject.Build(GBUFFER_SHADER_PATH,
 			{ ShaderStage::Vertex, ShaderStage::Pixel },
 			PreparedPSO::Main_Static);
 		m_GridObject.GetObjectFragments(0)->GetLocation().Set({ 0.0f, -20.0f, 0.0f });
 
 
-		m_SkyObject.SetMesh(GeometryGenerator::CreateSphere(commandList,
-			10000.0f,10,10));
+		m_SkyObject.SetMesh(GeometryGenerator::CreateBox(commandList,
+			10000.0f, 10000.0f, 10000.0f, 0));
 		m_SkyObject.AddCubeTexture(m_SkyTexture);
-
 		m_SkyObject.Build(
 			SKY_BOX_SHADER_PATH,
 			{ ShaderStage::Vertex, ShaderStage::Pixel },
 			PreparedPSO::SkyBox);
 	}
 	{
-		m_CubeMap = make_unique<CubeMap>(1024, 1024, m_Camera.GetFarZ(), m_Camera.GetNearZ());
+		// 큐브 맵 밉맵
+		m_CubeMap = make_unique<ReflectionMap>(512, 512, m_Camera.GetFarZ(), m_Camera.GetNearZ(), false , DXGI_FORMAT_R16G16B16A16_FLOAT);
 		m_CubeMap->SetPosition(m_Object.GetObjectFragments(0)->GetLocation().Get());
+
+		m_IrradianceMap = make_unique<IrradianceMap>(commandList, 32, 32,m_Camera.GetFarZ(), m_Camera.GetNearZ());
+		m_PrefilterMap = make_unique<PrefilterMap>(commandList, 512, 512, m_Camera.GetFarZ(), m_Camera.GetNearZ());
 	}
-
+	Update();
+	m_CubeMap->Draw(commandList, { &m_SkyObject ,&m_GridObject });
+    m_IrradianceMap->Draw(commandList, m_CubeMap->GetTexture());
+    m_PrefilterMap->Draw(commandList, m_CubeMap->GetTexture());
 	commandList->Close();
-
 	m_CommandQueue->ExcuteCommandList(commandList);
 	m_CommandQueue->Flush();
 
 
-
+	// GenerateMipMap
 	auto cmdList = DxDevice::GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)->GetCommandList();
 	cmdList->GenerateMipMaps(m_Texture);
 	cmdList->Close();
 	DxDevice::GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)->ExcuteCommandList(cmdList);
 	DxDevice::GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)->Flush();
-	//m_Object.AddTexture(m_Texture);
+
+
+
+	// IrradianceMap
+	//commandList = m_CommandQueue->GetCommandList();
+
+	//commandList->Close();
+	//m_CommandQueue->ExcuteCommandList(commandList);
+	//m_CommandQueue->Flush();
+
+
+
+
+
+	// 텍스쳐 설정
 	m_Object.AddCubeTexture(m_CubeMap->GetTexture());
+	m_Object.AddCubeTexture(m_IrradianceMap->GetTexture());
+	m_Object.AddCubeTexture(m_PrefilterMap->GetTexture());
 	return true;
 }
 void HelloWindow::OnResize(int width, int height)
@@ -112,27 +133,17 @@ void HelloWindow::Update()
 	m_SkyObject.Update();
 	Inverse(m_Camera.GetHlslMatrix());
 	m_PassCB.Set(m_Camera);
-	
 }
 void HelloWindow::Draw()
 {
 	// 3d 그래픽 Draw
     m_CommandQueue->Flush();
 	auto commandList = m_CommandQueue->GetCommandList();
-	m_Object.SetCubeTexture(CubeTextureSlot::Slot0, m_CubeMap->GetTexture());
 
-
-	m_GBuffer->Draw(commandList, { &m_SkyObject, &m_Object, &m_GridObject }, m_PassCB);
-
+	m_GBuffer->Draw(commandList, { &m_SkyObject, &m_Object ,&m_GridObject }, m_PassCB);
 	m_Scene->Draw(commandList, m_GBuffer.get());
-
-	m_CubeMap->Draw(commandList, { &m_SkyObject ,&m_GridObject });
-
-
-	commandList->TransitionBarrier(m_CubeMap->GetTexture(), D3D12_RESOURCE_STATE_COMMON);
 	commandList->Close();
     m_CommandQueue->ExcuteCommandList(commandList);
-
 	m_Screen->Present(m_Scene->GetTexture());
 }
 
@@ -195,10 +206,16 @@ void HelloWindow::KeyDown(WPARAM wparam)
 		break;
 
 	case 'H':
-		m_PassCB.padding.x -= 0.5f;
+		m_PassCB.padding.x -= 0.1f;
 		break;
 	case 'J':
-		m_PassCB.padding.x += 0.5f;
+		m_PassCB.padding.x += 0.1f;
+		break;
+	case 'K':
+		m_PassCB.padding.y -= 0.1f;
+		break;
+	case 'L':
+		m_PassCB.padding.y += 0.1f;
 		break;
 	case '1':
 		m_Scene->DebugModeOn(GBufferTexture::Albedo);

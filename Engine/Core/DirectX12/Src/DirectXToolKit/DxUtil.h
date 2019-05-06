@@ -27,20 +27,6 @@ namespace Dx12
         @param type : 커맨드 리스트 타입 */
 		ComPtr<ID3D12CommandAllocator>    CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE type);
 
-		/* IDXGISwapChain 생성 
-		@param CmdQue : ID3D12CommandQueue
-		@param HWND   : WindowHandle
-		@param width  : 백버퍼 가로 크기
-		@param height : 백버퍼 세로 크기
-		@param bufferCount : 백버퍼 갯수 
-		@param format : 백버퍼 Format  */
-		ComPtr<IDXGISwapChain4> CreateSwapChain(
-			ID3D12CommandQueue* CmdQue,
-			HWND hWnd, 
-			int width, int height, 
-			int bufferCount,
-			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
-
 
 		/* 셰이더 컴파일
 		@param filename :  hlsl 파일 path

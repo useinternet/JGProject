@@ -24,10 +24,7 @@
 #pragma comment(lib,"Common.lib")
 #pragma comment(lib,"DirectXTex.lib")
 #endif
-// ¼³Á¤
 REISTER_COMMONPATH
-
-#define DX12_LOG_PATH GLOBAL_PATH / "Engine/Log/DirectX12.txt"
 
 #define GLOBAL_SHADER_PATH(x) GLOBAL_PATH / std::string("Contents/Engine/Shaders/") + x \
 

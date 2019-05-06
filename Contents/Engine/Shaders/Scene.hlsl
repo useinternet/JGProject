@@ -1,81 +1,85 @@
 #include"GraphicsDefine.hlsl"
+#include"QuadVS.hlsl"
 
-#define SCENE_ALBEDO 0
-#define SCENE_NORMAL 1
-#define SCENE_SPECULAR 2
-#define SCENE_DEPTH 3
+#ifndef __SCENE_HLSL__
+#define __SCENE_HLSL__
 
 
-static const float2 gTexCoords[6] =
-{
-    float2(0.0f, 1.0f),
-    float2(0.0f, 0.0f),
-    float2(1.0f, 0.0f),
-    float2(0.0f, 1.0f),
-    float2(1.0f, 0.0f),
-    float2(1.0f, 1.0f)
-};
- 
-struct VsToPs
-{
-    float4 PosH : SV_POSITION;
-    float2 TexC : TEXCOORD0;
-};
 
-VsToPs VS(uint vid : SV_VertexID)
-{
-    VsToPs vout;
-    
-    vout.TexC = gTexCoords[vid];
-    vout.PosH = float4(2.0f * vout.TexC.x - 1.0f, 1.0f - 2.0f * vout.TexC.y, 0.0f, 1.0f);
-    return vout;
-}
+
 
 static const float3 SunDir = { 0.0f, 0.0f, 1.0f };
 float4 PS(VsToPs pin) : SV_Target
 {
 
+
+    SceneData data;
+    data = GetSceneData(pin.TexC);
 #ifdef SCENE_DEBUG_MODE_ALBEDO
-    return float4(gTexture[SCENE_ALBEDO].Sample(gAnisotropicWrapSampler, pin.TexC).xyz, 1.0f);
+    return float4(data.Albedo, 1.0f);
 #endif
 #ifdef SCENE_DEBUG_MODE_NORMAL
-    return float4(gTexture[SCENE_NORMAL].Sample(gAnisotropicWrapSampler, pin.TexC).xyz, 1.0f);
+    return float4(normalize(data.Normal), 1.0f);
 #endif
 #ifdef SCENE_DEBUG_MODE_SPECULAR
-    return float4(gTexture[SCENE_SPECULAR].Sample(gAnisotropicWrapSampler, pin.TexC).xyz, 1.0f);
+    return float4(data.F0, 1.0f);
 #endif
 #ifdef SCENE_DEBUG_MODE_DEPTH
-    float debug_depth = gTexture[SCENE_DEPTH].Sample(gAnisotropicWrapSampler, pin.TexC).r;
-    debug_depth = ConvertLinearDepth(debug_depth);
-    return float4(debug_depth,debug_depth,debug_depth, 1.0f);
+    return float4(data.Depth,data.Depth,data.Depth, 1.0f);
 #endif
 
-    float4 diffuseColor = gTexture[SCENE_ALBEDO].Sample(gAnisotropicWrapSampler, pin.TexC);
+    float3 diffuseColor = data.Albedo;
+
 
 
 
     // 큐브 맵이면 그냥 렌더링
-    if (diffuseColor.a == 0.0f)
+    if (data.IsBackGround)
         return float4(diffuseColor.xyz, 1.0f);
 
-    float3 worldpos = CalcWorldPosition(pin.TexC, SCENE_DEPTH);
-    float  depth    = ConvertLinearDepth(gTexture[SCENE_DEPTH].Sample(gPointWrapSampler, pin.TexC).r);
-    float3 normal   = gTexture[SCENE_NORMAL].Sample(gAnisotropicWrapSampler, pin.TexC).xyz;
-    normal = normalize(normal);
-    normal = (normal * 2.0f) - 1.0f;
 
-
-    float3 color = diffuseColor.xyz;
-    float3 ambient = float3(0.25f, 0.25f, 0.25f) * color;
+    float3 ambient = float3(0.25f, 0.25f, 0.25f); //* color;
   
 
-    float3 N = normal;
+    // 필요 상수들 
+    float3 N = normalize(data.Normal);
     float3 L = normalize(-SunDir);
-    float NDotL = dot(N, L);
+    float3 V = normalize(gToEye - data.WorldPosition);
+    float3 H = GetHalfVector(L, V);
+    float NDotL = max(dot(N, L), 0.0f);
+    float NDotV = max(dot(N, V), 0.0f);
+    float NDotH = max(dot(N, H), 0.0f);
+    float VDotH = max(dot(V, H), 0.0f);
+    float VDotL = max(dot(V, L), 0.0f);
 
 
-    color = saturate(color * NDotL);
-    color = ambient + color;
-    return float4(color, 1.0f);
 
+    float roughtness = clamp(padding.x, 0.01f, 1.0f);
+    float metalic = clamp(padding.y, 0.01f, 1.0f);
+
+
+    float3 F0 = lerp(float3(0.03, 0.03, 0.03), diffuseColor.rgb, metalic);
+    float3 specular = Specular(NDotL, NDotH, NDotV, F0, roughtness);
+
+
+    float3 color = diffuseColor - diffuseColor * metalic;
+    color = Diffuse(color);
+
+
+
+
+
+
+    float3 Lo = float3(0.0f, 0.0f, 0.0f);
+    Lo = NDotL * (color * (float3(1.0f, 1.0f, 1.0f) - specular) + specular);
+
+
+
+    ambient *= diffuseColor.rgb;
+    color = ambient + Lo;
+
+    //
+    return float4(diffuseColor, 1.0f);
 }
+
+#endif

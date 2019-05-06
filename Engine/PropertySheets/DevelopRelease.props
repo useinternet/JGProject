@@ -12,6 +12,7 @@
   <ItemDefinitionGroup>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /c "$(TargetDir)*.lib" "$(SolutionDir)Common\Lib\" 
@@ -22,6 +23,7 @@ xcopy /y /c "$(TargetDir)*.dll" "$(SolutionDir)Common\Dll\" </Command>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(SolutionDir)Temp\PCH\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <Optimization>Full</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -14,9 +14,9 @@ namespace Dx12
 	namespace GBufferTexture
 	{
 		/*
-		|  R  |  G  |  B  |
-RTV1    |      alebdo     |  DXGI_FORMAT_R8G8B8
-RTV2    |      normal     |  DXGI_FORMAT_R8G8B8
+		|  R  |  G  |  B  |  A   |
+RTV1    |      alebdo     | 
+RTV2    |      normal     | 
 RTV3    |     specular    |  DXGI_FORMAT_R8G8B8
 RTV4    |depth|     |     |  DXGI_FORMAT_R8
 		*/

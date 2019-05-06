@@ -7,13 +7,15 @@ namespace Dx12 {
 	namespace DxDevice {
 		extern std::string g_LogGroupName;
 	}
-	template<typename EnumType>
-	EnumType operator|(EnumType e1, EnumType e2)
-	{
-		return (int)e1 | (int)e2;
-	}
 
+	// Enum | 연산
+	//template<typename EnumType>
+	//EnumType operator|(EnumType e1, EnumType e2)
+	//{
+	//	return (int)e1 | (int)e2;
+	//}
 
+	// 텍스쳐 타입
 	typedef int ETextureUsage;
 	namespace TextureUsage
 	{
@@ -28,6 +30,7 @@ namespace Dx12 {
 		};
 	}
 
+	// 텍스쳐 슬롯
 	typedef int ETextureSlot;
 	namespace TextureSlot
 	{
@@ -46,6 +49,8 @@ namespace Dx12 {
 			Normal  = Slot1
 		};
 	}
+
+	// 큐브 텍스쳐 슬롯
 	typedef int ECubeTextureSlot;
 	namespace CubeTextureSlot
 	{
@@ -62,7 +67,7 @@ namespace Dx12 {
 
 
 
-
+	// 셰이더 단계
 	typedef int EShaderStage;
 	namespace ShaderStage
 	{
@@ -77,6 +82,7 @@ namespace Dx12 {
 		};
 	}
 
+	// HLSL 타입
 	typedef int EHLSLVersion;
 	namespace HLSLVersion
 	{

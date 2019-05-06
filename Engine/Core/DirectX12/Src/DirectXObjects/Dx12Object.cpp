@@ -10,7 +10,7 @@ using namespace Common;
 
 
 Dx12Object::Dx12Object(const std::string& name) : 
-	m_Name(name), m_InstanceCount(0), m_ShaderPath(MAIN_SHADER_PATH)
+	m_Name(name), m_InstanceCount(0), m_ShaderPath(GBUFFER_SHADER_PATH)
 {
 	m_BuildOK = false;
 }
@@ -212,17 +212,24 @@ void Dx12Object::AddCubeTexture(const Texture& texture)
 		DX12_LOG_WARNING("object's max cubetexture slot exceed");
 		return;
 	}
+	
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = texture.GetDesc().Format;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-	srvDesc.TextureCube.MipLevels = texture.GetDesc().MipLevels;
-	srvDesc.TextureCube.MostDetailedMip = 0;
-	srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	if (texture.IsValid())
+	{
+		srvDesc.Format = texture.GetDesc().Format;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.TextureCube.MipLevels = texture.GetDesc().MipLevels;
+		srvDesc.TextureCube.MostDetailedMip = 0;
+		srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		m_CubeTextureSRVHandles.push_back(texture.GetShaderResourceView(&srvDesc));
+	}
+	else
+	{
+		m_CubeTextureSRVHandles.push_back({ 0 });
+	}
 
 	m_CubeTextures.push_back(texture);
-	m_CubeTextureSRVHandles.push_back(texture.GetShaderResourceView(&srvDesc));
-
 	m_BuildOK = false;
 }
 void Dx12Object::AddCubeTextures(const std::vector<Texture>& textures)

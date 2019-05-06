@@ -15,7 +15,7 @@ const std::vector<DXGI_FORMAT>& GBuffer::GetRtvFormatArray()
 {
 	if (ms_RtvFormatArray.empty())
 	{
-		ms_RtvFormatArray = { ms_AlebdoFormat , ms_NormalFormat,ms_SpecularFormat,ms_DepthFormat };
+		ms_RtvFormatArray = { ms_AlebdoFormat , ms_NormalFormat,ms_SpecularFormat, ms_DepthFormat };
 	}
 	return ms_RtvFormatArray;
 }
@@ -47,7 +47,6 @@ GBuffer::GBuffer(int width, int height)
 	resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(ms_SpecularFormat, width, height,
 		1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 	Texture specular(TextureUsage::RenderTarget, resourceDesc, &clearValue, "GBuffer_Specular_Texture");
-
 
 
 	clearValue.Format = ms_DepthFormat;

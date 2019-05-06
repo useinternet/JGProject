@@ -17,9 +17,10 @@ namespace Dx12
 		RenderTarget m_RenderTarget;
 		Viewport     m_Viewport;
 		ScissorRect  m_ScissorRect;
+		DXGI_FORMAT  m_Format;
 	public:
-		Scene(int width, int height);
-		Scene(int width, int height, const RenderTarget& rendertarget);
+		Scene(int width, int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+		Scene(int width, int height, const RenderTarget& rendertarget, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 	public:
 		void  DebugModeOn(int GbufferSlot);
 		void  DebugModeOff();

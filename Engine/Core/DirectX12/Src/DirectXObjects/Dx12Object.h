@@ -55,6 +55,9 @@ namespace Dx12
 		uint32_t GetInstanceCount() const {
 			return (uint32_t)m_ObjectFragments.size();
 		}
+		const std::string& GetShaderPath() const {
+			return m_ShaderPath;
+		}
 	public:
 		void SetMesh(const Mesh& mesh);
 		void SetName(const std::string& name);

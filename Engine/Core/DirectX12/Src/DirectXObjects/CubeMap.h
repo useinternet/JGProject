@@ -7,42 +7,51 @@
 #include"DirectXToolKit/ScissorRect.h"
 #include"ShaderCommonDefines.h"
 
+
+
+
+
 namespace Dx12
 {
-	class GBuffer;
-	class Scene;
-	class CommandList;
-	class Dx12Object;
+	class Dx12Obejct;
 	class CubeMap
 	{
-	private:
-		D3D12_RENDER_TARGET_VIEW_DESC m_RTVDescs[6];
-		D3D12_DEPTH_STENCIL_VIEW_DESC m_DSVDescs[6];
-		std::unique_ptr<GBuffer> m_GBuffer;
-		std::unique_ptr<Scene>   m_Scene[6];
+
+	protected:
+		static const int ms_NumFace = 6;
+
+		D3D12_RENDER_TARGET_VIEW_DESC m_RTVDescs[ms_NumFace];
+		D3D12_DEPTH_STENCIL_VIEW_DESC m_DSVDescs[ms_NumFace];
+
 		Camera m_Camera[6];
 		PassCB m_PassCB[6];
-	private:
+
+	protected:
 		uint32_t m_Width;
 		uint32_t m_Height;
 		float m_FarZ;
 		float m_NearZ;
 		DXGI_FORMAT m_Format;
 	public:
-		CubeMap(
-			uint32_t width, uint32_t height,
-			float farZ, float NearZ ,
-			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+		CubeMap(uint32_t width, uint32_t height,
+			float farZ, float NearZ, DXGI_FORMAT format);
 
-		void Draw(CommandList* commandList, const std::vector<Dx12Object*>& objArray);
-		void Resize(uint32_t width, uint32_t height);
+
+
+		// 큐브맵 그릴 위치 설정
+		// @param v : 위치 값
 		void SetPosition(const Common::JVector3& v);
+
+		// 카메라 Near, Far 설정
+		// @param farZ,nearZ : far, near 값
 		void SetCameraFarNear(float farZ, float nearZ);
-	
-		const Texture& GetTexture() const;
+
+		//
+		virtual const Texture& GetTexture() const = 0;
+	protected:
+		virtual void Build();
+		RenderTarget CreateRenderTarget(const std::string& resourceName = "CubeMap", int miplevels = 0);
 	private:
-		void Build();
-		void ResourceBuild();
 		void CameraBuild();
 		void PassCBBuild();
 	};

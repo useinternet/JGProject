@@ -8,6 +8,7 @@
 #include"DirectXToolKit/RasterizerState.h"
 #include"GBuffer.h"
 #include"DirectXToolKit/Camera.h"
+#include"IntegratedBRDFTexture.h"
 using namespace Dx12;
 using namespace std;
 using namespace Common;
@@ -52,7 +53,7 @@ Dx12CommonShaderDefines::Dx12CommonShaderDefines()
 
 	m_MainRootSignature.Finalize();
 }
-GraphicsPSO Dx12CommonShaderDefines::GetPSO(EPreparedPSO pso, const GraphicsShader& shader)
+GraphicsPSO Dx12CommonShaderDefines::GetPSO(EPreparedPSO pso, const GraphicsShader& shader) const
 {
 	switch (pso)
 	{
@@ -63,16 +64,21 @@ GraphicsPSO Dx12CommonShaderDefines::GetPSO(EPreparedPSO pso, const GraphicsShad
 	case PreparedPSO::SkyBox:
 		return GetSkyBoxPSO(shader);
 	case PreparedPSO::Scene:
-		return GetScenePSO(shader);
+		return GetScenePSO(shader, DXGI_FORMAT_R8G8B8A8_UNORM);
+	case PreparedPSO::Scene_F16:
+		return GetScenePSO(shader, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	case PreparedPSO::IrradianceMap:
+		return GetIrradiancePSO(shader);
+	case PreparedPSO::IntegratedBRDF:
+		return GetIntegratedBRDF(shader);
 	}
 	return GraphicsPSO();
 }
-GraphicsPSO Dx12CommonShaderDefines::GetMainPSO(const GraphicsShader& shader, bool is_skinned)
+GraphicsPSO Dx12CommonShaderDefines::GetMainPSO(const GraphicsShader& shader, bool is_skinned) const
 {
 	GraphicsPSO pso;
 	pso.SetRenderTargetFormats(GBufferTexture::NumBuffer, GBuffer::GetRtvFormatArray().data(),
 		DXGI_FORMAT_D24_UNORM_S8_UINT);
-
 	pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 	pso.SetRootSig(m_MainRootSignature.Get());
 	pso.SetVertexShader(shader);
@@ -88,7 +94,7 @@ GraphicsPSO Dx12CommonShaderDefines::GetMainPSO(const GraphicsShader& shader, bo
 }
 
 
-GraphicsPSO Dx12CommonShaderDefines::GetSkyBoxPSO(const GraphicsShader& shader)
+GraphicsPSO Dx12CommonShaderDefines::GetSkyBoxPSO(const GraphicsShader& shader) const
 {
 	GraphicsPSO pso;
 	pso.SetRasterizerState(RasterizerState::CullNone());
@@ -105,10 +111,10 @@ GraphicsPSO Dx12CommonShaderDefines::GetSkyBoxPSO(const GraphicsShader& shader)
 	return pso;
 }
 
-GraphicsPSO Dx12CommonShaderDefines::GetScenePSO(const GraphicsShader& shader)
+GraphicsPSO Dx12CommonShaderDefines::GetScenePSO(const GraphicsShader& shader, DXGI_FORMAT format) const
 {
 	GraphicsPSO pso;
-	pso.SetRenderTargetFormat(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	pso.SetRenderTargetFormat(format, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 	pso.SetRootSig(m_MainRootSignature.Get());
 	pso.SetVertexShader(shader);
@@ -116,5 +122,33 @@ GraphicsPSO Dx12CommonShaderDefines::GetScenePSO(const GraphicsShader& shader)
 	pso.SetInputLayout(JgVertex::GetNumInputLayout(), JgVertex::GetInputLayoutDesc());
 	pso.Finalize();
 
+	return pso;
+}
+
+GraphicsPSO Dx12CommonShaderDefines::GetIrradiancePSO(const GraphicsShader& shader) const
+{
+	GraphicsPSO pso;
+	pso.SetRasterizerState(RasterizerState::CullNone());
+	pso.SetDepthStencilState(DepthStencilState::LessEqual());
+	pso.SetRenderTargetFormat(DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+	pso.SetRootSig(m_MainRootSignature.Get());
+	pso.SetVertexShader(shader);
+	pso.SetPixelShader(shader);
+	pso.SetInputLayout(JgVertex::GetNumInputLayout(), JgVertex::GetInputLayoutDesc());
+	pso.Finalize();
+
+	return pso;
+}
+GraphicsPSO Dx12CommonShaderDefines::GetIntegratedBRDF(const GraphicsShader& shader) const
+{
+	GraphicsPSO pso;
+	pso.SetRenderTargetFormat(IntegratedBRDFTexture::GetFormat(), DXGI_FORMAT_D24_UNORM_S8_UINT);
+	pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+	pso.SetRootSig(m_MainRootSignature.Get());
+	pso.SetVertexShader(shader);
+	pso.SetPixelShader(shader);
+	pso.SetInputLayout(JgVertex::GetNumInputLayout(), JgVertex::GetInputLayoutDesc());
+	pso.Finalize();
 	return pso;
 }

@@ -40,13 +40,23 @@ namespace Dx12
 	public:
 		CommandList(D3D12_COMMAND_LIST_TYPE type);
 
+		// ComPtr<ID3D12GraphicsCommandList> 가져오기 
 		ComPtr<ID3D12GraphicsCommandList> GetComPtr() const {
 			return m_D3D_CommandList;
 		}
+
+		// ID3D12GraphicsCommandList* 가져오기
 		ID3D12GraphicsCommandList* Get() const {
 			return m_D3D_CommandList.Get();
 		}
 	public:
+
+		/* 버퍼에 데이터를 복사한다. 
+		@param buffer : 데이터를 담을 버퍼 클래스 
+		@param numElements : 데이터 요소 갯수
+		@param elementSize : 데이터 요소 크기
+		@param bufferData : 데이터 
+		@param flags : D3D12_RESOURCE_FLAGS 리소스 플래그*/
 		void CopyBuffer(
 			Buffer& buffer,
 			uint32_t numElements,
@@ -54,6 +64,11 @@ namespace Dx12
 			const void* bufferData, 
 			D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE);
 
+
+		// 버퍼에 데이터를 복사한다. <데이터 타입>
+		// @param buffer : 데이터를 담을 버퍼 클래스 
+		// @param datas  : 데이터 배열(vector)
+		// @param flags  : D3D12_RESOURCE_FLAGS 리소스 플래그
 		template<typename DataType>
 		void CopyBuffer(
 			Buffer& buffer,
@@ -65,15 +80,37 @@ namespace Dx12
 		}
 
 
-
+		// 리소스를 복사한다.
+		// @param destResource : 복사 되어지는 리소스
+		// @param srcResource  : 복사 할 리소스
 		void CopyResource(const Resource& destResource, const Resource& srcResource);
+
+		// 렌더타겟을 지정한 색상으로 클리어한다.
+		// @param rendertarget : 클리어 시킬 렌더타겟
 		void ClearRenderTarget(const RenderTarget& rendertarget);
 
+
+		// 리소스 상태를 이동 시킨다.
+		// @param resource : 이동 시킬 리소스
+		// @param afterstate : 이동 할 리소스 상태
 		void TransitionBarrier(const Resource& resource, D3D12_RESOURCE_STATES afterstate);
+
+		// Uav 장벽
+		// @param resource : Uav 장벽 대상 리소스
 		void UAVBarrier(const Resource& resource);
+
+		// Aliasing장벽
+		// @param beforeResource : 전 리소스
+		// @param afterResource  : 후 리소스
 		void AliasingBarrier(const Resource& beforeResource, const Resource& afterResource);
 
+
+		// Texture 나 CubeTexture 들을 밉맵 생성을 한다. 
+		// @param texture : 밉맵생성 시킬 텍스쳐
+		// @param isCubeMap : 큐브맵 텍스쳐인지 여부
 		void GenerateMipMaps(const Texture& texture, bool isCubeMap = false);
+
+
 	public:
 		void SetGraphicsConstants(uint32_t rootparam, uint32_t num32BitValues,const void* srcData);
 		void SetGraphicsConstantBufferView(uint32_t rootparam, uint32_t sizeInbyte,const void* data);

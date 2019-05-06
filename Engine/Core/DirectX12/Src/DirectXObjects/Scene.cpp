@@ -10,8 +10,9 @@
 using namespace Dx12;
 using namespace std;
 
-Scene::Scene(int width, int height)
+Scene::Scene(int width, int height, DXGI_FORMAT format)
 {
+	m_Format = format;
 	m_Viewport.Set((float)width, (float)height);
 	m_ScissorRect.Set(width, height);
 
@@ -19,14 +20,14 @@ Scene::Scene(int width, int height)
 
 
 	D3D12_CLEAR_VALUE clearColor;
-	clearColor.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearColor.Format = format;
 	clearColor.Color[0] = 0.0f;
 	clearColor.Color[1] = 0.0f;
 	clearColor.Color[2] = 0.0f;
 	clearColor.Color[3] = 1.0f;
 
 	Texture texture(TextureUsage::RenderTarget,
-		CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, 
+		CD3DX12_RESOURCE_DESC::Tex2D(format,
 			width, height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
 		&clearColor,
 		"SceneTexture");
@@ -46,7 +47,8 @@ Scene::Scene(int width, int height)
 	m_RenderTarget.SetRenderTargetClearColor(RtvSlot::Slot_0, { 0.0f,0.0f,0.0f,1.0f });
 	m_RenderTarget.SetDepthStencilClearColor(1.0f, 0, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL);
 }
-Scene::Scene(int width, int height, const RenderTarget& rendertarget) : m_RenderTarget(rendertarget)
+Scene::Scene(int width, int height, const RenderTarget& rendertarget, DXGI_FORMAT format) :
+	m_RenderTarget(rendertarget), m_Format(format)
 {
 	m_Viewport.Set((float)width, (float)height);
 	m_ScissorRect.Set(width, height);
@@ -77,7 +79,11 @@ void  Scene::DebugModeOn(int GbufferSlot)
 		return;
 	}
 	shader.Compile();
-	m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
+
+	(m_Format == DXGI_FORMAT_R16G16B16A16_FLOAT) ? 
+		m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene_F16, shader) :
+		m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
+
 }
 void  Scene::DebugModeOff() 
 {
@@ -85,7 +91,9 @@ void  Scene::DebugModeOff()
 	shader.AddShaderPaths({ ShaderStage::Pixel, ShaderStage::Vertex }, SCENE_SHADER_PATH);
 	shader.Compile();
 
-	m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
+	(m_Format == DXGI_FORMAT_R16G16B16A16_FLOAT) ?
+		m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene_F16, shader) :
+		m_ScenePSO = DxDevice::GetShaderCommonDefines()->GetPSO(PreparedPSO::Scene, shader);
 }
 void  Scene::ReSize(int width, int height)
 {

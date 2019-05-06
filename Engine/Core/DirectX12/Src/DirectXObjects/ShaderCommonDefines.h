@@ -3,10 +3,13 @@
 #include"DirectXToolKit/RootSigature.h"
 
 // ºŒ¿Ã¥ı path
-#define MAIN_SHADER_PATH     GLOBAL_SHADER_PATH("Main.hlsl")
-#define SKY_BOX_SHADER_PATH  GLOBAL_SHADER_PATH("SkyBox.hlsl")
-#define SCENE_SHADER_PATH   GLOBAL_SHADER_PATH("Scene.hlsl")
-#define GENERATE_MIPMAP_PATH GLOBAL_SHADER_PATH("GenerateMips_CS.hlsl");
+#define GBUFFER_SHADER_PATH        GLOBAL_SHADER_PATH("GBuffer.hlsl")
+#define SKY_BOX_SHADER_PATH        GLOBAL_SHADER_PATH("SkyBox.hlsl")
+#define SCENE_SHADER_PATH          GLOBAL_SHADER_PATH("Scene.hlsl")
+#define IRRADIANCEMAP_SHADER_PATH  GLOBAL_SHADER_PATH("IrradianceMap.hlsl")
+#define PREFILTERMAP_SHADER_PATH   GLOBAL_SHADER_PATH("PrefilterMap.hlsl")
+#define INTEGRATEDBRDF_SHADER_PATH GLOBAL_SHADER_PATH("IntegratedBRDF.hlsl")
+#define GENERATE_MIPMAP_PATH       GLOBAL_SHADER_PATH("GenerateMips_CS.hlsl")
 // Define ¡§¿«
 #define SHADER_MACRO_USE_SKINNED "USE_SKINNED"
 // Texture
@@ -27,10 +30,10 @@
 #define SHADER_MACRO_USE_CUBETEXTURE_SLOT3   "USE_CUBETEXTURE_SLOT3"
 
 // SceneDebugMode 
-#define SHADER_MACRO_SCENE_DEBUG_MODE_ALBEDO "SCENE_DEBUG_MODE_ALBEDO"
-#define SHADER_MACRO_SCENE_DEBUG_MODE_NORMAL  "SCENE_DEBUG_MODE_NORMAL"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_ALBEDO   "SCENE_DEBUG_MODE_ALBEDO"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_NORMAL   "SCENE_DEBUG_MODE_NORMAL"
 #define SHADER_MACRO_SCENE_DEBUG_MODE_SPECULAR "SCENE_DEBUG_MODE_SPECULAR"
-#define SHADER_MACRO_SCENE_DEBUG_MODE_DEPTH   "SCENE_DEBUG_MODE_DEPTH"
+#define SHADER_MACRO_SCENE_DEBUG_MODE_DEPTH    "SCENE_DEBUG_MODE_DEPTH"
 
 
 #define SHADER_MACRO_DEFINE "1"
@@ -50,7 +53,7 @@ namespace Dx12
 			MaterialCB,
 			SkinnedCB,
 			Texture,
-			CubeMap,
+			CubeMap
 		};
 	}
 
@@ -115,7 +118,11 @@ namespace Dx12
 			Main_Static,
 			Main_Skeletal,
 			SkyBox,
-			Scene
+			Scene,
+			Scene_F16,
+			IrradianceMap,
+			ProfilterMap = IrradianceMap,
+			IntegratedBRDF
 		};
 	}
 	class Dx12CommonShaderDefines
@@ -128,11 +135,12 @@ namespace Dx12
 		const RootSignature& GetMainRootSig() const {
 			return m_MainRootSignature;
 		}
-		GraphicsPSO GetPSO(EPreparedPSO pso, const GraphicsShader& shader);
-
+		GraphicsPSO GetPSO(EPreparedPSO pso, const GraphicsShader& shader) const;
 	private:
-		GraphicsPSO GetMainPSO(const GraphicsShader& shader, bool is_skinned = false);
-		GraphicsPSO GetSkyBoxPSO(const GraphicsShader& shader);
-		GraphicsPSO GetScenePSO(const GraphicsShader& shader);
+		GraphicsPSO GetMainPSO(const GraphicsShader& shader, bool is_skinned = false) const;
+		GraphicsPSO GetSkyBoxPSO(const GraphicsShader& shader) const;
+		GraphicsPSO GetScenePSO(const GraphicsShader& shader, DXGI_FORMAT format) const;
+		GraphicsPSO GetIrradiancePSO(const GraphicsShader& shader) const;
+		GraphicsPSO GetIntegratedBRDF(const GraphicsShader& shader) const;
 	};
 }

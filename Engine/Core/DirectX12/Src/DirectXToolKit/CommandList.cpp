@@ -122,7 +122,6 @@ void CommandList::ClearRenderTarget(const RenderTarget& rendertarget)
 	if (rendertarget.GetTexture(RtvSlot::DepthStencil).IsValid())
 	{
 		TransitionBarrier(rendertarget.GetTexture(RtvSlot::DepthStencil), D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
 		m_D3D_CommandList->ClearDepthStencilView(
 			rendertarget.GetDepthStencilView(),
 			rendertarget.GetDepthStencilClearFlags(),
@@ -435,11 +434,12 @@ void CommandList::SetComputeRootSignature(const RootSignature& rootSig)
 
 void CommandList::SetVertexBuffer(const VertexBuffer& buffer)
 {
+	TransitionBarrier(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 	m_D3D_CommandList->IASetVertexBuffers(0, 1, &buffer.GetVertexBufferView());
-
 }
 void CommandList::SetIndexBuffer(const IndexBuffer& buffer)
 {
+	TransitionBarrier(buffer, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 	m_D3D_CommandList->IASetIndexBuffer(&buffer.GetIndexBufferView());
 }
 void CommandList::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY type)

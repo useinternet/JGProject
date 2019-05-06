@@ -14,7 +14,10 @@ RenderTarget::RenderTarget()
 
 RenderTarget::RenderTarget(const RenderTarget& copy)
 {
+	m_Textures.resize(RtvSlot::NumRtvSlot);
 	m_RtvDescs.resize(RtvSlot::DepthStencil);
+	m_RtvClearColors.resize(RtvSlot::DepthStencil);
+	
 	m_Textures = copy.m_Textures;
 	for (int i = 0; i < RtvSlot::DepthStencil; ++i)
 	{
@@ -53,6 +56,10 @@ RenderTarget::RenderTarget(RenderTarget&& rhs)
 
 RenderTarget& RenderTarget::operator=(const RenderTarget& rhs)
 {
+	m_Textures.resize(RtvSlot::NumRtvSlot);
+	m_RtvDescs.resize(RtvSlot::DepthStencil);
+	m_RtvClearColors.resize(RtvSlot::DepthStencil);
+
 	m_Textures = rhs.m_Textures;
 	for (int i = 0; i < RtvSlot::DepthStencil; ++i)
 	{

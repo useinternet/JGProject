@@ -28,7 +28,9 @@
 #include"DirectXObjects/Scene.h"
 #include<AssetManager.h>
 #include<AssetAnimTransform.h>
-#include"DirectXObjects/CubeMap.h"
+#include"DirectXObjects/ReflectionMap.h"
+#include"DirectXObjects/IrradianceMap.h"
+#include"DirectXObjects/PrefilterMap.h"
 using namespace Dx12;
 using namespace Dx2D;
 class HelloWindow : public JGWindow
@@ -54,7 +56,9 @@ private:
 	int m_PrevMouseX;
 	int m_PrevMouseY;
 	//
-	std::unique_ptr<CubeMap> m_CubeMap;
+	std::unique_ptr<ReflectionMap> m_CubeMap;
+	std::unique_ptr<IrradianceMap> m_IrradianceMap;
+	std::unique_ptr<PrefilterMap> m_PrefilterMap;
 	//
 public:
 	HelloWindow(HINSTANCE hInst) : JGWindow(hInst) {}
