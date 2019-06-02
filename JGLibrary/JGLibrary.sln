@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGLibrary", "JGLibrary\JGLibrary.vcxproj", "{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Debug|x64.ActiveCfg = Debug|x64
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Debug|x64.Build.0 = Debug|x64
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Debug|x86.ActiveCfg = Debug|Win32
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Debug|x86.Build.0 = Debug|Win32
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Release|x64.ActiveCfg = Release|x64
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Release|x64.Build.0 = Release|x64
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Release|x86.ActiveCfg = Release|Win32
+		{6ECEC22F-A586-4296-BDD6-D3E84DDFA661}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB805DE3-F0D8-448D-B550-F6C2D5D0FC05}
+	EndGlobalSection
+EndGlobal

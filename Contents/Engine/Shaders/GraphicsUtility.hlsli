@@ -1,6 +1,0 @@
-
-
-#define _PI  3.14159265359f
-#define _2PI 6.28318530718f
-#define _PIDIV2 1.57079632679f
-
