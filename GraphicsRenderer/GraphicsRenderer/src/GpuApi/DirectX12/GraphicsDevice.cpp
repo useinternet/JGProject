@@ -13,6 +13,7 @@
 #include"Image.h"
 #include"PSOCache.h"
 #include"RootSignatureCache.h"
+#include"GPUAllocator.h"
 using namespace std;
 namespace GR
 {
@@ -24,6 +25,7 @@ namespace GR
 		GraphicsDevice::GraphicsDevice()
 		{
 			m_FrameIndex = 0;
+	
 			for (int i = 0; i < ms_FrameCount; ++i)
 			{
 				m_FenceValue[i] = 0;
@@ -46,13 +48,17 @@ namespace GR
 			m_EngineShaderVersions[Shader::PS] = "ps_5_1";
 			m_EngineShaderVersions[Shader::CS] = "cs_5_1";
 			ms_App = this;
+
+			// ui 관련 초기화
+
 		}
 		GraphicsDevice::~GraphicsDevice()
 		{
+			m_DestroyUIEvent();
 			Flush();
 		}
 
-		void GraphicsDevice::Initialize(HWND hWnd, uint32_t width, uint32_t height, bool isUseWrap)
+		void GraphicsDevice::Initialize(HWND hWnd, uint32_t width, uint32_t height, bool isUseWrap, UIEvents* e)
 		{
 			// 변수 저장
 			{
@@ -108,6 +114,53 @@ namespace GR
 	
 			// 백버퍼 생성
 			UpdateRenderTarget();
+			
+			if (e)
+			{
+				m_InitUIEvent = e->initEvent;
+				m_DestroyUIEvent = e->destroyEvent;
+				m_NewFrameUIEvent = e->newFrameEvent;
+				m_DrawUIEvent = e->renderEvent;
+			}
+			else
+			{
+				m_NewFrameUIEvent = []() {};
+				m_DrawUIEvent = [](GraphicsCommander* c) {};
+				m_InitUIEvent = [](HWND, GraphicsDevice*) {};
+				m_DestroyUIEvent = []() {};
+			}
+
+			
+			// ui 관련 초기화
+			m_UIGpuAllocator = make_shared<GPUAllocator>();
+			m_UIGpuAllocator->Initialize(m_Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024 * 64);
+			m_InitUIEvent(hWnd, this);
+		}
+		void GraphicsDevice::Resize(uint32_t width, uint32_t height)
+		{
+			//assert(false && "resize not imp");
+			//
+			if (m_Width == width && m_Height == height)
+			{
+				return;
+			}
+
+			Flush();
+
+			for (int i = 0; i < ms_FrameCount; ++i)
+			{
+				m_BackBufferResource[i].m_Resource.Reset();
+				m_BackBufferResource[i].m_UsageState = D3D12_RESOURCE_STATE_COMMON;
+				m_BackBufferResource[i].m_RTVs.clear();
+			}
+			DXGI_SWAP_CHAIN_DESC desc;
+			m_SwapChain->GetDesc(&desc);
+			m_SwapChain->ResizeBuffers(ms_FrameCount, width, height, ms_BackBufferFormat,
+				desc.Flags);
+			UpdateRenderTarget();
+
+			m_Width = width;
+			m_Height = height;
 		}
 		void GraphicsDevice::NewFrame()
 		{
@@ -118,6 +171,7 @@ namespace GR
 			{
 				m_DescriptorAllocator[i]->ReleaseStaleDescriptors(m_FrameValue[m_FrameIndex]);
 			}
+			m_NewFrameUIEvent();
 		}
 		void GraphicsDevice::Present(ColorTexture* texture)
 		{
@@ -128,17 +182,72 @@ namespace GR
 			auto& backBuffer = m_BackBufferResource[m_FrameIndex];
 
 
-			commander->TransitionBarrier(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, true);
-			commander->ClearColor(backBuffer);
+
+			// 백버퍼 클리어
+			{
+
+				commander->m_D3D_CommandList->ResourceBarrier(
+					1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.GetResource(), backBuffer.m_UsageState,
+						D3D12_RESOURCE_STATE_RENDER_TARGET));
+				backBuffer.m_UsageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+				auto color = backBuffer.GetClearColor();
+				float clearValue[4];
+				clearValue[0] = color.x;
+				clearValue[1] = color.y;
+				clearValue[2] = color.z;
+				clearValue[3] = color.w;
+				commander->m_D3D_CommandList->ClearRenderTargetView(backBuffer.GetRTV(), clearValue, 0, nullptr);
+			}
+			
 			
 
+
+
+			// 텍스쳐 복사
 			if (texture)
 			{
-				commander->CopyResource(backBuffer, *texture);
+				D3D12_RESOURCE_BARRIER barrier[] = {
+					CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.GetResource(), backBuffer.m_UsageState,
+						D3D12_RESOURCE_STATE_COPY_DEST),
+					CD3DX12_RESOURCE_BARRIER::Transition(texture->GetResource(), backBuffer.m_UsageState,
+						D3D12_RESOURCE_STATE_COPY_SOURCE)
+				};
+
+				commander->m_D3D_CommandList->ResourceBarrier(
+					2, barrier);
+
+				commander->m_D3D_CommandList->CopyResource(backBuffer.GetResource(), texture->GetResource());
+
+
+
+				backBuffer.m_UsageState = D3D12_RESOURCE_STATE_COPY_DEST;
+				texture->m_UsageState  = D3D12_RESOURCE_STATE_COPY_SOURCE;
+				commander->BackUpObject(texture->GetResource());
+
+
+				commander->m_D3D_CommandList->ResourceBarrier(
+				1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.GetResource(), backBuffer.m_UsageState,
+					D3D12_RESOURCE_STATE_RENDER_TARGET));
+			backBuffer.m_UsageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			}
 
-			commander->TransitionBarrier(backBuffer, D3D12_RESOURCE_STATE_PRESENT, true);
+			// UI 에 그릴 렌더타겟 설정
+			{
+				commander->m_D3D_CommandList->OMSetRenderTargets(1, &backBuffer.GetRTV(), false, nullptr);
+				commander->m_D3D_CommandList->SetDescriptorHeaps(1, m_UIGpuAllocator->GetD3DDescriptorHeap().GetAddressOf());
 
+			}
+			
+			// UI 그리기
+			m_DrawUIEvent(commander);
+
+
+			// 푸시 커맨드
+			commander->m_D3D_CommandList->ResourceBarrier(
+				1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.GetResource(), backBuffer.m_UsageState,
+					D3D12_RESOURCE_STATE_PRESENT));
+			backBuffer.m_UsageState = D3D12_RESOURCE_STATE_PRESENT;
 
 			PushCommander(commander);
 
@@ -289,6 +398,17 @@ namespace GR
 		RootSignature GraphicsDevice::GetRootSignatureFromCache(ERootSignature enumRootSig)
 		{
 			return m_RootSigCache->GetRootSignature(enumRootSig);
+		}
+		GPUAllocation GraphicsDevice::UIGPUAllcoate()
+		{
+			return m_UIGpuAllocator->Allocate();
+		}
+		GPUAllocation GraphicsDevice::UIGPUAllocateAndRegister(Texture* in_texture)
+		{
+			auto gpu = m_UIGpuAllocator->Allocate();
+			m_Device->CreateShaderResourceView(in_texture->GetResource(), in_texture->m_CurrentSrvDesc.get(),
+				gpu.CPU());
+			return gpu;
 		}
 		void GraphicsDevice::SetShaderDirPath(const std::wstring& path)
 		{
@@ -628,6 +748,7 @@ namespace GR
 
 			if (is_cubmap && file_format == ".hdr")
 			{
+
 				GPUResource uavResource = CreateGPUResource(CD3DX12_RESOURCE_DESC::Tex2D(
 					DXGI_FORMAT_R16G16B16A16_FLOAT, 1024, 1024, 6, 0, 1, 0,
 					D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
@@ -651,12 +772,13 @@ namespace GR
 
 				computeCommander->SetRootSignature(rootSig);
 				computeCommander->SetPipelineState(pso);
-				computeCommander->SetDescriptorTable(C_InputOutput_RootParam_InputTexture, 1, &texture->GetSRV());
-				computeCommander->SetDescriptorTable(C_InputOutput_RootParam_OutputTexture, 1, &uavTexture.GetUAV());
+				computeCommander->SetSRVDescriptorTable(C_InputOutput_RootParam_InputTexture, 1, &texture->GetSRV());
+				computeCommander->SetUAVDescriptorTable(C_InputOutput_RootParam_OutputTexture, 1, &uavTexture.GetUAV());
 				computeCommander->Dispatch(texture->GetResource()->GetDesc().Width / 32, texture->GetResource()->GetDesc().Height / 32, 6);
+				computeCommander->UAVBarrier(uavTexture, true);
 
-
-				*texture = uavTexture;
+				texture->m_Resource = uavTexture.m_Resource;
+				texture->m_UsageState = uavTexture.m_UsageState;
 			}
 
 			if (is_generate)

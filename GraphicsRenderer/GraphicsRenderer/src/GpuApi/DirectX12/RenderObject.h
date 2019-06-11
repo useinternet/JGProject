@@ -35,7 +35,12 @@ namespace GR
 				SLOT5 = ROUGHNESS,
 				SLOT6 = A0,
 				SLOT7 = CUSTOM0,
-				SLOT8 = CUSTOM1
+				SLOT8 = CUSTOM1,
+
+				// PBR
+				SPECULARBRDF  = SLOT7,
+				SPECULARMAP   = SLOT1,
+				IRRADIANCEMAP = SLOT2
 			};
 		private:
 			std::vector<ObjectCB> m_ObjectCBs;

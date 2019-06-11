@@ -16,6 +16,10 @@
 #include"GpuApi/DirectX12/RenderObject.h"
 #include"GpuApi/DirectX12/RootSignatureCache.h"
 #include"GpuApi/DirectX12/PSOCache.h"
+#include"GpuApi/DirectX12/GPUAllocator.h"
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_dx12.h"
+#include"imgui/imgui_impl_win32.h"
 #include<ppl.h>
 #ifdef _DEBUG
 // ../GraphicsRenderer/bin/GraphicsRenderer_d.lib
@@ -26,16 +30,27 @@
 #endif
 using namespace GR::Dx12;
 /*
-1. 시작 커맨더 푸시
-2. 각 커맨더로 그리기
-3. 끝 커맨더 푸시
+
+1. gpuallocator 에 mutex추가(multi thread)
 
 
 
 
 */
+struct SkyTexturePack
+{
+	Texture sky;
+	Texture spMap;
+	Texture irrMap;
+	Texture spBrdf;
+};
 class HelloWindow : public JGWindow
 {
+public:
+	GPUAllocation m_FontGPU;
+	GPUAllocation m_GBufferGPU;
+	GPUAllocation m_ToneMapGpu;
+private:
 	std::unique_ptr<GraphicsDevice> m_Device;
 	Renderer* m_Renderer;
 	RenderObject m_Gun;
@@ -48,7 +63,9 @@ class HelloWindow : public JGWindow
 	Texture m_GunTexture_N;
 	Texture m_GunTexture_R;
 	Texture m_GunTexture_M;
-	Texture m_HDRSkyTexture;
+
+	std::vector<SkyTexturePack> m_SkyPack;
+	uint64_t m_TextureID;
 
 
 	int m_LastMouseX;
@@ -56,6 +73,11 @@ class HelloWindow : public JGWindow
 	float pitch = 0.0f;
 	float yaw = 0.0f;
 	float3 CameraPos;
+
+
+
+	std::string m_CurrentItem = "0";
+	bool m_isToneMapping = true;
 public:
 	HelloWindow(HINSTANCE hInst) : JGWindow(hInst) {}
 	virtual bool Initialize();
@@ -65,10 +87,13 @@ protected:
 	virtual void Draw() override;
 
 	// Convenience overrides for handling mouse input.
-	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
+	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 	void Input();
+public:
+	virtual void Destroy() override;
+	void UI();
 private:
 	ObjectCB UpdateObjectCB(float x = 0, float y = 0, float z = 0);
+	void BindIBLTexture(SkyTexturePack& t);
 };

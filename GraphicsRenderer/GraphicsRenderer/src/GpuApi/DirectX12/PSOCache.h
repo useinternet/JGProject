@@ -16,6 +16,7 @@ namespace GR
 			{
 				GBUFFER,
 				SKYBOX,
+				TONEMAPPING,
 				NUMPSO
 			};
 			enum EComputePSO
@@ -71,6 +72,7 @@ namespace GR
 		private:
 			void CreateGBufferPSO(GraphicsPSO& pso, EGraphicsMacroOption option);
 			void CreateSkyPSO(GraphicsPSO& pso, EGraphicsMacroOption option);
+			void CreateToneMappingPSO(GraphicsPSO& pso, EGraphicsMacroOption option);
 			// Compute
 		private:
 			void CreateEquirect2Cube(ComputePSO& pso, EComputeMacroOption option);

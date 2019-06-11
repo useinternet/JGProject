@@ -23,10 +23,24 @@ namespace GR
 		class GraphicsPSO;
 		class ComputePSO;
 		class RootSignature;
+		class GPUAllocator;
+		class GPUAllocation;
 		enum class ERootSignature;
 		class GraphicsDevice 
 		{
+			using UIInitEvent = std::function<void(HWND, GraphicsDevice*)>;
+			using UIDestroyEvent = std::function<void()>;
+			using UINewFrameEvent = std::function<void()>;
+			using UIRenderEvent = std::function<void(GraphicsCommander*)>;
 			using ShaderCache = std::unordered_map<uint32_t, ComPtr<ID3DBlob>>;
+		public:
+			struct UIEvents
+			{
+				UIInitEvent     initEvent;
+				UIDestroyEvent  destroyEvent;
+				UINewFrameEvent newFrameEvent;
+				UIRenderEvent   renderEvent;
+			};
 			// 
 		public:
 			// 리소스 힙 타입
@@ -79,6 +93,8 @@ namespace GR
 			ComPtr<IDXGIFactory4>   m_Factory;
 			ComPtr<IDXGISwapChain4> m_SwapChain;
 			std::shared_ptr<DescriptorAllocator>    m_DescriptorAllocator[DH_NUM];
+			std::shared_ptr<GPUAllocator> m_UIGpuAllocator;
+		public:
 			std::shared_ptr<CommandExecutorManager> m_CommandExecutorManager;
 			std::shared_ptr<Renderer>               m_GraphicsRenderer;
 			std::shared_ptr<PSOCache>               m_PSOCache;
@@ -98,8 +114,11 @@ namespace GR
 			uint64_t m_FenceValue[ms_FrameCount];
 			uint64_t m_FrameValue[ms_FrameCount];
 	
-
-
+			// UI 이벤트
+			UIInitEvent     m_InitUIEvent;
+			UIDestroyEvent  m_DestroyUIEvent;
+			UINewFrameEvent m_NewFrameUIEvent;
+			UIRenderEvent   m_DrawUIEvent;
 			// 커맨더 자원관리 
 			std::vector<Commander*> m_WaitingCommanders[CQ_NUM];
 			GraphicsCommander*      m_LoadCommander[NUM_LOADER];
@@ -108,8 +127,9 @@ namespace GR
 			GraphicsDevice();
 			virtual ~GraphicsDevice();
 
-			virtual void Initialize(HWND hWnd, uint32_t width, uint32_t height, bool isUseWrap);
+			virtual void Initialize(HWND hWnd, uint32_t width, uint32_t height,bool isUseWrap, UIEvents* e = nullptr);
 			virtual void NewFrame();
+			virtual void Resize(uint32_t width, uint32_t height);
 			virtual void Present(ColorTexture* texture = nullptr);
 			virtual void Flush();
 			virtual void Flush(ECmdQueueType type);
@@ -126,9 +146,11 @@ namespace GR
 			CopyCommander*     GetCopyCommander();
 			GraphicsCommander* GetLoadCommander(ELoadCommanderType type);
 			Renderer*   GetRenderer();
-			GraphicsPSO GetGraphicsPSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption);;
-			ComputePSO  GetComputePSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption);
+			GraphicsPSO GetGraphicsPSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption = 0);;
+			ComputePSO  GetComputePSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption = 0);
 			RootSignature GetRootSignatureFromCache(ERootSignature enumRootSig);
+			GPUAllocation UIGPUAllcoate();
+			GPUAllocation UIGPUAllocateAndRegister(Texture* in_texture);
 			void SetShaderDirPath(const std::wstring& path);
 		public:
 			GPUResource CreateGPUResource(

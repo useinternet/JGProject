@@ -28,6 +28,7 @@
     <ClInclude Include="src\GpuApi\DirectX12\DepthStencilState.h" />
     <ClInclude Include="src\GpuApi\DirectX12\DescriptorHeap.h" />
     <ClInclude Include="src\GpuApi\DirectX12\GeometryGenerator.h" />
+    <ClInclude Include="src\GpuApi\DirectX12\GPUAllocator.h" />
     <ClInclude Include="src\GpuApi\DirectX12\GraphicsDevice.h" />
     <ClInclude Include="src\GpuApi\DirectX12\Dx12Helper.h" />
     <ClInclude Include="src\GpuApi\DirectX12\Dx12Include.h" />
@@ -60,6 +61,7 @@
     <ClCompile Include="src\GpuApi\DirectX12\DDSTextureLoader12.cpp" />
     <ClCompile Include="src\GpuApi\DirectX12\DescriptorHeap.cpp" />
     <ClCompile Include="src\GpuApi\DirectX12\GeometryGenerator.cpp" />
+    <ClCompile Include="src\GpuApi\DirectX12\GPUAllocator.cpp" />
     <ClCompile Include="src\GpuApi\DirectX12\GraphicsDevice.cpp" />
     <ClCompile Include="src\GpuApi\DirectX12\Dx12Helper.cpp" />
     <ClCompile Include="src\GpuApi\DirectX12\Fence.cpp" />
@@ -87,85 +89,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\SkyBoxPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\SkyBoxVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Domain</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\Equirect2CubeCS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\Graphics\GBufferPS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\GBufferVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\GraphicsFunctions.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\GraphicsStructDefine.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\QuadPS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\QuadVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\RS_GCommon.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\SkyBoxPS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Graphics\SkyBoxVS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\Compute\Equirect2CubeCS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\Compute\GenerateMipsCS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\Compute\IrrmapCS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Compute\SpecularBrdfCS.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="src\Shader\HLSL\Compute\Specularmap.hlsl">
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

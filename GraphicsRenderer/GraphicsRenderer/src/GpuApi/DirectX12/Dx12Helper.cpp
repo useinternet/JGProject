@@ -187,6 +187,7 @@ namespace GR
 			desc.Flags = flag;
 
 			hr = device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap));
+			hr = device->GetDeviceRemovedReason();
 			assert(SUCCEEDED(hr) && "failed Create ID3D12DescriptorHeap");
 
 

@@ -38,7 +38,8 @@ namespace GR
 			m_IncrementDescritporSize = m_D3DDevice->GetDescriptorHandleIncrementSize(m_D3D_DescirptorHeapType);
 			Reset();
 		}
-		void Commander::GPUDescriptorAllocator::StageDescriptorHandles(uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		void Commander::GPUDescriptorAllocator::StageDescriptorHandles(
+			Commander::GPUDescriptorAllocator::EHeapType type, uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
 		{
 			CPUDescriptorHandle cpuHandle;
 
@@ -47,10 +48,11 @@ namespace GR
 			cpuHandle.handles.resize(numHandles);
 			std::copy(handle, handle + numHandles, cpuHandle.handles.begin());
 			
-			m_CPUCache->push_back(cpuHandle);
+			m_CPUCache[type].push_back(cpuHandle);
 
 		}
-		void Commander::GPUDescriptorAllocator::StageDescriptorHandles(uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+		void Commander::GPUDescriptorAllocator::StageDescriptorHandles(
+			Commander::GPUDescriptorAllocator::EHeapType type, uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 		{
 			CPUDescriptorHandle cpuHandle;
 
@@ -58,7 +60,7 @@ namespace GR
 			cpuHandle.numHandles = numHandles;
 			cpuHandle.handles.push_back(handle);
 
-			m_CPUCache->push_back(cpuHandle);
+			m_CPUCache[type].push_back(cpuHandle);
 		}
 		void Commander::GPUDescriptorAllocator::BindDescriptorTable(Commander* commander, bool is_compute)
 		{
@@ -256,6 +258,38 @@ namespace GR
 			BackUpObject(dest);
 			BackUpObject(src);
 		}
+		void Commander::CopyResourceRegion(
+			GPUResource& dest_resource, uint32_t dstMip, uint32_t dstX, uint32_t dstY, uint32_t dstZ,
+			GPUResource& src_resource, uint32_t srcMip, uint32_t arraySlice)
+		{
+			TransitionBarrier(dest_resource, D3D12_RESOURCE_STATE_COPY_DEST);
+			TransitionBarrier(src_resource, D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+			FlushResourceBarriers();
+
+
+			D3D12_RESOURCE_DESC dst_desc = dest_resource->GetDesc();
+			D3D12_RESOURCE_DESC src_desc = src_resource->GetDesc();
+
+
+			D3D12_TEXTURE_COPY_LOCATION dst = {};
+			dst.pResource = dest_resource.GetResource();
+			dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+			dst.SubresourceIndex = D3D12CalcSubresource(dstMip, arraySlice, 0, dst_desc.MipLevels, dst_desc.DepthOrArraySize);
+
+			D3D12_TEXTURE_COPY_LOCATION src = {};
+			src.pResource = src_resource.GetResource();
+			src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+			src.SubresourceIndex = D3D12CalcSubresource(srcMip, arraySlice, 0, src_desc.MipLevels, src_desc.DepthOrArraySize);
+
+
+			m_D3D_CommandList->CopyTextureRegion(&dst, dstX, dstY, dstZ, &src, nullptr);
+
+
+			BackUpObject(dest_resource);
+			BackUpObject(src_resource);
+
+		}
 		void Commander::CopyBuffer(
 			GPUBuffer& buffer,
 			uint32_t numElements, uint32_t elementSize,
@@ -337,8 +371,10 @@ namespace GR
 			m_UploadBuffer->Reset();
 			FlushBackUpObject();
 		}
-		void GraphicsCommander::ClearColor(const ColorTexture& texture)
+		void GraphicsCommander::ClearColor(ColorTexture& texture)
 		{
+			TransitionBarrier(texture, D3D12_RESOURCE_STATE_RENDER_TARGET, true);
+
 			auto color = texture.GetClearColor();
 			float clearValue[4];
 			clearValue[0] = color.x;
@@ -349,20 +385,26 @@ namespace GR
 			BackUpObject(texture);
 			
 		}
-		void GraphicsCommander::ClearDepth(const DepthTexture& texture)
+		void GraphicsCommander::ClearDepth(DepthTexture& texture)
 		{
+			TransitionBarrier(texture, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+
 			m_D3D_CommandList->ClearDepthStencilView(
 				texture.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, texture.GetClearDepth(), texture.GetClearStencil(), 0, nullptr);
 			BackUpObject(texture);
 		}
-		void GraphicsCommander::ClearStencil(const DepthTexture& texture)
+		void GraphicsCommander::ClearStencil(DepthTexture& texture)
 		{
+			TransitionBarrier(texture, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+
 			m_D3D_CommandList->ClearDepthStencilView(
 				texture.GetDSV(), D3D12_CLEAR_FLAG_STENCIL, texture.GetClearDepth(), texture.GetClearStencil(), 0, nullptr);
 			BackUpObject(texture);
 		}
-		void GraphicsCommander::ClearDepthStencil(const DepthTexture& texture)
+		void GraphicsCommander::ClearDepthStencil(DepthTexture& texture)
 		{
+			TransitionBarrier(texture, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+
 			m_D3D_CommandList->ClearDepthStencilView(
 				texture.GetDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, texture.GetClearDepth(), texture.GetClearStencil(), 0, nullptr);
 			BackUpObject(texture);
@@ -512,9 +554,20 @@ namespace GR
 			}
 
 		}
-		void GraphicsCommander::SetDescirptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		void GraphicsCommander::SetSRVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
 		{
-			m_GPUAllocator->StageDescriptorHandles(rootparam, numHandles, handle);
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::SRV,
+				rootparam, numHandles, handle);
+		}
+		void GraphicsCommander::SetUAVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		{
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::UAV,
+				rootparam, numHandles, handle);
+		}
+		void GraphicsCommander::SetCBVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		{
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::CBV,
+				rootparam, numHandles, handle);
 		}
 		void GraphicsCommander::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation)
 		{
@@ -593,12 +646,18 @@ namespace GR
 				m_CurrRootSignature = pRootsig;
 			}
 		}
-
-		void ComputeCommander::SetDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		void ComputeCommander::SetSRVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
 		{
-			m_GPUAllocator->StageDescriptorHandles(rootparam, numHandles, handle);
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::SRV, rootparam, numHandles, handle);
 		}
-
+		void ComputeCommander::SetUAVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		{
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::UAV, rootparam, numHandles, handle);
+		}
+		void ComputeCommander::SetCBVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle)
+		{
+			m_GPUAllocator->StageDescriptorHandles(GPUDescriptorAllocator::CBV, rootparam, numHandles, handle);
+		}
 		void ComputeCommander::Dispatch(uint32_t groupX, uint32_t groupY, uint32_t groupZ)
 		{
 			m_GPUAllocator->BindDescriptorTable(this, true);
@@ -715,7 +774,7 @@ namespace GR
 
 
 					SetDynamicConstantBuffer(C_GenerateMipMaps_RootParam_GenerateMipsCB, sizeof(GenerateMipsCB), &mipCB);
-					SetDescriptorTable(C_GenerateMipMaps_RootParam_InputTexture, 1, &stagingTexture.GetSRV(&srvDesc));
+					SetSRVDescriptorTable(C_GenerateMipMaps_RootParam_InputTexture, 1, &stagingTexture.GetSRV(&srvDesc));
 					std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> outputHandles(4);
 					for (uint32_t mip = 0; mip < mipCount; ++mip)
 					{
@@ -743,7 +802,7 @@ namespace GR
 						outputHandles[mip] = UAVHandle.GetDescriptorHandle(mip);
 					}
 
-					SetDescriptorTable(C_GenerateMipMaps_RootParam_OutputTexture, 4, outputHandles.data());
+					SetUAVDescriptorTable(C_GenerateMipMaps_RootParam_OutputTexture, 4, outputHandles.data());
 
 					Dispatch(Math::DivideByMultiple(dstWidth, 8), Math::DivideByMultiple(dstHeight, 8), 1);
 					UAVBarrier(stagingTexture);

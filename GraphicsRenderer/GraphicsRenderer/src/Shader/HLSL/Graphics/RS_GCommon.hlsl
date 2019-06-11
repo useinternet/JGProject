@@ -19,6 +19,10 @@
 #define GBUFFER_CUSTOM1   7
 
 
+#define GBUFFER_SPECMAP   0
+#define GBUFFER_IRRMAP    1
+#define GBUFFER_SPECBRDF  6
+
 
 // 오브젝트 정의
 StructuredBuffer<ObjectCB> gObjectCBs : register(t0, space0);

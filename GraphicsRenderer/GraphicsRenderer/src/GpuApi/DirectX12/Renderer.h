@@ -33,15 +33,14 @@ namespace GR
 
 		class Renderer
 		{
-		private:
+			friend GraphicsDevice;
+		public:
 			enum ERenderPass
 			{
 				GBUFFER,
-				SKYBOX,
+				TONEMAPPING,
 				NUMPASS
 			};
-		private:
-			friend GraphicsDevice;
 			struct RenderPass
 			{
 				RenderTarget RT;
@@ -51,22 +50,22 @@ namespace GR
 			};
 		private:
 			GraphicsDevice* m_GraphcisDevice;
-	
 			std::shared_ptr<Camera> m_Camera;
 			std::shared_ptr<RenderObject> m_SkyBox;
-
-
 			RootSignature m_GCommonRootSignature;
-			//
+			RenderPass  m_GBufferPass;
 		public:
-			RenderPass m_GBufferPass;
+			RenderPass  m_ToneMappingPass;
+			ERenderPass m_CurrentRenderPass;
 			std::map<ERenderPass, GraphicsCommander*> m_PassCommanders;
 		public:
 			Renderer();
+			
 			GraphicsDevice* GetDevice();
 			const GraphicsDevice* GetDevice() const;
 
 			void Initialize(uint32_t width, uint32_t height);
+			void Resize(uint32_t width, uint32_t height);
 			Camera* GetCamera();
 		public:
 			void RenderBegin();
@@ -75,11 +74,16 @@ namespace GR
 			void GBufferOn();
 			void GBufferRender(const RenderObject& obj);
 			void GBufferOff();
-			RenderTarget* GetGBufferRenderTarget();
+			ColorTexture* GetTexture();
+			RenderTarget* GetRenderTarget(ERenderPass pass);
+		public:
+			void ToneMapping();
 		public:
 			void SkyBoxRender(const Texture& texture);
 		private:
 			void GBufferInit(uint32_t width, uint32_t height);
+			void ToneMappingInit(uint32_t width, uint32_t height);
+		public:
 			void BakeIBLTexture(ComputeCommander* commander, const Texture& inTexture, Texture& outSpMap, Texture& outSpbrdf, Texture& irrMap);
 		public:
 

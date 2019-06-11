@@ -113,6 +113,9 @@ namespace GR
 			(copy.m_CurrentUavDesc) ?
 				m_CurrentUavDesc = make_unique<D3D12_UNORDERED_ACCESS_VIEW_DESC>(*copy.m_CurrentUavDesc) :
 				m_CurrentUavDesc = nullptr;
+
+			m_SRVs.clear();
+			m_UAVs.clear();
 		}
 		Texture::Texture(Texture&& rhs) : GPUResource(rhs)
 		{
@@ -139,6 +142,9 @@ namespace GR
 				m_CurrentUavDesc = make_unique<D3D12_UNORDERED_ACCESS_VIEW_DESC>(*rhs.m_CurrentUavDesc) :
 				m_CurrentUavDesc = nullptr;
 
+
+			m_SRVs.clear();
+			m_UAVs.clear();
 			return *this;
 		}
 		Texture& Texture::operator=(Texture&& rhs)
@@ -242,6 +248,8 @@ namespace GR
 			(copy.m_CurrentRtvDesc) ?
 				m_CurrentRtvDesc = make_unique<D3D12_RENDER_TARGET_VIEW_DESC>(*copy.m_CurrentRtvDesc) :
 				m_CurrentRtvDesc = nullptr;
+
+			m_RTVs.clear();
 		}
 		ColorTexture::ColorTexture(ColorTexture&& rhs) : 
 			Texture(rhs), m_ClearColor(rhs.m_ClearColor)
@@ -261,6 +269,8 @@ namespace GR
 
 			m_ClearColor = rhs.m_ClearColor;
 
+
+			m_RTVs.clear();
 			return *this;
 		}
 		ColorTexture& ColorTexture::operator=(ColorTexture&& rhs)
@@ -341,7 +351,7 @@ namespace GR
 			(copy.m_CurrentDsvDesc) ?
 				m_CurrentDsvDesc = make_unique<D3D12_DEPTH_STENCIL_VIEW_DESC>(*copy.m_CurrentDsvDesc) :
 				m_CurrentDsvDesc = nullptr;
-
+			m_DSVs.clear();
 
 		}
 		DepthTexture::DepthTexture(DepthTexture&& rhs) : 
@@ -378,7 +388,7 @@ namespace GR
 			m_ClearStencil = rhs.m_ClearStencil;
 			rhs.m_ClearDepth = 1.0f;
 			rhs.m_ClearStencil = 0;
-
+			m_DSVs.clear();
 			return *this;
 		}
 		void DepthTexture::SetDSVDesc(D3D12_DEPTH_STENCIL_VIEW_DESC* desc)

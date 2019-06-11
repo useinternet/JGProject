@@ -59,7 +59,7 @@ float gaSchlickGGX_IBL(float cosLi, float cosLo, float roughness)
 }
 
 [numthreads(32, 32, 1)]
-void cs_main(uint2 ThreadID : SV_DispatchThreadID)
+void CS(uint2 ThreadID : SV_DispatchThreadID)
 {
 	// Get output LUT dimensions.
 	float outputWidth, outputHeight;

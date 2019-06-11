@@ -5,12 +5,11 @@ static const float PI = 3.141592;
 static const float TwoPI = 2 * PI;
 static const float Epsilon = 0.00001;
 
-static const uint NumSamples = 64 * 1024;
+static const uint NumSamples = 1024;
 static const float InvNumSamples = 1.0 / float(NumSamples);
 
 TextureCube inputTexture : register(t0);
 RWTexture2DArray<float4> outputTexture : register(u0);
-
 SamplerState defaultSampler : register(s0);
 
 // Compute Van der Corput radical inverse
@@ -84,7 +83,7 @@ float3 tangentToWorld(const float3 v, const float3 N, const float3 S, const floa
 }
 
 [numthreads(32, 32, 1)]
-void cs_main(uint3 ThreadID : SV_DispatchThreadID)
+void CS(uint3 ThreadID : SV_DispatchThreadID)
 {
 	float3 N = getSamplingVector(ThreadID);
 
@@ -96,12 +95,12 @@ void cs_main(uint3 ThreadID : SV_DispatchThreadID)
 	// so we don't need to normalize in PBR fragment shader (so technically it encodes exitant radiance rather than irradiance).
 	float3 irradiance = 0.0;
 	for (uint i = 0; i<NumSamples; ++i) {
+
 		float2 u = sampleHammersley(i);
 		float3 Li = tangentToWorld(sampleHemisphere(u.x, u.y), N, S, T);
 		float cosTheta = max(0.0, dot(Li, N));
-
 		// PIs here cancel out because of division by pdf.
-		irradiance += 2.0 * inputTexture.SampleLevel(defaultSampler, Li, 0).rgb * cosTheta;
+		irradiance += 2.0  *  inputTexture.SampleLevel(defaultSampler, Li, 0.0f).rgb * cosTheta;
 	}
 	irradiance /= float(NumSamples);
 

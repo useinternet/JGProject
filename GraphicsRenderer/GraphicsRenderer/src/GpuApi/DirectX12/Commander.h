@@ -38,6 +38,7 @@ namespace GR
 
 			*/
 			friend GraphicsDevice;
+		protected:
 			class GPUDescriptorAllocator
 			{
 			public:
@@ -66,9 +67,9 @@ namespace GR
 			public:
 				GPUDescriptorAllocator(ID3D12Device* device);
 				// 불 연속 적인 Heap 메모리
-				void StageDescriptorHandles(uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
+				void StageDescriptorHandles(EHeapType type, uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
 				// 연속적인 Heap 메모리
-				void StageDescriptorHandles(uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+				void StageDescriptorHandles(EHeapType type,uint32_t rootIndex, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 				void BindDescriptorTable(Commander* commander, bool is_compute);
 				void BindDescriptorHeap(Commander* commander);
 				void Reset();
@@ -108,6 +109,9 @@ namespace GR
 			// -- 복사 함수 -- //
 
 			void CopyResource(GPUResource& dest, GPUResource& src);
+			void CopyResourceRegion(
+				GPUResource& dest, uint32_t dstMip, uint32_t dstX, uint32_t dstY, uint32_t dstZ,
+				GPUResource& src, uint32_t srcMip, uint32_t arraySlice);
 			void CopyBuffer(
 				GPUBuffer& buffer, 
 				uint32_t numElements, uint32_t elementSize, 
@@ -140,10 +144,10 @@ namespace GR
 				Commander(device, D3D12_COMMAND_LIST_TYPE_DIRECT) {}
 			virtual ~GraphicsCommander() {}
 		public:
-			void ClearColor(const ColorTexture& texture);
-			void ClearDepth(const DepthTexture& texture);
-			void ClearStencil(const DepthTexture& texture);
-			void ClearDepthStencil(const DepthTexture& texture);
+			void ClearColor(ColorTexture& texture);
+			void ClearDepth(DepthTexture& texture);
+			void ClearStencil(DepthTexture& texture);
+			void ClearDepthStencil(DepthTexture& texture);
 
 
 			void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV, D3D12_CPU_DESCRIPTOR_HANDLE DSV);
@@ -180,8 +184,9 @@ namespace GR
 			void SetPipelineState(GraphicsPSO& pso);
 			void SetRootSignature(RootSignature& rootsig);
 
-			void SetDescirptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
-
+			void SetSRVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
+			void SetUAVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
+			void SetCBVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
 			// Draw 콜
 			void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
 			void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t startIndexLocation = 0, uint32_t baseVertexLocation = 0, uint32_t startInstanceLocation = 0);
@@ -208,8 +213,10 @@ namespace GR
 			void SetPipelineState(ComputePSO& pso);
 			void SetRootSignature(RootSignature& rootsig);
 
-			void SetDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
-		
+	
+			void SetSRVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
+			void SetUAVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
+			void SetCBVDescriptorTable(uint32_t rootparam, uint32_t numHandles, D3D12_CPU_DESCRIPTOR_HANDLE* handle);
 			void Dispatch(uint32_t groupX, uint32_t groupY, uint32_t groupZ);
 		public:
 			void GenerateMipMaps(Texture& texture);

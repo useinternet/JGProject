@@ -33,6 +33,9 @@ namespace GR
 			case SKYBOX:
 				CreateSkyPSO(pso, option);
 				break;
+			case TONEMAPPING:
+				CreateToneMappingPSO(pso, option);
+				break;
 			}
 
 			m_GraphicsPSOMap[hashCode] = pso;
@@ -162,6 +165,21 @@ namespace GR
 			pso.Finalize();
 
 		}
+		void PSOCache::CreateToneMappingPSO(GraphicsPSO& pso, EGraphicsMacroOption option)
+		{
+			VertexShader VS;
+			PixelShader PS;
+			auto device = GraphicsDevice::GetPointer();
+
+			device->CreateShader(m_ShaderDirPath + L"Graphics/" + L"QuadVS.hlsl", &VS);
+			device->CreateShader(m_ShaderDirPath + L"Graphics/" + L"ToneMappingPS.hlsl", &PS);
+
+			pso.SetRenderTargetFormats({ 0 }, { DXGI_FORMAT_R8G8B8A8_UNORM });
+			pso.SetDepthStencilState(DepthStencilState::NoneDepth());
+			pso.BindVertexShader(VS);
+			pso.BindPixelShader(PS);
+			pso.Finalize();
+		}
 		// Compute
 		void PSOCache::CreateEquirect2Cube(ComputePSO& pso, EComputeMacroOption option)
 		{
@@ -181,7 +199,7 @@ namespace GR
 		}
 		void PSOCache::CreateSpecularMap(ComputePSO& pso, EComputeMacroOption option)
 		{
-			DefaultBindComputeShader(pso, L"Specularmap.hlsl");
+			DefaultBindComputeShader(pso, L"SpecularmapCS.hlsl");
 		}
 		void PSOCache::DefaultBindComputeShader(ComputePSO& pso, const std::wstring& shadername)
 		{

@@ -136,6 +136,9 @@
     <ClInclude Include="src\GpuApi\DirectX12\RasterizerState.h">
       <Filter>GpuApi\DirectX12\RenderingToolKit\State</Filter>
     </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GPUAllocator.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -208,37 +211,8 @@
     <ClCompile Include="src\GpuApi\DirectX12\Image.cpp">
       <Filter>GpuApi\DirectX12\TextureUtil</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Shader\HLSL\SkyBoxPS.hlsl" />
-    <None Include="src\Shader\HLSL\SkyBoxVS.hlsl" />
-    <None Include="src\Shader\HLSL\Equirect2CubeCS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\GBufferPS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\GBufferVS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\GraphicsFunctions.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\GraphicsStructDefine.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\QuadPS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\QuadVS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\RS_GCommon.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\SkyBoxPS.hlsl" />
-    <None Include="src\Shader\HLSL\Graphics\SkyBoxVS.hlsl" />
-    <None Include="src\Shader\HLSL\Compute\Equirect2CubeCS.hlsl" />
-    <None Include="src\Shader\HLSL\Compute\GenerateMipsArrayCS.hlsl" />
-    <None Include="src\Shader\HLSL\Compute\GenerateMipsGammaCS.hlsl" />
-    <None Include="src\Shader\HLSL\Compute\GenerateMipsLinearCS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="src\Shader\HLSL\Compute\GenerateMipsCS.hlsl">
-      <Filter>Shader\HLSL\Compute</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shader\HLSL\Compute\IrrmapCS.hlsl">
-      <Filter>Shader\HLSL\Compute</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shader\HLSL\Compute\SpecularBrdfCS.hlsl">
-      <Filter>Shader\HLSL\Compute</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shader\HLSL\Compute\Specularmap.hlsl">
-      <Filter>Shader\HLSL\Compute</Filter>
-    </FxCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GPUAllocator.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

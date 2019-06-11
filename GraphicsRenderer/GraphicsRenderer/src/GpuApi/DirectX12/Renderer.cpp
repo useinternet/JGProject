@@ -35,6 +35,7 @@ namespace GR
 			}
 			m_GCommonRootSignature = m_GraphcisDevice->GetRootSignatureFromCache(ERootSignature::G_Common);
 			GBufferInit(width, height);
+			ToneMappingInit(width, height);
 			{
 				m_Camera = std::make_unique<Camera>();
 				m_Camera->SetLens(0.25f * DirectX::XM_PI, (float)width, (float)height, 1.0f, 100000.0f);
@@ -53,6 +54,10 @@ namespace GR
 
 
 		}
+		void Renderer::Resize(uint32_t width, uint32_t height)
+		{
+			assert(false && "resize not imp");
+		}
 		Camera* Renderer::GetCamera()
 		{
 			return m_Camera.get();
@@ -64,6 +69,7 @@ namespace GR
 			if (m_Camera->IsUpadte())
 			{
 				m_GBufferPass.passCB.Set(*m_Camera);
+				m_ToneMappingPass.passCB = m_GBufferPass.passCB;
 			}
 		}
 		void Renderer::RenderEnd()
@@ -72,14 +78,12 @@ namespace GR
 		}
 		void Renderer::GBufferOn()
 		{
+			m_CurrentRenderPass = GBUFFER;
 			m_PassCommanders[GBUFFER] = m_GraphcisDevice->GetGraphicsCommander();
 			auto commander = m_PassCommanders[GBUFFER];
 			commander->SetViewport(m_GBufferPass.viewPort);
 			commander->SetScissorRect(m_GBufferPass.scissorRect);
 
-			commander->TransitionBarrier(*m_GBufferPass.RT.GetTexture(RenderTarget::Slot0), D3D12_RESOURCE_STATE_RENDER_TARGET);
-			commander->TransitionBarrier(*m_GBufferPass.RT.GetDepthTexture(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
-			commander->FlushResourceBarriers();
 
 			commander->ClearColor(*m_GBufferPass.RT.GetTexture(RenderTarget::Slot0));
 			commander->ClearDepthStencil(*m_GBufferPass.RT.GetDepthTexture());
@@ -141,7 +145,12 @@ namespace GR
 			// 텍스쳐 바인딩
 			{
 				auto srv_Vec = obj.GetTextureSRV();
-				commander->SetDescirptorTable(G_Common_RootParam_Texture, (uint32_t)srv_Vec.size(), srv_Vec.data());
+				commander->SetSRVDescriptorTable(G_Common_RootParam_Texture, (uint32_t)srv_Vec.size(), srv_Vec.data());
+			}
+			// 큐브 텍스쳐 바인딩
+			{
+				auto srv_Vec = obj.GetCubeTextureSRV();
+				commander->SetSRVDescriptorTable(G_Common_RootParam_CubeTexture, (uint32_t)srv_Vec.size(), srv_Vec.data());
 			}
 
 
@@ -167,9 +176,52 @@ namespace GR
 				return;
 			m_GraphcisDevice->PushCommander(m_PassCommanders[GBUFFER]);
 		}
-		RenderTarget* Renderer::GetGBufferRenderTarget()
+		ColorTexture* Renderer::GetTexture()
 		{
-			return &m_GBufferPass.RT;
+			switch (m_CurrentRenderPass)
+			{
+			case GBUFFER:
+				return m_GBufferPass.RT.GetTexture(RenderTarget::Slot0);
+			case TONEMAPPING:
+				return m_ToneMappingPass.RT.GetTexture(RenderTarget::Slot0);
+			}
+			return nullptr;
+		}
+		RenderTarget* Renderer::GetRenderTarget(ERenderPass pass)
+		{
+			switch (pass)
+			{
+			case GBUFFER:
+				return &m_GBufferPass.RT;
+			case TONEMAPPING:
+				return &m_ToneMappingPass.RT;
+			}
+			return nullptr;
+		}
+		void Renderer::ToneMapping()
+		{
+			m_CurrentRenderPass = TONEMAPPING;
+			m_PassCommanders[TONEMAPPING] = m_GraphcisDevice->GetGraphicsCommander();
+			auto sceneTexture = m_GBufferPass.RT.GetTexture(RenderTarget::Slot0);
+			sceneTexture->SetSRVDesc(nullptr);
+			sceneTexture->SetRTVDesc(nullptr);
+			auto commander = m_PassCommanders[TONEMAPPING];
+
+
+			commander->SetViewport(m_ToneMappingPass.viewPort);
+			commander->SetScissorRect(m_ToneMappingPass.scissorRect);
+			commander->ClearColor(*m_ToneMappingPass.RT.GetTexture(RenderTarget::Slot0));
+			commander->SetRenderTarget(m_ToneMappingPass.RT.GetTexture(RenderTarget::Slot0)->GetRTV());
+			commander->SetRootSignature(m_GCommonRootSignature);
+			commander->SetDynamicConstantBuffer(G_Common_RootParam_PassCB, sizeof(PassCB), &m_ToneMappingPass.passCB);
+			auto pso = m_GraphcisDevice->GetGraphicsPSOFromCache(m_GCommonRootSignature, PSOCache::TONEMAPPING, PSOCache::USE_NULL);
+			commander->SetPipelineState(pso);
+			commander->SetSRVDescriptorTable(G_Common_RootParam_Texture, 1, &sceneTexture->GetSRV());
+			commander->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			commander->Draw(6);
+
+			m_GraphcisDevice->PushCommander(commander);
+			m_PassCommanders[TONEMAPPING] = nullptr;
 		}
 		void Renderer::SkyBoxRender(const Texture& texture)
 		{
@@ -190,7 +242,7 @@ namespace GR
 				m_SkyBox->BindCubeTexture(RenderObject::SLOT1, texture);
 			}
 			auto cube_srv_Vec = m_SkyBox->GetCubeTextureSRV();
-			commander->SetDescirptorTable(G_Common_RootParam_CubeTexture,
+			commander->SetSRVDescriptorTable(G_Common_RootParam_CubeTexture,
 				(uint32_t)cube_srv_Vec.size(), cube_srv_Vec.data());
 
 			commander->SetDynamicStructuredBuffer(G_Common_RootParam_ObjectCB,
@@ -224,8 +276,18 @@ namespace GR
 				m_GBufferPass.scissorRect.Set(width, height);
 			}
 		}
+		void Renderer::ToneMappingInit(uint32_t width, uint32_t height)
+		{
+			GPUResource gpuresource = m_GraphcisDevice->CreateRenderTargetGPUResource(
+				DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1);
+			auto sceneTexture = m_GraphcisDevice->CreateColorTexture(gpuresource);
 
-		void Renderer::BakeIBLTexture(ComputeCommander* commander, const Texture& inTexture, Texture& outSpMap, Texture& outSpbrdf, Texture& irrMap)
+
+			m_ToneMappingPass.RT.AttachTexture(RenderTarget::Slot0, sceneTexture);
+			m_ToneMappingPass.viewPort.Set((float)width, (float)height);
+			m_ToneMappingPass.scissorRect.Set(width, height);
+		}
+		void Renderer::BakeIBLTexture(ComputeCommander* commander, const Texture& inTexture, Texture& outSpMap, Texture& outSpbrdf, Texture& outirrMap)
 		{
 			Texture texture = inTexture;
 			if (texture->GetDesc().DepthOrArraySize != 6)
@@ -244,14 +306,34 @@ namespace GR
 			srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 			texture.SetSRVDesc(&srvDesc);
 
-
+			
 			// 리소스 생성
 			{
 				auto desc = resourceDesc;
+				desc.Width = 1024; desc.Height = 1024;
 				desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 				GPUResource spmapResource = m_GraphcisDevice->CreateGPUResource(desc, nullptr,
 					GraphicsDevice::DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 				outSpMap = m_GraphcisDevice->CreateTexture(spmapResource);
+
+				//
+
+				desc.Width = 32; desc.Height = 32;
+				desc.DepthOrArraySize = 6;
+				desc.MipLevels = 1;
+
+				GPUResource irrResource = m_GraphcisDevice->CreateGPUResource(desc, nullptr,
+					GraphicsDevice::DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+				outirrMap = m_GraphcisDevice->CreateTexture(irrResource);
+
+				//
+				desc.Width = 256; desc.Height = 256;
+				desc.DepthOrArraySize = 1;
+				desc.Format = DXGI_FORMAT_R16G16_FLOAT;
+				GPUResource spbrdfResource = m_GraphcisDevice->CreateGPUResource(desc, nullptr,
+					GraphicsDevice::DEFAULT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+				outSpbrdf = m_GraphcisDevice->CreateTexture(spbrdfResource);
+
 			}
 
 
@@ -267,16 +349,26 @@ namespace GR
 
 
 			// 루트 서명 및 PSO
-			RootSignature rootSig = m_GraphcisDevice->GetRootSignatureFromCache(ERootSignature::C_SpecularMap);
-			ComputePSO pso = m_GraphcisDevice->GetComputePSOFromCache(rootSig, PSOCache::SPECULARMAP, PSOCache::USE_NULL);
+			
+			
 
+			for (UINT arraySlice = 0; arraySlice < 6; ++arraySlice)
+			{
+				commander->CopyResourceRegion(outSpMap, 0, 0, 0, 0, texture, 0, arraySlice);
+			}
 
-			commander->SetRootSignature(rootSig);
-			commander->SetPipelineState(pso);
+			commander->TransitionBarrier(outSpMap, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, true);
+
+			
 
 			// prefiltered specular Map
 			{
-				commander->SetDescriptorTable(EC_SpecularMap_RootParam_InputTexture, 1, &texture.GetSRV());
+				RootSignature rootSig = m_GraphcisDevice->GetRootSignatureFromCache(ERootSignature::C_SpecularMap);
+				ComputePSO pso = m_GraphcisDevice->GetComputePSOFromCache(rootSig, PSOCache::SPECULARMAP, PSOCache::USE_NULL);
+
+				commander->SetRootSignature(rootSig);
+				commander->SetPipelineState(pso);
+				commander->SetSRVDescriptorTable(EC_SpecularMap_RootParam_InputTexture, 1, &texture.GetSRV());
 
 				const float deltaRoughness = 1.0f / std::max(float(resourceDesc.MipLevels - 1), 1.0f);
 
@@ -291,19 +383,50 @@ namespace GR
 
 
 					commander->SetDynamicConstantBuffer(EC_SpecularMap_RootParam_Roughness, sizeof(float), &constant_roughness);
-					commander->SetDescriptorTable(EC_SpecularMap_RootParam_OutputTexture, 1, &outSpMap.GetUAV());
+					commander->SetUAVDescriptorTable(EC_SpecularMap_RootParam_OutputTexture, 1, &outSpMap.GetUAV());
 					commander->Dispatch(numGroups, numGroups, 6);
+				
 				}
 				outSpMap.SetUAVDesc(nullptr);
-				commander->TransitionBarrier(outSpMap, D3D12_RESOURCE_STATE_GENERIC_READ);
 
+				commander->TransitionBarrier(outSpMap, D3D12_RESOURCE_STATE_COMMON, true);
 			}
 
+			// Compute diffuse irradiance cubemap
+			{
+				uavDesc.Texture2DArray.MipSlice = 0;
+				outirrMap.SetUAVDesc(&uavDesc);
 
 
+				RootSignature rootSig = m_GraphcisDevice->GetRootSignatureFromCache(ERootSignature::C_IrrMap);
+				ComputePSO pso = m_GraphcisDevice->GetComputePSOFromCache(rootSig, PSOCache::IRRADIANCEMAP, PSOCache::USE_NULL);
+				commander->SetRootSignature(rootSig);
+				commander->SetPipelineState(pso);
+
+		
+				commander->SetSRVDescriptorTable(EC_IrrMap_RootParam_InputTexture, 1, &texture.GetSRV());
+				commander->SetUAVDescriptorTable(EC_IrrMap_RootParam_OutputTexture, 1, &outirrMap.GetUAV());
+				commander->Dispatch(outirrMap->GetDesc().Width / 32, outirrMap->GetDesc().Height / 32, 6);
 
 
+				commander->UAVBarrier(outirrMap, true);
 
+				outirrMap.SetUAVDesc(nullptr);
+			}
+
+			// Compute Cook-Torrance BRDF 2D LUT for split-sum approximation
+			{
+				RootSignature rootSig = m_GraphcisDevice->GetRootSignatureFromCache(ERootSignature::C_SpecularBRDF);
+				ComputePSO pso = m_GraphcisDevice->GetComputePSOFromCache(rootSig, PSOCache::SPECULARBRDF, PSOCache::USE_NULL);
+
+
+				commander->SetRootSignature(rootSig);
+				commander->SetPipelineState(pso);
+
+				commander->SetUAVDescriptorTable(EC_SpecularBRDF_RootParam_OutputTexture, 1, &outSpbrdf.GetUAV());
+				commander->Dispatch(outSpbrdf->GetDesc().Width / 32, outSpbrdf->GetDesc().Height / 32, 1);
+				commander->UAVBarrier(outSpbrdf, true);
+			}
 
 		}
 
