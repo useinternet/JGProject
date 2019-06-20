@@ -37,6 +37,7 @@ namespace GR
 			void AttachTexture(ESlot slot, const ColorTexture& texture);
 			void AttachTexture(ESlot slot, const DepthTexture& texture);
 
+			const ColorTexture* GetTexture(ESlot slot) const;
 			ColorTexture* GetTexture(ESlot slot);
 			DepthTexture* GetDepthTexture();
 

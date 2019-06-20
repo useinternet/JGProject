@@ -11,54 +11,31 @@ namespace GR
 	{
 		class Mesh;
 		class Renderer;
+		class GBuffer;
+		class Material;
+		class GraphicsCommander;
 		class RenderObject
 		{
+			friend GBuffer;
 			friend Renderer;
-		public:
-			enum ETextureSlot
-			{
-				ALBEDO,
-				NORMAL,
-				SPECULAR,
-				METALLIC,
-				ROUGHNESS,
-				A0,
-				CUSTOM0,
-				CUSTOM1,
-				NUM_TEXTURESLOT,
-
-				//  ½½·Ô
-				SLOT1 = ALBEDO,
-				SLOT2 = NORMAL,
-				SLOT3 = SPECULAR,
-				SLOT4 = METALLIC,
-				SLOT5 = ROUGHNESS,
-				SLOT6 = A0,
-				SLOT7 = CUSTOM0,
-				SLOT8 = CUSTOM1,
-
-				// PBR
-				SPECULARBRDF  = SLOT7,
-				SPECULARMAP   = SLOT1,
-				IRRADIANCEMAP = SLOT2
-			};
 		private:
 			std::vector<ObjectCB> m_ObjectCBs;
-			Texture m_Textures[NUM_TEXTURESLOT];
-			Texture m_CubeTextures[NUM_TEXTURESLOT];
 			std::shared_ptr<Mesh> m_Mesh;
+			std::shared_ptr<Material> m_Material;
 		public:
 			RenderObject();
 			void BindMesh(Mesh* mesh);
-			void BindTexture(ETextureSlot slot, const Texture& texture);
-			void BindCubeTexture(ETextureSlot slot, const Texture& texture);
+			void BindMaterial(class Material* mat);
+			void BindConstantBufferAtGPU(GraphicsCommander* commander);
 			void AddInstance(const ObjectCB& objectCB);
 			void SetInstance(uint32_t ID, const ObjectCB& objectCB);
 			ObjectCB& GetInstance(uint32_t ID);
 			const ObjectCB& GetInstance(uint32_t ID) const;
-
-			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> GetTextureSRV() const;
-			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> GetCubeTextureSRV() const;
+			
+			Mesh* GetMesh();
+			Material* GetMaterial();
+			const Mesh* GetMesh() const;
+			const Material* GetMaterial() const;
 		};
 	}
 }

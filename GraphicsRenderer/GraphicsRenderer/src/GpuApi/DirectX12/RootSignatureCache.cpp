@@ -11,6 +11,7 @@ namespace GR
 
 		RootSignature RootSignatureCache::GetRootSignature(ERootSignature enumpass)
 		{
+			std::lock_guard<std::mutex> lock(m_RootSigMutex);
 			RootSignature rootSig;
 			if (m_RootSignatureCache.find(enumpass) != m_RootSignatureCache.end())
 			{

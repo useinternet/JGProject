@@ -12,7 +12,7 @@ namespace GR
 {
 	namespace Dx12
 	{
-		// 
+		// 라이팅 패쓰에 큐브맵 그리기
 		class GraphicsDevice;
 		class GraphicsCommander;
 		class Camera;
@@ -20,44 +20,28 @@ namespace GR
 		class PSOCache;
 		class RootSignatureCache;
 		class RenderObject;
-
+		class LightingPass;
+		class ToneMapping;
+		class GBuffer;
+		class IBLBaker;
 		/* Renderer 기능에 필요한것
-
-
-
-
-		RenderObject  GetSRV 기능 업데이트 될때만 HANDLE 값 변경
-		HDR 텍스쳐 로드 다시 만지기 ( HDR 버전으로 컨버전 계산 셰이더 생성)
 
 		*/
 
 		class Renderer
 		{
 			friend GraphicsDevice;
-		public:
-			enum ERenderPass
-			{
-				GBUFFER,
-				TONEMAPPING,
-				NUMPASS
-			};
-			struct RenderPass
-			{
-				RenderTarget RT;
-				PassCB       passCB;
-				Viewport     viewPort;
-				ScissorRect  scissorRect;
-			};
 		private:
 			GraphicsDevice* m_GraphcisDevice;
 			std::shared_ptr<Camera> m_Camera;
-			std::shared_ptr<RenderObject> m_SkyBox;
-			RootSignature m_GCommonRootSignature;
-			RenderPass  m_GBufferPass;
+			std::shared_ptr<GBuffer> m_GBuffer;
+			std::shared_ptr<LightingPass> m_LightingPass;
+			std::shared_ptr<ToneMapping>  m_ToneMapping;
+			std::shared_ptr<IBLBaker>     m_IBLBaker;
+			Texture m_SkyTexture;
+			PassCB  m_PassCB;
 		public:
-			RenderPass  m_ToneMappingPass;
-			ERenderPass m_CurrentRenderPass;
-			std::map<ERenderPass, GraphicsCommander*> m_PassCommanders;
+			GraphicsCommander* m_GraphicsCommander;
 		public:
 			Renderer();
 			
@@ -71,18 +55,17 @@ namespace GR
 			void RenderBegin();
 			void RenderEnd();
 		public: // GBuffer
-			void GBufferOn();
-			void GBufferRender(const RenderObject& obj);
-			void GBufferOff();
-			ColorTexture* GetTexture();
-			RenderTarget* GetRenderTarget(ERenderPass pass);
-		public:
-			void ToneMapping();
-		public:
-			void SkyBoxRender(const Texture& texture);
-		private:
-			void GBufferInit(uint32_t width, uint32_t height);
-			void ToneMappingInit(uint32_t width, uint32_t height);
+			void PushObject(RenderObject* obj);
+			void PushObjects(const std::vector<RenderObject*>& objs);
+			void GBuffer();
+			void BindSkyTexture(const Texture& texture);
+			void Lighting();
+			void PostProcess();
+
+			class GBuffer* GetGBuffer();
+			LightingPass* GetLightingPass();
+			ToneMapping*  GetToneMapping();
+			Texture* GetTexture();
 		public:
 			void BakeIBLTexture(ComputeCommander* commander, const Texture& inTexture, Texture& outSpMap, Texture& outSpbrdf, Texture& irrMap);
 		public:

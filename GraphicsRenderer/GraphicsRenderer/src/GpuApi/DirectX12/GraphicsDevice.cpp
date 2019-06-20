@@ -11,7 +11,6 @@
 #include"WICTextureLoader12.h"
 #include"DDSTextureLoader12.h"
 #include"Image.h"
-#include"PSOCache.h"
 #include"RootSignatureCache.h"
 #include"GPUAllocator.h"
 using namespace std;
@@ -20,6 +19,7 @@ namespace GR
 	namespace Dx12
 	{
 		uint64_t GraphicsDevice::ms_EngineFrame = 0;
+		std::wstring GraphicsDevice::ms_Equirect2CubeShaderPath = L"Equirect2CubeCS.hlsl";
 		GraphicsDevice* GraphicsDevice::ms_App = nullptr;
 
 		GraphicsDevice::GraphicsDevice()
@@ -78,7 +78,6 @@ namespace GR
 					m_CommandExecutorManager->GetGraphicsCommandExecutor()->GetD3DCommandQueue(),
 					ms_BackBufferFormat, m_Width, m_Height, ms_FrameCount);
 
-				m_PSOCache     = make_unique<PSOCache>();
 				m_RootSigCache = make_unique<RootSignatureCache>();
 			}
 		
@@ -387,14 +386,14 @@ namespace GR
 			}
 			return m_GraphicsRenderer.get();
 		}
-		GraphicsPSO GraphicsDevice::GetGraphicsPSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption)
-		{
-			return m_PSOCache->GetGraphicsPSO(rootSig, (PSOCache::EGraphicsPSO)enumPso, (PSOCache::EGraphicsMacroOption)macrooption);
-		}
-		ComputePSO  GraphicsDevice::GetComputePSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption)
-		{
-			return m_PSOCache->GetComputePSO(rootSig, (PSOCache::EComputePSO)enumPso, (PSOCache::EComputeMacroOption)macrooption);
-		}
+		//GraphicsPSO GraphicsDevice::GetGraphicsPSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption)
+		//{
+		//	return m_PSOCache->GetGraphicsPSO(rootSig, (PSOCache::EGraphicsPSO)enumPso, (PSOCache::EGraphicsMacroOption)macrooption);
+		//}
+		//ComputePSO  GraphicsDevice::GetComputePSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption)
+		//{
+		//	return m_PSOCache->GetComputePSO(rootSig, (PSOCache::EComputePSO)enumPso, (PSOCache::EComputeMacroOption)macrooption);
+		//}
 		RootSignature GraphicsDevice::GetRootSignatureFromCache(ERootSignature enumRootSig)
 		{
 			return m_RootSigCache->GetRootSignature(enumRootSig);
@@ -412,7 +411,21 @@ namespace GR
 		}
 		void GraphicsDevice::SetShaderDirPath(const std::wstring& path)
 		{
-			m_PSOCache->BindShaderDirPath(path);
+			m_ShaderDirPath = path;
+			//m_PSOCache->BindShaderDirPath(path);
+		}
+		const std::wstring& GraphicsDevice::GetShaderDirPath() const
+		{
+			return m_ShaderDirPath;
+		}
+		const std::wstring GraphicsDevice::GetGraphicsShaderDirPath() const
+		{
+			return m_ShaderDirPath + L"Graphics/";
+
+		}
+		const std::wstring GraphicsDevice::GetComputeShaderDirPath() const
+		{
+			return m_ShaderDirPath + L"Compute/";
 		}
 		GPUResource GraphicsDevice::CreateGPUResource(
 			const D3D12_RESOURCE_DESC& desc, D3D12_CLEAR_VALUE* clearValue,
@@ -748,7 +761,17 @@ namespace GR
 
 			if (is_cubmap && file_format == ".hdr")
 			{
+				if (!m_Equirect2CubePSO.GetD3DPipelineState())
+				{
+					auto sig = GetRootSignatureFromCache(ERootSignature::C_InputOutput);
+					auto dir = GetComputeShaderDirPath();
+					m_Equirect2CubePSO.BindRootSignature(sig.GetD3DRootSignature());
 
+					ComputeShader CS;
+					CreateShader(dir + ms_Equirect2CubeShaderPath, &CS);
+					m_Equirect2CubePSO.BindComputeShader(CS);
+					m_Equirect2CubePSO.Finalize();
+				}
 				GPUResource uavResource = CreateGPUResource(CD3DX12_RESOURCE_DESC::Tex2D(
 					DXGI_FORMAT_R16G16B16A16_FLOAT, 1024, 1024, 6, 0, 1, 0,
 					D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
@@ -768,7 +791,7 @@ namespace GR
 
 				ComputeCommander* computeCommander = m_LoadCommander[TEXTURE_LOADER]->ConvertComputeCommander();
 				auto rootSig = GetRootSignatureFromCache(ERootSignature::C_InputOutput);
-				auto pso = GetComputePSOFromCache(rootSig, PSOCache::EQUIRECT2CUBE, PSOCache::USE_NULL);
+				auto pso = m_Equirect2CubePSO;//GetComputePSOFromCache(rootSig, PSOCache::EQUIRECT2CUBE, PSOCache::USE_NULL);
 
 				computeCommander->SetRootSignature(rootSig);
 				computeCommander->SetPipelineState(pso);

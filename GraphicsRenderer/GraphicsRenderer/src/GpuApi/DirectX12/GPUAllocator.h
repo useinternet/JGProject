@@ -47,6 +47,7 @@ namespace GR
 			uint32_t                      m_Offset;
 			uint32_t                      m_NumDescriptor;
 			std::queue<uint32_t>          m_PendingGPUOffset;
+			std::mutex m_AllcateMutex;
 		public:
 			GPUAllocator();
 			void Initialize(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptor);

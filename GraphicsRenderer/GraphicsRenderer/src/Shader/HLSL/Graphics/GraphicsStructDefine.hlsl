@@ -34,10 +34,50 @@ struct PassCB
 
 struct GBufferPack
 {
-    float4 Albedo_Metallic; // format = //
-    float4 Normal_Roughness;
-    float4 Specular_Depth;
-    float4 A0;
+    float3 Albedo;
+    float3 Normal;
+    float3 Ambient;
+    float3 PosW;
+    float Metallic;
+    float Roughness;
+    float Depth;
+    float A0;
 };
 
+struct GBufferTarget
+{
+    float4 Albedo : SV_Target0;
+    float4 Normal : SV_Target1;
+    float4 Ambient : SV_Target2;
+    float4 MaterialProperty : SV_Target3;
+    float  Depth : SV_Target4;
+};
+
+GBufferTarget BindingGBufferTarget(float3 albedo, float3 normal, float3 ambient, float metallic, float roughness, float depth)
+{
+    GBufferTarget target;
+    target.Albedo = float4(albedo, 1.0f);
+    target.Normal.xyz = (normal.xyz + 1.0f) * 0.5f;
+    target.Normal.w = 1.0f;
+
+    target.Ambient = float4(ambient, 1.0f);
+    target.MaterialProperty = float4(metallic, roughness, 0.0f, 1.0f);
+    target.Depth = depth;
+    return target;
+}
+GBufferPack UnGBufferPack(float3 albedo, float3 normal, float3 ambient, float3 matproperty, float a0, float depth)
+{
+    GBufferPack pack;
+
+    pack.Albedo = saturate(albedo);
+    normal = normalize(normal);
+    pack.Normal = normalize((normal.xyz * 2.0f) - 1.0f);
+    pack.Ambient = saturate(ambient);
+    pack.Metallic = saturate(matproperty.x);
+    pack.Roughness = saturate(matproperty.y);
+    pack.A0 = a0;
+    pack.Depth = saturate(depth);
+
+    return pack;
+}
 #endif

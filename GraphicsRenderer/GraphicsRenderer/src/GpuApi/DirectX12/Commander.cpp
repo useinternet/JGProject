@@ -11,7 +11,6 @@
 #include"RootSignature.h"
 #include"RootSignatureCache.h"
 #include"GraphicsDevice.h"
-#include"PSOCache.h"
 using namespace std;
 #define VALID_COMPUTE_QUEUE_RESOURCE_STATES \
     ( D3D12_RESOURCE_STATE_UNORDERED_ACCESS \
@@ -27,6 +26,8 @@ namespace GR
 {
 	namespace Dx12
 	{
+
+		std::wstring Commander::ms_GenerateMipMapsShaderPath = L"GenerateMipsCS.hlsl";
 		Commander::GPUDescriptorAllocator::GPUDescriptorAllocator(ID3D12Device* device) : 
 			m_D3D_DescirptorHeapType(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
@@ -713,7 +714,19 @@ namespace GR
 				stagingTexture = texture;
 			}
 			auto rootsig = device->GetRootSignatureFromCache(ERootSignature::C_GenerateMipMaps);
-			auto pso = device->GetComputePSOFromCache(rootsig, PSOCache::GENERATEMIPMAPS, PSOCache::USE_NULL);
+			ComputePSO pso;
+			if (!m_GenerateMipMapsPSO)
+			{
+				m_GenerateMipMapsPSO = make_shared<ComputePSO>();
+				ComputeShader CS;
+				auto dir = device->GetComputeShaderDirPath();
+				device->CreateShader(dir + ms_GenerateMipMapsShaderPath, &CS);
+				m_GenerateMipMapsPSO->BindComputeShader(CS);
+				m_GenerateMipMapsPSO->BindRootSignature(rootsig.GetD3DRootSignature());
+				m_GenerateMipMapsPSO->Finalize();
+			}
+			pso = *m_GenerateMipMapsPSO;
+			//auto pso = device->GetComputePSOFromCache(rootsig, PSOCache::GENERATEMIPMAPS, PSOCache::USE_NULL);
 			SetRootSignature(rootsig);
 			SetPipelineState(pso);
 

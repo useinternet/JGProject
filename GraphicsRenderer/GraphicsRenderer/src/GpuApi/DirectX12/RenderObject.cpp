@@ -2,6 +2,8 @@
 #include"RenderObject.h"
 #include"RootSignatureCache.h"
 #include"Mesh.h"
+#include"Material.h"
+#include"Commander.h"
 namespace GR
 {
 	namespace Dx12
@@ -20,26 +22,24 @@ namespace GR
 				*m_Mesh = *mesh;
 			}
 		}
-		void RenderObject::BindTexture(RenderObject::ETextureSlot slot, const Texture& texture)
+		void RenderObject::BindMaterial(Material* mat)
 		{
-			m_Textures[slot] = texture;
+			if (m_Material)
+				m_Material.reset();
+			m_Material = std::make_unique<Material>();
+
+			if (mat)
+			{
+				*m_Material = *mat;
+			}
 		}
-		void RenderObject::BindCubeTexture(ETextureSlot slot, const Texture& texture)
+		void RenderObject::BindConstantBufferAtGPU(GraphicsCommander* commander)
 		{
-			m_CubeTextures[slot] = texture;
-
-
-			auto desc = m_CubeTextures[slot]->GetDesc();
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-			srvDesc.Format = desc.Format;
-	
-			srvDesc.TextureCube.MipLevels = desc.MipLevels;
-			srvDesc.TextureCube.MostDetailedMip = 0;
-			srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
-
-			m_CubeTextures[slot].SetSRVDesc(&srvDesc);
+			if (!m_ObjectCBs.empty())
+			{
+				commander->SetDynamicStructuredBuffer(G_Common_RootParam_ObjectCB, (uint32_t)m_ObjectCBs.size(),
+					sizeof(ObjectCB), m_ObjectCBs.data());
+			}
 
 		}
 		void RenderObject::AddInstance(const ObjectCB& objectCB)
@@ -58,41 +58,25 @@ namespace GR
 		{
 			return m_ObjectCBs[ID];
 		}
-
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> RenderObject::GetTextureSRV() const
+		Mesh* RenderObject::GetMesh()
 		{
-			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(G_Common_Value_NumTextureSlot);
-			for (uint32_t i = 0; i < RenderObject::NUM_TEXTURESLOT; ++i)
-			{
-				if (m_Textures[i].IsValid())
-				{
-					handles[i] = m_Textures[i].GetSRV();
-				}
-				else
-				{
-					handles[i].ptr = 0;
-				}
-
-			}
-			return handles;
+			return m_Mesh.get();
 		}
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> RenderObject::GetCubeTextureSRV() const
+		Material* RenderObject::GetMaterial()
 		{
-			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(G_Common_Value_NumTextureSlot);
-			for (uint32_t i = 0; i < RenderObject::NUM_TEXTURESLOT; ++i)
-			{
-				if (m_CubeTextures[i].IsValid())
-				{
-					handles[i] = m_CubeTextures[i].GetSRV();
-				}
-				else
-				{
-					handles[i].ptr = 0;
-				}
-
-			}
-			return handles;
-
+			if (!m_Material)
+				m_Material = std::make_unique<Material>();
+			return m_Material.get();
+		}
+		const Mesh* RenderObject::GetMesh() const
+		{
+			return m_Mesh.get();
+		}
+		const Material* RenderObject::GetMaterial() const
+		{
+			if (!m_Material)
+				return nullptr;
+			return m_Material.get();
 		}
 	}
 }

@@ -1,5 +1,4 @@
 #include"GraphicsStructDefine.hlsl"
-
 #ifndef __GRAPHICSFUNCTIONS_HLSL__
 #define __GRAPHICSFUNCTIONS_HLSL__
 /* 단순 계산을 위한 함수 */
@@ -18,7 +17,17 @@ float3 CalcBumpNormal(float3 normalMap, float3 normalW, float3 tangentW)
     return normalize(bumpedNormalW);
 }
 
+float3 CalcWorldPosition(float2 texC, float depth, float4x4 invViewProj)
+{
+    float z = depth;
 
+    float x = 2.0f * texC.x - 1.0f;
+    float y = 1.0f - 2.0f * texC.y;
+    float4 PosInProj = float4(x, y, z, 1.0f);
+    float4 PosInWorld = mul(PosInProj, invViewProj);
+    PosInWorld.xyz /= PosInWorld.w;
+    return PosInWorld.xyz;
+}
 /* BRDF을 위한 공식 함수 */
 float ndfGGX(float NDotH, float roughness)
 {

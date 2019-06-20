@@ -1,6 +1,7 @@
 #pragma once
 #include"Dx12Include.h"
 #include"GraphicsResource.h"
+#include"PipelineState.h"
 #include<atomic>
 #include<vector>
 #include<string>
@@ -18,10 +19,7 @@ namespace GR
 		class Renderer;
 		class Vertex;
 		class Mesh;
-		class PSOCache;
 		class RootSignatureCache;
-		class GraphicsPSO;
-		class ComputePSO;
 		class RootSignature;
 		class GPUAllocator;
 		class GPUAllocation;
@@ -81,6 +79,7 @@ namespace GR
 			static const uint32_t    ms_FrameCount = 3;
 			static const uint32_t    ms_UseVsync = 0;
 			static const DXGI_FORMAT ms_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+			static std::wstring ms_Equirect2CubeShaderPath;
 			//
 			static GraphicsDevice* ms_App;
 			static uint64_t ms_EngineFrame;
@@ -97,7 +96,7 @@ namespace GR
 		public:
 			std::shared_ptr<CommandExecutorManager> m_CommandExecutorManager;
 			std::shared_ptr<Renderer>               m_GraphicsRenderer;
-			std::shared_ptr<PSOCache>               m_PSOCache;
+			std::wstring m_ShaderDirPath;
 			std::shared_ptr<RootSignatureCache>     m_RootSigCache;
 			//
 			// RenderTarget 소스
@@ -119,10 +118,14 @@ namespace GR
 			UIDestroyEvent  m_DestroyUIEvent;
 			UINewFrameEvent m_NewFrameUIEvent;
 			UIRenderEvent   m_DrawUIEvent;
+
 			// 커맨더 자원관리 
 			std::vector<Commander*> m_WaitingCommanders[CQ_NUM];
 			GraphicsCommander*      m_LoadCommander[NUM_LOADER];
 			std::mutex              m_PushCommanderMutex;
+
+			// PipelineState
+			ComputePSO m_Equirect2CubePSO;
 		public:
 			GraphicsDevice();
 			virtual ~GraphicsDevice();
@@ -146,12 +149,13 @@ namespace GR
 			CopyCommander*     GetCopyCommander();
 			GraphicsCommander* GetLoadCommander(ELoadCommanderType type);
 			Renderer*   GetRenderer();
-			GraphicsPSO GetGraphicsPSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption = 0);;
-			ComputePSO  GetComputePSOFromCache(RootSignature& rootSig, uint32_t enumPso, uint32_t macrooption = 0);
 			RootSignature GetRootSignatureFromCache(ERootSignature enumRootSig);
 			GPUAllocation UIGPUAllcoate();
 			GPUAllocation UIGPUAllocateAndRegister(Texture* in_texture);
 			void SetShaderDirPath(const std::wstring& path);
+			const std::wstring& GetShaderDirPath() const;
+			const std::wstring GetGraphicsShaderDirPath() const;
+			const std::wstring GetComputeShaderDirPath() const;
 		public:
 			GPUResource CreateGPUResource(
 				const D3D12_RESOURCE_DESC& desc,

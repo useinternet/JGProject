@@ -61,6 +61,7 @@ namespace GR
 			std::map<ERootSignature, RootSignature> m_RootSignatureCache;
 		public:
 			RootSignature GetRootSignature(ERootSignature enumpass);
+			std::mutex m_RootSigMutex;
 		public:
 
 		};

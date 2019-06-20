@@ -95,14 +95,17 @@ bool HelloWindow::Initialize()
 	}
 	// 텍스쳐 바인딩
 	{
-		m_XBot1.BindTexture(RenderObject::ALBEDO, m_AlbedoTexture);
-		m_XBot1.BindTexture(RenderObject::NORMAL, m_NormalTexture);
-		m_XBot2.BindTexture(RenderObject::ALBEDO, m_AlbedoTexture);
-		m_XBot2.BindTexture(RenderObject::NORMAL, m_NormalTexture);
-		m_Gun.BindTexture(RenderObject::ALBEDO, m_GunTexture_A);
-		m_Gun.BindTexture(RenderObject::NORMAL, m_GunTexture_N);
-		m_Gun.BindTexture(RenderObject::METALLIC, m_GunTexture_M);
-		m_Gun.BindTexture(RenderObject::ROUGHNESS, m_GunTexture_R);
+		m_XbotMaterial.BindTexture(ETextureSlot::Albedo, m_AlbedoTexture);
+		m_XbotMaterial.BindTexture(ETextureSlot::Normal, m_NormalTexture);
+
+
+
+		m_GunMaterial.BindTexture(ETextureSlot::Albedo, m_GunTexture_A);
+		m_GunMaterial.BindTexture(ETextureSlot::Normal, m_GunTexture_N);
+		m_GunMaterial.BindTexture(ETextureSlot::Metallic, m_GunTexture_M);
+		m_GunMaterial.BindTexture(ETextureSlot::Roughness, m_GunTexture_R);
+
+
 	}
 	// 메시 바인딩
 	{
@@ -118,27 +121,38 @@ bool HelloWindow::Initialize()
 	m_Device->ExecuteCommander(GraphicsDevice::GRAPHICS, true);
 
 
-	
-	concurrency::parallel_for(0, (int)m_SkyPack.size(), [&](int i) {
+
+
+	for (auto& pack : m_SkyPack)
+	{
 		auto computeCommander = m_Device->GetComputeCommander();
-		m_Renderer->BakeIBLTexture(computeCommander, m_SkyPack[i].sky,
-			m_SkyPack[i].spMap, m_SkyPack[i].spBrdf, m_SkyPack[i].irrMap);
+		m_Renderer->BakeIBLTexture(computeCommander, pack.sky,
+			pack.spMap, pack.spBrdf, pack.irrMap);
 		m_Device->PushCommander(computeCommander);
-	});
-
-
+	}
 	m_Device->ExecuteCommander(GraphicsDevice::COMPUTE, true);
 
 
-	BindIBLTexture(m_SkyPack[0]);
+	m_GunMaterial.BindCubeTexture(ETextureSlot::SpecularMap, m_SkyPack[0].spMap);
+	m_GunMaterial.BindCubeTexture(ETextureSlot::IrradianceMap, m_SkyPack[0].irrMap);
+	m_GunMaterial.BindTexture(ETextureSlot::SpecularBRDF, m_SkyPack[0].spBrdf);
+	m_XbotMaterial.BindCubeTexture(ETextureSlot::SpecularMap, m_SkyPack[0].spMap);
+	m_XbotMaterial.BindCubeTexture(ETextureSlot::IrradianceMap, m_SkyPack[0].irrMap);
+	m_XbotMaterial.BindTexture(ETextureSlot::SpecularBRDF, m_SkyPack[0].spBrdf);
+	m_Gun.BindMaterial(&m_GunMaterial);
+	m_XBot1.BindMaterial(&m_XbotMaterial);
+	m_XBot2.BindMaterial(&m_XbotMaterial);
 
-	auto gbuffertexture = m_Renderer->GetRenderTarget(Renderer::GBUFFER)->GetTexture(RenderTarget::Slot0);
-	auto tonemapping = m_Renderer->GetRenderTarget(Renderer::TONEMAPPING)->GetTexture(RenderTarget::Slot0);
 
 
-	m_GBufferGPU = m_Device->UIGPUAllocateAndRegister(gbuffertexture);
-	m_ToneMapGpu = m_Device->UIGPUAllocateAndRegister(tonemapping);
-
+	m_AlbedoGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetGBuffer()->GetTexture(EGBufferSlot::Albedo));
+	m_NormalGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetGBuffer()->GetTexture(EGBufferSlot::Normal));
+	m_AmbientGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetGBuffer()->GetTexture(EGBufferSlot::Ambient));
+	m_MatPropertyGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetGBuffer()->GetTexture(EGBufferSlot::MaterialProperty));
+	m_LinearDepthGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetGBuffer()->GetTexture(EGBufferSlot::Depth));
+	m_LightingPassGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetLightingPass()->GetTexture());
+	m_ToneMappingGPU = m_Device->UIGPUAllocateAndRegister(m_Renderer->GetToneMapping()->GetTexture());
+	m_TextureID = m_AlbedoGPU.GPU().ptr;
 
 	return true;
 }
@@ -159,39 +173,50 @@ void HelloWindow::Update()
 	Input();
 	m_Device->NewFrame();
 
+	//"Albedo", "Normal", "Ambient", "MatProperty", "LinearDepth"
+	if (m_CurrentItem == "Albedo")
+	{
+		m_TextureID = m_AlbedoGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "Normal")
+	{
+		m_TextureID = m_NormalGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "Ambient")
+	{
+		m_TextureID = m_AmbientGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "MatProperty")
+	{
+		m_TextureID = m_MatPropertyGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "Depth")
+	{
+		m_TextureID = m_LinearDepthGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "Lighitng")
+	{
+		m_TextureID =  m_LightingPassGPU.GPU().ptr;
+	}
+	else if (m_CurrentItem == "ToneMapping")
+	{
+		m_TextureID = m_ToneMappingGPU.GPU().ptr;
+	}
 }
 void HelloWindow::Draw()
 {
 	m_Gun.SetInstance(0, UpdateObjectCB(0, 100, 0));
 	m_XBot1.SetInstance(0, UpdateObjectCB(100,0,0));
 	m_XBot2.SetInstance(0, UpdateObjectCB(-100,0,0));
-
+	BindIBLTexture(m_SkyPack[m_SkyIndex]);
 	m_Renderer->RenderBegin();
-
-
-	// GBuffer 그리기
-	int skyindex = atoi(m_CurrentItem.c_str());
-	m_Renderer->Renderer::GBufferOn();
-	BindIBLTexture(m_SkyPack[skyindex]);
-	m_Renderer->SkyBoxRender(m_SkyPack[skyindex].spMap);
- 
-	m_Renderer->GBufferRender(m_Gun);
-	m_Renderer->GBufferRender(m_XBot1);
-	m_Renderer->GBufferRender(m_XBot2);
-
-	m_Renderer->GBufferOff();
-	if (m_isToneMapping)
-	{
-		m_TextureID = m_ToneMapGpu.GPU().ptr;
-		m_Renderer->ToneMapping();
-	}
-	else
-	{
-		m_TextureID = m_GBufferGPU.GPU().ptr;
-	}
+	m_Renderer->PushObjects({ &m_Gun, &m_XBot1, &m_XBot2 });
+	m_Renderer->GBuffer();
+	m_Renderer->BindSkyTexture(m_SkyPack[m_SkyIndex].sky);
+	m_Renderer->Lighting();
+	m_Renderer->PostProcess();
 
 	m_Renderer->RenderEnd();
-
 	m_Device->Present();
 }
 void HelloWindow::Destroy()
@@ -289,19 +314,19 @@ void HelloWindow::UI()
 {
 	static bool demo = true;
 	//ImGui::ShowDemoWindow(&demo);
-	std::vector<std::string> itemList;
+	std::vector<std::string> itemList = {
+		"Albedo", "Normal", "Ambient" , "MatProperty", "Depth", "Lighitng", "ToneMapping"
+	};
 
-	for (int i = 0; i < m_SkyPack.size(); ++i)
-	{
-		itemList.push_back(to_string(i));
-	}
+	std::vector<std::string> skyList = {
+		"environment" ,"HDR_029_Sky_Cloudy_Ref", "hdri_sky_01_sample", "grace-new", "doge2","uffizi-large"
+	};
 	
 
 	if (ImGui::Begin("Setting", &demo))
 	{
-		ImGui::Checkbox("ToneMapping", &m_isToneMapping);
-
-		if (ImGui::BeginCombo("SkyTexture", m_CurrentItem.c_str()))
+		ImGui::Text("Draw PipeLine");
+		if (ImGui::BeginCombo("##draw pipeline", m_CurrentItem.c_str()))
 		{
 			for (int n = 0; n < itemList.size(); n++)
 			{
@@ -314,16 +339,32 @@ void HelloWindow::UI()
 			}
 			ImGui::EndCombo();
 		}
+
+		ImGui::Text("SkyTexture");
+		if (ImGui::BeginCombo("## skytexture", m_CurrentSky.c_str()))
+		{
+			for (int n = 0; n < skyList.size(); n++)
+			{
+				bool is_selected = (m_CurrentSky == skyList[n]); // You can store your selection however you want, outside or inside your objects
+				if (ImGui::Selectable(skyList[n].c_str(), is_selected))
+				{
+					m_SkyIndex = n;
+					m_CurrentSky = skyList[n];
+				}
+				
+
+				if (is_selected)
+				{
+					ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+				}
+					
+			}
+			ImGui::EndCombo();
+		}
 		ImGui::End();
 	}
 
-	float aspectWidth = 1920 / 1080;
-	float aspectHeight = 1080 / 1920;
-
-	auto resource = m_Renderer->GetTexture()->GetResource();
-
-	
-	if (ImGui::Begin("Rendering", &demo, ImGuiWindowFlags_NoMove))
+	if (ImGui::Begin("Rendering", &demo))
 	{
 		ImVec2 size = ImGui::GetWindowSize();
 		size.y *= 0.95f;
@@ -357,15 +398,16 @@ ObjectCB HelloWindow::UpdateObjectCB(float x, float y, float z)
 
 void HelloWindow::BindIBLTexture(SkyTexturePack& t)
 {
-	m_Gun.BindCubeTexture(RenderObject::SPECULARMAP, t.spMap);
-	m_Gun.BindCubeTexture(RenderObject::IRRADIANCEMAP, t.irrMap);
-	m_Gun.BindTexture(RenderObject::SPECULARBRDF, t.spBrdf);
-	m_XBot1.BindCubeTexture(RenderObject::SPECULARMAP, t.spMap);
-	m_XBot1.BindCubeTexture(RenderObject::IRRADIANCEMAP, t.irrMap);
-	m_XBot1.BindTexture(RenderObject::SPECULARBRDF, t.spBrdf);
+	m_Gun.GetMaterial()->BindCubeTexture(ETextureSlot::SpecularMap, t.spMap);
+	m_Gun.GetMaterial()->BindCubeTexture(ETextureSlot::IrradianceMap, t.irrMap);
+	m_Gun.GetMaterial()->BindTexture(ETextureSlot::SpecularBRDF, t.spBrdf);
+	m_XBot1.GetMaterial()->BindCubeTexture(ETextureSlot::SpecularMap, t.spMap);
+	m_XBot1.GetMaterial()->BindCubeTexture(ETextureSlot::IrradianceMap, t.irrMap);
+	m_XBot1.GetMaterial()->BindTexture(ETextureSlot::SpecularBRDF, t.spBrdf);
+	m_XBot2.GetMaterial()->BindCubeTexture(ETextureSlot::SpecularMap, t.spMap);
+	m_XBot2.GetMaterial()->BindCubeTexture(ETextureSlot::IrradianceMap, t.irrMap);
+	m_XBot2.GetMaterial()->BindTexture(ETextureSlot::SpecularBRDF, t.spBrdf);
 
-	m_XBot2.BindCubeTexture(RenderObject::SPECULARMAP, t.spMap);
-	m_XBot2.BindCubeTexture(RenderObject::IRRADIANCEMAP, t.irrMap);
-	m_XBot2.BindTexture(RenderObject::SPECULARBRDF, t.spBrdf);
+
 
 }

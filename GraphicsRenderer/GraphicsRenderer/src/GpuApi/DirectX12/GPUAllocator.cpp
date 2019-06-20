@@ -78,6 +78,7 @@ namespace GR
 
 		GPUAllocation GPUAllocator::Allocate()
 		{
+			std::lock_guard<std::mutex> lock(m_AllcateMutex);
 			int offset = 0;
 			if (m_PendingGPUOffset.empty())
 			{
@@ -103,6 +104,7 @@ namespace GR
 		}
 		void GPUAllocator::Free(GPUAllocation* allocation)
 		{
+			std::lock_guard<std::mutex> lock(m_AllcateMutex);
 			int offset = allocation->m_Index;
 			m_PendingGPUOffset.push(offset);
 		}

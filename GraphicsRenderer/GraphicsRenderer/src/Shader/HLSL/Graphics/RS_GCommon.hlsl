@@ -9,19 +9,6 @@
 #define NUM_TEXTURESLOT   8
 
 
-#define GBUFFER_ALBEDO    0 
-#define GBUFFER_NORMAL    1
-#define GBUFFER_SPECULAR  2
-#define GBUFFER_METALLIC  3
-#define GBUFFER_ROUGHNESS 4
-#define GBUFFER_A0        5
-#define GBUFFER_CUSTOM0   6
-#define GBUFFER_CUSTOM1   7
-
-
-#define GBUFFER_SPECMAP   0
-#define GBUFFER_IRRMAP    1
-#define GBUFFER_SPECBRDF  6
 
 
 // 오브젝트 정의

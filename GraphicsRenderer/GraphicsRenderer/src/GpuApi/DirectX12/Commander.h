@@ -23,21 +23,9 @@ namespace GR
 		class GraphicsDevice;
 		class Commander
 		{
-			/*
-			SRV 64
-			UAV 8
-			CBV 12
-
-			리소스별 사이즈 : 
-			한 힙 사이즈 1024 * ( 84 )
-
-			SRV 시작 위치 = 0
-			UAV 시작 위치 = 1024 * SRV(64)
-			CBV 시작 위치 = 1024 * (SRV(64) + UAV(8));
-
-
-			*/
 			friend GraphicsDevice;
+		protected:
+			static std::wstring ms_GenerateMipMapsShaderPath;
 		protected:
 			class GPUDescriptorAllocator
 			{
@@ -55,6 +43,7 @@ namespace GR
 					uint32_t numHandles;
 					std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
 				};
+
 			private:
 				ComPtr<ID3D12DescriptorHeap>             m_GPUHeap;
 				D3D12_CPU_DESCRIPTOR_HANDLE              m_StartCPUHeapHandle;
@@ -91,6 +80,7 @@ namespace GR
 		protected:
 			ID3D12PipelineState* m_CurrPipeLineState;
 			ID3D12RootSignature* m_CurrRootSignature;
+			std::shared_ptr<ComputePSO> m_GenerateMipMapsPSO;
 		public:
 			Commander(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type);
 			ID3D12GraphicsCommandList* GetD3DCommandList() const {

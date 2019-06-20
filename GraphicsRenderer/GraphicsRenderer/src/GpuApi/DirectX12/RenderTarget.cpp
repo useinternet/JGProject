@@ -16,7 +16,15 @@ namespace GR
 			m_DepthTexture = texture;
 		}
 
+		const ColorTexture* RenderTarget::GetTexture(ESlot slot) const
+		{
+			if (!m_ColorTexture[slot].IsValid() || slot == DepthStencil || slot == NumRenderTarget)
+			{
+				return nullptr;
+			}
 
+			return &m_ColorTexture[slot];
+		}
 		ColorTexture* RenderTarget::GetTexture(ESlot slot)
 		{
 			if (!m_ColorTexture[slot].IsValid() || slot == DepthStencil || slot == NumRenderTarget)

@@ -37,6 +37,9 @@
     <Filter Include="Shader\HLSL\Graphics">
       <UniqueIdentifier>{09cdee23-b0e6-4ea8-b7df-d333b7b76431}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GpuApi\DirectX12\Compute">
+      <UniqueIdentifier>{a9f26429-76a2-4eec-8839-36e788a43317}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GpuApi\DirectX12\Dx12Include.h">
@@ -109,9 +112,6 @@
     <ClInclude Include="src\GpuApi\DirectX12\RenderObject.h">
       <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
     </ClInclude>
-    <ClInclude Include="src\GpuApi\DirectX12\PSOCache.h">
-      <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
-    </ClInclude>
     <ClInclude Include="src\GpuApi\DirectX12\RootSignatureCache.h">
       <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
     </ClInclude>
@@ -138,6 +138,24 @@
     </ClInclude>
     <ClInclude Include="src\GpuApi\DirectX12\GPUAllocator.h">
       <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GBuffer.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\ToneMapping.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\LightingPass.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Material.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GraphicsPass.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\IBLBaker.h">
+      <Filter>GpuApi\DirectX12\Compute</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -196,9 +214,6 @@
     <ClCompile Include="src\GpuApi\DirectX12\RenderObject.cpp">
       <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
     </ClCompile>
-    <ClCompile Include="src\GpuApi\DirectX12\PSOCache.cpp">
-      <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
-    </ClCompile>
     <ClCompile Include="src\GpuApi\DirectX12\RootSignatureCache.cpp">
       <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
     </ClCompile>
@@ -213,6 +228,21 @@
     </ClCompile>
     <ClCompile Include="src\GpuApi\DirectX12\GPUAllocator.cpp">
       <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GBuffer.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\ToneMapping.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\LightingPass.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Material.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\IBLBaker.cpp">
+      <Filter>GpuApi\DirectX12\Compute</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
