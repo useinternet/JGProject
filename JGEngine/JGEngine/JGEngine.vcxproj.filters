@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="pch">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{0f99e824-c1cb-4fa2-a8e7-509d2eb16b7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{c757b8fc-e4ff-4a6b-b735-33f6af82e5dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\EditorGUI">
+      <UniqueIdentifier>{2e2b302a-399e-49bc-8f4d-8ce90064189f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\GameGUI">
+      <UniqueIdentifier>{abb46ab1-1b65-4fd0-bc6d-6ded777637d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\EditorGUI\ImGui">
+      <UniqueIdentifier>{42b8c792-6c64-486e-837f-584a9f8459ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\EditorGUI\Profile">
+      <UniqueIdentifier>{8b5742f1-0977-48cc-bd6b-9d38c88b67cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\EditorGUI\Editor">
+      <UniqueIdentifier>{b5894adf-bfea-450b-a9e4-354a00925a14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>pch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>pch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\App\Application.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\App\Window.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GameGUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui_demo.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui_draw.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui_impl_win32.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui_widgets.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\ImGui\imgui_impl_dx12.cpp">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\IGWindow.cpp">
+      <Filter>GUI\EditorGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\IGManager.cpp">
+      <Filter>GUI\EditorGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\Profile\RenderingProfile.cpp">
+      <Filter>GUI\EditorGUI\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\Profile\ConsoleLog.cpp">
+      <Filter>GUI\EditorGUI\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\EditorGUI\Editor\SceneEditor.cpp">
+      <Filter>GUI\EditorGUI\Editor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\framework.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JE.h" />
+    <ClInclude Include="src\App\Application.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="src\App\Window.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="src\App\EntryPoint.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\GameGUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imconfig.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imgui.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imgui_impl_win32.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imgui_internal.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imstb_rectpack.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imstb_textedit.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imstb_truetype.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\ImGui\imgui_impl_dx12.h">
+      <Filter>GUI\EditorGUI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\IGWindow.h">
+      <Filter>GUI\EditorGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\IGManager.h">
+      <Filter>GUI\EditorGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\Profile\RenderingProfile.h">
+      <Filter>GUI\EditorGUI\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\Profile\ConsoleLog.h">
+      <Filter>GUI\EditorGUI\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\EditorGUI\Editor\SceneEditor.h">
+      <Filter>GUI\EditorGUI\Editor</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

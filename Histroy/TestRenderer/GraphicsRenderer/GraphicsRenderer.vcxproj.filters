@@ -1,0 +1,269 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GpuApi">
+      <UniqueIdentifier>{b9696555-6538-4e9f-985e-5bd6d421cefe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12">
+      <UniqueIdentifier>{d9768de3-39e5-49c0-bfa5-7aad99fdb9fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\Classes">
+      <UniqueIdentifier>{e8dd6068-586e-4e2a-aa8b-21e74ee505f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\RenderingToolKit">
+      <UniqueIdentifier>{d6e67840-643d-478b-bdd6-3d6a5b225af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{20602009-fe86-4bca-a928-f7288c606607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\HLSL">
+      <UniqueIdentifier>{7788f3f5-901c-49e8-a83b-02b42b0a4ef0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\RenderingToolKit\Cache">
+      <UniqueIdentifier>{727314e0-e91d-44aa-a9d0-f044d69f34c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\Pass">
+      <UniqueIdentifier>{2381ed11-237a-483e-8117-fd328cf70b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\TextureUtil">
+      <UniqueIdentifier>{d4350f68-e292-40bf-8e37-ab8e95812447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\RenderingToolKit\State">
+      <UniqueIdentifier>{ec695f10-610d-4455-99d8-3f69ae5b65c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\HLSL\Compute">
+      <UniqueIdentifier>{d7e4ac59-19c1-4840-80b3-d23b106d9195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\HLSL\Graphics">
+      <UniqueIdentifier>{09cdee23-b0e6-4ea8-b7df-d333b7b76431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GpuApi\DirectX12\Compute">
+      <UniqueIdentifier>{a9f26429-76a2-4eec-8839-36e788a43317}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GpuApi\DirectX12\Dx12Include.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GraphicsResource.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\d3dx12.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\GpuApi\DirectX12\Fence.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\CommandExecutor.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Commander.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\PipelineState.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\RootSignature.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\DescriptorHeap.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Dx12Helper.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\ScissorRect.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Viewport.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\UploadBuffer.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GraphicsDevice.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GeometryGenerator.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\VertexCollection.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\RenderTarget.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Mesh.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Camera.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Renderer.h">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\SamplerState.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\ShaderType.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\RenderObject.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\RootSignatureCache.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\DDSTextureLoader12.h">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\WICTextureLoader12.h">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Image.h">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\stb_image.h">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\DepthStencilState.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit\State</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\BlendState.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit\State</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\RasterizerState.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit\State</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GPUAllocator.h">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GBuffer.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\ToneMapping.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\LightingPass.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Material.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\GraphicsPass.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\IBLBaker.h">
+      <Filter>GpuApi\DirectX12\Compute</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\DepthFromLight.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\Light.h">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpuApi\DirectX12\ShadowMapping.h">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\pch.cpp" />
+    <ClCompile Include="src\GpuApi\DirectX12\GraphicsResource.cpp">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Fence.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Commander.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\PipelineState.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\RootSignature.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\DescriptorHeap.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Dx12Helper.cpp">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\UploadBuffer.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\CommandExecutor.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GraphicsDevice.cpp">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GeometryGenerator.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\VertexCollection.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\RenderTarget.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Mesh.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Camera.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Renderer.cpp">
+      <Filter>GpuApi\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\ShaderType.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\RenderObject.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\RootSignatureCache.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit\Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\DDSTextureLoader12.cpp">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\WICTextureLoader12.cpp">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Image.cpp">
+      <Filter>GpuApi\DirectX12\TextureUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GPUAllocator.cpp">
+      <Filter>GpuApi\DirectX12\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GBuffer.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\ToneMapping.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\LightingPass.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Material.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\IBLBaker.cpp">
+      <Filter>GpuApi\DirectX12\Compute</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\GraphicsPass.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\DepthFromLight.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\Light.cpp">
+      <Filter>GpuApi\DirectX12\RenderingToolKit</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GpuApi\DirectX12\ShadowMapping.cpp">
+      <Filter>GpuApi\DirectX12\Pass</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
