@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DevelopEngine|x64">
+      <Configuration>DevelopEngine</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevelopGame|x64">
+      <Configuration>DevelopGame</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevelopGameOnRelease|x64">
+      <Configuration>DevelopGameOnRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AC6F16C9-983C-71D4-C155-5F7CAD81A662}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>JGEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>dlls_libs\DevelopEngine\</OutDir>
+    <IntDir>obj\DevelopEngine\DevelopEngine\JGEngine\</IntDir>
+    <TargetName>JGEngine</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\DevelopGame\</OutDir>
+    <IntDir>obj\DevelopGame\DevelopGame\JGEngine\</IntDir>
+    <TargetName>JGEngine</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\DevelopGameOnRelease\</OutDir>
+    <IntDir>obj\DevelopGameOnRelease\DevelopGameOnRelease\JGEngine\</IntDir>
+    <TargetName>JGEngine</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\Release\</OutDir>
+    <IntDir>obj\Release\Release\JGEngine\</IntDir>
+    <TargetName>JGEngine</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>JGENGINE_EXPORTS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Core\GameFrameWork;..\JGEngine\Core\PhysicsEngine;..\JGEngine\Core\InputEngine;..\JGEngine\Core\RenderEngine;..\JGEngine\Core\SoundEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>dlls_libs\DevelopEngine\JGEngine.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>JGENGINE_EXPORTS;_RELEASE_ONDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Core\GameFrameWork;..\JGEngine\Core\PhysicsEngine;..\JGEngine\Core\InputEngine;..\JGEngine\Core\RenderEngine;..\JGEngine\Core\SoundEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\DevelopGame\JGEngine.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>JGENGINE_EXPORTS;_RELEASE_ONDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Core\GameFrameWork;..\JGEngine\Core\PhysicsEngine;..\JGEngine\Core\InputEngine;..\JGEngine\Core\RenderEngine;..\JGEngine\Core\SoundEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\DevelopGameOnRelease\JGEngine.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>JGENGINE_EXPORTS;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Core\GameFrameWork;..\JGEngine\Core\PhysicsEngine;..\JGEngine\Core\InputEngine;..\JGEngine\Core\RenderEngine;..\JGEngine\Core\SoundEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\Release\JGEngine.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Application\App\Application.h" />
+    <ClInclude Include="..\JGEngine\Application\App\EntryPoint.h" />
+    <ClInclude Include="..\JGEngine\Application\App\Window.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imconfig.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_textedit.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_truetype.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\GameGUI.h" />
+    <ClInclude Include="..\JGEngine\Application\JE.h" />
+    <ClInclude Include="..\JGEngine\Application\framework.h" />
+    <ClInclude Include="..\JGEngine\Application\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Application\App\Application.cpp" />
+    <ClCompile Include="..\JGEngine\Application\App\Window.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_demo.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_draw.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_widgets.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\GameGUI.cpp" />
+    <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
+    <ClCompile Include="..\JGEngine\Application\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Common.vcxproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="RenderEngine.vcxproj">
+      <Project>{9B7EAD07-87E1-3CAC-3067-75621CA9082F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="PhysicsEngine.vcxproj">
+      <Project>{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}</Project>
+    </ProjectReference>
+    <ProjectReference Include="SoundEngine.vcxproj">
+      <Project>{E415EB64-50CB-635A-D9BF-5D3145745A5E}</Project>
+    </ProjectReference>
+    <ProjectReference Include="InputEngine.vcxproj">
+      <Project>{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}</Project>
+    </ProjectReference>
+    <ProjectReference Include="GameFrameWork.vcxproj">
+      <Project>{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

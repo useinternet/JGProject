@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Class">
+      <UniqueIdentifier>{BB4EF80C-2763-20BE-F0E4-C31D5CB81CEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataType">
+      <UniqueIdentifier>{21AEA27D-0D7B-FD88-3694-EB3022C03217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataType\Abstract">
+      <UniqueIdentifier>{44B9F293-B0CF-F029-F946-7C4B659CC1B1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataType\Debug">
+      <UniqueIdentifier>{570D5923-43DB-4C29-2C6F-BD4F18DC288E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Event">
+      <UniqueIdentifier>{E70B220D-5320-4ABE-1CA2-ED1D887546EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utill">
+      <UniqueIdentifier>{EF8B420E-5BA0-6ABF-2422-0E1F90F566F0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\EventManager.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\GlobalLinkStream.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\Log.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\TimerManager.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\CommonCore.h" />
+    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EngineCore.h">
+      <Filter>DataType\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EventListener.h">
+      <Filter>DataType\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\NoneCopy.h">
+      <Filter>DataType\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Color.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugDataType.h">
+      <Filter>DataType\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\Event.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\GameFrameWorkEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\InputEvents.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\PhysicsEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\RenderEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\SoundEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Event\WindowEvents.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Math\JMatrix.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Math\JVector.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Math\Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Utill\Hash.h">
+      <Filter>Utill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\framework.h" />
+    <ClInclude Include="..\JGEngine\Common\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\EventManager.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\GlobalLinkStream.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\Log.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\TimerManager.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp">
+      <Filter>DataType\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\pch.cpp" />
+  </ItemGroup>
+</Project>

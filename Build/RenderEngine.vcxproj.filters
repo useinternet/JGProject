@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Defines">
+      <UniqueIdentifier>{C3004269-2FE0-C004-38F8-4BDBA4562766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{DCCA4FC7-C86C-7A9D-B127-8EF19D6801EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\DxObject">
+      <UniqueIdentifier>{DE4DDA38-4AD9-47FD-53EA-CAF1BFF4A3FD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\ReObject">
+      <UniqueIdentifier>{D96FE16D-45FB-4E32-4E0C-D226BA16AB32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Temp">
+      <UniqueIdentifier>{7BDB8C7C-6712-8E0D-10FF-7310FC140A0F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Defines\Dx12Hash.h">
+      <Filter>Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Defines\ReDataTypeDefines.h">
+      <Filter>Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Defines\ReEnumDefines.h">
+      <Filter>Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\DxUtill.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\GUI.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\CommandList.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\CommandQueue.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorAllocator.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorHandle.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorHeap.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DxObject.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Fence.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\GUIAllocation.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\PipelineState.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\RenderDevice.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Resource.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\ResourceDataMap.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\RootSignature.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Shader.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\UploadBuffer.h">
+      <Filter>Object\DxObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderTarget.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\RE.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\RE_EventListener.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\RenderEngine.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Temp\DDSTextureLoader.h">
+      <Filter>Temp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\d3dx12.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\framework.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\DxUtill.cpp" />
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\CommandList.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\CommandQueue.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorAllocator.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorHandle.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DescriptorHeap.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\DxObject.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Fence.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\PipelineState.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\RenderDevice.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Resource.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\ResourceDataMap.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\RootSignature.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\Shader.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\UploadBuffer.cpp">
+      <Filter>Object\DxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderTarget.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\RE_EventListener.cpp" />
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\RenderEngine.cpp" />
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Temp\DDSTextureLoader.cpp">
+      <Filter>Temp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\pch.cpp" />
+  </ItemGroup>
+</Project>
