@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Class/Log.h"
 #include "Event/Event.h"
+
 // engine
 #include "Game.h"
 #include "RenderEngine.h"
@@ -13,6 +14,7 @@
 // TEST
 #include "GUI/EditorGUI.h"
 using namespace std;
+using namespace concurrency;
 Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
@@ -23,17 +25,20 @@ bool Application::Init()
 	Log::Init("JGEngine", "enginelog.txt");
 	m_EventManager = make_shared<EventManager>();
 	m_EngineTimer  = make_shared<EngineTimer>();
+	m_EngineConfig = make_shared<EngineConfig>();
 	m_EngineTimer->Start();
-
+	m_EngineConfig->LoadConfig();
 
 	GlobalLinkStream stream;
 	// Create Global Link Stream 
 	{
 		auto call_back_func = std::bind(&Application::OnEvent, this, std::placeholders::_1);
+		stream.LogFileName = "enginelog.txt";
 		stream.Logger = Log::GetLogger();
 		stream.OnEvent = call_back_func;
 		stream.EngineEventManager = m_EventManager;
 		stream._EngineTimer = m_EngineTimer;
+		stream._EngineConfig = m_EngineConfig;
 		GlobalLinkData::Init(stream, true);
 	}
 
@@ -63,9 +68,19 @@ bool Application::Init()
 	m_IsInit = true;
 	return true;
 }
+void Application::Load()
+{
+	m_InputEngine->Load();
+	m_PhysicsEngine->Load();
+	m_SoundEngine->Load();
+	m_RenderEngine->Load();
+	m_Game->Load();
+	m_EditorGUI->Load();
+}
 void Application::Run()
 {
 	MSG msg = { 0 };
+	Load();
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -75,23 +90,48 @@ void Application::Run()
 		}
 		else
 		{
-			////엔진 업데이트
-			m_EditorGUI->Update();
-			m_InputEngine->Update();
-		    m_PhysicsEngine->Update();
-			m_SoundEngine->Update();
 
-			m_Game->Update();
-			m_RenderEngine->Update();
+			auto input_task = make_task([&] {
+				m_InputEngine->Update();
+			});
+			auto physics_task = make_task([&] {
+				m_PhysicsEngine->Update();
+			});
+			auto sound_task = make_task([&] {
+				m_SoundEngine->Update();
+			});
+			auto gui_task = make_task([&] {
+				m_EditorGUI->Update();
+			});
+			auto game_task = make_task([&] {
+				m_Game->Update();
+			});
+			auto render_task = make_task([&] {
+				m_RenderEngine->Update();
+			});
+			////엔진 업데이트
+
+			structured_task_group update_tasks;
+			structured_task_group render_tasks;
+			update_tasks.run(input_task);
+			update_tasks.run(physics_task);
+			update_tasks.run(sound_task);
+			update_tasks.run(game_task);
+			update_tasks.run(gui_task);
+			update_tasks.wait();
+
+			render_tasks.run(render_task);
+			render_tasks.wait();
 			m_EngineTimer->Tick();
 		}
 	}
 }
 void Application::OnEvent(Event& e)
 {
+
 	if (!m_IsInit)
 		return;
-	ENGINE_LOG_TRACE(e.ToString());
+//	ENGINE_LOG_TRACE(e.ToString());
 	if (e.IsInCategory(EventCategory_Application))
 	{
 		m_EditorGUI->OnEvent(e);

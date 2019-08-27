@@ -14,10 +14,7 @@ namespace RE
 	class RenderTarget;
 	class GUI;
 	class Shader;
-	// RenderTarget 제작
-	// 간단한 물체 띄워보기
-	// DynamicDescriptor 제작
-	// Sample로 텍스쳐로 물체 띄워보기
+
 	struct RENDERENGINE_API RenderDeviceDesc
 	{
 		HWND hWnd;
@@ -72,6 +69,14 @@ namespace RE
 		// Etc...
 		bool CompileShader(Shader& shader, const ShaderCompiler& compiler);
 		void Resize(uint32_t width, uint32_t height);
+
+		// DebugInfo
+		void GetGUIAllocatorDebugInfo(Debug::GUIAllocatorInfo& out_debug_info);
+		void GetSrvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		void GetUavDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		void GetCbvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		void GetRtvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		void GetDsvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 	public:
 		ID3D12Device* GetD3DDevice();
 		IDXGIFactory4* GetDxgiFactory();

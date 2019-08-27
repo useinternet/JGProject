@@ -36,9 +36,6 @@
     <ClInclude Include="..\JGEngine\Common\Class\Log.h">
       <Filter>Class</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Class\TimerManager.h">
-      <Filter>Class</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Common\CommonCore.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EngineCore.h">
       <Filter>DataType\Abstract</Filter>
@@ -52,10 +49,13 @@
     <ClInclude Include="..\JGEngine\Common\DataType\Color.h">
       <Filter>DataType</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugDataType.h">
+    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugInfo.h">
       <Filter>DataType\Debug</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Timer.h">
       <Filter>DataType</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h">
@@ -96,6 +96,9 @@
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\framework.h" />
     <ClInclude Include="..\JGEngine\Common\pch.h" />
+    <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h">
+      <Filter>Class</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp">
@@ -110,11 +113,11 @@
     <ClCompile Include="..\JGEngine\Common\Class\Log.cpp">
       <Filter>Class</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Class\TimerManager.cpp">
-      <Filter>Class</Filter>
-    </ClCompile>
     <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp">
       <Filter>DataType\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\DataType\Timer.cpp">
+      <Filter>DataType</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp">
       <Filter>Math</Filter>
@@ -123,5 +126,8 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

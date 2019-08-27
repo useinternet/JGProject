@@ -4,6 +4,9 @@
 #include "ResourceDataMap.h"
 #include "Defines/Dx12Hash.h"
 #include "RenderDevice.h"
+
+
+using namespace Microsoft::WRL;
 namespace RE
 {
 
@@ -20,7 +23,7 @@ namespace RE
 		m_ClearDepth(copy.m_ClearDepth),
 		m_ClearStencil(copy.m_ClearStencil)
 	{
-		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), D3D12_RESOURCE_STATE_COMMON);
+		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), GetName(), D3D12_RESOURCE_STATE_COMMON);
 	}
 	Resource::Resource(Resource&& rhs) : 
 		DxObject(rhs),
@@ -41,7 +44,7 @@ namespace RE
 
 		// register resource data map
 		m_D3D_Resource = rhs.m_D3D_Resource;
-		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), D3D12_RESOURCE_STATE_COMMON);
+		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), GetName(), D3D12_RESOURCE_STATE_COMMON);
 
 		return *this;
 	}
@@ -124,11 +127,7 @@ namespace RE
 	{
 		Reset();
 		m_D3D_Resource = d3d_resource;
-		std::wstring wstr;
-		std::string str = GetName();
-		wstr.assign(str.begin(), str.end());
-		m_D3D_Resource->SetName(wstr.c_str());
-		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), init_State);
+		ResourceDataMap::RegisterResource(m_D3D_Resource.Get(), GetName(), init_State);
 	}
 	void Resource::Resize(uint64_t width, uint32_t height)
 	{
@@ -196,7 +195,14 @@ namespace RE
 	{
 		return m_D3D_Resource.Get();
 	}
-
+	void Resource::SetName(const std::string& name)
+	{
+		ReObject::SetName(name);
+		if (m_D3D_Resource)
+		{
+			ResourceDataMap::SetResourceName(m_D3D_Resource.Get(), GetName());
+		}
+	}
 
 	Texture::Texture() : Resource("Texture") { }
 	Texture::Texture(const std::string& name) : Resource(name) { }
@@ -208,7 +214,7 @@ namespace RE
 		if(m_SrvDesc) 
 			std::hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*m_SrvDesc);
 
-		ResourceDataMap::DataLock();
+		std::lock_guard<std::mutex> lock(GetData()->SrvMutex);
 		auto& SrvDescriptorHandles = GetData()->SrvDescriptorHandles;
 
 		auto iter = SrvDescriptorHandles.find(seed);
@@ -223,7 +229,6 @@ namespace RE
 			SrvDescriptorHandles.emplace(seed, std::move(handle));
 		}
 
-		ResourceDataMap::DataUnLock();
 		return SrvDescriptorHandles.at(seed).CPU();
 	}
 	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetRtv() const
@@ -232,7 +237,7 @@ namespace RE
 		if(m_RtvDesc)
 			std::hash<D3D12_RENDER_TARGET_VIEW_DESC>{}(*m_RtvDesc);
 
-		ResourceDataMap::DataLock();
+		std::lock_guard<std::mutex> lock(GetData()->RtvMutex);
 		auto& RtvDescriptorHandles = GetData()->RtvDescriptorHandles;
 
 		auto iter = RtvDescriptorHandles.find(seed);
@@ -246,7 +251,6 @@ namespace RE
 			RtvDescriptorHandles.emplace(seed, std::move(handle));
 		}
 
-		ResourceDataMap::DataUnLock();
 		return RtvDescriptorHandles.at(seed).CPU();
 	}
 	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDsv() const
@@ -254,8 +258,7 @@ namespace RE
 		size_t seed = 0; 
 		if(m_DsvDesc) 
 			std::hash<D3D12_DEPTH_STENCIL_VIEW_DESC>{}(*m_DsvDesc);
-
-		ResourceDataMap::DataLock();
+		std::lock_guard<std::mutex> lock(GetData()->DsvMutex);
 		auto& DsvDescriptorHandles = GetData()->DsvDescriptorHandles;
 		auto iter = DsvDescriptorHandles.find(seed);
 
@@ -268,7 +271,6 @@ namespace RE
 
 			DsvDescriptorHandles.emplace(seed, std::move(handle));
 		}
-		ResourceDataMap::DataUnLock();
 		return DsvDescriptorHandles.at(seed).CPU();
 	}
 	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetUav() const
@@ -277,7 +279,7 @@ namespace RE
 		if(m_UavDesc)
 			std::hash<D3D12_UNORDERED_ACCESS_VIEW_DESC>{}(*m_UavDesc);
 
-		ResourceDataMap::DataLock();
+		std::lock_guard<std::mutex> lock(GetData()->UavMutex);
 		auto& UavDescriptorHandles = GetData()->UavDescriptorHandles;
 
 		auto iter = UavDescriptorHandles.find(seed);
@@ -291,7 +293,6 @@ namespace RE
 
 			UavDescriptorHandles.emplace(seed, std::move(handle));
 		}
-		ResourceDataMap::DataUnLock();
 		return UavDescriptorHandles.at(seed).CPU();
 	}
 	void Texture::SetSrvDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& desc)

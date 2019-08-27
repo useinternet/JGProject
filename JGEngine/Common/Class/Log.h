@@ -13,11 +13,12 @@ public:
 		const std::string& loggerName = "JGEngine",
 		const std::string& filename = "enginelog.txt");
 	static void RegisterLog(
-		const std::shared_ptr<spdlog::logger>& logger);
-
+		const std::shared_ptr<spdlog::logger>& logger, const std::string& filename);
+	static std::string GetFileName();
 	static std::shared_ptr<spdlog::logger> GetLogger();
 private:
 	static std::shared_ptr<spdlog::logger> sm_Logger;
+	static std::string sm_FileName;
 };
 
 
@@ -25,7 +26,7 @@ private:
 #define ENGINE_LOG_INFO(str,...)  Log::GetLogger()->info("[Engine] : " + std::string(str), __VA_ARGS__)
 #define ENGINE_LOG_WARN(str,...)  Log::GetLogger()->warn("[Engine] : " + std::string(str), __VA_ARGS__)
 #define ENGINE_LOG_ERROR(str,...) Log::GetLogger()->error("[Engine] : " + std::string(str), __VA_ARGS__)
-#define ENGINE_LOG_FATAL(...) Log::GetLogger()->critical("[Engine] : " + std::string(str), __VA_ARGS__)
+#define ENGINE_LOG_FATAL(str,...) Log::GetLogger()->critical("[Engine] : " + std::string(str), __VA_ARGS__)
 
 #define IE_LOG_TRACE(str,...) Log::GetLogger()->trace("[Input] : " + std::string(str), __VA_ARGS__)
 #define IE_LOG_INFO(str,...)  Log::GetLogger()->info("[Input] : " + std::string(str), __VA_ARGS__)

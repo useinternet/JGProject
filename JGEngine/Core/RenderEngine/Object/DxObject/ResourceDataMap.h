@@ -29,10 +29,9 @@ namespace RE
 
 		static void StateLock();
 		static void StateUnLock();
-		static void DataLock();
-		static void DataUnLock();
-
-		static void RegisterResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES state);
+		static void GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo);
+		static void RegisterResource(ID3D12Resource* resource, const std::string& name, D3D12_RESOURCE_STATES state);
+		static void SetResourceName(ID3D12Resource* resource, const std::string& name);
 		static void DeRegisterResource(ID3D12Resource* resource);
 		static const _ResourceData* GetData(ID3D12Resource* resource);
 	private:
@@ -46,9 +45,7 @@ namespace RE
 		static std::unordered_map<ID3D12Resource*, _ResourceData> ms_GlobalResourceDatas;
 		static std::mutex ms_GlobalStateMutex;
 		static std::mutex ms_GlobalRegisterMutex;
-		static std::mutex ms_GlobalDataMutex;
 		static bool ms_IsStateLocked;
-		static bool ms_IsDataLocked;
 	};
 
 	class ResourceStateMap
@@ -88,11 +85,16 @@ namespace RE
 		using DescriptorHandlePool = std::unordered_map<std::size_t, DescriptorHandle>;
 	public:
 		uint32_t RefCount;
+		std::string ResourceName;
 		mutable DescriptorHandlePool SrvDescriptorHandles;
 		mutable DescriptorHandlePool RtvDescriptorHandles;
 		mutable DescriptorHandlePool DsvDescriptorHandles;
 		mutable DescriptorHandlePool UavDescriptorHandles;
 		ResourceStateMap ResourceState;
+		mutable std::mutex SrvMutex;
+		mutable std::mutex UavMutex;
+		mutable std::mutex RtvMutex;
+		mutable std::mutex DsvMutex;
 	public:
 		_ResourceData() : RefCount(0) {}
 	};

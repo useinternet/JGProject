@@ -1,0 +1,12 @@
+{
+
+  "ContentsPath": "../Contents/",
+  "SourcePath" : "../",
+  "EnginePath" : "../Contents/Engine/",
+  "ConfigPath" : "../Config/",
+
+
+
+  "ImGuiConfig"  : "JE_ImGuiConfig",
+  "EditorConfig" : "JE_EditorConfig"
+}

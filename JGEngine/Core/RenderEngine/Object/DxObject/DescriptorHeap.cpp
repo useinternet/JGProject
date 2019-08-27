@@ -17,7 +17,6 @@ namespace RE
 	{
 		m_D3D_Heap = CreateD3DDescriptorHeap(GetD3DDevice(), m_OwnerAllcator->GetType(), D3D12_DESCRIPTOR_HEAP_FLAG_NONE, m_NumDescriptor);
 		m_IncreasementSize = GetD3DDevice()->GetDescriptorHandleIncrementSize(m_OwnerAllcator->GetType());
-
 		
 		DescriptorBlock block;
 		block.startPos = 0;
@@ -241,10 +240,28 @@ namespace RE
 				--i;
 			}
 		}
+	}
+	void DescriptorHeap::GetDebugInfo(Debug::DescriptorHeapInfo& out_debug_info)
+	{
+		lock_guard<mutex> lock(m_Mutex);
 
-		
-		
+		uint32_t allocatedDescriptorCount = 0;
+		for (auto& block_pair : m_DescriptorBlocks)
+		{
+			auto& block = block_pair.second;
+			Debug::DescriptorBlockInfo block_debug_info;
+			block_debug_info.address = m_D3D_Heap->GetCPUDescriptorHandleForHeapStart().ptr + (block.startPos * m_IncreasementSize);
+			block_debug_info.is_allocate = block.isAllocate;
+			block_debug_info.numDescriptor = block.numDescriptor;
+			block_debug_info.start_offset = block.startPos;
+			out_debug_info.descriptor_blocks[block_debug_info.start_offset] = block_debug_info;
 
+
+			if (block.isAllocate)
+				allocatedDescriptorCount++;
+		}
+		out_debug_info.max_numDescriptor = m_NumDescriptor;
+		out_debug_info.num_allocated_descriptor = allocatedDescriptorCount;
 	}
 	void DescriptorHeap::FreeBlock(const DescriptorBlock& block)
 	{

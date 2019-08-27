@@ -1,7 +1,7 @@
 #pragma once
 #include "CommonCore.h"
 #include <ppltasks.h>
-
+#include <mutex>
 
 
 
@@ -16,7 +16,7 @@ class EventManager
 	using AsyncEventPool = std::vector<AsyncEvent>;
 	CustomEventPool m_CustomEventPool;
 	AsyncEventPool  m_AsyncEventPool;
-
+	std::mutex m_EventMutex;
 public:
 	void Dispatch(const CustomEvent& e);
 	const CustomEvent& DesireCustomEvent(const std::string& name);
@@ -36,5 +36,6 @@ public:
 			m_Task.wait();
 	}
 	void Excute();
+	void Reset();
 	bool IsComplete() const;
 };

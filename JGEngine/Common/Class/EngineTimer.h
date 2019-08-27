@@ -28,4 +28,5 @@ private:
 	uint32_t m_FPS    = 0;
 	bool m_IsStart    = false;
 	bool m_IsFirst    = true;
+	uint32_t init_count = 0;
 };

@@ -4,11 +4,16 @@
 #include "GUI/EditorGUI.h"
 
 
+
+
 namespace JE
 {
 	IGWindow::IGWindow() :
-		m_Name("None"), m_IsOpen(true), m_pManager(nullptr), m_IsFocused(false),
-		m_WindowFlags(ImGuiWindowFlags_None) { }
+		m_Name("None"), m_IsOpen(true), m_pManager(nullptr),
+		m_WindowFlags(ImGuiWindowFlags_None)
+	{
+		RegisterEventListener(IGWindowEventListener(this));
+	}
 
 	void IGWindow::Load(IGManager* manager)
 	{
@@ -25,7 +30,6 @@ namespace JE
 			}
 			else
 			{
-				m_IsFocused = ImGui::IsWindowFocused();
 				OnGUI();
 				ImGui::End();
 			}
@@ -35,34 +39,11 @@ namespace JE
 	{
 		OnDestroy();
 	}
-	void IGWindow::ReceiveEvent(Event& e)
+	void IGWindow::OnEvent(Event& e)
 	{
-		if (m_IsOpen)
+		if (m_IsOpen && m_EventListener)
 		{
-			OnEvent(e);
-
-			// RenderEvent 
-			if (e.GetEventType() == EventType::RenderEvent)
-			{
-				RenderEvent render_e = CONVERT_EVENT(RenderEvent, e);
-				// RenderDevice Event
-				if (render_e.GetRenderEventType() == RenderEventType::RenderDevice)
-				{
-					RenderDeviceEvent rd_e = CONVERT_EVENT(RenderDeviceEvent, e);
-					switch (rd_e.GetRenderDeviceEventType())
-					{
-					case RenderDeviceEventType::SendManagedResource:
-						SendManagedResource(CONVERT_EVENT(SendManagedResourceEvent, e));
-						return;
-					case RenderDeviceEventType::GUIAllocatorReAllocated:
-						GUIAllocatorReAllocated(CONVERT_EVENT(GUIAllocatorReAllocatedEvent, e));
-						return;
-					}
-
-				}
-
-			}
-
+			m_EventListener->OnEvent(e);
 		}
 	}
 	const std::string& IGWindow::GetName() const
@@ -85,11 +66,6 @@ namespace JE
 	{
 		m_IsOpen = false;
 	}
-
-	bool IGWindow::IsFocused() const
-	{
-		return m_IsFocused;
-	}
 	bool IGWindow::IsOpen() const
 	{
 		return m_IsOpen;
@@ -102,6 +78,52 @@ namespace JE
 	{
 		return m_pManager;
 	}
+	
 }
 
+IGWindowEventListener::IGWindowEventListener(JE::IGWindow* owner) : Owner(owner) {}
 
+void IGWindowEventListener::OnRenderEvent(RenderEvent& e)
+{
+	static std::mutex RenderMutex;
+	std::lock_guard<std::mutex> lock(RenderMutex);
+	if (Owner == nullptr)
+		return;
+	if (e.GetRenderEventType() == RenderEventType::ToEditFromRe)
+	{
+		if (CONVERT_EVENT(ToEditFromReEvent, e).SendIGWindowID != (uint64_t)Owner)
+			return;
+
+		Owner->OnEventFromRE(CONVERT_EVENT(ToEditFromReEvent, e));
+	}
+}
+void IGWindowEventListener::OnAppEvent(AppEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}
+void IGWindowEventListener::OnInputEvent(InputEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}
+void IGWindowEventListener::OnPhysicsEvent(PhysicsEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}
+void IGWindowEventListener::OnSoundEvent(SoundEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}
+void IGWindowEventListener::OnGmaeFrameWorkEvent(GameFrameWorkEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}
+void IGWindowEventListener::OnWindowEvent(WindowEvent& e)
+{
+	if (Owner == nullptr)
+		return;
+}

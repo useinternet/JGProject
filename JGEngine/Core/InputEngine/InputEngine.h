@@ -17,6 +17,7 @@ namespace IE
 		virtual ~InputEngine() = default;
 	public:
 		void Init(HWND hWnd);
+		virtual void Load() override {}
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 	private:

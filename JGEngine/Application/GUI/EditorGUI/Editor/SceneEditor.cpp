@@ -9,24 +9,13 @@ namespace JE
 		m_SceneAddress = 0;
 		m_SceneAspect = 0.0f;
 		RequestResourceEvent e;
+		e.SentIGWindowID = (uint64_t)this;
 		e.SentIGWindow = GetName();
 		e.RequestResourceName = "FinalScene";
 		EventNotify(e);
-
-
-		AsyncEvent test;
-		test.Function = []() {
-			ENGINE_LOG_ERROR("이것은 테스트 로그이다.!!!");
-		};
-		m_EventHandler = GlobalLinkData::EngineEventManager->GetAsyncEventHandler(test);
-		m_EventHandler.Excute();
 	}
 	void SceneEditor::OnGUI()
 	{
-		if (m_EventHandler.IsComplete())
-		{
-			ENGINE_LOG_ERROR("테스트로그이벤트 완료!!");
-		}
 		ImGui::Text(("GPUAddress : " + std::to_string(m_SceneAddress)).c_str());
 		ImGui::SameLine();
 		ImGui::Text(("FPS : " + std::to_string(GlobalLinkData::GetFPS())).c_str());
@@ -54,20 +43,31 @@ namespace JE
 
 
 	}
+	void SceneEditor::OnEventFromRE(ToEditFromReEvent& e)
+	{
+		switch (e.GetCommand())
+		{
+		case ToEditFromReCommand::SendManagedResource:
+			SendManagedResource(CONVERT_EVENT(SendManagedResourceEvent, e));
+			return;
+
+		case ToEditFromReCommand::GUIAllocatorReAllocatedNotice:
+			GUIAllocatorReAllocatedNotice(CONVERT_EVENT(GUIAllocatorReAllocatedNoticeEvent, e));
+			return;
+
+		}
+	}
 	void SceneEditor::SendManagedResource(SendManagedResourceEvent& e)
 	{
-		if (e.RequesterName != GetName())
-		{
-			return;
-		}
 		m_SceneAddress = e.GpuAddress;
 		m_SceneAspect = (float)e.ResourceHeight / (float)e.ResourceWidth;
 	}
-	void SceneEditor::GUIAllocatorReAllocated(GUIAllocatorReAllocatedEvent& e)
+	void SceneEditor::GUIAllocatorReAllocatedNotice(GUIAllocatorReAllocatedNoticeEvent& e)
 	{
 		RequestResourceEvent request_e;
+		request_e.SentIGWindowID = (uint64_t)this;
 		request_e.SentIGWindow = GetName();
 		request_e.RequestResourceName = "FinalScene";
-		EventNotify(e);
+		EventNotify(request_e);
 	}
 }

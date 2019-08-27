@@ -16,6 +16,7 @@ namespace JE
 		virtual ~EditorGUI() = default;
 	public:
 		virtual void Init(RE::RenderDevice* renderDevice) override;
+		void Load();
 		virtual void Destroy() override;
 		virtual void Render(ID3D12GraphicsCommandList* cmdList) override;
 		virtual void OnEvent(Event& e) override;
@@ -28,5 +29,6 @@ namespace JE
 
 		RE::RenderDevice* m_pRenderDevice;
 		std::shared_ptr<IGManager> m_IGManager;
+		std::vector<std::string> m_InitWindowArray;
 	};
 }

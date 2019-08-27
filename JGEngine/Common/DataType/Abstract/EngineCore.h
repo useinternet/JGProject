@@ -11,6 +11,7 @@ public:
 	EngineCore(const GlobalLinkStream& stream);
 	virtual ~EngineCore() = default;
 public:
+	virtual void Load() = 0;
 	virtual void Update() = 0;
 	virtual void OnEvent(Event& e) = 0;
 };

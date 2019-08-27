@@ -196,7 +196,8 @@ namespace RE
 						gui_allocation.second.m_Cpu);
 				}
 
-				GUIAllocatorReAllocatedEvent e;
+				GUIAllocatorReAllocatedNoticeEvent e;
+				e.ID = RenderEngineID::RenderDevice;
 				GlobalLinkData::OnEvent(e);
 			}
 			// วาด็
@@ -359,6 +360,48 @@ namespace RE
 			m_BackBuffer[i]->SetD3DResource(d3d_resource, D3D12_RESOURCE_STATE_COMMON);
 		}
 		m_ValueIndex = m_SwapChain->GetCurrentBackBufferIndex();
+	}
+	void RenderDevice::GetGUIAllocatorDebugInfo(Debug::GUIAllocatorInfo& out_debug_info)
+	{
+		for (auto& gui_pair : m_GUIAllocationMap)
+		{
+			auto& gui_allocation = gui_pair.second;
+
+			Debug::GUIAllocationInfo info;
+			info.cpu_address = gui_allocation.m_Cpu.ptr;
+			info.gpu_address = gui_allocation.m_Gpu.ptr;
+			info.bind_reosurce_name = gui_allocation.m_ManagedResourceName;
+			out_debug_info.AllocationInfo.push_back(info);
+		}
+
+		out_debug_info.numDescriptor = m_GUIMaxNumDescriptor;
+		out_debug_info.num_allocated_descriptor = m_GUIHeapOffset;
+
+	}
+	void RenderDevice::GetSrvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	{
+		m_SrvAllocator->GetDebugInfo(out_debug_info);
+		out_debug_info.DescriptorAllocatorType = "ShaderResourceView";
+	}
+	void RenderDevice::GetUavDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	{
+		m_UavAllocator->GetDebugInfo(out_debug_info);
+		out_debug_info.DescriptorAllocatorType = "UnorderedAccessView";
+	}
+	void RenderDevice::GetCbvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	{
+		m_CbvAllocator->GetDebugInfo(out_debug_info);
+		out_debug_info.DescriptorAllocatorType = "ConstantBufferView";
+	}
+	void RenderDevice::GetRtvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	{
+		m_RtvAllocator->GetDebugInfo(out_debug_info);
+		out_debug_info.DescriptorAllocatorType = "RenderTargetView";
+	}
+	void RenderDevice::GetDsvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	{
+		m_DsvAllocator->GetDebugInfo(out_debug_info);
+		out_debug_info.DescriptorAllocatorType = "DepthStencilView";
 	}
 	ID3D12Device* RenderDevice::GetD3DDevice()
 	{

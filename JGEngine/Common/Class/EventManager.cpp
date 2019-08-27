@@ -6,6 +6,7 @@ using namespace concurrency;
 
 void EventManager::Dispatch(const CustomEvent& e)
 {
+	lock_guard<mutex> lock(m_EventMutex);
 	if (m_CustomEventPool.find(e.EventName) != m_CustomEventPool.end())
 	{
 		ENGINE_LOG_ERROR("{0}' already register in EventManager", e.EventName);
@@ -15,6 +16,7 @@ void EventManager::Dispatch(const CustomEvent& e)
 }
 const CustomEvent& EventManager::DesireCustomEvent(const std::string& name)
 {
+	lock_guard<mutex> lock(m_EventMutex);
 	if (m_CustomEventPool.find(name) == m_CustomEventPool.end())
 	{
 		assert(false && "This CustomEvent not exist in EventManager");
@@ -32,12 +34,21 @@ AsyncEventHandler EventManager::GetAsyncEventHandler(AsyncEvent& e)
 
 void AsyncEventHandler::Excute()
 {
+	if (m_IsRun)
+		return;
 	m_IsRun = true;
 	m_Task = create_task([&]() {
 		m_AsyncEvent->m_IsCompelete = false;
 		m_AsyncEvent->Function();
 		m_AsyncEvent->m_IsCompelete = true;
 	});
+}
+void AsyncEventHandler::Reset()
+{
+	if (!IsComplete())
+		m_Task.wait();
+	m_IsRun = false;
+	m_AsyncEvent->m_IsCompelete = false;
 }
 bool AsyncEventHandler::IsComplete() const
 {

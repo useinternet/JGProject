@@ -2,16 +2,14 @@
 #include "ResourceDataMap.h"
 #include "Resource.h"
 #include "CommandList.h"
-
+#include "DxUtill.h"
 
 namespace RE
 {
 	std::unordered_map<ID3D12Resource*, _ResourceData> ResourceDataMap::ms_GlobalResourceDatas;
 	std::mutex ResourceDataMap::ms_GlobalStateMutex;
 	std::mutex ResourceDataMap::ms_GlobalRegisterMutex;
-	std::mutex ResourceDataMap::ms_GlobalDataMutex;
 	bool ResourceDataMap::ms_IsStateLocked;
-	bool ResourceDataMap::ms_IsDataLocked;
 
 
 
@@ -148,18 +146,59 @@ namespace RE
 		ms_GlobalStateMutex.unlock();
 		ms_IsStateLocked = false;
 	}
-	void ResourceDataMap::DataLock()
+	void ResourceDataMap::GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo)
 	{
-		ms_GlobalDataMutex.lock();
-		ms_IsDataLocked = true;
+		
+		std::lock_guard<std::mutex> lock(ms_GlobalRegisterMutex);
+		for (auto& data_pair : ms_GlobalResourceDatas)
+		{
+			auto& resource_data = data_pair.second;
+
+			Debug::ResourceInfo info;
+			info.name = resource_data.ResourceName;
+			info.ref_count = resource_data.RefCount;
+
+			//
+			for (auto& srv : resource_data.SrvDescriptorHandles)
+			{
+				info.srv_addresses.push_back(srv.second.CPU().ptr);
+			}
+			for (auto& uav : resource_data.UavDescriptorHandles)
+			{
+				info.uav_addresses.push_back(uav.second.CPU().ptr);
+			}
+			for (auto& rtv : resource_data.RtvDescriptorHandles)
+			{
+				info.rtv_addresses.push_back(rtv.second.CPU().ptr);
+			}
+			for (auto& dsv : resource_data.DsvDescriptorHandles)
+			{
+				info.dsv_addresses.push_back(dsv.second.CPU().ptr);
+			}
+
+			auto desc = data_pair.first->GetDesc();
+			//
+			info.dimension = Dx12ToString(desc.Dimension);
+			info.alignment = desc.Alignment;
+			info.width = desc.Width;
+			info.height = desc.Height;
+			info.array_size = desc.DepthOrArraySize;
+			info.miplevels = desc.MipLevels;
+			info.format = Dx12ToString(desc.Format);
+			info.sampleCount = desc.SampleDesc.Count;
+			info.sampleQuality = desc.SampleDesc.Quality;
+			info.texture_layout = Dx12ToString(desc.Layout);
+			info.flags = Dx12ToString(desc.Flags);
+
+			out_resourceInfo.push_back(info);
+		}
+
+
+
 	}
-	void ResourceDataMap::DataUnLock()
+	void ResourceDataMap::RegisterResource(ID3D12Resource* resource, const std::string& name, D3D12_RESOURCE_STATES state)
 	{
-		ms_GlobalDataMutex.unlock();
-		ms_IsDataLocked = false;
-	}
-	void ResourceDataMap::RegisterResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES state)
-	{
+		
 		if (resource != nullptr)
 		{
 			std::lock_guard<std::mutex> lock(ms_GlobalRegisterMutex);
@@ -168,11 +207,32 @@ namespace RE
 
 			if (iter == ms_GlobalResourceDatas.end())
 			{
+				std::wstring w_str;
+				w_str.assign(name.begin(), name.end());
+				resource->SetName(w_str.c_str());
 				ms_GlobalResourceDatas[resource].RefCount = 0;
+				ms_GlobalResourceDatas[resource].ResourceName = name;
 				ms_GlobalResourceDatas[resource].ResourceState.SetResourceState(D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, state);
 			}
 
 			ms_GlobalResourceDatas[resource].RefCount++;
+		}
+	}
+	void ResourceDataMap::SetResourceName(ID3D12Resource* resource, const std::string& name)
+	{
+		if (resource != nullptr)
+		{
+			std::lock_guard<std::mutex> lock(ms_GlobalRegisterMutex);
+
+			auto iter = ms_GlobalResourceDatas.find(resource);
+
+			if (iter != ms_GlobalResourceDatas.end())
+			{
+				std::wstring w_str;
+				w_str.assign(name.begin(), name.end());
+				resource->SetName(w_str.c_str());
+				ms_GlobalResourceDatas[resource].ResourceName = name;
+			}
 		}
 	}
 	void ResourceDataMap::DeRegisterResource(ID3D12Resource* resource)
@@ -192,8 +252,6 @@ namespace RE
 	}
 	const _ResourceData* ResourceDataMap::GetData(ID3D12Resource* resource)
 	{
-		assert(ms_IsDataLocked && "Not DataLock While Call ResourceDataMap::GetData())");
-
 		auto iter = ms_GlobalResourceDatas.find(resource);
 		if (iter == ms_GlobalResourceDatas.end())
 			return nullptr;

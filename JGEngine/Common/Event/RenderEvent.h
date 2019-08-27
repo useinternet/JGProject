@@ -2,29 +2,29 @@
 
 
 #include "Event.h"
-
-enum class RenderEventType
+#include "DataType/Debug/RE_DebugInfo.h"
+enum class RenderEngineID
 {
+	None,
 	RenderDevice,
 	Renderer,
+	ResourceDataMap
 };
-enum class RenderDeviceEventType
+enum class RenderEventType
 {
-	SendManagedResource,
-	GUIAllocatorReAllocated,
+	ToEditFromRe,
 };
-enum class RendererEventType
-{
 
-};
 class RenderEvent : public Event
 {
 	RenderEventType m_Type;
 public:
+	RenderEngineID ID = RenderEngineID::None;
+public:
 	RenderEvent(RenderEventType type) : m_Type(type) {}
 	REGISTER_EVENT_TYPE(RenderEvent)
 	REGISTER_EVENT_CATEGORY(EventCategory_None)
-	RenderEventType GetRenderEventType() {
+	RenderEventType GetRenderEventType() const {
 		return m_Type;
 	}
 	virtual std::string ToString() const override {
@@ -33,59 +33,80 @@ public:
 };
 
 
-class RenderDeviceEvent : public RenderEvent
+
+
+
+
+// Edit && RE Event
+///summary  
+enum class ToEditFromReCommand
 {
-	RenderDeviceEventType m_Type;
+	SendManagedResource,
+	SendAllResourceDebugInfo,
+	SendAllocatorDebugInfo,
+	GUIAllocatorReAllocatedNotice,
+};
+class ToEditFromReEvent : public RenderEvent
+{
+private:
+	ToEditFromReCommand m_Command;
 public:
-	RenderDeviceEvent(RenderDeviceEventType type) : RenderEvent(RenderEventType::RenderDevice), m_Type(type) {}
-	RenderDeviceEventType GetRenderDeviceEventType() {
-		return m_Type;
-	}
+	uint64_t    SendIGWindowID = 0;
+	std::string SendIGWindow = "None";
+public:
+	ToEditFromReEvent(ToEditFromReCommand cmd) :
+		RenderEvent(RenderEventType::ToEditFromRe), m_Command(cmd) { }
+	REGISTER_EVENT_CATEGORY(EventCategory_Application)
 	virtual std::string ToString() const override {
-		return "RenderDeviceEventType";
+		return "SendToEditorEvent";
 	}
+	ToEditFromReCommand GetCommand() const { return m_Command; }
 };
 
-
-class RendererEvent : public RenderEvent
-{
-	RendererEventType m_Type;
-public:
-	RendererEvent(RendererEventType type) : RenderEvent(RenderEventType::Renderer), m_Type(type) {}
-	RendererEventType GetRenderDeviceEventType() {
-		return m_Type;
-	}
-	virtual std::string ToString() const override {
-		return "RendererEvent";
-	}
-
-
-};
-
-
-
-class SendManagedResourceEvent : public RenderDeviceEvent
+// editor & renderengine event
+class SendManagedResourceEvent : public ToEditFromReEvent
 {
 public:
-	std::string RequesterName = "None";
 	uint64_t GpuAddress = 0;
 	uint32_t ResourceWidth = 0;
 	uint32_t ResourceHeight = 0;
 public:
-	SendManagedResourceEvent() : RenderDeviceEvent(RenderDeviceEventType::SendManagedResource) {}
-	REGISTER_EVENT_CATEGORY(EventCategory_Application)
+	SendManagedResourceEvent() : ToEditFromReEvent(ToEditFromReCommand::SendManagedResource) {}
 	virtual std::string ToString() const override {
-		return "Send Resource( " + std::to_string(GpuAddress) + " ) .. To : " + RequesterName;
+		return "Send Resource( " + std::to_string(GpuAddress) + " ) .. To : " + SendIGWindow;
 	}
 };
-
-class GUIAllocatorReAllocatedEvent : public RenderDeviceEvent
+class SendAllResourceDebugInfoEvent : public ToEditFromReEvent
 {
 public:
-	GUIAllocatorReAllocatedEvent() : RenderDeviceEvent(RenderDeviceEventType::GUIAllocatorReAllocated) {}
-	REGISTER_EVENT_CATEGORY(EventCategory_Application)
+	std::vector<Debug::ResourceInfo> ResourceInfoArray;
+public:
+	SendAllResourceDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllResourceDebugInfo) {}
 	virtual std::string ToString() const override {
-		return "GUIAllocatorReAllcatedEvent";
+		return "SendAllResourceDebugInfoEvent";
+	}
+};
+class SendAllocatorDebugInfoEvent : public ToEditFromReEvent
+{
+public:
+	Debug::GUIAllocatorInfo GUIDebugInfo;
+	Debug::DescritporAllocatorInfo SrvDebugInfo;
+	Debug::DescritporAllocatorInfo UavDebugInfo;
+	Debug::DescritporAllocatorInfo CbvDebugInfo;
+	Debug::DescritporAllocatorInfo RtvDebugInfo;
+	Debug::DescritporAllocatorInfo DsvDebugInfo;
+public:
+	SendAllocatorDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllocatorDebugInfo) {}
+	virtual std::string ToString() const override {
+		return "SendAllocatorDebugInfoEvent";
+	}
+};
+class GUIAllocatorReAllocatedNoticeEvent : public ToEditFromReEvent
+{
+public:
+	GUIAllocatorReAllocatedNoticeEvent() : ToEditFromReEvent(ToEditFromReCommand::GUIAllocatorReAllocatedNotice) {}
+	virtual std::string ToString() const override {
+		return "GUIAllocatorReAllocatedNoticeEvent";
 	}
 
 };

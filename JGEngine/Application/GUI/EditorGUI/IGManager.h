@@ -11,6 +11,7 @@ namespace JE
 
 	public:
 		IGManager(EditorGUI* editor);
+		~IGManager();
 		void Load();
 		void Update();
 		void OnEvent(Event& e);
@@ -19,6 +20,8 @@ namespace JE
 			return m_EditorGui;
 		}
 	private:
+		void OpenWindow(const std::string& select_menu);
+
 		template<typename CustomWindow>
 		void CreateIGWindow(const std::string& name)
 		{

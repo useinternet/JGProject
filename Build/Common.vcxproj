@@ -94,7 +94,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -109,7 +109,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_RELEASE_ONDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -128,7 +128,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_RELEASE_ONDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -147,7 +147,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -162,18 +162,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h" />
     <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h" />
     <ClInclude Include="..\JGEngine\Common\Class\EventManager.h" />
     <ClInclude Include="..\JGEngine\Common\Class\GlobalLinkStream.h" />
     <ClInclude Include="..\JGEngine\Common\Class\Log.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\TimerManager.h" />
     <ClInclude Include="..\JGEngine\Common\CommonCore.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EngineCore.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EventListener.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\NoneCopy.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Color.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugDataType.h" />
+    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugInfo.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h" />
+    <ClInclude Include="..\JGEngine\Common\DataType\Timer.h" />
     <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h" />
     <ClInclude Include="..\JGEngine\Common\Event\Event.h" />
     <ClInclude Include="..\JGEngine\Common\Event\GameFrameWorkEvent.h" />
@@ -190,12 +191,13 @@
     <ClInclude Include="..\JGEngine\Common\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\EventManager.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\GlobalLinkStream.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\Log.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\TimerManager.cpp" />
     <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp" />
+    <ClCompile Include="..\JGEngine\Common\DataType\Timer.cpp" />
     <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp" />
     <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp" />
     <ClCompile Include="..\JGEngine\Common\pch.cpp">

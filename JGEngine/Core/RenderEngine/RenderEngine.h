@@ -78,11 +78,11 @@ namespace RE
 	public:
 		void Init(HWND hWnd, int width, int height, const std::shared_ptr<GUI>& bind_gui);
 	public:
+		virtual void Load() override;
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 	private:
 		void CreateBox(float  width, float height, float depth);
 		void LoadTexture(const std::wstring& name, CommandList* cmdList);
 	};
-
 }

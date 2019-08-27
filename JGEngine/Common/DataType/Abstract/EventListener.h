@@ -7,7 +7,7 @@
 #include "Event/GameFrameWorkEvent.h"
 #include "Event/PhysicsEvent.h"
 #include "Event/SoundEvent.h"
-
+#include <mutex>
 class EventListener
 {
 	// Copy here
@@ -30,7 +30,7 @@ protected:
 	virtual void OnWindowEvent(WindowEvent& e) = 0;
 public:
 	void OnEvent(Event& e) {
-
+		//std::lock_guard<std::mutex> lock(m_EventMutex);
 		switch (e.GetEventType())
 		{
 		case EventType::AppEvent:

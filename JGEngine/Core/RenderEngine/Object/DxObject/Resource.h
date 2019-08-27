@@ -42,6 +42,8 @@ namespace RE
 		float GetClearDepth() const;
 		uint8_t GetClearStencil() const;
 		ID3D12Resource* GetD3DResource() const;
+		virtual void SetName(const std::string& name) override;
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_D3D_Resource;
 		Color m_ClearColor = Color();

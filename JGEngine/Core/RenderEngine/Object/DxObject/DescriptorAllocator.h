@@ -21,6 +21,7 @@ namespace RE
 		DescriptorHandle Allocate(uint32_t numDescriptor = 1);
 		void ReleaseFreeReserveredDescriptorHandles();
 		D3D12_DESCRIPTOR_HEAP_TYPE  GetType() const;
+		void GetDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 	private:
 		uint32_t m_NumDescriptorPerHeap;
 		D3D12_DESCRIPTOR_HEAP_TYPE m_Type;

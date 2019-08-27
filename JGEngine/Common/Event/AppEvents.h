@@ -25,12 +25,14 @@ public:
 enum class EditorEventType 
 {
 	RequestResource,
-	RequestRenderDeviceDebugInfo
+	RequestAllResourceDebugInfo,
+	RequestDescriptorAllocatorDebugInfo
 };
 class EditorEvent : public AppEvent
 {
 	EditorEventType m_Type;
 public:
+	uint64_t    SentIGWindowID  = 0;
 	std::string SentIGWindow = "None";
 public:
 	EditorEvent(EditorEventType type) : AppEvent(AppEventType::EditorGUI), m_Type(type) {}
@@ -51,23 +53,22 @@ public:
 		return "From Window : " + SentIGWindow + "  Request Resource : " + RequestResourceName;
 	}
 };
-
-class RequestRenderDeviceDebugInfoEvent : EditorEvent
+class RequestAllResourceDebugInfoEvent : public EditorEvent
 {
 public:
-
-
-
-
-
-
-
-
-public:
-	RequestRenderDeviceDebugInfoEvent() : EditorEvent(EditorEventType::RequestRenderDeviceDebugInfo) {}
+	RequestAllResourceDebugInfoEvent() : EditorEvent(EditorEventType::RequestAllResourceDebugInfo) {}
 	REGISTER_EVENT_CATEGORY(EventCategory_RenderEngine)
 	virtual std::string ToString() const override {
-		return "From Window : " + SentIGWindow + "  Request DebugInformation of RenderDevice";
+		return "RequestAllResourceDebugInfoEvent";
+	}
+};
+class RequestDescriptorAllocatorDebugInfoEvent : public EditorEvent
+{
+public:
+	RequestDescriptorAllocatorDebugInfoEvent() : EditorEvent(EditorEventType::RequestDescriptorAllocatorDebugInfo) {}
+	REGISTER_EVENT_CATEGORY(EventCategory_RenderEngine)
+	virtual std::string ToString() const override {
+		return "From Window : " + SentIGWindow + "  Request DebugInformation of DescriptorAllocator";
 	}
 };
 

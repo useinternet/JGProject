@@ -54,6 +54,9 @@ namespace RE
 		void RenewalHandle(const DescriptorHandle* handle);
 		//
 		void ReleaseDescriptorBlock();
+
+		// Debug
+		void GetDebugInfo(Debug::DescriptorHeapInfo& out_debug_info);
 	private:
 		void FreeBlock(const DescriptorBlock& block);
 		DescriptorBlock MergeBlock(const DescriptorBlock& block1, const DescriptorBlock& block2, bool is_allocate);

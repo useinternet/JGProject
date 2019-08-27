@@ -11,6 +11,7 @@ namespace PE
 		PhysicsEngine(const GlobalLinkStream& stream);
 		virtual ~PhysicsEngine() = default;
 	public:
+		virtual void Load() override {}
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 	};

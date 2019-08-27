@@ -37,7 +37,7 @@ enum EventCategory
  virtual int GetEventCategory() const override { return category; } \
 
 
-#define CONVERT_EVENT(EventType, Event) *(##EventType*)&##Event  
+#define CONVERT_EVENT(EventType, Event) (*(##EventType*)&##Event)  
 
 class Event
 {
@@ -87,29 +87,29 @@ public:
 
 
 
-//// Only Write in Cpp file  \\ macro(eventname, return type, param...)
-//#define CREATE_DISPATCH_CUSTOMEVENT(Event_Name, Return, ...) \
-//class Dispatch_##Event_Name : public CustomEvent  \
-//{\
-//public: \
-//    std::function<##Return(__VA_ARGS__)> Function; \
-//public: \
-//    Dispatch_##Event_Name(const std::function<##Return(__VA_ARGS__)>& func) : CustomEvent(#Event_Name), Function(func) {} \
-//}; \
-//
-//// Only Write in Cpp file \\ macro(eventname, return type, param...)
-//#define DESIRE_DISPATCH_CUSTOMEVENT(Event_Name, Return, ...) \
-//CREATE_DISPATCH_CUSTOMEVENT(Event_Name, Return, __VA_ARGS__) \
-//class Event_Name \
-//{\
-//public: \
-//	std::function<##Return(__VA_ARGS__)> Excute;\
-//public:\
-//	Event_Name() {\
-//		auto custom_event = *(Dispatch_##Event_Name*)&EventManager::DesireCustomEvent(#Event_Name);\
-//		Excute = custom_event.Function; \
-//	}\
-//};\
+// Only Write in Cpp file  \\ macro(eventname, return type, param...)
+#define CREATE_DISPATCH_CUSTOMEVENT(Event_Name, Return, ...) \
+class Dispatch_##Event_Name : public CustomEvent  \
+{\
+public: \
+    std::function<##Return(__VA_ARGS__)> Function; \
+public: \
+    Dispatch_##Event_Name(const std::function<##Return(__VA_ARGS__)>& func) : CustomEvent(#Event_Name), Function(func) {} \
+}; \
+
+// Only Write in Cpp file \\ macro(eventname, return type, param...)
+#define DESIRE_DISPATCH_CUSTOMEVENT(Event_Name, Return, ...) \
+CREATE_DISPATCH_CUSTOMEVENT(Event_Name, Return, __VA_ARGS__) \
+class Event_Name \
+{\
+public: \
+	std::function<##Return(__VA_ARGS__)> Excute;\
+public:\
+	Event_Name() {\
+		auto custom_event = *(Dispatch_##Event_Name*)&GlobalLinkData::EngineEventManager->DesireCustomEvent(#Event_Name);\
+		Excute = custom_event.Function; \
+	}\
+};\
 
 
 

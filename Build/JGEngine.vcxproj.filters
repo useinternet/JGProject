@@ -78,6 +78,9 @@
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.h">
+      <Filter>GUI\EditorGUI\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -127,5 +130,8 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.cpp">
+      <Filter>GUI\EditorGUI\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

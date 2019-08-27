@@ -44,8 +44,9 @@ namespace RE
 		m_EventListener.m_RenderEngine = this;
 		m_EventListener.m_RenderDevice = m_RenderDevice.get();
 		RE_LOG_INFO("RenderEngine Init Complete...");
-
-
+	}
+	void RenderEngine::Load()
+	{
 		m_RenderItem.Rootsignature = make_shared<RootSignature>(2);
 		m_RenderItem.Rootsignature->InitParam(0).InitAsConstantBufferView(0);
 		m_RenderItem.Rootsignature->InitParam(1).PushAsDescriptorRange(
@@ -64,9 +65,9 @@ namespace RE
 		std::vector<D3D12_INPUT_ELEMENT_DESC> InputLayouts =
 		{
 			 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		     { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		     { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		     { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+			 { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			 { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			 { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
 
 
@@ -151,23 +152,23 @@ float4 PS(VertexOut pin) : SV_Target
 		m_RenderItem.PSO->SetRootSignature(*m_RenderItem.Rootsignature);
 		m_RenderItem.PSO->Finalize();
 
-		 JMatrix view = JMatrix::LookAtLH({ 0.0f, 0.0f, -5.0f }, { 0.0f,0.0f,1.0f }, { 0.0f,1.0f,0.0f });
-		 JMatrix proj = JMatrix::PerspectiveFovLH(0.25f * 3.141592f,
-			 (float)1920 / (float)1080, 1.0f, 1000.0f);
-		
-		 {
-			 m_RenderItem.contants1.ViewProj = JMatrix::Transpose(view * proj);
-		 }
-		 {
-			 m_RenderItem.contants2.ViewProj = JMatrix::Transpose(view * proj);
-			 m_RenderItem.contants2.World = JMatrix::Transpose(JMatrix::Translation({ 1.5f,0.0f,0.0f }));
-			 m_RenderItem.contants2.Frame = 120;
-		 }
-		 {
-			 m_RenderItem.contants3.ViewProj = JMatrix::Transpose(view * proj);
-			 m_RenderItem.contants3.World = JMatrix::Transpose(JMatrix::Translation({ -1.5f,0.0f,0.0f }));
-			 m_RenderItem.contants3.Frame = 240;
-		 }
+		JMatrix view = JMatrix::LookAtLH({ 0.0f, 0.0f, -5.0f }, { 0.0f,0.0f,1.0f }, { 0.0f,1.0f,0.0f });
+		JMatrix proj = JMatrix::PerspectiveFovLH(0.25f * 3.141592f,
+			(float)1920 / (float)1080, 1.0f, 1000.0f);
+
+		{
+			m_RenderItem.contants1.ViewProj = JMatrix::Transpose(view * proj);
+		}
+		{
+			m_RenderItem.contants2.ViewProj = JMatrix::Transpose(view * proj);
+			m_RenderItem.contants2.World = JMatrix::Transpose(JMatrix::Translation({ 1.5f,0.0f,0.0f }));
+			m_RenderItem.contants2.Frame = 120;
+		}
+		{
+			m_RenderItem.contants3.ViewProj = JMatrix::Transpose(view * proj);
+			m_RenderItem.contants3.World = JMatrix::Transpose(JMatrix::Translation({ -1.5f,0.0f,0.0f }));
+			m_RenderItem.contants3.Frame = 240;
+		}
 
 
 
@@ -185,8 +186,8 @@ float4 PS(VertexOut pin) : SV_Target
 		Texture texture("FinalScene");
 		texture.CreateResource(
 			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-				1920 ,1080, 1, 1, 1, 0,
-				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), 
+				1920, 1080, 1, 1, 1, 0,
+				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
 			&rtv_clear);
 		m_RenderDevice->RegisterGUITexture(texture);
 
@@ -212,22 +213,24 @@ float4 PS(VertexOut pin) : SV_Target
 		//임시 텍스쳐
 		{
 			CommandQueue texture_que(D3D12_COMMAND_LIST_TYPE_DIRECT);
-			
-			auto texture_cmdList = texture_que.GetCommandList();
-			LoadTexture(L"../Contents/Engine/Textures/bricks3.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/bricks.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/bricks2.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/checkboard.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/ice.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/tile.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/stone.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/WoodCrate01.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/WoodCrate02.dds", texture_cmdList);
-			LoadTexture(L"../Contents/Engine/Textures/water1.dds", texture_cmdList);
 
+			auto texture_cmdList = texture_que.GetCommandList();
+			auto config = GlobalLinkData::_EngineConfig;
+			LoadTexture(config->InEngineW("Textures/bricks3.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/bricks.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/bricks2.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/checkboard.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/ice.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/tile.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/stone.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/WoodCrate01.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/WoodCrate02.dds"), texture_cmdList);
+			LoadTexture(config->InEngineW("Textures/water1.dds"), texture_cmdList);
 			texture_que.ExcuteCommandList({ texture_cmdList });
 			texture_que.Flush();
 		}
+
+
 	}
 	void RenderEngine::Update()
 	{
@@ -246,8 +249,12 @@ float4 PS(VertexOut pin) : SV_Target
 		{
 			m_RenderItem.contants3.Frame = 0;
 		}
+		m_RenderDevice->SubmitToRender(0,
+			[&](CommandList* commandList) {
+			commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
 
-		m_RenderDevice->SubmitToRender(0, 
+		});
+		m_RenderDevice->SubmitToRender(1, 
 			[&](CommandList* commandList) {
 
 			Viewport viewport;
@@ -261,7 +268,7 @@ float4 PS(VertexOut pin) : SV_Target
 			commandList->SetPipelineState(*m_RenderItem.PSO);
 			
 
-			commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
+		
 			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
 
 			{
@@ -275,31 +282,64 @@ float4 PS(VertexOut pin) : SV_Target
 
 				commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
 			}
+		});
+		m_RenderDevice->SubmitToRender(1,
+			[&](CommandList* commandList) {
+
+			Viewport viewport;
+			viewport.Set((float)m_RenderItem.width, (float)m_RenderItem.height);
+			ScissorRect rect;
+			rect.Set(m_RenderItem.width, m_RenderItem.height);
+
+			commandList->SetViewport(viewport);
+			commandList->SetScissorRect(rect);
+			commandList->SetGraphicsRootSignature(*m_RenderItem.Rootsignature);
+			commandList->SetPipelineState(*m_RenderItem.PSO);
+
+
+			//commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
+			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
+
 			{
-				commandList->BindGraphicsDynamicConstantBuffer(
-					0, m_RenderItem.contants2);
-				commandList->BindSRV(1, m_RenderItem.textures);
-				commandList->BindDynamicVertexBuffer(
-					0, m_RenderItem.vertices);
-				commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					commandList->BindGraphicsDynamicConstantBuffer(
+						0, m_RenderItem.contants2);
+					commandList->BindSRV(1, m_RenderItem.textures);
+					commandList->BindDynamicVertexBuffer(
+						0, m_RenderItem.vertices);
+					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-
-
+					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
 			}
+		});
+		m_RenderDevice->SubmitToRender(1,
+			[&](CommandList* commandList) {
+
+			Viewport viewport;
+			viewport.Set((float)m_RenderItem.width, (float)m_RenderItem.height);
+			ScissorRect rect;
+			rect.Set(m_RenderItem.width, m_RenderItem.height);
+
+			commandList->SetViewport(viewport);
+			commandList->SetScissorRect(rect);
+			commandList->SetGraphicsRootSignature(*m_RenderItem.Rootsignature);
+			commandList->SetPipelineState(*m_RenderItem.PSO);
+
+
+			//commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
+			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
+
 			{
-				commandList->BindGraphicsDynamicConstantBuffer(
-					0, m_RenderItem.contants3);
-				commandList->BindSRV(1, m_RenderItem.textures);
-				commandList->BindDynamicVertexBuffer(
-					0, m_RenderItem.vertices);
-				commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					commandList->BindGraphicsDynamicConstantBuffer(
+						0, m_RenderItem.contants3);
+					commandList->BindSRV(1, m_RenderItem.textures);
+					commandList->BindDynamicVertexBuffer(
+						0, m_RenderItem.vertices);
+					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
+					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
 			}
-
 		});
 
 		m_RenderDevice->Update();
@@ -399,12 +439,15 @@ float4 PS(VertexOut pin) : SV_Target
 		HRESULT hr = DirectX::CreateDDSTextureFromFile12(m_RenderDevice->GetD3DDevice(),
 			cmdList->GetD3DCommandList(), name.c_str(),
 			d3d_resource, upload_resource);
-		Texture tex;
+
+		std::string str;
+		str.assign(name.begin(), name.end());
+		Texture tex(str);
 		tex.SetD3DResource(d3d_resource, D3D12_RESOURCE_STATE_COMMON);
 		m_RenderItem.textures.push_back(move(tex));
 		
 
-		Resource upload;
+		Resource upload(str + "_upload");
 		upload.SetD3DResource(upload_resource, D3D12_RESOURCE_STATE_COMMON);
 		m_UploadResource.push_back(upload);
 	}

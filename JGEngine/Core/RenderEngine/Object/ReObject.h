@@ -21,7 +21,7 @@ namespace RE
 		virtual ~ReObject() = default;
 
 	public:
-		void SetName(const std::string& name) { m_Name = name; }
+		virtual void SetName(const std::string& name) { m_Name = name; }
 		const std::string& GetName() const { return m_Name; }
 
 

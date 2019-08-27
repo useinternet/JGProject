@@ -11,6 +11,7 @@
 #include "DataType/Abstract/NoneCopy.h"
 #include "DataType/Abstract/EventListener.h"
 #include "DataType/Color.h"
+#include "DataType/Timer.h"
 
 
 #include "Event/Event.h"
@@ -30,4 +31,6 @@
 #include "Class/Log.h"
 #include "Class/EventManager.h"
 #include "Class/EngineTimer.h"
+#include "Class/EngineConfig.h"
 #include "Class/GlobalLinkStream.h"
+

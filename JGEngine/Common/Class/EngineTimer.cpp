@@ -12,6 +12,7 @@ void EngineTimer::Tick()
 	static system_clock::time_point start_point;
 	static uint32_t frame_count = 0;
 	static float    time_elapsed = 0.0f;
+	if (init_count < 5) init_count++;
 	if (!m_IsStart)
 	{
 		m_DeltaTime = 0.0f;
@@ -68,6 +69,8 @@ float EngineTimer::GetTotalTime(TimeStepType step_type) const
 }
 float EngineTimer::GetTick(TimeStepType step_type) const
 {
+	if (init_count < 5)
+		return 0.0f;
 	switch (step_type)
 	{
 	case TimeStepType::MiliSecond:

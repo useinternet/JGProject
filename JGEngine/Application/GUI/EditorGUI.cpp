@@ -23,8 +23,9 @@ namespace JE
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		static std::string str = "../Config/JGEngineConfig";
-		io.IniFilename = str.c_str();
+		auto filename  = GlobalLinkData::_EngineConfig->GetImGuiConfigFile();
+		static std::string file_path = GlobalLinkData::_EngineConfig->InConfig(filename);
+		io.IniFilename = file_path.c_str();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
@@ -46,6 +47,14 @@ namespace JE
 		ENGINE_LOG_INFO("EditorGui Init");
 	}
 
+	void EditorGUI::Load()
+	{
+		if (!m_IGManager)
+		{
+			m_IGManager = make_shared<IGManager>(this);
+			m_IGManager->Load();
+		}
+	}
 	void EditorGUI::Destroy()
 	{
 		ImGui_ImplDX12_Shutdown();
@@ -65,11 +74,6 @@ namespace JE
 	}
 	void EditorGUI::Update()
 	{
-		if (!m_IGManager)
-		{
-			m_IGManager = make_shared<IGManager>(this);
-			m_IGManager->Load();
-		}
 		{
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -78,15 +82,11 @@ namespace JE
 		}
 		ImGui::ShowDemoWindow();
 		m_IGManager->Update();
-
-
-
 		if (ImGui::BeginMainMenuBar())
 		{
 			m_IGManager->OnMainMenu();
 			ImGui::EndMainMenuBar();
 		}
-		
 	}
 	void EditorGUI::ApplyDockSpace()
 	{

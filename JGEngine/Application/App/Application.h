@@ -44,6 +44,7 @@ public:
 	Application(const std::wstring& name, EApplicationMode mode);
 	virtual ~Application();
 	bool Init();
+	void Load();
 	void Run();
 	void OnEvent(Event& e);
 private:
@@ -61,5 +62,7 @@ private:
 	std::shared_ptr<JE::EditorGUI>     m_EditorGUI;
 	std::shared_ptr<EventManager>      m_EventManager;
 	std::shared_ptr<EngineTimer>       m_EngineTimer;
+	std::shared_ptr<EngineConfig>      m_EngineConfig;
 	bool m_IsInit;
+	std::mutex m_EventMutex;
 };
