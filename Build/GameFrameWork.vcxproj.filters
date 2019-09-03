@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Object">
+      <UniqueIdentifier>{DCCA4FC7-C86C-7A9D-B127-8EF19D6801EE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\Core.h" />
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\GFW.h" />
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\Game.h" />
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\Object\GameObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\framework.h" />
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Core\GameFrameWork\Game.cpp" />
+    <ClCompile Include="..\JGEngine\Core\GameFrameWork\Object\GameObject.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GameFrameWork\pch.cpp" />
+  </ItemGroup>
+</Project>

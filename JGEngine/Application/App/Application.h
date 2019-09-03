@@ -63,6 +63,7 @@ private:
 	std::shared_ptr<EventManager>      m_EventManager;
 	std::shared_ptr<EngineTimer>       m_EngineTimer;
 	std::shared_ptr<EngineConfig>      m_EngineConfig;
+	std::shared_ptr<EnginePerformance> m_Performance;
 	bool m_IsInit;
 	std::mutex m_EventMutex;
 };

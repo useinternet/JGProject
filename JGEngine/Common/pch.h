@@ -27,7 +27,9 @@
 #include <functional>
 #include <algorithm>
 #include <filesystem>
-
+#include  "psapi.h"
+#include <Pdh.h>
+#include <PdhMsg.h>
 namespace fs = std::experimental::filesystem;
 
 #endif //PCH_H

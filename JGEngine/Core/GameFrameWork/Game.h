@@ -12,7 +12,7 @@ namespace GFW
 		Game(const GlobalLinkStream& stream);
 		virtual ~Game() = default;
 	public:
-		virtual void Load() override {}
+		virtual void Load() override;
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 	};

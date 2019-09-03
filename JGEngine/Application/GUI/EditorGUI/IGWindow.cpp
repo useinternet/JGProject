@@ -70,6 +70,14 @@ namespace JE
 	{
 		return m_IsOpen;
 	}
+	void IGWindow::DataLoad(std::ifstream& fin)
+	{
+		
+	}
+	void IGWindow::DataSave(std::ofstream& fout)
+	{
+		fout << GetName() << std::endl;
+	}
 	void IGWindow::EventNotify(Event& e)
 	{
 		GlobalLinkData::OnEvent(e);

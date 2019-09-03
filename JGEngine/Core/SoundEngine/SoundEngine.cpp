@@ -15,7 +15,7 @@ namespace SE
 
 	void SoundEngine::Update()
 	{
-
+		ENGINE_PERFORMANCE_TIMER("Application", "SoundEngine");
 	}
 	void SoundEngine::OnEvent(Event& e)
 	{

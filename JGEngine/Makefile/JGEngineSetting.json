@@ -1,9 +1,9 @@
 {
 
-  "ContentsPath": "../Contents/",
-  "SourcePath" : "../",
-  "EnginePath" : "../Contents/Engine/",
-  "ConfigPath" : "../Config/",
+  "ContentsPath": "..\\Contents\\",
+  "SourcePath" : "..\\Source\\",
+  "EnginePath" : "..\\Contents\\Engine\\",
+  "ConfigPath" : "..\\Config\\",
 
 
 

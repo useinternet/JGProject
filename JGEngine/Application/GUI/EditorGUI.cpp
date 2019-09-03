@@ -74,6 +74,7 @@ namespace JE
 	}
 	void EditorGUI::Update()
 	{
+		ENGINE_PERFORMANCE_TIMER("Application", "Editor");
 		{
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();

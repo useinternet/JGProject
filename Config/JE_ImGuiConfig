@@ -3,62 +3,59 @@ Pos=0,0
 Size=1536,801
 Collapsed=0
 
-[Window][Dear ImGui Demo]
-Pos=860,19
-Size=676,531
-Collapsed=0
-DockId=0x00000005,0
-
 [Window][Debug##Default]
 Pos=60,60
 Size=400,400
 Collapsed=0
 
-[Window][SceneEditor]
-Pos=0,19
-Size=858,531
+[Window][Dear ImGui Demo]
+Pos=927,19
+Size=609,526
 Collapsed=0
 DockId=0x00000003,0
 
 [Window][RenderProfile]
-Pos=860,19
-Size=676,531
+Pos=942,19
+Size=594,472
 Collapsed=0
-DockId=0x00000005,1
+DockId=0x00000003,1
+
+[Window][SceneEditor]
+Pos=0,19
+Size=925,571
+Collapsed=0
+DockId=0x00000005,0
 
 [Window][ConsoleLog]
-Pos=860,552
-Size=676,249
+Pos=0,592
+Size=925,209
 Collapsed=0
 DockId=0x00000006,0
 
-[Window][Example: Custom rendering]
-Pos=60,60
-Size=350,560
-Collapsed=0
-
-[Window][Example: Log]
-Pos=60,60
-Size=500,400
-Collapsed=0
-
-[Window][Example: Auto-resizing window]
-Pos=277,160
-Size=653,437
-Collapsed=0
-
 [Window][FileViewer]
-Pos=0,552
-Size=858,249
+Pos=927,547
+Size=609,254
 Collapsed=0
 DockId=0x00000004,0
 
+[Window][RenderingProfile]
+Pos=927,19
+Size=609,526
+Collapsed=0
+DockId=0x00000003,1
+
+[Window][Performance]
+Pos=927,19
+Size=609,526
+Collapsed=0
+DockId=0x00000003,2
+
 [Docking][Data]
 DockSpace     ID=0xA15E893B Window=0xFD6DE84F Pos=0,19 Size=1536,782 Split=X
-  DockNode    ID=0x00000001 Parent=0xA15E893B SizeRef=858,782 Split=Y Selected=0xC08FF5B5
-    DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=1020,531 CentralNode=1 HiddenTabBar=1 Selected=0xC08FF5B5
-    DockNode  ID=0x00000004 Parent=0x00000001 SizeRef=1020,249 HiddenTabBar=1 Selected=0x6B16F618
-  DockNode    ID=0x00000002 Parent=0xA15E893B SizeRef=676,782 Split=Y Selected=0x27FAD87F
-    DockNode  ID=0x00000005 Parent=0x00000002 SizeRef=676,531 Selected=0x27FAD87F
-    DockNode  ID=0x00000006 Parent=0x00000002 SizeRef=676,249 HiddenTabBar=1 Selected=0xEC97355A
+  DockNode    ID=0x00000001 Parent=0xA15E893B SizeRef=925,782 Split=Y Selected=0xC08FF5B5
+    DockNode  ID=0x00000005 Parent=0x00000001 SizeRef=922,571 CentralNode=1 Selected=0xC08FF5B5
+    DockNode  ID=0x00000006 Parent=0x00000001 SizeRef=922,209 Selected=0xEC97355A
+  DockNode    ID=0x00000002 Parent=0xA15E893B SizeRef=609,782 Split=Y Selected=0xE927CF2F
+    DockNode  ID=0x00000003 Parent=0x00000002 SizeRef=550,526 Selected=0x044B1956
+    DockNode  ID=0x00000004 Parent=0x00000002 SizeRef=550,254 HiddenTabBar=1 Selected=0x6B16F618
 

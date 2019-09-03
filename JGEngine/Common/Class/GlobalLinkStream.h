@@ -11,6 +11,7 @@ struct GlobalLinkStream
 	std::shared_ptr<EventManager>   EngineEventManager;
 	std::shared_ptr<EngineTimer>    _EngineTimer;
 	std::shared_ptr<EngineConfig>   _EngineConfig;
+	std::shared_ptr<EnginePerformance> _EnginePerformance;
 };
 
 class GlobalLinkData
@@ -21,6 +22,7 @@ public:
 	static std::shared_ptr<spdlog::logger> Logger;
 	static std::shared_ptr<EventManager>   EngineEventManager;
 	static std::shared_ptr<EngineConfig>   _EngineConfig;
+	static std::shared_ptr<EnginePerformance> _EnginePerformance;
 	static void Init(const GlobalLinkStream& stream, bool is_app = false)
 	{
 		OnEvent = stream.OnEvent;
@@ -28,9 +30,11 @@ public:
 		EngineEventManager = stream.EngineEventManager;
 		_EngineTimer = stream._EngineTimer;
 		_EngineConfig = stream._EngineConfig;
+		_EnginePerformance = stream._EnginePerformance;
 		if(!is_app)
 			Log::RegisterLog(Logger, stream.LogFileName);
 	}
+
 	static float GetTick(TimeStepType type = TimeStepType::Second);
 	static float GetTotalTime(TimeStepType type = TimeStepType::Second);
 	static uint32_t GetFPS();

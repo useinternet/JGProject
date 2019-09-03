@@ -24,6 +24,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h">
+      <Filter>Class</Filter>
+    </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h">
       <Filter>Class</Filter>
     </ClInclude>
@@ -96,11 +99,17 @@
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\framework.h" />
     <ClInclude Include="..\JGEngine\Common\pch.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h">
+    <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\EnginePerformance.h">
       <Filter>Class</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp">
       <Filter>Class</Filter>
     </ClCompile>
@@ -126,7 +135,10 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">
+    <ClCompile Include="..\JGEngine\Common\DataType\Plugin.cpp">
+      <Filter>DataType</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\EnginePerformance.cpp">
       <Filter>Class</Filter>
     </ClCompile>
   </ItemGroup>

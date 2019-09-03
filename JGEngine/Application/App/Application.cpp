@@ -19,6 +19,7 @@ Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
 {
+	//GlobalLinkData::Destory();
 }
 bool Application::Init()
 {
@@ -26,6 +27,7 @@ bool Application::Init()
 	m_EventManager = make_shared<EventManager>();
 	m_EngineTimer  = make_shared<EngineTimer>();
 	m_EngineConfig = make_shared<EngineConfig>();
+	m_Performance = make_shared<EnginePerformance>();
 	m_EngineTimer->Start();
 	m_EngineConfig->LoadConfig();
 
@@ -39,6 +41,7 @@ bool Application::Init()
 		stream.EngineEventManager = m_EventManager;
 		stream._EngineTimer = m_EngineTimer;
 		stream._EngineConfig = m_EngineConfig;
+		stream._EnginePerformance = m_Performance;
 		GlobalLinkData::Init(stream, true);
 	}
 
@@ -90,6 +93,10 @@ void Application::Run()
 		}
 		else
 		{
+			if(GlobalLinkData::_EnginePerformance)
+				GlobalLinkData::_EnginePerformance->Reset();
+		
+			ENGINE_PERFORMANCE_TIMER_START("Application");
 
 			auto input_task = make_task([&] {
 				m_InputEngine->Update();
@@ -111,17 +118,16 @@ void Application::Run()
 			});
 			////엔진 업데이트
 
-			structured_task_group update_tasks;
+			structured_task_group _tasks;
 			structured_task_group render_tasks;
-			update_tasks.run(input_task);
-			update_tasks.run(physics_task);
-			update_tasks.run(sound_task);
-			update_tasks.run(game_task);
-			update_tasks.run(gui_task);
-			update_tasks.wait();
-
-			render_tasks.run(render_task);
-			render_tasks.wait();
+			_tasks.run(input_task);
+			_tasks.run(physics_task);
+			_tasks.run(sound_task);
+			_tasks.run(game_task);
+			_tasks.run(gui_task);
+			_tasks.wait();
+			
+			_tasks.run_and_wait(render_task);
 			m_EngineTimer->Tick();
 		}
 	}

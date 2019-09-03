@@ -6,6 +6,16 @@ using namespace std;
 
 namespace JE
 {
+	void RenderingProfile::TestPerformance(std::shared_ptr<EnginePerformance::TimerNode> node)
+	{
+		//auto name = node->Name + " : ";
+		//auto tick = to_string(node->Tick) + " sec";
+		//ImGui::Text(name.c_str()); ImGui::SameLine(); ImGui::Text(tick.c_str());
+		//for (auto& ss : node->Childs)
+		//{
+		//	TestPerformance(ss);
+		//}
+	}
 	void RenderingProfile::OnLoad()
 	{
 		AsyncEvent asyncEvent;
@@ -93,6 +103,10 @@ namespace JE
 				{
 					ENGINE_LOG_FATAL("LOG");
 				}
+
+		/*		auto node = GlobalLinkData::_EnginePerformance->GetRootTimeNode();
+				TestPerformance(node);*/
+
 				ImGui::EndTabItem();
 			}
 
@@ -263,7 +277,6 @@ namespace JE
 		bool is_tool_tip = false;
 		for (auto& resource : info)
 		{
-			int s = resource.name.find(input_str);
 			if (resource.name.find(input_str) == std::string::npos)
 			{
 				continue;
@@ -271,7 +284,8 @@ namespace JE
 			ImGui::TextColored(green, resource.name.c_str());
 			if (ImGui::IsItemHovered())
 			{
-				std::string tool_tip = R"(** DescInfo ** 
+				std::string tool_tip = R"(** DescInfo **
+Name : %s 
 Dimension : %s 
 Width : %d   Height : %d 
 Array Size : %d 
@@ -281,6 +295,7 @@ SampleCount : %d   SampleQuality : %d
 TextureLayout : %s 
 Flags : %s )";
 				ImGui::SetTooltip(tool_tip.c_str(),
+					resource.name.c_str(),
 					resource.dimension.c_str(),
 					resource.width, resource.height,
 					resource.array_size,

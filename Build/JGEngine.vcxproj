@@ -187,6 +187,7 @@
     <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\GameGUI.h" />
     <ClInclude Include="..\JGEngine\Application\JE.h" />
@@ -218,6 +219,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\GameGUI.cpp" />
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />

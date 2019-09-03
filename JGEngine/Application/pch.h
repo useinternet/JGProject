@@ -23,10 +23,12 @@
 #include <mutex>
 #include <fstream>
 #include <string>
+#include <cmath>
 #include <map>
 #include <functional>
+#include  <Psapi.h>
 #include <algorithm>
-#include <filesystem>
+#include <experimental/filesystem>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
@@ -43,7 +45,7 @@
 
 
 using namespace Microsoft::WRL;
-
+namespace fs = std::experimental::filesystem;
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"Dxgi.lib")

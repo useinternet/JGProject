@@ -72,7 +72,7 @@ workspace "JGGame"
   os.mkdir("Bin")
   os.mkdir("Config")
   os.mkdir("Contents")
-  os.mkdir("Temp")
+  os.mkdir("Source")
   os.mkdir("Build")
 
 
@@ -347,7 +347,37 @@ group "Engine"
          SetEngineConfiguarations()
       
 
-group "%{wks.name}"
+group "Game"
+   project "JGGame"
+   location "Build"
+   kind "SharedLib"
+   language "C++"
+   targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
+   objdir("./Build/obj/%{cfg.buildcfg}/")
+   -- defines
+   defines("JGGAME_EXPORTS")
+   --
+   -- files
+   files{
+      "Source/**.h",
+      "Source/**.cpp"
+   }
+
+   -- add include dir
+   includedirs{
+      "JGEngine/Library",
+      "JGEngine/Common",
+      "JGEngine/Core/GameFrameWork"
+   }
+   -- linkProject
+   links {
+      "Common",
+      "GameFrameWork"
+   }
+   vpaths{
+      ["*"] = {"Source/**.h", "Source/**.cpp"}
+   }
+   SetGameConfiguarations()
 
 
 group ""

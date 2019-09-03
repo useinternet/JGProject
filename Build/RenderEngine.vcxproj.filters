@@ -89,6 +89,9 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\d3dx12.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\framework.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\pch.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\DxUtill.cpp" />
@@ -146,5 +149,8 @@
       <Filter>Temp</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

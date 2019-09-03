@@ -21,6 +21,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundEngine", "Build\SoundE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGEngine", "Build\JGEngine.vcxproj", "{AC6F16C9-983C-71D4-C155-5F7CAD81A662}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{6695C55D-524D-07AB-BB54-E006A72BA29B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGGame", "Build\JGGame.vcxproj", "{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		DevelopEngine|x64 = DevelopEngine|x64
@@ -93,6 +97,14 @@ Global
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.Release|x64.ActiveCfg = Release|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.Release|x64.Build.0 = Release|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.Build.0 = DevelopGame|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.Release|x64.ActiveCfg = Release|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,5 +119,6 @@ Global
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F} = {1AAFCB23-86C5-C9B9-CF3C-55DB3B929A41}
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E} = {1AAFCB23-86C5-C9B9-CF3C-55DB3B929A41}
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662} = {8249BEE1-6EAC-4D86-1732-863C03741909}
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0} = {6695C55D-524D-07AB-BB54-E006A72BA29B}
 	EndGlobalSection
 EndGlobal

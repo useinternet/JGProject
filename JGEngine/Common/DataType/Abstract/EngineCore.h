@@ -9,7 +9,7 @@ class EngineCore : public NoneCopy
 {
 public:
 	EngineCore(const GlobalLinkStream& stream);
-	virtual ~EngineCore() = default;
+	virtual ~EngineCore();
 public:
 	virtual void Load() = 0;
 	virtual void Update() = 0;

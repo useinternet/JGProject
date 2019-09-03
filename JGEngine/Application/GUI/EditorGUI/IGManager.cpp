@@ -4,10 +4,19 @@ using namespace std;
 // profile
 #include "Profile/RenderingProfile.h"
 #include "Profile/ConsoleLog.h"
-
+#include "Profile/Performance.h"
 // editor
 #include "Editor/SceneEditor.h"
 #include "Editor/FileViewer.h"
+
+
+
+
+
+
+#define SELECT_IGWINDOW(str) if (ImGui::MenuItem(#str)) select_menu = #str;
+#define OPEN_IGWINDOW(str)   if (select_menu == #str) CreateIGWindow<##str>(#str);
+
 namespace JE
 {
 	IGManager::IGManager(EditorGUI* editor) : m_EditorGui(editor)
@@ -21,7 +30,7 @@ namespace JE
 		
 		for (auto& window_pair : m_IGWindowPool)
 		{
-			fout << window_pair.first << endl;
+			window_pair.second->DataSave(fout);
 		}
 		fout.close();
 	}
@@ -41,6 +50,8 @@ namespace JE
 					std::string str;
 					std::getline(fin, str);
 					OpenWindow(str);
+					if (m_IGWindowPool.find(str) != m_IGWindowPool.end())
+						m_IGWindowPool[str]->DataLoad(fin);
 				}
 			}
 			fin.close();
@@ -48,11 +59,13 @@ namespace JE
 	}
 	void IGManager::Update()
 	{
+		ENGINE_PERFORMANCE_TIMER("Editor", "IGManager::Update");
 		for (auto iter = m_IGWindowPool.begin(); iter != m_IGWindowPool.end();)
 		{
 			auto ig_window = iter->second;
 			if (ig_window->IsOpen())
 			{
+				ENGINE_PERFORMANCE_TIMER("IGManager::Update", ig_window->GetName());
 				ig_window->Update();
 				++iter;
 			}
@@ -85,8 +98,8 @@ namespace JE
 				{
 					if (ImGui::BeginMenu("Editor"))
 					{
-						if (ImGui::MenuItem("SceneEditor")) select_menu = "SceneEditor";
-						if (ImGui::MenuItem("FileViewer")) select_menu = "FileViewer";
+						SELECT_IGWINDOW(SceneEditor);
+						SELECT_IGWINDOW(FileViewer);
 						ImGui::EndMenu();
 					}
 
@@ -97,15 +110,12 @@ namespace JE
 				{
 					if (ImGui::BeginMenu("Profile"))
 					{
-						if (ImGui::MenuItem("RenderProfile"))  select_menu = "RenderProfile";
-						if (ImGui::MenuItem("ConsoleLog")) select_menu = "ConsoleLog";
+						SELECT_IGWINDOW(RenderingProfile);
+						SELECT_IGWINDOW(ConsoleLog);
+						SELECT_IGWINDOW(Performance);
 						ImGui::EndMenu();
 					}
 				}
-
-			
-
-
 				ImGui::EndMenu();
 			}
 
@@ -119,14 +129,14 @@ namespace JE
 
 		// Editor Window Open
 		{
-			if (select_menu == "SceneEditor") CreateIGWindow<SceneEditor>("SceneEditor");
-			if (select_menu == "FileViewer") CreateIGWindow<FileViewer>("FileViewer");
+			OPEN_IGWINDOW(SceneEditor);
+			OPEN_IGWINDOW(FileViewer);
 		}
 		// Profile Window Open
 		{
-			if (select_menu == "RenderProfile") CreateIGWindow<RenderingProfile>("RenderProfile");
-			if (select_menu == "ConsoleLog") 	CreateIGWindow<ConsoleLog>("ConsoleLog");
-
+			OPEN_IGWINDOW(RenderingProfile);
+			OPEN_IGWINDOW(ConsoleLog);
+			OPEN_IGWINDOW(Performance);
 		}
 
 	}

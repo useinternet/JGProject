@@ -24,7 +24,7 @@ namespace IE
 	}
 	void InputEngine::Update()
 	{
-
+		ENGINE_PERFORMANCE_TIMER("Application", "InputEngine");
 
 	}
 	void InputEngine::OnEvent(Event& e)

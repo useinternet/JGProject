@@ -170,13 +170,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\Core.h" />
     <ClInclude Include="..\JGEngine\Core\GameFrameWork\GFW.h" />
     <ClInclude Include="..\JGEngine\Core\GameFrameWork\Game.h" />
+    <ClInclude Include="..\JGEngine\Core\GameFrameWork\Object\GameObject.h" />
     <ClInclude Include="..\JGEngine\Core\GameFrameWork\framework.h" />
     <ClInclude Include="..\JGEngine\Core\GameFrameWork\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Core\GameFrameWork\Game.cpp" />
+    <ClCompile Include="..\JGEngine\Core\GameFrameWork\Object\GameObject.cpp" />
     <ClCompile Include="..\JGEngine\Core\GameFrameWork\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

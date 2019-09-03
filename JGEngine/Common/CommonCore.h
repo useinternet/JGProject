@@ -14,6 +14,7 @@
 #include "DataType/Timer.h"
 
 
+
 #include "Event/Event.h"
 #include "Event/WindowEvents.h"
 #include "Event/AppEvents.h"
@@ -32,5 +33,6 @@
 #include "Class/EventManager.h"
 #include "Class/EngineTimer.h"
 #include "Class/EngineConfig.h"
+#include "Class/EnginePerformance.h"
 #include "Class/GlobalLinkStream.h"
 

@@ -29,6 +29,10 @@ namespace JE
 		void AddWindowFlags(ImGuiWindowFlags flags);
 		void Close();
 		bool IsOpen() const;
+
+
+		virtual void DataLoad(std::ifstream& fin);
+		virtual void DataSave(std::ofstream& fout);
 	protected: // RenderEvent
 		virtual void OnEventFromRE(ToEditFromReEvent& e) {}
 	protected:

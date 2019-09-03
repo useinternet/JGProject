@@ -8,3 +8,8 @@
 #define GAMEFRAMEWORK_API __declspec(dllimport)
 #endif
 #include "CommonCore.h"
+
+
+
+class GameObject;
+typedef  GameObject* (*pCreateGameObjectFunc)();

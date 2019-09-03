@@ -51,3 +51,4 @@ public:
 	int  RemainingRepeatCount() const; 
 	bool IsCompelete() const;
 };
+

@@ -84,6 +84,7 @@ namespace RE
 	}
 	void RenderDevice::Update()
 	{
+		ENGINE_PERFORMANCE_TIMER("RenderEngine", "RenderDevice::Update()");
 		m_RenderDevice->BeginFrame();
 
 
@@ -429,6 +430,7 @@ namespace RE
 	}
 	void RenderDevice::RenderUpdate()
 	{
+		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::RenderUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_DirectCommandQueue->WaitForFenceValue(frameresource.DirectFenceValue);
 
@@ -469,6 +471,7 @@ namespace RE
 	}
 	void RenderDevice::ComputeUpdate()
 	{
+		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::ComputeUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_ComputeCommandQueue->WaitForFenceValue(frameresource.ComputeFenceValue);
 
@@ -500,6 +503,7 @@ namespace RE
 	}
 	void RenderDevice::CopyUpdate()
 	{
+		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::CopyUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_CopyCommandQueue->WaitForFenceValue(frameresource.CopyFenceValue);
 

@@ -1,9 +1,8 @@
-[info] [21180] [Physics] : PhysicsEngine Init Compelete...
-[info] [21180] [Sound] : SoundEngine Init Compelete
-[info] [21180] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [21180] [Engine] : EditorGui Init
-[info] [21180] [Rendering] : RenderEngine Init Complete...
-[info] [14420] [Engine] : LOG
-[error] [7092] [Engine] : LOG
-[warning] [18928] [Engine] : LOG
-[info] [21180] [Engine] : EditorGui Destroy
+[info] [7776] [Physics] : PhysicsEngine Init Compelete...
+[info] [7776] [Sound] : SoundEngine Init Compelete
+[info] [7776] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [7776] [Engine] : EditorGui Init
+[info] [7776] [Rendering] : RenderEngine Init Complete...
+[trace] [7776] [Rendering] : Start shader var
+[trace] [7776] [Rendering] : ShaderName : LightColor   ShaderType : float3  Value : [ 1.000000, 0.000000, 0.500000 ]
+[trace] [7776] [Rendering] : ShaderName : LightColor   ShaderType : float3  Value : [ 0.200000, 0.440000, 1.000000 ]

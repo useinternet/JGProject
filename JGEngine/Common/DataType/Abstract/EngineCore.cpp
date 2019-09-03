@@ -5,3 +5,8 @@ EngineCore::EngineCore(const GlobalLinkStream& stream)
 {
 	GlobalLinkData::Init(stream);
 }
+
+EngineCore::~EngineCore()
+{
+
+}

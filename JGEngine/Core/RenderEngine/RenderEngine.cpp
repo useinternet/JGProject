@@ -47,6 +47,38 @@ namespace RE
 	}
 	void RenderEngine::Load()
 	{
+		RE_LOG_TRACE("Start shader var");
+
+
+		ShaderData data;
+		data.Set("LightColor", ShaderEnum::_float3, JVector(1.0f, 0.0f, 0.5f));
+		
+		JVector s;
+		data.Get(&s);
+		
+		RE_LOG_TRACE("ShaderName : {0}   ShaderType : {1}  Value : {2}",
+			data.GetName(), data.GetTypeString(), s.ToString());
+		data.Set(JVector(0.2f, 0.44f, 1.0f));
+		data.Get(&s);
+		RE_LOG_TRACE("ShaderName : {0}   ShaderType : {1}  Value : {2}",
+			data.GetName(), data.GetTypeString(), s.ToString());
+
+		/*
+		struct VertexIn
+{
+	float3 PosL : POSITION;
+	float3 Normal : NORMAL;
+	float3 Tangent : TANGENT;
+	float2 TexC : TEXCOORD;
+};
+	*/
+		//InputShaderData input("VertexIn");
+		//input.AddData(ShaderEnum::_float3, "PosL", "POSITION");
+		//input.AddData(ShaderEnum::_float3, "Normal", "NORMAL");
+		//input.AddData(ShaderEnum::_float3, "TANGENT", "TANGENT");
+		//input.AddData(ShaderEnum::_float3, "TexC", "TEXCOORD");
+		//auto str = input.GetShaderCode();
+
 		m_RenderItem.Rootsignature = make_shared<RootSignature>(2);
 		m_RenderItem.Rootsignature->InitParam(0).InitAsConstantBufferView(0);
 		m_RenderItem.Rootsignature->InitParam(1).PushAsDescriptorRange(
@@ -234,6 +266,7 @@ float4 PS(VertexOut pin) : SV_Target
 	}
 	void RenderEngine::Update()
 	{
+		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
 		m_RenderItem.contants1.Frame++;
 		if (m_RenderItem.contants1.Frame >= 600)
 		{

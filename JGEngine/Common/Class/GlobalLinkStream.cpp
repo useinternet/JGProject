@@ -6,7 +6,7 @@ std::shared_ptr<spdlog::logger> GlobalLinkData::Logger;
 std::shared_ptr<EventManager>   GlobalLinkData::EngineEventManager;
 std::shared_ptr<EngineTimer>    GlobalLinkData::_EngineTimer;
 std::shared_ptr<EngineConfig>   GlobalLinkData::_EngineConfig;
-
+std::shared_ptr<EnginePerformance> GlobalLinkData::_EnginePerformance;
 
 float GlobalLinkData::GetTick(TimeStepType type) {
 	return _EngineTimer->GetTick(type);

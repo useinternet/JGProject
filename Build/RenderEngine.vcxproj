@@ -192,6 +192,7 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\DxObject\UploadBuffer.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderTarget.h" />
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\RE.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\RE_EventListener.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\RenderEngine.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\DxObject\UploadBuffer.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderTarget.cpp" />
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\RE_EventListener.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\RenderEngine.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Temp\DDSTextureLoader.cpp" />

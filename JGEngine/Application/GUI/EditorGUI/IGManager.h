@@ -2,6 +2,8 @@
 
 #include "IGWindow.h"
 #include "CommonCore.h"
+
+
 namespace JE
 {
 	class EditorGUI;

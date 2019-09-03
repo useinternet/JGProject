@@ -26,6 +26,8 @@ namespace JE
 
 		//timer 
 		TimerByFunction m_FunctionTimer;
+	private:
+		void TestPerformance(std::shared_ptr<EnginePerformance::TimerNode> node);
 	protected:
 		virtual void OnLoad() override;
 		virtual void OnGUI() override;
@@ -38,6 +40,7 @@ namespace JE
 	protected:
 	    void SendAllocatorDebugInfo(SendAllocatorDebugInfoEvent& e);
 		void SendAllResourceDebugInfo(SendAllResourceDebugInfoEvent& e);
+
 
 	};
 }
