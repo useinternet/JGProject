@@ -452,9 +452,10 @@ namespace JE
 						thread_ID.emplace(child->ThreadID,thread_ID_count++);
 					}
 					id = thread_ID[child->ThreadID];
-
+					
 					ImGui::Text(("Name : " + child->Name).c_str());
 					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 100.0f);
 					ImGui::Text("Thread : %d", id);
 					ImGui::NextColumn();
 					PushBarColorByValue(m_ChildTickPercent[count], 0.4f, 0.8f);

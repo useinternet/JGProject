@@ -13,7 +13,7 @@
 #include "Object/DxObject/Shader.h"
 #include "Object/DxObject/PipelineState.h"
 #include "Object/DxObject/RootSignature.h"
-
+#include "Object/ReObject/ShaderModule.h"
 #include "Temp/DDSTextureLoader.h"
 #include <d3dcompiler.h>
 using namespace std;
@@ -47,138 +47,145 @@ namespace RE
 	}
 	void RenderEngine::Load()
 	{
-		RE_LOG_TRACE("Start shader var");
+		CreateBox(1.0f, 1.0f, 1.0f);
+
+		GraphicsShaderModule gModule(1920, 1080);
 
 
-		ShaderData data;
-		data.Set("LightColor", ShaderEnum::_float3, JVector(1.0f, 0.0f, 0.5f));
-		
-		JVector s;
-		data.Get(&s);
-		
-		RE_LOG_TRACE("ShaderName : {0}   ShaderType : {1}  Value : {2}",
-			data.GetName(), data.GetTypeString(), s.ToString());
-		data.Set(JVector(0.2f, 0.44f, 1.0f));
-		data.Get(&s);
-		RE_LOG_TRACE("ShaderName : {0}   ShaderType : {1}  Value : {2}",
-			data.GetName(), data.GetTypeString(), s.ToString());
+		SCInputStruct* vertexIn = gModule.DefineInputStruct("VertexIn");
+		vertexIn->AddVar(ShaderEnum::_float3, "PosL", "POSITION");
+		vertexIn->AddVar(ShaderEnum::_float3, "Normal", "NORMAL");
+		vertexIn->AddVar(ShaderEnum::_float3, "Tangent", "TANGENT");
+		vertexIn->AddVar(ShaderEnum::_float2, "TexC", "TEXCOORD");
+		auto InputLayouts = vertexIn->GetInputElementDescArray();
 
-		/*
-		struct VertexIn
-{
-	float3 PosL : POSITION;
-	float3 Normal : NORMAL;
-	float3 Tangent : TANGENT;
-	float2 TexC : TEXCOORD;
-};
-	*/
-		//InputShaderData input("VertexIn");
-		//input.AddData(ShaderEnum::_float3, "PosL", "POSITION");
-		//input.AddData(ShaderEnum::_float3, "Normal", "NORMAL");
-		//input.AddData(ShaderEnum::_float3, "TANGENT", "TANGENT");
-		//input.AddData(ShaderEnum::_float3, "TexC", "TEXCOORD");
-		//auto str = input.GetShaderCode();
 
-		m_RenderItem.Rootsignature = make_shared<RootSignature>(2);
-		m_RenderItem.Rootsignature->InitParam(0).InitAsConstantBufferView(0);
-		m_RenderItem.Rootsignature->InitParam(1).PushAsDescriptorRange(
-			D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 0);
-		m_RenderItem.Rootsignature->InitParam(1).InitAsDescriptorTable();
-		m_RenderItem.Rootsignature->AddStaticSampler(
+		SCInputStruct* vertexOut = gModule.DefineInputStruct("VertexOut");
+		vertexOut->AddVar(ShaderEnum::_float4, "PosH", "SV_POSITION");
+		vertexOut->AddVar(ShaderEnum::_float3, "NormalW", "NORMAL");
+		vertexOut->AddVar(ShaderEnum::_float3, "TangentW", "TANGENT");
+		vertexOut->AddVar(ShaderEnum::_float2, "TexC", "TEXCOORD");
+
+		SDConstantBuffer* cbPerObject = gModule.DefineConstantBuffer("cbPerObject");
+		cbPerObject->AddVar(ShaderEnum::_matrix4x4, "gWorld");
+		cbPerObject->AddVar(ShaderEnum::_matrix4x4, "gViewProj");
+		cbPerObject->AddVar(ShaderEnum::_uint, "gFrame");
+		cbPerObject->AddVar(ShaderEnum::_float3, "gpadding");
+
+		gModule.DefineSamplerState("gsampler",
 			CD3DX12_STATIC_SAMPLER_DESC(0,
 				D3D12_FILTER_ANISOTROPIC,
 				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
 				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
 				D3D12_TEXTURE_ADDRESS_MODE_WRAP));
-		m_RenderItem.Rootsignature->Finalize();
-
-		CreateBox(1.0f, 1.0f, 1.0f);
-
-		std::vector<D3D12_INPUT_ELEMENT_DESC> InputLayouts =
-		{
-			 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			 { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			 { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			 { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-		};
+		gModule.DefineSDResource(ShaderEnum::Texture2D, "gtexture", 10);
 
 
+		gModule.AddRenderTargetTexture(
+			"FinalScene", DXGI_FORMAT_R8G8B8A8_UNORM,
+			{ 0.0f,0.0f,0.0f,0.0f });
+		gModule.AddDepthStencilTexture("FinalDepthScene");
+		m_RenderDevice->RegisterGUITexture(*gModule.FindRenderTargetTexture(0));
+		m_RenderItem.rendertarget = make_shared<RenderTarget>(*gModule.GetRenderTarget());
 
-		std::string shadercode = R"(
-	    cbuffer cbPerObject : register(b0)
-		{
-            float4x4 gWorld;
-			float4x4 gViewProj;
-            uint gFrame;
-            float3 gpadding;
-		};
 
-		struct VertexIn
-		{
-			float3 PosL : POSITION;
-            float3 Normal : NORMAL;
-            float3 Tangent : TANGENT;
-			float2 TexC : TEXCOORD;
-		};
+		gModule.SetInputOutputStream(ShaderType::Vertex, "VertexIn", "VertexOut");
+		gModule.SetInputOutputStream(ShaderType::Pixel, "VertexOut", "OutStream");
+		// Test
+		//gModule.DefineSDResource(ShaderEnum::Texture2D, "testTexture", 30);
+		//gModule.DefineConstantBuffer("testcBuffer");
+		//gModule.DefineStruct("light")->AddVar(ShaderEnum::_float,"distance");
+		//gModule.DefineStructuredBuffer("structuredBufffer", "light");
 
-		struct VertexOut
-		{
-			float4 PosH : SV_POSITION;
-            float3 NormalW : NORMAL;
-            float3 TangentW : TANGENT;
-			float2 TexC : TEXCOORD;
-		};
-
+		/*
 		VertexOut VS(VertexIn vin)
-		{
-			VertexOut vout;
-
-			// Transform to homogeneous clip space.
-            float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-			vout.PosH = mul(posW, gViewProj);
-
-			// Just pass vertex color into the pixel shader.
-			vout.TexC = vin.TexC;
-            vout.NormalW = float3(0.0f,0.0f,0.0f);
-            vout.TangentW = float3(0.0f,0.0f,0.0f);
-			return vout;
-		} 
-
-
-Texture2D  gtexture[10] : register(t0);
-SamplerState  gsampler  : register(s0);
-float4 PS(VertexOut pin) : SV_Target
 {
+    VertexOut vout;
+		*/
+		gModule.PushCode(ShaderType::Vertex,
+			R"(
+    // Transform to homogeneous clip space.
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    vout.PosH = mul(posW, gViewProj);
+
+	// Just pass vertex color into the pixel shader.
+	vout.TexC = vin.TexC;
+    vout.NormalW = float3(0.0f,0.0f,0.0f);
+    vout.TangentW = float3(0.0f,0.0f,0.0f); )");
+        gModule.PushCode(ShaderType::Pixel,
+			R"(
     uint index = gFrame / 60;
     float4 color = gtexture[index].Sample(gsampler, pin.TexC);
     // 
-    return color;
-}
-       )";
+    pout.FinalScene = color;
+)");
+		gModule.CreateCode();
+		gModule.CreateRootSignature();
+		gModule.Compile();
+		m_RenderItem.Rootsignature = make_shared<RootSignature>(*gModule.GetRootSignature());
 
-		//VertexShader v_shader;
-		m_RenderItem.VertexShader = make_shared<VertexShader>();
-		m_RenderItem.VertexShader->Set(shadercode);
-		//PixelShader  p_shader;
-		m_RenderItem.PixelShader = make_shared<PixelShader>();
-		m_RenderItem.PixelShader->Set(shadercode);
-		ShaderCompiler v_shader_Compiler(m_RenderItem.VertexShader->GetType());
-		ShaderCompiler p_shader_Compiler(m_RenderItem.PixelShader->GetType());
-#ifdef _DEBUG
-		v_shader_Compiler.Flags1 = p_shader_Compiler.Flags1 = D3DCOMPILE_DEBUG;
-#else
-		v_shader_Compiler.Flags1 = p_shader_Compiler.Flags1 = D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
-		m_RenderDevice->CompileShader(*m_RenderItem.VertexShader, v_shader_Compiler);
-		m_RenderDevice->CompileShader(*m_RenderItem.PixelShader, p_shader_Compiler);
+		auto v_shader_str = gModule.GetCode(ShaderType::Vertex);
+		auto p_shader_str = gModule.GetCode(ShaderType::Pixel);
 
+
+//		std::string shadercode = R"(
+//	    cbuffer cbPerObject : register(b0)
+//		{
+//            float4x4 gWorld;
+//			float4x4 gViewProj;
+//            uint gFrame;
+//            float3 gpadding;
+//		};
+//
+//		struct VertexIn
+//		{
+//			float3 PosL : POSITION;
+//            float3 Normal : NORMAL;
+//            float3 Tangent : TANGENT;
+//			float2 TexC : TEXCOORD;
+//		};
+//
+//		struct VertexOut
+//		{
+//			float4 PosH : SV_POSITION;
+//            float3 NormalW : NORMAL;
+//            float3 TangentW : TANGENT;
+//			float2 TexC : TEXCOORD;
+//		};
+//
+//		VertexOut VS(VertexIn vin)
+//		{
+//			VertexOut vout;
+//
+//			// Transform to homogeneous clip space.
+//            float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+//			vout.PosH = mul(posW, gViewProj);
+//
+//			// Just pass vertex color into the pixel shader.
+//			vout.TexC = vin.TexC;
+//            vout.NormalW = float3(0.0f,0.0f,0.0f);
+//            vout.TangentW = float3(0.0f,0.0f,0.0f);
+//			return vout;
+//		} 
+//
+//
+//Texture2D  gtexture[10] : register(t0);
+//SamplerState  gsampler  : register(s0);
+//float4 PS(VertexOut pin) : SV_Target
+//{
+//    uint index = gFrame / 60;
+//    float4 color = gtexture[index].Sample(gsampler, pin.TexC);
+//    // 
+//    return color;
+//}
+//       )";
 
 
 		m_RenderItem.PSO = make_shared<GraphicsPipelineState>();
 
 		m_RenderItem.PSO->SetInputLayout(InputLayouts);
-		m_RenderItem.PSO->BindShader(*m_RenderItem.VertexShader);
-		m_RenderItem.PSO->BindShader(*m_RenderItem.PixelShader);
+		m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Vertex));
+		m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Pixel));
 		m_RenderItem.PSO->SetRenderTargetFormat({ 0 }, { DXGI_FORMAT_R8G8B8A8_UNORM });
 		m_RenderItem.PSO->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
 		m_RenderItem.PSO->SetRootSignature(*m_RenderItem.Rootsignature);
@@ -209,37 +216,6 @@ float4 PS(VertexOut pin) : SV_Target
 		m_RenderItem.height = 1080;
 
 
-		D3D12_CLEAR_VALUE rtv_clear = {};
-		rtv_clear.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		rtv_clear.Color[0] = 0.0f;
-		rtv_clear.Color[1] = 0.0f;
-		rtv_clear.Color[2] = 0.0f;
-		rtv_clear.Color[3] = 0.0f;
-		Texture texture("FinalScene");
-		texture.CreateResource(
-			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-				1920, 1080, 1, 1, 1, 0,
-				D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-			&rtv_clear);
-		m_RenderDevice->RegisterGUITexture(texture);
-
-
-		D3D12_CLEAR_VALUE dsv_clear = {};
-		dsv_clear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		dsv_clear.DepthStencil.Depth = 1.0f;
-		dsv_clear.DepthStencil.Stencil = 0;
-
-		Texture depth_texture;
-		depth_texture.CreateResource(
-			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D24_UNORM_S8_UINT,
-				1920, 1080, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-			&dsv_clear);
-
-
-
-		m_RenderItem.rendertarget = make_shared<RenderTarget>();
-		m_RenderItem.rendertarget->BindTexture(0, texture);
-		m_RenderItem.rendertarget->BindDepthTexture(depth_texture);
 
 
 		//임시 텍스쳐

@@ -7,6 +7,8 @@ namespace RE
 	class Shader : public DxObject
 	{
 		friend class RenderDevice;
+
+		
 	public:
 		Shader();
 		Shader(const std::string& name);

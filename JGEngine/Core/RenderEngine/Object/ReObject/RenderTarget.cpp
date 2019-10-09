@@ -54,6 +54,19 @@ namespace RE
 	{
 		return m_DepthTexture;
 	}
+	Texture* RenderTarget::GetTexture(uint32_t slot)
+	{
+		if (slot >= MAX_RENDER_TARGET)
+		{
+			RE_LOG_WARN("You have exceeded the maximum slot of{ 0 }", GetName());
+			return &m_Textures[0];
+		}
+		return &m_Textures[slot];
+	}
+	Texture* RenderTarget::GetDepthTexture()
+	{
+		return &m_DepthTexture;
+	}
 	const Color& RenderTarget::GetClearColor(uint32_t slot) const
 	{
 		if (slot >= MAX_RENDER_TARGET)

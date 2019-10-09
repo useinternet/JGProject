@@ -93,12 +93,15 @@ namespace RE
 		{
 			BindGraphicsDynamicConstantBuffer(rootparam, sizeof(DataType), &data);
 		}
+		void BindGraphicsDynamicConstantBuffer(
+			uint32_t rootparam, const std::vector<byte>& data);
 		template<typename DataType>
 		void BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, const std::vector<DataType>& data_array)
 		{
 			BindGraphicsDynamicStructuredBuffer(rootparam, 
 				(uint32_t)data_array.size(), (uint32_t)sizeof(DataType), data_array.data());
 		}
+		void BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, uint32_t dataSize, const std::vector<byte>& data);
 
 		void BindVertexBuffer(uint32_t slot, const VertexBuffer& vertex_buffer);
 		void BindIndexBuffer(const IndexBuffer& index_buffer);

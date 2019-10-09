@@ -25,6 +25,8 @@ namespace RE
 	class GraphicsPipelineState;
 	class VertexShader;
 	class PixelShader;
+
+	
 	struct Vertex
 	{
 		DirectX::XMFLOAT3 Pos;

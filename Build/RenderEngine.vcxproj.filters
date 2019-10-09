@@ -92,6 +92,12 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.h">
       <Filter>Object\ReObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderCode.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\DxUtill.cpp" />
@@ -150,6 +156,12 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\pch.cpp" />
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderCode.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.cpp">
       <Filter>Object\ReObject</Filter>
     </ClCompile>
   </ItemGroup>
