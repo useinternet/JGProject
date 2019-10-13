@@ -51,7 +51,7 @@ namespace RE
 
 		GraphicsShaderModule gModule(1920, 1080);
 
-
+	
 		SCInputStruct* vertexIn = gModule.DefineInputStruct("VertexIn");
 		vertexIn->AddVar(ShaderEnum::_float3, "PosL", "POSITION");
 		vertexIn->AddVar(ShaderEnum::_float3, "Normal", "NORMAL");
@@ -238,7 +238,8 @@ namespace RE
 			texture_que.Flush();
 		}
 
-
+		m_Module = make_shared<GraphicsShaderModule>(gModule);
+		m_Module->FindBindedSDResource("gtexture")->BindResource(m_RenderItem.textures);
 	}
 	void RenderEngine::Update()
 	{
@@ -266,90 +267,59 @@ namespace RE
 		m_RenderDevice->SubmitToRender(1, 
 			[&](CommandList* commandList) {
 
-			Viewport viewport;
-			viewport.Set((float)m_RenderItem.width, (float)m_RenderItem.height);
-			ScissorRect rect;
-			rect.Set(m_RenderItem.width, m_RenderItem.height);
 
-			commandList->SetViewport(viewport);
-			commandList->SetScissorRect(rect);
-			commandList->SetGraphicsRootSignature(*m_RenderItem.Rootsignature);
-			commandList->SetPipelineState(*m_RenderItem.PSO);
+				{
+					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
+					cbuffer->SetVar(m_RenderItem.contants1);
 			
-
-		
-			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
-
-			{
-				commandList->BindGraphicsDynamicConstantBuffer(
-					0, m_RenderItem.contants1);
-				commandList->BindSRV(1, m_RenderItem.textures);
-				commandList->BindDynamicVertexBuffer(
-					0, m_RenderItem.vertices);
-				commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-				commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-			}
-		});
-		m_RenderDevice->SubmitToRender(1,
-			[&](CommandList* commandList) {
-
-			Viewport viewport;
-			viewport.Set((float)m_RenderItem.width, (float)m_RenderItem.height);
-			ScissorRect rect;
-			rect.Set(m_RenderItem.width, m_RenderItem.height);
-
-			commandList->SetViewport(viewport);
-			commandList->SetScissorRect(rect);
-			commandList->SetGraphicsRootSignature(*m_RenderItem.Rootsignature);
-			commandList->SetPipelineState(*m_RenderItem.PSO);
+					m_Module->Execute(commandList, *m_Module->GetPipelineState());
 
 
-			//commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
-			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
 
-			{
-					commandList->BindGraphicsDynamicConstantBuffer(
-						0, m_RenderItem.contants2);
-					commandList->BindSRV(1, m_RenderItem.textures);
 					commandList->BindDynamicVertexBuffer(
 						0, m_RenderItem.vertices);
 					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
 					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-			}
-		});
-		m_RenderDevice->SubmitToRender(1,
-			[&](CommandList* commandList) {
 
-			Viewport viewport;
-			viewport.Set((float)m_RenderItem.width, (float)m_RenderItem.height);
-			ScissorRect rect;
-			rect.Set(m_RenderItem.width, m_RenderItem.height);
+				}
 
-			commandList->SetViewport(viewport);
-			commandList->SetScissorRect(rect);
-			commandList->SetGraphicsRootSignature(*m_RenderItem.Rootsignature);
-			commandList->SetPipelineState(*m_RenderItem.PSO);
+				{
 
+					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
+					cbuffer->SetVar(m_RenderItem.contants2);
 
-			//commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
-			commandList->SetRenderTarget(*m_RenderItem.rendertarget);
+					m_Module->Execute(commandList, *m_Module->GetPipelineState());
 
-			{
-					commandList->BindGraphicsDynamicConstantBuffer(
-						0, m_RenderItem.contants3);
-					commandList->BindSRV(1, m_RenderItem.textures);
 					commandList->BindDynamicVertexBuffer(
 						0, m_RenderItem.vertices);
 					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
 					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-			}
+				}
+
+
+
+				{
+					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
+					cbuffer->SetVar(m_RenderItem.contants3);
+					m_Module->Execute(commandList, *m_Module->GetPipelineState());
+
+					commandList->BindDynamicVertexBuffer(
+						0, m_RenderItem.vertices);
+					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
+
+				}
+
+
+
 		});
+
 
 		m_RenderDevice->Update();
 	}

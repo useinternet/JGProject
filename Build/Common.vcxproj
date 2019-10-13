@@ -177,6 +177,8 @@
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Timer.h" />
+    <ClInclude Include="..\JGEngine\Common\DataType\VertexCollection.h" />
+    <ClInclude Include="..\JGEngine\Common\Defined.h" />
     <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h" />
     <ClInclude Include="..\JGEngine\Common\Event\Event.h" />
     <ClInclude Include="..\JGEngine\Common\Event\GameFrameWorkEvent.h" />

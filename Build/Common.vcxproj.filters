@@ -105,6 +105,10 @@
     <ClInclude Include="..\JGEngine\Common\Class\EnginePerformance.h">
       <Filter>Class</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\VertexCollection.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Defined.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">

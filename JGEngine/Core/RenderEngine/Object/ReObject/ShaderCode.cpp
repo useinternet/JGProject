@@ -364,6 +364,16 @@ namespace RE
 		m_SCVars.push_back(std::make_shared<SCStruct>(var));
 	}
 
+	uint32_t SDConstantBuffer::GetDataSize() const
+	{
+		uint32_t size = 0;
+		for (auto& data : m_DataSheet)
+		{
+			size += (uint32_t)data.second.size();
+		}
+		return size;
+	}
+
 	std::vector<byte> SDConstantBuffer::GetData() const
 	{
 		std::vector<byte> result;

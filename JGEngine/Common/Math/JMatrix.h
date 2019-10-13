@@ -2,7 +2,7 @@
 #include "CommonCore.h"
 #include <DirectXMath.h>
 
-class JVector;
+class JVector3;
 class JMatrix
 {
 	using SimMat = DirectX::XMMATRIX;
@@ -21,15 +21,15 @@ public:
 			_31, _32, _33, _34,
 			_41, _42, _43, _44) {}
 	JMatrix(float w,
-		const JVector& v1,
-		const JVector& v2,
-		const JVector& v3,
-		const JVector& v4);
+		const JVector3& v1,
+		const JVector3& v2,
+		const JVector3& v3,
+		const JVector3& v4);
 	JMatrix(
-		const JVector& v1, float w1,
-		const JVector& v2, float w2,
-		const JVector& v3, float w3,
-		const JVector& v4, float w4);
+		const JVector3& v1, float w1,
+		const JVector3& v2, float w2,
+		const JVector3& v3, float w3,
+		const JVector3& v4, float w4);
 
 	JMatrix(const JMatrix& copy) = default;
 	JMatrix(JMatrix&& rhs) = default;
@@ -76,9 +76,9 @@ public:
 		result.SetSIMD(DirectX::XMMatrixTranspose(m.GetSIMD()));
 		return result;
 	}
-	static JMatrix Translation(const JVector& v);
-	static JMatrix Rotation(const JVector& v);
-	static JMatrix LookAtLH(const JVector& pos, const JVector& target, const JVector& up);
+	static JMatrix Translation(const JVector3& v);
+	static JMatrix Rotation(const JVector3& v);
+	static JMatrix LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
 	inline static JMatrix PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 	{
 		JMatrix result;

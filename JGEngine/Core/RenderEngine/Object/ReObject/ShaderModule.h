@@ -12,6 +12,8 @@ namespace RE
 	class ShaderRegisterMap;
 	class CommandList;
 	class RenderTarget;
+	class GraphicsPipelineState;
+	class PipelineState;
 	class ShaderModule : public ReObject
 	{
 
@@ -81,7 +83,7 @@ namespace RE
 		virtual void PushCode(ShaderType type, const std::string& code) = 0;
 		virtual void CreateRootSignature();
 		virtual void CreateCode() = 0;
-		virtual void Execute(CommandList* cmdList) = 0;
+		virtual void Execute(CommandList* cmdList, const PipelineState& pso) = 0;
 		bool Compile(ErrorCodeMap& out_error_code = ErrorCodeMap());
 
 		//
@@ -142,7 +144,7 @@ namespace RE
 		}
 		virtual void PushCode(ShaderType type, const std::string& code) override;
 		virtual void CreateCode() override;
-		virtual void Execute(CommandList* cmdList) override;
+		virtual void Execute(CommandList* cmdList, const PipelineState& pso) override;
 	public:
 		Texture* AddRenderTargetTexture(
 			const std::string& name,
@@ -168,6 +170,11 @@ namespace RE
 		Texture* FindRenderTargetTexture(const std::string& name);
 		Texture* FindRenderTargetTexture(uint32_t slot);
 		RenderTarget* GetRenderTarget() const;
+
+		std::shared_ptr<GraphicsPipelineState> GetPipelineState(
+			const D3D12_DEPTH_STENCIL_DESC& depth_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT),
+			const D3D12_RASTERIZER_DESC& raster_desc   = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+			const D3D12_BLEND_DESC& blend_desc         = CD3DX12_BLEND_DESC(D3D12_DEFAULT));
 	private:
 		void InsertCodeByVisible(ShaderEnum::EShaderVisible visible,const std::string& src);
 

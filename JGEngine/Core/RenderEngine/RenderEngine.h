@@ -48,7 +48,7 @@ namespace RE
 		JMatrix World = JMatrix::Identity();
 		JMatrix ViewProj;
 		uint32_t Frame = 0;
-		JVector padding;
+		JVector3 padding;
 	};
 	struct RenderItem
 	{
@@ -67,6 +67,7 @@ namespace RE
 		std::vector<Texture> textures;
 	};
 
+	class GraphicsShaderModule;
 	class RENDERENGINE_API RenderEngine : public EngineCore
 	{
 	private:
@@ -74,6 +75,7 @@ namespace RE
 		RE_EventListener m_EventListener;
 		RenderItem m_RenderItem;
 		std::vector<Resource> m_UploadResource;
+		std::shared_ptr<GraphicsShaderModule> m_Module;
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();

@@ -209,13 +209,33 @@ namespace RE
 				RE_LOG_ERROR("{0} not exist in {1}", var_name, GetName());
 				return;
 			}
-			if (sizeof(T) != m_DataSheet[var_name])
+			if (sizeof(T) != m_DataSheet[var_name].size())
 			{
 				RE_LOG_ERROR("{0} not match datasize in {1}", var_name, GetName());
 				return;
 			}
 			memcpy_s(&m_DataSheet[var_name][0], m_DataSheet[var_name].size(),
 				&data, m_DataSheet[var_name].size());
+		}
+		template<typename T>
+		void SetVar(const T& data)
+		{
+
+			if (sizeof(T) != GetDataSize())
+			{
+				RE_LOG_ERROR("not match datasize in {0}", GetName());
+				return;
+			}
+			std::vector<byte> btData(sizeof(T));
+			memcpy_s(&btData[0], btData.size(), &data, sizeof(T));
+			int idx = 0;
+
+			for (auto& var : m_SCVars)
+			{
+				auto iter = m_DataSheet.find(var->GetName());
+				memcpy_s(&iter->second[0], iter->second.size(), &btData[idx], iter->second.size());
+				idx += iter->second.size();
+			}
 		}
 		template<typename T>
 		void GetVar(const std::string& var_name, T* out_data)
@@ -234,7 +254,19 @@ namespace RE
 			memcpy_s(out_data, m_DataSheet[var_name].size(), m_DataSheet[var_name].data(),
 				m_DataSheet[var_name].size());
 		}
+		template<typename T>
+		void GetVar(T* out_data)
+		{
+			if (sizeof(T) != GetDataSize())
+			{
+				RE_LOG_ERROR("not match datasize in {0}", GetName());
+				return;
+			}
+			auto data = GetData();
+			memcpy_s(out_data, data.size(), data.data(), data.size());
+		}
 	public:
+		uint32_t GetDataSize() const;
 		virtual std::vector<byte> GetData() const override;
 		virtual std::string GetShaderCode() const override;
 	private:

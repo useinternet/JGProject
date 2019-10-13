@@ -98,6 +98,12 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.h">
       <Filter>Object\ReObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\SMObject.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMesh.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\DxUtill.cpp" />
@@ -162,6 +168,12 @@
       <Filter>Object\ReObject</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\SMObject.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMesh.cpp">
       <Filter>Object\ReObject</Filter>
     </ClCompile>
   </ItemGroup>

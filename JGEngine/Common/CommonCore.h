@@ -1,9 +1,7 @@
 
 #pragma once
-#pragma warning(disable : 4251 4275 26495 26451 6387 26439 26498 26495 26498 6387 26110 26451)
-#define ERROR_RANGE 0.000005f
 
-
+#include "Defined.h"
 
 
 #include "DataType/KeyCode.h"
@@ -27,7 +25,7 @@
 #include "Math/Math.h"
 #include "Math/JVector.h"
 #include "Math/JMatrix.h"
-
+#include "DataType/VertexCollection.h"
 
 #include "Class/Log.h"
 #include "Class/EventManager.h"

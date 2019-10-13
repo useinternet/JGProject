@@ -2,7 +2,7 @@
 #include "JVector.h"
 
 
-JVector operator* (float k, const JVector& v)
+JVector3 operator* (float k, const JVector3& v)
 {
 	return v * k;
 }

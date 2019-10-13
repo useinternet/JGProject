@@ -6,6 +6,7 @@
 #include "Object/DxObject/CommandList.h"
 #include "Object/DxObject/RenderDevice.h"
 #include "Object/ReObject/RenderTarget.h"
+#include "Object/DxObject/PipelineState.h"
 using namespace std;
 #define OUT_STREAM "OutStream" 
 namespace RE
@@ -429,14 +430,14 @@ namespace RE
 			code.second.FinalCode += main_code;
 		}
 	}
-	void GraphicsShaderModule::Execute(CommandList* cmdList)
+	void GraphicsShaderModule::Execute(CommandList* cmdList, const PipelineState& pso)
 	{
 		cmdList->SetGraphicsRootSignature(*m_RootSignature);
-		// PSO
 		cmdList->SetViewport(m_Viewport);
 		cmdList->SetScissorRect(m_ScissorRect);
+		cmdList->SetPipelineState(pso);
 		cmdList->SetRenderTarget(*m_RenderTarget);
-		
+	
 
 		for (auto& cbuffer : m_BindedConstantBuffers)
 		{
@@ -568,6 +569,64 @@ namespace RE
 	RenderTarget* GraphicsShaderModule::GetRenderTarget() const
 	{
 		return m_RenderTarget.get();
+	}
+	std::shared_ptr<GraphicsPipelineState> GraphicsShaderModule::GetPipelineState(const D3D12_DEPTH_STENCIL_DESC& depth_desc, const D3D12_RASTERIZER_DESC& raster_desc, const D3D12_BLEND_DESC& blend_desc)
+	{
+		std::shared_ptr<GraphicsPipelineState> pso = make_shared<GraphicsPipelineState>();
+		pso->SetDepthStencilState(depth_desc);
+		pso->SetRasterizerState(raster_desc);
+		pso->SetBlendState(blend_desc);
+
+
+
+		// 렌더 타겟 및 깊이 텍스쳐 설정
+		vector<uint32_t> renderSlots(m_NumRenderTarget);
+		vector<DXGI_FORMAT> renderFormats(m_NumRenderTarget);
+		for (int i = 0; i < m_NumRenderTarget; ++i)
+		{
+			renderSlots[i] = i;
+			renderFormats[i] = m_RenderTarget->GetTexture(i)->GetDesc().Format;
+		}
+
+		pso->SetRenderTargetFormat(renderSlots, renderFormats);
+		
+		auto depth_texture = m_RenderTarget->GetDepthTexture();
+		if (depth_texture)
+		{
+			pso->SetDepthStencilFormat(depth_texture->GetDesc().Format);
+		}
+
+		// 입력 레이아웃 바인딩
+		auto input_struct_name = m_ShaderDatas[ShaderType::Vertex].Stream.first;
+		auto input_strcut = FindDefinedInputStruct(input_struct_name);
+		if (input_strcut)
+		{
+			pso->SetInputLayout(input_strcut->GetInputElementDescArray());
+		}
+
+		// 루트 서명 바인딩
+		pso->SetRootSignature(*m_RootSignature);
+
+		// 셰이더 데이터 바인딩
+		for (auto& sd : m_ShaderDatas)
+		{
+			auto shader = sd.second.Data;
+
+			if (shader)
+			{
+				pso->BindShader(*shader);
+			}
+		}
+
+		if (pso->Finalize())
+		{
+			return pso;
+		}
+		else
+		{
+			RE_LOG_ERROR("Failed Create PipeLineState");
+			return nullptr;
+		}
 	}
 
 	void GraphicsShaderModule::InsertCodeByVisible(ShaderEnum::EShaderVisible visible, const std::string& src)
