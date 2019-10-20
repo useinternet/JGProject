@@ -50,8 +50,6 @@ namespace RE
 		CreateBox(1.0f, 1.0f, 1.0f);
 
 		GraphicsShaderModule gModule(1920, 1080);
-
-	
 		SCInputStruct* vertexIn = gModule.DefineInputStruct("VertexIn");
 		vertexIn->AddVar(ShaderEnum::_float3, "PosL", "POSITION");
 		vertexIn->AddVar(ShaderEnum::_float3, "Normal", "NORMAL");
@@ -90,18 +88,10 @@ namespace RE
 
 
 		gModule.SetInputOutputStream(ShaderType::Vertex, "VertexIn", "VertexOut");
+		gModule.AddShaderParameter(ShaderType::Vertex, ShaderEnum::InstanceID, "insID");
 		gModule.SetInputOutputStream(ShaderType::Pixel, "VertexOut", "OutStream");
-		// Test
-		//gModule.DefineSDResource(ShaderEnum::Texture2D, "testTexture", 30);
-		//gModule.DefineConstantBuffer("testcBuffer");
-		//gModule.DefineStruct("light")->AddVar(ShaderEnum::_float,"distance");
-		//gModule.DefineStructuredBuffer("structuredBufffer", "light");
 
-		/*
-		VertexOut VS(VertexIn vin)
-{
-    VertexOut vout;
-		*/
+
 		gModule.PushCode(ShaderType::Vertex,
 			R"(
     // Transform to homogeneous clip space.
@@ -216,7 +206,7 @@ namespace RE
 		m_RenderItem.height = 1080;
 
 
-
+		
 
 		//임시 텍스쳐
 		{

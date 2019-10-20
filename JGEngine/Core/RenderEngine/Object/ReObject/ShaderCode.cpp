@@ -5,8 +5,8 @@
 using namespace std;
 namespace RE
 {
-	ShaderCode::ShaderCode(ShaderModule* owner_module, const std::string& name, ShaderEnum::EShaderVisible visible) :
-		m_OwnerModule(owner_module), m_Name(name), m_Visible(visible)  { }
+	ShaderCode::ShaderCode(const std::string& name, ShaderEnum::EShaderVisible visible) :
+		 m_Name(name), m_Visible(visible)  { }
 	// Shader ±¸Á¶Ã¼
 	void SCStruct::Set(const std::string& struct_name, ShaderEnum::EShaderVisible visible) {
 		CodeSet(struct_name, visible);
@@ -23,7 +23,7 @@ namespace RE
 		uint32_t array_size, 
 		ShaderEnum::EShaderVisible visible)
 	{
-		SCVar var(m_OwnerModule, type, name, array_size, visible);
+		SCVar var(type, name, array_size, visible);
 		AddVar(var);
 	}
 	void SCStruct::AddVar(const SCStruct& _struct, const std::string& var_name)
@@ -61,7 +61,7 @@ namespace RE
 	}
 	void SCInputStruct::AddVar(const ShaderEnum::EShaderDataType type, const std::string& var_name, const std::string& semantic_name)
 	{
-		SCVar var(m_OwnerModule, type, var_name, 1, GetVisible());
+		SCVar var(type, var_name, 1, GetVisible());
 		m_Datas.push_back(make_shared<SCVar>(var));
 		m_SemanticNames.push_back(semantic_name);
 	}

@@ -16,13 +16,12 @@ namespace RE
 
 	public:
 		ShaderCode() = default;
-		ShaderCode(ShaderModule* owner_module, const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All);
+		ShaderCode(const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All);
 	public:
 		virtual std::string GetShaderCode() const { return""; };
 	public:
 		const std::string& GetName() const { return m_Name; }
 		ShaderEnum::EShaderVisible GetVisible() const { return m_Visible; }
-		void SetOwner(ShaderModule* owner_module) { m_OwnerModule = owner_module; }
 		void SetName(const std::string& name) { m_Name = name; }
 		void SetVisible(ShaderEnum::EShaderVisible visible) { m_Visible = visible; }
 	protected:
@@ -41,8 +40,8 @@ namespace RE
 	{
 	public:
 		SCStruct() : ShaderCode() {}
-		SCStruct(ShaderModule* owner_module, const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All)
-			: ShaderCode(owner_module, name, visible) {}
+		SCStruct(const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All)
+			: ShaderCode(name, visible) {}
 		void Set(const std::string& struct_name, ShaderEnum::EShaderVisible visible); 
 		void AddVar(const SCVar& data);
 		void AddVar(
@@ -64,8 +63,8 @@ namespace RE
 	{
 	public:
 		SCInputStruct() : ShaderCode() {}
-		SCInputStruct(ShaderModule* owner_module, const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All)
-			: ShaderCode(owner_module, name, visible) {}
+		SCInputStruct(const std::string& name, ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All)
+			: ShaderCode(name, visible) {}
 		void Set(const std::string& struct_name, ShaderEnum::EShaderVisible visible);
 		void AddVar(const SCVar& var, const std::string& semantic_name);
 		void AddVar(const ShaderEnum::EShaderDataType type, const std::string& var_name, const std::string& semantic_name);
@@ -82,12 +81,11 @@ namespace RE
 	public:
 		SCVar() = default;
 		SCVar(
-			ShaderModule* owner_module,
 			ShaderEnum::EShaderDataType type,
 			const std::string& name,
 			uint32_t array_size = 1,
 			ShaderEnum::EShaderVisible visible = ShaderEnum::Visible_All) :
-			ShaderCode(owner_module, name, visible),
+			ShaderCode(name, visible),
 			m_Type(type), m_ArraySize(array_size) { }
 
 		void Set(
@@ -116,7 +114,6 @@ namespace RE
 		ShaderEnum::EShaderVisible GetVisible() const { return m_Visible; }
 		uint32_t GetRegisterNumber() const { return m_RegisterNumber; }
 		uint32_t GetRegisterSpace() const { return m_RegisterSpace; }
-		void SetOwner(ShaderModule* owner_module) { m_OwnerModule = owner_module; }
 		void SetName(const std::string& name) { m_Name = name; }
 		void SetVisible(ShaderEnum::EShaderVisible visible) { m_Visible = visible;}
 		virtual void SetRegisterIndex(uint32_t register_number, uint32_t register_space)
@@ -124,7 +121,7 @@ namespace RE
 			m_RegisterNumber = register_number; m_RegisterSpace = register_space;
 		}
 	public:
-		ShaderData(ShaderModule* owner_module) { m_OwnerModule = owner_module; }
+		ShaderData() { }
 		virtual std::string GetShaderCode() const = 0;
 	private:
 		std::string m_Name;
@@ -138,7 +135,7 @@ namespace RE
 	class SDBuffer : public ShaderData
 	{
 	public:
-		SDBuffer(ShaderModule* owner_module) : ShaderData(owner_module) {}
+		SDBuffer() : ShaderData() {}
 		virtual std::vector<byte> GetData() const = 0;
 		virtual std::string GetShaderCode() const override = 0;
 	};
@@ -151,7 +148,7 @@ namespace RE
 	class SDResource : public ShaderData
 	{
 	public:
-		SDResource(ShaderModule* owner_module) : ShaderData(owner_module) {}
+		SDResource() : ShaderData() {}
 		void Set(
 			ShaderEnum::EShaderResourceType type,
 			const std::string& name,
@@ -172,7 +169,7 @@ namespace RE
 	class SDSamplerState : public ShaderData
 	{
 	public:
-		SDSamplerState(ShaderModule* owner_module) : ShaderData(owner_module) {}
+		SDSamplerState() : ShaderData() {}
 		void Set(
 			const D3D12_STATIC_SAMPLER_DESC& desc,
 			const std::string& name,
@@ -189,7 +186,7 @@ namespace RE
 	class SDConstantBuffer : public SDBuffer
 	{
 	public:
-		SDConstantBuffer(ShaderModule* owner_module) : SDBuffer(owner_module) {}
+		SDConstantBuffer() : SDBuffer() {}
 		void Set(
 			const std::string& name,
 			ShaderEnum::EShaderVisible visible);
@@ -279,7 +276,7 @@ namespace RE
 	class SDStructuredBuffer : public SDBuffer
 	{
 	public:
-		SDStructuredBuffer(ShaderModule* owner_module) : SDBuffer(owner_module) {}
+		SDStructuredBuffer() : SDBuffer() {}
 
 		void Set(
 			const std::string& define_name,
@@ -287,7 +284,7 @@ namespace RE
 			ShaderEnum::EShaderVisible visible);
 
 		template<typename T>
-		void AddData(const T& data)
+		uint32_t AddData(const T& data)
 		{
 			uint32_t size = sizeof(T);
 
@@ -303,8 +300,33 @@ namespace RE
 			memcpy_s(&btArray[0], size, &data, size);
 
 			m_Data.insert(m_Data.end(), btArray.begin(), btArray.end());
+			m_IDMap[m_IDIndex] = m_Data.size() - size;
+			return m_IDIndex++;
 		}
-		
+		void RemoveData(uint32_t ID)
+		{
+			if (m_IDMap.find(ID) == m_IDMap.end())
+				return;
+
+			// 
+			uint32_t structSize = m_StructDataType->GetSize();
+			uint32_t idx = m_IDMap[ID];
+			m_IDMap.erase(idx);
+
+			// 데이터 삭제
+			auto start = m_Data.begin() + idx;
+			auto end = start + structSize;
+			m_Data.erase(start , end);
+
+			// 인덱스 변경
+			for (auto& id_pair : m_IDMap)
+			{
+				if (id_pair.second > idx)
+				{
+					id_pair.second -= structSize;
+				}
+			}
+		}
 		template<typename T>
 		void SetData(int idx, const T& data)
 		{
@@ -318,6 +340,16 @@ namespace RE
 
 			memcpy_s(&m_Data[pos], m_StructDataType->GetSize(), &data, m_StructDataType->GetSize());
 		}
+		template<typename T>
+		void SetDataByID(uint32_t id, const T& data)
+		{
+			if (m_IDMap.find(id) == m_IDMap.end())
+				return;
+
+			uint32_t idx = m_IDMap[id];
+			memcpy_s(&m_Data[pos], m_StructDataType->GetSize(), &data, m_StructDataType->GetSize());
+		}
+
 
 		template<typename T>
 		T GetData(int idx)
@@ -334,8 +366,24 @@ namespace RE
 			memcpy_s(&result, m_StructDataType->GetSize(), &m_Data[pos], m_StructDataType->GetSize());
 			return result;
 		}
+		template<typename T>
+		T GetDataByID(uint32_t ID)
+		{
+			if (m_IDMap.find(id) == m_IDMap.end())
+				return;
+			T result;
+			uint32_t size = m_StructDataType->GetSize();
+			memcpy_s(&result, size, &m_Data[m_IDMap[ID]], size);
+			return result;
+		}
 		uint32_t GetElementSize() const {
 			return m_StructDataType->GetSize();
+		}
+		bool IsExistID(uint32_t id)
+		{
+			if (m_IDMap.find(id) == m_IDMap.end())
+				return false;
+			return true;
 		}
 	public:
 		virtual std::vector<byte> GetData() const override;
@@ -343,6 +391,8 @@ namespace RE
 	private:
 		std::shared_ptr<SCStruct> m_StructDataType;
 		std::vector<byte> m_Data;
+		uint32_t m_IDIndex = 0;
+		std::unordered_map<uint32_t, uint32_t> m_IDMap;
 	};
 
 

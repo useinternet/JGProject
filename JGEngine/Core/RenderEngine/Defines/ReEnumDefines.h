@@ -22,6 +22,20 @@ namespace RE
 
 	namespace ShaderEnum
 	{
+		enum EShaderParam
+		{
+			// Vertex
+			InstanceID
+		};
+		inline std::string ShaderParamToString(EShaderParam param)
+		{
+			switch (param)
+			{
+			case InstanceID:
+				return "SV_InstanceID";
+			}
+			return "";
+		}
 		enum EShaderVisible
 		{
 			Visible_Vertex = 0x0001,

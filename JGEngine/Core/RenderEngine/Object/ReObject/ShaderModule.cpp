@@ -8,7 +8,7 @@
 #include "Object/ReObject/RenderTarget.h"
 #include "Object/DxObject/PipelineState.h"
 using namespace std;
-#define OUT_STREAM "OutStream" 
+
 namespace RE
 {
 	ShaderModule::ShaderModule() : ReObject("ShaderModule") 
@@ -30,7 +30,6 @@ namespace RE
 	SCVar* ShaderModule::DefineVar(ShaderEnum::EShaderDataType type, const std::string& name, ShaderEnum::EShaderVisible visible)
 	{
 		shared_ptr<SCVar> var = make_shared<SCVar>();
-		var->SetOwner(this);
 		var->Set(type, name);
 	
 
@@ -42,7 +41,6 @@ namespace RE
 	SCStruct* ShaderModule::DefineStruct(const std::string& name, ShaderEnum::EShaderVisible visible)
 	{
 		shared_ptr<SCStruct> _struct = make_shared<SCStruct>();
-		_struct->SetOwner(this);
 		_struct->Set(name, visible);
 	
 		m_ShaderDefineCodes.emplace(_struct->GetName(), _struct);
@@ -53,7 +51,6 @@ namespace RE
 	SCInputStruct* ShaderModule::DefineInputStruct(const std::string& name, ShaderEnum::EShaderVisible visible)
 	{
 		shared_ptr<SCInputStruct> inputStruct = make_shared<SCInputStruct>();
-		inputStruct->SetOwner(this);
 		inputStruct->Set(name, visible);
 		
 		m_ShaderDefineCodes.emplace(inputStruct->GetName(), inputStruct);
@@ -65,7 +62,7 @@ namespace RE
 		const std::string& name, 
 		ShaderEnum::EShaderVisible visible)
 	{
-		shared_ptr<SDConstantBuffer> cbuffer = make_shared<SDConstantBuffer>(this);
+		shared_ptr<SDConstantBuffer> cbuffer = make_shared<SDConstantBuffer>();
 		cbuffer->Set(name, visible);
 
 		m_ShaderBindDatas.emplace(cbuffer->GetName(), cbuffer);
@@ -82,7 +79,7 @@ namespace RE
 		auto findcode = FindDefinedStruct(defined_struct_name);
 		if (findcode == nullptr)
 			return nullptr;
-		shared_ptr<SDStructuredBuffer> sbuffer = make_shared<SDStructuredBuffer>(this);
+		shared_ptr<SDStructuredBuffer> sbuffer = make_shared<SDStructuredBuffer>();
 		sbuffer->Set(name, *findcode,  visible);
 
 		m_ShaderBindDatas.emplace(sbuffer->GetName(), sbuffer);
@@ -97,7 +94,7 @@ namespace RE
 		uint32_t init_array_size,
 		ShaderEnum::EShaderVisible visible)
 	{
-		shared_ptr<SDResource> resource = make_shared<SDResource>(this);
+		shared_ptr<SDResource> resource = make_shared<SDResource>();
 		resource->Set(type, name, init_array_size, visible);
 
 		m_ShaderBindDatas.emplace(resource->GetName(), resource);
@@ -121,7 +118,7 @@ namespace RE
 		const D3D12_STATIC_SAMPLER_DESC& desc,
 		ShaderEnum::EShaderVisible visible)
 	{
-		shared_ptr<SDSamplerState> sampler = make_shared<SDSamplerState>(this);
+		shared_ptr<SDSamplerState> sampler = make_shared<SDSamplerState>();
 		sampler->Set(desc, name, visible);
 
 		m_ShaderBindDatas.emplace(sampler->GetName(), sampler);
@@ -186,6 +183,10 @@ namespace RE
 		if (m_BindedResources.find(name) == m_BindedResources.end())
 			return nullptr;
 		return m_BindedResources[name];
+	}
+	void ShaderModule::AddShaderParameter(ShaderType type, ShaderEnum::EShaderParam param, const std::string& name)
+	{
+		m_ShaderDatas[type].Parameters[param] = name;
 	}
 	void ShaderModule::SetInputOutputStream(
 		ShaderType type,
@@ -416,7 +417,18 @@ namespace RE
 		{
 			std::string main_code = m_ShaderDatas[code.first].Stream.second + " ";
 			main_code += m_ShaderDatas[code.first].Compiler.EntryPoint +
-				"(" + m_ShaderDatas[code.first].Stream.first + " " + m_ShaderDatas[code.first].Compiler.inStream + ") \n";
+				"(" + m_ShaderDatas[code.first].Stream.first + " " + m_ShaderDatas[code.first].Compiler.inStream;
+				
+			for (auto& param : m_ShaderDatas[code.first].Parameters)
+			{
+				switch (param.first)
+				{
+				case ShaderEnum::InstanceID:
+					main_code += ", uint " + param.second + " : " + ShaderEnum::ShaderParamToString(param.first);
+					break;
+				}
+			}
+			main_code += ") \n";
 			main_code += "{\n   ";
 			main_code += m_ShaderDatas[code.first].Stream.second + " " + m_ShaderDatas[code.first].Compiler.outStream +  ";\n";
 
@@ -493,10 +505,10 @@ namespace RE
 			RE_LOG_ERROR("NumRenderTarget over max 8 in {0}", GetName());
 			return nullptr;
 		}
-		auto out_stream = FindDefinedInputStruct(OUT_STREAM);
+		auto out_stream = FindDefinedInputStruct(FINAL_STREAM);
 		if (out_stream == nullptr)
 		{
-			out_stream = DefineInputStruct(OUT_STREAM);
+			out_stream = DefineInputStruct(FINAL_STREAM);
 			m_RenderTarget = make_shared<RenderTarget>();
 		}
 		D3D12_CLEAR_VALUE value;

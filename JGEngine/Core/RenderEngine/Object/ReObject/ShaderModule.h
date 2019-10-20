@@ -6,6 +6,7 @@
 #include "Object/ReObject.h"
 #include "Object/DxObject/Shader.h"
 #include "Object/ReObject/ShaderCode.h"
+#define FINAL_STREAM "FinalStream" 
 namespace RE
 {
 	class RootSignature;
@@ -28,7 +29,9 @@ namespace RE
 		using BindedStructuredBufferArray = std::map<std::string, SDStructuredBuffer*>;
 		using ErrorCodeMap = std::map<ShaderType, std::vector<std::string>>;
 		using InputOutputStream = std::pair<std::string, std::string>;
+		using ShaderParameter = std::map<ShaderEnum::EShaderParam, std::string>;
 		using RootParamMap = std::map<std::string, uint32_t>;
+	
 	public:
 		ShaderModule();
 
@@ -73,6 +76,14 @@ namespace RE
 		void UnBind(const std::string& name);
 
 
+
+		void AddShaderParameter(ShaderType type, ShaderEnum::EShaderParam param, const std::string& name);
+
+
+
+
+
+
 		void SetInputOutputStream(
 			ShaderType type, 
 			const std::string& in_inputstruct_name,
@@ -101,6 +112,7 @@ namespace RE
 			std::shared_ptr<Shader> Data;
 			ShaderCompiler          Compiler;
 			InputOutputStream       Stream;
+			ShaderParameter         Parameters;
 		};
 		// 정의 코드 조각
 		DefinedVarArray         m_DefinedShaderVars;
