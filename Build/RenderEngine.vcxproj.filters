@@ -16,6 +16,9 @@
     <Filter Include="Temp">
       <UniqueIdentifier>{7BDB8C7C-6712-8E0D-10FF-7310FC140A0F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Shader">
+      <UniqueIdentifier>{f77bd9de-7833-4021-a52e-5ae9755ba9c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Defines\Dx12Hash.h">
@@ -89,20 +92,29 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\d3dx12.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\framework.h" />
     <ClInclude Include="..\JGEngine\Core\RenderEngine\pch.h" />
-    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.h">
-      <Filter>Object\ReObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderCode.h">
-      <Filter>Object\ReObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.h">
-      <Filter>Object\ReObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\SMObject.h">
-      <Filter>Object\ReObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMesh.h">
       <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderDefined.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderObject.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderData.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderLib.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderModule.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMaterial.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderDataType.h">
+      <Filter>Object\Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,20 +173,26 @@
       <Filter>Temp</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderModule.cpp">
-      <Filter>Object\ReObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderCode.cpp">
-      <Filter>Object\ReObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ShaderRegisterMap.cpp">
-      <Filter>Object\ReObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\SMObject.cpp">
-      <Filter>Object\ReObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMesh.cpp">
       <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderObject.cpp">
+      <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderData.cpp">
+      <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderLib.cpp">
+      <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderModule.cpp">
+      <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReMaterial.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderDataType.cpp">
+      <Filter>Object\Shader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

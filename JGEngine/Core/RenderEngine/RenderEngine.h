@@ -50,6 +50,7 @@ namespace RE
 		uint32_t Frame = 0;
 		JVector3 padding;
 	};
+
 	struct RenderItem
 	{
 		std::shared_ptr<GraphicsPipelineState> PSO;
@@ -68,10 +69,19 @@ namespace RE
 	};
 
 	class GraphicsShaderModule;
+	class ShaderLibManager;
 	class RENDERENGINE_API RenderEngine : public EngineCore
 	{
 	private:
-		std::shared_ptr<RenderDevice> m_RenderDevice;
+		std::shared_ptr<RenderDevice>     m_RenderDevice;
+		std::shared_ptr<ShaderLibManager> m_ShaderLibManager;
+
+
+
+
+
+
+
 		RE_EventListener m_EventListener;
 		RenderItem m_RenderItem;
 		std::vector<Resource> m_UploadResource;

@@ -7,6 +7,40 @@
 //
 class JMatrix;
 
+template<typename T>
+class JVector2Template
+{
+public:
+	T x, y;
+public:
+	JVector2Template() : x(0), y(0) {}
+};
+
+template<typename T>
+class JVector3Template
+{
+public:
+	T x, y, z;
+public:
+	JVector3Template() : x(0), y(0), z(0) {}
+};
+
+template<typename T>
+class JVector4Template
+{
+public:
+	T x, y, z, w;
+public:
+	JVector4Template() : x(0), y(0), z(0), w(0) {}
+};
+
+using JVector2Int = JVector2Template<int>;
+using JVector3Int = JVector3Template<int>;
+using JVector4Int = JVector4Template<int>;
+using JVector2Uint = JVector2Template<uint32_t>;
+using JVector3Uint = JVector3Template<uint32_t>;
+using JVector4Uint = JVector4Template<uint32_t>;
+
 class JVector2
 {
 public:
@@ -14,7 +48,13 @@ public:
 public:
 	JVector2() : x(0), y(0) {}
 };
-
+class JVector4
+{
+public:
+	float x, y, z, w;
+public:
+	JVector4() : x(0), y(0),z(0), w(0) {}
+};
 class JVector3
 {
 	friend JMatrix;

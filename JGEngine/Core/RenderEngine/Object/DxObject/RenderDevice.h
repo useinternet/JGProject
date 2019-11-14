@@ -14,7 +14,7 @@ namespace RE
 	class RenderTarget;
 	class GUI;
 	class Shader;
-
+	class ShaderLibManager;
 	struct RENDERENGINE_API RenderDeviceDesc
 	{
 		HWND hWnd;

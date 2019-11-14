@@ -13,8 +13,11 @@
 #include "Object/DxObject/Shader.h"
 #include "Object/DxObject/PipelineState.h"
 #include "Object/DxObject/RootSignature.h"
-#include "Object/ReObject/ShaderModule.h"
 #include "Temp/DDSTextureLoader.h"
+#include "Object/Shader/ShaderData.h"
+#include "Object/Shader/ShaderLib.h"
+#include "Object/Shader/ShaderDataType.h"
+#include "Object/Shader/ShaderModule.h"
 #include <d3dcompiler.h>
 using namespace std;
 using namespace DirectX;
@@ -29,7 +32,8 @@ namespace RE
 	}
 	RenderEngine::~RenderEngine()
 	{
-
+		std::string path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Lib\\ShaderTypeLib.jg");
+		m_ShaderLibManager->Save(path);
 	}
 	void RenderEngine::Init(HWND hWnd, int width, int height, const std::shared_ptr<GUI>& bind_gui)
 	{
@@ -43,79 +47,40 @@ namespace RE
 		m_RenderDevice = make_shared<RenderDevice>(desc);
 		m_EventListener.m_RenderEngine = this;
 		m_EventListener.m_RenderDevice = m_RenderDevice.get();
+		m_ShaderLibManager = make_shared<ShaderLibManager>();
 		RE_LOG_INFO("RenderEngine Init Complete...");
 	}
 	void RenderEngine::Load()
 	{
+		std::string path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Lib\\ShaderTypeLib.jg");
+		m_ShaderLibManager->Load(path);
+
+
+		path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Module\\GBufferModule.jg");
+		GBufferModule ggg("GBufferModule");
+		ggg.Load(path);
+
+
+		auto vcode = ggg.GetCode(ShaderType::Vertex);
+		auto hcode = ggg.GetCode(ShaderType::Hull);
+		auto dcode = ggg.GetCode(ShaderType::Domain);
+		auto gcode = ggg.GetCode(ShaderType::Geometry);
+		auto pcode = ggg.GetCode(ShaderType::Pixel);
+
+
+
+
+		ggg.Save(path);
+
+
+
 		CreateBox(1.0f, 1.0f, 1.0f);
 
-		GraphicsShaderModule gModule(1920, 1080);
-		SCInputStruct* vertexIn = gModule.DefineInputStruct("VertexIn");
-		vertexIn->AddVar(ShaderEnum::_float3, "PosL", "POSITION");
-		vertexIn->AddVar(ShaderEnum::_float3, "Normal", "NORMAL");
-		vertexIn->AddVar(ShaderEnum::_float3, "Tangent", "TANGENT");
-		vertexIn->AddVar(ShaderEnum::_float2, "TexC", "TEXCOORD");
-		auto InputLayouts = vertexIn->GetInputElementDescArray();
+
+					
 
 
-		SCInputStruct* vertexOut = gModule.DefineInputStruct("VertexOut");
-		vertexOut->AddVar(ShaderEnum::_float4, "PosH", "SV_POSITION");
-		vertexOut->AddVar(ShaderEnum::_float3, "NormalW", "NORMAL");
-		vertexOut->AddVar(ShaderEnum::_float3, "TangentW", "TANGENT");
-		vertexOut->AddVar(ShaderEnum::_float2, "TexC", "TEXCOORD");
 
-		SDConstantBuffer* cbPerObject = gModule.DefineConstantBuffer("cbPerObject");
-		cbPerObject->AddVar(ShaderEnum::_matrix4x4, "gWorld");
-		cbPerObject->AddVar(ShaderEnum::_matrix4x4, "gViewProj");
-		cbPerObject->AddVar(ShaderEnum::_uint, "gFrame");
-		cbPerObject->AddVar(ShaderEnum::_float3, "gpadding");
-
-		gModule.DefineSamplerState("gsampler",
-			CD3DX12_STATIC_SAMPLER_DESC(0,
-				D3D12_FILTER_ANISOTROPIC,
-				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-				D3D12_TEXTURE_ADDRESS_MODE_WRAP));
-		gModule.DefineSDResource(ShaderEnum::Texture2D, "gtexture", 10);
-
-
-		gModule.AddRenderTargetTexture(
-			"FinalScene", DXGI_FORMAT_R8G8B8A8_UNORM,
-			{ 0.0f,0.0f,0.0f,0.0f });
-		gModule.AddDepthStencilTexture("FinalDepthScene");
-		m_RenderDevice->RegisterGUITexture(*gModule.FindRenderTargetTexture(0));
-		m_RenderItem.rendertarget = make_shared<RenderTarget>(*gModule.GetRenderTarget());
-
-
-		gModule.SetInputOutputStream(ShaderType::Vertex, "VertexIn", "VertexOut");
-		gModule.AddShaderParameter(ShaderType::Vertex, ShaderEnum::InstanceID, "insID");
-		gModule.SetInputOutputStream(ShaderType::Pixel, "VertexOut", "OutStream");
-
-
-		gModule.PushCode(ShaderType::Vertex,
-			R"(
-    // Transform to homogeneous clip space.
-    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-    vout.PosH = mul(posW, gViewProj);
-
-	// Just pass vertex color into the pixel shader.
-	vout.TexC = vin.TexC;
-    vout.NormalW = float3(0.0f,0.0f,0.0f);
-    vout.TangentW = float3(0.0f,0.0f,0.0f); )");
-        gModule.PushCode(ShaderType::Pixel,
-			R"(
-    uint index = gFrame / 60;
-    float4 color = gtexture[index].Sample(gsampler, pin.TexC);
-    // 
-    pout.FinalScene = color;
-)");
-		gModule.CreateCode();
-		gModule.CreateRootSignature();
-		gModule.Compile();
-		m_RenderItem.Rootsignature = make_shared<RootSignature>(*gModule.GetRootSignature());
-
-		auto v_shader_str = gModule.GetCode(ShaderType::Vertex);
-		auto p_shader_str = gModule.GetCode(ShaderType::Pixel);
 
 
 //		std::string shadercode = R"(
@@ -171,15 +136,15 @@ namespace RE
 //       )";
 
 
-		m_RenderItem.PSO = make_shared<GraphicsPipelineState>();
+		//m_RenderItem.PSO = make_shared<GraphicsPipelineState>();
 
-		m_RenderItem.PSO->SetInputLayout(InputLayouts);
-		m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Vertex));
-		m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Pixel));
-		m_RenderItem.PSO->SetRenderTargetFormat({ 0 }, { DXGI_FORMAT_R8G8B8A8_UNORM });
-		m_RenderItem.PSO->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
-		m_RenderItem.PSO->SetRootSignature(*m_RenderItem.Rootsignature);
-		m_RenderItem.PSO->Finalize();
+		//m_RenderItem.PSO->SetInputLayout(InputLayouts);
+		//m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Vertex));
+		//m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Pixel));
+		//m_RenderItem.PSO->SetRenderTargetFormat({ 0 }, { DXGI_FORMAT_R8G8B8A8_UNORM });
+		//m_RenderItem.PSO->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
+		//m_RenderItem.PSO->SetRootSignature(*m_RenderItem.Rootsignature);
+		//m_RenderItem.PSO->Finalize();
 
 		JMatrix view = JMatrix::LookAtLH({ 0.0f, 0.0f, -5.0f }, { 0.0f,0.0f,1.0f }, { 0.0f,1.0f,0.0f });
 		JMatrix proj = JMatrix::PerspectiveFovLH(0.25f * 3.141592f,
@@ -206,8 +171,6 @@ namespace RE
 		m_RenderItem.height = 1080;
 
 
-		
-
 		//임시 텍스쳐
 		{
 			CommandQueue texture_que(D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -227,9 +190,6 @@ namespace RE
 			texture_que.ExcuteCommandList({ texture_cmdList });
 			texture_que.Flush();
 		}
-
-		m_Module = make_shared<GraphicsShaderModule>(gModule);
-		m_Module->FindBindedSDResource("gtexture")->BindResource(m_RenderItem.textures);
 	}
 	void RenderEngine::Update()
 	{
@@ -249,62 +209,43 @@ namespace RE
 		{
 			m_RenderItem.contants3.Frame = 0;
 		}
-		m_RenderDevice->SubmitToRender(0,
+		m_RenderDevice->SubmitToRender(0, 
 			[&](CommandList* commandList) {
-			commandList->ClearRenderTarget(*m_RenderItem.rendertarget);
-
-		});
-		m_RenderDevice->SubmitToRender(1, 
-			[&](CommandList* commandList) {
-
-
-				{
-					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
-					cbuffer->SetVar(m_RenderItem.contants1);
 			
-					m_Module->Execute(commandList, *m_Module->GetPipelineState());
+
+				//{
+				//	commandList->BindDynamicVertexBuffer(
+				//		0, m_RenderItem.vertices);
+				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
+
+				//}
+
+				//{
+
+
+				//	commandList->BindDynamicVertexBuffer(
+				//		0, m_RenderItem.vertices);
+				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
+				//}
 
 
 
-					commandList->BindDynamicVertexBuffer(
-						0, m_RenderItem.vertices);
-					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				//{
 
-					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
+				//	commandList->BindDynamicVertexBuffer(
+				//		0, m_RenderItem.vertices);
+				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
+				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				}
+				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
 
-				{
-
-					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
-					cbuffer->SetVar(m_RenderItem.contants2);
-
-					m_Module->Execute(commandList, *m_Module->GetPipelineState());
-
-					commandList->BindDynamicVertexBuffer(
-						0, m_RenderItem.vertices);
-					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-				}
-
-
-
-				{
-					auto cbuffer = m_Module->FindBindedContantBuffer("cbPerObject");
-					cbuffer->SetVar(m_RenderItem.contants3);
-					m_Module->Execute(commandList, *m_Module->GetPipelineState());
-
-					commandList->BindDynamicVertexBuffer(
-						0, m_RenderItem.vertices);
-					commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-					commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-					commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-
-				}
+				//}
 
 
 

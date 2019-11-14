@@ -8,7 +8,8 @@ namespace RE
 	{
 		friend class RenderDevice;
 
-		
+	public:
+		static std::shared_ptr<Shader> MakeShader(ShaderType type);
 	public:
 		Shader();
 		Shader(const std::string& name);

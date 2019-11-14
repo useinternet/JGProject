@@ -138,15 +138,8 @@ namespace RE
 		auto desc = GetDesc();
 		desc.Width  = width;
 		desc.Height = height;
-		D3D12_CLEAR_VALUE clear_value;
-		clear_value.Format = desc.Format;
-		clear_value.Color[0] = m_ClearColor.r;
-		clear_value.Color[1] = m_ClearColor.g;
-		clear_value.Color[2] = m_ClearColor.b;
-		clear_value.Color[3] = m_ClearColor.a;
-		clear_value.DepthStencil.Depth = m_ClearDepth;
-		clear_value.DepthStencil.Stencil = m_ClearStencil;
-		CreateResource(desc, &clear_value);
+
+		SetDesc(desc);
 	}
 	void Resource::Reset()
 	{
@@ -170,6 +163,20 @@ namespace RE
 			return m_D3D_Resource->GetDesc();
 
 		return D3D12_RESOURCE_DESC();
+	}
+	void Resource::SetDesc(const D3D12_RESOURCE_DESC& desc)
+	{
+		if (m_D3D_Resource == nullptr)
+			return;
+		D3D12_CLEAR_VALUE clear_value;
+		clear_value.Format = desc.Format;
+		clear_value.Color[0] = m_ClearColor.r;
+		clear_value.Color[1] = m_ClearColor.g;
+		clear_value.Color[2] = m_ClearColor.b;
+		clear_value.Color[3] = m_ClearColor.a;
+		clear_value.DepthStencil.Depth = m_ClearDepth;
+		clear_value.DepthStencil.Stencil = m_ClearStencil;
+		CreateResource(desc, &clear_value);
 	}
 	uint32_t Resource::GetRefCount() const
 	{

@@ -1,0 +1,12 @@
+{
+
+  "ContentsPath": "..\\Contents\\",
+  "SourcePath": "..\\Source\\",
+  "EnginePath": "..\\JGEngine\\Resource\\",
+  "ConfigPath": "..\\Config\\",
+
+
+
+  "ImGuiConfig": "JE_ImGuiConfig",
+  "EditorConfig": "JE_EditorConfig"
+}

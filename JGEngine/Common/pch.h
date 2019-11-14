@@ -26,6 +26,8 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <ostream>
+#include <istream>
 #include <filesystem>
 #include  "psapi.h"
 #include <Pdh.h>

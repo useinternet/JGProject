@@ -36,6 +36,7 @@ namespace RE
 		bool IsVaild() const;
 		const _ResourceData* GetData() const;
 		D3D12_RESOURCE_DESC GetDesc() const;
+		void SetDesc(const D3D12_RESOURCE_DESC& desc);
 		uint32_t GetRefCount() const;
 
 		const Color& GetClearColor() const;

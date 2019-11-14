@@ -17,7 +17,6 @@ namespace RE
 
 		const Texture& GetTexture(uint32_t slot) const;
 		const Texture& GetDepthTexture() const;
-
 		Texture* GetTexture(uint32_t slot);
 		Texture* GetDepthTexture();
 		const Color& GetClearColor(uint32_t slot) const;

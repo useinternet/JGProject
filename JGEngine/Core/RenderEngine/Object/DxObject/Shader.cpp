@@ -6,6 +6,25 @@ using namespace std;
 
 namespace RE
 {
+	std::shared_ptr<Shader> MakeShader(ShaderType type)
+	{
+		switch (type)
+		{
+		case ShaderType::Vertex:
+			return make_shared<VertexShader>();
+		case ShaderType::Domain:
+			return make_shared<DomainShader>();
+		case ShaderType::Hull:
+			return make_shared<HullShader>();
+		case ShaderType::Geometry:
+			return make_shared<GeometryShader>();
+		case ShaderType::Pixel:
+			return make_shared<PixelShader>();
+		case ShaderType::Compute:
+			return make_shared<ComputeShader>();
+		}
+		return nullptr;
+	}
 	Shader::Shader() : DxObject("Shader")
 	{
 

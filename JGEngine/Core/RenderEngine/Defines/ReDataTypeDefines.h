@@ -1,7 +1,7 @@
 #pragma once
 #include "ReEnumDefines.h"
 #include "d3dx12.h"
-
+#pragma warning(disable : 4996)
 
 namespace RE
 {
@@ -11,8 +11,6 @@ namespace RE
 	public:
 		std::string EntryPoint;
 		std::string CompileVersion;
-		std::string inStream;
-		std::string outStream;
 		uint32_t Flags1;
 		uint32_t Flags2;
 
@@ -21,7 +19,7 @@ namespace RE
 		std::vector<D3D_SHADER_MACRO> Macros;
 		ID3DInclude* pIncludes;
 		uint32_t    SecondaryDataFlags;
-		const void* SecondaryData;
+		const void* SecondaryData = nullptr;
 		uint32_t    SecondaryDataSize;
 	public:
 		ShaderCompiler() :
@@ -39,40 +37,70 @@ namespace RE
 			case ShaderType::Vertex:
 				EntryPoint = "VS";
 				CompileVersion = "vs_5_1";
-				inStream = "vin";
-				outStream = "vout";
 				break;
 			case ShaderType::Hull:
 				EntryPoint = "HS";
 				CompileVersion = "hs_5_1";
-				inStream = "hin";
-				outStream = "hout";
 				break;
 			case ShaderType::Domain:
 				EntryPoint = "DS";
 				CompileVersion = "ds_5_1";
-				inStream = "din";
-				outStream = "dout";
 				break;
 			case ShaderType::Geometry:
 				EntryPoint = "GS";
 				CompileVersion = "gs_5_1";
-				inStream = "gin";
-				outStream = "gout";
 				break;
 			case ShaderType::Pixel:
 				EntryPoint = "PS";
 				CompileVersion = "ps_5_1";
-				inStream = "pin";
-				outStream = "pout";
 				break;
 			case ShaderType::Compute:
 				EntryPoint = "CS";
 				CompileVersion = "cs_5_1";
-				inStream = "cin";
-				outStream = "cout";
 				break;
 			}
+		}
+		void Save(std::ofstream& fout)
+		{
+			DataIO::write(fout, EntryPoint);
+			DataIO::write(fout, CompileVersion);
+			DataIO::write(fout, Flags1);
+			DataIO::write(fout, Flags2);
+			DataIO::write(fout, Macros.size());
+			for (auto& m : Macros)
+			{
+				DataIO::write(fout, std::string(m.Name));
+				DataIO::write(fout, std::string(m.Definition));
+			}
+			//DataIO::write(fout, SecondaryDataFlags);
+			//DataIO::write(fout, SecondaryDataSize);
+			//DataIO::write(fout, reinterpret_cast<const char*>(SecondaryData));
+		}
+		void Load(std::ifstream& fin)
+		{
+			DataIO::read(fin, EntryPoint);
+			DataIO::read(fin, CompileVersion);
+
+			DataIO::read(fin, Flags1);
+			DataIO::read(fin, Flags2);
+			size_t size = 0;
+			DataIO::read(fin, size);
+
+			for (size_t i = 0; i < size; ++i)
+			{
+				D3D_SHADER_MACRO macro = {};
+				std::string name;
+				std::string definition;
+				DataIO::read(fin, name);
+				DataIO::read(fin, definition);
+				strcpy(const_cast<char*>(macro.Name), name.data());
+				strcpy(const_cast<char*>(macro.Definition), definition.data());
+				Macros.push_back(macro);
+			}
+
+		/*	DataIO::read(fin, SecondaryDataFlags);
+			DataIO::read(fin, SecondaryDataSize);
+			fin.read(const_cast<char*>(reinterpret_cast<const char*>(SecondaryData)), SecondaryDataSize);*/
 		}
 	};
 	class ScissorRect
