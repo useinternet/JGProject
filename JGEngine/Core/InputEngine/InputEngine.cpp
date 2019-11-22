@@ -44,9 +44,10 @@ namespace IE
 		
 
 		m_PrevMousePos = m_MousePos;
-
+		m_PrevMouseFromScreen = m_MousePosFromScreen;
 		POINT p;
 		GetCursorPos(&p);
+		m_MousePosFromScreen = { (float)p.x, (float)p.y };
 		ScreenToClient(m_hWnd, &p);
 		m_MousePos = { (float)p.x, (float)p.y };
 	}
@@ -85,5 +86,14 @@ namespace IE
 	{
 		return { m_MousePos.x - m_PrevMousePos.x, m_MousePos.y - m_PrevMousePos.y };
 	}
-
+	const JVector2 InputEngine::GetMousePositionFromScreen()
+	{
+		return m_MousePosFromScreen;
+	}
+	const JVector2 InputEngine::GetMouseDeltaFromScreen()
+	{
+		return
+		{ m_MousePosFromScreen.x - m_PrevMouseFromScreen.x,
+		  m_MousePosFromScreen.y - m_PrevMouseFromScreen.y };
+	}
 }

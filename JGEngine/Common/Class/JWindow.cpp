@@ -5,8 +5,9 @@ using namespace std;
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-bool JWindow::Init(HINSTANCE hInst)
+bool JWindow::Init(uint32_t width, uint32_t height, uint32_t startX, uint32_t startY)
 {
+	HINSTANCE hInst = GetModuleHandle(NULL);
 	WNDCLASSEXW wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -24,7 +25,7 @@ bool JWindow::Init(HINSTANCE hInst)
 
 	RegisterClassExW(&wcex);
 
-	m_hWnd = CreateWindowW(m_Desc.name.c_str(), m_Desc.name.c_str(), WS_OVERLAPPEDWINDOW,
+	m_hWnd = CreateWindowW(m_Desc.name.c_str(), m_Desc.name.c_str(), WS_POPUP,
 		CW_USEDEFAULT, 0, m_Desc.width, m_Desc.height, nullptr, nullptr, hInst, nullptr);
 
 	if (!m_hWnd)

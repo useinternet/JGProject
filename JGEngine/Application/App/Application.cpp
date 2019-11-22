@@ -56,7 +56,7 @@ bool Application::Init()
 
 
 	////// ÃÊ±âÈ­
-	if (!m_Window->Init(GetModuleHandle(NULL), m_AppName.c_str()))
+	if (!m_Window->Init(GetModuleHandle(NULL), m_AppName.c_str(), 800, 600))
 	{
 		return false;
 	}
@@ -102,6 +102,18 @@ void Application::Run()
 				GlobalLinkData::_EnginePerformance->Reset();
 		
 			ENGINE_PERFORMANCE_TIMER_START("Application");
+
+
+			if (m_InputEngine->GetKeyDown(KeyCode::LeftMouseButton))
+			{
+				auto delta = m_InputEngine->GetMouseDeltaFromScreen();
+				auto window_data = m_Window->GetData();
+				RECT rect;
+				GetWindowRect(window_data.hWnd, &rect);
+				SetWindowPos(window_data.hWnd, HWND_TOP, rect.left + delta.x, rect.top + delta.y, window_data.width, window_data.height, SWP_SHOWWINDOW);
+			}
+
+
 
 			auto input_task = make_task([&] {
 				m_InputEngine->Update();

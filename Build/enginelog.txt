@@ -1,9 +1,12 @@
-[info] [22932] [Physics] : PhysicsEngine Init Compelete...
-[info] [22932] [Sound] : SoundEngine Init Compelete
-[info] [22932] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [22932] [Engine] : EditorGui Init
-[info] [22932] [Rendering] : RenderEngine Init Complete...
-[trace] [22932] [Game] : Begin
-[trace] [22932] [Game] : Tick
-[trace] [22932] [Game] : End
-[info] [22932] [Engine] : EditorGui Destroy
+[info] [11036] [Physics] : PhysicsEngine Init Compelete...
+[info] [11036] [Sound] : SoundEngine Init Compelete
+[info] [11036] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [11036] [Engine] : EditorGui Init
+[info] [11036] [Rendering] : RenderEngine Init Complete...
+[trace] [11036] [Game] : Begin
+[trace] [11036] [Game] : Tick
+[trace] [11036] [Game] : End
+[trace] [11036] [Engine] : reset
+[trace] [11036] [Engine] : reset
+[trace] [11036] [Engine] : reset
+[info] [11036] [Engine] : EditorGui Destroy

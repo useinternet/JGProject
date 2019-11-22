@@ -35,7 +35,7 @@ namespace JE
 
 		RegisterClassExW(&wcex);
 
-		m_Data.hWnd = CreateWindowW(appName, appName, WS_OVERLAPPEDWINDOW,
+		m_Data.hWnd = CreateWindowW(appName, appName, WS_POPUP ,
 			CW_USEDEFAULT, 0, m_Data.width, m_Data.height, nullptr, nullptr, hInst, nullptr);
 
 		if (!m_Data.hWnd)
@@ -43,7 +43,7 @@ namespace JE
 			return false;
 		}
 
-		ShowWindow(m_Data.hWnd, SW_MAXIMIZE);
+		ShowWindow(m_Data.hWnd, SW_NORMAL);
 		UpdateWindow(m_Data.hWnd);
 		return true;
 	}

@@ -1,16 +1,16 @@
 [Window][JGEngine_DockSpace]
 Pos=0,0
-Size=1536,801
+Size=800,600
 Collapsed=0
 
 [Window][Debug##Default]
-Pos=60,60
+Pos=60,-7
 Size=400,400
 Collapsed=0
 
 [Window][Dear ImGui Demo]
-Pos=927,19
-Size=609,526
+Pos=570,19
+Size=230,390
 Collapsed=0
 DockId=0x00000003,0
 
@@ -22,40 +22,40 @@ DockId=0x00000003,1
 
 [Window][SceneEditor]
 Pos=0,19
-Size=925,571
+Size=568,330
 Collapsed=0
 DockId=0x00000005,0
 
 [Window][ConsoleLog]
-Pos=0,592
-Size=925,209
+Pos=0,351
+Size=568,249
 Collapsed=0
 DockId=0x00000006,0
 
 [Window][FileViewer]
-Pos=927,547
-Size=609,254
+Pos=570,411
+Size=230,189
 Collapsed=0
 DockId=0x00000004,0
 
 [Window][RenderingProfile]
-Pos=927,19
-Size=609,526
+Pos=570,19
+Size=230,390
 Collapsed=0
 DockId=0x00000003,1
 
 [Window][Performance]
-Pos=927,19
-Size=609,526
+Pos=570,19
+Size=230,390
 Collapsed=0
 DockId=0x00000003,2
 
 [Docking][Data]
-DockSpace     ID=0xA15E893B Window=0xFD6DE84F Pos=0,19 Size=1536,782 Split=X
-  DockNode    ID=0x00000001 Parent=0xA15E893B SizeRef=925,782 Split=Y Selected=0xC08FF5B5
-    DockNode  ID=0x00000005 Parent=0x00000001 SizeRef=922,571 CentralNode=1 Selected=0xC08FF5B5
-    DockNode  ID=0x00000006 Parent=0x00000001 SizeRef=922,209 Selected=0xEC97355A
-  DockNode    ID=0x00000002 Parent=0xA15E893B SizeRef=609,782 Split=Y Selected=0xE927CF2F
-    DockNode  ID=0x00000003 Parent=0x00000002 SizeRef=550,526 Selected=0x044B1956
+DockSpace     ID=0xA15E893B Window=0xFD6DE84F Pos=0,19 Size=800,581 Split=X
+  DockNode    ID=0x00000001 Parent=0xA15E893B SizeRef=568,782 Split=Y Selected=0xC08FF5B5
+    DockNode  ID=0x00000005 Parent=0x00000001 SizeRef=922,594 CentralNode=1 Selected=0xC08FF5B5
+    DockNode  ID=0x00000006 Parent=0x00000001 SizeRef=922,249 Selected=0xEC97355A
+  DockNode    ID=0x00000002 Parent=0xA15E893B SizeRef=230,782 Split=Y Selected=0xE927CF2F
+    DockNode  ID=0x00000003 Parent=0x00000002 SizeRef=550,526 Selected=0xFDB357B2
     DockNode  ID=0x00000004 Parent=0x00000002 SizeRef=550,254 HiddenTabBar=1 Selected=0x6B16F618
 

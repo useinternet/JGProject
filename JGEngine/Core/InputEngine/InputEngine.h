@@ -25,6 +25,8 @@ namespace IE
 		const JVector2 GetMousePosition();
 		const JVector2 GetMouseDelta();
 
+		const JVector2 GetMousePositionFromScreen();
+		const JVector2 GetMouseDeltaFromScreen();
 	private:
 		enum EKeyState
 		{
@@ -41,6 +43,8 @@ namespace IE
 		EKeyState m_PrevKeyMap[KeyMapCount];
 		JVector2 m_MousePos;
 		JVector2 m_PrevMousePos;
+		JVector2 m_MousePosFromScreen;
+		JVector2 m_PrevMouseFromScreen;
 
 	};
 }
