@@ -7,6 +7,7 @@ namespace RE
 {
 	class Shader;
 	class RootSignature;
+	class RenderTarget;
 	class PipelineState : public DxObject
 	{
 	public:
@@ -31,7 +32,7 @@ namespace RE
 		void SetRootSignature(const RootSignature& rootsig);
 		void SetRenderTargetFormat(const std::vector<uint32_t>& slot, const std::vector<DXGI_FORMAT>& formats);
 		void SetDepthStencilFormat(DXGI_FORMAT format);
-
+		void BindRenderTarget(const RenderTarget& rt);
 		void SetRasterizerState(const D3D12_RASTERIZER_DESC& desc);
 		void SetBlendState(const D3D12_BLEND_DESC& desc);
 		void SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& desc);
@@ -43,9 +44,10 @@ namespace RE
 
 	private:
 		void Init();
+
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC    m_Desc;
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputElementDesc;
-		ComPtr<ID3D12RootSignature>           m_RootSignature;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature>           m_RootSignature;
 	};
 
 

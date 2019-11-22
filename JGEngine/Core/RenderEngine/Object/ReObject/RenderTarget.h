@@ -7,14 +7,14 @@ namespace RE
 {
 	class RenderTarget : public ReObject
 	{
-
+	public:
+		static uint32_t GetMaxNumRenderTarget();
 	public:
 		RenderTarget();
 		void BindTexture(uint32_t slot, const Texture& texture);
 		void BindDepthTexture(
 			const Texture& texture,
 			D3D12_CLEAR_FLAGS flags = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL);
-
 		const Texture& GetTexture(uint32_t slot) const;
 		const Texture& GetDepthTexture() const;
 		Texture* GetTexture(uint32_t slot);

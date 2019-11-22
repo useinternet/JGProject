@@ -101,7 +101,12 @@ namespace RE
 			BindGraphicsDynamicStructuredBuffer(rootparam, 
 				(uint32_t)data_array.size(), (uint32_t)sizeof(DataType), data_array.data());
 		}
-		void BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, uint32_t dataSize, const std::vector<byte>& data);
+		void BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, uint32_t dataSize, const std::vector<byte>& data)
+		{
+			uint32_t numElements = data.size() / dataSize;
+			uint32_t elementSize = dataSize;
+			BindGraphicsDynamicStructuredBuffer(rootparam, numElements, elementSize, data.data());
+		}
 
 		void BindVertexBuffer(uint32_t slot, const VertexBuffer& vertex_buffer);
 		void BindIndexBuffer(const IndexBuffer& index_buffer);
@@ -110,6 +115,12 @@ namespace RE
 		void BindDynamicVertexBuffer(uint32_t slot, const std::vector<VertexType>& vertices)
 		{
 			BindDynamicVertexBuffer(slot, (uint32_t)vertices.size(), (uint32_t)sizeof(VertexType), vertices.data());
+		}
+
+		void BindDynamicVertexBuffer(uint32_t slot, uint32_t type_size, const std::vector<byte>& bt_vertices)
+		{
+			
+			BindDynamicVertexBuffer(slot, (uint32_t)bt_vertices.size() / type_size, type_size, bt_vertices.data());
 		}
 
 		template<typename IndexType>

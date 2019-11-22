@@ -1,6 +1,9 @@
-[info] [9352] [Physics] : PhysicsEngine Init Compelete...
-[info] [9352] [Sound] : SoundEngine Init Compelete
-[info] [9352] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [9352] [Engine] : EditorGui Init
-[info] [9352] [Rendering] : RenderEngine Init Complete...
-[error] [9352] [Rendering] : Failed Load GBufferModule
+[info] [22932] [Physics] : PhysicsEngine Init Compelete...
+[info] [22932] [Sound] : SoundEngine Init Compelete
+[info] [22932] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [22932] [Engine] : EditorGui Init
+[info] [22932] [Rendering] : RenderEngine Init Complete...
+[trace] [22932] [Game] : Begin
+[trace] [22932] [Game] : Tick
+[trace] [22932] [Game] : End
+[info] [22932] [Engine] : EditorGui Destroy

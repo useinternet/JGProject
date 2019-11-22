@@ -124,7 +124,9 @@ public:
 	}
 	bool operator!=(const KeyCode& code) {
 		return this->code != code.code;
+		
 	}
+
 public:
 	int ToInt() const {
 		return code;

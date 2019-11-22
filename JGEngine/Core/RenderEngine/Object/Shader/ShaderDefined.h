@@ -21,6 +21,7 @@ namespace RE
 			_float2,
 			_float3,
 			_float4,
+			_matrix3x3,
 			_matrix4x4,
 			_struct,
 		};
@@ -62,7 +63,8 @@ namespace RE
 			case _float2:    return "float2";
 			case _float3:    return "float3";
 			case _float4:    return "float4";
-			case _matrix4x4: return "matrix4x4";
+			case _matrix3x3: return "float3x3";
+			case _matrix4x4: return "float4x4";
 			}
 			return "";
 		}
@@ -72,9 +74,43 @@ namespace RE
 			switch (param)
 			{
 			case Vertex_InstanceID:
-				return "instanceID : SV_InstanceID";
+				return "uint instanceID : SV_InstanceID";
 			}
 			return "";
+		}
+
+		inline DXGI_FORMAT ToFormat(EShaderData type)
+		{
+			switch (type)
+			{
+			case _uint:
+				return DXGI_FORMAT_R32_UINT;
+			case _uint2:
+				return DXGI_FORMAT_R32G32_UINT;
+			case _uint3:
+				return DXGI_FORMAT_R32G32B32_UINT;
+			case _uint4:
+				return DXGI_FORMAT_R32G32B32A32_UINT;
+			case _int:
+				return DXGI_FORMAT_R32_SINT;
+			case _int2:
+				return DXGI_FORMAT_R32G32_SINT;
+			case _int3:
+				return DXGI_FORMAT_R32G32B32_SINT;
+			case _int4:
+				return DXGI_FORMAT_R32G32B32A32_SINT;
+			case _float:
+				return DXGI_FORMAT_R32_FLOAT;
+			case _float2:
+				return DXGI_FORMAT_R32G32_FLOAT;
+			case _float3:
+				return DXGI_FORMAT_R32G32B32_FLOAT;
+			case _float4:
+				return DXGI_FORMAT_R32G32B32A32_FLOAT;
+			default:
+				return DXGI_FORMAT_UNKNOWN;
+			}
+			return DXGI_FORMAT_UNKNOWN;
 		}
 
 

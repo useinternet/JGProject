@@ -2,6 +2,7 @@
 #include "PipelineState.h"
 #include "Shader.h"
 #include "RootSignature.h"
+#include "Object/ReObject/RenderTarget.h"
 using namespace std;
 namespace RE
 {
@@ -76,7 +77,7 @@ namespace RE
 	}
 	void GraphicsPipelineState::SetInputLayout(const std::vector<D3D12_INPUT_ELEMENT_DESC>& intput_element_desc)
 	{
-		m_InputElementDesc = intput_element_desc;
+		m_InputElementDesc = std::move(intput_element_desc);
 		m_Desc.InputLayout.NumElements = (uint32_t)m_InputElementDesc.size();
 		m_Desc.InputLayout.pInputElementDescs = m_InputElementDesc.data();
 	}
@@ -108,6 +109,32 @@ namespace RE
 	void GraphicsPipelineState::SetDepthStencilFormat(DXGI_FORMAT format)
 	{
 		m_Desc.DSVFormat = format;
+	}
+	void GraphicsPipelineState::BindRenderTarget(const RenderTarget& rt)
+	{
+		std::vector<uint32_t> slots;
+		std::vector<DXGI_FORMAT> formats;
+
+		for (uint32_t i = 0; RenderTarget::GetMaxNumRenderTarget(); ++i)
+		{
+			auto t = rt.GetTexture(i);
+			if (t.IsVaild())
+			{
+				slots.push_back(i);
+				formats.push_back(t.GetDesc().Format);
+			}
+			else
+				break;
+		}
+
+		SetRenderTargetFormat(slots, formats);
+		auto t = rt.GetDepthTexture();
+		if (t.IsVaild())
+		{
+			SetDepthStencilFormat(t.GetDesc().Format);
+
+		}
+
 	}
 	void GraphicsPipelineState::SetRasterizerState(const D3D12_RASTERIZER_DESC& desc)
 	{

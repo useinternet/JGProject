@@ -42,6 +42,7 @@ namespace RE
 		HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
 			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
 
+
 		if (FAILED(hr))
 			return false;
 

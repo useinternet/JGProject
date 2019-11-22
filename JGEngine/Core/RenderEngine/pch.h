@@ -32,7 +32,8 @@
 #include <chrono>
 #include <ppl.h>
 #include <concurrent_vector.h>
-
+#include <filesystem>
+namespace fs = std::experimental::filesystem;
 
 #include <d3d12.h>
 #include <dxgi1_6.h>

@@ -47,6 +47,12 @@ public:
 	float x, y;
 public:
 	JVector2() : x(0), y(0) {}
+	JVector2(float x, float y) : x(x), y(y) {}
+	JVector2(const JVector2& v) = default;
+	JVector2(JVector2&& v) = default;
+
+	JVector2& operator=(const JVector2& v) = default;
+	JVector2& operator=(JVector2&& v) = default;
 };
 class JVector4
 {

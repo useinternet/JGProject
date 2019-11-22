@@ -6,7 +6,7 @@ using namespace std;
 
 namespace RE
 {
-	std::shared_ptr<Shader> MakeShader(ShaderType type)
+	std::shared_ptr<Shader> Shader::MakeShader(ShaderType type)
 	{
 		switch (type)
 		{

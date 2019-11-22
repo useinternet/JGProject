@@ -25,6 +25,7 @@
 #include "Math/Math.h"
 #include "Math/JVector.h"
 #include "Math/JMatrix.h"
+#include "Math/JQuaternion.h"
 #include "DataType/VertexCollection.h"
 
 

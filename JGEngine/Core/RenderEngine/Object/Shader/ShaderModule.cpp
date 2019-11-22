@@ -8,6 +8,11 @@
 #include "Object/Shader/ShaderLib.h"
 #include "Object/DxObject/RenderDevice.h"
 #include "Object/DxObject/PipelineState.h"
+#include "Object/DxObject/CommandList.h"
+#include "Object/ReObject/ReMesh.h"
+#include "Object/ReObject/ReMaterial.h"
+#include "Object/ReObject/RenderItem.h"
+#include "Object/ReObject/ReCamera.h"
 // struct 의 변수 이름과 ConstantBuffer의 변수이름을 잇는다.
 // ShaderObject에 들어가 있는 정보
 /*
@@ -23,7 +28,8 @@
 using namespace std;
 namespace RE
 {
-	ShaderModule::ShaderModule(const std::string& name) : ReObject(name)
+	ShaderModule::ShaderModule(const std::string& name, EModuleFormat format) : ReObject(name),
+		m_ModuleFormat(format)
 	{
 		m_ModuleDatasByShaderType[ShaderType::Vertex].Compiler = ShaderCompiler(ShaderType::Vertex);
 		m_ModuleDatasByShaderType[ShaderType::Hull].Compiler = ShaderCompiler(ShaderType::Hull);
@@ -33,58 +39,58 @@ namespace RE
 		m_ModuleDatasByShaderType[ShaderType::Compute].Compiler = ShaderCompiler(ShaderType::Compute);
 	}
 
-	SBDConstantBuffer* ShaderModule::AddConstantBuffer(const std::string& name, ShaderType type)
+	SBDConstantBuffer* ShaderModule::AddConstantBuffer(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) != m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) != m_SBDPool.end())
 			return nullptr;
 
 		shared_ptr<SBDConstantBuffer> result = make_shared<SBDConstantBuffer>(name);
-		m_ModuleDatasByShaderType[type].SBDPool[name] = result;
+		m_SBDPool[name] = result;
 		return result.get();
 	}
-	SBDStructuredBuffer* ShaderModule::AddStructuredBuffer(const std::string& name, const std::string& strcut_type_name, ShaderType type)
+	SBDStructuredBuffer* ShaderModule::AddStructuredBuffer(const std::string& name, const std::string& strcut_type_name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) != m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) != m_SBDPool.end())
 			return nullptr;
 
 		shared_ptr<SBDStructuredBuffer> result = make_shared<SBDStructuredBuffer>(name);
 		result->BindStruct(strcut_type_name);
-		m_ModuleDatasByShaderType[type].SBDPool[name] = result;
+		m_SBDPool[name] = result;
 		return result.get();
 	}
-	void ShaderModule::AddSamplerState(const std::string& name, const D3D12_STATIC_SAMPLER_DESC& desc, ShaderType type)
+	void ShaderModule::AddSamplerState(const std::string& name, const D3D12_STATIC_SAMPLER_DESC& desc)
 	{
-		if (m_ModuleDatasByShaderType[type].SSPool.find(name) != m_ModuleDatasByShaderType[type].SSPool.end())
+		if (m_SSPool.find(name) != m_SSPool.end())
 			return;
 
-		m_ModuleDatasByShaderType[type].SSPool[name] = desc;
+		m_SSPool[name] = desc;
 	}
-	SBDTexture2D* ShaderModule::AddTexture2D(const std::string& name, ShaderType type)
+	SBDTexture2D* ShaderModule::AddTexture2D(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) != m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) != m_SBDPool.end())
 			return nullptr;
 		shared_ptr<SBDTexture2D> result = make_shared<SBDTexture2D>(name);
-		m_ModuleDatasByShaderType[type].SBDPool[name] = result;
+		m_SBDPool[name] = result;
 
 		return result.get();
 	}
-	SBDTextureCube* ShaderModule::AddTextureCube(const std::string& name, ShaderType type)
+	SBDTextureCube* ShaderModule::AddTextureCube(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) != m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) != m_SBDPool.end())
 			return nullptr;
 		shared_ptr<SBDTextureCube> result = make_shared<SBDTextureCube>(name);
-		m_ModuleDatasByShaderType[type].SBDPool[name] = result;
+		m_SBDPool[name] = result;
 
 		return result.get();
 	}
 
 
-	SBDConstantBuffer* ShaderModule::FindConstantBuffer(const std::string& name, ShaderType type)
+	SBDConstantBuffer* ShaderModule::FindConstantBuffer(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) == m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) == m_SBDPool.end())
 			return nullptr;
 
-		auto result = m_ModuleDatasByShaderType[type].SBDPool[name];
+		auto result = m_SBDPool[name];
 		if (result->GetType() == JGShader::ConstantBuffer)
 		{
 			return (SBDConstantBuffer*)result.get();
@@ -92,12 +98,12 @@ namespace RE
 		else
 			return nullptr;
 	}
-	SBDStructuredBuffer* ShaderModule::FindStructuredBuffer(const std::string& name, ShaderType type)
+	SBDStructuredBuffer* ShaderModule::FindStructuredBuffer(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) == m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) == m_SBDPool.end())
 			return nullptr;
 
-		auto result = m_ModuleDatasByShaderType[type].SBDPool[name];
+		auto result = m_SBDPool[name];
 		if (result->GetType() == JGShader::StructuredBuffer)
 		{
 			return (SBDStructuredBuffer*)result.get();
@@ -105,18 +111,18 @@ namespace RE
 		else
 			return nullptr;
 	}
-	D3D12_STATIC_SAMPLER_DESC* ShaderModule::FindSamplerState(const std::string& name, ShaderType type)
+	D3D12_STATIC_SAMPLER_DESC* ShaderModule::FindSamplerState(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SSPool.find(name) == m_ModuleDatasByShaderType[type].SSPool.end())
+		if (m_SSPool.find(name) == m_SSPool.end())
 			return nullptr;
-		return &m_ModuleDatasByShaderType[type].SSPool[name];
+		return &m_SSPool[name];
 	}
-	SBDTexture2D* ShaderModule::FindTexture2D(const std::string& name, ShaderType type)
+	SBDTexture2D* ShaderModule::FindTexture2D(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) == m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) == m_SBDPool.end())
 			return nullptr;
 
-		auto result = m_ModuleDatasByShaderType[type].SBDPool[name];
+		auto result = m_SBDPool[name];
 		if (result->GetType() == JGShader::Texture2D)
 		{
 			return (SBDTexture2D*)result.get();
@@ -124,12 +130,12 @@ namespace RE
 		else
 			return nullptr;
 	}
-	SBDTextureCube* ShaderModule::FindTextureCube(const std::string& name, ShaderType type)
+	SBDTextureCube* ShaderModule::FindTextureCube(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) == m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) == m_SBDPool.end())
 			return nullptr;
 
-		auto result = m_ModuleDatasByShaderType[type].SBDPool[name];
+		auto result = m_SBDPool[name];
 		if (result->GetType() == JGShader::TextureCube)
 		{
 			return (SBDTextureCube*)result.get();
@@ -141,17 +147,21 @@ namespace RE
 	{
 		m_ModuleDatasByShaderType[shader_type].MainCode = code;
 	}
-	void ShaderModule::RemoveSBD(const std::string& name, ShaderType type)
+	void ShaderModule::RemoveSBD(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SBDPool.find(name) == m_ModuleDatasByShaderType[type].SBDPool.end())
+		if (m_SBDPool.find(name) == m_SBDPool.end())
 			return;
-		m_ModuleDatasByShaderType[type].SBDPool.erase(name);
+		m_SBDPool.erase(name);
 	}
-	void ShaderModule::RemoveSS(const std::string& name, ShaderType type)
+	void ShaderModule::RemoveSS(const std::string& name)
 	{
-		if (m_ModuleDatasByShaderType[type].SSPool.find(name) == m_ModuleDatasByShaderType[type].SSPool.end())
+		if (m_SSPool.find(name) == m_SSPool.end())
 			return;
-		m_ModuleDatasByShaderType[type].SSPool.erase(name);
+		m_SSPool.erase(name);
+	}
+	const std::string ShaderModule::GetSafeCode(ShaderType type)
+	{
+		return m_ModuleDatasByShaderType[type].SafeCode;
 	}
 	bool ShaderModule::Save(const std::string& path)
 	{
@@ -175,6 +185,7 @@ namespace RE
 			return false;
 		}
 		DataLoad(fin);
+		Compile();
 		return true;
 	}
 	void ShaderModule::DataSave(std::ofstream& fout)
@@ -185,32 +196,39 @@ namespace RE
 		// -- 바인딩된 데이터 갯수
 		//    -> 바인된된 데이터 이름
 		//    -> 바인딩된 데이터
-		 
+		DataIO::write(fout, EAssetGroup::AssetGroup_RE);
+		DataIO::write(fout, EAssetFormat::AssetFormat_RE_ShaderModule);
+		DataIO::write(fout, m_ModuleFormat);
 		DataIO::write(fout, GetName());
+
+		// sbd
+		DataIO::write(fout, m_SBDPool.size());
+
+		for (auto& sbd : m_SBDPool)
+		{
+			DataIO::write(fout, sbd.first);
+			DataIO::write(fout, sbd.second->GetType());
+			sbd.second->Save(fout);
+		}
+		//ss
+		DataIO::write(fout,m_SSPool.size());
+		for (auto& ss :m_SSPool)
+		{
+			DataIO::write(fout, ss.first);
+			DataIO::write(fout, ss.second);
+
+		}
+
+		// shader
 		DataIO::write(fout, m_ModuleDatasByShaderType.size());
 		for (auto& data : m_ModuleDatasByShaderType)
 		{
 			DataIO::write(fout, data.first);
-			DataIO::write(fout, data.second.SBDPool.size());
 
-			for (auto& sbd : data.second.SBDPool)
-			{
-				DataIO::write(fout, sbd.first);
-				DataIO::write(fout, sbd.second->GetType());
-				sbd.second->Save(fout);
-			}
 
 			data.second.Compiler.Save(fout);
 			
-			DataIO::write(fout, data.second.SSPool.size());
-			for (auto& ss : data.second.SSPool)
-			{
-				DataIO::write(fout, ss.first);
-				DataIO::write(fout, ss.second);
-
-			}
-
-		
+			DataIO::write(fout, data.second.MainCode);
 			DataIO::write(fout, data.second.SafeCode);
 			
 			DataIO::write(fout, data.second.Params.size());
@@ -223,9 +241,44 @@ namespace RE
 	}
 	void ShaderModule::DataLoad(std::ifstream& fin)
 	{
+		EAssetGroup asset_group;
+		EAssetFormat asset_format;
+		DataIO::read(fin, asset_group);
+		DataIO::read(fin, asset_format);
+		DataIO::read(fin, m_ModuleFormat);
 
 		string module_name;
 		DataIO::read(fin, module_name); SetName(module_name);
+
+
+
+		//
+		// sbd
+		size_t sbdPool_size;
+		DataIO::read(fin, sbdPool_size);
+		for (size_t i = 0; i < sbdPool_size; ++i)
+		{
+			string data_name;
+			JGShader::EShaderBindData d_type;
+			DataIO::read(fin, data_name);
+			DataIO::read(fin, d_type);
+			auto sbd = GetSBDByType(d_type);
+			sbd->Load(fin);
+			m_SBDPool[data_name] = move(sbd);
+		}
+		//ss
+		size_t ssPool_size;
+		DataIO::read(fin, ssPool_size);
+		for (size_t i = 0; i < ssPool_size; ++i)
+		{
+			D3D12_STATIC_SAMPLER_DESC desc;
+			string name;
+			DataIO::read(fin, name);
+			DataIO::read(fin, desc);
+			m_SSPool[name] = desc;
+		}
+
+
 		size_t module_data_size;
 		DataIO::read(fin, module_data_size);
 
@@ -234,37 +287,12 @@ namespace RE
 			ShaderType shader_type;
 			DataIO::read(fin, shader_type);
 
-			size_t sbdPool_size;
-			DataIO::read(fin, sbdPool_size);
-
-			// sbd
-			for (size_t i = 0; i < sbdPool_size; ++i)
-			{
-				string data_name;
-				JGShader::EShaderBindData d_type;
-				DataIO::read(fin, data_name);
-				DataIO::read(fin, d_type);
-				auto sbd = GetSBDByType(d_type);
-				sbd->Load(fin);
-				m_ModuleDatasByShaderType[shader_type].SBDPool[data_name] = move(sbd);
-			}
-
 			//compiler
 			m_ModuleDatasByShaderType[shader_type].Compiler.Load(fin);
 
-			//ss
-			size_t ssPool_size;
-			DataIO::read(fin, ssPool_size);
-			for (size_t i = 0; i < ssPool_size; ++i)
-			{
-				D3D12_STATIC_SAMPLER_DESC desc;
-				string name;
-				DataIO::read(fin, name);
-				DataIO::read(fin, desc);
-				m_ModuleDatasByShaderType[shader_type].SSPool[name] = desc;
-			}
 
 			// Code
+			DataIO::read(fin, m_ModuleDatasByShaderType[shader_type].MainCode);
 			DataIO::read(fin, m_ModuleDatasByShaderType[shader_type].SafeCode);
 	
 			// param
@@ -280,8 +308,16 @@ namespace RE
 		
 		}
 	}
-
-	GraphicsShaderModule::GraphicsShaderModule(const std::string& name) : ShaderModule(name)
+	uint32_t ShaderModule::GetRootParamIndex(const std::string& sbd_name)
+	{
+		if (m_RootParamMap.find(sbd_name) == m_RootParamMap.end())
+		{
+			return 0;
+		}
+		return m_RootParamMap[sbd_name];
+	}
+	GraphicsShaderModule::GraphicsShaderModule(const std::string& name, EModuleFormat format) :
+		ShaderModule(name, format)
 	{
 		m_RenderTarget = make_shared<RenderTarget>();
 	}
@@ -289,8 +325,14 @@ namespace RE
 	void GraphicsShaderModule::AddRenderTargetTexture(const std::string& name, DXGI_FORMAT format)
 	{
 		Texture t(name);
+		D3D12_CLEAR_VALUE value;
+		value.Color[0] = 0.0f;
+		value.Color[1] = 0.0f;
+		value.Color[2] = 0.0f;
+		value.Color[3] = 0.0f;
+		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 1, 0, 1, 0,
-			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET));
+			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), &value);
 		uint32_t numRT = m_NumRenderTarget;
 		m_RenderTarget->BindTexture(m_NumRenderTarget++, t);
 
@@ -299,8 +341,14 @@ namespace RE
 	void GraphicsShaderModule::AddRenderTargetCubeTexture(const std::string& name, DXGI_FORMAT format)
 	{
 		Texture t(name);
+		D3D12_CLEAR_VALUE value;
+		value.Color[0] = 0.0f;
+		value.Color[1] = 0.0f;
+		value.Color[2] = 0.0f;
+		value.Color[3] = 0.0f;
+		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height,
-			6, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET));
+			6, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), &value);
 		uint32_t numRT = m_NumRenderTarget;
 		m_RenderTarget->BindTexture(m_NumRenderTarget++, t);
 
@@ -309,15 +357,23 @@ namespace RE
 	void GraphicsShaderModule::AddDepthStencilTexture(const std::string& name, DXGI_FORMAT format)
 	{
 		Texture t(name);
+		D3D12_CLEAR_VALUE value;
+		value.DepthStencil.Depth = 1.0f;
+		value.DepthStencil.Stencil = 0;
+		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 1,
-			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL));
+			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
 		m_RenderTarget->BindDepthTexture(t);
 	}
 	void GraphicsShaderModule::AddDepthStencilCubeTexture(const std::string& name, DXGI_FORMAT format)
 	{
 		Texture t(name);
+		D3D12_CLEAR_VALUE value;
+		value.DepthStencil.Depth = 1.0f;
+		value.DepthStencil.Stencil = 0;
+		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 6,
-			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL));
+			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
 		m_RenderTarget->BindDepthTexture(t);
 	}
 
@@ -334,81 +390,397 @@ namespace RE
 		auto shader_type = JGShader::GetShaderTypeByShaderParam(param);
 		m_ModuleDatasByShaderType[shader_type].Params.push_back(param);
 	}
-	void GraphicsShaderModule::SetRenderTargetTextureName(
-		const std::string& origin_name, const std::string& name)
-	{
-
-	}
-	void GraphicsShaderModule::SetRenderTargetTextureFormat(
-		const std::string& name, DXGI_FORMAT format)
-	{
-
-	}
 	void GraphicsShaderModule::SetRenderTargetTextureName(uint32_t slot, const std::string& name)
 	{
+		Texture* t = m_RenderTarget->GetTexture(slot);
+		if (t == nullptr)
+		{
+			RE_LOG_ERROR("{0} Slot does not exist", slot);
+			return;
+		}
+		
+
+		t->SetName(name);
 	}
 	void GraphicsShaderModule::SetRenderTargetTextureFormat(uint32_t slot, DXGI_FORMAT format)
 	{
+		Texture* t = m_RenderTarget->GetTexture(slot);
+		if (t == nullptr)
+		{
+			RE_LOG_ERROR("{0} Slot does not exist", slot);
+			return;
+		}
+	
+		auto desc = t->GetDesc();
+		desc.Format = format;
+		t->SetDesc(desc);
 	}
 	void GraphicsShaderModule::SetDepthStencilTextureName(const std::string& name)
 	{
-
+		Texture* t = m_RenderTarget->GetDepthTexture();
+		if (t == nullptr)
+		{
+			RE_LOG_ERROR("DepthTexture does not exist");
+			return;
+		}
+		t->SetName(name);
 	}
 	void GraphicsShaderModule::SetDepthStencilTextureFormat(DXGI_FORMAT format)
 	{
-
+		Texture* t = m_RenderTarget->GetDepthTexture();
+		if (t == nullptr)
+		{
+			RE_LOG_ERROR("DepthTexture does not exist");
+			return;
+		}
+		auto desc = t->GetDesc();
+		desc.Format = format;
+		t->SetDesc(desc);
 	}
 
 	void GraphicsShaderModule::SetInputElementSementic(
-		const std::string& name, const std::string& sementic)
+		ShaderType type, const std::string& name, const std::string& sementic)
 	{
-
+		uint32_t size = (uint32_t)m_Input.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Input[type][i].name == name)
+			{
+				m_Input[type][i].semantic = sementic;
+				break;
+			}
+		}
 	}
 	void GraphicsShaderModule::SetInputElementName(
-		const std::string& origin_name, const std::string& name)
+		ShaderType type, const std::string& origin_name, const std::string& name)
 	{
-
+		uint32_t size = (uint32_t)m_Input.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Input[type][i].name == origin_name)
+			{
+				m_Input[type][i].name = name;;
+				break;
+			}
+		}
 	}
 	void GraphicsShaderModule::SetInputElementDataType(
-		const std::string& name, JGShader::EShaderData type)
+		ShaderType shader_type, const std::string& name, JGShader::EShaderData type)
 	{
-
+		uint32_t size = (uint32_t)m_Input.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Input[shader_type][i].name == name)
+			{
+				m_Input[shader_type][i].type = type;;
+				break;
+			}
+		}
 	}
 	void GraphicsShaderModule::SetOutputElementSementic(
-		const std::string& name, const std::string& sementic)
+		ShaderType type, const std::string& name, const std::string& sementic)
 	{
-
+		uint32_t size = (uint32_t)m_Output.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Output[type][i].name == name)
+			{
+				m_Output[type][i].semantic = sementic;
+				break;
+			}
+		}
 	}
 	void GraphicsShaderModule::SetOutputElementName(
-		const std::string& origin_name, const std::string& name)
+		ShaderType type, const std::string& origin_name, const std::string& name)
 	{
-
+		uint32_t size = (uint32_t)m_Output.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Output[type][i].name == origin_name)
+			{
+				m_Output[type][i].name = name;;
+				break;
+			}
+		}
 	}
 	void GraphicsShaderModule::SetOutputElementDataType(
-		const std::string& name, JGShader::EShaderData type)
+		ShaderType shader_type, const std::string& name, JGShader::EShaderData type)
 	{
-
+		uint32_t size = (uint32_t)m_Output.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (m_Output[shader_type][i].name == name)
+			{
+				m_Output[shader_type][i].type = type;;
+				break;
+			}
+		}
+	}
+	const Texture& GraphicsShaderModule::GetRenderTargetTexture(uint32_t slot) const
+	{
+		return *m_RenderTarget->GetTexture(slot);
 	}
 
 
-	std::shared_ptr<GraphicsPipelineState> GraphicsShaderModule::MakePipelineState() const
+	void GraphicsShaderModule::MakePSO(GraphicsPipelineState* pso)
 	{
-		return nullptr;
+
+		Compile();
+		// 셰이더 바인딩
+		for (auto& module_data : m_ModuleDatasByShaderType)
+		{
+			if (module_data.second._Shader)
+			{
+				pso->BindShader(*module_data.second._Shader);
+
+			}
+
+		}
+	
+
+
+		// 렌더타겟 바인딩
+		pso->BindRenderTarget(*m_RenderTarget);
+		// 루트 서명 바인딩
+		pso->SetRootSignature(*m_RootSignature);
+
+		std::vector<D3D12_INPUT_ELEMENT_DESC> input;
+		uint32_t acc_size = 0;
+		for (auto& element : m_Input[ShaderType::Vertex])
+		{
+			D3D12_INPUT_ELEMENT_DESC desc = {};
+			desc = { element.semantic.c_str(), 0, JGShader::ToFormat(element.type), 0, acc_size,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 };
+
+			acc_size += JGShader::GetDataSize(element.type);
+			input.push_back(desc);
+		}
+		pso->SetInputLayout(input);
 	}
+	struct ShaderRegisterData
+	{
+
+		/*
+		-- u,t 일 경우
+
+		t 종류 : StructuredBuffer, Texture, TextureCube
+		  1. Texture          : RegisterSpcae 0 고정 RegisterNumber 변동
+		  2. TextureCube      : RegisterSpace 1 고정 RegisterNumber 변동
+		  3. StructuredBuffer : RegisterSpace   변동 RegisterNumber 0 고정
+
+
+		u 종류 : RWStructuredBuffer, RWTexture
+		  1. RWTexture :  RegisterSpace 0 고정 RegisterNumber 변동
+
+
+		-- ConstantBuffer일 경우
+		1. RegisterSpace는 무조건 0 고정
+		2. RegisterNumber가 변동
+
+		-- SamplerState일 경우
+		1. RegisterSpace는 무조건 0 고정
+		2. RegisterNumber가 변동
+
+		*/
+		//  RegisterSpace = rs, RegisterNumber = rn 초기 값
+		bool is_exist = false;
+		// texture
+		uint32_t t_rn = 0;
+		uint32_t t_rs = 0;
+
+		// textureCube
+		uint32_t tc_rn = 0;
+		uint32_t tc_rs = 1;
+
+		// StructuredBuffer
+		uint32_t sb_rn = 0;
+		uint32_t sb_rs = 2;
+
+		// rwtexture
+		uint32_t rt_rn = 0;
+		uint32_t rt_rs = 0;
+
+		// RWStructuredBuffer
+		uint32_t rsb_rn = 0;
+		uint32_t rsb_rs = 1;
+
+		// ConstantBuffer
+		uint32_t cb_rn = 0;
+		uint32_t cb_rs = 0;
+
+		// SamplerState
+		uint32_t ss_rn = 0;
+		uint32_t ss_rs = 0;
+	};
+	bool GraphicsShaderModule::MakeRootSignature()
+	{
+		// RootSignature
+		std::map<uint32_t, std::string> sb_rootparamMap;
+		std::map<uint32_t, std::string> rsb_rootparamMap;
+		std::map<uint32_t, std::string> cb_rootparamMap;
+		uint32_t numRootParam = 0;
+		ShaderRegisterData register_data;
+		numRootParam = 1;
+		for (auto& sbdpair : m_SBDPool)
+		{
+			auto& var_name = sbdpair.first;
+			auto& sbd = sbdpair.second;
+
+			auto type = sbd->GetType();
+			auto state = sbd->GetState();
+
+			// texture
+			if (type == JGShader::EShaderBindData::Texture2D &&
+				state == JGShader::EShaderBindDataState::ReadOnly)
+			{
+				// RegisterSpcae 0 고정 RegisterNumber 변동
+				sbd->SetShaderRegister(register_data.t_rn, register_data.t_rs);
+				auto sbd_texture2d = (SBDTexture2D*)sbd.get();
+				register_data.t_rn += sbd_texture2d->Count();
+			}
+			// textureCube
+			else if (type == JGShader::EShaderBindData::TextureCube)
+			{
+				//  RegisterSpace 1 고정 RegisterNumber 변동
+				sbd->SetShaderRegister(register_data.tc_rn, register_data.tc_rs);
+				auto sbd_textureCube = (SBDTextureCube*)sbd.get();
+				register_data.tc_rn += sbd_textureCube->Count();
+			}
+			// structuredBuffer
+			else if (type == JGShader::EShaderBindData::StructuredBuffer &&
+				state == JGShader::EShaderBindDataState::ReadOnly)
+			{
+				// RegisterSpace   변동 RegisterNumber 0 고정
+				sb_rootparamMap[register_data.sb_rs] = sbd->GetName();
+				sbd->SetShaderRegister(register_data.sb_rn, register_data.sb_rs);
+				++register_data.sb_rs;
+				++numRootParam;
+			}
+			// rwtexture
+			else if (type == JGShader::EShaderBindData::Texture2D &&
+				state == JGShader::EShaderBindDataState::ReadWrite)
+			{
+				// RegisterSpace 0 고정 RegisterNumber 변동
+				sbd->SetShaderRegister(register_data.rt_rn, register_data.rt_rs);
+				auto sbd_texture2d = (SBDTexture2D*)sbd.get();
+				register_data.rt_rn += sbd_texture2d->Count();
+
+			}
+			// rwstructuredBuffer
+			else if (type == JGShader::EShaderBindData::StructuredBuffer &&
+				state == JGShader::EShaderBindDataState::ReadWrite)
+			{
+				rsb_rootparamMap[register_data.rsb_rs] = sbd->GetName();
+				// RegisterSpace   변동 RegisterNumber 0 고정
+				sbd->SetShaderRegister(register_data.rsb_rn, register_data.rsb_rs);
+				++register_data.rsb_rs;
+				++numRootParam;
+			}
+			else if (type == JGShader::EShaderBindData::ConstantBuffer)
+			{
+				cb_rootparamMap[register_data.cb_rn] = sbd->GetName();
+				// RegisterSpace는 무조건 0 고정  RegisterNumber가 변동
+				sbd->SetShaderRegister(register_data.cb_rn, register_data.cb_rs);
+				++register_data.cb_rn;
+				++numRootParam;
+			}
+			else
+			{
+				RE_LOG_ERROR("does not exist ShaderBindDataType");
+			}
+		}
+		for (auto& ss : m_SSPool)
+		{
+			ss.second.RegisterSpace = register_data.ss_rs;
+			ss.second.ShaderRegister = register_data.ss_rn;
+			++register_data.ss_rn;
+		}
+
+
+
+		if (register_data.t_rn == 0 && register_data.tc_rn == 0 && register_data.rt_rn == 0)
+			numRootParam--;
+
+
+
+		m_RootSignature = make_shared<RootSignature>(numRootParam);
+		int param_index = 0;
+		// texture
+		// textureCube
+		// rwtexture
+		uint32_t p1_idx = 0;
+		if (register_data.t_rn != 0 || register_data.tc_rn != 0 || register_data.rt_rn != 0)
+		{
+			p1_idx = param_index++;
+		}
+		if (register_data.t_rn != 0)
+		{
+			m_RootSignature->InitParam(p1_idx).PushAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+				register_data.t_rn, 0, register_data.t_rs);
+		}
+		if (register_data.tc_rn != 0)
+		{
+			m_RootSignature->InitParam(p1_idx).PushAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+				register_data.tc_rn, 0, register_data.tc_rs);
+		}
+		if (register_data.rt_rn != 0)
+		{
+			m_RootSignature->InitParam(p1_idx).PushAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
+				register_data.rt_rn, 0, register_data.rt_rs);
+		}
+		if (register_data.t_rn != 0 || register_data.tc_rn != 0 || register_data.rt_rn != 0)
+		{
+			m_RootSignature->InitParam(p1_idx).InitAsDescriptorTable();
+		}
+
+		m_RootParamMap.clear();
+		// structuredBuffer
+		for (uint32_t i = 2; i < register_data.sb_rs; ++i)
+		{
+			auto name = sb_rootparamMap[i];
+			m_RootParamMap[name] = param_index;
+			m_RootSignature->InitParam(param_index++).InitAsSRV(0, i);
+
+		}
+		// rwstructuredBuffer
+		for (uint32_t i = 1; i < register_data.rsb_rs; ++i)
+		{
+			auto name = rsb_rootparamMap[i];
+			m_RootParamMap[name] = param_index;
+			m_RootSignature->InitParam(param_index++).InitAsUAV(0, i);
+		}
+
+		// constbuffer
+		for (uint32_t i = 0; i < register_data.cb_rn; ++i)
+		{
+			auto name = cb_rootparamMap[i];
+			m_RootParamMap[name] = param_index;
+			m_RootSignature->InitParam(param_index++).InitAsConstantBufferView(i);
+		}
+
+
+		for (auto& ss : m_SSPool)
+		{
+			m_RootSignature->AddStaticSampler(ss.second);
+		}
+
+		if (!m_RootSignature->Finalize())
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
 	bool GraphicsShaderModule::Compile()
 	{
 		bool result = true;
-		// RootSignature
-		/*
-		1. Register Space, Number, 관리
-		2. 
-		*/
-		
-		m_RootSignature = make_shared<RootSignature>();
-		
+		if (m_RootSignature == nullptr)
+		{
+			MakeRootSignature();
+		}
 
-
-
+		if (!result)
+			return false;
 		// Shader 컴파일
 		for (auto& pair : m_ModuleDatasByShaderType)
 		{
@@ -444,10 +816,12 @@ namespace RE
 				module_data.SafeCode = code;
 			}
 			else
+			{
 				result = false;
-		}
+			}
 		
-
+		}
+	
 		return result;
 	}
 	string GraphicsShaderModule::GetCode(ShaderType type)
@@ -458,13 +832,13 @@ namespace RE
 		// 텍스쳐
 		// 샘플러
 		uint32_t idx = 0;
-		for (auto& ss : moduleData.SSPool)
+		for (auto& ss : m_SSPool)
 		{
 			code += "SamplerState " + ss.first + " : register(s" + to_string(idx++) + ");\n";
 		}
-		for (auto& sbd : moduleData.SBDPool)
+		for (auto& sbd : m_SBDPool)
 		{
-			code += sbd.second->GetCode(0,0);
+			code += sbd.second->GetCode();
 		}
 
 		// input
@@ -501,13 +875,18 @@ namespace RE
 		code += "};\n";
 		return code;
 	}
+
+
+	void GraphicsShaderModule::Execute(CommandList* cmdList)
+	{
+
+	}
 	void GraphicsShaderModule::DataSave(std::ofstream& fout)
 	{
 		ShaderModule::DataSave(fout);
 		
 		DataIO::write(fout, m_Width);
 		DataIO::write(fout, m_Height);
-
 
 		// 텍스쳐 
 		DataIO::write(fout, m_NumRenderTarget);
@@ -556,7 +935,6 @@ namespace RE
 
 		DataIO::read(fin, m_Width);
 		DataIO::read(fin, m_Height);
-
 		// texture
 		uint32_t numRt = 0;
 		DataIO::read(fin, numRt);
@@ -571,11 +949,11 @@ namespace RE
 
 			if (array_size == 6)
 			{
-				AddRenderTargetTexture(name, format);
+				AddRenderTargetCubeTexture(name, format);
 			}
 			else
 			{
-				AddRenderTargetCubeTexture(name, format);
+				AddRenderTargetTexture(name, format);
 			}
 		
 		}
@@ -617,24 +995,33 @@ namespace RE
 				DataIO::read(fin, e.type);
 				DataIO::read(fin, e.name);
 				DataIO::read(fin, e.semantic);
+				if (shader_type == ShaderType::Pixel)
+					continue;
 				m_Output[shader_type].push_back(e);
 			}
 		}
 	}
 
 
-	GBufferModule::GBufferModule(const std::string& name) : GraphicsShaderModule(name) 
+	StaticGBufferModule::StaticGBufferModule(const std::string& name) : 
+		GraphicsShaderModule(name, EModuleFormat::G_StaticGBuffer)
 	{
-		
+	
 	}
-	bool GBufferModule::Load(const std::string& path)
+	bool StaticGBufferModule::Load(const std::string& path)
 	{
 		if (GraphicsShaderModule::Load(path))
 			return true;
+		Init();
+	
+		return true;
+	}
+	void StaticGBufferModule::Init()
+	{
 		// Vertex //
 		// 		
-		AddStructuredBuffer("GameObjectArray", "GameObject", ShaderType::Vertex);
-		auto cbuffer = AddConstantBuffer("CameraCB", ShaderType::Vertex);
+		AddStructuredBuffer("GameObjectArray", "GameObject");
+		auto cbuffer = AddConstantBuffer("CameraCB");
 		cbuffer->Add("Camera", "camera");
 		// INPUT
 		AddInputEelement(ShaderType::Vertex, JGShader::_float3, "Position", "POSITION");
@@ -659,22 +1046,25 @@ namespace RE
 		SetMainCode(ShaderType::Vertex,
 			R"(
 
-Output output;
+    Output output;
 
-GameObject obj = GameObjectArray[instanceID];
-
-float4 posW = mul(float4(input.Position, 1.0f), obj.World);
-
-output.PosH = mul(posW, camera.ViewProj);
-output.PosW = posW.xyz;
-output.NormalW = normalize(mul(input.Normal, (float3x3)obj.World));
-output.TangentW = normalize(mul(input.Tangent, (float3x3)obj.World));
-output.Depth = output.PosH.z / output.PosH.w;
-output.TexC = input.TexC;
-output.InstanceID = instanceID;
+    GameObject obj = GameObjectArray[instanceID];
+    float4x4 world = obj.World;
 
 
-return output;
+
+    float4 posW = mul(float4(input.Position, 1.0f), world);
+
+    output.PosH = mul(posW, camera.ViewProj);
+    output.PosW = posW.xyz;
+    output.NormalW = normalize(mul(input.Normal, (float3x3)world));
+    output.TangentW = normalize(mul(input.Tangent, (float3x3)world));
+    output.Depth = output.PosH.z / output.PosH.w;
+    output.TexC = input.TexC;
+    output.InstanceID = instanceID;
+
+
+    return output;
 
 )");
 
@@ -685,33 +1075,154 @@ return output;
 
 		// Pixel //
 		//AddSamplerState("")
-		AddTexture2D("MaterialTextures", ShaderType::Pixel);
-		cbuffer = AddConstantBuffer("CameraCB", ShaderType::Pixel);
-		cbuffer->Add("Camera", "camera");
+		AddTexture2D("MaterialTextures")->Resize(100);
+		AddSamplerState("AnisotropicSampler", CD3DX12_STATIC_SAMPLER_DESC(0));
 
 		AddInputEelement(ShaderType::Pixel, JGShader::_float4, "PosH", "SV_POSITION");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "PosW", "POSITION");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "NormalW", "NORMAL");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "TangentW", "TANGENT");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float2, "TexC", "TEXCOORD");
-		AddInputEelement(ShaderType::Pixel, JGShader::_float,  "Depth", "DEPTH");
-		AddInputEelement(ShaderType::Pixel, JGShader::_uint,   "InstanceID", "INSTANCE");
+		AddInputEelement(ShaderType::Pixel, JGShader::_float, "Depth", "DEPTH");
+		AddInputEelement(ShaderType::Pixel, JGShader::_uint, "InstanceID", "INSTANCE");
 
-		AddRenderTargetCubeTexture("Default", DXGI_FORMAT_R8G8B8A8_UNORM);
+
+
+		AddRenderTargetTexture("Default", DXGI_FORMAT_R8G8B8A8_UNORM);
+		AddDepthStencilTexture("DefaultDepth");
+		//AddRenderTargetTexture("BaseColor_Oc", DXGI_FORMAT_R8G8B8A8_UNORM);
+		//AddRenderTargetTexture("Normal_AO", DXGI_FORMAT_R8G8B8A8_UNORM);
+		//AddRenderTargetTexture("MSR", DXGI_FORMAT_R8G8B8A8_UNORM);
+		//AddRenderTargetTexture("EmessiveColor", DXGI_FORMAT_R8G8B8A8_UNORM);
+		//AddRenderTargetTexture("Depth", DXGI_FORMAT_R32_FLOAT);
+
+
+
+
 
 		SetMainCode(ShaderType::Pixel,
 			R"(
 
-Output output;
-
-output.Default = float4(1.0f,1.0f,1.0f,1.0f);
+    Output output;
 
 
-return output;
+    // Next Material Code;
+
+    float3 color = float3(1.0f,1.0f,1.0f);
+    float3 dir = float3(0.0f,1.0f,1.0f);
+    dir = normalize(dir);
+    float d = dot(-dir, input.NormalW);
+
+    color = color * d;
+
+
+
+
+
+
+
+
+
+
+    output.Default = float4(color, 1.0f);
+
+
+    return output;
 
 )");
+	}
 
-		return true;
+	void StaticGBufferModule::BindCamera(ReCamera* cam)
+	{
+		GraphicsShaderModule::BindCamera(cam);
+		if (m_BindedCamera)
+		{
+			auto cbuffer = FindConstantBuffer("CameraCB");
+			auto camera = ((STStruct*)cbuffer->Get("camera"));
+
+			JMatrix view = JMatrix::Transpose(m_BindedCamera->GetView());
+			JMatrix proj = JMatrix::Transpose(m_BindedCamera->GetProj());
+			JMatrix viewproj = JMatrix::Transpose(m_BindedCamera->GetViewProj());
+
+
+			((STMatrix*)camera->GetElement("View"))->Set(view);
+			((STMatrix*)camera->GetElement("Proj"))->Set(proj);
+			((STMatrix*)camera->GetElement("ViewProj"))->Set(viewproj);
+			((STMatrix*)camera->GetElement("InvView"))->Set(JMatrix::Inverse(view));
+			((STMatrix*)camera->GetElement("InvProj"))->Set(JMatrix::Inverse(proj));
+			((STMatrix*)camera->GetElement("InvViewProj"))->Set(JMatrix::Inverse(viewproj));
+			((STFloat3*)camera->GetElement("Position"))->Set(m_BindedCamera->GetPosition());
+			((STFloat*)camera->GetElement("FarZ"))->Set(m_BindedCamera->GetFarZ());
+			((STFloat*)camera->GetElement("NearZ"))->Set(m_BindedCamera->GetNearZ());
+			((STFloat2*)camera->GetElement("ScreenSize"))->Set(
+				{ m_BindedCamera->GetLensWidth(), m_BindedCamera->GetLensHeight() });
+
+		}
+	}
+
+	void StaticGBufferModule::Execute(CommandList* cmdList)
+	{
+		auto RIManager = GetRenderItemManager();
+
+
+
+		Viewport viewport;
+		ScissorRect rect;
+		viewport.Set(m_Width, m_Height);
+		rect.Set(m_Width, m_Height);
+
+		cmdList->SetViewport(viewport);
+		cmdList->SetScissorRect(rect);
+		cmdList->SetGraphicsRootSignature(*m_RootSignature);
+		cmdList->ClearRenderTarget(*m_RenderTarget);
+		cmdList->SetRenderTarget(*m_RenderTarget);
+
+
+		auto item_array = RIManager->GetItemByMesh(EReMeshType::Static);
+
+
+		
+
+		// GameObjectArray
+		auto sbuffer = FindStructuredBuffer("GameObjectArray");
+		auto clone = sbuffer->CloneBindedStruct();
+		uint32_t sbuffer_element_count = sbuffer->GetElementCount();
+		for (uint32_t i = 0; i < item_array.size(); ++i)
+		{
+			if (i >= sbuffer_element_count)
+			{
+				((STMatrix*)clone.GetElement("World"))->Set(item_array[i]->TempWorld);
+				sbuffer->Add(clone);
+			}
+			else
+			{
+				((STMatrix*)sbuffer->Get(i)->GetElement("World"))->Set(item_array[i]->TempWorld);
+			}
+		}
+		cmdList->BindGraphicsDynamicStructuredBuffer(
+			GetRootParamIndex("GameObjectArray"),clone.GetSize(),  sbuffer->GetData());
+
+
+		// Camera
+		if (m_BindedCamera)
+		{
+			auto cbuffer = FindConstantBuffer("CameraCB");
+			cmdList->BindGraphicsDynamicConstantBuffer(
+				GetRootParamIndex("CameraCB"), cbuffer->GetData());
+		}
+
+
+		// Texture
+		// 머터리얼을 이용해 텍스쳐 바인딩
+		//auto t = FindTexture2D("MaterialTextures");
+		
+		
+		// PSO 및 Mesh Draw
+		for (auto& item : item_array)
+		{
+			cmdList->SetPipelineState(*item->Material->GetPSO());
+			item->Mesh->Draw(cmdList);
+		}
 	}
 }
 

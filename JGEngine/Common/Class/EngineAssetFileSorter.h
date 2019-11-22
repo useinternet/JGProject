@@ -1,6 +1,6 @@
 #pragma once
 
-
+#define JGFORMAT ".jg"
 enum EAssetGroup : uint32_t
 {
 	AssetGroup_RE,

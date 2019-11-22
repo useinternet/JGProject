@@ -86,10 +86,15 @@ void Application::Run()
 	Load();
 	while (msg.message != WM_QUIT)
 	{
+
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		}
+		else if (m_InputEngine->GetKeyAsButton(KeyCode::Esc))
+		{
+			DestroyWindow(m_Window->GetData().hWnd);
 		}
 		else
 		{

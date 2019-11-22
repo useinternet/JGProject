@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 
 class JVector3;
+class JQuaternion;
 class JMatrix
 {
 	using SimMat = DirectX::XMMATRIX;
@@ -59,6 +60,9 @@ public: // ¿¬»êÀÚ
 		(*this) *= m2;
 		return *this;
 	}
+
+	JVector3 TransformPoint(const JVector3& v);
+	JVector3 TransformVector(const JVector3& v);
 public:
 	inline static JMatrix Identity() {
 		JMatrix m;
@@ -78,6 +82,7 @@ public:
 	}
 	static JMatrix Translation(const JVector3& v);
 	static JMatrix Rotation(const JVector3& v);
+	static JMatrix Rotation(const JQuaternion& q);
 	static JMatrix LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
 	inline static JMatrix PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 	{
@@ -90,7 +95,12 @@ public:
 		JMatrix result;
 		result.SetSIMD(DirectX::XMMatrixOrthographicLH(width, height, nearZ, farZ));
 		return result;
+		
+		
 	}
+
+
+	//static JVector3 
 public:
 	float& Get(int col, int row) {
 		return m_Data.m[col][row];

@@ -298,12 +298,7 @@ namespace RE
 		m_D3D_CommandList->SetGraphicsRootConstantBufferView(rootparam, alloc.GPU);
 
 	}
-	void CommandList::BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, uint32_t dataSize, const std::vector<byte>& data)
-	{
-		uint32_t numElements = data.size() / dataSize;
-		uint32_t elementSize = dataSize;
-		BindGraphicsDynamicStructuredBuffer(rootparam, numElements, elementSize, data.data());
-	}
+
 	void CommandList::BindVertexBuffer(uint32_t slot, const VertexBuffer& vertex_buffer)
 	{
 		TransitionBarrier(vertex_buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);

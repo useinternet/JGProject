@@ -180,7 +180,7 @@ namespace RE
 		}
 		// 1번
 		// 그룹과 파일 포맷  구조체 갯수저장
-		EAssetGroup  group  = EAssetGroup::AssetGroup_RE;
+		EAssetGroup   group  = EAssetGroup::AssetGroup_RE;
 		EAssetFormat  format = EAssetFormat::AssetFormat_RE_ShaderTypeLib;
 		DataIO::write(fout, group);
 		DataIO::write(fout, format);

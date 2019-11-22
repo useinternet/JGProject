@@ -18,6 +18,11 @@
 #include "Object/Shader/ShaderLib.h"
 #include "Object/Shader/ShaderDataType.h"
 #include "Object/Shader/ShaderModule.h"
+#include "Object/Shader/ShaderModuleManager.h"
+#include "Object/ReObject/RenderItem.h"
+#include "Object/ReObject/ReMesh.h"
+#include "Object/ReObject/ReMaterial.h"
+#include "Object/ReObject/ReCamera.h"
 #include <d3dcompiler.h>
 using namespace std;
 using namespace DirectX;
@@ -34,6 +39,9 @@ namespace RE
 	{
 		std::string path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Lib\\ShaderTypeLib.jg");
 		m_ShaderLibManager->Save(path);
+
+		path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Module");
+		m_ShaderModuleManager->Save(path);
 	}
 	void RenderEngine::Init(HWND hWnd, int width, int height, const std::shared_ptr<GUI>& bind_gui)
 	{
@@ -47,7 +55,9 @@ namespace RE
 		m_RenderDevice = make_shared<RenderDevice>(desc);
 		m_EventListener.m_RenderEngine = this;
 		m_EventListener.m_RenderDevice = m_RenderDevice.get();
-		m_ShaderLibManager = make_shared<ShaderLibManager>();
+		m_ShaderLibManager    = make_shared<ShaderLibManager>();
+		m_RenderItemManager   = make_shared<RenderItemManager>();
+		m_ShaderModuleManager = make_shared<ShaderModuleManager>();
 		RE_LOG_INFO("RenderEngine Init Complete...");
 	}
 	void RenderEngine::Load()
@@ -56,292 +66,87 @@ namespace RE
 		m_ShaderLibManager->Load(path);
 
 
-		path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Module\\GBufferModule.jg");
-		GBufferModule ggg("GBufferModule");
-		ggg.Load(path);
+		path = GlobalLinkData::_EngineConfig->InEngine("Shader\\Module");
+		m_ShaderModuleManager->Load(path);
+		//
+		m_ShaderModuleManager->CreateGraphicsModule("DefaultStaticGBuffer", EModuleFormat::G_StaticGBuffer);
+		auto item1 = m_RenderItemManager->CreateItem("Object1");
+		item1->Mesh = ReMesh::Create(EReMeshShape::Box);
+		m_ShaderModuleManager->FindGraphicsModule("DefaultStaticGBuffer")->MakePSO(item1->Material->GetPSO());
+		item1->Material->GetPSO()->Finalize();
 
 
-		auto vcode = ggg.GetCode(ShaderType::Vertex);
-		auto hcode = ggg.GetCode(ShaderType::Hull);
-		auto dcode = ggg.GetCode(ShaderType::Domain);
-		auto gcode = ggg.GetCode(ShaderType::Geometry);
-		auto pcode = ggg.GetCode(ShaderType::Pixel);
+		m_RenderDevice->RegisterGUITexture(m_ShaderModuleManager->FindGraphicsModule("DefaultStaticGBuffer")->GetRenderTargetTexture(0));
 
-
-
-
-		ggg.Save(path);
-
-
-
-		CreateBox(1.0f, 1.0f, 1.0f);
-
-
-					
-
-
-
-
-
-//		std::string shadercode = R"(
-//	    cbuffer cbPerObject : register(b0)
-//		{
-//            float4x4 gWorld;
-//			float4x4 gViewProj;
-//            uint gFrame;
-//            float3 gpadding;
-//		};
-//
-//		struct VertexIn
-//		{
-//			float3 PosL : POSITION;
-//            float3 Normal : NORMAL;
-//            float3 Tangent : TANGENT;
-//			float2 TexC : TEXCOORD;
-//		};
-//
-//		struct VertexOut
-//		{
-//			float4 PosH : SV_POSITION;
-//            float3 NormalW : NORMAL;
-//            float3 TangentW : TANGENT;
-//			float2 TexC : TEXCOORD;
-//		};
-//
-//		VertexOut VS(VertexIn vin)
-//		{
-//			VertexOut vout;
-//
-//			// Transform to homogeneous clip space.
-//            float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-//			vout.PosH = mul(posW, gViewProj);
-//
-//			// Just pass vertex color into the pixel shader.
-//			vout.TexC = vin.TexC;
-//            vout.NormalW = float3(0.0f,0.0f,0.0f);
-//            vout.TangentW = float3(0.0f,0.0f,0.0f);
-//			return vout;
-//		} 
-//
-//
-//Texture2D  gtexture[10] : register(t0);
-//SamplerState  gsampler  : register(s0);
-//float4 PS(VertexOut pin) : SV_Target
-//{
-//    uint index = gFrame / 60;
-//    float4 color = gtexture[index].Sample(gsampler, pin.TexC);
-//    // 
-//    return color;
-//}
-//       )";
-
-
-		//m_RenderItem.PSO = make_shared<GraphicsPipelineState>();
-
-		//m_RenderItem.PSO->SetInputLayout(InputLayouts);
-		//m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Vertex));
-		//m_RenderItem.PSO->BindShader(gModule.GetShader(ShaderType::Pixel));
-		//m_RenderItem.PSO->SetRenderTargetFormat({ 0 }, { DXGI_FORMAT_R8G8B8A8_UNORM });
-		//m_RenderItem.PSO->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
-		//m_RenderItem.PSO->SetRootSignature(*m_RenderItem.Rootsignature);
-		//m_RenderItem.PSO->Finalize();
-
-		JMatrix view = JMatrix::LookAtLH({ 0.0f, 0.0f, -5.0f }, { 0.0f,0.0f,1.0f }, { 0.0f,1.0f,0.0f });
-		JMatrix proj = JMatrix::PerspectiveFovLH(0.25f * 3.141592f,
-			(float)1920 / (float)1080, 1.0f, 1000.0f);
-
-		{
-			m_RenderItem.contants1.ViewProj = JMatrix::Transpose(view * proj);
-		}
-		{
-			m_RenderItem.contants2.ViewProj = JMatrix::Transpose(view * proj);
-			m_RenderItem.contants2.World = JMatrix::Transpose(JMatrix::Translation({ 1.5f,0.0f,0.0f }));
-			m_RenderItem.contants2.Frame = 120;
-		}
-		{
-			m_RenderItem.contants3.ViewProj = JMatrix::Transpose(view * proj);
-			m_RenderItem.contants3.World = JMatrix::Transpose(JMatrix::Translation({ -1.5f,0.0f,0.0f }));
-			m_RenderItem.contants3.Frame = 240;
-		}
-
-
-
-
-		m_RenderItem.width = 1920;
-		m_RenderItem.height = 1080;
-
+	
+		m_Cam = make_shared<ReCamera>();
+		m_Cam->SetLens(45, 1920, 1080);
+		m_Cam->SetPosition(0, 0, -5);
+		m_ShaderModuleManager->FindGraphicsModule("DefaultStaticGBuffer")->BindCamera(m_Cam.get());
 
 		//임시 텍스쳐
-		{
-			CommandQueue texture_que(D3D12_COMMAND_LIST_TYPE_DIRECT);
+		//{
+		//	CommandQueue texture_que(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-			auto texture_cmdList = texture_que.GetCommandList();
-			auto config = GlobalLinkData::_EngineConfig;
-			LoadTexture(config->InEngineW("Textures/bricks3.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/bricks.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/bricks2.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/checkboard.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/ice.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/tile.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/stone.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/WoodCrate01.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/WoodCrate02.dds"), texture_cmdList);
-			LoadTexture(config->InEngineW("Textures/water1.dds"), texture_cmdList);
-			texture_que.ExcuteCommandList({ texture_cmdList });
-			texture_que.Flush();
-		}
+		//	auto texture_cmdList = texture_que.GetCommandList();
+		//	auto config = GlobalLinkData::_EngineConfig;
+		//	LoadTexture(config->InEngineW("Textures/bricks3.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/bricks.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/bricks2.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/checkboard.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/ice.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/tile.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/stone.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/WoodCrate01.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/WoodCrate02.dds"), texture_cmdList);
+		//	LoadTexture(config->InEngineW("Textures/water1.dds"), texture_cmdList);
+		//	texture_que.ExcuteCommandList({ texture_cmdList });
+		//	texture_que.Flush();
+		//}
 	}
+	struct GameObject
+	{
+		JMatrix World;
+	};
+	struct Camera
+	{
+		JMatrix View;
+		JMatrix Proj;
+		JMatrix ViewProj;
+		JMatrix InvView;
+		JMatrix InvProj;
+		JMatrix InvViewProj;
+		JVector3 Position;
+		float FarZ;
+		float NearZ;
+		JVector2 ScreenSize;
+		float padding;
+	};
 	void RenderEngine::Update()
 	{
 		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
-		m_RenderItem.contants1.Frame++;
-		if (m_RenderItem.contants1.Frame >= 600)
-		{
-			m_RenderItem.contants1.Frame = 0;
-		}
-		m_RenderItem.contants2.Frame++;
-		if (m_RenderItem.contants2.Frame >= 600)
-		{
-			m_RenderItem.contants2.Frame = 0;
-		}
-		m_RenderItem.contants3.Frame++;
-		if (m_RenderItem.contants3.Frame >= 600)
-		{
-			m_RenderItem.contants3.Frame = 0;
-		}
+		auto gbuffer = m_ShaderModuleManager->FindGraphicsModule("DefaultStaticGBuffer");
+
+		
+
+
+
+
 		m_RenderDevice->SubmitToRender(0, 
 			[&](CommandList* commandList) {
-			
-
-				//{
-				//	commandList->BindDynamicVertexBuffer(
-				//		0, m_RenderItem.vertices);
-				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-
-				//}
-
-				//{
-
-
-				//	commandList->BindDynamicVertexBuffer(
-				//		0, m_RenderItem.vertices);
-				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-				//}
-
-
-
-				//{
-
-				//	commandList->BindDynamicVertexBuffer(
-				//		0, m_RenderItem.vertices);
-				//	commandList->BindDynamicIndexBuffer(m_RenderItem.indices);
-				//	commandList->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-				//	commandList->DrawIndexed((uint32_t)m_RenderItem.indices.size());
-
-				//}
-
+//		
+			gbuffer->Execute(commandList);
 
 
 		});
-
-
+		auto desc = m_ShaderModuleManager->FindGraphicsModule("DefaultStaticGBuffer")->GetRenderTargetTexture(0).GetDesc();
 		m_RenderDevice->Update();
 	}
 	void RenderEngine::OnEvent(Event& e)
 	{
 		m_EventListener.OnEvent(e);
 	}
-	void RenderEngine::CreateBox(float  width , float height, float depth)
-	{
-		Vertex v[24];
 
-		float w2 = 0.5f * width;
-		float h2 = 0.5f * height;
-		float d2 = 0.5f * depth;
-
-		// Fill in the front face vertex data.
-		v[0] = Vertex(-w2, -h2, -d2 , 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		v[1] = Vertex(-w2, +h2, -d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		v[2] = Vertex(+w2, +h2, -d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-		v[3] = Vertex(+w2, -h2, -d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-
-		// Fill in the back face vertex data.
-		v[4] = Vertex(-w2, -h2, +d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-		v[5] = Vertex(+w2, -h2, +d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		v[6] = Vertex(+w2, +h2, +d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		v[7] = Vertex(-w2, +h2, +d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
-		// Fill in the top face vertex data.
-		v[8] = Vertex(-w2, +h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		v[9] = Vertex(-w2, +h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		v[10] = Vertex(+w2, +h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-		v[11] = Vertex(+w2, +h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-
-		// Fill in the bottom face vertex data.
-		v[12] = Vertex(-w2, -h2, -d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-		v[13] = Vertex(+w2, -h2, -d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		v[14] = Vertex(+w2, -h2, +d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		v[15] = Vertex(-w2, -h2, +d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
-		// Fill in the left face vertex data.
-		v[16] = Vertex(-w2, -h2, +d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
-		v[17] = Vertex(-w2, +h2, +d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-		v[18] = Vertex(-w2, +h2, -d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
-		v[19] = Vertex(-w2, -h2, -d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f);
-
-		// Fill in the right face vertex data.
-		v[20] = Vertex(+w2, -h2, -d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
-		v[21] = Vertex(+w2, +h2, -d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-		v[22] = Vertex(+w2, +h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-		v[23] = Vertex(+w2, -h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-
-		for (uint32_t i = 0; i < 24; ++i)
-		{
-			m_RenderItem.vertices.push_back(v[i]);
-		}
-		//
-		// Create the indices.
-		//
-
-		uint32_t i[36];
-
-		// Fill in the front face index data
-		i[0] = 0; i[1] = 1; i[2] = 2;
-		i[3] = 0; i[4] = 2; i[5] = 3;
-
-		// Fill in the back face index data
-		i[6] = 4; i[7] = 5; i[8] = 6;
-		i[9] = 4; i[10] = 6; i[11] = 7;
-
-		// Fill in the top face index data
-		i[12] = 8; i[13] = 9; i[14] = 10;
-		i[15] = 8; i[16] = 10; i[17] = 11;
-
-		// Fill in the bottom face index data
-		i[18] = 12; i[19] = 13; i[20] = 14;
-		i[21] = 12; i[22] = 14; i[23] = 15;
-
-		// Fill in the left face index data
-		i[24] = 16; i[25] = 17; i[26] = 18;
-		i[27] = 16; i[28] = 18; i[29] = 19;
-
-		// Fill in the right face index data
-		i[30] = 20; i[31] = 21; i[32] = 22;
-		i[33] = 20; i[34] = 22; i[35] = 23;
-
-
-		for (uint32_t k = 0; k < 36; ++k)
-		{
-			m_RenderItem.indices.push_back(i[k]);
-		}
-	}
 	void RenderEngine::LoadTexture(const std::wstring& name, CommandList* cmdList)
 	{
 		ComPtr<ID3D12Resource> d3d_resource;
@@ -354,7 +159,6 @@ namespace RE
 		str.assign(name.begin(), name.end());
 		Texture tex(str);
 		tex.SetD3DResource(d3d_resource, D3D12_RESOURCE_STATE_COMMON);
-		m_RenderItem.textures.push_back(move(tex));
 		
 
 		Resource upload(str + "_upload");

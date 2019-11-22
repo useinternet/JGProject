@@ -6,6 +6,10 @@ using namespace std;
 
 namespace RE
 {
+	uint32_t RenderTarget::GetMaxNumRenderTarget()
+	{
+		return MAX_RENDER_TARGET;
+	}
 	RenderTarget::RenderTarget() : ReObject("RenderTarget")
 	{
 		m_Textures.resize(MAX_RENDER_TARGET);

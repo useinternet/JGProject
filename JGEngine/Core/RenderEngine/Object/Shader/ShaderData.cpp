@@ -23,6 +23,8 @@ namespace RE
 		DataIO::write(fout, m_Type);
 		// ป๓ลย
 		DataIO::write(fout, m_State);
+		DataIO::write(fout, m_RegisterNumber);
+		DataIO::write(fout, m_RegisterSpace);
 	}
 	void ShaderBindingData::Load(std::ifstream& fin)
 	{
@@ -30,6 +32,8 @@ namespace RE
 		DataIO::read(fin, name); SetName(name);
 		DataIO::read(fin, m_Type);
 		DataIO::read(fin, m_State);
+		DataIO::read(fin, m_RegisterNumber);
+		DataIO::read(fin, m_RegisterSpace);
 	}
 
 
@@ -168,7 +172,7 @@ namespace RE
 	}
 	std::string SBDConstantBuffer::GetCode(uint32_t register_number, uint32_t register_space)
 	{
-		std::string code = "cbuffer " + GetName() + " : " + "(b" + to_string(register_number) + ", space" +
+		std::string code = "cbuffer " + GetName() + " : register(b" + to_string(register_number) + ", space" +
 			to_string(register_space) + ") \n{\n";
 
 		for (auto& name : m_DataVarNames)
@@ -217,6 +221,12 @@ namespace RE
 		m_ElementsIndex[result] = count;
 
 		return result;
+	}
+	STStruct* SBDStructuredBuffer::Add(const STStruct& _struct)
+	{
+		auto s = Add();
+		*s = _struct;
+		return s;
 	}
 	void      SBDStructuredBuffer::Remove(STStruct* _struct)
 	{
@@ -272,7 +282,7 @@ namespace RE
 	{
 		m_ElementsIndex.clear();
 		m_Elements.clear();
-		m_BindedStructType.reset();
+		//m_BindedStructType.reset();
 	}
 	std::string SBDStructuredBuffer::GetCode(uint32_t register_number, uint32_t register_space)
 	{
@@ -281,11 +291,11 @@ namespace RE
 		{
 		case JGShader::ReadOnly:
 			code += "StructuredBuffer<" + m_BindedStructType->GetName() + "> " + GetName() +
-				" : (t" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
+				" : register(t" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
 			break;
 		case JGShader::ReadWrite:
 			code += "RWStructuredBuffer<" + m_BindedStructType->GetName() + "> " + GetName() +
-				" : (u" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
+				" : register(u" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
 			break;
 		}
 		return code;
@@ -341,6 +351,10 @@ namespace RE
 		}
 
 		m_Textures.push_back(move(t));
+	}
+    void  SBDTexture2D::Resize(uint32_t count)
+	{
+		m_Textures.resize(count);
 	}
 	Texture* SBDTexture2D::Get(uint32_t idx)
 	{
@@ -401,27 +415,35 @@ namespace RE
 		switch (m_State)
 		{
 		case JGShader::ReadOnly:
-			if (m_Textures.size() == 1)
+			if (m_Textures.empty())
 			{
-				code += "Textue2D " + GetName() + " : (t" + to_string(register_number) + ", space" +
+
+			}
+			else if (m_Textures.size() == 1)
+			{
+				code += "Texture2D " + GetName() + " : register(t" + to_string(register_number) + ", space" +
 					to_string(register_space) + ");\n";
 			}
 			else
 			{
-				code += "Textue2D " + GetName() + "[" + to_string(Count()) +  "] : (t" + 
+				code += "Texture2D " + GetName() + "[" + to_string(Count()) +  "] : register(t" + 
 					to_string(register_number) + ", space" + to_string(register_space) + ");\n";
 			}
 
 			break;
 		case JGShader::ReadWrite:
-			if (m_Textures.size() == 1)
+			if (m_Textures.empty())
 			{
-				code += "RWTextue2D " + GetName() + " : (u" + to_string(register_number) + ", space" +
+
+			}
+			else if (m_Textures.size() == 1)
+			{
+				code += "RWTexture2D " + GetName() + " : register(u" + to_string(register_number) + ", space" +
 					to_string(register_space) + ");\n";
 			}
 			else
 			{
-				code += "RWTextue2D " + GetName() + "[" + to_string(Count()) + "] : (u" +
+				code += "RWTexture2D " + GetName() + "[" + to_string(Count()) + "] : register(u" +
 					to_string(register_number) + ", space" + to_string(register_space) + ");\n";
 			}
 			break;
@@ -431,10 +453,14 @@ namespace RE
 	void SBDTexture2D::Save(std::ofstream& fout)
 	{
 		ShaderBindingData::Save(fout);
+		DataIO::write(fout, m_Textures.size());
 	}
 	void SBDTexture2D::Load(std::ifstream& fin)
 	{
 		ShaderBindingData::Load(fin);
+		size_t size;
+		DataIO::read(fin, size);
+		m_Textures.resize(size);
 	}
 	void SBDTexture2D::ConvertReadWrite()
 	{
@@ -539,19 +565,25 @@ namespace RE
 	std::string SBDTextureCube::GetCode(uint32_t register_number, uint32_t register_space)
 	{
 		std::string code = "TextureCube " + GetName();
+		if (m_Textures.empty())
+			return "";
 		if(m_Textures.size() > 1)
 		{ 
 			code += "[" + to_string(Count()) + "]";
 		}
-		code += " : (t" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
+		code += " : register(t" + to_string(register_number) + ", space" + to_string(register_space) + ");\n";
 		return code;
 	}
 	void SBDTextureCube::Save(std::ofstream& fout)
 	{
 		ShaderBindingData::Save(fout);
+		DataIO::write(fout, m_Textures.size());
 	}
 	void SBDTextureCube::Load(std::ifstream& fin)
 	{
 		ShaderBindingData::Load(fin);
+		size_t size;
+		DataIO::read(fin, size);
+		m_Textures.resize(size);
 	}
 }

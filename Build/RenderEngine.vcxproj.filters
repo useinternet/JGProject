@@ -116,6 +116,15 @@
     <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderDataType.h">
       <Filter>Object\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderItem.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderModuleManager.h">
+      <Filter>Object\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReCamera.h">
+      <Filter>Object\ReObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\DxUtill.cpp" />
@@ -193,6 +202,15 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderDataType.cpp">
       <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\RenderItem.cpp">
+      <Filter>Object\ReObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\Shader\ShaderModuleManager.cpp">
+      <Filter>Object\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\RenderEngine\Object\ReObject\ReCamera.cpp">
+      <Filter>Object\ReObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

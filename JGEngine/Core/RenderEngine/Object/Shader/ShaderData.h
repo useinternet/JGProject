@@ -14,6 +14,9 @@ namespace RE
 		ShaderBindingData();
 		ShaderBindingData(const std::string& name);
 	public:
+		std::string GetCode() {
+			return std::move(GetCode(m_RegisterNumber, m_RegisterSpace));
+		}
 		virtual std::string GetCode(uint32_t register_number, uint32_t register_space) = 0;
 		JGShader::EShaderBindData GetType() const {
 			return m_Type;
@@ -21,7 +24,10 @@ namespace RE
 		JGShader::EShaderBindDataState GetState() const {
 			return m_State;
 		}
-
+		void SetShaderRegister(uint32_t register_number, uint32_t register_space) {
+			m_RegisterNumber = register_number;
+			m_RegisterSpace  = register_space;
+		}
 		virtual void ConvertReadWrite() {
 			m_State = JGShader::ReadWrite;
 		}
@@ -33,6 +39,11 @@ namespace RE
 	protected:
 		JGShader::EShaderBindData m_Type;
 		JGShader::EShaderBindDataState m_State = JGShader::ReadOnly;
+		uint32_t m_RegisterNumber = 0;
+		uint32_t m_RegisterSpace = 0;
+	protected:
+
+		
 	};
 
 	class SBDConstantBuffer : public ShaderBindingData
@@ -63,8 +74,13 @@ namespace RE
 		SBDStructuredBuffer();
 		SBDStructuredBuffer(const std::string& name);
 	public:
+		STStruct  CloneBindedStruct() const
+		{
+			return *m_BindedStructType;
+		}
 		void      BindStruct(const std::string& struct_type_name);
 		STStruct* Add();
+		STStruct* Add(const STStruct& _struct);
 		void      Remove(STStruct* _struct);
 		void      Remove(uint32_t idx);
 		STStruct* Get(uint32_t idx);
@@ -89,6 +105,7 @@ namespace RE
 		SBDTexture2D(const std::string& name);
 	public:
 		virtual void     Add(const Texture& texture);
+		virtual void     Resize(uint32_t count);
 		virtual void     Set(uint32_t idx, const Texture& texture);
 		Texture* Get(uint32_t idx);
 		void     Remove(uint32_t idx);

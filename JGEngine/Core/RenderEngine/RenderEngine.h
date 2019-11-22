@@ -25,67 +25,26 @@ namespace RE
 	class GraphicsPipelineState;
 	class VertexShader;
 	class PixelShader;
-
-	
-	struct Vertex
-	{
-		DirectX::XMFLOAT3 Pos;
-		DirectX::XMFLOAT3 Normal;
-		DirectX::XMFLOAT3 Tangent;
-		DirectX::XMFLOAT2 Tex;
-		Vertex() {}
-		Vertex(float p1, float p2, float p3, 
-			float n1, float n2, float n3,
-			float t1, float t2, float t3,
-			float u, float v) :
-			Pos({ p1, p2, p3 }), 
-			Normal({ n1,n2,n3 }),
-			Tangent({t1,t2,t3}),
-			Tex({ u, v }) {}
-	};
-	struct ObjectConstants
-	{
-		JMatrix World = JMatrix::Identity();
-		JMatrix ViewProj;
-		uint32_t Frame = 0;
-		JVector3 padding;
-	};
-
-	struct RenderItem
-	{
-		std::shared_ptr<GraphicsPipelineState> PSO;
-		std::shared_ptr<RootSignature> Rootsignature;
-		std::shared_ptr<VertexShader> VertexShader;
-		std::shared_ptr<PixelShader> PixelShader;
-		std::vector<Vertex> vertices;
-		std::vector<std::uint32_t> indices;
-		ObjectConstants contants1;
-		ObjectConstants contants2;
-		ObjectConstants contants3;
-		int width, height;
-
-		std::shared_ptr<RenderTarget> rendertarget;
-		std::vector<Texture> textures;
-	};
-
 	class GraphicsShaderModule;
 	class ShaderLibManager;
+	class RenderItemManager;
+	class ShaderModuleManager;
+	class ReCamera;
 	class RENDERENGINE_API RenderEngine : public EngineCore
 	{
 	private:
-		std::shared_ptr<RenderDevice>     m_RenderDevice;
-		std::shared_ptr<ShaderLibManager> m_ShaderLibManager;
+		std::shared_ptr<RenderDevice>      m_RenderDevice;
+		std::shared_ptr<ShaderLibManager>  m_ShaderLibManager;
+		std::shared_ptr<RenderItemManager> m_RenderItemManager;
+		std::shared_ptr<ShaderModuleManager> m_ShaderModuleManager;
 
 
-
-
-
-
-
+		std::shared_ptr<RenderTarget> m_RenderTarget;
 		RE_EventListener m_EventListener;
-		RenderItem m_RenderItem;
 		std::vector<Resource> m_UploadResource;
-		std::shared_ptr<GraphicsShaderModule> m_Module;
+
+
+		std::shared_ptr<ReCamera> m_Cam;
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();
@@ -96,7 +55,6 @@ namespace RE
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 	private:
-		void CreateBox(float  width, float height, float depth);
 		void LoadTexture(const std::wstring& name, CommandList* cmdList);
 	};
 }

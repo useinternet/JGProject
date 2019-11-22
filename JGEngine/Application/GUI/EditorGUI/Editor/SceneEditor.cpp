@@ -11,7 +11,7 @@ namespace JE
 		RequestResourceEvent e;
 		e.SentIGWindowID = (uint64_t)this;
 		e.SentIGWindow = GetName();
-		e.RequestResourceName = "FinalScene";
+		e.RequestResourceName = "Default";
 		EventNotify(e);
 	}
 	void SceneEditor::OnGUI()

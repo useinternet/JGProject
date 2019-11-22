@@ -12,10 +12,14 @@ namespace RE
 {
 	class RenderDevice;
 	class ShaderLibManager;
+	class RenderItemManager;
+	class ShaderModuleManager;
 	class RENDERENGINE_API ReObject
 	{
 		friend RenderDevice;
 		friend ShaderLibManager;
+		friend RenderItemManager;
+		friend ShaderModuleManager;
 	public:
 		ReObject() = default;
 		ReObject(const std::string& name) : m_Name(name) { }
@@ -39,9 +43,23 @@ namespace RE
 		ShaderLibManager* GetShaderLibManager() const {
 			return m_ShaderLibManager;
 		}
+		RenderItemManager* GetRenderItemManager()  {
+			return m_RenderItemManager;
+		}
+		RenderItemManager* GetRenderItemManager() const {
+			return m_RenderItemManager;
+		}
+		ShaderModuleManager* GetShaderModuleManager() {
+			return m_ShaderModuleManager;
+		}
+		ShaderModuleManager* GetShaderModuleManager() const {
+			return m_ShaderModuleManager;
+		}
 	private:
 		std::string m_Name;
-		static RenderDevice* m_RenderDevice;
-		static ShaderLibManager* m_ShaderLibManager;
+		static RenderDevice*      m_RenderDevice;
+		static ShaderLibManager*  m_ShaderLibManager;
+		static RenderItemManager* m_RenderItemManager;
+		static ShaderModuleManager* m_ShaderModuleManager;
 	};
 }

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JMatrix.h"
 #include "JVector.h"
-
+#include "JQuaternion.h"
 
 JMatrix::JMatrix() :
 	m_Data(
@@ -40,7 +40,16 @@ JMatrix::JMatrix(
 		v3.x, v3.y, v3.z, w3,
 		v4.x, v4.y, v4.z, w4) { }
 
-
+JVector3 JMatrix::TransformPoint(const JVector3& v)
+{
+	auto sim_v = DirectX::XMVector3TransformCoord(JVector3::GetSIMD(v), GetSIMD());
+	return JVector3::ConvertJVector3(sim_v);
+}
+JVector3 JMatrix::TransformVector(const JVector3& v)
+{
+	auto sim_v = DirectX::XMVector3TransformNormal(JVector3::GetSIMD(v), GetSIMD());
+	return JVector3::ConvertJVector3(sim_v);
+}
 JMatrix JMatrix::Translation(const JVector3& v)
 {
 	JMatrix m;
@@ -51,6 +60,12 @@ JMatrix JMatrix::Rotation(const JVector3& v)
 {
 	JMatrix m;
 	m.SetSIMD(DirectX::XMMatrixRotationRollPitchYaw(v.x, v.y, v.z));
+	return m;
+}
+JMatrix JMatrix::Rotation(const JQuaternion& q)
+{
+	JMatrix m;
+	m.SetSIMD(DirectX::XMMatrixRotationQuaternion(q.GetSIMD()));
 	return m;
 }
 JMatrix JMatrix::LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up)
