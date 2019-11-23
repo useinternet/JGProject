@@ -24,6 +24,7 @@ Application::~Application()
 bool Application::Init()
 {
 	Log::Init("JGEngine", "enginelog.txt");
+	m_JWindowManager = make_shared<JWindowManager>();
 	m_EventManager = make_shared<EventManager>();
 	m_EngineTimer  = make_shared<EngineTimer>();
 	m_EngineConfig = make_shared<EngineConfig>();
@@ -45,8 +46,6 @@ bool Application::Init()
 		GlobalLinkData::Init(stream, true);
 	}
 
-
-	m_Window = make_shared<JE::Window>();
 	m_InputEngine = make_shared<IE::InputEngine>(stream);
 	m_PhysicsEngine = make_shared<PE::PhysicsEngine>(stream);
 	m_SoundEngine = make_shared<SE::SoundEngine>(stream);
@@ -56,17 +55,16 @@ bool Application::Init()
 
 
 	////// ÃÊ±âÈ­
-	if (!m_Window->Init(GetModuleHandle(NULL), m_AppName.c_str(), 800, 600))
-	{
-		return false;
-	}
+	JWindowDesc desc;
+	desc.name = "JWindow";
+	desc.width = 800;
+	desc.height = 600;
+	m_Window = JWindowManager::Create(desc, 100, 50);
 
-	auto windata = m_Window->GetData();
-	RECT rect;
-	GetClientRect(windata.hWnd, &rect);
 	m_RenderEngine->Init(
-		windata.hWnd, rect.right, rect.bottom, m_EditorGUI);
-	m_InputEngine->Init(m_Window->GetData().hWnd);
+		m_Window->GetHandle(), desc.width, desc.height, m_EditorGUI);
+	m_InputEngine->Init(m_Window->GetHandle());
+
 
 	m_IsInit = true;
 	return true;
@@ -94,7 +92,7 @@ void Application::Run()
 		}
 		else if (m_InputEngine->GetKeyAsButton(KeyCode::Esc))
 		{
-			DestroyWindow(m_Window->GetData().hWnd);
+			DestroyWindow(GetFocus());
 		}
 		else
 		{
@@ -106,13 +104,15 @@ void Application::Run()
 
 			if (m_InputEngine->GetKeyDown(KeyCode::LeftMouseButton))
 			{
-				auto delta = m_InputEngine->GetMouseDeltaFromScreen();
-				auto window_data = m_Window->GetData();
-				RECT rect;
-				GetWindowRect(window_data.hWnd, &rect);
-				SetWindowPos(window_data.hWnd, HWND_TOP, rect.left + delta.x, rect.top + delta.y, window_data.width, window_data.height, SWP_SHOWWINDOW);
-			}
+				auto window = JWindowManager::Find(GetFocus());
+				if (window)
+				{
+					auto delta = m_InputEngine->GetMouseDeltaFromScreen();
 
+					window->AddPosition(delta.x, delta.y);
+				}
+	
+			}
 
 
 			auto input_task = make_task([&] {

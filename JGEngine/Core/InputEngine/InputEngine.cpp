@@ -22,6 +22,7 @@ namespace IE
 	}
 	void InputEngine::Update()
 	{
+		m_hWnd = GetFocus();
 		ENGINE_PERFORMANCE_TIMER("Application", "InputEngine");
 
 		for (int i = 0; i < KeyMapCount; ++i)

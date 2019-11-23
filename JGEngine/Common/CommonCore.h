@@ -38,6 +38,7 @@
 #include "Class/EngineConfig.h"
 #include "Class/EngineAssetFileSorter.h"
 #include "Class/EnginePerformance.h"
+#include "Class/JWindow.h"
 #include "Class/GlobalLinkStream.h"
 
 
