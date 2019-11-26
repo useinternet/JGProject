@@ -322,7 +322,7 @@ namespace RE
 		m_RenderTarget = make_shared<RenderTarget>();
 	}
 
-	void GraphicsShaderModule::AddRenderTargetTexture(const std::string& name, DXGI_FORMAT format)
+	void GraphicsShaderModule::AddRenderTargetTexture(const std::string& name, DXGI_FORMAT format, uint32_t miplevels)
 	{
 		Texture t(name);
 		D3D12_CLEAR_VALUE value;
@@ -331,14 +331,14 @@ namespace RE
 		value.Color[2] = 0.0f;
 		value.Color[3] = 0.0f;
 		value.Format = format;
-		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 1, 0, 1, 0,
+		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 1, miplevels, 1, 0,
 			D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), &value);
 		uint32_t numRT = m_NumRenderTarget;
 		m_RenderTarget->BindTexture(m_NumRenderTarget++, t);
 
 		AddOutputEelement(ShaderType::Pixel, JGShader::ToShaderDataType(format), name, "SV_TARGET" + to_string(numRT));
 	}
-	void GraphicsShaderModule::AddRenderTargetCubeTexture(const std::string& name, DXGI_FORMAT format)
+	void GraphicsShaderModule::AddRenderTargetCubeTexture(const std::string& name, DXGI_FORMAT format, uint32_t miplevels)
 	{
 		Texture t(name);
 		D3D12_CLEAR_VALUE value;
@@ -348,13 +348,13 @@ namespace RE
 		value.Color[3] = 0.0f;
 		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height,
-			6, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), &value);
+			6, miplevels, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET), &value);
 		uint32_t numRT = m_NumRenderTarget;
 		m_RenderTarget->BindTexture(m_NumRenderTarget++, t);
 
 		AddOutputEelement(ShaderType::Pixel, JGShader::ToShaderDataType(format), name, "SV_TARGET" + to_string(numRT));
 	}
-	void GraphicsShaderModule::AddDepthStencilTexture(const std::string& name, DXGI_FORMAT format)
+	void GraphicsShaderModule::AddDepthStencilTexture(const std::string& name, DXGI_FORMAT format, uint32_t miplevels)
 	{
 		Texture t(name);
 		D3D12_CLEAR_VALUE value;
@@ -362,10 +362,10 @@ namespace RE
 		value.DepthStencil.Stencil = 0;
 		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 1,
-			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
+			miplevels, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
 		m_RenderTarget->BindDepthTexture(t);
 	}
-	void GraphicsShaderModule::AddDepthStencilCubeTexture(const std::string& name, DXGI_FORMAT format)
+	void GraphicsShaderModule::AddDepthStencilCubeTexture(const std::string& name, DXGI_FORMAT format, uint32_t miplevels)
 	{
 		Texture t(name);
 		D3D12_CLEAR_VALUE value;
@@ -373,7 +373,7 @@ namespace RE
 		value.DepthStencil.Stencil = 0;
 		value.Format = format;
 		t.CreateResource(CD3DX12_RESOURCE_DESC::Tex2D(format, m_Width, m_Height, 6,
-			0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
+			miplevels, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), &value);
 		m_RenderTarget->BindDepthTexture(t);
 	}
 
@@ -770,6 +770,20 @@ namespace RE
 
 		return true;
 	}
+
+	void GraphicsShaderModule::BindCamera(ReCamera* cam)
+	{
+		m_BindedCamera = cam;
+		if (m_Width != cam->GetLensWidth() ||
+			m_Height != cam->GetLensHeight())
+		{
+			m_Width = (uint32_t)cam->GetLensWidth();
+			m_Height = (uint32_t)cam->GetLensHeight();
+
+			m_RenderTarget->Resize(m_Width, m_Height);
+		}
+
+	}
 	
 	bool GraphicsShaderModule::Compile()
 	{
@@ -784,47 +798,72 @@ namespace RE
 		// Shader 컴파일
 		for (auto& pair : m_ModuleDatasByShaderType)
 		{
-			auto& shader_type = pair.first;
+			//auto& shader_type = pair.first;
 			auto& module_data = pair.second;
-
-			// 입력 출력 요소가 없거나 메인코드가 없다면
-			// 컴파일 하지 않는다.
-			if (module_data.MainCode.length() == 0 ||
-				m_Input[shader_type].empty() ||
-				m_Output[shader_type].empty())
-				continue;
-			auto LibManager = GetShaderLibManager();
-
-			string code;
-			code += "// ShaderLibraryCode Part      \n\n\n\n";
-			code += LibManager->GetCode();
-
-			code += "\n\n\n\n";
-			code += "// ShaderModule Part";
-			code += "\n\n\n\n";
-
-			code += GetCode(shader_type);
-
-		
-			module_data._Shader = Shader::MakeShader(shader_type);
-			module_data._Shader->Set(code);
-			auto device = GetRenderDevice();
-			auto is_success = device->CompileShader(*module_data._Shader, module_data.Compiler);
-
-			if (is_success)
+			if (module_data.MainCode.length() != 0)
 			{
-				module_data.SafeCode = code;
+				module_data._Shader = Shader::MakeShader(pair.first);
+				if (!CustomCompile(module_data._Shader, module_data.MainCode))
+				{
+					result = false;
+				}
 			}
-			else
-			{
-				result = false;
-			}
-		
+
+	
 		}
 	
 		return result;
 	}
-	string GraphicsShaderModule::GetCode(ShaderType type)
+	bool GraphicsShaderModule::CustomCompile(std::shared_ptr<Shader>& shader, const std::string& main_code)
+	{
+		bool result = true;
+		if (m_RootSignature == nullptr)
+		{
+			MakeRootSignature();
+		}
+
+		if (!result)
+			return false;
+
+		auto shader_type = shader->GetType();
+		auto& module_data = m_ModuleDatasByShaderType[shader_type];
+
+		// 입력 출력 요소가 없거나 메인코드가 없다면
+		// 컴파일 하지 않는다.
+		if (main_code.length() == 0      ||
+			m_Input[shader_type].empty() ||
+			m_Output[shader_type].empty())
+		{
+			return false;
+		}
+		
+		auto LibManager = GetShaderLibManager();
+
+		string code;
+		code += "// ShaderLibraryCode Part      \n\n\n\n";
+		code += LibManager->GetCode();
+
+		code += "\n\n\n\n";
+		code += "// ShaderModule Part";
+		code += "\n\n\n\n";
+
+		code += GetCode(shader_type, main_code);
+
+		shader->Set(code);
+		auto device = GetRenderDevice();
+		auto is_success = device->CompileShader(*shader, module_data.Compiler);
+
+		if (is_success)
+		{
+			module_data.SafeCode = code;
+		}
+		else
+		{
+			result = false;
+		}
+		return result;
+	}
+	string GraphicsShaderModule::GetCode(ShaderType type, const std::string& main_code)
 	{
 		string code;
 		auto& moduleData = m_ModuleDatasByShaderType[type];
@@ -870,7 +909,7 @@ namespace RE
 		code += ")\n{\n";
 
 
-		code += moduleData.MainCode;
+		code += main_code;
 
 		code += "};\n";
 		return code;
@@ -894,9 +933,16 @@ namespace RE
 		{
 			auto t = m_RenderTarget->GetTexture(i);
 			DataIO::write(fout, t->GetName());
+			DataIO::write(fout, t->GetDesc().MipLevels);
 			DataIO::write(fout, t->GetDesc().DepthOrArraySize);
 			DataIO::write(fout, t->GetDesc().Format);
 		}
+		auto depth = m_RenderTarget->GetDepthTexture();
+		DataIO::write(fout, depth->GetName());
+		DataIO::write(fout, depth->GetDesc().MipLevels);
+		DataIO::write(fout, depth->GetDesc().DepthOrArraySize);
+		DataIO::write(fout, depth->GetDesc().Format);
+
 		// input
 		DataIO::write(fout, m_Input.size());
 		for (auto& input : m_Input)
@@ -942,22 +988,39 @@ namespace RE
 		{
 			string name;
 			UINT16 array_size;
+			UINT16 miplevels;
 			DXGI_FORMAT format;
 			DataIO::read(fin, name);
+			DataIO::read(fin, miplevels);
 			DataIO::read(fin, array_size);
 			DataIO::read(fin, format);
 
 			if (array_size == 6)
 			{
-				AddRenderTargetCubeTexture(name, format);
+				AddRenderTargetCubeTexture(name, format, miplevels);
 			}
 			else
 			{
-				AddRenderTargetTexture(name, format);
+				AddRenderTargetTexture(name, format, miplevels);
 			}
 		
 		}
-
+		string name;
+		UINT16 array_size;
+		UINT16 miplevels;
+		DXGI_FORMAT format;
+		DataIO::read(fin, name);
+		DataIO::read(fin, miplevels);
+		DataIO::read(fin, array_size);
+		DataIO::read(fin, format);
+		if (array_size == 6)
+		{
+			AddDepthStencilCubeTexture(name, format, miplevels);
+		}
+		else
+		{
+			AddDepthStencilTexture(name, format, miplevels);
+		}
 		// input
 		size_t input_size = 0;
 		DataIO::read(fin, input_size);
@@ -1001,28 +1064,95 @@ namespace RE
 			}
 		}
 	}
-
-
-	StaticGBufferModule::StaticGBufferModule(const std::string& name) : 
-		GraphicsShaderModule(name, EModuleFormat::G_StaticGBuffer)
-	{
-	
+	string EntryShaderModule::GameObjectStructuredBufferName = "GameObjectArray";
+	string EntryShaderModule::CameraConstantBufferName       = "CameraCB";
+	string EntryShaderModule::MaterialTextureArrayName       = "MaterialTextures";
+	string EntryShaderModule::MaterialConstantBufferName     = "MaterialCB";
+	const std::string& EntryShaderModule::GameObjectSBName() {
+		return GameObjectStructuredBufferName;
 	}
-	bool StaticGBufferModule::Load(const std::string& path)
+	const std::string& EntryShaderModule::CameraCBName() {
+		return CameraConstantBufferName;
+	}
+	const std::string& EntryShaderModule::MatTextureArrayName() {
+		return MaterialTextureArrayName;
+	}
+	const std::string& EntryShaderModule::MatCBName() {
+		return MaterialConstantBufferName;
+	}
+	//const std::string& EntryShaderModule::BindedGameObjectStructName()
+	//{
+	//	return GameObjectStructNameToBind;
+	//}
+	//const std::string& EntryShaderModule::BindedCameraStructName();
+	bool EntryShaderModule::Load(const std::string& path)
 	{
 		if (GraphicsShaderModule::Load(path))
 			return true;
 		Init();
-	
+
+
 		return true;
+	}
+
+	void EntryShaderModule::Init()
+	{
+		AddStructuredBuffer(GameObjectSBName(), GameObjectStructNameToBind);
+		auto cbuffer = AddConstantBuffer(CameraCBName());
+		cbuffer->Add(CameraStructNameToBind, "camera");
+
+
+
+		//AddSamplerState("")
+		AddTexture2D(MatTextureArrayName())->Resize(100);
+		AddSamplerState("AnisotropicSampler", CD3DX12_STATIC_SAMPLER_DESC(0));
+	}
+
+	void EntryShaderModule::BindCamera(ReCamera* cam)
+	{
+		GraphicsShaderModule::BindCamera(cam);
+		if (m_BindedCamera)
+		{
+			auto cbuffer = FindConstantBuffer(CameraCBName());
+			auto camera = ((STStruct*)cbuffer->Get("camera"));
+
+			JMatrix view = JMatrix::Transpose(m_BindedCamera->GetView());
+			JMatrix proj = JMatrix::Transpose(m_BindedCamera->GetProj());
+			JMatrix viewproj = JMatrix::Transpose(m_BindedCamera->GetViewProj());
+
+
+			((STMatrix*)camera->GetElement("View"))->Set(view);
+			((STMatrix*)camera->GetElement("Proj"))->Set(proj);
+			((STMatrix*)camera->GetElement("ViewProj"))->Set(viewproj);
+			((STMatrix*)camera->GetElement("InvView"))->Set(JMatrix::Inverse(view));
+			((STMatrix*)camera->GetElement("InvProj"))->Set(JMatrix::Inverse(proj));
+			((STMatrix*)camera->GetElement("InvViewProj"))->Set(JMatrix::Inverse(viewproj));
+			((STFloat3*)camera->GetElement("Position"))->Set(m_BindedCamera->GetPosition());
+			((STFloat*)camera->GetElement("FarZ"))->Set(m_BindedCamera->GetFarZ());
+			((STFloat*)camera->GetElement("NearZ"))->Set(m_BindedCamera->GetNearZ());
+			((STFloat2*)camera->GetElement("ScreenSize"))->Set(
+				{ m_BindedCamera->GetLensWidth(), m_BindedCamera->GetLensHeight() });
+
+		}
+	}
+
+	void EntryShaderModule::Execute(CommandList* cmdList)
+	{
+	}
+
+
+
+
+	StaticGBufferModule::StaticGBufferModule(const std::string& name) : 
+		EntryShaderModule(name, EModuleFormat::G_StaticGBuffer)
+	{
+	
 	}
 	void StaticGBufferModule::Init()
 	{
+		EntryShaderModule::Init();
 		// Vertex //
 		// 		
-		AddStructuredBuffer("GameObjectArray", "GameObject");
-		auto cbuffer = AddConstantBuffer("CameraCB");
-		cbuffer->Add("Camera", "camera");
 		// INPUT
 		AddInputEelement(ShaderType::Vertex, JGShader::_float3, "Position", "POSITION");
 		AddInputEelement(ShaderType::Vertex, JGShader::_float3, "Normal", "NORMAL");
@@ -1068,16 +1198,6 @@ namespace RE
 
 )");
 
-
-
-
-
-
-		// Pixel //
-		//AddSamplerState("")
-		AddTexture2D("MaterialTextures")->Resize(100);
-		AddSamplerState("AnisotropicSampler", CD3DX12_STATIC_SAMPLER_DESC(0));
-
 		AddInputEelement(ShaderType::Pixel, JGShader::_float4, "PosH", "SV_POSITION");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "PosW", "POSITION");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "NormalW", "NORMAL");
@@ -1088,87 +1208,21 @@ namespace RE
 
 
 
-		AddRenderTargetTexture("Default", DXGI_FORMAT_R8G8B8A8_UNORM);
-		AddDepthStencilTexture("DefaultDepth");
+		AddRenderTargetTexture("Default", DXGI_FORMAT_R8G8B8A8_UNORM, 1);
+		AddDepthStencilTexture("DefaultDepth", DXGI_FORMAT_D24_UNORM_S8_UINT, 1);
 		//AddRenderTargetTexture("BaseColor_Oc", DXGI_FORMAT_R8G8B8A8_UNORM);
 		//AddRenderTargetTexture("Normal_AO", DXGI_FORMAT_R8G8B8A8_UNORM);
 		//AddRenderTargetTexture("MSR", DXGI_FORMAT_R8G8B8A8_UNORM);
 		//AddRenderTargetTexture("EmessiveColor", DXGI_FORMAT_R8G8B8A8_UNORM);
 		//AddRenderTargetTexture("Depth", DXGI_FORMAT_R32_FLOAT);
-
-
-
-
-
-		SetMainCode(ShaderType::Pixel,
-			R"(
-
-    Output output;
-
-
-    // Next Material Code;
-
-    float3 color = float3(1.0f,1.0f,1.0f);
-    float3 dir = float3(0.0f,1.0f,1.0f);
-    dir = normalize(dir);
-    float d = dot(-dir, input.NormalW);
-
-    color = color * d;
-
-
-
-
-
-
-
-
-
-
-    output.Default = float4(color, 1.0f);
-
-
-    return output;
-
-)");
 	}
-
-	void StaticGBufferModule::BindCamera(ReCamera* cam)
-	{
-		GraphicsShaderModule::BindCamera(cam);
-		if (m_BindedCamera)
-		{
-			auto cbuffer = FindConstantBuffer("CameraCB");
-			auto camera = ((STStruct*)cbuffer->Get("camera"));
-
-			JMatrix view = JMatrix::Transpose(m_BindedCamera->GetView());
-			JMatrix proj = JMatrix::Transpose(m_BindedCamera->GetProj());
-			JMatrix viewproj = JMatrix::Transpose(m_BindedCamera->GetViewProj());
-
-
-			((STMatrix*)camera->GetElement("View"))->Set(view);
-			((STMatrix*)camera->GetElement("Proj"))->Set(proj);
-			((STMatrix*)camera->GetElement("ViewProj"))->Set(viewproj);
-			((STMatrix*)camera->GetElement("InvView"))->Set(JMatrix::Inverse(view));
-			((STMatrix*)camera->GetElement("InvProj"))->Set(JMatrix::Inverse(proj));
-			((STMatrix*)camera->GetElement("InvViewProj"))->Set(JMatrix::Inverse(viewproj));
-			((STFloat3*)camera->GetElement("Position"))->Set(m_BindedCamera->GetPosition());
-			((STFloat*)camera->GetElement("FarZ"))->Set(m_BindedCamera->GetFarZ());
-			((STFloat*)camera->GetElement("NearZ"))->Set(m_BindedCamera->GetNearZ());
-			((STFloat2*)camera->GetElement("ScreenSize"))->Set(
-				{ m_BindedCamera->GetLensWidth(), m_BindedCamera->GetLensHeight() });
-
-		}
-	}
-
 	void StaticGBufferModule::Execute(CommandList* cmdList)
 	{
 		auto RIManager = GetRenderItemManager();
 
-
-
 		Viewport viewport;
 		ScissorRect rect;
-		viewport.Set(m_Width, m_Height);
+		viewport.Set((float)m_Width, (float)m_Height);
 		rect.Set(m_Width, m_Height);
 
 		cmdList->SetViewport(viewport);
@@ -1178,52 +1232,69 @@ namespace RE
 		cmdList->SetRenderTarget(*m_RenderTarget);
 
 
+		// Camera
+		if (m_BindedCamera)
+		{
+			auto cbuffer = FindConstantBuffer(CameraCBName());
+			cmdList->BindGraphicsDynamicConstantBuffer(
+				GetRootParamIndex(CameraCBName()), cbuffer->GetData());
+		}
+
+
+
 		auto item_array = RIManager->GetItemByMesh(EReMeshType::Static);
 
-
-		
-
 		// GameObjectArray
-		auto sbuffer = FindStructuredBuffer("GameObjectArray");
+		auto sbuffer = FindStructuredBuffer(GameObjectSBName());
 		auto clone = sbuffer->CloneBindedStruct();
 		uint32_t sbuffer_element_count = sbuffer->GetElementCount();
 		for (uint32_t i = 0; i < item_array.size(); ++i)
 		{
-			if (i >= sbuffer_element_count)
+			RenderItem* item = item_array[i];
+			if (clone.GetSize() != item->StructuredBuffer->CloneBindedStruct().GetSize())
+				continue;
+
+			cmdList->BindGraphicsDynamicStructuredBuffer(
+				GetRootParamIndex(GameObjectSBName()),
+				clone.GetSize(), 
+				item->StructuredBuffer->GetData());
+
+
+			auto t = item->Material->GetBindedTextures();
+			
+			if (!t.empty())
 			{
-				((STMatrix*)clone.GetElement("World"))->Set(item_array[i]->TempWorld);
-				sbuffer->Add(clone);
+				cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
 			}
-			else
-			{
-				((STMatrix*)sbuffer->Get(i)->GetElement("World"))->Set(item_array[i]->TempWorld);
-			}
-		}
-		cmdList->BindGraphicsDynamicStructuredBuffer(
-			GetRootParamIndex("GameObjectArray"),clone.GetSize(),  sbuffer->GetData());
-
-
-		// Camera
-		if (m_BindedCamera)
-		{
-			auto cbuffer = FindConstantBuffer("CameraCB");
-			cmdList->BindGraphicsDynamicConstantBuffer(
-				GetRootParamIndex("CameraCB"), cbuffer->GetData());
-		}
-
-
-		// Texture
-		// 머터리얼을 이용해 텍스쳐 바인딩
-		//auto t = FindTexture2D("MaterialTextures");
-		
-		
-		// PSO 및 Mesh Draw
-		for (auto& item : item_array)
-		{
+	
 			cmdList->SetPipelineState(*item->Material->GetPSO());
-			item->Mesh->Draw(cmdList);
+			item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
 		}
+
 	}
+
+	SkeletalGBufferModule::SkeletalGBufferModule(const std::string& name) :
+		EntryShaderModule(name, EModuleFormat::G_SkeletalGBuffer)
+	{
+
+	}
+
+	GUIModule::GUIModule(const std::string& name)
+	{
+	}
+
+	void GUIModule::Init()
+	{
+	}
+
+	void GUIModule::BindCamera(ReCamera* cam)
+	{
+	}
+
+	void GUIModule::Execute(CommandList* cmdList)
+	{
+	}
+
 }
 
 

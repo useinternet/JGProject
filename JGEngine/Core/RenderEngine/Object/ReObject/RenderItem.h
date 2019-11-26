@@ -8,24 +8,35 @@ namespace RE
 
 	class ReMesh;
 	class ReMaterial;
+	class SBDStructuredBuffer;
+	class STStruct;
 	// RenderItem은 renderengine에 저장
 	// 모든 Mesh, Material 은 에셋 매니저에서 관리
 	// 모든 module, pass 정보도 에셋매니저에서 관리
 	// 모든 텍스쳐, 뼈대 정보, 애니메이션 정보도 에셋매니저에서 관리
+	class InstanceRenderItem;
 	class RenderItem : public ReObject
 	{
 		
 	public:
 		RenderItem(const std::string& name);
 
-
-
+		InstanceRenderItem* AddInstance();
+		void RemoveInstance(InstanceRenderItem* instance);
 	public:
 
 		std::shared_ptr<ReMaterial>            Material;
 		std::shared_ptr<ReMesh>                Mesh;
-		// 
-		JMatrix TempWorld = JMatrix::Identity();
+		//  
+	
+
+		std::shared_ptr<SBDStructuredBuffer>              StructuredBuffer;
+		std::vector<std::shared_ptr<InstanceRenderItem>>  InstanceItems;
+		std::unordered_map<InstanceRenderItem*, uint32_t> InstanceMapByPointer;
+
+
+
+
 		//
 		// pipelinestate (각 blend상태, depth상태, 레스터화기 상태)
 		// material;
@@ -41,6 +52,22 @@ namespace RE
 		  */
 		// 좌표정보(위치, 회전, 스케일)
 	};
+
+	class InstanceRenderItem : public ReObject
+	{
+		friend RenderItem;
+	public:
+		InstanceRenderItem(const std::string& name) : ReObject(name) {}
+	public:
+		void Set(const std::string& name, const JMatrix& m);
+
+
+
+		bool Get(const std::string& name, JMatrix& m);
+	private:
+		STStruct* Element;
+	};
+
 
 	enum class EReMeshType;
 

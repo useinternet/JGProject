@@ -89,6 +89,7 @@ namespace RE
 			init_state,
 			clear_value,
 			IID_PPV_ARGS(d3d_resource.GetAddressOf()));
+		RE_LOG_INFO("Create {0} : {1}", GetName(), (uint64_t)d3d_resource.Get());
 		//
 		SetD3DResource(d3d_resource, init_state);
 	}
@@ -120,7 +121,7 @@ namespace RE
 			nullptr,
 			IID_PPV_ARGS(d3d_resource.GetAddressOf()));
 
-
+		RE_LOG_INFO("Create {0} : {1}", GetName(), (uint64_t)d3d_resource.Get());
 		SetD3DResource(d3d_resource, init_state);
 	}
 	void Resource::SetD3DResource(Microsoft::WRL::ComPtr<ID3D12Resource> d3d_resource, D3D12_RESOURCE_STATES init_State)

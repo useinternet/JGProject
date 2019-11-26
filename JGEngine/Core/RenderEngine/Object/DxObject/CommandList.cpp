@@ -72,7 +72,7 @@ namespace RE
 		m_UploadBuffer->Reset();
 		m_DynamicDescriptorAllocator->Reset();
 		m_TemporaryResourceObject.clear();
-
+		m_TemporaryUploadResource.clear();
 
 		m_D3D_Graphics_RootSignature.Reset();
 		m_D3D_Compute_RootSignature.Reset();
@@ -130,6 +130,38 @@ namespace RE
 		ResourceTemporaryStorage(dstRes);
 		ResourceTemporaryStorage(srcRes);
 
+	}
+	void CommandList::CopyTextureSubresource(Texture& texture, uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData)
+	{
+		auto device = GetD3DDevice();
+
+		if (texture.IsVaild())
+		{
+			// Resource must be in the copy-destination state.
+			TransitionBarrier(texture, D3D12_RESOURCE_STATE_COPY_DEST);
+			
+			FlushResourceBarrier();
+
+			UINT64 requiredSize = GetRequiredIntermediateSize(texture.GetD3DResource(), firstSubresource, numSubresources);
+
+			Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+			GetD3DDevice()->CreateCommittedResource(
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+				D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(requiredSize),
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(intermediateResource.GetAddressOf()));
+
+			UpdateSubresources(
+				m_D3D_CommandList.Get(),
+				texture.GetD3DResource(),
+				intermediateResource.Get(),
+				0, firstSubresource, numSubresources, subresourceData);
+		
+			ResourceTemporaryStorage(texture);
+			UploadResourceTemporaryStorage(intermediateResource);
+		}
 	}
 	void CommandList::SetDescriptorHeap(ID3D12DescriptorHeap* d3d_heaps)
 	{
@@ -401,19 +433,19 @@ namespace RE
 		if (buffer_size == 0)
 			return;
 
-		Resource upload_resource;
-
 		buffer.CreateResource(CD3DX12_RESOURCE_DESC::Buffer(buffer_size, flags));
 
 
 		if (data != nullptr)
 		{
-			upload_resource.CreateResource(
-				CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			Microsoft::WRL::ComPtr<ID3D12Resource> d3d_resource;
+			GetD3DDevice()->CreateCommittedResource(
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				CD3DX12_RESOURCE_DESC::Buffer(buffer_size),
-				D3D12_RESOURCE_STATE_GENERIC_READ);
-
+				&CD3DX12_RESOURCE_DESC::Buffer(buffer_size),
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(d3d_resource.GetAddressOf()));
 
 			D3D12_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pData = data;
@@ -425,9 +457,9 @@ namespace RE
 			FlushResourceBarrier();
 
 			UpdateSubresources(m_D3D_CommandList.Get(), buffer.GetD3DResource(),
-				upload_resource.GetD3DResource(), 0, 0, 1, &subresourceData);
+				d3d_resource.Get(), 0, 0, 1, &subresourceData);
 
-			ResourceTemporaryStorage(upload_resource);
+			UploadResourceTemporaryStorage(d3d_resource);
 
 		}
 		ResourceTemporaryStorage(buffer);
@@ -489,28 +521,15 @@ namespace RE
 	}
 
 
+	void CommandList::UploadResourceTemporaryStorage(Microsoft::WRL::ComPtr<ID3D12Resource> resource)
+	{
+		m_TemporaryUploadResource.push_back(resource);
+	}
+
 	void CommandList::ResourceTemporaryStorage(const Resource& resource)
 	{
 		m_TemporaryResourceObject[resource.GetD3DResource()] = resource;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

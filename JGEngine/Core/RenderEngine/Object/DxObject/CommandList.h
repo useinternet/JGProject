@@ -49,7 +49,7 @@ namespace RE
 	
 		void CopyResource(const Resource& destResource, const Resource& sourceResource);
 		void ResolveSubresource(Resource& dstRes, const Resource& srcRes, uint32_t dstSubresource = 0, uint32_t srcSubresource = 0);
-
+		void CopyTextureSubresource(Texture& texture, uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* subresourceData);
 
 
 		template<typename VertexType>
@@ -103,7 +103,7 @@ namespace RE
 		}
 		void BindGraphicsDynamicStructuredBuffer(uint32_t rootparam, uint32_t dataSize, const std::vector<byte>& data)
 		{
-			uint32_t numElements = data.size() / dataSize;
+			uint32_t numElements = (uint32_t)data.size() / dataSize;
 			uint32_t elementSize = dataSize;
 			BindGraphicsDynamicStructuredBuffer(rootparam, numElements, elementSize, data.data());
 		}
@@ -169,7 +169,7 @@ namespace RE
 
 		
 
-
+		void UploadResourceTemporaryStorage(Microsoft::WRL::ComPtr<ID3D12Resource> resource);
 		void ResourceTemporaryStorage(const Resource& resource);
 	private:
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_D3D_CommandList;
@@ -180,8 +180,7 @@ namespace RE
 		std::shared_ptr<UploadBuffer>     m_UploadBuffer;
 		std::shared_ptr<DynamicDescriptorAllocator> m_DynamicDescriptorAllocator;
 		std::unordered_map<ID3D12Resource*, ReObject> m_TemporaryResourceObject;
-
-
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_TemporaryUploadResource;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_D3D_Graphics_RootSignature;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_D3D_Compute_RootSignature;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_D3D_PipelineState;

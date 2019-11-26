@@ -38,7 +38,7 @@ namespace RE
 		
 	public:
 		ShaderModule(const std::string& name, EModuleFormat format);
-	protected:
+	public:
 		SBDConstantBuffer*   AddConstantBuffer(const std::string& name);
 		SBDStructuredBuffer* AddStructuredBuffer(const std::string& name, const std::string& strcut_type_name);
 		void                 AddSamplerState(const std::string& name, const D3D12_STATIC_SAMPLER_DESC& desc);
@@ -55,7 +55,8 @@ namespace RE
 		void RemoveSS(const std::string& name);
 	public:
 		virtual bool Compile() = 0;
-		virtual std::string GetCode(ShaderType type) = 0;
+		virtual bool CustomCompile(std::shared_ptr<Shader>& shader, const std::string& main_code) = 0;
+		virtual std::string GetCode(ShaderType type, const std::string& main_code) = 0;
 		virtual void Execute(CommandList* cmdList) = 0;
 		const std::string GetSafeCode(ShaderType type);
 
@@ -101,10 +102,10 @@ namespace RE
 	public:
 		GraphicsShaderModule(const std::string& name = "GraphicsShaderModule", EModuleFormat format = EModuleFormat::Graphics);
 	public:
-		void AddRenderTargetTexture(const std::string& name, DXGI_FORMAT format);
-		void AddRenderTargetCubeTexture(const std::string& name, DXGI_FORMAT format);
-		void AddDepthStencilTexture(const std::string& name, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT);
-		void AddDepthStencilCubeTexture(const std::string& name, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT);
+		void AddRenderTargetTexture(const std::string& name, DXGI_FORMAT format,  uint32_t miplevels = 0);
+		void AddRenderTargetCubeTexture(const std::string& name, DXGI_FORMAT format, uint32_t miplevels = 0);
+		void AddDepthStencilTexture(const std::string& name, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT, uint32_t miplevels = 0);
+		void AddDepthStencilCubeTexture(const std::string& name, DXGI_FORMAT format = DXGI_FORMAT_D24_UNORM_S8_UINT, uint32_t miplevels = 0);
 
 
 		void AddInputEelement(ShaderType shader_type, JGShader::EShaderData type, const std::string& name, const std::string& semantic);
@@ -131,10 +132,12 @@ namespace RE
 		void MakePSO(GraphicsPipelineState* pso);
 
 		virtual bool MakeRootSignature();
-		virtual void BindCamera(ReCamera* cam) { m_BindedCamera = cam; }
+		virtual void BindCamera(ReCamera* cam);
+
 	public:
 		virtual bool Compile() override;
-		virtual std::string GetCode(ShaderType type) override;
+		virtual bool CustomCompile(std::shared_ptr<Shader>& shader, const std::string& main_code) override;
+		virtual std::string GetCode(ShaderType type, const std::string& main_code) override;
 		virtual void Execute(CommandList* cmdList) override;
 	protected:
 		virtual void DataSave(std::ofstream& fout) override;
@@ -158,26 +161,72 @@ namespace RE
 		ReCamera* m_BindedCamera = nullptr;
 	};
 
+	
+	/*
+	-- 추가 할것
+	1. EntryShaderModule ( GUI, Static, Skeletal )
+	2. Material 전용 상수 만들기
+	3. 시작 세이더모듈 지정 변수들  클래스변수화 하다끝남
+	
+	
+	*/
 
+	class EntryShaderModule : public GraphicsShaderModule
+	{
+		const std::string GameObjectStructNameToBind = "GameObject";;
+		const std::string CameraStructNameToBind = "Camera";
+		static std::string GameObjectStructuredBufferName;
+		static std::string CameraConstantBufferName;
+		static std::string MaterialTextureArrayName;
+		static std::string MaterialConstantBufferName;
+	public:
+		static const std::string& GameObjectSBName();
+		static const std::string& CameraCBName();
+		static const std::string& MatTextureArrayName();
+		static const std::string& MatCBName();
+		//static const std::string& BindedGameObjectStructName();
+		//static const std::string& BindedCameraStructName();
+	public:
+		EntryShaderModule(const std::string& name, EModuleFormat format) :
+			GraphicsShaderModule(name, format) {}
+	public:
+		virtual bool Load(const std::string& path) override;
+		virtual void Init();
+		virtual void BindCamera(ReCamera* cam) override;
+		virtual void Execute(CommandList* cmdList) override;
+	};
 
-
-	class StaticGBufferModule : public GraphicsShaderModule
+	class StaticGBufferModule : public EntryShaderModule
 	{
 	public:
 		StaticGBufferModule(const std::string& name = "StaticGBufferModule");
 	public:
-		virtual bool Load(const std::string& path);
-		void Init();
-		virtual void BindCamera(ReCamera* cam) override;
-
-
-		virtual void Execute(CommandList* cmdList);
+		virtual void Init() override;
+		virtual void Execute(CommandList* cmdList) override;
 	private:
 
 	};
 
+	class SkeletalGBufferModule : public EntryShaderModule
+	{
+	public:
+		SkeletalGBufferModule(const std::string& name = "SkeletalGBufferModule");
+	public:
+		virtual void Init() override {}
+		virtual void Execute(CommandList* cmdList) override {}
+	};
 
+	class GUIModule : public GraphicsShaderModule
+	{
 
+	public:
+		GUIModule(const std::string& name = "GUIModule");
+	public:
+		void Init();
+		virtual void BindCamera(ReCamera* cam) override;
+		virtual void Execute(CommandList* cmdList);
+
+	};
 
 	class ComputeShaderModule : public ShaderModule
 	{

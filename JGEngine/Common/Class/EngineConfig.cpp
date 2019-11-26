@@ -10,7 +10,7 @@ using namespace rapidjson;
 void EngineConfig::LoadConfig()
 {
 	ifstream fin;
-	fin.open("..\\JGEngine\\JGEngineSetting.json");
+	fin.open("..\\JGEngine\\Resource\\Config\\JGEngineSetting.json");
 	assert(fin.is_open() && "failed load engine config file");
 
 	fin.seekg(0, std::ios::end);

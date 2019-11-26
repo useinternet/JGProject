@@ -7,18 +7,6 @@
     <Filter Include="GUI">
       <UniqueIdentifier>{2AEC870B-96F5-877C-1F71-9E7C8B79937C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\EditorGUI">
-      <UniqueIdentifier>{659B18CF-D15B-9405-9A96-DD820616D9E1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\EditorGUI\Editor">
-      <UniqueIdentifier>{FB7427C0-E703-B189-9022-C5847C90C12F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\EditorGUI\ImGui">
-      <UniqueIdentifier>{4F48A315-BBA9-8023-4417-C7D5B077B7E2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\EditorGUI\Profile">
-      <UniqueIdentifier>{45B5E334-B121-9F2F-7A15-378DE640C197}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JGEngine\Application\App\Application.h">
@@ -27,117 +15,15 @@
     <ClInclude Include="..\JGEngine\Application\App\EntryPoint.h">
       <Filter>App</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\App\Window.h">
-      <Filter>App</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.h">
-      <Filter>GUI\EditorGUI\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.h">
-      <Filter>GUI\EditorGUI\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.h">
-      <Filter>GUI\EditorGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.h">
-      <Filter>GUI\EditorGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imconfig.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_internal.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_rectpack.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_textedit.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_truetype.h">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.h">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.h">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\GameGUI.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.h">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\App\Window.cpp">
-      <Filter>App</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.cpp">
-      <Filter>GUI\EditorGUI\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.cpp">
-      <Filter>GUI\EditorGUI\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.cpp">
-      <Filter>GUI\EditorGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.cpp">
-      <Filter>GUI\EditorGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_demo.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_draw.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_widgets.cpp">
-      <Filter>GUI\EditorGUI\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.cpp">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.cpp">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\GameGUI.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.cpp">
-      <Filter>GUI\EditorGUI\Profile</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

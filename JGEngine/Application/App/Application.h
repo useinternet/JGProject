@@ -50,8 +50,6 @@ public:
 private:
 	EApplicationMode m_AppMode;
 	std::wstring     m_AppName;
-	JWindow*         m_Window;
-	std::vector<JWindow*> testWindow;
 
 
 	std::shared_ptr<IE::InputEngine>   m_InputEngine;
@@ -59,10 +57,6 @@ private:
 	std::shared_ptr<SE::SoundEngine>   m_SoundEngine;
 	std::shared_ptr<RE::RenderEngine>  m_RenderEngine;
 	std::shared_ptr<GFW::Game>         m_Game;
-
-	std::shared_ptr<JE::EditorGUI>     m_EditorGUI;
-
-	std::shared_ptr<JWindowManager>    m_JWindowManager;
 	std::shared_ptr<EventManager>      m_EventManager;
 	std::shared_ptr<EngineTimer>       m_EngineTimer;
 	std::shared_ptr<EngineConfig>      m_EngineConfig;

@@ -4,6 +4,9 @@
 #include "Object/DxObject/PipelineState.h"
 #include "ReMaterial.h"
 #include "ReMesh.h"
+#include "Object/Shader/ShaderData.h"
+#include "Object/Shader/ShaderLib.h"
+#include "Object/Shader/ShaderDataType.h"
 using namespace std;
 
 
@@ -15,6 +18,69 @@ namespace RE
 		Mesh = make_shared<ReStaticMesh>();
 	}
 
+	InstanceRenderItem* RenderItem::AddInstance()
+	{
+		if (StructuredBuffer == nullptr)
+		{
+			StructuredBuffer = make_shared<SBDStructuredBuffer>();
+			StructuredBuffer->BindStruct("GameObject");
+		
+		}
+		uint32_t index = (uint32_t)InstanceItems.size();
+		auto instance = make_shared< InstanceRenderItem>(GetName() + "_Instance" + to_string(InstanceItems.size()));
+		InstanceItems.push_back(instance);
+		InstanceMapByPointer[instance.get()] = index;
+		instance->Element = StructuredBuffer->Add();
+		instance->Set("World", JMatrix::Identity());
+		return instance.get();
+	}
+	void RenderItem::RemoveInstance(InstanceRenderItem* instance)
+	{
+		if (InstanceMapByPointer.find(instance) == InstanceMapByPointer.end())
+		{
+			return;
+		}
+		uint32_t index = InstanceMapByPointer[instance];
+		InstanceMapByPointer.erase(instance);
+		auto iter = InstanceItems.begin() + index;
+		StructuredBuffer->Remove((*iter)->Element);
+		InstanceItems.erase(iter);
+	}
+
+	void InstanceRenderItem::Set(const std::string& name, const JMatrix& m)
+	{
+		auto element = Element->GetElement(name);
+		if (element == nullptr)
+			return;
+		if (element->GetType() == JGShader::_matrix4x4)
+		{
+			((STMatrix*)element)->Set(m);
+		}
+	}
+
+	bool InstanceRenderItem::Get(const std::string& name, JMatrix& m)
+	{
+		auto element = Element->GetElement(name);
+		if (element == nullptr)
+			return false;
+
+		if (element->GetType() == JGShader::_matrix4x4)
+		{
+			m = ((STMatrix*)element)->Get();
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+
+
+
+
+
+
 
 
 	RenderItem* RenderItemManager::CreateItem(const std::string& name)
@@ -23,6 +89,11 @@ namespace RE
 		m_RenderItemPool[item.get()] = item;
 		return item.get();
 	}
+
+
+
+
+
 	void RenderItemManager::DeleteItem(RenderItem* item)
 	{
 		if (m_RenderItemPool.find(item) == m_RenderItemPool.end())

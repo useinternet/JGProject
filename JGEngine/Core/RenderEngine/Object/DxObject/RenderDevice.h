@@ -15,21 +15,16 @@ namespace RE
 	class GUI;
 	class Shader;
 	class ShaderLibManager;
+	class DxScreen;
 	struct RENDERENGINE_API RenderDeviceDesc
 	{
-		HWND hWnd;
-		DXGI_FORMAT format;
-		uint32_t width;
-		uint32_t height;
-		uint32_t bufferCount;
-	
 		std::shared_ptr<GUI> gui;
-		uint32_t gui_numDescriptor = 2048;
 	};
 
 	using RDFrameSubmission = std::function<void(CommandList*)>;
 	class RENDERENGINE_API RenderDevice : public DxObject
 	{
+		static const uint32_t csm_Engine_BufferCount = 3;
 	public:
 		RenderDevice(const RenderDeviceDesc& desc);
 		~RenderDevice();
@@ -51,7 +46,6 @@ namespace RE
 		void SubmitToRender(uint32_t priority_number, const RDFrameSubmission& func);
 		void SubmitToCompute(uint32_t priority_number,const RDFrameSubmission& func);
 		void SubmitToCopy(uint32_t priority_number,    const RDFrameSubmission& func);
-		void SubmitFinalTexture(const Texture& texture);
 
 		// Allocate Function
 		DescriptorHandle SrvAllocate(uint32_t numDescriptor = 1);
@@ -61,25 +55,32 @@ namespace RE
 		DescriptorHandle DsvAllocate(uint32_t numDescriptor = 1);
 
 		// GUI Allocate
-		void GUIAllocate(const std::string& managedresourceName, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc = nullptr);
-		void GUIUnAllocate(const std::string& managedresourceName, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc = nullptr);
-		uint64_t GetGUIAllocation(const std::string& managedresourceName, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc = nullptr);
-		void RegisterGUITexture(const Texture& resource);
-		const Resource& GetRegisteredGUITexture(const std::string& managedresourceName);
+
 		// Etc...
 		bool CompileShader(Shader& shader, const ShaderCompiler& compiler);
-		void Resize(uint32_t width, uint32_t height);
 
 		// DebugInfo
-		void GetGUIAllocatorDebugInfo(Debug::GUIAllocatorInfo& out_debug_info);
+		//void GetGUIAllocatorDebugInfo(Debug::GUIAllocatorInfo& out_debug_info);
 		void GetSrvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 		void GetUavDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 		void GetCbvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 		void GetRtvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 		void GetDsvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+
+
+		DxScreen* CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height,
+			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+		void DestroyDxScreen(HWND hWnd);
+		void DestroyDxScreen(DxScreen* screen);
+		DxScreen* FindDxScreen(HWND hWnd);
+
+		void Flush();
 	public:
 		ID3D12Device* GetD3DDevice();
 		IDXGIFactory4* GetDxgiFactory();
+		CommandQueue* GetDirectCmdQueue();
+		CommandQueue* GetComputeCmdQueue();
+		CommandQueue* GetCopyCmdQueue();
 		uint64_t GetFrameCount() const;
 		uint32_t GetValueIndex() const;
 		const RenderDeviceDesc& GetDesc() const;
@@ -89,8 +90,6 @@ namespace RE
 		void ComputeUpdate();
 		void CopyUpdate();
 		void EndFrame();
-		void Present(CommandList* commandList, const Texture& texture);
-		void Flush();
 	private:
 		struct FrameResource
 		{
@@ -109,8 +108,7 @@ namespace RE
 		// DXGI or D3D 's Objects
 		Microsoft::WRL::ComPtr<IDXGIFactory4> m_Factory;
 		Microsoft::WRL::ComPtr<ID3D12Device>  m_Device;
-		Microsoft::WRL::ComPtr<IDXGISwapChain4> m_SwapChain;
-
+		
 		//  타입별 CommandQueue 및 프레임 리소스
 		std::shared_ptr<CommandQueue> m_DirectCommandQueue;
 		std::shared_ptr<CommandQueue> m_ComputeCommandQueue;
@@ -136,24 +134,8 @@ namespace RE
 		uint64_t m_Frame;
 		uint32_t m_ValueIndex;
 
-		// 장치 리소스
-		std::vector<std::shared_ptr<Texture>> m_BackBuffer;
-		std::shared_ptr<Texture> m_FinalTexture;
-
-		// GUI 할당
-		std::unordered_map<size_t, GUIAllocation>  m_GUIAllocationMap;
-		std::queue<GUIAllocation> m_PendingGUIAllocations;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_GUIDescriptorHeap;
-		uint32_t m_GUIHeapOffset;
-		uint32_t m_GUIHeapIncrementSize;
-		uint32_t m_GUIMaxNumDescriptor;
-		std::mutex m_GuiAllocationMutex;
-
-		// GUI용 리소스 맵
-		using ManagedTextureMap = std::unordered_map<std::string, Resource>;
-		ManagedTextureMap m_ManagedTextureMap;
+		//
+		std::unordered_map<DxScreen*, std::shared_ptr<DxScreen>> m_DxScreenPool;
+		std::unordered_map<HWND, DxScreen*> m_DxScreenMapByHWND;
 	};
-
-
-
 }

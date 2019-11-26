@@ -30,6 +30,24 @@ namespace RE
 	class RenderItemManager;
 	class ShaderModuleManager;
 	class ReCamera;
+	class DxScreen;
+	class TextureManager;
+
+	class RENDERENGINE_API RenderEngineConfig
+	{
+	public:
+		std::string ShaderLibPath;
+		std::string ShaderModulePath;
+		std::string TexturePath;
+		std::string MatStaticEntryModuleName;
+		std::string MatSkeletalEntryModuleName;
+		std::string MatGUIEntryModuleName;
+
+		//
+
+
+	};
+
 	class RENDERENGINE_API RenderEngine : public EngineCore
 	{
 	private:
@@ -37,24 +55,30 @@ namespace RE
 		std::shared_ptr<ShaderLibManager>  m_ShaderLibManager;
 		std::shared_ptr<RenderItemManager> m_RenderItemManager;
 		std::shared_ptr<ShaderModuleManager> m_ShaderModuleManager;
-
+		std::shared_ptr<TextureManager>    m_TextureManager;
 
 		std::shared_ptr<RenderTarget> m_RenderTarget;
-		RE_EventListener m_EventListener;
-		std::vector<Resource> m_UploadResource;
+		std::vector<Resource>         m_UploadResource;
 
 
 		std::shared_ptr<ReCamera> m_Cam;
+		DxScreen* m_MainScreen = nullptr;
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();
 	public:
-		void Init(HWND hWnd, int width, int height, const std::shared_ptr<GUI>& bind_gui);
+		void Init(HWND hWnd, int width, int height);
 	public:
 		virtual void Load() override;
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
-	private:
-		void LoadTexture(const std::wstring& name, CommandList* cmdList);
+	public:
+		static DxScreen* CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height, 
+			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+		static void DestroyDxScreen(HWND hWnd);
+		static void DestroyDxScreen(DxScreen* screen);
+		static DxScreen* FindDxScreen(HWND hWnd);
 	};
+
+
 }

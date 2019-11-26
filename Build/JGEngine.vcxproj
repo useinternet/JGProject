@@ -172,56 +172,12 @@
   <ItemGroup>
     <ClInclude Include="..\JGEngine\Application\App\Application.h" />
     <ClInclude Include="..\JGEngine\Application\App\EntryPoint.h" />
-    <ClInclude Include="..\JGEngine\Application\App\Window.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imconfig.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_internal.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_textedit.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imstb_truetype.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\GameGUI.h" />
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp" />
-    <ClCompile Include="..\JGEngine\Application\App\Window.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\FileViewer.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Editor\SceneEditor.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGManager.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\IGWindow.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_demo.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_draw.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_dx12.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_impl_win32.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\ImGui\imgui_widgets.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\ConsoleLog.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\Performance.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\EditorGUI\Profile\RenderingProfile.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\GameGUI.cpp" />
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
