@@ -96,6 +96,13 @@ namespace RE
 	public:
 		ReGuiMesh() : ReMesh("ReGuiMesh", EReMeshType::GUI) {}
 		ReGuiMesh(const std::string& name) : ReMesh(name, EReMeshType::GUI) {}
+		void Create(const std::vector<JGUIVertex>& v, const IndexData& i)
+		{
+			Set(v, i);
+		}
+	public:
+		static std::shared_ptr<ReGuiMesh> CreateFillRect(float width, float height);
+		static std::shared_ptr<ReGuiMesh> CreateEmptyRect(float width, float height);
 	};
 
 

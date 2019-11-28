@@ -22,6 +22,18 @@ public:
 	JVertex& operator=(JVertex&& rhs) = default;
 };
 
+struct JGUIVertex
+{
+	JVector3 Position;
+	JVector2 Texcoord;
+
+public:
+	JGUIVertex(const JVector3& pos = JVector3(), const JVector2& tex = JVector2()) :
+		Position(pos), Texcoord(tex) { }
+	JGUIVertex(float p1, float p2, float p3, float t1, float t2) :
+		Position({ p1,p2,p3 }), Texcoord({ t1, t2 }) {}
+};
+
 struct JSkinnedVertex
 {
 	JVector3 Position;

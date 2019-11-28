@@ -28,6 +28,55 @@ namespace RE
 		return result;
 	}
 
+	std::shared_ptr<ReGuiMesh> ReGuiMesh::CreateFillRect(float width, float height)
+	{
+		auto mesh = make_shared<ReGuiMesh>();
+
+		std::vector<JGUIVertex> v(4);
+		std::vector<uint32_t>   i(6);
+
+		float hw = width * 0.5f;
+		float hh = height * 0.5f;
+
+		v[0] = JGUIVertex(-hw, -hh, 0, 0, 1);
+		v[1] = JGUIVertex(-hw, +hh, 0, 0, 0);
+		v[2] = JGUIVertex(+hw, +hh, 0, 1, 0);
+		v[3] = JGUIVertex(+hw, -hh, 0, 1, 1);
+
+
+		i[0] = 0; i[1] = 1; i[2] = 2;
+		i[3] = 0; i[4] = 2; i[5] = 3;
+
+		mesh->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mesh->Create(v, i);
+
+		return mesh;
+	}
+
+	std::shared_ptr<ReGuiMesh> ReGuiMesh::CreateEmptyRect(float width, float height)
+	{
+		auto mesh = make_shared<ReGuiMesh>();
+
+		std::vector<JGUIVertex> v(4);
+		std::vector<uint32_t>   i(5);
+
+		float hw = width * 0.5f;
+		float hh = height * 0.5f;
+
+		v[0] = JGUIVertex(-hw, -hh, 0, 0, 1);
+		v[1] = JGUIVertex(-hw, +hh, 0, 0, 0);
+		v[2] = JGUIVertex(+hw, +hh, 0, 1, 0);
+		v[3] = JGUIVertex(+hw, -hh, 0, 1, 1);
+
+
+		i[0] = 0; i[1] = 1; i[2] = 2; i[3] = 3; 
+		i[4] = 0;
+
+		mesh->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		mesh->Create(v, i);
+		return mesh;
+	}
+
 
 	void CreateBox(ReStaticMesh* mesh, float  width, float height, float depth)
 	{
@@ -102,4 +151,10 @@ namespace RE
 
 		mesh->Create(v, i);
 	}
+
+
+
+	
+
+
 }

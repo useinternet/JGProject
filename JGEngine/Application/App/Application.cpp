@@ -102,7 +102,7 @@ void Application::Run()
 				{
 					auto delta = m_InputEngine->GetMouseDeltaFromScreen();
 
-					window->AddPosition(delta.x, delta.y);
+					window->AddPosition((float)delta.x, (float)delta.y);
 				}
 	
 			}

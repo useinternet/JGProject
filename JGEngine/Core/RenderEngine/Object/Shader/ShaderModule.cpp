@@ -790,7 +790,7 @@ namespace RE
 		bool result = true;
 		if (m_RootSignature == nullptr)
 		{
-			MakeRootSignature();
+			result = MakeRootSignature();
 		}
 
 		if (!result)
@@ -819,7 +819,7 @@ namespace RE
 		bool result = true;
 		if (m_RootSignature == nullptr)
 		{
-			MakeRootSignature();
+			result = MakeRootSignature();
 		}
 
 		if (!result)
@@ -938,10 +938,19 @@ namespace RE
 			DataIO::write(fout, t->GetDesc().Format);
 		}
 		auto depth = m_RenderTarget->GetDepthTexture();
-		DataIO::write(fout, depth->GetName());
-		DataIO::write(fout, depth->GetDesc().MipLevels);
-		DataIO::write(fout, depth->GetDesc().DepthOrArraySize);
-		DataIO::write(fout, depth->GetDesc().Format);
+		if (depth->IsVaild())
+		{
+			DataIO::write(fout, true);
+			DataIO::write(fout, depth->GetName());
+			DataIO::write(fout, depth->GetDesc().MipLevels);
+			DataIO::write(fout, depth->GetDesc().DepthOrArraySize);
+			DataIO::write(fout, depth->GetDesc().Format);
+		}
+		else
+		{
+			DataIO::write(fout, false);
+		}
+
 
 		// input
 		DataIO::write(fout, m_Input.size());
@@ -1005,22 +1014,28 @@ namespace RE
 			}
 		
 		}
+		bool is_depth = true;
 		string name;
 		UINT16 array_size;
 		UINT16 miplevels;
 		DXGI_FORMAT format;
-		DataIO::read(fin, name);
-		DataIO::read(fin, miplevels);
-		DataIO::read(fin, array_size);
-		DataIO::read(fin, format);
-		if (array_size == 6)
+		DataIO::read(fin, is_depth);
+		if (is_depth)
 		{
-			AddDepthStencilCubeTexture(name, format, miplevels);
+			DataIO::read(fin, name);
+			DataIO::read(fin, miplevels);
+			DataIO::read(fin, array_size);
+			DataIO::read(fin, format);
+			if (array_size == 6)
+			{
+				AddDepthStencilCubeTexture(name, format, miplevels);
+			}
+			else
+			{
+				AddDepthStencilTexture(name, format, miplevels);
+			}
 		}
-		else
-		{
-			AddDepthStencilTexture(name, format, miplevels);
-		}
+
 		// input
 		size_t input_size = 0;
 		DataIO::read(fin, input_size);
@@ -1064,6 +1079,8 @@ namespace RE
 			}
 		}
 	}
+	std::string EntryShaderModule::GameObjectStructNameToBind = "GameObject";;
+	std::string EntryShaderModule::CameraStructNameToBind     = "Camera";
 	string EntryShaderModule::GameObjectStructuredBufferName = "GameObjectArray";
 	string EntryShaderModule::CameraConstantBufferName       = "CameraCB";
 	string EntryShaderModule::MaterialTextureArrayName       = "MaterialTextures";
@@ -1080,11 +1097,30 @@ namespace RE
 	const std::string& EntryShaderModule::MatCBName() {
 		return MaterialConstantBufferName;
 	}
-	//const std::string& EntryShaderModule::BindedGameObjectStructName()
-	//{
-	//	return GameObjectStructNameToBind;
-	//}
-	//const std::string& EntryShaderModule::BindedCameraStructName();
+	const std::string& EntryShaderModule::BindedGameObjectStructName()
+	{
+		return GameObjectStructNameToBind;
+	}
+	const std::string& EntryShaderModule::BindedCameraStructName()
+	{
+		return CameraStructNameToBind;
+	}
+	void EntryShaderModule::SetGameObjectSBName(const std::string& name)
+	{
+		GameObjectStructuredBufferName = name;
+	}
+	void EntryShaderModule::SetCameraCBName(const std::string& name)
+	{
+		CameraConstantBufferName = name;
+	}
+	void EntryShaderModule::SetMatTextureArrayName(const std::string& name)
+	{
+		MaterialTextureArrayName = name;
+	}
+	void EntryShaderModule::SetMatConstantBufferName(const std::string& name)
+	{
+		MaterialConstantBufferName = name;
+	}
 	bool EntryShaderModule::Load(const std::string& path)
 	{
 		if (GraphicsShaderModule::Load(path))
@@ -1097,14 +1133,21 @@ namespace RE
 
 	void EntryShaderModule::Init()
 	{
+		// GameObject  StructuredBuffer 추가
 		AddStructuredBuffer(GameObjectSBName(), GameObjectStructNameToBind);
+
+		// Camera ConstantBuffer 추가
 		auto cbuffer = AddConstantBuffer(CameraCBName());
 		cbuffer->Add(CameraStructNameToBind, "camera");
 
+		// Material 상수 버퍼 추가
+		AddConstantBuffer(MatCBName());
 
 
-		//AddSamplerState("")
+		// 텍스쳐 배열 추가
 		AddTexture2D(MatTextureArrayName())->Resize(100);
+
+		// 샘플러 스테이트 추가
 		AddSamplerState("AnisotropicSampler", CD3DX12_STATIC_SAMPLER_DESC(0));
 	}
 
@@ -1239,10 +1282,10 @@ namespace RE
 			cmdList->BindGraphicsDynamicConstantBuffer(
 				GetRootParamIndex(CameraCBName()), cbuffer->GetData());
 		}
+		
 
 
-
-		auto item_array = RIManager->GetItemByMesh(EReMeshType::Static);
+		auto item_array = RIManager->GetStaticItems();
 
 		// GameObjectArray
 		auto sbuffer = FindStructuredBuffer(GameObjectSBName());
@@ -1254,21 +1297,36 @@ namespace RE
 			if (clone.GetSize() != item->StructuredBuffer->CloneBindedStruct().GetSize())
 				continue;
 
+			// GameObject
 			cmdList->BindGraphicsDynamicStructuredBuffer(
 				GetRootParamIndex(GameObjectSBName()),
 				clone.GetSize(), 
 				item->StructuredBuffer->GetData());
 
-
-			auto t = item->Material->GetBindedTextures();
-			
-			if (!t.empty())
+			// MaterialCB
+			if (item->Material)
 			{
-				cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
+				auto cbData = item->Material->GetCBData();
+				if (!cbData.empty())
+				{
+					cmdList->BindGraphicsDynamicConstantBuffer(
+						GetRootParamIndex(EntryShaderModule::MatCBName()), cbData);
+				}
+			
+
+				auto t = item->Material->GetTextureArray();
+
+				if (!t.empty())
+				{
+					cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
+				}
+
+
+
+				cmdList->SetPipelineState(*item->Material->GetMatOwner()->GetPSO());
+				item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
 			}
-	
-			cmdList->SetPipelineState(*item->Material->GetPSO());
-			item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
+			
 		}
 
 	}
@@ -1279,20 +1337,115 @@ namespace RE
 
 	}
 
-	GUIModule::GUIModule(const std::string& name)
+	GUIModule::GUIModule(const std::string& name) : EntryShaderModule(name, EModuleFormat::G_GUI)
 	{
+
 	}
 
 	void GUIModule::Init()
 	{
-	}
+		EntryShaderModule::Init();
+		// Vertex //
+        // INPUT
+		AddInputEelement(ShaderType::Vertex, JGShader::_float3, "Position", "POSITION");
+		AddInputEelement(ShaderType::Vertex, JGShader::_float2, "TexC", "TEXCOORD");
+		// OUTPUT
+		AddOutputEelement(ShaderType::Vertex, JGShader::_float4, "PosH", "SV_POSITION");
+		AddOutputEelement(ShaderType::Vertex, JGShader::_float3, "PosW", "POSITION");
+		AddOutputEelement(ShaderType::Vertex, JGShader::_float2, "TexC", "TEXCOORD");
+		AddOutputEelement(ShaderType::Vertex, JGShader::_uint, "InstanceID", "INSTANCE");
 
-	void GUIModule::BindCamera(ReCamera* cam)
-	{
+		// Input
+		AddInputEelement(ShaderType::Pixel, JGShader::_float4, "PosH", "SV_POSITION");
+		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "PosW", "POSITION");
+		AddInputEelement(ShaderType::Pixel, JGShader::_float2, "TexC", "TEXCOORD");
+		AddInputEelement(ShaderType::Pixel, JGShader::_uint, "InstanceID", "INSTANCE");
+
+
+		AddShaderParameter(JGShader::Vertex_InstanceID);
+
+		SetMainCode(ShaderType::Vertex, R"(
+    Output output;
+
+    GameObject obj = GameObjectArray[instanceID];
+    float4x4 world = obj.World;
+    float4 posW = mul(float4(input.Position, 1.0f), world);
+    output.PosH = mul(posW, camera.ViewProj);
+    output.PosW = posW.xyz;
+    output.TexC = input.TexC;
+    output.InstanceID = instanceID;
+    return output;
+
+)");
+		AddRenderTargetTexture("Screen", DXGI_FORMAT_R8G8B8A8_UNORM, 1);
 	}
 
 	void GUIModule::Execute(CommandList* cmdList)
 	{
+		auto RIManager = GetRenderItemManager();
+
+		Viewport viewport;
+		ScissorRect rect;
+		viewport.Set((float)m_Width, (float)m_Height);
+		rect.Set(m_Width, m_Height);
+
+		cmdList->SetViewport(viewport);
+		cmdList->SetScissorRect(rect);
+		cmdList->SetGraphicsRootSignature(*m_RootSignature);
+		cmdList->ClearRenderTarget(*m_RenderTarget);
+		cmdList->SetRenderTarget(*m_RenderTarget);
+
+		auto item_array = RIManager->GetGUIItems();
+
+		// Camera
+		if (m_BindedCamera)
+		{
+			auto cbuffer = FindConstantBuffer(CameraCBName());
+			cmdList->BindGraphicsDynamicConstantBuffer(
+				GetRootParamIndex(CameraCBName()), cbuffer->GetData());
+		}
+
+		// GameObjectArray
+		auto sbuffer = FindStructuredBuffer(GameObjectSBName());
+		auto clone = sbuffer->CloneBindedStruct();
+		uint32_t sbuffer_element_count = sbuffer->GetElementCount();
+		for (uint32_t i = 0; i < item_array.size(); ++i)
+		{
+			RenderItem* item = item_array[i];
+			if (clone.GetSize() != item->StructuredBuffer->CloneBindedStruct().GetSize())
+				continue;
+
+			// GameObject
+			cmdList->BindGraphicsDynamicStructuredBuffer(
+				GetRootParamIndex(GameObjectSBName()),
+				clone.GetSize(),
+				item->StructuredBuffer->GetData());
+
+			// MaterialCB
+			if (item->Material)
+			{
+				auto cbData = item->Material->GetCBData();
+				if (!cbData.empty())
+				{
+					cmdList->BindGraphicsDynamicConstantBuffer(
+						GetRootParamIndex(EntryShaderModule::MatCBName()), cbData);
+				}
+
+
+				auto t = item->Material->GetTextureArray();
+
+				if (!t.empty())
+				{
+					cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
+				}
+
+
+
+				cmdList->SetPipelineState(*item->Material->GetMatOwner()->GetPSO());
+				item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
+			}
+
+		}
 	}
 
 }

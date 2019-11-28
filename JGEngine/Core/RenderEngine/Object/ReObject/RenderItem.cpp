@@ -12,18 +12,51 @@ using namespace std;
 
 namespace RE
 {
-	RenderItem::RenderItem(const std::string& name) : ReObject(name)
+	std::map<ERenderItemUsage, std::string> RenderItem::sm_ModuleNameByUsage;
+
+	const string& RenderItem::GetModuleNameByUsage(ERenderItemUsage usage)
 	{
-		Material = make_shared<ReMaterial>();
-		Mesh = make_shared<ReStaticMesh>();
+		return sm_ModuleNameByUsage[usage];
+		// TODO: 여기에 반환 구문을 삽입합니다.
+	}
+
+	void RenderItem::BindShaderModuleByUsage(ERenderItemUsage usage, const std::string& module_name)
+	{
+		sm_ModuleNameByUsage[usage] = module_name;
+	}
+
+	RenderItem::RenderItem(const std::string& name, ERenderItemUsage usage) : 
+		ReObject(name), Usage(usage)
+	{
+		switch (usage)
+		{
+		case ERenderItemUsage::Static3D:
+			Mesh = make_shared<ReStaticMesh>(name + "'s ReStaticMesh");
+			break;
+		case ERenderItemUsage::Skeletal3D:
+			Mesh = make_shared<ReSkeletalMesh>(name + "'s ReStaticMesh");
+			break;
+		case ERenderItemUsage::GUI:
+			Mesh = make_shared<ReGuiMesh>(name + "'s ReGUIMesh");
+			break;
+		}
+	}
+
+	RenderItem::~RenderItem()
+	{
+		if (Material)
+		{
+			ReMaterialManager::DeleteMaterialController(Material);
+		}
 	}
 
 	InstanceRenderItem* RenderItem::AddInstance()
 	{
 		if (StructuredBuffer == nullptr)
 		{
-			StructuredBuffer = make_shared<SBDStructuredBuffer>();
-			StructuredBuffer->BindStruct("GameObject");
+			StructuredBuffer = make_shared<SBDStructuredBuffer>(EntryShaderModule::BindedGameObjectStructName());
+		
+			StructuredBuffer->BindStruct(EntryShaderModule::BindedGameObjectStructName());
 		
 		}
 		uint32_t index = (uint32_t)InstanceItems.size();
@@ -45,6 +78,21 @@ namespace RE
 		auto iter = InstanceItems.begin() + index;
 		StructuredBuffer->Remove((*iter)->Element);
 		InstanceItems.erase(iter);
+	}
+
+	void RenderItem::SetMaterial(const std::string& mat_name)
+	{
+		if (Material)
+		{
+			ReMaterialManager::DeleteMaterialController(Material);
+		}
+		Material = ReMaterialManager::GetMaterialController(mat_name);
+		if (Material->GetUsage() != Usage)
+		{
+			ReMaterialManager::DeleteMaterialController(Material);
+			Material = nullptr;
+		}
+			
 	}
 
 	void InstanceRenderItem::Set(const std::string& name, const JMatrix& m)
@@ -74,39 +122,48 @@ namespace RE
 
 
 
-
-
-
-
-
-
-
-
-
-	RenderItem* RenderItemManager::CreateItem(const std::string& name)
+	RenderItemManager::RenderItemManager()
 	{
-		auto item = make_shared<RenderItem>(name);
-		m_RenderItemPool[item.get()] = item;
-		return item.get();
+		ReObject::m_RenderItemManager = this;
 	}
 
-
-
-
+	StaticRenderItem* RenderItemManager::CreateStaticItem(const std::string& name)
+	{
+		auto item = make_shared<StaticRenderItem>(name);
+		m_RenderItemPool[item.get()] = item;
+		m_StaticRIs[item.get()] = item.get();
+		return item.get();
+	}
+	SkeletalRenderItem* RenderItemManager::CreateSkeletalItem(const std::string& name)
+	{
+		auto item = make_shared<SkeletalRenderItem>(name);
+		m_RenderItemPool[item.get()] = item;
+		m_SkeletalRIs[item.get()] = item.get();
+		return item.get();
+	}
+	GUIRenderItem* RenderItemManager::CreateGUIItem(const std::string& name)
+	{
+		auto item = make_shared<GUIRenderItem>(name);
+		m_RenderItemPool[item.get()] = item;
+		m_GUIRIs[item.get()] = item.get();
+		return item.get();
+	}
 
 	void RenderItemManager::DeleteItem(RenderItem* item)
 	{
 		if (m_RenderItemPool.find(item) == m_RenderItemPool.end())
 			return;
+		if (m_StaticRIs.find(item) != m_StaticRIs.end())
+			m_StaticRIs.erase(item);
+		else if (m_SkeletalRIs.find(item) != m_SkeletalRIs.end())
+			m_SkeletalRIs.erase(item);
+		else
+			m_GUIRIs.erase(item);
+
 		m_RenderItemPool.erase(item);
 	}
 
-
-	RenderItemManager::RenderItemManager()
-	{
-		ReObject::m_RenderItemManager = this;
-	}
-	std::vector<RenderItem*> RenderItemManager::GetAllItem()
+	std::vector<RenderItem*> RenderItemManager::GetAllItems()
 	{
 		std::vector<RenderItem*> v;
 		for (auto& iter : m_RenderItemPool)
@@ -115,17 +172,36 @@ namespace RE
 		}
 		return move(v);
 	}
-	std::vector<RenderItem*> RenderItemManager::GetItemByMesh(EReMeshType type)
+	std::vector<StaticRenderItem*> RenderItemManager::GetStaticItems()
 	{
-		std::vector<RenderItem*> v;
-		for (auto& iter : m_RenderItemPool)
+		std::vector<StaticRenderItem*> v(m_StaticRIs.size());
+		int count = 0;
+		for (auto& ri : m_StaticRIs)
 		{
-			if (iter.second->Mesh->GetType() == type)
-			{
-				v.push_back(iter.first);
-			}
+			v[count++] = ri.second;
 		}
 		return move(v);
 	}
+	std::vector<SkeletalRenderItem*> RenderItemManager::GetSkeletaltems()
+	{
+		std::vector<SkeletalRenderItem*> v(m_SkeletalRIs.size());
+		int count = 0;
+		for (auto& ri : m_SkeletalRIs)
+		{
+			v[count++] = ri.second;
+		}
+		return move(v);
+	}
+	std::vector<GUIRenderItem*> RenderItemManager::GetGUIItems()
+	{
+		std::vector<GUIRenderItem*> v(m_GUIRIs.size());
+		int count = 0;
+		for (auto& ri : m_GUIRIs)
+		{
+			v[count++] = ri.second;
+		}
+		return move(v);
+	}
+
 
 }

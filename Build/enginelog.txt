@@ -1,46 +1,47 @@
-[info] [20012] [Physics] : PhysicsEngine Init Compelete...
-[info] [20012] [Sound] : SoundEngine Init Compelete
-[info] [20012] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [20012] [Rendering] : RenderEngine Init Complete...
-[info] [20012] [Rendering] : Create Default : 2006880717312
-[info] [20012] [Rendering] : Create DefaultDepth : 2006880689712
-[info] [20012] [Rendering] : Create bricks.dds : 2006880701856
-[info] [20012] [Rendering] : Create bricks2.dds : 2006880718416
-[info] [20012] [Rendering] : Create bricks2_nmap.dds : 2006880709584
-[info] [20012] [Rendering] : Create bricks3.dds : 2006880714000
-[info] [20012] [Rendering] : Create bricks_nmap.dds : 2006880707376
-[info] [20012] [Rendering] : Create checkboard.dds : 2006880719520
-[info] [20012] [Rendering] : Create default_nmap.dds : 2006880696336
-[info] [20012] [Rendering] : Create desertcube1024.dds : 2006880697440
-[info] [20012] [Rendering] : Create grass.dds : 2006881437520
-[info] [20012] [Rendering] : Create grasscube1024.dds : 2006881436416
-[info] [20012] [Rendering] : Create head_diff.dds : 2006881415440
-[info] [20012] [Rendering] : Create head_norm.dds : 2006881435312
-[info] [20012] [Rendering] : Create ice.dds : 2006881430896
-[info] [20012] [Rendering] : Create jacket_diff.dds : 2006881425376
-[info] [20012] [Rendering] : Create jacket_norm.dds : 2006881418752
-[info] [20012] [Rendering] : Create pants_diff.dds : 2006881438624
-[info] [20012] [Rendering] : Create pants_norm.dds : 2006881444144
-[info] [20012] [Rendering] : Create snowcube1024.dds : 2006881417648
-[info] [20012] [Rendering] : Create stone.dds : 2006881714688
-[info] [20012] [Rendering] : Create sunsetcube1024.dds : 2006881722416
-[info] [20012] [Rendering] : Create tile.dds : 2006881729040
-[info] [20012] [Rendering] : Create tile_nmap.dds : 2006881713584
-[info] [20012] [Rendering] : Create tree0.bmp : 2006881715792
-[info] [20012] [Rendering] : Create tree01S.dds : 2006881716896
-[info] [20012] [Rendering] : Create tree02S.dds : 2006881723520
-[info] [20012] [Rendering] : Create tree1.bmp : 2006881725728
-[info] [20012] [Rendering] : Create tree2.bmp : 2006881954096
-[info] [20012] [Rendering] : Create tree35S.dds : 2006881938640
-[info] [20012] [Rendering] : Create treearray.dds : 2006881944160
-[info] [20012] [Rendering] : Create treeArray2.dds : 2006881935328
-[info] [20012] [Rendering] : Create upBody_diff.dds : 2006881955200
-[info] [20012] [Rendering] : Create upbody_norm.dds : 2006881948576
-[info] [20012] [Rendering] : Create water1.dds : 2006881925392
-[info] [20012] [Rendering] : Create white1x1.dds : 2006881950784
-[info] [20012] [Rendering] : Create WireFence.dds : 2006881946368
-[info] [20012] [Rendering] : Create WoodCrate01.dds : 2006881934224
-[info] [20012] [Rendering] : Create WoodCrate02.dds : 2006881930912
-[trace] [20012] [Game] : Begin
-[trace] [20012] [Game] : Tick
-[trace] [20012] [Game] : End
+[info] [19856] [Physics] : PhysicsEngine Init Compelete...
+[info] [19856] [Sound] : SoundEngine Init Compelete
+[info] [19856] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [19856] [Rendering] : RenderEngine Init Complete...
+[info] [19856] [Rendering] : Create Default : 2200818316752
+[info] [19856] [Rendering] : Create DefaultDepth : 2200818301296
+[info] [19856] [Rendering] : Create Screen : 2200818297984
+[info] [19856] [Rendering] : Create bricks.dds : 2200818313440
+[info] [19856] [Rendering] : Create bricks2.dds : 2200818305712
+[info] [19856] [Rendering] : Create bricks2_nmap.dds : 2200818314544
+[info] [19856] [Rendering] : Create bricks3.dds : 2200818311232
+[info] [19856] [Rendering] : Create bricks_nmap.dds : 2200818299088
+[info] [19856] [Rendering] : Create checkboard.dds : 2200818317856
+[info] [19856] [Rendering] : Create default_nmap.dds : 2200818318960
+[info] [19856] [Rendering] : Create desertcube1024.dds : 2200818312336
+[info] [19856] [Rendering] : Create grass.dds : 2200819126336
+[info] [19856] [Rendering] : Create grasscube1024.dds : 2200819148416
+[info] [19856] [Rendering] : Create head_diff.dds : 2200819121920
+[info] [19856] [Rendering] : Create head_norm.dds : 2200819132960
+[info] [19856] [Rendering] : Create ice.dds : 2200819130752
+[info] [19856] [Rendering] : Create jacket_diff.dds : 2200819150624
+[info] [19856] [Rendering] : Create jacket_norm.dds : 2200819123024
+[info] [19856] [Rendering] : Create pants_diff.dds : 2200819140688
+[info] [19856] [Rendering] : Create pants_norm.dds : 2200819141792
+[info] [19856] [Rendering] : Create snowcube1024.dds : 2200819409360
+[info] [19856] [Rendering] : Create stone.dds : 2200819403840
+[info] [19856] [Rendering] : Create sunsetcube1024.dds : 2200819415984
+[info] [19856] [Rendering] : Create tile.dds : 2200819412672
+[info] [19856] [Rendering] : Create tile_nmap.dds : 2200819396112
+[info] [19856] [Rendering] : Create tree0.bmp : 2200819422608
+[info] [19856] [Rendering] : Create tree01S.dds : 2200819413776
+[info] [19856] [Rendering] : Create tree02S.dds : 2200819392800
+[info] [19856] [Rendering] : Create tree1.bmp : 2200819407152
+[info] [19856] [Rendering] : Create tree2.bmp : 2200819795104
+[info] [19856] [Rendering] : Create tree35S.dds : 2200819785168
+[info] [19856] [Rendering] : Create treearray.dds : 2200819778544
+[info] [19856] [Rendering] : Create treeArray2.dds : 2200819775232
+[info] [19856] [Rendering] : Create upBody_diff.dds : 2200819769712
+[info] [19856] [Rendering] : Create upbody_norm.dds : 2200819771920
+[info] [19856] [Rendering] : Create water1.dds : 2200819794000
+[info] [19856] [Rendering] : Create white1x1.dds : 2200819780752
+[info] [19856] [Rendering] : Create WireFence.dds : 2200819790688
+[info] [19856] [Rendering] : Create WoodCrate01.dds : 2200819781856
+[info] [19856] [Rendering] : Create WoodCrate02.dds : 2200819796208
+[trace] [19856] [Game] : Begin
+[trace] [19856] [Game] : Tick
+[trace] [19856] [Game] : End

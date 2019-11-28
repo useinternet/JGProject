@@ -15,28 +15,48 @@ namespace RE
 	// 모든 module, pass 정보도 에셋매니저에서 관리
 	// 모든 텍스쳐, 뼈대 정보, 애니메이션 정보도 에셋매니저에서 관리
 	class InstanceRenderItem;
+	class ReMaterialController;
+	enum class ERenderItemUsage
+	{
+		GUI,
+		Static3D,
+		Skeletal3D
+	};
 	class RenderItem : public ReObject
 	{
-		
+		friend class StaticGBufferModule;
+		friend class SkeletalGBufferModule;
+		friend class GUIModule;
+		static std::map<ERenderItemUsage, std::string> sm_ModuleNameByUsage;
 	public:
-		RenderItem(const std::string& name);
-
+		static const std::string& GetModuleNameByUsage(ERenderItemUsage usage);
+		static void BindShaderModuleByUsage(ERenderItemUsage usage, const std::string& module_name);
+	public:
+		RenderItem(const std::string& name, ERenderItemUsage usage);
+		~RenderItem();
 		InstanceRenderItem* AddInstance();
 		void RemoveInstance(InstanceRenderItem* instance);
-	public:
-
-		std::shared_ptr<ReMaterial>            Material;
+		ReMaterialController* GetMaterial() const {
+			return Material;
+		}
+		ReMesh* GetMesh() const {
+			return Mesh.get();
+		}
+		void SetMesh(std::shared_ptr<ReMesh> mesh) {
+			Mesh = mesh;
+		}
+		void SetMaterial(const std::string& mat_name);
+		ERenderItemUsage GetUsage() const {
+			return Usage;
+		}
+	private:
+		ReMaterialController*                  Material = nullptr;
 		std::shared_ptr<ReMesh>                Mesh;
+		ERenderItemUsage                       Usage = ERenderItemUsage::Static3D;
 		//  
-	
-
 		std::shared_ptr<SBDStructuredBuffer>              StructuredBuffer;
 		std::vector<std::shared_ptr<InstanceRenderItem>>  InstanceItems;
 		std::unordered_map<InstanceRenderItem*, uint32_t> InstanceMapByPointer;
-
-
-
-
 		//
 		// pipelinestate (각 blend상태, depth상태, 레스터화기 상태)
 		// material;
@@ -53,6 +73,28 @@ namespace RE
 		// 좌표정보(위치, 회전, 스케일)
 	};
 
+
+	class StaticRenderItem : public RenderItem
+	{
+	public:
+		StaticRenderItem(const std::string& name) :
+			RenderItem(name, ERenderItemUsage::Static3D) {}
+	};
+	class SkeletalRenderItem : public RenderItem
+	{
+	public:
+		SkeletalRenderItem(const std::string& name) :
+			RenderItem(name, ERenderItemUsage::Skeletal3D) {}
+	};
+	class GUIRenderItem : public RenderItem
+	{
+	public:
+		GUIRenderItem(const std::string& name) :
+			RenderItem(name, ERenderItemUsage::GUI) {}
+	};
+
+
+
 	class InstanceRenderItem : public ReObject
 	{
 		friend RenderItem;
@@ -68,19 +110,23 @@ namespace RE
 		STStruct* Element;
 	};
 
-
-	enum class EReMeshType;
-
 	class RenderItemManager
 	{
 	public:
 		RenderItemManager();
-		RenderItem* CreateItem(const std::string& name);
+		StaticRenderItem*   CreateStaticItem(const std::string& name);
+		SkeletalRenderItem* CreateSkeletalItem(const std::string& name);
+		GUIRenderItem*      CreateGUIItem(const std::string& name);
 		void DeleteItem(RenderItem* item);
 	public:
-		std::vector<RenderItem*> GetAllItem();
-		std::vector<RenderItem*> GetItemByMesh(EReMeshType type);
+		std::vector<RenderItem*> GetAllItems();
+		std::vector<StaticRenderItem*> GetStaticItems();
+		std::vector<SkeletalRenderItem*> GetSkeletaltems();
+		std::vector<GUIRenderItem*> GetGUIItems();
 	private:
 		std::unordered_map<RenderItem*, std::shared_ptr<RenderItem>> m_RenderItemPool;
+		std::unordered_map<RenderItem*, StaticRenderItem*>   m_StaticRIs;
+		std::unordered_map<RenderItem*, SkeletalRenderItem*> m_SkeletalRIs;
+		std::unordered_map<RenderItem*, GUIRenderItem*>      m_GUIRIs;
 	};
 }

@@ -32,7 +32,9 @@ namespace RE
 	class ReCamera;
 	class DxScreen;
 	class TextureManager;
-
+	class ReMaterialManager;
+	class InstanceRenderItem;
+	class RenderItem;
 	class RENDERENGINE_API RenderEngineConfig
 	{
 	public:
@@ -53,16 +55,20 @@ namespace RE
 	private:
 		std::shared_ptr<RenderDevice>      m_RenderDevice;
 		std::shared_ptr<ShaderLibManager>  m_ShaderLibManager;
-		std::shared_ptr<RenderItemManager> m_RenderItemManager;
 		std::shared_ptr<ShaderModuleManager> m_ShaderModuleManager;
 		std::shared_ptr<TextureManager>    m_TextureManager;
+		std::shared_ptr<ReMaterialManager> m_MaterialManager;
+		std::shared_ptr<RenderItemManager> m_RenderItemManager;
 
-		std::shared_ptr<RenderTarget> m_RenderTarget;
-		std::vector<Resource>         m_UploadResource;
 
-
+		// TEMP
+		RenderItem* item = nullptr;
+		InstanceRenderItem* instance = nullptr;
 		std::shared_ptr<ReCamera> m_Cam;
 		DxScreen* m_MainScreen = nullptr;
+
+		GraphicsShaderModule* GUIModule;
+		GraphicsShaderModule* StaticModule;
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();

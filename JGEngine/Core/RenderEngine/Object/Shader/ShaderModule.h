@@ -164,17 +164,15 @@ namespace RE
 	
 	/*
 	-- 추가 할것
-	1. EntryShaderModule ( GUI, Static, Skeletal )
-	2. Material 전용 상수 만들기
-	3. 시작 세이더모듈 지정 변수들  클래스변수화 하다끝남
+	1. MaterialCB 생성
 	
 	
 	*/
 
 	class EntryShaderModule : public GraphicsShaderModule
 	{
-		const std::string GameObjectStructNameToBind = "GameObject";;
-		const std::string CameraStructNameToBind = "Camera";
+		static std::string GameObjectStructNameToBind;
+		static std::string CameraStructNameToBind;
 		static std::string GameObjectStructuredBufferName;
 		static std::string CameraConstantBufferName;
 		static std::string MaterialTextureArrayName;
@@ -184,8 +182,13 @@ namespace RE
 		static const std::string& CameraCBName();
 		static const std::string& MatTextureArrayName();
 		static const std::string& MatCBName();
-		//static const std::string& BindedGameObjectStructName();
-		//static const std::string& BindedCameraStructName();
+		static const std::string& BindedGameObjectStructName();
+		static const std::string& BindedCameraStructName();
+		static void SetGameObjectSBName(const std::string& name);
+		static void SetCameraCBName(const std::string& name);
+		static void SetMatTextureArrayName(const std::string& name);
+		static void SetMatConstantBufferName(const std::string& name);
+		
 	public:
 		EntryShaderModule(const std::string& name, EModuleFormat format) :
 			GraphicsShaderModule(name, format) {}
@@ -216,14 +219,13 @@ namespace RE
 		virtual void Execute(CommandList* cmdList) override {}
 	};
 
-	class GUIModule : public GraphicsShaderModule
+	class GUIModule : public EntryShaderModule
 	{
 
 	public:
 		GUIModule(const std::string& name = "GUIModule");
 	public:
-		void Init();
-		virtual void BindCamera(ReCamera* cam) override;
+		virtual void Init() override;
 		virtual void Execute(CommandList* cmdList);
 
 	};
@@ -251,7 +253,7 @@ namespace RE
 		case EModuleFormat::G_Quad:
 			return std::make_shared<GraphicsShaderModule>();
 		case EModuleFormat::G_GUI:
-			return std::make_shared<GraphicsShaderModule>();
+			return std::make_shared<GUIModule>();
 		default:
 			return nullptr;
 		}
