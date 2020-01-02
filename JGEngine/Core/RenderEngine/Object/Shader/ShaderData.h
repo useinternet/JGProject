@@ -52,6 +52,9 @@ namespace RE
 		SBDConstantBuffer();
 		SBDConstantBuffer(const std::string& name);
 	public:
+		SBDConstantBuffer(const SBDConstantBuffer& copy);
+		SBDConstantBuffer& operator=(const SBDConstantBuffer& copy);
+	public:
 		ShaderDataType* Add(const JGShader::EShaderData type, const std::string& var_name);
 		ShaderDataType* Add(const std::string& struct_type_name, const std::string& var_name);
 		void Remove(const std::string& var_name);
@@ -93,7 +96,7 @@ namespace RE
 		virtual void Load(std::ifstream& fin) override;
 	private:
 		std::map<STStruct*, uint32_t>          m_ElementsIndex;
-		std::vector<std::shared_ptr<STStruct>> m_Elements;
+		std::vector<STStruct> m_Elements;
 		std::shared_ptr<STStruct>              m_BindedStructType;
 	};
 

@@ -10,6 +10,7 @@
 #include "DataType/Abstract/EventListener.h"
 #include "DataType/Color.h"
 #include "DataType/Timer.h"
+#include "DataType/Plugin.h"
 
 
 
@@ -32,6 +33,9 @@
 
 
 #include "Utill/DataIO.h"
+#include "Utill/dlfcn.h"
+#include "Utill/StringUtill.h"
+
 #include "Class/Log.h"
 #include "Class/EventManager.h"
 #include "Class/EngineTimer.h"

@@ -12,45 +12,62 @@ namespace IE
 		for (int i = 0; i < KeyMapCount; ++i)
 		{
 			m_KeyMap[i]     = Key_None;
-			m_PrevKeyMap[i] = Key_None;
 		}
-	}
-
-	void InputEngine::Init(HWND hWnd)
-	{
-		m_hWnd = hWnd;
 	}
 	void InputEngine::Update()
 	{
 		m_hWnd = GetFocus();
 		ENGINE_PERFORMANCE_TIMER("Application", "InputEngine");
 
-		for (int i = 0; i < KeyMapCount; ++i)
+		m_KeyDownList.clear();
+		m_KeyUpList.clear();
+		m_MBtDownList.clear();
+		m_MBtUpList.clear();
+
+		while (!m_KeyNoneBuffer.empty())
 		{
-			m_PrevKeyMap[i] = m_KeyMap[i];
-			if (GetAsyncKeyState(i))
-			{
-				m_KeyMap[i] = Key_Down;
-			}
-			else
-			{
-				if (m_KeyMap[i] == Key_Down)
-				{
-					m_KeyMap[i] = Key_Up;
-				}
-				else
-					m_KeyMap[i] = Key_None;
-			}
+			KeyCode code = m_KeyNoneBuffer.front(); m_KeyNoneBuffer.pop();
+			m_KeyMap[code.ToInt()] = Key_None;
+		}
+		while (!m_KeyDownBuffer.empty())
+		{
+			KeyCode code = m_KeyDownBuffer.front(); m_KeyDownBuffer.pop();
+			m_KeyMap[code.ToInt()] = Key_Down;
+		}
+		while (!m_KeyUpBuffer.empty())
+		{
+			KeyCode code = m_KeyUpBuffer.front(); m_KeyUpBuffer.pop();
+			m_KeyMap[code.ToInt()] = Key_Up;
+			m_KeyNoneBuffer.push(code);
 		}
 		
 
-		m_PrevMousePos = m_MousePos;
-		m_PrevMouseFromScreen = m_MousePosFromScreen;
-		POINT p;
-		GetCursorPos(&p);
-		m_MousePosFromScreen = { (float)p.x, (float)p.y };
-		ScreenToClient(m_hWnd, &p);
-		m_MousePos = { (float)p.x, (float)p.y };
+		for (int i = 0; i < KeyMapCount; ++i)
+		{
+			EKeyState state = m_KeyMap[i];
+			KeyCode code(i);
+			switch (state)
+			{
+			case Key_Down:
+				if (code == KeyCode::LeftMouseButton | code == KeyCode::RightMouseButton |
+					code == KeyCode::MouseWheelButton)
+				{
+					m_MBtDownList.push_back(code);
+				}
+				else
+					m_KeyDownList.push_back(code);
+				break;
+			case Key_Up:
+				if (code == KeyCode::LeftMouseButton | code == KeyCode::RightMouseButton |
+					code == KeyCode::MouseWheelButton)
+				{
+					m_MBtUpList.push_back(code);
+				}
+				else
+					m_KeyUpList.push_back(code);
+				break;
+			}
+		}
 	}
 	void InputEngine::OnEvent(Event& e)
 	{
@@ -59,42 +76,33 @@ namespace IE
 
 	bool InputEngine::GetKeyDown(KeyCode code)
 	{
-		if (m_KeyMap[code.ToInt()] == Key_Down)
-			return true;
-		return false;
+		return m_KeyMap[code.ToInt()] == Key_Down;
 	}
 	bool InputEngine::GetKeyUp(KeyCode code)
 	{
-		if (m_KeyMap[code.ToInt()] == Key_Up)
-			return true;
-		return false;
-	}
-	bool InputEngine::GetKeyAsButton(KeyCode code)
-	{
-		if (m_KeyMap[code.ToInt()] == Key_Up &&
-			m_PrevKeyMap[code.ToInt()] == Key_Down)
-		{
-			return true;
-		}
-		return false;
+		return m_KeyMap[code.ToInt()] == Key_Up;
 	}
 
-	const JVector2 InputEngine::GetMousePosition()
+	const JVector2Int InputEngine::GetMousePosition()
 	{
 		return m_MousePos;
 	}
-	const JVector2 InputEngine::GetMouseDelta()
+	const JVector2Int InputEngine::GetMouseDelta()
 	{
 		return { m_MousePos.x - m_PrevMousePos.x, m_MousePos.y - m_PrevMousePos.y };
 	}
-	const JVector2 InputEngine::GetMousePositionFromScreen()
+	void InputEngine::NotifyKeyDown(KeyCode code)
 	{
-		return m_MousePosFromScreen;
+		m_KeyDownBuffer.push(code);
 	}
-	const JVector2 InputEngine::GetMouseDeltaFromScreen()
+	void InputEngine::NotifyKeyUp(KeyCode code)
 	{
-		return
-		{ m_MousePosFromScreen.x - m_PrevMouseFromScreen.x,
-		  m_MousePosFromScreen.y - m_PrevMouseFromScreen.y };
+		m_KeyUpBuffer.push(code);
+	}
+	void InputEngine::NotifyMousePos(int x, int y)
+	{
+		m_PrevMousePos = m_MousePos;
+		m_MousePos.x = x;
+		m_MousePos.y = y;
 	}
 }

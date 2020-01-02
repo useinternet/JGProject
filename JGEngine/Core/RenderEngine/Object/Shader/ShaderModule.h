@@ -2,25 +2,22 @@
 #include "Object/ReObject.h"
 #include "Object/DxObject/Shader.h"
 #include "Object/Shader/ShaderDefined.h"
+#include "ShaderDataType.h"
+#include "ShaderData.h"
+#include "Object/ReObject/RenderTarget.h"
 namespace RE
 {
 	class CommandList;
-	class SBDConstantBuffer;
-	class SBDStructuredBuffer;
-	class STStruct;
-	class SBDTexture2D;
-	class SBDTextureCube;
-	class ShaderLibManager;
-	class ShaderBindingData;
 	class RootSignature;
-	class Texture;
-	class RenderTarget;
+	class ShaderLibManager;
 	class PipelineState;
 	class GraphicsPipelineState;
 	class ComputePipelineState;
+	class FixedGShaderModuleClone;
 	class ReCamera;
 
-	enum class EModuleFormat : uint32_t
+
+	enum class RENDERENGINE_API EModuleFormat : uint32_t
 	{
 		Compute,
 		Graphics,
@@ -33,7 +30,7 @@ namespace RE
 		G_Quad,
 	};
 	//  루트 서명 작업 하다 맘 
-	class ShaderModule : public ReObject
+	class RENDERENGINE_API ShaderModule : public ReObject
 	{
 		
 	public:
@@ -91,13 +88,16 @@ namespace RE
 		};
 		ShaderBindingDataPool   m_SBDPool;
 		SamplerStatePool        m_SSPool;
+
 		std::map<ShaderType, ModuleData> m_ModuleDatasByShaderType;
 		std::shared_ptr<RootSignature>   m_RootSignature;
 		EModuleFormat m_ModuleFormat;
-
 		std::map<std::string, uint32_t>  m_RootParamMap;
 	};
-	class GraphicsShaderModule : public ShaderModule
+
+
+	/*     Graphics Module    */
+	class RENDERENGINE_API GraphicsShaderModule : public ShaderModule
 	{
 	public:
 		GraphicsShaderModule(const std::string& name = "GraphicsShaderModule", EModuleFormat format = EModuleFormat::Graphics);
@@ -133,7 +133,6 @@ namespace RE
 
 		virtual bool MakeRootSignature();
 		virtual void BindCamera(ReCamera* cam);
-
 	public:
 		virtual bool Compile() override;
 		virtual bool CustomCompile(std::shared_ptr<Shader>& shader, const std::string& main_code) override;
@@ -169,7 +168,10 @@ namespace RE
 	
 	*/
 
-	class EntryShaderModule : public GraphicsShaderModule
+
+
+
+	class RENDERENGINE_API FixedGShaderModule : public GraphicsShaderModule
 	{
 		static std::string GameObjectStructNameToBind;
 		static std::string CameraStructNameToBind;
@@ -188,53 +190,103 @@ namespace RE
 		static void SetCameraCBName(const std::string& name);
 		static void SetMatTextureArrayName(const std::string& name);
 		static void SetMatConstantBufferName(const std::string& name);
-		
 	public:
-		EntryShaderModule(const std::string& name, EModuleFormat format) :
+		FixedGShaderModule(const std::string& name, EModuleFormat format) :
 			GraphicsShaderModule(name, format) {}
 	public:
 		virtual bool Load(const std::string& path) override;
 		virtual void Init();
 		virtual void BindCamera(ReCamera* cam) override;
-		virtual void Execute(CommandList* cmdList) override;
+		std::shared_ptr<FixedGShaderModuleClone> Clone(ReCamera* cam, uint64_t id);
 	};
 
-	class StaticGBufferModule : public EntryShaderModule
+	class RENDERENGINE_API StaticGBufferModule : public FixedGShaderModule
 	{
 	public:
 		StaticGBufferModule(const std::string& name = "StaticGBufferModule");
 	public:
 		virtual void Init() override;
-		virtual void Execute(CommandList* cmdList) override;
 	private:
 
 	};
 
-	class SkeletalGBufferModule : public EntryShaderModule
+	class RENDERENGINE_API SkeletalGBufferModule : public FixedGShaderModule
 	{
 	public:
 		SkeletalGBufferModule(const std::string& name = "SkeletalGBufferModule");
 	public:
 		virtual void Init() override {}
-		virtual void Execute(CommandList* cmdList) override {}
 	};
 
-	class GUIModule : public EntryShaderModule
+	class RENDERENGINE_API GUIModule : public FixedGShaderModule
 	{
 
 	public:
 		GUIModule(const std::string& name = "GUIModule");
 	public:
 		virtual void Init() override;
-		virtual void Execute(CommandList* cmdList);
 
 	};
 
-	class ComputeShaderModule : public ShaderModule
+
+	/*     Compute Module    */
+	class RENDERENGINE_API ComputeShaderModule : public ShaderModule
 	{
 	public:
 
 	};
+
+
+	/*     Shader Module Clone    */
+	class RENDERENGINE_API FixedGShaderModuleClone : public ReObject
+	{
+		friend FixedGShaderModule;
+	private:
+		RootSignature*    m_RootSig;
+		JVector2          m_ScreenSize;
+		SBDConstantBuffer m_CamCB;
+		STStruct          m_GameObjectSB_Struct;
+		RenderTarget      m_RenderTarget;
+		EModuleFormat     m_Format;
+		uint64_t          m_ID;
+
+		std::map<std::string, uint32_t>  m_RootParamMap;
+	public:
+		FixedGShaderModuleClone() = default;
+		const Texture& GetRTTexture(uint32_t slot) const {
+			return m_RenderTarget.GetTexture(slot);
+		}
+		const Texture& GetRTDepthTexture() const {
+			return m_RenderTarget.GetDepthTexture();
+		}
+		void Execute(CommandList* cmdList);
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

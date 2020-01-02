@@ -172,6 +172,18 @@
   <ItemGroup>
     <ClInclude Include="..\JGEngine\Application\App\Application.h" />
     <ClInclude Include="..\JGEngine\Application\App\EntryPoint.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUI.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIScreen.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIObject.h" />
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
@@ -179,6 +191,17 @@
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp" />
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUI.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIScreen.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIObject.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

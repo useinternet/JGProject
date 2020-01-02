@@ -6,7 +6,7 @@
 namespace RE
 {
 	class STStruct;
-	class ReCamera : public ReObject
+	class RENDERENGINE_API ReCamera : public ReObject
 	{
 	private:
 		JVector3 m_Position;

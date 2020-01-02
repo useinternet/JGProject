@@ -7,6 +7,15 @@
     <Filter Include="GUI">
       <UniqueIdentifier>{2AEC870B-96F5-877C-1F71-9E7C8B79937C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\JGUIObject">
+      <UniqueIdentifier>{c42bff39-5e8e-46ab-ad5b-0537ca783f6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent">
+      <UniqueIdentifier>{c9b3585d-abb3-4471-a855-7dc0204f382b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIForm">
+      <UniqueIdentifier>{63063229-6777-4b20-8c8c-b0cb78522ed9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JGEngine\Application\App\Application.h">
@@ -18,6 +27,42 @@
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIObject.h">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIScreen.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.h">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.h">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.h">
+      <Filter>GUI\JGUIForm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -25,5 +70,38 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIObject.cpp">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIScreen.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.cpp">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.cpp">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.cpp">
+      <Filter>GUI\JGUIForm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -86,9 +86,9 @@ namespace RE
 		const RenderDeviceDesc& GetDesc() const;
 	private:
 		void BeginFrame();
-		void RenderUpdate();
-		void ComputeUpdate();
-		void CopyUpdate();
+		std::vector<CommandList*> RenderUpdate();
+		std::vector<CommandList*> ComputeUpdate();
+		std::vector<CommandList*> CopyUpdate();
 		void EndFrame();
 	private:
 		struct FrameResource
@@ -133,7 +133,6 @@ namespace RE
 		RenderDeviceDesc m_RenderDeviceDesc;
 		uint64_t m_Frame;
 		uint32_t m_ValueIndex;
-
 		//
 		std::unordered_map<DxScreen*, std::shared_ptr<DxScreen>> m_DxScreenPool;
 		std::unordered_map<HWND, DxScreen*> m_DxScreenMapByHWND;

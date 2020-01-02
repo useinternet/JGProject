@@ -26,78 +26,65 @@ namespace RE
 	}
 
 	RenderItem::RenderItem(const std::string& name, ERenderItemUsage usage) : 
-		ReObject(name), Usage(usage)
-	{
-		switch (usage)
-		{
-		case ERenderItemUsage::Static3D:
-			Mesh = make_shared<ReStaticMesh>(name + "'s ReStaticMesh");
-			break;
-		case ERenderItemUsage::Skeletal3D:
-			Mesh = make_shared<ReSkeletalMesh>(name + "'s ReStaticMesh");
-			break;
-		case ERenderItemUsage::GUI:
-			Mesh = make_shared<ReGuiMesh>(name + "'s ReGUIMesh");
-			break;
-		}
-	}
+		ReObject(name), m_Usage(usage)
+	{ }
 
 	RenderItem::~RenderItem()
 	{
-		if (Material)
+		if (m_Material)
 		{
-			ReMaterialManager::DeleteMaterialController(Material);
+			ReMaterialManager::DeleteMaterialController(m_Material);
 		}
 	}
 
 	InstanceRenderItem* RenderItem::AddInstance()
 	{
-		if (StructuredBuffer == nullptr)
+		if (m_StructuredBuffer == nullptr)
 		{
-			StructuredBuffer = make_shared<SBDStructuredBuffer>(EntryShaderModule::BindedGameObjectStructName());
+			m_StructuredBuffer = make_shared<SBDStructuredBuffer>(FixedGShaderModule::BindedGameObjectStructName());
 		
-			StructuredBuffer->BindStruct(EntryShaderModule::BindedGameObjectStructName());
+			m_StructuredBuffer->BindStruct(FixedGShaderModule::BindedGameObjectStructName());
 		
 		}
-		uint32_t index = (uint32_t)InstanceItems.size();
-		auto instance = make_shared< InstanceRenderItem>(GetName() + "_Instance" + to_string(InstanceItems.size()));
-		InstanceItems.push_back(instance);
-		InstanceMapByPointer[instance.get()] = index;
-		instance->Element = StructuredBuffer->Add();
-		instance->Set("World", JMatrix::Identity());
+		uint32_t index = (uint32_t)m_InstanceItems.size();
+		auto instance = make_shared< InstanceRenderItem>(GetName() + "_Instance" + to_string(m_InstanceItems.size()));
+		m_InstanceItems.push_back(instance);
+		m_InstanceMapByPointer[instance.get()] = index;
+		instance->m_Element = m_StructuredBuffer->Add();
+ 		instance->Set("World", JMatrix::Identity());
 		return instance.get();
 	}
 	void RenderItem::RemoveInstance(InstanceRenderItem* instance)
 	{
-		if (InstanceMapByPointer.find(instance) == InstanceMapByPointer.end())
+		if (m_InstanceMapByPointer.find(instance) == m_InstanceMapByPointer.end())
 		{
 			return;
 		}
-		uint32_t index = InstanceMapByPointer[instance];
-		InstanceMapByPointer.erase(instance);
-		auto iter = InstanceItems.begin() + index;
-		StructuredBuffer->Remove((*iter)->Element);
-		InstanceItems.erase(iter);
+		uint32_t index = m_InstanceMapByPointer[instance];
+		m_InstanceMapByPointer.erase(instance);
+		auto iter = m_InstanceItems.begin() + index;
+		m_StructuredBuffer->Remove((*iter)->m_Element);
+		m_InstanceItems.erase(iter);
 	}
 
 	void RenderItem::SetMaterial(const std::string& mat_name)
 	{
-		if (Material)
+		if (m_Material)
 		{
-			ReMaterialManager::DeleteMaterialController(Material);
+			ReMaterialManager::DeleteMaterialController(m_Material);
 		}
-		Material = ReMaterialManager::GetMaterialController(mat_name);
-		if (Material->GetUsage() != Usage)
+		m_Material = ReMaterialManager::GetMaterialController(mat_name);
+		if (m_Material->GetUsage() != m_Usage)
 		{
-			ReMaterialManager::DeleteMaterialController(Material);
-			Material = nullptr;
+			ReMaterialManager::DeleteMaterialController(m_Material);
+			m_Material = nullptr;
 		}
 			
 	}
 
 	void InstanceRenderItem::Set(const std::string& name, const JMatrix& m)
 	{
-		auto element = Element->GetElement(name);
+		auto element = m_Element->GetElement(name);
 		if (element == nullptr)
 			return;
 		if (element->GetType() == JGShader::_matrix4x4)
@@ -108,7 +95,7 @@ namespace RE
 
 	bool InstanceRenderItem::Get(const std::string& name, JMatrix& m)
 	{
-		auto element = Element->GetElement(name);
+		auto element = m_Element->GetElement(name);
 		if (element == nullptr)
 			return false;
 
@@ -122,9 +109,9 @@ namespace RE
 
 
 
-	RenderItemManager::RenderItemManager()
+	RenderItemManager::RenderItemManager(uint64_t id)
 	{
-		ReObject::m_RenderItemManager = this;
+		ReObject::m_RenderItemManager[id] = this;
 	}
 
 	StaticRenderItem* RenderItemManager::CreateStaticItem(const std::string& name)
@@ -163,6 +150,30 @@ namespace RE
 		m_RenderItemPool.erase(item);
 	}
 
+	void RenderItemManager::Merge(RenderItemManager* mananger)
+	{
+		for (auto& ri : mananger->m_RenderItemPool)
+		{
+			m_RenderItemPool[ri.first] = ri.second;
+			switch (ri.second->GetUsage())
+			{
+			case ERenderItemUsage::Static3D:
+				m_StaticRIs[ri.first] = static_cast<StaticRenderItem*>(ri.first);
+				break;
+			case ERenderItemUsage::Skeletal3D:
+				m_SkeletalRIs[ri.first] = static_cast<SkeletalRenderItem*>(ri.first);
+				break;
+			case ERenderItemUsage::GUI:
+				m_GUIRIs[ri.first] = static_cast<GUIRenderItem*>(ri.first);
+				break;
+			}
+		}
+		mananger->m_StaticRIs.clear();
+		mananger->m_SkeletalRIs.clear();
+		mananger->m_GUIRIs.clear();
+		mananger->m_RenderItemPool.clear();
+	}
+
 	std::vector<RenderItem*> RenderItemManager::GetAllItems()
 	{
 		std::vector<RenderItem*> v;
@@ -172,9 +183,9 @@ namespace RE
 		}
 		return move(v);
 	}
-	std::vector<StaticRenderItem*> RenderItemManager::GetStaticItems()
+	std::vector<RenderItem*> RenderItemManager::GetStaticItems()
 	{
-		std::vector<StaticRenderItem*> v(m_StaticRIs.size());
+		std::vector<RenderItem*> v(m_StaticRIs.size());
 		int count = 0;
 		for (auto& ri : m_StaticRIs)
 		{
@@ -182,9 +193,9 @@ namespace RE
 		}
 		return move(v);
 	}
-	std::vector<SkeletalRenderItem*> RenderItemManager::GetSkeletaltems()
+	std::vector<RenderItem*> RenderItemManager::GetSkeletaltems()
 	{
-		std::vector<SkeletalRenderItem*> v(m_SkeletalRIs.size());
+		std::vector<RenderItem*> v(m_SkeletalRIs.size());
 		int count = 0;
 		for (auto& ri : m_SkeletalRIs)
 		{
@@ -192,14 +203,18 @@ namespace RE
 		}
 		return move(v);
 	}
-	std::vector<GUIRenderItem*> RenderItemManager::GetGUIItems()
+	std::vector<RenderItem*> RenderItemManager::GetGUIItems()
 	{
-		std::vector<GUIRenderItem*> v(m_GUIRIs.size());
+		std::vector<RenderItem*> v(m_GUIRIs.size());
 		int count = 0;
 		for (auto& ri : m_GUIRIs)
 		{
 			v[count++] = ri.second;
 		}
+		std::sort(v.begin(), v.end(), [&](RenderItem* r1, RenderItem* r2)
+		{
+			return r1->GetPriority() < r2->GetPriority();
+		});
 		return move(v);
 	}
 

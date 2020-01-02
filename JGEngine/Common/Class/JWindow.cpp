@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "JWindow.h"
-
+#include "CommonCore.h"
 using namespace std;
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -92,7 +92,8 @@ bool JWindow::Init(const JWindowDesc& desc, uint32_t startX, uint32_t startY)
 
 std::shared_ptr<JWindowManager> g_WindowManager = nullptr;
 HWND g_MainhWnd = 0;
-
+mutex g_WindowMutex;
+bool g_isLock = false;
 void JWindowManager::Init()
 {
 	g_WindowManager = make_shared<JWindowManager>();
@@ -100,12 +101,24 @@ void JWindowManager::Init()
 
 JWindow* JWindowManager::Create(const JWindowDesc& desc, uint32_t startX, uint32_t startY)
 {
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
+
 	if (g_WindowManager->JWindowMapByName.find(desc.name) != g_WindowManager->JWindowMapByName.end())
+	{
+		g_isLock = false;
+		ENGINE_LOG_ERROR("{0} areadly exsit window name", desc.name);
 		return nullptr;
+	}
+
 
 	auto window = make_shared<JWindow>();
 	if (!window->Init(desc, startX, startY))
 	{
+		g_isLock = false;
 		return nullptr;
 	}
 
@@ -116,26 +129,51 @@ JWindow* JWindowManager::Create(const JWindowDesc& desc, uint32_t startX, uint32
 	g_WindowManager->JWindowMapByName[desc.name] = p;
 	g_WindowManager->JWindowMapByHWND[p->GetHandle()] = p;
 
+	if (g_WindowManager->JWindowPool.size() == 1)
+		SetMainWindow(p);
+	g_isLock = false;
 	return p;
 }
 JWindow* JWindowManager::Find(HWND hWnd)
 {
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
 	if (g_WindowManager->JWindowMapByHWND.find(hWnd) == g_WindowManager->JWindowMapByHWND.end())
 	{
+		g_isLock = false;
 		return nullptr;
 	}
+	g_isLock = false;
 	return g_WindowManager->JWindowMapByHWND[hWnd];
 }
 JWindow* JWindowManager::Find(const std::string& name)
 {
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
 	if (g_WindowManager->JWindowMapByName.find(name) == g_WindowManager->JWindowMapByName.end())
 	{
+		g_isLock = false;
 		return nullptr;
 	}
+
+	g_isLock = false;
 	return g_WindowManager->JWindowMapByName[name];
 }
 void JWindowManager::Destroy(HWND hWnd)
 {
+	if (g_WindowManager == nullptr)
+		return;
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
 	if (g_WindowManager->JWindowMapByHWND.find(hWnd) == g_WindowManager->JWindowMapByHWND.end())
 	{
 		return;
@@ -143,18 +181,36 @@ void JWindowManager::Destroy(HWND hWnd)
 	auto p_win = g_WindowManager->JWindowMapByHWND[hWnd];
 
 	g_WindowManager->Destroy(p_win);
+
+	g_isLock = false;
 }
 void JWindowManager::Destroy(const std::string& name)
 {
+	if (g_WindowManager == nullptr)
+		return;
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
 	if (g_WindowManager->JWindowMapByName.find(name) == g_WindowManager->JWindowMapByName.end())
 	{
 		return;
 	}
 	auto p_win = g_WindowManager->JWindowMapByName[name];
 	g_WindowManager->Destroy(p_win);
+
+	g_isLock = false;
 }
 void JWindowManager::Destroy(JWindow* window)
 {
+	if (g_WindowManager == nullptr)
+		return;
+	if (!g_isLock)
+	{
+		lock_guard<mutex> lock(g_WindowMutex);
+		g_isLock = true;
+	}
 	if (g_WindowManager->JWindowPool.find(window) == g_WindowManager->JWindowPool.end())
 	{
 		return;
@@ -164,6 +220,8 @@ void JWindowManager::Destroy(JWindow* window)
 	g_WindowManager->JWindowMapByName.erase(window->GetDesc().name);
 	g_WindowManager->JWindowPool.erase(window);
 	DestroyWindow(hWnd);
+
+	g_isLock = false;
 }
 
 void JWindowManager::SetMainWindow(JWindow* main)
@@ -173,7 +231,13 @@ void JWindowManager::SetMainWindow(JWindow* main)
 
 uint32_t JWindowManager::WindowCount()
 {
+	lock_guard<mutex> lock(g_WindowMutex);
 	return g_WindowManager->JWindowPool.size();
+}
+
+void JWindowManager::BindWindowProcFunc(const std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)>& func)
+{
+	g_WindowManager->BindedWindowProcFunc = func;
 }
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -186,8 +250,12 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			g_WindowManager.reset();
 			PostQuitMessage(0);
 		}
-
 		break;
 	}
+	if (g_WindowManager && g_WindowManager->BindedWindowProcFunc)
+	{
+		return g_WindowManager->BindedWindowProcFunc(hWnd, msg, wParam, lParam);
+	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }

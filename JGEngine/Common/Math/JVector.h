@@ -6,14 +6,14 @@
 
 //
 class JMatrix;
-
+class JColor;
 template<typename T>
 class JVector2Template
 {
 public:
 	T x, y;
 public:
-	JVector2Template() : x(0), y(0) {}
+	JVector2Template(T x = 0, T y = 0) : x(x), y(y) {}
 };
 
 template<typename T>
@@ -22,7 +22,7 @@ class JVector3Template
 public:
 	T x, y, z;
 public:
-	JVector3Template() : x(0), y(0), z(0) {}
+	JVector3Template(T x = 0, T y = 0, T z = 0) : x(x), y(y), z(z) {}
 };
 
 template<typename T>
@@ -31,7 +31,7 @@ class JVector4Template
 public:
 	T x, y, z, w;
 public:
-	JVector4Template() : x(0), y(0), z(0), w(0) {}
+	JVector4Template(T x = 0, T y = 0, T z = 0, T w = 0) : x(x), y(y), z(z), w(w) {}
 };
 
 using JVector2Int = JVector2Template<int>;
@@ -53,6 +53,13 @@ public:
 
 	JVector2& operator=(const JVector2& v) = default;
 	JVector2& operator=(JVector2&& v) = default;
+public:
+	bool operator==(const JVector2& v) const {
+		return (v.x == x && v.y == y);
+	}
+	bool operator!=(const JVector2& v) const {
+		return (v.x != x || v.y != y);
+	}
 };
 class JVector4
 {
@@ -62,6 +69,7 @@ public:
 	JVector4() : x(0), y(0),z(0), w(0) {}
 	JVector4(float x, float y, float z, float w) :
 		x(x), y(y), z(z), w(w) {}
+	JVector4(const JColor& c);
 };
 class JVector3
 {

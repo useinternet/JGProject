@@ -17,6 +17,5 @@ namespace RE
 	private:
 		bool TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList);
 		std::unordered_map<std::string, std::shared_ptr<Texture>> m_TextureCahce;
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_Temp;
 	};
 }

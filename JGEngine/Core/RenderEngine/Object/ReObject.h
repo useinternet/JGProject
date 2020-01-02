@@ -43,11 +43,11 @@ namespace RE
 		ShaderLibManager* GetShaderLibManager() const {
 			return m_ShaderLibManager;
 		}
-		RenderItemManager* GetRenderItemManager()  {
-			return m_RenderItemManager;
+		RenderItemManager* GetRenderItemManager(uint64_t id)  {
+			return m_RenderItemManager[id];
 		}
-		RenderItemManager* GetRenderItemManager() const {
-			return m_RenderItemManager;
+		RenderItemManager* GetRenderItemManager(uint64_t id) const {
+			return m_RenderItemManager[id];
 		}
 		ShaderModuleManager* GetShaderModuleManager() {
 			return m_ShaderModuleManager;
@@ -59,7 +59,7 @@ namespace RE
 		std::string m_Name;
 		static RenderDevice*      m_RenderDevice;
 		static ShaderLibManager*  m_ShaderLibManager;
-		static RenderItemManager* m_RenderItemManager;
 		static ShaderModuleManager* m_ShaderModuleManager;
+		static std::unordered_map<uint64_t ,RenderItemManager*> m_RenderItemManager;
 	};
 }

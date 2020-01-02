@@ -1,6 +1,7 @@
 #pragma once
 #include "Object/ReObject.h"
 #include "Object/Shader/ShaderDefined.h"
+#include "Object/DxObject/Resource.h"
 namespace RE
 {
 	class GraphicsShaderModule;
@@ -21,7 +22,7 @@ namespace RE
 	class SBDConstantBuffer;
 	class ReMaterialController;
 	enum class ERenderItemUsage;
-	class ReMaterial : public ReObject
+	class RENDERENGINE_API ReMaterial : public ReObject
 	{
 
 	public:
@@ -34,8 +35,11 @@ namespace RE
 		void SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& desc);
 		void SetRasterizerState(const D3D12_RASTERIZER_DESC& desc);
 		bool AddTexture(const std::string& name, const std::string& asset_texture_path);
+		bool AddTexture(const std::string& name, const Texture& t = Texture());
 		bool SetTexture(uint32_t index, const std::string& asset_texture_path);
 		bool SetTexture(const std::string& name, const std::string& asset_texture_path);
+		bool SetTexture(uint32_t index, const Texture& t);
+		bool SetTexture(const std::string& name, const Texture& t);
 		bool EraseTexture(const std::string& name);
 		bool EraseTexture(uint32_t index);
 		bool TextureReName(const std::string& origin_name, const std::string& new_name);
@@ -88,7 +92,7 @@ namespace RE
 		ReMaterialControllerPool m_MatControllerPool;
 	};
 
-	class ReMaterialController : public ReObject
+	class RENDERENGINE_API ReMaterialController : public ReObject
 	{
 		friend ReMaterial;
 	private:
@@ -100,6 +104,7 @@ namespace RE
 	public:
 		std::vector<byte> GetCBData() const;
 		void     SetTexture(const std::string& name, const std::string& asset_texture_path);
+		void     SetTexture(const std::string& name, const Texture& t);
 		uint32_t GetTextureCount() const;
 		SBDConstantBuffer* GetSBDMatCB() const {
 			return m_MaterialCB.get();

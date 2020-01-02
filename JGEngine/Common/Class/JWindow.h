@@ -34,6 +34,7 @@ private:
 
 class JWindowManager
 {
+	friend LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 public:
 	static void Init();
 	static JWindow* Create(const JWindowDesc& desc, uint32_t startX = 0, uint32_t startY = 0);
@@ -46,11 +47,10 @@ public:
 
 	static void SetMainWindow(JWindow* main);
 	static uint32_t WindowCount();
+	static void BindWindowProcFunc(const std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)>& func);
 private:
 	std::unordered_map<JWindow*, std::shared_ptr<JWindow>> JWindowPool;
 	std::unordered_map<std::string, JWindow*> JWindowMapByName;
 	std::unordered_map<HWND, JWindow*>        JWindowMapByHWND;
-	
-
-
+	std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> BindedWindowProcFunc;
 };

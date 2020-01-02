@@ -21,7 +21,130 @@ namespace RE
 		DataIO::read(fin, m_SortingOrder);
 	}
 
-
+	STStruct::STStruct(const STStruct& copy) : ShaderDataType(copy.GetName())
+	{
+		for (auto& n : copy.m_SortingOrderMap)
+		{
+			auto element = n.second.first;
+			auto name = n.second.second;
+			if (element->GetType() == JGShader::_struct)
+			{
+				STStruct* p = (STStruct*)element;
+				Add(*p, name);
+			}
+			else
+			{
+				auto e = Add(element->GetType(), name);
+				switch (e->GetType())
+				{
+				case JGShader::_int:
+					CastShaderDataType<STInt>(e)->Set(CastShaderDataType<STInt>(element)->Get());
+					break;
+				case JGShader::_int2:
+					CastShaderDataType<STInt2>(e)->Set(CastShaderDataType<STInt2>(element)->Get());
+					break;
+				case JGShader::_int3:
+					CastShaderDataType<STInt3>(e)->Set(CastShaderDataType<STInt3>(element)->Get());
+					break;
+				case JGShader::_int4:
+					CastShaderDataType<STInt4>(e)->Set(CastShaderDataType<STInt4>(element)->Get());
+					break;
+				case JGShader::_uint:
+					CastShaderDataType<STUint>(e)->Set(CastShaderDataType<STUint>(element)->Get());
+					break;
+				case JGShader::_uint2:
+					CastShaderDataType<STUint2>(e)->Set(CastShaderDataType<STUint2>(element)->Get());
+					break;
+				case JGShader::_uint3:
+					CastShaderDataType<STUint3>(e)->Set(CastShaderDataType<STUint3>(element)->Get());
+					break;
+				case JGShader::_uint4:
+					CastShaderDataType<STUint4>(e)->Set(CastShaderDataType<STUint4>(element)->Get());
+					break;
+				case JGShader::_float:
+					CastShaderDataType<STFloat>(e)->Set(CastShaderDataType<STFloat>(element)->Get());
+					break;
+				case JGShader::_float2:
+					CastShaderDataType<STFloat2>(e)->Set(CastShaderDataType<STFloat2>(element)->Get());
+					break;
+				case JGShader::_float3:
+					CastShaderDataType<STFloat3>(e)->Set(CastShaderDataType<STFloat3>(element)->Get());
+					break;
+				case JGShader::_float4:
+					CastShaderDataType<STFloat4>(e)->Set(CastShaderDataType<STFloat4>(element)->Get());
+					break;
+				case JGShader::_matrix4x4:
+					CastShaderDataType<STMatrix>(e)->Set(CastShaderDataType<STMatrix>(element)->Get());
+					break;
+				}
+			}
+		}
+	}
+	STStruct& STStruct::operator=(const STStruct& copy)
+	{
+		m_Size = 0;
+		m_SortingOrder = -1;
+		m_StructElements.clear();
+		m_SortingOrderMap.clear();
+		m_SortingIndex = 0;
+		for (auto& n : copy.m_SortingOrderMap)
+		{
+			auto element = n.second.first;
+			auto name = n.second.second;
+			if (element->GetType() == JGShader::_struct)
+			{
+				STStruct* p = (STStruct*)element;
+				Add(*p, name);
+			}
+			else
+			{
+				auto e = Add(element->GetType(), name);
+				switch (e->GetType())
+				{
+				case JGShader::_int:
+					CastShaderDataType<STInt>(e)->Set(CastShaderDataType<STInt>(element)->Get());
+					break;
+				case JGShader::_int2:
+					CastShaderDataType<STInt2>(e)->Set(CastShaderDataType<STInt2>(element)->Get());
+					break;
+				case JGShader::_int3:
+					CastShaderDataType<STInt3>(e)->Set(CastShaderDataType<STInt3>(element)->Get());
+					break;
+				case JGShader::_int4:
+					CastShaderDataType<STInt4>(e)->Set(CastShaderDataType<STInt4>(element)->Get());
+					break;
+				case JGShader::_uint:
+					CastShaderDataType<STUint>(e)->Set(CastShaderDataType<STUint>(element)->Get());
+					break;
+				case JGShader::_uint2:
+					CastShaderDataType<STUint2>(e)->Set(CastShaderDataType<STUint2>(element)->Get());
+					break;
+				case JGShader::_uint3:
+					CastShaderDataType<STUint3>(e)->Set(CastShaderDataType<STUint3>(element)->Get());
+					break;
+				case JGShader::_uint4:
+					CastShaderDataType<STUint4>(e)->Set(CastShaderDataType<STUint4>(element)->Get());
+					break;
+				case JGShader::_float:
+					CastShaderDataType<STFloat>(e)->Set(CastShaderDataType<STFloat>(element)->Get());
+					break;
+				case JGShader::_float2:
+					CastShaderDataType<STFloat2>(e)->Set(CastShaderDataType<STFloat2>(element)->Get());
+					break;
+				case JGShader::_float3:
+					CastShaderDataType<STFloat3>(e)->Set(CastShaderDataType<STFloat3>(element)->Get());
+					break;
+				case JGShader::_float4:
+					CastShaderDataType<STFloat4>(e)->Set(CastShaderDataType<STFloat4>(element)->Get());
+					break;
+				case JGShader::_matrix4x4:
+					CastShaderDataType<STMatrix>(e)->Set(CastShaderDataType<STMatrix>(element)->Get());
+					break;
+				}
+			}
+		}
+		return *this;
+	}
 
 	ShaderDataType* STStruct::Add(JGShader::EShaderData data_type, const std::string& name)
 	{

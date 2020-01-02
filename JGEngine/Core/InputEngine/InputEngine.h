@@ -6,27 +6,48 @@
 
 namespace IE
 {
+
 	class INPUTEGINE_API InputEngine : public EngineCore
 	{
 	public:
 		InputEngine(const GlobalLinkStream& stream);
 		virtual ~InputEngine() = default;
 	public:
-		void Init(HWND hWnd);
-		virtual void Load() override {}
+		virtual void Load() override { m_hWnd = GetFocus(); }
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 
 		bool GetKeyDown(KeyCode code);
 		bool GetKeyUp(KeyCode code);
-		bool GetKeyAsButton(KeyCode code);
+
+		const std::vector<KeyCode> GetKeyBoardDownList() const {
+			return m_KeyDownList;
+		}
+		const std::vector<KeyCode> GetKeyBoardUpList() const {
+			return m_KeyUpList;
+		}
+		const std::vector<KeyCode> GetMouseBtDownList() const {
+			return m_MBtDownList;
+		}
+		const std::vector<KeyCode> GetMouseBtUpList() const {
+			return m_MBtUpList;
+		}
 
 
-		const JVector2 GetMousePosition();
-		const JVector2 GetMouseDelta();
+
+
+		const JVector2Int GetMousePosition();
+		const JVector2Int GetMouseDelta();
 
 		const JVector2 GetMousePositionFromScreen();
 		const JVector2 GetMouseDeltaFromScreen();
+		HWND GetHandle() {
+			return m_hWnd;
+		}
+	public:
+		void NotifyKeyDown(KeyCode code);
+		void NotifyKeyUp(KeyCode code);
+		void NotifyMousePos(int x, int y);
 	private:
 		enum EKeyState
 		{
@@ -37,14 +58,20 @@ namespace IE
 		};
 	private:
 		HWND m_hWnd;
-
-		//std::map<int, EKeyState> m_KeyMap;
 		EKeyState m_KeyMap[KeyMapCount];
-		EKeyState m_PrevKeyMap[KeyMapCount];
-		JVector2 m_MousePos;
-		JVector2 m_PrevMousePos;
-		JVector2 m_MousePosFromScreen;
-		JVector2 m_PrevMouseFromScreen;
 
+
+		std::queue<KeyCode> m_KeyDownBuffer;
+		std::queue<KeyCode> m_KeyUpBuffer;
+		std::queue<KeyCode> m_KeyNoneBuffer;
+
+		std::vector<KeyCode> m_KeyDownList;
+		std::vector<KeyCode> m_KeyUpList;
+		std::vector<KeyCode> m_MBtDownList;
+		std::vector<KeyCode> m_MBtUpList;
+
+
+		JVector2Int m_MousePos;
+		JVector2Int m_PrevMousePos;
 	};
 }

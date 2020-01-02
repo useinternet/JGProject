@@ -46,7 +46,39 @@ namespace RE
 	{
 		m_Type = JGShader::ConstantBuffer;
 	}
-	
+	SBDConstantBuffer::SBDConstantBuffer(const SBDConstantBuffer& copy) : ShaderBindingData(copy)
+	{
+		for (size_t i = 0; i < copy.m_DataVarNames.size(); ++i)
+		{
+			auto name = copy.m_DataVarNames[i];
+			auto data = copy.m_Datas.at(name);
+
+			m_DataVarNames.push_back(name);
+			m_Datas[name] = GetShaderDataTypeByType(data->GetType(), data);
+		}
+	}
+	SBDConstantBuffer& SBDConstantBuffer::operator=(const SBDConstantBuffer& copy)
+	{
+		m_Type = copy.m_Type;
+		m_State = copy.m_State;
+		m_RegisterNumber = copy.m_RegisterNumber;
+		m_RegisterSpace = copy.m_RegisterSpace;
+
+
+		m_DataVarNames.clear();
+		m_Datas.clear();
+
+		for (size_t i = 0; i < copy.m_DataVarNames.size(); ++i)
+		{
+			auto name = copy.m_DataVarNames[i];
+			auto data = copy.m_Datas.at(name);
+
+			m_DataVarNames.push_back(name);
+			m_Datas[name] = GetShaderDataTypeByType(data->GetType(), data);
+		}
+
+		return *this;
+	}
 
 	ShaderDataType* SBDConstantBuffer::Add(const JGShader::EShaderData type, const std::string& var_name)
 	{
@@ -204,6 +236,7 @@ namespace RE
 			Clear();
 
 		m_BindedStructType = GetShaderLibManager()->GetTypeLib()->CloneStruct(struct_type_name);
+
 		if (m_BindedStructType == nullptr)
 		{
 			RE_LOG_ERROR("failed bindStruct({0}) in {1}", struct_type_name, GetName());
@@ -213,11 +246,14 @@ namespace RE
 	{
 		if (m_BindedStructType == nullptr)
 			return nullptr;
-		shared_ptr<STStruct> element = make_shared<STStruct>(*m_BindedStructType);
-		STStruct* result = element.get();
+
+		
+		STStruct element = *m_BindedStructType;
 
 		uint32_t count = (uint32_t)m_Elements.size();
-		m_Elements.push_back(move(element));
+		m_Elements.push_back(element);
+		STStruct* result = &m_Elements[count];
+
 		m_ElementsIndex[result] = count;
 
 		return result;
@@ -246,8 +282,8 @@ namespace RE
 			return;
 
 
-		auto p = m_Elements[idx];
-		m_ElementsIndex.erase(p.get());
+		auto* p = &m_Elements[idx];
+		m_ElementsIndex.erase(p);
 		auto iter = m_Elements.begin() + idx;
 		m_Elements.erase(iter);
 	}
@@ -255,7 +291,7 @@ namespace RE
 	{
 		if (m_Elements.size() <= idx)
 			return nullptr;
-		return m_Elements[idx].get();
+		return &m_Elements[idx];
 	}
 	uint32_t  SBDStructuredBuffer::GetElementCount() const
 	{
@@ -266,7 +302,7 @@ namespace RE
 		std::vector<byte> bt;
 		for (auto& element : m_Elements)
 		{
-			auto src = element->GetByteData();
+			auto src = element.GetByteData();
 			bt.insert(bt.end(), src.begin(), src.end());
 		}
 		return move(bt);
@@ -282,7 +318,6 @@ namespace RE
 	{
 		m_ElementsIndex.clear();
 		m_Elements.clear();
-		//m_BindedStructType.reset();
 	}
 	std::string SBDStructuredBuffer::GetCode(uint32_t register_number, uint32_t register_space)
 	{

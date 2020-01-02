@@ -39,15 +39,16 @@ namespace RE
 		void SetDesc(const D3D12_RESOURCE_DESC& desc);
 		uint32_t GetRefCount() const;
 
-		const Color& GetClearColor() const;
+		const JColor& GetClearColor() const;
 		float GetClearDepth() const;
 		uint8_t GetClearStencil() const;
 		ID3D12Resource* GetD3DResource() const;
 		virtual void SetName(const std::string& name) override;
 
+		virtual void Clone(Resource& resource);
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_D3D_Resource;
-		Color m_ClearColor = Color();
+		JColor m_ClearColor = JColor();
 		float m_ClearDepth = 0.0f;
 		uint8_t m_ClearStencil = 0;
 	};
@@ -76,6 +77,7 @@ namespace RE
 
 		void SetUavDesc(const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
 		void SetUavDescNull();
+
 	private:
 		std::shared_ptr<D3D12_SHADER_RESOURCE_VIEW_DESC>    m_SrvDesc;
 		std::shared_ptr<D3D12_RENDER_TARGET_VIEW_DESC>      m_RtvDesc;

@@ -195,9 +195,11 @@
     <ClInclude Include="..\JGEngine\Common\Math\JVector.h" />
     <ClInclude Include="..\JGEngine\Common\Math\Math.h" />
     <ClInclude Include="..\JGEngine\Common\Utill\DataIO.h" />
+    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h" />
     <ClInclude Include="..\JGEngine\Common\Utill\Hash.h" />
     <ClInclude Include="..\JGEngine\Common\framework.h" />
     <ClInclude Include="..\JGEngine\Common\pch.h" />
+    <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Common\Class\AssetLoader.cpp" />
@@ -219,6 +221,9 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
+    <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

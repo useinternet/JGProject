@@ -25,13 +25,17 @@ public:
 struct JGUIVertex
 {
 	JVector3 Position;
+	JVector4 Color;
 	JVector2 Texcoord;
 
 public:
-	JGUIVertex(const JVector3& pos = JVector3(), const JVector2& tex = JVector2()) :
-		Position(pos), Texcoord(tex) { }
-	JGUIVertex(float p1, float p2, float p3, float t1, float t2) :
-		Position({ p1,p2,p3 }), Texcoord({ t1, t2 }) {}
+	JGUIVertex(
+		const JVector3& pos = JVector3(),
+		const JVector4& color = JVector4(),
+		const JVector2& tex = JVector2()) :
+		Position(pos), Color(color), Texcoord(tex) { }
+	JGUIVertex(float p1, float p2, float p3,float r, float g, float b, float a,  float t1, float t2) :
+		Position({ p1,p2,p3 }), Color({r,g,b,a}), Texcoord({ t1, t2 }) {}
 };
 
 struct JSkinnedVertex

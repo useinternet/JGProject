@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "ShaderModule.h"
-#include "ShaderDataType.h"
-#include "ShaderData.h"
+
 #include "Object/DxObject/Resource.h"
 #include "Object/DxObject/RootSignature.h"
 #include "Object/ReObject/RenderTarget.h"
@@ -784,7 +783,7 @@ namespace RE
 		}
 
 	}
-	
+
 	bool GraphicsShaderModule::Compile()
 	{
 		bool result = true;
@@ -1079,49 +1078,54 @@ namespace RE
 			}
 		}
 	}
-	std::string EntryShaderModule::GameObjectStructNameToBind = "GameObject";;
-	std::string EntryShaderModule::CameraStructNameToBind     = "Camera";
-	string EntryShaderModule::GameObjectStructuredBufferName = "GameObjectArray";
-	string EntryShaderModule::CameraConstantBufferName       = "CameraCB";
-	string EntryShaderModule::MaterialTextureArrayName       = "MaterialTextures";
-	string EntryShaderModule::MaterialConstantBufferName     = "MaterialCB";
-	const std::string& EntryShaderModule::GameObjectSBName() {
+
+	
+
+
+
+	std::string FixedGShaderModule::GameObjectStructNameToBind = "GameObject";;
+	std::string FixedGShaderModule::CameraStructNameToBind     = "Camera";
+	string FixedGShaderModule::GameObjectStructuredBufferName = "GameObjectArray";
+	string FixedGShaderModule::CameraConstantBufferName       = "CameraCB";
+	string FixedGShaderModule::MaterialTextureArrayName       = "MaterialTextures";
+	string FixedGShaderModule::MaterialConstantBufferName     = "MaterialCB";
+	const std::string& FixedGShaderModule::GameObjectSBName() {
 		return GameObjectStructuredBufferName;
 	}
-	const std::string& EntryShaderModule::CameraCBName() {
+	const std::string& FixedGShaderModule::CameraCBName() {
 		return CameraConstantBufferName;
 	}
-	const std::string& EntryShaderModule::MatTextureArrayName() {
+	const std::string& FixedGShaderModule::MatTextureArrayName() {
 		return MaterialTextureArrayName;
 	}
-	const std::string& EntryShaderModule::MatCBName() {
+	const std::string& FixedGShaderModule::MatCBName() {
 		return MaterialConstantBufferName;
 	}
-	const std::string& EntryShaderModule::BindedGameObjectStructName()
+	const std::string& FixedGShaderModule::BindedGameObjectStructName()
 	{
 		return GameObjectStructNameToBind;
 	}
-	const std::string& EntryShaderModule::BindedCameraStructName()
+	const std::string& FixedGShaderModule::BindedCameraStructName()
 	{
 		return CameraStructNameToBind;
 	}
-	void EntryShaderModule::SetGameObjectSBName(const std::string& name)
+	void FixedGShaderModule::SetGameObjectSBName(const std::string& name)
 	{
 		GameObjectStructuredBufferName = name;
 	}
-	void EntryShaderModule::SetCameraCBName(const std::string& name)
+	void FixedGShaderModule::SetCameraCBName(const std::string& name)
 	{
 		CameraConstantBufferName = name;
 	}
-	void EntryShaderModule::SetMatTextureArrayName(const std::string& name)
+	void FixedGShaderModule::SetMatTextureArrayName(const std::string& name)
 	{
 		MaterialTextureArrayName = name;
 	}
-	void EntryShaderModule::SetMatConstantBufferName(const std::string& name)
+	void FixedGShaderModule::SetMatConstantBufferName(const std::string& name)
 	{
 		MaterialConstantBufferName = name;
 	}
-	bool EntryShaderModule::Load(const std::string& path)
+	bool FixedGShaderModule::Load(const std::string& path)
 	{
 		if (GraphicsShaderModule::Load(path))
 			return true;
@@ -1131,7 +1135,7 @@ namespace RE
 		return true;
 	}
 
-	void EntryShaderModule::Init()
+	void FixedGShaderModule::Init()
 	{
 		// GameObject  StructuredBuffer Ãß°¡
 		AddStructuredBuffer(GameObjectSBName(), GameObjectStructNameToBind);
@@ -1151,7 +1155,7 @@ namespace RE
 		AddSamplerState("AnisotropicSampler", CD3DX12_STATIC_SAMPLER_DESC(0));
 	}
 
-	void EntryShaderModule::BindCamera(ReCamera* cam)
+	void FixedGShaderModule::BindCamera(ReCamera* cam)
 	{
 		GraphicsShaderModule::BindCamera(cam);
 		if (m_BindedCamera)
@@ -1178,22 +1182,32 @@ namespace RE
 
 		}
 	}
-
-	void EntryShaderModule::Execute(CommandList* cmdList)
+	std::shared_ptr<FixedGShaderModuleClone> FixedGShaderModule::Clone(ReCamera* cam, uint64_t id)
 	{
+		auto result = std::make_shared<FixedGShaderModuleClone>();
+		result->m_Format = m_ModuleFormat;
+		result->m_ID = id;
+		result->m_RootParamMap = m_RootParamMap;
+		result->m_RootSig = m_RootSignature.get();
+		result->m_ScreenSize = JVector2((float)m_Width, (float)m_Height);
+		BindCamera(cam);
+		result->m_CamCB = *FindConstantBuffer(CameraCBName());
+		result->m_GameObjectSB_Struct = FindStructuredBuffer(GameObjectSBName())->CloneBindedStruct();
+		m_RenderTarget->Clone(result->m_RenderTarget);
+		return result;
 	}
 
 
 
 
 	StaticGBufferModule::StaticGBufferModule(const std::string& name) : 
-		EntryShaderModule(name, EModuleFormat::G_StaticGBuffer)
+		FixedGShaderModule(name, EModuleFormat::G_StaticGBuffer)
 	{
 	
 	}
 	void StaticGBufferModule::Init()
 	{
-		EntryShaderModule::Init();
+		FixedGShaderModule::Init();
 		// Vertex //
 		// 		
 		// INPUT
@@ -1259,105 +1273,38 @@ namespace RE
 		//AddRenderTargetTexture("EmessiveColor", DXGI_FORMAT_R8G8B8A8_UNORM);
 		//AddRenderTargetTexture("Depth", DXGI_FORMAT_R32_FLOAT);
 	}
-	void StaticGBufferModule::Execute(CommandList* cmdList)
-	{
-		auto RIManager = GetRenderItemManager();
-
-		Viewport viewport;
-		ScissorRect rect;
-		viewport.Set((float)m_Width, (float)m_Height);
-		rect.Set(m_Width, m_Height);
-
-		cmdList->SetViewport(viewport);
-		cmdList->SetScissorRect(rect);
-		cmdList->SetGraphicsRootSignature(*m_RootSignature);
-		cmdList->ClearRenderTarget(*m_RenderTarget);
-		cmdList->SetRenderTarget(*m_RenderTarget);
-
-
-		// Camera
-		if (m_BindedCamera)
-		{
-			auto cbuffer = FindConstantBuffer(CameraCBName());
-			cmdList->BindGraphicsDynamicConstantBuffer(
-				GetRootParamIndex(CameraCBName()), cbuffer->GetData());
-		}
-		
-
-
-		auto item_array = RIManager->GetStaticItems();
-
-		// GameObjectArray
-		auto sbuffer = FindStructuredBuffer(GameObjectSBName());
-		auto clone = sbuffer->CloneBindedStruct();
-		uint32_t sbuffer_element_count = sbuffer->GetElementCount();
-		for (uint32_t i = 0; i < item_array.size(); ++i)
-		{
-			RenderItem* item = item_array[i];
-			if (clone.GetSize() != item->StructuredBuffer->CloneBindedStruct().GetSize())
-				continue;
-
-			// GameObject
-			cmdList->BindGraphicsDynamicStructuredBuffer(
-				GetRootParamIndex(GameObjectSBName()),
-				clone.GetSize(), 
-				item->StructuredBuffer->GetData());
-
-			// MaterialCB
-			if (item->Material)
-			{
-				auto cbData = item->Material->GetCBData();
-				if (!cbData.empty())
-				{
-					cmdList->BindGraphicsDynamicConstantBuffer(
-						GetRootParamIndex(EntryShaderModule::MatCBName()), cbData);
-				}
-			
-
-				auto t = item->Material->GetTextureArray();
-
-				if (!t.empty())
-				{
-					cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
-				}
-
-
-
-				cmdList->SetPipelineState(*item->Material->GetMatOwner()->GetPSO());
-				item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
-			}
-			
-		}
-
-	}
+	
 
 	SkeletalGBufferModule::SkeletalGBufferModule(const std::string& name) :
-		EntryShaderModule(name, EModuleFormat::G_SkeletalGBuffer)
+		FixedGShaderModule(name, EModuleFormat::G_SkeletalGBuffer)
 	{
 
 	}
 
-	GUIModule::GUIModule(const std::string& name) : EntryShaderModule(name, EModuleFormat::G_GUI)
+	GUIModule::GUIModule(const std::string& name) : FixedGShaderModule(name, EModuleFormat::G_GUI)
 	{
 
 	}
 
 	void GUIModule::Init()
 	{
-		EntryShaderModule::Init();
+		FixedGShaderModule::Init();
 		// Vertex //
         // INPUT
 		AddInputEelement(ShaderType::Vertex, JGShader::_float3, "Position", "POSITION");
+		AddInputEelement(ShaderType::Vertex, JGShader::_float4, "Color", "COLOR");
 		AddInputEelement(ShaderType::Vertex, JGShader::_float2, "TexC", "TEXCOORD");
 		// OUTPUT
 		AddOutputEelement(ShaderType::Vertex, JGShader::_float4, "PosH", "SV_POSITION");
 		AddOutputEelement(ShaderType::Vertex, JGShader::_float3, "PosW", "POSITION");
+		AddOutputEelement(ShaderType::Vertex, JGShader::_float4, "Color", "COLOR");
 		AddOutputEelement(ShaderType::Vertex, JGShader::_float2, "TexC", "TEXCOORD");
 		AddOutputEelement(ShaderType::Vertex, JGShader::_uint, "InstanceID", "INSTANCE");
 
 		// Input
 		AddInputEelement(ShaderType::Pixel, JGShader::_float4, "PosH", "SV_POSITION");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float3, "PosW", "POSITION");
+		AddInputEelement(ShaderType::Pixel, JGShader::_float4, "Color", "COLOR");
 		AddInputEelement(ShaderType::Pixel, JGShader::_float2, "TexC", "TEXCOORD");
 		AddInputEelement(ShaderType::Pixel, JGShader::_uint, "InstanceID", "INSTANCE");
 
@@ -1373,6 +1320,7 @@ namespace RE
     output.PosH = mul(posW, camera.ViewProj);
     output.PosW = posW.xyz;
     output.TexC = input.TexC;
+    output.Color = input.Color;
     output.InstanceID = instanceID;
     return output;
 
@@ -1380,72 +1328,93 @@ namespace RE
 		AddRenderTargetTexture("Screen", DXGI_FORMAT_R8G8B8A8_UNORM, 1);
 	}
 
-	void GUIModule::Execute(CommandList* cmdList)
-	{
-		auto RIManager = GetRenderItemManager();
 
+
+	void FixedGShaderModuleClone::Execute(CommandList* cmdList)
+	{
+		auto RIManager = GetRenderItemManager(m_ID);
+		if (RIManager == nullptr)
+			return;
 		Viewport viewport;
 		ScissorRect rect;
-		viewport.Set((float)m_Width, (float)m_Height);
-		rect.Set(m_Width, m_Height);
+		viewport.Set(m_ScreenSize.x, m_ScreenSize.y);
+		rect.Set((uint32_t)m_ScreenSize.x, (uint32_t)m_ScreenSize.y);
 
 		cmdList->SetViewport(viewport);
 		cmdList->SetScissorRect(rect);
-		cmdList->SetGraphicsRootSignature(*m_RootSignature);
-		cmdList->ClearRenderTarget(*m_RenderTarget);
-		cmdList->SetRenderTarget(*m_RenderTarget);
+		cmdList->SetGraphicsRootSignature(*m_RootSig);
+		cmdList->ClearRenderTarget(m_RenderTarget);
+		cmdList->SetRenderTarget(m_RenderTarget);
 
-		auto item_array = RIManager->GetGUIItems();
-
-		// Camera
-		if (m_BindedCamera)
+		std::vector<RenderItem*> item_array;
+		switch (m_Format)
 		{
-			auto cbuffer = FindConstantBuffer(CameraCBName());
-			cmdList->BindGraphicsDynamicConstantBuffer(
-				GetRootParamIndex(CameraCBName()), cbuffer->GetData());
+		case EModuleFormat::G_GUI:
+			item_array = RIManager->GetGUIItems();
+			break;
+		case EModuleFormat::G_StaticGBuffer:
+			item_array = RIManager->GetStaticItems();
+			break;
+		case EModuleFormat::G_SkeletalGBuffer:
+			item_array = RIManager->GetSkeletaltems();
+			break;
+		default:
+			return;
+
 		}
+		std::string cbName = FixedGShaderModule::CameraCBName();
+		cmdList->BindGraphicsDynamicConstantBuffer(
+			m_RootParamMap[cbName], m_CamCB.GetData());
+
 
 		// GameObjectArray
-		auto sbuffer = FindStructuredBuffer(GameObjectSBName());
-		auto clone = sbuffer->CloneBindedStruct();
-		uint32_t sbuffer_element_count = sbuffer->GetElementCount();
+		std::string gameObjName = FixedGShaderModule::GameObjectSBName();
 		for (uint32_t i = 0; i < item_array.size(); ++i)
 		{
 			RenderItem* item = item_array[i];
-			if (clone.GetSize() != item->StructuredBuffer->CloneBindedStruct().GetSize())
-				continue;
 
+			if (!item->GetActive()) continue;
+
+			if (m_GameObjectSB_Struct.GetSize() != item->m_StructuredBuffer->CloneBindedStruct().GetSize())
+			{
+				continue;
+			}
 			// GameObject
 			cmdList->BindGraphicsDynamicStructuredBuffer(
-				GetRootParamIndex(GameObjectSBName()),
-				clone.GetSize(),
-				item->StructuredBuffer->GetData());
+				m_RootParamMap[gameObjName],
+				m_GameObjectSB_Struct.GetSize(),
+				item->m_StructuredBuffer->GetData());
 
-			// MaterialCB
-			if (item->Material)
+			if (item->m_Material)
 			{
-				auto cbData = item->Material->GetCBData();
+				// MaterialCB
+				auto cbData = item->m_Material->GetCBData();
 				if (!cbData.empty())
 				{
 					cmdList->BindGraphicsDynamicConstantBuffer(
-						GetRootParamIndex(EntryShaderModule::MatCBName()), cbData);
+						m_RootParamMap[FixedGShaderModule::MatCBName()], cbData);
 				}
 
-
-				auto t = item->Material->GetTextureArray();
+				// Texture
+				auto t = item->m_Material->GetTextureArray();
 
 				if (!t.empty())
 				{
-					cmdList->BindSRV(GetRootParamIndex(MatTextureArrayName()), t);
+					cmdList->BindSRV(
+						m_RootParamMap[FixedGShaderModule::MatTextureArrayName()], t);
 				}
 
 
+				// PSO
+				cmdList->SetPipelineState(*item->m_Material->GetMatOwner()->GetPSO());
 
-				cmdList->SetPipelineState(*item->Material->GetMatOwner()->GetPSO());
-				item->Mesh->Draw(cmdList, (uint32_t)item->InstanceItems.size());
+				// Mesh
+				item->m_Mesh->Draw(cmdList, (uint32_t)item->m_InstanceItems.size());
 			}
-
+		
 		}
+
+
 	}
 
 }

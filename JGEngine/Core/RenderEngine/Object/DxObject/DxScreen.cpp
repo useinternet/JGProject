@@ -38,7 +38,7 @@ namespace RE
 		
 		
 
-		cmdList->ClearRenderTarget(*back_buffer, Color(0.0f, 0.0f, 0.0f, 0.0f));
+		cmdList->ClearRenderTarget(*back_buffer, JColor(0.0f, 0.0f, 0.0f, 0.0f));
 
 
 		if (m_FinalTexture->IsVaild())
@@ -54,23 +54,6 @@ namespace RE
 		// gui
 		cmdList->TransitionBarrier(*back_buffer, D3D12_RESOURCE_STATE_PRESENT);
 		cmdList->DeleteTemporaryResource(*back_buffer);
-
-
-
-		/*
-		commandList->SetRenderTarget(*resource);
-		commandList->FlushResourceBarrier();
-
-
-		//commandList->GetD3DCommandList()->SetDescriptorHeaps(1, m_GUIDescriptorHeap.GetAddressOf());
-		if (m_RenderDeviceDesc.gui)
-		{
-			m_RenderDeviceDesc.gui->Render(commandList->GetD3DCommandList());
-		}
-		commandList->TransitionBarrier(*resource, D3D12_RESOURCE_STATE_PRESENT);
-
-		commandList->DeleteTemporaryResource(*resource);
-		*/
 	}
 	void DxScreen::Present()
 	{

@@ -57,6 +57,8 @@ namespace RE
 		STStruct(const std::string& name) : ShaderDataType(name) {
 			m_Type = JGShader::_struct;
 		}
+		STStruct(const STStruct& copy);
+		STStruct& operator=(const STStruct& copy);
 	public:
 		ShaderDataType* Add(JGShader::EShaderData data_type, const std::string& name);
 		ShaderDataType* Add(const STStruct& _struct, const std::string& name);
@@ -273,6 +275,61 @@ namespace RE
 			break;
 		case JGShader::_struct:
 			result = std::make_shared<STStruct>();
+			break;
+		}
+
+
+		return result;
+	}
+
+
+	inline std::shared_ptr<ShaderDataType> GetShaderDataTypeByType(JGShader::EShaderData type, std::shared_ptr<ShaderDataType> init_data)
+	{
+		std::shared_ptr<ShaderDataType> result;
+
+		switch (type)
+		{
+		case JGShader::_int:
+			result = std::make_shared<STInt>(*(CastShaderDataType<STInt>(init_data.get())));
+			break;
+		case JGShader::_int2:
+			result = std::make_shared<STInt2>(*(CastShaderDataType<STInt2>(init_data.get())));
+			break;
+		case JGShader::_int3:
+			result = std::make_shared<STInt3>(*(CastShaderDataType<STInt3>(init_data.get())));
+			break;
+		case JGShader::_int4:
+			result = std::make_shared<STInt4>(*(CastShaderDataType<STInt4>(init_data.get())));
+			break;
+		case JGShader::_uint:
+			result = std::make_shared<STUint>(*(CastShaderDataType<STUint>(init_data.get())));
+			break;
+		case JGShader::_uint2:
+			result = std::make_shared<STUint2>(*(CastShaderDataType<STUint2>(init_data.get())));
+			break;
+		case JGShader::_uint3:
+			result = std::make_shared<STUint3>(*(CastShaderDataType<STUint3>(init_data.get())));
+			break;
+		case JGShader::_uint4:
+			result = std::make_shared<STUint4>(*(CastShaderDataType<STUint4>(init_data.get())));
+			break;
+		case JGShader::_float:
+			result = std::make_shared<STFloat>(*(CastShaderDataType<STFloat>(init_data.get())));
+			break;
+		case JGShader::_float2:
+			result = std::make_shared<STFloat2>(*(CastShaderDataType<STFloat2>(init_data.get())));
+			break;
+		case JGShader::_float3:
+			result = std::make_shared<STFloat3>(*(CastShaderDataType<STFloat3>(init_data.get())));
+			break;
+		case JGShader::_float4:
+			result = std::make_shared<STFloat4>(*(CastShaderDataType<STFloat4>(init_data.get())));
+			break;
+		case JGShader::_matrix4x4:
+			result = std::make_shared<STMatrix>(*(CastShaderDataType<STMatrix>(init_data.get())));
+			break;
+		case JGShader::_struct:
+			result = std::make_shared<STStruct>(*(CastShaderDataType<STStruct>(init_data.get())));
 			break;
 		}
 

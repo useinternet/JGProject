@@ -1,7 +1,5 @@
 #pragma once
 #include "DxObject.h"
-class Color;
-
 namespace RE
 {
 	class Resource;
@@ -73,7 +71,7 @@ namespace RE
 		void SetGraphicsRootSignature(const RootSignature& rootsig);
 		void SetComputeRootSignature(const RootSignature& rootsig);
 		void SetPipelineState(const PipelineState& pso);
-		void ClearRenderTarget(const Texture& texture, const Color& color);
+		void ClearRenderTarget(const Texture& texture, const JColor& color);
 		void ClearRenderTarget(const RenderTarget& rendertarget);
 		void SetRenderTarget(const Texture& texture);
 		void SetRenderTarget(const RenderTarget& rendertarget);

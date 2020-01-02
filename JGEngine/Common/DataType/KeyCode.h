@@ -54,8 +54,8 @@ public:
 		J = 0x4A,
 		K = 0x4B,
 		L = 0x4C,
-		N = 0x4D,
-		M = 0x4E,
+		N = 0x4E,
+		M = 0x4D,
 		O = 0x4F,
 		P = 0x50,
 		Q = 0x51,
@@ -113,18 +113,31 @@ public:
 	};
 public:
 	KeyCode(EnumKeyCode code) : code(code) {}
+	KeyCode(WPARAM code) : KeyCode((EnumKeyCode)code) {}
+	KeyCode(int code) : KeyCode((EnumKeyCode)code) {}
 	KeyCode() : code(-1) {}
  public:
 	KeyCode& operator=(const KeyCode& code) {
 		this->code = code.code;
 		return *this;
 	}
-	bool operator==(const KeyCode& code) {
+	bool operator==(const KeyCode& code) const {
 		return this->code == code.code;
 	}
-	bool operator!=(const KeyCode& code) {
+	bool operator!=(const KeyCode& code) const {
 		return this->code != code.code;
 		
+	}
+	KeyCode& operator=(KeyCode::EnumKeyCode code) {
+		this->code = code;
+		return *this;
+	}
+	bool operator==( KeyCode::EnumKeyCode code) const {
+		return this->code == code;
+	}
+	bool operator!=( KeyCode::EnumKeyCode code) const {
+		return this->code != code;
+
 	}
 
 public:

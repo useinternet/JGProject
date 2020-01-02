@@ -38,10 +38,10 @@ namespace RE
 		float hw = width * 0.5f;
 		float hh = height * 0.5f;
 
-		v[0] = JGUIVertex(-hw, -hh, 0, 0, 1);
-		v[1] = JGUIVertex(-hw, +hh, 0, 0, 0);
-		v[2] = JGUIVertex(+hw, +hh, 0, 1, 0);
-		v[3] = JGUIVertex(+hw, -hh, 0, 1, 1);
+		v[0] = JGUIVertex(-hw, -hh, 0, 1.0f ,1.0f, 1.0f ,1.0f , 0, 1);
+		v[1] = JGUIVertex(-hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 0);
+		v[2] = JGUIVertex(+hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0);
+		v[3] = JGUIVertex(+hw, -hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 1);
 
 
 		i[0] = 0; i[1] = 1; i[2] = 2;
@@ -63,10 +63,10 @@ namespace RE
 		float hw = width * 0.5f;
 		float hh = height * 0.5f;
 
-		v[0] = JGUIVertex(-hw, -hh, 0, 0, 1);
-		v[1] = JGUIVertex(-hw, +hh, 0, 0, 0);
-		v[2] = JGUIVertex(+hw, +hh, 0, 1, 0);
-		v[3] = JGUIVertex(+hw, -hh, 0, 1, 1);
+		v[0] = JGUIVertex(-hw, -hh, 0, 1.0f, 1.0f, 1.0f, 1.0f , 0, 1);
+		v[1] = JGUIVertex(-hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 0);
+		v[2] = JGUIVertex(+hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0);
+		v[3] = JGUIVertex(+hw, -hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 1);
 
 
 		i[0] = 0; i[1] = 1; i[2] = 2; i[3] = 3; 

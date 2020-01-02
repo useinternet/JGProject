@@ -6,17 +6,17 @@
 namespace RE
 {
 	class CommandList;
-	enum class EReMeshType
+	enum class RENDERENGINE_API EReMeshType
 	{
 		Static,
 		Skeletal,
 		GUI
 	};
-	enum class EReMeshShape
+	enum class RENDERENGINE_API EReMeshShape
 	{
 		Box
 	};
-	class ReMesh : public ReObject
+	class RENDERENGINE_API ReMesh : public ReObject
 	{
 
 	protected:
@@ -67,7 +67,7 @@ namespace RE
 	};
 
 
-	class ReStaticMesh : public ReMesh
+	class RENDERENGINE_API ReStaticMesh : public ReMesh
 	{
 	public:
 		ReStaticMesh() : ReMesh("ReStaticMesh", EReMeshType::Static) {}
@@ -79,7 +79,7 @@ namespace RE
 		}
 	};
 
-	class ReSkeletalMesh : public ReMesh
+	class RENDERENGINE_API ReSkeletalMesh : public ReMesh
 	{
 	public:
 		ReSkeletalMesh() : ReMesh("ReSkeletalMesh", EReMeshType::Skeletal) {}
@@ -91,7 +91,7 @@ namespace RE
 		}
 	};
 
-	class ReGuiMesh : public ReMesh
+	class RENDERENGINE_API ReGuiMesh : public ReMesh
 	{
 	public:
 		ReGuiMesh() : ReMesh("ReGuiMesh", EReMeshType::GUI) {}

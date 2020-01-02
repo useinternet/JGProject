@@ -25,6 +25,9 @@ namespace RE
 		void Update(CommandList* cmdList);
 		void Present();
 		void ReSize(uint32_t width, uint32_t height);
+		HWND GetHandle() const {
+			return m_Desc.hWnd;
+		}
 		const DxScreenDesc& GetDesc() const
 		{
 			return m_Desc;

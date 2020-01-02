@@ -71,7 +71,7 @@ namespace RE
 	{
 		return &m_DepthTexture;
 	}
-	const Color& RenderTarget::GetClearColor(uint32_t slot) const
+	const JColor& RenderTarget::GetClearColor(uint32_t slot) const
 	{
 		if (slot >= MAX_RENDER_TARGET)
 		{
@@ -99,5 +99,26 @@ namespace RE
 			texture.Resize(width, height);
 		}
 		m_DepthTexture.Resize(width, height);
+	}
+
+	void RenderTarget::Clone(RenderTarget& rt)
+	{
+		for (int i = 0; i < MAX_RENDER_TARGET; ++i)
+		{
+			rt.m_Textures[i].Reset();
+			if (m_Textures[i].IsVaild())
+			{
+				Texture t;
+				m_Textures[i].Clone(rt.m_Textures[i]);
+			}
+		}
+		rt.m_DepthTexture.Reset();
+		if (m_DepthTexture.IsVaild())
+		{
+			m_DepthTexture.Clone(rt.m_DepthTexture);
+		}
+
+		rt.m_ClearFlags = m_ClearFlags;
+
 	}
 }

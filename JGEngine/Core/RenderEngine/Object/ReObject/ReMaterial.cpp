@@ -3,7 +3,6 @@
 #include "Object/Shader/ShaderModule.h"
 #include "Object/DxObject/PipelineState.h"
 #include "Object/DxObject/TextureManager.h"
-#include "Object/DxObject/Resource.h"
 #include "Object/Shader/ShaderModuleManager.h"
 #include "Object/DxObject/Shader.h"
 #include "Object/Shader/ShaderData.h"
@@ -17,7 +16,7 @@ namespace RE
 	{ 
 		m_CompiledPixelShader = make_shared<PixelShader>();
 		m_PSO = make_shared<GraphicsPipelineState>();
-		m_MaterialCB = make_shared<SBDConstantBuffer>(EntryShaderModule::MatCBName());
+		m_MaterialCB = make_shared<SBDConstantBuffer>(FixedGShaderModule::MatCBName());
 	}
 	void ReMaterial::SetBlendState(const D3D12_BLEND_DESC& desc)
 	{
@@ -35,15 +34,36 @@ namespace RE
 	{
 		if (m_TextureIndexMap.find(name) != m_TextureIndexMap.end())
 			return false;
-		auto t = TextureManager::GetTexture(asset_texture_path);
+
+		Texture t;
+		t = TextureManager::GetTexture(asset_texture_path);
 		if (!t.IsVaild())
 			return false;
+
+
 		uint32_t index = (uint32_t)m_BindedTextures.size();
 		m_BindedTextures.push_back(t);
 		m_TextureIndexMap[name] = index;
 
 
 		//
+		for (auto& controller_pair : m_MatControllerPool)
+		{
+			controller_pair.second->m_BindedTextures.push_back(t);
+		}
+
+
+		return true;
+	}
+	bool ReMaterial::AddTexture(const std::string& name, const Texture& t)
+	{
+		if (m_TextureIndexMap.find(name) != m_TextureIndexMap.end())
+			return false;
+
+		uint32_t index = (uint32_t)m_BindedTextures.size();
+		m_BindedTextures.push_back(t);
+		m_TextureIndexMap[name] = index;
+
 		for (auto& controller_pair : m_MatControllerPool)
 		{
 			controller_pair.second->m_BindedTextures.push_back(t);
@@ -68,6 +88,24 @@ namespace RE
 		if (index == -1)
 			return false;
 		return SetTexture(index, asset_texture_path);
+	}
+
+	bool ReMaterial::SetTexture(uint32_t index, const Texture& t)
+	{
+		if (!t.IsVaild())
+			return false;
+		if (index >= m_BindedTextures.size())
+			return false;
+		m_BindedTextures[index] = t;
+
+		return true;
+	}
+	bool ReMaterial::SetTexture(const std::string& name, const Texture& t)
+	{
+		uint32_t index = GetBindedTextureIndex(name);
+		if (index == -1)
+			return false;
+		return SetTexture(index, t);
 	}
 	bool ReMaterial::EraseTexture(const std::string& name)
 	{
@@ -167,7 +205,7 @@ namespace RE
 		{
 			std::string name = index_pair.first;
 			uint32_t    index = index_pair.second;
-			std::string replace_name = EntryShaderModule::MatTextureArrayName() + "[" + to_string(index) + "]";
+			std::string replace_name = FixedGShaderModule::MatTextureArrayName() + "[" + to_string(index) + "]";
 	
 			size_t pos = 0;
 			while ((pos = code.find(name, pos)) != std::string::npos)
@@ -182,7 +220,7 @@ namespace RE
 
 		}
 
-		auto matCB = shader_module->FindConstantBuffer(EntryShaderModule::MatCBName());
+		auto matCB = shader_module->FindConstantBuffer(FixedGShaderModule::MatCBName());
 		if (matCB)
 		{
 			*matCB = *m_MaterialCB;
@@ -338,7 +376,7 @@ namespace RE
 	ReMaterialController::ReMaterialController(ReMaterial* owner) :
 		m_MatOwner(owner)
 	{
-		m_MaterialCB = make_shared<SBDConstantBuffer>(EntryShaderModule::MatCBName());
+		m_MaterialCB = make_shared<SBDConstantBuffer>(FixedGShaderModule::MatCBName());
 		*m_MaterialCB = *(owner->GetMaterialCB());
 		m_BindedTextures = owner->GetBindedTextures();
 	}
@@ -352,6 +390,17 @@ namespace RE
 		if (index == -1)
 			return;
 		auto t = TextureManager::GetTexture(asset_texture_path);
+		m_BindedTextures[index] = t;
+		//if (t.IsVaild())
+		//{
+		//	
+		//}
+	}
+	void     ReMaterialController::SetTexture(const std::string& name, const Texture& t)
+	{
+		uint32_t index = m_MatOwner->GetBindedTextureIndex(name);
+		if (index == -1)
+			return;
 		if (t.IsVaild())
 		{
 			m_BindedTextures[index] = t;

@@ -83,6 +83,7 @@ public:
 	static JMatrix Translation(const JVector3& v);
 	static JMatrix Rotation(const JVector3& v);
 	static JMatrix Rotation(const JQuaternion& q);
+	static JMatrix Scaling(const JVector3& v);
 	static JMatrix LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
 	inline static JMatrix PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 	{

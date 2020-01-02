@@ -19,11 +19,14 @@ namespace RE
 		const Texture& GetDepthTexture() const;
 		Texture* GetTexture(uint32_t slot);
 		Texture* GetDepthTexture();
-		const Color& GetClearColor(uint32_t slot) const;
+		const JColor& GetClearColor(uint32_t slot) const;
 		float GetClearDepth() const;
 		uint8_t GetClearStencil() const;
 		D3D12_CLEAR_FLAGS GetDepthClearFlags() const;
 		void Resize(uint32_t width, uint32_t height);
+
+
+		void Clone(RenderTarget& rt);
 	private:
 		std::vector<Texture> m_Textures;
 		Texture m_DepthTexture;

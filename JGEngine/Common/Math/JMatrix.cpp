@@ -68,6 +68,12 @@ JMatrix JMatrix::Rotation(const JQuaternion& q)
 	m.SetSIMD(DirectX::XMMatrixRotationQuaternion(q.GetSIMD()));
 	return m;
 }
+JMatrix JMatrix::Scaling(const JVector3& v)
+{
+	JMatrix m;
+	m.SetSIMD(DirectX::XMMatrixScaling(v.x, v.y, v.z));
+	return m;
+}
 JMatrix JMatrix::LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up)
 {
 	JMatrix m;

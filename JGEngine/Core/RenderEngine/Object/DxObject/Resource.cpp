@@ -187,7 +187,7 @@ namespace RE
 
 		return 0;
 	}
-	const Color& Resource::GetClearColor() const
+	const JColor& Resource::GetClearColor() const
 	{
 		return m_ClearColor;
 	}
@@ -211,7 +211,21 @@ namespace RE
 			ResourceDataMap::SetResourceName(m_D3D_Resource.Get(), GetName());
 		}
 	}
-
+	void Resource::Clone(Resource& resource)
+	{
+		if (m_D3D_Resource.Get() == resource.GetD3DResource())
+			return;
+		auto desc = GetDesc();
+		D3D12_CLEAR_VALUE clear_value;
+		clear_value.Format = desc.Format;
+		clear_value.Color[0] = m_ClearColor.r;
+		clear_value.Color[1] = m_ClearColor.g;
+		clear_value.Color[2] = m_ClearColor.b;
+		clear_value.Color[3] = m_ClearColor.a;
+		clear_value.DepthStencil.Depth = m_ClearDepth;
+		clear_value.DepthStencil.Stencil = m_ClearStencil;
+		resource.CreateResource(desc, &clear_value);
+	}
 	Texture::Texture() : Resource("Texture") { }
 	Texture::Texture(const std::string& name) : Resource(name) { }
 

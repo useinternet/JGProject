@@ -2,16 +2,19 @@
 #include "Application.h"
 #include "Class/Log.h"
 #include "Event/Event.h"
-
 // engine
 #include "Game.h"
 #include "RenderEngine.h"
 #include "InputEngine.h"
 #include "PhysicsEngine.h"
 #include "SoundEngine.h"
-
+#include "GUI/JGUI.h"
+#include "GUI/JGUIObject/JGUIWindow.h"
 using namespace std;
 using namespace concurrency;
+
+JGUIWindow* g_window = nullptr;
+
 Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
@@ -49,20 +52,7 @@ bool Application::Init()
 	m_RenderEngine = make_shared<RE::RenderEngine>(stream);
 	m_Game = make_shared<GFW::Game>(stream);
 
-
-	////// ÃÊ±âÈ­
-	JWindowDesc desc;
-	desc.name = "JWindow";
-	desc.width = 800;
-	desc.height = 600;
-	auto window = JWindowManager::Create(desc, 100, 50);
-	JWindowManager::SetMainWindow(window);
-
-
-	m_RenderEngine->Init(
-		window->GetHandle(), desc.width, desc.height);
-	m_InputEngine->Init(window->GetHandle());
-
+	m_RenderEngine->Init();
 
 	m_IsInit = true;
 	return true;
@@ -74,14 +64,16 @@ void Application::Load()
 	m_SoundEngine->Load();
 	m_RenderEngine->Load();
 	m_Game->Load();
+	m_GUI = make_shared<JGUI>(m_InputEngine.get());
 }
+typedef	JGUIObject*(*TestFunc)(const std::string);
 void Application::Run()
 {
 	MSG msg = { 0 };
 	Load();
 	while (msg.message != WM_QUIT)
 	{
-		static int count = -1;
+		JGUI::ClearExpectedDestroyScreen();
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
@@ -94,29 +86,13 @@ void Application::Run()
 		
 			ENGINE_PERFORMANCE_TIMER_START("Application");
 
-
-			if (m_InputEngine->GetKeyDown(KeyCode::LeftMouseButton))
-			{
-				auto window = JWindowManager::Find(GetFocus());
-				if (window)
-				{
-					auto delta = m_InputEngine->GetMouseDeltaFromScreen();
-
-					window->AddPosition((float)delta.x, (float)delta.y);
-				}
 	
-			}
-			if (m_InputEngine->GetKeyAsButton(KeyCode::A))
-			{
-				JWindowDesc desc;
-				desc.name = "JWindow" + to_string(++count);
-				desc.width = 800;
-				desc.height = 600;
-				desc.parent_hWnd = 0; // JWindowManager::Find("JWindow")->GetHandle();
-				auto window = JWindowManager::Create(desc, 100, 100);
-				RE::RenderEngine::CreateDxScreen(window->GetHandle(), desc.width, desc.height);
-			}
 
+			if (m_InputEngine->GetKeyUp(KeyCode::A))
+			{
+				static int count = 0;
+				JGUI::CreateJGUIWindow<JGUIWindow>("Test" + to_string(count++), true);
+			}
 
 			auto input_task = make_task([&] {
 				m_InputEngine->Update();
@@ -130,6 +106,9 @@ void Application::Run()
 			auto game_task = make_task([&] {
 				m_Game->Update();
 			});
+			auto gui_task = make_task([&] {
+				m_GUI->Update();
+			});
 			auto render_task = make_task([&] {
 				m_RenderEngine->Update();
 			});
@@ -137,21 +116,19 @@ void Application::Run()
 
 			structured_task_group _tasks;
 			structured_task_group render_tasks;
-			_tasks.run(input_task);
+			_tasks.run_and_wait(input_task);
 			_tasks.run(physics_task);
 			_tasks.run(sound_task);
 			_tasks.run(game_task);
+			_tasks.run(gui_task);
 			_tasks.wait();
 			
 			_tasks.run_and_wait(render_task);
 			m_EngineTimer->Tick();
-
-
-			if (m_InputEngine->GetKeyAsButton(KeyCode::Esc))
+			if (m_InputEngine->GetKeyUp(KeyCode::Esc))
 			{
-				HWND hwnd = GetFocus();
-				RE::RenderEngine::DestroyDxScreen(hwnd);
-				JWindowManager::Destroy(hwnd);
+				auto win = JGUI::FindRootJGUIWindow(GetFocus());
+				JGUI::DestroyObject(win);
 			}
 
 		}

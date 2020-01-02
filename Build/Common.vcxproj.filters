@@ -124,6 +124,12 @@
     <ClInclude Include="..\JGEngine\Common\Class\JWindow.h">
       <Filter>Class</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h">
+      <Filter>Utill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h">
+      <Filter>Utill</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">
@@ -174,6 +180,9 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Class\JWindow.cpp">
       <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
+      <Filter>Utill</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,43 +28,45 @@ namespace RE
 
 		for (auto& iter : directory)
 		{
-			
-			Texture t(iter.path().filename().string());
-			
-
-			if (TextureLoad(t, iter.path(), cmdList))
+			if (fs::is_directory(iter.status()))
 			{
-				m_TextureCahce[t.GetName()] = make_shared<Texture>(t);
+				InitLoad(iter.path().string());
 			}
 			else
 			{
-				RE_LOG_ERROR("Failed Load Texture : {0}", iter.path().string());
+				Texture t(iter.path().filename().string());
+				if (TextureLoad(t, iter.path(), cmdList))
+				{
+					m_TextureCahce[t.GetName()] = make_shared<Texture>(t);
+				}
+				else
+				{
+					RE_LOG_ERROR("Failed Load Texture : {0}", iter.path().string());
+				}
 			}
+
 			
 		}
 
 		directQueue->ExcuteCommandList({ cmdList });
 		directQueue->Flush();
-		m_Temp.clear();
 	}
 
 	const Texture& TextureManager::GetTexture(const std::string& name)
 	{
+		static Texture* pT = nullptr;
 		auto& cahce = g_TextureManager->m_TextureCahce;
 		auto renderDevice = g_TextureManager->GetRenderDevice();
 		if (cahce.find(name) == cahce.end())
 		{
+			cahce[name] = make_shared<Texture>(name);
+			pT = cahce[name].get();
 			renderDevice->SubmitToCopy(0, [&](CommandList* cmdList) {
-				Texture t(name);
-				if (g_TextureManager->TextureLoad(t, name, cmdList))
+	
+				if (!g_TextureManager->TextureLoad(*pT, pT->GetName(), cmdList))
 				{
-					cahce[t.GetName()] = make_shared<Texture>(t);
+					RE_LOG_ERROR("Failed Load Texture : {0}", pT->GetName());
 				}
-				else
-				{
-					RE_LOG_ERROR("Failed Load Texture : {0}", name);
-				}
-
 			});
 		}
 		return *cahce[name];
@@ -99,6 +101,7 @@ namespace RE
 		}
 		else
 		{
+			CoInitialize(nullptr);
 			hr = LoadFromWICFile(p.wstring().c_str(),
 				DDS_FLAGS_NONE,
 				&metadata,

@@ -11,79 +11,99 @@ namespace RE
 {
 	class Fence;
 	class RenderDevice;
-	class CommandQueue;
-	class CommandList;
-	class DescriptorAllocator;
-	class DescriptorHandle;
 	class Resource;
-	class ResourceData;
 	class Texture;
 	class GUI;
-	class RenderTarget;
-	class RootSignature;
-	class PipelineState;
-	class GraphicsPipelineState;
-	class VertexShader;
-	class PixelShader;
 	class GraphicsShaderModule;
+	class ComputeShaderModule;
+	class GUIModule;
 	class ShaderLibManager;
 	class RenderItemManager;
 	class ShaderModuleManager;
-	class ReCamera;
 	class DxScreen;
 	class TextureManager;
 	class ReMaterialManager;
-	class InstanceRenderItem;
+	class ReMaterial;
 	class RenderItem;
+	enum class ERenderItemUsage;
 	class RENDERENGINE_API RenderEngineConfig
 	{
 	public:
-		std::string ShaderLibPath;
-		std::string ShaderModulePath;
-		std::string TexturePath;
-		std::string MatStaticEntryModuleName;
-		std::string MatSkeletalEntryModuleName;
-		std::string MatGUIEntryModuleName;
+		std::string ShaderLibPath    = "Shader\\Lib\\ShaderTypeLib.jg";
+		std::string ShaderModulePath = "Shader\\Module";
+		std::string TexturePath      = "Textures";
+		std::string StaticEntryModuleName    = "StaticGBuffer";
+		std::string SkeletalEntryModuleName  = "None";
+		std::string GUIEntryModuleName       = "JGUI";
 
 		//
 
 
 	};
 
+#define RE_GUI_DefaultMaterial      "M_DefaultGUI"
+#define RE_GUI_OneTextureDefault    "M_DefaultTextureGUI"
+
+	enum RENDERENGINE_API ERE_GUI_Material
+	{
+		GUI_Default,
+		GUI_LineDefault
+	};
+
 	class RENDERENGINE_API RenderEngine : public EngineCore
 	{
-	private:
-		std::shared_ptr<RenderDevice>      m_RenderDevice;
-		std::shared_ptr<ShaderLibManager>  m_ShaderLibManager;
-		std::shared_ptr<ShaderModuleManager> m_ShaderModuleManager;
-		std::shared_ptr<TextureManager>    m_TextureManager;
-		std::shared_ptr<ReMaterialManager> m_MaterialManager;
-		std::shared_ptr<RenderItemManager> m_RenderItemManager;
+	public:
+		// Window 관련
+
+		static DxScreen* CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height,
+			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+		static void      DestroyDxScreen(HWND hWnd);
+		static void      DestroyDxScreen(DxScreen* screen);
+		static DxScreen* FindDxScreen(HWND hWnd);
 
 
-		// TEMP
-		RenderItem* item = nullptr;
-		InstanceRenderItem* instance = nullptr;
-		std::shared_ptr<ReCamera> m_Cam;
-		DxScreen* m_MainScreen = nullptr;
+		// RenderItem 관련
+		static void        RegisterRIManager(uint64_t id);
+		static RenderItem* CreateRenderItem(uint64_t id, ERenderItemUsage usage, const std::string& name = "RenderItem");
+		static void        DestroyRenderItem(uint64_t id, RenderItem* item);
+		static void        UnRegisterRIManager(uint64_t id);
 
-		GraphicsShaderModule* GUIModule;
-		GraphicsShaderModule* StaticModule;
+		// 아직 미구현
+		static void        MoveRenderItem(uint64_t old_id, uint64_t new_id);
+
+
+		// Shader Module 관련
+
+		static GraphicsShaderModule* FindGraphicsShaderModule(const std::string& name);
+		static ComputeShaderModule*  FindComputeShaderModule(const std::string& name);
+		static GUIModule* GetGUIModule();
+
+
+		// Material 관련
+		void        RegisterMaterial(const std::string& name, const ReMaterial& m);
+		ReMaterial* FindMaterial(const std::string& name);
+
+
+		// 기타
+		static RenderDevice* GetDevice();
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();
 	public:
-		void Init(HWND hWnd, int width, int height);
+		void Init(const RenderEngineConfig& config = RenderEngineConfig());
 	public:
 		virtual void Load() override;
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
-	public:
-		static DxScreen* CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height, 
-			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
-		static void DestroyDxScreen(HWND hWnd);
-		static void DestroyDxScreen(DxScreen* screen);
-		static DxScreen* FindDxScreen(HWND hWnd);
+	private:
+		std::shared_ptr<RenderDevice>        m_RenderDevice;
+		std::shared_ptr<ShaderLibManager>    m_ShaderLibManager;
+		std::shared_ptr<ShaderModuleManager> m_ShaderModuleManager;
+		std::shared_ptr<TextureManager>      m_TextureManager;
+		std::shared_ptr<ReMaterialManager>   m_MaterialManager;
+
+		std::unordered_map<uint64_t, std::shared_ptr<RenderItemManager>> m_RIManager;
+		RenderEngineConfig m_Config;
 	};
 
 

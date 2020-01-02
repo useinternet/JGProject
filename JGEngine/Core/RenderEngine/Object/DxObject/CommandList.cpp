@@ -200,7 +200,7 @@ namespace RE
 		}
 
 	}
-	void CommandList::ClearRenderTarget(const Texture& texture, const Color& color)
+	void CommandList::ClearRenderTarget(const Texture& texture, const JColor& color)
 	{
 		if (!texture.IsVaild())
 		{
@@ -289,31 +289,31 @@ namespace RE
 	}
 	void CommandList::BindSRV(uint32_t rootparam, const std::vector<Texture>& textures)
 	{
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handle(textures.size());
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handle;
 	
-		for (uint32_t i = 0; i < (uint32_t)handle.size(); ++i)
+		for (uint32_t i = 0; i < (uint32_t)textures.size(); ++i)
 		{
 			if (!textures[i].IsVaild())
 			{
 				RE_LOG_ERROR("{0} is Invalid While Bind SRV", textures[i].GetName());
 				continue;
 			}
-			handle[i] = textures[i].GetSrv();
+			handle.push_back(textures[i].GetSrv());
 		}
 		m_DynamicDescriptorAllocator->PushCPUHandle(rootparam, handle);
 	}
 	void CommandList::BindUAV(uint32_t rootparam, const std::vector<Texture>& textures)
 	{
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handle(textures.size());
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> handle;
 
-		for (uint32_t i = 0; i < (uint32_t)handle.size(); ++i)
+		for (uint32_t i = 0; i < (uint32_t)textures.size(); ++i)
 		{
 			if (!textures[i].IsVaild())
 			{
 				RE_LOG_ERROR("{0} is Invalid While Bind UAV", textures[i].GetName());
 				continue;
 			}
-			handle[i] = textures[i].GetUav();
+			handle.push_back(textures[i].GetUav());
 		}
 		m_DynamicDescriptorAllocator->PushCPUHandle(rootparam, handle);
 	}
