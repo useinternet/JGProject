@@ -12,38 +12,14 @@
 using namespace std;
 
 
+void JGUIShape::Awake()
+{
+	ChildLock();
+}
+
 void JGUIShape::Start()
 {
-	JGUIComponent* p = GetParent();
-	bool is_find = false;
-	uint64_t cnt = 0;
-	while (p != nullptr)
-	{
-		cnt++;
-		if (typeid(*p) == typeid(JGUIPanel))
-		{
-			m_OwnerPanel = (JGUIPanel*)p;
-			is_find = true;
-			if (cnt == 1)
-			{
-				if (m_OwnerPanel->GetParent() == nullptr) m_Priority = GetOwnerWindow()->GetPriority();
-				else m_Priority = GetOwnerWindow()->GetPriority() + cnt;
-			}
-			break;
-		}
-		p = p->GetParent();
-	}
-
-	if (!is_find)
-	{
-		m_OwnerPanel = nullptr;
-		DestroyRI();
-	}
-	else
-	{
-		CreateRI();
-	}
-	GetTransform()->OffsetPosition(0.0f, 0.0f);
+	FindPanel();
 }
 
 void JGUIShape::Tick(const JGUITickEvent& e)
@@ -109,35 +85,7 @@ void JGUIShape::SetParent(JGUIComponent* parent)
 {
 	JGUIComponent::SetParent(parent);
 
-	JGUIComponent* p = GetParent();
-	bool is_find = false;
-	uint64_t cnt = 0;
-	while (p != nullptr)
-	{
-		cnt++;
-		if (typeid(*p) == typeid(JGUIPanel))
-		{
-			m_OwnerPanel = (JGUIPanel*)p;
-			is_find = true;
-			if (cnt == 1)
-			{
-				if (m_OwnerPanel->GetParent() == nullptr) m_Priority = GetOwnerWindow()->GetPriority();
-				else m_Priority = GetOwnerWindow()->GetPriority() + cnt;
-			}
-			break;
-		}
-		p = p->GetParent();
-	}
-
-	if (!is_find)
-	{
-		m_OwnerPanel = nullptr;
-		DestroyRI();
-	}
-	else
-	{
-		CreateRI();
-	}
+	FindPanel();
 }
 void JGUIShape::SetColor(const JColor& color)
 {
@@ -153,6 +101,38 @@ void JGUIShape::DestroyRI()
 	if (m_RenderItem)
 	{
 		RE::RenderEngine::DestroyRenderItem(GetOwnerWindow()->GetID(), m_RenderItem);
+	}
+}
+void JGUIShape::FindPanel()
+{
+	JGUIComponent* p = GetParent();
+	bool is_find = false;
+	uint64_t cnt = 0;
+	while (p != nullptr)
+	{
+		cnt++;
+		if (typeid(*p) == typeid(JGUIPanel))
+		{
+			m_OwnerPanel = (JGUIPanel*)p;
+			is_find = true;
+			if (cnt == 1 && m_OwnerPanel->GetParent() == nullptr)
+			{
+				m_Priority = GetOwnerWindow()->GetPriority();
+			}
+			else  m_Priority = GetOwnerWindow()->GetPriority() + cnt;
+			break;
+		}
+		p = p->GetParent();
+	}
+
+	if (!is_find)
+	{
+		m_OwnerPanel = nullptr;
+		DestroyRI();
+	}
+	else
+	{
+		CreateRI();
 	}
 }
 void JGUIShape::CreateRI()

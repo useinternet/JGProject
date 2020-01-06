@@ -25,6 +25,7 @@ void JGUIComponent::JGUIStart()
 {
 	for (auto& child : m_ChildComponents)
 	{
+		if (child->IsExecuteStartFunc()) continue;
 		child->JGUIStart();
 	}
 	JGUIObject::JGUIStart();
@@ -32,8 +33,6 @@ void JGUIComponent::JGUIStart()
 void JGUIComponent::JGUITick(const JGUITickEvent& e)
 {
 	JGUIObject::JGUITick(e);
-
-
 
 	if (m_RectTransform)
 	{
@@ -52,10 +51,10 @@ void JGUIComponent::JGUITick(const JGUITickEvent& e)
 		}
 	}
 
-
-
 	for (auto& child : m_ChildComponents)
 	{
+		if (!child->IsExecuteStartFunc()) child->JGUIStart();
+		if (!child->IsActive()) continue;
 		child->JGUITick(e);
 	}
 }
@@ -117,9 +116,9 @@ void JGUIComponent::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 
 void JGUIComponent::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
-	ENGINE_LOG_INFO(GetName() + " : " + e.ToString());
-
 	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
+	ENGINE_LOG_INFO(GetName() + " : " + e.ToString() + " [{0} , {1}] ", p.x, p.y);
+
 	for (auto& com : m_ChildComponents)
 	{
 		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
@@ -155,6 +154,10 @@ void JGUIComponent::JGUIMouseHover()
 
 void JGUIComponent::SetParent(JGUIComponent* parent)
 {
+	if (parent && parent->m_IsChildLock) return;
+
+
+
 	if (m_Parent)
 	{
 		// »èÁ¦
@@ -171,7 +174,6 @@ void JGUIComponent::SetParent(JGUIComponent* parent)
 		auto& childs = parent->m_ChildComponents;
 		childs.push_back(this);
 	}
-
 	m_Parent = parent;
 }
 JGUIComponent* JGUIComponent::GetParent() const

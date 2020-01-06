@@ -14,6 +14,8 @@ enum EJGUIBtState
 	JGUI_BtState_Disabled,
 	JGUI_BtState_Count
 };
+
+
 class JGUIButton : public JGUIComponent
 {
 protected:
@@ -25,13 +27,47 @@ protected:
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) override;
 	virtual void MouseLeave() override;
 	virtual void Tick(const JGUITickEvent& e) override;
+	virtual void OnClick() {
+		if (m_OnClick) m_OnClick();
+	}
 public:
 	void SetBtImage(const std::string& path);
 	void SetBtColor(EJGUIBtState state, const JColor& color);
+	void BIndOnClick(const std::function<void()>& func);
 private:
 	JGUIRectangle* m_Rectangle = nullptr;
 	JColor         m_BtColor[JGUI_BtState_Count];
 	EJGUIBtState   m_BtState = JGUI_BtState_Normal;
 	bool           m_IsClick = false;
+	std::function<void()> m_OnClick;
 	std::string m_SourceImage = "none";
+};
+
+
+
+class JGUICloseButton : public JGUIButton
+{
+protected:
+	virtual void Start() override;
+protected:
+	virtual void OnClick() override;
+
+};
+
+class JGUIMaximizeButton : public JGUIButton
+{
+protected:
+	virtual void Start() override;
+protected:
+	virtual void OnClick() override;
+};
+
+
+class JGUIMinimizeButton : public JGUIButton
+{
+protected:
+	virtual void Start() override;
+protected:
+	virtual void OnClick() override;
+
 };

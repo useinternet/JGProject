@@ -62,6 +62,8 @@ public:
 	void RegisterBoxCollider();
 private:
 	void Init(const std::string& name, JGUIWindow* owner_window);
+protected:
+	void ChildLock() { m_IsChildLock = true; }
 private:
 	JGUIWindow* m_OwnerWindow = nullptr;
 
@@ -74,4 +76,5 @@ private:
 	JGUICollider*      m_Collider = nullptr;
 	JVector2 m_PrevSize;
 	bool m_IsMouseTracking = false;
+	bool m_IsChildLock = false;
 };

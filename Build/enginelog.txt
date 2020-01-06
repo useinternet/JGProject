@@ -1,78 +1,58 @@
-[info] [57056] [Physics] : PhysicsEngine Init Compelete...
-[info] [57056] [Sound] : SoundEngine Init Compelete
-[info] [57056] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [57056] [Rendering] : RenderEngine Init Complete...
-[info] [57056] [Rendering] : Create Screen : 2571321407568
-[info] [57056] [Rendering] : Create Default : 2571321410880
-[info] [57056] [Rendering] : Create DefaultDepth : 2571321404256
-[info] [57056] [Rendering] : Create bricks.dds : 2571573091024
-[info] [57056] [Rendering] : Create bricks2.dds : 2571573096544
-[info] [57056] [Rendering] : Create bricks2_nmap.dds : 2571573094336
-[info] [57056] [Rendering] : Create bricks3.dds : 2571573075568
-[info] [57056] [Rendering] : Create bricks_nmap.dds : 2571573092128
-[info] [57056] [Rendering] : Create checkboard.dds : 2571573070048
-[info] [57056] [Rendering] : Create default_nmap.dds : 2571573071152
-[info] [57056] [Rendering] : Create desertcube1024.dds : 2571573089920
-[info] [57056] [Rendering] : Create grass.dds : 2571573100960
-[info] [57056] [Rendering] : Create grasscube1024.dds : 2571573076672
-[info] [57056] [Rendering] : Create head_diff.dds : 2571573088816
-[info] [57056] [Rendering] : Create head_norm.dds : 2571573418608
-[info] [57056] [Rendering] : Create ice.dds : 2571573409776
-[info] [57056] [Rendering] : Create jacket_diff.dds : 2571573419712
-[info] [57056] [Rendering] : Create jacket_norm.dds : 2571573414192
-[info] [57056] [Rendering] : Create pants_diff.dds : 2571573417504
-[info] [57056] [Rendering] : Create pants_norm.dds : 2571573410880
-[info] [57056] [Rendering] : Create snowcube1024.dds : 2571573415296
-[info] [57056] [Rendering] : Create stone.dds : 2571573400944
-[info] [57056] [Rendering] : Create sunsetcube1024.dds : 2571573394320
-[info] [57056] [Rendering] : Create tile.dds : 2571573610784
-[info] [57056] [Rendering] : Create tile_nmap.dds : 2571573600848
-[info] [57056] [Rendering] : Create tree0.bmp : 2571573616304
-[info] [57056] [Rendering] : Create tree01S.dds : 2571573620720
-[info] [57056] [Rendering] : Create tree02S.dds : 2571573612992
-[info] [57056] [Rendering] : Create tree1.bmp : 2571573601952
-[info] [57056] [Rendering] : Create tree2.bmp : 2571573605264
-[info] [57056] [Rendering] : Create tree35S.dds : 2571573604160
-[info] [57056] [Rendering] : Create treearray.dds : 2571573621824
-[info] [57056] [Rendering] : Create treeArray2.dds : 2571573609680
-[info] [57056] [Rendering] : Create upBody_diff.dds : 2571573622928
-[info] [57056] [Rendering] : Create upbody_norm.dds : 2571573597536
-[info] [57056] [Rendering] : Create water1.dds : 2571573595328
-[info] [57056] [Rendering] : Create white1x1.dds : 2571573598640
-[info] [57056] [Rendering] : Create WireFence.dds : 2571573930960
-[info] [57056] [Rendering] : Create WoodCrate01.dds : 2571573921024
-[info] [57056] [Rendering] : Create WoodCrate02.dds : 2571573924336
-[info] [57056] [Rendering] : Create Close.png : 2571573913296
-[info] [57056] [Rendering] : Create Exit.png : 2571573926544
-[info] [57056] [Rendering] : Create Maximum.png : 2571573935376
-[info] [57056] [Rendering] : Create sssss.png : 2571573927648
-[trace] [57056] [Game] : Begin
-[trace] [57056] [Game] : Tick
-[trace] [57056] [Game] : End
-[info] [57056] [Rendering] : Create Texture : 2571573912192
-[info] [57056] [Engine] : M
-[info] [57056] [Engine] : I
-[info] [57056] [Engine] : N
-[info] [57056] [Engine] : I
-[info] [57056] [Engine] : M
-[info] [57056] [Engine] : K
-[info] [57056] [Engine] : J
-[info] [57056] [Engine] : K
-[info] [57056] [Engine] : Shift
-[info] [57056] [Engine] : J
-[info] [57056] [Engine] : I
-[info] [57056] [Engine] : M
-[info] [57056] [Engine] : M
-[info] [57056] [Engine] : I
-[info] [57056] [Engine] : Shift
-[info] [57056] [Engine] : Up
-[info] [57056] [Engine] : Down
-[info] [57056] [Engine] : Up
-[info] [57056] [Engine] : Left
-[info] [57056] [Engine] : JGUIHover
-[info] [57056] [Engine] : JGUIPanel : JGUIKeyUpEvent : LeftMouseButton
-[info] [57056] [Engine] : JGUIButton : JGUIKeyUpEvent : LeftMouseButton
-[info] [57056] [Engine] : JGUIPanel : JGUIKeyUpEvent : LeftMouseButton
-[info] [57056] [Engine] : JGUIButton : JGUIKeyUpEvent : LeftMouseButton
-[info] [57056] [Engine] : JGUIPanel : JGUIKeyUpEvent : LeftMouseButton
-[info] [57056] [Engine] : Esc
+[info] [816] [Physics] : PhysicsEngine Init Compelete...
+[info] [816] [Sound] : SoundEngine Init Compelete
+[info] [816] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [816] [Rendering] : RenderEngine Init Complete...
+[info] [816] [Rendering] : Create Screen : 1924474998304
+[info] [816] [Rendering] : Create Default : 1924475003824
+[info] [816] [Rendering] : Create DefaultDepth : 1924474997200
+[info] [816] [Rendering] : Create bricks.dds : 1924475000512
+[info] [816] [Rendering] : Create bricks2.dds : 1924475002720
+[info] [816] [Rendering] : Create bricks2_nmap.dds : 1924474990576
+[info] [816] [Rendering] : Create bricks3.dds : 1924474994992
+[info] [816] [Rendering] : Create bricks_nmap.dds : 1924690925184
+[info] [816] [Rendering] : Create checkboard.dds : 1924690928496
+[info] [816] [Rendering] : Create default_nmap.dds : 1924690931808
+[info] [816] [Rendering] : Create desertcube1024.dds : 1924690926288
+[info] [816] [Rendering] : Create grass.dds : 1924690932912
+[info] [816] [Rendering] : Create grasscube1024.dds : 1924690909728
+[info] [816] [Rendering] : Create head_diff.dds : 1924690920768
+[info] [816] [Rendering] : Create head_norm.dds : 1924690939536
+[info] [816] [Rendering] : Create ice.dds : 1924690938432
+[info] [816] [Rendering] : Create jacket_diff.dds : 1924690918560
+[info] [816] [Rendering] : Create jacket_norm.dds : 1924690940640
+[info] [816] [Rendering] : Create pants_diff.dds : 1924690863856
+[info] [816] [Rendering] : Create pants_norm.dds : 1924690862752
+[info] [816] [Rendering] : Create snowcube1024.dds : 1924690858336
+[info] [816] [Rendering] : Create stone.dds : 1924690883728
+[info] [816] [Rendering] : Create sunsetcube1024.dds : 1924690872688
+[info] [816] [Rendering] : Create tile.dds : 1924690871584
+[info] [816] [Rendering] : Create tile_nmap.dds : 1924690873792
+[info] [816] [Rendering] : Create tree0.bmp : 1924690874896
+[info] [816] [Rendering] : Create tree01S.dds : 1924691293744
+[info] [816] [Rendering] : Create tree02S.dds : 1924691266144
+[info] [816] [Rendering] : Create tree1.bmp : 1924691268352
+[info] [816] [Rendering] : Create tree2.bmp : 1924691288224
+[info] [816] [Rendering] : Create tree35S.dds : 1924691282704
+[info] [816] [Rendering] : Create treearray.dds : 1924691272768
+[info] [816] [Rendering] : Create treeArray2.dds : 1924691284912
+[info] [816] [Rendering] : Create upBody_diff.dds : 1924691295952
+[info] [816] [Rendering] : Create upbody_norm.dds : 1924691269456
+[info] [816] [Rendering] : Create water1.dds : 1924691286016
+[info] [816] [Rendering] : Create white1x1.dds : 1924691277184
+[info] [816] [Rendering] : Create WireFence.dds : 1924691271664
+[info] [816] [Rendering] : Create WoodCrate01.dds : 1924691274976
+[info] [816] [Rendering] : Create WoodCrate02.dds : 1924691281600
+[info] [816] [Rendering] : Create Close.png : 1924690876000
+[info] [816] [Rendering] : Create Maximize.png : 1924690864960
+[info] [816] [Rendering] : Create Minimize.png : 1924690877104
+[info] [816] [Rendering] : Create sssss.png : 1924690878208
+[trace] [816] [Game] : Begin
+[trace] [816] [Game] : Tick
+[trace] [816] [Game] : End
+[info] [816] [Rendering] : Create Texture : 1924690856128
+[info] [816] [Engine] : JGUIHover
+[info] [816] [Engine] : JGUILeave
+[info] [816] [Engine] : JGUIHover
+[info] [816] [Engine] : JGUIPanel : JGUIKeyUpEvent : LeftMouseButton [549 , 158] 
+[info] [816] [Engine] : JGUILeave
+[info] [816] [Engine] : JGUIHover

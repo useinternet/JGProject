@@ -29,14 +29,16 @@ JGUI::JGUI(IE::InputEngine* input)
 
 void        JGUI::DestroyObject(JGUIObject* obj)
 {
-	auto& objPool = sm_GUI->m_ObjectPool;
+	auto& objqueue = sm_GUI->m_ExpectedDestroyObject;
+	//auto& objPool = sm_GUI->m_ObjectPool;
 	obj->JGUIDestroy();
 	if (obj->GetID() != -1)
 	{
 		sm_GUI->m_IDQueue.push(obj->GetID());
 	}
 	sm_GUI->m_MouseTrackMap.erase(obj);
-	objPool.erase(obj);
+	objqueue.push(obj);
+	//objPool.erase(obj);
 
 }
 
@@ -137,6 +139,14 @@ void JGUI::RegisterMouseTrack(const JGUIMouseTrack& mt)
 
 void JGUI::Update()
 {
+	while (!m_ExpectedCreateObject.empty())
+	{
+		auto obj = m_ExpectedCreateObject.front();
+		m_ExpectedCreateObject.pop();
+		m_ObjectPool[obj.get()] = obj;
+	}
+
+
 	static int focus_cnt = 0;
 	// Focus
 	auto focus_window = FindRootJGUIWindow(GetFocus());
@@ -242,22 +252,27 @@ void JGUI::Update()
 		}
 	}
 
-
-	// Tick
-	for (auto& obj_pair : m_ObjectPool)
+	for(auto& w_pair : m_ScreenPool)
 	{
-		auto obj = obj_pair.second;
-		if (!obj->IsActive())
-			continue;
-		if (!obj->IsExecuteStartFunc())
-			obj->JGUIStart();
+		auto window = w_pair.second.first;
+		if (window == nullptr) continue;
+		if (!window->IsActive()) continue;
+		if (!window->IsExecuteStartFunc()) window->JGUIStart();
 
 
 		JGUITickEvent e;
 		e.deltaTime = GlobalLinkData::GetTick();
 		e.totalTime = GlobalLinkData::GetTotalTime();
 		e.fps = GlobalLinkData::GetFPS();
-		obj->JGUITick(e);
+		window->JGUITick(e);
+	}
+
+
+
+	while (!m_ExpectedDestroyObject.empty())
+	{
+		m_ObjectPool.erase(m_ExpectedDestroyObject.front());
+		m_ExpectedDestroyObject.pop();
 	}
 }
 

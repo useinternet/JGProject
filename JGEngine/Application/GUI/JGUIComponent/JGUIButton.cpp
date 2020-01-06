@@ -26,7 +26,7 @@ void JGUIButton::Start()
 	{
 		m_Rectangle->SetImage(m_SourceImage);
 	}
-
+	m_Rectangle->SetColor(m_BtColor[m_BtState]);
 }
 void JGUIButton::Resize(const JGUIResizeEvent& e)
 {
@@ -35,7 +35,7 @@ void JGUIButton::Resize(const JGUIResizeEvent& e)
 void JGUIButton::MouseBtUp(const JGUIKeyUpEvent& e)
 {
 	if (e.Code != KeyCode::LeftMouseButton) return;
-
+	ENGINE_LOG_INFO(e.ToString());
 	if (m_BtState == JGUI_BtState_Pressed)
 	{
 		m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Selected]);
@@ -51,7 +51,7 @@ void JGUIButton::MouseBtDown(const JGUIKeyDownEvent& e)
 }
 void JGUIButton::MouseMove(const JGUIMouseMoveEvent& e)
 {
-	if (m_BtState == JGUI_BtState_Pressed || m_BtState == JGUI_BtState_Selected) return;
+	if (m_BtState == JGUI_BtState_Pressed) return;
 	m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Hightlight]);
 	m_BtState = JGUI_BtState_Hightlight;
 }
@@ -85,6 +85,12 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}
+	if (m_IsClick)
+	{
+		OnClick();
+		ENGINE_LOG_INFO("Bt Click");
+		m_IsClick = false;
+	}
 }
 
 void JGUIButton::SetBtImage(const std::string& path)
@@ -97,4 +103,54 @@ void JGUIButton::SetBtColor(EJGUIBtState state, const JColor& color)
 {
 	if (state >= JGUI_BtState_Count) return;
 	m_BtColor[state] = color;
+}
+
+void JGUIButton::BIndOnClick(const std::function<void()>& func)
+{
+	m_OnClick = func;
+}
+
+void JGUICloseButton::Start()
+{
+	JGUIButton::Start();
+	SetBtImage("Close.png");
+	
+	SetBtColor(JGUI_BtState_Pressed, JColor(0.8f, 0.3f, 0.3f, 1.0f));
+	SetBtColor(JGUI_BtState_Hightlight, JColor(1.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void JGUICloseButton::OnClick()
+{
+	if (GetOwnerWindow())
+	{
+		auto window = GetOwnerWindow();
+		JGUI::DestroyObject(window);
+	}
+	ENGINE_LOG_INFO("Close On Click");
+}
+
+void JGUIMaximizeButton::Start()
+{
+	JGUIButton::Start();
+	SetBtImage("Maximize.png");
+	SetBtColor(JGUI_BtState_Pressed, JColor(0.8f, 0.3f, 0.3f, 1.0f));
+	SetBtColor(JGUI_BtState_Hightlight, JColor(1.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void JGUIMaximizeButton::OnClick()
+{
+	ENGINE_LOG_INFO("Maximize On Click");
+}
+
+void JGUIMinimizeButton::Start()
+{
+	JGUIButton::Start();
+	SetBtImage("Minimize.png");
+	SetBtColor(JGUI_BtState_Pressed, JColor(0.8f, 0.3f, 0.3f, 1.0f));
+	SetBtColor(JGUI_BtState_Hightlight, JColor(1.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void JGUIMinimizeButton::OnClick()
+{
+	ENGINE_LOG_INFO("Minimize On Click");
 }

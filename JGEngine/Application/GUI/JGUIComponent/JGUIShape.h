@@ -15,6 +15,7 @@ class JGUIShape : public JGUIComponent
 {
 
 protected:
+	virtual void Awake() override;
 	virtual void Start() override;
 	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Destroy() override;
@@ -28,6 +29,7 @@ public:
 	void SetColor(const JColor& color);
 protected:
 	void DestroyRI();
+	void FindPanel();
 	virtual void CreateRI();
 protected:
 	JGUIPanel*              m_OwnerPanel = nullptr;

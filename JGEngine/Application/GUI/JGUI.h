@@ -2,7 +2,7 @@
 
 #include "CommonCore.h"
 #include "JGUIEvent.h"
-
+#include <vector>
 namespace IE
 {
 	class InputEngine;
@@ -86,6 +86,7 @@ enum
 };
 #define JGUI_DEFAULT_HOVERTRACKTIME 0.01f
 #define JGUI_DEFAULT_LEAVETRACKTIME 0.01f
+
 class JGUIMouseTrack
 {
 	friend class JGUI;
@@ -101,13 +102,16 @@ private:
 
 class JGUI
 {
+	
 public:
+	static float Gap() { return 10.0f; }
 	static void        DestroyObject(JGUIObject* obj);
 
 	template<typename ComponentType>
 	static ComponentType* CreateJGUIComponent(const std::string& name, JGUIWindow* owner_window)
 	{
-		auto& objPool = sm_GUI->m_ObjectPool;
+		//auto& objPool = sm_GUI->m_ObjectPool;
+		auto& objqueue = sm_GUI->m_ExpectedCreateObject;
 		auto& id_queue = sm_GUI->m_IDQueue;
 		auto& id_offset = sm_GUI->m_IDOffset;
 		auto obj = std::make_shared<ComponentType>();
@@ -124,13 +128,14 @@ public:
 		obj->m_ID = id;
 		obj->Init(name, owner_window);
 		obj->JGUIAwake();
-		objPool[obj.get()] = obj;
+		objqueue.push(obj);
+		//objPool[obj.get()] = obj;
 		return obj.get();
 	}
 	template<typename WindowType>
 	static WindowType* CreateJGUIWindow(const std::string& name, bool is_new_window = false)
 	{
-		auto& objPool   = sm_GUI->m_ObjectPool;
+		auto& objqueue = sm_GUI->m_ExpectedCreateObject;
 		auto& id_queue  = sm_GUI->m_IDQueue;
 		auto& id_offset = sm_GUI->m_IDOffset;
 		auto obj = std::make_shared<WindowType>();
@@ -147,7 +152,8 @@ public:
 		obj->m_ID = id;
 		obj->Init(name, is_new_window);
 		obj->JGUIAwake();
-		objPool[obj.get()] = obj;
+		objqueue.push(obj);
+		//objPool[obj.get()] = obj;
 		return obj.get();
 	}
 	static JGUIScreen* ReqeustRegisterJGUIScreen(JGUIWindow* window, const std::string& name, uint32_t width, uint32_t height,
@@ -187,6 +193,8 @@ private:
 	JGUIScreenPool   m_ScreenPool;
 	Plugin           m_Plugin;
 	std::queue<HWND> m_ExpectedDestroyWindow;
+	std::queue<std::shared_ptr<JGUIObject>> m_ExpectedCreateObject;
+	std::queue<JGUIObject*> m_ExpectedDestroyObject;
 	JGUIWindow*      m_MainWindow = nullptr;
 	uint64_t             m_IDOffset = 0;
 	std::queue<uint64_t> m_IDQueue;

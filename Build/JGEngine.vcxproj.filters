@@ -63,6 +63,9 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -101,6 +104,9 @@
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>

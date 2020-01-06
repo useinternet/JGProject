@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JGUIRectTransform.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
-
+#include "GUI/JGUIScreen.h"
 using namespace std;
 
 JGUIRectTransform::JGUIRectTransform(const JVector2& pos, float angle, const JVector2& scale)
@@ -10,6 +10,7 @@ JGUIRectTransform::JGUIRectTransform(const JVector2& pos, float angle, const JVe
 	m_LocalAngle = angle;
 	m_Scale = { scale.x, scale.y };
 	m_Size = { 100.0f,100.0f };
+	ChildLock();
 }
 
 void JGUIRectTransform::SetPosition(const JVector2& pos)
@@ -337,5 +338,39 @@ void JGUIRectTransform::SendDirty(int n)
 			com->GetTransform()->m_IsDirty[n] = true;
 		}
 
+	}
+}
+
+void JGUIWinRectTransform::SetPosition(const JVector2& pos)
+{
+	JGUIRectTransform::SetPosition(pos);
+	SendPosToWin();
+}
+
+void JGUIWinRectTransform::SetPosition(float x, float y)
+{
+	JGUIRectTransform::SetPosition(x,y);
+	SendPosToWin();
+}
+
+void JGUIWinRectTransform::OffsetPosition(const JVector2& offset)
+{
+	JGUIRectTransform::OffsetPosition(offset);
+	SendPosToWin();
+}
+
+void JGUIWinRectTransform::OffsetPosition(float x, float y)
+{
+	JGUIRectTransform::OffsetPosition(x,y);
+	SendPosToWin();
+}
+
+void JGUIWinRectTransform::SendPosToWin()
+{
+	if (GetOwnerWindow()->GetParent() == nullptr)
+	{
+		uint32_t x = std::max<uint32_t>(0, (uint32_t)m_LocalPosition.x);
+		uint32_t y = std::max<uint32_t>(0, (uint32_t)m_LocalPosition.y);
+		GetOwnerWindow()->GetScreen()->GetJWin()->SetPosition(x, y);
 	}
 }

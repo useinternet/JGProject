@@ -53,6 +53,50 @@ public:
 
 	JVector2& operator=(const JVector2& v) = default;
 	JVector2& operator=(JVector2&& v) = default;
+
+
+public:
+	inline JVector2 operator+(const JVector2& v) const {
+		return JVector2(x + v.x, y + v.y);
+	}
+	inline JVector2 operator-(const JVector2& v) const {
+		return JVector2(x - v.x, y - v.y);
+	}
+	inline JVector2& operator+=(const JVector2& v) {
+		x += v.x; y += v.y; return *this;
+	}
+	inline JVector2& operator-=(const JVector2& v) {
+		x -= v.x; y -= v.y; return *this;
+	}
+	inline JVector2 operator*(float k) const {
+		return JVector2(x * k, y * k);
+	}
+	inline JVector2 operator/(float k) const {
+		k = 1.0f / k;
+		return JVector2(x * k, y * k);
+	}
+	inline JVector2& operator*=(float k) {
+		x *= k;
+		y *= k;
+		return *this;
+	}
+	inline JVector2& operator/=(float k) {
+		k = 1.0f / k;
+		x *= k; y *= k;
+		return *this;
+	}
+	inline float& operator[](int idx) {
+		switch (idx)
+		{
+		case 0:
+			return x;
+		case 1:
+			return y;
+		default:
+			assert(false && "Vector Index exceed..");
+			return x;
+		}
+	}
 public:
 	bool operator==(const JVector2& v) const {
 		return (v.x == x && v.y == y);
@@ -60,6 +104,55 @@ public:
 	bool operator!=(const JVector2& v) const {
 		return (v.x != x || v.y != y);
 	}
+public:
+	inline static float Length(const JVector2& v) {
+		auto len = DirectX::XMVector2Length(GetSIMD(v));
+		return DirectX::XMVectorGetX(len);
+	}
+	inline static JVector2 Abs(const JVector2& v) {
+		return JVector2(std::abs(v.x), std::abs(v.y));
+	}
+	inline static float LengthSqrd(const JVector2& v) {
+		auto len = DirectX::XMVector2LengthSq(GetSIMD(v));
+		return DirectX::XMVectorGetX(len);
+	}
+	inline static JVector2 Normalize(const JVector2& v) {
+		auto sim = DirectX::XMVector2Normalize(GetSIMD(v));
+		return ConvertJVector2(sim);
+	}
+	inline static float Dot(const JVector2& v1, const JVector2& v2) {
+		auto sim = DirectX::XMVector2Dot(GetSIMD(v1), GetSIMD(v2));
+		return DirectX::XMVectorGetX(sim);
+	}
+	inline static JVector2 Cross(const JVector2& v1, const JVector2& v2) {
+		auto sim = DirectX::XMVector2Cross(GetSIMD(v1), GetSIMD(v2));
+		return ConvertJVector2(sim);
+	}
+	inline static bool Equals(const JVector2& v1, const JVector2& v2, float error_range = ERROR_RANGE)
+	{
+		JVector2 delta_v = v1 - v2;
+		delta_v = Abs(delta_v);
+		if (delta_v.x < error_range && delta_v.y < error_range)
+			return true;
+		return false;
+	}
+private:
+	inline static DirectX::XMVECTOR GetSIMD(const JVector2& v)
+	{
+		DirectX::XMFLOAT2 value(v.x, v.y);
+		return DirectX::XMLoadFloat2(&value);
+	}
+	inline static JVector2 ConvertJVector2(DirectX::XMVECTOR sim_vec) {
+		DirectX::XMFLOAT2 value;
+		DirectX::XMStoreFloat2(&value, sim_vec);
+		return JVector2(value.x, value.y);
+	}
+	inline static void ConvertJVector2(DirectX::XMVECTOR sim_vec, JVector2& in_v) {
+		DirectX::XMFLOAT2 value;
+		DirectX::XMStoreFloat2(&value, sim_vec);
+		in_v.x = value.x; in_v.y = value.y;
+	}
+
 };
 class JVector4
 {
@@ -192,5 +285,5 @@ private:
 
 
 
-
+JVector2 operator* (float k, const JVector2& v);
 JVector3 operator* (float k, const JVector3& v);

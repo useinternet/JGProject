@@ -9,11 +9,13 @@ public:
 		const JVector2& pos = { 0.0f,0.0f },
 		float angle = 0.0f, 
 		const JVector2 & scale = { 1.0f,1.0f });
+protected:
+
 public:
-	void SetPosition(const JVector2& pos);
-	void SetPosition(float x, float y);
-	void OffsetPosition(const JVector2& offset);
-	void OffsetPosition(float x, float y);
+	virtual void SetPosition(const JVector2& pos);
+	virtual void SetPosition(float x, float y);
+	virtual void OffsetPosition(const JVector2& offset);
+	virtual void OffsetPosition(float x, float y);
 
 
 
@@ -52,14 +54,14 @@ public:
 	JGUIRect GetLocalRect() const;
 private:
 	void SendDirty(int n);
-private:
+
+protected:
 	JVector2    m_LocalPosition;
 	float       m_LocalAngle;
 	JVector2    m_LocalPivot;
 	JVector2    m_Scale;
 	JVector2    m_Size;
 	mutable JVector2 m_Pivot;
-
 	mutable JVector2 m_Position;
 	mutable float    m_Angle = 0.0f;
 
@@ -70,4 +72,18 @@ private:
 		AngleDirty = 1,
 		PivotDirty = 2
 	};
+};
+
+class JGUIWinRectTransform : public JGUIRectTransform
+{
+
+public:
+	virtual void SetPosition(const JVector2& pos);
+	virtual void SetPosition(float x, float y);
+	virtual void OffsetPosition(const JVector2& offset);
+	virtual void OffsetPosition(float x, float y);
+private:
+	void SendPosToWin();
+
+
 };

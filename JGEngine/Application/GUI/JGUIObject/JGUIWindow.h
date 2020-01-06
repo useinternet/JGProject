@@ -91,6 +91,9 @@ public:
 	JGUIPanel* GetPanel() const {
 		return m_Panel;
 	}
+	JGUIScreen* GetScreen() const {
+		return m_Screen;
+	}
 	void SetPriority(EJGUI_WindowPriority p);
 	EJGUI_WindowPriority GetPriority() const
 	{

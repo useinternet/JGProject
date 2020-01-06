@@ -28,15 +28,14 @@ void JGUIWindow::JGUIStart()
 {
 	for (auto& com : m_WindowComponents)
 	{
+		if (com->IsExecuteStartFunc()) continue;
 		com->JGUIStart();
 	}
 	for (auto& window : m_ChildWindows)
 	{
+		if (window->IsExecuteStartFunc()) continue;
 		window->JGUIStart();
 	}
-
-
-
 	JGUIObject::JGUIStart();
 }
 
@@ -66,7 +65,7 @@ void JGUIWindow::JGUIDestroy()
 	}
 	// 렌더아이템 매니저 해제
 	RenderEngine::UnRegisterRIManager(m_ID);
-
+	m_GUIModule = nullptr;
 	// 스크린 삭제 요청
 	if (m_Screen)
 	{
@@ -77,12 +76,19 @@ void JGUIWindow::JGUIDestroy()
 void JGUIWindow::JGUITick(const JGUITickEvent& e)
 {
 	JGUIObject::JGUITick(e);
+
+
+
 	for (auto& com : m_WindowComponents)
 	{
+		if (!com->IsExecuteStartFunc()) com->JGUIStart();
+		if (!com->IsActive()) continue;
 		com->JGUITick(e);
 	}
 	for (auto& window : m_ChildWindows)
 	{
+		if (!window->IsExecuteStartFunc()) window->JGUIStart();
+		if (!window->IsActive()) continue;
 		window->JGUITick(e);
 	}
 	auto device = RE::RenderEngine::GetDevice();
@@ -90,6 +96,7 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 	{
 		device->SubmitToRender(10, [&](RE::CommandList* cmdList)
 		{
+			if (m_GUIModule == nullptr) return;
 			m_GUIModule->Execute(cmdList);
 		});
 	}
@@ -328,7 +335,7 @@ void JGUIWindow::Init(const std::string& name, bool is_new_window)
 {
 	SetName(name);
 	RE::RenderEngine::RegisterRIManager(GetID());
-	m_RectTransform = CreateJGUIComponent<JGUIRectTransform>("JGUIRectTransform");
+	m_RectTransform = CreateJGUIComponent<JGUIWinRectTransform>("JGUIRectTransform");
 	GetTransform()->Flush();
 	auto transform = GetTransform();
 	auto window_size = transform->GetSize();
