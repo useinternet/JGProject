@@ -41,6 +41,7 @@ namespace RE
 		enum EShaderParameter
 		{
 			Vertex_InstanceID,
+			Vertex_VertexID
 
 		};
 

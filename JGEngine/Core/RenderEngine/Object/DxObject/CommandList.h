@@ -171,7 +171,7 @@ namespace RE
 		void ResourceTemporaryStorage(const Resource& resource);
 	private:
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_D3D_CommandList;
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3D_Allocator;
+		Microsoft::WRL::ComPtr<ID3D12CommandAllocator>    m_D3D_Allocator;
 		D3D12_COMMAND_LIST_TYPE m_Type;
 	private:
 		std::shared_ptr<ResourceDataMap> m_ResourceDataMap;

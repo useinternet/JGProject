@@ -116,6 +116,11 @@ bool JGUIRectTransform::IsDirty() const
 	return false;
 }
 
+void JGUIRectTransform::SendDirty()
+{
+	SendDirty(UpdateDirty);
+}
+
 void JGUIRectTransform::Flush()
 {
 	for (auto& i : m_IsDirty)
@@ -316,6 +321,7 @@ JGUIRect JGUIRectTransform::GetLocalRect() const
 void JGUIRectTransform::SendDirty(int n)
 {
 	m_IsDirty[n] = true;
+	m_IsDirty[UpdateDirty] = true;
 	auto p = GetParent();
 	if (p)
 	{
@@ -364,7 +370,26 @@ void JGUIWinRectTransform::OffsetPosition(float x, float y)
 	JGUIRectTransform::OffsetPosition(x,y);
 	SendPosToWin();
 }
-
+void JGUIWinRectTransform::SetSize(const JVector2& size)
+{
+	JGUIRectTransform::SetSize(size);
+	SendSizeToWin();
+}
+void JGUIWinRectTransform::SetSize(float x, float y)
+{
+	JGUIRectTransform::SetSize(x,y);
+	SendSizeToWin();
+}
+void JGUIWinRectTransform::OffsetSize(const JVector2& offset)
+{
+	JGUIRectTransform::SetSize(offset);
+	SendSizeToWin();
+}
+void JGUIWinRectTransform::OffsetSize(float x, float y)
+{
+	JGUIRectTransform::SetSize(x,y);
+	SendSizeToWin();
+}
 void JGUIWinRectTransform::SendPosToWin()
 {
 	if (GetOwnerWindow()->GetParent() == nullptr)
@@ -372,5 +397,16 @@ void JGUIWinRectTransform::SendPosToWin()
 		uint32_t x = std::max<uint32_t>(0, (uint32_t)m_LocalPosition.x);
 		uint32_t y = std::max<uint32_t>(0, (uint32_t)m_LocalPosition.y);
 		GetOwnerWindow()->GetScreen()->GetJWin()->SetPosition(x, y);
+	}
+}
+void JGUIWinRectTransform::SendSizeToWin()
+{
+	if (GetOwnerWindow()->GetParent() == nullptr)
+	{
+		uint32_t x = std::max<uint32_t>(0, (uint32_t)m_Size.x);
+		uint32_t y = std::max<uint32_t>(0, (uint32_t)m_Size.y);
+
+
+		GetOwnerWindow()->GetScreen()->GetJWin()->SetClientSize(x, y);
 	}
 }

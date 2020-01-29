@@ -152,6 +152,12 @@ void JGUIComponent::JGUIMouseHover()
 
 }
 
+void JGUIComponent::JGUIOnFocus()
+{
+
+
+}
+
 void JGUIComponent::SetParent(JGUIComponent* parent)
 {
 	if (parent && parent->m_IsChildLock) return;

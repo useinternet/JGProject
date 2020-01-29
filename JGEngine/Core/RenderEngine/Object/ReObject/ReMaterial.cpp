@@ -35,21 +35,17 @@ namespace RE
 		if (m_TextureIndexMap.find(name) != m_TextureIndexMap.end())
 			return false;
 
-		Texture t;
-		t = TextureManager::GetTexture(asset_texture_path);
-		if (!t.IsVaild())
-			return false;
-
-
 		uint32_t index = (uint32_t)m_BindedTextures.size();
-		m_BindedTextures.push_back(t);
+		m_BindedTextures.push_back(Texture());
+		TextureManager::RequestLoadAndGetTexture(asset_texture_path, &m_BindedTextures[index]);
 		m_TextureIndexMap[name] = index;
 
 
 		//
 		for (auto& controller_pair : m_MatControllerPool)
 		{
-			controller_pair.second->m_BindedTextures.push_back(t);
+			controller_pair.second->m_BindedTextures.push_back(Texture());
+			TextureManager::RequestLoadAndGetTexture(asset_texture_path, &controller_pair.second->m_BindedTextures[index]);
 		}
 
 
@@ -74,12 +70,9 @@ namespace RE
 	}
 	bool ReMaterial::SetTexture(uint32_t index, const std::string& asset_texture_path)
 	{
-		auto t = TextureManager::GetTexture(asset_texture_path);
-		if (!t.IsVaild())
-			return false;
 		if (index >= m_BindedTextures.size())
 			return false;
-		m_BindedTextures[index] = t;
+		TextureManager::RequestLoadAndGetTexture(asset_texture_path, &m_BindedTextures[index]);
 		return true;
 	}
 	bool ReMaterial::SetTexture(const std::string& name, const std::string& asset_texture_path)
@@ -389,12 +382,7 @@ namespace RE
 		uint32_t index = m_MatOwner->GetBindedTextureIndex(name);
 		if (index == -1)
 			return;
-		auto t = TextureManager::GetTexture(asset_texture_path);
-		m_BindedTextures[index] = t;
-		//if (t.IsVaild())
-		//{
-		//	
-		//}
+		TextureManager::RequestLoadAndGetTexture(asset_texture_path, &m_BindedTextures[index]);
 	}
 	void     ReMaterialController::SetTexture(const std::string& name, const Texture& t)
 	{

@@ -28,6 +28,7 @@ protected:
 	virtual void JGUIMouseBtUp(const JGUIKeyUpEvent& e);
 	virtual void JGUIMouseLeave();
 	virtual void JGUIMouseHover();
+	virtual void JGUIOnFocus();
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) {}

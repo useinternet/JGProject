@@ -33,6 +33,7 @@ namespace RE
 {
 	mutex g_ScreenMutex;
 	mutex g_RIMutex;
+	mutex g_WorkingMutex;
 	RenderEngine* g_RenderEngine = nullptr;
 
 	DxScreen* RenderEngine::CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format)
@@ -71,7 +72,11 @@ namespace RE
 	{
 		lock_guard<mutex> lock(g_RIMutex);
 		if (g_RenderEngine->m_RIManager.find(id) == g_RenderEngine->m_RIManager.end())
+		{
+			ENGINE_LOG_INFO("Null");
 			return nullptr;
+		}
+			
 
 		switch (usage)
 		{
@@ -139,6 +144,19 @@ namespace RE
 	ReMaterial* RenderEngine::FindMaterial(const std::string& name)
 	{
 		return ReMaterialManager::GetMaterial(name);
+	}
+
+	bool g_test = false;
+	void RenderEngine::RequestWorkToProcessed(const std::function<void()>& func)
+	{
+		lock_guard<mutex> lock(g_WorkingMutex);
+		if(g_test == false) g_RenderEngine->m_WorkQueue.push(func);
+		
+	}
+
+	void RenderEngine::RequestTextureLoad(const std::string& t_path)
+	{
+		TextureManager::RequestLoadAndGetTexture(t_path);
 	}
 	RenderDevice* RenderEngine::GetDevice()
 	{
@@ -248,16 +266,42 @@ namespace RE
 			//
 			}
 		
+			ReMaterial default_txtMat(RE_GUI_TextMaterial, ERenderItemUsage::GUI);
+			{
+				default_txtMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
+				default_txtMat.AddTexture("Image");
+
+				default_txtMat.SetCode(R"(
+    Output output;
+    float4 img = Image.Sample( AnisotropicSampler, input.TexC);
+    output.Screen = input.Color * img * Color;
+    return output;
+)");
+				default_txtMat.SetDepthStencilState(depth_desc);
+				default_txtMat.SetBlendState(blend_desc);
+				default_txtMat.Compile();
+			}
+			ReMaterialManager::RegisterMaterial(default_txtMat.GetName(), default_txtMat);
 			ReMaterialManager::RegisterMaterial(default_Mat.GetName(), default_Mat);
 			ReMaterialManager::RegisterMaterial(default_tMat.GetName(), default_tMat);
 		}
 	}
-
 	void RenderEngine::Update()
 	{
-		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
+		g_WorkingMutex.lock();
+		g_test = true;
+		while (!m_WorkQueue.empty())
+		{
+			auto& f = m_WorkQueue.front();
+			f();
+			m_WorkQueue.pop();
+		}
+		g_WorkingMutex.unlock();
+		g_test = false;
+
 
 		m_RenderDevice->Update();
+		m_TextureManager->Update();
 	}
 	void RenderEngine::OnEvent(Event& e)
 	{

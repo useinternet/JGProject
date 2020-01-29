@@ -6,7 +6,7 @@
 #include "JGUIRectTransform.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 using namespace std;
-#define Default_Bt_Size 25
+#define Default_Bt_Size 20
 
 
 void JGUITitleBar::Awake()
@@ -20,10 +20,72 @@ void JGUITitleBar::Awake()
 	m_MinBt->SetParent(m_Panel);
 	m_CloseBt->SetParent(m_Panel);
 
+	SettingElement();
 
 
-	GetTransform()->SetSize(800, 50);
-	m_Panel->GetTransform()->SetSize(800, Default_Bt_Size);
+}
+
+void JGUITitleBar::Resize(const JGUIResizeEvent& e)
+{
+	SettingElement();
+
+}
+
+void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
+{
+
+	if (!m_IsGrap)
+	{
+		m_IsGrap = true;
+		auto mouse_pos = JGUI::GetCursorPos();
+		auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
+
+		m_Delta.x = (int)window_pos.x - mouse_pos.x;
+		m_Delta.y = (int)window_pos.y - mouse_pos.y;
+		JGUIExtraEvent e;
+		e.Bind(JGUI_EXTRAEVENT_REPEAT, this, [&](JGUIExtraEvent& e) {
+			if (m_IsGrap)
+			{
+				auto mouse_pos = JGUI::GetCursorPos();
+				mouse_pos.x += m_Delta.x;
+				mouse_pos.y += m_Delta.y;
+				JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
+				GetOwnerWindow()->GetTransform()->SetPosition(pos);
+			}
+
+
+			if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
+			{
+				if (m_IsGrap)
+				{
+					m_IsGrap = false;
+					e.flag = JGUI_EXTRAEVENT_EXIT;
+				}
+			}
+		});
+		JGUI::RegisterExtraEvent(e);
+	}
+
+
+}
+
+void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
+{
+	if(m_IsGrap) m_IsGrap = false;
+}
+
+void JGUITitleBar::Tick(const JGUITickEvent& e)
+{
+
+}
+
+void JGUITitleBar::SettingElement()
+{
+	auto size = GetOwnerWindow()->GetTransform()->GetSize();
+
+
+	GetTransform()->SetSize(size.x, 40);
+	m_Panel->GetTransform()->SetSize(size.x, Default_Bt_Size);
 	m_Panel->SetColor(JColor(0.3f, 0.3f, 0.3f, 1.0f));
 	m_CloseBt->GetTransform()->SetSize(Default_Bt_Size, Default_Bt_Size);
 	m_MaxBt->GetTransform()->SetSize(Default_Bt_Size, Default_Bt_Size);
@@ -42,45 +104,4 @@ void JGUITitleBar::Awake()
 	m_MaxBt->GetTransform()->SetPosition(pos, 0);
 	pos -= (btsize + gap);
 	m_MinBt->GetTransform()->SetPosition(pos, 0);
-}
-
-void JGUITitleBar::Resize(const JGUIResizeEvent& e)
-{
-
-
-}
-
-void JGUITitleBar::Tick(const JGUITickEvent& e)
-{
-	if (m_IsGrap)
-	{
-		auto mouse_pos = JGUI::GetCursorPos();
-		mouse_pos.x += m_Delta.x;
-		mouse_pos.y += m_Delta.y;
-		JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
-		GetOwnerWindow()->GetTransform()->SetPosition(pos);
-	}
-	if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
-	{
-		if (m_IsGrap) m_IsGrap = false;
-	}
-}
-
-void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
-{
-	if (!m_IsGrap)
-	{
-		m_IsGrap = true;
-		auto mouse_pos = JGUI::GetCursorPos();
-		auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
-
-		m_Delta.x = (int)window_pos.x - mouse_pos.x;
-		m_Delta.y = (int)window_pos.y - mouse_pos.y;
-	}
-
-}
-
-void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
-{
-	if(m_IsGrap) m_IsGrap = false;
 }

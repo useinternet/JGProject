@@ -1,58 +1,92 @@
-[info] [816] [Physics] : PhysicsEngine Init Compelete...
-[info] [816] [Sound] : SoundEngine Init Compelete
-[info] [816] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [816] [Rendering] : RenderEngine Init Complete...
-[info] [816] [Rendering] : Create Screen : 1924474998304
-[info] [816] [Rendering] : Create Default : 1924475003824
-[info] [816] [Rendering] : Create DefaultDepth : 1924474997200
-[info] [816] [Rendering] : Create bricks.dds : 1924475000512
-[info] [816] [Rendering] : Create bricks2.dds : 1924475002720
-[info] [816] [Rendering] : Create bricks2_nmap.dds : 1924474990576
-[info] [816] [Rendering] : Create bricks3.dds : 1924474994992
-[info] [816] [Rendering] : Create bricks_nmap.dds : 1924690925184
-[info] [816] [Rendering] : Create checkboard.dds : 1924690928496
-[info] [816] [Rendering] : Create default_nmap.dds : 1924690931808
-[info] [816] [Rendering] : Create desertcube1024.dds : 1924690926288
-[info] [816] [Rendering] : Create grass.dds : 1924690932912
-[info] [816] [Rendering] : Create grasscube1024.dds : 1924690909728
-[info] [816] [Rendering] : Create head_diff.dds : 1924690920768
-[info] [816] [Rendering] : Create head_norm.dds : 1924690939536
-[info] [816] [Rendering] : Create ice.dds : 1924690938432
-[info] [816] [Rendering] : Create jacket_diff.dds : 1924690918560
-[info] [816] [Rendering] : Create jacket_norm.dds : 1924690940640
-[info] [816] [Rendering] : Create pants_diff.dds : 1924690863856
-[info] [816] [Rendering] : Create pants_norm.dds : 1924690862752
-[info] [816] [Rendering] : Create snowcube1024.dds : 1924690858336
-[info] [816] [Rendering] : Create stone.dds : 1924690883728
-[info] [816] [Rendering] : Create sunsetcube1024.dds : 1924690872688
-[info] [816] [Rendering] : Create tile.dds : 1924690871584
-[info] [816] [Rendering] : Create tile_nmap.dds : 1924690873792
-[info] [816] [Rendering] : Create tree0.bmp : 1924690874896
-[info] [816] [Rendering] : Create tree01S.dds : 1924691293744
-[info] [816] [Rendering] : Create tree02S.dds : 1924691266144
-[info] [816] [Rendering] : Create tree1.bmp : 1924691268352
-[info] [816] [Rendering] : Create tree2.bmp : 1924691288224
-[info] [816] [Rendering] : Create tree35S.dds : 1924691282704
-[info] [816] [Rendering] : Create treearray.dds : 1924691272768
-[info] [816] [Rendering] : Create treeArray2.dds : 1924691284912
-[info] [816] [Rendering] : Create upBody_diff.dds : 1924691295952
-[info] [816] [Rendering] : Create upbody_norm.dds : 1924691269456
-[info] [816] [Rendering] : Create water1.dds : 1924691286016
-[info] [816] [Rendering] : Create white1x1.dds : 1924691277184
-[info] [816] [Rendering] : Create WireFence.dds : 1924691271664
-[info] [816] [Rendering] : Create WoodCrate01.dds : 1924691274976
-[info] [816] [Rendering] : Create WoodCrate02.dds : 1924691281600
-[info] [816] [Rendering] : Create Close.png : 1924690876000
-[info] [816] [Rendering] : Create Maximize.png : 1924690864960
-[info] [816] [Rendering] : Create Minimize.png : 1924690877104
-[info] [816] [Rendering] : Create sssss.png : 1924690878208
-[trace] [816] [Game] : Begin
-[trace] [816] [Game] : Tick
-[trace] [816] [Game] : End
-[info] [816] [Rendering] : Create Texture : 1924690856128
-[info] [816] [Engine] : JGUIHover
-[info] [816] [Engine] : JGUILeave
-[info] [816] [Engine] : JGUIHover
-[info] [816] [Engine] : JGUIPanel : JGUIKeyUpEvent : LeftMouseButton [549 , 158] 
-[info] [816] [Engine] : JGUILeave
-[info] [816] [Engine] : JGUIHover
+[info] [29452] [Physics] : PhysicsEngine Init Compelete...
+[info] [29452] [Sound] : SoundEngine Init Compelete
+[info] [29452] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [29452] [Rendering] : RenderEngine Init Complete...
+[info] [29452] [Rendering] : Create Screen : 2241963908304
+[info] [29452] [Rendering] : Create Default : 2241963963104
+[info] [29452] [Rendering] : Create DefaultDepth : 2241964015008
+[info] [29452] [Rendering] : 3 : 0 index's CmdList(2241908978992)  Create
+[info] [29452] [Rendering] : 3 : 0 index's CmdList(2241908975824)  Create
+[info] [29452] [Rendering] : Create bricks.dds : 2241964808496
+[info] [29452] [Rendering] : Create bricks2.dds : 2241965179904
+[info] [29452] [Rendering] : Create bricks2_nmap.dds : 2241965091872
+[info] [29452] [Rendering] : Create bricks3.dds : 2241965131808
+[info] [29452] [Rendering] : Create bricks_nmap.dds : 2241965138960
+[info] [29452] [Rendering] : Create checkboard.dds : 2241965151152
+[info] [29452] [Rendering] : Create default_nmap.dds : 2241965166768
+[info] [29452] [Rendering] : Create desertcube1024.dds : 2241965159040
+[info] [29452] [Rendering] : Create grass.dds : 2241965167872
+[info] [29452] [Rendering] : Create grasscube1024.dds : 2241965157936
+[info] [29452] [Rendering] : Create head_diff.dds : 2241965165664
+[info] [29452] [Rendering] : Create head_norm.dds : 2241965170080
+[info] [29452] [Rendering] : Create ice.dds : 2241965171184
+[info] [29452] [Rendering] : Create jacket_diff.dds : 2241965339440
+[info] [29452] [Rendering] : Create jacket_norm.dds : 2241965317360
+[info] [29452] [Rendering] : Create pants_diff.dds : 2241965330608
+[info] [29452] [Rendering] : Create pants_norm.dds : 2241965314048
+[info] [29452] [Rendering] : Create snowcube1024.dds : 2241965340544
+[info] [29452] [Rendering] : Create stone.dds : 2241965331712
+[info] [29452] [Rendering] : Create sunsetcube1024.dds : 2241965343856
+[info] [29452] [Rendering] : Create tile.dds : 2241965319568
+[info] [29452] [Rendering] : Create tile_nmap.dds : 2241965320672
+[info] [29452] [Rendering] : Create tree0.bmp : 2241965321776
+[info] [29452] [Rendering] : Create tree01S.dds : 2241965328400
+[info] [29452] [Rendering] : Create tree02S.dds : 2241965630064
+[info] [29452] [Rendering] : Create tree1.bmp : 2241965613504
+[info] [29452] [Rendering] : Create tree2.bmp : 2241965631168
+[info] [29452] [Rendering] : Create tree35S.dds : 2241965611296
+[info] [29452] [Rendering] : Create treearray.dds : 2241965623440
+[info] [29452] [Rendering] : Create treeArray2.dds : 2241965610192
+[info] [29452] [Rendering] : Create upBody_diff.dds : 2241965615712
+[info] [29452] [Rendering] : Create upbody_norm.dds : 2241965619024
+[info] [29452] [Rendering] : Create water1.dds : 2241965600256
+[info] [29452] [Rendering] : Create white1x1.dds : 2241965627856
+[info] [29452] [Rendering] : Create WireFence.dds : 2241965602464
+[info] [29452] [Rendering] : Create WoodCrate01.dds : 2241965603568
+[info] [29452] [Rendering] : Create WoodCrate02.dds : 2241965606880
+[info] [29452] [Rendering] : 3 : 0 index's CmdList(2241908976176)  Create
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908976176) -> CmdList
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908975824) -> CmdList
+[info] [29452] [Rendering] : Create Close.png : 2241965604672
+[info] [29452] [Rendering] : Create Maximize.png : 2241965616816
+[info] [29452] [Rendering] : Create Minimize.png : 2241965621232
+[info] [29452] [Rendering] : Create sssss.png : 2241965626752
+[info] [29452] [Rendering] : 3 : 0 index's CmdList(2241908976880)  Create
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908976880) -> CmdList
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908975824) -> CmdList
+[trace] [29452] [Game] : Begin
+[trace] [29452] [Game] : Tick
+[trace] [29452] [Game] : End
+[info] [29452] [Rendering] : Create Screen : 2241965612400
+[info] [29452] [Rendering] : Create Texture : 2241965624544
+[info] [29452] [Engine] : JGUITick
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908976880) -> CmdList
+[info] [25272] [Rendering] : 0 : 0 index's CmdList(2241967292928)  Create
+[error] [25272] [Rendering] : Texture is Invalid While Bind SRV
+[info] [29452] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 2241965333920
+[info] [25272] [Rendering] : 0 : 0 index's CmdList(2241967293984)  Create
+[info] [29452] [Rendering] : 0 : 0 index's CmdList(2241967294336)  Create
+[info] [29452] [Rendering] : 0 : 0 index's CmdList(2241908980400)  Create
+[info] [29452] [Rendering] : 3 : 0 index's PendingCmdList(2241908976176) -> CmdList
+[info] [29452] [Engine] : JGUITick
+[info] [27004] [Rendering] : 0 : 1 index's CmdList(2240011009216)  Create
+[error] [27004] [Rendering] : Texture is Invalid While Bind SRV
+[info] [27004] [Rendering] : 0 : 1 index's CmdList(2240011009568)  Create
+[info] [29452] [Rendering] : 0 : 1 index's CmdList(2240011007104)  Create
+[info] [29452] [Rendering] : 0 : 1 index's CmdList(2240011003936)  Create
+[info] [29452] [Engine] : JGUITick
+[info] [25272] [Rendering] : 0 : 2 index's CmdList(2240011007456)  Create
+[error] [25272] [Rendering] : Texture is Invalid While Bind SRV
+[info] [25272] [Rendering] : 0 : 2 index's CmdList(2240011005344)  Create
+[info] [29452] [Rendering] : 0 : 2 index's CmdList(2240011008512)  Create
+[info] [29452] [Rendering] : 0 : 2 index's CmdList(2240011004640)  Create
+[info] [29452] [Engine] : JGUITick
+[info] [27004] [Rendering] : 0 : 0 index's PendingCmdList(2241967294336) -> CmdList
+[info] [27004] [Rendering] : 0 : 0 index's PendingCmdList(2241967292928) -> CmdList
+[info] [29452] [Rendering] : 0 : 0 index's PendingCmdList(2241908980400) -> CmdList
+[info] [29452] [Rendering] : 0 : 0 index's PendingCmdList(2241967293984) -> CmdList
+[info] [29452] [Engine] : JGUITick
+[info] [25272] [Rendering] : 0 : 1 index's PendingCmdList(2240011007104) -> CmdList
+[info] [25272] [Rendering] : 0 : 1 index's PendingCmdList(2240011009216) -> CmdList
+[info] [29452] [Rendering] : 0 : 1 index's PendingCmdList(2240011003936) -> CmdList
+[info] [29452] [Rendering] : 0 : 1 index's PendingCmdList(2240011009568) -> CmdList

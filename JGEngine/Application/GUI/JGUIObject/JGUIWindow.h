@@ -30,6 +30,7 @@ private:
 
 	virtual void JGUIKeyDown(const JGUIKeyDownEvent& e);
 	virtual void JGUIKeyUp(const JGUIKeyUpEvent& e);
+	virtual void JGUIChar(const JGUICharEvent& e);
 	virtual void JGUIMouseBtDown(const JGUIKeyDownEvent& e);
 	virtual void JGUIMouseBtUp(const JGUIKeyUpEvent& e);
 	virtual void JGUIMouseMove(const JGUIMouseMoveEvent& e);
@@ -43,6 +44,7 @@ protected:
 
 	virtual void KeyDown(const JGUIKeyDownEvent& e) {}
 	virtual void KeyUp(const JGUIKeyUpEvent& e) {}
+	virtual void Char(const JGUICharEvent& e) {}
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) {}
 	virtual void MouseBtUp(const JGUIKeyUpEvent& e) {}
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) {}
@@ -61,10 +63,10 @@ public:
 		return m_RectTransform;
 	}
 	template<typename WindowType>
-	WindowType* CreateJGUIWindow(const std::string& name, bool is_new_load = false)
+	WindowType* CreateJGUIWindow(const std::string& name, EJGUI_WindowFlags flag = JGUI_WindowFlag_None)
 	{
-		auto win = JGUI::CreateJGUIWindow<WindowType>(name, is_new_load);
-		if (!is_new_load)
+		auto win = JGUI::CreateJGUIWindow<WindowType>(name, flag);
+		if (!flag)
 		{
 			win->SetParent(this);
 		}
@@ -99,27 +101,35 @@ public:
 	{
 		return m_Priority;
 	}
+	EJGUI_WindowFlags GetFlag() const
+	{
+		return m_Flag;
+	}
 private:
-	void Init(const std::string& name, bool is_new_window);
+	void Init(const std::string& name, EJGUI_WindowFlags flag);
 	void NewLoad();
 private:
+	//
 	JGUIScreen* m_Screen = nullptr;
 	JGUIWindow* m_ParentWindow = nullptr;
 	std::vector<JGUIComponent*>  m_WindowComponents;
 	std::vector<JGUIWindow*>     m_ChildWindows;
 	JGUIRectTransform*           m_RectTransform = nullptr;
-	JGUIPanel* m_Panel = nullptr;
+	JGUIPanel*                   m_Panel = nullptr;
+
+
+
 
 	// RenderEngine 변수들
 	std::shared_ptr<RE::FixedGShaderModuleClone> m_GUIModule;
 	std::shared_ptr<RE::ReCamera>                m_ReCamera;
 	EJGUI_WindowPriority m_Priority = JGUI_WindowPriority_None;
+
+	
+	
+	EJGUI_WindowFlags m_Flag;
+	//
 	bool m_IsTracking = false;
 };
 
-/*
-1. 위치나 회전 값은 부모의 위치를 기준으로 한다.
-2. 
-
-*/
 

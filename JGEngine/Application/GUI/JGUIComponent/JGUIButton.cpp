@@ -126,7 +126,6 @@ void JGUICloseButton::OnClick()
 		auto window = GetOwnerWindow();
 		JGUI::DestroyObject(window);
 	}
-	ENGINE_LOG_INFO("Close On Click");
 }
 
 void JGUIMaximizeButton::Start()
@@ -139,7 +138,11 @@ void JGUIMaximizeButton::Start()
 
 void JGUIMaximizeButton::OnClick()
 {
-	ENGINE_LOG_INFO("Maximize On Click");
+	if (GetOwnerWindow())
+	{
+		::ShowWindow(GetOwnerWindow()->GetRootWindowHandle(), SW_MAXIMIZE);
+		GetOwnerWindow()->GetTransform()->SetPosition(0, 0);
+	}
 }
 
 void JGUIMinimizeButton::Start()
@@ -152,5 +155,8 @@ void JGUIMinimizeButton::Start()
 
 void JGUIMinimizeButton::OnClick()
 {
-	ENGINE_LOG_INFO("Minimize On Click");
+	if (GetOwnerWindow())
+	{
+		::ShowWindow(GetOwnerWindow()->GetRootWindowHandle(), SW_MINIMIZE);
+	}
 }

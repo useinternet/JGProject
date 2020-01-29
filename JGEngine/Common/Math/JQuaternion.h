@@ -1,8 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
-
-class JVector3;
-class JMatrix;
+ class JVector3;
+ class JMatrix;
 class JQuaternion
 {
 	friend JMatrix;
@@ -44,9 +43,9 @@ public:
 		return !DirectX::XMQuaternionEqual(GetSIMD(), q.GetSIMD());
 	}
 
-	inline static JQuaternion ToQuaternion(const JVector3& euler);
-	inline static JQuaternion ToQuaternion(float pitch, float yaw, float roll);
-	inline static JVector3 ToEuler(const JQuaternion& q);
+	static JQuaternion ToQuaternion(const JVector3& euler);
+	static JQuaternion ToQuaternion(float pitch, float yaw, float roll);
+	static JVector3 ToEuler(const JQuaternion& q);
 
 	inline static JQuaternion Identity()
 	{

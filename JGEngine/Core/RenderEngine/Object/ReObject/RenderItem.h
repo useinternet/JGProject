@@ -73,9 +73,7 @@ namespace RE
 		std::shared_ptr<SBDStructuredBuffer>              m_StructuredBuffer;
 		std::vector<std::shared_ptr<InstanceRenderItem>>  m_InstanceItems;
 		std::unordered_map<InstanceRenderItem*, uint32_t> m_InstanceMapByPointer;
-
 		bool m_IsActive = true;
-
 		uint64_t m_Priority = 0;
 	};
 

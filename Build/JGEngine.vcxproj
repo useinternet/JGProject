@@ -175,11 +175,13 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUI.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.h" />
@@ -195,10 +197,12 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUI.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.cpp" />

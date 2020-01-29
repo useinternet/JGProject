@@ -20,15 +20,19 @@ namespace GFW
 		{
 			pCreateGameObjectFunc func;
 			func = (pCreateGameObjectFunc)p.GetProcAddress("CreateTestObject");
+			pDeleteGameObjectFunc dfunc;
+			dfunc = (pDeleteGameObjectFunc)p.GetProcAddress("DeleteTestObject");
 			if (func)
 			{
 				auto obj = func();
-				std::shared_ptr<GameObject> ptr(obj);
+				//std::unique_ptr<GameObject> ptr(obj);
 
 
-				ptr->Begin();
-				ptr->Tick();
-				ptr->End();
+				obj->Begin();
+				obj->Tick();
+				obj->End();
+				if (dfunc)
+					dfunc(obj);
 			}
 		}
 		else

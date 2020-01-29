@@ -63,8 +63,6 @@ void JGUIWindow::JGUIDestroy()
 	{
 		JGUI::DestroyObject(window);
 	}
-	// 렌더아이템 매니저 해제
-	RenderEngine::UnRegisterRIManager(m_ID);
 	m_GUIModule = nullptr;
 	// 스크린 삭제 요청
 	if (m_Screen)
@@ -76,9 +74,6 @@ void JGUIWindow::JGUIDestroy()
 void JGUIWindow::JGUITick(const JGUITickEvent& e)
 {
 	JGUIObject::JGUITick(e);
-
-
-
 	for (auto& com : m_WindowComponents)
 	{
 		if (!com->IsExecuteStartFunc()) com->JGUIStart();
@@ -104,7 +99,11 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 
 void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 {
-	//ENGINE_LOG_INFO(e.ToString());
+	ENGINE_LOG_INFO(e.ToString());
+	m_Panel->GetTransform()->SetSize(e.width, e.height);
+	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
+	GetTransform()->SetSize(e.width, e.height);
+
 	m_ReCamera = make_shared<RE::ReCamera>();
 	m_ReCamera->SetLens(45, e.width, e.height);
 	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
@@ -114,10 +113,13 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 
 	if (m_Screen)
 	{
+		m_Screen->Resize((uint32_t)e.width, (uint32_t)e.height);
 		m_Screen->BindGUIModuleClone(m_GUIModule.get());
 	}
+	
+
+
 	Resize(e);
-	// resize 구현
 }
 void JGUIWindow::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
 {
@@ -144,6 +146,12 @@ void JGUIWindow::JGUIKeyUp(const JGUIKeyUpEvent& e)
 {
 	//ENGINE_LOG_INFO(e.ToString());
 	KeyUp(e);
+}
+
+void JGUIWindow::JGUIChar(const JGUICharEvent& e)
+{
+
+	Char(e);
 }
 
 void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
@@ -225,6 +233,7 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 	{
 		if (m_Screen)
 		{
+	
 			JGUI::RequestDestroyScreen(m_Screen->GetHandle());
 			m_Screen = nullptr;
 		}
@@ -331,32 +340,32 @@ void JGUIWindow::SetPriority(EJGUI_WindowPriority p)
 {
 	m_Priority = p;
 }
-void JGUIWindow::Init(const std::string& name, bool is_new_window)
+void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 {
+	m_Flag = flag;
 	SetName(name);
 	RE::RenderEngine::RegisterRIManager(GetID());
+
 	m_RectTransform = CreateJGUIComponent<JGUIWinRectTransform>("JGUIRectTransform");
 	GetTransform()->Flush();
 	auto transform = GetTransform();
 	auto window_size = transform->GetSize();
 
-	transform->SetSize(std::max<float>(800.0f, window_size.x), std::max<float>(600.0f, window_size.y));
-
-
-
 	m_Panel = JGUI::CreateJGUIComponent<JGUIPanel>(GetName() + "Panel", this);
 	m_WindowComponents.push_back(m_Panel);
 	m_Panel->GetTransform()->SetSize(GetTransform()->GetSize());
-	m_Panel->SetColor({ 0.2f,0.2f,0.4f, 0.0f });
-	if (is_new_window)
+	m_Panel->SetColor({ 0.2f,0.2f,0.4f, 1.0f });
+
+
+	if (m_Flag && JGUI_WindowFlag_NewLoad)
 	{
 		SetParent(nullptr);
 	}
-	//m_Flags = flag;
 }
 
 void JGUIWindow::NewLoad()
 {
+
 	if (m_Screen)
 	{
 		JGUI::RequestDestroyScreen(m_Screen->GetHandle());
@@ -364,15 +373,12 @@ void JGUIWindow::NewLoad()
 	}
 	auto size = m_RectTransform->GetSize();
 	auto pos = m_RectTransform->GetPosition();
-	m_Screen = JGUI::ReqeustRegisterJGUIScreen(this, GetName() + "_GUIScreen",
-		(uint32_t)size.x, (uint32_t)size.y, (uint32_t)pos.x, (uint32_t)pos.y);
-
+	m_Screen = JGUI::ReqeustRegisterJGUIScreen(this);
 	m_ReCamera = make_shared<RE::ReCamera>();
 	m_ReCamera->SetLens(45, size.x, size.y);
 	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
 	m_ReCamera->ConvertOrthographic();
 	m_GUIModule = RE::RenderEngine::GetGUIModule()->Clone(m_ReCamera.get(), GetID());
-
 
 	if (m_Screen)
 	{

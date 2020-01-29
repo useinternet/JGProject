@@ -22,7 +22,7 @@ namespace RE
 	}
 	void TextureManager::InitLoad(const std::string& path)
 	{
-		auto directQueue = GetRenderDevice()->GetDirectCmdQueue();
+		auto directQueue = GetRenderDevice()->GetCopyCmdQueue();
 		auto cmdList = directQueue->GetCommandList();
 		auto directory = fs::directory_iterator(path);
 
@@ -52,23 +52,66 @@ namespace RE
 		directQueue->Flush();
 	}
 
+	void TextureManager::Update()
+	{
+		int value_index = GetRenderDevice()->GetValueIndex();
+
+		for (auto iter = m_TextureEstimates.begin(); iter != m_TextureEstimates.end();)
+		{
+			auto& estimate = iter->second; 
+			if (value_index == estimate->value_index)
+			{
+				for (auto& request_t : estimate->requested_t)
+				{
+					*request_t = *estimate->origin_t;
+				}
+				iter = m_TextureEstimates.erase(iter);
+			}
+			else ++iter;
+		}
+	}
+
+	void TextureManager::RequestLoadAndGetTexture(const std::string& name, Texture* t)
+	{
+		auto& tEstimates = g_TextureManager->m_TextureEstimates;
+		auto& cahce = g_TextureManager->m_TextureCahce;
+		auto& sumitted_texture_queue = g_TextureManager->m_SumittedTextureQueue;
+		auto  renderDevice = g_TextureManager->GetRenderDevice();
+		if (cahce.find(name) != cahce.end())
+		{
+			if (t == nullptr) return;
+
+			if(cahce[name]->IsVaild()) *t = *cahce[name];
+			else tEstimates[name]->requested_t.push_back(t);
+
+			return;
+		}
+		///
+		cahce[name] = make_shared<Texture>(name);
+		tEstimates[name] = make_shared<TextureEstimate>();
+		if(t) tEstimates[name]->requested_t.push_back(t);
+		tEstimates[name]->origin_t = cahce[name].get();
+
+		///
+		sumitted_texture_queue.push(tEstimates[name].get());
+		//
+		renderDevice->SubmitToCopy(0, [&](CommandList* cmdList) {
+
+			auto rd = g_TextureManager->GetRenderDevice();
+			auto estimate = sumitted_texture_queue.front();
+			sumitted_texture_queue.pop();
+
+			if (!g_TextureManager->TextureLoad(*(estimate->origin_t), estimate->origin_t->GetName(), cmdList))
+			{
+				RE_LOG_ERROR("Failed Load Texture : {0}", estimate->origin_t->GetName());
+			}
+			estimate->value_index = rd->GetValueIndex();
+		});
+	}
+
 	const Texture& TextureManager::GetTexture(const std::string& name)
 	{
-		static Texture* pT = nullptr;
 		auto& cahce = g_TextureManager->m_TextureCahce;
-		auto renderDevice = g_TextureManager->GetRenderDevice();
-		if (cahce.find(name) == cahce.end())
-		{
-			cahce[name] = make_shared<Texture>(name);
-			pT = cahce[name].get();
-			renderDevice->SubmitToCopy(0, [&](CommandList* cmdList) {
-	
-				if (!g_TextureManager->TextureLoad(*pT, pT->GetName(), cmdList))
-				{
-					RE_LOG_ERROR("Failed Load Texture : {0}", pT->GetName());
-				}
-			});
-		}
 		return *cahce[name];
 	}
 	bool TextureManager::TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList)

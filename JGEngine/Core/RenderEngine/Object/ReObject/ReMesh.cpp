@@ -151,10 +151,4 @@ namespace RE
 
 		mesh->Create(v, i);
 	}
-
-
-
-	
-
-
 }

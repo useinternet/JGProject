@@ -36,13 +36,11 @@ bool JGUIScreen::Init(uint32_t width, uint32_t height, uint32_t startX, uint32_t
 	{
 		win_desc.parent_hWnd = JGUI::GetMainWindow()->GetRootWindowHandle();
 	}
-	
 
 
 	m_Window = JWindowManager::Create(win_desc, startX, startY);
 	if (m_Window == nullptr)
 		return false;
-
 	m_DxScreen = RE::RenderEngine::CreateDxScreen(m_Window->GetHandle(), width, height);
 	if (m_DxScreen == nullptr)
 		return false;
@@ -51,6 +49,8 @@ bool JGUIScreen::Init(uint32_t width, uint32_t height, uint32_t startX, uint32_t
 
 void JGUIScreen::Resize(uint32_t width, uint32_t height)
 {
+	m_DxScreen->ReSize(width, height);
+	m_Window->SetClientSize(width, height);
 }
 
 HWND JGUIScreen::GetHandle() const

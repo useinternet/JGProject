@@ -63,12 +63,16 @@ namespace RE
 		std::vector<CommandList*> compute_List;
 		std::vector<CommandList*> copy_List;
 
+
+		
+		
+	
 		auto render_task = make_task([&] {
 			render_List = RenderUpdate();
 		});
 		auto compute_task = make_task([&] {
 			compute_List = ComputeUpdate();
-		});
+		});	
 		auto copy_task = make_task([&]{
 			copy_List = CopyUpdate();
 		});
@@ -78,25 +82,24 @@ namespace RE
 		update_tasks.run(compute_task);
 		update_tasks.run(copy_task);
 		update_tasks.wait();
-
+		
 
 		// FrameResource
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 
 
-		// Direct
 		m_DirectCommandQueue->ExcuteCommandList(render_List);
+
+
+		// Direct
 		for (auto& screen : m_DxScreenPool)
 		{
 			screen.second->Present();
 		}
 		frameresource.DirectFenceValue = m_DirectCommandQueue->Signal();
-		m_DirectCommandQueue->Flush();
-
 		// Compute
 		m_ComputeCommandQueue->ExcuteCommandList(compute_List);
 		frameresource.ComputeFenceValue = m_ComputeCommandQueue->Signal();
-
 		//Copy
 		m_CopyCommandQueue->ExcuteCommandList(copy_List);
 		frameresource.CopyFenceValue = m_CopyCommandQueue->Signal();
@@ -288,14 +291,10 @@ namespace RE
 
 
 		std::vector<CommandList*> cmdList_vector;
-
-
-
 		for (auto& frame_submissons : m_RenderFrameSubmissionPool)
 		{
 			uint32_t submisson_count = (uint32_t)frame_submissons.second.size();
 			std::vector<CommandList*> temp_cmdList_array(submisson_count);
-
 			parallel_for((uint32_t)0, submisson_count, [&](uint32_t index)
 			{
 				temp_cmdList_array[index] = m_DirectCommandQueue->GetCommandList();
@@ -311,7 +310,6 @@ namespace RE
 		for (auto& screen : m_DxScreenPool)
 		{
 			auto present_commandList = m_DirectCommandQueue->GetCommandList();
-
 			screen.second->Update(present_commandList);
 			cmdList_vector.push_back(present_commandList);
 		}
@@ -333,7 +331,6 @@ namespace RE
 
 			uint32_t submisson_count = (uint32_t)frame_submissons.second.size();
 			std::vector<CommandList*> temp_cmdList_array(submisson_count);
-
 			parallel_for((uint32_t)0, submisson_count, [&](uint32_t index)
 			{
 				temp_cmdList_array[index] = m_ComputeCommandQueue->GetCommandList();
@@ -361,10 +358,9 @@ namespace RE
 
 			uint32_t submisson_count = (uint32_t)frame_submissons.second.size();
 			std::vector<CommandList*> temp_cmdList_array(submisson_count);
-
 			parallel_for((uint32_t)0, submisson_count, [&](uint32_t index)
 			{
-				temp_cmdList_array[index] = m_CopyCommandQueue->GetCommandList();
+				temp_cmdList_array[index] = m_ComputeCommandQueue->GetCommandList();
 				frame_submissons.second[index](temp_cmdList_array[index]);
 			});
 

@@ -29,10 +29,10 @@ public:
 	void OffsetScale(float x, float y);
 
 
-	void SetSize(const JVector2& size);
-	void SetSize(float x, float y);
-	void OffsetSize(const JVector2& offset);
-	void OffsetSize(float x, float y);
+	virtual void SetSize(const JVector2& size);
+	virtual void SetSize(float x, float y);
+	virtual void OffsetSize(const JVector2& offset);
+	virtual void OffsetSize(float x, float y);
 
 	void SetPivot(const JVector2& pivot);
 	void SetPivot(float x, float y);
@@ -40,6 +40,7 @@ public:
 	void OffsetPivot(float x, float y);
 
 	bool IsDirty() const;
+	void SendDirty();
 	void Flush();
 public:
 	const JVector2& GetLocalPosition() const;
@@ -65,12 +66,14 @@ protected:
 	mutable JVector2 m_Position;
 	mutable float    m_Angle = 0.0f;
 
-	mutable bool m_IsDirty[3];
+	mutable bool m_IsDirty[4];
 	enum
 	{
 		PosDirty = 0,
 		AngleDirty = 1,
-		PivotDirty = 2
+		PivotDirty = 2,
+		UpdateDirty = 3,
+		DirtyCount = 4
 	};
 };
 
@@ -78,12 +81,18 @@ class JGUIWinRectTransform : public JGUIRectTransform
 {
 
 public:
-	virtual void SetPosition(const JVector2& pos);
-	virtual void SetPosition(float x, float y);
-	virtual void OffsetPosition(const JVector2& offset);
-	virtual void OffsetPosition(float x, float y);
+	virtual void SetPosition(const JVector2& pos) override;
+	virtual void SetPosition(float x, float y) override;
+	virtual void OffsetPosition(const JVector2& offset) override;
+	virtual void OffsetPosition(float x, float y) override;
+
+
+
+	virtual void SetSize(const JVector2& size) override;
+	virtual void SetSize(float x, float y) override;
+	virtual void OffsetSize(const JVector2& offset) override;
+	virtual void OffsetSize(float x, float y) override;
 private:
 	void SendPosToWin();
-
-
+	void SendSizeToWin();
 };

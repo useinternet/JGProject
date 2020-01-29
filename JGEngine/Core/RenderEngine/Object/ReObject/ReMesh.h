@@ -34,14 +34,26 @@ namespace RE
 		EReMeshType GetType() const {
 			return m_MeshType;
 		}
-		const VertexData& GetVertexData() const {
+		const VertexData& GetVertexData_c() const {
 			return m_MeshVertexDatas;
 		}
-		const IndexData& GetIndexData() const {
+		const IndexData& GetIndexData_c() const {
+			return m_MeshIndexDatas;
+		}
+		VertexData& GetVertexData() {
+			return m_MeshVertexDatas;
+		}
+		IndexData& GetIndexData() {
 			return m_MeshIndexDatas;
 		}
 		void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) {
 			m_Topology = topology;
+		}
+		void Reset()
+		{
+			m_MeshIndexDatas.clear();
+			m_MeshVertexDatas.clear();
+			m_VertexTypeSize = 0;
 		}
 		void Draw(CommandList* cmdList, uint32_t instanceCount = 1);
 	public:
@@ -56,6 +68,97 @@ namespace RE
 			memcpy_s(&m_MeshVertexDatas[0], btSize, v.data(), btSize);
 			m_MeshIndexDatas = std::move(i);
 		}
+		template<typename T>
+		void Add(const std::vector<T>& v, const IndexData& i)
+		{
+			if(m_MeshVertexDatas.empty()) m_VertexTypeSize = (uint32_t)sizeof(T);
+			size_t btSize = v.size() * sizeof(T);
+			std::vector<byte> btData(btSize);
+			memcpy_s(&btData[0], btSize, v.data(), btSize);
+			
+
+			m_MeshVertexDatas.insert(m_MeshVertexDatas.end(), btData.begin(), btData.end());
+			m_MeshIndexDatas.insert(m_MeshIndexDatas.end(), i.begin(), i.end());
+		}
+		template<typename T>
+		void Insert(const std::vector<T>& v, uint32_t vpos, const IndexData& i,  uint32_t ipos)
+		{
+			size_t btSize = v.size() * sizeof(T);
+			std::vector<byte> btData(btSize);
+			memcpy_s(&btData[0], btSize, v.data(), btSize);
+
+
+			size_t btpos = sizeof(T) * vpos;
+			
+			auto viter = m_MeshVertexDatas.begin() + btpos;
+			auto iiter = m_MeshIndexDatas.begin() + ipos;
+			m_MeshVertexDatas.insert(viter, btData.begin(), btData.end());
+			m_MeshIndexDatas.insert(iiter, i.begin(), i.end());
+		}
+		template<typename T>
+		T GetV(uint32_t idx)
+		{
+			T result;
+			size_t btSize = sizeof(T);
+			size_t btpos = sizeof(T) * idx;
+			assert(btSize + btpos <= m_MeshVertexDatas.size());
+			memcpy_s(&result, btSize, &m_MeshVertexDatas[btpos] , btSize);
+			return result;
+		}
+		uint32_t GetI(uint32_t idx)
+		{
+			return m_MeshIndexDatas[idx];
+		}
+		template<typename T>
+		void ModifyV(const T& data, uint32_t idx)
+		{
+			size_t btSize = sizeof(T);
+			size_t btpos = sizeof(T) * idx;
+			if (btSize + btpos > m_MeshVertexDatas.size()) return;
+			memcpy_s(&m_MeshVertexDatas[btpos], btSize, &data, btSize);
+		}
+		void ModifyI(uint32_t i, uint32_t idx)
+		{
+			m_MeshIndexDatas[idx] = i;
+		}
+		template<typename T>
+		void Modify(const std::vector<T>& v, uint32_t vpos)
+		{
+			size_t btSize = v.size() * sizeof(T);
+			size_t btpos  = sizeof(T) * vpos;
+			if (btSize + btpos > m_MeshVertexDatas.size()) return;
+			memcpy_s(&m_MeshVertexDatas[btpos], btSize, v.data(), btSize);
+		}
+		template<typename T>
+		void Modify(const IndexData& i, uint32_t ipos)
+		{
+			if (i.size() + ipos > m_MeshIndexDatas.size()) return;
+			size_t iSize = i.size();
+			memcpy_s(&m_MeshIndexDatas[ipos], iSize, i.data(), iSize);
+		}
+		template<typename T>
+		void Modify(const std::vector<T>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)
+		{
+			Modify(v, vpos);
+			Modify(i, ipos);
+		}
+		void Remove(uint32_t vpos_start, uint32_t vpos_end, uint32_t ipos_start, uint32_t ipos_end)
+		{
+			auto typesize = m_VertexTypeSize;
+			auto vstart = m_MeshVertexDatas.begin() + (vpos_start * typesize);
+			auto vend = m_MeshVertexDatas.begin() + (vpos_end * typesize);
+
+
+			m_MeshVertexDatas.erase(vstart, vend);
+
+
+			auto istart = m_MeshIndexDatas.begin() + ipos_start;
+			auto iend = m_MeshIndexDatas.begin() + ipos_end;
+
+			m_MeshIndexDatas.erase(istart, iend);
+
+		}
+
 
 		EReMeshType  m_MeshType;
 		VertexData   m_MeshVertexDatas;
@@ -100,10 +203,52 @@ namespace RE
 		{
 			Set(v, i);
 		}
+		void Add(const std::vector<JGUIVertex>& v, const IndexData& i)
+		{
+			ReMesh::Add(v, i);
+		}
+		void Insert(const std::vector<JGUIVertex>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)
+		{
+			ReMesh::Insert(v, vpos, i, ipos);
+		}
+		JGUIVertex GetV(uint32_t idx)
+		{
+			return ReMesh::GetV<JGUIVertex>(idx);
+		}
+		uint32_t  GetI(uint32_t idx)
+		{
+			return ReMesh::GetI(idx);
+		}
+		void ModifyV(const JGUIVertex& v, uint32_t idx)
+		{
+			ReMesh::ModifyV(v, idx);
+		}
+		void ModifyI(uint32_t i, uint32_t idx)
+		{
+			ReMesh::ModifyI(i, idx);
+		}
+		void Modify(const std::vector<JGUIVertex>& v, uint32_t vpos)
+		{
+			ReMesh::Modify(v, vpos);
+		}
+		void Modify(const IndexData& i, uint32_t ipos)
+		{
+			ReMesh::Modify(i, ipos);
+		}
+		void Modify(const std::vector<JGUIVertex>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)
+		{
+			ReMesh::Modify(v, vpos, i, ipos);
+		}
+		void Remove(uint32_t vstart, uint32_t vend, uint32_t istart, uint32_t iend)
+		{
+			ReMesh::Remove(vstart, vend, istart, iend);
+		}
 	public:
 		static std::shared_ptr<ReGuiMesh> CreateFillRect(float width, float height);
 		static std::shared_ptr<ReGuiMesh> CreateEmptyRect(float width, float height);
 	};
+
+
 
 
 }

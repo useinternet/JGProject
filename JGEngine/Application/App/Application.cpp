@@ -19,6 +19,7 @@ Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
 {
+	//m_GUI.reset();
 	//GlobalLinkData::Destory();
 }
 bool Application::Init()
@@ -46,14 +47,13 @@ bool Application::Init()
 		GlobalLinkData::Init(stream, true);
 	}
 
-	m_InputEngine = make_shared<IE::InputEngine>(stream);
+	m_InputEngine   = make_shared<IE::InputEngine>(stream);
 	m_PhysicsEngine = make_shared<PE::PhysicsEngine>(stream);
-	m_SoundEngine = make_shared<SE::SoundEngine>(stream);
-	m_RenderEngine = make_shared<RE::RenderEngine>(stream);
-	m_Game = make_shared<GFW::Game>(stream);
+	m_SoundEngine   = make_shared<SE::SoundEngine>(stream);
+	m_RenderEngine  = make_shared<RE::RenderEngine>(stream);
+	m_Game          = make_shared<GFW::Game>(stream);
 
 	m_RenderEngine->Init();
-
 	m_IsInit = true;
 	return true;
 }
@@ -66,7 +66,7 @@ void Application::Load()
 	m_Game->Load();
 	m_GUI = make_shared<JGUI>(m_InputEngine.get());
 }
-typedef	JGUIObject*(*TestFunc)(const std::string);
+
 void Application::Run()
 {
 	MSG msg = { 0 };
@@ -85,18 +85,6 @@ void Application::Run()
 				GlobalLinkData::_EnginePerformance->Reset();
 		
 			ENGINE_PERFORMANCE_TIMER_START("Application");
-
-	
-
-			if (m_InputEngine->GetKeyUp(KeyCode::A))
-			{
-				static int count = 0;
-				JGUI::CreateJGUIWindow<JGUIWindow>("Test" + to_string(count++), true);
-			}
-
-			auto input_task = make_task([&] {
-				m_InputEngine->Update();
-			});
 			auto physics_task = make_task([&] {
 				m_PhysicsEngine->Update();
 			});
@@ -109,21 +97,20 @@ void Application::Run()
 			auto gui_task = make_task([&] {
 				m_GUI->Update();
 			});
-			auto render_task = make_task([&] {
-				m_RenderEngine->Update();
-			});
+
 			////엔진 업데이트
 
 			structured_task_group _tasks;
-			structured_task_group render_tasks;
-			_tasks.run_and_wait(input_task);
+
+			m_InputEngine->Update();
+
 			_tasks.run(physics_task);
 			_tasks.run(sound_task);
 			_tasks.run(game_task);
 			_tasks.run(gui_task);
 			_tasks.wait();
-			
-			_tasks.run_and_wait(render_task);
+
+			m_RenderEngine->Update();
 			m_EngineTimer->Tick();
 			if (m_InputEngine->GetKeyUp(KeyCode::Esc))
 			{
