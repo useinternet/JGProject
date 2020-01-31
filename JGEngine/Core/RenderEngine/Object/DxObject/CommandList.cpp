@@ -15,7 +15,7 @@ namespace RE
 		m_Type(type)
 	{
 		m_CurrRootSignatureState = RootSignatureState_None;
-		m_D3D_Allocator = CreateD3DCommandAllocator(GetD3DDevice(), type);
+		m_D3D_Allocator = CreateD3DCommandAllocator(GetD3DDevice(),type);
 		m_D3D_CommandList = CreateD3DCommandList(GetD3DDevice(), m_D3D_Allocator, type);
 
 
@@ -59,12 +59,9 @@ namespace RE
 	{
 		m_TemporaryResourceObject.erase(resource.GetD3DResource());
 	}
-
-
 	void CommandList::Reset()
 	{
 		HRESULT hResult = S_OK;
-		//RE_LOG_INFO("{0} Allocator Reset", (uint64_t)m_D3D_Allocator.Get());
 		hResult = m_D3D_Allocator->Reset();
 		assert(SUCCEEDED(hResult) && "Failed ID3D12ComamndAllocator::Reset()");
 		hResult = m_D3D_CommandList->Reset(m_D3D_Allocator.Get(), nullptr);
@@ -91,13 +88,10 @@ namespace RE
 	{
 		FlushResourceBarrier();
 
+		m_D3D_CommandList->Close();
 
 		uint32_t numPendingResourceBarrier = m_ResourceDataMap->FlushPendingResourceBarrier(pendingCmdList);
 		m_ResourceDataMap->CommitResourceState();
-
-		m_D3D_CommandList->Close();
-
-
 
 
 		return numPendingResourceBarrier > 0;

@@ -176,7 +176,6 @@
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EventListener.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\NoneCopy.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Color.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugInfo.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Timer.h" />
@@ -223,9 +222,6 @@
     <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
     <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

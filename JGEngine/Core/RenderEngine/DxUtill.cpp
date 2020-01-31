@@ -8,6 +8,7 @@
 #include "d3dx12.h"
 using namespace std;
 
+
 namespace RE
 {
 	ComPtr<IDXGIFactory4> CreateDXGIFactory()
@@ -108,7 +109,6 @@ namespace RE
 		swapChainDesc.Height = height;
 		swapChainDesc.Format = format;
 		swapChainDesc.Stereo = false;
-		
 		swapChainDesc.SampleDesc = { 1, 0 };
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = bufferCount;
@@ -170,7 +170,7 @@ namespace RE
 		HRESULT hr = S_OK;
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		hr = device->CreateCommandAllocator(type, IID_PPV_ARGS(&commandAllocator));
-		
+
 
 		assert(SUCCEEDED(hr) && "failed Create ID3D12CommandAllocator");
 		return commandAllocator;
@@ -223,7 +223,6 @@ namespace RE
 
 	bool CheckTearingSupport(ComPtr<IDXGIFactory4> factory)
 	{
-		return false;
 		bool allowTearing = false;
 
 		ComPtr<IDXGIFactory5> factory5;

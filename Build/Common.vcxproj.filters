@@ -10,9 +10,6 @@
     <Filter Include="DataType\Abstract">
       <UniqueIdentifier>{44B9F293-B0CF-F029-F946-7C4B659CC1B1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DataType\Debug">
-      <UniqueIdentifier>{570D5923-43DB-4C29-2C6F-BD4F18DC288E}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Event">
       <UniqueIdentifier>{E70B220D-5320-4ABE-1CA2-ED1D887546EF}</UniqueIdentifier>
     </Filter>
@@ -51,9 +48,6 @@
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\DataType\Color.h">
       <Filter>DataType</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\DataType\Debug\RE_DebugInfo.h">
-      <Filter>DataType\Debug</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h">
       <Filter>DataType</Filter>

@@ -22,7 +22,7 @@ namespace RE
 	}
 	void TextureManager::InitLoad(const std::string& path)
 	{
-		auto directQueue = GetRenderDevice()->GetCopyCmdQueue();
+		auto directQueue = GetRenderDevice()->GetDirectCmdQueue();
 		auto cmdList = directQueue->GetCommandList();
 		auto directory = fs::directory_iterator(path);
 
@@ -51,14 +51,13 @@ namespace RE
 		directQueue->ExcuteCommandList({ cmdList });
 		directQueue->Flush();
 	}
-
-	void TextureManager::Update()
+	void  TextureManager::Update()
 	{
 		int value_index = GetRenderDevice()->GetValueIndex();
 
 		for (auto iter = m_TextureEstimates.begin(); iter != m_TextureEstimates.end();)
 		{
-			auto& estimate = iter->second; 
+			auto& estimate = iter->second;
 			if (value_index == estimate->value_index)
 			{
 				for (auto& request_t : estimate->requested_t)
@@ -70,7 +69,6 @@ namespace RE
 			else ++iter;
 		}
 	}
-
 	void TextureManager::RequestLoadAndGetTexture(const std::string& name, Texture* t)
 	{
 		auto& tEstimates = g_TextureManager->m_TextureEstimates;
@@ -81,7 +79,7 @@ namespace RE
 		{
 			if (t == nullptr) return;
 
-			if(cahce[name]->IsVaild()) *t = *cahce[name];
+			if (cahce[name]->IsVaild())* t = *cahce[name];
 			else tEstimates[name]->requested_t.push_back(t);
 
 			return;
@@ -89,7 +87,11 @@ namespace RE
 		///
 		cahce[name] = make_shared<Texture>(name);
 		tEstimates[name] = make_shared<TextureEstimate>();
-		if(t) tEstimates[name]->requested_t.push_back(t);
+		if (t)
+		{
+			t->SetName(name);
+			tEstimates[name]->requested_t.push_back(t);
+		}
 		tEstimates[name]->origin_t = cahce[name].get();
 
 		///
@@ -107,8 +109,20 @@ namespace RE
 			}
 			estimate->value_index = rd->GetValueIndex();
 		});
-	}
 
+	}
+	void TextureManager::RequestCancelLoadTexture(Texture* t)
+	{
+		if (g_TextureManager->m_TextureEstimates.find(t->GetName()) == g_TextureManager->m_TextureEstimates.end())
+			return;
+
+
+		auto& estimate = g_TextureManager->m_TextureEstimates[t->GetName()];
+		auto iter = find(estimate->requested_t.begin(), estimate->requested_t.end(), t);
+
+		if (iter == estimate->requested_t.end()) return;
+		estimate->requested_t.erase(iter);
+	}
 	const Texture& TextureManager::GetTexture(const std::string& name)
 	{
 		auto& cahce = g_TextureManager->m_TextureCahce;

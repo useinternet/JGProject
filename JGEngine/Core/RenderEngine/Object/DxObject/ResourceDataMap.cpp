@@ -146,56 +146,56 @@ namespace RE
 		ms_GlobalStateMutex.unlock();
 		ms_IsStateLocked = false;
 	}
-	void ResourceDataMap::GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo)
-	{
-		
-		std::lock_guard<std::mutex> lock(ms_GlobalRegisterMutex);
-		for (auto& data_pair : ms_GlobalResourceDatas)
-		{
-			auto& resource_data = data_pair.second;
+	//void ResourceDataMap::GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo)
+	//{
+	//	
+	//	std::lock_guard<std::mutex> lock(ms_GlobalRegisterMutex);
+	//	for (auto& data_pair : ms_GlobalResourceDatas)
+	//	{
+	//		auto& resource_data = data_pair.second;
 
-			Debug::ResourceInfo info;
-			info.name = resource_data.ResourceName;
-			info.ref_count = resource_data.RefCount;
+	//		Debug::ResourceInfo info;
+	//		info.name = resource_data.ResourceName;
+	//		info.ref_count = resource_data.RefCount;
 
-			//
-			for (auto& srv : resource_data.SrvDescriptorHandles)
-			{
-				info.srv_addresses.push_back(srv.second.CPU().ptr);
-			}
-			for (auto& uav : resource_data.UavDescriptorHandles)
-			{
-				info.uav_addresses.push_back(uav.second.CPU().ptr);
-			}
-			for (auto& rtv : resource_data.RtvDescriptorHandles)
-			{
-				info.rtv_addresses.push_back(rtv.second.CPU().ptr);
-			}
-			for (auto& dsv : resource_data.DsvDescriptorHandles)
-			{
-				info.dsv_addresses.push_back(dsv.second.CPU().ptr);
-			}
+	//		//
+	//		for (auto& srv : resource_data.SrvDescriptorHandles)
+	//		{
+	//			info.srv_addresses.push_back(srv.second.CPU().ptr);
+	//		}
+	//		for (auto& uav : resource_data.UavDescriptorHandles)
+	//		{
+	//			info.uav_addresses.push_back(uav.second.CPU().ptr);
+	//		}
+	//		for (auto& rtv : resource_data.RtvDescriptorHandles)
+	//		{
+	//			info.rtv_addresses.push_back(rtv.second.CPU().ptr);
+	//		}
+	//		for (auto& dsv : resource_data.DsvDescriptorHandles)
+	//		{
+	//			info.dsv_addresses.push_back(dsv.second.CPU().ptr);
+	//		}
 
-			auto desc = data_pair.first->GetDesc();
-			//
-			info.dimension = Dx12ToString(desc.Dimension);
-			info.alignment = desc.Alignment;
-			info.width = desc.Width;
-			info.height = desc.Height;
-			info.array_size = desc.DepthOrArraySize;
-			info.miplevels = desc.MipLevels;
-			info.format = Dx12ToString(desc.Format);
-			info.sampleCount = desc.SampleDesc.Count;
-			info.sampleQuality = desc.SampleDesc.Quality;
-			info.texture_layout = Dx12ToString(desc.Layout);
-			info.flags = Dx12ToString(desc.Flags);
+	//		auto desc = data_pair.first->GetDesc();
+	//		//
+	//		info.dimension = Dx12ToString(desc.Dimension);
+	//		info.alignment = desc.Alignment;
+	//		info.width = desc.Width;
+	//		info.height = desc.Height;
+	//		info.array_size = desc.DepthOrArraySize;
+	//		info.miplevels = desc.MipLevels;
+	//		info.format = Dx12ToString(desc.Format);
+	//		info.sampleCount = desc.SampleDesc.Count;
+	//		info.sampleQuality = desc.SampleDesc.Quality;
+	//		info.texture_layout = Dx12ToString(desc.Layout);
+	//		info.flags = Dx12ToString(desc.Flags);
 
-			out_resourceInfo.push_back(info);
-		}
+	//		out_resourceInfo.push_back(info);
+	//	}
 
 
 
-	}
+	//}
 	void ResourceDataMap::RegisterResource(ID3D12Resource* resource, const std::string& name, D3D12_RESOURCE_STATES state)
 	{
 		

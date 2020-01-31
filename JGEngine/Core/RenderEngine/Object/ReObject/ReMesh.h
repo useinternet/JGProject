@@ -34,16 +34,10 @@ namespace RE
 		EReMeshType GetType() const {
 			return m_MeshType;
 		}
-		const VertexData& GetVertexData_c() const {
+		const VertexData& GetVertexData() const {
 			return m_MeshVertexDatas;
 		}
-		const IndexData& GetIndexData_c() const {
-			return m_MeshIndexDatas;
-		}
-		VertexData& GetVertexData() {
-			return m_MeshVertexDatas;
-		}
-		IndexData& GetIndexData() {
+		const IndexData& GetIndexData() const {
 			return m_MeshIndexDatas;
 		}
 		void SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY topology) {
@@ -71,17 +65,17 @@ namespace RE
 		template<typename T>
 		void Add(const std::vector<T>& v, const IndexData& i)
 		{
-			if(m_MeshVertexDatas.empty()) m_VertexTypeSize = (uint32_t)sizeof(T);
+			if (m_MeshVertexDatas.empty()) m_VertexTypeSize = (uint32_t)sizeof(T);
 			size_t btSize = v.size() * sizeof(T);
 			std::vector<byte> btData(btSize);
 			memcpy_s(&btData[0], btSize, v.data(), btSize);
-			
+
 
 			m_MeshVertexDatas.insert(m_MeshVertexDatas.end(), btData.begin(), btData.end());
 			m_MeshIndexDatas.insert(m_MeshIndexDatas.end(), i.begin(), i.end());
 		}
 		template<typename T>
-		void Insert(const std::vector<T>& v, uint32_t vpos, const IndexData& i,  uint32_t ipos)
+		void Insert(const std::vector<T>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)
 		{
 			size_t btSize = v.size() * sizeof(T);
 			std::vector<byte> btData(btSize);
@@ -89,7 +83,7 @@ namespace RE
 
 
 			size_t btpos = sizeof(T) * vpos;
-			
+
 			auto viter = m_MeshVertexDatas.begin() + btpos;
 			auto iiter = m_MeshIndexDatas.begin() + ipos;
 			m_MeshVertexDatas.insert(viter, btData.begin(), btData.end());
@@ -102,7 +96,7 @@ namespace RE
 			size_t btSize = sizeof(T);
 			size_t btpos = sizeof(T) * idx;
 			assert(btSize + btpos <= m_MeshVertexDatas.size());
-			memcpy_s(&result, btSize, &m_MeshVertexDatas[btpos] , btSize);
+			memcpy_s(&result, btSize, &m_MeshVertexDatas[btpos], btSize);
 			return result;
 		}
 		uint32_t GetI(uint32_t idx)
@@ -125,7 +119,7 @@ namespace RE
 		void Modify(const std::vector<T>& v, uint32_t vpos)
 		{
 			size_t btSize = v.size() * sizeof(T);
-			size_t btpos  = sizeof(T) * vpos;
+			size_t btpos = sizeof(T) * vpos;
 			if (btSize + btpos > m_MeshVertexDatas.size()) return;
 			memcpy_s(&m_MeshVertexDatas[btpos], btSize, v.data(), btSize);
 		}
@@ -160,10 +154,11 @@ namespace RE
 		}
 
 
+    protected:
 		EReMeshType  m_MeshType;
 		VertexData   m_MeshVertexDatas;
 		IndexData    m_MeshIndexDatas;
-		uint32_t     m_VertexTypeSize;
+		uint32_t     m_VertexTypeSize = 0;
 		D3D_PRIMITIVE_TOPOLOGY m_Topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	public:
 		static ReMesh Merge(const ReMesh& m1, const ReMesh& m2);
@@ -247,8 +242,6 @@ namespace RE
 		static std::shared_ptr<ReGuiMesh> CreateFillRect(float width, float height);
 		static std::shared_ptr<ReGuiMesh> CreateEmptyRect(float width, float height);
 	};
-
-
 
 
 }

@@ -241,7 +241,7 @@ namespace RE
 			}
 		}
 	}
-	void DescriptorHeap::GetDebugInfo(Debug::DescriptorHeapInfo& out_debug_info)
+	/*void DescriptorHeap::GetDebugInfo(Debug::DescriptorHeapInfo& out_debug_info)
 	{
 		lock_guard<mutex> lock(m_Mutex);
 
@@ -262,7 +262,7 @@ namespace RE
 		}
 		out_debug_info.max_numDescriptor = m_NumDescriptor;
 		out_debug_info.num_allocated_descriptor = allocatedDescriptorCount;
-	}
+	}*/
 	void DescriptorHeap::FreeBlock(const DescriptorBlock& block)
 	{
 		auto curr_pos = m_DescriptorBlocks.find(block.startPos);

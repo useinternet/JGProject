@@ -54,16 +54,16 @@ namespace RE
 	{
 		return m_Type;
 	}
-	void DescriptorAllocator::GetDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
-	{
-		lock_guard<mutex> lock(m_Mutex);
-		uint32_t count = 0;
-		for (auto& heap : m_DescriptorHeaps)
-		{
-			Debug::DescriptorHeapInfo heap_info;
-			heap_info.num = count++;
-			heap->GetDebugInfo(heap_info);
-			out_debug_info.descriptor_heapInfo.push_back(heap_info);
-		}
-	}
+	//void DescriptorAllocator::GetDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info)
+	//{
+	//	lock_guard<mutex> lock(m_Mutex);
+	//	uint32_t count = 0;
+	//	for (auto& heap : m_DescriptorHeaps)
+	//	{
+	//		Debug::DescriptorHeapInfo heap_info;
+	//		heap_info.num = count++;
+	//		heap->GetDebugInfo(heap_info);
+	//		out_debug_info.descriptor_heapInfo.push_back(heap_info);
+	//	}
+	//}
 }

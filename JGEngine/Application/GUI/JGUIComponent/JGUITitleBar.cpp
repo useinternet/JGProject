@@ -20,9 +20,8 @@ void JGUITitleBar::Awake()
 	m_MinBt->SetParent(m_Panel);
 	m_CloseBt->SetParent(m_Panel);
 
+
 	SettingElement();
-
-
 }
 
 void JGUITitleBar::Resize(const JGUIResizeEvent& e)
@@ -33,7 +32,6 @@ void JGUITitleBar::Resize(const JGUIResizeEvent& e)
 
 void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 {
-
 	if (!m_IsGrap)
 	{
 		m_IsGrap = true;
@@ -66,7 +64,6 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 		JGUI::RegisterExtraEvent(e);
 	}
 
-
 }
 
 void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
@@ -74,10 +71,6 @@ void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
 	if(m_IsGrap) m_IsGrap = false;
 }
 
-void JGUITitleBar::Tick(const JGUITickEvent& e)
-{
-
-}
 
 void JGUITitleBar::SettingElement()
 {

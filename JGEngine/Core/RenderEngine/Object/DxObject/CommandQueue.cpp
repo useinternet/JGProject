@@ -34,10 +34,9 @@ namespace RE
 		uint64_t value = Signal();
 		WaitForFenceValue(value);
 	}
-	
+
 	void CommandQueue::ExcuteCommandList(const std::vector<CommandList*> cmdLists)
 	{
-	
 		ResourceDataMap::StateLock();
 		std::vector<ID3D12CommandList*> d3d_cmdLists;
 		std::vector<CommandList*> temp_pending_commandList;
@@ -50,7 +49,6 @@ namespace RE
 			
 			if (hasPendingBarriers)
 			{
-				//RE_LOG_INFO("{2} : {0} index's PendingCommandList({1}) hasPendingBarriers", value_index, (uint64_t)pendingCmdList, (int)m_Type);
 				d3d_cmdLists.push_back(pendingCmdList->GetD3DCommandList());
 			}
 			d3d_cmdLists.push_back(commandList->GetD3DCommandList());
@@ -59,36 +57,31 @@ namespace RE
 		}
 		for (auto& commandList : temp_pending_commandList)
 		{
-			// RE_LOG_INFO("{2} : {0} index's CommandList({1}) -> PendingCmdList", value_index, (uint64_t)commandList, (int)m_Type);
 			m_PendingCmdList[value_index].push(m_CmdListPool[commandList]);
 			m_CmdListPool.erase(commandList);
 		}
 
 		m_D3D_CmdQueue->ExecuteCommandLists((uint32_t)d3d_cmdLists.size(), d3d_cmdLists.data());
-
 		ResourceDataMap::StateUnLock();
 	}
+
 	CommandList* CommandQueue::GetCommandList()
 	{
 		std::lock_guard<mutex> lock(m_Mutex);
-
-	
 		uint32_t value_index = GetRenderDevice()->GetValueIndex();
 		CommandList* result = nullptr;
+
 		if (m_PendingCmdList[value_index].empty())
 		{
 			std::shared_ptr<CommandList> cmdList = make_shared<CommandList>(m_Type);
-			RE_LOG_INFO("{2} : {0} index's CmdList({1})  Create", value_index, (uint64_t)cmdList.get(), (int)m_Type);
 			result = cmdList.get();
 			m_CmdListPool[cmdList.get()] = move(cmdList);
 		}
-		else 
+		else
 		{
-
 			result = m_PendingCmdList[value_index].front().get();
-			RE_LOG_INFO("{2} : {0} index's PendingCmdList({1}) -> CmdList", value_index, (uint64_t)result, (int)m_Type);
 			result->Reset();
-			m_CmdListPool[result] = move(m_PendingCmdList[value_index].front());
+			m_CmdListPool[result] = m_PendingCmdList[value_index].front();
 
 			m_PendingCmdList[value_index].pop();
 		}

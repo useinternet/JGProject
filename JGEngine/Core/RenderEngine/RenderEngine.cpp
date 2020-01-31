@@ -33,7 +33,6 @@ namespace RE
 {
 	mutex g_ScreenMutex;
 	mutex g_RIMutex;
-	mutex g_WorkingMutex;
 	RenderEngine* g_RenderEngine = nullptr;
 
 	DxScreen* RenderEngine::CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format)
@@ -72,11 +71,7 @@ namespace RE
 	{
 		lock_guard<mutex> lock(g_RIMutex);
 		if (g_RenderEngine->m_RIManager.find(id) == g_RenderEngine->m_RIManager.end())
-		{
-			ENGINE_LOG_INFO("Null");
 			return nullptr;
-		}
-			
 
 		switch (usage)
 		{
@@ -145,24 +140,14 @@ namespace RE
 	{
 		return ReMaterialManager::GetMaterial(name);
 	}
-
-	bool g_test = false;
-	void RenderEngine::RequestWorkToProcessed(const std::function<void()>& func)
-	{
-		lock_guard<mutex> lock(g_WorkingMutex);
-		if(g_test == false) g_RenderEngine->m_WorkQueue.push(func);
-		
-	}
-
-	void RenderEngine::RequestTextureLoad(const std::string& t_path)
-	{
-		TextureManager::RequestLoadAndGetTexture(t_path);
-	}
 	RenderDevice* RenderEngine::GetDevice()
 	{
 		return g_RenderEngine->m_RenderDevice.get();
 	}
-
+	void RenderEngine::RequestTextureLoad(const std::string& path)
+	{
+		TextureManager::RequestLoadAndGetTexture(path);
+	}
 
 
 
@@ -191,7 +176,6 @@ namespace RE
 		m_MaterialManager     = make_shared<ReMaterialManager>();
 		RE_LOG_INFO("RenderEngine Init Complete...");
 		m_Config = config;
-		//m_MainScreen = m_RenderDevice->CreateDxScreen(hWnd, width, height);
 	}
 	void RenderEngine::Load()
 	{
@@ -265,7 +249,8 @@ namespace RE
 			default_tMat.Compile();
 			//
 			}
-		
+
+
 			ReMaterial default_txtMat(RE_GUI_TextMaterial, ERenderItemUsage::GUI);
 			{
 				default_txtMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
@@ -286,20 +271,11 @@ namespace RE
 			ReMaterialManager::RegisterMaterial(default_tMat.GetName(), default_tMat);
 		}
 	}
+
 	void RenderEngine::Update()
 	{
-		g_WorkingMutex.lock();
-		g_test = true;
-		while (!m_WorkQueue.empty())
-		{
-			auto& f = m_WorkQueue.front();
-			f();
-			m_WorkQueue.pop();
-		}
-		g_WorkingMutex.unlock();
-		g_test = false;
-
-
+		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
+	
 		m_RenderDevice->Update();
 		m_TextureManager->Update();
 	}

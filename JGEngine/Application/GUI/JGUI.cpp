@@ -1,14 +1,18 @@
 #include "pch.h"
 #include "JGUI.h"
 #include "JGUIObject/JGUIObject.h"
+#include "JGUIObject/JGUIWindow.h"
+
+
+#include "JGUIComponent/JGUICollider.h"
+#include "JGUIComponent/JGUIRectTransform.h"
 #include "JGUIFont/JGUIFontManager.h"
 
-#include "JGUIComponent/JGUIRectTransform.h"
-#include "JGUIComponent/JGUICollider.h"
+
 #include "JGUIScreen.h"
-#include "Object/DxObject/RenderDevice.h"
 #include "RenderEngine.h"
-#include "JGUIObject/JGUIWindow.h"
+#include "Object/DxObject/RenderDevice.h"
+
 #include "InputEngine.h"
 using namespace std;
 
@@ -23,18 +27,20 @@ JGUI::JGUI(IE::InputEngine* input)
 	JWindowManager::BindWindowProcFunc(std::bind(&JGUI::WindowProc, this,
 		placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
 	m_Input = input;
-	m_FontManager = make_shared<JGUIFontManager>();
-	
-	m_FontManager->FontLoad(m_DefaultFontName);
 	m_Plugin.Load("JGEngine.dll");
+
+	m_FontManager = make_shared<JGUIFontManager>();
+	if (!m_FontManager->FontLoad(m_DefaultFont))
+	{
+		ENGINE_LOG_ERROR("Failed Default Font Load");
+	}
+
+
 	m_MainWindow = ((JGUIMainWindowFunc)m_Plugin.GetProcAddress("LoadMainWindowForm"))("JGUI");
 	m_MainWindow->GetTransform()->SetSize(800, 600);
 	m_MainHWND = m_MainWindow->GetRootWindowHandle();
 }
-JGUI::~JGUI()
-{
 
-}
 
 
 
@@ -42,22 +48,26 @@ void        JGUI::DestroyObject(JGUIObject* obj)
 {
 	auto& objqueue = sm_GUI->m_ExpectedDestroyObject;
 	obj->JGUIDestroy();
-
 	if (obj->GetID() != -1)
 	{
 		sm_GUI->m_IDQueue.push(obj->GetID());
 	}
 	sm_GUI->m_MouseTrackMap.erase(obj);
+	sm_GUI->m_ExtraEventMap.erase(obj);
 	objqueue.push(obj);
+
 }
 
 JGUIScreen* JGUI::ReqeustRegisterJGUIScreen(JGUIWindow* window)
 {
-
+	
 	auto size = window->GetTransform()->GetSize();
 	auto pos = window->GetTransform()->GetPosition();
+
+
 	auto screen = make_shared<JGUIScreen>(window->GetName() + "_GUIScreen");
 	bool result = screen->Init((uint32_t)size.x, (uint32_t)size.y, (uint32_t)pos.x, (uint32_t)pos.y);
+
 	if (!result)
 		return nullptr;
 	HWND hWnd = screen->GetHandle();
@@ -94,7 +104,6 @@ void JGUI::ClearExpectedDestroyScreen()
 			RE::RenderEngine::GetDevice()->Flush();
 		}
 		screenPool.erase(hWnd);
-		
 	}
 }
 
@@ -151,7 +160,6 @@ void JGUI::RegisterMouseTrack(const JGUIMouseTrack& mt)
 		trcak_map[mt.win] = mt;
 	}
 }
-
 void JGUI::RegisterExtraEvent(const JGUIExtraEvent& e)
 {
 	auto& e_map = sm_GUI->m_ExtraEventMap;
@@ -164,33 +172,14 @@ void JGUI::RegisterExtraEvent(const JGUIExtraEvent& e)
 		e_map[e.win] = e;
 	}
 }
-
-void JGUI::TickLock()
-{
-	sm_GUI->m_IsTickLock = true;
-}
-
-void JGUI::TickUnLock()
-{
-	sm_GUI->m_IsTickLock = false;
-}
-
 JGUIFontManager* JGUI::GetJGUIFontManager()
 {
 	return sm_GUI->m_FontManager.get();
 }
-
-const std::string& JGUI::GetDefaultFontName()
+const std::string JGUI::GetDefaultFontName()
 {
-	return sm_GUI->m_DefaultFontName;
+	return sm_GUI->m_DefaultFont;
 }
-
-const JColor& JGUI::GetDefaultColor()
-{
-	return sm_GUI->m_DefaultJGUIColor;
-	// TODO: 여기에 반환 구문을 삽입합니다.
-}
-
 void JGUI::Update()
 {
 	while (!m_ExpectedDestroyObject.empty())
@@ -208,140 +197,127 @@ void JGUI::Update()
 	}
 
 
-	if (!m_IsTickLock)
+	static int focus_cnt = 0;
+	// Focus
+	auto focus_window = FindRootJGUIWindow(GetFocus());
+	if (focus_window == nullptr) focus_cnt++;
+	else focus_cnt = 0;
+
+	if (focus_window)
 	{
-		static int focus_cnt = 0;
+		ENGINE_LOG_INFO("Focus");
+		focus_window->JGUIOnFocus();
+		auto kdownList = m_Input->GetKeyBoardDownList();
+		auto kupList = m_Input->GetKeyBoardUpList();
+		auto mdownList = m_Input->GetMouseBtDownList();
+		auto mupList = m_Input->GetMouseBtUpList();
 
-		// Focus
-		auto focus_window = FindRootJGUIWindow(GetFocus());
-		if (focus_window == nullptr) focus_cnt++;
-		else focus_cnt = 0;
-
-		if (focus_window)
+		for (auto k : kdownList)
 		{
-			focus_window->JGUIOnFocus();
-			auto kdownList = m_Input->GetKeyBoardDownList();
-			auto kupList = m_Input->GetKeyBoardUpList();
-			auto mdownList = m_Input->GetMouseBtDownList();
-			auto mupList = m_Input->GetMouseBtUpList();
-
-			for (auto k : kdownList)
-			{
-				JGUIKeyDownEvent e;
-				e.Code = k;
-				focus_window->JGUIKeyDown(e);
-			}
-			for (auto k : kupList)
-			{
-				JGUIKeyUpEvent e;
-				e.Code = k;
-				focus_window->JGUIKeyUp(e);
-			}
-			for (auto k : mdownList)
-			{
-				JGUIKeyDownEvent e;
-				e.Code = k;
-				focus_window->JGUIMouseBtDown(e);
-			}
-			for (auto k : mupList)
-			{
-				JGUIKeyUpEvent e;
-				e.Code = k;
-				focus_window->JGUIMouseBtUp(e);
-			}
+			JGUIKeyDownEvent e;
+			e.Code = k;
+			focus_window->JGUIKeyDown(e);
 		}
-		for (auto iter = m_MouseTrackMap.begin(); iter != m_MouseTrackMap.end();)
+		for (auto k : kupList)
 		{
-			JGUIWindow* ownerwin = nullptr;
-			JGUICollider* collider = nullptr;
-			JGUIComponent* com = nullptr;
-			JGUIWindow* win = nullptr;
-
-			if (iter->second.com)
-			{
-				com = iter->second.com;
-				collider = com->GetCollider();
-				ownerwin = com->GetOwnerWindow();
-			}
-			if (iter->second.win)
-			{
-				win = iter->second.win;
-				ownerwin = JGUI::FindRootJGUIWindow(win->GetRootWindowHandle());
-				collider = win->GetPanel()->GetCollider();
-			}
-			if (focus_cnt > JGUI_FOCUS_RANGE)
-			{
-				if (iter->second.flag == JGUI_MOUSETRACKFLAG_MOUSELEAVE)
-				{
-					if (com) com->JGUIMouseLeave();
-					else if (win) win->JGUIMouseLeave();
-				}
-				if (com) com->m_IsMouseTracking = false;
-				if (win) win->m_IsTracking = false;
-				iter = m_MouseTrackMap.erase(iter);
-			}
-			else
-			{
-				HWND focusHandle = ownerwin->GetRootWindowHandle();
-				bool check = collider->CheckInPoint(JGUI::GetMousePos(focusHandle));
-				switch (iter->second.flag)
-				{
-				case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
-					if (check) iter->second.start = true;
-					break;
-				case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
-					if (check == false) iter->second.start = true;
-					break;
-				}
-
-				if (iter->second.start) iter->second.tick += GlobalLinkData::GetTick();
-				if (iter->second.tick > iter->second.time)
-				{
-					auto flag = iter->second.flag;
-					iter = m_MouseTrackMap.erase(iter);
-					switch (flag)
-					{
-					case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
-						if (com) com->JGUIMouseHover();
-						else if (win) win->JGUIMouseHover();
-						break;
-					case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
-						if (com) com->JGUIMouseLeave();
-						else if (win) win->JGUIMouseLeave();
-						break;
-					}
-				}
-				else ++iter;
-			}
+			JGUIKeyUpEvent e;
+			e.Code = k;
+			focus_window->JGUIKeyUp(e);
 		}
-	
-
-		for (auto& w_pair : m_ScreenPool)
+		for (auto k : mdownList)
 		{
-			auto window = w_pair.second.first;
-			if (window == nullptr)
-			{
-				continue;
-			}
-			if (!window->IsActive())
-			{
-				continue;
-			}
-			if (!window->IsExecuteStartFunc())
-			{
-				window->JGUIStart();
-			}
-			JGUITickEvent e;
-			e.deltaTime = GlobalLinkData::GetTick();
-			e.totalTime = GlobalLinkData::GetTotalTime();
-			e.fps = GlobalLinkData::GetFPS();
-			ENGINE_LOG_INFO("JGUITick");
-			window->JGUITick(e);
+			JGUIKeyDownEvent e;
+			e.Code = k;
+			focus_window->JGUIMouseBtDown(e);
+		}
+		for (auto k : mupList)
+		{
+			JGUIKeyUpEvent e;
+			e.Code = k;
+			focus_window->JGUIMouseBtUp(e);
 		}
 	}
 
+	for (auto iter = m_MouseTrackMap.begin(); iter != m_MouseTrackMap.end();)
+	{
+		JGUIWindow* ownerwin = nullptr;
+		JGUICollider* collider = nullptr;
+		JGUIComponent* com = nullptr;
+		JGUIWindow* win = nullptr;
 
+		if (iter->second.com)
+		{
+			com = iter->second.com;
+			collider = com->GetCollider();
+			ownerwin = com->GetOwnerWindow();
+		}
+		if (iter->second.win)
+		{
+			win = iter->second.win;
+			ownerwin = JGUI::FindRootJGUIWindow(win->GetRootWindowHandle());
+			collider = win->GetPanel()->GetCollider();
+		}
+		if (focus_cnt > JGUI_FOCUS_RANGE)
+		{
+			if (iter->second.flag == JGUI_MOUSETRACKFLAG_MOUSELEAVE)
+			{
+				if (com) com->JGUIMouseLeave();
+				else if (win) win->JGUIMouseLeave();
+			}
+			if (com) com->m_IsMouseTracking = false;
+			if (win) win->m_IsTracking = false;
+			iter = m_MouseTrackMap.erase(iter);
+		}
+		else
+		{
+			HWND focusHandle = ownerwin->GetRootWindowHandle();
+			bool check = collider->CheckInPoint(JGUI::GetMousePos(focusHandle));
+			switch (iter->second.flag)
+			{
+			case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
+				if (check) iter->second.start = true;
+				break;
+			case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
+				if (check == false) iter->second.start = true;
+				break;
+			}
+
+			if (iter->second.start) iter->second.tick += GlobalLinkData::GetTick();
+			if (iter->second.tick > iter->second.time)
+			{
+				auto flag = iter->second.flag;
+				iter = m_MouseTrackMap.erase(iter);
+				switch (flag)
+				{
+				case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
+					if (com) com->JGUIMouseHover();
+					else if (win) win->JGUIMouseHover();
+					break;
+				case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
+					if (com) com->JGUIMouseLeave();
+					else if (win) win->JGUIMouseLeave();
+					break;
+				}
+			}
+			else ++iter;
+		}
+	}
+
+	for(auto& w_pair : m_ScreenPool)
+	{
+		auto window = w_pair.second.first;
+		if (window == nullptr) continue;
+		if (!window->IsActive()) continue;
+		if (!window->IsExecuteStartFunc()) window->JGUIStart();
 	
+
+		JGUITickEvent e;
+		e.deltaTime = GlobalLinkData::GetTick();
+		e.totalTime = GlobalLinkData::GetTotalTime();
+		e.fps = GlobalLinkData::GetFPS();
+		window->JGUITick(e);
+	}
+
 
 	for (auto iter = m_ExtraEventMap.begin(); iter != m_ExtraEventMap.end();)
 	{
@@ -360,9 +336,6 @@ void JGUI::Update()
 		}
 	}
 
-
-
-
 }
 
 
@@ -374,7 +347,6 @@ LRESULT JGUI::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_SIZE:
-	
 		return WindowProcResize(currentWindow, wParam, lParam);
 	case WM_SETFOCUS:
 		return WindowSetFocus(currentWindow, wParam);
@@ -420,8 +392,6 @@ LRESULT JGUI::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		bin = false;
 		return WindowMouseLeave(currentWindow);
 	}
-
-
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
@@ -452,6 +422,17 @@ LRESULT JGUI::WindowKillFocus(JGUIWindow* window, WPARAM wParam)
 	auto next_focus_window = FindRootJGUIWindow((HWND)wParam);
 	e.nextFocusWindow = next_focus_window;
 	window->JGUIFocusHover(e);
+	return 0;
+}
+LRESULT JGUI::WindowChar(JGUIWindow* window, WPARAM wParam, LPARAM lParam)
+{
+	if (wParam > 128) return 0;
+	auto str = (TCHAR)wParam;
+	JGUICharEvent e;
+	char c;
+	wcstombs(&c, (wchar_t*)& str, 1);
+	e.str = c;
+	window->JGUIChar(e);
 	return 0;
 }
 LRESULT  JGUI::WindowKeyDownEvent(WPARAM wParam)
@@ -490,17 +471,4 @@ LRESULT JGUI::WindowMouseLeave(JGUIWindow* window)
 	window->JGUIMouseLeave();
 	return 0;
 }
-
-LRESULT JGUI::WindowChar(JGUIWindow* window, WPARAM wParam, LPARAM lParam)
-{
-	if (wParam > 128) return 0;
-	auto str = (TCHAR)wParam;
-	JGUICharEvent e;
-	char c;
-	wcstombs(&c, (wchar_t*)&str, 1);
-	e.str = c;
-	window->JGUIChar(e);
-	return 0;
-}
-
 

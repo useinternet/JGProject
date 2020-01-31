@@ -17,7 +17,7 @@
       <UniqueIdentifier>{63063229-6777-4b20-8c8c-b0cb78522ed9}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\JGUIFont">
-      <UniqueIdentifier>{127cd4de-27c8-47ca-b8a1-d9da8d30afe6}</UniqueIdentifier>
+      <UniqueIdentifier>{42cec6f6-70db-4fca-9bc3-3950b490c87e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,9 +72,6 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.h">
       <Filter>GUI\JGUIFont</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -120,9 +117,6 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp">
       <Filter>GUI\JGUIFont</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

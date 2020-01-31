@@ -18,6 +18,14 @@ namespace RE
 		m_PSO = make_shared<GraphicsPipelineState>();
 		m_MaterialCB = make_shared<SBDConstantBuffer>(FixedGShaderModule::MatCBName());
 	}
+	ReMaterial::~ReMaterial()
+	{
+		for (auto& t : m_BindedTextures)
+		{
+			TextureManager::RequestCancelLoadTexture(&t);
+		}
+
+	}
 	void ReMaterial::SetBlendState(const D3D12_BLEND_DESC& desc)
 	{
 		m_PSO->SetBlendState(desc);
@@ -267,6 +275,11 @@ namespace RE
 	{
 		if (m_MatControllerPool.find(matController) == m_MatControllerPool.end())
 			return false;
+
+		for (auto& t : matController->m_BindedTextures)
+		{
+			TextureManager::RequestCancelLoadTexture(&t);
+		}
 
 		m_MatControllerPool.erase(matController);
 		return true;

@@ -101,9 +101,9 @@ class JGUICharEvent : public JGUIEventArg
 {
 public:
 	JGUIEventArgConstruct(JGUICharEvent)
-	virtual std::string ToString() const {
+		virtual std::string ToString() const {
 		return JGUIEventArg::ToString() + " : " + str;
 	}
 public:
-	std::string str="";
+	std::string str = "";
 };

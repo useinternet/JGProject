@@ -18,7 +18,6 @@ protected:
 	virtual void Resize(const JGUIResizeEvent& e) override;
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) override;
 	virtual void MouseBtUp(const JGUIKeyUpEvent& e) override;
-	virtual void Tick(const JGUITickEvent& e) override;
 private:
 	void SettingElement();
 private:

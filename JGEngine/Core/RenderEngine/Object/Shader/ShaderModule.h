@@ -229,9 +229,6 @@ namespace RE
 	};
 
 
-
-
-
 	/*     Compute Module    */
 	class RENDERENGINE_API ComputeShaderModule : public ShaderModule
 	{

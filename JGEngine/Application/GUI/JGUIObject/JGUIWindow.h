@@ -28,9 +28,10 @@ private:
 	virtual void JGUIFocusHover(const JGUIFocusHoverEvent& e);
 	virtual void JGUIOnFocus();
 
+
+	virtual void JGUIChar(const JGUICharEvent& e);
 	virtual void JGUIKeyDown(const JGUIKeyDownEvent& e);
 	virtual void JGUIKeyUp(const JGUIKeyUpEvent& e);
-	virtual void JGUIChar(const JGUICharEvent& e);
 	virtual void JGUIMouseBtDown(const JGUIKeyDownEvent& e);
 	virtual void JGUIMouseBtUp(const JGUIKeyUpEvent& e);
 	virtual void JGUIMouseMove(const JGUIMouseMoveEvent& e);
@@ -42,9 +43,11 @@ protected:
 	virtual void FocusHover(const JGUIFocusHoverEvent& e) {}
 	virtual void OnFocus() {}
 
+
+
+	virtual void Char(const JGUICharEvent& e);
 	virtual void KeyDown(const JGUIKeyDownEvent& e) {}
 	virtual void KeyUp(const JGUIKeyUpEvent& e) {}
-	virtual void Char(const JGUICharEvent& e) {}
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) {}
 	virtual void MouseBtUp(const JGUIKeyUpEvent& e) {}
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) {}
@@ -66,7 +69,7 @@ public:
 	WindowType* CreateJGUIWindow(const std::string& name, EJGUI_WindowFlags flag = JGUI_WindowFlag_None)
 	{
 		auto win = JGUI::CreateJGUIWindow<WindowType>(name, flag);
-		if (!flag)
+		if ((flag & JGUI_WindowFlag_NewLoad) == false)
 		{
 			win->SetParent(this);
 		}
@@ -101,35 +104,30 @@ public:
 	{
 		return m_Priority;
 	}
-	EJGUI_WindowFlags GetFlag() const
-	{
-		return m_Flag;
-	}
 private:
-	void Init(const std::string& name, EJGUI_WindowFlags flag);
+	void Init(const std::string& name, EJGUI_WindowFlags flags);
 	void NewLoad();
 private:
-	//
 	JGUIScreen* m_Screen = nullptr;
 	JGUIWindow* m_ParentWindow = nullptr;
 	std::vector<JGUIComponent*>  m_WindowComponents;
 	std::vector<JGUIWindow*>     m_ChildWindows;
 	JGUIRectTransform*           m_RectTransform = nullptr;
-	JGUIPanel*                   m_Panel = nullptr;
+	JGUIPanel* m_Panel = nullptr;
 
-
+	EJGUI_WindowFlags m_Flags = JGUI_WindowFlag_None;
 
 
 	// RenderEngine 변수들
 	std::shared_ptr<RE::FixedGShaderModuleClone> m_GUIModule;
 	std::shared_ptr<RE::ReCamera>                m_ReCamera;
 	EJGUI_WindowPriority m_Priority = JGUI_WindowPriority_None;
-
-	
-	
-	EJGUI_WindowFlags m_Flag;
-	//
 	bool m_IsTracking = false;
 };
 
+/*
+1. 위치나 회전 값은 부모의 위치를 기준으로 한다.
+2. 
+
+*/
 

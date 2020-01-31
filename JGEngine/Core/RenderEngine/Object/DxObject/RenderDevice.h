@@ -61,11 +61,11 @@ namespace RE
 
 		// DebugInfo
 		//void GetGUIAllocatorDebugInfo(Debug::GUIAllocatorInfo& out_debug_info);
-		void GetSrvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
-		void GetUavDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
-		void GetCbvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
-		void GetRtvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
-		void GetDsvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		//void GetSrvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		//void GetUavDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		//void GetCbvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		//void GetRtvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
+		//void GetDsvDescriptorAllocatorDebugInfo(Debug::DescritporAllocatorInfo& out_debug_info);
 
 
 		DxScreen* CreateDxScreen(HWND hWnd, uint32_t width, uint32_t height,

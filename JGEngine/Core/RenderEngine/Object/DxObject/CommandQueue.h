@@ -26,7 +26,7 @@ namespace RE
 	private:
 		using CommandListPool = std::map<CommandList*, std::shared_ptr<CommandList>>;
 		using CommandListQueue = std::map<uint32_t, std::queue<std::shared_ptr<CommandList>>>;
-		//using CommandListQueue = std::queue<std::shared_ptr<CommandList>>;
+
 		std::mutex m_Mutex;
 		std::shared_ptr<Fence> m_Fence;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3D_CmdQueue;
@@ -34,5 +34,10 @@ namespace RE
 		
 		CommandListPool  m_CmdListPool;
 		CommandListQueue m_PendingCmdList;
+
+
+
+
+
 	};
 }

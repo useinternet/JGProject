@@ -9,7 +9,6 @@
 #include "Object/ReObject/ReMaterial.h"
 #include "Object/ReObject/RenderItem.h"
 #include "Object/ReObject/ReMesh.h"
-
 using namespace std;
 
 
@@ -27,11 +26,9 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 {
 	auto transform = GetTransform();
 	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
-
 	if (transform->IsDirty() || 
 		(window_size != m_PrevWindowSize))
 	{
-
 		m_PrevWindowSize = window_size;
 		auto pos = transform->GetPosition();
 		pos += m_Offset;
@@ -65,7 +62,6 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 }
 void JGUIShape::Destroy()
 {
-
 	DestroyRI();
 }
 void JGUIShape::SetActive(bool active)
@@ -146,14 +142,6 @@ void JGUIRectangle::SetImage(const std::string& texture_image)
 	}
 
 }
-void JGUIRectangle::Resize(const JGUIResizeEvent& e)
-{
-	if (m_RenderItem == nullptr)	SetParent(GetParent());
-	if (m_RenderItem)
-	{
-		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(e.width, e.height));
-	}
-}
 void JGUIRectangle::CreateRI()
 {
 	if (m_RenderItem)
@@ -165,7 +153,11 @@ void JGUIRectangle::CreateRI()
 
 	m_RenderItem = RE::RenderEngine::CreateRenderItem(GetOwnerWindow()->GetID(),
 		RE::ERenderItemUsage::GUI, GetName() + "_RI");
-	m_RenderItem->SetMaterial(RE_GUI_DefaultMaterial);
+	
+	if(m_ImageName.empty()) m_RenderItem->SetMaterial(RE_GUI_DefaultMaterial);
+	else m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
+
+	
 	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 	if (!m_ImageName.empty()) m_RenderItem->GetMaterial()->SetTexture("Image", m_ImageName);
 	m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
@@ -174,6 +166,16 @@ void JGUIRectangle::CreateRI()
 	m_RenderItem->SetActive(IsActive());
 
 }
+void JGUIRectangle::Resize(const JGUIResizeEvent& e)
+{
+	if (m_RenderItem == nullptr)	SetParent(GetParent());
+	if (m_RenderItem)
+	{
+		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(e.width, e.height));
+	}
+
+}
+
 
 void JGUIText::SetFont(const std::string& str)
 {
@@ -277,7 +279,7 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 	auto mesh = (RE::ReGuiMesh*)dmesh;
 
 	m_StartPos = m_TextPosMap[start_pos];
-	m_IOffset  = start_pos * m_VertexCount;
+	m_IOffset = start_pos * m_VertexCount;
 
 
 
@@ -287,7 +289,7 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 	uint32_t vend = end_pos * m_VertexCount;
 	uint32_t iend = end_pos * m_IndexCount;
 	m_Text.erase(start_pos, end_pos - start_pos);
-    m_TextPosMap.erase(m_TextPosMap.begin() + start_pos, m_TextPosMap.begin() + end_pos);
+	m_TextPosMap.erase(m_TextPosMap.begin() + start_pos, m_TextPosMap.begin() + end_pos);
 	mesh->Remove(vstart, vend, istart, iend);
 
 
@@ -338,9 +340,9 @@ void JGUIText::SetFontSize(float size)
 
 void JGUIText::SetTextRect(float width, float height)
 {
-	m_TextRect.width  = width;
+	m_TextRect.width = width;
 	m_TextRect.height = height;
-	m_TextRect.right  = width;
+	m_TextRect.right = width;
 	m_TextRect.bottom = height;
 	SetText(m_Text);
 }
@@ -348,7 +350,7 @@ void JGUIText::SetTextRect(float width, float height)
 
 void JGUIText::Start()
 {
-	
+
 
 }
 void JGUIText::CreateRI()
@@ -371,7 +373,7 @@ void JGUIText::CreateRI()
 	m_RenderItem->SetMaterial(RE_GUI_TextMaterial);
 	m_RenderItem->SetMesh(make_shared<RE::ReGuiMesh>());
 	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	m_RenderItem->GetMaterial()->SetTexture("Image", fileInfo.page[0] );
+	m_RenderItem->GetMaterial()->SetTexture("Image", fileInfo.page[0]);
 
 	m_RenderItem->SetPriority(m_Priority);
 	m_Instance = m_RenderItem->AddInstance();
@@ -379,7 +381,7 @@ void JGUIText::CreateRI()
 }
 
 std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
-	uint32_t ioffset, JVector2 start_pos, const std::string& str, 
+	uint32_t ioffset, JVector2 start_pos, const std::string& str,
 	std::vector<JGUIVertex>& v, std::vector<uint32_t>& i, std::vector<JVector2>& p)
 {
 	auto fontManager = JGUI::GetJGUIFontManager();
@@ -387,11 +389,11 @@ std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 	std::wstring wstr = s2ws(str);
 
 	// 각종 폰트 정보들 불러오기
-	auto  charInfo         = fontManager->GetFontCharInfo(m_FontName, wstr);
-	auto  fontfileInfo     = fontManager->GetFontFileInfo(m_FontName);
-	float font_size_ratio  = m_FontSize / (float)fontfileInfo.default_font_size;
+	auto  charInfo = fontManager->GetFontCharInfo(m_FontName, wstr);
+	auto  fontfileInfo = fontManager->GetFontFileInfo(m_FontName);
+	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
 	float font_height = (float)fontfileInfo.lineHeight * font_size_ratio;
-         
+
 	// a3. 각 텍스트에 맞는 Vertex생성
 	for (auto& info : charInfo)
 	{

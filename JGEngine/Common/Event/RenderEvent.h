@@ -2,7 +2,7 @@
 
 
 #include "Event.h"
-#include "DataType/Debug/RE_DebugInfo.h"
+// #include "DataType/Debug/RE_DebugInfo.h"
 enum class RenderEngineID
 {
 	None,
@@ -76,31 +76,31 @@ public:
 		return "Send Resource( " + std::to_string(GpuAddress) + " ) .. To : " + SendIGWindow;
 	}
 };
-class SendAllResourceDebugInfoEvent : public ToEditFromReEvent
-{
-public:
-	std::vector<Debug::ResourceInfo> ResourceInfoArray;
-public:
-	SendAllResourceDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllResourceDebugInfo) {}
-	virtual std::string ToString() const override {
-		return "SendAllResourceDebugInfoEvent";
-	}
-};
-class SendAllocatorDebugInfoEvent : public ToEditFromReEvent
-{
-public:
-	Debug::GUIAllocatorInfo GUIDebugInfo;
-	Debug::DescritporAllocatorInfo SrvDebugInfo;
-	Debug::DescritporAllocatorInfo UavDebugInfo;
-	Debug::DescritporAllocatorInfo CbvDebugInfo;
-	Debug::DescritporAllocatorInfo RtvDebugInfo;
-	Debug::DescritporAllocatorInfo DsvDebugInfo;
-public:
-	SendAllocatorDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllocatorDebugInfo) {}
-	virtual std::string ToString() const override {
-		return "SendAllocatorDebugInfoEvent";
-	}
-};
+//class SendAllResourceDebugInfoEvent : public ToEditFromReEvent
+//{
+//public:
+//	std::vector<Debug::ResourceInfo> ResourceInfoArray;
+//public:
+//	SendAllResourceDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllResourceDebugInfo) {}
+//	virtual std::string ToString() const override {
+//		return "SendAllResourceDebugInfoEvent";
+//	}
+//};
+//class SendAllocatorDebugInfoEvent : public ToEditFromReEvent
+//{
+//public:
+//	Debug::GUIAllocatorInfo GUIDebugInfo;
+//	Debug::DescritporAllocatorInfo SrvDebugInfo;
+//	Debug::DescritporAllocatorInfo UavDebugInfo;
+//	Debug::DescritporAllocatorInfo CbvDebugInfo;
+//	Debug::DescritporAllocatorInfo RtvDebugInfo;
+//	Debug::DescritporAllocatorInfo DsvDebugInfo;
+//public:
+//	SendAllocatorDebugInfoEvent() : ToEditFromReEvent(ToEditFromReCommand::SendAllocatorDebugInfo) {}
+//	virtual std::string ToString() const override {
+//		return "SendAllocatorDebugInfoEvent";
+//	}
+//};
 class GUIAllocatorReAllocatedNoticeEvent : public ToEditFromReEvent
 {
 public:

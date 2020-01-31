@@ -1328,6 +1328,8 @@ namespace RE
 		AddRenderTargetTexture("Screen", DXGI_FORMAT_R8G8B8A8_UNORM, 1);
 	}
 
+
+
 	void FixedGShaderModuleClone::Execute(CommandList* cmdList)
 	{
 		auto RIManager = GetRenderItemManager(m_ID);
@@ -1370,7 +1372,7 @@ namespace RE
 		for (uint32_t i = 0; i < item_array.size(); ++i)
 		{
 			RenderItem* item = item_array[i];
-			if (item->m_Mesh == nullptr || item->m_Mesh->GetVertexData().empty() || item->m_Mesh->GetIndexData().empty()) continue;
+
 			if (!item->GetActive()) continue;
 
 			if (m_GameObjectSB_Struct.GetSize() != item->m_StructuredBuffer->CloneBindedStruct().GetSize())
@@ -1406,16 +1408,14 @@ namespace RE
 				// PSO
 				cmdList->SetPipelineState(*item->m_Material->GetMatOwner()->GetPSO());
 
-				item->m_Mesh->Draw(cmdList, (uint32_t)item->m_InstanceItems.size());
 				// Mesh
-				
+				item->m_Mesh->Draw(cmdList, (uint32_t)item->m_InstanceItems.size());
 			}
 		
 		}
 
 
 	}
-
 
 }
 

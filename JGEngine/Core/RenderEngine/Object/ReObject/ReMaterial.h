@@ -30,6 +30,7 @@ namespace RE
 			return m_PSO.get();
 		}
 		ReMaterial(const std::string& name, ERenderItemUsage usage);
+		~ReMaterial();
 	public:
 		void SetBlendState(const D3D12_BLEND_DESC& desc);
 		void SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& desc);

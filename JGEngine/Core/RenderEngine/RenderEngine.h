@@ -43,8 +43,7 @@ namespace RE
 
 #define RE_GUI_DefaultMaterial      "M_DefaultGUI"
 #define RE_GUI_OneTextureDefault    "M_DefaultTextureGUI"
-#define RE_GUI_TextMaterial         "M_DefaultTextGUI"
-
+#define RE_GUI_TextMaterial         "M_DefaultGUIText"
 	enum RENDERENGINE_API ERE_GUI_Material
 	{
 		GUI_Default,
@@ -81,17 +80,15 @@ namespace RE
 
 
 		// Material 관련
-		static void        RegisterMaterial(const std::string& name, const ReMaterial& m);
-		static ReMaterial* FindMaterial(const std::string& name);
+		void        RegisterMaterial(const std::string& name, const ReMaterial& m);
+		ReMaterial* FindMaterial(const std::string& name);
 
 
-		//
-		static void RequestWorkToProcessed(const std::function<void()>& func);
-		//
-		// Texture 관련
-		static void  RequestTextureLoad(const std::string& t_path);
 		// 기타
 		static RenderDevice* GetDevice();
+
+		//
+		static void RequestTextureLoad(const std::string& path);
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();
@@ -109,7 +106,8 @@ namespace RE
 		std::shared_ptr<ReMaterialManager>   m_MaterialManager;
 
 		std::unordered_map<uint64_t, std::shared_ptr<RenderItemManager>> m_RIManager;
-		std::queue<std::function<void()>>      m_WorkQueue;
 		RenderEngineConfig m_Config;
 	};
+
+
 }

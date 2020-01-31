@@ -14,8 +14,6 @@ inline std::string GetClassNameByFullFuncName(const char* fullFuncName)
 	}
 	return fullFuncNameStr.substr(0, pos - 1);
 }
-
-
 inline std::wstring s2ws(const std::string& str)
 {
 	using convert_typeX = std::codecvt_utf8<wchar_t>;

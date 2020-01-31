@@ -8,6 +8,8 @@ namespace RE
 	void CreateBox(ReStaticMesh* mesh, float  width, float height, float depth);
 	void ReMesh::Draw(CommandList* cmdList, uint32_t instanceCount)
 	{
+		if (m_MeshIndexDatas.empty() || m_MeshIndexDatas.empty()) return;
+
 		cmdList->BindDynamicVertexBuffer(0, m_VertexTypeSize, m_MeshVertexDatas);
 		cmdList->BindDynamicIndexBuffer(m_MeshIndexDatas);
 		cmdList->SetPrimitiveTopology(m_Topology);
@@ -151,4 +153,10 @@ namespace RE
 
 		mesh->Create(v, i);
 	}
+
+
+
+	
+
+
 }

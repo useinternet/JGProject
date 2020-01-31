@@ -1,7 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
- class JVector3;
- class JMatrix;
+
+class JVector3;
+class JMatrix;
 class JQuaternion
 {
 	friend JMatrix;

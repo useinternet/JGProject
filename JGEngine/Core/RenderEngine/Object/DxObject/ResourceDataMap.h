@@ -29,7 +29,7 @@ namespace RE
 
 		static void StateLock();
 		static void StateUnLock();
-		static void GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo);
+		//static void GetAllResourceDebugInfo(std::vector<Debug::ResourceInfo>& out_resourceInfo);
 		static void RegisterResource(ID3D12Resource* resource, const std::string& name, D3D12_RESOURCE_STATES state);
 		static void SetResourceName(ID3D12Resource* resource, const std::string& name);
 		static void DeRegisterResource(ID3D12Resource* resource);

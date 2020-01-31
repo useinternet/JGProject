@@ -55,7 +55,6 @@ public:
 	JGUIRect GetLocalRect() const;
 private:
 	void SendDirty(int n);
-
 protected:
 	JVector2    m_LocalPosition;
 	float       m_LocalAngle;
@@ -81,10 +80,11 @@ class JGUIWinRectTransform : public JGUIRectTransform
 {
 
 public:
-	virtual void SetPosition(const JVector2& pos) override;
-	virtual void SetPosition(float x, float y) override;
-	virtual void OffsetPosition(const JVector2& offset) override;
-	virtual void OffsetPosition(float x, float y) override;
+	virtual void SetPosition(const JVector2& pos);
+	virtual void SetPosition(float x, float y);
+	virtual void OffsetPosition(const JVector2& offset);
+	virtual void OffsetPosition(float x, float y);
+
 
 
 
@@ -95,4 +95,5 @@ public:
 private:
 	void SendPosToWin();
 	void SendSizeToWin();
+
 };

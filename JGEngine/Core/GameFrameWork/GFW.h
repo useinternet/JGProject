@@ -13,4 +13,3 @@
 
 class GameObject;
 typedef  GameObject* (*pCreateGameObjectFunc)();
-typedef  void (*pDeleteGameObjectFunc)(GameObject*);

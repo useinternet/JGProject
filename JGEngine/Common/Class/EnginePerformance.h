@@ -5,6 +5,7 @@
 #include <memory>
 #include <chrono>
 #include <Pdh.h>
+#include <map>
 #include <PdhMsg.h>
 #include <iostream>
 class PerformanceTimer;

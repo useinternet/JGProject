@@ -19,6 +19,7 @@ protected:
 	virtual void Start() override;
 	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Destroy() override;
+
 public:
 	virtual void SetActive(bool active) override;
 public:
@@ -34,10 +35,10 @@ protected:
 	JGUIPanel*              m_OwnerPanel = nullptr;
 	RE::RenderItem*         m_RenderItem = nullptr;
 	RE::InstanceRenderItem* m_Instance   = nullptr;
-	
+	JColor                  m_Color = { 1.0f,1.0f,1.0f,1.0f };
+	JVector2                m_Offset = { 0,0 };
 
-	JVector2 m_Offset = { 0,0 };
-	JColor   m_Color = { 1.0f,1.0f,1.0f,1.0f };
+
 	JVector2 m_PrevWindowSize;
 	uint64_t m_Priority = 0;
 };
@@ -47,16 +48,12 @@ class JGUIRectangle : public JGUIShape
 public:
 	void SetImage(const std::string& texture_image);
 protected:
-	virtual void Resize(const JGUIResizeEvent& e) override;
-protected:
 	virtual void CreateRI() override;
-
+	virtual void Resize(const JGUIResizeEvent& e) override;
 
 private:
 	std::string m_ImageName;
 };
-
-
 
 class JGUIText : public JGUIShape
 {
@@ -74,7 +71,6 @@ public:
 	uint32_t Length() const;
 	void SetFontSize(float size);
 	void SetTextRect(float width, float height);
-
 public:
 	const JGUIRect& GetTextRect() const {
 		return m_TextRect;
@@ -92,7 +88,7 @@ protected:
 	void UpdateTextSize(const std::string& str);
 private:
 	std::string m_FontName = "";
-	std::string m_Text     = "";
+	std::string m_Text = "";
 	float       m_FontSize = 32;
 	std::vector<JVector2> m_TextPosMap;
 
