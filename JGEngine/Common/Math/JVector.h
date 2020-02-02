@@ -14,6 +14,15 @@ public:
 	T x, y;
 public:
 	JVector2Template(T x = 0, T y = 0) : x(x), y(y) {}
+
+
+public:
+	bool operator==(const JVector2Template& v) const {
+		return (v.x == x && v.y == y);
+	}
+	bool operator!=(const JVector2Template& v) const {
+		return (v.x != x || v.y != y);
+	}
 };
 
 template<typename T>
@@ -53,8 +62,6 @@ public:
 
 	JVector2& operator=(const JVector2& v) = default;
 	JVector2& operator=(JVector2&& v) = default;
-
-
 public:
 	inline JVector2 operator+(const JVector2& v) const {
 		return JVector2(x + v.x, y + v.y);

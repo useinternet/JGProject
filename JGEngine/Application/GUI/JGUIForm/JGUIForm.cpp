@@ -6,28 +6,27 @@
 #include "GUI/JGUIComponent/JGUIButton.h"
 #include "GUI/JGUIComponent/JGUICollider.h"
 #include "GUI/JGUIComponent/JGUITitleBar.h"
+#include "GUI/JGUIComponent/JGUIResizeBox.h"
 using namespace std;
 
-void TestJGUIForm::Start()
-{
-	title = CreateJGUIComponent<JGUITitleBar>("titleBar");
-	GetPanel()->SetColor(JColor(0.2f, 0.2f, 0.3f, 0.3f));
-}
-
-void TestJGUIForm::Resize(const JGUIResizeEvent& e)
-{
-	if (title)
-	{
-		title->GetTransform()->SetSize(e.width, 50);
-	}
-}
 
 void JGUIForm::Start()
 {
-	title = CreateJGUIComponent<JGUITitleBar>("titleBar");
+	auto size = GetTransform()->GetSize();
+	m_ResizeBox = CreateJGUIComponent<JGUIResizeBox>("ResizeBox");
+	float thickness = m_ResizeBox->GetThickness();
+	m_Title = CreateJGUIComponent<JGUITitleBar>("titleBar");
+	m_Title->GetTransform()->SetPosition(thickness, thickness);
+
+
+
+
+
+
+
 	text = CreateJGUIComponent<JGUIText>("defaultText");
-	text->GetTransform()->SetPosition(100, 100);
-	text->SetTextRect(300, 300);
+	text->GetTransform()->SetPosition(0, 50);
+	text->SetTextRect(800, 550);
 }
 
 void JGUIForm::Tick(const JGUITickEvent& e)
@@ -37,9 +36,13 @@ void JGUIForm::Tick(const JGUITickEvent& e)
 
 void JGUIForm::Resize(const JGUIResizeEvent& e)
 {
-	if (title)
+	if (m_Title)
 	{
-		title->GetTransform()->SetSize(e.width, 50);
+		m_Title->GetTransform()->SetSize(e.width, 50);
+	}
+	if (m_ResizeBox)
+	{
+		m_ResizeBox->GetTransform()->SetSize(e.width, e.height);
 	}
 }
 

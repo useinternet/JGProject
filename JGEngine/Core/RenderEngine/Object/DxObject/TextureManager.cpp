@@ -80,7 +80,11 @@ namespace RE
 			if (t == nullptr) return;
 
 			if (cahce[name]->IsVaild())* t = *cahce[name];
-			else tEstimates[name]->requested_t.push_back(t);
+			else
+			{
+				t->SetName(name);
+				tEstimates[name]->requested_t.push_back(t);
+			}
 
 			return;
 		}

@@ -52,10 +52,10 @@ public:
 	JGUIWindow* prevFocusWindow = nullptr;
 };
 
-class JGUIFocusHoverEvent : public JGUIEventArg
+class JGUIFocusExitEvent : public JGUIEventArg
 {
 public:
-	JGUIEventArgConstruct(JGUIFocusHoverEvent)
+	JGUIEventArgConstruct(JGUIFocusExitEvent)
 public:
 	JGUIWindow* nextFocusWindow = nullptr;
 };

@@ -222,6 +222,9 @@
     <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
     <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -240,7 +240,7 @@ namespace RE
 		}
 	public:
 		static std::shared_ptr<ReGuiMesh> CreateFillRect(float width, float height);
-		static std::shared_ptr<ReGuiMesh> CreateEmptyRect(float width, float height);
+		static std::shared_ptr<ReGuiMesh> CreateEmptyRect(float width, float height, float thick);
 	};
 
 

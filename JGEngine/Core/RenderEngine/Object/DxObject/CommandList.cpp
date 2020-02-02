@@ -555,6 +555,7 @@ namespace RE
 
 	void CommandList::DynamicDescriptorAllocator::PushCPUHandle(uint32_t rootparam, const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& handles)
 	{
+		if (handles.empty()) return;
 		if (m_NumDescriptorPerHeap < handles.size())
 		{
 			RE_LOG_ERROR("More CPUHnadle pushes than the maximum number of heaps.Adjust the value of  ** m_NumDescritporPerHeap ** ");
@@ -562,7 +563,7 @@ namespace RE
 		}
 		if (m_CPUCache.find(rootparam) != m_CPUCache.end())
 		{
-			RE_LOG_ERROR("RootParam: {0} is already set.It will be overwritten.", rootparam);
+			// RE_LOG_ERROR("RootParam: {0} is already set.It will be overwritten.", rootparam);
 		}
 		m_CPUCache[rootparam] = handles;
 	}

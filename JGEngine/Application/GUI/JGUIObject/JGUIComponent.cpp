@@ -19,7 +19,7 @@ void JGUIComponent::JGUIAwake()
 	{
 		m_RectTransform = CreateJGUIComponent<JGUIRectTransform>("JGUIRectTransform");
 	}
-	JGUIObject::JGUIAwake();
+	EventProcess(JGUI_ComponentEvent_Awake, nullptr);
 }
 void JGUIComponent::JGUIStart()
 {
@@ -28,11 +28,11 @@ void JGUIComponent::JGUIStart()
 		if (child->IsExecuteStartFunc()) continue;
 		child->JGUIStart();
 	}
-	JGUIObject::JGUIStart();
+	EventProcess(JGUI_ComponentEvent_Start, nullptr);
 }
 void JGUIComponent::JGUITick(const JGUITickEvent& e)
 {
-	JGUIObject::JGUITick(e);
+	EventProcess(JGUI_ComponentEvent_Tick, &e);
 
 	if (m_RectTransform)
 	{
@@ -60,7 +60,7 @@ void JGUIComponent::JGUITick(const JGUITickEvent& e)
 }
 void JGUIComponent::JGUIDestroy()
 {
-	JGUIObject::JGUIDestroy();
+	EventProcess(JGUI_ComponentEvent_Destroy, nullptr);
 
 	
 
@@ -68,13 +68,15 @@ void JGUIComponent::JGUIDestroy()
 	// 자식 손절
 	for (int i = 0; i < m_ChildComponents.size();)
 	{
+		auto com = m_ChildComponents[i];
 		JGUI::DestroyObject(m_ChildComponents[i]);
+		if (GetOwnerWindow()->GetFocus() == com) GetOwnerWindow()->SetFocus(nullptr);
 	}
 }
 
 void JGUIComponent::JGUIResize(const JGUIResizeEvent& e)
 {
-	Resize(e);
+	EventProcess(JGUI_ComponentEvent_Resize, &e);
 }
 
 void JGUIComponent::JGUIMouseMove(const JGUIMouseMoveEvent& e)
@@ -88,45 +90,42 @@ void JGUIComponent::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 		track.time = JGUI_DEFAULT_HOVERTRACKTIME;
 		JGUI::RegisterMouseTrack(track);
 	}
-
-	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
 	for (auto& com : m_ChildComponents)
 	{
-		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
+		if (com->Interation(JGUI_ComponentEvent_MouseMove))
 		{
 			com->JGUIMouseMove(e);
 		}
 	}
-	MouseMove(e);
+
+	EventProcess(JGUI_ComponentEvent_MouseMove, &e);
+
 }
 
 void JGUIComponent::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 {
-
-	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
 	for (auto& com : m_ChildComponents)
 	{
-		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
+		if (com->Interation(JGUI_ComponentEvent_MouseBtDown))
 		{
 			com->JGUIMouseBtDown(e);
 		}
 	}
-	MouseBtDown(e);
+
+	EventProcess(JGUI_ComponentEvent_MouseBtDown, &e);
 }
 
 void JGUIComponent::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
-	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
-	ENGINE_LOG_INFO(GetName() + " : " + e.ToString() + " [{0} , {1}] ", p.x, p.y);
-
 	for (auto& com : m_ChildComponents)
 	{
-		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
+		if (com->Interation(JGUI_ComponentEvent_MouseBtUp))
 		{
 			com->JGUIMouseBtUp(e);
 		}
 	}
-	MouseBtUp(e);
+
+	EventProcess(JGUI_ComponentEvent_MouseBtUp, &e);
 }
 
 void JGUIComponent::JGUIMouseLeave()
@@ -134,7 +133,7 @@ void JGUIComponent::JGUIMouseLeave()
 	if (m_IsMouseTracking)
 	{
 		m_IsMouseTracking = false;
-		MouseLeave();
+		EventProcess(JGUI_ComponentEvent_MouseLeave, nullptr);
 	}
 }
 
@@ -147,16 +146,24 @@ void JGUIComponent::JGUIMouseHover()
 		track.flag = JGUI_MOUSETRACKFLAG_MOUSELEAVE;
 		track.time = JGUI_DEFAULT_LEAVETRACKTIME;
 		JGUI::RegisterMouseTrack(track);
-		MouseHover();
+
+		EventProcess(JGUI_ComponentEvent_MouseHover, nullptr);
 	}
 
+}
+
+void JGUIComponent::JGUIParentUpdateNotification()
+{
+	for (auto& child : m_ChildComponents)
+	{
+		child->JGUIParentUpdateNotification();
+	}
+	EventProcess(JGUI_ComponentEvent_ParentUpdateNotification, nullptr);
 }
 
 void JGUIComponent::SetParent(JGUIComponent* parent)
 {
 	if (parent && parent->m_IsChildLock) return;
-
-
 
 	if (m_Parent)
 	{
@@ -174,7 +181,14 @@ void JGUIComponent::SetParent(JGUIComponent* parent)
 		auto& childs = parent->m_ChildComponents;
 		childs.push_back(this);
 	}
+	auto temp_parent = m_Parent;
 	m_Parent = parent;
+
+	if (temp_parent != parent)
+	{
+		JGUIParentUpdateNotification();
+	}
+
 }
 JGUIComponent* JGUIComponent::GetParent() const
 {
@@ -204,15 +218,152 @@ JGUIComponent* JGUIComponent::FindChild(const std::string& name)
 	}
 	return nullptr;
 }
-void JGUIComponent::RegisterBoxCollider()
+
+//bool JGUIComponent::IsEventLock(EJGUI_ComponentEvents event_type) {
+//	return m_EventLockMap[event_type];
+//}
+//
+//
+//void JGUIComponent::EventLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag)
+//{
+//	m_EventLockMap[event_type] = true;
+//	if (flag & JGUI_ComponentEventLockFlag_SendParent && GetParent())
+//	{
+//		GetParent()->EventLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendChild));
+//	}
+//	if (flag & JGUI_ComponentEventLockFlag_SendChild)
+//	{
+//		for (auto& child : m_ChildComponents) child->EventLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendParent));
+//	}
+//	if (flag & JGUI_ComponentEventLockFlag_Once)
+//	{
+//		m_OnceEventLockMap.insert(event_type);
+//	}
+//}
+//void JGUIComponent::EventUnLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag)
+//{
+//	m_EventLockMap[event_type] = false;
+//	if (flag & JGUI_ComponentEventLockFlag_SendParent && GetParent())
+//	{
+//		GetParent()->EventUnLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendChild));
+//	}
+//	if (flag & JGUI_ComponentEventLockFlag_SendChild)
+//	{
+//		for (auto& child : m_ChildComponents) child->EventUnLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendParent));
+//	}
+//}
+
+
+
+void JGUIComponent::RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI_ComponentInteractionFlags flags)
 {
-	m_Collider = CreateJGUIComponent<JGUIBoxCollider>("JGUIBoxCollider");
+	switch (colider_type)
+	{
+	case JGUI_Component_Colider_Box:
+		m_Collider = CreateJGUIComponent<JGUIBoxCollider>("JGUIBoxCollider");
+		break;
+	case JGUI_Component_Colider_EmptyBox:
+		m_Collider = CreateJGUIComponent<JGUIEmptyBoxColider>("JGUIEmptyBoxCollider");
+		break;
+	}
 	m_Collider->SetParent(this);
 	m_Collider->GetTransform()->SetSize(GetTransform()->GetSize());
+	m_InteractionFlag = flags;
+}
+
+
+
+
+void JGUIComponent::EventProcess(EJGUI_ComponentEvents event_type,const void* data)
+{
+
+
+	//if (IsEventLock(event_type))
+	//{
+	//	if (m_OnceEventLockMap.find(event_type) != m_OnceEventLockMap.end())
+	//	{
+	//		m_OnceEventLockMap.erase(event_type);
+	//		EventUnLock(event_type);
+	//	}
+	//	return;
+	//}
+
+	switch (event_type)
+	{
+	case JGUI_ComponentEvent_Awake:
+		JGUIObject::JGUIAwake();
+		break;
+	case JGUI_ComponentEvent_Start:
+		JGUIObject::JGUIStart();
+		break;
+	case JGUI_ComponentEvent_Tick:
+		Tick(*(JGUITickEvent*)data);
+		break;
+	case JGUI_ComponentEvent_Destroy:
+		JGUIObject::JGUIDestroy();
+		break;
+	case JGUI_ComponentEvent_Resize:
+		Resize(*(JGUIResizeEvent*)data);
+		break;
+	case JGUI_ComponentEvent_MouseMove:
+		MouseMove(*(JGUIMouseMoveEvent*)data);
+		break;
+	case JGUI_ComponentEvent_MouseBtDown:
+		MouseBtDown(*(JGUIKeyDownEvent*)data);
+		break;
+	case JGUI_ComponentEvent_MouseBtUp:
+		MouseBtUp(*(JGUIKeyUpEvent*)data);
+		break;
+	case JGUI_ComponentEvent_MouseLeave:
+		MouseLeave();
+		break;
+	case JGUI_ComponentEvent_MouseHover:
+		MouseHover();
+		break;
+	case JGUI_ComponentEvent_ParentUpdateNotification:
+		ParentUpdateNotification();
+		break;
+	}
+
+
 }
 void JGUIComponent::Init(const std::string& name, JGUIWindow* owner_window)
 {
 	SetName(name);
 	m_OwnerWindow = owner_window;
 
+}
+
+bool JGUIComponent::Interation(EJGUI_ComponentEvents event_type)
+{
+
+	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
+	bool result = IsActive() && GetCollider() && GetCollider()->CheckInPoint(p);
+	auto flag = m_InteractionFlag;
+
+	return result;
+}
+
+JGUIComponent* JGUIComponent::TrackingCanInteractionComponent()
+{
+	JGUIComponent* com = nullptr;
+
+	auto flag = GetInteractionFlag();
+	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
+	if (flag & JGUI_ComponentInteractionFlag_Default &&
+		IsActive() && GetCollider() && GetCollider()->CheckInPoint(p))
+	{
+		com = this;
+	}
+
+	for (auto& child : m_ChildComponents)
+	{
+		auto temp_com = child->TrackingCanInteractionComponent();
+		if (temp_com)
+		{
+			com = temp_com;
+			break;
+		}
+	}
+	return com;
 }

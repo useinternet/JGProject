@@ -19,42 +19,20 @@ bool JGUICollider::CheckInPoint(const JVector2Int& p)
 
 void JGUIBoxCollider::Awake()
 {
-	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("JGUIRectangle");
-	m_Rectangle->SetColor({ 0.0f, 1.0f,0.0f, 1.0f });
-	m_Rectangle->SetActive(false);
+	m_ColiderType = JGUI_Component_Colider_Box;
 }
-void JGUIBoxCollider::Tick(const JGUITickEvent& e)
-{
-	if(m_IsDebug)
-	{
-		if (CheckInPoint(JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle())))
-		{
-			m_Rectangle->SetColor({ 1.0f,0.0f,0.0f,0.5f });
-		}
-		else
-		{
-			m_Rectangle->SetColor({ 0.0f, 1.0f,0.0f, 0.5f });
-		}
-	}
-}
-void JGUIBoxCollider::Resize(const JGUIResizeEvent& e)
-{
-	m_Rectangle->GetTransform()->SetSize(e.width, e.height);
-}
+
 void JGUIBoxCollider::DebugOn()
 {
 	m_IsDebug = true;
-	m_Rectangle->SetActive(true);
 }
 void JGUIBoxCollider::DebugOff()
 {
 	m_IsDebug = false;
-	m_Rectangle->SetActive(false);
 }
 bool JGUIBoxCollider::CheckInPoint(const JVector2Int& p)
 {
 	if (IsActive() == false) return false;
-
 	JGUIRect rect = GetTransform()->GetRect();
 
 	if (rect.left < p.x  && rect.top < p.y &&
@@ -64,4 +42,30 @@ bool JGUIBoxCollider::CheckInPoint(const JVector2Int& p)
 	}
 	return false;
 
+}
+
+void JGUIEmptyBoxColider::Awake()
+{
+	m_ColiderType = JGUI_Component_Colider_EmptyBox;
+}
+
+bool JGUIEmptyBoxColider::CheckInPoint(const JVector2Int& p)
+{
+	if (IsActive() == false) return false;
+	JGUIRect rect = GetTransform()->GetRect();
+	bool out_result = false;
+	if (rect.left < p.x && rect.top < p.y &&
+		rect.right > p.x && rect.bottom > p.y)
+	{
+		out_result = true;
+	}
+
+	bool in_result = false;
+	if (rect.left + m_Thick < p.x && rect.top + m_Thick < p.y &&
+		rect.right - m_Thick > p.x && rect.bottom - m_Thick > p.y)
+	{
+		in_result = true;
+	}
+
+	return (!in_result && out_result);
 }

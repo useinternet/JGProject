@@ -55,26 +55,63 @@ namespace RE
 		return mesh;
 	}
 
-	std::shared_ptr<ReGuiMesh> ReGuiMesh::CreateEmptyRect(float width, float height)
+	std::shared_ptr<ReGuiMesh> ReGuiMesh::CreateEmptyRect(float width, float height, float thick)
 	{
 		auto mesh = make_shared<ReGuiMesh>();
 
-		std::vector<JGUIVertex> v(4);
-		std::vector<uint32_t>   i(5);
+		std::vector<JGUIVertex> v(12);
+		std::vector<uint32_t>   i(24);
 
 		float hw = width * 0.5f;
 		float hh = height * 0.5f;
 
-		v[0] = JGUIVertex(-hw, -hh, 0, 1.0f, 1.0f, 1.0f, 1.0f , 0, 1);
-		v[1] = JGUIVertex(-hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 0);
-		v[2] = JGUIVertex(+hw, +hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0);
-		v[3] = JGUIVertex(+hw, -hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 1);
+		float out_hw = hw;
+		float out_hh = hh;
+
+		float in_hw = hw - (thick * 2);
+		float in_hh = hh - (thick * 2);
+
+		float t_thick = 1.0f / thick;
+
+		v[0] = JGUIVertex(-out_hw, + in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, t_thick);
+		v[1] = JGUIVertex(-out_hw, +out_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 0);
+		v[2] = JGUIVertex(+out_hw, +out_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0);
+		v[3] = JGUIVertex(+out_hw, + in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, t_thick);
+
+		v[4] = JGUIVertex(-out_hw, -out_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 1);
+		v[5] = JGUIVertex(-out_hw, - in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 0, 1 - t_thick);
+		v[6] = JGUIVertex(+out_hw, - in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 1 - t_thick);
+		v[7] = JGUIVertex(+out_hw, -out_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1, 1);
 
 
-		i[0] = 0; i[1] = 1; i[2] = 2; i[3] = 3; 
-		i[4] = 0;
+		v[8]  = JGUIVertex(-in_hw, -in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, t_thick, 1 - t_thick);
+		v[9]  = JGUIVertex(-in_hw, +in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, t_thick, t_thick);
+		v[10] = JGUIVertex(+in_hw, +in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1 - t_thick, t_thick);
+		v[11] = JGUIVertex(+in_hw, -in_hh, 0, 1.0f, 1.0f, 1.0f, 1.0f, 1 - t_thick, 1 - t_thick);
 
-		mesh->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+
+
+
+		// 위 막대기
+		i[0] = 0; i[1] = 1; i[2] = 2;
+		i[3] = 0; i[4] = 2; i[5] = 3;
+
+		// 아래 막대기
+		i[6] = 4; i[7] = 5; i[8] = 6;
+		i[9] = 4; i[10] = 6; i[11] = 7;
+
+		// 왼쪽 막대기
+		i[12] = 5; i[13] = 0; i[14] = 9;
+		i[15] = 5; i[16] = 9; i[17] = 8;
+
+
+		// 오른쪽 막대기
+		i[18] = 11; i[19] = 10; i[20] = 3;
+		i[21] = 11; i[22] = 3; i[23] = 6;
+
+
+		mesh->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		mesh->Create(v, i);
 		return mesh;
 	}

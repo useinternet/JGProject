@@ -71,9 +71,26 @@ namespace IE
 	}
 	void InputEngine::OnEvent(Event& e)
 	{
+		m_KeyDownList.clear();
+		m_KeyUpList.clear();
+		m_MBtDownList.clear();
+		m_MBtUpList.clear();
+
 
 	}
-
+	void InputEngine::Flush()
+	{
+		for (int i = 0; i < KeyMapCount; ++i)
+		{
+			m_KeyMap[i] = Key_None;
+		}
+	}
+	void InputEngine::MouseFlush()
+	{
+		m_KeyMap[KeyCode::LeftMouseButton]  = Key_None;
+		m_KeyMap[KeyCode::RightMouseButton] = Key_None;
+		m_KeyMap[KeyCode::MouseWheelButton] = Key_None;
+	}
 	bool InputEngine::GetKeyDown(KeyCode code)
 	{
 		return m_KeyMap[code.ToInt()] == Key_Down;

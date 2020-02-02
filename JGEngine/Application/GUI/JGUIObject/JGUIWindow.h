@@ -25,7 +25,7 @@ private:
 	virtual void JGUITick(const JGUITickEvent& e) override;
 	virtual void JGUIResize(const JGUIResizeEvent& e);
 	virtual void JGUIFocusEnter(const JGUIFocusEnterEvent& e);
-	virtual void JGUIFocusHover(const JGUIFocusHoverEvent& e);
+	virtual void JGUIFocusExit(const JGUIFocusExitEvent& e);
 	virtual void JGUIOnFocus();
 
 
@@ -40,7 +40,7 @@ private:
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
 	virtual void FocusEnter(const JGUIFocusEnterEvent& e) {}
-	virtual void FocusHover(const JGUIFocusHoverEvent& e) {}
+	virtual void FocusExit(const JGUIFocusExitEvent& e) {}
 	virtual void OnFocus() {}
 
 
@@ -93,6 +93,11 @@ public:
 
 
 	HWND GetRootWindowHandle() const;
+
+
+	void SetFocus(JGUIComponent* com);
+	JGUIComponent* GetFocus();
+
 	JGUIPanel* GetPanel() const {
 		return m_Panel;
 	}
@@ -112,6 +117,9 @@ private:
 	JGUIWindow* m_ParentWindow = nullptr;
 	std::vector<JGUIComponent*>  m_WindowComponents;
 	std::vector<JGUIWindow*>     m_ChildWindows;
+
+
+	JGUIComponent*               m_FocusComponent = nullptr;
 	JGUIRectTransform*           m_RectTransform = nullptr;
 	JGUIPanel* m_Panel = nullptr;
 
@@ -123,6 +131,7 @@ private:
 	std::shared_ptr<RE::ReCamera>                m_ReCamera;
 	EJGUI_WindowPriority m_Priority = JGUI_WindowPriority_None;
 	bool m_IsTracking = false;
+	bool m_IsMouseLeave = false;
 };
 
 /*

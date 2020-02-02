@@ -8,7 +8,8 @@ using namespace std;
 
 void JGUIButton::Awake()
 {
-	RegisterBoxCollider();
+	RegisterCollider(JGUI_Component_Colider_Box);
+	SetInteractionFlag(JGUI_ComponentInteractionFlag_Default);
 	GetTransform()->SetPosition(0.0f, 0.0f);
 	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("JGUIRectangle");
 	m_Rectangle->GetTransform()->SetSize(GetTransform()->GetSize());

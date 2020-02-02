@@ -18,8 +18,21 @@ JGUIFlag operator|(JGUIFlag f1, JGUIFlag f2)
 	return (JGUIFlag)((uint64_t)f1 | (uint64_t)f2);
 }
 
+template<typename JGUIFlag>
+JGUIFlag operator&(JGUIFlag f1, JGUIFlag f2)
+{
+	return (JGUIFlag)((uint64_t)f1 & (uint64_t)f2);
+}
 
 
+template<typename JGUIFlag>
+JGUIFlag operator~(JGUIFlag f1)
+{
+	return (JGUIFlag)~(uint64_t)f1;
+}
+
+
+// Window
 enum EJGUI_WindowFlags
 {
 	JGUI_WindowFlag_None    = 0x000000,
@@ -35,6 +48,40 @@ enum EJGUI_WindowPriority : uint64_t
 	JGUI_WindowPriority_Focus      = 30000000000000000,
 	JGUI_WindowPriority_None       = 20000000000000000,
 	JGUI_WindowPriority_BottomMost = 10000000000000000,
+};
+
+// Component
+enum EJGUI_ComponentInteractionFlags
+{
+	JGUI_ComponentInteractionFlag_None = 0x00000000,
+	JGUI_ComponentInteractionFlag_Default = 0x00000001
+};
+//enum EJGUI_ComponentEventLockFlags
+//{
+//	JGUI_ComponentEventLockFlag_None = 0x0000,
+//	JGUI_ComponentEventLockFlag_SendParent = 0x0001,
+//	JGUI_ComponentEventLockFlag_SendChild  = 0x0002,
+//	JGUI_ComponentEventLockFlag_Once       = 0x0004,
+//};
+enum EJGUI_ComponentEvents
+{
+	JGUI_ComponentEvent_Awake,
+	JGUI_ComponentEvent_Start,
+	JGUI_ComponentEvent_Tick,
+	JGUI_ComponentEvent_Destroy,
+	JGUI_ComponentEvent_Resize,
+	JGUI_ComponentEvent_MouseMove,
+	JGUI_ComponentEvent_MouseBtDown,
+	JGUI_ComponentEvent_MouseBtUp,
+	JGUI_ComponentEvent_MouseLeave,
+	JGUI_ComponentEvent_MouseHover,
+	JGUI_ComponentEvent_ParentUpdateNotification,
+};
+
+enum EJGUI_Component_Colider
+{
+	JGUI_Component_Colider_Box = 0,
+	JGUI_Component_Colider_EmptyBox = 1,
 };
 
 
@@ -72,6 +119,10 @@ enum
 	JGUI_EXTRAEVENT_DEFAULT,
 	JGUI_EXTRAEVENT_EXIT
 };
+
+
+
+
 #define JGUI_DEFAULT_HOVERTRACKTIME 0.01f
 #define JGUI_DEFAULT_LEAVETRACKTIME 0.01f
 
@@ -172,6 +223,8 @@ public:
 	static JVector2Int GetMousePos(HWND hWnd);
 	static bool        GetKeyDown(JGUIWindow* owner_window, KeyCode code);
 	static bool        GetKeyUp(JGUIWindow* owner_window, KeyCode code);
+	static void        InputFlush();
+	static void        InputMouseFlush();
 	static void        RegisterMouseTrack(const JGUIMouseTrack& mt);
 	static void        RegisterExtraEvent(const JGUIExtraEvent& e);
 	static JGUIFontManager*  GetJGUIFontManager();

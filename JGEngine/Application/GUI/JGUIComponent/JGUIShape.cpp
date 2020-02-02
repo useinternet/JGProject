@@ -19,11 +19,17 @@ void JGUIShape::Awake()
 
 void JGUIShape::Start()
 {
+
 	FindPanel();
 }
 
 void JGUIShape::Tick(const JGUITickEvent& e)
 {
+	if (m_ParentDirty)
+	{
+		m_ParentDirty = false;
+		FindPanel();
+	}
 	auto transform = GetTransform();
 	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
 	if (transform->IsDirty() || 
@@ -64,6 +70,10 @@ void JGUIShape::Destroy()
 {
 	DestroyRI();
 }
+void JGUIShape::ParentUpdateNotification()
+{
+	m_ParentDirty = true;
+}
 void JGUIShape::SetActive(bool active)
 {
 	JGUIComponent::SetActive(active);
@@ -76,8 +86,11 @@ void JGUIShape::SetActive(bool active)
 void JGUIShape::SetParent(JGUIComponent* parent)
 {
 	JGUIComponent::SetParent(parent);
-
-	FindPanel();
+	if (m_ParentDirty && m_RenderItem == nullptr)
+	{
+		m_ParentDirty = false;
+		FindPanel();
+	}
 }
 void JGUIShape::SetColor(const JColor& color)
 {
@@ -94,6 +107,7 @@ void JGUIShape::DestroyRI()
 	{
 		m_Instance = nullptr;
 		RE::RenderEngine::DestroyRenderItem(GetOwnerWindow()->GetID(), m_RenderItem);
+		m_RenderItem = nullptr;
 	}
 }
 void JGUIShape::FindPanel()
@@ -108,11 +122,11 @@ void JGUIShape::FindPanel()
 		{
 			m_OwnerPanel = (JGUIPanel*)p;
 			is_find = true;
-			if (cnt == 1 && m_OwnerPanel->GetParent() == nullptr)
+			if (cnt == 1 && m_OwnerPanel->GetParent() == nullptr && typeid(*this) == typeid(JGUIRectangle))
 			{
 				m_Priority = GetOwnerWindow()->GetPriority();
 			}
-			else  m_Priority = GetOwnerWindow()->GetPriority() + cnt;
+			else  m_Priority = m_OwnerPanel->GetPriority() + cnt;
 			break;
 		}
 		p = p->GetParent();
@@ -125,7 +139,14 @@ void JGUIShape::FindPanel()
 	}
 	else
 	{
-		CreateRI();
+		if (m_RenderItem == nullptr)
+		{
+			CreateRI();
+		}
+		else
+		{
+			m_RenderItem->SetPriority(m_Priority);
+		}
 	}
 }
 void JGUIShape::CreateRI()
@@ -141,6 +162,16 @@ void JGUIRectangle::SetImage(const std::string& texture_image)
 		m_RenderItem->GetMaterial()->SetTexture("Image", texture_image);
 	}
 
+}
+void JGUIRectangle::FillOn()
+{
+	m_IsFill = true;
+	CreateMesh();
+}
+void JGUIRectangle::EmptyOn()
+{
+	m_IsFill = false;
+	CreateMesh();
 }
 void JGUIRectangle::CreateRI()
 {
@@ -160,7 +191,9 @@ void JGUIRectangle::CreateRI()
 	
 	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 	if (!m_ImageName.empty()) m_RenderItem->GetMaterial()->SetTexture("Image", m_ImageName);
-	m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+
+	CreateMesh();
+
 	m_RenderItem->SetPriority(m_Priority);
 	m_Instance = m_RenderItem->AddInstance();
 	m_RenderItem->SetActive(IsActive());
@@ -171,21 +204,44 @@ void JGUIRectangle::Resize(const JGUIResizeEvent& e)
 	if (m_RenderItem == nullptr)	SetParent(GetParent());
 	if (m_RenderItem)
 	{
-		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(e.width, e.height));
+		CreateMesh();
+	}
+}
+
+
+
+void JGUIRectangle::CreateMesh()
+{
+	if (m_RenderItem == nullptr) return;
+	auto size = GetTransform()->GetSize();
+	if (m_IsFill)
+	{
+		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	}
+	else
+	{
+		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
 	}
 
 }
 
 
+
+
+
+
+
+
+
 void JGUIText::SetFont(const std::string& str)
 {
 	m_FontName = str;
-
-	// 여러가지 일들
+	SetText(m_Text);
 }
 
 void JGUIText::SetText(const std::string& str)
 {
+	if (m_RenderItem == nullptr) CreateRI();
 	if (str.empty()) return;
 	auto dmesh = m_RenderItem->GetMesh();
 	if (dmesh->GetType() != RE::EReMeshType::GUI) return;
@@ -347,12 +403,6 @@ void JGUIText::SetTextRect(float width, float height)
 	SetText(m_Text);
 }
 
-
-void JGUIText::Start()
-{
-
-
-}
 void JGUIText::CreateRI()
 {
 	if (m_RenderItem)

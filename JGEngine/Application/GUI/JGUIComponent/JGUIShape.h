@@ -19,7 +19,7 @@ protected:
 	virtual void Start() override;
 	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Destroy() override;
-
+	virtual void ParentUpdateNotification() override;
 public:
 	virtual void SetActive(bool active) override;
 public:
@@ -27,6 +27,9 @@ public:
 
 
 	void SetColor(const JColor& color);
+	uint64_t GetPriority() const {
+		return m_Priority;
+	}
 protected:
 	void DestroyRI();
 	void FindPanel();
@@ -41,19 +44,32 @@ protected:
 
 	JVector2 m_PrevWindowSize;
 	uint64_t m_Priority = 0;
+	bool     m_ParentDirty = false;
 };
 
 class JGUIRectangle : public JGUIShape
 {
 public:
 	void SetImage(const std::string& texture_image);
+	void FillOn();
+	void EmptyOn();
+	void  SetThickness(float thick) { m_Thick = thick; }
+	float GetThickness() const      { return m_Thick; }
 protected:
 	virtual void CreateRI() override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
 
 private:
+	void CreateMesh();
+private:
 	std::string m_ImageName;
+	bool m_IsFill = true;
+	float m_Thick = 5.0f;
 };
+
+
+
+
 
 class JGUIText : public JGUIShape
 {
@@ -78,8 +94,6 @@ public:
 public:
 	JGUIText& operator=(const std::string& str);
 	JGUIText& operator+=(const std::string& str);
-protected:
-	virtual void Start() override;
 protected:
 	virtual void CreateRI() override;
 	std::pair<uint32_t, JVector2> ConvertVertex(

@@ -382,12 +382,12 @@ void JGUIWinRectTransform::SetSize(float x, float y)
 }
 void JGUIWinRectTransform::OffsetSize(const JVector2& offset)
 {
-	JGUIRectTransform::SetSize(offset);
+	JGUIRectTransform::OffsetSize(offset);
 	SendSizeToWin();
 }
 void JGUIWinRectTransform::OffsetSize(float x, float y)
 {
-	JGUIRectTransform::SetSize(x, y);
+	JGUIRectTransform::OffsetSize(x, y);
 	SendSizeToWin();
 }
 void JGUIWinRectTransform::SendPosToWin()

@@ -1,26 +1,29 @@
 #include "pch.h"
 #include "JGUITitleBar.h"
 #include "JGUIPanel.h"
+#include "JGUIShape.h"
 #include "JGUIButton.h"
 #include "JGUICollider.h"
 #include "JGUIRectTransform.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
+
 using namespace std;
 #define Default_Bt_Size 20
 
 
 void JGUITitleBar::Awake()
 {
-	RegisterBoxCollider();
+	RegisterCollider(JGUI_Component_Colider_Box);
 	m_Panel = CreateJGUIComponent<JGUIPanel>("JGUIPanel");
 	m_CloseBt = CreateJGUIComponent<JGUICloseButton>("JGUICloseBt");
 	m_MaxBt = CreateJGUIComponent<JGUIMaximizeButton>("JGUIMaxBt");
 	m_MinBt = CreateJGUIComponent<JGUIMinimizeButton>("JGUIMinBt");
+	m_TitleText = CreateJGUIComponent<JGUIText>("JGUITitleText");
+
+	m_CloseBt->SetParent(m_Panel);
 	m_MaxBt->SetParent(m_Panel);
 	m_MinBt->SetParent(m_Panel);
-	m_CloseBt->SetParent(m_Panel);
-
-
+	m_TitleText->SetParent(m_Panel);
 	SettingElement();
 }
 
@@ -68,7 +71,7 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 
 void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
 {
-	if(m_IsGrap) m_IsGrap = false;
+	// if(m_IsGrap) m_IsGrap = false;
 }
 
 
@@ -77,7 +80,13 @@ void JGUITitleBar::SettingElement()
 	auto size = GetOwnerWindow()->GetTransform()->GetSize();
 
 
-	GetTransform()->SetSize(size.x, 40);
+	GetTransform()->SetSize(size.x, Default_Bt_Size);
+
+
+	m_TitleText->SetTextRect(size.x, Default_Bt_Size);
+	m_TitleText->SetFontSize(Default_Bt_Size - 4.0f);
+	m_TitleText->SetText(GetOwnerWindow()->GetName());
+	m_TitleText->GetTransform()->SetPosition(JGUI::Gap(), 0.0f);
 	m_Panel->GetTransform()->SetSize(size.x, Default_Bt_Size);
 	m_Panel->SetColor(JColor(0.3f, 0.3f, 0.3f, 1.0f));
 	m_CloseBt->GetTransform()->SetSize(Default_Bt_Size, Default_Bt_Size);

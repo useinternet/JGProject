@@ -12,6 +12,9 @@ extern "C" GAME_API GameObject* Create##class_name() { \
      GameObject* obj = new(##class_name); \
      return obj; \
 } \
+extern "C" GAME_API void Delete##class_name(GameObject* obj) { \
+     delete obj; \
+} \
 
 
 

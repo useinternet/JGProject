@@ -18,17 +18,20 @@ namespace GFW
 		p.Load("JGGame.dll");
 		if (p.IsValid())
 		{
-			pCreateGameObjectFunc func;
-			func = (pCreateGameObjectFunc)p.GetProcAddress("CreateTestObject");
-			if (func)
+			pCreateGameObjectFunc create_func;
+			pDeleteGameObjectFunc delete_func;
+			create_func = (pCreateGameObjectFunc)p.GetProcAddress("CreateTestObject");
+			delete_func = (pDeleteGameObjectFunc)p.GetProcAddress("DeleteTestObject");
+			if (create_func)
 			{
-				auto obj = func();
-				std::shared_ptr<GameObject> ptr(obj);
+				auto obj = create_func();
 
 
-				ptr->Begin();
-				ptr->Tick();
-				ptr->End();
+				obj->Begin();
+				obj->Tick();
+				obj->End();
+
+				delete_func(obj);
 			}
 		}
 		else

@@ -17,6 +17,9 @@ namespace IE
 		virtual void Update() override;
 		virtual void OnEvent(Event& e) override;
 
+
+		void Flush();
+		void MouseFlush();
 		bool GetKeyDown(KeyCode code);
 		bool GetKeyUp(KeyCode code);
 
@@ -38,9 +41,6 @@ namespace IE
 
 		const JVector2Int GetMousePosition();
 		const JVector2Int GetMouseDelta();
-
-		const JVector2 GetMousePositionFromScreen();
-		const JVector2 GetMouseDeltaFromScreen();
 		HWND GetHandle() {
 			return m_hWnd;
 		}

@@ -59,9 +59,10 @@ void JGUIWindow::JGUIDestroy()
 		JGUI::DestroyObject(window);
 	}
 	// 컴포넌트 삭제
-	for (auto& window : m_WindowComponents)
+	for (auto& com : m_WindowComponents)
 	{
-		JGUI::DestroyObject(window);
+		JGUI::DestroyObject(com);
+		if (GetFocus() == com) SetFocus(nullptr);
 	}
 	m_GUIModule = nullptr;
 	// 스크린 삭제 요청
@@ -127,10 +128,12 @@ void JGUIWindow::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
 
 	FocusEnter(e);
 }
-void JGUIWindow::JGUIFocusHover(const JGUIFocusHoverEvent& e)
+void JGUIWindow::JGUIFocusExit(const JGUIFocusExitEvent& e)
 {
-	//ENGINE_LOG_INFO(e.ToString() + " : " + GetName());
-	FocusHover(e);
+	JGUI::InputFlush();
+	SetFocus(nullptr);
+	ENGINE_LOG_INFO(e.ToString() + " : " + GetName());
+	FocusExit(e);
 }
 void JGUIWindow::JGUIOnFocus()
 {
@@ -155,32 +158,34 @@ void JGUIWindow::JGUIKeyUp(const JGUIKeyUpEvent& e)
 
 void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 {
+	JGUIComponent* cc = m_Panel;
+	cc = cc->TrackingCanInteractionComponent();
 
-	for (auto& com : m_WindowComponents)
+	if (GetFocus() == nullptr || m_IsMouseLeave)
 	{
-		auto p = JGUI::GetMousePos(GetRootWindowHandle());
-		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
-		{
-			com->JGUIMouseBtDown(e);
-		}
+		SetFocus(cc);
+		m_IsMouseLeave = false;
+	}
+
+	if (GetFocus() && GetFocus() == cc)
+	{
+		cc->EventProcess(JGUI_ComponentEvent_MouseBtDown, &e);
 	}
 	MouseBtDown(e);
-//	ENGINE_LOG_INFO(e.ToString());
 }
 
 void JGUIWindow::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
-
-	for (auto& com : m_WindowComponents)
+	auto focus = GetFocus();
+	if (focus)
 	{
-		auto p = JGUI::GetMousePos(GetRootWindowHandle());
-		if (com->IsActive() && com->GetCollider() && com->GetCollider()->CheckInPoint(p))
+		if (focus->Interation(JGUI_ComponentEvent_MouseBtUp))
 		{
-			com->JGUIMouseBtUp(e);
+			focus->EventProcess(JGUI_ComponentEvent_MouseBtUp, &e);
 		}
+		SetFocus(nullptr);
 	}
 	MouseBtUp(e);
-	//ENGINE_LOG_INFO(e.ToString());
 }
 void JGUIWindow::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 {
@@ -213,7 +218,7 @@ void JGUIWindow::JGUIMouseHover()
 		track.flag = JGUI_MOUSETRACKFLAG_MOUSELEAVE;
 		JGUI::RegisterMouseTrack(track);
 	}
-	ENGINE_LOG_INFO(GetName() + "Hover");
+	
 	MouseHover();
 }
 void JGUIWindow::JGUIMouseLeave()
@@ -222,7 +227,8 @@ void JGUIWindow::JGUIMouseLeave()
 	{
 		m_IsTracking = false;
 	}
-	ENGINE_LOG_INFO(GetName() + "Leave");
+	m_IsMouseLeave = true;
+	JGUI::InputMouseFlush();
 	MouseLeave();
 }
 void JGUIWindow::Char(const JGUICharEvent& e)
@@ -337,6 +343,18 @@ HWND JGUIWindow::GetRootWindowHandle() const
 	else
 		return 0;
 }
+
+void JGUIWindow::SetFocus(JGUIComponent* com)
+{
+	m_FocusComponent = com;
+}
+JGUIComponent* JGUIWindow::GetFocus()
+{
+	return m_FocusComponent;
+}
+
+
+
 void JGUIWindow::SetPriority(EJGUI_WindowPriority p)
 {
 	m_Priority = p;
@@ -351,6 +369,7 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 	auto transform = GetTransform();
 	auto window_size = transform->GetSize();
 	m_Panel = JGUI::CreateJGUIComponent<JGUIPanel>(GetName() + "Panel", this);
+	//m_Panel->RegisterCollider(JGUI_Component_Colider_Box);
 	m_WindowComponents.push_back(m_Panel);
 	m_Panel->GetTransform()->SetSize(GetTransform()->GetSize());
 	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });

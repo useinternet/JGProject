@@ -72,6 +72,9 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.h">
       <Filter>GUI\JGUIFont</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -117,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp">
       <Filter>GUI\JGUIFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

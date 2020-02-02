@@ -147,6 +147,16 @@ bool JGUI::GetKeyUp(JGUIWindow* owner_window, KeyCode code)
 	return sm_GUI->m_Input->GetKeyUp(code);
 }
 
+void JGUI::InputFlush()
+{
+	sm_GUI->m_Input->Flush();
+}
+
+void JGUI::InputMouseFlush()
+{
+	sm_GUI->m_Input->MouseFlush();
+}
+
 void JGUI::RegisterMouseTrack(const JGUIMouseTrack& mt)
 {
 	auto& trcak_map = sm_GUI->m_MouseTrackMap;
@@ -205,7 +215,6 @@ void JGUI::Update()
 
 	if (focus_window)
 	{
-		ENGINE_LOG_INFO("Focus");
 		focus_window->JGUIOnFocus();
 		auto kdownList = m_Input->GetKeyBoardDownList();
 		auto kupList = m_Input->GetKeyBoardUpList();
@@ -418,10 +427,10 @@ LRESULT JGUI::WindowSetFocus(JGUIWindow* window, WPARAM wParam)
 LRESULT JGUI::WindowKillFocus(JGUIWindow* window, WPARAM wParam)
 {
 	if (window == nullptr) return 0;
-	JGUIFocusHoverEvent e;
+	JGUIFocusExitEvent e;
 	auto next_focus_window = FindRootJGUIWindow((HWND)wParam);
 	e.nextFocusWindow = next_focus_window;
-	window->JGUIFocusHover(e);
+	window->JGUIFocusExit(e);
 	return 0;
 }
 LRESULT JGUI::WindowChar(JGUIWindow* window, WPARAM wParam, LPARAM lParam)
