@@ -211,7 +211,7 @@ namespace RE
 			ResourceDataMap::SetResourceName(m_D3D_Resource.Get(), GetName());
 		}
 	}
-	void Resource::Clone(Resource& resource)
+	void Resource::Clone(Resource& resource) 
 	{
 		if (m_D3D_Resource.Get() == resource.GetD3DResource())
 			return;

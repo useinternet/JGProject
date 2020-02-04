@@ -12,6 +12,7 @@
 #include "Object/ReObject/ReMaterial.h"
 #include "Object/ReObject/RenderItem.h"
 #include "Object/ReObject/ReCamera.h"
+#include "Object/DxObject/TextureManager.h"
 // struct 의 변수 이름과 ConstantBuffer의 변수이름을 잇는다.
 // ShaderObject에 들어가 있는 정보
 /*
@@ -1194,6 +1195,9 @@ namespace RE
 		result->m_CamCB = *FindConstantBuffer(CameraCBName());
 		result->m_GameObjectSB_Struct = FindStructuredBuffer(GameObjectSBName())->CloneBindedStruct();
 		m_RenderTarget->Clone(result->m_RenderTarget);
+
+
+		result->m_TextureCacheKey = "FixedGShaderModuleClone_" + to_string(id);
 		return result;
 	}
 

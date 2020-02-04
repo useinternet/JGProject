@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RenderEngine.h"
+#include "DirectXTex/DirectXTex.h"
 #include "Object/DxObject/Fence.h"
 #include "Object/DxObject/DescriptorAllocator.h"
 #include "Object/DxObject/DescriptorHandle.h"
@@ -28,6 +29,8 @@
 #include <d3dcompiler.h>
 using namespace std;
 using namespace DirectX;
+
+
 
 namespace RE
 {
@@ -113,11 +116,12 @@ namespace RE
 
 		auto& riManager = g_RenderEngine->m_RIManager;
 		riManager[new_id]->Merge(riManager[old_id].get());
-
+		
 	}
 
 	GraphicsShaderModule* RenderEngine::FindGraphicsShaderModule(const std::string& name)
 	{
+		
 		// 미구현
 		return nullptr;
 	}
@@ -144,9 +148,35 @@ namespace RE
 	{
 		return g_RenderEngine->m_RenderDevice.get();
 	}
+	void RenderEngine::SaveToFile(const std::string& path, const Texture& t)
+	{
+		DirectX::ScratchImage image;
+		if (t.IsVaild())
+		{
+			DirectX::CaptureTexture(g_RenderEngine->m_RenderDevice->GetDirectCmdQueue()->GetD3DCommandQueue(),
+				t.GetD3DResource(), false, image);
+			DirectX::SaveToDDSFile(image.GetImages(), image.GetImageCount(),
+				image.GetMetadata(), DirectX::DDS_FLAGS::DDS_FLAGS_NONE, s2ws(path).c_str());
+		}
+
+	}
+	void RenderEngine::SaveToFile(const std::string& path, const std::string& texturename)
+	{
+		SaveToFile(path, TextureManager::GetTexture(texturename));
+	}
 	void RenderEngine::RequestTextureLoad(const std::string& path)
 	{
 		TextureManager::RequestLoadAndGetTexture(path);
+	}
+
+	void RenderEngine::RegisterTexture(const std::string& name, const Texture& t)
+	{
+		TextureManager::RegisterTexture(name, t);
+	}
+
+	void RenderEngine::UnRegisterTexture(const std::string& name)
+	{
+		TextureManager::UnRegisterTexture(name);
 	}
 
 
@@ -208,11 +238,11 @@ namespace RE
 			blend_desc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 			blend_desc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 			blend_desc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-			blend_desc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			blend_desc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE; // D3D12_BLEND_ZERO;
 			blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 			blend_desc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-
+			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA; // D3D12_BLEND_ONE;
+			
 
 			// 텍스쳐 없는 기본 머터리얼
 			{
@@ -275,6 +305,7 @@ namespace RE
 	void RenderEngine::Update()
 	{
 		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
+		
 	
 		m_RenderDevice->Update();
 		m_TextureManager->Update();

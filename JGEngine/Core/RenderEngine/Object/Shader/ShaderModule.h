@@ -249,7 +249,7 @@ namespace RE
 		RenderTarget      m_RenderTarget;
 		EModuleFormat     m_Format;
 		uint64_t          m_ID;
-
+		std::string       m_TextureCacheKey;
 		std::map<std::string, uint32_t>  m_RootParamMap;
 	public:
 		FixedGShaderModuleClone() = default;
@@ -260,6 +260,12 @@ namespace RE
 			return m_RenderTarget.GetDepthTexture();
 		}
 		void Execute(CommandList* cmdList);
+		const std::string& GetTextureCacheKey() const {
+			return m_TextureCacheKey;
+		}
+		const std::string& GetTextureCacheKey()  {
+			return m_TextureCacheKey;
+		}
 	};
 
 

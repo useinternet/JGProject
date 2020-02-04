@@ -4,6 +4,7 @@
 #include "GUI/JGUIComponent/JGUIRectTransform.h"
 #include "GUI/JGUIComponent/JGUIPanel.h"
 #include "GUI/JGUIComponent/JGUICollider.h"
+#include "GUI/JGUIComponent/JGUIShape.h"
 
 #include "GUI/JGUIScreen.h"
 #include "RenderEngine.h"
@@ -16,7 +17,6 @@
 #include "Object/ReObject/ReMaterial.h"
 using namespace std;
 using namespace RE;
-
 
 void JGUIWindow::JGUIAwake()
 {
@@ -76,6 +76,7 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 {
 	JGUIObject::JGUITick(e);
 	
+	if (GetFocus()) GetFocus()->JGUIOnFocus();
 
 
 	for (auto& com : m_WindowComponents)
@@ -96,9 +97,22 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 		device->SubmitToRender(JGUI_SubmitCmdListPriority_Default, [&](RE::CommandList* cmdList)
 		{
 			if (m_GUIModule == nullptr) return;
+
+
 			m_GUIModule->Execute(cmdList);
+
 		});
 	}
+
+	//if (m_WinTexture && GetTransform()->IsDirty())
+	//{
+	//	m_WinTexture->GetTransform()->SetPosition(GetTransform()->GetPosition());
+	//	m_WinTexture->GetTransform()->SetPivot(GetTransform()->GetPivot());
+	//	m_WinTexture->GetTransform()->SetAngle(GetTransform()->GetAngle());
+	//	m_WinTexture->GetTransform()->SetActive(IsActive());
+	//	m_WinTexture->GetTransform()->SetScale(GetTransform()->GetScale());
+	//	m_WinTexture->GetTransform()->SetSize(GetTransform()->GetSize());
+	//}
 }
 
 void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
@@ -107,13 +121,8 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 	GetTransform()->SetSize(e.width, e.height);
 	m_Panel->GetTransform()->SetSize(e.width, e.height);
 	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
-	m_ReCamera = make_shared<RE::ReCamera>();
-	m_ReCamera->SetLens(45, e.width, e.height);
-	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
-	m_ReCamera->ConvertOrthographic();
-	m_GUIModule = RE::RenderEngine::GetGUIModule()->Clone(m_ReCamera.get(), GetID());
 
-
+	ReadyGUIModule();
 	if (m_Screen)
 	{
 		m_Screen->Resize((uint32_t)e.width, (uint32_t)e.height);
@@ -124,7 +133,6 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 }
 void JGUIWindow::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
 {
-	//ENGINE_LOG_INFO(e.ToString() + " : " + GetName());
 
 	FocusEnter(e);
 }
@@ -132,7 +140,6 @@ void JGUIWindow::JGUIFocusExit(const JGUIFocusExitEvent& e)
 {
 	JGUI::InputFlush();
 	SetFocus(nullptr);
-	ENGINE_LOG_INFO(e.ToString() + " : " + GetName());
 	FocusExit(e);
 }
 void JGUIWindow::JGUIOnFocus()
@@ -147,12 +154,11 @@ void JGUIWindow::JGUIChar(const JGUICharEvent& e)
 
 void JGUIWindow::JGUIKeyDown(const JGUIKeyDownEvent& e)
 {
-	//ENGINE_LOG_INFO(e.ToString());
+	
 	KeyDown(e);
 }
 void JGUIWindow::JGUIKeyUp(const JGUIKeyUpEvent& e)
 {
-	//ENGINE_LOG_INFO(e.ToString());
 	KeyUp(e);
 }
 
@@ -161,15 +167,20 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 	JGUIComponent* cc = m_Panel;
 	cc = cc->TrackingCanInteractionComponent();
 
-	if (GetFocus() == nullptr || m_IsMouseLeave)
+	if (!m_IsMouseDown || m_IsMouseLeave)
 	{
 		SetFocus(cc);
+		m_IsMouseDown  = true;
 		m_IsMouseLeave = false;
 	}
 
-	if (GetFocus() && GetFocus() == cc)
+	auto focus = GetFocus();
+	if (GetFocus())
 	{
-		cc->EventProcess(JGUI_ComponentEvent_MouseBtDown, &e);
+		if (focus->Interation(JGUI_ComponentEvent_MouseBtDown))
+		{
+			focus->EventProcess(JGUI_ComponentEvent_MouseBtDown, &e);
+		}
 	}
 	MouseBtDown(e);
 }
@@ -177,14 +188,14 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 void JGUIWindow::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
 	auto focus = GetFocus();
-	if (focus)
+	if (GetFocus())
 	{
 		if (focus->Interation(JGUI_ComponentEvent_MouseBtUp))
 		{
 			focus->EventProcess(JGUI_ComponentEvent_MouseBtUp, &e);
 		}
-		SetFocus(nullptr);
 	}
+	if (m_IsMouseDown) m_IsMouseDown = false;
 	MouseBtUp(e);
 }
 void JGUIWindow::JGUIMouseMove(const JGUIMouseMoveEvent& e)
@@ -246,6 +257,8 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 		}
 		parent->m_ChildWindows.push_back(this);
 		m_ParentWindow = parent;
+		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey(), m_ParentWindow->GetID());
+		m_Priority = JGUI_WindowPriority_Child;
 	}
 	else if (parent == nullptr) // 최상단 루트가 되어라
 	{
@@ -255,10 +268,13 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 				m_ParentWindow->m_ChildWindows.end(), this), m_ParentWindow->m_ChildWindows.end());
 		}
 		m_ParentWindow = nullptr;
+		
 		if (m_Screen == nullptr)
 		{
 			NewLoad();
 		}
+		m_WinTexture->UnBind();
+		m_Priority = JGUI_WindowPriority_None;
 	}
 	else
 	{
@@ -269,6 +285,7 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 		}
 		parent->m_ChildWindows.push_back(this);
 		m_ParentWindow = parent;
+		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey(), m_ParentWindow->GetID());
 	}
 }
 JGUIWindow* JGUIWindow::GetParent() const
@@ -346,7 +363,24 @@ HWND JGUIWindow::GetRootWindowHandle() const
 
 void JGUIWindow::SetFocus(JGUIComponent* com)
 {
-	m_FocusComponent = com;
+	if (m_FocusComponent != com)
+	{
+		if (m_FocusComponent) // exit
+		{
+			JGUIFocusExitEvent exit_e;
+			exit_e.nextFocus = com;
+			m_FocusComponent->JGUIFocusExit(exit_e);
+		}
+		JGUIFocusEnterEvent enter_e;
+		enter_e.prevFocus = m_FocusComponent;
+
+		//
+		m_FocusComponent = com;
+		if (com) // enter
+		{
+			com->JGUIFocusEnter(enter_e);
+		}
+	}
 }
 JGUIComponent* JGUIWindow::GetFocus()
 {
@@ -369,12 +403,12 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 	auto transform = GetTransform();
 	auto window_size = transform->GetSize();
 	m_Panel = JGUI::CreateJGUIComponent<JGUIPanel>(GetName() + "Panel", this);
-	//m_Panel->RegisterCollider(JGUI_Component_Colider_Box);
 	m_WindowComponents.push_back(m_Panel);
 	m_Panel->GetTransform()->SetSize(GetTransform()->GetSize());
 	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
-
-
+	m_WinTexture = CreateJGUIComponent<JGUIWindowTexture>("WindowTexture");
+	m_RectTransform->AttachTransform(m_WinTexture->GetTransform());
+	ReadyGUIModule();
 	if (m_Flags & JGUI_WindowFlag_NewLoad)
 	{
 		SetParent(nullptr);
@@ -388,19 +422,21 @@ void JGUIWindow::NewLoad()
 		JGUI::RequestDestroyScreen(m_Screen->GetHandle());
 		m_Screen = nullptr;
 	}
-	auto size = m_RectTransform->GetSize();
-	auto pos = m_RectTransform->GetPosition();
 	m_Screen = JGUI::ReqeustRegisterJGUIScreen(this);
-
-	m_ReCamera = make_shared<RE::ReCamera>();
-	m_ReCamera->SetLens(45, size.x, size.y);
-	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
-	m_ReCamera->ConvertOrthographic();
-	m_GUIModule = RE::RenderEngine::GetGUIModule()->Clone(m_ReCamera.get(), GetID());
-
 
 	if (m_Screen)
 	{
 		m_Screen->BindGUIModuleClone(m_GUIModule.get());
 	}
+}
+
+void JGUIWindow::ReadyGUIModule()
+{
+	auto size = GetTransform()->GetSize();
+	m_ReCamera = make_shared<RE::ReCamera>();
+	m_ReCamera->SetLens(45, size.x, size.y);
+	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
+	m_ReCamera->ConvertOrthographic();
+	m_GUIModule = RE::RenderEngine::GetGUIModule()->Clone(m_ReCamera.get(), GetID());
+	RE::RenderEngine::RegisterTexture(m_GUIModule->GetTextureCacheKey(), m_GUIModule->GetRTTexture(0));
 }

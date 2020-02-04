@@ -420,7 +420,7 @@ LRESULT JGUI::WindowSetFocus(JGUIWindow* window, WPARAM wParam)
 	if (window == nullptr) return 0;
 	JGUIFocusEnterEvent e;
 	auto prev_focus_window = FindRootJGUIWindow((HWND)wParam);
-	e.prevFocusWindow = prev_focus_window;
+	e.prevFocus = prev_focus_window;
 	window->JGUIFocusEnter(e);
 	return 0;
 }
@@ -429,7 +429,7 @@ LRESULT JGUI::WindowKillFocus(JGUIWindow* window, WPARAM wParam)
 	if (window == nullptr) return 0;
 	JGUIFocusExitEvent e;
 	auto next_focus_window = FindRootJGUIWindow((HWND)wParam);
-	e.nextFocusWindow = next_focus_window;
+	e.nextFocus = next_focus_window;
 	window->JGUIFocusExit(e);
 	return 0;
 }

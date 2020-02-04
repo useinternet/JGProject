@@ -10,6 +10,8 @@
 #include "GUI.h"
 #include "Shader.h"
 #include "DxScreen.h"
+
+
 using namespace std;
 using namespace concurrency;
 namespace RE
@@ -307,14 +309,14 @@ namespace RE
 				temp_cmdList_array.begin(), temp_cmdList_array.end());
 		}
 
-
+		
 		for (auto& screen : m_DxScreenPool)
 		{
 			auto present_commandList = m_DirectCommandQueue->GetCommandList();
-
 			screen.second->Update(present_commandList);
 			cmdList_vector.push_back(present_commandList);
 		}
+		
 
 		return cmdList_vector;
 	}

@@ -8,14 +8,12 @@ class JGUITitleBar;
 class JGUIRectangle;
 class JGUIText;
 class JGUIResizeBox;
+class JGUIWinTexture;
 
 class JGUIForm : public JGUIWindow
 {
 	JGUITitleBar*  m_Title = nullptr;
-
 	JGUIResizeBox* m_ResizeBox = nullptr;
-
-	//TestCode
 	JGUIText* text = nullptr;
 protected:
 	virtual void Start() override;

@@ -44,8 +44,9 @@ enum EJGUI_SubmitCmdListPriority
 };
 enum EJGUI_WindowPriority : uint64_t
 {
-	JGUI_WindowPriority_TopMost    = 40000000000000000,
-	JGUI_WindowPriority_Focus      = 30000000000000000,
+	JGUI_WindowPriority_TopMost    = 50000000000000000,
+	JGUI_WindowPriority_Focus      = 40000000000000000,
+	JGUI_WindowPriority_Child      = 30000000000000000,
 	JGUI_WindowPriority_None       = 20000000000000000,
 	JGUI_WindowPriority_BottomMost = 10000000000000000,
 };
@@ -75,6 +76,9 @@ enum EJGUI_ComponentEvents
 	JGUI_ComponentEvent_MouseBtUp,
 	JGUI_ComponentEvent_MouseLeave,
 	JGUI_ComponentEvent_MouseHover,
+	JGUI_ComponentEvent_FocusEnter,
+	JGUI_ComponentEvent_FocusExit,
+	JGUI_ComponentEvent_OnFocus,
 	JGUI_ComponentEvent_ParentUpdateNotification,
 };
 

@@ -86,9 +86,13 @@ namespace RE
 
 		// ±‚≈∏
 		static RenderDevice* GetDevice();
-
+		// TestCode
+		static void SaveToFile(const std::string& path, const Texture& t);
+		static void SaveToFile(const std::string& path, const std::string& texturename);
 		//
 		static void RequestTextureLoad(const std::string& path);
+		static void RegisterTexture(const std::string& name, const Texture& t);
+		static void UnRegisterTexture(const std::string& name);
 	public:
 		RenderEngine(const GlobalLinkStream& stream);
 		virtual ~RenderEngine();

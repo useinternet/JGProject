@@ -24,6 +24,8 @@ namespace RE
 		static void  RequestLoadAndGetTexture(const std::string& name, Texture* t = nullptr);
 		static void  RequestCancelLoadTexture(Texture* t);
 		static const Texture& GetTexture(const std::string& name);
+		static bool RegisterTexture(const std::string& name, const Texture& t);
+		static bool UnRegisterTexture(const std::string& name);
 	private:
 		bool TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList);
 	private:

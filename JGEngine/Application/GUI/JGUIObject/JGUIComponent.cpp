@@ -152,6 +152,23 @@ void JGUIComponent::JGUIMouseHover()
 
 }
 
+void JGUIComponent::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
+{
+	ENGINE_LOG_INFO(GetName() + " : " + e.ToString());
+	EventProcess(JGUI_ComponentEvent_FocusEnter, &e);
+}
+
+void JGUIComponent::JGUIFocusExit(const JGUIFocusExitEvent& e)
+{
+	ENGINE_LOG_INFO(GetName() + " : " + e.ToString());
+	EventProcess(JGUI_ComponentEvent_FocusExit, &e);
+}
+
+void JGUIComponent::JGUIOnFocus()
+{
+	EventProcess(JGUI_ComponentEvent_OnFocus, nullptr);
+}
+
 void JGUIComponent::JGUIParentUpdateNotification()
 {
 	for (auto& child : m_ChildComponents)
@@ -219,42 +236,6 @@ JGUIComponent* JGUIComponent::FindChild(const std::string& name)
 	return nullptr;
 }
 
-//bool JGUIComponent::IsEventLock(EJGUI_ComponentEvents event_type) {
-//	return m_EventLockMap[event_type];
-//}
-//
-//
-//void JGUIComponent::EventLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag)
-//{
-//	m_EventLockMap[event_type] = true;
-//	if (flag & JGUI_ComponentEventLockFlag_SendParent && GetParent())
-//	{
-//		GetParent()->EventLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendChild));
-//	}
-//	if (flag & JGUI_ComponentEventLockFlag_SendChild)
-//	{
-//		for (auto& child : m_ChildComponents) child->EventLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendParent));
-//	}
-//	if (flag & JGUI_ComponentEventLockFlag_Once)
-//	{
-//		m_OnceEventLockMap.insert(event_type);
-//	}
-//}
-//void JGUIComponent::EventUnLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag)
-//{
-//	m_EventLockMap[event_type] = false;
-//	if (flag & JGUI_ComponentEventLockFlag_SendParent && GetParent())
-//	{
-//		GetParent()->EventUnLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendChild));
-//	}
-//	if (flag & JGUI_ComponentEventLockFlag_SendChild)
-//	{
-//		for (auto& child : m_ChildComponents) child->EventUnLock(event_type, (flag & ~JGUI_ComponentEventLockFlag_SendParent));
-//	}
-//}
-
-
-
 void JGUIComponent::RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI_ComponentInteractionFlags flags)
 {
 	switch (colider_type)
@@ -276,18 +257,6 @@ void JGUIComponent::RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI
 
 void JGUIComponent::EventProcess(EJGUI_ComponentEvents event_type,const void* data)
 {
-
-
-	//if (IsEventLock(event_type))
-	//{
-	//	if (m_OnceEventLockMap.find(event_type) != m_OnceEventLockMap.end())
-	//	{
-	//		m_OnceEventLockMap.erase(event_type);
-	//		EventUnLock(event_type);
-	//	}
-	//	return;
-	//}
-
 	switch (event_type)
 	{
 	case JGUI_ComponentEvent_Awake:
@@ -319,6 +288,15 @@ void JGUIComponent::EventProcess(EJGUI_ComponentEvents event_type,const void* da
 		break;
 	case JGUI_ComponentEvent_MouseHover:
 		MouseHover();
+		break;
+	case JGUI_ComponentEvent_FocusEnter:
+		FocusEnter(*(JGUIFocusEnterEvent*)data);
+		break;
+	case JGUI_ComponentEvent_FocusExit:
+		FocusExit(*(JGUIFocusExitEvent*)data);
+		break;
+	case JGUI_ComponentEvent_OnFocus:
+		OnFocus();
 		break;
 	case JGUI_ComponentEvent_ParentUpdateNotification:
 		ParentUpdateNotification();

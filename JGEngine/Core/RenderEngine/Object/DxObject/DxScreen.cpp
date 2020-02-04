@@ -4,6 +4,8 @@
 #include "RenderDevice.h"
 #include "CommandQueue.h"
 #include "CommandList.h"
+
+
 using namespace std;
 
 
@@ -35,7 +37,6 @@ namespace RE
 	{
 		auto index = m_SwapChain->GetCurrentBackBufferIndex();
 		auto& back_buffer = m_BackBuffer[index];
-		
 		
 
 		cmdList->ClearRenderTarget(*back_buffer, JColor(0.0f, 0.0f, 0.0f, 0.0f));

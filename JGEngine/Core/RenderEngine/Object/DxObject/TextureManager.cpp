@@ -19,6 +19,7 @@ namespace RE
 			g_TextureManager = this;
 		}
 	
+	
 	}
 	void TextureManager::InitLoad(const std::string& path)
 	{
@@ -131,6 +132,21 @@ namespace RE
 	{
 		auto& cahce = g_TextureManager->m_TextureCahce;
 		return *cahce[name];
+	}
+	bool TextureManager::RegisterTexture(const std::string& name, const Texture& t)
+	{
+		auto& cahce = g_TextureManager->m_TextureCahce;
+		if (cahce.find(name) != cahce.end()) return false;
+
+		cahce[name] = make_shared<Texture>(t);
+		return true;
+	}
+	bool TextureManager::UnRegisterTexture(const std::string& name)
+	{
+		auto& cahce = g_TextureManager->m_TextureCahce;
+		if (cahce.find(name) == cahce.end()) return false;
+		cahce.erase(name);
+		return true;
 	}
 	bool TextureManager::TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList)
 	{

@@ -67,3 +67,4 @@ void JGUIScreen::BindGUIModuleClone(RE::FixedGShaderModuleClone* clone)
 		m_DxScreen->SetFinalTexture(clone->GetRTTexture(0));
 	}
 }
+

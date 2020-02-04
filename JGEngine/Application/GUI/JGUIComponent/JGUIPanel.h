@@ -4,9 +4,6 @@
 #include "GUI/JGUIObject/JGUIComponent.h"
 
 
-
-
-
 class JGUIRectangle;
 class JGUIPanel : public JGUIComponent
 {

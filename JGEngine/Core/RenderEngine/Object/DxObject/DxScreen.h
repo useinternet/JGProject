@@ -32,14 +32,16 @@ namespace RE
 		{
 			return m_Desc;
 		}
-	private:
 		void UpdateBackBuffer();
-	
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> m_SwapChain;
 		std::vector<std::shared_ptr<Texture>>   m_BackBuffer;
 		std::shared_ptr<Texture>                m_FinalTexture;
 		DxScreenDesc m_Desc;
+
+
+		bool m_Capture = false;
+
 		/*
 		스왑체인
 		버퍼 카운트

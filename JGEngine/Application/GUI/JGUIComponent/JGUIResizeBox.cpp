@@ -31,8 +31,20 @@ void JGUIResizeBox::Awake()
 
 
 	GetTransform()->SetSize(GetOwnerWindow()->GetTransform()->GetSize());
+}
+
+void JGUIResizeBox::Tick(const JGUITickEvent& e)
+{
 
 
+	if (GetCollider()->CheckInPoint(JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle())) || m_Resizing)
+	{
+		m_Rectangle->SetColor(JColor(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else
+	{
+		m_Rectangle->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
+	}
 }
 
 void JGUIResizeBox::Resize(const JGUIResizeEvent& e)
@@ -62,20 +74,6 @@ void JGUIResizeBox::MouseBtDown(const JGUIKeyDownEvent& e)
 		JGUI::RegisterExtraEvent(extra_event);
 	}
 }
-void JGUIResizeBox::MouseMove(const JGUIMouseMoveEvent& e)
-{
-	m_Rectangle->SetColor(JColor(1.0f, 0.0f, 0.0f, 1.0f));
-}
-
-
-void JGUIResizeBox::MouseLeave()
-{
-	if (m_Resizing == false)
-	{
-		m_Rectangle->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
-	}
-}
-
 void JGUIResizeBox::CheckCursorDirection()
 {
 	auto mouse_pos = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());

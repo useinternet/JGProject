@@ -26,10 +26,9 @@ public:
 	bool  IsResizing() const { return m_Resizing; }
 protected:
 	virtual void Awake() override;
+	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) override;
-	virtual void MouseMove(const JGUIMouseMoveEvent& e) override;
-	virtual void MouseLeave() override;
 private:
 	void CheckCursorDirection();
 	void ResizeByDirection();

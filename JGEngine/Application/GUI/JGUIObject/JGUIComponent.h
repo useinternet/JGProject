@@ -29,6 +29,9 @@ protected:
 	virtual void JGUIMouseLeave();
 	virtual void JGUIMouseHover();
 
+	virtual void JGUIFocusEnter(const JGUIFocusEnterEvent& e);
+	virtual void JGUIFocusExit(const JGUIFocusExitEvent& e);
+	virtual void JGUIOnFocus();
 	virtual void JGUIParentUpdateNotification();
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
@@ -37,6 +40,9 @@ protected:
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) {}
 	virtual void MouseLeave() {}
 	virtual void MouseHover() {}
+	virtual void FocusEnter(const JGUIFocusEnterEvent& e) {}
+	virtual void FocusExit(const JGUIFocusExitEvent& e) {}
+	virtual void OnFocus() {}
 	virtual void ParentUpdateNotification() {}
 public:
 	virtual void SetParent(JGUIComponent* parent);
@@ -53,10 +59,6 @@ public:
 	JGUICollider* GetCollider() const {
 		return m_Collider;
 	}
-	//bool IsEventLock(EJGUI_ComponentEvents event_type);
-	//void EventLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag = JGUI_ComponentEventLockFlag_None);
-	//void EventUnLock(EJGUI_ComponentEvents event_type, EJGUI_ComponentEventLockFlags flag = JGUI_ComponentEventLockFlag_None);
-
 public:
 	template<typename ComponentType>
 	ComponentType* CreateJGUIComponent(const std::string& name)

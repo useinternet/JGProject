@@ -9,6 +9,8 @@
 #include "Object/ReObject/ReMaterial.h"
 #include "Object/ReObject/RenderItem.h"
 #include "Object/ReObject/ReMesh.h"
+#include "Object/DxObject/Resource.h"
+#include "Object/Shader/ShaderModule.h"
 using namespace std;
 
 
@@ -31,7 +33,18 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 		FindPanel();
 	}
 	auto transform = GetTransform();
-	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
+
+	auto owner_root_window = GetOwnerWindow();
+	JVector2 window_size;
+	while (owner_root_window != nullptr)
+	{
+		if (owner_root_window->GetParent() == nullptr)
+		{
+			window_size = GetOwnerWindow()->GetTransform()->GetSize();
+			break;
+		}
+		owner_root_window = owner_root_window->GetParent();
+	}
 	if (transform->IsDirty() || 
 		(window_size != m_PrevWindowSize))
 	{
@@ -40,7 +53,15 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 		pos += m_Offset;
 		auto angle = transform->GetAngle();
 		auto scale = transform->GetScale();
-		pos = GetOwnerWindow()->ConvertToScreenPos(pos);
+		if (m_IsWindowTexture)
+		{
+			pos = owner_root_window->ConvertToScreenPos(pos);
+		}
+		else
+		{
+			pos = GetOwnerWindow()->ConvertToScreenPos(pos);
+		}
+		
 
 
 		auto pivot = transform->GetPivot();
@@ -152,12 +173,63 @@ void JGUIShape::FindPanel()
 void JGUIShape::CreateRI()
 {
 }
+
+void JGUIWindowTexture::Bind(const std::string& moduleKey, uint64_t parnet_id)
+{
+	if (m_ParentID == parnet_id) return;
+
+
+	m_ParentID = parnet_id;
+	if (m_RenderItem)
+	{
+		DestroyRI();
+	}
+	auto transform = GetTransform();
+	auto size = transform->GetSize();
+	m_RenderItem = RE::RenderEngine::CreateRenderItem(parnet_id,
+		RE::ERenderItemUsage::GUI, GetName() + "_RI");
+
+	m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
+	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	m_RenderItem->GetMaterial()->SetTexture("Image", moduleKey);
+	m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	m_RenderItem->SetPriority(GetOwnerWindow()->GetPriority());
+	m_Instance = m_RenderItem->AddInstance();
+	m_RenderItem->SetActive(IsActive());
+}
+
+void JGUIWindowTexture::UnBind()
+{
+	if (m_RenderItem)
+	{
+		DestroyRI();
+	}
+
+
+	m_ParentID = -1;
+}
+
+void JGUIWindowTexture::Awake()
+{
+	JGUIShape::Awake();
+	m_IsWindowTexture = true;
+}
+
+void JGUIWindowTexture::Resize(const JGUIResizeEvent& e)
+{
+	auto size = GetTransform()->GetSize();
+	if (m_RenderItem)
+	{
+		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	}
+}
+
 void JGUIRectangle::SetImage(const std::string& texture_image)
 {
 	if (m_RenderItem)
 	{
+		if (m_ImageName.empty()) m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
 		m_ImageName = texture_image;
-		m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
 		m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 		m_RenderItem->GetMaterial()->SetTexture("Image", texture_image);
 	}
@@ -207,9 +279,6 @@ void JGUIRectangle::Resize(const JGUIResizeEvent& e)
 		CreateMesh();
 	}
 }
-
-
-
 void JGUIRectangle::CreateMesh()
 {
 	if (m_RenderItem == nullptr) return;
@@ -224,15 +293,6 @@ void JGUIRectangle::CreateMesh()
 	}
 
 }
-
-
-
-
-
-
-
-
-
 void JGUIText::SetFont(const std::string& str)
 {
 	m_FontName = str;
@@ -243,6 +303,7 @@ void JGUIText::SetText(const std::string& str)
 {
 	if (m_RenderItem == nullptr) CreateRI();
 	if (str.empty()) return;
+	if (m_RenderItem == nullptr) return;
 	auto dmesh = m_RenderItem->GetMesh();
 	if (dmesh->GetType() != RE::EReMeshType::GUI) return;
 	dmesh->Reset();
@@ -420,6 +481,7 @@ void JGUIText::CreateRI()
 
 	m_RenderItem = RE::RenderEngine::CreateRenderItem(GetOwnerWindow()->GetID(),
 		RE::ERenderItemUsage::GUI, GetName() + "_RI");
+	if (m_RenderItem == nullptr) return;
 	m_RenderItem->SetMaterial(RE_GUI_TextMaterial);
 	m_RenderItem->SetMesh(make_shared<RE::ReGuiMesh>());
 	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
@@ -531,7 +593,7 @@ void JGUIText::UpdateTextSize(const std::string& str)
 	text_rect_size.y = font_height * lineCount;
 
 	GetTransform()->SetSize(text_rect_size);
-	GetTransform()->SendDirty();
+	//GetTransform()->SendDirty();
 	m_Offset.x = -(text_rect_size.x / 2.0f);
 	m_Offset.y = -(lineCount - 1) * font_height * 0.5f;
 }

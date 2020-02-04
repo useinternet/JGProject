@@ -7,8 +7,10 @@
 
 namespace RE
 {
+	class Texture;
 	class RenderItem;
 	class InstanceRenderItem;
+	class FixedGShaderModuleClone;
 }
 class JGUIPanel;
 class JGUIShape : public JGUIComponent
@@ -45,7 +47,23 @@ protected:
 	JVector2 m_PrevWindowSize;
 	uint64_t m_Priority = 0;
 	bool     m_ParentDirty = false;
+	bool     m_IsWindowTexture = false;
 };
+
+
+
+class JGUIWindowTexture : public JGUIShape
+{
+public:
+	void Bind(const std::string& moduleKey, uint64_t parnet_id);
+	void UnBind();
+protected:
+	virtual void Awake() override;
+	virtual void Resize(const JGUIResizeEvent& e) override;
+	uint64_t m_ParentID = -1;
+};
+
+
 
 class JGUIRectangle : public JGUIShape
 {
@@ -66,9 +84,6 @@ private:
 	bool m_IsFill = true;
 	float m_Thick = 5.0f;
 };
-
-
-
 
 
 class JGUIText : public JGUIShape

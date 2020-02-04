@@ -15,6 +15,9 @@ namespace RE
 class JGUIScreen;
 class JGUIComponent;
 class JGUIRectTransform;
+class JGUIRectangle;
+class JGUIWindowTexture;
+class JGUIWinRectTransform;
 class JGUIWindow : public JGUIObject
 {
 	friend JGUI;
@@ -62,7 +65,7 @@ public:
 	std::vector<JGUIComponent*>& GetWindowComponents();
 	JGUIWindow* FindChild(uint32_t index);
 	JGUIWindow* FindChild(const std::string& name);
-	JGUIRectTransform* GetTransform() const {
+	JGUIWinRectTransform* GetTransform() const {
 		return m_RectTransform;
 	}
 	template<typename WindowType>
@@ -112,6 +115,7 @@ public:
 private:
 	void Init(const std::string& name, EJGUI_WindowFlags flags);
 	void NewLoad();
+	void ReadyGUIModule();
 private:
 	JGUIScreen* m_Screen = nullptr;
 	JGUIWindow* m_ParentWindow = nullptr;
@@ -120,7 +124,8 @@ private:
 
 
 	JGUIComponent*               m_FocusComponent = nullptr;
-	JGUIRectTransform*           m_RectTransform = nullptr;
+	JGUIWinRectTransform*        m_RectTransform = nullptr;
+	JGUIWindowTexture*           m_WinTexture = nullptr;
 	JGUIPanel* m_Panel = nullptr;
 
 	EJGUI_WindowFlags m_Flags = JGUI_WindowFlag_None;
@@ -130,8 +135,11 @@ private:
 	std::shared_ptr<RE::FixedGShaderModuleClone> m_GUIModule;
 	std::shared_ptr<RE::ReCamera>                m_ReCamera;
 	EJGUI_WindowPriority m_Priority = JGUI_WindowPriority_None;
-	bool m_IsTracking = false;
+
+	// 작동 변수들
+	bool m_IsTracking   = false;
 	bool m_IsMouseLeave = false;
+	bool m_IsMouseDown  = false;
 };
 
 /*

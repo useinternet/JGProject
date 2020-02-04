@@ -10,8 +10,9 @@ public:
 		float angle = 0.0f, 
 		const JVector2 & scale = { 1.0f,1.0f });
 protected:
-
+	virtual void Destroy() override;
 public:
+	void AttachTransform(JGUIRectTransform* transform);
 	virtual void SetPosition(const JVector2& pos);
 	virtual void SetPosition(float x, float y);
 	virtual void OffsetPosition(const JVector2& offset);
@@ -55,6 +56,7 @@ public:
 	JGUIRect GetLocalRect() const;
 private:
 	void SendDirty(int n);
+
 protected:
 	JVector2    m_LocalPosition;
 	float       m_LocalAngle;
@@ -74,12 +76,18 @@ protected:
 		UpdateDirty = 3,
 		DirtyCount = 4
 	};
+	JGUIRectTransform* m_Attached = nullptr; // 연결된 트랜스폼
+	JGUIRectTransform* m_Attacher = nullptr; // 연결한 트랜스폼
+
 };
 
 class JGUIWinRectTransform : public JGUIRectTransform
 {
+protected:
+
 
 public:
+
 	virtual void SetPosition(const JVector2& pos);
 	virtual void SetPosition(float x, float y);
 	virtual void OffsetPosition(const JVector2& offset);
@@ -95,5 +103,4 @@ public:
 private:
 	void SendPosToWin();
 	void SendSizeToWin();
-
 };

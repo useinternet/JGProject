@@ -6,6 +6,8 @@
 
 #define JGUIEventArgConstruct(classname) classname() : JGUIEventArg(#classname) {}
 class JGUIWindow;
+class JGUIObject;
+class JGUIComponent;
 class JGUIEventArg
 {
 private:
@@ -49,7 +51,7 @@ class JGUIFocusEnterEvent : public JGUIEventArg
 public:
 	JGUIEventArgConstruct(JGUIFocusEnterEvent)
 public:
-	JGUIWindow* prevFocusWindow = nullptr;
+	JGUIObject* prevFocus = nullptr;
 };
 
 class JGUIFocusExitEvent : public JGUIEventArg
@@ -57,7 +59,7 @@ class JGUIFocusExitEvent : public JGUIEventArg
 public:
 	JGUIEventArgConstruct(JGUIFocusExitEvent)
 public:
-	JGUIWindow* nextFocusWindow = nullptr;
+	JGUIObject* nextFocus= nullptr;
 };
 
 

@@ -21,7 +21,6 @@ public:
 	void Resize(uint32_t width, uint32_t height);
 	HWND GetHandle() const;
 	void BindGUIModuleClone(RE::FixedGShaderModuleClone* clone);
-
 	JWindow* GetJWin() const {
 		return m_Window;
 	}
