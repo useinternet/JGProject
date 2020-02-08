@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GUI/JGUIObject/JGUIComponent.h"
-
+#include <set>
 class JGUIRectTransform : public JGUIComponent
 {
 public:
@@ -13,6 +13,8 @@ protected:
 	virtual void Destroy() override;
 public:
 	void AttachTransform(JGUIRectTransform* transform);
+	void DetachTransform(JGUIRectTransform* transform);
+	void ClearAttachedTransform();
 	virtual void SetPosition(const JVector2& pos);
 	virtual void SetPosition(float x, float y);
 	virtual void OffsetPosition(const JVector2& offset);
@@ -76,13 +78,14 @@ protected:
 		UpdateDirty = 3,
 		DirtyCount = 4
 	};
-	JGUIRectTransform* m_Attached = nullptr; // 연결된 트랜스폼
+	std::set<JGUIRectTransform*> m_AttachedList; // 연결된 트랜스폼
 	JGUIRectTransform* m_Attacher = nullptr; // 연결한 트랜스폼
 
 };
 
 class JGUIWinRectTransform : public JGUIRectTransform
 {
+	friend class JGUIWindow;
 protected:
 
 

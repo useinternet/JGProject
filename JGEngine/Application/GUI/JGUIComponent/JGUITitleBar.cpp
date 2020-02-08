@@ -40,8 +40,6 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 		m_IsGrap = true;
 		auto mouse_pos = JGUI::GetCursorPos();
 		auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
-		ENGINE_LOG_INFO("{0}, {1} wINDOW", window_pos.x, window_pos.y);
-		ENGINE_LOG_INFO("{0}, {1} Cursor", mouse_pos.x, mouse_pos.y);
 		m_Delta.x = (int)window_pos.x - mouse_pos.x;
 		m_Delta.y = (int)window_pos.y - mouse_pos.y;
 		JGUIExtraEvent e;
@@ -56,7 +54,7 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 
 
 				auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
-				ENGINE_LOG_INFO("{0}, {1} move", window_pos.x, window_pos.y);
+	
 			}
 
 

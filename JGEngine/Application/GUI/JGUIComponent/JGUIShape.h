@@ -33,7 +33,7 @@ public:
 		return m_Priority;
 	}
 protected:
-	void DestroyRI();
+	virtual void DestroyRI();
 	void FindPanel();
 	virtual void CreateRI();
 protected:
@@ -60,6 +60,10 @@ public:
 protected:
 	virtual void Awake() override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
+
+protected:
+	virtual void DestroyRI() override;
+protected:
 	uint64_t m_ParentID = -1;
 };
 
@@ -101,7 +105,17 @@ public:
 	void RemoveBack();
 	uint32_t Length() const;
 	void SetFontSize(float size);
+	float GetFontSize()
+	{
+		return m_FontSize;
+	}
+
+
 	void SetTextRect(float width, float height);
+
+
+	JVector2 GetTextLastPos();
+	const JVector2& GetTextPos(int n) const;
 public:
 	const JGUIRect& GetTextRect() const {
 		return m_TextRect;

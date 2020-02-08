@@ -9,19 +9,19 @@ class JGUIRectangle;
 class JGUIText;
 class JGUIResizeBox;
 class JGUIWinTexture;
+class JGUIInputText;
 
 class JGUIForm : public JGUIWindow
 {
-	JGUITitleBar*  m_Title = nullptr;
-	JGUIResizeBox* m_ResizeBox = nullptr;
 	JGUIText* text = nullptr;
+	JGUIInputText* inputText = nullptr;
 protected:
 	virtual void Start() override;
-	virtual void Tick(const JGUITickEvent& e) override;
-	virtual void Resize(const JGUIResizeEvent& e) override;
-	virtual void KeyDown(const JGUIKeyDownEvent& e) override;
 	virtual void KeyUp(const JGUIKeyUpEvent& e) override;
-	virtual void Char(const JGUICharEvent& e) override;
+
 };
+
+
+
 
 

@@ -117,7 +117,7 @@ void Application::Run()
 			_tasks.run(game_task);
 			_tasks.run(gui_task);
 			_tasks.wait();
-			
+
 			_tasks.run_and_wait(render_task);
 			m_EngineTimer->Tick();
 			if (m_InputEngine->GetKeyUp(KeyCode::Esc))

@@ -264,7 +264,12 @@ void JGUI::Update()
 		{
 			win = iter->second.win;
 			ownerwin = JGUI::FindRootJGUIWindow(win->GetRootWindowHandle());
-			collider = win->GetPanel()->GetCollider();
+			if (ownerwin == win) collider = win->GetPanel()->GetCollider();
+			else
+			{
+
+				collider = win->GetColider();
+			}
 		}
 		if (focus_cnt > JGUI_FOCUS_RANGE)
 		{
@@ -279,8 +284,9 @@ void JGUI::Update()
 		}
 		else
 		{
-			HWND focusHandle = ownerwin->GetRootWindowHandle();
-			bool check = collider->CheckInPoint(JGUI::GetMousePos(focusHandle));
+
+			bool check = collider->CheckInPoint(ownerwin->GetMousePos());
+
 			switch (iter->second.flag)
 			{
 			case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
@@ -296,6 +302,7 @@ void JGUI::Update()
 			{
 				auto flag = iter->second.flag;
 				iter = m_MouseTrackMap.erase(iter);
+
 				switch (flag)
 				{
 				case JGUI_MOUSETRACKFLAG_MOUSEHOVER:

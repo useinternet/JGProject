@@ -19,7 +19,7 @@ void JGUIComponent::JGUIAwake()
 	{
 		m_RectTransform = CreateJGUIComponent<JGUIRectTransform>("JGUIRectTransform");
 	}
-	EventProcess(JGUI_ComponentEvent_Awake, nullptr);
+	JGUIObject::JGUIAwake();
 }
 void JGUIComponent::JGUIStart()
 {
@@ -28,12 +28,12 @@ void JGUIComponent::JGUIStart()
 		if (child->IsExecuteStartFunc()) continue;
 		child->JGUIStart();
 	}
-	EventProcess(JGUI_ComponentEvent_Start, nullptr);
+	JGUIObject::JGUIStart();
 }
 void JGUIComponent::JGUITick(const JGUITickEvent& e)
 {
-	EventProcess(JGUI_ComponentEvent_Tick, &e);
 
+	Tick(e);
 	if (m_RectTransform)
 	{
 		if (m_PrevSize != m_RectTransform->GetSize())
@@ -57,12 +57,11 @@ void JGUIComponent::JGUITick(const JGUITickEvent& e)
 		if (!child->IsActive()) continue;
 		child->JGUITick(e);
 	}
+
 }
 void JGUIComponent::JGUIDestroy()
 {
-	EventProcess(JGUI_ComponentEvent_Destroy, nullptr);
-
-	
+	JGUIObject::JGUIDestroy();
 
 	SetParent(nullptr);
 	// 자식 손절
@@ -70,18 +69,31 @@ void JGUIComponent::JGUIDestroy()
 	{
 		auto com = m_ChildComponents[i];
 		JGUI::DestroyObject(m_ChildComponents[i]);
-		if (GetOwnerWindow()->GetFocus() == com) GetOwnerWindow()->SetFocus(nullptr);
+		if (GetOwnerWindow()->GetFocusComponent() == com) GetOwnerWindow()->SetFocusComponent(nullptr);
 	}
+	SetActive(false);
 }
 
 void JGUIComponent::JGUIResize(const JGUIResizeEvent& e)
 {
-	EventProcess(JGUI_ComponentEvent_Resize, &e);
+	Resize(e);
 }
-
+void JGUIComponent::JGUIChar(const JGUICharEvent& e)
+{
+	Char(e);
+}
+void JGUIComponent::JGUIKeyDown(const JGUIKeyDownEvent& e)
+{
+	KeyDown(e);
+}
+void JGUIComponent::JGUIKeyUp(const JGUIKeyUpEvent& e)
+{
+	KeyUp(e);
+}
 void JGUIComponent::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 {
-	if (m_IsMouseTracking == false && GetParent())
+	bool interation_result = Interation();
+	if (m_IsMouseTracking == false && GetParent() && interation_result)
 	{
 		m_IsMouseTracking = true;
 		JGUIMouseTrack track;
@@ -92,40 +104,19 @@ void JGUIComponent::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 	}
 	for (auto& com : m_ChildComponents)
 	{
-		if (com->Interation(JGUI_ComponentEvent_MouseMove))
-		{
-			com->JGUIMouseMove(e);
-		}
+		com->JGUIMouseMove(e);
 	}
-
-	EventProcess(JGUI_ComponentEvent_MouseMove, &e);
-
+	if(interation_result) MouseMove(e);
 }
 
 void JGUIComponent::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 {
-	for (auto& com : m_ChildComponents)
-	{
-		if (com->Interation(JGUI_ComponentEvent_MouseBtDown))
-		{
-			com->JGUIMouseBtDown(e);
-		}
-	}
-
-	EventProcess(JGUI_ComponentEvent_MouseBtDown, &e);
+	MouseBtDown(e);
 }
 
 void JGUIComponent::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
-	for (auto& com : m_ChildComponents)
-	{
-		if (com->Interation(JGUI_ComponentEvent_MouseBtUp))
-		{
-			com->JGUIMouseBtUp(e);
-		}
-	}
-
-	EventProcess(JGUI_ComponentEvent_MouseBtUp, &e);
+	MouseBtUp(e);
 }
 
 void JGUIComponent::JGUIMouseLeave()
@@ -133,7 +124,7 @@ void JGUIComponent::JGUIMouseLeave()
 	if (m_IsMouseTracking)
 	{
 		m_IsMouseTracking = false;
-		EventProcess(JGUI_ComponentEvent_MouseLeave, nullptr);
+		MouseLeave();
 	}
 }
 
@@ -146,36 +137,33 @@ void JGUIComponent::JGUIMouseHover()
 		track.flag = JGUI_MOUSETRACKFLAG_MOUSELEAVE;
 		track.time = JGUI_DEFAULT_LEAVETRACKTIME;
 		JGUI::RegisterMouseTrack(track);
-
-		EventProcess(JGUI_ComponentEvent_MouseHover, nullptr);
+		MouseHover();
 	}
 
 }
 
 void JGUIComponent::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
 {
-	ENGINE_LOG_INFO(GetName() + " : " + e.ToString());
-	EventProcess(JGUI_ComponentEvent_FocusEnter, &e);
+	FocusEnter(e);
 }
 
 void JGUIComponent::JGUIFocusExit(const JGUIFocusExitEvent& e)
 {
-	ENGINE_LOG_INFO(GetName() + " : " + e.ToString());
-	EventProcess(JGUI_ComponentEvent_FocusExit, &e);
+	FocusExit(e);
 }
 
 void JGUIComponent::JGUIOnFocus()
 {
-	EventProcess(JGUI_ComponentEvent_OnFocus, nullptr);
+	OnFocus();
 }
 
 void JGUIComponent::JGUIParentUpdateNotification()
 {
+	ParentUpdateNotification();
 	for (auto& child : m_ChildComponents)
 	{
 		child->JGUIParentUpdateNotification();
 	}
-	EventProcess(JGUI_ComponentEvent_ParentUpdateNotification, nullptr);
 }
 
 void JGUIComponent::SetParent(JGUIComponent* parent)
@@ -253,58 +241,6 @@ void JGUIComponent::RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI
 }
 
 
-
-
-void JGUIComponent::EventProcess(EJGUI_ComponentEvents event_type,const void* data)
-{
-	switch (event_type)
-	{
-	case JGUI_ComponentEvent_Awake:
-		JGUIObject::JGUIAwake();
-		break;
-	case JGUI_ComponentEvent_Start:
-		JGUIObject::JGUIStart();
-		break;
-	case JGUI_ComponentEvent_Tick:
-		Tick(*(JGUITickEvent*)data);
-		break;
-	case JGUI_ComponentEvent_Destroy:
-		JGUIObject::JGUIDestroy();
-		break;
-	case JGUI_ComponentEvent_Resize:
-		Resize(*(JGUIResizeEvent*)data);
-		break;
-	case JGUI_ComponentEvent_MouseMove:
-		MouseMove(*(JGUIMouseMoveEvent*)data);
-		break;
-	case JGUI_ComponentEvent_MouseBtDown:
-		MouseBtDown(*(JGUIKeyDownEvent*)data);
-		break;
-	case JGUI_ComponentEvent_MouseBtUp:
-		MouseBtUp(*(JGUIKeyUpEvent*)data);
-		break;
-	case JGUI_ComponentEvent_MouseLeave:
-		MouseLeave();
-		break;
-	case JGUI_ComponentEvent_MouseHover:
-		MouseHover();
-		break;
-	case JGUI_ComponentEvent_FocusEnter:
-		FocusEnter(*(JGUIFocusEnterEvent*)data);
-		break;
-	case JGUI_ComponentEvent_FocusExit:
-		FocusExit(*(JGUIFocusExitEvent*)data);
-		break;
-	case JGUI_ComponentEvent_OnFocus:
-		OnFocus();
-		break;
-	case JGUI_ComponentEvent_ParentUpdateNotification:
-		ParentUpdateNotification();
-		break;
-	}
-
-
-}
 void JGUIComponent::Init(const std::string& name, JGUIWindow* owner_window)
 {
 	SetName(name);
@@ -312,14 +248,11 @@ void JGUIComponent::Init(const std::string& name, JGUIWindow* owner_window)
 
 }
 
-bool JGUIComponent::Interation(EJGUI_ComponentEvents event_type)
+bool JGUIComponent::Interation()
 {
 
-	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
-	bool result = IsActive() && GetCollider() && GetCollider()->CheckInPoint(p);
-	auto flag = m_InteractionFlag;
-
-	return result;
+	auto p = GetOwnerWindow()->GetMousePos();
+	return IsActive() && GetCollider() && GetCollider()->CheckInPoint(p);
 }
 
 JGUIComponent* JGUIComponent::TrackingCanInteractionComponent()
@@ -327,9 +260,7 @@ JGUIComponent* JGUIComponent::TrackingCanInteractionComponent()
 	JGUIComponent* com = nullptr;
 
 	auto flag = GetInteractionFlag();
-	auto p = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
-	if (flag & JGUI_ComponentInteractionFlag_Default &&
-		IsActive() && GetCollider() && GetCollider()->CheckInPoint(p))
+	if (flag & JGUI_ComponentInteractionFlag_Default && Interation())
 	{
 		com = this;
 	}

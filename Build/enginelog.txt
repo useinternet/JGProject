@@ -1,155 +1,548 @@
-[info] [22924] [Physics] : PhysicsEngine Init Compelete...
-[info] [22924] [Sound] : SoundEngine Init Compelete
-[info] [22924] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [22924] [Rendering] : RenderEngine Init Complete...
-[info] [22924] [Rendering] : Create Screen : 2253113319200
-[info] [22924] [Rendering] : Create Default : 2253113316992
-[info] [22924] [Rendering] : Create DefaultDepth : 2253113313680
-[info] [22924] [Rendering] : Create bricks.dds : 2253113304848
-[info] [22924] [Rendering] : Create bricks2.dds : 2253113305952
-[info] [22924] [Rendering] : Create bricks2_nmap.dds : 2253113314784
-[info] [22924] [Rendering] : Create bricks3.dds : 2253113309264
-[info] [22924] [Rendering] : Create bricks_nmap.dds : 2253113311472
-[info] [22924] [Rendering] : Create checkboard.dds : 2253269482832
-[info] [22924] [Rendering] : Create default_nmap.dds : 2253269487248
-[info] [22924] [Rendering] : Create desertcube1024.dds : 2253269507120
-[info] [22924] [Rendering] : Create grass.dds : 2253269489456
-[info] [22924] [Rendering] : Create grasscube1024.dds : 2253269478416
-[info] [22924] [Rendering] : Create head_diff.dds : 2253269497184
-[info] [22924] [Rendering] : Create head_norm.dds : 2253269509328
-[info] [22924] [Rendering] : Create ice.dds : 2253269498288
-[info] [22924] [Rendering] : Create jacket_diff.dds : 2253269500496
-[info] [22924] [Rendering] : Create jacket_norm.dds : 2253269964064
-[info] [22924] [Rendering] : Create pants_diff.dds : 2253269965168
-[info] [22924] [Rendering] : Create pants_norm.dds : 2253269987248
-[info] [22924] [Rendering] : Create snowcube1024.dds : 2253269983936
-[info] [22924] [Rendering] : Create stone.dds : 2253269988352
-[info] [22924] [Rendering] : Create sunsetcube1024.dds : 2253269975104
-[info] [22924] [Rendering] : Create tile.dds : 2253269981728
-[info] [22924] [Rendering] : Create tile_nmap.dds : 2253269959648
-[info] [22924] [Rendering] : Create tree0.bmp : 2253270062480
-[info] [22924] [Rendering] : Create tree01S.dds : 2253270064688
-[info] [22924] [Rendering] : Create tree02S.dds : 2253270071312
-[info] [22924] [Rendering] : Create tree1.bmp : 2253270072416
-[info] [22924] [Rendering] : Create tree2.bmp : 2253270074624
-[info] [22924] [Rendering] : Create tree35S.dds : 2253270061376
-[info] [22924] [Rendering] : Create treearray.dds : 2253270060272
-[info] [22924] [Rendering] : Create treeArray2.dds : 2253270541152
-[info] [22924] [Rendering] : Create upBody_diff.dds : 2253270549984
-[info] [22924] [Rendering] : Create upbody_norm.dds : 2253270523488
-[info] [22924] [Rendering] : Create water1.dds : 2253270534528
-[info] [22924] [Rendering] : Create white1x1.dds : 2253270532320
-[info] [22924] [Rendering] : Create WireFence.dds : 2253270536736
-[info] [22924] [Rendering] : Create WoodCrate01.dds : 2253270537840
-[info] [22924] [Rendering] : Create WoodCrate02.dds : 2253270533424
-[info] [22924] [Rendering] : Create cursor_lr_arrow.png : 2253270538944
-[info] [22924] [Rendering] : Create cursor_ud_arrow.cur : 2253270519072
-[info] [22924] [Rendering] : Create cursor_ud_arrow.png : 2253270548880
-[info] [22924] [Rendering] : Create icon_ldia_arrow.png : 2253270529008
-[info] [22924] [Rendering] : Create icon_rdia_arrow.png : 2253270521280
-[info] [22924] [Rendering] : Create Close.png : 2253270522384
-[info] [22924] [Rendering] : Create Maximize.png : 2253270525696
-[info] [22924] [Rendering] : Create Minimize.png : 2253270531216
-[info] [22924] [Rendering] : Create sssss.png : 2253270527904
-[trace] [22924] [Game] : Begin
-[trace] [22924] [Game] : Tick
-[trace] [22924] [Game] : End
-[info] [22924] [Rendering] : Create Texture : 2253270540048
-[info] [22924] [Rendering] : Create Screen : 2253270547776
-[info] [22924] [Rendering] : Create Texture : 2253270543360
-[error] [7644] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [7644] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[info] [22924] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 2253269958544
-[error] [22820] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [22820] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [20896] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [20896] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[info] [22924] [Engine] : titleBar : JGUIFocusEnterEvent
-[info] [22924] [Engine] : 0, 0 wINDOW
-[info] [22924] [Engine] : 535, 16 Cursor
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 0, 0 move
-[info] [22924] [Engine] : 1, 0 move
-[info] [22924] [Engine] : 2, 1 move
-[info] [22924] [Engine] : 2, 2 move
-[info] [22924] [Engine] : 4, 4 move
-[info] [22924] [Engine] : 6, 6 move
-[info] [22924] [Engine] : 9, 8 move
-[info] [22924] [Engine] : 12, 11 move
-[info] [22924] [Engine] : 15, 13 move
-[info] [22924] [Engine] : 21, 18 move
-[info] [22924] [Engine] : 26, 21 move
-[info] [22924] [Engine] : 33, 26 move
-[info] [22924] [Engine] : 38, 29 move
-[info] [22924] [Engine] : 45, 33 move
-[info] [22924] [Engine] : 51, 36 move
-[info] [22924] [Engine] : 58, 39 move
-[info] [22924] [Engine] : 65, 44 move
-[info] [22924] [Engine] : 73, 48 move
-[info] [22924] [Engine] : 81, 52 move
-[info] [22924] [Engine] : 89, 56 move
-[info] [22924] [Engine] : 100, 61 move
-[info] [22924] [Engine] : 110, 66 move
-[info] [22924] [Engine] : 120, 71 move
-[info] [22924] [Engine] : 131, 77 move
-[info] [22924] [Engine] : 143, 82 move
-[info] [22924] [Engine] : 155, 88 move
-[info] [22924] [Engine] : 169, 94 move
-[info] [22924] [Engine] : 187, 102 move
-[info] [22924] [Engine] : 214, 113 move
-[info] [22924] [Engine] : 230, 120 move
-[info] [22924] [Engine] : 244, 125 move
-[info] [22924] [Engine] : 264, 132 move
-[info] [22924] [Engine] : 279, 137 move
-[info] [22924] [Engine] : 292, 141 move
-[info] [22924] [Engine] : 307, 146 move
-[info] [22924] [Engine] : 321, 150 move
-[info] [22924] [Engine] : 334, 154 move
-[info] [22924] [Engine] : 350, 158 move
-[info] [22924] [Engine] : 361, 161 move
-[info] [22924] [Engine] : 375, 164 move
-[info] [22924] [Engine] : 391, 167 move
-[info] [22924] [Engine] : 407, 171 move
-[info] [22924] [Engine] : 418, 173 move
-[info] [22924] [Engine] : 426, 175 move
-[info] [22924] [Engine] : 433, 176 move
-[info] [22924] [Engine] : 438, 177 move
-[info] [22924] [Engine] : 441, 178 move
-[info] [22924] [Engine] : 445, 179 move
-[info] [22924] [Engine] : 450, 180 move
-[info] [22924] [Engine] : 454, 181 move
-[info] [22924] [Engine] : 457, 182 move
-[info] [22924] [Engine] : 460, 183 move
-[info] [22924] [Engine] : 463, 184 move
-[info] [22924] [Engine] : 465, 185 move
-[info] [22924] [Engine] : 469, 186 move
-[info] [22924] [Engine] : 470, 187 move
-[info] [22924] [Engine] : 472, 188 move
-[info] [22924] [Engine] : 473, 188 move
-[info] [22924] [Engine] : 474, 189 move
-[info] [22924] [Engine] : 476, 190 move
-[info] [22924] [Engine] : 477, 190 move
-[info] [22924] [Engine] : 477, 191 move
-[info] [22924] [Engine] : titleBar : JGUIFocusExitEvent
-[info] [22924] [Rendering] : Create Screen : 2253269490560
-[info] [22924] [Rendering] : Create Texture : 2253269486144
-[info] [22924] [Engine] : JGUICloseBt : JGUIFocusEnterEvent
-[info] [22924] [Engine] : JGUIKeyUpEvent : LeftMouseButton
-[info] [22924] [Engine] : JGUICloseBt : JGUIFocusExitEvent
-[info] [22924] [Engine] : Bt Click
+[info] [34088] [Physics] : PhysicsEngine Init Compelete...
+[info] [34088] [Sound] : SoundEngine Init Compelete
+[info] [34088] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [34088] [Rendering] : RenderEngine Init Complete...
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Default : 3271897475216
+[info] [34088] [Rendering] : Create DefaultDepth : 3271897481840
+[info] [34088] [Rendering] : Create bricks.dds : 3271897477424
+[info] [34088] [Rendering] : Create bricks2.dds : 3271897479632
+[info] [34088] [Rendering] : Create bricks2_nmap.dds : 3271897484048
+[info] [34088] [Rendering] : Create bricks3.dds : 3271897486256
+[info] [34088] [Rendering] : Create bricks_nmap.dds : 3271897474112
+[info] [34088] [Rendering] : Create checkboard.dds : 3271905841232
+[info] [34088] [Rendering] : Create default_nmap.dds : 3271905853376
+[info] [34088] [Rendering] : Create desertcube1024.dds : 3271905847856
+[info] [34088] [Rendering] : Create grass.dds : 3271905856688
+[info] [34088] [Rendering] : Create grasscube1024.dds : 3271905836816
+[info] [34088] [Rendering] : Create head_diff.dds : 3271905858896
+[info] [34088] [Rendering] : Create head_norm.dds : 3271905857792
+[info] [34088] [Rendering] : Create ice.dds : 3271905843440
+[info] [34088] [Rendering] : Create jacket_diff.dds : 3271905848960
+[info] [34088] [Rendering] : Create jacket_norm.dds : 3271906129904
+[info] [34088] [Rendering] : Create pants_diff.dds : 3271906151984
+[info] [34088] [Rendering] : Create pants_norm.dds : 3271906127696
+[info] [34088] [Rendering] : Create snowcube1024.dds : 3271906128800
+[info] [34088] [Rendering] : Create stone.dds : 3271906139840
+[info] [34088] [Rendering] : Create sunsetcube1024.dds : 3271906146464
+[info] [34088] [Rendering] : Create tile.dds : 3271906149776
+[info] [34088] [Rendering] : Create tile_nmap.dds : 3271906124384
+[info] [34088] [Rendering] : Create tree0.bmp : 3271906572144
+[info] [34088] [Rendering] : Create tree01S.dds : 3271906580976
+[info] [34088] [Rendering] : Create tree02S.dds : 3271906588704
+[info] [34088] [Rendering] : Create tree1.bmp : 3271906585392
+[info] [34088] [Rendering] : Create tree2.bmp : 3271906593120
+[info] [34088] [Rendering] : Create tree35S.dds : 3271906584288
+[info] [34088] [Rendering] : Create treearray.dds : 3271906586496
+[info] [34088] [Rendering] : Create treeArray2.dds : 3271906597536
+[info] [34088] [Rendering] : Create upBody_diff.dds : 3271906592016
+[info] [34088] [Rendering] : Create upbody_norm.dds : 3271906589808
+[info] [34088] [Rendering] : Create water1.dds : 3271906601952
+[info] [34088] [Rendering] : Create white1x1.dds : 3271906582080
+[info] [34088] [Rendering] : Create WireFence.dds : 3271906594224
+[info] [34088] [Rendering] : Create WoodCrate01.dds : 3271906598640
+[info] [34088] [Rendering] : Create WoodCrate02.dds : 3271906571040
+[info] [34088] [Rendering] : Create cursor_lr_arrow.png : 3271906148672
+[info] [34088] [Rendering] : Create cursor_ud_arrow.cur : 3271906131008
+[info] [34088] [Rendering] : Create cursor_ud_arrow.png : 3271906147568
+[info] [34088] [Rendering] : Create icon_ldia_arrow.png : 3271906123280
+[info] [34088] [Rendering] : Create icon_rdia_arrow.png : 3271906126592
+[info] [34088] [Rendering] : Create Close.png : 3271906133216
+[info] [34088] [Rendering] : Create Maximize.png : 3271906137632
+[info] [34088] [Rendering] : Create Minimize.png : 3271906140944
+[info] [34088] [Rendering] : Create sssss.png : 3271906145360
+[trace] [34088] [Game] : Begin
+[trace] [34088] [Game] : Tick
+[trace] [34088] [Game] : End
+[info] [34088] [Rendering] : Create Screen : 3271905855584
+[info] [34088] [Rendering] : Create Texture : 3271905830192
+[info] [34088] [Rendering] : Create Screen : 3271905855584
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[info] [34088] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 3271906595328
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [33556] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [14012] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [14012] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [14012] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Rendering] : Create Screen : 3271906144256
+[info] [34088] [Rendering] : Create Texture : 3271906150880
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3271897478528
+[info] [34088] [Rendering] : Create Texture : 3271897482944
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897482944
+[info] [34088] [Rendering] : Create Screen : 3271897478528
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Rendering] : Create Screen : 3271897485152
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897482944
+[info] [34088] [Rendering] : Create Screen : 3271897485152
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897478528
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Rendering] : Create Screen : 3271897478528
+[info] [34088] [Rendering] : Create Texture : 3271897482944
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897485152
+[info] [34088] [Rendering] : Create Texture : 3271897482944
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897473008
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897478528
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897485152
+[info] [34088] [Rendering] : Create Screen : 3271897482944
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUIKeyUpEvent : LeftMouseButton
+[info] [34088] [Rendering] : Create Screen : 3272105508192
+[info] [34088] [Rendering] : Create Texture : 3272105504880
+[info] [34088] [Engine] : Bt Click
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105511504
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272105488320
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Rendering] : Create Screen : 3272105491632
+[info] [34088] [Rendering] : Create Texture : 3272105509296
+[info] [34088] [Rendering] : Create Screen : 3272105498256
+[info] [34088] [Rendering] : Create Texture : 3272105494944
+[info] [34088] [Rendering] : Create Screen : 3272105488320
+[info] [34088] [Rendering] : Create Texture : 3272105498256
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105493840
+[info] [34088] [Rendering] : Create Texture : 3272105498256
+[info] [34088] [Rendering] : Create Screen : 3272105488320
+[info] [34088] [Rendering] : Create Texture : 3272105492736
+[info] [34088] [Rendering] : Create Screen : 3272105515920
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Rendering] : Create Screen : 3272105498256
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105514816
+[info] [34088] [Rendering] : Create Texture : 3272105490528
+[info] [34088] [Rendering] : Create Screen : 3272105514816
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105515920
+[info] [34088] [Rendering] : Create Texture : 3272105508192
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Rendering] : Create Screen : 3272105494944
+[info] [34088] [Rendering] : Create Texture : 3272105499360
+[info] [34088] [Rendering] : Create Screen : 3272105491632
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105492736
+[info] [34088] [Rendering] : Create Texture : 3272105488320
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272105499360
+[info] [34088] [Rendering] : Create Texture : 3272105509296
+[info] [34088] [Rendering] : Create Screen : 3272105493840
+[info] [34088] [Rendering] : Create Texture : 3272105510400
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105511504
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105511504
+[info] [34088] [Rendering] : Create Texture : 3272105512608
+[info] [34088] [Rendering] : Create Screen : 3272105509296
+[info] [34088] [Rendering] : Create Texture : 3272105493840
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272105514816
+[info] [34088] [Rendering] : Create Texture : 3272105515920
+[info] [34088] [Rendering] : Create Screen : 3272105509296
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Rendering] : Create Screen : 3272105491632
+[info] [34088] [Rendering] : Create Texture : 3272105509296
+[info] [34088] [Rendering] : Create Screen : 3272105510400
+[info] [34088] [Rendering] : Create Texture : 3272105511504
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105488320
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Rendering] : Create Screen : 3272105511504
+[info] [34088] [Rendering] : Create Texture : 3272105488320
+[info] [34088] [Rendering] : Create Screen : 3272105499360
+[info] [34088] [Rendering] : Create Texture : 3272105508192
+[info] [34088] [Rendering] : Create Screen : 3272105512608
+[info] [34088] [Rendering] : Create Texture : 3272105514816
+[info] [34088] [Rendering] : Create Screen : 3272105498256
+[info] [34088] [Rendering] : Create Texture : 3272105499360
+[info] [34088] [Rendering] : Create Screen : 3272105491632
+[info] [34088] [Rendering] : Create Texture : 3272105490528
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105508192
+[info] [34088] [Rendering] : Create Screen : 3272105488320
+[info] [34088] [Rendering] : Create Texture : 3272105490528
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105508192
+[info] [34088] [Rendering] : Create Screen : 3272105509296
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Rendering] : Create Screen : 3272105512608
+[info] [34088] [Rendering] : Create Texture : 3272105514816
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105498256
+[info] [34088] [Rendering] : Create Screen : 3272105493840
+[info] [34088] [Rendering] : Create Texture : 3272105511504
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272105493840
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105494944
+[info] [34088] [Rendering] : Create Screen : 3272105512608
+[info] [34088] [Rendering] : Create Texture : 3272105498256
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105508192
+[info] [34088] [Rendering] : Create Texture : 3272105490528
+[info] [34088] [Rendering] : Create Screen : 3272105514816
+[info] [34088] [Rendering] : Create Texture : 3272105492736
+[info] [34088] [Rendering] : Create Screen : 3272105488320
+[info] [34088] [Rendering] : Create Texture : 3272105490528
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105499360
+[info] [34088] [Rendering] : Create Screen : 3272105510400
+[info] [34088] [Rendering] : Create Texture : 3272105509296
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105499360
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105494944
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Rendering] : Create Screen : 3272105507088
+[info] [34088] [Rendering] : Create Texture : 3272105505984
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Rendering] : Create Screen : 3272105505984
+[info] [34088] [Rendering] : Create Texture : 3272105488320
+[info] [34088] [Rendering] : Create Screen : 3272105490528
+[info] [34088] [Rendering] : Create Texture : 3272105492736
+[info] [34088] [Rendering] : Create Screen : 3272105494944
+[info] [34088] [Rendering] : Create Texture : 3272105507088
+[info] [34088] [Rendering] : Create Screen : 3272105510400
+[info] [34088] [Rendering] : Create Texture : 3272105511504
+[info] [34088] [Rendering] : Create Screen : 3272105515920
+[info] [34088] [Rendering] : Create Texture : 3272105491632
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : TestForm0 MouseHover
+[info] [34088] [Engine] : TestForm0 MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Engine] : JGUI MouseLeave
+[info] [34088] [Engine] : JGUI MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272105511504
+[info] [34088] [Rendering] : Create Texture : 3272105494944
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3271897485152
+[info] [34088] [Rendering] : Create Texture : 3271897473008
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3271897485152
+[info] [34088] [Rendering] : Create Texture : 3271905832400
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905844544
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905844544
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905844544
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905844544
+[info] [34088] [Rendering] : Create Texture : 3271905832400
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905844544
+[info] [34088] [Rendering] : Create Texture : 3271905832400
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905844544
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905844544
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905844544
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905835712
+[info] [34088] [Rendering] : Create Screen : 3271905832400
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905832400
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3271905835712
+[info] [34088] [Rendering] : Create Texture : 3271905837920
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272182493344
+[info] [34088] [Rendering] : Create Texture : 3272182507696
+[info] [34088] [Rendering] : Create Screen : 3272182488928
+[info] [34088] [Rendering] : Create Texture : 3272182513216
+[info] [34088] [Rendering] : Create Screen : 3272182508800
+[info] [34088] [Rendering] : Create Texture : 3272182509904
+[info] [34088] [Rendering] : Create Screen : 3272182486720
+[info] [34088] [Rendering] : Create Texture : 3272182484512
+[info] [34088] [Rendering] : Create Screen : 3272182504384
+[info] [34088] [Rendering] : Create Texture : 3272182505488
+[info] [34088] [Rendering] : Create Screen : 3272182486720
+[info] [34088] [Rendering] : Create Texture : 3272182503280
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272182483408
+[info] [34088] [Rendering] : Create Texture : 3272182513216
+[info] [34088] [Rendering] : Create Screen : 3272182503280
+[info] [34088] [Rendering] : Create Texture : 3272182494448
+[info] [34088] [Rendering] : Create Screen : 3272182508800
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182497760
+[info] [34088] [Rendering] : Create Texture : 3272182511008
+[info] [34088] [Rendering] : Create Screen : 3272182484512
+[info] [34088] [Rendering] : Create Texture : 3272182497760
+[info] [34088] [Rendering] : Create Screen : 3272182502176
+[info] [34088] [Rendering] : Create Texture : 3272182483408
+[info] [34088] [Rendering] : Create Screen : 3272182484512
+[info] [34088] [Rendering] : Create Texture : 3272182505488
+[info] [34088] [Rendering] : Create Screen : 3272182484512
+[info] [34088] [Rendering] : Create Texture : 3272182497760
+[info] [34088] [Rendering] : Create Screen : 3272182506592
+[info] [34088] [Rendering] : Create Texture : 3272182499968
+[info] [34088] [Rendering] : Create Screen : 3272182483408
+[info] [34088] [Rendering] : Create Texture : 3272182511008
+[info] [34088] [Rendering] : Create Screen : 3272182492240
+[info] [34088] [Rendering] : Create Texture : 3272182487824
+[info] [34088] [Rendering] : Create Screen : 3272182493344
+[info] [34088] [Rendering] : Create Texture : 3272182507696
+[info] [34088] [Rendering] : Create Screen : 3272182502176
+[info] [34088] [Rendering] : Create Texture : 3272182503280
+[info] [34088] [Rendering] : Create Screen : 3272182512112
+[info] [34088] [Rendering] : Create Texture : 3272182495552
+[info] [34088] [Rendering] : Create Screen : 3272182503280
+[info] [34088] [Rendering] : Create Texture : 3272182507696
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272182487824
+[info] [34088] [Rendering] : Create Texture : 3272182493344
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272182499968
+[info] [34088] [Rendering] : Create Texture : 3272182504384
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272182502176
+[info] [34088] [Rendering] : Create Texture : 3272182493344
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Rendering] : Create Screen : 3272182497760
+[info] [34088] [Rendering] : Create Texture : 3272182494448
+[info] [34088] [Rendering] : Create Screen : 3272182495552
+[info] [34088] [Rendering] : Create Texture : 3272182511008
+[info] [34088] [Rendering] : Create Screen : 3272182501072
+[info] [34088] [Rendering] : Create Texture : 3272182509904
+[info] [34088] [Rendering] : Create Screen : 3272182492240
+[info] [34088] [Rendering] : Create Texture : 3272182487824
+[info] [34088] [Rendering] : Create Screen : 3272182514320
+[info] [34088] [Rendering] : Create Texture : 3272182513216
+[info] [34088] [Rendering] : Create Screen : 3272182512112
+[info] [34088] [Rendering] : Create Texture : 3272182494448
+[info] [34088] [Rendering] : Create Screen : 3272182483408
+[info] [34088] [Rendering] : Create Texture : 3272182499968
+[info] [34088] [Rendering] : Create Screen : 3272182509904
+[info] [34088] [Rendering] : Create Texture : 3272182491136
+[info] [34088] [Rendering] : Create Screen : 3272182506592
+[info] [34088] [Rendering] : Create Texture : 3272182505488
+[info] [34088] [Rendering] : Create Screen : 3272182501072
+[info] [34088] [Rendering] : Create Texture : 3272182490032
+[info] [34088] [Rendering] : Create Screen : 3272182509904
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182483408
+[info] [34088] [Rendering] : Create Texture : 3272182487824
+[info] [34088] [Rendering] : Create Screen : 3272182498864
+[info] [34088] [Rendering] : Create Texture : 3272182505488
+[info] [34088] [Rendering] : Create Screen : 3272182492240
+[info] [34088] [Rendering] : Create Texture : 3272182484512
+[info] [34088] [Rendering] : Create Screen : 3272182505488
+[info] [34088] [Rendering] : Create Texture : 3272182498864
+[info] [34088] [Rendering] : Create Screen : 3272182491136
+[info] [34088] [Rendering] : Create Texture : 3272182512112
+[info] [34088] [Rendering] : Create Screen : 3272182490032
+[info] [34088] [Rendering] : Create Texture : 3272182494448
+[info] [34088] [Rendering] : Create Screen : 3272182495552
+[info] [34088] [Rendering] : Create Texture : 3272182514320
+[info] [34088] [Rendering] : Create Screen : 3272182485616
+[info] [34088] [Rendering] : Create Texture : 3272182486720
+[info] [34088] [Rendering] : Create Screen : 3272182484512
+[info] [34088] [Rendering] : Create Texture : 3272182483408
+[info] [34088] [Rendering] : Create Screen : 3272182505488
+[info] [34088] [Rendering] : Create Texture : 3272182506592
+[info] [34088] [Rendering] : Create Screen : 3272182487824
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182509904
+[info] [34088] [Rendering] : Create Texture : 3272182485616
+[info] [34088] [Rendering] : Create Screen : 3272182512112
+[info] [34088] [Rendering] : Create Texture : 3272182495552
+[info] [34088] [Rendering] : Create Screen : 3272182486720
+[info] [34088] [Rendering] : Create Texture : 3272182498864
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Rendering] : Create Screen : 3272182490032
+[info] [34088] [Rendering] : Create Texture : 3272182512112
+[info] [34088] [Rendering] : Create Screen : 3272182507696
+[info] [34088] [Rendering] : Create Texture : 3272182503280
+[info] [34088] [Rendering] : Create Screen : 3272182507696
+[info] [34088] [Rendering] : Create Texture : 3272182506592
+[info] [34088] [Rendering] : Create Screen : 3272182511008
+[info] [34088] [Rendering] : Create Texture : 3272182512112
+[info] [34088] [Rendering] : Create Screen : 3272182501072
+[info] [34088] [Rendering] : Create Texture : 3272182492240
+[info] [34088] [Rendering] : Create Screen : 3272182483408
+[info] [34088] [Rendering] : Create Texture : 3272182503280
+[info] [34088] [Rendering] : Create Screen : 3272182505488
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182495552
+[info] [34088] [Rendering] : Create Texture : 3272182506592
+[info] [34088] [Rendering] : Create Screen : 3272182507696
+[info] [34088] [Rendering] : Create Texture : 3272182495552
+[info] [34088] [Rendering] : Create Screen : 3272182506592
+[info] [34088] [Rendering] : Create Texture : 3272182485616
+[info] [34088] [Rendering] : Create Screen : 3272182484512
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182491136
+[info] [34088] [Rendering] : Create Texture : 3272182502176
+[info] [34088] [Rendering] : Create Screen : 3272182503280
+[info] [34088] [Rendering] : Create Texture : 3272182504384
+[info] [34088] [Rendering] : Create Screen : 3272182502176
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182514320
+[info] [34088] [Rendering] : Create Texture : 3272182497760
+[info] [34088] [Rendering] : Create Screen : 3272182511008
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182503280
+[info] [34088] [Rendering] : Create Texture : 3272182492240
+[info] [34088] [Rendering] : Create Screen : 3272182488928
+[info] [34088] [Rendering] : Create Texture : 3272182491136
+[info] [34088] [Rendering] : Create Screen : 3272182501072
+[info] [34088] [Rendering] : Create Texture : 3272182503280
+[info] [34088] [Rendering] : Create Screen : 3272182506592
+[info] [34088] [Rendering] : Create Texture : 3272182484512
+[info] [34088] [Rendering] : Create Screen : 3272182502176
+[info] [34088] [Rendering] : Create Texture : 3272182501072
+[info] [34088] [Rendering] : Create Screen : 3272182487824
+[info] [34088] [Rendering] : Create Texture : 3272182491136
+[info] [34088] [Rendering] : Create Screen : 3272182508800
+[info] [34088] [Rendering] : Create Texture : 3272182495552
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm3 MouseHover
+[info] [34088] [Engine] : TestForm3 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm1 MouseLeave
+[info] [34088] [Engine] : TestForm1 MouseHover
+[info] [34088] [Engine] : TestForm2 MouseHover
+[info] [34088] [Engine] : JGUIKeyUpEvent : LeftMouseButton
+[info] [34088] [Engine] : Bt Click
+[info] [34088] [Engine] : TestForm2 MouseLeave
+[info] [34088] [Engine] : JGUIKeyUpEvent : LeftMouseButton
+[info] [34088] [Engine] : Bt Click

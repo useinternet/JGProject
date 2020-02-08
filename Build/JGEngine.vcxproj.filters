@@ -75,6 +75,9 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -122,6 +125,9 @@
       <Filter>GUI\JGUIFont</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>

@@ -34,28 +34,25 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 	}
 	auto transform = GetTransform();
 
-	auto owner_root_window = GetOwnerWindow();
-	JVector2 window_size;
-	while (owner_root_window != nullptr)
-	{
-		if (owner_root_window->GetParent() == nullptr)
-		{
-			window_size = GetOwnerWindow()->GetTransform()->GetSize();
-			break;
-		}
-		owner_root_window = owner_root_window->GetParent();
-	}
+	JVector2 window_size = GetOwnerWindow()->GetTransform()->GetSize();
+
 	if (transform->IsDirty() || 
 		(window_size != m_PrevWindowSize))
 	{
+
+
+
+
 		m_PrevWindowSize = window_size;
 		auto pos = transform->GetPosition();
 		pos += m_Offset;
+		
 		auto angle = transform->GetAngle();
 		auto scale = transform->GetScale();
 		if (m_IsWindowTexture)
 		{
-			pos = owner_root_window->ConvertToScreenPos(pos);
+			if (GetOwnerWindow()->GetParent()) pos = GetOwnerWindow()->GetParent()->ConvertToScreenPos(pos);
+			else pos = GetOwnerWindow()->ConvertToScreenPos(pos);
 		}
 		else
 		{
@@ -143,11 +140,20 @@ void JGUIShape::FindPanel()
 		{
 			m_OwnerPanel = (JGUIPanel*)p;
 			is_find = true;
-			if (cnt == 1 && m_OwnerPanel->GetParent() == nullptr && typeid(*this) == typeid(JGUIRectangle))
+
+			if (!m_IsWindowTexture)
+			{
+				if (cnt == 1 && typeid(*this) == typeid(JGUIRectangle))
+				{
+					if (m_OwnerPanel->GetParent() == nullptr) m_Priority = 0;
+					else m_Priority = cnt;
+				}
+				else  m_Priority = m_OwnerPanel->GetPriority() + cnt;
+			}
+			else
 			{
 				m_Priority = GetOwnerWindow()->GetPriority();
 			}
-			else  m_Priority = m_OwnerPanel->GetPriority() + cnt;
 			break;
 		}
 		p = p->GetParent();
@@ -176,7 +182,14 @@ void JGUIShape::CreateRI()
 
 void JGUIWindowTexture::Bind(const std::string& moduleKey, uint64_t parnet_id)
 {
-	if (m_ParentID == parnet_id) return;
+	if (m_ParentID == parnet_id && m_RenderItem)
+	{
+		m_RenderItem->GetMaterial()->SetTexture("Image", moduleKey);
+
+		auto desc = m_RenderItem->GetMaterial()->GetTextureArray()[0].GetDesc();
+
+		return;
+	}
 
 
 	m_ParentID = parnet_id;
@@ -223,6 +236,17 @@ void JGUIWindowTexture::Resize(const JGUIResizeEvent& e)
 		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 	}
 }
+
+void JGUIWindowTexture::DestroyRI()
+{
+	if (m_RenderItem)
+	{
+		m_Instance = nullptr;
+		RE::RenderEngine::DestroyRenderItem(m_ParentID, m_RenderItem);
+		m_RenderItem = nullptr;
+	}
+}
+
 
 void JGUIRectangle::SetImage(const std::string& texture_image)
 {
@@ -357,7 +381,7 @@ void JGUIText::Insert(int idx, const std::string& str)
 		AddText(str); return;
 	}
 
-	uint32_t len = m_Text.length();
+	uint32_t len = (uint32_t)m_Text.length();
 	string sub = m_Text.substr(idx, m_Text.length());
 	RemoveRange(idx, len);
 	AddText(str + sub);
@@ -464,6 +488,29 @@ void JGUIText::SetTextRect(float width, float height)
 	SetText(m_Text);
 }
 
+JVector2 JGUIText::GetTextLastPos()
+{
+	if (m_Text.length() == 0) return JVector2();
+
+
+
+	string last = m_Text.substr(m_Text.length() - 1, m_Text.length());
+	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName,s2ws(last));
+	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
+
+	auto pos = GetTextPos(m_Text.length() - 1);
+	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
+
+	auto info = *(charInfo.begin() );
+	pos.x += ((float)info.xadvance * font_size_ratio);
+	return pos;
+}
+
+const JVector2& JGUIText::GetTextPos(int n) const
+{
+	return m_TextPosMap[n];
+}
+
 void JGUIText::CreateRI()
 {
 	if (m_RenderItem)
@@ -509,6 +556,8 @@ std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 	// a3. 각 텍스트에 맞는 Vertex생성
 	for (auto& info : charInfo)
 	{
+		info.height += 1;
+		info.width  += 1;
 		// offset
 		float xoffset = (float)info.xoffset * font_size_ratio;
 		float yoffset = (float)info.yoffset * font_size_ratio;
@@ -593,7 +642,6 @@ void JGUIText::UpdateTextSize(const std::string& str)
 	text_rect_size.y = font_height * lineCount;
 
 	GetTransform()->SetSize(text_rect_size);
-	//GetTransform()->SendDirty();
 	m_Offset.x = -(text_rect_size.x / 2.0f);
 	m_Offset.y = -(lineCount - 1) * font_height * 0.5f;
 }

@@ -23,6 +23,9 @@ protected:
 
 
 	virtual void JGUIResize(const JGUIResizeEvent& e);
+	virtual void JGUIChar(const JGUICharEvent& e);
+	virtual void JGUIKeyDown(const JGUIKeyDownEvent& e);
+	virtual void JGUIKeyUp(const JGUIKeyUpEvent& e);
 	virtual void JGUIMouseMove(const JGUIMouseMoveEvent& e);
 	virtual void JGUIMouseBtDown(const JGUIKeyDownEvent& e);
 	virtual void JGUIMouseBtUp(const JGUIKeyUpEvent& e);
@@ -35,6 +38,9 @@ protected:
 	virtual void JGUIParentUpdateNotification();
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
+	virtual void Char(const JGUICharEvent& e) {}
+	virtual void KeyDown(const JGUIKeyDownEvent& e) {}
+	virtual void KeyUp(const JGUIKeyUpEvent& e) {}
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) {}
 	virtual void MouseBtUp(const JGUIKeyUpEvent& e) {}
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) {}
@@ -74,17 +80,14 @@ protected:
 	void SetInteractionFlag(EJGUI_ComponentInteractionFlags flags) { m_InteractionFlag = flags; }
 
 private:
-	void EventProcess(EJGUI_ComponentEvents event_type, const void* data);
 	void Init(const std::string& name, JGUIWindow* owner_window);
-	bool Interation(EJGUI_ComponentEvents event_type);
+	bool Interation();
 	JGUIComponent* TrackingCanInteractionComponent();
 private:
 	JGUIWindow* m_OwnerWindow = nullptr;
 
 	// 부모
 	JGUIComponent* m_Parent   = nullptr;
-	std::map<EJGUI_ComponentEvents, bool> m_EventLockMap;
-	std::set<EJGUI_ComponentEvents>       m_OnceEventLockMap;
 
 
 	// 플래그
@@ -95,7 +98,7 @@ private:
 	std::vector<JGUIComponent*> m_ChildComponents;
 	JGUIRectTransform* m_RectTransform = nullptr;
 	JGUICollider*      m_Collider = nullptr;
-	JVector2 m_PrevSize;
+	JVector2           m_PrevSize;
 	bool m_IsMouseTracking = false;
 	bool m_IsChildLock = false;
 };

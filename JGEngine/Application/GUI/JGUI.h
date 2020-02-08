@@ -57,30 +57,7 @@ enum EJGUI_ComponentInteractionFlags
 	JGUI_ComponentInteractionFlag_None = 0x00000000,
 	JGUI_ComponentInteractionFlag_Default = 0x00000001
 };
-//enum EJGUI_ComponentEventLockFlags
-//{
-//	JGUI_ComponentEventLockFlag_None = 0x0000,
-//	JGUI_ComponentEventLockFlag_SendParent = 0x0001,
-//	JGUI_ComponentEventLockFlag_SendChild  = 0x0002,
-//	JGUI_ComponentEventLockFlag_Once       = 0x0004,
-//};
-enum EJGUI_ComponentEvents
-{
-	JGUI_ComponentEvent_Awake,
-	JGUI_ComponentEvent_Start,
-	JGUI_ComponentEvent_Tick,
-	JGUI_ComponentEvent_Destroy,
-	JGUI_ComponentEvent_Resize,
-	JGUI_ComponentEvent_MouseMove,
-	JGUI_ComponentEvent_MouseBtDown,
-	JGUI_ComponentEvent_MouseBtUp,
-	JGUI_ComponentEvent_MouseLeave,
-	JGUI_ComponentEvent_MouseHover,
-	JGUI_ComponentEvent_FocusEnter,
-	JGUI_ComponentEvent_FocusExit,
-	JGUI_ComponentEvent_OnFocus,
-	JGUI_ComponentEvent_ParentUpdateNotification,
-};
+
 
 enum EJGUI_Component_Colider
 {

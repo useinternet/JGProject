@@ -70,8 +70,8 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 {
 	if (m_BtState == JGUI_BtState_Selected && JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
 	{
-		HWND hWnd = GetOwnerWindow()->GetRootWindowHandle();
-		if (!GetCollider()->CheckInPoint(JGUI::GetMousePos(hWnd)))
+		auto p = GetOwnerWindow()->GetMousePos();
+		if (!GetCollider()->CheckInPoint(p))
 		{
 			m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
@@ -79,8 +79,8 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 	}
 	if (m_BtState == JGUI_BtState_Pressed && JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
 	{
-		HWND hWnd = GetOwnerWindow()->GetRootWindowHandle();
-		if (!GetCollider()->CheckInPoint(JGUI::GetMousePos(hWnd)))
+		auto p = GetOwnerWindow()->GetMousePos();
+		if (!GetCollider()->CheckInPoint(p))
 		{
 			m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
@@ -139,7 +139,7 @@ void JGUIMaximizeButton::Start()
 
 void JGUIMaximizeButton::OnClick()
 {
-	if (GetOwnerWindow())
+	if (GetOwnerWindow()->GetParent() == nullptr)
 	{
 		::ShowWindow(GetOwnerWindow()->GetRootWindowHandle(), SW_MAXIMIZE);
 		GetOwnerWindow()->GetTransform()->SetPosition(0, 0);
@@ -156,8 +156,12 @@ void JGUIMinimizeButton::Start()
 
 void JGUIMinimizeButton::OnClick()
 {
-	if (GetOwnerWindow())
+	if (GetOwnerWindow()->GetParent() == nullptr)
 	{
 		::ShowWindow(GetOwnerWindow()->GetRootWindowHandle(), SW_MINIMIZE);
+	}
+	else
+	{
+
 	}
 }

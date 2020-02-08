@@ -37,7 +37,7 @@ void JGUIResizeBox::Tick(const JGUITickEvent& e)
 {
 
 
-	if (GetCollider()->CheckInPoint(JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle())) || m_Resizing)
+	if (GetCollider()->CheckInPoint(GetOwnerWindow()->GetMousePos()) || m_Resizing)
 	{
 		m_Rectangle->SetColor(JColor(1.0f, 0.0f, 0.0f, 1.0f));
 	}
@@ -76,7 +76,7 @@ void JGUIResizeBox::MouseBtDown(const JGUIKeyDownEvent& e)
 }
 void JGUIResizeBox::CheckCursorDirection()
 {
-	auto mouse_pos = JGUI::GetMousePos(GetOwnerWindow()->GetRootWindowHandle());
+	auto mouse_pos = GetOwnerWindow()->GetMousePos();
 	auto pos = GetTransform()->GetPosition();
 	auto size = GetTransform()->GetSize();
 
