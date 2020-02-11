@@ -14,7 +14,7 @@ void JGUIResizeBox::SetThickness(float thick)
 
 	m_Rectangle->SetThickness(m_Thick);
 
-	if (GetCollider()->GetColiderType() == JGUI_Component_Colider_EmptyBox)
+	if (GetCollider()->GetColiderType() == JGUI_Collider_EmptyBox)
 	{
 		((JGUIEmptyBoxColider*)GetCollider())->SetThick(m_Thick);
 	}
@@ -22,9 +22,8 @@ void JGUIResizeBox::SetThickness(float thick)
 
 void JGUIResizeBox::Awake()
 {
-	RegisterCollider(JGUI_Component_Colider_EmptyBox);
-	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("ResizeRectangle");
-	m_Rectangle->EmptyOn();
+	RegisterCollider(GetOwnerWindow(), JGUI_Collider_EmptyBox);
+	m_Rectangle = CreateJGUIComponent<JGUIEmptyRectangle>("ResizeRectangle");
 	m_Rectangle->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
 	m_Rectangle->GetTransform()->SetSize(GetTransform()->GetSize());
 	SetThickness(m_Thick);
@@ -121,7 +120,7 @@ void JGUIResizeBox::ResizeByDirection()
 		{
 		case UP_NS:
 			GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetPosition(0.0f, deltaY);
+			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
 			break;
 		case DOWN_NS:
 			GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, deltaY);
@@ -131,22 +130,22 @@ void JGUIResizeBox::ResizeByDirection()
 			break;
 		case LEFT_WE:
 			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, 0.0f);
-			GetOwnerWindow()->GetTransform()->OffsetPosition(deltaX, 0.0f);
+			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
 			break;
 		case RIGHTUP_NE:
 			GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetPosition(0.0f, deltaY);
+			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
 			break;
 		case RIGHTDOWN_SE:
 			GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, deltaY);
 			break;
 		case LEFTUP_NW:
 			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetPosition(deltaX, deltaY);
+			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, deltaY);
 			break;
 		case LEFTDOWN_SW:
 			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetPosition(deltaX, 0.0f);
+			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
 			break;
 		}
 		m_TempMousePos = mouse_pos;

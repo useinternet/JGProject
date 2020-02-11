@@ -17,60 +17,65 @@ void JGUIComponent::JGUIAwake()
 
 	if (typeid(*this) != typeid(JGUIRectTransform))
 	{
-		m_RectTransform = CreateJGUIComponent<JGUIRectTransform>("JGUIRectTransform");
+		RegisterTransform(this, JGUI_RectTransform_Default);
 	}
 	JGUIObject::JGUIAwake();
 }
 void JGUIComponent::JGUIStart()
 {
-	for (auto& child : m_ChildComponents)
+	for (auto& child_info : m_ChildComponents)
 	{
-		if (child->IsExecuteStartFunc()) continue;
-		child->JGUIStart();
+		for (auto& child : child_info.second)
+		{
+			if (child->IsExecuteStartFunc()) continue;
+			child->JGUIStart();
+		}
 	}
+
+
 	JGUIObject::JGUIStart();
 }
 void JGUIComponent::JGUITick(const JGUITickEvent& e)
 {
-
 	Tick(e);
-	if (m_RectTransform)
+	if (GetTransform())
 	{
-		if (m_PrevSize != m_RectTransform->GetSize())
+		if (m_PrevSize != GetTransform()->GetSize())
 		{
-			m_PrevSize = m_RectTransform->GetSize();
+			m_PrevSize = GetTransform()->GetSize();
 			JGUIResizeEvent e;
 			e.width = m_PrevSize.x;
 			e.height = m_PrevSize.y;
-			if (m_Collider)
-			{
-				m_Collider->GetTransform()->SetSize(e.width, e.height);
-			}
-
 			JGUIResize(e);
 		}
 	}
-
-	for (auto& child : m_ChildComponents)
+	uint64_t cnt = 0;
+	for (auto& child_info : m_ChildComponents)
 	{
-		if (!child->IsExecuteStartFunc()) child->JGUIStart();
-		if (!child->IsActive()) continue;
-		child->JGUITick(e);
+		for (auto& child : child_info.second)
+		{
+			if (!child->IsExecuteStartFunc()) child->JGUIStart();
+			if (!child->IsActive()) continue;
+			child->m_RISortingOrder = m_RISortingOrder + (++cnt);
+			child->JGUITick(e);
+		}
 	}
-
 }
 void JGUIComponent::JGUIDestroy()
 {
 	JGUIObject::JGUIDestroy();
 
-	SetParent(nullptr);
-	// 자식 손절
-	for (int i = 0; i < m_ChildComponents.size();)
+	
+	for (auto& child_info : m_ChildComponents)
 	{
-		auto com = m_ChildComponents[i];
-		JGUI::DestroyObject(m_ChildComponents[i]);
-		if (GetOwnerWindow()->GetFocusComponent() == com) GetOwnerWindow()->SetFocusComponent(nullptr);
+		for (auto& child : child_info.second)
+		{
+			auto com = child;
+			JGUI::DestroyObject(child);
+			if (GetOwnerWindow()->GetFocusComponent() == com) GetOwnerWindow()->SetFocusComponent(nullptr);
+		}
 	}
+	//SetParent(nullptr);
 	SetActive(false);
 }
 
@@ -102,10 +107,14 @@ void JGUIComponent::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 		track.time = JGUI_DEFAULT_HOVERTRACKTIME;
 		JGUI::RegisterMouseTrack(track);
 	}
-	for (auto& com : m_ChildComponents)
+	for (auto& child_info : m_ChildComponents)
 	{
-		com->JGUIMouseMove(e);
+		for (auto& child : child_info.second)
+		{
+			child->JGUIMouseMove(e);
+		}
 	}
+
 	if(interation_result) MouseMove(e);
 }
 
@@ -157,23 +166,19 @@ void JGUIComponent::JGUIOnFocus()
 	OnFocus();
 }
 
-void JGUIComponent::JGUIParentUpdateNotification()
-{
-	ParentUpdateNotification();
-	for (auto& child : m_ChildComponents)
-	{
-		child->JGUIParentUpdateNotification();
-	}
-}
+
 
 void JGUIComponent::SetParent(JGUIComponent* parent)
 {
+	if (m_Flags & JGUI_ComponentFlag_NoParent) return;
+
+
 	if (parent && parent->m_IsChildLock) return;
 
 	if (m_Parent)
 	{
 		// 삭제
-		auto& childs = m_Parent->m_ChildComponents;
+		auto& childs = m_Parent->m_ChildComponents[m_Priority];
 		childs.erase(std::remove_if(childs.begin(), childs.end(), [&](JGUIComponent* com)
 		{
 			return com == this;
@@ -184,61 +189,38 @@ void JGUIComponent::SetParent(JGUIComponent* parent)
 	{
 		// 삽입
 		auto& childs = parent->m_ChildComponents;
-		childs.push_back(this);
+		childs[m_Priority].push_back(this);
 	}
-	auto temp_parent = m_Parent;
 	m_Parent = parent;
-
-	if (temp_parent != parent)
-	{
-		JGUIParentUpdateNotification();
-	}
-
 }
 JGUIComponent* JGUIComponent::GetParent() const
 {
 	return m_Parent;
 }
-const std::vector<JGUIComponent*>& JGUIComponent::GetChilds() const
+vector<JGUIComponent*> JGUIComponent::GetChilds() const
 {
-	return m_ChildComponents;
-}
-std::vector<JGUIComponent*>& JGUIComponent::GetChilds()
-{
-	return m_ChildComponents;
-
-}
-JGUIComponent* JGUIComponent::FindChild(uint32_t index)
-{
-	if (m_ChildComponents.size() <= index)
-		return nullptr;
-	return m_ChildComponents[index];
-}
-JGUIComponent* JGUIComponent::FindChild(const std::string& name)
-{
-	for (auto& com : m_ChildComponents)
+	vector<JGUIComponent*> result;
+	for (auto& child_info : m_ChildComponents)
 	{
-		if (com->GetName() == name)
-			return com;
+		for (auto& child : child_info.second)
+		{
+			result.push_back(child);
+		}
 	}
-	return nullptr;
+	return result;
 }
 
-void JGUIComponent::RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI_ComponentInteractionFlags flags)
+
+void JGUIComponent::SetPriority(uint32_t priority)
 {
-	switch (colider_type)
+	if (GetParent())
 	{
-	case JGUI_Component_Colider_Box:
-		m_Collider = CreateJGUIComponent<JGUIBoxCollider>("JGUIBoxCollider");
-		break;
-	case JGUI_Component_Colider_EmptyBox:
-		m_Collider = CreateJGUIComponent<JGUIEmptyBoxColider>("JGUIEmptyBoxCollider");
-		break;
+		GetParent()->m_ChildComponents.erase(m_Priority);
+		GetParent()->m_ChildComponents[priority].push_back(this);
 	}
-	m_Collider->SetParent(this);
-	m_Collider->GetTransform()->SetSize(GetTransform()->GetSize());
-	m_InteractionFlag = flags;
+	m_Priority;
 }
+
 
 
 void JGUIComponent::Init(const std::string& name, JGUIWindow* owner_window)
@@ -259,19 +241,21 @@ JGUIComponent* JGUIComponent::TrackingCanInteractionComponent()
 {
 	JGUIComponent* com = nullptr;
 
-	auto flag = GetInteractionFlag();
-	if (flag & JGUI_ComponentInteractionFlag_Default && Interation())
+	
+	if (Interation())
 	{
 		com = this;
 	}
-
-	for (auto& child : m_ChildComponents)
+	for (auto& child_info : m_ChildComponents)
 	{
-		auto temp_com = child->TrackingCanInteractionComponent();
-		if (temp_com)
+		for (auto& child : child_info.second)
 		{
-			com = temp_com;
-			break;
+			auto temp_com = child->TrackingCanInteractionComponent();
+			if (temp_com)
+			{
+				com = temp_com;
+				break;
+			}
 		}
 	}
 	return com;

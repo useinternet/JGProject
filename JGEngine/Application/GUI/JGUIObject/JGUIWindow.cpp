@@ -39,7 +39,7 @@ void JGUIWindow::JGUIAwake()
 	m_ResizeBox = CreateJGUIComponent<JGUIResizeBox>("ResizeBox");
 	float thickness = m_ResizeBox->GetThickness();
 	m_Title = CreateJGUIComponent<JGUITitleBar>("TitleBar");
-	m_Title->GetTransform()->SetPosition(thickness * 2, thickness * 2);
+	m_Title->GetTransform()->SetLocalPosition(thickness * 2, thickness * 2);
 
 
 
@@ -82,7 +82,6 @@ void JGUIWindow::JGUIDestroy()
 	// 자식들 손절
 	for (auto& window : m_ChildWindows)
 	{
-	
 		JGUI::DestroyObject(window);
 	}
 	// 컴포넌트 삭제
@@ -271,21 +270,8 @@ void JGUIWindow::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 			focus_win->JGUIMouseBtUp(e);
 		}
 	}
-
-
-
-
 	if (m_IsMouseDown) m_IsMouseDown = false;
 
-
-	//// 윈도우와의 상호작용
-	//for (auto& child : m_ChildWindows)
-	//{
-	//	if (child->Interaction())
-	//	{
-	//		child->JGUIMouseBtUp(e);
-	//	}
-	//}
 	MouseBtUp(e);
 }
 void JGUIWindow::JGUIMouseMove(const JGUIMouseMoveEvent& e)
@@ -329,8 +315,7 @@ void JGUIWindow::JGUIMouseHover()
 		track.time = 0.01f;
 		track.flag = JGUI_MOUSETRACKFLAG_MOUSELEAVE;
 		JGUI::RegisterMouseTrack(track);
-	}
-	ENGINE_LOG_INFO(GetName() + " MouseHover");
+	} 
 	MouseHover();
 }
 void JGUIWindow::JGUIMouseLeave()
@@ -341,34 +326,9 @@ void JGUIWindow::JGUIMouseLeave()
 	}
 	m_IsMouseLeave = true;
 	JGUI::InputMouseFlush();
-
-
-	ENGINE_LOG_INFO(GetName() + " MouseLeave");
 	MouseLeave();
 }
-void JGUIWindow::JGUIParentUpdateNotification()
-{
-	ParentUpdateNotification();
-	for (auto& com : m_WindowComponents)
-	{
-		com->JGUIParentUpdateNotification();
-	}
 
-	// 윈도우와의 상호작용
-	for (auto& child : m_ChildWindows)
-	{
-		child->JGUIParentUpdateNotification();
-	}
-
-}
-void JGUIWindow::Char(const JGUICharEvent& e)
-{
-}
-
-void JGUIWindow::ParentUpdateNotification()
-{
-
-}
 
 void JGUIWindow::SetParent(JGUIWindow* parent)
 {
@@ -386,7 +346,7 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 			auto pos = GetTransform()->GetPosition();
 			auto parent_pos = m_ParentWindow->GetTransform()->GetPosition();
 			pos = pos + parent_pos;
-			GetTransform()->SetPosition(pos);
+			GetTransform()->SetLocalPosition(pos);
 		}
 		m_ParentWindow = nullptr;
 		
@@ -396,7 +356,6 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 		}
 		m_WinTexture->UnBind();
 		m_Priority = JGUI_WindowPriority_None;
-		JGUIParentUpdateNotification();
 	}
 	else
 	{
@@ -423,10 +382,10 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 			auto pos = GetTransform()->GetPosition();
 			auto parent_pos = parent->GetTransform()->GetPosition();
 			pos = pos - parent_pos;
-			GetTransform()->SetPosition(pos);
+			GetTransform()->SetLocalPosition(pos);
 		}
 
-		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey(), m_ParentWindow->GetID());
+		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey());
 	}
 
 }
@@ -463,12 +422,20 @@ JGUIWindow* JGUIWindow::FindChild(const std::string& name)
 
 	return nullptr;
 }
+void JGUIWindow::DestroyJGUIWindow(JGUIWindow* window)
+{
+
+}
+void JGUIWindow::DestroyJGUIComponent(JGUIComponent* com)
+{
+
+}
 JVector2 JGUIWindow::ConvertToScreenPos(const JVector2& pos)
 {
 	JVector2 result;
 	auto size = GetTransform()->GetSize();
-	result.x = pos.x - (size.x / 2);
-	result.y = -pos.y + (size.y / 2);
+	result.x = pos.x - (size.x * 0.5f);
+	result.y = -pos.y + (size.y * 0.5f);
 
 	return result;
 }
@@ -492,6 +459,34 @@ JGUIRect JGUIWindow::ConvertToScreenRect(const JGUIRect& rect)
 	return result;
 
 
+}
+JVector2 JGUIWindow::ConvertToWorldPos(const JVector2& pos)
+{
+	JVector2 result;
+	auto size = GetTransform()->GetSize();
+	result.x = pos.x  + (size.x * 0.5f);
+	result.y = -pos.y + (size.y * 0.5f);
+
+	return result;
+}
+JGUIRect JGUIWindow::ConvertToWorldRect(const JGUIRect& pos)
+{
+	JGUIRect result;
+	auto size = GetTransform()->GetSize();
+
+
+	JVector2 lt = { result.left , result.top };
+	lt = ConvertToWorldPos(lt);
+
+	JVector2 rb = { result.right, result.bottom };
+	rb = ConvertToWorldPos(rb);
+
+	result.left = lt.x;
+	result.right = rb.x;
+	result.top = lt.y;
+	result.bottom = rb.y;
+
+	return result;
 }
 JVector2Int JGUIWindow::GetMousePos()
 {
@@ -540,28 +535,6 @@ JGUIComponent* JGUIWindow::GetFocusComponent()
 
 void JGUIWindow::SetFocusWindow(JGUIWindow* win)
 {
-	//// 윈도우 안에 있는 자식은 기봊거으로 30000000000000000 인데 이거는 최솟값이고
-//// 생성할수록 1씩증가해서 생성
-//// 포커싱을하면 4조따리가되고 
-//// 풀리면 
-//// root win       2조따리
-//// child 1        3조따리
-//// child 2        3조~ 1따리
-//// child 3        4조 -> 클릭
-//// child 4        3조~ 5따리
-//// child 5        3조~ 4따리 
-//// case 1 단독 일경우
-////   case 1-1 포커싱을 옮길경우
-//	 // 포커싱된 윈도우 -> 포커싱
-//	 // 잃은 윈도우  -> 기존 자식 윈도우중 제일 상위 우선순위를 얻는다.
-////   case 1-2 포커싱을 잃을 경우
-////      기존 -> 기존 자식 윈도우 중 제일 상위 우선순위를 얻는다.
-
-//// case 2 겹쳣을 경우
-//  // case 2-1  포커싱을 옮길 경우
-//	   // -> 제일 상위 우선순위를 얻은 윈도우가 포커스를 얻어간다.
-//	   // 기존 -> 기존 자식 윈도우 중 제일 상위 우선순위를 얻는다. 
-//  // case 2-2  포커싱을 잃을 경우
 
 	if (m_FocusWindow != win)
 	{
@@ -608,17 +581,17 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 	RE::RenderEngine::RegisterRIManager(GetID());
 
 	// 2. Transform 생성
-	m_RectTransform = CreateJGUIComponent<JGUIWinRectTransform>("JGUIRectTransform");
+	RegisterTransform(this, JGUI_RectTransform_Window); 	
+	RegisterCollider(this, JGUI_Collider_Box);
 	GetTransform()->Flush();
-
 	//
 	auto transform = GetTransform();
 	auto window_size = transform->GetSize();
 
 
 	// 3. Panel 생성
-	m_Panel = JGUI::CreateJGUIComponent<JGUIPanel>(GetName() + "Panel", this);
-	m_Panel->RegisterCollider(JGUI_Component_Colider_Box, JGUI_ComponentInteractionFlag_None);
+	m_Panel = JGUI::CreateJGUIComponent<JGUIPanel>(GetName() + "Panel", this,  JGUI_ComponentFlag_None);
+	m_Panel->RegisterCollider(this, JGUI_Collider_Box);
 	m_WindowComponents.push_back(m_Panel);
 
 
@@ -627,11 +600,7 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 
 	// 4. 윈도우 텍스쳐 생성
 	m_WinTexture = CreateJGUIComponent<JGUIWindowTexture>("WindowTexture");
-	m_RectTransform->AttachTransform(m_WinTexture->GetTransform());
-
-	// 5. 윈도우 콜라이더 생성
-	m_BoxColider = CreateJGUIComponent<JGUIBoxCollider>("WindowBoxColider");
-	m_RectTransform->AttachTransform(m_BoxColider->GetTransform());
+	GetTransform()->AttachTransform(m_WinTexture->GetTransform());
 
 	// 5. GUI 모듈 준비
 	ReadyGUIModule();
@@ -675,7 +644,7 @@ void JGUIWindow::ReadyGUIModule()
 	//
 	if (GetParent())
 	{
-		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey(), GetParent()->GetID());
+		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey());
 	}
 
 }
@@ -687,7 +656,7 @@ bool JGUIWindow::Interaction()
 	auto pos = GetParent()->GetMousePos();
 
 
-	return IsActive() && m_BoxColider->CheckInPoint(pos);
+	return IsActive() && GetCollider() && GetCollider()->CheckInPoint(pos);
 }
 
 EJGUI_WindowPriority JGUIWindow::ChildWindowSortByPriority()
@@ -704,7 +673,6 @@ EJGUI_WindowPriority JGUIWindow::ChildWindowSortByPriority()
 		child->m_Priority = p;
 		p = (EJGUI_WindowPriority)(p + 1);
 	}
-	JGUIParentUpdateNotification();
 	return p;
 }
 

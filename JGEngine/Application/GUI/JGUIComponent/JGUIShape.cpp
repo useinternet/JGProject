@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JGUIShape.h"
-#include "JGUIPanel.h"
 #include "JGUIRectTransform.h"
+#include "JGUIRenderItem.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 #include "GUI/JGUIFont/JGUIFontManager.h"
 
@@ -11,312 +11,231 @@
 #include "Object/ReObject/ReMesh.h"
 #include "Object/DxObject/Resource.h"
 #include "Object/Shader/ShaderModule.h"
-using namespace std;
 
+using namespace std;
 
 void JGUIShape::Awake()
 {
-	ChildLock();
+	m_RI = JGUI::CreateJGUIComponent<JGUIRenderItem>("RenderItem", GetOwnerWindow(),
+		JGUI_ComponentFlag_NoChild | JGUI_ComponentFlag_NoParent | JGUI_ComponentFlag_LockCreateFunction);
+	m_RI->SetDrawingWindow(GetOwnerWindow());
+	m_RI->SetRIPriority(GetRISortingOrder());
+
+	InitRenderItem(m_RI->GetRI());
+	GetTransform()->AttachTransform(m_RI->GetTransform());
 }
 
-void JGUIShape::Start()
+void JGUIShape::Destroy()
 {
 
-	FindPanel();
+	JGUI::DestroyObject(m_RI);
 }
 
 void JGUIShape::Tick(const JGUITickEvent& e)
 {
-	if (m_ParentDirty)
-	{
-		m_ParentDirty = false;
-		FindPanel();
-	}
-	auto transform = GetTransform();
-
-	JVector2 window_size = GetOwnerWindow()->GetTransform()->GetSize();
-
-	if (transform->IsDirty() || 
-		(window_size != m_PrevWindowSize))
-	{
-
-
-
-
-		m_PrevWindowSize = window_size;
-		auto pos = transform->GetPosition();
-		pos += m_Offset;
-		
-		auto angle = transform->GetAngle();
-		auto scale = transform->GetScale();
-		if (m_IsWindowTexture)
-		{
-			if (GetOwnerWindow()->GetParent()) pos = GetOwnerWindow()->GetParent()->ConvertToScreenPos(pos);
-			else pos = GetOwnerWindow()->ConvertToScreenPos(pos);
-		}
-		else
-		{
-			pos = GetOwnerWindow()->ConvertToScreenPos(pos);
-		}
-		
-
-
-		auto pivot = transform->GetPivot();
-		pivot.x = 1.0f - (pivot.x  + 0.5f );
-		
-		pivot.y -= 0.5f;
-
-		auto shape_size = transform->GetSize();
-		pos.x += (shape_size.x * pivot.x);
-		pos.y += (shape_size.y * pivot.y);
-
-
-		// 매트릭스계산
-		auto t = JMatrix::Translation(JVector3(pos.x, pos.y, 0.0f));
-		auto r = JMatrix::Rotation(JQuaternion::ToQuaternion({ 0.0f,0.0f, angle }));
-		auto s = JMatrix::Scaling(JVector3(scale.x, scale.y, 1.0f));
-
-		auto m = s * r * t;
-		if (m_Instance)
-		{
-			m_Instance->Set("World", JMatrix::Transpose(m));
-		}
-		transform->Flush();
-	}
+	m_RI->SetRIPriority(GetRISortingOrder());
+	m_RI->RenderUpdate();
 }
-void JGUIShape::Destroy()
+
+void JGUIShape::SetActive(bool is_active)
 {
-	DestroyRI();
+	m_RI->SetActive(is_active);
+	JGUIComponent::SetActive(is_active);
 }
-void JGUIShape::ParentUpdateNotification()
+
+void JGUIShape::CreateRI(JGUIWindow* drawing_win)
 {
-	m_ParentDirty = true;
+	m_RI->SetRIPriority(GetRISortingOrder());
+	m_RI->SetDrawingWindow(drawing_win);
+	InitRenderItem(m_RI->GetRI());
 }
-void JGUIShape::SetActive(bool active)
+
+
+void JGUIWindowTexture::Bind(const std::string& moduleKey)
 {
-	JGUIComponent::SetActive(active);
-	if(m_RenderItem == nullptr)	SetParent(GetParent());
-	if (m_RenderItem)
-	{
-		m_RenderItem->SetActive(active);
-	}
+	is_code = true;
+	m_ModuleKey = moduleKey;
+	CreateRI(GetOwnerWindow()->GetParent());
 }
-void JGUIShape::SetParent(JGUIComponent* parent)
-{
-	JGUIComponent::SetParent(parent);
-	if (m_ParentDirty && m_RenderItem == nullptr)
-	{
-		m_ParentDirty = false;
-		FindPanel();
-	}
-}
-void JGUIShape::SetColor(const JColor& color)
-{
-	m_Color = color;
-	if (m_RenderItem == nullptr)	SetParent(GetParent());
-	if (m_RenderItem)
-	{
-		m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", color);
-	}
-}
-void JGUIShape::DestroyRI()
-{
-	if (m_RenderItem)
-	{
-		m_Instance = nullptr;
-		RE::RenderEngine::DestroyRenderItem(GetOwnerWindow()->GetID(), m_RenderItem);
-		m_RenderItem = nullptr;
-	}
-}
-void JGUIShape::FindPanel()
-{
-	JGUIComponent* p = GetParent();
-	bool is_find = false;
-	uint64_t cnt = 0;
-	while (p != nullptr)
-	{
-		cnt++;
-		if (typeid(*p) == typeid(JGUIPanel))
-		{
-			m_OwnerPanel = (JGUIPanel*)p;
-			is_find = true;
-
-			if (!m_IsWindowTexture)
-			{
-				if (cnt == 1 && typeid(*this) == typeid(JGUIRectangle))
-				{
-					if (m_OwnerPanel->GetParent() == nullptr) m_Priority = 0;
-					else m_Priority = cnt;
-				}
-				else  m_Priority = m_OwnerPanel->GetPriority() + cnt;
-			}
-			else
-			{
-				m_Priority = GetOwnerWindow()->GetPriority();
-			}
-			break;
-		}
-		p = p->GetParent();
-	}
-
-	if (!is_find)
-	{
-		m_OwnerPanel = nullptr;
-		DestroyRI();
-	}
-	else
-	{
-		if (m_RenderItem == nullptr)
-		{
-			CreateRI();
-		}
-		else
-		{
-			m_RenderItem->SetPriority(m_Priority);
-		}
-	}
-}
-void JGUIShape::CreateRI()
-{
-}
-
-void JGUIWindowTexture::Bind(const std::string& moduleKey, uint64_t parnet_id)
-{
-	if (m_ParentID == parnet_id && m_RenderItem)
-	{
-		m_RenderItem->GetMaterial()->SetTexture("Image", moduleKey);
-
-		auto desc = m_RenderItem->GetMaterial()->GetTextureArray()[0].GetDesc();
-
-		return;
-	}
-
-
-	m_ParentID = parnet_id;
-	if (m_RenderItem)
-	{
-		DestroyRI();
-	}
-	auto transform = GetTransform();
-	auto size = transform->GetSize();
-	m_RenderItem = RE::RenderEngine::CreateRenderItem(parnet_id,
-		RE::ERenderItemUsage::GUI, GetName() + "_RI");
-
-	m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
-	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	m_RenderItem->GetMaterial()->SetTexture("Image", moduleKey);
-	m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
-	m_RenderItem->SetPriority(GetOwnerWindow()->GetPriority());
-	m_Instance = m_RenderItem->AddInstance();
-	m_RenderItem->SetActive(IsActive());
-}
-
 void JGUIWindowTexture::UnBind()
 {
-	if (m_RenderItem)
-	{
-		DestroyRI();
-	}
-
-
-	m_ParentID = -1;
+	GetRenderItem()->SetDrawingWindow(nullptr);
 }
 
-void JGUIWindowTexture::Awake()
+void JGUIWindowTexture::InitRenderItem(RE::RenderItem* ri)
 {
-	JGUIShape::Awake();
-	m_IsWindowTexture = true;
+	if (m_ModuleKey.empty()) return;
+	auto size = GetTransform()->GetSize();
+	ri->SetMaterial(RE_GUI_OneTextureDefault);
+	ri->GetMaterial()->SetValueAsFloat4("Color", JColor(1,1,1,1));
+	ri->GetMaterial()->SetTexture("Image", m_ModuleKey);
+	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 }
-
+void JGUIWindowTexture::Tick(const JGUITickEvent& e)
+{
+	GetRenderItem()->SetRIPriority(GetOwnerWindow()->GetPriority());
+	GetRenderItem()->RenderUpdate();
+}
 void JGUIWindowTexture::Resize(const JGUIResizeEvent& e)
 {
 	auto size = GetTransform()->GetSize();
-	if (m_RenderItem)
+	if (GetRenderItem()->GetRI())
 	{
-		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
-	}
-}
-
-void JGUIWindowTexture::DestroyRI()
-{
-	if (m_RenderItem)
-	{
-		m_Instance = nullptr;
-		RE::RenderEngine::DestroyRenderItem(m_ParentID, m_RenderItem);
-		m_RenderItem = nullptr;
-	}
-}
-
-
-void JGUIRectangle::SetImage(const std::string& texture_image)
-{
-	if (m_RenderItem)
-	{
-		if (m_ImageName.empty()) m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
-		m_ImageName = texture_image;
-		m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-		m_RenderItem->GetMaterial()->SetTexture("Image", texture_image);
+		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 	}
 
 }
-void JGUIRectangle::FillOn()
-{
-	m_IsFill = true;
-	CreateMesh();
-}
-void JGUIRectangle::EmptyOn()
-{
-	m_IsFill = false;
-	CreateMesh();
-}
-void JGUIRectangle::CreateRI()
-{
-	if (m_RenderItem)
-	{
-		DestroyRI();
-	}
-	auto transform = GetTransform();
-	auto size = transform->GetSize();
 
-	m_RenderItem = RE::RenderEngine::CreateRenderItem(GetOwnerWindow()->GetID(),
-		RE::ERenderItemUsage::GUI, GetName() + "_RI");
-	
-	if(m_ImageName.empty()) m_RenderItem->SetMaterial(RE_GUI_DefaultMaterial);
-	else m_RenderItem->SetMaterial(RE_GUI_OneTextureDefault);
 
-	
-	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	if (!m_ImageName.empty()) m_RenderItem->GetMaterial()->SetTexture("Image", m_ImageName);
 
-	CreateMesh();
-
-	m_RenderItem->SetPriority(m_Priority);
-	m_Instance = m_RenderItem->AddInstance();
-	m_RenderItem->SetActive(IsActive());
-
-}
-void JGUIRectangle::Resize(const JGUIResizeEvent& e)
+void JGUIImage::InitRenderItem(RE::RenderItem* ri)
 {
-	if (m_RenderItem == nullptr)	SetParent(GetParent());
-	if (m_RenderItem)
-	{
-		CreateMesh();
-	}
-}
-void JGUIRectangle::CreateMesh()
-{
-	if (m_RenderItem == nullptr) return;
 	auto size = GetTransform()->GetSize();
-	if (m_IsFill)
+	if (m_ImageSource == "none")
 	{
-		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+		ri->SetMaterial(RE_GUI_DefaultMaterial);
+		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 	}
 	else
 	{
-		m_RenderItem->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
+		ri->SetMaterial(RE_GUI_OneTextureDefault);
+		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+		ri->GetMaterial()->SetTexture("Image", m_ImageSource);
+	
+	}
+	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+}
+
+void JGUIImage::Resize(const JGUIResizeEvent& e)
+{
+	auto size = GetTransform()->GetSize();
+	if (GetRenderItem()->GetRI())
+	{
+		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	}
+}
+
+void JGUIImage::SetImage(const std::string& path)
+{
+	m_ImageSource = path;
+	if (GetRenderItem()->GetRI())
+	{
+		CreateRI(GetOwnerWindow());
+	}
+}
+
+void JGUIImage::SetColor(const JColor& color)
+{
+	m_Color = color;
+	if (GetRenderItem()->GetRI())
+	{
+		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	}
+}
+
+void JGUIImage::SetColor(float r, float g, float b, float a)
+{
+	SetColor(JColor(r, g, b, a));
+}
+
+
+
+
+
+
+
+
+
+void JGUIRectangle::InitRenderItem(RE::RenderItem* ri)
+{
+	auto size = GetTransform()->GetSize();
+	ri->SetMaterial(RE_GUI_DefaultMaterial);
+	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+}
+void JGUIRectangle::Resize(const JGUIResizeEvent& e)
+{
+	if (GetRenderItem()->GetRI())
+	{
+		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateFillRect(e.width, e.height));
 	}
 
 }
+void JGUIRectangle::SetColor(const JColor& color)
+{
+	m_Color = color;
+	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	
+}
+void JGUIRectangle::SetColor(float r, float g, float b, float a)
+{
+	m_Color = JColor(r, g, b, a);
+	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+}
+
+
+
+
+
+void JGUIEmptyRectangle::InitRenderItem(RE::RenderItem* ri)
+{
+	auto size = GetTransform()->GetSize();
+	ri->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
+	ri->SetMaterial(RE_GUI_DefaultMaterial);
+	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+}
+void JGUIEmptyRectangle::Resize(const JGUIResizeEvent& e)
+{
+	if (GetRenderItem()->GetRI())
+	{
+		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateEmptyRect(e.width, e.height, m_Thick));
+	}
+	
+}
+void JGUIEmptyRectangle::SetColor(const JColor& color)
+{
+	m_Color = color;
+	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+
+}
+void JGUIEmptyRectangle::SetColor(float r, float g, float b, float a)
+{
+	m_Color = JColor(r, g, b, a);
+	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+}
+
+void JGUIEmptyRectangle::SetThickness(float thick)
+{
+	if (m_Thick != thick)
+	{
+		auto size = GetTransform()->GetSize();
+		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
+	}
+	m_Thick = thick;
+}
+
+
+
+
+
+
+
+
+
+
+void JGUIText::InitRenderItem(RE::RenderItem* ri)
+{
+	auto size = GetTransform()->GetSize();
+	auto fileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
+
+
+	ri->SetMaterial(RE_GUI_TextMaterial);
+	ri->SetMesh(make_shared<RE::ReGuiMesh>());
+	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	ri->GetMaterial()->SetTexture("Image", fileInfo.page[0]);
+}
+
+
 void JGUIText::SetFont(const std::string& str)
 {
 	m_FontName = str;
@@ -325,10 +244,8 @@ void JGUIText::SetFont(const std::string& str)
 
 void JGUIText::SetText(const std::string& str)
 {
-	if (m_RenderItem == nullptr) CreateRI();
 	if (str.empty()) return;
-	if (m_RenderItem == nullptr) return;
-	auto dmesh = m_RenderItem->GetMesh();
+	auto dmesh = GetRenderItem()->GetRI()->GetMesh();
 	if (dmesh->GetType() != RE::EReMeshType::GUI) return;
 	dmesh->Reset();
 	// 
@@ -357,7 +274,7 @@ void JGUIText::AddText(const std::string& str)
 		SetText(str); return;
 	}
 
-	auto dmesh = m_RenderItem->GetMesh();
+	auto dmesh = GetRenderItem()->GetRI()->GetMesh();
 	if (dmesh->GetType() != RE::EReMeshType::GUI) return;
 	// 
 	m_Text += str;
@@ -415,7 +332,7 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 {
 	if (m_Text.empty()) return;
 	if (start_pos >= end_pos) return;
-	auto dmesh = m_RenderItem->GetMesh();
+	auto dmesh = GetRenderItem()->GetRI()->GetMesh();
 	if (dmesh->GetType() != RE::EReMeshType::GUI) return;
 	auto mesh = (RE::ReGuiMesh*)dmesh;
 
@@ -432,7 +349,6 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 	m_Text.erase(start_pos, end_pos - start_pos);
 	m_TextPosMap.erase(m_TextPosMap.begin() + start_pos, m_TextPosMap.begin() + end_pos);
 	mesh->Remove(vstart, vend, istart, iend);
-
 
 	string sub = m_Text.substr(start_pos, m_Text.length());
 	if (!sub.empty())
@@ -487,21 +403,36 @@ void JGUIText::SetTextRect(float width, float height)
 	m_TextRect.bottom = height;
 	SetText(m_Text);
 }
-
-JVector2 JGUIText::GetTextLastPos()
+void JGUIText::SetColor(const JColor& color)
+{
+	m_Color = color;
+	if (GetRenderItem())
+	{
+		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	}
+}
+void JGUIText::SetColor(float r, float g, float b, float a)
+{
+	m_Color = JColor(r, g, b, a);
+	if (GetRenderItem())
+	{
+		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	}
+}
+JVector2 JGUIText::GetTextLastPos(int n)
 {
 	if (m_Text.length() == 0) return JVector2();
+	if (m_Text.length() <= n) return JVector2();
 
 
-
-	string last = m_Text.substr(m_Text.length() - 1, m_Text.length());
-	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName,s2ws(last));
+	string last = m_Text.substr(n, n + 1);
+	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName, s2ws(last));
 	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
 
-	auto pos = GetTextPos(m_Text.length() - 1);
+	auto pos = GetTextPos(n);
 	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
 
-	auto info = *(charInfo.begin() );
+	auto info = *(charInfo.begin());
 	pos.x += ((float)info.xadvance * font_size_ratio);
 	return pos;
 }
@@ -511,33 +442,7 @@ const JVector2& JGUIText::GetTextPos(int n) const
 	return m_TextPosMap[n];
 }
 
-void JGUIText::CreateRI()
-{
-	if (m_RenderItem)
-	{
-		DestroyRI();
-	}
-	if (m_FontName == "")
-	{
-		m_FontName = JGUI::GetDefaultFontName();
-	}
-	auto transform = GetTransform();
-	auto size = transform->GetSize();
-	auto fileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
 
-
-	m_RenderItem = RE::RenderEngine::CreateRenderItem(GetOwnerWindow()->GetID(),
-		RE::ERenderItemUsage::GUI, GetName() + "_RI");
-	if (m_RenderItem == nullptr) return;
-	m_RenderItem->SetMaterial(RE_GUI_TextMaterial);
-	m_RenderItem->SetMesh(make_shared<RE::ReGuiMesh>());
-	m_RenderItem->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	m_RenderItem->GetMaterial()->SetTexture("Image", fileInfo.page[0]);
-
-	m_RenderItem->SetPriority(m_Priority);
-	m_Instance = m_RenderItem->AddInstance();
-	m_RenderItem->SetActive(IsActive());
-}
 
 std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 	uint32_t ioffset, JVector2 start_pos, const std::string& str,
@@ -557,7 +462,7 @@ std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 	for (auto& info : charInfo)
 	{
 		info.height += 1;
-		info.width  += 1;
+		info.width += 1;
 		// offset
 		float xoffset = (float)info.xoffset * font_size_ratio;
 		float yoffset = (float)info.yoffset * font_size_ratio;
@@ -642,7 +547,23 @@ void JGUIText::UpdateTextSize(const std::string& str)
 	text_rect_size.y = font_height * lineCount;
 
 	GetTransform()->SetSize(text_rect_size);
-	m_Offset.x = -(text_rect_size.x / 2.0f);
-	m_Offset.y = -(lineCount - 1) * font_height * 0.5f;
+
+	auto offset = GetRenderItem()->GetOffset();
+	offset.x = -(text_rect_size.x / 2.0f);
+	offset.y = -(lineCount - 1) * font_height * 0.5f;
+	GetRenderItem()->SetOffset(offset);
+
+	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
+	float half_window_width = window_size.x * 0.5f;
+	JVector2 ClipRange = { 0.0f, text_rect_size.x };
+	auto pos = GetTransform()->GetPosition();
+	ClipRange.x += (pos.x - half_window_width);
+	ClipRange.y += (pos.x - half_window_width);
+
+
+
+    bool result = GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat2("Clip", ClipRange);
+
 }
+
 

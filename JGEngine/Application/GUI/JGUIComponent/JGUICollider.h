@@ -5,14 +5,15 @@
 class JGUIRectangle;
 class JGUICollider : public JGUIComponent
 {
+	friend class JGUIObject;
 protected:
-	EJGUI_Component_Colider m_ColiderType;
+	EJGUI_Colider m_ColiderType;
 public:
 	virtual void DebugOn();
 	virtual void DebugOff();
 	virtual bool CheckInPoint(const JVector2Int& p);
 
-	EJGUI_Component_Colider GetColiderType() const {
+	EJGUI_Colider GetColiderType() const {
 		return m_ColiderType;
 	}
 };

@@ -268,7 +268,7 @@ void JGUI::Update()
 			else
 			{
 
-				collider = win->GetColider();
+				collider = win->GetCollider();
 			}
 		}
 		if (focus_cnt > JGUI_FOCUS_RANGE)

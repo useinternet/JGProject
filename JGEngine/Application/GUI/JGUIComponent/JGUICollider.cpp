@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JGUICollider.h"
 #include "JGUIRectTransform.h"
-#include "JGUIShape.h"
+#include "JGUIRenderItem.h"
 #include "JGUIPanel.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 
@@ -19,7 +19,7 @@ bool JGUICollider::CheckInPoint(const JVector2Int& p)
 
 void JGUIBoxCollider::Awake()
 {
-	m_ColiderType = JGUI_Component_Colider_Box;
+	m_ColiderType = JGUI_Collider_Box;
 }
 
 void JGUIBoxCollider::DebugOn()
@@ -46,7 +46,7 @@ bool JGUIBoxCollider::CheckInPoint(const JVector2Int& p)
 
 void JGUIEmptyBoxColider::Awake()
 {
-	m_ColiderType = JGUI_Component_Colider_EmptyBox;
+	m_ColiderType = JGUI_Collider_EmptyBox;
 }
 
 bool JGUIEmptyBoxColider::CheckInPoint(const JVector2Int& p)

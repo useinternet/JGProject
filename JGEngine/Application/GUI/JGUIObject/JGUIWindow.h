@@ -40,7 +40,6 @@ private:
 	virtual void JGUIMouseMove(const JGUIMouseMoveEvent& e);
 	virtual void JGUIMouseHover();
 	virtual void JGUIMouseLeave();
-	virtual void JGUIParentUpdateNotification();
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
 	virtual void FocusEnter(const JGUIFocusEnterEvent& e) {}
@@ -49,7 +48,7 @@ protected:
 
 
 
-	virtual void Char(const JGUICharEvent& e);
+	virtual void Char(const JGUICharEvent& e) {}
 	virtual void KeyDown(const JGUIKeyDownEvent& e) {}
 	virtual void KeyUp(const JGUIKeyUpEvent& e) {}
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) {}
@@ -57,7 +56,6 @@ protected:
 	virtual void MouseMove(const JGUIMouseMoveEvent& e) {}
 	virtual void MouseHover() {}
 	virtual void MouseLeave() {}
-	virtual void ParentUpdateNotification();
 public:
 	// 자식 부모 관련 함수 
 	void        SetParent(JGUIWindow* parent);
@@ -86,16 +84,23 @@ public:
 	}
 
 	template<typename ComponentType>
-	ComponentType* CreateJGUIComponent(const std::string& name)
+	ComponentType* CreateJGUIComponent(const std::string& name, EJGUI_ComponentFlags flags = JGUI_ComponentFlag_None)
 	{
-		auto com = JGUI::CreateJGUIComponent<ComponentType>(name, this);
+		auto com = JGUI::CreateJGUIComponent<ComponentType>(name, this, flags);
 		com->SetParent(m_Panel);
 		return com;
 	}
 
+	void DestroyJGUIWindow(JGUIWindow* window);
+	void DestroyJGUIComponent(JGUIComponent* com);
+
+
+
 	// 윈도우 유틸 함수
 	JVector2 ConvertToScreenPos(const JVector2& pos);
 	JGUIRect ConvertToScreenRect(const JGUIRect& rect);
+	JVector2 ConvertToWorldPos(const JVector2& pos);
+	JGUIRect ConvertToWorldRect(const JGUIRect& pos);
 	JVector2Int GetMousePos();
 
 	HWND GetRootWindowHandle() const;
@@ -111,13 +116,7 @@ public:
 	JGUIPanel* GetPanel() const {
 		return m_Panel;
 	}
-	JGUIBoxCollider* GetColider() const {
-		return m_BoxColider;
-	}
 
-	JGUIWinRectTransform* GetTransform() const {
-		return m_RectTransform;
-	}
 	JGUIScreen* GetScreen() const {
 		return m_Screen;
 	}
@@ -143,9 +142,7 @@ private:
 	std::vector<JGUIWindow*>     m_ChildWindows;
 	JGUIComponent*               m_FocusComponent = nullptr;
 	JGUIWindow*                  m_FocusWindow    = nullptr;
-	JGUIWinRectTransform*        m_RectTransform  = nullptr;
 	JGUIWindowTexture*           m_WinTexture     = nullptr;
-	JGUIBoxCollider*             m_BoxColider     = nullptr;
 	JGUIPanel*                   m_Panel          = nullptr;
 
 	EJGUI_WindowFlags m_Flags = JGUI_WindowFlag_None;

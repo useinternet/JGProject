@@ -4,7 +4,7 @@
 
 #include "GUI/JGUIObject/JGUIComponent.h"
 
-class JGUIRectangle;
+class JGUIImage;
 enum EJGUIBtState
 {
 	JGUI_BtState_Normal = 0,
@@ -35,7 +35,7 @@ public:
 	void SetBtColor(EJGUIBtState state, const JColor& color);
 	void BIndOnClick(const std::function<void()>& func);
 private:
-	JGUIRectangle* m_Rectangle = nullptr;
+	JGUIImage*     m_Image = nullptr;
 	JColor         m_BtColor[JGUI_BtState_Count];
 	EJGUIBtState   m_BtState = JGUI_BtState_Normal;
 	bool           m_IsClick = false;

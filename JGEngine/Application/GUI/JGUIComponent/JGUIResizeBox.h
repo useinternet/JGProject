@@ -5,7 +5,7 @@
 #include "GUI/JGUIObject/JGUIComponent.h"
 
 
-class JGUIRectangle;
+class JGUIEmptyRectangle;
 class JGUIResizeBox : public JGUIComponent
 {
 	enum EResizeDirection
@@ -34,7 +34,7 @@ private:
 	void ResizeByDirection();
 private:
 	// 콜라이더 2개
-	JGUIRectangle* m_Rectangle = nullptr;
+	JGUIEmptyRectangle* m_Rectangle = nullptr;
 	bool           m_Resizing = false;
 	EResizeDirection m_Direction;
 	JVector2Int     m_TempMousePos;

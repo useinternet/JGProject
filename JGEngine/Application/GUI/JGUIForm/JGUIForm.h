@@ -17,8 +17,8 @@ class JGUIForm : public JGUIWindow
 	JGUIInputText* inputText = nullptr;
 protected:
 	virtual void Start() override;
+	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void KeyUp(const JGUIKeyUpEvent& e) override;
-
 };
 
 

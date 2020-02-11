@@ -179,6 +179,7 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp" />

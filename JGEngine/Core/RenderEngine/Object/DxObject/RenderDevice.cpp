@@ -85,7 +85,8 @@ namespace RE
 		// FrameResource
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 
-
+		//DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		//swapChainDesc.
 		// Direct
 		m_DirectCommandQueue->ExcuteCommandList(render_List);
 		for (auto& screen : m_DxScreenPool)

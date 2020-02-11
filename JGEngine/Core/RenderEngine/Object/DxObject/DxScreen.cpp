@@ -58,7 +58,7 @@ namespace RE
 	}
 	void DxScreen::Present()
 	{
-		m_SwapChain->Present(0, 0);
+		HRESULT hr = m_SwapChain->Present(0, 0);
 	}
 
 	void DxScreen::ReSize(uint32_t width, uint32_t height)

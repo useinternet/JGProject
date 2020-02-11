@@ -13,7 +13,7 @@ using namespace std;
 
 void JGUITitleBar::Awake()
 {
-	RegisterCollider(JGUI_Component_Colider_Box);
+	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
 	m_Panel = CreateJGUIComponent<JGUIPanel>("JGUIPanel");
 	m_CloseBt = CreateJGUIComponent<JGUICloseButton>("JGUICloseBt");
 	m_MaxBt = CreateJGUIComponent<JGUIMaximizeButton>("JGUIMaxBt");
@@ -50,7 +50,7 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 				mouse_pos.x += m_Delta.x;
 				mouse_pos.y += m_Delta.y;
 				JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
-				GetOwnerWindow()->GetTransform()->SetPosition(pos);
+				GetOwnerWindow()->GetTransform()->SetLocalPosition(pos);
 
 
 				auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
@@ -90,7 +90,7 @@ void JGUITitleBar::SettingElement()
 	m_TitleText->SetTextRect(size.x, Default_Bt_Size);
 	m_TitleText->SetFontSize(Default_Bt_Size - 4.0f);
 	m_TitleText->SetText(GetOwnerWindow()->GetName());
-	m_TitleText->GetTransform()->SetPosition(JGUI::Gap(), 0.0f);
+	m_TitleText->GetTransform()->SetLocalPosition(JGUI::Gap(), 0.0f);
 	m_Panel->GetTransform()->SetSize(size.x, Default_Bt_Size);
 	m_Panel->SetColor(JColor(0.3f, 0.3f, 0.3f, 1.0f));
 	m_CloseBt->GetTransform()->SetSize(Default_Bt_Size, Default_Bt_Size);
@@ -105,9 +105,9 @@ void JGUITitleBar::SettingElement()
 	float gap = JGUI::Gap();
 
 	pos -= (btsize + gap);
-	m_CloseBt->GetTransform()->SetPosition(pos, 0);
+	m_CloseBt->GetTransform()->SetLocalPosition(pos, 0);
 	pos -= (btsize + gap);
-	m_MaxBt->GetTransform()->SetPosition(pos, 0);
+	m_MaxBt->GetTransform()->SetLocalPosition(pos, 0);
 	pos -= (btsize + gap);
-	m_MinBt->GetTransform()->SetPosition(pos, 0);
+	m_MinBt->GetTransform()->SetLocalPosition(pos, 0);
 }

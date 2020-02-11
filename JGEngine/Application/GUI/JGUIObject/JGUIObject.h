@@ -5,6 +5,9 @@
 
 class JGUIWindow;
 class JGUIComponent;
+class JGUIRectTransform;
+class JGUIShape;
+class JGUICollider;
 class JGUIObject
 {
 	friend JGUI;
@@ -21,7 +24,7 @@ protected:
 private:
 	virtual void JGUIAwake(){ Awake(); };
 	virtual void JGUIStart() { Start(); m_Is_ExecuteStart = true; }
-	virtual void JGUIDestroy() { Destroy();};
+	virtual void JGUIDestroy();
 	virtual void JGUITick(const JGUITickEvent& e) { Tick(e); }
 public:
 	const std::string& GetName() const {
@@ -42,14 +45,36 @@ public:
 	uint64_t GetID() const {
 		return m_ID;
 	}
+
+	JGUIRectTransform* GetTransform() {
+		return m_Transform;
+	}
+	JGUICollider* GetCollider() {
+		return m_Collider;
+	}
+	
+
+
+	
+protected:
+	void RegisterCollider(JGUIWindow* owner_window, EJGUI_Colider type);
+	void RegisterTransform(JGUIComponent* owner_com, EJGUI_RectTransform type);
+	void RegisterTransform(JGUIWindow* owner_window,    EJGUI_RectTransform type);
 private:
 
+private:
 	std::string m_Name;
 	std::string m_LayerName = "None";
 	//
 	bool        m_Active = true;
 	//
 	uint64_t    m_ID = -1;
-
+	//
 	bool m_Is_ExecuteStart = false;
+
+	// Flags
+
+	// 기본 컴포넌트들
+	JGUIRectTransform* m_Transform = nullptr;
+	JGUICollider*      m_Collider  = nullptr;
 };

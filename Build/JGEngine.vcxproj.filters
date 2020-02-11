@@ -54,9 +54,6 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
@@ -76,6 +73,12 @@
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,9 +109,6 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
@@ -128,6 +128,12 @@
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>

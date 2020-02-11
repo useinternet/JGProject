@@ -57,191 +57,144 @@ void JGUIRectTransform::ClearAttachedTransform()
 	m_AttachedList.clear();
 	return;
 }
-void JGUIRectTransform::SetPosition(const JVector2& pos)
+void JGUIRectTransform::SetLocalPosition(const JVector2& pos)
 {
 	if (m_Attacher) return;
 	m_LocalPosition = { pos.x, pos.y };
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPosition = m_LocalPosition;
-	}
 	SendDirty(PosDirty);
 }
-void JGUIRectTransform::SetPosition(float x, float y)
+void JGUIRectTransform::SetLocalPosition(float x, float y)
 {
 	if (m_Attacher) return;
 	m_LocalPosition = { x, y };
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPosition = m_LocalPosition;
-	}
 	SendDirty(PosDirty);
 }
-void JGUIRectTransform::OffsetPosition(const JVector2& offset)
+void JGUIRectTransform::OffsetLocalPosition(const JVector2& offset)
 {
 	if (m_Attacher) return;
 	m_LocalPosition.x += offset.x;
 	m_LocalPosition.y += offset.y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPosition = m_LocalPosition;
-	}
 	SendDirty(PosDirty);
 }
-void JGUIRectTransform::OffsetPosition(float x, float y)
+void JGUIRectTransform::OffsetLocalPosition(float x, float y)
 {
 	if (m_Attacher) return;
 	m_LocalPosition.x += x;
 	m_LocalPosition.y += y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPosition = m_LocalPosition;
-	}
 	SendDirty(PosDirty);
 }
 
 
-void JGUIRectTransform::SetAngle(float angle)
+void JGUIRectTransform::SetLocalAngle(float angle)
 {
 	if (m_Attacher) return;
 	m_LocalAngle = angle;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalAngle = m_LocalAngle;
-	}
 	SendDirty(AngleDirty);
 }
-void JGUIRectTransform::OffsetAngle(float angle)
+void JGUIRectTransform::OffsetLocalAngle(float angle)
 {
 	if (m_Attacher) return;
 	m_LocalAngle += angle;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalAngle = m_LocalAngle;
-	}
 	SendDirty(AngleDirty);
 }
 
 
-void JGUIRectTransform::SetScale(const JVector2& scale)
+void JGUIRectTransform::SetLocalScale(const JVector2& scale)
 {
 	if (m_Attacher) return;
 	m_Scale = { scale.x, scale.y};
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Scale = m_Scale;
-	}
+	SendAttachedTransform_Scale(scale);
 }
-void JGUIRectTransform::SetScale(float x, float y)
+void JGUIRectTransform::SetLocalScale(float x, float y)
 {
 	if (m_Attacher) return;
 	m_Scale = { x, y };
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Scale = m_Scale;
-	}
+	SendAttachedTransform_Scale(m_Scale);
 }
-void JGUIRectTransform::OffsetScale(const JVector2& scale)
+void JGUIRectTransform::OffsetLocalScale(const JVector2& scale)
 {
 	if (m_Attacher) return;
 	m_Scale.x += scale.x;
 	m_Scale.y += scale.y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Scale = m_Scale;
-	}
+	SendAttachedTransform_Scale(scale);
 }
-void JGUIRectTransform::OffsetScale(float x, float y)
+void JGUIRectTransform::OffsetLocalScale(float x, float y)
 {
 	if (m_Attacher) return;
 	m_Scale.x += x;
 	m_Scale.y += y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Scale = m_Scale;
-	}
+	SendAttachedTransform_Scale(m_Scale);
 }
 void JGUIRectTransform::SetSize(const JVector2& size)
 {
 	if (m_Attacher) return;
 	m_Size = size;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Size = m_Size;
-	}
+
+	SendAttachedTransform_Size(m_Size);
 }
 void JGUIRectTransform::SetSize(float x, float y)
 {
 	if (m_Attacher) return;
 	m_Size.x = x;
 	m_Size.y = y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Size = m_Size;
-	}
+	SendAttachedTransform_Size(m_Size);
 }
 void JGUIRectTransform::OffsetSize(const JVector2& offset)
 {
 	if (m_Attacher) return;
 	m_Size.x += offset.x;
 	m_Size.y += offset.y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Size = m_Size;
-	}
+	SendAttachedTransform_Size(m_Size);
 }
 void JGUIRectTransform::OffsetSize(float x, float y)
 {
 	if (m_Attacher) return;
 	m_Size.x += x;
 	m_Size.y += y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_Size = m_Size;
-	}
+	SendAttachedTransform_Size(m_Size);
 }
-void JGUIRectTransform::SetPivot(const JVector2& pivot)
-{
-	if (m_Attacher) return;
-	m_LocalPivot = pivot;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPivot = m_LocalPivot;
-	}
-	SendDirty(PivotDirty);
-}
-void JGUIRectTransform::SetPivot(float x, float y)
-{
-	if (m_Attacher) return;
-	m_LocalPivot = { x,y };
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPivot = m_LocalPivot;
-	}
-	SendDirty(PivotDirty);
-}
-void JGUIRectTransform::OffsetPivot(const JVector2& pivot)
-{
-	if (m_Attacher) return;
-	m_LocalPivot.x += pivot.x;
-	m_LocalPivot.y += pivot.y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPivot = m_LocalPivot;
-	}
-	SendDirty(PivotDirty);
-}
-void JGUIRectTransform::OffsetPivot(float x, float y)
-{
-	if (m_Attacher) return;
-	m_LocalPivot.x += x;
-	m_LocalPivot.y += y;
-	for (auto& attached_com : m_AttachedList)
-	{
-		attached_com->m_LocalPivot = m_LocalPivot;
-	}
-	SendDirty(PivotDirty);
-}
+//void JGUIRectTransform::SetLocalPivot(const JVector2& pivot)
+//{
+//	if (m_Attacher) return;
+//	m_LocalPivot = pivot;
+//	for (auto& attached_com : m_AttachedList)
+//	{
+//		attached_com->m_LocalPivot = m_LocalPivot;
+//	}
+//	SendDirty(PivotDirty);
+//}
+//void JGUIRectTransform::SetLocalPivot(float x, float y)
+//{
+//	if (m_Attacher) return;
+//	m_LocalPivot = { x,y };
+//	for (auto& attached_com : m_AttachedList)
+//	{
+//		attached_com->m_LocalPivot = m_LocalPivot;
+//	}
+//	SendDirty(PivotDirty);
+//}
+//void JGUIRectTransform::OffsetLocalPivot(const JVector2& pivot)
+//{
+//	if (m_Attacher) return;
+//	m_LocalPivot.x += pivot.x;
+//	m_LocalPivot.y += pivot.y;
+//	for (auto& attached_com : m_AttachedList)
+//	{
+//		attached_com->m_LocalPivot = m_LocalPivot;
+//	}
+//	SendDirty(PivotDirty);
+//}
+//void JGUIRectTransform::OffsetLocalPivot(float x, float y)
+//{
+//	if (m_Attacher) return;
+//	m_LocalPivot.x += x;
+//	m_LocalPivot.y += y;
+//	for (auto& attached_com : m_AttachedList)
+//	{
+//		attached_com->m_LocalPivot = m_LocalPivot;
+//	}
+//	SendDirty(PivotDirty);
+//}
 bool JGUIRectTransform::IsDirty() const
 {
 	
@@ -264,26 +217,7 @@ void JGUIRectTransform::Flush()
 	{
 		i = false;
 	}
-	auto* parent = GetParent();
-	if (parent)
-	{
-		parent = parent->GetParent();
-	}
-	// 부모가 컴퍼넌트
-	if (parent)
-	{
-		parent->GetTransform()->Flush();
-	}
-	// 직속 윈도우 트랜스폼
-	else
-	{
-		auto window = GetOwnerWindow();
-		if (window->GetParent())
-		{
-			auto window_parent_transform = window->GetParent()->GetTransform();
-			window_parent_transform->Flush();
-		}
-	}
+
 }
 
 const JVector2& JGUIRectTransform::GetLocalPosition() const
@@ -291,26 +225,27 @@ const JVector2& JGUIRectTransform::GetLocalPosition() const
 	return m_LocalPosition;
 }
 const JVector2& JGUIRectTransform::GetPosition() const {
+	if (m_Attacher) return m_Attacher->GetPosition();
 	if (m_IsDirty[PosDirty])
 	{
-		auto* parent = GetParent();
-		if (parent)
-		{
-			parent = parent->GetParent();
-		}
-		// 부모가 컴퍼넌트
-		if (parent)
-		{
-			auto parent_transform = parent->GetTransform();
-			m_Position = parent_transform->GetPosition();
-			m_Position.x += m_LocalPosition.x;
-			m_Position.y += m_LocalPosition.y;
-		}
-		// 직속 윈도우 트랜스폼
-		else
+		m_Position = { 0,0 };
+
+		if (m_BindedWindow)
 		{
 			m_Position.x = m_LocalPosition.x;
 			m_Position.y = m_LocalPosition.y;
+		}
+
+
+		if (m_BindedComponent)
+		{
+			auto parent = m_BindedComponent->GetParent();
+			if (parent)
+			{
+				m_Position = parent->GetTransform()->GetPosition();
+				m_Position.x += m_LocalPosition.x;
+				m_Position.y += m_LocalPosition.y;
+			}
 		}
 		m_IsDirty[PosDirty] = false;
 	}
@@ -323,24 +258,24 @@ float JGUIRectTransform::GetLocalAngle() const
 }
 float JGUIRectTransform::GetAngle() const
 {
+	if (m_Attacher) return m_Attacher->GetAngle();
 	if (m_IsDirty[AngleDirty])
 	{
-		auto* parent = GetParent();
-		if (parent)
-		{
-			parent = parent->GetParent();
-		}
-		// 부모가 컴퍼넌트
-		if (parent)
-		{
-			auto parent_transform = parent->GetTransform();
-			m_Angle = parent_transform->GetAngle();
-			m_Angle += GetLocalAngle();
-		}
-		// 직속 윈도우 트랜스폼
-		else
+		m_Angle = 0.0f;
+		if (m_BindedWindow)
 		{
 			m_Angle = GetLocalAngle();
+		}
+
+
+		if (m_BindedComponent)
+		{
+			auto parent = m_BindedComponent->GetParent();
+			if (parent)
+			{
+				m_Angle = parent->GetTransform()->GetAngle();
+				m_Angle += GetLocalAngle();
+			}
 		}
 		m_IsDirty[AngleDirty] = false;
 	}
@@ -356,26 +291,24 @@ const JVector2& JGUIRectTransform::GetSize()  const {
 }
 const JVector2& JGUIRectTransform::GetPivot() const
 {
+	if (m_Attacher) return m_Attacher->GetPivot();
 	if (m_IsDirty[PivotDirty])
 	{
-		auto* parent = GetParent();
-		if (parent)
-		{
-			parent = parent->GetParent();
-		}
-		// 부모가 컴퍼넌트
-		if (parent)
-		{
-			auto parent_transform = parent->GetTransform();
-			m_Pivot = parent_transform->GetPivot();
-			m_Pivot.x += m_LocalPivot.x;
-			m_Pivot.y += m_LocalPivot.y;
-		}
-		// 직속 윈도우 트랜스폼
-		else
+		m_Pivot = { 0,0 };
+		if (m_BindedWindow)
 		{
 			m_Pivot.x = m_LocalPivot.x;
 			m_Pivot.y = m_LocalPivot.y;
+		}
+		if (m_BindedComponent)
+		{
+			auto parent = m_BindedComponent->GetParent();
+			if (parent)
+			{
+				m_Pivot = parent->GetTransform()->GetPivot();
+				m_Pivot.x += m_LocalPivot.x;
+				m_Pivot.y += m_LocalPivot.y;
+			}
 		}
 		m_IsDirty[PivotDirty] = false;
 	}
@@ -437,54 +370,66 @@ void JGUIRectTransform::SendDirty(int n)
 	}
 
 
-	auto p = GetParent();
-	if (p)
+	if (m_BindedComponent)
 	{
-		auto& child_array = p->GetChilds();
-		for (auto& child : child_array)
+		for (auto& child : m_BindedComponent->GetChilds())
 		{
-			if (child->GetTransform() == nullptr) continue;
 			child->GetTransform()->SendDirty(n);
-			//child->GetTransform()->m_IsDirty[n] = true;
 		}
 	}
-	else
+}
+void JGUIRectTransform::SendAttachedTransform_Size(const JVector2& size)
+{
+	for (auto& attached_com : m_AttachedList)
 	{
-		auto w = GetOwnerWindow();
-		auto& com_array = w->GetWindowComponents();
-		for (auto& com : com_array)
-		{
-			if (com->GetTransform() == nullptr) continue;
-			com->GetTransform()->SendDirty(n);
-			//com->GetTransform()->m_IsDirty[n] = true;
-		}
-
+		attached_com->m_Size = size;
+		attached_com->SendDirty();
+		attached_com->SendAttachedTransform_Size(size);
 	}
 }
-
-
-void JGUIWinRectTransform::SetPosition(const JVector2& pos)
+void JGUIRectTransform::SendAttachedTransform_Scale(const JVector2& scale)
 {
+	for (auto& attached_com : m_AttachedList)
+	{
+		attached_com->m_Scale = scale;
+		attached_com->SendDirty();
+		attached_com->SendAttachedTransform_Scale(scale);
+	}
+}
+void JGUIRectTransform::BindComponent(JGUIComponent* com)
+{
+	m_BindedComponent = com;
+	m_BindedWindow = nullptr;
+}
 
-	JGUIRectTransform::SetPosition(pos);
+void JGUIRectTransform::BindWindow(JGUIWindow* win)
+{
+	m_BindedWindow = win;
+	m_BindedComponent = nullptr;
+}
+
+
+void JGUIWinRectTransform::SetLocalPosition(const JVector2& pos)
+{
+	JGUIRectTransform::SetLocalPosition(pos);
 	SendPosToWin();
 }
 
-void JGUIWinRectTransform::SetPosition(float x, float y)
+void JGUIWinRectTransform::SetLocalPosition(float x, float y)
 {
-	JGUIRectTransform::SetPosition(x,y);
+	JGUIRectTransform::SetLocalPosition(x,y);
 	SendPosToWin();
 }
 
-void JGUIWinRectTransform::OffsetPosition(const JVector2& offset)
+void JGUIWinRectTransform::OffsetLocalPosition(const JVector2& offset)
 {
-	JGUIRectTransform::OffsetPosition(offset);
+	JGUIRectTransform::OffsetLocalPosition(offset);
 	SendPosToWin();
 }
 
-void JGUIWinRectTransform::OffsetPosition(float x, float y)
+void JGUIWinRectTransform::OffsetLocalPosition(float x, float y)
 {
-	JGUIRectTransform::OffsetPosition(x,y);
+	JGUIRectTransform::OffsetLocalPosition(x,y);
 	SendPosToWin();
 }
 void JGUIWinRectTransform::SetSize(const JVector2& size)

@@ -6,7 +6,10 @@
 #	include "DXGIDebug.h"
 #endif // _DEBUG
 #include "d3dx12.h"
+#include <wrl.h>
+
 using namespace std;
+using namespace Microsoft::WRL;
 
 
 namespace RE
@@ -110,6 +113,7 @@ namespace RE
 		swapChainDesc.Format = format;
 		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc = { 1, 0 };
+	
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = bufferCount;
 		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;

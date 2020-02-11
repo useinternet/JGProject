@@ -8,11 +8,10 @@ using namespace std;
 
 void JGUIButton::Awake()
 {
-	RegisterCollider(JGUI_Component_Colider_Box);
-	SetInteractionFlag(JGUI_ComponentInteractionFlag_Default);
-	GetTransform()->SetPosition(0.0f, 0.0f);
-	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("JGUIRectangle");
-	m_Rectangle->GetTransform()->SetSize(GetTransform()->GetSize());
+	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
+	GetTransform()->SetLocalPosition(0.0f, 0.0f);
+	m_Image = CreateJGUIComponent<JGUIImage>("JGUIImage");
+	m_Image->GetTransform()->SetSize(GetTransform()->GetSize());
 
 	m_BtColor[JGUI_BtState_Normal] = JColor(0.9f, 0.9f, 0.9f, 1.0f);
 	m_BtColor[JGUI_BtState_Hightlight] = JColor(0.7f, 0.7f, 0.7f, 1.0f);
@@ -25,13 +24,13 @@ void JGUIButton::Start()
 {
 	if (m_SourceImage != "none")
 	{
-		m_Rectangle->SetImage(m_SourceImage);
+		m_Image->SetImage(m_SourceImage);
 	}
-	m_Rectangle->SetColor(m_BtColor[m_BtState]);
+	m_Image->SetColor(m_BtColor[m_BtState]);
 }
 void JGUIButton::Resize(const JGUIResizeEvent& e)
 {
-	m_Rectangle->GetTransform()->SetSize(e.width, e.height);
+	m_Image->GetTransform()->SetSize(e.width, e.height);
 }
 void JGUIButton::MouseBtUp(const JGUIKeyUpEvent& e)
 {
@@ -39,7 +38,7 @@ void JGUIButton::MouseBtUp(const JGUIKeyUpEvent& e)
 	ENGINE_LOG_INFO(e.ToString());
 	if (m_BtState == JGUI_BtState_Pressed)
 	{
-		m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Selected]);
+		m_Image->SetColor(m_BtColor[JGUI_BtState_Selected]);
 		m_BtState = JGUI_BtState_Selected;
 		m_IsClick = true;
 	}
@@ -47,13 +46,13 @@ void JGUIButton::MouseBtUp(const JGUIKeyUpEvent& e)
 void JGUIButton::MouseBtDown(const JGUIKeyDownEvent& e)
 {
 	if (e.Code != KeyCode::LeftMouseButton) return;
-	m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Pressed]);
+	m_Image->SetColor(m_BtColor[JGUI_BtState_Pressed]);
 	m_BtState = JGUI_BtState_Pressed;
 }
 void JGUIButton::MouseMove(const JGUIMouseMoveEvent& e)
 {
 	if (m_BtState == JGUI_BtState_Pressed) return;
-	m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Hightlight]);
+	m_Image->SetColor(m_BtColor[JGUI_BtState_Hightlight]);
 	m_BtState = JGUI_BtState_Hightlight;
 }
 
@@ -61,7 +60,7 @@ void JGUIButton::MouseLeave()
 {
 	if (m_BtState != JGUI_BtState_Hightlight) return;
 
-	m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Normal]);
+	m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
 	m_BtState = JGUI_BtState_Normal;
 
 }
@@ -73,7 +72,7 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 		auto p = GetOwnerWindow()->GetMousePos();
 		if (!GetCollider()->CheckInPoint(p))
 		{
-			m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Normal]);
+			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}
@@ -82,14 +81,13 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 		auto p = GetOwnerWindow()->GetMousePos();
 		if (!GetCollider()->CheckInPoint(p))
 		{
-			m_Rectangle->SetColor(m_BtColor[JGUI_BtState_Normal]);
+			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}
 	if (m_IsClick)
 	{
 		OnClick();
-		ENGINE_LOG_INFO("Bt Click");
 		m_IsClick = false;
 	}
 }
@@ -97,7 +95,7 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 void JGUIButton::SetBtImage(const std::string& path)
 {
 	m_SourceImage = path;
-	m_Rectangle->SetImage(m_SourceImage);
+	m_Image->SetImage(m_SourceImage);
 }
 
 void JGUIButton::SetBtColor(EJGUIBtState state, const JColor& color)
@@ -142,7 +140,7 @@ void JGUIMaximizeButton::OnClick()
 	if (GetOwnerWindow()->GetParent() == nullptr)
 	{
 		::ShowWindow(GetOwnerWindow()->GetRootWindowHandle(), SW_MAXIMIZE);
-		GetOwnerWindow()->GetTransform()->SetPosition(0, 0);
+		GetOwnerWindow()->GetTransform()->SetLocalPosition(0, 0);
 	}
 }
 

@@ -1,97 +1,116 @@
 #pragma once
 
-
 #include "GUI/JGUIObject/JGUIComponent.h"
-
 
 
 namespace RE
 {
-	class Texture;
 	class RenderItem;
-	class InstanceRenderItem;
-	class FixedGShaderModuleClone;
 }
-class JGUIPanel;
+class JGUIRenderItem;
 class JGUIShape : public JGUIComponent
 {
 
 protected:
 	virtual void Awake() override;
-	virtual void Start() override;
-	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Destroy() override;
-	virtual void ParentUpdateNotification() override;
+	virtual void Tick(const JGUITickEvent& e) override;
 public:
-	virtual void SetActive(bool active) override;
-public:
-	virtual void SetParent(JGUIComponent* parent) override;
-
-
-	void SetColor(const JColor& color);
-	uint64_t GetPriority() const {
-		return m_Priority;
+	virtual void SetActive(bool is_active) override;
+protected:
+	virtual void InitRenderItem(RE::RenderItem* ri) {}
+	void CreateRI(JGUIWindow* drawing_win);
+	JGUIRenderItem* GetRenderItem() const {
+		return m_RI;
 	}
-protected:
-	virtual void DestroyRI();
-	void FindPanel();
-	virtual void CreateRI();
-protected:
-	JGUIPanel*              m_OwnerPanel = nullptr;
-	RE::RenderItem*         m_RenderItem = nullptr;
-	RE::InstanceRenderItem* m_Instance   = nullptr;
-	JColor                  m_Color = { 1.0f,1.0f,1.0f,1.0f };
-	JVector2                m_Offset = { 0,0 };
+private:
+	JGUIRenderItem* m_RI = nullptr;
 
-
-	JVector2 m_PrevWindowSize;
-	uint64_t m_Priority = 0;
-	bool     m_ParentDirty = false;
-	bool     m_IsWindowTexture = false;
+public:
+	//testcode
+	bool is_code = false;
 };
-
 
 
 class JGUIWindowTexture : public JGUIShape
 {
 public:
-	void Bind(const std::string& moduleKey, uint64_t parnet_id);
+	void Bind(const std::string& moduleKey);
 	void UnBind();
 protected:
-	virtual void Awake() override;
+	virtual void InitRenderItem(RE::RenderItem* ri) override;
+	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
+protected:
+	std::string m_ModuleKey;
+};
+
+
+class JGUIImage : public JGUIShape
+{
 
 protected:
-	virtual void DestroyRI() override;
-protected:
-	uint64_t m_ParentID = -1;
+	virtual void InitRenderItem(RE::RenderItem* ri) override;
+	virtual void Resize(const JGUIResizeEvent& e)   override;
+public:
+	void SetImage(const std::string& path);
+	void SetColor(const JColor& color);
+	void SetColor(float r, float g, float b, float a);
+
+	const JColor& GetColor() const {
+		return m_Color;
+	}
+private:
+	JColor m_Color = JColor(1, 1, 1, 1);
+	std::string m_ImageSource = "none";
 };
 
 
 
 class JGUIRectangle : public JGUIShape
 {
-public:
-	void SetImage(const std::string& texture_image);
-	void FillOn();
-	void EmptyOn();
-	void  SetThickness(float thick) { m_Thick = thick; }
-	float GetThickness() const      { return m_Thick; }
 protected:
-	virtual void CreateRI() override;
+	virtual void InitRenderItem(RE::RenderItem* ri) override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
+public:
+	void SetColor(const JColor& color);
+	void SetColor(float r, float g, float b, float a);
 
+	const JColor& GetColor() const {
+		return m_Color;
+	}
 private:
-	void CreateMesh();
+	JColor m_Color = JColor(1, 1, 1, 1);
+};
+
+
+
+class JGUIEmptyRectangle : public JGUIShape
+{
+protected:
+	virtual void InitRenderItem(RE::RenderItem* ri) override;
+	virtual void Resize(const JGUIResizeEvent& e) override;
+public:
+	void SetColor(const JColor& color);
+	void SetColor(float r, float g, float b, float a);
+	void SetThickness(float thick);
+
+	const JColor& GetColor() const {
+		return m_Color;
+	}
+	float GetThickness() const {
+		return m_Thick;
+	}
 private:
-	std::string m_ImageName;
-	bool m_IsFill = true;
-	float m_Thick = 5.0f;
+	JColor m_Color = JColor(1, 1, 1, 1);
+	float  m_Thick = 5.0f;
 };
 
 
 class JGUIText : public JGUIShape
 {
+protected:
+	virtual void InitRenderItem(RE::RenderItem* ri) override;
 public:
 	void SetFont(const std::string& str);
 	void SetText(const std::string& str);
@@ -112,9 +131,12 @@ public:
 
 
 	void SetTextRect(float width, float height);
-
-
-	JVector2 GetTextLastPos();
+	void SetColor(const JColor& color);
+	void SetColor(float r, float g, float b, float a);
+	const JColor& GetColor() const {
+		return m_Color;
+	}
+	JVector2        GetTextLastPos(int n);
 	const JVector2& GetTextPos(int n) const;
 public:
 	const JGUIRect& GetTextRect() const {
@@ -124,15 +146,14 @@ public:
 	JGUIText& operator=(const std::string& str);
 	JGUIText& operator+=(const std::string& str);
 protected:
-	virtual void CreateRI() override;
 	std::pair<uint32_t, JVector2> ConvertVertex(
 		uint32_t ioffset, JVector2 start_pos, const std::string& str,
 		std::vector<JGUIVertex>& v, std::vector<uint32_t>& i, std::vector<JVector2>& pos);
 	void UpdateTextSize(const std::string& str);
 private:
-	std::string m_FontName = "";
+	std::string m_FontName = JGUI::GetDefaultFontName();
 	std::string m_Text = "";
-	float       m_FontSize = 32;
+	float       m_FontSize = 16;
 	std::vector<JVector2> m_TextPosMap;
 
 	JGUIRect m_TextRect;
@@ -140,4 +161,9 @@ private:
 	JVector2 m_StartPos;
 	int  m_VertexCount = 4;
 	int  m_IndexCount = 6;
+
+	JColor m_Color = JColor(1, 1, 1, 1);
 };
+
+
+

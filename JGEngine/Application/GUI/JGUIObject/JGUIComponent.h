@@ -35,7 +35,6 @@ protected:
 	virtual void JGUIFocusEnter(const JGUIFocusEnterEvent& e);
 	virtual void JGUIFocusExit(const JGUIFocusExitEvent& e);
 	virtual void JGUIOnFocus();
-	virtual void JGUIParentUpdateNotification();
 protected:
 	virtual void Resize(const JGUIResizeEvent& e) {}
 	virtual void Char(const JGUICharEvent& e) {}
@@ -49,35 +48,36 @@ protected:
 	virtual void FocusEnter(const JGUIFocusEnterEvent& e) {}
 	virtual void FocusExit(const JGUIFocusExitEvent& e) {}
 	virtual void OnFocus() {}
-	virtual void ParentUpdateNotification() {}
 public:
 	virtual void SetParent(JGUIComponent* parent);
 	JGUIComponent* GetParent() const;
-	const std::vector<JGUIComponent*>& GetChilds() const;
-	std::vector<JGUIComponent*>& GetChilds();
-	JGUIComponent* FindChild(uint32_t index);
-	JGUIComponent* FindChild(const std::string& name);
+
+	std::vector<JGUIComponent*> GetChilds() const;
 
 
-	JGUIRectTransform* GetTransform() const {
-		return m_RectTransform;
+	EJGUI_ComponentFlags GetFlags() const {
+		return m_Flags;
 	}
-	JGUICollider* GetCollider() const {
-		return m_Collider;
+	uint32_t GetPriority() const {
+		return m_Priority;
+	}
+	void SetPriority(uint32_t priority);
+	uint64_t GetRISortingOrder() const {
+		return m_RISortingOrder;
 	}
 public:
 	template<typename ComponentType>
-	ComponentType* CreateJGUIComponent(const std::string& name)
+	ComponentType* CreateJGUIComponent(const std::string& name, EJGUI_ComponentFlags flag = JGUI_ComponentFlag_None)
 	{
-		auto com = JGUI::CreateJGUIComponent<ComponentType>(name, m_OwnerWindow);
-		com->SetParent(this); // <- 여기서 자식배열에 추가
+	
+		auto com = JGUI::CreateJGUIComponent<ComponentType>(name, m_OwnerWindow, flag);
+		if ((m_Flags & JGUI_ComponentFlag_NoChild) == false) com->SetParent(this);
 		return com;
 	}
-	void RegisterCollider(EJGUI_Component_Colider colider_type, EJGUI_ComponentInteractionFlags flags = JGUI_ComponentInteractionFlag_Default);
+;
 protected:
 	void ChildLock() { m_IsChildLock = true; }
-	EJGUI_ComponentInteractionFlags GetInteractionFlag() const { return m_InteractionFlag; }
-	void SetInteractionFlag(EJGUI_ComponentInteractionFlags flags) { m_InteractionFlag = flags; }
+
 
 private:
 	void Init(const std::string& name, JGUIWindow* owner_window);
@@ -91,14 +91,14 @@ private:
 
 
 	// 플래그
-	EJGUI_ComponentInteractionFlags m_InteractionFlag = JGUI_ComponentInteractionFlag_None;
+	EJGUI_ComponentFlags m_Flags;
 
-
+	std::map<uint32_t, std::vector<JGUIComponent*>> m_ChildComponents;
 	// 자식 컴포넌트
-	std::vector<JGUIComponent*> m_ChildComponents;
-	JGUIRectTransform* m_RectTransform = nullptr;
-	JGUICollider*      m_Collider = nullptr;
+	// std::vector<JGUIComponent*> m_ChildComponents;
 	JVector2           m_PrevSize;
 	bool m_IsMouseTracking = false;
-	bool m_IsChildLock = false;
+	bool m_IsChildLock     = false;
+	uint32_t m_Priority       = 0;
+	uint64_t m_RISortingOrder = 0;
 };

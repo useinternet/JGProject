@@ -31,12 +31,35 @@ JGUIFlag operator~(JGUIFlag f1)
 	return (JGUIFlag)~(uint64_t)f1;
 }
 
-
+// Common
+enum EJGUI_Colider
+{
+	JGUI_Collider_Box = 0,
+	JGUI_Collider_EmptyBox = 1,
+};
+enum EJGUI_RectTransform
+{
+	JGUI_RectTransform_Default,
+	JGUI_RectTransform_Window,
+};
+enum EJGUI_RIMaterial
+{
+	JGUI_RIMaterial_Default,
+	JGUI_RIMaterial_OneTexture,
+	JGUI_RIMaterial_Text
+};
+enum EJGUI_RIMesh
+{
+	JGUI_RIMesh_Rectangle,
+	JGUI_RIMesh_EmptyRectangle,
+};
 // Window
 enum EJGUI_WindowFlags
 {
 	JGUI_WindowFlag_None    = 0x000000,
 	JGUI_WindowFlag_NewLoad = 0x000001,
+	JGUI_WindowFlag_TitileBar = 0x000002,
+	JGUI_WindowFlag_EnableResize = 0x000004,
 };
 enum EJGUI_SubmitCmdListPriority
 {
@@ -52,18 +75,15 @@ enum EJGUI_WindowPriority : uint64_t
 };
 
 // Component
-enum EJGUI_ComponentInteractionFlags
+enum EJGUI_ComponentFlags
 {
-	JGUI_ComponentInteractionFlag_None = 0x00000000,
-	JGUI_ComponentInteractionFlag_Default = 0x00000001
+	JGUI_ComponentFlag_None               = 0x0000000000,
+	JGUI_ComponentFlag_NoChild            = 0x0000000001,
+	JGUI_ComponentFlag_NoParent           = 0x0000000002,
+	JGUI_ComponentFlag_LockCreateFunction = 0x0000000004
 };
 
 
-enum EJGUI_Component_Colider
-{
-	JGUI_Component_Colider_Box = 0,
-	JGUI_Component_Colider_EmptyBox = 1,
-};
 
 
 // 포커스 플래그
@@ -145,12 +165,11 @@ class JGUI
 	
 public:
 	static float Gap() { return 10.0f; }
-	static void        DestroyObject(JGUIObject* obj);
+	static void  DestroyObject(JGUIObject* obj);
 
 	template<typename ComponentType>
-	static ComponentType* CreateJGUIComponent(const std::string& name, JGUIWindow* owner_window)
+	static ComponentType* CreateJGUIComponent(const std::string& name, JGUIWindow* owner_window, EJGUI_ComponentFlags flag)
 	{
-		//auto& objPool = sm_GUI->m_ObjectPool;
 		auto& objqueue = sm_GUI->m_ExpectedCreateObject;
 		auto& id_queue = sm_GUI->m_IDQueue;
 		auto& id_offset = sm_GUI->m_IDOffset;
@@ -166,6 +185,7 @@ public:
 			id = id_offset++;
 		}
 		obj->m_ID = id;
+		obj->m_Flags = flag;
 		obj->Init(name, owner_window);
 		obj->JGUIAwake();
 		objqueue.push(obj);

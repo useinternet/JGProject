@@ -264,8 +264,9 @@ namespace RE
 			ReMaterial default_tMat(RE_GUI_OneTextureDefault, ERenderItemUsage::GUI);
 			// 텍스쳐 있는 머터리얼
 			{
-			
+		
 			default_tMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
+			
 			default_tMat.AddTexture("Image");
 		
 			default_tMat.SetCode(R"(
@@ -284,10 +285,22 @@ namespace RE
 			ReMaterial default_txtMat(RE_GUI_TextMaterial, ERenderItemUsage::GUI);
 			{
 				default_txtMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
+				default_txtMat.AddFloat2InMaterialCB("Clip", { 0.0f,0.0f });
 				default_txtMat.AddTexture("Image");
-
+	
 				default_txtMat.SetCode(R"(
+
     Output output;
+    if(input.PosW.x < Clip.x)
+    {
+        output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+        return output;
+    }
+    if(input.PosW.x > Clip.y)
+    {
+        output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+        return output;
+    }
     float4 img = Image.Sample( AnisotropicSampler, input.TexC);
     output.Screen = input.Color * img * Color;
     return output;

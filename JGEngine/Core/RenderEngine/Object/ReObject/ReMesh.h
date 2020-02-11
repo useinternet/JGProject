@@ -123,12 +123,13 @@ namespace RE
 			if (btSize + btpos > m_MeshVertexDatas.size()) return;
 			memcpy_s(&m_MeshVertexDatas[btpos], btSize, v.data(), btSize);
 		}
-		template<typename T>
+
 		void Modify(const IndexData& i, uint32_t ipos)
 		{
 			if (i.size() + ipos > m_MeshIndexDatas.size()) return;
 			size_t iSize = i.size();
-			memcpy_s(&m_MeshIndexDatas[ipos], iSize, i.data(), iSize);
+
+			std::copy(i.begin(), i.end(), m_MeshIndexDatas.begin() + ipos);
 		}
 		template<typename T>
 		void Modify(const std::vector<T>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)

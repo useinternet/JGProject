@@ -14,14 +14,18 @@ using namespace std;
 void JGUIForm::Start()
 {
 	text = CreateJGUIComponent<JGUIText>("defaultText");
-	text->GetTransform()->SetPosition(0, 50);
+	text->GetTransform()->SetLocalPosition(30, 50);
 	text->SetTextRect(800, 550);
-	text->SetFontSize(256);
+	text->SetFontSize(16);
 	inputText = CreateJGUIComponent<JGUIInputText>("InputText");
-	inputText->GetTransform()->SetSize(500, 50);
+	inputText->GetTransform()->SetSize(500, 25);
+	inputText->GetTransform()->SetLocalPosition(50, 200);
+	inputText->SetTextSize(40);
+}
 
-
-	inputText->GetTransform()->SetPosition(50, 200);
+void JGUIForm::Tick(const JGUITickEvent& e)
+{
+	text->SetText(to_string(e.fps));
 }
 
 
@@ -31,18 +35,18 @@ void JGUIForm::Start()
 static int cnt = 0;
 void JGUIForm::KeyUp(const JGUIKeyUpEvent& e)
 {
-
-	if (e.Code == KeyCode::Left)
+	
+	if (e.Code == KeyCode::Home)
 	{
 
 		auto window = CreateJGUIWindow<JGUIForm>("TestForm"  + to_string(cnt++));
-		window->GetTransform()->SetPosition(200, 100);
+		window->GetTransform()->SetLocalPosition(200, 100);
+		window->GetTransform()->SetSize(300, 300);
 	}
-	if (e.Code == KeyCode::Right)
+	if (e.Code == KeyCode::End)
 	{
 		SetParent(nullptr);
 	}
-
 }
 
 
