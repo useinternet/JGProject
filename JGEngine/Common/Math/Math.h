@@ -3,6 +3,16 @@
 #include "CommonCore.h"
 
 
+
+typedef unsigned char jbyte;
+typedef float         jfloat;
+typedef double        jdouble;
+typedef int           jint;
+typedef unsigned int  juint;
+typedef long long     jint64;
+typedef unsigned long long juint64;
+typedef bool          jbool;
+
 class Math
 {
 public:

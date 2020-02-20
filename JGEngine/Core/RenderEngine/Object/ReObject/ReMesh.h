@@ -67,7 +67,7 @@ namespace RE
 		{
 			if (m_MeshVertexDatas.empty()) m_VertexTypeSize = (uint32_t)sizeof(T);
 			size_t btSize = v.size() * sizeof(T);
-			std::vector<byte> btData(btSize);
+			std::vector<jbyte> btData(btSize);
 			memcpy_s(&btData[0], btSize, v.data(), btSize);
 
 
@@ -78,7 +78,7 @@ namespace RE
 		void Insert(const std::vector<T>& v, uint32_t vpos, const IndexData& i, uint32_t ipos)
 		{
 			size_t btSize = v.size() * sizeof(T);
-			std::vector<byte> btData(btSize);
+			std::vector<jbyte> btData(btSize);
 			memcpy_s(&btData[0], btSize, v.data(), btSize);
 
 

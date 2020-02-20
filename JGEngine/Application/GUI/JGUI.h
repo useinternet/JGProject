@@ -83,6 +83,43 @@ enum EJGUI_ComponentFlags
 	JGUI_ComponentFlag_LockCreateFunction = 0x0000000004
 };
 
+enum EJGUI_Clip_Flags
+{
+	JGUI_Clip_Flag_None = 0x00,
+	JGUI_Clip_Flag_X = 0x01,
+	JGUI_Clip_Flag_Y = 0x02,
+	JGUI_Clip_Flag_Reverse = 0x04
+};
+/* EJGUI_TextFlags : 텍스트가 텍스트 사각형 범위내에 벗어 날시 Flag */
+
+enum EJGUI_Text_Flags
+{
+	JGUI_Text_Flag_None         = 0x000,
+	JGUI_Text_Flag_Border       = 0x001,
+};
+
+enum EJGUI_Text_Drawing
+{
+	JGUI_Text_Drawing_Discard,       // 범위 내에 벗어날 때 그만큼 텍스트를 자른다.
+	JGUI_Text_Drawing_NextLine,      // 범위 내에 벗어날 때 다음줄로 간다.
+	JGUI_Text_Drawing_RightPushed,   // 범위 내에 벗어날 때 오른쪽으로 밀고 벗어난만큼 자른다.
+	JGUI_Text_Drawing_DownPushed,    // 범위 내에 벗어날 때 아래쪽으로 밀고 벗어난만큼 자른다.
+	JGUI_Text_Drawing_Ignore         // 범위 내에 벗어나도 무시한다.
+};
+
+enum EJGUI_Text_HAlignment
+{
+	JGUI_Text_HAlignment_Left,
+	JGUI_Text_HAlignment_Right,
+	JGUI_Text_HAlignment_Center,
+};
+enum EJGUI_Text_VAlignment
+{
+	JGUI_Text_VAlignment_Top,
+	JGUI_Text_VAlignment_Bottom,
+	JGUI_Text_VAlignment_Center,
+};
+
 
 
 
@@ -106,8 +143,14 @@ public:
 	float right = 0.0f;
 	float bottom = 0.0f;
 
-	float width = 0.0f;
-	float height = 0.0f;
+	float width() const
+	{
+		return right - left;
+	}
+	float height() const
+	{
+		return bottom - top;
+	}
 };
 
 

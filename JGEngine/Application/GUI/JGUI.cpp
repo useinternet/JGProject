@@ -55,7 +55,6 @@ void        JGUI::DestroyObject(JGUIObject* obj)
 	sm_GUI->m_MouseTrackMap.erase(obj);
 	sm_GUI->m_ExtraEventMap.erase(obj);
 	objqueue.push(obj);
-
 }
 
 JGUIScreen* JGUI::ReqeustRegisterJGUIScreen(JGUIWindow* window)
@@ -94,15 +93,14 @@ void JGUI::RequestDestroyScreen(HWND hWnd)
 
 void JGUI::ClearExpectedDestroyScreen()
 {
+
 	auto& queue = sm_GUI->m_ExpectedDestroyWindow;
 	auto& screenPool = sm_GUI->m_ScreenPool;
-	while (!queue.empty())
+	if(!queue.empty()) 	RE::RenderEngine::GetDevice()->Flush();
+	while (!queue.empty()) 
 	{
 		auto hWnd = queue.front(); queue.pop();
-		if (sm_GUI->m_MainHWND == hWnd)
-		{
-			RE::RenderEngine::GetDevice()->Flush();
-		}
+	
 		screenPool.erase(hWnd);
 	}
 }
@@ -212,7 +210,7 @@ void JGUI::Update()
 	auto focus_window = FindRootJGUIWindow(GetFocus());
 	if (focus_window == nullptr) focus_cnt++;
 	else focus_cnt = 0;
-
+	ENGINE_LOG_INFO("focus {0}", focus_cnt);
 	if (focus_window)
 	{
 		focus_window->JGUIOnFocus();
@@ -271,8 +269,40 @@ void JGUI::Update()
 				collider = win->GetCollider();
 			}
 		}
-		if (focus_cnt > JGUI_FOCUS_RANGE)
+		bool check = collider->CheckInPoint(ownerwin->GetMousePos());
+
+		switch (iter->second.flag)
 		{
+		case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
+			if (check) iter->second.start = true;
+			break;
+		case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
+			if (check == false) iter->second.start = true;
+			break;
+		}
+
+		if (iter->second.start) iter->second.tick += GlobalLinkData::GetTick();
+		if (iter->second.tick > iter->second.time)
+		{
+			auto flag = iter->second.flag;
+			iter = m_MouseTrackMap.erase(iter);
+
+			switch (flag)
+			{
+			case JGUI_MOUSETRACKFLAG_MOUSEHOVER:
+				if (com) com->JGUIMouseHover();
+				else if (win) win->JGUIMouseHover();
+				break;
+			case JGUI_MOUSETRACKFLAG_MOUSELEAVE:
+				if (com) com->JGUIMouseLeave();
+				else if (win) win->JGUIMouseLeave();
+				break;
+			}
+		}
+		else ++iter;
+		/*if (focus_cnt > JGUI_FOCUS_RANGE)
+		{
+		
 			if (iter->second.flag == JGUI_MOUSETRACKFLAG_MOUSELEAVE)
 			{
 				if (com) com->JGUIMouseLeave();
@@ -315,8 +345,8 @@ void JGUI::Update()
 					break;
 				}
 			}
-			else ++iter;
-		}
+			else ++iter;*/
+		//}
 	}
 
 	for(auto& w_pair : m_ScreenPool)

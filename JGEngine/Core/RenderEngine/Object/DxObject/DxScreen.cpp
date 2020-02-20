@@ -35,6 +35,8 @@ namespace RE
 	}
 	void DxScreen::Update(CommandList* cmdList)
 	{
+		// TestCode
+
 		auto index = m_SwapChain->GetCurrentBackBufferIndex();
 		auto& back_buffer = m_BackBuffer[index];
 		
@@ -48,12 +50,13 @@ namespace RE
 		}
 
 
-		cmdList->SetRenderTarget(*back_buffer);
-		cmdList->FlushResourceBarrier();
+		/*cmdList->SetRenderTarget(*back_buffer);
+		cmdList->FlushResourceBarrier();*/
 
 
 		// gui
 		cmdList->TransitionBarrier(*back_buffer, D3D12_RESOURCE_STATE_PRESENT);
+
 		cmdList->DeleteTemporaryResource(*back_buffer);
 	}
 	void DxScreen::Present()
@@ -63,6 +66,7 @@ namespace RE
 
 	void DxScreen::ReSize(uint32_t width, uint32_t height)
 	{
+
 		m_Desc.width = width;
 		m_Desc.height = height;
 		GetRenderDevice()->Flush();

@@ -59,7 +59,7 @@ public:
 	JGUIRect GetLocalRect() const;
 private:
 	void SendDirty(int n);
-	void SendAttachedTransform_Size(const JVector2& pivot);
+	void SendAttachedTransform_Size(const JVector2& size);
 	void SendAttachedTransform_Scale(const JVector2& scale);
 	void BindComponent(JGUIComponent* com);
 	void BindWindow(JGUIWindow* win);

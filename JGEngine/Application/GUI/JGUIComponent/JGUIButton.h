@@ -45,6 +45,8 @@ private:
 
 
 
+
+
 class JGUICloseButton : public JGUIButton
 {
 protected:

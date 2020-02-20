@@ -4,6 +4,7 @@
 #include "DxObject.h"
 #include <string>
 #include <memory>
+#include <filesystem>
 namespace RE
 {
 	class CommandList;
@@ -27,7 +28,7 @@ namespace RE
 		static bool RegisterTexture(const std::string& name, const Texture& t);
 		static bool UnRegisterTexture(const std::string& name);
 	private:
-		bool TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList);
+		bool TextureLoad(Texture& t, const std::filesystem::path& p, CommandList* cmdList);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Texture>> m_TextureCahce;
 		std::unordered_map<std::string, std::shared_ptr<TextureEstimate>> m_TextureEstimates;

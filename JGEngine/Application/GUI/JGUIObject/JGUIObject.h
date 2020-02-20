@@ -21,6 +21,9 @@ protected:
 	virtual void Start() {}
 	virtual void Destroy() {}
 	virtual void Tick(const JGUITickEvent& e) {}
+
+
+	float GetTick() const;
 private:
 	virtual void JGUIAwake(){ Awake(); };
 	virtual void JGUIStart() { Start(); m_Is_ExecuteStart = true; }

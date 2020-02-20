@@ -6,10 +6,22 @@
 #include "JGUIWindow.h"
 using namespace std;
 
-
+uint64_t JGUIComponent::m_RIOffset = 0;
 JGUIWindow* JGUIComponent::GetOwnerWindow() const
 {
 	return m_OwnerWindow;
+}
+
+void JGUIComponent::SetActive(bool active)
+{
+	JGUIObject::SetActive(active);
+	for (auto& child_info : m_ChildComponents)
+	{
+		for (auto& child : child_info.second)
+		{
+			child->SetActive(active);
+		}
+	}
 }
 
 void JGUIComponent::JGUIAwake()
@@ -49,14 +61,15 @@ void JGUIComponent::JGUITick(const JGUITickEvent& e)
 			JGUIResize(e);
 		}
 	}
-	uint64_t cnt = 0;
+
 	for (auto& child_info : m_ChildComponents)
 	{
 		for (auto& child : child_info.second)
 		{
 			if (!child->IsExecuteStartFunc()) child->JGUIStart();
 			if (!child->IsActive()) continue;
-			child->m_RISortingOrder = m_RISortingOrder + (++cnt);
+
+			child->m_RISortingOrder = ++m_RIOffset;
 			child->JGUITick(e);
 		}
 	}
@@ -65,17 +78,21 @@ void JGUIComponent::JGUIDestroy()
 {
 	JGUIObject::JGUIDestroy();
 
-	
-	for (auto& child_info : m_ChildComponents)
+	if (GetParent())
 	{
-		for (auto& child : child_info.second)
-		{
-			auto com = child;
-			JGUI::DestroyObject(child);
-			if (GetOwnerWindow()->GetFocusComponent() == com) GetOwnerWindow()->SetFocusComponent(nullptr);
-		}
+		auto& childs = GetParent()->m_ChildComponents[m_Priority];
+		if (GetOwnerWindow()->GetFocusComponent() == this) GetOwnerWindow()->SetFocusComponent(nullptr);
+		childs.erase(std::remove(childs.begin(), childs.end(), this), childs.end());
 	}
-	//SetParent(nullptr);
+
+	auto childs = GetChilds();
+	for (auto& child : childs)
+	{
+		auto com = child;
+		JGUI::DestroyObject(child);
+		if (GetOwnerWindow()->GetFocusComponent() == com) GetOwnerWindow()->SetFocusComponent(nullptr);
+	}
+
 	SetActive(false);
 }
 
@@ -171,10 +188,6 @@ void JGUIComponent::JGUIOnFocus()
 void JGUIComponent::SetParent(JGUIComponent* parent)
 {
 	if (m_Flags & JGUI_ComponentFlag_NoParent) return;
-
-
-	if (parent && parent->m_IsChildLock) return;
-
 	if (m_Parent)
 	{
 		// »èÁ¦
@@ -183,7 +196,6 @@ void JGUIComponent::SetParent(JGUIComponent* parent)
 		{
 			return com == this;
 		}), childs.end());
-
 	}
 	if (parent)
 	{
@@ -215,12 +227,24 @@ void JGUIComponent::SetPriority(uint32_t priority)
 {
 	if (GetParent())
 	{
-		GetParent()->m_ChildComponents.erase(m_Priority);
+		for (
+			auto iter = GetParent()->m_ChildComponents[m_Priority].begin(); 
+			iter < GetParent()->m_ChildComponents[m_Priority].end();)
+		{
+			if ((*iter) == this)
+			{
+				iter = GetParent()->m_ChildComponents[m_Priority].erase(iter);
+			}
+			else ++iter;
+		}
 		GetParent()->m_ChildComponents[priority].push_back(this);
 	}
-	m_Priority;
+	m_Priority = priority;
 }
-
+void JGUIComponent::DestroyJGUIComponent(JGUIComponent* com)
+{
+	GetOwnerWindow()->DestroyJGUIComponent(com);
+}
 
 
 void JGUIComponent::Init(const std::string& name, JGUIWindow* owner_window)

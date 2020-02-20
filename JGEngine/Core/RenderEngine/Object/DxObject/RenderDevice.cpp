@@ -84,9 +84,6 @@ namespace RE
 
 		// FrameResource
 		auto& frameresource = m_FrameResources[m_ValueIndex];
-
-		//DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		//swapChainDesc.
 		// Direct
 		m_DirectCommandQueue->ExcuteCommandList(render_List);
 		for (auto& screen : m_DxScreenPool)
@@ -94,7 +91,7 @@ namespace RE
 			screen.second->Present();
 		}
 		frameresource.DirectFenceValue = m_DirectCommandQueue->Signal();
-		m_DirectCommandQueue->Flush();
+		//m_DirectCommandQueue->Flush();
 
 		// Compute
 		m_ComputeCommandQueue->ExcuteCommandList(compute_List);
@@ -292,6 +289,8 @@ namespace RE
 
 		std::vector<CommandList*> cmdList_vector;
 
+
+		// TestCode
 
 
 		for (auto& frame_submissons : m_RenderFrameSubmissionPool)

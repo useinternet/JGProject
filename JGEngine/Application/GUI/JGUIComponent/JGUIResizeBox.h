@@ -5,7 +5,7 @@
 #include "GUI/JGUIObject/JGUIComponent.h"
 
 
-class JGUIEmptyRectangle;
+class JGUIRectangle;
 class JGUIResizeBox : public JGUIComponent
 {
 	enum EResizeDirection
@@ -21,9 +21,8 @@ class JGUIResizeBox : public JGUIComponent
 	};
 
 public:
-	void  SetThickness(float thick);
-	float GetThickness() { return m_Thick; }
 	bool  IsResizing() const { return m_Resizing; }
+	void  PositionAdjustment();
 protected:
 	virtual void Awake() override;
 	virtual void Tick(const JGUITickEvent& e) override;
@@ -34,10 +33,10 @@ private:
 	void ResizeByDirection();
 private:
 	// 콜라이더 2개
-	JGUIEmptyRectangle* m_Rectangle = nullptr;
-	bool           m_Resizing = false;
-	EResizeDirection m_Direction;
-	JVector2Int     m_TempMousePos;
+	JGUIRectangle*      m_Rectangle = nullptr;
+	bool                m_Resizing = false;
+	EResizeDirection    m_Direction;
+	JVector2Int         m_TempMousePos;
 
 	float m_Thick = 1.5f;
 	float m_Gap   = 10.0f;

@@ -325,9 +325,9 @@ namespace RE
 		value.first->m_SortingOrder = type->m_SortingOrder;
 		value2.first->m_SortingOrder = sorting_order;
 	}
-	std::vector<byte> STStruct::GetByteData() const
+	std::vector<jbyte> STStruct::GetByteData() const
 	{
-		std::vector<byte> result;
+		std::vector<jbyte> result;
 		for (auto& sdtype : m_SortingOrderMap)
 		{
 			auto type = sdtype.second.first;

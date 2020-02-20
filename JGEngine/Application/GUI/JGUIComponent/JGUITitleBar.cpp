@@ -18,7 +18,7 @@ void JGUITitleBar::Awake()
 	m_CloseBt = CreateJGUIComponent<JGUICloseButton>("JGUICloseBt");
 	m_MaxBt = CreateJGUIComponent<JGUIMaximizeButton>("JGUIMaxBt");
 	m_MinBt = CreateJGUIComponent<JGUIMinimizeButton>("JGUIMinBt");
-	m_TitleText = CreateJGUIComponent<JGUIText>("JGUITitleText");
+	m_TitleText = CreateJGUIComponent<JGUITextMesh>("JGUITitleText");
 
 	m_CloseBt->SetParent(m_Panel);
 	m_MaxBt->SetParent(m_Panel);
@@ -81,7 +81,6 @@ void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
 void JGUITitleBar::SettingElement()
 {
 	auto size = GetOwnerWindow()->GetTransform()->GetSize();
-	size.x -= 6.0f;
 
 
 	GetTransform()->SetSize(size.x, Default_Bt_Size);

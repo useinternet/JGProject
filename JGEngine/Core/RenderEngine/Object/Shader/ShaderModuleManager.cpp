@@ -19,7 +19,7 @@ namespace RE
 	}
 	void ShaderModuleManager::Load(const std::string& path)
 	{
-		auto entry = fs::directory_iterator(path);
+		auto entry = filesystem::directory_iterator(path);
 
 		for (auto& file : entry)
 		{

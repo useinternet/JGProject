@@ -3,7 +3,7 @@
 
 
 class JGUIPanel;
-class JGUIText;
+class JGUITextMesh;
 class JGUIRectangle;
 
 
@@ -22,7 +22,6 @@ protected:
 
 
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) override;
-	virtual void MouseBtUp(const JGUIKeyUpEvent& e) override;
 	virtual void KeyDown(const JGUIKeyDownEvent& e) override;
 	virtual void KeyUp(const JGUIKeyUpEvent& e) override;
 	virtual void Char(const JGUICharEvent& e) override;
@@ -32,7 +31,9 @@ protected:
 	virtual void Resize(const JGUIResizeEvent& e) override;
 
 public:
-	void SetTextSize(float size);
+	void  SetTextSize(float size);
+	float GetTextSize();
+	const std::string& GetText();
 private:
 	void Setting();
 	void InputText(const std::string& str);
@@ -48,16 +49,19 @@ private:
 	JGUIPanel*     m_TextBackGround = nullptr;
 	JGUIRectangle* m_SelectedBox    = nullptr;
 	JGUIRectangle* m_Flash = nullptr;
-	JGUIText*      m_Text  = nullptr;
+	JGUITextMesh*      m_Text  = nullptr;
 
 
-
+	// 각종 설정 변수들
 	float         m_PressedTick = 0.0f;
+	float         m_FlashMoveTick = 0.0f;
+	float         m_MouseDownTick = 0.0f;
+	float         m_FlashMoveTime = 1.5f;
 	std::string   m_CurrentChar;
 	int           m_CurrentFlashTextIndex = 0;
-	float  m_TextSize = 16;
-	float  m_GapRatio = 1.1f;
-
+	float         m_TextSize = 16;
+	float         m_GapRatio = 1.1f;
+	bool          m_InputSwitch = false;
 
 
 	float  m_FlashTick      = 0.0f;

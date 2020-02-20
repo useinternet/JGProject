@@ -12,9 +12,15 @@ class JGUIComponent : public JGUIObject
 {
 	friend JGUI;
 	friend JGUIWindow;
+private:
+	static uint64_t m_RIOffset;
+	static void RISortingOrderReset() {
+		m_RIOffset = 0;
+	}
 public:
 	JGUIComponent(const std::string& name = "JGUIComponent") : JGUIObject(name) {}
 	JGUIWindow* GetOwnerWindow() const;
+	virtual void SetActive(bool active) override;
 protected:
 	virtual void JGUIAwake() override;
 	virtual void JGUIStart() override;
@@ -69,16 +75,11 @@ public:
 	template<typename ComponentType>
 	ComponentType* CreateJGUIComponent(const std::string& name, EJGUI_ComponentFlags flag = JGUI_ComponentFlag_None)
 	{
-	
 		auto com = JGUI::CreateJGUIComponent<ComponentType>(name, m_OwnerWindow, flag);
 		if ((m_Flags & JGUI_ComponentFlag_NoChild) == false) com->SetParent(this);
 		return com;
 	}
-;
-protected:
-	void ChildLock() { m_IsChildLock = true; }
-
-
+	void DestroyJGUIComponent(JGUIComponent* com);
 private:
 	void Init(const std::string& name, JGUIWindow* owner_window);
 	bool Interation();
@@ -94,11 +95,9 @@ private:
 	EJGUI_ComponentFlags m_Flags;
 
 	std::map<uint32_t, std::vector<JGUIComponent*>> m_ChildComponents;
-	// 자식 컴포넌트
-	// std::vector<JGUIComponent*> m_ChildComponents;
-	JVector2           m_PrevSize;
-	bool m_IsMouseTracking = false;
-	bool m_IsChildLock     = false;
+
+	JVector2 m_PrevSize;
+	bool     m_IsMouseTracking = false;
 	uint32_t m_Priority       = 0;
 	uint64_t m_RISortingOrder = 0;
 };

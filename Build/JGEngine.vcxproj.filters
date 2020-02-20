@@ -81,6 +81,18 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -134,6 +146,18 @@
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,28 +8,21 @@
 
 #include "GUI/JGUIObject/JGUIWindow.h"
 
-void JGUIResizeBox::SetThickness(float thick)
+
+void JGUIResizeBox::PositionAdjustment()
 {
-	m_Thick = thick;
-
-	m_Rectangle->SetThickness(m_Thick);
-
-	if (GetCollider()->GetColiderType() == JGUI_Collider_EmptyBox)
-	{
-		((JGUIEmptyBoxColider*)GetCollider())->SetThick(m_Thick);
-	}
+	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
+	auto size = GetTransform()->GetSize();
+	GetTransform()->SetLocalPosition(window_size.x - size.x, window_size.y - size.y);
 }
 
 void JGUIResizeBox::Awake()
 {
-	RegisterCollider(GetOwnerWindow(), JGUI_Collider_EmptyBox);
-	m_Rectangle = CreateJGUIComponent<JGUIEmptyRectangle>("ResizeRectangle");
+	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
+	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("ResizeRectangle");
 	m_Rectangle->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
-	m_Rectangle->GetTransform()->SetSize(GetTransform()->GetSize());
-	SetThickness(m_Thick);
-
-
-	GetTransform()->SetSize(GetOwnerWindow()->GetTransform()->GetSize());
+	GetTransform()->AttachTransform(m_Rectangle->GetTransform());
+	PositionAdjustment();
 }
 
 void JGUIResizeBox::Tick(const JGUITickEvent& e)
@@ -48,7 +41,7 @@ void JGUIResizeBox::Tick(const JGUITickEvent& e)
 
 void JGUIResizeBox::Resize(const JGUIResizeEvent& e)
 {
-	m_Rectangle->GetTransform()->SetSize(e.width, e.height);
+	PositionAdjustment();
 }
 
 void JGUIResizeBox::MouseBtDown(const JGUIKeyDownEvent& e)
@@ -114,40 +107,40 @@ void JGUIResizeBox::ResizeByDirection()
 	{
 		float deltaX = (float)(mouse_pos.x - m_TempMousePos.x);
 		float deltaY = (float)(mouse_pos.y - m_TempMousePos.y);
+		GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, deltaY);
 
-
-		switch (m_Direction)
-		{
-		case UP_NS:
-			GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
-			break;
-		case DOWN_NS:
-			GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, deltaY);
-			break;
-		case RIGHT_WE:
-			GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, 0.0f);
-			break;
-		case LEFT_WE:
-			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, 0.0f);
-			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
-			break;
-		case RIGHTUP_NE:
-			GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
-			break;
-		case RIGHTDOWN_SE:
-			GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, deltaY);
-			break;
-		case LEFTUP_NW:
-			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, -deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, deltaY);
-			break;
-		case LEFTDOWN_SW:
-			GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, deltaY);
-			GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
-			break;
-		}
+		//switch (m_Direction)
+		//{
+		//case UP_NS:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, -deltaY);
+		//	GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
+		//	break;
+		//case DOWN_NS:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(0.0f, deltaY);
+		//	break;
+		//case RIGHT_WE:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, 0.0f);
+		//	break;
+		//case LEFT_WE:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, 0.0f);
+		//	GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
+		//	break;
+		//case RIGHTUP_NE:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(deltaX, -deltaY);
+		//	GetOwnerWindow()->GetTransform()->OffsetLocalPosition(0.0f, deltaY);
+		//	break;
+		//case RIGHTDOWN_SE:
+		//
+		//	break;
+		//case LEFTUP_NW:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, -deltaY);
+		//	GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, deltaY);
+		//	break;
+		//case LEFTDOWN_SW:
+		//	GetOwnerWindow()->GetTransform()->OffsetSize(-deltaX, deltaY);
+		//	GetOwnerWindow()->GetTransform()->OffsetLocalPosition(deltaX, 0.0f);
+		//	break;
+		//}
 		m_TempMousePos = mouse_pos;
 	}
 }

@@ -33,6 +33,10 @@ void JGUIShape::Destroy()
 
 void JGUIShape::Tick(const JGUITickEvent& e)
 {
+	if (GetRISortingOrder()== 5)
+	{
+		auto  name = GetName();
+	}
 	m_RI->SetRIPriority(GetRISortingOrder());
 	m_RI->RenderUpdate();
 }
@@ -43,17 +47,39 @@ void JGUIShape::SetActive(bool is_active)
 	JGUIComponent::SetActive(is_active);
 }
 
+void JGUIShape::SetClipFlag(EJGUI_Clip_Flags flags)
+{
+	int flag = RE_GUI_CLIP_NONE;
+	if (flags & JGUI_Clip_Flag_X)
+	{
+		flag |= RE_GUI_CLIP_XON;
+	}
+	if (flags & JGUI_Clip_Flag_Y)
+	{
+		flag |= RE_GUI_CLIP_YON;
+	}
+	if (flags & JGUI_Clip_Flag_Reverse)
+	{
+		flag |= RE_GUI_CLIP_REVERSE;
+	}
+	if (m_RI && m_RI->GetRI() && m_RI->GetRI()->GetMaterial())
+	{
+		m_RI->GetRI()->GetMaterial()->SetValueAsInt("Clip", flag);
+	}
+	m_ClipFlag = flags;
+}
+
 void JGUIShape::CreateRI(JGUIWindow* drawing_win)
 {
 	m_RI->SetRIPriority(GetRISortingOrder());
 	m_RI->SetDrawingWindow(drawing_win);
 	InitRenderItem(m_RI->GetRI());
+	SetClipFlag(m_ClipFlag);
 }
 
 
 void JGUIWindowTexture::Bind(const std::string& moduleKey)
 {
-	is_code = true;
 	m_ModuleKey = moduleKey;
 	CreateRI(GetOwnerWindow()->GetParent());
 }
@@ -67,7 +93,7 @@ void JGUIWindowTexture::InitRenderItem(RE::RenderItem* ri)
 	if (m_ModuleKey.empty()) return;
 	auto size = GetTransform()->GetSize();
 	ri->SetMaterial(RE_GUI_OneTextureDefault);
-	ri->GetMaterial()->SetValueAsFloat4("Color", JColor(1,1,1,1));
+	ri->GetMaterial()->SetValueAsFloat4("Color", JColor(1, 1, 1, 1));
 	ri->GetMaterial()->SetTexture("Image", m_ModuleKey);
 	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 }
@@ -83,7 +109,6 @@ void JGUIWindowTexture::Resize(const JGUIResizeEvent& e)
 	{
 		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 	}
-
 }
 
 
@@ -101,7 +126,7 @@ void JGUIImage::InitRenderItem(RE::RenderItem* ri)
 		ri->SetMaterial(RE_GUI_OneTextureDefault);
 		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 		ri->GetMaterial()->SetTexture("Image", m_ImageSource);
-	
+
 	}
 	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
 }
@@ -165,7 +190,7 @@ void JGUIRectangle::SetColor(const JColor& color)
 {
 	m_Color = color;
 	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	
+
 }
 void JGUIRectangle::SetColor(float r, float g, float b, float a)
 {
@@ -190,7 +215,7 @@ void JGUIEmptyRectangle::Resize(const JGUIResizeEvent& e)
 	{
 		GetRenderItem()->GetRI()->SetMesh(RE::ReGuiMesh::CreateEmptyRect(e.width, e.height, m_Thick));
 	}
-	
+
 }
 void JGUIEmptyRectangle::SetColor(const JColor& color)
 {
@@ -223,7 +248,13 @@ void JGUIEmptyRectangle::SetThickness(float thick)
 
 
 
-void JGUIText::InitRenderItem(RE::RenderItem* ri)
+void JGUITextMesh::Awake()
+{
+	JGUIShape::Awake();
+	UpdateTextFlags();
+}
+
+void JGUITextMesh::InitRenderItem(RE::RenderItem* ri)
 {
 	auto size = GetTransform()->GetSize();
 	auto fileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
@@ -236,13 +267,13 @@ void JGUIText::InitRenderItem(RE::RenderItem* ri)
 }
 
 
-void JGUIText::SetFont(const std::string& str)
+void JGUITextMesh::SetFont(const std::string& str)
 {
 	m_FontName = str;
 	SetText(m_Text);
 }
 
-void JGUIText::SetText(const std::string& str)
+void JGUITextMesh::SetText(const std::string& str)
 {
 	if (str.empty()) return;
 	auto dmesh = GetRenderItem()->GetRI()->GetMesh();
@@ -267,7 +298,7 @@ void JGUIText::SetText(const std::string& str)
 	mesh->Create(v, i);
 }
 
-void JGUIText::AddText(const std::string& str)
+void JGUITextMesh::AddText(const std::string& str)
 {
 	if (m_Text.empty())
 	{
@@ -290,7 +321,7 @@ void JGUIText::AddText(const std::string& str)
 	mesh->Add(v, i);
 }
 
-void JGUIText::Insert(int idx, const std::string& str)
+void JGUITextMesh::Insert(int idx, const std::string& str)
 {
 	if (idx > m_Text.length()) return;
 	if (idx == m_Text.length())
@@ -298,37 +329,84 @@ void JGUIText::Insert(int idx, const std::string& str)
 		AddText(str); return;
 	}
 
+	bool is_over = false;
+	if (m_DrawingType == JGUI_Text_Drawing_RightPushed)
+	{
+		float last_pos_x = m_TextPosMap[m_Text.length() - 1].x + GetTextWidth(m_Text.substr(m_Text.length() - 1));
+		if (last_pos_x >= m_TextRect.right)
+		{
+			is_over = true;
+		}
+	}
+
+
 	uint32_t len = (uint32_t)m_Text.length();
 	string sub = m_Text.substr(idx, m_Text.length());
+
+	float temp = m_TextWidthDelta;
 	RemoveRange(idx, len);
+	m_TextWidthDelta = temp;
+
+
+
 	AddText(str + sub);
+
+
+	// 여기서 넘어서는 순간 PushLeft한다. 이거 고치셈
+	if (m_DrawingType == JGUI_Text_Drawing_RightPushed)
+	{
+		if (GetTextLastPos(idx).x >= m_TextRect.right)
+		{
+			PushRight(GetTextLastPos(idx).x - m_TextRect.right);
+		}
+		else
+		{
+			float text_width = GetTextWidth(m_Text);
+			float str_width = GetTextWidth(str);
+
+			if (text_width >= m_TextRect.right)
+			{
+				float last_pos_x = m_TextPosMap[m_Text.length() - 1].x + GetTextWidth(m_Text.substr(m_Text.length() - 1));
+				if (last_pos_x >= m_TextRect.right && is_over == false)
+				{
+					PushLeft(text_width - m_TextRect.right);
+				}
+				else
+				{
+					PushLeft(str_width);
+				}
+			
+			}
+		}
+		UpdateTextSize(m_Text);
+	}
 }
 
-void JGUIText::Modify(int idx, const std::string& str)
+void JGUITextMesh::Modify(int idx, const std::string& str)
 {
-	//
 	uint32_t origin_len = (uint32_t)m_Text.length();
 	uint32_t len = (uint32_t)str.length();
 	if (len + idx > origin_len) return;
-
+	float temp = m_TextWidthDelta;
 	RemoveRange(idx, idx + len);
+	m_TextWidthDelta = temp;
 	Insert(idx, str);
 }
 
-void JGUIText::RemoveFirstOf(const std::string& str)
+void JGUITextMesh::RemoveFirstOf(const std::string& str)
 {
 
 }
-void JGUIText::RemoveLastOf(const std::string& str)
+void JGUITextMesh::RemoveLastOf(const std::string& str)
 {
 
 }
-void JGUIText::RemoveAll(const std::string& str)
+void JGUITextMesh::RemoveAll(const std::string& str)
 {
 
 }
 
-void JGUIText::RemoveRange(int start_pos, int end_pos)
+void JGUITextMesh::RemoveRange(int start_pos, int end_pos)
 {
 	if (m_Text.empty()) return;
 	if (start_pos >= end_pos) return;
@@ -338,6 +416,14 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 
 	m_StartPos = m_TextPosMap[start_pos];
 	m_IOffset = start_pos * m_VertexCount;
+
+
+
+	{
+		m_TextWidthDelta -= GetTextWidth(m_Text.substr(start_pos, end_pos - start_pos));
+		m_TextWidthDelta = std::max<float>(m_TextWidthDelta, 0.0f);
+	}
+
 
 
 
@@ -368,42 +454,45 @@ void JGUIText::RemoveRange(int start_pos, int end_pos)
 	UpdateTextSize(m_Text);
 }
 
-void JGUIText::RemoveBack()
+void JGUITextMesh::RemoveBack()
 {
 	RemoveRange((int)m_Text.size() - 1, (int)m_Text.size());
 }
 
-uint32_t JGUIText::Length() const
+uint32_t JGUITextMesh::Length() const
 {
 	return (uint32_t)m_Text.length();
 }
 
-JGUIText& JGUIText::operator=(const std::string& str)
+JGUITextMesh& JGUITextMesh::operator=(const std::string& str)
 {
 	SetText(str);
 	return *this;
 }
-JGUIText& JGUIText::operator+=(const std::string& str)
+JGUITextMesh& JGUITextMesh::operator+=(const std::string& str)
 {
 	AddText(str);
 	return *this;
 }
 
-void JGUIText::SetFontSize(float size)
+void JGUITextMesh::SetFontSize(float size)
 {
+	float ratio = size / m_FontSize;
+
 	m_FontSize = size;
+	m_TextWidthDelta = m_TextWidthDelta * ratio;
 	SetText(m_Text);
 }
 
-void JGUIText::SetTextRect(float width, float height)
+void JGUITextMesh::SetTextRect(float width, float height)
 {
-	m_TextRect.width = width;
-	m_TextRect.height = height;
+	m_TextRect.left = 0.0f;
+	m_TextRect.right = 0.0f;
 	m_TextRect.right = width;
 	m_TextRect.bottom = height;
 	SetText(m_Text);
 }
-void JGUIText::SetColor(const JColor& color)
+void JGUITextMesh::SetColor(const JColor& color)
 {
 	m_Color = color;
 	if (GetRenderItem())
@@ -411,7 +500,7 @@ void JGUIText::SetColor(const JColor& color)
 		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 	}
 }
-void JGUIText::SetColor(float r, float g, float b, float a)
+void JGUITextMesh::SetColor(float r, float g, float b, float a)
 {
 	m_Color = JColor(r, g, b, a);
 	if (GetRenderItem())
@@ -419,32 +508,163 @@ void JGUIText::SetColor(float r, float g, float b, float a)
 		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 	}
 }
-JVector2 JGUIText::GetTextLastPos(int n)
+JVector2 JGUITextMesh::GetTextLastPos(int n)
 {
 	if (m_Text.length() == 0) return JVector2();
 	if (m_Text.length() <= n) return JVector2();
-
+	if (n < 0) return JVector2();
 
 	string last = m_Text.substr(n, n + 1);
 	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName, s2ws(last));
 	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
 
-	auto pos = GetTextPos(n);
+	auto pos = m_TextPosMap[n];
 	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
 
 	auto info = *(charInfo.begin());
 	pos.x += ((float)info.xadvance * font_size_ratio);
+
+	float font_height = (float)fontfileInfo.lineHeight * font_size_ratio;
+	switch (m_DrawingType)
+	{
+	case JGUI_Text_Drawing_Discard:
+	case JGUI_Text_Drawing_Ignore:
+	case JGUI_Text_Drawing_NextLine:
+		break;
+	case JGUI_Text_Drawing_RightPushed:
+		
+		if (m_TextWidth >= m_TextRect.width())
+		{
+			pos.x -= (m_TextWidth - m_TextRect.width());
+			pos.x += m_TextWidthDelta;
+		}
+		break;
+	case JGUI_Text_Drawing_DownPushed:
+		if (m_LineCount > 1)
+		{
+			pos.y += m_LineCount * font_height;
+		}
+		break;
+	}
 	return pos;
 }
 
-const JVector2& JGUIText::GetTextPos(int n) const
+JVector2 JGUITextMesh::GetTextPos(int n) 
 {
-	return m_TextPosMap[n];
+	if (m_Text.length() == 0) return JVector2();
+	if (m_Text.length() <= n) return JVector2();
+	if (n < 0) return JVector2();
+
+	auto pos = m_TextPosMap[n];
+	string last = m_Text.substr(n, n + 1);
+	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName, s2ws(last));
+	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
+	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
+	float font_height = (float)fontfileInfo.lineHeight * font_size_ratio;
+	switch (m_DrawingType)
+	{
+	case JGUI_Text_Drawing_Discard:
+	case JGUI_Text_Drawing_Ignore:
+	case JGUI_Text_Drawing_NextLine:
+		break;
+	case JGUI_Text_Drawing_RightPushed:
+		if (m_TextWidth >= m_TextRect.width())
+		{
+			pos.x -= (m_TextWidth - m_TextRect.width());
+			pos.x += m_TextWidthDelta;
+		}
+		// 살짝 조정 
+		break;
+	case JGUI_Text_Drawing_DownPushed:
+		if (m_LineCount > 1)
+		{
+			pos.y += m_LineCount * font_height;
+		}
+		// 살짝 조정
+		break;
+	}
+	return pos;
+}
+float JGUITextMesh::GetTextWidth() const
+{
+	return GetTextWidth(m_Text);
+}
+void JGUITextMesh::PushRight(int last_index_located)
+{
+	if (m_DrawingType != JGUI_Text_Drawing_RightPushed) return;
+	if (last_index_located < 0) return;
+
+	auto text_pos = GetTextLastPos(last_index_located);
+
+	if (text_pos.x <= m_TextRect.width()) return;
+
+	float delta = text_pos.x - m_TextRect.width();
+
+
+	PushRight(delta);
+	// index에 해당하는 위치와 현재 위치의 차이만큼 offset 조정
+}
+void JGUITextMesh::PushRight(float off)
+{
+	auto clip = GetRenderItem()->GetClipRect();
+	auto offset = GetRenderItem()->GetOffset();
+	m_TextWidthDelta -= off;
+	// 앤 델타만큼 빼져야되고
+
+	clip.left += off; clip.right += off;
+	offset.x -= off;
+
+	GetRenderItem()->SetClipRect(clip);
+	GetRenderItem()->SetOffset(offset);
+	GetRenderItem()->GetTransform()->SendDirty();
 }
 
+void JGUITextMesh::PushLeft(int start_index_located)
+{
+	if (m_DrawingType != JGUI_Text_Drawing_RightPushed) return;
+	if (start_index_located < 0) return;
+
+	auto text_pos = GetTextPos(start_index_located);
+
+	
+	if (text_pos.x >= 0) return;
+
+	float delta = -text_pos.x;
+	PushLeft(delta);
+}
+void JGUITextMesh::PushLeft(float off)
+{
+	auto clip = GetRenderItem()->GetClipRect();
+	auto offset = GetRenderItem()->GetOffset();
+	m_TextWidthDelta += off;
 
 
-std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
+	clip.left -= off; clip.right -= off;
+	offset.x += off;
+
+	GetRenderItem()->SetClipRect(clip);
+	GetRenderItem()->SetOffset(offset);
+	GetRenderItem()->GetTransform()->SendDirty();
+}
+void JGUITextMesh::PushUp(int start_line_located)
+{
+	if (m_DrawingType != JGUI_Text_Drawing_DownPushed) return;
+}
+void JGUITextMesh::PushDown(int end_line_located)
+{
+	if (m_DrawingType != JGUI_Text_Drawing_DownPushed) return;
+}
+void JGUITextMesh::SetTextFlags(EJGUI_Text_Flags flags)
+{
+	m_TextFlags = flags;
+	UpdateTextFlags();
+}
+void JGUITextMesh::SetTextDrawing(EJGUI_Text_Drawing type)
+{
+	m_DrawingType = type;
+	SetText(m_Text);
+}
+std::pair<uint32_t, JVector2> JGUITextMesh::ConvertVertex(
 	uint32_t ioffset, JVector2 start_pos, const std::string& str,
 	std::vector<JGUIVertex>& v, std::vector<uint32_t>& i, std::vector<JVector2>& p)
 {
@@ -505,15 +725,26 @@ std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 		ii[3] = 0 + ioffset; ii[4] = 2 + ioffset; ii[5] = 3 + ioffset;
 
 		ioffset += (int)vv.size();
-		if (start_pos.x + (float)m_FontSize > m_TextRect.width)
+
+		if (m_DrawingType == JGUI_Text_Drawing_NextLine ||
+			m_DrawingType == JGUI_Text_Drawing_DownPushed)
 		{
-			start_pos.x = 0.0f;
-			start_pos.y -= font_height;
+			if (start_pos.x + (float)m_FontSize > m_TextRect.width())
+			{
+				start_pos.x = 0.0f;
+				start_pos.y -= font_height;
+			}
+			else
+			{
+				start_pos.x += (float)info.xadvance * font_size_ratio;
+			}
 		}
 		else
 		{
 			start_pos.x += (float)info.xadvance * font_size_ratio;
 		}
+
+
 
 
 		v.insert(v.end(), vv.begin(), vv.end());
@@ -522,48 +753,165 @@ std::pair<uint32_t, JVector2> JGUIText::ConvertVertex(
 	return pair<uint32_t, JVector2>(ioffset, start_pos);
 }
 
-void JGUIText::UpdateTextSize(const std::string& str)
+void JGUITextMesh::UpdateTextSize(const std::string& str)
 {
 	std::wstring wstr = s2ws(str);
-
+	SetClipFlag(JGUI_Clip_Flag_None);
 
 	auto fontManager = JGUI::GetJGUIFontManager();
 	auto charInfo = fontManager->GetFontCharInfo(m_FontName, wstr);
 	auto fontfileInfo = fontManager->GetFontFileInfo(m_FontName);
 	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
 	float font_height = fontfileInfo.lineHeight * font_size_ratio;
-	// a1. 텍스트 전체 크기를 구한다.
-	JVector2 text_rect_size;
 
+	JVector2 offset;
+	JVector2 text_rect_size;
+	if (m_DrawingType == JGUI_Text_Drawing_NextLine || m_DrawingType == JGUI_Text_Drawing_DownPushed)
+	{
+		m_TextWidth = 0.0f;
+		for (auto& info : charInfo)
+		{
+			m_TextWidth += (info.xadvance * font_size_ratio);
+		}
+		m_LineCount = (int)(m_TextWidth / m_TextRect.width()) + 1;
+		if (m_LineCount == 1) text_rect_size.x = m_TextWidth;
+		else text_rect_size.x = m_TextRect.width();
+		text_rect_size.y = font_height * m_LineCount;
+
+
+		switch (m_DrawingType)
+		{
+		case JGUI_Text_Drawing_NextLine:
+			offset.x = -(text_rect_size.x / 2.0f);
+			offset.y = -(m_LineCount - 1) * font_height * 0.5f;
+
+			break;
+		case JGUI_Text_Drawing_DownPushed:
+			SetClipFlag(JGUI_Clip_Flag_Y);
+			offset.x = -(text_rect_size.x / 2.0f);
+			offset.y = -(m_LineCount - 1) * font_height * 1.5f;
+	
+			
+			JGUIRect clip_rect;
+			clip_rect.top    = -(font_height * 0.5f) + ((m_LineCount - 1) * font_height);
+			clip_rect.bottom = font_height * 0.5f + ((m_LineCount - 1) * font_height);
+			
+			GetRenderItem()->SetClipRect(clip_rect);
+
+			break;
+		}
+
+
+	}
+	if (m_DrawingType == JGUI_Text_Drawing_Ignore || m_DrawingType == JGUI_Text_Drawing_Discard ||
+		m_DrawingType == JGUI_Text_Drawing_RightPushed)
+	{
+		m_LineCount = 1;
+
+
+		JGUIRect clip_rect;
+		m_TextWidth = 0.0f;
+		for (auto& info : charInfo)
+		{
+			m_TextWidth += (info.xadvance * font_size_ratio);
+		}
+
+
+		switch (m_DrawingType)
+		{
+		case JGUI_Text_Drawing_Discard:
+			SetClipFlag(JGUI_Clip_Flag_X);
+
+			clip_rect.left = 0.0f;
+			clip_rect.right = m_TextRect.width();
+
+			if (m_TextWidth >= m_TextRect.width())
+			{
+				text_rect_size.x = m_TextRect.width();
+				text_rect_size.y = font_height;
+			}
+			else
+			{
+				text_rect_size.x = m_TextWidth;
+				text_rect_size.y = font_height;
+			}
+
+			offset.x = -(text_rect_size.x / 2.0f);
+			GetRenderItem()->SetClipRect(clip_rect);
+			break;
+		case JGUI_Text_Drawing_Ignore:
+			text_rect_size.x = m_TextWidth;
+			text_rect_size.y = font_height;
+			offset.x = -(text_rect_size.x / 2.0f);
+			break;
+		case JGUI_Text_Drawing_RightPushed:
+			SetClipFlag(JGUI_Clip_Flag_X);
+	
+			if (m_TextWidth >= m_TextRect.width())
+			{
+				float delta_width = (m_TextWidth - m_TextRect.width());
+				clip_rect.left  = delta_width - m_TextWidthDelta;
+				clip_rect.right = m_TextRect.width() + delta_width - m_TextWidthDelta;
+				text_rect_size.x = m_TextWidth;
+				text_rect_size.y = font_height;
+				offset.x = -(m_TextWidth / 2.0f) ;
+				offset.x -= (m_TextWidth - m_TextRect.width());
+				offset.x += m_TextWidthDelta;
+			}
+			else
+			{
+				clip_rect.left   = 0.0f;
+				clip_rect.right  = m_TextRect.width();
+				text_rect_size.x = m_TextWidth;
+				text_rect_size.y = font_height;
+				offset.x = -(text_rect_size.x / 2.0f);
+	
+			}
+			GetRenderItem()->SetClipRect(clip_rect);
+			break;
+		}
+
+	}
+
+	GetTransform()->SetSize(text_rect_size);
+	GetRenderItem()->SetOffset(offset);
+	UpdateTextFlags();
+}
+
+void JGUITextMesh::UpdateTextFlags()
+{
+	if (m_TextFlags & JGUI_Text_Flag_Border)
+	{
+		if (m_Border == nullptr)
+		{
+			m_Border = CreateJGUIComponent<JGUIEmptyRectangle>("EmptyRectangle");
+		}
+		m_Border->SetThickness(1.0f);
+		m_Border->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
+		m_Border->GetTransform()->SetSize(m_TextRect.width(), m_TextRect.height());
+	}
+	else
+	{
+		if (m_Border)
+		{
+			DestroyJGUIComponent(m_Border);
+			m_Border = nullptr;
+		}
+	}
+}
+
+float JGUITextMesh::GetTextWidth(const std::string& str) const
+{
+	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(m_FontName,
+		s2ws(str));
+	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
+	float font_size_ratio = m_FontSize / (float)fontfileInfo.default_font_size;
 	float accX = 0.0f;
-	int   lineCount = 0;
 	for (auto& info : charInfo)
 	{
 		accX += (info.xadvance * font_size_ratio);
 	}
-	lineCount = (int)(accX / m_TextRect.width) + 1;
-	if (lineCount == 1) text_rect_size.x = accX;
-	else text_rect_size.x = m_TextRect.width;
-	text_rect_size.y = font_height * lineCount;
-
-	GetTransform()->SetSize(text_rect_size);
-
-	auto offset = GetRenderItem()->GetOffset();
-	offset.x = -(text_rect_size.x / 2.0f);
-	offset.y = -(lineCount - 1) * font_height * 0.5f;
-	GetRenderItem()->SetOffset(offset);
-
-	auto window_size = GetOwnerWindow()->GetTransform()->GetSize();
-	float half_window_width = window_size.x * 0.5f;
-	JVector2 ClipRange = { 0.0f, text_rect_size.x };
-	auto pos = GetTransform()->GetPosition();
-	ClipRange.x += (pos.x - half_window_width);
-	ClipRange.y += (pos.x - half_window_width);
-
-
-
-    bool result = GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat2("Clip", ClipRange);
-
+	return accX;
 }
 
 

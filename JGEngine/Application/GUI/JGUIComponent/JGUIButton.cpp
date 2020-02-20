@@ -61,6 +61,7 @@ void JGUIButton::MouseLeave()
 	if (m_BtState != JGUI_BtState_Hightlight) return;
 
 	m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
+	ENGINE_LOG_INFO("MouseLeave Normal");
 	m_BtState = JGUI_BtState_Normal;
 
 }
@@ -72,6 +73,7 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 		auto p = GetOwnerWindow()->GetMousePos();
 		if (!GetCollider()->CheckInPoint(p))
 		{
+			ENGINE_LOG_INFO("Selected Normal");
 			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
 		}
@@ -82,6 +84,7 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 		if (!GetCollider()->CheckInPoint(p))
 		{
 			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
+			ENGINE_LOG_INFO("Pressed Normal");
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}

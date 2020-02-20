@@ -6,6 +6,11 @@
 
 using namespace std;
 
+float JGUIObject::GetTick() const
+{
+	return GlobalLinkData::GetTick();
+}
+
 void JGUIObject::JGUIDestroy()
 {
 	Destroy();

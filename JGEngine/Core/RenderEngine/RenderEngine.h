@@ -44,6 +44,14 @@ namespace RE
 #define RE_GUI_DefaultMaterial      "M_DefaultGUI"
 #define RE_GUI_OneTextureDefault    "M_DefaultTextureGUI"
 #define RE_GUI_TextMaterial         "M_DefaultGUIText"
+
+
+#define RE_GUI_CLIP_NONE 0
+#define RE_GUI_CLIP_XON  1
+#define RE_GUI_CLIP_YON  2
+#define RE_GUI_CLIP_REVERSE 4
+
+
 	enum RENDERENGINE_API ERE_GUI_Material
 	{
 		GUI_Default,

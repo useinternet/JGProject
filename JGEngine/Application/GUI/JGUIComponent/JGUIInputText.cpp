@@ -10,8 +10,9 @@ void JGUIInputText::Awake()
 {
 	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
 	m_TextBackGround = CreateJGUIComponent<JGUIPanel>("TextBackGround");
-	m_Text = CreateJGUIComponent<JGUIText>("Text");
+	m_Text = CreateJGUIComponent<JGUITextMesh>("Text");
 	m_SelectedBox = CreateJGUIComponent<JGUIRectangle>("SelectedBox");
+	m_SelectedBox->GetTransform()->SetSize(0, 0);
 	m_Flash = CreateJGUIComponent<JGUIRectangle>("Line");
 
 }
@@ -25,91 +26,164 @@ void JGUIInputText::Start()
 
 
 	Setting();
-
-	m_Text->SetText("(ne)");
+	Reset();
+	m_Text->SetText("(none)");
 	m_CurrentFlashTextIndex = m_Text->Length() - 1;
 	ReviseFlashPosByChar();
 
 
 
 	m_Text->SetColor(JColor(0, 0, 0, 1));
+	m_Text->SetTextDrawing(JGUI_Text_Drawing_RightPushed);
 	m_Flash->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
 	m_SelectedBox->SetColor(JColor(0.0f, 0.0f, 1.0f, 1.0f));
 	m_Flash->SetActive(false);
 	m_SelectedBox->SetActive(false);
+	
 }
 void JGUIInputText::MouseBtDown(const JGUIKeyDownEvent& e)
 {
-	if (e.Code == KeyCode::LeftMouseButton)
+	if (e.Code == KeyCode::LeftMouseButton && !m_Selected)
 	{
-		if (!m_Selected)
+		JGUIExtraEvent extra_event;
+		extra_event.Bind(JGUI_EXTRAEVENT_REPEAT, this, [&](JGUIExtraEvent& e)
 		{
-			m_SelectedEndTextIndex = -2;
-			m_SelectedStartTextIndex = INT_MAX;
-		}
-		m_Selected = true;
+			float tick = GlobalLinkData::GetTick();
+			if (JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
+			{
+				if (!m_Selected)
+				{
+					m_SelectedEndTextIndex = -2;
+					m_SelectedStartTextIndex = INT_MAX;
+				}
+				m_Selected = true;
+				auto mouse_pos = GetOwnerWindow()->GetMousePos();
+				auto text_rect = m_Text->GetLocalTextRect();
+				text_rect.left += m_Text->GetTransform()->GetPosition().x;
+				text_rect.right += m_Text->GetTransform()->GetPosition().x;
+
+				if (mouse_pos.x >= text_rect.left && mouse_pos.x <= text_rect.right)
+				{
+					m_MouseDownTick = 0.0f;
+					ReviseFlashPosByMousePos();
+				}
+				else if(m_SelectedStartTextIndex <= m_SelectedEndTextIndex)
+				{
+					m_MouseDownTick += tick;
+					// LeftPush
+					if (mouse_pos.x <= text_rect.left && m_MouseDownTick >= 0.05f)
+					{
+						m_SelectedStartTextIndex--;
+						m_CurrentFlashTextIndex = m_SelectedStartTextIndex;
+	
+						m_SelectedStartTextIndex = std::max<int>(m_SelectedStartTextIndex, -1);
+						m_MouseDownTick = 0.0f;
+					}
+					// RightPush
+					if (mouse_pos.x >= text_rect.right && m_MouseDownTick >= 0.05f)
+					{
+						m_SelectedEndTextIndex++;
+						m_CurrentFlashTextIndex = m_SelectedEndTextIndex;
+				
+						m_SelectedEndTextIndex = std::min<int>(m_SelectedEndTextIndex, m_Text->Length() - 1);
+						m_MouseDownTick = 0.0f;
+					}
+					
+					ReviseFlashPosByChar();
+				}
 
 
-		ReviseFlashPosByMousePos();
+				if (m_SelectedStartTextIndex == m_SelectedEndTextIndex)
+				{
 
-		//ENGINE_LOG_INFO("Start : {0},  End : {1}", m_SelectedStartTextIndex, m_SelectedEndTextIndex);
-		if (m_SelectedStartTextIndex == m_SelectedEndTextIndex)
-		{
+					m_SelectedBox->SetActive(false);
+				}
+				else
+				{
 
-			m_SelectedBox->SetActive(false);
-		}
-		else
-		{
-		
-			m_SelectedBox->SetActive(true);
-			auto pos = m_SelectedBox->GetTransform()->GetLocalPosition();
-			auto size = m_SelectedBox->GetTransform()->GetSize();
+					m_SelectedBox->SetActive(true);
+					auto pos = m_SelectedBox->GetTransform()->GetLocalPosition();
+					auto size = m_SelectedBox->GetTransform()->GetSize();
 
-			auto start_pos = m_Text->GetTextLastPos(m_SelectedStartTextIndex);
-			auto end_pos = m_Text->GetTextLastPos(m_SelectedEndTextIndex);
-			//ENGINE_LOG_INFO("Pos :]] Start : {0},  End : {1}", start_pos.x, end_pos.x);
-			size.x = end_pos.x - start_pos.x;
-			pos.x = start_pos.x;
+					auto start_pos = m_Text->GetTextLastPos(m_SelectedStartTextIndex);
+					auto end_pos = m_Text->GetTextLastPos(m_SelectedEndTextIndex);
 
-			m_SelectedBox->GetTransform()->SetLocalPosition(pos);
-			m_SelectedBox->GetTransform()->SetSize(size);
+					size.x = end_pos.x - start_pos.x;
+					pos.x = start_pos.x + JGUI::Gap();
+					if (pos.x < JGUI::Gap())
+					{
+						float delta = JGUI::Gap() - pos.x;
+						size.x -= delta;
+						pos.x = JGUI::Gap();
+					}
 
-		}
 
+					
+					auto rect = m_Text->GetTransform()->GetRect();
+					rect.right = rect.left + m_Text->GetLocalTextRect().width();
+
+					if (mouse_pos.x <= rect.left)
+					{
+						m_Text->PushLeft(m_SelectedStartTextIndex);
+					}
+					if (mouse_pos.x >= rect.right)
+					{
+						m_Text->PushRight(m_SelectedEndTextIndex + 1);
+					}
+
+					m_SelectedBox->GetTransform()->SetLocalPosition(pos);
+					auto text_size = m_Text->GetLocalTextRect().width();
+					if (size.x > text_size) size.x = text_size - pos.x;
+					m_SelectedBox->GetTransform()->SetSize(size);
+				}
+			}
+
+
+			if (m_Selected && JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
+			{
+				m_Selected = false;
+				e.flag = JGUI_EXTRAEVENT_EXIT;
+			}
+		});
+		JGUI::RegisterExtraEvent(extra_event);
 	}
 }
-void JGUIInputText::MouseBtUp(const JGUIKeyUpEvent& e)
-{
-	m_Selected = false;
-}
+
 void JGUIInputText::KeyDown(const JGUIKeyDownEvent& e)
 {
-	
-	m_PressedTick += GlobalLinkData::GetTick();
+	if (m_InputSwitch)
+	{
+		m_PressedTick += GlobalLinkData::GetTick();
+	}	
+
+
 	// 키 입력
 	if (!m_FlashMove)
 	{
-		if (m_CurrentChar != "" && m_PressedTick >= 0.25f)
+		if (m_CurrentChar != "" &&  m_PressedTick >= 0.25f && m_InputSwitch)
 		{
 			InputText(m_CurrentChar);
 			m_PressedTick = 0.0f;
 		}
-		if (m_CurrentChar == "\b" && e.Code == KeyCode::BackSpace && m_PressedTick >= 0.25f)
+		if (m_CurrentChar == "\b" && e.Code == KeyCode::BackSpace && m_PressedTick >= 0.25f && m_InputSwitch)
 		{
 			RemoveText();
 			m_PressedTick = 0.0f;
 		}
 		if (e.Code == KeyCode::Right || e.Code == KeyCode::Left)
 		{
+			m_FlashMoveTime = 0.5f;
 			m_FlashMove = true;
 			FlashMove(e);
 		}
 	}
 	else
 	{
-		if (m_PressedTick >= 0.05f)
+		m_FlashMoveTick += GlobalLinkData::GetTick();
+		if (m_FlashMoveTick >= m_FlashMoveTime)
 		{
-			m_PressedTick = 0.0f;
+			m_FlashMoveTick = 0.0f;
+			m_FlashMoveTime = 0.05f;
 			FlashMove(e);
 		}
 
@@ -119,7 +193,6 @@ void JGUIInputText::KeyDown(const JGUIKeyDownEvent& e)
 void JGUIInputText::KeyUp(const JGUIKeyUpEvent& e)
 {
 	Reset();
-
 }
 
 void JGUIInputText::Char(const JGUICharEvent& e)
@@ -129,6 +202,7 @@ void JGUIInputText::Char(const JGUICharEvent& e)
 	if (e.str == "\b") RemoveText();
 	else InputText(e.str);
 	m_CurrentChar = e.str;
+	m_InputSwitch = true;
 }
 
 void JGUIInputText::FocusEnter(const JGUIFocusEnterEvent& e)
@@ -161,6 +235,7 @@ void JGUIInputText::FocusExit(const JGUIFocusExitEvent& e)
 {
 	m_FlashTick = 0.0f;
 	m_Flash->SetActive(false);
+
 	Reset();
 }
 
@@ -177,6 +252,16 @@ void JGUIInputText::SetTextSize(float size)
 	ReviseFlashPosByChar();
 }
 
+float JGUIInputText::GetTextSize()
+{
+	return m_Text->GetFontSize();
+}
+
+const std::string& JGUIInputText::GetText()
+{
+	return m_Text->GetString();
+}
+
 
 
 void JGUIInputText::Setting()
@@ -190,11 +275,10 @@ void JGUIInputText::Setting()
 	// 선택 박스 (파란색) 조정
 	JVector2 selected_box_pos = m_SelectedBox->GetTransform()->GetLocalPosition();
 	selected_box_pos.y = gap_y;
-	m_SelectedBox->GetTransform()->SetLocalPosition(selected_box_pos);
 	JVector2 selected_box_size = m_SelectedBox->GetTransform()->GetSize();
 	selected_box_size.y = m_TextSize;
 	m_SelectedBox->GetTransform()->SetSize(selected_box_size);
-
+	m_SelectedBox->GetTransform()->SetLocalPosition(selected_box_pos);
 
 	// 텍스트 배경 박스 조정
 	float box_size = m_TextSize * m_GapRatio;
@@ -206,7 +290,8 @@ void JGUIInputText::Setting()
 
 
 	// 텍스트 크기 조정
-	m_Text->SetTextRect(size.x, size.y);
+	m_Text->SetTextRect(size.x - (JGUI::Gap() * 2), size.y);
+	m_Text->GetTransform()->SetLocalPosition(JGUI::Gap(), 0.0f);
 	m_Flash->GetTransform()->SetSize(m_FlashThickness, m_TextSize);
 	m_Text->SetFontSize(m_TextSize);
 }
@@ -246,14 +331,31 @@ void JGUIInputText::ReviseFlashPosByMousePos()
 
 	if (m_PrevMousePos == mouse_pos)
 	{
-		m_SelectedStartTextIndex = std::min<int>(m_SelectedStartTextIndex, m_CurrentFlashTextIndex);
-		m_SelectedEndTextIndex = std::max<int>(m_SelectedEndTextIndex, m_CurrentFlashTextIndex);
+		if (m_SelectedEndTextIndex == m_SelectedStartTextIndex)
+		{
+			if (m_SelectedStartTextIndex > m_CurrentFlashTextIndex) m_SelectedStartTextIndex = m_CurrentFlashTextIndex;
+			else m_SelectedEndTextIndex = m_CurrentFlashTextIndex;
+		}
+		else if (m_SelectedStartTextIndex < m_CurrentFlashTextIndex &&
+			m_SelectedEndTextIndex   > m_CurrentFlashTextIndex)
+		{
+
+			auto start_delta = m_CurrentFlashTextIndex - m_SelectedStartTextIndex;
+			auto end_delta = m_SelectedEndTextIndex - m_CurrentFlashTextIndex;
+			if (start_delta > end_delta) m_SelectedEndTextIndex = m_CurrentFlashTextIndex;
+			else  m_SelectedStartTextIndex = m_CurrentFlashTextIndex;
+		}
+		else
+		{
+			m_SelectedStartTextIndex = std::min<int>(m_SelectedStartTextIndex, m_CurrentFlashTextIndex);
+			m_SelectedEndTextIndex = std::max<int>(m_SelectedEndTextIndex, m_CurrentFlashTextIndex);
+		}
+		
 		return;
 	}
 	m_PrevMousePos = mouse_pos;
-	
 
-
+	// 34  67
 
 	bool is_find = false;
 	int is_find_text_index = -1;
@@ -281,19 +383,54 @@ void JGUIInputText::ReviseFlashPosByMousePos()
 			break;
 		}
 	}
-	if (is_find) m_CurrentFlashTextIndex = is_find_text_index;
-	else m_CurrentFlashTextIndex = text_len - 1;
-	m_SelectedStartTextIndex = std::min<int>(m_SelectedStartTextIndex, m_CurrentFlashTextIndex);
-	m_SelectedEndTextIndex = std::max<int>(m_SelectedEndTextIndex, m_CurrentFlashTextIndex);
+	if (is_find)
+	{
+		m_CurrentFlashTextIndex = is_find_text_index;
+	}
+	else
+	{
+		auto t_pos = m_Text->GetTextPos(text_len - 1).x;
+		t_pos += m_Text->GetTransform()->GetPosition().x;
+		if (mouse_pos.x >= t_pos)
+		{
+			m_CurrentFlashTextIndex = text_len - 1;
+		}
+		else
+		{
+			m_CurrentFlashTextIndex = -1;
+		}
 
+	}
+
+	if (m_SelectedEndTextIndex == m_SelectedStartTextIndex)
+	{
+
+		if (m_SelectedStartTextIndex > m_CurrentFlashTextIndex) m_SelectedStartTextIndex = m_CurrentFlashTextIndex;
+		else m_SelectedEndTextIndex = m_CurrentFlashTextIndex;
+	}
+	else if (m_SelectedStartTextIndex < m_CurrentFlashTextIndex &&
+		m_SelectedEndTextIndex   > m_CurrentFlashTextIndex)
+	{
+	
+		auto start_delta = m_CurrentFlashTextIndex - m_SelectedStartTextIndex;
+		auto end_delta = m_SelectedEndTextIndex - m_CurrentFlashTextIndex;
+		if (start_delta > end_delta) m_SelectedEndTextIndex = m_CurrentFlashTextIndex;
+		else  m_SelectedStartTextIndex = m_CurrentFlashTextIndex;
+	}
+	else
+	{
+		m_SelectedStartTextIndex = std::min<int>(m_SelectedStartTextIndex, m_CurrentFlashTextIndex);
+		m_SelectedEndTextIndex = std::max<int>(m_SelectedEndTextIndex, m_CurrentFlashTextIndex);
+	}
 
 	ReviseFlashPosByChar();
 }
 
 void JGUIInputText::ReviseFlashPosByChar()
 {
-	uint32_t len = m_Text->Length();
-	if (len <= m_CurrentFlashTextIndex && m_CurrentFlashTextIndex != -1)
+	int len = m_Text->Length();
+	m_CurrentFlashTextIndex = std::max<int>(-1, m_CurrentFlashTextIndex);
+	if (len <= m_CurrentFlashTextIndex)
 	{
 		m_CurrentFlashTextIndex = len - 1;
 	}
@@ -301,6 +438,7 @@ void JGUIInputText::ReviseFlashPosByChar()
 	auto text_last_pos = m_Text->GetTextLastPos(m_CurrentFlashTextIndex);
 	auto pos = m_Flash->GetTransform()->GetLocalPosition();
 	pos.x = text_last_pos.x;
+	pos.x += m_Text->GetTransform()->GetLocalPosition().x;
 	m_Flash->GetTransform()->SetLocalPosition(pos);
 }
 
@@ -308,12 +446,19 @@ void JGUIInputText::FlashMove(const JGUIKeyDownEvent& e)
 {
 
 
-	if (e.Code == KeyCode::Right) m_CurrentFlashTextIndex++;
-	if (e.Code == KeyCode::Left && m_CurrentFlashTextIndex != -1)  m_CurrentFlashTextIndex--;
+	if (e.Code == KeyCode::Right)
+	{
+		m_CurrentFlashTextIndex++;
+		m_Text->PushRight(m_CurrentFlashTextIndex);
+	}
+	if (e.Code == KeyCode::Left && m_CurrentFlashTextIndex != -1)
+	{
+		
+		m_CurrentFlashTextIndex--;
+		m_Text->PushLeft(m_CurrentFlashTextIndex + 1);
+	}
 
-	if(m_CurrentFlashTextIndex != -1)  m_CurrentFlashTextIndex = std::min<uint32_t>(m_Text->Length() - 1, m_CurrentFlashTextIndex);
-	
-
+	m_CurrentFlashTextIndex = std::min<int>(m_Text->Length() - 1, m_CurrentFlashTextIndex);
 
 
 	ReviseFlashPosByChar();
@@ -322,7 +467,17 @@ void JGUIInputText::FlashMove(const JGUIKeyDownEvent& e)
 void JGUIInputText::Reset()
 {
 	m_PressedTick = 0.0f;
+	m_FlashMoveTick = 0.0f;
+	m_MouseDownTick = 0.0f;
 	m_FlashMove = false;
+	m_InputSwitch = false;
 	m_CurrentChar = "";
 	m_Selected = false;
+	m_SelectedBox->SetActive(false);
+	auto size= m_SelectedBox->GetTransform()->GetSize();
+	size.x = 0.0f;
+	m_SelectedBox->GetTransform()->SetSize(size);
+
+	m_SelectedStartTextIndex = INT_MAX;
+	 m_SelectedEndTextIndex = -2;
 }

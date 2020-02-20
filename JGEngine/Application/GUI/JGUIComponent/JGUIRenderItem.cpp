@@ -70,6 +70,37 @@ void JGUIRenderItem::RenderUpdate()
 			m_Instance->Set("World", JMatrix::Transpose(m));
 		}
 		transform->Flush();
+
+
+		if (m_RenderItem && m_RenderItem->GetMaterial())
+		{
+		
+			auto mat = GetRI()->GetMaterial();
+			float width  = m_ClipRect.width();
+			float height = m_ClipRect.height();
+			JGUIRect rect = m_ClipRect;
+
+			JVector2 lt = { rect.left, rect.top };
+			JVector2 rb = { rect.right, rect.bottom };
+
+			lt += transform->GetPosition();
+			rb += transform->GetPosition();
+			lt += m_Offset;
+			rb += m_Offset;
+
+			lt = m_DrawingWindow->ConvertToScreenPos(lt);
+			rb = m_DrawingWindow->ConvertToScreenPos(rb);
+
+			lt.x += (shape_size.x * pivot.x);
+			lt.y += (shape_size.y * pivot.y);
+			rb.x += (shape_size.x * pivot.x);
+			rb.y += (shape_size.y * pivot.y);
+
+			mat->SetValueAsFloat2("ClipX", { lt.x, rb.x });
+			mat->SetValueAsFloat2("ClipY", { lt.y, rb.y });
+		}
+
+
 	}
 }
 
@@ -92,6 +123,7 @@ void JGUIRenderItem::SetDrawingWindow(JGUIWindow* win)
 		CreateRI();
 	}
 }
+
 void JGUIRenderItem::DestroyRI()
 {
 	if (m_RenderItem)

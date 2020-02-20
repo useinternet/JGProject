@@ -28,7 +28,8 @@
 #include <functional>
 #include  <Psapi.h>
 #include <algorithm>
-#include <experimental/filesystem>
+#include <filesystem>
+//#include <experimental/filesystem>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
@@ -42,15 +43,16 @@
 #include <d3dcompiler.h>
 #include <d3dx12.h>
 #include "CommonCore.h"
-
+#include <filesystem>
 
 using namespace Microsoft::WRL;
-namespace fs = std::experimental::filesystem;
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"Dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
-#endif //PCH_H
 
+
+
+#endif //PCH_H
 
 

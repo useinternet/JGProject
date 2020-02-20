@@ -10,7 +10,6 @@ JGUIRectTransform::JGUIRectTransform(const JVector2& pos, float angle, const JVe
 	m_LocalAngle = angle;
 	m_Scale = { scale.x, scale.y };
 	m_Size = { 100.0f,100.0f };
-	ChildLock();
 
 	for (int i = 0; i < DirtyCount; ++i)
 	{
@@ -36,6 +35,12 @@ void JGUIRectTransform::AttachTransform(JGUIRectTransform* transform)
 		transform->m_Attacher->DetachTransform(transform);
 	}
 	transform->m_Attacher = this;
+	transform->m_Size = m_Size;
+	transform->m_Scale = m_Scale;
+	transform->SendDirty();
+	transform->SendAttachedTransform_Scale(m_Scale);
+	transform->SendAttachedTransform_Size(m_Size);
+
 	m_AttachedList.insert(transform);
 }
 void JGUIRectTransform::DetachTransform(JGUIRectTransform* transform)
@@ -322,20 +327,23 @@ const JVector2& JGUIRectTransform::GetLocalPivot() const
 JGUIRect JGUIRectTransform::GetRect()  const {
 
 	JGUIRect rect;
-	rect.width = m_Size.x;
-	rect.height = m_Size.y;
+	float width = m_Size.x;
+	float height = m_Size.y;
+
+	//rect.width = m_Size.x;
+	//rect.height = m_Size.y;
 
 	auto pos = GetPosition();
 	auto pivot = GetPivot();
 
-	pos.x -= (pivot.x * rect.width);
-	pos.y -= (pivot.y * rect.height);
+	pos.x -= (pivot.x * width);
+	pos.y -= (pivot.y * height);
 
 	rect.left = pos.x;
 	rect.top = pos.y;
 
-	rect.right = rect.left + rect.width;
-	rect.bottom = rect.top + rect.height;
+	rect.right = rect.left + width;
+	rect.bottom = rect.top + height;
 
 	return rect;
 }
@@ -343,17 +351,20 @@ JGUIRect JGUIRectTransform::GetRect()  const {
 JGUIRect JGUIRectTransform::GetLocalRect() const
 {
 	JGUIRect rect;
-	rect.width = m_Size.x;
-	rect.height = m_Size.y;
+	float width = m_Size.x;
+	float height = m_Size.y;
+
+
+
 	auto pivot = GetPivot();
 	rect.left = m_LocalPosition.x;
-	rect.top = m_LocalPosition.y;
+	rect.top  = m_LocalPosition.y;
 
-	rect.left -= (pivot.x * rect.width);
-	rect.top -= (pivot.y * rect.height);
+	rect.left -= (pivot.x * width);
+	rect.top  -= (pivot.y * height);
 
-	rect.right = rect.left + rect.width;
-	rect.bottom = rect.top + rect.height;
+	rect.right = rect.left + width;
+	rect.bottom = rect.top + height;
 
 	return rect;
 }

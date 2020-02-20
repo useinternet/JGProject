@@ -322,7 +322,7 @@ namespace RE
 		m_D3D_CommandList->IASetPrimitiveTopology(primitiveTopology);
 	}
 	void CommandList::BindGraphicsDynamicConstantBuffer(
-		uint32_t rootparam, const std::vector<byte>& data)
+		uint32_t rootparam, const std::vector<jbyte>& data)
 	{
 		auto alloc = m_UploadBuffer->Allocate(data.size(), D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
 		memcpy(alloc.CPU, data.data(), data.size());

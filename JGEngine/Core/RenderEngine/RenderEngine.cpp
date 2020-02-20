@@ -247,8 +247,70 @@ namespace RE
 			// 텍스쳐 없는 기본 머터리얼
 			{
 				default_Mat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
+				default_Mat.AddFloat2InMaterialCB("ClipX", { 0.0f, 0.0f });
+				default_Mat.AddFloat2InMaterialCB("ClipY", { 0.0f, 0.0f });
+				default_Mat.AddIntInMaterialCB("Clip", RE_GUI_CLIP_NONE);
+
 				default_Mat.SetCode(R"(
     Output output;
+    if(Clip & 1) // ClipOn
+    {
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.x >= ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x <= ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.x < ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x > ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+    }
+	if(Clip & 2) // ClipYOn
+	{
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.y <= ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y >= ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.y > ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y < ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+	}
     output.Screen = input.Color * Color;
     return output;
 )");
@@ -266,11 +328,71 @@ namespace RE
 			{
 		
 			default_tMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
-			
+			default_tMat.AddFloat2InMaterialCB("ClipX", { 0.0f, 0.0f });
+			default_tMat.AddFloat2InMaterialCB("ClipY", { 0.0f, 0.0f });
+			default_tMat.AddIntInMaterialCB("Clip", RE_GUI_CLIP_NONE);
 			default_tMat.AddTexture("Image");
 		
 			default_tMat.SetCode(R"(
     Output output;
+    if(Clip & 1) // ClipOn
+    {
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.x >= ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x <= ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.x < ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x > ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+    }
+	if(Clip & 2) // ClipYOn
+	{
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.y <= ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y >= ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.y > ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y < ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+	}
     float4 img = Image.Sample( AnisotropicSampler, input.TexC);
     output.Screen = input.Color * img * Color;
     return output;
@@ -285,22 +407,74 @@ namespace RE
 			ReMaterial default_txtMat(RE_GUI_TextMaterial, ERenderItemUsage::GUI);
 			{
 				default_txtMat.AddFloat4InMaterialCB("Color", { 1.0f,1.0f,1.0f,1.0f });
-				default_txtMat.AddFloat2InMaterialCB("Clip", { 0.0f,0.0f });
+				default_txtMat.AddFloat2InMaterialCB("ClipX", { 0.0f, 0.0f });
+				default_txtMat.AddFloat2InMaterialCB("ClipY", { 0.0f, 0.0f });
+				default_txtMat.AddIntInMaterialCB("Clip", RE_GUI_CLIP_NONE);
 				default_txtMat.AddTexture("Image");
 	
 				default_txtMat.SetCode(R"(
 
     Output output;
-    if(input.PosW.x < Clip.x)
+    if(Clip & 1) // ClipOn
     {
-        output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
-        return output;
+	
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.x >= ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x <= ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.x < ClipX.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.x > ClipX.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
     }
-    if(input.PosW.x > Clip.y)
-    {
-        output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
-        return output;
-    }
+	if(Clip & 2) // ClipYOn
+	{
+		if(Clip & 4) // Reverse
+		{
+			if(input.PosW.y <= ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y >= ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+		else 
+		{
+			if(input.PosW.y > ClipY.x)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+			if(input.PosW.y < ClipY.y)
+			{
+				output.Screen = float4(0.0f,0.0f,0.0f,0.0f);
+				return output;
+			}
+		}
+	}
+   
     float4 img = Image.Sample( AnisotropicSampler, input.TexC);
     output.Screen = input.Color * img * Color;
     return output;

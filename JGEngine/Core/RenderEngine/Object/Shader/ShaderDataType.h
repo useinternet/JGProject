@@ -101,8 +101,8 @@ namespace RE
 		T Get() const {
 			return m_Value;
 		}
-		virtual std::vector<byte> GetByteData() const override {
-			std::vector<byte> result(GetSize());
+		virtual std::vector<jbyte> GetByteData() const override {
+			std::vector<jbyte> result(GetSize());
 			memcpy_s(&result[0], GetSize(), &m_Value, GetSize());
 			return result;
 		}

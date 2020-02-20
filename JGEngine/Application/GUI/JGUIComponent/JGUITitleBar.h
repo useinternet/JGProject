@@ -11,7 +11,7 @@ class JGUICloseButton;
 class JGUIButton;
 class JGUIMaximizeButton;
 class JGUIMinimizeButton;
-class JGUIText;
+class JGUITextMesh;
 class JGUITitleBar : public JGUIComponent
 {
 protected:
@@ -26,7 +26,7 @@ private:
 	JGUICloseButton*    m_CloseBt = nullptr;
 	JGUIMaximizeButton* m_MaxBt   = nullptr;
 	JGUIMinimizeButton* m_MinBt   = nullptr;
-	JGUIText*           m_TitleText = nullptr; 
+	JGUITextMesh*           m_TitleText = nullptr; 
 	bool m_IsGrap = false;
 	JVector2Int m_Delta;
 };

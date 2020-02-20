@@ -60,7 +60,7 @@ namespace RE
 		void Remove(const std::string& var_name);
 		ShaderDataType* Get(const std::string& var_name);
 
-		std::vector<byte> GetData();
+		std::vector<jbyte> GetData();
 		uint32_t GetSize() const;
 
 		virtual std::string GetCode(uint32_t register_number, uint32_t register_space) override;
@@ -89,7 +89,7 @@ namespace RE
 		STStruct* Get(uint32_t idx);
 		uint32_t  GetElementCount() const;
 		void      Clear();
-		std::vector<byte> GetData();
+		std::vector<jbyte> GetData();
 		uint32_t GetSize() const;
 		virtual std::string GetCode(uint32_t register_number, uint32_t register_space) override;
 		virtual void Save(std::ofstream& fout) override;

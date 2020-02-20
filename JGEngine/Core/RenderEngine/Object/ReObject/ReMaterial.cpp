@@ -386,7 +386,7 @@ namespace RE
 		*m_MaterialCB = *(owner->GetMaterialCB());
 		m_BindedTextures = owner->GetBindedTextures();
 	}
-	std::vector<byte> ReMaterialController::GetCBData() const
+	std::vector<jbyte> ReMaterialController::GetCBData() const
 	{
 		return move(m_MaterialCB->GetData());
 	}
@@ -395,6 +395,7 @@ namespace RE
 		uint32_t index = m_MatOwner->GetBindedTextureIndex(name);
 		if (index == -1)
 			return;
+		//RequestLoadAndGetTexture
 		TextureManager::RequestLoadAndGetTexture(asset_texture_path, &m_BindedTextures[index]);
 	}
 	void     ReMaterialController::SetTexture(const std::string& name, const Texture& t)

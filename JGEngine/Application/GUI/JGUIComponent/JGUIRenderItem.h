@@ -26,7 +26,6 @@ protected:
 public:
 	void RenderUpdate();
 public:
-	// void SetColor(const JColor& color);
 	uint64_t GetRIPriority() const {
 		return m_RIPriority;
 	}
@@ -41,6 +40,8 @@ public:
 	const JVector2& GetOffset() const {
 		return m_Offset;
 	}
+	void  SetClipRect(const JGUIRect& rect) { m_ClipRect = rect; }
+	const JGUIRect& GetClipRect() const     { return m_ClipRect; }
 protected:
 	virtual void DestroyRI();
 	virtual void CreateRI();
@@ -52,6 +53,8 @@ protected:
 
 	JGUIWindow* m_DrawingWindow = nullptr;
 	JVector2 m_PrevWindowSize;
+	JGUIRect m_ClipRect;
+
 	uint64_t m_RIPriority = 0;
 	uint64_t m_RegisterID = 0;
 };

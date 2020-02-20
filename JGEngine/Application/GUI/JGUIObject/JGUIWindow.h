@@ -158,8 +158,7 @@ private:
 	bool m_IsMouseDown  = false;
 
 	// ºÎ°¡ ÆÄÃ÷
-	class JGUITitleBar*  m_Title = nullptr;
-	class JGUIResizeBox* m_ResizeBox = nullptr;
+
 
 
 	friend void JGUIWinRectTransform::SendSizeToWin();

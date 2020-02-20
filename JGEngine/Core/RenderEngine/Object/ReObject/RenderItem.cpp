@@ -217,6 +217,4 @@ namespace RE
 		});
 		return move(v);
 	}
-
-
 }

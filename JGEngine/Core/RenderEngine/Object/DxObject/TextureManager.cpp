@@ -25,11 +25,11 @@ namespace RE
 	{
 		auto directQueue = GetRenderDevice()->GetDirectCmdQueue();
 		auto cmdList = directQueue->GetCommandList();
-		auto directory = fs::directory_iterator(path);
-
+		auto directory = filesystem::directory_iterator(path);
+		
 		for (auto& iter : directory)
 		{
-			if (fs::is_directory(iter.status()))
+			if (filesystem::is_directory(iter.status()))
 			{
 				InitLoad(iter.path().string());
 			}
@@ -72,6 +72,7 @@ namespace RE
 	}
 	void TextureManager::RequestLoadAndGetTexture(const std::string& name, Texture* t)
 	{
+		
 		auto& tEstimates = g_TextureManager->m_TextureEstimates;
 		auto& cahce = g_TextureManager->m_TextureCahce;
 		auto& sumitted_texture_queue = g_TextureManager->m_SumittedTextureQueue;
@@ -148,7 +149,7 @@ namespace RE
 		cahce.erase(name);
 		return true;
 	}
-	bool TextureManager::TextureLoad(Texture& t, const fs::path& p, CommandList* cmdList)
+	bool TextureManager::TextureLoad(Texture& t, const filesystem::path& p, CommandList* cmdList)
 	{
 		HRESULT hr = S_OK;
 

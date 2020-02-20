@@ -72,7 +72,7 @@ bool JGUIFontManager::FontLoad(const std::string& path)
 		int pageID = 0;
 		Next(fin); fin >> pageID; Next(fin); fin >> bf;
 		bf = bf.substr(1, bf.size() - 2);
-		fs::path p(path);
+		std::filesystem::path p(path);
 		auto filename = p.filename().string();
 		bf = path.substr(0, path.size() - filename.size()) + bf;
 		fontInfo.FileInfo.page[pageID] = bf;

@@ -35,15 +35,6 @@ using namespace RE;
 void JGUIWindow::JGUIAwake()
 {
 
-	auto size = GetTransform()->GetSize();
-	m_ResizeBox = CreateJGUIComponent<JGUIResizeBox>("ResizeBox");
-	float thickness = m_ResizeBox->GetThickness();
-	m_Title = CreateJGUIComponent<JGUITitleBar>("TitleBar");
-	m_Title->GetTransform()->SetLocalPosition(thickness * 2, thickness * 2);
-
-
-
-
 
 	JGUIObject::JGUIAwake();
 }
@@ -68,21 +59,22 @@ void JGUIWindow::JGUIDestroy()
 {
 	JGUIObject::JGUIDestroy();
 
-
+	RE::RenderEngine::GetDevice()->Flush();
 	// 부모 윈도우 배열에서 삭제
 	if (m_ParentWindow)
 	{
 		auto& childs = m_ParentWindow->m_ChildWindows;
-		childs.erase(std::remove_if(childs.begin(), childs.end(), [&](JGUIWindow* win)
-		{
-			if (this == m_ParentWindow->GetFocusWindow()) m_ParentWindow->SetFocusWindow(nullptr);
-			return win == this;
-		}), childs.end());
+		if (m_ParentWindow->GetFocusWindow() == this) m_ParentWindow->SetFocusWindow(nullptr);
+		childs.erase(std::remove(childs.begin(), childs.end(), this), childs.end());
 	}
+
+	vector<JGUIWindow*> child_clones = m_ChildWindows;
+
 	// 자식들 손절
-	for (auto& window : m_ChildWindows)
+	for (auto& window : child_clones)
 	{
 		JGUI::DestroyObject(window);
+		if (GetFocusWindow() == window) SetFocusWindow(nullptr);
 	}
 	// 컴포넌트 삭제
 	for (auto& com : m_WindowComponents)
@@ -114,6 +106,7 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 	if (GetFocusComponent()) GetFocusComponent()->JGUIOnFocus();
 	if (GetFocusWindow())    GetFocusWindow()->JGUIOnFocus();
 
+	JGUIComponent::RISortingOrderReset();
 	for (auto& com : m_WindowComponents)
 	{
 		if (!com->IsExecuteStartFunc()) com->JGUIStart();
@@ -151,7 +144,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 
 	m_Panel->GetTransform()->SetSize(e.width, e.height);
 	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
-
+	RE::RenderEngine::GetDevice()->Flush();
 	ReadyGUIModule();
 	
 	if (m_Screen)
@@ -166,14 +159,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 	}
 
 
-	if (m_Title)
-	{
-		m_Title->GetTransform()->SetSize(e.width, 50);
-	}
-	if (m_ResizeBox)
-	{
-		m_ResizeBox->GetTransform()->SetSize(e.width, e.height);
-	}
+
 	Resize(e);
 	// resize 구현
 }
@@ -197,9 +183,6 @@ void JGUIWindow::JGUIOnFocus()
 void JGUIWindow::JGUIChar(const JGUICharEvent& e)
 {
 	if (GetFocusComponent()) GetFocusComponent()->JGUIChar(e);
-
-
-
 	if (GetFocusWindow()) GetFocusWindow()->JGUIChar(e);
 	else Char(e);
 }
@@ -207,17 +190,23 @@ void JGUIWindow::JGUIChar(const JGUICharEvent& e)
 void JGUIWindow::JGUIKeyDown(const JGUIKeyDownEvent& e)
 {
 	if (GetFocusComponent()) GetFocusComponent()->JGUIKeyDown(e);
-
 	if (GetFocusWindow()) GetFocusWindow()->JGUIKeyDown(e);
-	else KeyDown(e);
+	else
+	{
+	
+		KeyDown(e);
+	}
 }
 void JGUIWindow::JGUIKeyUp(const JGUIKeyUpEvent& e)
 {
-
 	if (GetFocusComponent()) GetFocusComponent()->JGUIKeyUp(e);
-
 	if (GetFocusWindow()) GetFocusWindow()->JGUIKeyUp(e);
-	else KeyUp(e);
+	else
+	{
+		
+		KeyUp(e);
+	}
+
 }
 
 void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
@@ -228,51 +217,54 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 	// Window 찾기
 	JGUIWindow* focus_win = TrackingCanInteractionWindow();
 
+
+
 	if (!m_IsMouseDown || m_IsMouseLeave)
 	{
-		SetFocusComponent(focus_com);
+		if(focus_win == nullptr) SetFocusComponent(focus_com);
+		else SetFocusComponent(nullptr);
+
 		SetFocusWindow(focus_win);
 		m_IsMouseDown = true;
 		m_IsMouseLeave = false;
 	}
 
-	focus_com = GetFocusComponent();
-	if (GetFocusComponent())
-	{
-		focus_com->JGUIMouseBtDown(e);
-	}
-
 	focus_win = GetFocusWindow();
-	if (focus_win)
-	{
-		focus_win->JGUIMouseBtDown(e);
-	}
-	//
-	MouseBtDown(e);
+	focus_com = GetFocusComponent();
+
+
+
+
+	if (focus_com) focus_com->JGUIMouseBtDown(e);
+
+	if (focus_win) focus_win->JGUIMouseBtDown(e);
+	else MouseBtDown(e);
 }
 
 void JGUIWindow::JGUIMouseBtUp(const JGUIKeyUpEvent& e)
 {
 	auto focus_com = GetFocusComponent();
-	if (focus_com)
+	auto focus_win = GetFocusWindow();
+
+
+
+
+	if (focus_com && focus_com->Interation()) focus_com->JGUIMouseBtUp(e);
+	if (focus_win && focus_win->Interaction())
 	{
-		if (focus_com->Interation())
-		{
-			focus_com->JGUIMouseBtUp(e);
-		}
+		focus_win->JGUIMouseBtUp(e);
+	}
+	else
+	{
+	
+		MouseBtUp(e);
 	}
 
-	auto focus_win = GetFocusWindow();
-	if (focus_win)
-	{
-		if (focus_win->Interaction())
-		{
-			focus_win->JGUIMouseBtUp(e);
-		}
-	}
+
+
 	if (m_IsMouseDown) m_IsMouseDown = false;
 
-	MouseBtUp(e);
+	
 }
 void JGUIWindow::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 {
@@ -424,11 +416,13 @@ JGUIWindow* JGUIWindow::FindChild(const std::string& name)
 }
 void JGUIWindow::DestroyJGUIWindow(JGUIWindow* window)
 {
-
-}
+	JGUI::DestroyObject(window);
+	if (window == GetFocusWindow()) SetFocusWindow(nullptr);
+} 
 void JGUIWindow::DestroyJGUIComponent(JGUIComponent* com)
 {
-
+	JGUI::DestroyObject(com);
+	if (com == GetFocusComponent()) SetFocusComponent(nullptr);
 }
 JVector2 JGUIWindow::ConvertToScreenPos(const JVector2& pos)
 {
@@ -690,5 +684,6 @@ JGUIWindow* JGUIWindow::TrackingCanInteractionWindow()
 			}
 		}
 	}
+
 	return result;
 }

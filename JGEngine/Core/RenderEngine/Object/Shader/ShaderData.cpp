@@ -132,9 +132,9 @@ namespace RE
 		return m_Datas[var_name].get();
 	}
 
-	std::vector<byte> SBDConstantBuffer::GetData()
+	std::vector<jbyte> SBDConstantBuffer::GetData()
 	{
-		std::vector<byte> result;
+		std::vector<jbyte> result;
 		for (auto& name : m_DataVarNames)
 		{
 			auto btData = m_Datas[name]->GetByteData();
@@ -297,9 +297,9 @@ namespace RE
 	{
 		return (uint32_t)m_Elements.size();
 	}
-	std::vector<byte> SBDStructuredBuffer::GetData()
+	std::vector<jbyte> SBDStructuredBuffer::GetData()
 	{
-		std::vector<byte> bt;
+		std::vector<jbyte> bt;
 		for (auto& element : m_Elements)
 		{
 			auto src = element.GetByteData();
