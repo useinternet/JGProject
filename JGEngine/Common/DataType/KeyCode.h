@@ -139,7 +139,22 @@ public:
 		return this->code != code;
 
 	}
-
+	bool operator<(const KeyCode& code) const
+	{
+		return this->code < code.code;
+	}
+	bool operator>(const KeyCode& code) const
+	{
+		return this->code > code.code;
+	}
+	bool operator<=(const KeyCode& code) const
+	{
+		return this->code <= code.code;
+	}
+	bool operator>=(const KeyCode& code) const
+	{
+		return this->code >= code.code;
+	}
 public:
 	int ToInt() const {
 		return code;
@@ -254,6 +269,8 @@ public:
 			return "T";
 		case U:
 			return "U";
+		case V:
+			return "V";
 		case W:
 			return "W";
 		case X:

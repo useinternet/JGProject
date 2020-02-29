@@ -8,6 +8,19 @@ using namespace std;
 
 
 
+float JGUIText::GetTextWidth(const std::string& font_name, const std::string& txt, float txt_size)
+{
+	auto  charInfo = JGUI::GetJGUIFontManager()->GetFontCharInfo(font_name, s2ws(txt));
+	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(font_name);
+	float accX = 0.0f;
+	float font_size_ratio = txt_size / (float)fontfileInfo.default_font_size;
+	for (auto& info : charInfo)
+	{
+		accX += (info.xadvance * font_size_ratio);
+	}
+	return accX;
+}
+
 void JGUIText::Awake()
 {
 	auto size = GetTransform()->GetSize();
@@ -123,7 +136,26 @@ EJGUI_Text_Flags JGUIText::GetTextFlags() const
 {
 	return m_TextFlags;
 }
+float JGUIText::GetTextWidth() const
+{
+	float width = 0.0f;
+	for (auto& mesh : m_TextMeshs)
+	{
+		width = std::max<float>(width, mesh.second->GetTextWidth());
+	}
+	return width;
+}
+float JGUIText::GetTextHeight() const
+{
+	uint32_t count = m_TextMeshs.size();
+	auto  fontfileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
+	float font_size_ratio = m_TextSize / (float)fontfileInfo.default_font_size;
+	float font_height = (float)fontfileInfo.lineHeight * font_size_ratio + m_LineGap;
+	float gap = m_LineGap * (count - 1);
+	float height = font_height * count;
 
+	return gap + height;
+}
 void JGUIText::ProcessByTextFlag()
 {
 	switch (m_TextFlags)

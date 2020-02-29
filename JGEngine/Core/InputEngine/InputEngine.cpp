@@ -24,6 +24,23 @@ namespace IE
 		m_MBtDownList.clear();
 		m_MBtUpList.clear();
 
+
+		for (int i = 0; i < KeyMapCount; ++i)
+		{
+			if (GetAsyncKeyState(i) & 0x8000)
+			{
+				NotifyKeyDown(i);
+			}
+			else
+			{
+				if (m_KeyMap[i] == Key_Down)
+				{
+					NotifyKeyUp(i);
+				}
+			}
+		}
+
+
 		while (!m_KeyNoneBuffer.empty())
 		{
 			KeyCode code = m_KeyNoneBuffer.front(); m_KeyNoneBuffer.pop();
@@ -40,6 +57,8 @@ namespace IE
 			m_KeyMap[code.ToInt()] = Key_Up;
 			m_KeyNoneBuffer.push(code);
 		}
+
+	
 		
 
 		for (int i = 0; i < KeyMapCount; ++i)
@@ -93,6 +112,7 @@ namespace IE
 	}
 	bool InputEngine::GetKeyDown(KeyCode code)
 	{
+
 		return m_KeyMap[code.ToInt()] == Key_Down;
 	}
 	bool InputEngine::GetKeyUp(KeyCode code)
@@ -110,10 +130,22 @@ namespace IE
 	}
 	void InputEngine::NotifyKeyDown(KeyCode code)
 	{
+		if (code == KeyCode::LeftAlt || code == KeyCode::RightAlt ||
+			code == KeyCode::LeftCtrl || code == KeyCode::RightCtrl ||
+			code == KeyCode::LeftShift || code == KeyCode::RightShift)
+		{
+			return;
+		}
 		m_KeyDownBuffer.push(code);
 	}
 	void InputEngine::NotifyKeyUp(KeyCode code)
 	{
+		if (code == KeyCode::LeftAlt || code == KeyCode::RightAlt ||
+			code == KeyCode::LeftCtrl || code == KeyCode::RightCtrl ||
+			code == KeyCode::LeftShift || code == KeyCode::RightShift)
+		{
+			return;
+		}
 		m_KeyUpBuffer.push(code);
 	}
 	void InputEngine::NotifyMousePos(int x, int y)

@@ -23,7 +23,8 @@ namespace RE
 		m_RenderDeviceDesc(desc)
 	{
 		m_Factory = CreateDXGIFactory();
-		m_Device = CreateD3DDevice(m_Factory, false);
+		DXGI_ADAPTER_DESC1 output_desc;
+		m_Device = CreateD3DDevice(m_Factory, false,&output_desc);
 		ReObject::m_RenderDevice = this;
 	
 

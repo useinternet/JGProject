@@ -93,6 +93,9 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITab.h">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -158,6 +161,9 @@
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.cpp">
+      <Filter>GUI\JGUIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITab.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
   </ItemGroup>

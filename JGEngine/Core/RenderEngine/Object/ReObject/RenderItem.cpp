@@ -205,16 +205,38 @@ namespace RE
 	}
 	std::vector<RenderItem*> RenderItemManager::GetGUIItems()
 	{
-		std::vector<RenderItem*> v(m_GUIRIs.size());
-		int count = 0;
+		std::map<uint64_t, std::vector<RenderItem*>> m;
+		std::vector<RenderItem*> v;
 		for (auto& ri : m_GUIRIs)
 		{
-			v[count++] = ri.second;
+			m[ri.second->GetLayer()].push_back(ri.second);
 		}
-		std::sort(v.begin(), v.end(), [&](RenderItem* r1, RenderItem* r2)
+
+		
+		for (auto& ri : m)
 		{
-			return r1->GetPriority() < r2->GetPriority();
-		});
+			std::sort(ri.second.begin(), ri.second.end(), [&](RenderItem* r1, RenderItem* r2)
+			{
+				return r1->GetPriority() < r2->GetPriority();
+			});
+			v.insert(v.end(), ri.second.begin(), ri.second.end());
+		}
+
+	
+		//int count = 0;
+		//for (auto& ri : m_GUIRIs)
+		//{
+		//	v[count++] = ri.second;
+		//}
+
+
+
+
+
+		//std::sort(v.begin(), v.end(), [&](RenderItem* r1, RenderItem* r2)
+		//{
+		//	return r1->GetPriority() < r2->GetPriority();
+		//});
 		return move(v);
 	}
 }

@@ -128,6 +128,14 @@ public:
 	{
 		return m_Priority;
 	}
+
+	void SetWindowFlags(EJGUI_WindowFlags flag);
+	EJGUI_WindowFlags GetWindowFlags() const;
+
+
+	virtual void SetActive(bool active, bool is_hierarchy = false) override;
+protected:
+	virtual void ProcessByWindowFlags(EJGUI_WindowFlags flag);
 private:
 	void Init(const std::string& name, EJGUI_WindowFlags flags);
 	void NewLoad();

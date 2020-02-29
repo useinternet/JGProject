@@ -37,15 +37,25 @@ void JGUIShape::Tick(const JGUITickEvent& e)
 	{
 		auto  name = GetName();
 	}
+	m_RI->SetLayer(GetLayer());
+
 	m_RI->SetRIPriority(GetRISortingOrder());
 	m_RI->RenderUpdate();
 }
 
-void JGUIShape::SetActive(bool is_active)
+void JGUIShape::SetActive(bool is_active, bool is_hierarchy)
 {
-	m_RI->SetActive(is_active);
-	JGUIComponent::SetActive(is_active);
+	if (GetName() == "SubItemBacground")
+	{
+		int n = 0;
+	}
+	JGUIComponent::SetActive(is_active, is_hierarchy);
+	m_RI->SetActive(is_active, is_hierarchy);
+
+
 }
+
+
 
 void JGUIShape::SetClipFlag(EJGUI_Clip_Flags flags)
 {

@@ -18,7 +18,7 @@ class JGUIRenderItem : public JGUIComponent
 
 public:
 
-	virtual void SetActive(bool is_active) override;
+	virtual void SetActive(bool is_active, bool is_hierarchy) override;
 
 protected:
 	
@@ -31,6 +31,8 @@ public:
 	}
 	void    SetRIPriority(uint64_t priority);
 	void    SetDrawingWindow(JGUIWindow* win);
+	void    SetLayer(uint64_t layer);
+	uint64_t GetLayer() const;
 	RE::RenderItem* GetRI() {
 		return m_RenderItem;
 	}
@@ -57,5 +59,6 @@ protected:
 
 	uint64_t m_RIPriority = 0;
 	uint64_t m_RegisterID = 0;
+	uint64_t m_Layer = 0;
 };
 

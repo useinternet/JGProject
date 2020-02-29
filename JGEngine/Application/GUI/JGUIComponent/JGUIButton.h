@@ -28,12 +28,17 @@ protected:
 	virtual void MouseLeave() override;
 	virtual void Tick(const JGUITickEvent& e) override;
 	virtual void OnClick() {
-		if (m_OnClick) m_OnClick();
+	
+		if (m_OnClick)
+		{
+			ENGINE_LOG_INFO("OnClick");
+			m_OnClick();
+		}
 	}
 public:
 	void SetBtImage(const std::string& path);
 	void SetBtColor(EJGUIBtState state, const JColor& color);
-	void BIndOnClick(const std::function<void()>& func);
+	void BindOnClick(const std::function<void()>& func);
 private:
 	JGUIImage*     m_Image = nullptr;
 	JColor         m_BtColor[JGUI_BtState_Count];

@@ -10,6 +10,8 @@
 class JGUITextMesh;
 class JGUIText : public JGUIComponent
 {
+public:
+	static float GetTextWidth(const std::string& font_name, const std::string& txt, float txt_size);
 protected:
 	virtual void Awake() override;
 	virtual void Resize(const JGUIResizeEvent& e) override;
@@ -27,6 +29,10 @@ public:
 	EJGUI_Text_HAlignment GetHAlign() const;
 	EJGUI_Text_VAlignment GetVAlign() const;
 	EJGUI_Text_Flags GetTextFlags()   const;
+
+
+	float GetTextWidth() const;
+	float GetTextHeight() const;
 private:
 	void ProcessByTextFlag();
 	void ProcessByHAlign();

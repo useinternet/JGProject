@@ -56,10 +56,12 @@ enum EJGUI_RIMesh
 // Window
 enum EJGUI_WindowFlags
 {
-	JGUI_WindowFlag_None    = 0x000000,
-	JGUI_WindowFlag_NewLoad = 0x000001,
-	JGUI_WindowFlag_TitileBar = 0x000002,
+	JGUI_WindowFlag_None         = 0x000000,
+	JGUI_WindowFlag_NewLoad      = 0x000001,
+	JGUI_WindowFlag_TitileBar    = 0x000002,
 	JGUI_WindowFlag_EnableResize = 0x000004,
+	JGUI_WindowFlag_TabBar       = 0x000008,
+	JGUI_WindowFlag_MenuBar      = 0x000010,
 };
 enum EJGUI_SubmitCmdListPriority
 {
@@ -318,6 +320,7 @@ private:
 
 	std::unordered_map<JGUIObject*, JGUIMouseTrack> m_MouseTrackMap;
 	std::unordered_map<JGUIObject*, JGUIExtraEvent> m_ExtraEventMap;
+	
 	std::shared_ptr<JGUIFontManager> m_FontManager;
 	std::string m_DefaultFont = GlobalLinkData::_EngineConfig->InEngine("Fonts/Consolas.fnt");
 	IE::InputEngine*    m_Input = nullptr;

@@ -65,6 +65,13 @@ namespace RE
 		void     SetPriority(uint64_t priority) {
 			m_Priority = priority;
 		}
+		uint64_t GetLayer() const {
+			return m_Layer;
+		}
+		void SetLayer(uint64_t layer)
+		{
+			m_Layer = layer;
+		}
 	private:
 		ReMaterialController*                  m_Material = nullptr;
 		std::shared_ptr<ReMesh>                m_Mesh;
@@ -77,6 +84,7 @@ namespace RE
 		bool m_IsActive = true;
 
 		uint64_t m_Priority = 0;
+		uint64_t m_Layer = 0;
 	};
 
 

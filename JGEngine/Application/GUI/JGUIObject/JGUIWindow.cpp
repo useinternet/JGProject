@@ -52,6 +52,8 @@ void JGUIWindow::JGUIStart()
 		window->JGUIStart();
 	}
 	JGUIObject::JGUIStart();
+
+
 }
 
 
@@ -565,6 +567,33 @@ void JGUIWindow::SetPriority(EJGUI_WindowPriority p)
 {
 	m_Priority = p;
 }
+void JGUIWindow::SetWindowFlags(EJGUI_WindowFlags flag)
+{
+	m_Flags = flag;
+	ProcessByWindowFlags(flag);
+}
+EJGUI_WindowFlags JGUIWindow::GetWindowFlags() const
+{
+	return m_Flags;
+}
+void JGUIWindow::SetActive(bool active, bool is_hierarchy)
+{
+	JGUIObject::SetActive(active, is_hierarchy);
+	for (auto& com : m_WindowComponents)
+	{
+		com->SetActive(active, is_hierarchy);
+	}
+	for (auto& win : m_ChildWindows)
+	{
+		win->SetActive(IsActive(), true);
+	}
+}
+void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
+{
+
+
+
+}
 void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 {
 	m_Flags = flag;
@@ -606,7 +635,7 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 		SetParent(nullptr);
 	}
 
-	//
+
 }
 
 void JGUIWindow::NewLoad()
@@ -687,3 +716,5 @@ JGUIWindow* JGUIWindow::TrackingCanInteractionWindow()
 
 	return result;
 }
+
+

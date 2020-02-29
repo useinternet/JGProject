@@ -18,6 +18,7 @@ void JGUIResizeBox::PositionAdjustment()
 
 void JGUIResizeBox::Awake()
 {
+
 	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
 	m_Rectangle = CreateJGUIComponent<JGUIRectangle>("ResizeRectangle");
 	m_Rectangle->SetColor(JColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -27,8 +28,6 @@ void JGUIResizeBox::Awake()
 
 void JGUIResizeBox::Tick(const JGUITickEvent& e)
 {
-
-
 	if (GetCollider()->CheckInPoint(GetOwnerWindow()->GetMousePos()) || m_Resizing)
 	{
 		m_Rectangle->SetColor(JColor(1.0f, 0.0f, 0.0f, 1.0f));

@@ -12,14 +12,16 @@ JGUIWindow* JGUIComponent::GetOwnerWindow() const
 	return m_OwnerWindow;
 }
 
-void JGUIComponent::SetActive(bool active)
+void JGUIComponent::SetActive(bool active, bool is_hierarchy)
 {
-	JGUIObject::SetActive(active);
+	JGUIObject::SetActive(active, is_hierarchy);
+
+
 	for (auto& child_info : m_ChildComponents)
 	{
 		for (auto& child : child_info.second)
 		{
-			child->SetActive(active);
+			child->SetActive(IsActive(), true);
 		}
 	}
 }
@@ -241,6 +243,17 @@ void JGUIComponent::SetPriority(uint32_t priority)
 	}
 	m_Priority = priority;
 }
+void JGUIComponent::SetLayer(uint64_t layer)
+{
+	m_Layer = layer;
+	for (auto& c_pair : m_ChildComponents)
+	{
+		for (auto& child : c_pair.second)
+		{
+			child->SetLayer(layer);
+		}
+	}
+}
 void JGUIComponent::DestroyJGUIComponent(JGUIComponent* com)
 {
 	GetOwnerWindow()->DestroyJGUIComponent(com);
@@ -284,3 +297,5 @@ JGUIComponent* JGUIComponent::TrackingCanInteractionComponent()
 	}
 	return com;
 }
+
+

@@ -14,6 +14,7 @@ using namespace std;
 void JGUITitleBar::Awake()
 {
 	RegisterCollider(GetOwnerWindow(), JGUI_Collider_Box);
+
 	m_Panel = CreateJGUIComponent<JGUIPanel>("JGUIPanel");
 	m_CloseBt = CreateJGUIComponent<JGUICloseButton>("JGUICloseBt");
 	m_MaxBt = CreateJGUIComponent<JGUIMaximizeButton>("JGUIMaxBt");
@@ -51,10 +52,6 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 				mouse_pos.y += m_Delta.y;
 				JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
 				GetOwnerWindow()->GetTransform()->SetLocalPosition(pos);
-
-
-				auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
-	
 			}
 
 

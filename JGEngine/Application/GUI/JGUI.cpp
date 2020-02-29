@@ -52,8 +52,8 @@ void        JGUI::DestroyObject(JGUIObject* obj)
 	{
 		sm_GUI->m_IDQueue.push(obj->GetID());
 	}
-	sm_GUI->m_MouseTrackMap.erase(obj);
-	sm_GUI->m_ExtraEventMap.erase(obj);
+	//sm_GUI->m_MouseTrackMap.erase(obj);
+	//sm_GUI->m_ExtraEventMap.erase(obj);
 	objqueue.push(obj);
 }
 
@@ -192,6 +192,8 @@ void JGUI::Update()
 {
 	while (!m_ExpectedDestroyObject.empty())
 	{
+		m_MouseTrackMap.erase(m_ExpectedDestroyObject.front());
+		m_ExtraEventMap.erase(m_ExpectedDestroyObject.front());
 		m_ObjectPool.erase(m_ExpectedDestroyObject.front());
 		m_ExpectedDestroyObject.pop();
 	}
@@ -210,7 +212,6 @@ void JGUI::Update()
 	auto focus_window = FindRootJGUIWindow(GetFocus());
 	if (focus_window == nullptr) focus_cnt++;
 	else focus_cnt = 0;
-	ENGINE_LOG_INFO("focus {0}", focus_cnt);
 	if (focus_window)
 	{
 		focus_window->JGUIOnFocus();
@@ -483,13 +484,13 @@ LRESULT JGUI::WindowChar(JGUIWindow* window, WPARAM wParam, LPARAM lParam)
 }
 LRESULT  JGUI::WindowKeyDownEvent(WPARAM wParam)
 {
-	m_Input->NotifyKeyDown(KeyCode(wParam));
+	//m_Input->NotifyKeyDown(KeyCode(wParam));
 	return 0;
 }
 
 LRESULT JGUI::WindowKeyUpEvent(WPARAM wParam)
 {
-	m_Input->NotifyKeyUp(KeyCode(wParam));
+	//m_Input->NotifyKeyUp(KeyCode(wParam));
 	return 0;
 }
 

@@ -16,7 +16,7 @@ protected:
 	virtual void Destroy() override;
 	virtual void Tick(const JGUITickEvent& e) override;
 public:
-	virtual void SetActive(bool is_active) override;
+	virtual void SetActive(bool is_active, bool is_hierarchy = false) override;
 	void SetClipFlag(EJGUI_Clip_Flags flags);
 	EJGUI_Clip_Flags GetClipFlag() const {
 		return m_ClipFlag;

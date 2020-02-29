@@ -15,15 +15,13 @@ using namespace std;
 
 
 
-void JGUIRenderItem::SetActive(bool is_active)
+void JGUIRenderItem::SetActive(bool is_active, bool is_hierarchy)
 {
-	if (m_RenderItem)  m_RenderItem->SetActive(is_active);
-	JGUIComponent::SetActive(is_active);
+	JGUIComponent::SetActive(is_active, is_hierarchy);
+	if (m_RenderItem)  m_RenderItem->SetActive(IsActive());
 }
 
-//
-//
-//
+
 void JGUIRenderItem::Destroy()
 {
 	DestroyRI();
@@ -31,6 +29,7 @@ void JGUIRenderItem::Destroy()
 void JGUIRenderItem::RenderUpdate()
 {
 	if (m_RenderItem == nullptr) return;
+
 	auto transform = GetTransform();
 
 	JVector2 window_size = m_DrawingWindow->GetTransform()->GetSize();
@@ -123,7 +122,15 @@ void JGUIRenderItem::SetDrawingWindow(JGUIWindow* win)
 		CreateRI();
 	}
 }
-
+void     JGUIRenderItem::SetLayer(uint64_t layer)
+{
+	m_Layer = layer;
+	if (m_RenderItem) m_RenderItem->SetLayer(layer);
+}
+uint64_t JGUIRenderItem::GetLayer() const
+{
+	return m_Layer;
+}
 void JGUIRenderItem::DestroyRI()
 {
 	if (m_RenderItem)
@@ -145,6 +152,7 @@ void JGUIRenderItem::CreateRI()
 	m_RenderItem = RE::RenderEngine::CreateRenderItem(m_DrawingWindow->GetID(),
 		RE::ERenderItemUsage::GUI, GetName() + "_RI");
 	m_RenderItem->SetPriority(GetOwnerWindow()->GetPriority());
+	m_RenderItem->SetLayer(m_Layer);
 	m_Instance = m_RenderItem->AddInstance();
 	m_RenderItem->SetActive(IsActive());
 }

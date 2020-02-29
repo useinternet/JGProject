@@ -61,7 +61,6 @@ void JGUIButton::MouseLeave()
 	if (m_BtState != JGUI_BtState_Hightlight) return;
 
 	m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
-	ENGINE_LOG_INFO("MouseLeave Normal");
 	m_BtState = JGUI_BtState_Normal;
 
 }
@@ -71,9 +70,8 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 	if (m_BtState == JGUI_BtState_Selected && JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
 	{
 		auto p = GetOwnerWindow()->GetMousePos();
-		if (!GetCollider()->CheckInPoint(p))
+		if (!GetCollider()->CheckInPoint(p)) 
 		{
-			ENGINE_LOG_INFO("Selected Normal");
 			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
 			m_BtState = JGUI_BtState_Normal;
 		}
@@ -84,7 +82,6 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 		if (!GetCollider()->CheckInPoint(p))
 		{
 			m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
-			ENGINE_LOG_INFO("Pressed Normal");
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}
@@ -101,13 +98,16 @@ void JGUIButton::SetBtImage(const std::string& path)
 	m_Image->SetImage(m_SourceImage);
 }
 
+
+
 void JGUIButton::SetBtColor(EJGUIBtState state, const JColor& color)
 {
 	if (state >= JGUI_BtState_Count) return;
 	m_BtColor[state] = color;
+	m_Image->SetColor(m_BtColor[m_BtState]);
 }
 
-void JGUIButton::BIndOnClick(const std::function<void()>& func)
+void JGUIButton::BindOnClick(const std::function<void()>& func)
 {
 	m_OnClick = func;
 }

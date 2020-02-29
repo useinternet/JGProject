@@ -20,7 +20,7 @@ private:
 public:
 	JGUIComponent(const std::string& name = "JGUIComponent") : JGUIObject(name) {}
 	JGUIWindow* GetOwnerWindow() const;
-	virtual void SetActive(bool active) override;
+	virtual void SetActive(bool active, bool is_hierarchy = false) override;
 protected:
 	virtual void JGUIAwake() override;
 	virtual void JGUIStart() override;
@@ -71,6 +71,10 @@ public:
 	uint64_t GetRISortingOrder() const {
 		return m_RISortingOrder;
 	}
+	void SetLayer(uint64_t layer);
+	uint64_t GetLayer() const {
+		return m_Layer;
+	}
 public:
 	template<typename ComponentType>
 	ComponentType* CreateJGUIComponent(const std::string& name, EJGUI_ComponentFlags flag = JGUI_ComponentFlag_None)
@@ -100,4 +104,5 @@ private:
 	bool     m_IsMouseTracking = false;
 	uint32_t m_Priority       = 0;
 	uint64_t m_RISortingOrder = 0;
+	uint64_t m_Layer = 0;
 };

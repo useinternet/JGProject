@@ -36,11 +36,15 @@ public:
 	void               SetName(const std::string& name) {
 		m_Name = name;
 	}
-	virtual void SetActive(bool active) {
-		m_Active = active;
+	virtual void SetActive(bool active, bool is_hierarchy = false) {
+		m_Active     = active;
+		if (!is_hierarchy)
+		{
+			m_ActiveSelf = active;
+		}
 	}
 	bool IsActive() const {
-		return m_Active;
+		return m_Active && m_ActiveSelf;
 	}
 	bool IsExecuteStartFunc() const {
 		return m_Is_ExecuteStart;
@@ -59,17 +63,16 @@ public:
 
 
 	
-protected:
+public:
 	void RegisterCollider(JGUIWindow* owner_window, EJGUI_Colider type);
 	void RegisterTransform(JGUIComponent* owner_com, EJGUI_RectTransform type);
 	void RegisterTransform(JGUIWindow* owner_window,    EJGUI_RectTransform type);
-private:
-
 private:
 	std::string m_Name;
 	std::string m_LayerName = "None";
 	//
 	bool        m_Active = true;
+	bool        m_ActiveSelf = true;
 	//
 	uint64_t    m_ID = -1;
 	//
