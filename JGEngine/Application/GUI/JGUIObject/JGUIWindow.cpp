@@ -103,6 +103,7 @@ void JGUIWindow::JGUIDestroy()
 
 void JGUIWindow::JGUITick(const JGUITickEvent& e)
 {
+
 	JGUIObject::JGUITick(e);
 	
 	if (GetFocusComponent()) GetFocusComponent()->JGUIOnFocus();
@@ -145,7 +146,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 
 
 	m_Panel->GetTransform()->SetSize(e.width, e.height);
-	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
+	m_Panel->SetColor({ 0.12549f, 0.13333f, 0.18431f, 1.0f });
 	RE::RenderEngine::GetDevice()->Flush();
 	ReadyGUIModule();
 	
@@ -223,22 +224,32 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 
 	if (!m_IsMouseDown || m_IsMouseLeave)
 	{
-		if(focus_win == nullptr) SetFocusComponent(focus_com);
-		else SetFocusComponent(nullptr);
+		if (focus_com && focus_com->GetFlags() & JGUI_ComponentFlag_TopMost)
+		{
+			if (focus_com == nullptr)
+			{
+				SetFocusWindow(focus_win);
+			}
+			else SetFocusWindow(nullptr);
+			SetFocusComponent(focus_com);
 
-		SetFocusWindow(focus_win);
+		}
+		else
+		{
+			if (focus_win == nullptr) SetFocusComponent(focus_com);
+			else SetFocusComponent(nullptr);
+
+			SetFocusWindow(focus_win);
+		}
+
+		
 		m_IsMouseDown = true;
 		m_IsMouseLeave = false;
 	}
 
 	focus_win = GetFocusWindow();
 	focus_com = GetFocusComponent();
-
-
-
-
 	if (focus_com) focus_com->JGUIMouseBtDown(e);
-
 	if (focus_win) focus_win->JGUIMouseBtDown(e);
 	else MouseBtDown(e);
 }
@@ -326,12 +337,21 @@ void JGUIWindow::JGUIMouseLeave()
 
 void JGUIWindow::SetParent(JGUIWindow* parent)
 {
-	
+	if (JGUI::GetMainWindow() == this ||
+		JGUI::GetMainWindow() == nullptr)
+	{
+		parent = nullptr;
+	}
+	else if (!(m_Flags & JGUI_WindowFlag_MultiSwapChain) && parent == nullptr)
+	{
+		parent = JGUI::GetMainWindow();
+	}
 	if (parent == nullptr) // 최상단 루트가 되어라
 	{
 		if (m_ParentWindow)
 		{
 			if (this == m_ParentWindow->GetFocusWindow()) m_ParentWindow->SetFocusWindow(nullptr);
+			
 			m_ParentWindow->m_ChildWindows.erase(std::remove(m_ParentWindow->m_ChildWindows.begin(),
 				m_ParentWindow->m_ChildWindows.end(), this), m_ParentWindow->m_ChildWindows.end());
 
@@ -343,13 +363,13 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 			GetTransform()->SetLocalPosition(pos);
 		}
 		m_ParentWindow = nullptr;
-		
+		m_WinTexture->UnBind();
+		m_Priority = JGUI_WindowPriority_None;
 		if (m_Screen == nullptr)
 		{
 			NewLoad();
 		}
-		m_WinTexture->UnBind();
-		m_Priority = JGUI_WindowPriority_None;
+	
 	}
 	else
 	{
@@ -358,8 +378,10 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 			JGUI::RequestDestroyScreen(m_Screen->GetHandle());
 			m_Screen = nullptr;
 		}
+		JGUIWindow* prev_parent_window = nullptr;
 		if (m_ParentWindow)
 		{
+			prev_parent_window = m_ParentWindow;
 			if (this == m_ParentWindow->GetFocusWindow()) m_ParentWindow->SetFocusWindow(nullptr);
 			m_ParentWindow->m_ChildWindows.erase(std::remove(m_ParentWindow->m_ChildWindows.begin(),
 				m_ParentWindow->m_ChildWindows.end(), this), m_ParentWindow->m_ChildWindows.end());
@@ -369,16 +391,29 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 		parent->m_ChildWindows.push_back(this);
 		m_ParentWindow = parent;
 
-
-		//// 클라이언트 창이었다가 속하게되면 위치값 ㅅ변경
-		if (m_ParentWindow->GetParent() == nullptr)
+		if (prev_parent_window)
+		{
+			auto pos = GetTransform()->GetLocalPosition();
+			while (prev_parent_window != nullptr)
+			{
+				auto parent_pos = prev_parent_window->GetTransform()->GetLocalPosition();
+				pos += parent_pos;
+				prev_parent_window = prev_parent_window->GetParent();
+			}
+			GetTransform()->SetLocalPosition(pos);
+		}
+		else
 		{
 			auto pos = GetTransform()->GetPosition();
 			auto parent_pos = parent->GetTransform()->GetPosition();
 			pos = pos - parent_pos;
 			GetTransform()->SetLocalPosition(pos);
 		}
+		// 원래 있었떤 위치
+		// 전 부모의 위치
 
+
+		m_WinTexture->UnBind();
 		m_WinTexture->Bind(m_GUIModule->GetTextureCacheKey());
 	}
 
@@ -619,7 +654,7 @@ void JGUIWindow::Init(const std::string& name, EJGUI_WindowFlags flag)
 
 
 	m_Panel->GetTransform()->SetSize(GetTransform()->GetSize());
-	m_Panel->SetColor({ 1.0f,0.0f,1.0f,0.3f });
+	m_Panel->SetColor({ 0.12549f, 0.13333f, 0.18431f, 1.0f });
 
 	// 4. 윈도우 텍스쳐 생성
 	m_WinTexture = CreateJGUIComponent<JGUIWindowTexture>("WindowTexture");

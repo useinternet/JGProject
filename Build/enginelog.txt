@@ -1,70 +1,972 @@
-[info] [33560] [Physics] : PhysicsEngine Init Compelete...
-[info] [33560] [Sound] : SoundEngine Init Compelete
-[info] [33560] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [33560] [Rendering] : RenderEngine Init Complete...
-[info] [33560] [Rendering] : Create Screen : 1953209673184
-[info] [33560] [Rendering] : Create Default : 1953209669872
-[info] [33560] [Rendering] : Create DefaultDepth : 1953209678704
-[info] [33560] [Rendering] : Create bricks.dds : 1953209675392
-[info] [33560] [Rendering] : Create bricks2.dds : 1953209682016
-[info] [33560] [Rendering] : Create bricks2_nmap.dds : 1953209676496
-[info] [33560] [Rendering] : Create bricks3.dds : 1953209679808
-[info] [33560] [Rendering] : Create bricks_nmap.dds : 1953209684224
-[info] [33560] [Rendering] : Create checkboard.dds : 1953379709136
-[info] [33560] [Rendering] : Create default_nmap.dds : 1953379706928
-[info] [33560] [Rendering] : Create desertcube1024.dds : 1953379694784
-[info] [33560] [Rendering] : Create grass.dds : 1953379711344
-[info] [33560] [Rendering] : Create grasscube1024.dds : 1953379699200
-[info] [33560] [Rendering] : Create head_diff.dds : 1953379696992
-[info] [33560] [Rendering] : Create head_norm.dds : 1953379687056
-[info] [33560] [Rendering] : Create ice.dds : 1953379702512
-[info] [33560] [Rendering] : Create jacket_diff.dds : 1953379703616
-[info] [33560] [Rendering] : Create jacket_norm.dds : 1953380105360
-[info] [33560] [Rendering] : Create pants_diff.dds : 1953380098736
-[info] [33560] [Rendering] : Create pants_norm.dds : 1953380102048
-[info] [33560] [Rendering] : Create snowcube1024.dds : 1953380095424
-[info] [33560] [Rendering] : Create stone.dds : 1953380096528
-[info] [33560] [Rendering] : Create sunsetcube1024.dds : 1953380093216
-[info] [33560] [Rendering] : Create tile.dds : 1953380111984
-[info] [33560] [Rendering] : Create tile_nmap.dds : 1953380115296
-[info] [33560] [Rendering] : Create tree0.bmp : 1953380499744
-[info] [33560] [Rendering] : Create tree01S.dds : 1953380515200
-[info] [33560] [Rendering] : Create tree02S.dds : 1953380496432
-[info] [33560] [Rendering] : Create tree1.bmp : 1953380516304
-[info] [33560] [Rendering] : Create tree2.bmp : 1953380514096
-[info] [33560] [Rendering] : Create tree35S.dds : 1953380517408
-[info] [33560] [Rendering] : Create treearray.dds : 1953380501952
-[info] [33560] [Rendering] : Create treeArray2.dds : 1953380508576
-[info] [33560] [Rendering] : Create upBody_diff.dds : 1953380522928
-[info] [33560] [Rendering] : Create upbody_norm.dds : 1953380504160
-[info] [33560] [Rendering] : Create water1.dds : 1953380519616
-[info] [33560] [Rendering] : Create white1x1.dds : 1953380500848
-[info] [33560] [Rendering] : Create WireFence.dds : 1953380509680
-[info] [33560] [Rendering] : Create WoodCrate01.dds : 1953380506368
-[info] [33560] [Rendering] : Create WoodCrate02.dds : 1953380511888
-[info] [33560] [Rendering] : Create cursor_lr_arrow.png : 1953380108672
-[info] [33560] [Rendering] : Create cursor_ud_arrow.cur : 1953380109776
-[info] [33560] [Rendering] : Create cursor_ud_arrow.png : 1953380110880
-[info] [33560] [Rendering] : Create icon_ldia_arrow.png : 1953380104256
-[info] [33560] [Rendering] : Create icon_rdia_arrow.png : 1953380114192
-[info] [33560] [Rendering] : Create Close.png : 1953380106464
-[info] [33560] [Rendering] : Create Maximize.png : 1953380117504
-[info] [33560] [Rendering] : Create Minimize.png : 1953380118608
-[info] [33560] [Rendering] : Create Right_Arrow.png : 1953380092112
-[info] [33560] [Rendering] : Create sssss.png : 1953379705824
-[trace] [33560] [Game] : Begin
-[trace] [33560] [Game] : Tick
-[trace] [33560] [Game] : End
-[info] [33560] [Rendering] : Create Screen : 1953379710240
-[info] [33560] [Rendering] : Create Texture : 1953379695888
-[info] [33560] [Rendering] : Create Screen : 1953379683744
-[info] [33560] [Rendering] : Create Texture : 1953379710240
-[info] [33560] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 1953380497536
-[error] [7532] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [7532] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30916] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32596] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[info] [33560] [Rendering] : Create Screen : 1953209674288
-[info] [33560] [Rendering] : Create Texture : 1953209683120
-[info] [33560] [Rendering] : Create Screen : 1953209672080
-[info] [33560] [Rendering] : Create Texture : 1953209673184
+[info] [36548] [Physics] : PhysicsEngine Init Compelete...
+[info] [36548] [Sound] : SoundEngine Init Compelete
+[info] [36548] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [36548] [Rendering] : RenderEngine Init Complete...
+[info] [36548] [Rendering] : Create Screen : 2280461849424
+[info] [36548] [Rendering] : Create Default : 2280461916944
+[info] [36548] [Rendering] : Create DefaultDepth : 2280461937984
+[info] [36548] [Rendering] : Create bricks.dds : 2280462987648
+[info] [36548] [Rendering] : Create bricks2.dds : 2280463375456
+[info] [36548] [Rendering] : Create bricks2_nmap.dds : 2280463287424
+[info] [36548] [Rendering] : Create bricks3.dds : 2280463294576
+[info] [36548] [Rendering] : Create bricks_nmap.dds : 2280463334512
+[info] [36548] [Rendering] : Create checkboard.dds : 2280463346704
+[info] [36548] [Rendering] : Create default_nmap.dds : 2280463357904
+[info] [36548] [Rendering] : Create desertcube1024.dds : 2280463353488
+[info] [36548] [Rendering] : Create grass.dds : 2280463355696
+[info] [36548] [Rendering] : Create grasscube1024.dds : 2280463367840
+[info] [36548] [Rendering] : Create head_diff.dds : 2280463362320
+[info] [36548] [Rendering] : Create head_norm.dds : 2280463363424
+[info] [36548] [Rendering] : Create ice.dds : 2280463365632
+[info] [36548] [Rendering] : Create jacket_diff.dds : 2280463545568
+[info] [36548] [Rendering] : Create jacket_norm.dds : 2280463529008
+[info] [36548] [Rendering] : Create pants_diff.dds : 2280463527904
+[info] [36548] [Rendering] : Create pants_norm.dds : 2280463544464
+[info] [36548] [Rendering] : Create snowcube1024.dds : 2280463521280
+[info] [36548] [Rendering] : Create stone.dds : 2280463531216
+[info] [36548] [Rendering] : Create sunsetcube1024.dds : 2280463543360
+[info] [36548] [Rendering] : Create tile.dds : 2280463522384
+[info] [36548] [Rendering] : Create tile_nmap.dds : 2280463536736
+[info] [36548] [Rendering] : Create tree0.bmp : 2280463538944
+[info] [36548] [Rendering] : Create tree01S.dds : 2280463541152
+[info] [36548] [Rendering] : Create tree02S.dds : 2280463835184
+[info] [36548] [Rendering] : Create tree1.bmp : 2280463852848
+[info] [36548] [Rendering] : Create tree2.bmp : 2280463845120
+[info] [36548] [Rendering] : Create tree35S.dds : 2280463847328
+[info] [36548] [Rendering] : Create treearray.dds : 2280463848432
+[info] [36548] [Rendering] : Create treeArray2.dds : 2280463831872
+[info] [36548] [Rendering] : Create upBody_diff.dds : 2280463841808
+[info] [36548] [Rendering] : Create upbody_norm.dds : 2280463825248
+[info] [36548] [Rendering] : Create water1.dds : 2280463846224
+[info] [36548] [Rendering] : Create white1x1.dds : 2280463826352
+[info] [36548] [Rendering] : Create WireFence.dds : 2280463827456
+[info] [36548] [Rendering] : Create WoodCrate01.dds : 2280463828560
+[info] [36548] [Rendering] : Create WoodCrate02.dds : 2280463839600
+[info] [36548] [Rendering] : Create cursor_lr_arrow.png : 2280463834080
+[info] [36548] [Rendering] : Create cursor_ud_arrow.cur : 2280463853952
+[info] [36548] [Rendering] : Create cursor_ud_arrow.png : 2280463840704
+[info] [36548] [Rendering] : Create icon_ldia_arrow.png : 2280463830768
+[info] [36548] [Rendering] : Create icon_rdia_arrow.png : 2280463838496
+[info] [36548] [Rendering] : Create Close.png : 2280463855056
+[info] [36548] [Rendering] : Create Maximize.png : 2280463850640
+[info] [36548] [Rendering] : Create Minimize.png : 2280463842912
+[info] [36548] [Rendering] : Create Right_Arrow.png : 2280463532320
+[info] [36548] [Rendering] : Create sssss.png : 2280463526800
+[trace] [36548] [Game] : Begin
+[trace] [36548] [Game] : Tick
+[trace] [36548] [Game] : End
+[info] [36548] [Rendering] : Create Screen : 2280463534528
+[info] [36548] [Rendering] : Create Texture : 2280463523488
+[info] [36548] [Rendering] : Create Screen : 2280463534528
+[info] [36548] [Rendering] : Create Texture : 2280463515760
+[error] [36468] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [36468] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[info] [36548] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 2280463360112
+[error] [36468] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [34636] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [34636] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [36468] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [36468] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[info] [36548] [Rendering] : Create Screen : 2280592169984
+[info] [36548] [Rendering] : Create Texture : 2280592165568
+[info] [36548] [Rendering] : Create Screen : 2280592142384
+[info] [36548] [Rendering] : Create Texture : 2280592143488
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592158944
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592165568
+[info] [36548] [Rendering] : Create Texture : 2280592156736
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592143488
+[info] [36548] [Rendering] : Create Texture : 2280592169984
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592156736
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592143488
+[info] [36548] [Rendering] : Create Texture : 2280592168880
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592169984
+[info] [36548] [Rendering] : Create Texture : 2280592165568
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592158944
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592142384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592154528
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592147904
+[info] [36548] [Rendering] : Create Texture : 2280592155632
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592142384
+[info] [36548] [Rendering] : Create Texture : 2280592153424
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592165568
+[info] [36548] [Rendering] : Create Texture : 2280592155632
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592169984
+[info] [36548] [Rendering] : Create Texture : 2280592153424
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592154528
+[info] [36548] [Rendering] : Create Texture : 2280592165568
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592147904
+[info] [36548] [Rendering] : Create Texture : 2280592158944
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592142384
+[info] [36548] [Rendering] : Create Texture : 2280592153424
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592154528
+[info] [36548] [Rendering] : Create Texture : 2280592169984
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592168880
+[info] [36548] [Rendering] : Create Texture : 2280592156736
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592142384
+[info] [36548] [Rendering] : Create Texture : 2280592154528
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592155632
+[info] [36548] [Rendering] : Create Texture : 2280592156736
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592142384
+[info] [36548] [Rendering] : Create Texture : 2280592143488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592154528
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592149008
+[info] [36548] [Rendering] : Create Texture : 2280592155632
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592168880
+[info] [36548] [Rendering] : Create Texture : 2280592157840
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592154528
+[info] [36548] [Rendering] : Create Texture : 2280592168880
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592169984
+[info] [36548] [Rendering] : Create Texture : 2280592142384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592154528
+[info] [36548] [Rendering] : Create Texture : 2280592147904
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592149008
+[info] [36548] [Rendering] : Create Texture : 2280592157840
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592158944
+[info] [36548] [Rendering] : Create Texture : 2280592149008
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592165568
+[info] [36548] [Rendering] : Create Texture : 2280592142384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592169984
+[info] [36548] [Rendering] : Create Texture : 2280592143488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592165568
+[info] [36548] [Rendering] : Create Texture : 2280592155632
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592158944
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592165568
+[info] [36548] [Rendering] : Create Texture : 2280592168880
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592153424
+[info] [36548] [Rendering] : Create Texture : 2280592157840
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592156736
+[info] [36548] [Rendering] : Create Texture : 2280592155632
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592149008
+[info] [36548] [Rendering] : Create Texture : 2280592147904
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280592168880
+[info] [36548] [Rendering] : Create Texture : 2280592165568
+[info] [36548] [Rendering] : Create Screen : 2280592149008
+[info] [36548] [Rendering] : Create Texture : 2280592168880
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600027136
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600029344
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600039280
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600040384
+[info] [36548] [Rendering] : Create Texture : 2280600029344
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600034864
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600041488
+[info] [36548] [Rendering] : Create Texture : 2280600028240
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600028240
+[info] [36548] [Rendering] : Create Texture : 2280600039280
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600041488
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600037072
+[info] [36548] [Rendering] : Create Texture : 2280600030448
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600031552
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600030448
+[info] [36548] [Rendering] : Create Texture : 2280600033760
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600027136
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Rendering] : Create Screen : 2280600033760
+[info] [36548] [Rendering] : Create Texture : 2280600037072
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : ResizeLine
+[info] [36548] [Engine] : JGUIKeyUpEvent : LeftMouseButton
+[info] [36548] [Rendering] : Create Screen : 2280600031552
+[info] [36548] [Rendering] : Create Texture : 2280600040384
+[info] [36548] [Rendering] : Create Screen : 2280600034864
+[info] [36548] [Rendering] : Create Texture : 2280600033760

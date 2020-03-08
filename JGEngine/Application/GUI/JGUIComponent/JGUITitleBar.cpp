@@ -6,7 +6,10 @@
 #include "JGUICollider.h"
 #include "JGUIRectTransform.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
-
+#include "GUI/JGUIForm/JGUIForm.h"
+#include "JGUITab.h"
+#include "GUI/JGUIForm/JGUIForm.h"
+#include "JGUIDock.h"
 using namespace std;
 #define Default_Bt_Size 20
 
@@ -38,14 +41,31 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 {
 	if (!m_IsGrap)
 	{
+		if (GetOwnerWindow()->GetParent())
+		{
+			auto dock = ((JGUIForm*)(GetOwnerWindow()->GetParent()))->GetDock();
+			if (dock)
+			{
+				dock->RequestRemoveBinedDock(GetOwnerWindow());
+			}
+
+			GetOwnerWindow()->SetParent(nullptr);
+		}
+
+
+
 		m_IsGrap = true;
+		
 		auto mouse_pos = JGUI::GetCursorPos();
-		auto window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
+	
+		JVector2 window_pos;
+		window_pos = GetOwnerWindow()->GetTransform()->GetPosition();
 		m_Delta.x = (int)window_pos.x - mouse_pos.x;
 		m_Delta.y = (int)window_pos.y - mouse_pos.y;
+		JGUI::RegisterDraggingWindow(GetOwnerWindow());
 		JGUIExtraEvent e;
 		e.Bind(JGUI_EXTRAEVENT_REPEAT, this, [&](JGUIExtraEvent& e) {
-			if (m_IsGrap)
+			if (m_IsGrap && !m_IsUnConnect)
 			{
 				auto mouse_pos = JGUI::GetCursorPos();
 				mouse_pos.x += m_Delta.x;
@@ -55,13 +75,22 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 			}
 
 
-			if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
+	/*		if (GetOwnerWindow()->GetParent() == nullptr)
+			{
+				TabBinding();
+			}*/
+
+
+			if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton) || m_IsUnConnect)
 			{
 				if (m_IsGrap)
 				{
+					JGUI::RegisterDraggingWindow(nullptr);
 					m_IsGrap = false;
 					e.flag = JGUI_EXTRAEVENT_EXIT;
 				}
+				if (m_IsUnConnect)
+					m_IsUnConnect = false;
 			}
 		});
 		JGUI::RegisterExtraEvent(e);
@@ -73,6 +102,89 @@ void JGUITitleBar::MouseBtUp(const JGUIKeyUpEvent& e)
 {
 	// if(m_IsGrap) m_IsGrap = false;
 }
+
+//void JGUITitleBar::Connect(const JVector2Int& delta)
+//{
+//	if (!m_IsGrap)
+//	{
+//		m_IsGrap = true;
+//		m_Delta = delta;
+//		JGUIExtraEvent e;
+//		e.Bind(JGUI_EXTRAEVENT_REPEAT, this, [&](JGUIExtraEvent& e) {
+//			if (m_IsGrap)
+//			{
+//				auto mouse_pos = JGUI::GetCursorPos();
+//				mouse_pos.x += m_Delta.x;
+//				mouse_pos.y += m_Delta.y;
+//				JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
+//				GetOwnerWindow()->GetTransform()->SetLocalPosition(pos);
+//			}
+//		/*	bool is_tab_binding = false;
+//			if (GetOwnerWindow()->GetParent() == nullptr)
+//			{
+//				is_tab_binding = TabBinding();
+//			}*/
+//
+//			if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton))
+//			{
+//				if (m_IsGrap)
+//				{
+//					m_IsGrap = false;
+//					e.flag = JGUI_EXTRAEVENT_EXIT;
+//				}
+//			}
+//		});
+//		JGUI::RegisterExtraEvent(e);
+//	}
+//}
+
+void JGUITitleBar::UnConnect()
+{
+	m_IsUnConnect = true;
+}
+
+//bool JGUITitleBar::TabBinding()
+//{
+//	JGUIWindow* nextWin = JGUI::GetTopJGUIWindow();
+//	JVector2Int cursor_pos = JGUI::GetCursorPos();
+//	bool is_find = false;
+//	while (nextWin != nullptr)
+//	{
+//		nextWin = JGUI::GetNextJGUIWindow(nextWin);
+//		if (nextWin)
+//		{
+//			auto win_mouse_pos = nextWin->GetMousePos();
+//			if (nextWin->GetPanel()->GetCollider()->CheckInPoint(win_mouse_pos))
+//			{
+//				if (nextWin != GetOwnerWindow())
+//				{
+//
+//					auto tab = ((JGUIForm*)nextWin)->GetTab();
+//					if (tab == nullptr) continue;
+//					auto collider = ((JGUIForm*)nextWin)->GetTab()->GetCollider();
+//
+//					if (collider->CheckInPoint(win_mouse_pos))
+//					{
+//						is_find = true;
+//						((JGUIForm*)nextWin)->GetTab()->BindWindow(GetOwnerWindow());
+//
+//						::SetFocus(nextWin->GetRootWindowHandle());
+//						((JGUIForm*)nextWin)->GetTab()->Connect(nextWin);
+//						break;
+//					}
+//				}
+//
+//				break;
+//			}
+//		}
+//		
+//	}
+//
+//
+//
+//	return is_find;
+//
+//}
 
 
 void JGUITitleBar::SettingElement()

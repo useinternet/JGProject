@@ -221,6 +221,9 @@ void JGUIMenuItem::SubItemClose()
 	if (!m_IsOpen) return;
 	m_IsOpen = false;
 	m_BackGround->SetActive(false);
+
+	m_Bt->Reset();
+
 	//for (auto& subitem : m_SubItems)
 	//{
 	//	subitem->SetActive(false);
@@ -234,6 +237,16 @@ void JGUIMenuItem::BtOnClick()
 		if (m_Desc.is_binding_func)
 		{
 			m_Desc.func();
+		}
+		JGUIMenuItem* nextIt = m_OwnerItem;
+		while (nextIt != nullptr)
+		{
+			if (nextIt->m_OwnerItem == nullptr)
+			{
+				nextIt->m_OwnerMainMenu->MenuItemAllClose();
+			}
+			nextIt = nextIt->m_OwnerItem;
+		
 		}
 	}
 	else

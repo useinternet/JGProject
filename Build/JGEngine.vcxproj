@@ -180,6 +180,7 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIDock.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIDock.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.cpp" />

@@ -51,6 +51,10 @@ void JGUIComponent::JGUIStart()
 }
 void JGUIComponent::JGUITick(const JGUITickEvent& e)
 {
+	if (m_Flags & JGUI_ComponentFlag_TopMost)
+	{
+		SetLayer(JGUI_WindowPriority_TopMost + 1);
+	}
 	Tick(e);
 	if (GetTransform())
 	{

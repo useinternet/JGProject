@@ -48,6 +48,9 @@ void        JGUI::DestroyObject(JGUIObject* obj)
 {
 	auto& objqueue = sm_GUI->m_ExpectedDestroyObject;
 	obj->JGUIDestroy();
+	obj->m_IsDestroying = true;
+	if (sm_GUI->m_DraggingWindow == obj)
+		sm_GUI->m_DraggingWindow = nullptr;
 	if (obj->GetID() != -1)
 	{
 		sm_GUI->m_IDQueue.push(obj->GetID());
@@ -188,6 +191,68 @@ const std::string JGUI::GetDefaultFontName()
 {
 	return sm_GUI->m_DefaultFont;
 }
+int  JGUI::GetWindowZOrder(JGUIWindow* win)
+{
+	int Zorder = 0;
+	HWND hWnd = GetTopWindow(NULL);
+	
+	while (win->GetRootWindowHandle() != hWnd)
+	{
+		Zorder++;
+		hWnd = GetNextWindow(hWnd, GW_HWNDNEXT);
+	}
+	return Zorder;
+}
+JGUIWindow* JGUI::GetTopJGUIWindow()
+{
+	auto& screenPool = sm_GUI->m_ScreenPool;
+	JGUIWindow* result = nullptr;
+	int min_zorder = INT_MAX;
+
+	for (auto& screen_pair : screenPool)
+	{
+		if (screen_pair.second.first == nullptr) continue;
+		int zorder = GetWindowZOrder(screen_pair.second.first);
+		if (zorder < min_zorder)
+		{
+			min_zorder = zorder;
+			result = screen_pair.second.first;
+		}
+	}
+	return result;
+}
+JGUIWindow* JGUI::GetNextJGUIWindow(JGUIWindow* win)
+{
+	if (win == nullptr) return GetTopJGUIWindow();
+	auto& screenPool = sm_GUI->m_ScreenPool;
+	int origin_zorder = JGUI::GetWindowZOrder(win);
+	JGUIWindow* result = nullptr;
+	map<int, JGUIWindow*> window_by_zorder;
+	for (auto& screen_pair : screenPool)
+	{
+		if (screen_pair.second.first == nullptr) continue;
+		if (screen_pair.second.first == win) continue;
+		
+		int zorder = GetWindowZOrder(screen_pair.second.first);
+		if (zorder < origin_zorder) continue;
+		window_by_zorder[zorder] = screen_pair.second.first;
+	}
+	if(!window_by_zorder.empty()) result = (window_by_zorder.begin())->second;
+	
+
+	return result;
+}
+
+void JGUI::RegisterDraggingWindow(JGUIWindow* win)
+{
+	sm_GUI->m_DraggingWindow = win;
+}
+
+JGUIWindow* JGUI::GetCurrentDraggingWindow()
+{
+	return sm_GUI->m_DraggingWindow;
+}
+
 void JGUI::Update()
 {
 	while (!m_ExpectedDestroyObject.empty())

@@ -20,4 +20,12 @@ public:
 		this->b = b;
 		this->a = a;
 	}
+
+
+public:
+	inline static JColor Red()   { return JColor(1.0f, 0.0f, 0.0f, 1.0f); }
+	inline static JColor Green() { return JColor(0.0f, 1.0f, 0.0f, 1.0f); }
+	inline static JColor Blue()  { return JColor(0.0f, 0.0f, 1.0f, 1.0f); }
+	inline static JColor White() { return JColor(1.0f, 1.0f, 1.0f, 1.0f); }
+	inline static JColor Black() { return JColor(0.0f, 0.0f, 0.0f, 1.0f); }
 };

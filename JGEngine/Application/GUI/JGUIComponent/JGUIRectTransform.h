@@ -38,10 +38,11 @@ public:
 	virtual void OffsetSize(const JVector2& offset);
 	virtual void OffsetSize(float x, float y);
 
-	//void SetLocalPivot(const JVector2& pivot);
-	//void SetLocalPivot(float x, float y);
-	//void OffsetLocalPivot(const JVector2& pivot);
-	//void OffsetLocalPivot(float x, float y);
+
+	void SetPivot(const JVector2& pivot);
+	void SetPivot(float x, float y);
+	void OffsetPivot(const JVector2& offset);
+	void OffsetPivot(float x, float y);
 
 	bool IsDirty() const;
 	void SendDirty();

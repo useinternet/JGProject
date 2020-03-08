@@ -59,7 +59,9 @@ public:
 	JGUICollider* GetCollider() {
 		return m_Collider;
 	}
-	
+	bool IsDestroying() const {
+		return m_IsDestroying;
+	}
 
 
 	
@@ -77,7 +79,7 @@ private:
 	uint64_t    m_ID = -1;
 	//
 	bool m_Is_ExecuteStart = false;
-
+	bool m_IsDestroying = false;
 	// Flags
 
 	// 기본 컴포넌트들

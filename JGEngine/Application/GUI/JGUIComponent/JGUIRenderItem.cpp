@@ -50,7 +50,6 @@ void JGUIRenderItem::RenderUpdate()
 
 		auto pivot = transform->GetPivot();
 		pivot.x = 1.0f - (pivot.x + 0.5f);
-
 		pivot.y -= 0.5f;
 
 		auto shape_size = transform->GetSize();
@@ -151,8 +150,12 @@ void JGUIRenderItem::CreateRI()
 
 	m_RenderItem = RE::RenderEngine::CreateRenderItem(m_DrawingWindow->GetID(),
 		RE::ERenderItemUsage::GUI, GetName() + "_RI");
-	m_RenderItem->SetPriority(GetOwnerWindow()->GetPriority());
-	m_RenderItem->SetLayer(m_Layer);
-	m_Instance = m_RenderItem->AddInstance();
-	m_RenderItem->SetActive(IsActive());
+	if (m_RenderItem)
+	{
+		m_RenderItem->SetPriority(GetOwnerWindow()->GetPriority());
+		m_RenderItem->SetLayer(m_Layer);
+		m_Instance = m_RenderItem->AddInstance();
+		m_RenderItem->SetActive(IsActive());
+	}
+
 }

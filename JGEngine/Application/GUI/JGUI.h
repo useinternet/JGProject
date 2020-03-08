@@ -62,6 +62,8 @@ enum EJGUI_WindowFlags
 	JGUI_WindowFlag_EnableResize = 0x000004,
 	JGUI_WindowFlag_TabBar       = 0x000008,
 	JGUI_WindowFlag_MenuBar      = 0x000010,
+	JGUI_WindowFlag_EnableDock   = 0x000020,
+    JGUI_WindowFlag_MultiSwapChain = 0x000040,
 };
 enum EJGUI_SubmitCmdListPriority
 {
@@ -82,7 +84,8 @@ enum EJGUI_ComponentFlags
 	JGUI_ComponentFlag_None               = 0x0000000000,
 	JGUI_ComponentFlag_NoChild            = 0x0000000001,
 	JGUI_ComponentFlag_NoParent           = 0x0000000002,
-	JGUI_ComponentFlag_LockCreateFunction = 0x0000000004
+	JGUI_ComponentFlag_LockCreateFunction = 0x0000000004,
+	JGUI_ComponentFlag_TopMost = 0x0000000008
 };
 
 enum EJGUI_Clip_Flags
@@ -153,6 +156,36 @@ public:
 	{
 		return bottom - top;
 	}
+	JVector2 center() const {
+		JVector2 center;
+		center.x = left + (width()  * 0.5f);
+		center.y = top  + (height() * 0.5f);
+		return center;
+	}
+	bool Contains(const JVector2 p)
+	{
+		if (p.x >= left && p.x <= right && p.y >= top && p.y <= bottom)
+			return true;
+		return false;
+	}
+	bool Contains(const JVector2Int p)
+	{
+		JVector2 fp(p.x, p.y);
+		return Contains(fp);
+	}
+	void Demical()
+	{
+		left = (float)(int)left;
+		top = (float)(int)top;
+		right = (float)(int)right;
+		bottom = (float)(int)bottom;
+	}
+
+	float Area()
+	{
+		return width()  *  height();
+	}
+
 };
 
 
@@ -275,7 +308,11 @@ public:
 	static void        RegisterExtraEvent(const JGUIExtraEvent& e);
 	static JGUIFontManager*  GetJGUIFontManager();
 	static const std::string GetDefaultFontName();
-
+	static int         GetWindowZOrder(JGUIWindow* win);
+	static JGUIWindow* GetTopJGUIWindow();
+	static JGUIWindow* GetNextJGUIWindow(JGUIWindow* win);
+	static void RegisterDraggingWindow(JGUIWindow* win);
+	static JGUIWindow* GetCurrentDraggingWindow();
 public:
 	JGUI(IE::InputEngine* input);
 	void Update();
@@ -313,6 +350,7 @@ private:
 
 
 	JGUIWindow*      m_MainWindow = nullptr;
+	JGUIWindow*      m_DraggingWindow = nullptr;
 	HWND             m_MainHWND;
 	uint64_t             m_IDOffset = 0;
 	std::queue<uint64_t> m_IDQueue;

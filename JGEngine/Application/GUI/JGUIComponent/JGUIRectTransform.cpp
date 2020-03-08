@@ -158,48 +158,26 @@ void JGUIRectTransform::OffsetSize(float x, float y)
 	m_Size.y += y;
 	SendAttachedTransform_Size(m_Size);
 }
-//void JGUIRectTransform::SetLocalPivot(const JVector2& pivot)
-//{
-//	if (m_Attacher) return;
-//	m_LocalPivot = pivot;
-//	for (auto& attached_com : m_AttachedList)
-//	{
-//		attached_com->m_LocalPivot = m_LocalPivot;
-//	}
-//	SendDirty(PivotDirty);
-//}
-//void JGUIRectTransform::SetLocalPivot(float x, float y)
-//{
-//	if (m_Attacher) return;
-//	m_LocalPivot = { x,y };
-//	for (auto& attached_com : m_AttachedList)
-//	{
-//		attached_com->m_LocalPivot = m_LocalPivot;
-//	}
-//	SendDirty(PivotDirty);
-//}
-//void JGUIRectTransform::OffsetLocalPivot(const JVector2& pivot)
-//{
-//	if (m_Attacher) return;
-//	m_LocalPivot.x += pivot.x;
-//	m_LocalPivot.y += pivot.y;
-//	for (auto& attached_com : m_AttachedList)
-//	{
-//		attached_com->m_LocalPivot = m_LocalPivot;
-//	}
-//	SendDirty(PivotDirty);
-//}
-//void JGUIRectTransform::OffsetLocalPivot(float x, float y)
-//{
-//	if (m_Attacher) return;
-//	m_LocalPivot.x += x;
-//	m_LocalPivot.y += y;
-//	for (auto& attached_com : m_AttachedList)
-//	{
-//		attached_com->m_LocalPivot = m_LocalPivot;
-//	}
-//	SendDirty(PivotDirty);
-//}
+void JGUIRectTransform::SetPivot(const JVector2& pivot)
+{
+	m_Pivot = pivot;
+	SendDirty(PivotDirty);
+}
+void JGUIRectTransform::SetPivot(float x, float y)
+{
+	m_Pivot = { x,y };
+	SendDirty(PivotDirty);
+}
+void JGUIRectTransform::OffsetPivot(const JVector2& offset)
+{
+	m_Pivot += offset;
+	SendDirty(PivotDirty);
+}
+void JGUIRectTransform::OffsetPivot(float x, float y)
+{
+	m_Pivot += {x, y};
+	SendDirty(PivotDirty);
+}
 bool JGUIRectTransform::IsDirty() const
 {
 	
@@ -297,27 +275,6 @@ const JVector2& JGUIRectTransform::GetSize()  const {
 const JVector2& JGUIRectTransform::GetPivot() const
 {
 	if (m_Attacher) return m_Attacher->GetPivot();
-	if (m_IsDirty[PivotDirty])
-	{
-		m_Pivot = { 0,0 };
-		if (m_BindedWindow)
-		{
-			m_Pivot.x = m_LocalPivot.x;
-			m_Pivot.y = m_LocalPivot.y;
-		}
-		if (m_BindedComponent)
-		{
-			auto parent = m_BindedComponent->GetParent();
-			if (parent)
-			{
-				m_Pivot = parent->GetTransform()->GetPivot();
-				m_Pivot.x += m_LocalPivot.x;
-				m_Pivot.y += m_LocalPivot.y;
-			}
-		}
-		m_IsDirty[PivotDirty] = false;
-	}
-
 	return m_Pivot;
 }
 const JVector2& JGUIRectTransform::GetLocalPivot() const
@@ -329,9 +286,6 @@ JGUIRect JGUIRectTransform::GetRect()  const {
 	JGUIRect rect;
 	float width = m_Size.x;
 	float height = m_Size.y;
-
-	//rect.width = m_Size.x;
-	//rect.height = m_Size.y;
 
 	auto pos = GetPosition();
 	auto pivot = GetPivot();

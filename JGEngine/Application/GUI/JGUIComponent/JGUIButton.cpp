@@ -112,6 +112,13 @@ void JGUIButton::BindOnClick(const std::function<void()>& func)
 	m_OnClick = func;
 }
 
+void JGUIButton::Reset()
+{
+	m_BtState = JGUI_BtState_Normal;
+	m_IsClick = false;
+	m_Image->SetColor(m_BtColor[m_BtState]);
+}
+
 void JGUICloseButton::Start()
 {
 	JGUIButton::Start();

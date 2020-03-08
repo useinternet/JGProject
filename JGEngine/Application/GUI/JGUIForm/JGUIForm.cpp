@@ -10,13 +10,14 @@
 #include "GUI/JGUIComponent/JGUIMenuItem.h"
 #include "GUI/JGUIComponent/JGUIText.h"
 #include "GUI/JGUIComponent/JGUITab.h"
+#include "GUI/JGUIComponent/JGUIDock.h"
 #include <filesystem>
 using namespace std;
 
 static int cnt = 0;
 void JGUIForm::Awake()
 {
-	m_Border = CreateJGUIComponent<JGUIEmptyRectangle>("BorderRectangle");
+	m_Border = CreateJGUIComponent<JGUIEmptyRectangle>("BorderRectangle", JGUI_ComponentFlag_TopMost);
 
 	if (m_Border)
 	{
@@ -24,15 +25,29 @@ void JGUIForm::Awake()
 		m_Border->SetPriority(1);
 		m_Border->SetColor(JColor(0, 0, 0, 1));
 		m_Border->SetThickness(1.0);
-
-		//offset_x = 1.5f;
-		//offset_y = 1.5f;
 	}
 
-	auto flag = GetWindowFlags();
-	SetWindowFlags(flag | JGUI_WindowFlag_EnableResize |
-		JGUI_WindowFlag_TabBar | JGUI_WindowFlag_TitileBar);
+	if (JGUI::GetMainWindow() == nullptr)
+	{
+		auto flag = GetWindowFlags();
+		SetWindowFlags(flag |
+			JGUI_WindowFlag_EnableResize |
+			JGUI_WindowFlag_TabBar |
+			JGUI_WindowFlag_TitileBar |
+			JGUI_WindowFlag_MenuBar |
+			JGUI_WindowFlag_EnableDock);
+	}
+	else
+	{
+		auto flag = GetWindowFlags();
+		SetWindowFlags(flag |
+			JGUI_WindowFlag_EnableResize |
+			JGUI_WindowFlag_TabBar |
+			JGUI_WindowFlag_TitileBar |
+			JGUI_WindowFlag_MenuBar);
+	}
 
+	DockOn();
 
 
 	//
@@ -46,7 +61,7 @@ void JGUIForm::Awake()
 	m_Txt->SetTextFlag(JGUI_Text_Flag_Border);
 
 
-	m_text = CreateJGUIComponent<JGUIEmptyRectangle>("textrect");
+	m_text = CreateJGUIComponent<JGUIEmptyRectangle>("textrect", JGUI_ComponentFlag_TopMost);
 	auto client_rect = GetClientRect();
 	m_text->GetTransform()->SetLocalPosition(client_rect.left , client_rect.top);
 	m_text->GetTransform()->SetSize(client_rect.width(), client_rect.height());
@@ -56,6 +71,7 @@ void JGUIForm::Awake()
 
 void JGUIForm::Tick(const JGUITickEvent& e)
 {
+
 	if (m_Txt)
 	{
 		m_Txt->SetText(GetName());
@@ -69,10 +85,10 @@ void JGUIForm::Resize(const JGUIResizeEvent& e)
 	{
 		m_Menu->GetTransform()->SetSize(e.width, 20);
 	}
-	if (m_Tab)
-	{
-		m_Tab->GetTransform()->SetSize(e.width, 20);
-	}
+	//if (m_Tab)
+	//{
+	//	m_Tab->GetTransform()->SetSize(e.width, 20);
+	//}
 	if (m_Title)
 	{
 		m_Title->GetTransform()->SetSize(e.width, 20);
@@ -85,6 +101,14 @@ void JGUIForm::Resize(const JGUIResizeEvent& e)
 	{
 		m_Border->GetTransform()->SetSize(GetTransform()->GetSize());
 	}
+	if (m_Dock)
+	{
+		auto client_rect = GetClientRect();
+		m_Dock->GetTransform()->SetLocalPosition(client_rect.left, client_rect.top);
+		m_Dock->GetTransform()->SetSize(client_rect.width(), client_rect.height());
+	}
+
+	//
 	if (m_text)
 	{
 		auto client_rect = GetClientRect();
@@ -118,17 +142,6 @@ void JGUIForm::KeyUp(const JGUIKeyUpEvent& e)
 	// TestCode
 	if (e.Code == KeyCode::A)
 	{
-		if (testwindow)
-		{
-			if (testwindow->IsActive())
-			{
-				testwindow->SetActive(false);
-			}
-			else
-			{
-				testwindow->SetActive(true);
-			}
-		}
 
 	}
 
@@ -151,7 +164,6 @@ void JGUIForm::KeyUp(const JGUIKeyUpEvent& e)
 		SetParent(nullptr);
 	}
 }
-
 void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 {
 	// Resize
@@ -159,7 +171,7 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	{
 		if (m_ResizeBox == nullptr)
 		{
-			m_ResizeBox = CreateJGUIComponent<JGUIResizeBox>("ResizeBox");
+			m_ResizeBox = CreateJGUIComponent<JGUIResizeBox>("ResizeBox", JGUI_ComponentFlag_TopMost);
 		}
 
 	}
@@ -171,12 +183,28 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 			m_ResizeBox = nullptr;
 		}
 	}
+	if (flag & JGUI_WindowFlag_EnableDock)
+	{
+		if (m_Dock == nullptr)
+		{
+			m_Dock = CreateJGUIComponent<JGUIDock>("DockSystem", JGUI_ComponentFlag_TopMost);
+
+		}
+	}
+	else
+	{
+		if (m_Dock)
+		{
+			DestroyJGUIComponent(m_Dock);
+			m_Dock = nullptr;
+		}
+	}
 	// TitleBar
 	if (flag & JGUI_WindowFlag_TitileBar)
 	{
 		if (m_Title == nullptr)
 		{
-			m_Title = CreateJGUIComponent<JGUITitleBar>("TitleBar");
+			m_Title = CreateJGUIComponent<JGUITitleBar>("TitleBar", JGUI_ComponentFlag_TopMost);
 		}
 	}
 	else
@@ -193,7 +221,7 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	{
 		if (m_Menu == nullptr)
 		{
-			m_Menu = CreateJGUIComponent<JGUIMenu>("JGUIMenu");
+			m_Menu = CreateJGUIComponent<JGUIMenu>("JGUIMenu", JGUI_ComponentFlag_TopMost);
 			// Menu
 			if (m_Menu)
 			{
@@ -316,21 +344,21 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	}
 
 	// Tab
-	if (flag & JGUI_WindowFlag_TabBar)
-	{
-		if (m_Tab == nullptr)
-		{
-			m_Tab = CreateJGUIComponent<JGUITab>("JGUITab");
-		}
-	}
-	else
-	{
-		if (m_Tab)
-		{
-			DestroyJGUIComponent(m_Tab);
-			m_Tab = nullptr;
-		}
-	}
+	//if (flag & JGUI_WindowFlag_TabBar)
+	//{
+	//	if (m_Tab == nullptr)
+	//	{
+	//		m_Tab = CreateJGUIComponent<JGUITab>("JGUITab");
+	//	}
+	//}
+	//else
+	//{
+	//	if (m_Tab)
+	//	{
+	//		DestroyJGUIComponent(m_Tab);
+	//		m_Tab = nullptr;
+	//	}
+	//}
 	float offset_x = 0.0f;
 	float offset_y = 0.0f;
 
@@ -354,12 +382,18 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 		m_Menu->GetTransform()->SetSize(window_size.x - (2 * offset_x), 20);
 		offset_y += 20;
 	}
-	if (m_Tab)
+	if (m_Dock)
 	{
-		m_Tab->GetTransform()->SetLocalPosition(offset_x, offset_y);
-		m_Tab->GetTransform()->SetSize(window_size.x - (2 * offset_x), 20);
-		offset_y += 20;
+		auto client_rect = GetClientRect();
+		m_Dock->GetTransform()->SetLocalPosition(client_rect.left, client_rect.top);
+		m_Dock->GetTransform()->SetSize(client_rect.width(), client_rect.height());
 	}
+	//if (m_Tab)
+	//{
+	//	m_Tab->GetTransform()->SetLocalPosition(offset_x, offset_y);
+	//	m_Tab->GetTransform()->SetSize(window_size.x - (2 * offset_x), 20);
+	//	offset_y += 20;
+	//}
 	if (m_ResizeBox)
 	{
 		m_ResizeBox->GetTransform()->SetSize(20, 20);
@@ -372,6 +406,21 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 
 
 }
+
+JGUITitleBar* JGUIForm::GetTitleBar() const
+{
+	return m_Title;
+}
+
+JGUIDock* JGUIForm::GetDock() const
+{
+	return m_Dock;
+}
+
+//JGUITab* JGUIForm::GetTab() const
+//{
+//	return m_Tab;
+//}
 
 JGUIRect JGUIForm::GetClientRect() const
 {
@@ -396,16 +445,25 @@ JGUIRect JGUIForm::GetClientRect() const
 		auto menu_size = m_Menu->GetTransform()->GetSize();
 		rect.top += menu_size.y;
 	}
-	if (m_Tab)
-	{
-		auto tab_size = m_Tab->GetTransform()->GetSize();
-		rect.top += tab_size.y;
-	}
+	//if (m_Tab)
+	//{
+	//	auto tab_size = m_Tab->GetTransform()->GetSize();
+	//	rect.top += tab_size.y;
+	//}
 
 
 	return rect;
 }
-
+void JGUIForm::DockOn()
+{
+	m_DockSwitch = true;
+	if (m_Dock) m_Dock->SetActive(true);
+}
+void JGUIForm::DockOff()
+{
+	m_DockSwitch = false;
+	if (m_Dock) m_Dock->SetActive(false);
+}
 
 
 

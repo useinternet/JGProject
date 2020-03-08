@@ -39,6 +39,7 @@ public:
 	void SetBtImage(const std::string& path);
 	void SetBtColor(EJGUIBtState state, const JColor& color);
 	void BindOnClick(const std::function<void()>& func);
+	void Reset();
 private:
 	JGUIImage*     m_Image = nullptr;
 	JColor         m_BtColor[JGUI_BtState_Count];

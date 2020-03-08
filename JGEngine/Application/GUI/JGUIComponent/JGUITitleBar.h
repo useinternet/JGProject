@@ -19,6 +19,10 @@ protected:
 	virtual void Resize(const JGUIResizeEvent& e) override;
 	virtual void MouseBtDown(const JGUIKeyDownEvent& e) override;
 	virtual void MouseBtUp(const JGUIKeyUpEvent& e) override;
+public:
+	//void Connect(const JVector2Int& delta);
+	void UnConnect();
+	//bool TabBinding();
 private:
 	void SettingElement();
 private:
@@ -29,4 +33,5 @@ private:
 	JGUITextMesh*           m_TitleText = nullptr; 
 	bool m_IsGrap = false;
 	JVector2Int m_Delta;
+	bool m_IsUnConnect = false;
 };

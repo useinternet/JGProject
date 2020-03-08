@@ -102,10 +102,14 @@ void JGUIWindowTexture::InitRenderItem(RE::RenderItem* ri)
 {
 	if (m_ModuleKey.empty()) return;
 	auto size = GetTransform()->GetSize();
-	ri->SetMaterial(RE_GUI_OneTextureDefault);
-	ri->GetMaterial()->SetValueAsFloat4("Color", JColor(1, 1, 1, 1));
-	ri->GetMaterial()->SetTexture("Image", m_ModuleKey);
-	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	if (ri)
+	{
+		ri->SetMaterial(RE_GUI_OneTextureDefault);
+		ri->GetMaterial()->SetValueAsFloat4("Color", JColor(1, 1, 1, 1));
+		ri->GetMaterial()->SetTexture("Image", m_ModuleKey);
+		ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	}
+
 }
 void JGUIWindowTexture::Tick(const JGUITickEvent& e)
 {
@@ -184,9 +188,13 @@ void JGUIImage::SetColor(float r, float g, float b, float a)
 void JGUIRectangle::InitRenderItem(RE::RenderItem* ri)
 {
 	auto size = GetTransform()->GetSize();
-	ri->SetMaterial(RE_GUI_DefaultMaterial);
-	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	if (ri)
+	{
+		ri->SetMaterial(RE_GUI_DefaultMaterial);
+		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+		ri->SetMesh(RE::ReGuiMesh::CreateFillRect(size.x, size.y));
+	}
+
 }
 void JGUIRectangle::Resize(const JGUIResizeEvent& e)
 {
@@ -199,13 +207,15 @@ void JGUIRectangle::Resize(const JGUIResizeEvent& e)
 void JGUIRectangle::SetColor(const JColor& color)
 {
 	m_Color = color;
-	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	if (GetRenderItem() && GetRenderItem()->GetRI() && GetRenderItem()->GetRI()->GetMaterial())
+		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 
 }
 void JGUIRectangle::SetColor(float r, float g, float b, float a)
 {
 	m_Color = JColor(r, g, b, a);
-	if (GetRenderItem()) GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	if (GetRenderItem() && GetRenderItem()->GetRI() && GetRenderItem()->GetRI()->GetMaterial())
+		GetRenderItem()->GetRI()->GetMaterial()->SetValueAsFloat4("Color", m_Color);
 }
 
 
@@ -215,9 +225,13 @@ void JGUIRectangle::SetColor(float r, float g, float b, float a)
 void JGUIEmptyRectangle::InitRenderItem(RE::RenderItem* ri)
 {
 	auto size = GetTransform()->GetSize();
-	ri->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
-	ri->SetMaterial(RE_GUI_DefaultMaterial);
-	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	if (ri)
+	{
+		ri->SetMesh(RE::ReGuiMesh::CreateEmptyRect(size.x, size.y, m_Thick));
+		ri->SetMaterial(RE_GUI_DefaultMaterial);
+		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+	}
+
 }
 void JGUIEmptyRectangle::Resize(const JGUIResizeEvent& e)
 {
@@ -269,11 +283,15 @@ void JGUITextMesh::InitRenderItem(RE::RenderItem* ri)
 	auto size = GetTransform()->GetSize();
 	auto fileInfo = JGUI::GetJGUIFontManager()->GetFontFileInfo(m_FontName);
 
+	if (ri)
+	{
+		ri->SetMaterial(RE_GUI_TextMaterial);
+		ri->SetMesh(make_shared<RE::ReGuiMesh>());
+		ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
+		ri->GetMaterial()->SetTexture("Image", fileInfo.page[0]);
+	}
 
-	ri->SetMaterial(RE_GUI_TextMaterial);
-	ri->SetMesh(make_shared<RE::ReGuiMesh>());
-	ri->GetMaterial()->SetValueAsFloat4("Color", m_Color);
-	ri->GetMaterial()->SetTexture("Image", fileInfo.page[0]);
+
 }
 
 
