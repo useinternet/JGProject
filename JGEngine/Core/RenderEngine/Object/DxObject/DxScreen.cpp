@@ -50,8 +50,8 @@ namespace RE
 		}
 
 
-		/*cmdList->SetRenderTarget(*back_buffer);
-		cmdList->FlushResourceBarrier();*/
+		cmdList->SetRenderTarget(*back_buffer);
+		cmdList->FlushResourceBarrier();
 
 
 		// gui

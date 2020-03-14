@@ -170,15 +170,34 @@ public:
 	}
 	bool Contains(const JVector2Int p)
 	{
-		JVector2 fp(p.x, p.y);
+		JVector2 fp((float)p.x, (float)p.y);
 		return Contains(fp);
 	}
 	void Demical()
 	{
-		left = (float)(int)left;
+		float intLeft = (int)left;
+		float intRight = (int)right;
+		float intTop = (int)top;
+		float intBottom = (int)bottom;
+
+
+
+		if (left - intLeft < 0.5f) left = intLeft;
+		else left = intLeft + 1.0f;
+
+		if (right - intRight < 0.5f) right = intRight;
+		else right = intRight + 1.0f;
+
+		if (top - intTop < 0.5f) top = intTop;
+		else top = intTop + 1.0f;
+
+		if (bottom - intBottom < 0.5f) bottom = intBottom;
+		else bottom = intBottom + 1.0f;
+
+	/*	left = (float)(int)left;
 		top = (float)(int)top;
 		right = (float)(int)right;
-		bottom = (float)(int)bottom;
+		bottom = (float)(int)bottom;*/
 	}
 
 	float Area()
@@ -202,8 +221,8 @@ enum
 
 
 
-#define JGUI_DEFAULT_HOVERTRACKTIME 0.01f
-#define JGUI_DEFAULT_LEAVETRACKTIME 0.01f
+#define JGUI_DEFAULT_HOVERTRACKTIME 0.00f
+#define JGUI_DEFAULT_LEAVETRACKTIME 0.00f
 
 class JGUIMouseTrack
 {

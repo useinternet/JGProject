@@ -431,16 +431,16 @@ void JGUIWinRectTransform::SendSizeToWin()
 {
 	if (GetOwnerWindow()->GetParent() == nullptr && GetOwnerWindow()->GetScreen())
 	{
-		uint32_t x = std::max<uint32_t>(0, (uint32_t)m_Size.x);
-		uint32_t y = std::max<uint32_t>(0, (uint32_t)m_Size.y);
-
-
+		uint32_t x = std::max<uint32_t>(200, (uint32_t)m_Size.x);
+		uint32_t y = std::max<uint32_t>(200, (uint32_t)m_Size.y);
+		m_Size.x = x;
+		m_Size.y = y;
 		GetOwnerWindow()->GetScreen()->GetJWin()->SetClientSize(x, y);
 
 		auto childCount = GetOwnerWindow()->GetChilds().size();
 		for (size_t i = 0; i < childCount; ++i)
 		{
-			GetOwnerWindow()->FindChild(i)->GetTransform()->SendDirty();
+			GetOwnerWindow()->FindChild((uint32_t)i)->GetTransform()->SendDirty();
 		}
 	}
 	else 

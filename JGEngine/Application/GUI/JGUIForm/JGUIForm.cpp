@@ -23,7 +23,7 @@ void JGUIForm::Awake()
 	{
 		m_Border->GetTransform()->SetSize(GetTransform()->GetSize());
 		m_Border->SetPriority(1);
-		m_Border->SetColor(JColor(0, 0, 0, 1));
+		m_Border->SetColor(JColor(1, 1, 1, 1));
 		m_Border->SetThickness(1.0);
 	}
 
@@ -112,6 +112,10 @@ void JGUIForm::Resize(const JGUIResizeEvent& e)
 	if (m_text)
 	{
 		auto client_rect = GetClientRect();
+		client_rect.left += 0.6F;
+		client_rect.right -= 0.6F;
+		client_rect.top += 0.5F;
+		client_rect.bottom -= 0.5F;
 		m_text->GetTransform()->SetLocalPosition(client_rect.left, client_rect.top);
 		m_text->GetTransform()->SetSize(client_rect.width(), client_rect.height());
 	}
@@ -187,7 +191,7 @@ void JGUIForm::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	{
 		if (m_Dock == nullptr)
 		{
-			m_Dock = CreateJGUIComponent<JGUIDock>("DockSystem", JGUI_ComponentFlag_TopMost);
+			m_Dock = CreateJGUIComponent<JGUIDock>("DockSystem");
 
 		}
 	}
@@ -428,13 +432,12 @@ JGUIRect JGUIForm::GetClientRect() const
 
 	if (m_Border)
 	{
-		rect.top    += 1.5f;
-		rect.left   += 1.6f;
-		rect.bottom -= 1.5f;
-		rect.right  -= 1.6f;
+		float thickness = m_Border->GetThickness();
+		rect.top    += thickness;
+		rect.left   += thickness;
+		rect.bottom -= thickness;
+		rect.right  -= thickness;
 	}
-
-
 	if (m_Title)
 	{
 		auto title_size = m_Title->GetTransform()->GetSize();

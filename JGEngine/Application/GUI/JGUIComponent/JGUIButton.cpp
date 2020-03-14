@@ -85,6 +85,15 @@ void JGUIButton::Tick(const JGUITickEvent& e)
 			m_BtState = JGUI_BtState_Normal;
 		}
 	}
+
+
+	if (m_BtState == JGUI_BtState_Hightlight && !GetCollider()->CheckInPoint(GetOwnerWindow()->GetMousePos()))
+	{
+		m_Image->SetColor(m_BtColor[JGUI_BtState_Normal]);
+		m_BtState = JGUI_BtState_Normal;
+	}
+
+
 	if (m_IsClick)
 	{
 		OnClick();

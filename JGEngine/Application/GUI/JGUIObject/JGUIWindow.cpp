@@ -290,25 +290,37 @@ void JGUIWindow::JGUIMouseMove(const JGUIMouseMoveEvent& e)
 		track.flag = JGUI_MOUSETRACKFLAG_MOUSEHOVER;
 		JGUI::RegisterMouseTrack(track);
 	}
-	for (auto& com : m_WindowComponents)
+	JGUIWindow* top_window = TrackingCanInteractionWindow();
+	if (top_window)
 	{
-		com->JGUIMouseMove(e);
+		auto child_mouse_pos = top_window->GetMousePos();
+		JGUIMouseMoveEvent child_e = e;
+		child_e.pos.x = (float)child_mouse_pos.x;
+		child_e.pos.y = (float)child_mouse_pos.y;
+		top_window->JGUIMouseMove(child_e);
 	}
-
+	else
+	{
+		for (auto& com : m_WindowComponents)
+		{
+			com->JGUIMouseMove(e);
+		}
+	}
+	//for (auto& child : m_ChildWindows)
+	//{
+	//	if (child->Interaction())
+	//	{
+	//		auto child_mouse_pos = child->GetMousePos();
+	//		JGUIMouseMoveEvent child_e = e;
+	//		child_e.pos.x = (float)child_mouse_pos.x;
+	//		child_e.pos.y = (float)child_mouse_pos.y;
+	//		child->JGUIMouseMove(child_e);
+	//	}
+	//}
 
 
 	// 윈도우와의 상호작용
-	for (auto& child : m_ChildWindows)
-	{
-		if (child->Interaction())
-		{
-			auto child_mouse_pos = child->GetMousePos();
-			JGUIMouseMoveEvent child_e = e;
-			child_e.pos.x = (float)child_mouse_pos.x;
-			child_e.pos.y = (float)child_mouse_pos.y;
-			child->JGUIMouseMove(child_e);
-		}
-	}
+
 	MouseMove(e);
 }
 void JGUIWindow::JGUIMouseHover()
@@ -337,11 +349,13 @@ void JGUIWindow::JGUIMouseLeave()
 
 void JGUIWindow::SetParent(JGUIWindow* parent)
 {
+
 	if (JGUI::GetMainWindow() == this ||
 		JGUI::GetMainWindow() == nullptr)
 	{
 		parent = nullptr;
 	}
+	if (m_ParentWindow != nullptr && m_ParentWindow == parent) return;
 	else if (!(m_Flags & JGUI_WindowFlag_MultiSwapChain) && parent == nullptr)
 	{
 		parent = JGUI::GetMainWindow();
@@ -373,6 +387,7 @@ void JGUIWindow::SetParent(JGUIWindow* parent)
 	}
 	else
 	{
+		
 		if (m_Screen)
 		{
 			JGUI::RequestDestroyScreen(m_Screen->GetHandle());
@@ -692,6 +707,8 @@ void JGUIWindow::ReadyGUIModule()
 {
 	auto size = GetTransform()->GetSize();
 	m_ReCamera = make_shared<RE::ReCamera>();
+	size.x = std::max<float>(10, size.x);
+	size.y = std::max<float>(10, size.y);
 	m_ReCamera->SetLens(45, size.x, size.y);
 	m_ReCamera->SetPosition({ 0.0f,0.0f,-10.0f });
 	m_ReCamera->ConvertOrthographic();

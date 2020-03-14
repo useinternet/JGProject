@@ -266,6 +266,7 @@ namespace RE
 	void DescriptorHeap::FreeBlock(const DescriptorBlock& block)
 	{
 		auto curr_pos = m_DescriptorBlocks.find(block.startPos);
+		if (curr_pos == m_DescriptorBlocks.end()) return;
 		auto prev_pos = curr_pos;
 		--prev_pos;
 

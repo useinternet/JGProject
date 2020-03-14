@@ -23,29 +23,52 @@ void JGUIMenu::Start()
 		item->BtOnClick();
 	}
 	MenuItemAllClose();
+
+
+	JGUIExtraEvent extra_e;
+	extra_e.Bind(JGUI_EXTRAEVENT_REPEAT, this, [&](JGUIExtraEvent& e)
+	{
+		if (JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
+		{
+			bool result = false;
+			for (auto& menuitem : m_MenuItems)
+			{
+				if (!menuitem->IsActive()) continue;
+				if (menuitem->CollisionCheck(GetOwnerWindow()->GetMousePos()))
+				{
+					result = true;
+					break;
+				}
+			}
+			if (!result)
+			{
+				MenuItemAllClose();
+			}
+		}
+	});
 }
 
 
 void JGUIMenu::Tick(const JGUITickEvent& e)
 {
 
-	if(JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
-	{
-		bool result = false;
-		for (auto& menuitem : m_MenuItems)
-		{
-			if (!menuitem->IsActive()) continue;
-			if(menuitem->CollisionCheck(GetOwnerWindow()->GetMousePos()))
-			{
-				result = true;
-				break;
-			}
-		}
-		if (!result)
-		{
-			MenuItemAllClose();
-		}
-	}
+	//if(JGUI::GetKeyDown(GetOwnerWindow(), KeyCode::LeftMouseButton))
+	//{
+	//	bool result = false;
+	//	for (auto& menuitem : m_MenuItems)
+	//	{
+	//		if (!menuitem->IsActive()) continue;
+	//		if(menuitem->CollisionCheck(GetOwnerWindow()->GetMousePos()))
+	//		{
+	//			result = true;
+	//			break;
+	//		}
+	//	}
+	//	if (!result)
+	//	{
+	//		MenuItemAllClose();
+	//	}
+	//}
 
 
 	for (auto& info_pair : m_KeyInfoMap)

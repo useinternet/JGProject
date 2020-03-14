@@ -71,6 +71,14 @@ void JGUITitleBar::MouseBtDown(const JGUIKeyDownEvent& e)
 				mouse_pos.x += m_Delta.x;
 				mouse_pos.y += m_Delta.y;
 				JVector2 pos((float)mouse_pos.x, (float)mouse_pos.y);
+
+				if (GetOwnerWindow()->GetParent())
+				{
+					auto parent_pos = GetOwnerWindow()->GetParent()->GetTransform()->GetPosition();
+					pos.x -= parent_pos.x;
+					pos.y -= parent_pos.y;
+				}
+
 				GetOwnerWindow()->GetTransform()->SetLocalPosition(pos);
 			}
 
