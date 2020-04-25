@@ -55,6 +55,7 @@ namespace RE
 		if (!g_RenderEngine)
 			return;
 		lock_guard<mutex> lock(g_ScreenMutex);
+		g_RenderEngine->m_RenderDevice->GetDirectCmdQueue()->Flush();
 		g_RenderEngine->m_RenderDevice->DestroyDxScreen(screen);
 	}
 	DxScreen* RenderEngine::FindDxScreen(HWND hWnd)

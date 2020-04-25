@@ -234,7 +234,7 @@ namespace RE
 	{
 		size_t seed = 0;
 		if(m_SrvDesc) 
-			std::hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*m_SrvDesc);
+			seed = std::hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*m_SrvDesc);
 
 		std::lock_guard<std::mutex> lock(GetData()->SrvMutex);
 		auto& SrvDescriptorHandles = GetData()->SrvDescriptorHandles;
@@ -257,7 +257,7 @@ namespace RE
 	{
 		size_t seed = 0;
 		if(m_RtvDesc)
-			std::hash<D3D12_RENDER_TARGET_VIEW_DESC>{}(*m_RtvDesc);
+			seed = std::hash<D3D12_RENDER_TARGET_VIEW_DESC>{}(*m_RtvDesc);
 
 		std::lock_guard<std::mutex> lock(GetData()->RtvMutex);
 		auto& RtvDescriptorHandles = GetData()->RtvDescriptorHandles;
@@ -279,7 +279,7 @@ namespace RE
 	{
 		size_t seed = 0; 
 		if(m_DsvDesc) 
-			std::hash<D3D12_DEPTH_STENCIL_VIEW_DESC>{}(*m_DsvDesc);
+			seed = std::hash<D3D12_DEPTH_STENCIL_VIEW_DESC>{}(*m_DsvDesc);
 		std::lock_guard<std::mutex> lock(GetData()->DsvMutex);
 		auto& DsvDescriptorHandles = GetData()->DsvDescriptorHandles;
 		auto iter = DsvDescriptorHandles.find(seed);
@@ -299,7 +299,7 @@ namespace RE
 	{
 		size_t seed = 0;
 		if(m_UavDesc)
-			std::hash<D3D12_UNORDERED_ACCESS_VIEW_DESC>{}(*m_UavDesc);
+			seed = std::hash<D3D12_UNORDERED_ACCESS_VIEW_DESC>{}(*m_UavDesc);
 
 		std::lock_guard<std::mutex> lock(GetData()->UavMutex);
 		auto& UavDescriptorHandles = GetData()->UavDescriptorHandles;

@@ -1,21 +1,28 @@
 #pragma once
 
 #include "GUI/JGUI.h"
+#include "GUI/JGUIComponent/JGUIComponent.h"
+#include "GUI/JGUIComponent/JGUIElementComponent.h"
+#include "GUI/JGUIComponent/JGUIWindowComponent.h"
+#include "GUI/JGUIComponent/JGUITransform.h"
+#include "GUI/JGUIComponent/JGUICollider.h"
 #include <functional>
 
 class JGUIWindow;
-class JGUIComponent;
-class JGUIRectTransform;
-class JGUIShape;
+class JGUIElement;
+class JGUITransform;
 class JGUICollider;
+class JGUIComponent;
+class JGUIElementComponent;
+class JGUIWindowComponent;
 class JGUIObject
 {
 	friend JGUI;
 	friend JGUIWindow;
-	friend JGUIComponent;
+	friend JGUIElement;
 public:
-	JGUIObject(const std::string& name = "JGUIObject") :
-		m_Name(name) {}
+	JGUIObject( const std::string& name = "JGUIObject");
+	
 protected:
 	virtual void Awake() {}
 	virtual void Start() {}
@@ -25,10 +32,10 @@ protected:
 
 	float GetTick() const;
 private:
-	virtual void JGUIAwake(){ Awake(); };
+	virtual void JGUIAwake();
 	virtual void JGUIStart() { Start(); m_Is_ExecuteStart = true; }
 	virtual void JGUIDestroy();
-	virtual void JGUITick(const JGUITickEvent& e) { Tick(e); }
+	virtual void JGUITick(const JGUITickEvent& e);
 public:
 	const std::string& GetName() const {
 		return m_Name;
@@ -36,24 +43,15 @@ public:
 	void               SetName(const std::string& name) {
 		m_Name = name;
 	}
-	virtual void SetActive(bool active, bool is_hierarchy = false) {
-		m_Active     = active;
-		if (!is_hierarchy)
-		{
-			m_ActiveSelf = active;
-		}
-	}
+	virtual void SetActive(bool active, bool is_hierarchy = false);
 	bool IsActive() const {
 		return m_Active && m_ActiveSelf;
-	}
-	bool IsExecuteStartFunc() const {
-		return m_Is_ExecuteStart;
 	}
 	uint64_t GetID() const {
 		return m_ID;
 	}
 
-	JGUIRectTransform* GetTransform() {
+	JGUITransform* GetTransform() {
 		return m_Transform;
 	}
 	JGUICollider* GetCollider() {
@@ -62,13 +60,37 @@ public:
 	bool IsDestroying() const {
 		return m_IsDestroying;
 	}
-
-
-	
 public:
-	void RegisterCollider(JGUIWindow* owner_window, EJGUI_Colider type);
-	void RegisterTransform(JGUIComponent* owner_com, EJGUI_RectTransform type);
-	void RegisterTransform(JGUIWindow* owner_window,    EJGUI_RectTransform type);
+	template<typename ComponentType>
+	ComponentType* CreateJGUIComponent()
+	{
+		ComponentType* result = JGUI::CreateJGUIComponent<ComponentType>(typeid(ComponentType).name());
+		m_Coms.push_back(result);
+		if (m_IsWindow) result->SetOwner((JGUIWindow*)this);
+		else result->SetOwner((JGUIElement*)this);
+		result->JGUIAwake();
+		return result;
+	}
+	void DestroyComponent(JGUIComponent* com);
+
+	template<typename ComponentType>
+	ComponentType* FindComponent() 
+	{
+		for (auto& com : m_Coms)
+		{
+			if (typeid(*com) == typeid(ComponentType))
+				return (ComponentType*)(com);
+		}
+		return nullptr;
+	}
+	JGUIComponent* FindComponent(const std::string& name) const;
+	JGUIComponent* GetComponent(int n) const;
+	uint32_t       GetComponentCount() const;
+	void RegisterCollider(EJGUI_Collider type);
+private:
+	bool IsExecuteStartFunc() const {
+		return m_Is_ExecuteStart;
+	}
 private:
 	std::string m_Name;
 	std::string m_LayerName = "None";
@@ -83,6 +105,11 @@ private:
 	// Flags
 
 	// 기본 컴포넌트들
-	JGUIRectTransform* m_Transform = nullptr;
+	JGUITransform*     m_Transform = nullptr;
 	JGUICollider*      m_Collider  = nullptr;
+
+
+	std::vector<JGUIComponent*> m_Coms;
+	std::queue<JGUIComponent*>  m_DestroyingComponent;
+	bool m_IsWindow = false;
 };

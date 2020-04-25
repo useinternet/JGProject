@@ -75,6 +75,7 @@ namespace RE
 	private:
 		ReMaterialController*                  m_Material = nullptr;
 		std::shared_ptr<ReMesh>                m_Mesh;
+		
 		ERenderItemUsage                       m_Usage = ERenderItemUsage::Static3D;
 		//  
 		std::shared_ptr<SBDStructuredBuffer>              m_StructuredBuffer;
@@ -82,7 +83,6 @@ namespace RE
 		std::unordered_map<InstanceRenderItem*, uint32_t> m_InstanceMapByPointer;
 
 		bool m_IsActive = true;
-
 		uint64_t m_Priority = 0;
 		uint64_t m_Layer = 0;
 	};

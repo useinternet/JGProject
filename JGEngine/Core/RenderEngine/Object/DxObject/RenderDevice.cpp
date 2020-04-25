@@ -280,6 +280,7 @@ namespace RE
 	void RenderDevice::BeginFrame()
 	{
 		++m_Frame;
+		//m_ValueIndex = 
 	}
 	std::vector<CommandList*> RenderDevice::RenderUpdate()
 	{

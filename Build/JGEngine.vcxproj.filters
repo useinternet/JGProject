@@ -10,14 +10,29 @@
     <Filter Include="GUI\JGUIObject">
       <UniqueIdentifier>{c42bff39-5e8e-46ab-ad5b-0537ca783f6a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\JGUIComponent">
-      <UniqueIdentifier>{c9b3585d-abb3-4471-a855-7dc0204f382b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\JGUIForm">
       <UniqueIdentifier>{63063229-6777-4b20-8c8c-b0cb78522ed9}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\JGUIFont">
       <UniqueIdentifier>{42cec6f6-70db-4fca-9bc3-3950b490c87e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIElement">
+      <UniqueIdentifier>{c9b3585d-abb3-4471-a855-7dc0204f382b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent">
+      <UniqueIdentifier>{cc2909c9-4e42-4370-a05a-a6a86170de20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent\JGUICommonComponent">
+      <UniqueIdentifier>{9a3b6b4e-6ccc-4725-a7f1-5cc5b73529cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent\Script">
+      <UniqueIdentifier>{6f674568-738d-472e-abc2-60cd32a09a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent\Window">
+      <UniqueIdentifier>{71373960-8a8f-45f4-af5e-0d28ddfab9d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\JGUIComponent\Element">
+      <UniqueIdentifier>{87d7452c-1a48-4a17-b452-9c4ea60eca52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -42,62 +57,104 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.h">
       <Filter>GUI\JGUIObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.h">
-      <Filter>GUI\JGUIObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.h">
       <Filter>GUI\JGUIForm</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.h">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.h">
       <Filter>GUI\JGUIFont</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.h">
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIButton.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIContextMenu.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIDock.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIInputText.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIMenu.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIMenuItem.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIPanel.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIScrollbar.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIShape.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUIText.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIElement\JGUITitleBar.h">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIObject\JGUIElement.h">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIComponent.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.h">
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIElementComponent.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.h">
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIWindowComponent.h">
       <Filter>GUI\JGUIComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITransform.h">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.h">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICamera.h">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITab.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Element\JGUICanvas.h">
+      <Filter>GUI\JGUIComponent\Element</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIDock.h">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Element\JGUIRenderer.h">
+      <Filter>GUI\JGUIComponent\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TabSystem.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Scrollbar.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Text.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MenuItem.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,59 +175,101 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIWindow.cpp">
       <Filter>GUI\JGUIObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIComponent.cpp">
-      <Filter>GUI\JGUIObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.cpp">
       <Filter>GUI\JGUIForm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIPanel.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRectTransform.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIButton.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITitleBar.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp">
       <Filter>GUI\JGUIFont</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIResizeBox.cpp">
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIButton.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIContextMenu.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIDock.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIInputText.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIMenu.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIMenuItem.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIPanel.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIScrollbar.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIShape.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUIText.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIElement\JGUITitleBar.cpp">
+      <Filter>GUI\JGUIElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIObject\JGUIElement.cpp">
+      <Filter>GUI\JGUIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIComponent.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIInputText.cpp">
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIElementComponent.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIRenderItem.cpp">
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIWindowComponent.cpp">
       <Filter>GUI\JGUIComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIShape.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITransform.cpp">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenuItem.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICollider.cpp">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIContextMenu.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIMenu.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIText.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUICamera.cpp">
+      <Filter>GUI\JGUIComponent\JGUICommonComponent</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITab.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Element\JGUICanvas.cpp">
+      <Filter>GUI\JGUIComponent\Element</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIDock.cpp">
-      <Filter>GUI\JGUIComponent</Filter>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Element\JGUIRenderer.cpp">
+      <Filter>GUI\JGUIComponent\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TabSystem.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Scrollbar.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Text.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MenuItem.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@ namespace IE
 	class InputEngine;
 }
 class JGUIObject;
+class JGUIComponent;
 class JGUIWindow;
 class JGUIScreen;
 class JGUIFontManager;
@@ -32,10 +33,9 @@ JGUIFlag operator~(JGUIFlag f1)
 }
 
 // Common
-enum EJGUI_Colider
+enum EJGUI_Collider
 {
 	JGUI_Collider_Box = 0,
-	JGUI_Collider_EmptyBox = 1,
 };
 enum EJGUI_RectTransform
 {
@@ -54,17 +54,38 @@ enum EJGUI_RIMesh
 	JGUI_RIMesh_EmptyRectangle,
 };
 // Window
-enum EJGUI_WindowFlags
+enum EJGUI_WindowFlags : uint64_t
 {
-	JGUI_WindowFlag_None         = 0x000000,
-	JGUI_WindowFlag_NewLoad      = 0x000001,
-	JGUI_WindowFlag_TitileBar    = 0x000002,
-	JGUI_WindowFlag_EnableResize = 0x000004,
-	JGUI_WindowFlag_TabBar       = 0x000008,
-	JGUI_WindowFlag_MenuBar      = 0x000010,
-	JGUI_WindowFlag_EnableDock   = 0x000020,
+	JGUI_WindowFlag_None           = 0x000000,
+	JGUI_WindowFlag_NewLoad        = 0x000001,
+	JGUI_WindowFlag_TitleBar       = 0x000002,
+	JGUI_WindowFlag_EnableResize   = 0x000004,
+	JGUI_WindowFlag_NoMove         = 0x000008,
+	JGUI_WindowFlag_MenuBar        = 0x000010,
+	JGUI_WindowFlag_EnableDock     = 0x000020,
     JGUI_WindowFlag_MultiSwapChain = 0x000040,
+	JGUI_WindowFlag_Border         = 0x000080,
+	JGUI_WindowFlag_TopMost        = 0x000100,
+	JGUI_WindowFlag_BottomMost     = 0x000200,
+	JGUI_WindowFlag_EnableClose    = 0x000400,
+	JGUI_WindowFlag_EnableMinimize = 0x000800,
+	JGUI_WindowFlag_EnableMaximize = 0x001000,
+	JGUI_WindowFlag_HorizontalScrollbar = 0x002000,
+	JGUI_WindowFlag_VerticalScrollbar = 0x004000,
 };
+
+// MainWindow ≈∏¿Ã∆≤, resize,
+
+#define JGUI_WindowFlag_MainWindow  JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border | JGUI_WindowFlag_EnableDock
+#define JGUI_WindowFlag_ChildWindow JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border
+
+
+#define JGUI_WindowFlag_MainTabWindow  JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_EnableDock | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
+#define JGUI_WindowFlag_ChildTabWindow JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
+
+
+#define JGUI_WindowFlag_DockWindow     JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_Border | JGUI_WindowFlag_BottomMost
+
 enum EJGUI_SubmitCmdListPriority
 {
 	JGUI_SubmitCmdListPriority_Default = 999
@@ -82,12 +103,15 @@ enum EJGUI_WindowPriority : uint64_t
 enum EJGUI_ComponentFlags
 {
 	JGUI_ComponentFlag_None               = 0x0000000000,
-	JGUI_ComponentFlag_NoChild            = 0x0000000001,
-	JGUI_ComponentFlag_NoParent           = 0x0000000002,
-	JGUI_ComponentFlag_LockCreateFunction = 0x0000000004,
-	JGUI_ComponentFlag_TopMost = 0x0000000008
+	JGUI_ComponentFlag_TopMost            = 0x0000000001,
+	JGUI_ComponentFlag_Overlay            = 0x0000000002
 };
-
+enum EJGUI_Canvas_Flags
+{
+	JGUI_CanvasFlag_None    = 0,
+	JGUI_CanvasFlag_TopMost = 2,
+	JGUI_CanvasFlag_Overlay = 4
+};
 enum EJGUI_Clip_Flags
 {
 	JGUI_Clip_Flag_None = 0x00,
@@ -175,10 +199,10 @@ public:
 	}
 	void Demical()
 	{
-		float intLeft = (int)left;
-		float intRight = (int)right;
-		float intTop = (int)top;
-		float intBottom = (int)bottom;
+		float intLeft = (float)(int)left;
+		float intRight = (float)(int)right;
+		float intTop = (float)(int)top;
+		float intBottom = (float)(int)bottom;
 
 
 
@@ -194,10 +218,6 @@ public:
 		if (bottom - intBottom < 0.5f) bottom = intBottom;
 		else bottom = intBottom + 1.0f;
 
-	/*	left = (float)(int)left;
-		top = (float)(int)top;
-		right = (float)(int)right;
-		bottom = (float)(int)bottom;*/
 	}
 
 	float Area()
@@ -229,7 +249,7 @@ class JGUIMouseTrack
 	friend class JGUI;
 public:
 	class JGUIWindow*    win = nullptr;
-	class JGUIComponent* com = nullptr;
+	class JGUIElement* com = nullptr;
 	uint32_t       flag = 0;
 	float time = 0.01f;
 private:
@@ -242,7 +262,7 @@ class JGUIExtraEvent
 	friend class JGUI;
 public:
 	uint32_t flag = JGUI_EXTRAEVENT_DEFAULT;
-	void Bind(uint32_t flag, JGUIComponent* com, const std::function<void(JGUIExtraEvent&)>& func) {
+	void Bind(uint32_t flag, JGUIElement* com, const std::function<void(JGUIExtraEvent&)>& func) {
 		this->com = com;
 		bindedFunc = func;
 		this->flag = flag;
@@ -253,9 +273,10 @@ public:
 		this->flag = flag;
 	}
 private:
-	class JGUIComponent* com = nullptr;
+	class JGUIElement* com = nullptr;
 	class JGUIWindow* win = nullptr;
 	std::function<void(JGUIExtraEvent&)> bindedFunc;
+	uint64_t id = 0;
 };
 class JGUI
 {
@@ -263,14 +284,29 @@ class JGUI
 public:
 	static float Gap() { return 10.0f; }
 	static void  DestroyObject(JGUIObject* obj);
+	static void  DestroyComponent(JGUIComponent* com);
 
-	template<typename ComponentType>
-	static ComponentType* CreateJGUIComponent(const std::string& name, JGUIWindow* owner_window, EJGUI_ComponentFlags flag)
+
+	template<typename ComType>
+	static ComType* CreateJGUIComponent(const std::string& name)
+	{
+		auto com = std::make_shared<ComType>();
+		com->SetName(name);
+
+		auto result = com.get();
+		sm_GUI->m_ComponentPool[com.get()] = com;
+
+		return result;
+	}
+
+	template<typename ElementType>
+	static ElementType* CreateJGUIElement(const std::string& name, JGUIWindow* owner_window, EJGUI_ComponentFlags flag)
 	{
 		auto& objqueue = sm_GUI->m_ExpectedCreateObject;
 		auto& id_queue = sm_GUI->m_IDQueue;
 		auto& id_offset = sm_GUI->m_IDOffset;
-		auto obj = std::make_shared<ComponentType>();
+		auto obj = std::make_shared<ElementType>();
+
 		uint64_t id = -1;
 		if (!id_queue.empty())
 		{
@@ -283,7 +319,8 @@ public:
 		}
 		obj->m_ID = id;
 		obj->m_Flags = flag;
-		obj->Init(name, owner_window);
+		obj->m_OwnerWindow = owner_window;
+		obj->SetName(name);
 		obj->JGUIAwake();
 		objqueue.push(obj);
 		return obj.get();
@@ -295,6 +332,7 @@ public:
 		auto& id_queue  = sm_GUI->m_IDQueue;
 		auto& id_offset = sm_GUI->m_IDOffset;
 		auto obj = std::make_shared<WindowType>();
+		obj->m_IsWindow = true;
 		uint64_t id = -1;
 		if (!id_queue.empty())
 		{
@@ -306,7 +344,8 @@ public:
 			id = id_offset++;
 		}
 		obj->m_ID = id;
-		obj->Init(name, flags);
+		obj->m_Flags = flags;
+		obj->SetName(name);
 		obj->JGUIAwake();
 		objqueue.push(obj);
 		return obj.get();
@@ -324,7 +363,7 @@ public:
 	static void        InputFlush();
 	static void        InputMouseFlush();
 	static void        RegisterMouseTrack(const JGUIMouseTrack& mt);
-	static void        RegisterExtraEvent(const JGUIExtraEvent& e);
+	static void        RegisterExtraEvent(const JGUIExtraEvent& e, uint64_t priority = 0);
 	static JGUIFontManager*  GetJGUIFontManager();
 	static const std::string GetDefaultFontName();
 	static int         GetWindowZOrder(JGUIWindow* win);
@@ -341,6 +380,7 @@ private:
 	LRESULT WindowSetFocus(JGUIWindow* window, WPARAM wParam);
 	LRESULT WindowKillFocus(JGUIWindow* window, WPARAM wParam);
 	LRESULT WindowChar(JGUIWindow* window, WPARAM wParam, LPARAM lParam);
+	LRESULT WindowMouseWheel(JGUIWindow* window, WPARAM wParam);
 	LRESULT WindowKeyDownEvent(WPARAM wParam);
 	LRESULT WindowKeyUpEvent(WPARAM wParam);
 	LRESULT WindowMouseMove(JGUIWindow* window, LPARAM lParam);
@@ -352,21 +392,23 @@ private:
 	using JGUIMainWindowFunc = JGUIWindow * (*)(const std::string&);
 	using JGUIWindowFunc = JGUIWindow * (*)(const std::string&, bool);
 	using JGUIObjectPool = std::unordered_map<JGUIObject*, std::shared_ptr<JGUIObject>>;
+	using JGUIComponentPool = std::unordered_map<JGUIComponent*, std::shared_ptr<JGUIComponent>>;
 	using JGUIScreenPool = std::unordered_map<HWND,
 		std::pair<JGUIWindow*, std::shared_ptr<JGUIScreen>>>;
 
 
-	JGUIObjectPool   m_ObjectPool;
-	JGUIScreenPool   m_ScreenPool;
+	JGUIObjectPool    m_ObjectPool;
+	JGUIComponentPool m_ComponentPool;
+	JGUIScreenPool    m_ScreenPool;
 
 
-	Plugin           m_Plugin;
+	Plugin            m_Plugin;
 
 
 	std::queue<HWND> m_ExpectedDestroyWindow;
 	std::queue<std::shared_ptr<JGUIObject>> m_ExpectedCreateObject;
-	std::queue<JGUIObject*> m_ExpectedDestroyObject;
-
+	std::queue<JGUIObject*>    m_ExpectedDestroyObject;
+	std::queue<JGUIComponent*> m_ExpectedDestroyComponent;
 
 	JGUIWindow*      m_MainWindow = nullptr;
 	JGUIWindow*      m_DraggingWindow = nullptr;
@@ -376,7 +418,7 @@ private:
 
 
 	std::unordered_map<JGUIObject*, JGUIMouseTrack> m_MouseTrackMap;
-	std::unordered_map<JGUIObject*, JGUIExtraEvent> m_ExtraEventMap;
+	std::unordered_map<JGUIObject*, std::map<uint64_t, std::vector<JGUIExtraEvent>>> m_ExtraEventMap;
 	
 	std::shared_ptr<JGUIFontManager> m_FontManager;
 	std::string m_DefaultFont = GlobalLinkData::_EngineConfig->InEngine("Fonts/Consolas.fnt");
@@ -405,26 +447,3 @@ inline ClassName* LoadMainWindowForm(const std::string& name) { \
 }\
 
 
-#define JGUI_REGISTER_WINFORM(ClassName) \
-class ClassName; \
-	extern "C" __declspec(dllexport) \
-	inline ClassName* Load##ClassName(const std::string& name, bool is_newLoad) { \
-    return JGUI::CreateJGUIWindow<##ClassName>(name, is_newLoad); \
-}\
-
-
-#define JGUI_REGISTER_COMPONENT(ClassName) \
-class ClassName; \
-	extern "C" __declspec(dllexport) \
-	inline ClassName* Load##ClassName(const std::string& name, JGUIWindow* owner_window) { \
-    return JGUI::CreateJGUIComponent<##ClassName>(name, owner_window); \
-}\
-
-
-
-
-
-class JGUILayer
-{
-
-};

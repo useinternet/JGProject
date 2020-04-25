@@ -242,6 +242,7 @@ namespace RE
 	{
 		friend FixedGShaderModule;
 	private:
+		GraphicsShaderModule* m_OwnerModule = nullptr;
 		RootSignature*    m_RootSig;
 		JVector2          m_ScreenSize;
 		SBDConstantBuffer m_CamCB;
@@ -266,6 +267,8 @@ namespace RE
 		const std::string& GetTextureCacheKey()  {
 			return m_TextureCacheKey;
 		}
+		void BindCamera(ReCamera* cam);
+
 	};
 
 

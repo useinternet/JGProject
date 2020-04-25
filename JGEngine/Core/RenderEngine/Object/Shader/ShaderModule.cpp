@@ -1186,6 +1186,7 @@ namespace RE
 	std::shared_ptr<FixedGShaderModuleClone> FixedGShaderModule::Clone(ReCamera* cam, uint64_t id)
 	{
 		auto result = std::make_shared<FixedGShaderModuleClone>();
+		result->m_OwnerModule = this;
 		result->m_Format = m_ModuleFormat;
 		result->m_ID = id;
 		result->m_RootParamMap = m_RootParamMap;
@@ -1376,7 +1377,10 @@ namespace RE
 		for (uint32_t i = 0; i < item_array.size(); ++i)
 		{
 			RenderItem* item = item_array[i];
-
+			if (!item->GetActive())
+			{
+				int n = 0;
+			}
 			if (!item->GetActive()) continue;
 
 			if (m_GameObjectSB_Struct.GetSize() != item->m_StructuredBuffer->CloneBindedStruct().GetSize())
@@ -1419,6 +1423,13 @@ namespace RE
 		}
 
 
+	}
+
+	void FixedGShaderModuleClone::BindCamera(ReCamera* cam)
+	{
+		m_ScreenSize = JVector2((float)cam->GetLensWidth(), (float)cam->GetLensHeight());
+		m_OwnerModule->BindCamera(cam);
+		m_CamCB = *(m_OwnerModule->FindConstantBuffer(FixedGShaderModule::CameraCBName()));
 	}
 
 }

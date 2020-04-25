@@ -7,7 +7,7 @@
 #define JGUIEventArgConstruct(classname) classname() : JGUIEventArg(#classname) {}
 class JGUIWindow;
 class JGUIObject;
-class JGUIComponent;
+class JGUIElement;
 class JGUIEventArg
 {
 private:
@@ -77,7 +77,17 @@ public:
 	JVector2 delta;
 };
 
-
+class JGUIMouseWheelEvent : public JGUIEventArg
+{
+public:
+	JGUIEventArgConstruct(JGUIMouseWheelEvent)
+		virtual std::string ToString() const {
+		return JGUIEventArg::ToString() +
+			"  delta : [ " + std::to_string(delta) + " ]";
+	}
+public:
+	int delta = 0;
+};
 class JGUIKeyDownEvent : public JGUIEventArg
 {
 public:
@@ -109,3 +119,29 @@ public:
 public:
 	std::string str = "";
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+using ResizeFunc       = std::function<void(const JGUIResizeEvent&)>;
+using MouseWheelFunc   = std::function<void(const JGUIMouseWheelEvent&)>;
+using CharFunc         = std::function<void(const JGUICharEvent&)>;
+using KeyDownFunc      = std::function<void(const JGUIKeyDownEvent&)>;
+using KeyUpFunc        = std::function<void(const JGUIKeyUpEvent&)>;
+using MouseBtDownFunc  = std::function<void(const JGUIKeyDownEvent&)>;
+using MouseBtUpFunc    = std::function<void(const JGUIKeyUpEvent&)>;
+using MouseMoveFunc    = std::function<void(const JGUIMouseMoveEvent&)>;
+using MouseLeaveFunc   = std::function<void()>;
+using MouseHoverFunc   = std::function<void()>;
+using FocusEnterFunc   = std::function<void(const JGUIFocusEnterEvent&)>;
+using FocusExitFunc    = std::function<void(const JGUIFocusExitEvent&)>;
+using OnFocusFunc      = std::function<void()>;
