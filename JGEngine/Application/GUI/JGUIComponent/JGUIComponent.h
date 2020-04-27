@@ -3,15 +3,13 @@
 
 
 
-
-
 class JGUIElement;
 class JGUIWindow;
 class JGUIObject;
 class JGUIElementComponent;
 class JGUIWindowComponent;
 class JGUITransform;
-class JGUIComponent
+class JGENGINE_API JGUIComponent
 {
 	friend JGUIObject;
 	friend JGUIWindow;
@@ -35,6 +33,11 @@ protected:
 	virtual void Destroy() {}
 	virtual void Tick(float tick) {}
 	virtual void ChangeParent(JGUIObject* prevParent) {}
+
+
+
+
+	float GetTick() const;
 public:
 	virtual void SetActive(bool active) {
 		m_IsActive = active;
@@ -56,6 +59,8 @@ public:
 	void SetOwner(JGUIWindow* win);
 
 	JGUITransform* GetTransform() const;
+
+	
 
 private:
 	bool IsExecuteStart() const {

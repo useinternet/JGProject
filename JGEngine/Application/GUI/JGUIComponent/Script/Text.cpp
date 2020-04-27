@@ -24,6 +24,7 @@
 
 
 using namespace std;
+JGUI_REGISTER_COMPONENT(Text)
 float Text::GetTextWidth(const std::string& fontname, float fontsize, const std::string& text)
 {
 	auto fm = JGUI::GetJGUIFontManager();

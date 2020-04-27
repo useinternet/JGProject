@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{8249BEE1-6EAC-4D86-1732-863C03741909}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EntryPoint", "Build\EntryPoint.vcxproj", "{419769CF-2D4F-AB1C-9656-8478822D460D}"
@@ -23,6 +21,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundEngine", "Build\SoundE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGEngine", "Build\JGEngine.vcxproj", "{AC6F16C9-983C-71D4-C155-5F7CAD81A662}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{339C0AE1-1FFF-9985-C884-D23BB4C66508}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGEditor", "Build\JGEditor.vcxproj", "{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{6695C55D-524D-07AB-BB54-E006A72BA29B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JGGame", "Build\JGGame.vcxproj", "{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}"
@@ -30,81 +32,89 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		DevelopEngine|x64 = DevelopEngine|x64
-		DevelopGame|x64 = DevelopGame|x64
 		DevelopGameOnRelease|x64 = DevelopGameOnRelease|x64
+		DevelopGame|x64 = DevelopGame|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{419769CF-2D4F-AB1C-9656-8478822D460D}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.Release|x64.ActiveCfg = Release|x64
 		{419769CF-2D4F-AB1C-9656-8478822D460D}.Release|x64.Build.0 = Release|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.Release|x64.ActiveCfg = Release|x64
 		{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}.Release|x64.Build.0 = Release|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.Release|x64.ActiveCfg = Release|x64
 		{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}.Release|x64.Build.0 = Release|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.Release|x64.ActiveCfg = Release|x64
 		{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}.Release|x64.Build.0 = Release|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.Release|x64.ActiveCfg = Release|x64
 		{9ED4FA58-0A95-768F-D3CF-BF0C3F4FBB6B}.Release|x64.Build.0 = Release|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.Release|x64.ActiveCfg = Release|x64
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F}.Release|x64.Build.0 = Release|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.Release|x64.ActiveCfg = Release|x64
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E}.Release|x64.Build.0 = Release|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.Release|x64.ActiveCfg = Release|x64
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662}.Release|x64.Build.0 = Release|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.DevelopGame|x64.Build.0 = DevelopGame|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.Release|x64.ActiveCfg = Release|x64
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261}.Release|x64.Build.0 = Release|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGameOnRelease|x64.ActiveCfg = DevelopGameOnRelease|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGameOnRelease|x64.Build.0 = DevelopGameOnRelease|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
+		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.Release|x64.ActiveCfg = Release|x64
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
@@ -121,9 +131,7 @@ Global
 		{9B7EAD07-87E1-3CAC-3067-75621CA9082F} = {1AAFCB23-86C5-C9B9-CF3C-55DB3B929A41}
 		{E415EB64-50CB-635A-D9BF-5D3145745A5E} = {1AAFCB23-86C5-C9B9-CF3C-55DB3B929A41}
 		{AC6F16C9-983C-71D4-C155-5F7CAD81A662} = {8249BEE1-6EAC-4D86-1732-863C03741909}
+		{5DC262C8-498F-BDD3-72A8-AB7B5ED4F261} = {339C0AE1-1FFF-9985-C884-D23BB4C66508}
 		{1029AAB9-FCCA-D48F-E585-E8E3D1C65BE0} = {6695C55D-524D-07AB-BB54-E006A72BA29B}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {EFD7F952-2E82-4E6A-83B6-AE3726F106DF}
 	EndGlobalSection
 EndGlobal

@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "WindowSizeAdjustment.h"
 #include "GUI/JGUIComponent/Element/JGUIRenderer.h"
+
+#include "GUI/JGUIObject/JGUIElement.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 using namespace std;
-
+JGUI_REGISTER_COMPONENT(WindowSizeAdjustment)
 void WindowSizeAdjustment::Start()
 {
 	m_Image = GetOwner()->FindComponent<JGUIImageRenderer>();

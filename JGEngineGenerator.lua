@@ -18,15 +18,18 @@ workspace "JGGame"
      symbols  "On"
      optimize "Off"
      defines {"_DEBUG"}
+     cppdialect "C++17"
    end
 
    function ReleaseOnDebugInfoConfig()
      optimize "Full" 
+     cppdialect "C++17"
      defines {"_RELEASE_ONDEBUG"}
    end
 
    function ReleaseConfig()
      optimize "Full" 
+     cppdialect "C++17"
      defines {"_RELEASE"}
    end
    function SetDllPath()
@@ -35,7 +38,7 @@ workspace "JGGame"
       --     debugenvs 
       debugenvs {"PATH=%{wks.location}Build\\dlls_libs\\%{cfg.buildcfg}\\;%PATH%;"}
    end
-
+--
    function SetEngineConfiguarations()
       filter "configurations:DevelopEngine"
         DebugConfig()
@@ -82,6 +85,7 @@ group "Engine"
       location "Build"
       kind "StaticLib"
       language "C++"
+     --cppdialect "std:c++17"
       targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
       objdir("./Build/obj/%{cfg.buildcfg}/")
 
@@ -111,6 +115,7 @@ group "Engine"
       location "Build"
       kind "SharedLib"
       language "C++"
+     --cppdialect "std:c++17"
       targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
       objdir("./Build/obj/%{cfg.buildcfg}/")
       -- precompiled header
@@ -147,16 +152,7 @@ group "Engine"
       vpaths{
          ["*"] = {"JGEngine/Application/**.h", "JGEngine/Application/**.cpp"}
       }
-      filter "files:JGEngine/Application/GUI/EditorGUI/ImGui/imgui.cpp"
-         flags("NoPCH")
-      filter "files:JGEngine/Application/GUI/EditorGUI/ImGui/imgui_demo.cpp"
-         flags("NoPCH")
-      filter "files:JGEngine/Application/GUI/EditorGUI/ImGui/imgui_impl_win32.cpp"
-         flags("NoPCH")
-      filter "files:JGEngine/Application/GUI/EditorGUI/ImGui/imgui_widgets.cpp"
-         flags("NoPCH")
-      filter "files:JGEngine/Application/GUI/EditorGUI/ImGui/imgui_draw.cpp"
-         flags("NoPCH")
+      
       SetEngineConfiguarations()
 
       
@@ -164,6 +160,7 @@ group "Engine"
       location "Build"
       kind "WindowedApp"
       language "C++"
+     --cppdialect "std:c++17"
       targetdir ("./Build/exe/%{cfg.buildcfg}/")
       objdir("./Build/exe/%{cfg.buildcfg}/")
       SetDllPath()
@@ -188,6 +185,7 @@ group "Engine"
          location "Build"
          kind "SharedLib"
          language "C++"
+        --cppdialect "std:c++17"
          targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
          objdir("./Build/obj/%{cfg.buildcfg}/")
          -- precompiled header
@@ -221,6 +219,7 @@ group "Engine"
          location "Build"
          kind "SharedLib"
          language "C++"
+        --cppdialect "std:c++17"
          targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
          objdir("./Build/obj/%{cfg.buildcfg}/")
          -- precompiled header
@@ -254,6 +253,7 @@ group "Engine"
          location "Build"
          kind "SharedLib"
          language "C++"
+        --cppdialect "std:c++17"
          targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
          objdir("./Build/obj/%{cfg.buildcfg}/")
          -- precompiled header
@@ -286,6 +286,7 @@ group "Engine"
          location "Build"
          kind "SharedLib"
          language "C++"
+        --cppdialect "std:c++17"
          targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
          objdir("./Build/obj/%{cfg.buildcfg}/")
          -- precompiled header
@@ -318,6 +319,7 @@ group "Engine"
          location "Build"
          kind "SharedLib"
          language "C++"
+        --cppdialect "std:c++17"
          targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
          objdir("./Build/obj/%{cfg.buildcfg}/")
          -- precompiled header
@@ -352,6 +354,7 @@ group "Game"
    location "Build"
    kind "SharedLib"
    language "C++"
+  --cppdialect "std:c++17"
    targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
    objdir("./Build/obj/%{cfg.buildcfg}/")
    -- defines
@@ -379,6 +382,42 @@ group "Game"
    }
    SetGameConfiguarations()
 
+
+group "Editor"
+   project  "JGEditor"
+   location "Build"
+   kind "SharedLib"
+   language "C++"
+  --cppdialect "std:c++17"
+   targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
+   objdir("./Build/obj/%{cfg.buildcfg}/")
+   -- precompiled header
+   pchheader ("pch.h")
+   pchsource ("JGEngine/Editor/pch.cpp")
+   -- defines
+   defines("JGEDITOR_EXPORTS")
+   -- files
+   files{
+      "JGEngine/Editor/**.h",
+      "JGEngine/Editor/**.cpp"
+   }
+      -- add include dir
+   includedirs{
+      "JGEngine/Library",
+      "JGEngine/Common",
+      "JGEngine/Application",
+      "JGEngine/Editor"
+   }
+      --linkProject
+   links {
+      "Common",
+      "JGEngine"
+   }
+   -- solution virual paths
+   vpaths{
+        ["*"] = {"JGEngine/Editor/**.h", "JGEngine/Editor/**.cpp"}
+   }
+   SetEngineConfiguarations()
 
 group ""
 

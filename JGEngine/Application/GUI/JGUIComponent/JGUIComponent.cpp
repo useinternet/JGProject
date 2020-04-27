@@ -4,6 +4,11 @@
 #include "GUI/JGUIObject/JGUIWindow.h"
 
 
+float JGUIComponent::GetTick() const
+{
+	return GlobalLinkData::GetTick();
+}
+
 void JGUIComponent::SetOwner(JGUIElement* element)
 {
 	m_ElementOwner = element;

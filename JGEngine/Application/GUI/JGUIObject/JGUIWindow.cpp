@@ -1,16 +1,7 @@
 #include "pch.h"
 #include "JGUIWindow.h"
-#include "JGUIElement.h"
 
-// JGUICompoennts Include
-//#include "GUI/JGUIElement/JGUIPanel.h"
-//#include "GUI/JGUIElement/JGUIShape.h"
-#include "GUI/JGUIElement/JGUIMenu.h"
-#include "GUI/JGUIElement/JGUIMenuItem.h"
-#include "GUI/JGUIElement/JGUIText.h"
-//#include "GUI/JGUIElement/JGUIScrollbar.h"
-
-
+//#include "JGUIElement.h"
 
 // Common Component Include
 #include "GUI/JGUIComponent/JGUICamera.h"
@@ -26,7 +17,8 @@
 #include "GUI/JGUIComponent/Script/DockSystem.h"
 #include "GUI/JGUIComponent/Script/TabSystem.h"
 #include "GUI/JGUIComponent/Script/Scrollbar.h"
-
+#include "GUI/JGUIComponent/Script/MainMenu.h"
+#include "GUI/JGUIComponent/Script/MenuItem.h"
 
 // RenderEngine Include
 #include "GUI/JGUIScreen.h"
@@ -63,13 +55,12 @@ void JGUIWindow::JGUIAwake()
 
 		m_ElementCanvas->SetParent(m_RootElement);
 		m_EssentialCanvas->SetParent(m_RootElement);
-
+		
+	
 		m_RootElement->GetTransform()->AttachTransform(m_ElementCanvas->GetTransform());
 		m_RootElement->GetTransform()->AttachTransform(m_EssentialCanvas->GetTransform());
 		m_WindowElements.push_back(m_RootElement);
 	}
-
-
 
 	// 4. 윈도우 텍스쳐 생성
 	m_WinRenderer = CreateJGUIElement("WinRenderer")->CreateJGUIComponent<JGUIWindowRenderer>();
@@ -93,6 +84,7 @@ void JGUIWindow::JGUIAwake()
 void JGUIWindow::JGUIStart()
 {
 	JGUIObject::JGUIStart();
+
 	for (size_t i = 0; i < m_WindowElements.size(); ++i)
 	{
 		if (m_WindowElements[i]->IsExecuteStartFunc()) continue;
@@ -187,10 +179,10 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 			JGUIResizeEvent ee; ee.width = width; ee.height = height;
 			JGUIResize(ee);
 		}
-	}
-	if (GetParent() == nullptr)
-	{
-		GetTransform()->SetSize(width, height);
+		else
+		{
+			GetTransform()->SetSize(width, height);
+		}
 	}
 
 	m_WinRenderer->GetTransform()->SetSize(width, height);
@@ -213,9 +205,9 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 		float offsety = 0.0f;
 		float thickness = 0.0f;
 
-		if (m_Menu)
+		if (m_MainMenu)
 		{
-			m_Menu->GetTransform()->SetSize(width, 20);
+			m_MainMenu->GetTransform()->SetSize(width, 20);
 			offsety += 20.0f;
 		}
 		if (m_TitleBar)
@@ -309,9 +301,9 @@ void JGUIWindow::JGUIKeyDown(const JGUIKeyDownEvent& e)
 	if (GetFocusWindow()) GetFocusWindow()->JGUIKeyDown(e);
 	else
 	{
-		if (m_Menu)
+		if (m_MainMenu)
 		{
-			m_Menu->ReceiveKeyEvent(e);
+			m_MainMenu->ReceiveKeyDown(e);
 		}
 	
 		KeyDown(e);
@@ -323,9 +315,9 @@ void JGUIWindow::JGUIKeyUp(const JGUIKeyUpEvent& e)
 	if (GetFocusWindow()) GetFocusWindow()->JGUIKeyUp(e);
 	else
 	{
-		if (m_Menu)
+		if (m_MainMenu)
 		{
-			m_Menu->ReceiveKeyEvent(e);
+			m_MainMenu->ReceiveKeyUp(e);
 		}
 		KeyUp(e);
 	}
@@ -619,6 +611,7 @@ void JGUIWindow::SetFocusElement(JGUIElement* com)
 		}
 		JGUIFocusEnterEvent enter_e;
 		enter_e.prevFocus = m_FocusElement;
+
 		//
 		m_FocusElement = com;
 		if (com) // enter
@@ -718,9 +711,9 @@ JGUIRect JGUIWindow::GetClientRect() const
 		auto title_size = m_TitleBar->GetTransform()->GetSize();
         rect.top += title_size.y;
 	}
-	if (m_Menu)
+	if (m_MainMenu)
 	{
-		auto menu_size = m_Menu->GetTransform()->GetSize();
+		auto menu_size = m_MainMenu->GetTransform()->GetSize();
 		rect.top += menu_size.y;
 	}
 	if (m_VScrollbar)
@@ -810,17 +803,17 @@ void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	// Menu
 	if (flag & JGUI_WindowFlag_MenuBar)
 	{
-		if (m_Menu == nullptr)
+		if (m_MainMenu == nullptr)
 		{
-			m_Menu = CreateJGUIEssentialElement<JGUIMenu>("JGUIMenu", com_flag);
+			m_MainMenu = CreateJGUIEssentialElement<JGUIElement>("JGUIMenu", com_flag)->CreateJGUIComponent<MainMenu>();
 		}
 	}
 	else
 	{
-		if (m_Menu)
+		if (m_MainMenu)
 		{
-			DestroyJGUIElement(m_Menu);
-			m_Menu = nullptr;
+			DestroyJGUIElement(m_MainMenu->GetOwner());
+			m_MainMenu = nullptr;
 		}
 	}
 
@@ -906,10 +899,10 @@ void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 		m_TabSystem->GetTransform()->SetSize(title_width - spare_width, m_TitleSize);
 		offset_y += 20;
 	}
-	if (m_Menu)
+	if (m_MainMenu)
 	{
-		m_Menu->GetTransform()->SetLocalPosition(offset_x, offset_y);
-		m_Menu->GetTransform()->SetSize(window_size.x - (2 * offset_x), 20);
+		m_MainMenu->GetTransform()->SetLocalPosition(offset_x, offset_y);
+		m_MainMenu->GetTransform()->SetSize(window_size.x - (2 * offset_x), 20);
 		offset_y += 20;
 	}
 	if (m_VScrollbar)

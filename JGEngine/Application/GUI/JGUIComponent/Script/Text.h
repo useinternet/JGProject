@@ -9,9 +9,9 @@ namespace RE
 class  JGUIFontManager;
 struct JGUIFontFileInfo;
 
-class Text : public JGUIRenderer
+class JGENGINE_API Text : public JGUIRenderer
 {
-	class TextMesh;
+	class  TextMesh;
 public:
 	static float GetTextWidth(const std::string& fontname, float fontsize, const std::string& text);
 protected:
@@ -62,7 +62,7 @@ private:
 	JColor           m_Color  = JColor::White();
 	JGUIFontManager* m_FM     = nullptr;
 
-	std::map<uint32_t, std::unique_ptr<TextMesh>> m_TextMeshByLine;
+	std::map<uint32_t, std::shared_ptr<TextMesh>> m_TextMeshByLine;
 	std::shared_ptr<RE::ReGuiMesh> m_ReMesh;
 	float m_FontSize = 20.0f;
 	EJGUI_Text_HAlignment m_HAlign = JGUI_Text_HAlignment_Left;
@@ -75,7 +75,7 @@ private:
 		bool IsDirty() const {
 			return is_dirty;
 		}
-		void SendDirty(){
+		void SendDirty() {
 			prev_text = "";
 		}
 		void Flush() {
@@ -83,7 +83,7 @@ private:
 		}
 	public:
 		JGUIFontManager* fm = nullptr;
-		Text*            owner   = nullptr;
+		Text* owner = nullptr;
 		std::string      text;
 		uint32_t         ioffset = 0;
 		uint32_t         line = 0;
@@ -94,6 +94,7 @@ private:
 
 		std::string prev_text = "";
 		bool is_first = true;
-		bool is_dirty  = false;
+		bool is_dirty = false;
 	};
 };
+

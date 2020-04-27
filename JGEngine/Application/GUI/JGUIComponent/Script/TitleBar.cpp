@@ -13,7 +13,7 @@
 using namespace std;
 
 
-
+JGUI_REGISTER_COMPONENT(TitleBar)
 
 void TitleBar::Awake()
 {

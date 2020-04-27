@@ -17,7 +17,6 @@ void JGUIElement::SetActive(bool active, bool is_hierarchy)
 	{
 		child->SetActive(IsActive(), true);
 	}
-	
 }
 void JGUIElement::JGUIAwake()
 {

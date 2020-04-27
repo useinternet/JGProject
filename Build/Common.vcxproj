@@ -98,6 +98,7 @@
       <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,6 +117,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,6 +137,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +157,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,8 +173,8 @@
     <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h" />
     <ClInclude Include="..\JGEngine\Common\Class\EventManager.h" />
     <ClInclude Include="..\JGEngine\Common\Class\GlobalLinkStream.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\Log.h" />
     <ClInclude Include="..\JGEngine\Common\Class\JWindow.h" />
+    <ClInclude Include="..\JGEngine\Common\Class\Log.h" />
     <ClInclude Include="..\JGEngine\Common\CommonCore.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EngineCore.h" />
     <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EventListener.h" />
@@ -194,11 +198,11 @@
     <ClInclude Include="..\JGEngine\Common\Math\JVector.h" />
     <ClInclude Include="..\JGEngine\Common\Math\Math.h" />
     <ClInclude Include="..\JGEngine\Common\Utill\DataIO.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h" />
     <ClInclude Include="..\JGEngine\Common\Utill\Hash.h" />
+    <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h" />
+    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h" />
     <ClInclude Include="..\JGEngine\Common\framework.h" />
     <ClInclude Include="..\JGEngine\Common\pch.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Common\Class\AssetLoader.cpp" />
@@ -208,23 +212,17 @@
     <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\EventManager.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\GlobalLinkStream.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\Log.cpp" />
     <ClCompile Include="..\JGEngine\Common\Class\JWindow.cpp" />
+    <ClCompile Include="..\JGEngine\Common\Class\Log.cpp" />
     <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp" />
     <ClCompile Include="..\JGEngine\Common\DataType\Plugin.cpp" />
     <ClCompile Include="..\JGEngine\Common\DataType\Timer.cpp" />
     <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp" />
     <ClCompile Include="..\JGEngine\Common\Math\JQuaternion.cpp" />
     <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp" />
+    <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
     <ClCompile Include="..\JGEngine\Common\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

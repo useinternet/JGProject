@@ -3,7 +3,7 @@
 
 
 
-class ContextMenu : public JGUIScriptComponent
+class JGENGINE_API ContextMenu : public JGUIScriptComponent
 {
 
 

@@ -3,7 +3,7 @@
 #include "GUI/JGUIComponent/Script/Button.h"
 class Button;
 class Text;
-class TabSystem : public JGUIScriptComponent
+class JGENGINE_API TabSystem : public JGUIScriptComponent
 {
 	class TabButton;
 	friend TabButton;
@@ -44,7 +44,7 @@ private:
 	void ArrangeBtSizeByTabCount();
 	JGUIWindow* FindWindowByBt(Button* tabBt);
 private:
-	std::vector<std::unique_ptr<TabInfo>> m_TabInfos;
+	std::vector<std::shared_ptr<TabInfo>> m_TabInfos;
 	Button* m_CurrentDraggingTabBt = nullptr;
 	Button* m_MainTabBt            = nullptr;
 

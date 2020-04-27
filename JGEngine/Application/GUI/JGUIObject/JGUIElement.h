@@ -9,7 +9,7 @@ class JGUICollider;
 class JGUIRectTransform;
 
 
-class JGUIElement : public JGUIObject
+class JGENGINE_API JGUIElement : public JGUIObject
 {
 	friend JGUI;
 	friend JGUIWindow;

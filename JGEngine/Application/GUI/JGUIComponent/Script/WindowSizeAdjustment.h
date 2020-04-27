@@ -3,7 +3,7 @@
 #include "GUI/JGUIComponent/JGUIElementComponent.h"
 
 
-class WindowSizeAdjustment : public JGUIScriptComponent
+class JGENGINE_API WindowSizeAdjustment : public JGUIScriptComponent
 {
 
 protected:

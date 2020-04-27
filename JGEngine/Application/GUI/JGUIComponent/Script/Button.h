@@ -2,7 +2,8 @@
 
 #include "GUI/JGUIComponent/JGUIElementComponent.h"
 
-class Button : public JGUIScriptComponent
+
+class JGENGINE_API Button : public JGUIScriptComponent
 {
 public:
 	enum
@@ -24,7 +25,6 @@ public:
 	void SetImage(const std::string& image);
 	void SetColor(int btState, const JColor& color);
 	void Reset();
-
 
 
 

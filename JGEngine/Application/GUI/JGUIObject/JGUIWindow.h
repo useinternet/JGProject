@@ -1,8 +1,7 @@
 #pragma once
 
 #include "JGUIObject.h"
-#include "GUI/JGUIElement/JGUIPanel.h"
-
+#include "JGUIElement.h"
 #include <string>
 
 class JGUIScreen;
@@ -17,13 +16,11 @@ class DockSystem;
 class TabSystem;
 class Scrollbar;
 class JGUIShapeRenderer;
+class MainMenu;
+class MainMenuItem;
+class MenuItem;
 
-
-
-//class JGUIEmptyRectangle;
-class JGUIMenu;
-//class JGUIScrollbar;
-class JGUIWindow : public JGUIObject
+class JGENGINE_API JGUIWindow : public JGUIObject
 {
 	friend JGUI;
 protected:
@@ -131,8 +128,8 @@ public:
 	TabSystem* GetTabSystem() const {
 		return m_TabSystem;
 	}
-	JGUIMenu* GetMenu() const {
-		return m_Menu;
+	MainMenu* GetMenu() const {
+		return m_MainMenu;
 	}
 	JGUICamera* GetCamera() const {
 		return m_WinCamera;
@@ -207,6 +204,7 @@ private:
 	TitleBar*   m_TitleBar   = nullptr;
 	float       m_TitleSize  = 20.0f;
 	DockSystem* m_DockSystem = nullptr;
+	MainMenu*   m_MainMenu = nullptr;
 	TabSystem*  m_TabSystem  = nullptr;
 	Scrollbar*  m_HScrollbar = nullptr;
 	Scrollbar*  m_VScrollbar = nullptr;
@@ -239,7 +237,7 @@ private:
 
 	//JGUITitleBar*       m_Title = nullptr;
 
-	JGUIMenu*           m_Menu = nullptr;
+	//JGUIMenu*           m_Menu = nullptr;
 	//JGUIDock*           m_Dock = nullptr;
 	//JGUIScrollbar*      m_HScrollbar = nullptr;
 	//JGUIScrollbar*      m_VScrollbar = nullptr;

@@ -1,24 +1,23 @@
 #include "pch.h"
 #include "Button.h"
 
-
+#include "GUI/JGUIObject/JGUIElement.h"
+#include "GUI/JGUIObject/JGUIWindow.h"
 
 #include "GUI/JGUIComponent/Element/JGUIRenderer.h"
 #include "GUI/JGUIComponent/JGUITransform.h"
 
 
-#include "GUI/JGUIObject/JGUIElement.h"
-#include "GUI/JGUIObject/JGUIWindow.h"
 using namespace std;
-
+JGUI_REGISTER_COMPONENT(Button)
 
 void Button::Awake()
 {
 	if (GetOwner()->GetCollider() == nullptr) GetOwner()->RegisterCollider(JGUI_Collider_Box);
-	m_BtColors[Normal] = JColor(0.9f, 0.9f, 0.9f, 1.0f);
+	m_BtColors[Normal]     = JColor(0.9f, 0.9f, 0.9f, 1.0f);
 	m_BtColors[Hightlight] = JColor(0.7f, 0.7f, 0.7f, 1.0f);
-	m_BtColors[Pressed] = JColor(0.5f, 0.5f, 0.5f, 1.0f);
-	m_BtColors[Disabled] = JColor(0.3f, 0.3f, 0.35f, 1.0f);
+	m_BtColors[Pressed]    = JColor(0.5f, 0.5f, 0.5f, 1.0f);
+	m_BtColors[Disabled]   = JColor(0.3f, 0.3f, 0.35f, 1.0f);
 	for (int i = 0; i < BtStateCount; ++i)
 	{
 		m_ImageSources[i] = "none";

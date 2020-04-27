@@ -2,9 +2,10 @@
 #include "JGUIComponent.h"
 #include <set>
 
-class JGUIWindow;
-class JGUIElement;
-class JGUITransform : public JGUIComponent
+
+class  JGUIWindow;
+class  JGUIElement;
+class JGENGINE_API JGUITransform : public JGUIComponent
 {
 	friend JGUI;
 	friend JGUIWindow;

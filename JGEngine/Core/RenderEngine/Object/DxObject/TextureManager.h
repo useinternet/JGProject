@@ -28,6 +28,7 @@ namespace RE
 		static bool RegisterTexture(const std::string& name, const Texture& t);
 		static bool UnRegisterTexture(const std::string& name);
 	private:
+		
 		bool TextureLoad(Texture& t, const std::filesystem::path& p, CommandList* cmdList);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Texture>> m_TextureCahce;

@@ -3,12 +3,12 @@
 #include "GUI/JGUIObject/JGUIWindow.h"
 
 
-JGUI_MAIN_WINFORM(JGUIForm)
+JGUI_MAIN_WINFORM(JGUIForm, JGUI_WindowFlag_MainWindow)
 
 
 
 
-class JGUIForm : public JGUIWindow
+class JGENGINE_API JGUIForm : public JGUIWindow
 {
 	friend class JGUIWinForm;
 	friend class JGUIShellForm;

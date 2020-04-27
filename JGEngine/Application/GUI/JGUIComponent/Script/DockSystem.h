@@ -4,7 +4,7 @@
 #include "GUI/JGUIComponent/JGUIElementComponent.h"
 #include <set>
 #include <map>
-class DockSystem : public JGUIScriptComponent
+class JGENGINE_API DockSystem : public JGUIScriptComponent
 {
 	class DockResizeLine;
 protected:
@@ -49,7 +49,7 @@ private:
 	void CreateResizeLineByDirection(DockDirection dir, DockInfo* l_t_info, DockInfo* r_b_info);
 	void ArrangeDockInfo(DockInfo* remove_info);
 private:
-	using DockInfoPool = std::unordered_map<DockInfo*, std::unique_ptr<DockInfo>>;
+	using DockInfoPool = std::unordered_map<DockInfo*, std::shared_ptr<DockInfo>>;
 	using DockInfoByWindow = std::unordered_map<JGUIWindow*, DockInfo*>;
 
 	class JGUIImageRenderer* m_Docks[DD_Count];

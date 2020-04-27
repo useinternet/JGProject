@@ -2,8 +2,15 @@
 #include "JGUIRenderer.h"
 
 #include "GUI/JGUIObject/JGUIWindow.h"
+#include "GUI/JGUIObject/JGUIElement.h"
+
+
 #include "GUI/JGUIComponent/JGUICamera.h"
 #include "GUI/JGUIComponent/Element/JGUICanvas.h"
+
+
+
+
 #include "GUI/JGUIFont/JGUIFontManager.h"
 
 
@@ -526,19 +533,5 @@ void JGUIWindowRenderer::FindCamera()
 		}
 		CreateRI();
 	}
-}
-
-
-
-void JGUITextRenderer::Awake()
-{
-}
-
-void JGUITextRenderer::Destroy()
-{
-}
-
-void JGUITextRenderer::Tick(float tick)
-{
 }
 

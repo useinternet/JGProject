@@ -6,7 +6,7 @@
 #include "GUI/JGUIObject/JGUIWindow.h"
 
 #include "GUI/JGUIComponent/Element/JGUIRenderer.h"
-
+JGUI_REGISTER_COMPONENT(Scrollbar)
 void Scrollbar::Awake()
 {
 
@@ -26,6 +26,7 @@ void Scrollbar::Start()
 
 void Scrollbar::Tick(float tick)
 {
+
 }
 
 void Scrollbar::Destroy()

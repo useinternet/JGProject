@@ -15,7 +15,7 @@ class JGUICollider;
 class JGUIComponent;
 class JGUIElementComponent;
 class JGUIWindowComponent;
-class JGUIObject
+class JGENGINE_API JGUIObject
 {
 	friend JGUI;
 	friend JGUIWindow;

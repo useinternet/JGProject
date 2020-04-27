@@ -6,7 +6,7 @@
 #include "GUI/JGUIComponent/Script/Button.h"
 
 class JGUIImageRenderer;
-class Scrollbar : public JGUIScriptComponent
+class JGENGINE_API Scrollbar : public JGUIScriptComponent
 {
 public:
 	enum
@@ -53,7 +53,7 @@ private:
 	float m_BarSize = 25.0f;
 	int   m_BarType = 0;
 private:
-	class ScrollButton : public Button
+	class JGENGINE_API ScrollButton : public Button
 	{
 		friend Scrollbar;
 	protected:

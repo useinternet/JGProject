@@ -21,7 +21,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JGEngine\Common\Class\AssetLoader.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\EngineAssetFileSorter.h">
+      <Filter>Class</Filter>
+    </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\EnginePerformance.h">
       <Filter>Class</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h">
@@ -31,6 +40,9 @@
       <Filter>Class</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Class\GlobalLinkStream.h">
+      <Filter>Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Class\JWindow.h">
       <Filter>Class</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Class\Log.h">
@@ -52,9 +64,16 @@
     <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h">
       <Filter>DataType</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
     <ClInclude Include="..\JGEngine\Common\DataType\Timer.h">
       <Filter>DataType</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\DataType\VertexCollection.h">
+      <Filter>DataType</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Defined.h" />
     <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h">
       <Filter>Event</Filter>
     </ClInclude>
@@ -82,51 +101,41 @@
     <ClInclude Include="..\JGEngine\Common\Math\JMatrix.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Math\JQuaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Math\JVector.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Math\Math.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Utill\Hash.h">
-      <Filter>Utill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\framework.h" />
-    <ClInclude Include="..\JGEngine\Common\pch.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h">
-      <Filter>DataType</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Class\EnginePerformance.h">
-      <Filter>Class</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\DataType\VertexCollection.h">
-      <Filter>DataType</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Defined.h" />
     <ClInclude Include="..\JGEngine\Common\Utill\DataIO.h">
       <Filter>Utill</Filter>
     </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Class\EngineAssetFileSorter.h">
-      <Filter>Class</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Class\AssetLoader.h">
-      <Filter>Class</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Math\JQuaternion.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Class\JWindow.h">
-      <Filter>Class</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h">
+    <ClInclude Include="..\JGEngine\Common\Utill\Hash.h">
       <Filter>Utill</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h">
       <Filter>Utill</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h">
+      <Filter>Utill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Common\framework.h" />
+    <ClInclude Include="..\JGEngine\Common\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\JGEngine\Common\Class\AssetLoader.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\EngineAssetFileSorter.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\EnginePerformance.cpp">
       <Filter>Class</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp">
@@ -138,11 +147,17 @@
     <ClCompile Include="..\JGEngine\Common\Class\GlobalLinkStream.cpp">
       <Filter>Class</Filter>
     </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\Class\JWindow.cpp">
+      <Filter>Class</Filter>
+    </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Class\Log.cpp">
       <Filter>Class</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp">
       <Filter>DataType\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\DataType\Plugin.cpp">
+      <Filter>DataType</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\DataType\Timer.cpp">
       <Filter>DataType</Filter>
@@ -150,33 +165,15 @@
     <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp">
+    <ClCompile Include="..\JGEngine\Common\Math\JQuaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Common\DataType\Plugin.cpp">
-      <Filter>DataType</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Class\EnginePerformance.cpp">
-      <Filter>Class</Filter>
+    <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp">
       <Filter>Utill</Filter>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Class\EngineAssetFileSorter.cpp">
-      <Filter>Class</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Class\AssetLoader.cpp">
-      <Filter>Class</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Math\JQuaternion.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Class\JWindow.cpp">
-      <Filter>Class</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Common\Utill\dlfcn.c">
-      <Filter>Utill</Filter>
-    </ClCompile>
+    <ClCompile Include="..\JGEngine\Common\pch.cpp" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 #include "GUI/JGUIComponent/JGUIElementComponent.h"
 
 
-class JGUICanvas : public JGUIElementComponent
+class JGENGINE_API JGUICanvas : public JGUIElementComponent
 {
 protected:
 	virtual void Awake() override;

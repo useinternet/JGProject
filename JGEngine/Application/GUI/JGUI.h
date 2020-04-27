@@ -1,12 +1,17 @@
 #pragma once
 
-#include "CommonCore.h"
+#include "JE.h"
 #include "JGUIEvent.h"
 #include <vector>
 namespace IE
 {
 	class InputEngine;
 }
+
+// 기본
+
+
+
 class JGUIObject;
 class JGUIComponent;
 class JGUIWindow;
@@ -76,15 +81,17 @@ enum EJGUI_WindowFlags : uint64_t
 
 // MainWindow 타이틀, resize,
 
-#define JGUI_WindowFlag_MainWindow  JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border | JGUI_WindowFlag_EnableDock
-#define JGUI_WindowFlag_ChildWindow JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border
+#define JGUI_WindowFlag_MainWindow \
+JGUI_WindowFlag_TitleBar       | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border         | \
+JGUI_WindowFlag_EnableDock     | JGUI_WindowFlag_EnableClose  | JGUI_WindowFlag_EnableMaximize | \
+JGUI_WindowFlag_EnableMinimize | JGUI_WindowFlag_MenuBar      | JGUI_WindowFlag_NewLoad          \
 
 
+
+#define JGUI_WindowFlag_ChildWindow    JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border
 #define JGUI_WindowFlag_MainTabWindow  JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_EnableDock | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
 #define JGUI_WindowFlag_ChildTabWindow JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
-
-
-#define JGUI_WindowFlag_DockWindow     JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_Border | JGUI_WindowFlag_BottomMost
+#define JGUI_WindowFlag_DockWindow     JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_Border     | JGUI_WindowFlag_BottomMost
 
 enum EJGUI_SubmitCmdListPriority
 {
@@ -164,7 +171,7 @@ enum EJGUI_FocusFlags
 	JGUI_FocusFlag_All,
 };
 
-class JGUIRect
+class JGENGINE_API JGUIRect
 {
 public:
 	float left = 0.0f;
@@ -244,7 +251,7 @@ enum
 #define JGUI_DEFAULT_HOVERTRACKTIME 0.00f
 #define JGUI_DEFAULT_LEAVETRACKTIME 0.00f
 
-class JGUIMouseTrack
+class JGENGINE_API JGUIMouseTrack
 {
 	friend class JGUI;
 public:
@@ -257,7 +264,7 @@ private:
 	float tick  = 0.0f;
 };
 
-class JGUIExtraEvent
+class JGENGINE_API JGUIExtraEvent
 {
 	friend class JGUI;
 public:
@@ -278,10 +285,21 @@ private:
 	std::function<void(JGUIExtraEvent&)> bindedFunc;
 	uint64_t id = 0;
 };
+
+class JGENGINE_API JGUIDesc
+{
+public:
+	std::vector<std::string> dllPaths;
+	std::string mainWindowName    = "JGUI";
+	std::string mainWindowdllPath = "JGEngine.dll";
+	std::string configFilePath    = "none";
+};
+
 class JGUI
 {
-	
 public:
+	static JGUI*  Instance();
+	static JGUI** InstancePtr();
 	static float Gap() { return 10.0f; }
 	static void  DestroyObject(JGUIObject* obj);
 	static void  DestroyComponent(JGUIComponent* com);
@@ -372,7 +390,7 @@ public:
 	static void RegisterDraggingWindow(JGUIWindow* win);
 	static JGUIWindow* GetCurrentDraggingWindow();
 public:
-	JGUI(IE::InputEngine* input);
+	JGUI(IE::InputEngine* input, const JGUIDesc& desc = JGUIDesc());
 	void Update();
 private:
 	LRESULT WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -403,7 +421,7 @@ private:
 
 
 	Plugin            m_Plugin;
-
+	JGUIDesc          m_Desc;
 
 	std::queue<HWND> m_ExpectedDestroyWindow;
 	std::queue<std::shared_ptr<JGUIObject>> m_ExpectedCreateObject;
@@ -430,20 +448,48 @@ private:
 
 
 // 시작 윈도우 형태
-
-#define JGUI_MAIN_WINFORM(ClassName) \
+#define JGUI_MAIN_WINFORM(ClassName, flag) \
 class ClassName; \
-extern "C" __declspec(dllexport) \
+extern "C" JGENGINE_API \
 inline ClassName* LoadMainWindowForm(const std::string& name) { \
-    return JGUI::CreateJGUIWindow<##ClassName>(name, JGUI_WindowFlag_NewLoad); \
+    return JGUI::CreateJGUIWindow<##ClassName>(name, flag); \
+}\
+
+#define JGUI_REGISTER_WINFORM(ClassName) \
+class ClassName; \
+extern "C" JGENGINE_API \
+inline ClassName* LoadWindowForm_##ClassName(JGUIWindow* owner, const std::string& name) { \
+    return owner->CreateJGUIWindow<##ClassName>(name); \
+}\
+
+#define JGUI_REGISTER_ELEMENT(ClassName) \
+class ClassName; \
+extern "C" JGENGINE_API \
+inline ClassName* LoadEelement_##ClassName(JGUIWindow* owner, const std::string& name) { \
+    return owner->CreateJGUIElement<##ClassName>(name); \
+}\
+inline ClassName * LoadEelement_##ClassName(JGUIElement* owner, const std::string & name) { \
+    return owner->CreateJGUIElement<##ClassName>(name); \
 }\
 
 
-#define JGUI_MAIN_WINFORM_ADDFLAG(ClassName, flag) \
+
+#define JGUI_REGISTER_COMPONENT(ClassName) \
 class ClassName; \
-extern "C" __declspec(dllexport) \
-inline ClassName* LoadMainWindowForm(const std::string& name) { \
-    return JGUI::CreateJGUIWindow<##ClassName>(name, JGUI_WindowFlag_NewLoad | flag); \
+extern "C" JGENGINE_API \
+inline ClassName* LoadComponent_##ClassName(JGUIWindow* owner) { \
+    return owner->CreateJGUIComponent<##ClassName>(); \
 }\
+inline ClassName* LoadComponent_##ClassName(JGUIElement* owner) { \
+    return owner->CreateJGUIComponent<##ClassName>(); \
+}\
+
+
+
+#define JGUI_REGISTER_PTR(JGUIPtr)  \
+*JGUI::InstancePtr() = JGUIPtr;  \
+
+
+
 
 

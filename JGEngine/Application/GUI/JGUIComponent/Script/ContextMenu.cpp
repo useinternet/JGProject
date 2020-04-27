@@ -8,7 +8,7 @@
 
 #include "GUI/JGUIComponent/Script/Text.h"
 using namespace std;
-
+JGUI_REGISTER_COMPONENT(ContextMenu)
 void ContextMenu::Awake()
 {
 }

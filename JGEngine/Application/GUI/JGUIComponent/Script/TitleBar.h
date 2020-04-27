@@ -11,7 +11,7 @@
 class Button;
 class JGUICanvas;
 class JGUIImageRenderer;
-class TitleBar : public JGUIScriptComponent
+class JGENGINE_API TitleBar : public JGUIScriptComponent
 {
 protected:
 	virtual void Awake() override;

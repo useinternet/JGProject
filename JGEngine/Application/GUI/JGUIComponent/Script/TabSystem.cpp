@@ -20,6 +20,7 @@
 
 
 using namespace std;
+JGUI_REGISTER_COMPONENT(TabSystem)
 
 void TabSystem::Awake()
 {

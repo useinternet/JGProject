@@ -6,7 +6,7 @@
 
 class JGUIObject;
 class JGUIWindow;
-class JGUIWindowComponent : public JGUIComponent
+class JGENGINE_API JGUIWindowComponent : public JGUIComponent
 {
 	friend JGUIObject;
 private:

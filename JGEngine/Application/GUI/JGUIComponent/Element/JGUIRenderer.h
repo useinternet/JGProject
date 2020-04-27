@@ -12,8 +12,9 @@ namespace RE
 }
 class JGUICanvas;
 class JGUICamera;
+class JGUIElement;
 // Image Renderer
-class JGUIRenderer : public JGUIElementComponent
+class JGENGINE_API JGUIRenderer : public JGUIElementComponent
 {
 protected:
 	virtual void Awake() override;
@@ -54,7 +55,7 @@ protected:
 	JGUICamera* m_OwnerCamera = nullptr;
 };
 
-class JGUIShapeRenderer : public JGUIRenderer
+class JGENGINE_API JGUIShapeRenderer : public JGUIRenderer
 {
 	enum
 	{
@@ -88,7 +89,7 @@ protected:
 };
 
 
-class JGUIImageRenderer : public JGUIRenderer
+class JGENGINE_API JGUIImageRenderer : public JGUIRenderer
 {
 protected:
 	virtual void Awake() override;
@@ -110,7 +111,7 @@ protected:
 };
 
 
-class JGUIWindowRenderer : public JGUIImageRenderer
+class JGENGINE_API JGUIWindowRenderer : public JGUIImageRenderer
 {
 protected:
 	virtual void Init() override;
@@ -123,14 +124,3 @@ private:
 
 
 
-class JGUITextRenderer : public JGUIRenderer
-{
-protected:
-	virtual void Awake() override;
-	virtual void Destroy() override;
-	virtual void Tick(float tick) override;
-
-
-
-
-};

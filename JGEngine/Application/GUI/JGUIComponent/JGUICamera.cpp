@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "JGUICamera.h"
 #include "JGUITransform.h"
+#include "GUI/JGUIObject/JGUIElement.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 
 #include "RenderEngine.h"

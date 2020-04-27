@@ -3,7 +3,7 @@
 #include "JGUIComponent.h"
 
 class JGUICanvas;
-class JGUICollider : public JGUIComponent
+class JGENGINE_API JGUICollider : public JGUIComponent
 {
 public:
 	virtual bool CheckInPoint(const JVector2Int& p);
@@ -18,7 +18,7 @@ protected:
 };
 
 
-class JGUIBoxCollider : public JGUICollider
+class JGENGINE_API JGUIBoxCollider : public JGUICollider
 {
 protected:
 	virtual void Awake() override;

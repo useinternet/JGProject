@@ -28,7 +28,12 @@ Separaters
 class JGUIImageRenderer;
 class JGUIShapeRenderer;
 class Text;
-class MenuItemDesc
+class MainMenu;
+class MainMenuItem;
+class ContextMenu;
+class MenuItemCollection;
+
+class JGENGINE_API MenuItemDesc
 {
 public:
 	
@@ -45,8 +50,12 @@ public:
 	std::string backGround_path   = "none";
 };
 
-class MenuItem : public JGUIScriptComponent
+class JGENGINE_API MenuItem : public JGUIScriptComponent
 {
+	friend MenuItemCollection;
+	friend MainMenu;
+	friend MainMenuItem;
+	friend ContextMenu;
 	enum
 	{
 		MenuItemDefaultHeight = 20
@@ -59,7 +68,6 @@ protected:
 public:
 	MenuItem* AddItem(const MenuItemDesc& desc);
 	MenuItem* GetItem(uint32_t idx) const;
-	MenuItem* GetItem(const std::string& name) const;
 	uint32_t  GetItemCount() const;
 
 	void      AddSeparater();
@@ -67,9 +75,18 @@ public:
 	void      OpenItems();
 	void      CloseItems();
 	bool      IsOpenItems() const;
+private:
 //private:
 	void Setting();
 	void ItemsSetting();
+	void ItemOperation();
+
+
+	void ReceiveAuxKeyDown(const JGUIKeyDownEvent& e);
+	void ReceiveAuxKeyUp(const JGUIKeyUpEvent& e);
+
+	void ReceiveShortCutKeyDown(const JGUIKeyDownEvent& e);
+	void ReceiveShortCutKeyUp(const JGUIKeyUpEvent& e);
 private:
 	std::map<uint32_t, JGUIElement*> m_SepIndexMap;
 
@@ -84,18 +101,12 @@ private:
 	//
 	Text*                  m_ContentsText    = nullptr;
 	Text*                  m_ShortcutKeyText = nullptr;
-
-public:
 	MenuItemDesc           m_Desc;
 
 	// 미세 조정 변수들
 	float m_ContentsTextWidth    = 0.0f;
 	float m_ShortcutKeyTextWidth = 0.0f;
-	float m_IconGap   = 1.0f;
-	float m_ArrowGap  = 4.0f;
-	float m_SepHeight = 5.0f;
-	float m_SepGap    = 2.0f;
-	float m_BorderThick = 0.5f;
+
 
 	bool m_IsSetting = false;
 	bool m_IsDirty   = true;
@@ -104,11 +115,73 @@ public:
 	bool m_IsMouseDown = false;
 
 
+	// 단축키 변수
+	bool  m_IsAuxOperation      = false;
+	bool  m_IsShortCutOperation = false;
+	bool  m_ActiveAuxKey     = false;
 
-	JColor m_NormalColor      = JColor(0.106f, 0.106f, 0.116f, 1.0f);
-	JColor m_HightlightColor  = JColor(0.206f, 0.206f, 0.216f, 1.0f);
-	JColor m_BorderColor      = JColor(0.206f, 0.206f, 0.216f, 1.0f);
-	JColor m_SepColor         = JColor(0.376f, 0.376f, 0.386f, 1.0f);
+
+	std::map<KeyCode, bool> m_ActiveShortcutKey;
+	uint32_t                m_ShortCutIndex = 0;
+
+
+
+
 
 	std::string m_ArrowSource_Path = "Right_Arrow.png";
+	MenuItemCollection* m_OwnerCollection = nullptr;
+private:
+	static const float IconGap;
+	static const float ArrowGap;
+	static const float SepHeight;
+	static const float SepGap;
+	static const float BorderThick;
+
+
+	static const JColor NormalColor;
+	static const JColor HightlightColor;
+	static const JColor BorderColor;
+	static const JColor SepColor;
+};
+
+
+
+
+class JGENGINE_API MenuItemCollection : public JGUIScriptComponent
+{
+protected:
+	virtual void Awake() override;
+	virtual void Start() override;
+	virtual void Destroy() override;
+	virtual void Tick(float tick) override;
+public:
+	MenuItem* AddItem(const MenuItemDesc& desc);
+	MenuItem* GetItem(uint32_t idx) const;
+	uint32_t  GetItemCount() const;
+
+	void      AddSeparater();
+
+	void      OpenItems();
+	void      CloseItems();
+	bool      IsOpenItems() const;
+public:
+	void ReceiveAuxKeyDown(const JGUIKeyDownEvent& e);
+	void ReceiveAuxKeyUp(const JGUIKeyUpEvent& e);
+
+	void ReceiveShortCutKeyDown(const JGUIKeyDownEvent& e);
+	void ReceiveShortCutKeyUp(const JGUIKeyUpEvent& e);
+private:
+	void ItemsSetting();
+	void ItemsAuxKeyUp(MenuItem* item, const JGUIKeyUpEvent& e);
+
+	void ItemsShortcutKeyDown(MenuItem* item, const JGUIKeyDownEvent& e);
+	void ItemsShortcutKeyUp(MenuItem* item, const JGUIKeyUpEvent& e);
+private:
+	std::map<uint32_t, JGUIElement*> m_SepIndexMap;
+	JGUIImageRenderer* m_BackGround       = nullptr;
+	JGUIShapeRenderer* m_BackGroundBorder = nullptr;
+	JGUIElement*       m_Separaters       = nullptr;
+	JGUIElement*       m_MenuItems        = nullptr;
+
+	bool   m_IsDirty = true;
 };

@@ -11,7 +11,7 @@
 #include "GUI/JGUIComponent/Script/TabSystem.h"
 
 using namespace std;
-
+JGUI_REGISTER_COMPONENT(DockSystem)
 void DockSystem::Awake()
 {
 	m_LineCanvas = GetOwner()->CreateJGUIElement("ResizeLineCanvas")->CreateJGUIComponent<JGUICanvas>();

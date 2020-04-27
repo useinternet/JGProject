@@ -8,7 +8,7 @@ namespace RE
 	class FixedGShaderModuleClone;
 	class ReCamera;
 }
-class JGUICamera : public JGUIComponent
+class JGENGINE_API JGUICamera : public JGUIComponent
 {
 protected:
 	virtual void Awake() override;

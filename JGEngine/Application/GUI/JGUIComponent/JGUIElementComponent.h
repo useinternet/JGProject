@@ -6,7 +6,7 @@
 class JGUIObject;
 class JGUIElement;
 class JGUIWindow;
-class JGUIElementComponent : public JGUIComponent
+class JGENGINE_API JGUIElementComponent : public JGUIComponent
 {
 	friend JGUIObject;
 private:
@@ -21,7 +21,7 @@ public:
 };
 
 
-class JGUIScriptComponent : public JGUIElementComponent
+class JGENGINE_API JGUIScriptComponent : public JGUIElementComponent
 {
 	friend JGUIElement;
 private:

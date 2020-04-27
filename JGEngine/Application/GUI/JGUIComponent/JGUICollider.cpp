@@ -3,13 +3,12 @@
 #include "GUI/JGUIObject/JGUIElement.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 #include "GUI/JGUIComponent/JGUICamera.h"
-#include "GUI/JGUIElement/JGUITitleBar.h"
 #include "Element/JGUICanvas.h"
 
 bool JGUICollider::CheckInPoint(const JVector2Int& p)
 {
 	
-
+	
 	return false;
 }
 
@@ -76,7 +75,6 @@ bool JGUIBoxCollider::CheckInPoint(const JVector2Int& p)
 		auto view_pos = m_ElementOwner->GetOwnerWindow()->GetParent()->GetCamera()->GetPosition();
 		mouse_pos.x += view_pos.x;
 		mouse_pos.y -= view_pos.y;
-		ENGINE_LOG_INFO("MousePos : {0} , {1}", mouse_pos.x, mouse_pos.y);
 	}
 	if (
 		(m_OwnerCanvas && !(m_OwnerCanvas->GetCanvasFlags() & JGUI_CanvasFlag_Overlay)) ||

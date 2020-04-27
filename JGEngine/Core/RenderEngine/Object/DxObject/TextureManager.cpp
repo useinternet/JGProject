@@ -8,8 +8,10 @@
 #include "CommandQueue.h"
 using namespace DirectX;
 using namespace std;
+
 namespace RE
 {
+	
 	TextureManager* g_TextureManager = nullptr;
 	TextureManager::TextureManager(const std::string& name) :
 		DxObject(name)

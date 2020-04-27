@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "JGUI.h"
 #include "JGUIObject/JGUIObject.h"
-#include "JGUIObject/JGUIWindow.h"
+#include "GUI/JGUIObject/JGUIElement.h"
+#include "GUI/JGUIObject/JGUIWindow.h"
+
+
 #include "JGUIFont/JGUIFontManager.h"
 #include "JGUIScreen.h"
 #include "RenderEngine.h"
@@ -12,7 +15,7 @@ using namespace std;
 
 
 JGUI* JGUI::sm_GUI = nullptr;
-JGUI::JGUI(IE::InputEngine* input)
+JGUI::JGUI(IE::InputEngine* input, const JGUIDesc& desc)
 {
 	if (sm_GUI == nullptr)
 	{
@@ -21,7 +24,7 @@ JGUI::JGUI(IE::InputEngine* input)
 	JWindowManager::BindWindowProcFunc(std::bind(&JGUI::WindowProc, this,
 		placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
 	m_Input = input;
-	m_Plugin.Load("JGEngine.dll");
+	m_Plugin.Load(m_Desc.mainWindowdllPath);
 
 	m_FontManager = make_shared<JGUIFontManager>();
 	if (!m_FontManager->FontLoad(m_DefaultFont))
@@ -30,13 +33,23 @@ JGUI::JGUI(IE::InputEngine* input)
 	}
 
 
-	m_MainWindow = ((JGUIMainWindowFunc)m_Plugin.GetProcAddress("LoadMainWindowForm"))("JGUI");
+	m_MainWindow = ((JGUIMainWindowFunc)m_Plugin.GetProcAddress("LoadMainWindowForm"))(m_Desc.mainWindowName);
 	m_MainWindow->GetTransform()->SetSize(800, 600);
 	m_MainHWND = m_MainWindow->GetRootWindowHandle();
 }
 
 
 
+
+JGUI* JGUI::Instance()
+{
+	return sm_GUI;
+}
+
+JGUI** JGUI::InstancePtr()
+{
+	return &sm_GUI;
+}
 
 void        JGUI::DestroyObject(JGUIObject* obj)
 {
