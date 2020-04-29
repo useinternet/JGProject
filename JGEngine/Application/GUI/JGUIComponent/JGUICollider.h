@@ -12,6 +12,10 @@ protected:
 	virtual void Awake() override;
 	virtual void ChangeParent(JGUIObject* prev_parent) override;
 	void FindCanvas();
+public:
+	JGUICanvas* GetOwnerCanvas() const {
+		return m_OwnerCanvas;
+	}
 protected:
 	EJGUI_Collider m_ColiderType;
 	JGUICanvas*    m_OwnerCanvas = nullptr;

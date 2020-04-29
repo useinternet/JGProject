@@ -139,18 +139,23 @@ void JGUITransform::OffsetLocalScale(float x, float y)
 void JGUITransform::SetSize(const JVector2& size)
 {
 	if (m_Attacher) return;
+	if (size == m_Size) return;
 	m_Size = size;
 	SendDirty();
 	SendAttachedTransform_Size(m_Size);
+	
+	SendSizeToElement();
 	SendSizeToWin();
 }
 void JGUITransform::SetSize(float x, float y)
 {
 	if (m_Attacher) return;
+	if (JVector2( x,y ) == m_Size) return;
 	m_Size.x = x;
 	m_Size.y = y;
 	SendDirty();
 	SendAttachedTransform_Size(m_Size);
+	SendSizeToElement();
 	SendSizeToWin();
 }
 void JGUITransform::OffsetSize(const JVector2& offset)
@@ -160,6 +165,7 @@ void JGUITransform::OffsetSize(const JVector2& offset)
 	m_Size.y += offset.y;
 	SendDirty();
 	SendAttachedTransform_Size(m_Size);
+	SendSizeToElement();
 	SendSizeToWin();
 }
 void JGUITransform::OffsetSize(float x, float y)
@@ -169,6 +175,7 @@ void JGUITransform::OffsetSize(float x, float y)
 	m_Size.y += y;
 	SendDirty();
 	SendAttachedTransform_Size(m_Size);
+	SendSizeToElement();
 	SendSizeToWin();
 }
 void JGUITransform::SetPivot(const JVector2& pivot)
@@ -441,23 +448,24 @@ void JGUITransform::SendSizeToWin()
 			m_WindowOwner->FindChild((uint32_t)i)->GetTransform()->SendDirty();
 		}
 	}
-	else
-	{
-		JGUIResizeEvent e;
-		e.width  = m_Size.x;
-		e.height = m_Size.y;
+	JGUIResizeEvent e;
+	e.width = m_Size.x;
+	e.height = m_Size.y;
 
-		m_WindowOwner->JGUIResize(e);
-	}
+	m_WindowOwner->JGUIResize(e);
 }
-//void JGUITransform::BindComponent(JGUIElement* com)
-//{
-//	m_BindedElement = com;
-//	m_BindedWindow = nullptr;
-//}
-//
-//void JGUITransform::BindWindow(JGUIWindow* win)
-//{
-//	m_BindedWindow = win;
-//	m_BindedElement = nullptr;
-//}
+void JGUITransform::SendSizeToElement()
+{
+	if (m_ElementOwner == nullptr) return;
+	uint32_t x = std::max<uint32_t>(1, (uint32_t)m_Size.x);
+	uint32_t y = std::max<uint32_t>(1, (uint32_t)m_Size.y);
+	m_Size.x = x;
+	m_Size.y = y;
+
+	JGUIResizeEvent e;
+	e.width = m_Size.x;
+	e.height = m_Size.y;
+	m_ElementOwner->JGUIResize(e);
+
+}
+

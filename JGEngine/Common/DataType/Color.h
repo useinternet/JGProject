@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 
@@ -27,8 +27,15 @@ public:
 
 public:
 	inline static JColor Red()   { return JColor(1.0f, 0.0f, 0.0f, 1.0f); }
+
 	inline static JColor Green() { return JColor(0.0f, 1.0f, 0.0f, 1.0f); }
 	inline static JColor Blue()  { return JColor(0.0f, 0.0f, 1.0f, 1.0f); }
 	inline static JColor White() { return JColor(1.0f, 1.0f, 1.0f, 1.0f); }
 	inline static JColor Black() { return JColor(0.0f, 0.0f, 0.0f, 1.0f); }
+	inline static JColor OrangeRed() { return JColor(1.0f, 0.64705f, 0.0f, 1.0f); }
+	inline static JColor Orange() { return JColor(1.0f, 0.64705f, 0.0f, 1.0f); }
+	inline static JColor DarkOrange() { return JColor(1.0f, 0.270588f, 0.0f, 1.0f); }
+	inline static JColor Gold() { return JColor(1.0f, 0.843137f, 0.0f, 1.0f); }
+	inline static JColor Yellow() { return JColor(1.0f, 1.0f, 0.0f, 1.0f); }
+	//0.64705 //0.270588
 };

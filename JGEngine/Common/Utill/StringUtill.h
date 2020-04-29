@@ -29,3 +29,20 @@ inline std::string ws2s(const std::wstring& wstr)
 
 	return converterX.to_bytes(wstr);
 }
+namespace std
+{
+	inline std::string replaceAll(const std::string& str, const std::string& pattern, const std::string& replace)
+	{
+		std::string result = str;
+		std::string::size_type pos = 0;
+		std::string::size_type offset = 0;
+		while ((pos = result.find(pattern, offset)) != std::string::npos)
+		{
+			result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
+			offset = pos + replace.size();
+		}
+		return result;
+	}
+
+}
+

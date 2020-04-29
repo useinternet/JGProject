@@ -81,14 +81,14 @@ public:
 
 
 	template<typename ComponentType>
-	ComponentType* CreateJGUIElement(const std::string& name, EJGUI_ComponentFlags flags = JGUI_ComponentFlag_None)
+	ComponentType* CreateJGUIElement(const std::string& name, EJGUI_ElementFlags flags = JGUI_ElementFlag_None)
 	{
 		auto com = JGUI::CreateJGUIElement<ComponentType>(name, this, flags);
 		com->SetParent(m_ElementCanvas);
 		return com;
 	}
 
-	JGUIElement* CreateJGUIElement(const std::string& name, EJGUI_ComponentFlags flags = JGUI_ComponentFlag_None)
+	JGUIElement* CreateJGUIElement(const std::string& name, EJGUI_ElementFlags flags = JGUI_ElementFlag_None)
 	{
 		return CreateJGUIElement<JGUIElement>(name, flags);
 	}
@@ -128,7 +128,7 @@ public:
 	TabSystem* GetTabSystem() const {
 		return m_TabSystem;
 	}
-	MainMenu* GetMenu() const {
+	MainMenu* GetMainMenu() const {
 		return m_MainMenu;
 	}
 	JGUICamera* GetCamera() const {
@@ -165,7 +165,7 @@ private:
 
 	// 일반
 	template<typename ComponentType>
-	ComponentType* CreateJGUIEssentialElement(const std::string& name, EJGUI_ComponentFlags flags = JGUI_ComponentFlag_None)
+	ComponentType* CreateJGUIEssentialElement(const std::string& name, EJGUI_ElementFlags flags = JGUI_ElementFlag_None)
 	{
 		auto com = JGUI::CreateJGUIElement<ComponentType>(name, this, flags);
 		com->SetParent(m_EssentialCanvas);
@@ -226,23 +226,6 @@ private:
 	bool m_IsTracking   = false;
 	bool m_IsMouseLeave = false;
 	bool m_IsMouseDown  = false;
-
-	// 부가 파츠
-
-
-
-
-
-
-
-	//JGUITitleBar*       m_Title = nullptr;
-
-	//JGUIMenu*           m_Menu = nullptr;
-	//JGUIDock*           m_Dock = nullptr;
-	//JGUIScrollbar*      m_HScrollbar = nullptr;
-	//JGUIScrollbar*      m_VScrollbar = nullptr;
-
-
 
 
 	friend void JGUITransform::SendSizeToWin();

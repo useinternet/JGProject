@@ -6,7 +6,7 @@
 #include "GUI/JGUIObject/JGUIWindow.h"
 using namespace std;
 JGUI_REGISTER_COMPONENT(WindowSizeAdjustment)
-void WindowSizeAdjustment::Start()
+void WindowSizeAdjustment::Awake()
 {
 	m_Image = GetOwner()->FindComponent<JGUIImageRenderer>();
 

@@ -42,21 +42,11 @@ enum EJGUI_Collider
 {
 	JGUI_Collider_Box = 0,
 };
-enum EJGUI_RectTransform
-{
-	JGUI_RectTransform_Default,
-	JGUI_RectTransform_Window,
-};
 enum EJGUI_RIMaterial
 {
 	JGUI_RIMaterial_Default,
 	JGUI_RIMaterial_OneTexture,
 	JGUI_RIMaterial_Text
-};
-enum EJGUI_RIMesh
-{
-	JGUI_RIMesh_Rectangle,
-	JGUI_RIMesh_EmptyRectangle,
 };
 // Window
 enum EJGUI_WindowFlags : uint64_t
@@ -88,7 +78,7 @@ JGUI_WindowFlag_EnableMinimize | JGUI_WindowFlag_MenuBar      | JGUI_WindowFlag_
 
 
 
-#define JGUI_WindowFlag_ChildWindow    JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border
+#define JGUI_WindowFlag_ChildWindow    JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_EnableResize | JGUI_WindowFlag_Border   | JGUI_WindowFlag_EnableClose
 #define JGUI_WindowFlag_MainTabWindow  JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_EnableDock | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
 #define JGUI_WindowFlag_ChildTabWindow JGUI_WindowFlag_NoMove   | JGUI_WindowFlag_BottomMost | JGUI_WindowFlag_Border
 #define JGUI_WindowFlag_DockWindow     JGUI_WindowFlag_TitleBar | JGUI_WindowFlag_Border     | JGUI_WindowFlag_BottomMost
@@ -107,11 +97,9 @@ enum EJGUI_WindowPriority : uint64_t
 };
 
 // Component
-enum EJGUI_ComponentFlags
+enum EJGUI_ElementFlags
 {
-	JGUI_ComponentFlag_None               = 0x0000000000,
-	JGUI_ComponentFlag_TopMost            = 0x0000000001,
-	JGUI_ComponentFlag_Overlay            = 0x0000000002
+	JGUI_ElementFlag_None               = 0x0000000000,
 };
 enum EJGUI_Canvas_Flags
 {
@@ -119,6 +107,8 @@ enum EJGUI_Canvas_Flags
 	JGUI_CanvasFlag_TopMost = 2,
 	JGUI_CanvasFlag_Overlay = 4
 };
+
+
 enum EJGUI_Clip_Flags
 {
 	JGUI_Clip_Flag_None = 0x00,
@@ -128,20 +118,6 @@ enum EJGUI_Clip_Flags
 };
 /* EJGUI_TextFlags : 텍스트가 텍스트 사각형 범위내에 벗어 날시 Flag */
 
-enum EJGUI_Text_Flags
-{
-	JGUI_Text_Flag_None         = 0x000,
-	JGUI_Text_Flag_Border       = 0x001,
-};
-
-enum EJGUI_Text_Drawing
-{
-	JGUI_Text_Drawing_Discard,       // 범위 내에 벗어날 때 그만큼 텍스트를 자른다.
-	JGUI_Text_Drawing_NextLine,      // 범위 내에 벗어날 때 다음줄로 간다.
-	JGUI_Text_Drawing_RightPushed,   // 범위 내에 벗어날 때 오른쪽으로 밀고 벗어난만큼 자른다.
-	JGUI_Text_Drawing_DownPushed,    // 범위 내에 벗어날 때 아래쪽으로 밀고 벗어난만큼 자른다.
-	JGUI_Text_Drawing_Ignore         // 범위 내에 벗어나도 무시한다.
-};
 
 enum EJGUI_Text_HAlignment
 {
@@ -193,16 +169,26 @@ public:
 		center.y = top  + (height() * 0.5f);
 		return center;
 	}
-	bool Contains(const JVector2 p)
+	bool Contains(const JVector2& p)
 	{
 		if (p.x >= left && p.x <= right && p.y >= top && p.y <= bottom)
 			return true;
 		return false;
 	}
-	bool Contains(const JVector2Int p)
+	bool Contains(const JVector2Int& p)
 	{
 		JVector2 fp((float)p.x, (float)p.y);
 		return Contains(fp);
+	}
+	bool Overlap(const JGUIRect& r)
+	{
+		if (Contains(JVector2(r.left, r.top))) return true;
+		if (Contains(JVector2(r.right, r.top))) return true;
+		if(Contains(JVector2(r.left, r.bottom))) return true;
+		if (Contains(JVector2(r.right, r.bottom))) return true;
+
+		return false;
+
 	}
 	void Demical()
 	{
@@ -291,11 +277,11 @@ class JGENGINE_API JGUIDesc
 public:
 	std::vector<std::string> dllPaths;
 	std::string mainWindowName    = "JGUI";
-	std::string mainWindowdllPath = "JGEngine.dll";
+	std::string mainWindowdllPath = "JGEditor.dll";
 	std::string configFilePath    = "none";
 };
 
-class JGUI
+class JGENGINE_API JGUI
 {
 public:
 	static JGUI*  Instance();
@@ -318,7 +304,7 @@ public:
 	}
 
 	template<typename ElementType>
-	static ElementType* CreateJGUIElement(const std::string& name, JGUIWindow* owner_window, EJGUI_ComponentFlags flag)
+	static ElementType* CreateJGUIElement(const std::string& name, JGUIWindow* owner_window, EJGUI_ElementFlags flag)
 	{
 		auto& objqueue = sm_GUI->m_ExpectedCreateObject;
 		auto& id_queue = sm_GUI->m_IDQueue;
@@ -405,7 +391,8 @@ private:
 	LRESULT WindowMouseHover(JGUIWindow* window);
 	LRESULT WindowMouseLeave(JGUIWindow* window);
 private:
-	static JGUI* sm_GUI;
+	Plugin            m_Plugin;
+    static JGUI* sm_GUI;
 	using JGUILoadFunc = JGUIObject * (*)(const std::string&);
 	using JGUIMainWindowFunc = JGUIWindow * (*)(const std::string&);
 	using JGUIWindowFunc = JGUIWindow * (*)(const std::string&, bool);
@@ -420,7 +407,7 @@ private:
 	JGUIScreenPool    m_ScreenPool;
 
 
-	Plugin            m_Plugin;
+	
 	JGUIDesc          m_Desc;
 
 	std::queue<HWND> m_ExpectedDestroyWindow;
@@ -450,21 +437,21 @@ private:
 // 시작 윈도우 형태
 #define JGUI_MAIN_WINFORM(ClassName, flag) \
 class ClassName; \
-extern "C" JGENGINE_API \
+extern "C" __declspec(dllexport) \
 inline ClassName* LoadMainWindowForm(const std::string& name) { \
     return JGUI::CreateJGUIWindow<##ClassName>(name, flag); \
 }\
 
 #define JGUI_REGISTER_WINFORM(ClassName) \
 class ClassName; \
-extern "C" JGENGINE_API \
+extern "C" __declspec(dllexport) \
 inline ClassName* LoadWindowForm_##ClassName(JGUIWindow* owner, const std::string& name) { \
-    return owner->CreateJGUIWindow<##ClassName>(name); \
+    return owner->CreateJGUIForm<##ClassName>(name); \
 }\
 
 #define JGUI_REGISTER_ELEMENT(ClassName) \
 class ClassName; \
-extern "C" JGENGINE_API \
+extern "C" __declspec(dllexport) \
 inline ClassName* LoadEelement_##ClassName(JGUIWindow* owner, const std::string& name) { \
     return owner->CreateJGUIElement<##ClassName>(name); \
 }\
@@ -476,7 +463,7 @@ inline ClassName * LoadEelement_##ClassName(JGUIElement* owner, const std::strin
 
 #define JGUI_REGISTER_COMPONENT(ClassName) \
 class ClassName; \
-extern "C" JGENGINE_API \
+extern "C" __declspec(dllexport) \
 inline ClassName* LoadComponent_##ClassName(JGUIWindow* owner) { \
     return owner->CreateJGUIComponent<##ClassName>(); \
 }\

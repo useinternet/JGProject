@@ -45,17 +45,16 @@ void Text::Awake()
 {
 	JGUIRenderer::Awake();
 	m_FM = JGUI::GetJGUIFontManager();
+	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
+	{
+		std::string text = replaceAll(ToString(), "\n", "");
+		SetText(text);
+	});
 }
 
 void Text::Start()
 {
-	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
-	{
-		for (auto& text_pair : m_TextMeshByLine)
-		{
-			text_pair.second->SendDirty();
-		}
-	});
+
 }
 
 void Text::Destroy()
@@ -323,7 +322,7 @@ void Text::MergeTextMesh(std::vector<JGUIVertex>& v, std::vector<uint32_t>& i)
 void Text::TextMesh::Update()
 {
 	if (text == prev_text && !is_first) return;
-	is_first = true;
+	is_first = false;
 	v_array.clear();
 	i_array.clear();
 

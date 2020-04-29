@@ -117,6 +117,12 @@
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -199,5 +205,11 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@ class JGENGINE_API JGUITransform : public JGUIComponent
 {
 	friend JGUI;
 	friend JGUIWindow;
+	friend JGUIElement;
 protected:
 	virtual void Awake() override;
 	virtual void Destroy() override;
@@ -66,6 +67,7 @@ private:
 	void SendAttachedTransform_Scale(const JVector2& scale);
 	void SendPosToWin();
 	void SendSizeToWin();
+	void SendSizeToElement();
 protected:
 	JVector2    m_LocalPosition;
 	float       m_LocalAngle;

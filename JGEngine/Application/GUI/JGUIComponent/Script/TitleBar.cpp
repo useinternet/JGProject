@@ -28,11 +28,6 @@ void TitleBar::Awake()
 	m_Image->SetColor(0.3f, 0.3f, 0.3f, 1.0f);
 	m_TitleCanvas = canvas->CreateJGUIComponent<JGUICanvas>();
 	m_TitleCanvas->SetCanvasFlags(JGUI_CanvasFlag_Overlay);
-}
-
-void TitleBar::Start()
-{
-
 
 	GetOwner()->BindMouseBtDownFunc([&](const JGUIKeyDownEvent& e)
 	{
@@ -42,6 +37,13 @@ void TitleBar::Start()
 	{
 		SettingByWindowFlags();
 	});
+}
+
+void TitleBar::Start()
+{
+
+
+	
 	SettingByWindowFlags();
 }
 

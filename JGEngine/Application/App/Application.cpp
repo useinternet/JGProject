@@ -13,14 +13,19 @@
 using namespace std;
 using namespace concurrency;
 
-JGUIWindow* g_window = nullptr;
+static GlobalLinkStream g_link_stream;
+const GlobalLinkStream& Application::GetLinkStream()
+{
+	return g_link_stream;
+}
 
 Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
 {
-	//GlobalLinkData::Destory();
+
 }
+
 bool Application::Init()
 {
 	Log::Init("JGEngine", "enginelog.txt");
@@ -32,25 +37,24 @@ bool Application::Init()
 	m_EngineTimer->Start();
 	m_EngineConfig->LoadConfig();
 
-	GlobalLinkStream stream;
 	// Create Global Link Stream 
 	{
 		auto call_back_func = std::bind(&Application::OnEvent, this, std::placeholders::_1);
-		stream.LogFileName = "enginelog.txt";
-		stream.Logger = Log::GetLogger();
-		stream.OnEvent = call_back_func;
-		stream.EngineEventManager = m_EventManager;
-		stream._EngineTimer = m_EngineTimer;
-		stream._EngineConfig = m_EngineConfig;
-		stream._EnginePerformance = m_Performance;
-		GlobalLinkData::Init(stream, true);
+		g_link_stream.LogFileName = "enginelog.txt";
+		g_link_stream.Logger = Log::GetLogger();
+		g_link_stream.OnEvent = call_back_func;
+		g_link_stream.EngineEventManager = m_EventManager;
+		g_link_stream._EngineTimer = m_EngineTimer;
+		g_link_stream._EngineConfig = m_EngineConfig;
+		g_link_stream._EnginePerformance = m_Performance;
+		GlobalLinkData::Init(g_link_stream, true);
 	}
 
-	m_InputEngine = make_shared<IE::InputEngine>(stream);
-	m_PhysicsEngine = make_shared<PE::PhysicsEngine>(stream);
-	m_SoundEngine = make_shared<SE::SoundEngine>(stream);
-	m_RenderEngine = make_shared<RE::RenderEngine>(stream);
-	m_Game = make_shared<GFW::Game>(stream);
+	m_InputEngine = make_shared<IE::InputEngine>(g_link_stream);
+	m_PhysicsEngine = make_shared<PE::PhysicsEngine>(g_link_stream);
+	m_SoundEngine = make_shared<SE::SoundEngine>(g_link_stream);
+	m_RenderEngine = make_shared<RE::RenderEngine>(g_link_stream);
+	m_Game = make_shared<GFW::Game>(g_link_stream);
 
 	m_RenderEngine->Init();
 

@@ -511,7 +511,7 @@ LRESULT JGUI::WindowProcResize(JGUIWindow* window, WPARAM wParam, LPARAM lParam)
 	e.width = (float)LOWORD(lParam);
 	e.height = (float)HIWORD(lParam);
 	if (e.width == 0.0f || e.height == 0.0f) return 0;
-	window->JGUIResize(e);
+	window->GetTransform()->SetSize(e.width, e.height);
 	return 0;
 }
 LRESULT JGUI::WindowSetFocus(JGUIWindow* window, WPARAM wParam)

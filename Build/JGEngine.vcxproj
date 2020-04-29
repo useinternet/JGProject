@@ -186,8 +186,10 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITransform.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIWindowComponent.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MenuItem.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Scrollbar.h" />
@@ -219,8 +221,10 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUITransform.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\JGUIWindowComponent.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MenuItem.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Scrollbar.cpp" />

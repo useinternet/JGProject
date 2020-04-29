@@ -15,21 +15,24 @@ void MainMenu::Awake()
 {
 
 	m_MainMenuItems = GetOwner()->CreateJGUIElement("MainMenuItems");
+	auto canvas = m_MainMenuItems->CreateJGUIComponent<JGUICanvas>();
+	canvas->SetCanvasFlags(JGUI_CanvasFlag_Overlay);
 	m_Image = m_MainMenuItems->CreateJGUIComponent<JGUIImageRenderer>();
 	m_Image->SetColor(MenuItem::HightlightColor);
 	
 	
 	GetTransform()->AttachTransform(m_MainMenuItems->GetTransform());
+	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
+	{
+		Setting();
+	});
 }
 
 void MainMenu::Start()
 {
 	
 	Setting();
-	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
-	{
-		Setting();
-	});
+
 
 }
 
@@ -178,10 +181,7 @@ void MainMenuItem::Awake()
 	m_Image->SetColor(MenuItem::HightlightColor);
 	m_ItemCollection = GetOwner()->CreateJGUIElement("MenuItemCollection")->CreateJGUIComponent<MenuItemCollection>();
 	m_ContentsText   = GetOwner()->CreateJGUIElement("ContentsText")->CreateJGUIComponent<Text>();
-}
 
-void MainMenuItem::Start()
-{
 
 	GetOwner()->BindMouseBtDownFunc([&](const JGUIKeyDownEvent& e)
 	{
@@ -207,6 +207,12 @@ void MainMenuItem::Start()
 			OpenItems();
 		}
 	});
+}
+
+void MainMenuItem::Start()
+{
+
+	
 
 	CloseItems();
 }

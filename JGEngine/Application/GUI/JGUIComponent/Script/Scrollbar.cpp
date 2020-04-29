@@ -9,7 +9,10 @@
 JGUI_REGISTER_COMPONENT(Scrollbar)
 void Scrollbar::Awake()
 {
-
+	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
+	{
+		Setting();
+	});
 
 
 }
@@ -18,10 +21,7 @@ void Scrollbar::Start()
 {
 	Setting();
 
-	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent  &e)
-	{
-		Setting();
-	});
+
 }
 
 void Scrollbar::Tick(float tick)
@@ -70,7 +70,11 @@ void Scrollbar::SetBarType(int n)
 	m_BarType = n;
 	Setting();
 }
-
+void Scrollbar::Set(float occupyRatio)
+{
+	m_OccupyRatio = occupyRatio;
+	Setting();
+}
 void Scrollbar::Setting()
 {
 	auto size = GetTransform()->GetSize();

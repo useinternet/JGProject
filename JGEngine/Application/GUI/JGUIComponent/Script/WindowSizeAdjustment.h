@@ -7,7 +7,7 @@ class JGENGINE_API WindowSizeAdjustment : public JGUIScriptComponent
 {
 
 protected:
-	virtual void Start() override;
+	virtual void Awake() override;
 	virtual void Destroy() override;
 	virtual void Tick(float tick) override;
 public:

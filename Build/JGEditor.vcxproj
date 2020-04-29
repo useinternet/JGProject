@@ -174,12 +174,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\JGEngine\Editor\Core.h" />
+    <ClInclude Include="..\JGEngine\Editor\JGEditor.h" />
     <ClInclude Include="..\JGEngine\Editor\pch.h" />
+    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGLog.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\JGEngine\Editor\JGEditor.cpp" />
     <ClCompile Include="..\JGEngine\Editor\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\JGEngine\Editor\Window\Debug\JGLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Common.vcxproj">

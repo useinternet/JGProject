@@ -3,7 +3,7 @@
 #include "GUI/JGUIObject/JGUIWindow.h"
 
 
-JGUI_MAIN_WINFORM(JGUIForm, JGUI_WindowFlag_MainWindow)
+
 
 
 

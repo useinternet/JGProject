@@ -44,20 +44,22 @@ void JGUIWindow::JGUIAwake()
 
 	// 3. Canvas 생성
 	{
-		m_RootElement = JGUI::CreateJGUIElement<JGUIElement>(GetName() + "Root", this, JGUI_ComponentFlag_None);
+		m_RootElement = JGUI::CreateJGUIElement<JGUIElement>(GetName() + "Root", this, JGUI_ElementFlag_None);
 
-		m_EssentialCanvas = JGUI::CreateJGUIElement<JGUIElement>(GetName() + "Canvas", this, JGUI_ComponentFlag_None);
+		m_EssentialCanvas = JGUI::CreateJGUIElement<JGUIElement>(GetName() + "Canvas", this, JGUI_ElementFlag_None);
 		auto canvas = m_EssentialCanvas->CreateJGUIComponent<JGUICanvas>();
 		canvas->SetCanvasFlags(JGUI_CanvasFlag_TopMost | JGUI_CanvasFlag_Overlay);
 
-		m_ElementCanvas = JGUI::CreateJGUIElement<JGUIElement>("ElementCanvas", this, JGUI_ComponentFlag_None);
+		m_ElementCanvas = JGUI::CreateJGUIElement<JGUIElement>("ElementCanvas", this, JGUI_ElementFlag_None);
+		auto background = m_ElementCanvas->CreateJGUIComponent<JGUIImageRenderer>();
+		background->SetColor(JColor(0.05f, 0.05f, 0.1f, 1.0f));
 		m_ElementCanvas->CreateJGUIComponent<JGUICanvas>();
 
 		m_ElementCanvas->SetParent(m_RootElement);
 		m_EssentialCanvas->SetParent(m_RootElement);
 		
 	
-		m_RootElement->GetTransform()->AttachTransform(m_ElementCanvas->GetTransform());
+		//m_RootElement->GetTransform()->AttachTransform(m_ElementCanvas->GetTransform());
 		m_RootElement->GetTransform()->AttachTransform(m_EssentialCanvas->GetTransform());
 		m_WindowElements.push_back(m_RootElement);
 	}
@@ -167,6 +169,7 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 
 void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 {
+	
 	float width  = e.width;
 	float height = e.height;
 	if (e.width < 200 || e.height < 200)
@@ -184,7 +187,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 			GetTransform()->SetSize(width, height);
 		}
 	}
-
+	m_ElementCanvas->GetTransform()->SetSize(width, height);
 	m_WinRenderer->GetTransform()->SetSize(width, height);
 
 	m_RootElement->GetTransform()->SetSize(width, height);
@@ -243,7 +246,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 			if (m_HScrollbar) scrollheight -= 20;
 			else if (m_WinSizeAdjment) scrollheight -= m_ResizeBoxSize;
 			m_VScrollbar->GetTransform()->SetSize(20, scrollheight);
-			m_VScrollbar->GetTransform()->SetLocalPosition(width - 20 - thickness, offsety + 2);
+			m_VScrollbar->GetTransform()->SetLocalPosition(width - 20 - thickness, offsety);
 		}
 		if (m_HScrollbar)
 		{
@@ -333,26 +336,31 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 
 	// Window 찾기
 	JGUIWindow* focus_win = TrackingCanInteractionWindow();
-
 	if (!m_IsMouseDown || m_IsMouseLeave)
 	{
-		if (focus_com && focus_com->GetElementFlags() & JGUI_ComponentFlag_TopMost)
-		{
-			if (focus_com == nullptr)
-			{
-				SetFocusWindow(focus_win);
-			}
-			else SetFocusWindow(nullptr);
-			SetFocusElement(focus_com);
 
+		//TopMost 우선
+		if (focus_com && focus_com->GetCollider())
+		{
+			auto flag = focus_com->GetCollider()->GetOwnerCanvas()->GetCanvasFlags();
+			if (flag & JGUI_CanvasFlag_TopMost)
+			{
+				focus_win = nullptr;
+			}
+		}
+
+
+		if(focus_win)
+		{
+			SetFocusElement(nullptr);
+			SetFocusWindow(focus_win);
 		}
 		else
 		{
-			if (focus_win == nullptr) SetFocusElement(focus_com);
-			else SetFocusElement(nullptr);
-
-			SetFocusWindow(focus_win);
+			SetFocusWindow(nullptr);
+			SetFocusElement(focus_com);
 		}
+
 
 		
 		m_IsMouseDown = true;
@@ -746,13 +754,12 @@ void JGUIWindow::SetActiveExceptEssentials(bool is_active)
 }
 void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 {
-	auto com_flag = JGUI_ComponentFlag_Overlay;
-	if (flag & JGUI_WindowFlag_MultiSwapChain) com_flag = JGUI_ComponentFlag_TopMost;
+	auto com_flag = JGUI_ElementFlag_None;
 	if (flag & JGUI_WindowFlag_EnableResize)
 	{
 		if (m_WinSizeAdjment == nullptr)
 		{
-			auto obj = CreateJGUIEssentialElement<JGUIElement>("ResizeBox", JGUI_ComponentFlag_TopMost);
+			auto obj = CreateJGUIEssentialElement<JGUIElement>("ResizeBox");
 			obj->CreateJGUIComponent<JGUIImageRenderer>();
 			m_WinSizeAdjment = obj->CreateJGUIComponent<WindowSizeAdjustment>();
 		}
@@ -908,7 +915,7 @@ void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 	if (m_VScrollbar)
 	{
 		float thickness = m_Border->GetThickness();
-		float scroll_size_y = window_size.y - (20 * 2 + thickness * 2);
+		float scroll_size_y = window_size.y - (offset_y + thickness);
 		if (m_HScrollbar) scroll_size_y -= 20;
 		else if (m_WinSizeAdjment) scroll_size_y -= m_ResizeBoxSize;
 		m_VScrollbar->GetTransform()->SetSize(m_ResizeBoxSize, scroll_size_y);

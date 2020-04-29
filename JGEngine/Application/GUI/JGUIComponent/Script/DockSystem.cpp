@@ -19,7 +19,8 @@ void DockSystem::Awake()
 
 
 	m_DockTarget = GetOwner()->CreateJGUIElement("DockTarget");
-	m_DockTarget->CreateJGUIComponent<JGUICanvas>();
+	auto canvas = m_DockTarget->CreateJGUIComponent<JGUICanvas>();
+	canvas->SetCanvasFlags(JGUI_CanvasFlag_TopMost);
 	m_DockTarget->GetTransform()->SetPivot(0.5f, 0.5f);
 	for (int i = 0; i < DD_Count; ++i)
 	{
@@ -49,6 +50,11 @@ void DockSystem::Awake()
 		}
 	});
 	JGUI::RegisterExtraEvent(extra_e);
+
+	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
+	{
+		Setting();
+	});
 }
 
 void DockSystem::Start()
@@ -56,20 +62,7 @@ void DockSystem::Start()
 	m_DockTarget->SetActive(false);
 
 
-	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
-	{
-		//auto root_win = JGUI::FindRootJGUIWindow(GetOwnerWindow()->GetRootWindowHandle());
-		//auto window_size = root_win->GetTransform()->GetSize();
-		//if (window_size.x < 800 || window_size.y < 600)
-		//{
-		//	m_PrevRect = GetTransform()->GetRect();
-		//	m_PrevRect.Demical();
-		//	m_DockTarget->GetTransform()->SetLocalPosition(m_PrevRect.width() * 0.5f,
-		//		m_PrevRect.height() * 0.5f);
-		//	return;
-		//}
-		Setting();
-	});
+
 
 }
 

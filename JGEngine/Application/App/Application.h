@@ -36,6 +36,8 @@ enum class JGENGINE_API EApplicationMode
 class JGENGINE_API Application : public NoneCopy
 {
 public:
+	static const GlobalLinkStream& GetLinkStream();
+public:
 	Application() = default;
 	Application(const std::wstring& name, EApplicationMode mode);
 	virtual ~Application();
@@ -52,8 +54,8 @@ private:
 	std::shared_ptr<PE::PhysicsEngine> m_PhysicsEngine;
 	std::shared_ptr<SE::SoundEngine>   m_SoundEngine;
 	std::shared_ptr<RE::RenderEngine>  m_RenderEngine;
-	std::shared_ptr<GFW::Game>         m_Game;
 	std::shared_ptr<JGUI>              m_GUI;
+	std::shared_ptr<GFW::Game>         m_Game;
 	std::shared_ptr<EventManager>      m_EventManager;
 	std::shared_ptr<EngineTimer>       m_EngineTimer;
 	std::shared_ptr<EngineConfig>      m_EngineConfig;

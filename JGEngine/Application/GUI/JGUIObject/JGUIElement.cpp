@@ -55,17 +55,6 @@ void JGUIElement::JGUIDestroy()
 void JGUIElement::JGUITick(const JGUITickEvent& e)
 {
 	JGUIObject::JGUITick(e);
-	if (GetTransform())
-	{
-		if (m_PrevSize != GetTransform()->GetSize())
-		{
-			m_PrevSize = GetTransform()->GetSize();
-			JGUIResizeEvent e;
-			e.width = m_PrevSize.x;
-			e.height = m_PrevSize.y;
-			JGUIResize(e);
-		}
-	}
 	for (int i = 0; i < m_Childs.size(); ++i)
 	{
 		auto child = m_Childs[i];
@@ -248,16 +237,16 @@ JGUIElement* JGUIElement::GetParent() const
 {
 	return m_Parent;
 }
-void JGUIElement::AddElementFlags(EJGUI_ComponentFlags flags)
+void JGUIElement::AddElementFlags(EJGUI_ElementFlags flags)
 {
 	m_Flags = m_Flags | flags;
 }
-void JGUIElement::RemoveElementFlags(EJGUI_ComponentFlags flags)
+void JGUIElement::RemoveElementFlags(EJGUI_ElementFlags flags)
 {
 	m_Flags = m_Flags & (~flags);
 
 }
-void JGUIElement::SetElementFlags(EJGUI_ComponentFlags flags)
+void JGUIElement::SetElementFlags(EJGUI_ElementFlags flags)
 {
 	m_Flags = flags;
 }

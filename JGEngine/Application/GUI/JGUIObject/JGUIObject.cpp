@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "JGUIObject.h"
+#include "App/Application.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 #include "GUI/JGUIComponent/JGUITransform.h"
 #include "GUI/JGUIComponent/JGUICollider.h"
@@ -13,7 +14,7 @@ float JGUIObject::GetTick() const
 
 JGUIObject::JGUIObject( const std::string& name) : m_Name(name)
 {
-
+	
 }
 
 void JGUIObject::JGUIAwake()

@@ -42,12 +42,6 @@ void MenuItem::Awake()
 
 	GetTransform()->AttachTransform(m_Image->GetTransform());
 	GetTransform()->SetSize(100, MenuItemDefaultHeight);
-}
-
-void MenuItem::Start()
-{
-	Setting();
-	ItemsSetting();
 
 	GetOwner()->BindMouseBtDownFunc([&](const JGUIKeyDownEvent& e)
 	{
@@ -58,8 +52,16 @@ void MenuItem::Start()
 		if (!m_IsMouseDown) return;
 		m_IsMouseDown = false;
 		ItemOperation();
-		
+
 	});
+}
+
+void MenuItem::Start()
+{
+	Setting();
+	ItemsSetting();
+
+
 	CloseItems();
 }
 
@@ -563,8 +565,6 @@ void      MenuItemCollection::AddSeparater()
 void      MenuItemCollection::OpenItems()
 {
 	GetOwner()->SetActive(true);
-	//m_MenuItems->SetActive(true);
-	//m_Separaters->SetActive(true);
 	uint32_t itemCount = m_MenuItems->GetChildCount();
 	for (uint32_t i = 0; i < itemCount; ++i)
 	{

@@ -67,26 +67,26 @@ public:
 			return nullptr;
 		}
 	}
-	EJGUI_ComponentFlags GetElementFlags() const {
+	EJGUI_ElementFlags GetElementFlags() const {
 		return m_Flags;
 	}
 
-	void AddElementFlags(EJGUI_ComponentFlags flags);
-	void RemoveElementFlags(EJGUI_ComponentFlags flags);
-	void SetElementFlags(EJGUI_ComponentFlags flags);
+	void AddElementFlags(EJGUI_ElementFlags flags);
+	void RemoveElementFlags(EJGUI_ElementFlags flags);
+	void SetElementFlags(EJGUI_ElementFlags flags);
 	uint64_t GetRISortingOrder() const {
 		return m_RISortingOrder;
 	}
 public:
 	template<typename ComponentType>
-	ComponentType* CreateJGUIElement(const std::string& name, EJGUI_ComponentFlags flag = JGUI_ComponentFlag_None)
+	ComponentType* CreateJGUIElement(const std::string& name, EJGUI_ElementFlags flag = JGUI_ElementFlag_None)
 	{
 		auto com = JGUI::CreateJGUIElement<ComponentType>(name, m_OwnerWindow, flag);
 		com->SetParent(this);
 		return com;
 	}
 
-	JGUIElement* CreateJGUIElement(const std::string& name, EJGUI_ComponentFlags flag = JGUI_ComponentFlag_None)
+	JGUIElement* CreateJGUIElement(const std::string& name, EJGUI_ElementFlags flag = JGUI_ElementFlag_None)
 	{
 		return CreateJGUIElement<JGUIElement>(name, flag);
 	}
@@ -106,13 +106,15 @@ private:
 	
 
 	// 플래그
-	EJGUI_ComponentFlags m_Flags;
+	EJGUI_ElementFlags m_Flags;
 	std::vector<JGUIElement*> m_Childs;
 
 	JVector2 m_PrevSize;
 	bool     m_IsMouseTracking = false;
 	uint32_t m_Priority       = 0;
 	uint64_t m_RISortingOrder = 0;
+
+	friend void JGUITransform::SendSizeToElement();
 
 private:
 	// 함수들

@@ -1,75 +1,96 @@
-[info] [2492] [Physics] : PhysicsEngine Init Compelete...
-[info] [2492] [Sound] : SoundEngine Init Compelete
-[info] [2492] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [2492] [Rendering] : RenderEngine Init Complete...
-[info] [2492] [Rendering] : Create Screen : 1641087580288
-[info] [2492] [Rendering] : Create Default : 1641087586912
-[info] [2492] [Rendering] : Create DefaultDepth : 1641087589120
-[info] [2492] [Rendering] : Create bricks.dds : 1641087592432
-[info] [2492] [Rendering] : Create bricks2.dds : 1641087581392
-[info] [2492] [Rendering] : Create bricks2_nmap.dds : 1641087585808
-[info] [2492] [Rendering] : Create bricks3.dds : 1641087578080
-[info] [2492] [Rendering] : Create bricks_nmap.dds : 1641087582496
-[info] [2492] [Rendering] : Create checkboard.dds : 1641239308352
-[info] [2492] [Rendering] : Create default_nmap.dds : 1641239321600
-[info] [2492] [Rendering] : Create desertcube1024.dds : 1641239324912
-[info] [2492] [Rendering] : Create grass.dds : 1641239318288
-[info] [2492] [Rendering] : Create grasscube1024.dds : 1641239332640
-[info] [2492] [Rendering] : Create head_diff.dds : 1641239311664
-[info] [2492] [Rendering] : Create head_norm.dds : 1641239314976
-[info] [2492] [Rendering] : Create ice.dds : 1641239320496
-[info] [2492] [Rendering] : Create jacket_diff.dds : 1641239323808
-[info] [2492] [Rendering] : Create jacket_norm.dds : 1641239629616
-[info] [2492] [Rendering] : Create pants_diff.dds : 1641239648384
-[info] [2492] [Rendering] : Create pants_norm.dds : 1641239653904
-[info] [2492] [Rendering] : Create snowcube1024.dds : 1641239655008
-[info] [2492] [Rendering] : Create stone.dds : 1641239631824
-[info] [2492] [Rendering] : Create sunsetcube1024.dds : 1641239636240
-[info] [2492] [Rendering] : Create tile.dds : 1641239627408
-[info] [2492] [Rendering] : Create tile_nmap.dds : 1641239649488
-[info] [2492] [Rendering] : Create tree0.bmp : 1641240153264
-[info] [2492] [Rendering] : Create tree01S.dds : 1641240156576
-[info] [2492] [Rendering] : Create tree02S.dds : 1641240142224
-[info] [2492] [Rendering] : Create tree1.bmp : 1641240143328
-[info] [2492] [Rendering] : Create tree2.bmp : 1641240144432
-[info] [2492] [Rendering] : Create tree35S.dds : 1641240154368
-[info] [2492] [Rendering] : Create treearray.dds : 1641240145536
-[info] [2492] [Rendering] : Create treeArray2.dds : 1641240166512
-[info] [2492] [Rendering] : Create upBody_diff.dds : 1641240146640
-[info] [2492] [Rendering] : Create upbody_norm.dds : 1641240163200
-[info] [2492] [Rendering] : Create water1.dds : 1641240149952
-[info] [2492] [Rendering] : Create white1x1.dds : 1641240152160
-[info] [2492] [Rendering] : Create WireFence.dds : 1641240167616
-[info] [2492] [Rendering] : Create WoodCrate01.dds : 1641240164304
-[info] [2492] [Rendering] : Create WoodCrate02.dds : 1641240138912
-[info] [2492] [Rendering] : Create cursor_lr_arrow.png : 1641239642864
-[info] [2492] [Rendering] : Create cursor_ud_arrow.cur : 1641239650592
-[info] [2492] [Rendering] : Create cursor_ud_arrow.png : 1641239634032
-[info] [2492] [Rendering] : Create icon_ldia_arrow.png : 1641239652800
-[info] [2492] [Rendering] : Create icon_rdia_arrow.png : 1641239656112
-[info] [2492] [Rendering] : Create Close.png : 1641239645072
-[info] [2492] [Rendering] : Create Maximize.png : 1641239646176
-[info] [2492] [Rendering] : Create Minimize.png : 1641239630720
-[info] [2492] [Rendering] : Create Right_Arrow.png : 1641239640656
-[info] [2492] [Rendering] : Create sssss.png : 1641239335952
-[trace] [2492] [Game] : Begin
-[trace] [2492] [Game] : Tick
-[trace] [2492] [Game] : End
-[info] [2492] [Rendering] : Create Screen : 1641239327120
-[info] [2492] [Rendering] : Create Texture : 1641239319392
-[info] [2492] [Rendering] : Create Screen : 1641239306144
-[info] [2492] [Rendering] : Create Texture : 1641239312768
-[error] [2492] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[info] [2492] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 1641240162096
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [32244] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [34588] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [34588] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [34588] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [34588] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[info] [21924] [Physics] : PhysicsEngine Init Compelete...
+[info] [21924] [Sound] : SoundEngine Init Compelete
+[info] [21924] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [21924] [Rendering] : RenderEngine Init Complete...
+[info] [21924] [Rendering] : Create Screen : 2080277929296
+[info] [21924] [Rendering] : Create Default : 2080277922672
+[info] [21924] [Rendering] : Create DefaultDepth : 2080277919360
+[info] [21924] [Rendering] : Create bricks.dds : 2080277928192
+[info] [21924] [Rendering] : Create bricks2.dds : 2080277925984
+[info] [21924] [Rendering] : Create bricks2_nmap.dds : 2080277924880
+[info] [21924] [Rendering] : Create bricks3.dds : 2080277932608
+[info] [21924] [Rendering] : Create bricks_nmap.dds : 2080277920464
+[info] [21924] [Rendering] : Create checkboard.dds : 2080430574112
+[info] [21924] [Rendering] : Create default_nmap.dds : 2080430581840
+[info] [21924] [Rendering] : Create desertcube1024.dds : 2080430561968
+[info] [21924] [Rendering] : Create grass.dds : 2080430586256
+[info] [21924] [Rendering] : Create grasscube1024.dds : 2080430568592
+[info] [21924] [Rendering] : Create head_diff.dds : 2080430558656
+[info] [21924] [Rendering] : Create head_norm.dds : 2080430563072
+[info] [21924] [Rendering] : Create ice.dds : 2080430565280
+[info] [21924] [Rendering] : Create jacket_diff.dds : 2080430569696
+[info] [21924] [Rendering] : Create jacket_norm.dds : 2080430906752
+[info] [21924] [Rendering] : Create pants_diff.dds : 2080430914480
+[info] [21924] [Rendering] : Create pants_norm.dds : 2080430905648
+[info] [21924] [Rendering] : Create snowcube1024.dds : 2080430887984
+[info] [21924] [Rendering] : Create stone.dds : 2080430913376
+[info] [21924] [Rendering] : Create sunsetcube1024.dds : 2080430889088
+[info] [21924] [Rendering] : Create tile.dds : 2080430908960
+[info] [21924] [Rendering] : Create tile_nmap.dds : 2080430884672
+[info] [21924] [Rendering] : Create tree0.bmp : 2080431447328
+[info] [21924] [Rendering] : Create tree01S.dds : 2080431449536
+[info] [21924] [Rendering] : Create tree02S.dds : 2080431445120
+[info] [21924] [Rendering] : Create tree1.bmp : 2080431446224
+[info] [21924] [Rendering] : Create tree2.bmp : 2080431439600
+[info] [21924] [Rendering] : Create tree35S.dds : 2080431423040
+[info] [21924] [Rendering] : Create treearray.dds : 2080431424144
+[info] [21924] [Rendering] : Create treeArray2.dds : 2080431428560
+[info] [21924] [Rendering] : Create upBody_diff.dds : 2080431442912
+[info] [21924] [Rendering] : Create upbody_norm.dds : 2080431435184
+[info] [21924] [Rendering] : Create water1.dds : 2080431431872
+[info] [21924] [Rendering] : Create white1x1.dds : 2080431437392
+[info] [21924] [Rendering] : Create WireFence.dds : 2080431432976
+[info] [21924] [Rendering] : Create WoodCrate01.dds : 2080431440704
+[info] [21924] [Rendering] : Create WoodCrate02.dds : 2080431444016
+[info] [21924] [Rendering] : Create cursor_lr_arrow.png : 2080430899024
+[info] [21924] [Rendering] : Create cursor_ud_arrow.cur : 2080430911168
+[info] [21924] [Rendering] : Create cursor_ud_arrow.png : 2080430890192
+[info] [21924] [Rendering] : Create icon_ldia_arrow.png : 2080430907856
+[info] [21924] [Rendering] : Create icon_rdia_arrow.png : 2080430894608
+[info] [21924] [Rendering] : Create Close.png : 2080430900128
+[info] [21924] [Rendering] : Create Maximize.png : 2080430896816
+[info] [21924] [Rendering] : Create Minimize.png : 2080430893504
+[info] [21924] [Rendering] : Create Right_Arrow.png : 2080430902336
+[info] [21924] [Rendering] : Create sssss.png : 2080430579632
+[trace] [21924] [Game] : Begin
+[trace] [21924] [Game] : Tick
+[trace] [21924] [Game] : End
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[info] [21924] [Rendering] : Create Screen : 2080430557552
+[info] [21924] [Rendering] : Create Texture : 2080430567488
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[info] [21924] [Rendering] : Create Screen : 2080430573008
+[info] [21924] [Rendering] : Create Texture : 2080430582944
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[info] [21924] [Rendering] : Create ..\JGEngine\Resource\Fonts/Consolas_0.dds : 2080431430768
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [12992] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [12992] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [12992] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [18044] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[info] [21924] [Rendering] : Create Screen : 2080277929296
+[info] [21924] [Rendering] : Create Texture : 2080277921568
+[info] [21924] [Rendering] : Create Screen : 2080277923776
+[info] [21924] [Rendering] : Create Texture : 2080277929296
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [21924] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[info] [21924] [Rendering] : Create Screen : 2080277923776
+[info] [21924] [Rendering] : Create Texture : 2080277931504
+[info] [21924] [Rendering] : Create Screen : 2080430582944
+[info] [21924] [Rendering] : Create Screen : 2080430575216
+[info] [21924] [Rendering] : Create Texture : 2080430582944
+[info] [21924] [Rendering] : Create Screen : 2080430575216
+[info] [21924] [Rendering] : Create Texture : 2080277923776
+[info] [21924] [Rendering] : Create Screen : 2080430575216
+[info] [21924] [Rendering] : Create Texture : 2080430582944

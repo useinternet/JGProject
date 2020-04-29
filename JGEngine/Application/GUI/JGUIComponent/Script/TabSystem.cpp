@@ -24,13 +24,6 @@ JGUI_REGISTER_COMPONENT(TabSystem)
 
 void TabSystem::Awake()
 {
-
-}
-
-void TabSystem::Start()
-{
-	BindWindow(GetOwnerWindow());
-
 	GetOwner()->BindResizeFunc([&](const JGUIResizeEvent& e)
 	{
 		auto rect = GetOwnerWindow()->GetClientRect();
@@ -42,6 +35,13 @@ void TabSystem::Start()
 		}
 		ArrangeBtSizeByTabCount();
 	});
+}
+
+void TabSystem::Start()
+{
+	BindWindow(GetOwnerWindow());
+
+
 
 	JGUIExtraEvent e;
 	e.Bind(JGUI_EXTRAEVENT_REPEAT, GetOwner(), [&](JGUIExtraEvent& e) {
