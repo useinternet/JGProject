@@ -132,7 +132,12 @@ void Text::SetText(std::string text)
 
 
 	m_TextMeshByLine.clear();
+	if (m_ReMesh)
+	{
+		m_ReMesh->Reset();
+	}
 
+	//m_ReMesh = make_shared<RE::ReGuiMesh>();
 	while (c_p != string::npos)
 	{
 		c_p = text.find('\n', 0);

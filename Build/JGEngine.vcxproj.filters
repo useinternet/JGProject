@@ -123,6 +123,9 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.h">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -209,6 +212,9 @@
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.cpp">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
   </ItemGroup>

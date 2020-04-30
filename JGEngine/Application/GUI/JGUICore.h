@@ -15,7 +15,9 @@
 #include "GUI/JGUIComponent/Script/Scrollbar.h"
 #include "GUI/JGUIComponent/Script/Text.h"
 #include "GUI/JGUIComponent/Script/MenuItem.h"
-
+#include "GUI/JGUIComponent/Script/InputText.h"
+#include "GUI/JGUIComponent/Script/CheckBox.h"
+#include "GUI/JGUIComponent/Script/GUIMask.h"
 
 
 #include "GUI/JGUIComponent/Script/ContextMenu.h"

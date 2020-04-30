@@ -503,6 +503,7 @@ void MenuItem::ReceiveShortCutKeyUp(const JGUIKeyUpEvent& e)
 
 void MenuItemCollection::Awake()
 {
+	GetOwner()->CreateJGUIComponent<JGUICanvas>()->SetCanvasFlags(JGUI_CanvasFlag_Overlay | JGUI_CanvasFlag_TopMost);
 	m_BackGround = GetOwner()->CreateJGUIComponent<JGUIImageRenderer>();
 	m_MenuItems  = GetOwner()->CreateJGUIElement("MenuItems");
 	m_Separaters = GetOwner()->CreateJGUIElement("Separaters");

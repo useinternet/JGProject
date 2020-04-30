@@ -108,29 +108,38 @@ void JGUIRenderer::Tick(float tick)
 		if (m_RenderItem && m_RenderItem->GetMaterial())
 		{
 
-			auto mat = GetRI()->GetMaterial();
-			float width = m_ClipRect.width();
-			float height = m_ClipRect.height();
+			auto mat      = GetRI()->GetMaterial();
+			float width   = m_ClipRect.width();
+			float height  = m_ClipRect.height();
 			JGUIRect rect = m_ClipRect;
 
 			JVector2 lt = { rect.left, rect.top };
 			JVector2 rb = { rect.right, rect.bottom };
-
-			lt += transform->GetPosition();
-			rb += transform->GetPosition();
-			lt += m_Offset;
-			rb += m_Offset;
+	
+			//lt += transform->GetPosition();
+			//rb += transform->GetPosition();
+			//lt += m_Offset;
+			//rb += m_Offset;
 
 			lt = m_OwnerCamera->ConvertScreenToWorldPos(lt);
 			rb = m_OwnerCamera->ConvertScreenToWorldPos(rb);
 
-			lt.x += (shape_size.x * pivot.x);
-			lt.y += (shape_size.y * pivot.y);
-			rb.x += (shape_size.x * pivot.x);
-			rb.y += (shape_size.y * pivot.y);
+			//lt.x += (shape_size.x * pivot.x);
+			//lt.y += (shape_size.y * pivot.y);
+			//rb.x += (shape_size.x * pivot.x);
+			//rb.y += (shape_size.y * pivot.y);
+			if (m_OwnerCanvas->GetCanvasFlags() & JGUI_CanvasFlag_Overlay)
+			{
+				auto view_pos = GetOwner()->GetOwnerWindow()->GetCamera()->GetPosition();
+				lt.x += view_pos.x;
+				lt.y += view_pos.y;
 
+				rb.x += view_pos.x;
+				rb.y += view_pos.y;
+			}
 			mat->SetValueAsFloat2("ClipX", { lt.x, rb.x });
 			mat->SetValueAsFloat2("ClipY", { lt.y, rb.y });
+			mat->SetValueAsInt("Clip", (int)m_ClipFlags);
 		}
 	}
 }
@@ -156,6 +165,11 @@ void JGUIRenderer::SetActive(bool active)
 	if (m_RenderItem)  m_RenderItem->SetActive(IsActive());
 }
 
+
+void JGUIRenderer::SetClipFlags(EJGUI_Clip_Flags flags)
+{
+	m_ClipFlags = flags;
+}
 
 void JGUIRenderer::DestroyRI()
 {

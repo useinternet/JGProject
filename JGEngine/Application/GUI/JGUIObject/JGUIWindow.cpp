@@ -864,7 +864,7 @@ void JGUIWindow::ProcessByWindowFlags(EJGUI_WindowFlags flag)
 			m_Border = CreateJGUIEssentialElement<JGUIElement>("BorderRectangle", com_flag)->CreateJGUIComponent<JGUIShapeRenderer>();
 
 			m_Border->GetTransform()->SetSize(GetTransform()->GetSize());
-			m_Border->SetColor(JColor(1, 1, 1, 1));
+			m_Border->SetColor(JColor(0.6f, 0.6f, 0.6f, 1));
 			m_Border->CreateEmptyRectangle(1.0);
 		}
 

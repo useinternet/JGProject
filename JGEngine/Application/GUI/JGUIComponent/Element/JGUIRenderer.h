@@ -35,6 +35,7 @@ public:
 		return m_Offset;
 	}
 	void  SetClipRect(const JGUIRect& rect) { m_ClipRect = rect; }
+	void  SetClipFlags(EJGUI_Clip_Flags flags);
 	const JGUIRect& GetClipRect() const { return m_ClipRect; }
 protected:
 	void DestroyRI();
@@ -53,6 +54,9 @@ protected:
 
 	JGUICanvas* m_OwnerCanvas = nullptr;
 	JGUICamera* m_OwnerCamera = nullptr;
+
+
+	EJGUI_Clip_Flags m_ClipFlags = JGUI_Clip_Flag_None;
 };
 
 class JGENGINE_API JGUIShapeRenderer : public JGUIRenderer
@@ -80,6 +84,10 @@ public:
 	}
 	float GetThickness() const {
 		return m_Thick;
+	}
+	void  SetThickness(float thick){
+		m_Thick = thick;
+
 	}
 protected:
 	JColor   m_Color = JColor::White();
