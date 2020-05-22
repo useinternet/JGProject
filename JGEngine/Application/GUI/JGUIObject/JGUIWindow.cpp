@@ -24,6 +24,7 @@
 #include "GUI/JGUIScreen.h"
 #include "RenderEngine.h"
 #include "Object/DxObject/RenderDevice.h"
+using namespace Concurrency;
 using namespace std;
 using namespace RE;
 
@@ -81,6 +82,10 @@ void JGUIWindow::JGUIAwake()
 
 	ProcessByWindowFlags(m_Flags);
 	JGUIObject::JGUIAwake();
+
+
+
+	ENGINE_LOG_INFO("{0} Aawake Function", GetName());
 }
 
 void JGUIWindow::JGUIStart()
@@ -92,11 +97,13 @@ void JGUIWindow::JGUIStart()
 		if (m_WindowElements[i]->IsExecuteStartFunc()) continue;
 		m_WindowElements[i]->JGUIStart();
 	}
+
 	for (size_t i = 0; i < m_ChildWindows.size(); ++i)
 	{
 		if (m_ChildWindows[i]->IsExecuteStartFunc()) continue;
 		m_ChildWindows[i]->JGUIStart();
 	}
+
 }
 
 
@@ -117,6 +124,7 @@ void JGUIWindow::JGUIDestroy()
 	vector<JGUIWindow*> child_clones = m_ChildWindows;
 
 	// 자식들 손절
+
 	for (auto& window : child_clones)
 	{
 		JGUI::DestroyObject(window);
@@ -140,6 +148,7 @@ void JGUIWindow::JGUIDestroy()
 void JGUIWindow::JGUITick(const JGUITickEvent& e)
 {
 
+
 	JGUIObject::JGUITick(e);
 
 	if (GetFocusElement())   GetFocusElement()->JGUIOnFocus();
@@ -158,6 +167,8 @@ void JGUIWindow::JGUITick(const JGUITickEvent& e)
 		if (m_WindowElements[i]->IsDestroying()) continue;
 		m_WindowElements[i]->JGUITick(e);
 	}
+
+
 	for (size_t i = 0; i < m_ChildWindows.size(); ++i)
 	{
 		if (!m_ChildWindows[i]->IsExecuteStartFunc()) m_ChildWindows[i]->JGUIStart();
@@ -172,6 +183,12 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 	
 	float width  = e.width;
 	float height = e.height;
+	m_WinRenderer->GetTransform()->SetSize(width, height);
+
+
+
+
+
 	if (e.width < 200 || e.height < 200)
 	{
 		width  = std::max<float>(e.width, 200);
@@ -187,14 +204,13 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 			GetTransform()->SetSize(width, height);
 		}
 	}
-	m_ElementCanvas->GetTransform()->SetSize(width, height);
-	m_WinRenderer->GetTransform()->SetSize(width, height);
 
+	m_ElementCanvas->GetTransform()->SetSize(width, height);
 	m_RootElement->GetTransform()->SetSize(width, height);
-	
+
 	RE::RenderEngine::GetDevice()->Flush();
 	ReadyCamera();
-	
+
 	if (m_Screen)
 	{
 		m_Screen->Resize((uint32_t)width, (uint32_t)height);
@@ -258,6 +274,7 @@ void JGUIWindow::JGUIResize(const JGUIResizeEvent& e)
 		}
 	}
 	Resize(e);
+
 }
 void JGUIWindow::JGUIFocusEnter(const JGUIFocusEnterEvent& e)
 {
@@ -336,7 +353,7 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 
 	// Window 찾기
 	JGUIWindow* focus_win = TrackingCanInteractionWindow();
-	if (!m_IsMouseDown || m_IsMouseLeave)
+	if (!m_IsMouseDown)
 	{
 
 		//TopMost 우선
@@ -364,14 +381,13 @@ void JGUIWindow::JGUIMouseBtDown(const JGUIKeyDownEvent& e)
 
 		
 		m_IsMouseDown = true;
-		m_IsMouseLeave = false;
+		//m_IsMouseLeave = false;
 	}
 	
 	focus_win = GetFocusWindow();
 	focus_com = GetFocusElement();
-
-	if (focus_com) focus_com->JGUIMouseBtDown(e);
 	if (focus_win) focus_win->JGUIMouseBtDown(e);
+	else if (focus_com) focus_com->JGUIMouseBtDown(e);
 	else MouseBtDown(e);
 }
 
@@ -455,11 +471,10 @@ void JGUIWindow::JGUIMouseLeave()
 	MouseLeave();
 }
 
-
 void JGUIWindow::SetParent(JGUIWindow* parent)
 {
 	auto prev_parent = m_ParentWindow;
-
+	
 	// 메인이 자기 자신이면 parent는 null
 	if (JGUI::GetMainWindow() == this ||
 		JGUI::GetMainWindow() == nullptr)
@@ -747,6 +762,20 @@ void JGUIWindow::SetActiveExceptEssentials(bool is_active)
 		if (m_WinRenderer->GetOwner() == com) continue;
 		com->SetActive(is_active, true);
 	}
+
+	if (m_TabSystem)
+	{
+		auto tabWindows = m_TabSystem->GetBindedWindow();
+
+		for (uint32_t i = 0; i < (uint32_t)m_ChildWindows.size(); ++i)
+		{
+			if (find(tabWindows.begin(), tabWindows.end(), m_ChildWindows[i]) == tabWindows.end())
+			{
+				m_ChildWindows[i]->SetActive(is_active);
+			}
+		}
+
+	}
 	if (m_DockSystem)
 	{
 		m_DockSystem->GetOwner()->SetActive(is_active, true);
@@ -978,6 +1007,7 @@ bool JGUIWindow::Interaction()
 
 	return IsActive() && GetCollider() && GetCollider()->CheckInPoint(GetParent()->GetMousePos());
 }
+
 
 void JGUIWindow::NotifyChangeParentToComponents(JGUIObject* prevparent)
 {

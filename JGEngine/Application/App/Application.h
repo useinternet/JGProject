@@ -33,6 +33,17 @@ enum class JGENGINE_API EApplicationMode
 	Editor,
 	GamePlay
 };
+
+class AppDesc
+{
+public:
+	std::string GraphicsEngineDllPath = "GraphicsEngine.dll";
+	std::string InputEngineDllPath    = "InputEngine.dll";
+	std::string SoundEngineDllPath    = "SoundEngine.dll";
+	std::string PhyscisEngineDllPath  = "PhysicsEngine.dll";
+	std::string GameFrameWorkDllPath  = "GameFrameWork.dll";
+};
+
 class JGENGINE_API Application : public NoneCopy
 {
 public:
@@ -49,7 +60,7 @@ private:
 	EApplicationMode m_AppMode;
 	std::wstring     m_AppName;
 
-
+	
 	std::shared_ptr<IE::InputEngine>   m_InputEngine;
 	std::shared_ptr<PE::PhysicsEngine> m_PhysicsEngine;
 	std::shared_ptr<SE::SoundEngine>   m_SoundEngine;
@@ -60,6 +71,16 @@ private:
 	std::shared_ptr<EngineTimer>       m_EngineTimer;
 	std::shared_ptr<EngineConfig>      m_EngineConfig;
 	std::shared_ptr<EnginePerformance> m_Performance;
+
+	// Test
+	EngineCore* m_Graphics = nullptr;
+	Plugin      m_Plugin;
+	Plugin      m_UnitTestPlugin;
+	using TestFunc = void* (*)(HWND, int, int);
+	//
 	bool m_IsInit;
 	std::mutex m_EventMutex;
+
+private:
+	using CreateEngineCoreFunc = EngineCore * (*)(const GlobalLinkStream&);
 };

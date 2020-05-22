@@ -21,7 +21,6 @@ protected:
 public:
 	void UnConnect();
 	void Connect(const JVector2Int& delta);
-	bool IsGrap();
 private:
 	void SettingByWindowFlags();
 	void Setting();

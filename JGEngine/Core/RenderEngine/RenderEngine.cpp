@@ -492,9 +492,7 @@ namespace RE
 
 	void RenderEngine::Update()
 	{
-		ENGINE_PERFORMANCE_TIMER("Application", "RenderEngine");
-		
-	
+
 		m_RenderDevice->Update();
 		m_TextureManager->Update();
 	}

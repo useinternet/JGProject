@@ -111,7 +111,9 @@ public:
 	void SetImage(const std::string& name);
 	
 	const JColor& GetColor() const;
-
+	const std::string& GetImage() const {
+		return m_Image;
+	}
 protected:
 	JColor   m_Color = JColor::White();
 	JVector2 m_PrevSize;

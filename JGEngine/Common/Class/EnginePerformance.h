@@ -85,13 +85,13 @@ private:
 };
 
 
-#define ENGINE_PERFORMANCE_TIMER_START(root_name) PerformanceTimer performance_timer("JGEngine", "PerformanceTimer_Root", root_name)
-
-#define ENGINE_PERFORMANCE_TIMER(parent_name, timer_name) PerformanceTimer performance_timer("JGEngine", parent_name, timer_name)  
-
-#define ROOT_PERFORMANCE_TIMER(category, timer_name) PerformanceTimer performance_timer(category, "PerformanceTimer_Root", timer_name) 
-
-#define CHILD_PERFORMANCE_TIMER(category, parent_name,timer_name) PerformanceTimer performance_timer(category, parent_name, timer_name)
-
-#define DEFAULT_PERFORMANCE_TIMER(timer_name) PerformanceTimer performance_timer("", "", timer_name)
+//#define ENGINE_PERFORMANCE_TIMER_START(root_name) PerformanceTimer performance_timer("JGEngine", "PerformanceTimer_Root", root_name)
+//
+//#define ENGINE_PERFORMANCE_TIMER(parent_name, timer_name) PerformanceTimer performance_timer("JGEngine", parent_name, timer_name)  
+//
+//#define ROOT_PERFORMANCE_TIMER(category, timer_name) PerformanceTimer performance_timer(category, "PerformanceTimer_Root", timer_name) 
+//
+//#define CHILD_PERFORMANCE_TIMER(category, parent_name,timer_name) PerformanceTimer performance_timer(category, parent_name, timer_name)
+//
+//#define DEFAULT_PERFORMANCE_TIMER(timer_name) PerformanceTimer performance_timer("", "", timer_name)
 

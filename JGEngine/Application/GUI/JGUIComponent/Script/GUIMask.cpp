@@ -24,11 +24,17 @@ void GUIMask::Destroy()
 
 void GUIMask::Tick(float tick)
 {
-	if (m_MaskRenderer && GetTransform()->IsDirty())
+	if (!m_MaskRenderers.empty() && GetTransform()->IsDirty())
 	{
-		m_MaskRenderer->SetClipFlags(JGUI_Clip_Flag_X | JGUI_Clip_Flag_Y);
-		m_MaskRenderer->SetClipRect(GetTransform()->GetRect());
-		m_MaskRenderer->GetTransform()->SendDirty();
+		for (auto& renderer : m_MaskRenderers)
+		{
+			renderer->SetClipFlags(JGUI_Clip_Flag_X | JGUI_Clip_Flag_Y);
+			renderer->SetClipRect(GetTransform()->GetRect());
+			renderer->GetTransform()->SendDirty();
+		}
+
+
+
 	}
 
 
@@ -36,6 +42,32 @@ void GUIMask::Tick(float tick)
 
 void GUIMask::Bind(JGUIRenderer* renderer)
 {
-	m_MaskRenderer = renderer;
+	m_MaskRenderers.clear();
+	m_MaskRenderers.push_back(renderer);
+
+}
+
+void GUIMask::Bind(JGUIElement* element)
+{
+	m_MaskRenderers.clear();
+
+	TracingImageRenderer(element);
+}
+
+void GUIMask::TracingImageRenderer(JGUIElement* element)
+{
+	JGUIRenderer* renderer = element->FindComponent<JGUIImageRenderer>();
+	if(renderer == nullptr)  renderer = element->FindComponent<JGUIShapeRenderer>();
+	if (renderer)
+	{
+		m_MaskRenderers.push_back(renderer);
+	}
+
+	for (uint32_t i = 0; i < element->GetChildCount(); ++i)
+	{
+		TracingImageRenderer(element->GetChild(i));
+	}
+
+
 
 }

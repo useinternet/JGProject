@@ -228,6 +228,7 @@ private:
 	bool m_IsMouseDown  = false;
 
 
+
 	friend void JGUITransform::SendSizeToWin();
 };
 

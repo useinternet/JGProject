@@ -116,18 +116,8 @@ void JGUIRenderer::Tick(float tick)
 			JVector2 lt = { rect.left, rect.top };
 			JVector2 rb = { rect.right, rect.bottom };
 	
-			//lt += transform->GetPosition();
-			//rb += transform->GetPosition();
-			//lt += m_Offset;
-			//rb += m_Offset;
-
 			lt = m_OwnerCamera->ConvertScreenToWorldPos(lt);
 			rb = m_OwnerCamera->ConvertScreenToWorldPos(rb);
-
-			//lt.x += (shape_size.x * pivot.x);
-			//lt.y += (shape_size.y * pivot.y);
-			//rb.x += (shape_size.x * pivot.x);
-			//rb.y += (shape_size.y * pivot.y);
 			if (m_OwnerCanvas->GetCanvasFlags() & JGUI_CanvasFlag_Overlay)
 			{
 				auto view_pos = GetOwner()->GetOwnerWindow()->GetCamera()->GetPosition();

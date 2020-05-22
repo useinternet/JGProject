@@ -197,6 +197,8 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TabSystem.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Text.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeItem.h" />
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeView.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUICore.h" />
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIEvent.h" />
@@ -233,6 +235,8 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TabSystem.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Text.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeItem.cpp" />
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeView.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIFont\JGUIFontManager.cpp" />
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIForm\JGUIForm.cpp" />
@@ -260,6 +264,9 @@
     </ProjectReference>
     <ProjectReference Include="InputEngine.vcxproj">
       <Project>{6BD9432A-D78E-BC1F-6083-B6F6CC37B323}</Project>
+    </ProjectReference>
+    <ProjectReference Include="GraphicsEngine.vcxproj">
+      <Project>{AC8E76BE-985C-6AC4-81F0-DAEA6D5D4629}</Project>
     </ProjectReference>
     <ProjectReference Include="GameFrameWork.vcxproj">
       <Project>{AD13F29C-19D4-6DD3-E20E-B7504E8EB2AF}</Project>

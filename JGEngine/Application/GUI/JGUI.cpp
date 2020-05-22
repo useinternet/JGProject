@@ -267,6 +267,17 @@ JGUIWindow* JGUI::GetCurrentDraggingWindow()
 	return sm_GUI->m_DraggingWindow;
 }
 
+std::vector<JGUIWindow*> JGUI::GetRootWindows()
+{
+	vector<JGUIWindow*> result;
+
+	for (auto& screen_pair : sm_GUI->m_ScreenPool)
+	{
+		result.push_back(screen_pair.second.first);
+	}
+	return result;
+}
+
 void JGUI::Update()
 {
 	while (!m_ExpectedDestroyComponent.empty())
@@ -291,7 +302,12 @@ void JGUI::Update()
 		m_ExpectedCreateObject.pop();
 		m_ObjectPool[obj.get()] = obj;
 	}
-
+	while (!m_ExpectedCreateComponent.empty())
+	{
+		auto com = m_ExpectedCreateComponent.front();
+		m_ExpectedCreateComponent.pop();
+		m_ComponentPool[com.get()] = com;
+	}
 
 	static int focus_cnt = 0;
 	// Focus
@@ -447,6 +463,7 @@ void JGUI::Update()
 LRESULT JGUI::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	JGUIWindow* currentWindow = FindRootJGUIWindow(hWnd);
+	if (currentWindow == nullptr) return DefWindowProc(hWnd, msg, wParam, lParam);
 	TRACKMOUSEEVENT tme;
 	static bool bin = false;
 	//int delta = GET_WHEEL_DELTA_WPARAM(wParam);

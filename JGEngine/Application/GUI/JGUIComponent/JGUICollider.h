@@ -10,9 +10,11 @@ public:
 
 protected:
 	virtual void Awake() override;
+	virtual void Start() override;
 	virtual void ChangeParent(JGUIObject* prev_parent) override;
-	void FindCanvas();
+	
 public:
+	void FindCanvas();
 	JGUICanvas* GetOwnerCanvas() const {
 		return m_OwnerCanvas;
 	}

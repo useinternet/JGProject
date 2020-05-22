@@ -17,7 +17,7 @@ namespace IE
 	void InputEngine::Update()
 	{
 		m_hWnd = GetFocus();
-		ENGINE_PERFORMANCE_TIMER("Application", "InputEngine");
+	
 
 		m_KeyDownList.clear();
 		m_KeyUpList.clear();

@@ -19,15 +19,12 @@ void TitleBar::Awake()
 {
 	if (GetOwner()->GetCollider() == nullptr) GetOwner()->RegisterCollider(JGUI_Collider_Box);
 
-	// Äµ¹ö½º »ý¼º
-	auto canvas = GetOwner()->CreateJGUIElement("Canvas");
-	GetOwner()->GetTransform()->AttachTransform(canvas->GetTransform());
-
-
-	m_Image       = canvas->CreateJGUIComponent<JGUIImageRenderer>();
+	m_Image       = GetOwner()->CreateJGUIComponent<JGUIImageRenderer>();
 	m_Image->SetColor(0.3f, 0.3f, 0.3f, 1.0f);
-	m_TitleCanvas = canvas->CreateJGUIComponent<JGUICanvas>();
+	m_TitleCanvas = GetOwner()->CreateJGUIComponent<JGUICanvas>();
 	m_TitleCanvas->SetCanvasFlags(JGUI_CanvasFlag_Overlay);
+	GetOwner()->GetCollider()->FindCanvas();
+
 
 	GetOwner()->BindMouseBtDownFunc([&](const JGUIKeyDownEvent& e)
 	{

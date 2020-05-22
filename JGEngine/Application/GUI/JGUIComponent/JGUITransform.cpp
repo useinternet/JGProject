@@ -3,6 +3,7 @@
 #include "GUI/JGUIObject/JGUIElement.h"
 #include "GUI/JGUIObject/JGUIWindow.h"
 #include "GUI/JGUIScreen.h"
+using namespace Concurrency;
 
 void JGUITransform::Awake()
 {
@@ -29,6 +30,7 @@ void JGUITransform::Destroy()
 
 void JGUITransform::AttachTransform(JGUITransform* transform)
 {
+	//if (this == transform) return;
 	if (transform == nullptr || transform->m_Attacher == this) return;
 
 	if (transform->m_Attacher)
@@ -448,11 +450,12 @@ void JGUITransform::SendSizeToWin()
 			m_WindowOwner->FindChild((uint32_t)i)->GetTransform()->SendDirty();
 		}
 	}
+
 	JGUIResizeEvent e;
 	e.width = m_Size.x;
 	e.height = m_Size.y;
-
 	m_WindowOwner->JGUIResize(e);
+	
 }
 void JGUITransform::SendSizeToElement()
 {

@@ -7,7 +7,7 @@ namespace RE
 {
 	
 }
-struct JGUIFontCharInfo
+struct JGENGINE_API JGUIFontCharInfo
 {
 	int id = 0;
 	int x = 0;
@@ -20,7 +20,7 @@ struct JGUIFontCharInfo
 	int pageID = 0;
 	int chnl = 0;
 };
-struct JGUIFontFileInfo
+struct JGENGINE_API JGUIFontFileInfo
 {
 	std::string face;
 	int default_font_size = 0;
@@ -48,12 +48,12 @@ struct JGUIFontFileInfo
 	int charCount = 0;
 
 };
-struct JGUIFontInfo
+struct JGENGINE_API JGUIFontInfo
 {
 	JGUIFontFileInfo FileInfo;
 	std::unordered_map<int, JGUIFontCharInfo> CharMap;
 };
-class JGUIFontManager
+class JGENGINE_API JGUIFontManager
 {
 public:
 	bool FontLoad(const std::string& path);

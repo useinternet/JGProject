@@ -1,8 +1,7 @@
 #pragma once
 #include "JGUIComponent.h"
+
 #include <set>
-
-
 class  JGUIWindow;
 class  JGUIElement;
 class JGENGINE_API JGUITransform : public JGUIComponent
@@ -89,4 +88,6 @@ protected:
 	};
 	std::set<JGUITransform*> m_AttachedList; // 연결된 트랜스폼
 	JGUITransform* m_Attacher = nullptr; // 연결한 트랜스폼
+
+
 };

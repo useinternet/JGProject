@@ -60,7 +60,6 @@ namespace RE
 	}
 	void RenderDevice::Update()
 	{
-		ENGINE_PERFORMANCE_TIMER("RenderEngine", "RenderDevice::Update()");
 		m_RenderDevice->BeginFrame();
 		std::vector<CommandList*> render_List;
 		std::vector<CommandList*> compute_List;
@@ -284,7 +283,6 @@ namespace RE
 	}
 	std::vector<CommandList*> RenderDevice::RenderUpdate()
 	{
-		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::RenderUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_DirectCommandQueue->WaitForFenceValue(frameresource.DirectFenceValue);
 
@@ -324,7 +322,6 @@ namespace RE
 	}
 	std::vector<CommandList*> RenderDevice::ComputeUpdate()
 	{
-		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::ComputeUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_ComputeCommandQueue->WaitForFenceValue(frameresource.ComputeFenceValue);
 
@@ -353,7 +350,6 @@ namespace RE
 	}
 	std::vector<CommandList*> RenderDevice::CopyUpdate()
 	{
-		ENGINE_PERFORMANCE_TIMER("RenderDevice::Update()", "RenderDevice::CopyUpdate()");
 		auto& frameresource = m_FrameResources[m_ValueIndex];
 		m_CopyCommandQueue->WaitForFenceValue(frameresource.CopyFenceValue);
 

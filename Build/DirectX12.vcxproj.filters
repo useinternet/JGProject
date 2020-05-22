@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12GraphicsDevice.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12Scene.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12Screen.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXApi.cpp" />
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BC.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BC4BC5.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BC6HBC7.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BCDirectCompute.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexCompress.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexCompressGPU.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexConvert.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexD3D11.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexD3D12.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexDDS.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexFlipRotate.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexHDR.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexImage.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexMipmaps.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexMisc.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexNormalMaps.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexPMAlpha.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexResize.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexTGA.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexUtil.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexWIC.cpp">
+      <Filter>DirectXTex</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\pch.h" />
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12GraphicsDevice.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Core.h" />
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12Scene.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\Object\DX12Screen.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXApi.h" />
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\d3dx12.h" />
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BC.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\BCDirectCompute.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\d3dx12.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DDS.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTex.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTexP.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\filters.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\scoped.h">
+      <Filter>DirectXTex</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object">
+      <UniqueIdentifier>{0d50c2c7-748d-4871-8fb5-86dfaa99504d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXTex">
+      <UniqueIdentifier>{18491c28-00db-444c-9e70-2ebac13e1fcf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX12\DirectXTex\DirectXTex.inl">
+      <Filter>DirectXTex</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -17,6 +17,14 @@ void JGUICollider::Awake()
 	FindCanvas();
 }
 
+void JGUICollider::Start()
+{
+	if (m_OwnerCanvas == nullptr)
+	{
+		FindCanvas();
+	}
+}
+
 void JGUICollider::ChangeParent(JGUIObject* prev_parent)
 {
 	FindCanvas();

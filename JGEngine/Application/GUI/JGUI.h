@@ -298,8 +298,8 @@ public:
 		com->SetName(name);
 
 		auto result = com.get();
-		sm_GUI->m_ComponentPool[com.get()] = com;
-
+		//sm_GUI->m_ComponentPool[com.get()] = com;
+		sm_GUI->m_ExpectedCreateComponent.push(com);
 		return result;
 	}
 
@@ -354,27 +354,50 @@ public:
 		objqueue.push(obj);
 		return obj.get();
 	}
+	//
 	static JGUIScreen* ReqeustRegisterJGUIScreen(JGUIWindow* window);
 	static JGUIWindow* FindRootJGUIWindow(HWND hWnd);
 	static JGUIScreen* FindJGUIScreen(HWND hWnd);
 	static void        RequestDestroyScreen(HWND hWnd);
 	static void        ClearExpectedDestroyScreen();
+
+	//
 	static JGUIWindow* GetMainWindow();
+
+	//
 	static JVector2Int GetCursorPos();
 	static JVector2Int GetMousePos(HWND hWnd);
 	static bool        GetKeyDown(JGUIWindow* owner_window, KeyCode code);
 	static bool        GetKeyUp(JGUIWindow* owner_window, KeyCode code);
 	static void        InputFlush();
 	static void        InputMouseFlush();
+	//
 	static void        RegisterMouseTrack(const JGUIMouseTrack& mt);
 	static void        RegisterExtraEvent(const JGUIExtraEvent& e, uint64_t priority = 0);
+	//
 	static JGUIFontManager*  GetJGUIFontManager();
 	static const std::string GetDefaultFontName();
+	//
 	static int         GetWindowZOrder(JGUIWindow* win);
 	static JGUIWindow* GetTopJGUIWindow();
 	static JGUIWindow* GetNextJGUIWindow(JGUIWindow* win);
+	//
 	static void RegisterDraggingWindow(JGUIWindow* win);
 	static JGUIWindow* GetCurrentDraggingWindow();
+	static std::vector<JGUIWindow*> GetRootWindows();
+
+	static const std::queue<std::shared_ptr<JGUIObject>>& GetExpectedCreateObjects() {
+		return sm_GUI->m_ExpectedCreateObject;
+	}
+	static const std::queue<JGUIObject*>& GetExpectedDestroyObjects() {
+		return sm_GUI->m_ExpectedDestroyObject;
+	}
+	static const std::queue<JGUIComponent*>& GetExpectedDestroyComponents() {
+		return sm_GUI->m_ExpectedDestroyComponent;
+	}
+	static const std::queue<std::shared_ptr<JGUIComponent>> GetExpectedCreateComponents() {
+		return sm_GUI->m_ExpectedCreateComponent;
+	}
 public:
 	JGUI(IE::InputEngine* input, const JGUIDesc& desc = JGUIDesc());
 	void Update();
@@ -410,10 +433,11 @@ private:
 	
 	JGUIDesc          m_Desc;
 
-	std::queue<HWND> m_ExpectedDestroyWindow;
-	std::queue<std::shared_ptr<JGUIObject>> m_ExpectedCreateObject;
-	std::queue<JGUIObject*>    m_ExpectedDestroyObject;
-	std::queue<JGUIComponent*> m_ExpectedDestroyComponent;
+	std::queue<HWND>                           m_ExpectedDestroyWindow;
+	std::queue<std::shared_ptr<JGUIObject>>    m_ExpectedCreateObject;
+	std::queue<JGUIObject*>                    m_ExpectedDestroyObject;
+	std::queue<std::shared_ptr<JGUIComponent>> m_ExpectedCreateComponent;
+	std::queue<JGUIComponent*>                 m_ExpectedDestroyComponent;
 
 	JGUIWindow*      m_MainWindow = nullptr;
 	JGUIWindow*      m_DraggingWindow = nullptr;

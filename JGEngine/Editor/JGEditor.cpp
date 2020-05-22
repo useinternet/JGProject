@@ -2,7 +2,9 @@
 #include "JGEditor.h"
 #include "App/Application.h"
 #include "Window/Debug/JGLog.h"
+#include "Window/Debug/JGUIHierarchy.h"
 
+using namespace std;
 void JGEditor::Awake()
 {
 	GlobalLinkData::Init(Application::GetLinkStream());
@@ -14,6 +16,15 @@ void JGEditor::Start()
 {
 
 	InitMainMenu();
+
+	m_FPS = CreateJGUIElement("FPS")->CreateJGUIComponent<Text>();
+	m_FPS->SetFontSize(32.0f);
+	m_FPS->GetTransform()->SetLocalPosition(50, 50);
+}
+
+void JGEditor::Tick(const JGUITickEvent& e)
+{
+	m_FPS->SetText(to_string(e.fps));
 }
 
 void JGEditor::InitMainMenu()
@@ -79,13 +90,30 @@ void JGEditor::InitMainMenu()
 				logItemDesc.auxiliary_key = KeyCode::L;
 				logItemDesc.func = [&](void* data)
 				{
-					JGUIForm* logForm = CreateJGUIForm<JGLog>("JGLog");
+					JGUIForm* logForm = CreateJGUIForm<JGLog>("Log");
 					logForm->GetTransform()->SetLocalPosition(50, 50);
 
 
 
 				};
 				MenuItem* log = debug->AddItem(logItemDesc);
+			}
+
+			// JGUIHierarchicalStructure
+			{
+				MenuItemDesc jhsItemDesc;
+				jhsItemDesc.contents = "JGUIHierarchy";
+				jhsItemDesc.name = "JGUIHierarchy";
+				jhsItemDesc.auxiliary_key = KeyCode::H;
+				jhsItemDesc.func = [&](void* data)
+				{
+					JGUIForm* jhsForm = CreateJGUIForm<JGUIHierarchy>("JGUIHierarchy");
+					jhsForm->GetTransform()->SetLocalPosition(50, 50);
+
+
+
+				};
+				MenuItem* jhs = debug->AddItem(jhsItemDesc);
 			}
 		}
 

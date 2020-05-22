@@ -1,26 +1,32 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\JGEngine\Editor\pch.cpp" />
+    <Filter Include="Window">
+      <UniqueIdentifier>{3DEA79DA-298C-A4B0-1247-B804FE872B01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Debug">
+      <UniqueIdentifier>{73EE0B97-5F51-9B3B-08D7-D3F1F41867BE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Editor\Core.h" />
+    <ClInclude Include="..\JGEngine\Editor\JGEditor.h" />
+    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGLog.h">
+      <Filter>Window\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGUIHierarchy.h">
+      <Filter>Window\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Editor\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\JGEngine\Editor\JGEditor.cpp" />
     <ClCompile Include="..\JGEngine\Editor\Window\Debug\JGLog.cpp">
       <Filter>Window\Debug</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\JGEngine\Editor\pch.h" />
-    <ClInclude Include="..\JGEngine\Editor\JGEditor.h" />
-    <ClInclude Include="..\JGEngine\Editor\Core.h" />
-    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGLog.h">
+    <ClCompile Include="..\JGEngine\Editor\Window\Debug\JGUIHierarchy.cpp">
       <Filter>Window\Debug</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Window">
-      <UniqueIdentifier>{aef4625f-b5c3-4884-a6be-ff5042449907}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Window\Debug">
-      <UniqueIdentifier>{0f6da2af-ab71-49ec-aaa9-a1a8a88b09ee}</UniqueIdentifier>
-    </Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Editor\pch.cpp" />
   </ItemGroup>
 </Project>

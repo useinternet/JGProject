@@ -211,6 +211,16 @@ void TabSystem::AdjustTabWindowSize()
 	}
 }
 
+std::vector<JGUIWindow*> TabSystem::GetBindedWindow() const
+{
+	vector<JGUIWindow*> result;
+	for (auto& info : m_TabInfos)
+	{
+		result.push_back(info->win);
+	}
+	return result;
+}
+
 TabSystem::TabInfo* TabSystem::CreateTabInfo(JGUIWindow* win)
 {
 	unique_ptr<TabInfo> tabinfo = make_unique<TabInfo>();
@@ -235,7 +245,9 @@ TabSystem::TabInfo* TabSystem::CreateTabInfo(JGUIWindow* win)
 	tabinfo->bt->GetTransform()->SetSize(m_TabBtWidth, btHeight - m_TabLineHeight);
 	tabinfo->txt = tabinfo->bt->GetOwner()->CreateJGUIElement("Text")->CreateJGUIComponent<Text>();
 	tabinfo->txt->SetColor(JColor::Black());
+	tabinfo->txt->SetFontSize(16.0f);
 	tabinfo->txt->SetText(tabinfo->origin_name);
+
 	tabinfo->txt->SetHAlign(JGUI_Text_HAlignment_Center);
 	tabinfo->txt->SetVAlign(JGUI_Text_VAlignment_Center);
 	tabinfo->bt->GetTransform()->AttachTransform(tabinfo->txt->GetTransform());

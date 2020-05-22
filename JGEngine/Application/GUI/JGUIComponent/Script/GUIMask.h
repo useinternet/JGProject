@@ -12,6 +12,9 @@ protected:
 	virtual void Tick(float tick) override;
 public:
 	void Bind(JGUIRenderer* renderer);
+	void Bind(JGUIElement* element);
 private:
-	JGUIRenderer* m_MaskRenderer = nullptr;
+	void TracingImageRenderer(JGUIElement* element);
+private:
+	std::vector<JGUIRenderer*> m_MaskRenderers;
 };

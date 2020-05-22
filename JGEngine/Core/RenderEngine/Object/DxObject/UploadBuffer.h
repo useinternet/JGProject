@@ -15,7 +15,7 @@ namespace RE
 	private:
 		class Page
 		{
-			ComPtr<ID3D12Resource> m_D3D12Resource;
+			Microsoft::WRL::ComPtr<ID3D12Resource> m_D3D12Resource;
 			//
 			void* m_CPUptr;
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUptr;

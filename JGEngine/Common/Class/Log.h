@@ -22,6 +22,16 @@ private:
 };
 
 
+#define LOG(level, affiliation, str, ... ) Log::GetLogger()->##level("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+
+#define LOG_TRACE(affiliation, str, ...) Log::GetLogger()->trace("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+#define LOG_INFO(affiliation, str,...)  Log::GetLogger()->info(("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+#define LOG_WARN(affiliation, str,...)  Log::GetLogger()->warn(("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+#define LOG_ERROR(affiliation, str,...) Log::GetLogger()->error(("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+#define LOG_FATAL(affiliation, str,...) Log::GetLogger()->critical(("[" + std::string(#affiliation) + "] : " + std::string(str), __VA_ARGS__)
+
+
+
 #define ENGINE_LOG_TRACE(str, ...) Log::GetLogger()->trace("[Engine] : " + std::string(str), __VA_ARGS__)
 #define ENGINE_LOG_INFO(str,...)  Log::GetLogger()->info("[Engine] : " + std::string(str), __VA_ARGS__)
 #define ENGINE_LOG_WARN(str,...)  Log::GetLogger()->warn("[Engine] : " + std::string(str), __VA_ARGS__)

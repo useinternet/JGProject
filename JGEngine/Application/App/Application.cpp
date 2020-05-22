@@ -23,7 +23,10 @@ Application::Application(const std::wstring& name, EApplicationMode mode) :
 	m_AppMode(mode), m_AppName(name), m_IsInit(false){  }
 Application::~Application()
 {
-
+	m_Graphics->Destroy();
+	delete m_Graphics;
+	m_Graphics = nullptr;
+	m_Plugin.~Plugin();
 }
 
 bool Application::Init()
@@ -59,6 +62,18 @@ bool Application::Init()
 	m_RenderEngine->Init();
 
 	m_IsInit = true;
+
+
+	// Test
+	AppDesc desc;
+	m_Plugin.Load(desc.GraphicsEngineDllPath);
+	m_UnitTestPlugin.Load(desc.GraphicsEngineDllPath);
+
+
+
+
+
+
 	return true;
 }
 void Application::Load()
@@ -67,8 +82,24 @@ void Application::Load()
 	m_PhysicsEngine->Load();
 	m_SoundEngine->Load();
 	m_RenderEngine->Load();
+	//
 	m_Game->Load();
 	m_GUI = make_shared<JGUI>(m_InputEngine.get());
+
+
+
+
+
+
+	//JWindowDesc windesc;
+	//windesc.width = 1100;
+	//windesc.height = 618;
+	//windesc.name = "UnitTest";
+	//auto win = JWindowManager::Create(windesc, 0, 0);
+	//((TestFunc)m_UnitTestPlugin.GetProcAddress("BindUnitTest"))(win->GetHandle(), 1920, 1080);
+	//m_Graphics = ((CreateEngineCoreFunc)m_Plugin.GetProcAddress("CreateGraphicsEngine"))(g_link_stream);
+	//m_Graphics->Init();
+	//m_Graphics->Load();
 }
 typedef	JGUIObject*(*TestFunc)(const std::string);
 void Application::Run()
@@ -85,10 +116,8 @@ void Application::Run()
 		}
 		else
 		{
-			if(GlobalLinkData::_EnginePerformance)
-				GlobalLinkData::_EnginePerformance->Reset();
+
 		
-			ENGINE_PERFORMANCE_TIMER_START("Application");
 
 	
 
@@ -110,6 +139,7 @@ void Application::Run()
 			});
 			auto render_task = make_task([&] {
 				m_RenderEngine->Update();
+				//m_Graphics->Update();
 			});
 			////엔진 업데이트
 

@@ -1,0 +1,91 @@
+
+
+
+
+Name
+{
+    // Node나 TAIL의 경우 VS가 정해져있고 PS만 취급.
+    // HEAD만이
+    Type = HEAD, TAIL, NODE 
+
+    // HEAD or TAIL
+    Shader
+    {
+        PS  = "none";
+        Flag
+        {
+            "Flag1", "Flag2" ...
+        }
+    }
+
+    // HEAD
+    Shader
+    {
+        VS = "none";
+        PS = "none"; 
+        StageFlag : " "
+        {
+            HS = "none";
+            DS = "none";
+            GS = "none"; 
+        }
+        StageFlag : " "
+        {
+            HS = "none";
+            DS = "none";
+            GS = "none"; 
+        }
+    }
+
+
+    InputLayout : Flag
+    {   
+        float4 : POSITION,
+        float3 : NORMAL,
+    }
+    Flag
+    {
+        "Flag1", "Flag2" ...
+    }
+
+    
+
+
+    //Common
+
+    
+
+
+
+    
+    RenderTarget
+    {
+        name : 0
+        {
+            Format = FORMAT_R8G8B8A8_UINT,
+        }
+
+
+        name : depth
+        {
+            Format = FORMAT_D24_8UINT,
+        }
+    }
+
+
+    PipelineState
+    {
+        BlendState = 
+        {
+            STATE_DEFAULT
+        },
+        DepthStencilState = 
+        {
+            STATE_DEFAULT
+        },
+        RasterizerState = 
+        {
+            STATE_DEFAULT
+        },
+    }
+}

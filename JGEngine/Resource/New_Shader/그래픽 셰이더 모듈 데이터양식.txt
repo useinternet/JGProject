@@ -1,0 +1,45 @@
+
+id = ..;
+
+stage = { vs, ps }
+hlsl = "..."
+
+size = {x,y}
+
+RT(index, name) = DXGI_FORMAT_...
+
+
+PSO = 
+{
+    INIT_DEFAULT // -> 기본으로 설정
+
+    BlendState = 
+    {
+
+    }
+    DepthStencilState = 
+    {
+
+    }
+    RasterizerState = 
+    {
+
+    }
+}
+
+
+1. 연결된 hlsl
+
+// 2. 모듈 타입 (head, tail, node)
+
+3. RT 정보
+ RT : {index}
+ {
+     textureDesc Info
+ }
+
+4. State 정보
+  - BlendState
+  - DepthStencilState
+  - RasterizeSate
+  - tolpolyType 등등

@@ -60,6 +60,9 @@ public:
 	bool IsDestroying() const {
 		return m_IsDestroying;
 	}
+	bool IsWindow() const {
+		return m_IsWindow;
+	}
 public:
 	template<typename ComponentType>
 	ComponentType* CreateJGUIComponent()

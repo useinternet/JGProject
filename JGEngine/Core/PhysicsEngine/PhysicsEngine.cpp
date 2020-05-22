@@ -12,7 +12,7 @@ namespace PE
 	}
 	void PhysicsEngine::Update()
 	{
-		ENGINE_PERFORMANCE_TIMER("Application", "PhysicsEngine");
+		
 	}
 	void PhysicsEngine::OnEvent(Event& e)
 	{

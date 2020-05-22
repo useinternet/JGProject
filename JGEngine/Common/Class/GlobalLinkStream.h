@@ -34,6 +34,17 @@ public:
 		if(!is_app)
 			Log::RegisterLog(Logger, stream.LogFileName);
 	}
+	static GlobalLinkStream GetStream()
+	{
+		GlobalLinkStream stream;
+		stream.OnEvent = OnEvent;
+		stream.Logger = Logger;
+		stream.EngineEventManager = EngineEventManager;
+		stream._EngineTimer = _EngineTimer;
+		stream._EngineConfig = _EngineConfig;
+		stream._EnginePerformance = _EnginePerformance;
+		return stream;
+	}
 
 	static float GetTick(TimeStepType type = TimeStepType::Second);
 	static float GetTotalTime(TimeStepType type = TimeStepType::Second);

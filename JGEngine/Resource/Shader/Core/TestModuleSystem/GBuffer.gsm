@@ -1,0 +1,52 @@
+GBuffer
+{
+    Type = HEAD
+    Shader
+    {
+        VS = "GBuffer_vs.hlsl",
+        PS = "GBuffer_ps.hlsl" 
+    }
+
+
+    InputLayout(flag = "default")
+    {   
+        float3 : POSITION,
+        float3 : NORMAL,
+        float3 : TANGENT,
+        float2 : TEXCOORD
+    }
+
+    Flag
+    {
+        
+    }
+
+    RenderTarget
+    {
+        "Output" : 0
+        {
+            Format = FORMAT_R8G8B8A8_UINT,
+        }
+        "DepthStncil" : depth
+        {
+            Format = FORMAT_D24_UNORM_S8_UINT,
+        }
+    }
+
+
+    PipelineState
+    {
+        BlendState = 
+        {
+            auto = STATE_DEFAULT
+        },
+        DepthStencilState = 
+        {
+            auto = STATE_DEFAULT
+        },
+        RasterizerState = 
+        {
+            auto = STATE_DEFAULT
+        },
+    }
+}

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX11\pch.cpp" />
+    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX11\temp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX11\pch.h" />
+    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\GPU_API\DirectX11\temp.h" />
+  </ItemGroup>
+</Project>

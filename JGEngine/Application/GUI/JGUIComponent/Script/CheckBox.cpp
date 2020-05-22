@@ -69,3 +69,24 @@ void CheckBox::SetBool(bool* bool_ptr)
 	m_BoolPtr = bool_ptr;
 
 }
+
+void CheckBox::SetCheckImage(const std::string& imagePath)
+{
+	m_Check->SetImage(imagePath);
+
+}
+
+void CheckBox::SetCheckBoxImage(const std::string& imagePath)
+{
+	m_CheckBox->SetImage(imagePath);
+}
+
+const std::string& CheckBox::GetCheckImage() const
+{
+	return m_Check->GetImage();
+}
+
+const std::string& CheckBox::GetCheckBoxImage() const
+{
+	return m_CheckBox->GetImage();
+}

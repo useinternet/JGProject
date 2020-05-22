@@ -9,9 +9,37 @@ class EngineCore : public NoneCopy
 {
 public:
 	EngineCore(const GlobalLinkStream& stream);
+	EngineCore();
 	virtual ~EngineCore();
 public:
-	virtual void Load() = 0;
-	virtual void Update() = 0;
-	virtual void OnEvent(Event& e) = 0;
+	virtual void Init() {}
+	virtual void Load() {}
+	virtual void Update() {}
+	virtual void Destroy() {}
+	virtual void OnEvent(Event& e) {}
 };
+
+template<typename EnginCoreType>
+inline EngineCore* CreateEngineCore(const GlobalLinkStream& stream)
+{
+	EngineCore* obj = new EnginCoreType(stream);
+	return obj;
+}
+
+
+//
+#define REGISTER_GRAPHICSENGINE(ClassName) \
+extern "C" __declspec(dllexport) \
+inline  EngineCore* CreateGraphicsEngine(const GlobalLinkStream& stream)\
+{ \
+	return CreateEngineCore<ClassName>(stream);  \
+} \
+
+
+
+
+
+
+
+
+

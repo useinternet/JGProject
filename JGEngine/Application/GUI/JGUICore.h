@@ -18,6 +18,7 @@
 #include "GUI/JGUIComponent/Script/InputText.h"
 #include "GUI/JGUIComponent/Script/CheckBox.h"
 #include "GUI/JGUIComponent/Script/GUIMask.h"
+#include "GUI/JGUIComponent/Script/TreeView.h"
 
 
 #include "GUI/JGUIComponent/Script/ContextMenu.h"

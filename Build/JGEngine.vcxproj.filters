@@ -63,10 +63,19 @@
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.h">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.h">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.h">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.h">
@@ -85,6 +94,12 @@
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeItem.h">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeView.h">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClInclude>
     <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.h">
@@ -117,15 +132,6 @@
     <ClInclude Include="..\JGEngine\Application\JE.h" />
     <ClInclude Include="..\JGEngine\Application\framework.h" />
     <ClInclude Include="..\JGEngine\Application\pch.h" />
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.h">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.h">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.h">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\JGEngine\Application\App\Application.cpp">
@@ -161,10 +167,19 @@
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\Button.cpp">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\ContextMenu.cpp">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\DockSystem.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.cpp">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\MainMenu.cpp">
@@ -183,6 +198,12 @@
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TitleBar.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeItem.cpp">
+      <Filter>GUI\JGUIComponent\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\TreeView.cpp">
       <Filter>GUI\JGUIComponent\Script</Filter>
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\WindowSizeAdjustment.cpp">
@@ -208,14 +229,5 @@
     </ClCompile>
     <ClCompile Include="..\JGEngine\Application\dllmain.cpp" />
     <ClCompile Include="..\JGEngine\Application\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\CheckBox.cpp">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\InputText.cpp">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Application\GUI\JGUIComponent\Script\GUIMask.cpp">
-      <Filter>GUI\JGUIComponent\Script</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

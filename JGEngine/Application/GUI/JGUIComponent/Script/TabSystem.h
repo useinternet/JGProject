@@ -14,10 +14,12 @@ protected:
 	virtual void Destroy() override;
 	virtual void Tick(float tick) override;
 public:
+
 	void ActiveWindow(JGUIWindow* win);
 	void BindWindow(JGUIWindow* win);
 	void BindWindowByCursorPos();
 	void AdjustTabWindowSize();
+	std::vector<JGUIWindow*> GetBindedWindow() const;
 private:
 
 	struct TabInfo

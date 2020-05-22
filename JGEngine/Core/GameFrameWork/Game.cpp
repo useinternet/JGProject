@@ -43,7 +43,7 @@ namespace GFW
 
 	void Game::Update()
 	{
-		ENGINE_PERFORMANCE_TIMER("Application", "Game");
+		
 	}
 	void Game::OnEvent(Event& e)
 	{

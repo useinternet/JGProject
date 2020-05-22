@@ -126,8 +126,8 @@ void Text::SetText(std::string text)
 	size_t   c_p     = 0;
 	uint32_t line    = 0;
 	uint32_t ioffset = 0;
-	auto size = GetTransform()->GetSize();
-	auto fontFileInfo = m_FM->GetFontFileInfo(m_Font);
+	auto size             = GetTransform()->GetSize();
+	auto fontFileInfo     = m_FM->GetFontFileInfo(m_Font);
 	float font_size_ratio = m_FontSize / (float)fontFileInfo.default_font_size;
 
 
@@ -136,7 +136,7 @@ void Text::SetText(std::string text)
 	{
 		m_ReMesh->Reset();
 	}
-
+	if (text.length() == 0) return;
 	//m_ReMesh = make_shared<RE::ReGuiMesh>();
 	while (c_p != string::npos)
 	{
@@ -156,10 +156,8 @@ void Text::SetText(std::string text)
 			string sub_str;
 			for (size_t i = 0; i<text.length(); ++i)
 			{
-				wstring w;
-				auto ipos = text.begin() + i;
-				w.insert(w.end(), ipos, ipos + 1);
-				auto info = m_FM->GetFontCharInfo(m_Font, w);
+				
+				auto info = m_FM->GetFontCharInfo(m_Font, s2ws(text.substr(i, 1)));
 				text_width += info[0].xadvance * font_size_ratio;
 				if (text_width >= size.x)
 				{
@@ -170,7 +168,7 @@ void Text::SetText(std::string text)
 				}
 			}
 			// 여기서 텍스트가 넘치는지 확인 cp조절
-			if (c_p != string::npos)
+			if (c_p != string::npos && c_p  != 0)
 			{
 
 				text_mesh->text = text.substr(0, c_p);

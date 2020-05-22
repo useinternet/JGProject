@@ -1119,135 +1119,133 @@ void DockSystem::DockResizeLine::Start()
 			JGUIExtraEvent extra_e;
 			extra_e.Bind(JGUI_EXTRAEVENT_REPEAT, GetOwner(), [&](JGUIExtraEvent& e)
 			{
-				JGUIRect top_area;
-				JGUIRect bottom_area;
-				JGUIRect right_area;
-				JGUIRect left_area;
-				auto mouse_pos = GetOwnerWindow()->GetMousePos();
-				if (m_PrevMousePos != mouse_pos)
-				{
-					int delta_x = mouse_pos.x - m_PrevMousePos.x;
-					int delta_y = mouse_pos.y - m_PrevMousePos.y;
-
-					switch (m_LineType)
-					{
-					case HLine:
-						top_area = TopArea();
-						top_area.bottom += delta_y;
-
-						bottom_area = BottomArea();
-						bottom_area.top += delta_y;
-
-
-						if (delta_y < 0 && top_area.height() <= 200) break;
-						if (delta_y >= 0 && bottom_area.height() <= 200) break;
-
-
-						for (auto& info_pair : m_TopDock)
-						{
-							info_pair.second->rect.bottom += delta_y;
-							auto rect = info_pair.second->rect;
-
-
-							if (info_pair.first == GetOwnerWindow()) continue;
-							info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
-						}
-						for (auto& info_pair : m_BottomDock)
-						{
-							info_pair.second->rect.top += delta_y;
-							auto rect = info_pair.second->rect;
-							if (info_pair.first == GetOwnerWindow()) continue;
-							info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
-							info_pair.first->GetTransform()->SetLocalPosition(rect.left, rect.top);
-						}
-
-						GetTransform()->OffsetLocalPosition(0.0f, delta_y);
-
-						for (auto& line : m_ConnectedResizeLines[DD_Bottom])
-						{
-							// delta_x 만큼 사이즈빼주고
-							auto line_pos = line->GetTransform()->GetLocalPosition();
-							line_pos.y += delta_y;
-							line->GetTransform()->SetLocalPosition(line_pos);
-							auto line_size = line->GetTransform()->GetSize();
-							line_size.y -= delta_y;
-							line->GetTransform()->SetSize(line_size);
-						}
-						for (auto& line : m_ConnectedResizeLines[DD_Top])
-						{
-							// delta_x 만큼 사이즈만 더해줌
-							auto line_size = line->GetTransform()->GetSize();
-							line_size.y += delta_y;
-							line->GetTransform()->SetSize(line_size);
-						}
-
-						//
-						break;
-					case VLine:
-
-						left_area = LeftArea();
-						left_area.right += delta_x;
-
-						right_area = RightArea()
-							;
-						right_area.left += delta_x;
-
-						if (delta_x < 0 && left_area.width() <= 200) break;
-						if (delta_x >= 0 && right_area.width() <= 200) break;
-
-						for (auto& info_pair : m_LeftDock)
-						{
-							info_pair.second->rect.right += delta_x;
-							auto rect = info_pair.second->rect;
-							if (info_pair.first == GetOwnerWindow()) continue;
-							info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
-						}
-						for (auto& info_pair : m_RightDock)
-						{
-							info_pair.second->rect.left += delta_x;
-							auto rect = info_pair.second->rect;
-							if (info_pair.first == GetOwnerWindow()) continue;
-							info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
-							info_pair.first->GetTransform()->SetLocalPosition(rect.left, rect.top);
-						}
-
-						GetTransform()->OffsetLocalPosition(delta_x, 0.0f);
-
-
-						for (auto& line : m_ConnectedResizeLines[DD_Right])
-						{
-							// delta_x 만큼 사이즈빼주고
-							auto line_pos = line->GetTransform()->GetLocalPosition();
-							line_pos.x += delta_x;
-							line->GetTransform()->SetLocalPosition(line_pos);
-							auto line_size = line->GetTransform()->GetSize();
-							line_size.x -= delta_x;
-							line->GetTransform()->SetSize(line_size);
-						}
-						for (auto& line : m_ConnectedResizeLines[DD_Left])
-						{
-							// delta_x 만큼 사이즈만 더해줌
-							auto line_size = line->GetTransform()->GetSize();
-							line_size.x += delta_x;
-							line->GetTransform()->SetSize(line_size);
-						}
-						break;
-					}
-
-
-
-				}
-
-
-
 				if (JGUI::GetKeyUp(GetOwnerWindow(), KeyCode::LeftMouseButton) || !IsActive())
 				{
+					JGUIRect top_area;
+					JGUIRect bottom_area;
+					JGUIRect right_area;
+					JGUIRect left_area;
+					auto mouse_pos = GetOwnerWindow()->GetMousePos();
+					if (m_PrevMousePos != mouse_pos)
+					{
+						int delta_x = mouse_pos.x - m_PrevMousePos.x;
+						int delta_y = mouse_pos.y - m_PrevMousePos.y;
+
+						switch (m_LineType)
+						{
+						case HLine:
+							top_area = TopArea();
+							top_area.bottom += delta_y;
+
+							bottom_area = BottomArea();
+							bottom_area.top += delta_y;
+
+
+							if (delta_y < 0 && top_area.height() <= 200) break;
+							if (delta_y >= 0 && bottom_area.height() <= 200) break;
+
+
+							for (auto& info_pair : m_TopDock)
+							{
+								info_pair.second->rect.bottom += delta_y;
+								auto rect = info_pair.second->rect;
+
+
+								if (info_pair.first == GetOwnerWindow()) continue;
+								info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
+							}
+							for (auto& info_pair : m_BottomDock)
+							{
+								info_pair.second->rect.top += delta_y;
+								auto rect = info_pair.second->rect;
+								if (info_pair.first == GetOwnerWindow()) continue;
+								info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
+								info_pair.first->GetTransform()->SetLocalPosition(rect.left, rect.top);
+							}
+
+							GetTransform()->OffsetLocalPosition(0.0f, delta_y);
+
+							for (auto& line : m_ConnectedResizeLines[DD_Bottom])
+							{
+								// delta_x 만큼 사이즈빼주고
+								auto line_pos = line->GetTransform()->GetLocalPosition();
+								line_pos.y += delta_y;
+								line->GetTransform()->SetLocalPosition(line_pos);
+								auto line_size = line->GetTransform()->GetSize();
+								line_size.y -= delta_y;
+								line->GetTransform()->SetSize(line_size);
+							}
+							for (auto& line : m_ConnectedResizeLines[DD_Top])
+							{
+								// delta_x 만큼 사이즈만 더해줌
+								auto line_size = line->GetTransform()->GetSize();
+								line_size.y += delta_y;
+								line->GetTransform()->SetSize(line_size);
+							}
+
+							//
+							break;
+						case VLine:
+
+							left_area = LeftArea();
+							left_area.right += delta_x;
+
+							right_area = RightArea()
+								;
+							right_area.left += delta_x;
+
+							if (delta_x < 0 && left_area.width() <= 200) break;
+							if (delta_x >= 0 && right_area.width() <= 200) break;
+
+							for (auto& info_pair : m_LeftDock)
+							{
+								info_pair.second->rect.right += delta_x;
+								auto rect = info_pair.second->rect;
+								if (info_pair.first == GetOwnerWindow()) continue;
+								info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
+							}
+							for (auto& info_pair : m_RightDock)
+							{
+								info_pair.second->rect.left += delta_x;
+								auto rect = info_pair.second->rect;
+								if (info_pair.first == GetOwnerWindow()) continue;
+								info_pair.first->GetTransform()->SetSize(rect.width(), rect.height());
+								info_pair.first->GetTransform()->SetLocalPosition(rect.left, rect.top);
+							}
+
+							GetTransform()->OffsetLocalPosition(delta_x, 0.0f);
+
+
+							for (auto& line : m_ConnectedResizeLines[DD_Right])
+							{
+								// delta_x 만큼 사이즈빼주고
+								auto line_pos = line->GetTransform()->GetLocalPosition();
+								line_pos.x += delta_x;
+								line->GetTransform()->SetLocalPosition(line_pos);
+								auto line_size = line->GetTransform()->GetSize();
+								line_size.x -= delta_x;
+								line->GetTransform()->SetSize(line_size);
+							}
+							for (auto& line : m_ConnectedResizeLines[DD_Left])
+							{
+								// delta_x 만큼 사이즈만 더해줌
+								auto line_size = line->GetTransform()->GetSize();
+								line_size.x += delta_x;
+								line->GetTransform()->SetSize(line_size);
+							}
+							break;
+						}
+
+
+
+					}
 					m_IsResizeing = false;
 					e.flag = JGUI_EXTRAEVENT_EXIT;
 					m_Line->SetColor(JColor::Black());
+					m_PrevMousePos = mouse_pos;
 				}
 
-				m_PrevMousePos = mouse_pos;
+			
 			});
 
 			JGUI::RegisterExtraEvent(extra_e);

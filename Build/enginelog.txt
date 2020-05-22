@@ -1,62 +1,36 @@
-[info] [28856] [Physics] : PhysicsEngine Init Compelete...
-[info] [28856] [Sound] : SoundEngine Init Compelete
-[info] [28856] [GameFrameWork] : GameFrameWork Init Compelete
-[info] [28856] [Rendering] : RenderEngine Init Complete...
-[trace] [28856] [Game] : Begin
-[trace] [28856] [Game] : Tick
-[trace] [28856] [Game] : End
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Camera
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Camera
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [30576] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [15860] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [15860] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [15860] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[info] [28856] [Engine] : Execute(Aux) : Debug 
-[info] [28856] [Engine] : Execute(Aux) : Log 
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Camera
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Camera
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[error] [28856] [Engine] : class JGUIImageRenderer is not exsit in Canvas
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Debug 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
-[info] [28856] [Engine] : Execute(Aux) : Open 
+[info] [13244] [Physics] : PhysicsEngine Init Compelete...
+[info] [13244] [Sound] : SoundEngine Init Compelete
+[info] [13244] [GameFrameWork] : GameFrameWork Init Compelete
+[info] [13244] [Rendering] : RenderEngine Init Complete...
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIBoxCollider is not exsit in Canvas
+[info] [13244] [Engine] : JGUI Aawake Function
+[error] [6092] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [6092] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [6092] [Rendering] : ..\JGEngine\Resource\Fonts/Consolas_0.dds is Invalid While Bind SRV
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Camera
+[error] [13244] [Engine] : class JGUIBoxCollider is not exsit in Canvas
+[info] [13244] [Engine] : Log Aawake Function
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIBoxCollider is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIBoxCollider is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIImageRenderer is not exsit in Canvas
+[error] [13244] [Engine] : class JGUIShapeRenderer is not exsit in Canvas
