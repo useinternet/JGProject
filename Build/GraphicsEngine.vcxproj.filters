@@ -1,56 +1,57 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\pch.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\GraphicsEngine.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Scene.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Screen.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GObject.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GraphicsDevice.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\pch.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\GraphicsEngine.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Scene.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Screen.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GObject.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GraphicsDevice.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Core.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\GECore.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Object">
-      <UniqueIdentifier>{c566c3a9-87db-4acd-9b0a-185f700e7c5c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{83917526-29b4-4a6e-bbf8-a22871776010}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\HLSL">
-      <UniqueIdentifier>{f31a2c56-2138-4137-aa43-8705eec7e377}</UniqueIdentifier>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{764D2783-E2B7-DBF9-2BF6-8C9F979FB94E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="GUI_VS.shader">
-      <Filter>Shader\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="GUI_PS.shader">
-      <Filter>Shader\HLSL</Filter>
-    </FxCompile>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GECore.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GraphicsEngine.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GraphicsIF.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GEObject.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GraphicsDevice.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GraphicsRenderer.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Material.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Scene.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneObject.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Screen.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Texture.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneLight.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\RenderingPass.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\ShaderDefined.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\StateWrapper.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\GraphicsEngine.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\Interface\GEObject.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\pch.cpp" />
   </ItemGroup>
 </Project>

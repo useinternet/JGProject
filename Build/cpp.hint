@@ -1,0 +1,8 @@
+// ?ŒíŠ¸ ?Œì¼?€ Visual Studio IDE?ì„œ ?¨ìˆ˜ ë°?ë§¤í¬ë¡??´ë¦„ê³?ê°™ì? Visual C++ ?ë³„?ë?
+// ?´ì„?˜ëŠ” ???„ì????©ë‹ˆ??
+// ?ì„¸???´ìš©?€ ?¤ìŒ??ì°¸ì¡°?˜ì„¸?? https://go.microsoft.com/fwlink/?linkid=865984
+#define REGISTER_MAIN_WINFORM(classType, titleName, flag) class classType extern "C" __declspec(dllexport) void CreateMainWindowForm() { GUI::GUIIF::CreateMainWindowForm<##classType>(##titleName,##flag); }
+// ?ŒíŠ¸ ?Œì¼?€ Visual Studio IDE?ì„œ ?¨ìˆ˜ ë°?ë§¤í¬ë¡??´ë¦„ê³?ê°™ì? Visual C++ ?ë³„?ë?
+// ?´ì„?˜ëŠ” ???„ì????©ë‹ˆ??
+// ?ì„¸???´ìš©?€ ?¤ìŒ??ì°¸ì¡°?˜ì„¸?? https://go.microsoft.com/fwlink/?linkid=865984
+#define REGISTER_MAIN_WINFORM(classType, titleName, flag) class classType extern "C" __declspec(dllexport) void CreateMainWindowForm() { GUI::GUIIF::CreateMainWindowForm<##classType>(##titleName,##flag); }

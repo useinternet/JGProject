@@ -1,10 +1,11 @@
-workspace "JGGame"
+
+workspace "JGEngine"
    architecture "x64"
    startproject "EntryPoint"
    configurations 
    {
    -- All Engine Debug
-      "DevelopEngine",
+     "DevelopEngine",
    -- Engine is DevelopEngineOnRelease CustomGame is Debug
      "DevelopGame",
    -- All Engine and CustomGame is Release but DebugInfo
@@ -13,8 +14,6 @@ workspace "JGGame"
      "Release"
    }
    --function 
-   
-
    function DebugConfig()
      symbols  "On"
      optimize "Off"
@@ -22,17 +21,19 @@ workspace "JGGame"
      cppdialect "C++17"
    end
 
-   function ReleaseOnDebugInfoConfig()
+   function ReleaseOnDebugConfig()
      optimize "Full" 
-     cppdialect "C++17"
+  
      defines {"_RELEASE_ONDEBUG"}
+     cppdialect "C++17"
    end
 
    function ReleaseConfig()
      optimize "Full" 
-     cppdialect "C++17"
      defines {"_RELEASE"}
+     cppdialect "C++17"
    end
+   
    function SetDllPath()
       -- 나중에 추가로 Game 개발시에 다른 경로로 Dll 복사
       --     postbuildcommands("{COPY} %{cfg.buildtarget.directory}%{cfg.buildtarget.name} -- path --")
@@ -45,10 +46,10 @@ workspace "JGGame"
         DebugConfig()
         defines("_DEVELOP_ENGINE")
      filter "configurations:DevelopGame"
-        ReleaseOnDebugInfoConfig()
+        ReleaseOnDebugConfig()
         defines("_DEVELOP_GAME")
      filter "configurations:DevelopGameOnRelease"
-        ReleaseOnDebugInfoConfig()
+        ReleaseOnDebugConfig()
         defines("_DEVELOP_GAME_ONRELEASE")
      filter "configurations:Release"
         ReleaseConfig()
@@ -63,7 +64,7 @@ workspace "JGGame"
         DebugConfig()
         defines("_DEVELOP_GAME")
      filter "configurations:DevelopGameOnRelease"
-        ReleaseOnDebugInfoConfig()
+        ReleaseOnDebugConfig()
         defines("_DEVELOP_GAME_ONRELEASE")
      filter "configurations:Release"
         ReleaseConfig()
@@ -98,88 +99,64 @@ workspace "JGGame"
 
    end
 
+   
+   function EngineStaticLibConfig(path)
+   
+      location "Build"
+      kind "StaticLib"
+      language "C++"
+      targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
+      objdir("./Build/obj/%{cfg.buildcfg}/")
+      -- precompiled header
+      pchheader ("pch.h")
+      pchsource (path .. "pch.cpp")
+      -- files
+      files{
+         path .. "**.h",
+         path .. "**.cpp"
+      }
+      -- solution virual paths
+      vpaths{
+         ["*"] = {path .. "**.h", path .. "**.cpp"}
+      }
+      
+      SetEngineConfiguarations()
+
+   end
+
+
+
+
   os.mkdir("Bin")
-  os.mkdir("Config")
-  os.mkdir("Contents")
-  os.mkdir("Source")
   os.mkdir("Build")
+
+
+
 
 
 group "Engine"
      -- Engine Core Project Setting
    project "Common"
-      location "Build"
-      kind "StaticLib"
-      language "C++"
-     --cppdialect "std:c++17"
-      targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
-      objdir("./Build/obj/%{cfg.buildcfg}/")
+      includedirs{
+         "Source/Common/",
+      }
+      -- linkProject
+      links {
+         -- ...
+      }
+      EngineStaticLibConfig("Source/Common/")
 
-      -- precompiled header
-      pchheader ("pch.h")
-      pchsource ("JGEngine/Common/pch.cpp")
-      -- files
-      files{
-         "JGEngine/Common/**.h",
-         "JGEngine/Common/**.cpp"
-      }
-      -- add include dir
+   project "Application"
       includedirs{
-         "JGEngine/Library",
-         "JGEngine/Common"
-      }
-      -- solution virual paths
-         vpaths{
-         ["*"] = {"JGEngine/Common/**.h", "JGEngine/Common/**.cpp"}
-      }
-      SetEngineConfiguarations()
-      
-   project "JGEngine"
-      location "Build"
-      kind "SharedLib"
-      language "C++"
-     --cppdialect "std:c++17"
-      targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
-      objdir("./Build/obj/%{cfg.buildcfg}/")
-      -- precompiled header
-      pchheader ("pch.h")
-      pchsource ("JGEngine/Application/pch.cpp")
-      -- defines
-      defines("JGENGINE_EXPORTS")
-      -- files
-      files{
-         "JGEngine/Application/**.h",
-         "JGEngine/Application/**.cpp"
-      }
-       -- add include dir
-      includedirs{
-         "JGEngine/Library",
-         "JGEngine/Common",
-         "JGEngine/Application",
-         "JGEngine/Core/GameFrameWork",
-         "JGEngine/Core/PhysicsEngine",
-         "JGEngine/Core/InputEngine",
-         "JGEngine/Core/RenderEngine",
-         "JGEngine/Core/SoundEngine",
+         "Source/Common/",
+         "Source/Application/Main/"
       }
       -- linkProject
       links {
          "Common",
-         "RenderEngine",
-         "PhysicsEngine",
-         "SoundEngine",
-         "InputEngine",
-         "GraphicsEngine",
-         "GameFrameWork"
       }
-      -- solution virual paths
-      vpaths{
-         ["*"] = {"JGEngine/Application/**.h", "JGEngine/Application/**.cpp"}
-      }
-      
-      SetEngineConfiguarations()
+      EngineShaderedLibConfig("APPLICATION_EXPORT", "Source/Application/Main/")
 
-      
    project  "EntryPoint"
       location "Build"
       kind "WindowedApp"
@@ -189,253 +166,221 @@ group "Engine"
       objdir("./Build/exe/%{cfg.buildcfg}/")
       SetDllPath()
       files{
-         "JGEngine/EntryPoint/**.h",
-         "JGEngine/EntryPoint/**.cpp"
+         "Source/EntryPoint/**.h",
+         "Source/EntryPoint/**.cpp"
       }
       includedirs{
-         "JGEngine/Library",
-         "JGEngine/Common",
-         "JGEngine/Application",
+         "Source/Common/",
+         "Source/Application/Main/",
       }
       -- linkProject
       links {
          "Common",
-         "JGEngine"
+         "Application"
       }
       SetEngineConfiguarations()
 
-   group "Engine/Core"
-      project "RenderEngine"
-         location "Build"
-         kind "SharedLib"
-         language "C++"
-        --cppdialect "std:c++17"
-         targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
-         objdir("./Build/obj/%{cfg.buildcfg}/")
-         -- precompiled header
-         pchheader ("pch.h")
-         pchsource ("JGEngine/Core/RenderEngine/pch.cpp")
-         -- defines
-         defines("RENDERENGINE_EXPORTS")
-         -- files
-         files{
-            "JGEngine/Core/RenderEngine/**.h",
-            "JGEngine/Core/RenderEngine/**.cpp"
-         }
-          -- add include dir
-         includedirs{
-            "JGEngine/Library",
-            "JGEngine/Common",
-            "JGEngine/Core/RenderEngine"
-         }
-         -- linkProject
-         links {
-            "Common"
-         }
-         -- solution virual paths
-         vpaths{
-            ["*"] = {"JGEngine/Core/RenderEngine/**.h", "JGEngine/Core/RenderEngine/**.cpp"}
-         }
-         SetEngineConfiguarations()
-      
-      project "InputEngine"
 
-
-          -- add include dir
-         includedirs{
-            "JGEngine/Library",
-            "JGEngine/Common",
-            "JGEngine/Core/InputEngine"
-         }
-         -- linkProject
-         links {
-            "Common"
-         }
-         EngineShaderedLibConfig(
-            "INPUTENGINE_EXPORTS", 
-            "JGEngine/Core/InputEngine/"
-         )
-
-      project "PhysicsEngine"
-
-          -- add include dir
-         includedirs{
-            "JGEngine/Library",
-            "JGEngine/Common",
-            "JGEngine/Core/PhysicsEngine"
-         }
-         -- linkProject
-         links {
-            "Common"
-         }
-         EngineShaderedLibConfig(
-            "PHYSICSENGINE_EXPORTS", 
-            "JGEngine/Core/PhysicsEngine/"
-         )
-
-      project "SoundEngine"
-         includedirs{
-            "JGEngine/Library",
-            "JGEngine/Common",
-            "JGEngine/Core/SoundEngine"
-         }
-         -- linkProject
-         links {
-            "Common"
-         }
-         EngineShaderedLibConfig(
-            "SOUNDENGINE_EXPORTS", 
-            "JGEngine/Core/SoundEngine/"
-         )
-          -- add include dir
-   
-
-      project "GameFrameWork"
-
-         includedirs{
-            "JGEngine/Library",
-            "JGEngine/Common",
-            "JGEngine/Core/GameFrameWork"
-         }
-         links {
-            "Common"
-         }
-         EngineShaderedLibConfig(
-            "GAMEFRAMEWORK_EXPORTS", 
-            "JGEngine/Core/GameFrameWork/"
-         )
-        
-
-
-      -- GraphicsEngine --
-      group "Engine/Core/GraphicsEngine"
-         project "GraphicsEngine"
-
-          -- add include dir
+      group "Engine/Core"
+         project "PhysicsEngine"
             includedirs{
-               "JGEngine/Library",
-               "JGEngine/Common",
-               "JGEngine/Core/GraphicsEngine/Main/"
+             "Source/Core/PhysicsEngine/Main",
+             "Source/Common/"
             }
             -- linkProject
             links {
-               "Common"
+               "Common",
             }
-            EngineShaderedLibConfig(
-               "GRAPHICSENGINE_EXPORTS", 
-               "JGEngine/Core/GraphicsEngine/Main/"
-            )
+            EngineShaderedLibConfig("PHYSICSENGINE_EXPORT", "Source/Core/PhysicsEngine/Main/")
 
-         group "Engine/Core/GraphicsEngine/GPU_API"
-            project "DirectX12"
+         project "SoundEngine"
+            includedirs{
+             "Source/Core/SoundEngine/Main",
+             "Source/Common/"
+            }
+            -- linkProject
+            links {
+               "Common",
+            }
+            EngineShaderedLibConfig("SOUNDENGINE_EXPORT", "Source/Core/SoundEngine/Main/")
+
+         project "InputEngine"
+            includedirs{
+             "Source/Core/InputEngine/Main",
+             "Source/Common/"
+            }
+            -- linkProject
+            links {
+               "Common",
+            }
+            EngineShaderedLibConfig("INPUTENGINE_EXPORT", "Source/Core/InputEngine/Main/")
  
+         project "GameFrameWork"
+            includedirs{
+             "Source/Core/GameFrameWork/Main",
+             "Source/Common/"
+            }
+            -- linkProject
+            links {
+               "Common",
+            }
+            EngineShaderedLibConfig("GAMEFRAMEWORK_EXPORT", "Source/Core/GameFrameWork/Main/")
+
+         project "GUI"
+            includedirs{
+             "Source/Core/GUI/Main",
+             "Source/Core/GraphicsEngine/Main",
+             "Source/Core/InputEngine/Main",
+             "Source/Common/"
+            }
+            -- linkProject
+            links {
+               "Common",
+               "GraphicsEngine",
+               "InputEngine"
+            }
+            EngineShaderedLibConfig("GUI_EXPORT", "Source/Core/GUI/Main/")
+
+         group "Engine/Core/GraphicsEngine"
+            project "GraphicsEngine"
                includedirs{
-                  "JGEngine/Library",
-                  "JGEngine/Common",
-                  "JGEngine/Core/GraphicsEngine/GPU_API/DirectX12"
-                  "JGEngine/Core/GraphicsEngine/Main"
-               }
+                  "Source/Core/GraphicsEngine/Main",
+                  "Source/Common/"
+                  }
+               -- linkProject
                links {
                   "Common",
-                  "GraphicsEngine"
                }
-               EngineShaderedLibConfig(
-                  "DIRECTX12_EXPORTS", 
-                  "JGEngine/Core/GraphicsEngine/GPU_API/DirectX12/"
-               )
-            project "DirectX11"
+               EngineShaderedLibConfig("GRAPHICSENGINE_EXPORT", "Source/Core/GraphicsEngine/Main/")
 
-               includedirs{
-                  "JGEngine/Library",
-                  "JGEngine/Common",
-                  "JGEngine/Core/GraphicsEngine/GPU_API/DirectX11"
-                  "JGEngine/Core/GraphicsEngine/Main"
-               }
-               links {
-                  "Common",
-                  "GraphicsEngine"
-               }
-               EngineShaderedLibConfig(
-                  "DIRECTX11_EXPORTS", 
-                  "JGEngine/Core/GraphicsEngine/GPU_API/DirectX11/"
-               )
+            group "Engine/Core/GraphicsEngine/GPU_API"
+               project "DirectX12"
+                  includedirs{
+                     "Source/Core/GraphicsEngine/GPU_API/DirectX12/Main/",
+                     "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/Common/"
+                  }
+                  -- linkProject
+                  links {
+                     "Common",
+                     "GraphicsEngine"
+                  }
+                  EngineShaderedLibConfig("DX12_EXPORT", "Source/Core/GraphicsEngine/GPU_API/DirectX12/Main/")
+ 
+               project "DirectX11"
+                  includedirs{
+                     "Source/Core/GraphicsEngine/GPU_API/DirectX11/Main/",
+                     "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/Common/"
+                  }
+                  -- linkProject
+                  links {
+                     "Common",
+                     "GraphicsEngine"
+                  }
+                  EngineShaderedLibConfig("DX11_EXPORT", "Source/Core/GraphicsEngine/GPU_API/DirectX11/Main/")
 
-            project "OpenGL"
-
-               includedirs{
-                  "JGEngine/Library",
-                  "JGEngine/Common",
-                  "JGEngine/Core/GraphicsEngine/GPU_API/OpenGL"
-                  "JGEngine/Core/GraphicsEngine/Main"
-               }
-               links {
-                  "Common",
-                  "GraphicsEngine"
-               }
-               EngineShaderedLibConfig(
-                  "OPENGL_EXPORTS", 
-                  "JGEngine/Core/GraphicsEngine/GPU_API/OpenGL/"
-               )
+               project "OpenGL"
+                  includedirs{
+                     "Source/Core/GraphicsEngine/GPU_API/OpenGL/Main/",
+                     "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/Common/"
+                  }
+                  -- linkProject
+                  links {
+                     "Common",
+                     "GraphicsEngine"
+                  }
+                  EngineShaderedLibConfig("OPENGL_EXPORT", "Source/Core/GraphicsEngine/GPU_API/OpenGL/Main/")
+      
       
 
-               
-
-group "Game"
-   project "JGGame"
-   location "Build"
-   kind "SharedLib"
-   language "C++"
-  --cppdialect "std:c++17"
-   targetdir ("./Build/dlls_libs/%{cfg.buildcfg}/")
-   objdir("./Build/obj/%{cfg.buildcfg}/")
-   -- defines
-   defines("JGGAME_EXPORTS")
-   --
-   -- files
-   files{
-      "Source/**.h",
-      "Source/**.cpp"
-   }
-
-   -- add include dir
-   includedirs{
-      "JGEngine/Library",
-      "JGEngine/Common",
-      "JGEngine/Core/GameFrameWork"
-   }
-   -- linkProject
-   links {
-      "Common",
-      "GameFrameWork"
-   }
-   vpaths{
-      ["*"] = {"Source/**.h", "Source/**.cpp"}
-   }
-   SetGameConfiguarations()
+         
 
 
 group "Editor"
-   project  "JGEditor"
-
+   project "JGEditor"
       includedirs{
-         "JGEngine/Library",
-         "JGEngine/Common",
-         "JGEngine/Application",
-         "JGEngine/Editor"
+         "Source/Common/"
+         "Source/Core/GUI/Main",
+         "Source/Core/GraphicsEngine/Main",
       }
+            -- linkProject
       links {
          "Common",
-         "JGEngine"
+         "GUI",
+         "GraphicsEngine"
       }
-      EngineShaderedLibConfig(
-         "JGEDITOR_EXPORTS", 
-         "JGEngine/Editor/"
-      )
+      EngineShaderedLibConfig("JGEDITOR_EXPORT", "Source/User/Editor/Main/")
+
+
+group "UserGame"
+   project "Game"
+      includedirs{
+
+      }
+      -- linkProject
+      links {
+         "Common",
+         "GameFrameWork",
+      }
+      EngineShaderedLibConfig("GAME_EXPORT", "Source/User/Game/")
+
+
+group "UnitTest"
+   project  "UTWindows"
+      location "Build"
+      kind "WindowedApp"
+      language "C++"
+      cppdialect "C++17"
+      targetdir ("./Build/UnitTestEXE/%{cfg.buildcfg}/")
+      objdir("./Build/UnitTestEXE/%{cfg.buildcfg}/")
+      SetDllPath()
+      files{
+         "UnitTest/UTWindows/**.h",
+         "UnitTest/UTWindows/**.cpp",
+         "UnitTest/UTWindows/**.ico",
+         "UnitTest/UTWindows/**.rc"
+      }
+      includedirs{
+         "Source/Common",
+         "UnitTest/UTWindows"
+      }
+      vpaths{
+         ["*"] = {"UnitTest/UTWindows/**.h", "UnitTest/UTWindows/**.cpp", "UnitTest/UTWindows/**.ico", "UnitTest/UTWindows/**.rc"}
+      }
+      -- linkProject
+      links {
+         "Common",
+      }
+      SetEngineConfiguarations()
+   project  "Console"
+      location "Build"
+      kind "ConsoleApp"
+      language "C++"
+      cppdialect "C++17"
+      targetdir ("./Build/UnitTestEXE/%{cfg.buildcfg}/")
+      objdir("./Build/UnitTestEXE/%{cfg.buildcfg}/")
+      SetDllPath()
+      files{
+         "UnitTest/UTConsole/**.h",
+         "UnitTest/UTConsole/**.cpp"
+
+      }
+      includedirs{
+         "Source/Common",
+         "UnitTest/UTConsole"
+      }
+      vpaths{
+         ["*"] = {"UnitTest/UTConsole/**.h", "UnitTest/UTConsole/**.cpp"}
+      }
+      -- linkProject
+      links {
+         "Common",
+      }
+      SetEngineConfiguarations()
+
 group ""
-
-
-
-
 
 
 

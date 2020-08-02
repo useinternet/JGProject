@@ -1,0 +1,2 @@
+1. Common 수학 관련 제작
+2. DirectX Api 이용해서 Interface 제작

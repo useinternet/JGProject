@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\Source\Core\GUI\Main\pch.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\GUI.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Element.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\Component.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Windows\Window.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\Transform.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Windows\Form.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Image.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\DrawComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Border.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\ResizeGrip.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\TitleBar.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Text.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Button.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\LayerComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Core\GUI\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUI.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIDefine.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIObject.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Element.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Windows\Window.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\Component.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\Transform.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIIF.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Windows\Form.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Image.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\DrawComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Border.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\ResizeGrip.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\TitleBar.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Text.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Button.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\LayerComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Components">
+      <UniqueIdentifier>{c86cd1c4-042c-4a52-bde2-e9b5ac6e6eb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{38a472fe-4a0a-47b4-8b52-127148acd2db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Elements">
+      <UniqueIdentifier>{b2b4a0aa-4bb6-45f5-8be4-3c0e12ab935e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

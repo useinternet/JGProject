@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DevelopEngine|x64">
+      <Configuration>DevelopEngine</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevelopGame|x64">
+      <Configuration>DevelopGame</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DevelopGameOnRelease|x64">
+      <Configuration>DevelopGameOnRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2AEC870B-96F5-877C-1F71-9E7C8B79937C}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>GUI</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>dlls_libs\DevelopEngine\</OutDir>
+    <IntDir>obj\DevelopEngine\DevelopEngine\GUI\</IntDir>
+    <TargetName>GUI</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\DevelopGame\</OutDir>
+    <IntDir>obj\DevelopGame\DevelopGame\GUI\</IntDir>
+    <TargetName>GUI</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\DevelopGameOnRelease\</OutDir>
+    <IntDir>obj\DevelopGameOnRelease\DevelopGameOnRelease\GUI\</IntDir>
+    <TargetName>GUI</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>dlls_libs\Release\</OutDir>
+    <IntDir>obj\Release\Release\GUI\</IntDir>
+    <TargetName>GUI</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GUI_EXPORT;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GUI\Main;..\Source\Common;..\Source\Core\GraphicsEngine\Main;..\Source\Core\InputEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>dlls_libs\DevelopEngine\GUI.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GUI_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GUI\Main;..\Source\Common;..\Source\Core\GraphicsEngine\Main;..\Source\Core\InputEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\DevelopGame\GUI.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GUI_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GUI\Main;..\Source\Common;..\Source\Core\GraphicsEngine\Main;..\Source\Core\InputEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\DevelopGameOnRelease\GUI.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GUI_EXPORT;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GUI\Main;..\Source\Common;..\Source\Core\GraphicsEngine\Main;..\Source\Core\InputEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>dlls_libs\Release\GUI.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\Component.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\DrawComponent.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\LayerComponent.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Components\Transform.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Border.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Button.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Element.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Image.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\ResizeGrip.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\Text.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Elements\TitleBar.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUI.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIDefine.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIIF.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\GUIObject.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Windows\Form.h" />
+    <ClInclude Include="..\Source\Core\GUI\Main\Windows\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\Component.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\DrawComponent.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\LayerComponent.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Components\Transform.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Border.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Button.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Element.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Image.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\ResizeGrip.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\Text.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Elements\TitleBar.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\GUI.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GUI\Main\Windows\Form.cpp" />
+    <ClCompile Include="..\Source\Core\GUI\Main\Windows\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Common.vcxproj">
+      <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="GraphicsEngine.vcxproj">
+      <Project>{ac8e76be-985c-6ac4-81f0-daea6d5d4629}</Project>
+    </ProjectReference>
+    <ProjectReference Include="InputEngine.vcxproj">
+      <Project>{6bd9432a-d78e-bc1f-6083-b6f6cc37b323}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

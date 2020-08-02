@@ -1,1 +1,1 @@
-C:\JGProject\Project\Build\exe\DevelopGameOnRelease\EntryPoint.exe
+C:\JGProject\JGEngine\Build\exe\DevelopGameOnRelease\EntryPoint.exe

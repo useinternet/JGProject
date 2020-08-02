@@ -95,7 +95,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -111,7 +111,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -131,7 +131,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -151,7 +151,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -166,62 +166,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\JGEngine\Common\Class\AssetLoader.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EngineAssetFileSorter.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EngineConfig.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EnginePerformance.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EngineTimer.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\EventManager.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\GlobalLinkStream.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\JWindow.h" />
-    <ClInclude Include="..\JGEngine\Common\Class\Log.h" />
-    <ClInclude Include="..\JGEngine\Common\CommonCore.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EngineCore.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\EventListener.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Abstract\NoneCopy.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Color.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\KeyCode.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Plugin.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\Timer.h" />
-    <ClInclude Include="..\JGEngine\Common\DataType\VertexCollection.h" />
-    <ClInclude Include="..\JGEngine\Common\Defined.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\AppEvents.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\Event.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\GameFrameWorkEvent.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\InputEvents.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\PhysicsEvent.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\RenderEvent.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\SoundEvent.h" />
-    <ClInclude Include="..\JGEngine\Common\Event\WindowEvents.h" />
-    <ClInclude Include="..\JGEngine\Common\Math\JMatrix.h" />
-    <ClInclude Include="..\JGEngine\Common\Math\JQuaternion.h" />
-    <ClInclude Include="..\JGEngine\Common\Math\JVector.h" />
-    <ClInclude Include="..\JGEngine\Common\Math\Math.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\DataIO.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\Hash.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\StringUtill.h" />
-    <ClInclude Include="..\JGEngine\Common\Utill\dlfcn.h" />
-    <ClInclude Include="..\JGEngine\Common\framework.h" />
-    <ClInclude Include="..\JGEngine\Common\pch.h" />
+    <ClInclude Include="..\Source\Common\App\EngineTimer.h" />
+    <ClInclude Include="..\Source\Common\App\Event.h" />
+    <ClInclude Include="..\Source\Common\App\GlobalSharedData.h" />
+    <ClInclude Include="..\Source\Common\App\JWindow.h" />
+    <ClInclude Include="..\Source\Common\App\Log.h" />
+    <ClInclude Include="..\Source\Common\App\Message.h" />
+    <ClInclude Include="..\Source\Common\App\Plugin.h" />
+    <ClInclude Include="..\Source\Common\App\SystemCore.h" />
+    <ClInclude Include="..\Source\Common\CommonCore.h" />
+    <ClInclude Include="..\Source\Common\Data\Color.h" />
+    <ClInclude Include="..\Source\Common\Data\KeyCode.h" />
+    <ClInclude Include="..\Source\Common\Data\SDCollection.h" />
+    <ClInclude Include="..\Source\Common\Math\JMatrix.h" />
+    <ClInclude Include="..\Source\Common\Math\JQuaternion.h" />
+    <ClInclude Include="..\Source\Common\Math\JRect.h" />
+    <ClInclude Include="..\Source\Common\Math\JVector.h" />
+    <ClInclude Include="..\Source\Common\Math\Math.h" />
+    <ClInclude Include="..\Source\Common\Utill\MeshGenerater.h" />
+    <ClInclude Include="..\Source\Common\Utill\StringUtill.h" />
+    <ClInclude Include="..\Source\Common\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JGEngine\Common\Class\AssetLoader.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EngineAssetFileSorter.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EngineConfig.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EnginePerformance.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EngineTimer.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\EventManager.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\GlobalLinkStream.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\JWindow.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Class\Log.cpp" />
-    <ClCompile Include="..\JGEngine\Common\DataType\Abstract\EngineCore.cpp" />
-    <ClCompile Include="..\JGEngine\Common\DataType\Plugin.cpp" />
-    <ClCompile Include="..\JGEngine\Common\DataType\Timer.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Math\JMatrix.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Math\JQuaternion.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Math\JVector.cpp" />
-    <ClCompile Include="..\JGEngine\Common\Utill\DataIO.cpp" />
-    <ClCompile Include="..\JGEngine\Common\pch.cpp">
+    <ClCompile Include="..\Source\Common\App\EngineTimer.cpp" />
+    <ClCompile Include="..\Source\Common\App\GlobalSharedData.cpp" />
+    <ClCompile Include="..\Source\Common\App\JWindow.cpp" />
+    <ClCompile Include="..\Source\Common\App\Log.cpp" />
+    <ClCompile Include="..\Source\Common\App\Message.cpp" />
+    <ClCompile Include="..\Source\Common\App\Plugin.cpp" />
+    <ClCompile Include="..\Source\Common\App\SystemCore.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JMatrix.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JQuaternion.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JVector.cpp" />
+    <ClCompile Include="..\Source\Common\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

@@ -98,11 +98,11 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>JGEDITOR_EXPORTS;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JGEDITOR_EXPORT;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>../Source/Common/;../Source/Core/GUI/Main/;../Source/Core/GraphicsEngine/Main/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,14 +115,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>JGEDITOR_EXPORTS;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JGEDITOR_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>../Source/Common/;../Source/Core/GUI/Main/;../Source/Core/GraphicsEngine/Main/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,14 +136,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>JGEDITOR_EXPORTS;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JGEDITOR_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>../Source/Common/;../Source/Core/GUI/Main/;../Source/Core/GraphicsEngine/Main/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,14 +157,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>JGEDITOR_EXPORTS;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Application;..\JGEngine\Editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JGEDITOR_EXPORT;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>../Source/Common/;../Source/Core/GUI/Main/;../Source/Core/GraphicsEngine/Main/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,17 +174,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\JGEngine\Editor\Core.h" />
-    <ClInclude Include="..\JGEngine\Editor\JGEditor.h" />
-    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGLog.h" />
-    <ClInclude Include="..\JGEngine\Editor\Window\Debug\JGUIHierarchy.h" />
-    <ClInclude Include="..\JGEngine\Editor\pch.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\Core.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\JGEditor.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\JGEditorMacro.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JGEngine\Editor\JGEditor.cpp" />
-    <ClCompile Include="..\JGEngine\Editor\Window\Debug\JGLog.cpp" />
-    <ClCompile Include="..\JGEngine\Editor\Window\Debug\JGUIHierarchy.cpp" />
-    <ClCompile Include="..\JGEngine\Editor\pch.cpp">
+    <ClCompile Include="..\Source\User\Editor\Main\JGEditor.cpp" />
+    <ClCompile Include="..\Source\User\Editor\Main\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
@@ -192,9 +189,15 @@
     <ProjectReference Include="Common.vcxproj">
       <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
     </ProjectReference>
-    <ProjectReference Include="JGEngine.vcxproj">
-      <Project>{AC6F16C9-983C-71D4-C155-5F7CAD81A662}</Project>
+    <ProjectReference Include="GraphicsEngine.vcxproj">
+      <Project>{ac8e76be-985c-6ac4-81f0-daea6d5d4629}</Project>
     </ProjectReference>
+    <ProjectReference Include="GUI.vcxproj">
+      <Project>{2AEC870B-96F5-877C-1F71-9E7C8B79937C}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

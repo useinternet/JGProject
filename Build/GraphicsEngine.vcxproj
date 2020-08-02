@@ -98,8 +98,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORTS;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Core\GraphicsEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORT;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\Main;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -115,8 +115,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORTS;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Core\GraphicsEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\Main;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -136,8 +136,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORTS;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Core\GraphicsEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\Main;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -157,8 +157,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORTS;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\JGEngine\Library;..\JGEngine\Common;..\JGEngine\Core\GraphicsEngine\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GRAPHICSENGINE_EXPORT;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\Main;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -174,47 +174,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Core.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\GECore.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GObject.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GraphicsDevice.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Scene.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Screen.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\pch.h" />
-    <ClInclude Include="..\JGEngine\Core\GraphicsEngine\Main\GraphicsEngine.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GECore.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GraphicsEngine.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\GraphicsIF.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GEObject.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GraphicsDevice.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\GraphicsRenderer.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Material.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\RenderingPass.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Scene.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneLight.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneObject.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Screen.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\ShaderDefined.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\StateWrapper.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Texture.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GObject.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\GraphicsDevice.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Scene.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\Object\Screen.cpp" />
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\pch.cpp">
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\GraphicsEngine.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\Interface\GEObject.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\JGEngine\Core\GraphicsEngine\Main\GraphicsEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Common.vcxproj">
       <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="GUI_PS.shader">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="GUI_VS.shader">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopGameOnRelease|x64'">6.3</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopGame|x64'">6.3</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DevelopEngine|x64'">6.3</ShaderModel>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
