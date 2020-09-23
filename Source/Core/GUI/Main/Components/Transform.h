@@ -3,7 +3,7 @@
 #include "Component.h"
 
 
-namespace GUI
+namespace JGUI
 {
 	enum class AnchorPreset
 	{
@@ -115,22 +115,14 @@ namespace GUI
 			else m_IsWorldUpdateDirty = false;
 		}
 	private:
-		void SendDirty(bool is_location_self = true) {
-			m_IsWorldUpdateDirty = true;
-			if (is_location_self)
-			{
-				m_IsLocationDirty = true;
-			}
-			for (auto& child : m_Childs)
-			{
-				child->SendDirty();
-			}
-		}
-
+		void SendDirty(bool is_location_self = true, bool is_send_layerDirty = false);
+		
 		void CalcAnchorDistance();
 		void AnchorProcess();
 		void UpdateLocation() const;
 		void UpdateWorldMatrix() const;
+	private:
+
 	protected:
 		JVector2 m_LocalLocation;
 		mutable JVector2 m_Location;

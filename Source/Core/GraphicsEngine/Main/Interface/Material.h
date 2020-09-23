@@ -51,13 +51,13 @@ namespace GE
 		virtual Material*    GetOwnerMaterial() const    = 0;
 		virtual const std::string& GetErrorCode() const  = 0;
 		virtual void GetTextureData(void* dataPtr) const = 0;
-
+		virtual const std::vector<std::pair<std::string, GE::Texture*>>& GetBindedTextures() const = 0;
 		virtual ~MaterialInstance() {}
 	};
 
 	class GRAPHICSENGINE_API Material : public GEObject
 	{
-
+		friend class GraphicsIF;
 
 	public:
 		virtual void SetMaterialProperty(const MaterialProperty& ppt) = 0;
@@ -86,7 +86,7 @@ namespace GE
 		//
 		virtual bool DefineTexture(const std::string& name, GE::Texture* init_t) = 0;
 		virtual void UnDefineTexture(const std::string& name) = 0;
-
+		virtual const std::vector<std::pair<std::string, GE::Texture*>>& GetBindedTextures() const = 0;
 
 
 
@@ -109,5 +109,11 @@ namespace GE
 		virtual const std::string& GetErrorCode() const = 0;
 
 		virtual ~Material() {}
+
+
+	public:
+		const std::wstring& GetName() const { return m_Name; }
+	private:
+		std::wstring m_Name;
 	};
 }

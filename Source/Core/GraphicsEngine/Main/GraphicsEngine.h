@@ -47,7 +47,6 @@ namespace GE
 		virtual void Destroy() override;
 	public:
 		virtual void ReceiveMessage(const Message& msg) override;
-
 	private:
 		std::shared_ptr<Plugin> m_GraphicsAPIPlugin;
 		std::unordered_map<std::wstring, Material*>  m_MaterialPool;
@@ -62,9 +61,6 @@ namespace GE
 
 		GraphicsDevice*   m_GraphicsDevice   = nullptr;
 		GraphicsRenderer* m_GraphicsRenderer = nullptr;
-
-	
-		Concurrency::task_group m_DrawCallTasks;
 	};
 
 

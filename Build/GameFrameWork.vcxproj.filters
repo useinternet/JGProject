@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UnitTest">
+      <UniqueIdentifier>{E5A465FE-D171-C009-FA8A-AEB1E6B6F597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{a1153ed6-9716-4269-a883-d8d7e11cf99b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GFWClasses">
+      <UniqueIdentifier>{533bc2ec-2c1b-4513-b5ca-db754b4c3d9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EditorLayout">
+      <UniqueIdentifier>{16b7d6d4-e8b0-4356-bcb3-a1f85aa0bea6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWCore.h" />
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWIF.h" />
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GameFrameWork.h" />
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\UnitTest\GBuffer.h">
+      <Filter>UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\UnitTest\UnitTest.h">
+      <Filter>UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWClasses\GameObject.h">
+      <Filter>GFWClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWClasses\World.h">
+      <Filter>GFWClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWClasses\GFWObject.h">
+      <Filter>GFWClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\HierarchicalComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\NonHierarchicalComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\GameObjectComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\CameraComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\PrimitiveComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\MeshComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\Components\StaticMeshComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GameFrameWork\Main\GFWClasses\CameraManager.h">
+      <Filter>GFWClasses</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\GameFrameWork.cpp" />
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\UnitTest\GBuffer.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\UnitTest\UnitTest.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\pch.cpp" />
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\GFWClasses\World.cpp">
+      <Filter>GFWClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\HierarchicalComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\NonHierarchicalComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\CameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\PrimitiveComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\MeshComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\StaticMeshComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\Components\GameObjectComponent.cpp" />
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\GFWClasses\GameObject.cpp">
+      <Filter>GFWClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GameFrameWork\Main\GFWClasses\CameraManager.cpp">
+      <Filter>GFWClasses</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -51,7 +51,7 @@ namespace DX12
 		virtual void UnBindAnimationData() override;
 
 
-		virtual void DrawCall(void* userData = nullptr) override;
+		virtual void DrawCall(void* userData = nullptr, bool isShadow = false) override;
 
 		virtual ~DX12_SceneObject() override {
 			m_vBuffer = VertexBuffer();

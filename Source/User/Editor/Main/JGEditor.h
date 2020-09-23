@@ -10,8 +10,8 @@
 */
 
 
-REGISTER_MAIN_WINFORM(JGEditor, L"JGEngine", GUI::WindowFlag_MainWindow)
-class JGEDITOR_API JGEditor : public GUI::Form
+REGISTER_MAIN_WINFORM(JGEditor, L"JGEngine", JGUI::WindowFlag_MainWindow)
+class JGEDITOR_API JGEditor : public JGUI::Form
 {
 protected:
 	virtual void Awake()   override;
@@ -20,4 +20,5 @@ protected:
 	virtual void Destroy() override;
 protected:
 	virtual void OnKeyUp(KeyCode code) override;
+
 };

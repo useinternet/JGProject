@@ -449,14 +449,12 @@ namespace DX12
 
 				cmdList->CopyResource(backBuffer.Get(), m_FinalTexture.GetD3DPtr());
 
-
-				cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
-					backBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_RENDER_TARGET));
+				DXCommand::TransitionBarrier(cmdKey, m_FinalTexture, D3D12_RESOURCE_STATE_COMMON);
 			}
 
 
 			cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
-				backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+				backBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
 
 	
 		}
@@ -856,7 +854,7 @@ namespace DX12
 		auto cmdList = cmdResource->d3d_commandList;
 		cmdList->RSSetScissorRects((uint32_t)d3d_rects.size(), d3d_rects.data());
 	}
-	void DXCommand::ClearRenderTarget(GraphicsCommandKeyPtr cmdKey, RenderTarget& renderTarget, bool is_depthClear)
+	void DXCommand::ClearRenderTarget(GraphicsCommandKeyPtr cmdKey, RenderTarget& renderTarget, D3D12_CLEAR_FLAGS clearFlags)
 	{
 		auto cmdResource = cmdKey->cmdResource;
 		auto cmdList = cmdResource->d3d_commandList;
@@ -864,7 +862,7 @@ namespace DX12
 
 		for (int i = 0; i < MAX_NUM_RENDERTARGET; ++i)
 		{
-			if (!renderTarget[i].IsValid()) continue;
+			if (!renderTarget[i].IsValid()) break;
 
 			TransitionBarrier(cmdKey, renderTarget[i], D3D12_RESOURCE_STATE_RENDER_TARGET,
 				D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, false);
@@ -882,7 +880,7 @@ namespace DX12
 
 		for (int i = 0; i < MAX_NUM_RENDERTARGET; ++i)
 		{
-			if (!renderTarget[i].IsValid()) continue;
+			if (!renderTarget[i].IsValid()) break;
 
 			auto clearValue = renderTarget[i].GetClearValue();
 			auto rtvDesc = renderTarget.GetRTVDesc(i);
@@ -899,7 +897,7 @@ namespace DX12
 			cmdResource->BackupResource(renderTarget[i]);
 		}
 
-		if (renderTarget.GetDepthStencilTexture().IsValid() && is_depthClear)
+		if (renderTarget.GetDepthStencilTexture().IsValid())
 		{
 			float clearDepth   = 1.0f;
 			uint8_t clearStencil = 0;
@@ -910,8 +908,9 @@ namespace DX12
 				clearDepth = clearValue->DepthStencil.Depth;
 				clearStencil = clearValue->DepthStencil.Stencil;
 			}
+			
 			cmdList->ClearDepthStencilView(renderTarget.GetDepthStencilTexture().GetDSV(dsvDesc),
-				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepth, clearStencil, 0, nullptr);
+				clearFlags, clearDepth, clearStencil, 0, nullptr);
 			cmdResource->BackupResource(renderTarget.GetDepthStencilTexture());
 		}
 	}
@@ -925,7 +924,7 @@ namespace DX12
 
 		for (int i = 0; i < MAX_NUM_RENDERTARGET; ++i)
 		{
-			if (!renderTarget[i].IsValid()) continue;
+			if (!renderTarget[i].IsValid()) break;
 
 			TransitionBarrier(cmdKey, renderTarget[i], D3D12_RESOURCE_STATE_RENDER_TARGET,
 				D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, false);
@@ -946,16 +945,13 @@ namespace DX12
 		}
 		FlushResourceBarrier(cmdKey);
 
-		if (!rtvHandles.empty())
+		if (dsvHandle.ptr != 0)
 		{
-			if (dsvHandle.ptr != 0)
-			{
-				cmdList->OMSetRenderTargets((uint32_t)rtvHandles.size(), rtvHandles.data(), false, &dsvHandle);
-			}
-			else
-			{
-				cmdList->OMSetRenderTargets((uint32_t)rtvHandles.size(), rtvHandles.data(), false, nullptr);
-			}
+			cmdList->OMSetRenderTargets((uint32_t)rtvHandles.size(), rtvHandles.data(), false, &dsvHandle);
+		}
+		else
+		{
+			cmdList->OMSetRenderTargets((uint32_t)rtvHandles.size(), rtvHandles.data(), false, nullptr);
 		}
 
 	}
@@ -1594,7 +1590,7 @@ namespace DX12
 		TexMetadata metadata;
 		ScratchImage scratchImage;
 
-		if (p.extension() == ".dds")
+		if (p.extension() == ".dds" || p.extension() == ".DDS")
 		{
 			hr = LoadFromDDSFile(p.wstring().c_str(),
 				DDS_FLAGS_NONE,
@@ -1602,13 +1598,13 @@ namespace DX12
 				scratchImage);
 
 		}
-		else if (p.extension() == ".hdf")
+		else if (p.extension() == ".hdf" || p.extension() == ".HDF")
 		{
 			hr = LoadFromHDRFile(p.wstring().c_str(),
 				&metadata,
 				scratchImage);
 		}
-		else if (p.extension() == ".tga")
+		else if (p.extension() == ".tga" || p.extension() == ".TGA")
 		{
 			hr = LoadFromTGAFile(p.wstring().c_str(),
 				&metadata,
@@ -2447,6 +2443,7 @@ namespace DX12
 		if (FAILED(hr))
 		{
 			m_ErrorCode = (char*)error->GetBufferPointer();
+			OutputDebugStringA(m_ErrorCode.c_str());
 			return false;
 		}
 
@@ -2674,16 +2671,55 @@ namespace DX12
 		{
 			seed = hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*desc);
 		}
-
-
-		lock_guard<mutex> lock(m_SRVMutex);
-		if (m_SRVs.find(seed) == m_SRVs.end())
+		if (GetD3DPtr())
 		{
-			auto alloc = CSUAllocate();
-			g_Device->CreateShaderResourceView(GetD3DPtr(), desc, alloc.CPU());
-			m_SRVs[seed] = move(alloc);
+			auto rscDesc = GetDesc();
+
+			if (desc == nullptr &&
+				(rscDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT ||
+				 rscDesc.Format == DXGI_FORMAT_D32_FLOAT))
+			{
+				D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				srvDesc.Texture2D.MipLevels = 1;
+				srvDesc.Texture2D.MostDetailedMip = 0;
+				srvDesc.Texture2D.PlaneSlice = 0;
+				srvDesc.Texture2D.ResourceMinLODClamp = 0;
+
+				switch (rscDesc.Format)
+				{
+				case DXGI_FORMAT_D24_UNORM_S8_UINT: srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
+				case DXGI_FORMAT_D32_FLOAT:         srvDesc.Format = DXGI_FORMAT_R32_FLOAT;             break;
+				}
+
+				
+
+
+				lock_guard<mutex> lock(m_SRVMutex);
+
+				seed = hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(srvDesc);
+				if (m_SRVs.find(seed) == m_SRVs.end())
+				{
+					auto alloc = CSUAllocate();
+					g_Device->CreateShaderResourceView(GetD3DPtr(), &srvDesc, alloc.CPU());
+					m_SRVs[seed] = move(alloc);
+				}
+				return m_SRVs[seed].CPU();
+			}
+			else
+			{
+				lock_guard<mutex> lock(m_SRVMutex);
+				if (m_SRVs.find(seed) == m_SRVs.end())
+				{
+					auto alloc = CSUAllocate();
+					g_Device->CreateShaderResourceView(GetD3DPtr(), desc, alloc.CPU());
+					m_SRVs[seed] = move(alloc);
+				}
+				return m_SRVs[seed].CPU();
+			}
 		}
-		return m_SRVs[seed].CPU();
+		else return D3D12_CPU_DESCRIPTOR_HANDLE();
 	}
 	D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetDSV(D3D12_DEPTH_STENCIL_VIEW_DESC* desc) const
 	{
@@ -2698,6 +2734,7 @@ namespace DX12
 		{
 			seed = hash<D3D12_DEPTH_STENCIL_VIEW_DESC>{}(*desc);
 		}
+
 
 
 		lock_guard<mutex> lock(m_DSVMutex);
@@ -2751,7 +2788,6 @@ namespace DX12
 		desc.Height = max<uint32_t>(1, height);
 
 		Create(GetName(), desc, D3D12_RESOURCE_STATE_COMMON, m_ClearValue.get());
-		desc = GetDesc();
 	}
 
 	void Texture::CreateView()
@@ -2914,6 +2950,10 @@ namespace DX12
 		for (uint32_t i = 0; i < numRenderTarget; ++i)
 		{
 			m_Desc.RTVFormats[i] = rtFormat[i];
+		}
+		if (m_Desc.NumRenderTargets == 0)
+		{
+			m_Desc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
 		}
 		if (dvFormat != DXGI_FORMAT_UNKNOWN)
 		{

@@ -5,6 +5,8 @@
 
 using namespace std;
 std::unique_ptr<InputIF> m_IF = nullptr;
+
+
 namespace IE
 {
 	void InputEngine::Awake()
@@ -30,21 +32,6 @@ namespace IE
 
 	}
 }
-
-
-//JVector2 InputIF::GetMousePos()
-//{
-//	auto hWnd = GlobalSharedData::GetWindowManager()->GetMainWindowHWND();
-//	POINT p;
-//	::GetCursorPos(&p);
-//
-//	::ScreenToClient(hWnd, &p);
-//
-//	JVector2 result;
-//	result.x = (float)p.x;
-//	result.y = (float)p.y;
-//	return result;
-//}
 
 JVector2 InputIF::GetCursorPos()
 {

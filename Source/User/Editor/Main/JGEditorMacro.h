@@ -2,3 +2,4 @@
 
 
 #include "Core.h"
+#include "JGEditorHub.h"

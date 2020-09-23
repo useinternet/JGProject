@@ -76,7 +76,7 @@ namespace GE
 		virtual void BindAnimationData(CBAnimData* data) = 0;
 		virtual void UnBindAnimationData() = 0;
 
-		virtual void DrawCall(void* userData = nullptr) = 0;
+		virtual void DrawCall(void* userData = nullptr, bool isShadow = false) = 0;
 
 		virtual ~SceneObject() {}
 	};

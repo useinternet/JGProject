@@ -15,6 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Common\App\AssetManager.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\App\EngineTimer.h">
+      <Filter>App</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\Common\App\Event.h">
       <Filter>App</Filter>
     </ClInclude>
@@ -22,6 +28,9 @@
       <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Common\App\JWindow.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\App\Log.h">
       <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Common\App\Message.h">
@@ -40,10 +49,16 @@
     <ClInclude Include="..\Source\Common\Data\KeyCode.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Common\Data\SDCollection.h">
+      <Filter>Data</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\Common\Math\JMatrix.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Common\Math\JQuaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\Math\JRect.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Common\Math\JVector.h">
@@ -52,31 +67,43 @@
     <ClInclude Include="..\Source\Common\Math\Math.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Common\Utill\MeshGenerater.h">
+      <Filter>Utill</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\Common\Utill\StringUtill.h">
       <Filter>Utill</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Common\pch.h" />
-    <ClInclude Include="..\Source\Common\Data\SDCollection.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Common\Utill\MeshGenerater.h">
-      <Filter>Utill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Common\App\Log.h">
-      <Filter>App</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Common\Math\JRect.h">
+    <ClInclude Include="..\Source\Common\Math\JBBox.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Common\App\EngineTimer.h">
-      <Filter>App</Filter>
+    <ClInclude Include="..\Source\Common\Data\Builder.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\Math\JRay.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\Math\JFrustum.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Common\Math\JPlane.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Common\App\AssetManager.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Common\App\EngineTimer.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
     <ClCompile Include="..\Source\Common\App\GlobalSharedData.cpp">
       <Filter>App</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Common\App\JWindow.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Common\App\Log.cpp">
       <Filter>App</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Common\App\Message.cpp">
@@ -97,12 +124,15 @@
     <ClCompile Include="..\Source\Common\Math\JVector.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Common\pch.cpp" />
-    <ClCompile Include="..\Source\Common\App\Log.cpp">
-      <Filter>App</Filter>
+    <ClCompile Include="..\Source\Common\Utill\MeshGenerater.cpp">
+      <Filter>Utill</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Common\App\EngineTimer.cpp">
-      <Filter>App</Filter>
+    <ClCompile Include="..\Source\Common\pch.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JFrustum.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Common\Math\JPlane.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

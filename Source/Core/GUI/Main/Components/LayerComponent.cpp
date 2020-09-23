@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace GUI
+namespace JGUI
 {
 	void LayerComponent::Awake()
 	{
@@ -17,5 +17,15 @@ namespace GUI
 	void LayerComponent::Destroy()
 	{
 		GetOwner()->m_LayerComponent = nullptr;
+	}
+	uint64_t LayerComponent::GetLayer() const
+	{
+		if (GetOwner()->GetFlags() & ElementFlag_TopMost) return GUIDraw_Priority_TopMostElement;
+		else return m_Layer;
+	}
+	uint64_t LayerComponent::IssueLayer()
+	{
+		if (GetOwner()->GetFlags() & ElementFlag_TopMost) return GUIDraw_Priority_TopMostElement;
+		else return m_Layer + m_LayerOffset++;
 	}
 }

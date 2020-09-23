@@ -3,7 +3,7 @@
 #include "Elements/Element.h"
 #include "Windows/Window.h"
 
-namespace GUI
+namespace JGUI
 {
 	void Transform::SetLocalLocation(const JVector2& pos)
 	{
@@ -158,7 +158,7 @@ namespace GUI
 		}
 
 		m_Parent = transform;
-		SendDirty();
+		SendDirty(true, true);
 		UpdateLocation();
 		CalcAnchorDistance();
 		if (m_Parent)
@@ -193,6 +193,24 @@ namespace GUI
 	{
 		UpdateWorldMatrix();
 		return m_WorldMatrix;
+	}
+
+	void Transform::SendDirty(bool is_location_self, bool is_send_layerDirty)
+	{
+		m_IsWorldUpdateDirty = true;
+		if (is_location_self)
+		{
+			m_IsLocationDirty = true;
+		}
+		if (is_send_layerDirty)
+		{
+			if (m_Parent) GetOwner()->m_LayerComponent = m_Parent->GetOwner()->m_LayerComponent;
+			else GetOwner()->m_LayerComponent = nullptr;
+		}
+		for (auto& child : m_Childs)
+		{
+			child->SendDirty(true, is_send_layerDirty);
+		}
 	}
 
 	void Transform::CalcAnchorDistance()

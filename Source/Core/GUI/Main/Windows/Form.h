@@ -3,7 +3,7 @@
 #include "Window.h"
 
 
-namespace GUI
+namespace JGUI
 {
 	
 	class GUI_API Form : public Window

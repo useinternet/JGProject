@@ -22,12 +22,13 @@
 #define GUI_PREGENERATED_MATERIAL_DEFAULT TT("GUI_PreGenerated_Material_Default")
 #define GUI_PREGENERATED_MATERIAL_IMAGE   TT("GUI_PreGenerated_Material_Image")
 #define GUI_PREGENERATED_MATERIAL_TEXT    TT("GUI_PreGenerated_Material_Text")
-namespace GUI
+namespace JGUI
 {
     enum ElementFlags
     {
         ElementFlag_None    = 0x0000,
-		ElementFlag_TopMost = 0x0001
+		ElementFlag_TopMost = 0x0001,
+		ElementFlag_AboveOnWindow = 0x0002
     };
     enum WindowFlags
     {
@@ -64,9 +65,7 @@ namespace GUI
     enum GUIDraw_Priority : uint64_t
     {
         GUIDraw_Priority_WindowBackGround   = 0,
-		         
-        GUIDraw_Priority_BottomMostElement  = 999999,
-        GUIDraw_Priority_Element            = 1000001,
+        GUIDraw_Priority_BottomMostElement  = 1,
         GUIDraw_Priority_TopMostElement     = 9999999,
 		GUIDraw_Priority_TitleBar,
         GUIDraw_Priority_BottomMostWindow   = 50000000,
@@ -105,6 +104,10 @@ namespace GUI
 		GUIStyle_ButtonPressed,
 		GUIStyle_ButtonSelected,
 		GUIStyle_ButtonDisable,
+
+		GUIStyle_SliderHandle,
+		GUIStyle_SliderBackGround,
+		GUIStyle_SliderFillArea,
         GUIStyle_Count,
     };
 	enum 
@@ -112,9 +115,17 @@ namespace GUI
 		GUIStyle_Resource_CloseBt,
 		GUIStyle_Resource_MaxBt,
 		GUIStyle_Resource_HideBt,
-		GUIStyle_Resource_Count
+		GUIStyle_Resource_Check,
+		GUIStyle_Resource_RightFillArrow,
+		GUIStyle_Resource_RightArrow,
+		GUIStyle_Resource_LeftFillArrow,
+		GUIStyle_Resource_LeftArrow,
+		GUIStyle_Resource_UpFillArrow,
+		GUIStyle_Resource_UpArrow,
+		GUIStyle_Resource_DownFillArrow,
+		GUIStyle_Resource_DownArrow,
+		GUIStyle_Resource_Count,
 	};
-
 	class JFontManager;
 	class JFont;
 	struct GUIDrawItem
@@ -145,7 +156,68 @@ namespace GUI
 		JVector2 prevPivot = { 0, 0 };
 		JVector2 prevSize = { -1, -1 };
 	};
+	template<class Type>
+	class GUIDropData
+	{
+	public:
+		Type Data;
+		size_t DataSize;
+	};
 
+
+	class GUIDropSourceBase
+	{
+	public:
+		virtual ~GUIDropSourceBase() {}
+	public:
+		std::function<void()> StartDragFunc;
+		std::function<void()> DraggingFunc;
+		std::function<void()> DropFunc;
+		
+	};
+
+	template<class Type, size_t typeSize = sizeof(Type)>
+	class GUIDropSource : public GUIDropSourceBase
+	{
+	public:
+		virtual ~GUIDropSource() {}
+		Type    Data;
+		size_t  DataSize = 0;
+		size_t  TypeSize = typeSize;
+	};
+
+
+	class GUIDropItem
+	{
+		friend LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
+		friend class GraphicsIF;
+	public:
+
+
+		template<class Type, size_t typeSize = sizeof(Type)>
+		std::unique_ptr<GUIDropData<Type>> GetDropSource(size_t i) const
+		{
+			if (DropSources.size() <= i) return nullptr;
+			auto dropSource = DropSources[i].get();
+			GUIDropSource<Type, typeSize>* dropSourceT = dynamic_cast<GUIDropSource<Type, typeSize>*>(dropSource);
+			if (dropSourceT)
+			{
+				GUIDropData<Type> data;
+				data.Data     = dropSourceT->Data;
+				data.DataSize = dropSourceT->DataSize;
+				return std::make_unique<GUIDropData<Type>>(data);
+			}
+			else return nullptr;
+		}
+
+		
+
+		size_t GetDropSourceCount() const {
+			return DropSources.size();
+		}
+	private:
+		std::vector<std::unique_ptr<GUIDropSourceBase>> DropSources;
+	};
     struct GUIIO
     {
         GUIIOFlags   IOFlags = GUIIOFlag_None;
@@ -164,7 +236,7 @@ namespace GUI
 
 
         float KeyDownDuration[256];
-        float KeyRepeatDelay = 0.25f;
+        float KeyRepeatDelay = 0.016f;
 
 
 
@@ -193,7 +265,13 @@ namespace GUI
 		float    TextLineSpacing = 5.0f;
 		float    TextTabSize = 16.0f;
 
-
+		/* FieldHeight
+		* 
+		
+		
+		*/
+		float FieldHeight = 20.0f;
+		float FieldWidth  = 160.0f;
 
 		JVector2 WindowPadding = { 8,8 };
 		JVector2 WindowMinSize = { 32, 32 };
@@ -216,6 +294,9 @@ namespace GUI
 			GUIColors[GUIStyle_ButtonSelected] = JColor(0.25f, 0.25f, 0.25f, Alpha);
 			GUIColors[GUIStyle_ButtonDisable] = JColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+			GUIColors[GUIStyle_SliderHandle]     = JColor(1.0f, 0.1f, 0.1f, Alpha);
+			GUIColors[GUIStyle_SliderBackGround] = JColor(0.5f, 0.5f, 0.5f, Alpha);
+			GUIColors[GUIStyle_SliderFillArea]   = JColor(1.0f, 1.0f, 1.0f, Alpha);
 
 			GUIColors[GUIStyle_WindowResizeGripHightlight] = JColor(0.95f, 0.67f, 0.14f, 0.75f);
 
@@ -223,6 +304,16 @@ namespace GUI
 			GUIImages[GUIStyle_Resource_CloseBt] = io.ResourcePath + TT("CloseBt.png");
 			GUIImages[GUIStyle_Resource_MaxBt]   = io.ResourcePath + TT("MaxBt.png");
 			GUIImages[GUIStyle_Resource_HideBt]  = io.ResourcePath + TT("HideBt.png");
+
+			GUIImages[GUIStyle_Resource_Check]          = io.ResourcePath + TT("Check.png");
+			GUIImages[GUIStyle_Resource_RightFillArrow] = io.ResourcePath + TT("RightFillArrow.png");
+			GUIImages[GUIStyle_Resource_RightArrow]     = io.ResourcePath + TT("RightArrow.png");
+			GUIImages[GUIStyle_Resource_LeftFillArrow]  = io.ResourcePath + TT("LeftFillArrow.png");
+			GUIImages[GUIStyle_Resource_LeftArrow]      = io.ResourcePath + TT("LeftArrow.png");
+			GUIImages[GUIStyle_Resource_UpFillArrow]    = io.ResourcePath + TT("UpFillArrow.png");
+			GUIImages[GUIStyle_Resource_UpArrow]        = io.ResourcePath + TT("UpArrow.png");
+			GUIImages[GUIStyle_Resource_DownFillArrow]  = io.ResourcePath + TT("DownFillArrow.png");
+			GUIImages[GUIStyle_Resource_DownArrow]      = io.ResourcePath + TT("DownArrow.png");
 		}
 	};
 
@@ -284,7 +375,12 @@ namespace GUI
 		}
 		const JFontCharInfo& GetCharInfo(wchar_t c)
 		{
-			return m_CharMap[c];
+			auto& iter = m_CharMap.find((int)c);
+			if (iter == m_CharMap.end())
+			{
+				return m_CharMap[0];
+			}
+			return iter->second;
 		}
 
 
@@ -385,6 +481,7 @@ namespace GUI
 				Next(fin); fin >> charInfo.xadvance;
 				Next(fin); fin >> charInfo.pageID;
 				Next(fin); fin >> charInfo.chnl;
+
 
 				out.m_CharMap[charInfo.id] = charInfo;
 			}

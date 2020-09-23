@@ -13,11 +13,25 @@ namespace GE
 	{
 		if (g_GE == nullptr) g_GE = this;
 		else assert("GraphicsEngine::Awake");
-
-
-	
-
 		GraphicsIF::Create();
+
+
+		GlobalSharedData::GetEventManager()->RegisterEvent(
+			TT("GE::GraphicsEngine::GraphicsIF::BeginDraw"), Event<void>(
+				[&]()
+		{
+			GraphicsIF::BeginDraw();
+		}));
+
+		GlobalSharedData::GetEventManager()->RegisterEvent(
+			TT("GE::GraphicsEngine::GraphicsIF::EndDraw"), Event<void>(
+				[&]()
+		{
+			GraphicsIF::EndDraw();
+		}));
+
+
+
 	}
 
 	void GraphicsEngine::Start()
@@ -59,6 +73,9 @@ namespace GE
 			}
 
 		}
+
+		GE::g_GE->m_GraphicsAPIPlugin.reset();
+		GE::g_GE->m_GraphicsAPIPlugin = nullptr;
 	}
 
 	void GraphicsEngine::ReceiveMessage(const Message& msg)
@@ -84,6 +101,11 @@ namespace GE
 /* API 
 
 */
+JVector2      GraphicsSetting::ShadowResolution = JVector2(1024, 1024);
+EShadowFilter GraphicsSetting::ShadowFilter     = EShadowFilter::PCF3X3;
+JVector4 GraphicsSetting::CasCadeRange     = JVector4(100.0f, 250.0f, 500.0f, 10000.0f);
+JVector4 GraphicsSetting::CasCadeDepthBias = JVector4(0.000000125f, 0.00000017f, 0.0000007f, 0.000001f);
+
 bool GraphicsIF::Create(GraphicsAPI api)
 {
 	std::string dllName;
@@ -122,6 +144,17 @@ bool GraphicsIF::Create(GraphicsAPI api)
 
 
 	GE::g_GE->m_GraphicsRenderer = LOAD_GRAPHICS_INTERFACE(GE::g_GE->m_GraphicsAPIPlugin, GraphicsRenderer);
+
+	GE::MaterialProperty ppt;
+	ppt.rendererMode = GE::RendererMode::_3D;
+	GraphicsIF::PreCompileMaterial(RequestMaterial(EMPTY_MATERIAL_3D, ppt).Get());
+
+	ppt.rendererMode = GE::RendererMode::Paper;
+	GraphicsIF::PreCompileMaterial(RequestMaterial(EMPTY_MATERIAL_PAPER, ppt).Get());
+
+	ppt.rendererMode = GE::RendererMode::GUI;
+	GraphicsIF::PreCompileMaterial(RequestMaterial(EMPTY_MATERIAL_GUI, ppt).Get());
+
 	return true;
 }
 
@@ -158,13 +191,33 @@ SceneObjectRef GraphicsIF::RequestSceneObject()
 	SceneObjectRef ref(obj, GE::g_GE);
 	return move(ref);
 }
+DirectionalLightRef GraphicsIF::RequestDirectionalLight()
+{
+	GE::DirectionalLight* light = LOAD_GRAPHICS_INTERFACE(GE::g_GE->m_GraphicsAPIPlugin, DirectionalLight);
 
-SceneRef GraphicsIF::RequestScene()
+	DirectionalLightRef ref(light, GE::g_GE);
+	return move(ref);
+}
+PointLightRef       GraphicsIF::RequestPointLight()
+{
+	GE::PointLight* light = LOAD_GRAPHICS_INTERFACE(GE::g_GE->m_GraphicsAPIPlugin, PointLight);
+
+	PointLightRef ref(light, GE::g_GE);
+	return move(ref);
+}
+SpotLightRef        GraphicsIF::RequestSpotLight()
+{
+	GE::SpotLight* light = LOAD_GRAPHICS_INTERFACE(GE::g_GE->m_GraphicsAPIPlugin, SpotLight);
+
+	SpotLightRef ref(light, GE::g_GE);
+	return move(ref);
+}
+SceneRef GraphicsIF::RequestScene(GE::RendererMode mode)
 {
 	GE::Scene* obj = LOAD_GRAPHICS_INTERFACE(GE::g_GE->m_GraphicsAPIPlugin, Scene);
 	//TODO( Defulat)
-
 	SceneRef ref(obj, GE::g_GE);
+	obj->m_RendererMode = mode;
 	return move(ref);
 }
 
@@ -189,7 +242,7 @@ MaterialRef GraphicsIF::RequestMaterial(const std::wstring& matName, const GE::M
 		lock_guard<std::shared_mutex> lock(GE::g_GE->m_MaterialMutex);
 		GE::g_GE->m_MaterialPool.emplace(matName, mat);
 	}
-
+	ref->m_Name = matName;
 	ref->SetMaterialProperty(ppt);
 	return move(ref);
 }
@@ -306,19 +359,21 @@ TextureRef GraphicsIF::GetTexture(const std::wstring& path)
 
 void GraphicsIF::DrawCall(SceneRef& sceneRef)
 {
-	GE::g_GE->m_DrawCallTasks.run(([&]()
+	DrawCall(sceneRef.Get());
+}
+
+void GraphicsIF::DrawCall(GE::Scene* scene)
+{
+	if (GE::g_GE->m_GraphicsRenderer == nullptr)
 	{
-		if (GE::g_GE->m_GraphicsRenderer == nullptr)
-		{
-			GELOG_FATAL("그래픽 렌더러가 nullptr 입니다.");
-			return;
-		}
-		if (!GE::g_GE->m_GraphicsRenderer->DrawCall(sceneRef.Get()))
-		{
-			GELOG_ERROR("Scene 드로우 콜이 실패했습니다.");
-			return;
-		}
-	}));
+		GELOG_FATAL("그래픽 렌더러가 nullptr 입니다.");
+		return;
+	}
+	if (!GE::g_GE->m_GraphicsRenderer->DrawCall(scene))
+	{
+		GELOG_ERROR("Scene 드로우 콜이 실패했습니다.");
+		return;
+	}
 }
 
 void GraphicsIF::BeginDraw()
@@ -328,7 +383,6 @@ void GraphicsIF::BeginDraw()
 }
 void GraphicsIF::EndDraw()
 {
-	GE::g_GE->m_DrawCallTasks.wait();
 	GE::g_GE->m_GraphicsRenderer->EndFrame();
 	GE::g_GE->m_GraphicsDevice->EndFrame();
 }
@@ -337,6 +391,8 @@ GraphicsAPI GraphicsIF::GetGraphicsAPI()
 {
 	return GraphicsAPI::DirectX12;
 }
+
+
 #ifdef INDEPENDENT_GRAPHICS_INTERFACE  
 void GraphicsIF::Destroy()
 {

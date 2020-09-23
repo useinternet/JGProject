@@ -139,6 +139,7 @@ group "Engine"
    project "Common"
       includedirs{
          "Source/Common/",
+         "Source/ThirdParty/Include/",
       }
       -- linkProject
       links {
@@ -149,6 +150,7 @@ group "Engine"
    project "Application"
       includedirs{
          "Source/Common/",
+         "Source/ThirdParty/Include/",
          "Source/Application/Main/"
       }
       -- linkProject
@@ -171,6 +173,7 @@ group "Engine"
       }
       includedirs{
          "Source/Common/",
+         "Source/ThirdParty/Include/",
          "Source/Application/Main/",
       }
       -- linkProject
@@ -185,6 +188,7 @@ group "Engine"
          project "PhysicsEngine"
             includedirs{
              "Source/Core/PhysicsEngine/Main",
+             "Source/ThirdParty/Include/",
              "Source/Common/"
             }
             -- linkProject
@@ -196,6 +200,7 @@ group "Engine"
          project "SoundEngine"
             includedirs{
              "Source/Core/SoundEngine/Main",
+             "Source/ThirdParty/Include/",
              "Source/Common/"
             }
             -- linkProject
@@ -207,6 +212,7 @@ group "Engine"
          project "InputEngine"
             includedirs{
              "Source/Core/InputEngine/Main",
+             "Source/ThirdParty/Include/",
              "Source/Common/"
             }
             -- linkProject
@@ -218,11 +224,13 @@ group "Engine"
          project "GameFrameWork"
             includedirs{
              "Source/Core/GameFrameWork/Main",
+             "Source/Core/GraphicsEngine/Main",
+             "Source/ThirdParty/Include/",
              "Source/Common/"
             }
             -- linkProject
             links {
-               "Common",
+               "Common", "GraphicsEngine"
             }
             EngineShaderedLibConfig("GAMEFRAMEWORK_EXPORT", "Source/Core/GameFrameWork/Main/")
 
@@ -231,7 +239,8 @@ group "Engine"
              "Source/Core/GUI/Main",
              "Source/Core/GraphicsEngine/Main",
              "Source/Core/InputEngine/Main",
-             "Source/Common/"
+             "Source/Common/",
+             "Source/ThirdParty/Include/"
             }
             -- linkProject
             links {
@@ -245,7 +254,8 @@ group "Engine"
             project "GraphicsEngine"
                includedirs{
                   "Source/Core/GraphicsEngine/Main",
-                  "Source/Common/"
+                  "Source/Common/",
+                  "Source/ThirdParty/Include/"
                   }
                -- linkProject
                links {
@@ -258,6 +268,7 @@ group "Engine"
                   includedirs{
                      "Source/Core/GraphicsEngine/GPU_API/DirectX12/Main/",
                      "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/ThirdParty/Include/",
                      "Source/Common/"
                   }
                   -- linkProject
@@ -271,6 +282,7 @@ group "Engine"
                   includedirs{
                      "Source/Core/GraphicsEngine/GPU_API/DirectX11/Main/",
                      "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/ThirdParty/Include/",
                      "Source/Common/"
                   }
                   -- linkProject
@@ -284,6 +296,7 @@ group "Engine"
                   includedirs{
                      "Source/Core/GraphicsEngine/GPU_API/OpenGL/Main/",
                      "Source/Core/GraphicsEngine/Main/Interface/",
+                     "Source/ThirdParty/Include/",
                      "Source/Common/"
                   }
                   -- linkProject
@@ -301,9 +314,11 @@ group "Engine"
 group "Editor"
    project "JGEditor"
       includedirs{
-         "Source/Common/"
+         "Source/Common/",
          "Source/Core/GUI/Main",
          "Source/Core/GraphicsEngine/Main",
+         "Source/ThirdParty/Include/",
+         "Source/User/Editor/Main"
       }
             -- linkProject
       links {
@@ -338,12 +353,12 @@ group "UnitTest"
       SetDllPath()
       files{
          "UnitTest/UTWindows/**.h",
-         "UnitTest/UTWindows/**.cpp",
-         "UnitTest/UTWindows/**.ico",
-         "UnitTest/UTWindows/**.rc"
+         "UnitTest/UTWindows/**.cpp"
       }
       includedirs{
          "Source/Common",
+         "Source/ThirdParty/Include/",
+         "Source/Core/GraphicsEngine/Main",
          "UnitTest/UTWindows"
       }
       vpaths{
@@ -351,7 +366,7 @@ group "UnitTest"
       }
       -- linkProject
       links {
-         "Common",
+         "Common", "GraphicsEngine"
       }
       SetEngineConfiguarations()
    project  "Console"
@@ -369,6 +384,7 @@ group "UnitTest"
       }
       includedirs{
          "Source/Common",
+         "Source/ThirdParty/Include/",
          "UnitTest/UTConsole"
       }
       vpaths{

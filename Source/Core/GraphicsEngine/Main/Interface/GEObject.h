@@ -41,6 +41,17 @@ namespace GE
 		template<class T>
 		using LoadFunc = T* (*)();
 
+		void SetUserData(const void* data, size_t dataSize) {
+			if (data == nullptr) m_UserData = nullptr;
+			else
+			{
+				memcpy(m_UserData, data, dataSize);
+			}
+		}
+		void* GetUserData();
+	private:
+		void* m_UserData = nullptr;
+
 	};
 
 
@@ -138,6 +149,9 @@ inline className* Load_GraphicsInterface_##interface_name() \
 #define REGISTER_GRAPHICS_INTERFACE_SCREEN(className)			REGISTER_GRAPHICS_INTERFACE_(Screen, className)
 #define REGISTER_GRAPHICS_INTERFACE_MATERIAL(className)			REGISTER_GRAPHICS_INTERFACE_(Material, className)
 #define REGISTER_GRAPHICS_INTERFACE_TEXTURE(className)			REGISTER_GRAPHICS_INTERFACE_(Texture, className)
+#define REGISTER_GRAPHICS_INTERFACE_DIRECTIONALLIGHT(className) REGISTER_GRAPHICS_INTERFACE_(DirectionalLight, className)
+#define REGISTER_GRAPHICS_INTERFACE_POINTLIGHT(className)       REGISTER_GRAPHICS_INTERFACE_(PointLight, className)
+#define REGISTER_GRAPHICS_INTERFACE_SPOTLIGHT(className)        REGISTER_GRAPHICS_INTERFACE_(SpotLight, className)
 
 
 #define LOAD_GRAPHICS_INTERFACE(plugin, interface_name) ((GE::GEObject::LoadFunc<GE::##interface_name>)plugin->GetProcAddress(std::string("Load_GraphicsInterface_") + #interface_name))()

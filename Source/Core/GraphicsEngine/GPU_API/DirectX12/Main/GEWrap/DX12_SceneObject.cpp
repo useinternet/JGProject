@@ -2,7 +2,7 @@
 #include "DX12_SceneObject.h"
 #include "DX12_Material.h"
 #include "DX12_GraphicsRenderer.h"
-
+#include "../GraphicsIF.h"
 
 using namespace std;
 
@@ -131,8 +131,9 @@ namespace DX12
 		if (m_Material && m_Material->GetOwnerMaterial() == m) return;
 		if (m_Material) UnBindMaterial();
 
-
-
+		if (m == nullptr) {
+			m = GraphicsIF::GetMaterial(EMPTY_MATERIAL_3D).Get();
+		}
 		m_Material = m->CreateMaterialInstance();
 		
 		//TODO
@@ -170,7 +171,7 @@ namespace DX12
 		m_AnimCBData.size = 0;
 		m_AnimCBData.count = 0;
 	}
-	void DX12_SceneObject::DrawCall(void* userData)
+	void DX12_SceneObject::DrawCall(void* userData, bool isShadow)
 	{
 		GraphicsCommandKeyPtr cmdKey = *((GraphicsCommandKeyPtr*)userData);
 		if (m_Instances.size == 0) {
@@ -184,7 +185,7 @@ namespace DX12
 			GELOG_ERROR("오브젝트 타입이 Skinned 인데  MeshType이 Static입니다.");
 			return;
 		}
-		else if (m_Material)
+		else if (m_Material && !isShadow)
 		{
 			auto matProperty = m_Material->GetOwnerMaterial()->GetMaterialProperty();
 			if ((m_ObjectType == GE::ObjectType::SDSkinned || m_ObjectType == GE::ObjectType::SDStatic) &&
@@ -204,22 +205,25 @@ namespace DX12
 			std::vector<D3D12_SHADER_RESOURCE_VIEW_DESC*> desc(tArray.size(), nullptr);
 		
 			DXCommand::BindTextures(cmdKey,
-				(uint32_t)DX12_GraphicsRenderer::RootParam::BindTexture,
+				RootParam::BindTexture,
 				tArray.data(), (void**)desc.data(), tArray.size());
 		}
 		 
 
-
+		if (!isShadow)
+		{
+			//Material Bind
+			DXCommand::BindDynamicConstantBuffer(
+				cmdKey, RootParam::Material,
+				m_Material->BtData(), m_Material->BtSize());
+		}
 		
-		//Material Bind
-		DXCommand::BindDynamicConstantBuffer(
-			cmdKey, (uint32_t)DX12_GraphicsRenderer::RootParam::Material,
-			m_Material->BtData(), m_Material->BtSize());
+
 
 
 		// Object Bind
 		DXCommand::BindDynamicStructuredBuffer(
-			cmdKey, (uint32_t)DX12_GraphicsRenderer::RootParam::Object,
+			cmdKey, RootParam::Object,
 			m_Instances.ptr, m_Instances.size, m_Instances.count);
 
 		size_t vertexSize = m_vDataPtr.size;
@@ -232,13 +236,13 @@ namespace DX12
 				CBAnimData animData;
 				animData.Reset();
 				DXCommand::BindDynamicConstantBuffer(cmdKey,
-					(uint32_t)DX12_GraphicsRenderer::RootParam::AnimData,
+					RootParam::AnimData,
 					&animData, sizeof(CBAnimData));
 			}
 			else
 			{
 				DXCommand::BindDynamicConstantBuffer(cmdKey,
-					(uint32_t)DX12_GraphicsRenderer::RootParam::AnimData,
+					RootParam::AnimData,
 					m_AnimCBData.ptr, m_AnimCBData.size);
 			}
 			break;

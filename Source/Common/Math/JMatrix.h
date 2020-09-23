@@ -3,9 +3,11 @@
 #include <DirectXMath.h>
 
 class JVector3;
+class JVector4;
 class JQuaternion;
 class JMatrix
 {
+	friend JVector3;
 	using SimMat = DirectX::XMMATRIX;
 private:
 	DirectX::XMFLOAT4X4 m_Data;
@@ -61,8 +63,9 @@ public: // ¿¬»êÀÚ
 		return *this;
 	}
 
-	JVector3 TransformPoint(const JVector3& v);
-	JVector3 TransformVector(const JVector3& v);
+	JVector3 TransformPoint(const JVector3& v) const;
+	JVector3 TransformVector(const JVector3& v) const;
+	JVector4 Transform(const JVector4& v) const;
 public:
 	inline static JMatrix Identity() {
 		JMatrix m;
@@ -82,10 +85,14 @@ public:
 	}
 	static JMatrix Translation(const JVector3& v);
 	static JMatrix Rotation(const JVector3& v);
+	static JMatrix RotationYaw(float yaw);
+	static JMatrix RotationPitch(float pitch);
+	static JMatrix RotationRoll(float roll);
 	static JMatrix Rotation(const JQuaternion& q);
 	static JMatrix RotationAxis(const JVector3& axis, float angle);
 	static JMatrix Scaling(const JVector3& v);
 	static JMatrix LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
+	static JMatrix LookToLH(const JVector3& pos, const JVector3& up, const JVector3& right, const JVector3& look);
 	inline static JMatrix PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 	{
 		JMatrix result;
@@ -105,10 +112,10 @@ public:
 	//inline static JVector3 
 public:
 	float& Get(int col, int row) {
-		return m_Data.m[col][row];
+		return m_Data.m[row][col];
 	}
 	float Get_C(int col, int row) const {
-		return m_Data.m[col][row];
+		return m_Data.m[row][col];
 	}
 	std::string ToString() const{
 		return "[ " + std::to_string(m_Data._11) + ", " + std::to_string(m_Data._12) + ", " + std::to_string(m_Data._13) + ", " + std::to_string(m_Data._14) + " ]\n" +

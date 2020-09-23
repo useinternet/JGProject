@@ -7,6 +7,12 @@
     <Filter Include="GEWrap">
       <UniqueIdentifier>{0B8B8FB2-F72C-BA88-E0E7-CDDCCC2841D9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GEWrap\Pass">
+      <UniqueIdentifier>{2a274555-9818-423f-91c8-a89b971c8f1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GEWrap\Pass\Graphics">
+      <UniqueIdentifier>{e4a8bfa1-36e1-4d49-8e1f-d1dd4268615d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\DirectXApi.h" />
@@ -37,9 +43,13 @@
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsDevice.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\d3dx12.h" />
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.h" />
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.h">
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.h">
+      <Filter>GEWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_MacroDeclaration.h">
+      <Filter>GEWrap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Scene.h">
@@ -48,20 +58,22 @@
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneObject.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.h">
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Texture.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_RenderingPass.h">
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\d3dx12.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneLight.h">
       <Filter>GEWrap</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.h">
-      <Filter>GEWrap</Filter>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPassDefine.h">
+      <Filter>GEWrap\Pass\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_MacroDeclaration.h">
-      <Filter>GEWrap</Filter>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPasses.h">
+      <Filter>GEWrap\Pass\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -132,8 +144,10 @@
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsDevice.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.cpp" />
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.cpp">
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.cpp">
+      <Filter>GEWrap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Scene.cpp">
@@ -142,17 +156,24 @@
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneObject.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.cpp">
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Texture.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_RenderingPass.cpp">
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneLight.cpp">
       <Filter>GEWrap</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.cpp">
-      <Filter>GEWrap</Filter>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPasses.cpp">
+      <Filter>GEWrap\Pass\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPassDefine.cpp">
+      <Filter>GEWrap\Pass\Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

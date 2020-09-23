@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form">
+      <UniqueIdentifier>{5959857C-4590-860D-EE7C-6C10DA92020F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form\Test">
+      <UniqueIdentifier>{1d915355-d6d3-42df-8e16-59d462837140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form\Test\Edit">
+      <UniqueIdentifier>{2E26DA85-9A90-8EFC-E3CE-3FA24F786C51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form\Test\Develop">
+      <UniqueIdentifier>{7fa8524c-febf-479e-8aaa-81fd9db6aa6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form\Edit">
+      <UniqueIdentifier>{f205584f-87b8-4b2f-bae3-cfbb94ecd98f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{7dc9637b-30c7-4830-be6a-25b793ed48e4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\User\Editor\Main\Core.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\JGEditor.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\JGEditorMacro.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\pch.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\Form\Develop\Develop.h">
+      <Filter>Form\Test\Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\User\Editor\Main\Form\Edit\Viewport.h">
+      <Filter>Form\Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\User\Editor\Main\JGEditorHub.h" />
+    <ClInclude Include="..\Source\User\Editor\Main\Form\Edit\Detail.h">
+      <Filter>Form\Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\User\Editor\Main\Form\Develop\UnitTest.h">
+      <Filter>Form\Test\Develop</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\User\Editor\Main\JGEditor.cpp" />
+    <ClCompile Include="..\Source\User\Editor\Main\pch.cpp" />
+    <ClCompile Include="..\Source\User\Editor\Main\Form\Develop\Develop.cpp">
+      <Filter>Form\Test\Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\User\Editor\Main\Form\Edit\Viewport.cpp">
+      <Filter>Form\Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\User\Editor\Main\JGEditorHub.cpp" />
+    <ClCompile Include="..\Source\User\Editor\Main\Form\Edit\Detail.cpp">
+      <Filter>Form\Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\User\Editor\Main\Form\Develop\UnitTest.cpp">
+      <Filter>Form\Test\Develop</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

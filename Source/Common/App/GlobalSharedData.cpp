@@ -2,12 +2,12 @@
 #include "GlobalSharedData.h"
 
 using namespace std;
-#pragma data_seg("SHAREDATA")
+//#pragma data_seg("SHAREDATA")
 
-unique_ptr<GlobalSharedData> g_sharedData = nullptr;
+shared_ptr<GlobalSharedData> g_sharedData = nullptr;
 
-#pragma data_seg()
-#pragma comment( linker, "/SECTION:SHAREDATA,RWS" )
+//#pragma data_seg()
+//#pragma comment( linker, "/SECTION:SHAREDATA,RWS" )
 
 
 
@@ -37,9 +37,14 @@ EngineTimer* GlobalSharedData::GetEngineTimer()
 	return g_sharedData->engineTimer;
 }
 
+AssetManager* GlobalSharedData::GetAssetManager()
+{
+	return g_sharedData->assetManager;
+}
+
 void LinkSharedData(const GlobalSharedData& data)
 {
-	g_sharedData = make_unique<GlobalSharedData>();
+	g_sharedData = make_shared<GlobalSharedData>();
 	*g_sharedData = data;
 }
 const GlobalSharedData& GetGlobalSharedData()

@@ -7,7 +7,7 @@ namespace GE
 	class GRAPHICSENGINE_API TextureInfo
 	{
 	public:
-		std::string path;
+		std::wstring path;
 		int width = 0, height = 0;
 		//std::string format;
 

@@ -155,7 +155,10 @@ namespace DX12
 			}
 		}
 	}
-
+	const std::vector<std::pair<std::string, GE::Texture*>>& DX12_MaterialInstance::GetBindedTextures() const
+	{
+		return m_BindedTextures;
+	}
 
 
 	void DX12_Material::SetMaterialProperty(const GE::MaterialProperty& ppt)
@@ -309,6 +312,11 @@ namespace DX12
 		}
 		
 
+	}
+
+	const std::vector<std::pair<std::string, GE::Texture*>>& DX12_Material::GetBindedTextures() const
+	{
+		return m_BindedTextures;
 	}
 
 	GE::MaterialInstance* DX12_Material::CreateMaterialInstance()

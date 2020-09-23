@@ -52,11 +52,11 @@ struct VS_OUT
 
 	// TODO()
 };
-
 struct PS_OUT
 {
 #if defined(__RENDERER_MODE_3D__)
 	float4 Albedo : SV_Target0;
+	float4 Normal : SV_Target1;
 #endif
 
 #if defined(__RENDERER_MODE_PAPER__)
@@ -69,52 +69,47 @@ struct PS_OUT
 };
 
 
-
-VS_OUT vs(VS_IN vin, uint insID : SV_InstanceID)
+VS_OUT Renderer3D_VSMain(VS_IN vin, uint insID)
 {
 	VS_OUT vout;
-	//  3DRenderer 
 #if defined(__RENDERER_MODE_3D__)
-
 	float4x4 world;
 	float4 posW = float4(0, 0, 0, 1);
 	float3 normalW = float3(0, 0, 0);
 	float3 tangentW = float3(0, 0, 0);
+
+
 #if defined(__SDSTATICOBJECT__)
-	world    = gObjectInstances[insID].world;
-	posW     = mul(float4(vin.posL, 1.0f), world);
-	normalW  = normalize(mul(vin.normalL, (float3x3)world));
+	world = gObjectInstances[insID].world;
+	posW = mul(float4(vin.posL, 1.0f), world);
+	normalW = normalize(mul(vin.normalL, (float3x3)world));
 	tangentW = normalize(mul(vin.tangentL, (float3x3)world));
 	// TODO 
 #endif
 #if defined(__SDSKINNEDOBJECT__)
-	world    = gObjectInstances[insID].world;
-	posW     = mul(float4(vin.posL, 1.0f), world);
-	normalW  = normalize(mul(vin.normalL, (float3x3)world));
+	world = gObjectInstances[insID].world;
+	posW = mul(float4(vin.posL, 1.0f), world);
+	normalW = normalize(mul(vin.normalL, (float3x3)world));
 	tangentW = normalize(mul(vin.tangentL, (float3x3)world));
 	// TODO 
 #endif
-	vout.posH     = mul(posW, g_viewProj);
-	vout.posW     = posW.xyz;
-	vout.normalW  = normalW;
+
+	vout.posH = mul(posW, g_viewProj);
+	vout.posW = posW.xyz;
+	vout.normalW = normalW;
 	vout.tangentW = tangentW;
 	vout.tex = vin.tex;
-
-
 #endif
+	return vout;
 
+}
+VS_OUT RendererPaper_VSMain(VS_IN vin, uint insID)
+{
+	VS_OUT vout;
 
-
-
-
-
-
-
-
-
-
-	// Paper Renderer
 #if defined(__RENDERER_MODE_PAPER__)
+
+
 
 	float4x4 world = gObjectInstances[insID].world;
 	float4 posW = mul(float4(vin.posL, 1.0f), world);
@@ -126,45 +121,58 @@ VS_OUT vs(VS_IN vin, uint insID : SV_InstanceID)
 
 
 
+	return vout;
 
+}
+VS_OUT RendererGUI_VSMain(VS_IN vin, uint insID)
+{
+	VS_OUT vout;
 
-
-
-
-
-
-
-
-
-
-
-	// GUI Renderer
 #if defined(__RENDERER_MODE_GUI__)
 	float4x4 world = gObjectInstances[insID].world;
 	float4 posW = mul(float4(vin.posL, 1.0f), world);
 	vout.posH = mul(posW, g_viewProj);
 	vout.tex = vin.tex;
 #endif
+	return vout;
+}
+
+
+
+
+VS_OUT vs(VS_IN vin, uint insID : SV_InstanceID)
+{
+	VS_OUT vout;
+#if defined(__RENDERER_MODE_3D__)
+	return Renderer3D_VSMain(vin, insID);
+#endif
+#if defined(__RENDERER_MODE_PAPER__)
+	return RendererPaper_VSMain(vin, insID);
+#endif
+#if defined(__RENDERER_MODE_GUI__)
+	return RendererGUI_VSMain(vin, insID);
+#endif
 
 
 	return vout;
 }
+
+
+
 
 PS_OUT ps(VS_OUT pin)
 {
 	PS_OUT pout;
 	// 3DRenderer
 #if defined(__RENDERER_MODE_3D__)
-
-	pout.Albedo = float4(1.0f, 1.0f, 1.0f, 1.0f);
-
-	
+	pout.Albedo  = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	pout.Normal  = float4(pin.normalW, 0.0f);
 #if defined(__DEFINE_MATERIAL_CODE__)
 	__DEFINE_MATERIAL_CODE__
 #endif
-		// TODO
-
-
+	pout.Normal = normalize(pout.Normal);
+	pout.Normal.xyz = (pout.Normal.xyz + 1.0f) * 0.5f;
+// 노멀 매핑
 #endif
 
 

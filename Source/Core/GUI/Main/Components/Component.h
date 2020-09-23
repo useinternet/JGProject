@@ -4,7 +4,7 @@
 #include "GUIObject.h"
 
 
-namespace GUI
+namespace JGUI
 {
 	class Element;
 	class Window;
@@ -24,6 +24,8 @@ namespace GUI
 		}
 		Window* GetOwnerWindow() const;
 		virtual ~Component() {}
+
+		Transform* GetTransform() const;
 	protected:
 		virtual void Awake()   {}
 		virtual void Start()   {}
@@ -33,7 +35,7 @@ namespace GUI
 		
 	private:
 		Element* m_Owner          = nullptr;
-		bool     m_IsActive       = false;
+		bool     m_IsActive       = true;
 		bool     m_IsExecuteStart = false;
 	};
 }

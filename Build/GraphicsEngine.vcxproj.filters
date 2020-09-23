@@ -24,26 +24,29 @@
     <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Scene.h">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneLight.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneObject.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Screen.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\pch.h" />
-    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Texture.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneLight.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\RenderingPass.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\ShaderDefined.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\StateWrapper.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Texture.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\pch.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneCamera.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GraphicsEngine\Main\Interface\Pass.h">
       <Filter>Interface</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,5 +56,11 @@
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Core\GraphicsEngine\Main\pch.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\Interface\SceneCamera.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GraphicsEngine\Main\Interface\Pass.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

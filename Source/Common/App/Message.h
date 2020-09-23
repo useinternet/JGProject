@@ -3,8 +3,11 @@
 #include <map>
 #include <queue>
 #include <shared_mutex>
+#include "Data/Builder.h"
+#include "Math/JVector.h"
 
 #define GRAPHICS_ENGINE_MESSAGE_ID "GraphicsEngine"
+#define GFW_MESSAGE_ID             "GameFrameWork"
 #define INPUT_ENGINE_MESSAGE_ID    "InputEngine"
 
 class SystemCore;
@@ -69,12 +72,111 @@ namespace GraphicsMessage
 	};
 }
 
-namespace GameFramwWorkMessage
+namespace GameFrameWorkMessage
 {
+	using GFWInstanceAddr = uint64_t;
 	enum
 	{
-		Msg_ReceiveGameWorldTexture,
+		Msg_RequestEditorCamera,
+		Msg_GetSelectGameObject,
+		Msg_TestSpawnGameObject
+
+
+
+
+		// Msg_GetWorldInfo,
+
 	};
+
+	struct RequestEditorCamera
+	{
+	/* Msg_RequestEditorCamera
+	* 에디터 카메라 인스턴스 가져오기
+	* Snd
+	std::wstring        -> 월드 이름
+	* Rcv
+	GE::SceneCamera*    -> 씬 카메라
+	GE::Texture*        -> 씬 텍스쳐
+	*/
+		struct Snd
+		{
+			std::wstring GameWorldName;
+		};
+		struct Rcv
+		{
+			GFWInstanceAddr SceneCameraAddr;
+			GFWInstanceAddr SceneTextureAddr;
+		};
+
+		Snd snd;
+		Rcv rcv;
+	};
+
+	struct GetSelectGameObject
+	{
+	/* Msg_GetSelectGameObject
+	* 설명 : 선택된 게임 오브젝트에 대한 정보 얻기
+	* Snd
+	JVector2   -> 마우스 위치
+	
+	* Rcv
+	
+	GameObject에 대한 정보
+	{
+		Name
+		classID
+		EditorLayoutBuilderFunc
+		EditorDataBindBuilderFunc
+		GameObject 조작할수있는 Pointer
+	}
+	
+	*/
+		struct Snd
+		{
+			JVector2 mousePos;
+		};
+		struct Rcv
+		{
+			std::wstring Name;
+			std::string  ClassID;
+			EditorLayoutBuilder   LayoutBuilder;
+			EditorDataBindBuilder DataBindBuilder;
+
+		};
+
+		Snd snd;
+		Rcv rcv;
+
+
+	};
+
+
+
+	/* Msg_TestSpawnGameObject
+	* Snd
+	meshPath = "";
+	matName  = "";
+	initlocation;
+	initRotation;
+	initScale;
+
+
+
+	* Rcv
+	
+	
+	*/
+	/* Msg_SpawnGameObject
+	* 미구현(추후 구현 예정)
+	* Snd
+	
+
+
+
+	* Rcv
+	
+	
+	*/
 }
 
 // 0000 0000 0000 0000

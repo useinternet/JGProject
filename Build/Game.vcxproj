@@ -167,8 +167,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>dlls_libs\Release\Game.lib</ImportLibrary>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\User\Game\헤더.h" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Common.vcxproj">
       <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>

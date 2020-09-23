@@ -16,3 +16,6 @@
 #define JGEDITOR_API __declspec(dllimport)
 
 #endif
+
+#include "JGEditorHub.h"
+#include "JGEditorMacro.h"

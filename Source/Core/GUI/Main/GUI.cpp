@@ -11,8 +11,10 @@ using namespace std;
 
 
 
-namespace GUI
+namespace JGUI
 {
+	
+
 	LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 
@@ -49,10 +51,11 @@ namespace GUI
 			case 2: GUIIF::GetInstance()->UpdateKeyDuration(KeyCode::MouseWheelButton, win); break;
 			}
 		};
-
+		static bool isHangule = false;
 
 		switch (msg)
 		{
+
 		case WM_LBUTTONDOWN:    downFunc(0); 	return 0;
 		case WM_RBUTTONDOWN:    downFunc(1);    return 0;
 		case WM_MBUTTONDOWN:    downFunc(2);    return 0;
@@ -66,8 +69,53 @@ namespace GUI
 			win->ReceiveFocusEvent(1);
 			GUIIF::GetInstance()->m_FocusWindow = nullptr;
 			break;
-		case WM_DESTROY:
+		case WM_DROPFILES:
+		{
+			::DragAcceptFiles(hWnd, false);
+			GUIDropItem item;
+			uint32_t dropCount = ::DragQueryFileW((HDROP)wParam, 0xFFFFFFFF, nullptr, 0);
+			for (uint32_t i = 0; i < dropCount; ++i)
+			{
+				std::wstring path;
+				path.resize(256);
+				::DragQueryFileW((HDROP)wParam, i, path.data(), 256);
 
+				path = path.substr(0, path.find(TT('\0')));
+
+
+				auto dropSource = make_unique<GUIDropSource<wstring>>();
+				dropSource->DataSize = path.length();
+				dropSource->Data = path;
+				item.DropSources.push_back(move(dropSource));
+			}
+			win->ReceiveDropItemEvent(item);
+			::DragAcceptFiles(hWnd, true);
+		}
+		return 0;
+		case WM_CHAR:
+		{
+			HIMC hIMC = ::ImmGetContext(hWnd);
+			DWORD conVersion, senTence;
+			::ImmGetConversionStatus(hIMC, &conVersion, &senTence);
+			if (conVersion == 1) return 0;
+			
+			std::string s;
+			s.resize(1); s[0] = (char)wParam;
+			std::wstring ws = s2ws(s);
+			
+			win->ReceiveCharEvent(ws[0]);
+		}
+			return 0;
+		case WM_IME_CHAR:
+		{
+			HIMC hIMC = ::ImmGetContext(hWnd);
+			DWORD conVersion, senTence;
+			::ImmGetConversionStatus(hIMC, &conVersion, &senTence);
+			if (conVersion == 0) return 0;
+			win->ReceiveCharEvent((wchar_t)wParam);
+		}
+
+			return 0;
 		default:
 			return 0;
 		}
@@ -117,8 +165,7 @@ pout.Albedo = Image_Texture.Sample(g_AnisotropicSampler, pin.tex) * Color_Data;
 			text_Material->DefineVarAsFloat4(GUI_MATERIAL_DATA_COLOR, JVector4(1.0f, 1.0f, 1.0f, 1.0f));
 			text_Material->DefineTexture(GUI_MATERIAL_DATA_IMAGE, nullptr);
 			text_Material->SetCode(R"(
-float4 textureColor = Image_Texture.Sample(g_LinearSampler, pin.tex).rrra;
-if(textureColor.r < 0.2f) textureColor.a = 0.0f;
+float4 textureColor = Image_Texture.Sample(g_LinearSampler, pin.tex).rgba;
 pout.Albedo = textureColor * Color_Data;
 )");
 
@@ -145,6 +192,7 @@ pout.Albedo = textureColor * Color_Data;
 			}
 			else
 			{
+				LINK_GLOBAL_SHARED_DATA(g_Instance->m_EditPlugin)
 				using Func = void(*)();
 				Func func = (Func)(g_Instance->m_EditPlugin->GetProcAddress("_CreateMainWindowForm"));
 				func();
@@ -154,18 +202,32 @@ pout.Albedo = textureColor * Color_Data;
 
 	void GUI::Update()
 	{
+
+
+		if (g_Instance->m_IsCloseApp)
+		{
+			g_Instance->m_MainWindow->GUIDestroy();
+			return;
+		}
+
 		auto& io = GUIIF::GetIO();
 		io.MousePos = InputIF::GetCursorPos();
 		
 		g_Instance->ProcessGarbageCollection(GUIIF::GetTick());
-		g_Instance->UpdateEvent();
+		
 		g_Instance->UpdateWindow();
 		g_Instance->UpdateScreen();
+		g_Instance->UpdateEvent();
+
+
 		g_Instance->m_FrameIndex = (g_Instance->m_FrameIndex + 1) % GUIIF::GetIO().FrameCount;
+
+
 
 	}
 	void GUI::Destroy()
 	{
+		
 		g_Instance->DestroyIF();
 		g_Instance = nullptr;
 
@@ -233,15 +295,20 @@ pout.Albedo = textureColor * Color_Data;
 			screen->prevSize     = size;
 			screen->prevLocation = location;
 		}
+		{// test
+			DragAcceptFiles(screen->win->GetHandle(), TRUE);
+		}
 	}
 
 	void GUIIF::UnRegisterScreen(Window* win)
 	{
 		auto& screenPool = GetInstance()->m_ScreenPool;
 		if (screenPool.find(win) == screenPool.end()) return;
-
+		
 		auto screen = screenPool[win];
 		screen->screen.Reset();
+
+
 		GlobalSharedData::GetWindowManager()->Destroy(screen->win);
 		screenPool.erase(win);
 	}
@@ -254,6 +321,10 @@ pout.Albedo = textureColor * Color_Data;
 
 	void GUIIF::ReserveDestroyWindow(Window* win)
 	{
+		if (win == GUIIF::GetMainWindow())
+		{
+			GetInstance()->m_IsCloseApp = true;
+		}
 		auto& reservedQueue = GetInstance()->m_ReservedWindows;
 		reservedQueue[GetInstance()->m_FrameIndex].push(win);
 	}
@@ -280,6 +351,33 @@ pout.Albedo = textureColor * Color_Data;
 	Window* GUIIF::GetMainWindow()
 	{
 		return GetInstance()->m_MainWindow;
+	}
+	void GUIIF::SetCursorPos(const JVector2& pos) {
+		::SetCursorPos((int)pos.x, (int)pos.y);
+	}
+	void GUIIF::CursorLock(const JRect& area)
+	{
+		RECT r;
+		r.left = area.left;
+		r.top = area.top;
+		r.right = area.right;
+		r.bottom = area.bottom;
+		ClipCursor(&r);
+
+	}
+	void GUIIF::CursorUnLock()
+	{
+		ClipCursor(nullptr);
+	}
+	void GUIIF::CursorVisible(bool is_visible)
+	{
+		static bool is = true;
+		if (is == is_visible)
+		{
+			return;
+		}
+		is = is_visible;
+		ShowCursor(is_visible);
 	}
 
 	GUIIO& GUIIF::GetIO()
@@ -342,7 +440,6 @@ pout.Albedo = textureColor * Color_Data;
 
 				if (!m_ObjectPool[index]->m_IsAlive)
 				{
-					GUILOG_INFO(" Delete %ld", m_ObjectPool[index]->GetInstanceID());
 					std::swap(m_ObjectPool[index], m_ObjectPool[obj_count - 1]);
 					m_ObjectPool.pop_back();
 					--obj_count;
@@ -574,6 +671,8 @@ pout.Albedo = textureColor * Color_Data;
 		}
 		m_ScreenPool.clear();
 		m_ObjectPool.clear();
+		m_EditPlugin.reset();
+		m_EditPlugin = nullptr;
 	}
 
 

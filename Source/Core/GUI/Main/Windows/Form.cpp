@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace GUI
+namespace JGUI
 {
 
 

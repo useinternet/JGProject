@@ -1,12 +1,11 @@
 #pragma once
 #include "Component.h"
+#include <filesystem>
 
 
 
-
-namespace GUI
+namespace JGUI
 {
-	class LayerComponent;
 	class GUI_API DrawComponent : public Component
 	{
 
@@ -32,6 +31,7 @@ namespace GUI
 		const JColor& GetColor() const {
 			return m_Color;
 		}
+
 	protected:
 		virtual void ConvertVertexCoordinate(const JRect& localRect);
 		virtual bool InteractionActive();
@@ -58,7 +58,7 @@ namespace GUI
 
 		JColor m_Color;
 
-		LayerComponent* m_Layer = nullptr;
+		//LayerComponent* m_Layer = nullptr;
 	};
 
 
@@ -69,7 +69,7 @@ namespace GUI
 	public:
 		void SetImage(GE::Texture* t);
 		void SetImage(const std::wstring& imagePath);
-
+		GE::Texture* GetTexture() const;
 	private:
 		std::wstring   m_ImageSource;
 	};
@@ -83,6 +83,7 @@ namespace GUI
 		virtual void Awake()   override;
 		virtual void ConvertVertexCoordinate(const JRect& localRect) override;
 		virtual bool InteractionActive() override;
+		virtual void ClearDirty() override;
 	public:
 		std::vector<PaperVertex>& V_Ref() {
 			return m_V;
@@ -105,6 +106,7 @@ namespace GUI
 	{
 	protected:
 		virtual void Awake()   override;
+		virtual void Tick() override;
 		virtual void ConvertVertexCoordinate(const JRect& localRect) override;
 		virtual bool IsDirty() override;
 		virtual void ClearDirty() override;
@@ -115,7 +117,7 @@ namespace GUI
 		void SetTextVAlign(TextVAlign align);
 		void SetLineSpacing(float spacing);
 		void SetTabSize(float tabSize);
-
+		void SetTextSize(float size);
 		const std::wstring& GetText() const {
 			return m_Text;
 		}
@@ -133,6 +135,9 @@ namespace GUI
 		}
 		float GetTabSize() const {
 			return m_TabSize;
+		}
+		float GetTextSize() const {
+			return m_TextSize;
 		}
 	private:
 		enum class UpdateItemState
@@ -173,7 +178,7 @@ namespace GUI
 		TextVAlign m_VAlign = TextVAlign_Top;
 
 
-
+		
 		Concurrency::task_group m_UpdateTextTask;
 		UpdateItem m_UpdateItem;
 	};

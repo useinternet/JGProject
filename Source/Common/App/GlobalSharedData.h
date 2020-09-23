@@ -25,6 +25,7 @@ class JWindowManager;
 class Application;
 class LogSystem;
 class EngineTimer;
+class AssetManager;
 
 class GlobalSharedData
 {
@@ -34,6 +35,7 @@ public:
 	static JWindowManager* GetWindowManager();
 	static LogSystem*      GetLogSystem();
 	static EngineTimer*    GetEngineTimer();
+	static AssetManager*   GetAssetManager();
 private:
 	friend Application;
 private:
@@ -42,6 +44,7 @@ private:
 	JWindowManager* winManager   = nullptr;
 	LogSystem*      logSystem    = nullptr;
 	EngineTimer*    engineTimer  = nullptr;
+	AssetManager*   assetManager = nullptr;
 };
 
 void  LinkSharedData(const GlobalSharedData& data);

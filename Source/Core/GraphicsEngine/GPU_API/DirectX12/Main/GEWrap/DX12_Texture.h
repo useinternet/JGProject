@@ -15,7 +15,7 @@ namespace DX12
 		virtual ~DX12_Texture() override {}
 	private:
 		DX12::Texture   m_Texture;
-		GE::TextureInfo m_Info;
+		mutable GE::TextureInfo m_Info;
 	};
 
 }

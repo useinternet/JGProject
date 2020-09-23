@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "DX12_Scene.h"
 #include "DX12_Texture.h"
+#include "DX12_SceneObject.h"
+#include "DX12_SceneLight.h"
 using namespace std;
 
 
@@ -28,17 +30,60 @@ namespace DX12
 
 	void DX12_Scene::PushObject(GE::SceneObject* sceneObject)
 	{
+		if (sceneObject->GetMaterial())
+		{
+			auto& ppt = sceneObject->GetMaterial()->GetOwnerMaterial()->GetMaterialProperty();
+			if (ppt.rendererMode != GetRendererMode())
+			{
+				GELOG_ERROR("Scene의 렌더러 모드와 Material의 렌더러모드가 일치 하지 않습니다.");
+				return;
+			}
+		}
 		m_SceneObjs.push_back(sceneObject);
 	}
 
 	void DX12_Scene::PushObjects(const vector<GE::SceneObject*>& sceneObject)
 	{
 		m_SceneObjs.insert(m_SceneObjs.end(), sceneObject.begin(), sceneObject.end());
+
+		for (auto& iter = m_SceneObjs.begin(); iter < m_SceneObjs.end();)
+		{
+			if ((*iter)->GetMaterial())
+			{
+				auto& ppt = (*iter)->GetMaterial()->GetOwnerMaterial()->GetMaterialProperty();
+				if (ppt.rendererMode != GetRendererMode())
+				{
+					GELOG_ERROR("Scene의 렌더러 모드와 Material의 렌더러모드가 일치 하지 않습니다.");
+					iter = m_SceneObjs.erase(iter);
+				}
+				else ++iter;
+			}
+		}
+	}
+
+	void DX12_Scene::PushLight(GE::SceneLight* light)
+	{
+		switch (light->GetType())
+		{
+		case GE::LightType::Directional:
+			m_DirectionalLight = static_cast<GE::DirectionalLight*>(light);
+			break;
+		case GE::LightType::Point:
+			m_PointLights.push_back(static_cast<GE::PointLight*>(light));
+			break;
+		case GE::LightType::Spot:
+			m_SpotLights.push_back(static_cast<GE::SpotLight*>(light));
+			break;
+		}
+
 	}
 
 	void DX12_Scene::FlushObjects()
 	{
+		m_DirectionalLight = nullptr;
 		m_SceneObjs.clear();
+		m_PointLights.clear();
+		m_SpotLights.clear();
 	}
 
 
@@ -48,10 +93,22 @@ namespace DX12
 		return m_Cam;
 	}
 
-	std::vector<GE::SceneObject*> DX12_Scene::GetPushedObjects() const
+	const std::vector<GE::SceneObject*>& DX12_Scene::GetPushedObjects() const
 	{
 		// 정렬 이나 카메라 컬링 후 배출
 		return m_SceneObjs;
+	}
+	GE::DirectionalLight* DX12_Scene::GetPushedDirectionalLight() const
+	{
+		return m_DirectionalLight;
+	}
+	const std::vector<GE::PointLight*>& DX12_Scene::GetPushedPointLights() const
+	{
+		return m_PointLights;
+	}
+	const std::vector<GE::SpotLight*>& DX12_Scene::GetPushedSpotLights() const
+	{
+		return m_SpotLights;
 	}
 	GE::Texture* DX12_Scene::GetSceneTexture() const
 	{

@@ -25,4 +25,8 @@
 #include <stack>
 #include <tuple>
 #include <shared_mutex>
+#include <imm.h>
 namespace fs = std::filesystem;
+
+
+#pragma comment(lib, "Imm32.lib")

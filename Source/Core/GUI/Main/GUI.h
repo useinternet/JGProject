@@ -18,13 +18,10 @@
 #include "GraphicsIF.h"
 
 
-namespace GUI
+
+namespace JGUI
 {
 	REGISTER_SYSTEM_CORE(GUI, 0, 0, 0)
-
-
-
-
 	class GUI_API GUI : public SystemCore
 	{
 	public:

@@ -56,7 +56,7 @@ namespace DX12
 			return m_ErrorCode;
 		}
 		virtual void GetTextureData(void* dataPtr) const override;
-
+		virtual const std::vector<std::pair<std::string, GE::Texture*>>& GetBindedTextures() const override;
 		virtual ~DX12_MaterialInstance() override {}
 	private:
 		struct DataBlock
@@ -158,7 +158,7 @@ namespace DX12
 
 		virtual bool DefineTexture(const std::string& name, GE::Texture* init_t) override;
 		virtual void UnDefineTexture(const std::string& name) override;
-
+		virtual const std::vector<std::pair<std::string, GE::Texture*>>& GetBindedTextures() const override;
 
 		// 추후 텍스쳐 선언하는것도 만들자
 		virtual GE::MaterialInstance* CreateMaterialInstance() override;

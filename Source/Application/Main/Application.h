@@ -43,6 +43,7 @@ private:
 	std::unique_ptr<JWindowManager> m_WindowManager;
 	std::unique_ptr<LogSystem>      m_LogSystem;
 	std::unique_ptr<EngineTimer>    m_EngineTimer;
+	std::unique_ptr<AssetManager>   m_AssetManager;
 	// SystemCore
 	std::vector<SystemCore*> m_SysCores;
 	std::vector<std::unique_ptr<Plugin>> m_SysPlugins;

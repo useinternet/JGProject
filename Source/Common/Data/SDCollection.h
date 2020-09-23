@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/JVector.h"
 #include "Math/JMatrix.h"
-
+#include "Data/Color.h"
 class PaperVertex
 {
 public:
@@ -106,4 +106,70 @@ public:
 	float lensHeight = 0.0f;
 	float farZ       = 0.0f;
 	float nearZ      = 0.0f;
+
+	JVector3 eyePos;
+};
+class SDPassData
+{
+public:
+	uint32_t PointLightCount = 0;
+	uint32_t SpotLightCount  = 0;
+	uint32_t DirectionalLightCount = 0;
+	uint32_t ShadowFilter    = 0;
+};
+class SDAmbientLight
+{
+
+public:
+	JVector4 ambient;
+};
+
+class SDPointLight
+{
+public:
+	JMatrix proj;
+	JMatrix viewProj[6];
+
+	JVector4 diffuse;
+
+	JVector3 position;
+	float att0 = 1.0f;
+
+	float att1 = 0.0f;
+	float att2 = 0.0f;
+	float inRange = 0.0f;
+	float outRange = 0.0f;
+	
+	float depthBias = 0.00001f;
+};
+class SDSpotLight
+{
+public:
+	JMatrix  viewProj;
+	JVector4 diffuse;
+
+	JVector3 position;
+	float att0 = 1.0f;
+	float att1 = 0.0f;
+	float att2 = 0.0f;
+	float inCone = 0.0f;
+	float outCone = 0.0f;
+
+	JVector3 dir;
+	float  inRange;
+
+	float  outRange;
+	float depthBias = 0.00001f;
+};
+class SDDirectionalLight
+{
+public:
+	JMatrix viewProj;
+	JColor   diffuse;
+	JVector3 dir;
+	float padding;
+	JVector4 depthBias;
+	JVector4 cascadeOffsetX;
+	JVector4 cascadeOffsetY;
+	JVector4 cascadeScale;
 };

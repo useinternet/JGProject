@@ -40,6 +40,7 @@ void Application::Init()
 	m_WindowManager = make_unique<JWindowManager>();
 	m_LogSystem = make_unique<LogSystem>();
 	m_EngineTimer = make_unique<EngineTimer>();
+	m_AssetManager = make_unique<AssetManager>();
 	m_LogSystem->Create("engineLog.txt");
 	/*
 	SystemCore 받아오기
@@ -77,14 +78,14 @@ void Application::Start()
 void Application::Update()
 {
 	m_EngineTimer->Tick();
-	{
-		Message msg;
-		msg.receiptID = GlobalSharedData::GetMessageBus()->GetID(GRAPHICS_ENGINE_MESSAGE_ID);
-		msg.msgID = GraphicsMessage::Msg_BeginDraw;
-		GlobalSharedData::GetMessageBus()->Send(msg);
-	}
+	//{
+	//	Message msg;
+	//	msg.receiptID = GlobalSharedData::GetMessageBus()->GetID(GRAPHICS_ENGINE_MESSAGE_ID);
+	//	msg.msgID = GraphicsMessage::Msg_BeginDraw;
+	//	GlobalSharedData::GetMessageBus()->Send(msg);
+	//}
 
-
+	GlobalSharedData::GetEventManager()->EventCall<void>(TT("GE::GraphicsEngine::GraphicsIF::BeginDraw"))();
 
 	static std::map<int, std::vector<SystemCore*>> update_sysCore;
 	if (update_sysCore.empty())
@@ -103,12 +104,14 @@ void Application::Update()
 		});
 	}
 
-	{
-		Message msg;
-		msg.receiptID = GlobalSharedData::GetMessageBus()->GetID(GRAPHICS_ENGINE_MESSAGE_ID);
-		msg.msgID = GraphicsMessage::Msg_EndDraw;
-		GlobalSharedData::GetMessageBus()->Send(msg);
-	}
+	GlobalSharedData::GetEventManager()->EventCall<void>(TT("GE::GraphicsEngine::GraphicsIF::EndDraw"))();
+
+	//{
+	//	Message msg;
+	//	msg.receiptID = GlobalSharedData::GetMessageBus()->GetID(GRAPHICS_ENGINE_MESSAGE_ID);
+	//	msg.msgID = GraphicsMessage::Msg_EndDraw;
+	//	GlobalSharedData::GetMessageBus()->Send(msg);
+	//}
 
 	GlobalSharedData::GetMessageBus()->Clear();
 }
@@ -156,6 +159,7 @@ bool Application::LoadConfig(const std::string& path)
 	sharedData.winManager = m_WindowManager.get();
 	sharedData.logSystem = m_LogSystem.get();
 	sharedData.engineTimer = m_EngineTimer.get();
+	sharedData.assetManager = m_AssetManager.get();
 	LinkSharedData(sharedData);
 
 
@@ -176,13 +180,7 @@ bool Application::LoadConfig(const std::string& path)
 		plugin->Load(buffer + ".dll");
 		if (plugin->IsValid())
 		{
-			if (buffer == "GameFrameWork")
-			{
-				auto func = plugin->GetProcAddress("_TestFunc");
-				int n = 0;
-			}
 			LINK_GLOBAL_SHARED_DATA(plugin);
-			//((GlobalSharedDataLinkFunc)plugin->GetProcAddress("LinkGlobalSharedData"))(sharedData);
 
 			SystemCore* core = ((SystemCoreLoadFunc)plugin->GetProcAddress("CreateSystemCore_" + buffer))();
 			core->Awake();

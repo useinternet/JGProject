@@ -1,6 +1,8 @@
 #pragma once
 #include "Data/SDCollection.h"
+#include "Math/JBBox.h"
 #include <vector>
+#include <string>
 
 
 
@@ -8,6 +10,13 @@
 class MeshGenerator
 {
 public:
+	struct StaticMeshData
+	{
+		std::vector<StaticVertex> v;
+		std::vector<uint32_t>     i;
+		JBBox bbox;
+	};
+	static bool LoadFromFile(const std::wstring& path, std::vector<StaticMeshData>& out_meshDatas);
 	// PaperVertex
 	static void Quad(float width, float height, float z,  std::vector<PaperVertex>& out_v, std::vector<uint32_t>& out_i)
 	{
@@ -78,30 +87,4 @@ public:
 		out_i[21] = 11; out_i[22] = 3; out_i[23] = 6;
 
 	}
-
-
-	static void Box(float x, float y, float z)
-	{
-
-
-
-
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 };

@@ -99,7 +99,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DX12_EXPORT;_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\ThirdParty\Include;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -116,7 +116,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DX12_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\ThirdParty\Include;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -137,7 +137,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DX12_EXPORT;_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\ThirdParty\Include;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -158,7 +158,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DX12_EXPORT;_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;..\Source\Core\GraphicsEngine\Main\Interface;..\Source\ThirdParty\Include;..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -171,6 +171,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ImportLibrary>dlls_libs\Release\DirectX12.lib</ImportLibrary>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -184,15 +185,17 @@
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\DirectXTex\filters.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\DirectXTex\scoped.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsDevice.h" />
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\d3dx12.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_MacroDeclaration.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.h" />
-    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_RenderingPass.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Scene.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneLight.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneObject.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Texture.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\d3dx12.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPassDefine.h" />
+    <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPasses.h" />
     <ClInclude Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -221,11 +224,13 @@
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsDevice.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_GraphicsRenderer.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Material.cpp" />
-    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_RenderingPass.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Scene.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneLight.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_SceneObject.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Screen.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\DX12_Texture.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPassDefine.cpp" />
+    <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\GEWrap\Pass\Graphics\GraphicPasses.cpp" />
     <ClCompile Include="..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -237,6 +242,9 @@
     <ProjectReference Include="GraphicsEngine.vcxproj">
       <Project>{AC8E76BE-985C-6AC4-81F0-DAEA6D5D4629}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

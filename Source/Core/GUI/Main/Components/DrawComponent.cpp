@@ -7,7 +7,7 @@
 using namespace std;
 
 
-namespace GUI
+namespace JGUI
 {
 	void DrawComponent::Awake()
 	{
@@ -15,6 +15,7 @@ namespace GUI
 		m_SceneObjectRef = GraphicsIF::RequestSceneObject();
 		m_SceneObjectRef->SetMeshType(GE::MeshType::Dynamic);
 		m_SceneObjectRef->BindInstanceData(&m_Instance, 1);
+		SetColor(JColor::White());
 	}
 	void DrawComponent::Start()
 	{
@@ -24,8 +25,7 @@ namespace GUI
 	void DrawComponent::Tick()
 	{
 		if (GetOwner()->GetOwnerWindow() == nullptr) return;
-
-
+		
 
 
 
@@ -53,28 +53,18 @@ namespace GUI
 
 			localRect.top    = -localRect.top;
 			localRect.bottom = -localRect.bottom;
-
 			ConvertVertexCoordinate(localRect);
-
 			ClearDirty();
-
-			if (m_IsAutoPriority)
-			{
-				Transform* p = GetOwner()->GetTransform();
-				m_Layer = GetOwner()->m_LayerComponent;
-				while (m_Layer == nullptr)
-				{
-					p = p->GetParent();
-					if (p == nullptr) break;
-					m_Layer = p->GetOwner()->m_LayerComponent;
-				}
-			}
 		}
 
 		m_Instance.world = GetOwner()->GetTransform()->GetWorldMatrix();
-		if (m_IsAutoPriority)
+		if (GetOwner()->GetFlags() & ElementFlag_TopMost)
 		{
-			if (m_Layer) m_DrawPriority = m_Layer->IssueLayer();
+			m_DrawPriority = GUIDraw_Priority_TopMostElement;
+		}
+		else if (m_IsAutoPriority)
+		{
+			if (GetOwner()->m_LayerComponent) m_DrawPriority = GetOwner()->m_LayerComponent->IssueLayer();
 			else m_DrawPriority = 0;
 		}
 
@@ -116,6 +106,7 @@ namespace GUI
 			}
 		}
 	}
+
 	void DrawComponent::ConvertVertexCoordinate(const JRect& localRect)
 	{
 		m_V[0].position = { localRect.left,  localRect.top, 0.0f };
@@ -160,6 +151,7 @@ namespace GUI
 
 	void ImageComponent::SetImage(const std::wstring& imagePath)
 	{
+		auto prevSource = m_ImageSource;
 		m_ImageSource = imagePath;
 		if (imagePath == TT("none"))
 		{
@@ -170,6 +162,22 @@ namespace GUI
 			m_SceneObjectRef->BindMaterial(GUIIF::GetGUIMaterialRef(GUI_PreGenerated_Material_Image).Get());
 			m_SceneObjectRef->GetMaterial()->BindTexture(GUI_MATERIAL_DATA_IMAGE, GraphicsIF::LoadTexture(m_ImageSource).Get());
 		}
+		if (prevSource == TT("none") && imagePath != TT("none") || prevSource != TT("none") && imagePath == TT("none"))
+		{
+			SetColor(m_Color);
+		}
+	}
+
+	GE::Texture* ImageComponent::GetTexture() const
+	{
+		if (m_ImageSource == TT("none")) return nullptr;
+		auto bindTextures = m_SceneObjectRef->GetMaterial()->GetBindedTextures();
+		for (auto& t_pair : bindTextures)
+		{
+			if (t_pair.first == GUI_MATERIAL_DATA_IMAGE) return t_pair.second;
+		}
+
+		return nullptr;
 	}
 
 
@@ -182,12 +190,23 @@ namespace GUI
 	}
 	void ShapeComponent::ConvertVertexCoordinate(const JRect& localRect)
 	{
-		if (m_ConvertVertexCoordinate) m_ConvertVertexCoordinate(localRect, m_V, m_I);
+		if (m_ConvertVertexCoordinate)
+		{
+			m_ConvertVertexCoordinate(localRect, m_V, m_I);
+		}
 	}
 	bool ShapeComponent::InteractionActive()
 	{
 		if (m_InteractionFunc) return m_InteractionFunc(GetOwner()->GetTransform()->GetRect());
 		else return false;
+	}
+
+	void ShapeComponent::ClearDirty()
+	{
+		if (m_ConvertVertexCoordinate)
+		{
+			DrawComponent::ClearDirty();
+		}
 	}
 
 
@@ -201,25 +220,39 @@ namespace GUI
 		SetFont(m_FontPath);
 	
 	}
-	void TextMeshComponent::ConvertVertexCoordinate(const JRect& localRect)
+	void TextMeshComponent::Tick()
 	{
 		if (m_Text.empty()) return;
+		DrawComponent::Tick();
+
+	}
+	void TextMeshComponent::ConvertVertexCoordinate(const JRect& localRect)
+	{
 		if (m_UpdateItem.State == UpdateItemState::Waiting)
 		{
-			m_UpdateItem.Font = m_Font;
-			m_UpdateItem.Text = m_Text;
-			m_UpdateItem.TextSize = m_TextSize;
-			m_UpdateItem.localRect = localRect;
-			m_UpdateItem.hAlign = m_HAlign;
-			m_UpdateItem.vAlign = m_VAlign;
-			m_UpdateItem.lineSpacing = m_LineSpacing;
-			m_UpdateItem.tabSize = m_TabSize;
-			m_UpdateItem.State = UpdateItemState::Run;
-			m_IsTextDirty = false;
-			m_UpdateTextTask.run([&]()
+			if (m_Text.empty())
 			{
-				UpdateTextMesh(m_UpdateItem);
-			});
+				m_UpdateItem.State = UpdateItemState::Compelete;
+			}
+			else
+			{
+				m_UpdateItem.Font = m_Font;
+				m_UpdateItem.Text = m_Text;
+				m_UpdateItem.TextSize = m_TextSize;
+				m_UpdateItem.localRect = localRect;
+				m_UpdateItem.hAlign = m_HAlign;
+				m_UpdateItem.vAlign = m_VAlign;
+				m_UpdateItem.lineSpacing = m_LineSpacing;
+				m_UpdateItem.tabSize = m_TabSize;
+				m_UpdateItem.State = UpdateItemState::Run;
+				m_UpdateTextTask.run([&]()
+				{
+					UpdateTextMesh(m_UpdateItem);
+				});
+			}
+
+			m_IsTextDirty = false;
+
 		}
 	}
 	bool TextMeshComponent::IsDirty()
@@ -280,6 +313,11 @@ namespace GUI
 		m_IsTextDirty = true;
 		m_TabSize = tabSize;
 	}
+	void TextMeshComponent::SetTextSize(float size)
+	{
+		m_IsTextDirty = true;
+		m_TextSize = size;
+	}
 	void TextMeshComponent::UpdateTextMesh(UpdateItem& item)
 	{
 		struct lineInfo
@@ -304,9 +342,7 @@ namespace GUI
 		float lineHeight = size_ratio * fileInfo.lineHeight;
 		for (uint32_t i = 0; i < len; ++i)
 		{
-
-
-
+			
 			if (item.Text[i] == '\n')
 			{
 				// 라인 초기화
@@ -326,8 +362,24 @@ namespace GUI
 				lineWidth += item.tabSize;
 				continue;
 			}
-
 			auto& charInfo = item.Font->GetCharInfo(item.Text[i]);
+			if (xOff + (float)charInfo.xadvance * size_ratio > item.localRect.right)
+			{
+
+				// 라인 초기화
+				WidthByLine[line].width = lineWidth;
+				WidthByLine[line].pos = i;
+				++line; lineWidth = 0.0f;
+
+
+				// yOffset
+				yOff -= (item.lineSpacing + lineHeight);
+				xOff = xStart;
+			}
+
+
+
+		
 			float xoffset = charInfo.xoffset * size_ratio;
 			float yoffset = charInfo.yoffset * size_ratio;
 
@@ -364,19 +416,7 @@ namespace GUI
 			iOff += 4;
 			xOff += (float)charInfo.xadvance * size_ratio;
 	
-			if (xOff > item.localRect.right)
-			{
-				
-				// 라인 초기화
-				WidthByLine[line].width = lineWidth;
-				WidthByLine[line].pos = i;
-				++line; lineWidth = 0.0f;
-
-
-				// yOffset
-				yOff -= (item.lineSpacing + lineHeight);
-				xOff = xStart;
-			}
+	
 			lineWidth += (float)charInfo.xadvance * size_ratio;
 			item.v.insert(item.v.end(), vv.begin(), vv.end());
 			item.i.insert(item.i.end(), ii.begin(), ii.end());

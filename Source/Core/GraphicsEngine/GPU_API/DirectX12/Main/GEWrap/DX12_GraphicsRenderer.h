@@ -3,7 +3,8 @@
 #include "SceneObject.h"
 #include "Material.h"
 #include "DirectXApi.h"
-
+#include "Pass/Graphics/GraphicPassDefine.h"
+#include "Pass/Graphics/GraphicPasses.h"
 namespace DX12
 {
 	REGISTER_GRAPHICS_INTERFACE_GRAPHICSRENDERER(DX12_GraphicsRenderer)
@@ -12,17 +13,7 @@ namespace DX12
 	class PassSetUpData;
 	class DX12_GraphicsRenderer : public GE::GraphicsRenderer
 	{
-	public:
-		enum class RootParam
-		{
-			Camera, // ConstantBuffer
-			Material, // ConstantBuffer
-			AnimData,
-			Object,
-			InputTexture, 
-			BindTexture,
-			RootParam_Count
-		};
+
 	public:
 		DX12_GraphicsRenderer();
 		virtual DX12_GraphicsRenderer::~DX12_GraphicsRenderer() override;
@@ -31,46 +22,35 @@ namespace DX12
 		virtual bool CompileMaterial(GE::Material* mat) override;
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
+	public:
+		bool GetPSO(GE::SceneObject* obj, GraphicsPipelineState& pso);
 	private:
-		struct PassData
-		{
-			using PassPool = std::vector<std::unique_ptr<DX12_RenderingPass>>;
-			using PassMap = std::unordered_map<std::string, DX12_RenderingPass*>;
-
-
-			PassPool passPool;
-			PassMap  passMap;
-		};
 		struct SceneInfo
 		{
-			std::vector<PassData*> passDatas;
+			std::vector<GraphicPassMap*> passDatas;
 			uint64_t dead_frame = 0;
 		};
 	private:
 		void Init();
-		bool GetPSO(GE::SceneObject* obj, GraphicsPipelineState& pso);
+
 		bool MakePSO(GE::Material* mat, GE::ObjectType objectType);
-		PassData* CreatePassData();
+		GraphicPassMap* CreatePassData();
 	private:
-		using PassSetUpDataMap = std::unordered_map<std::string, PassSetUpData>;
-		using PassDataPool     = std::vector<std::unique_ptr<PassData>>;
-		using PassDataQueue    = std::queue<PassData*>;
-		
+
+		using PassDataPool = std::vector<std::unique_ptr<GraphicPassMap>>;
+		using PassDataQueue = std::queue<GraphicPassMap*>;
+
 
 		bool m_IsSuccessed = true;
-		RootSignature m_RootSig;
-		
-
 
 		std::shared_mutex m_MaterialPSOsMutex;
 		std::unordered_map<size_t, GraphicsPipelineState>    m_MaterialPSOs;
+		GraphicsPipelineState m_ShadowStaticPSO;
+		GraphicsPipelineState m_ShadowSkinnedPSO;
 
 
 		// Pass Ãß°¡ 
-		Concurrency::task_group m_PassSetUpTaskGroup;
-		std::shared_mutex       m_SetUpMutex;
-		PassSetUpDataMap        m_SetUpDataMap;
-
+		GraphicPassMap      m_OriginPassMap;
 		PassDataPool        m_PassDataPool;
 		PassDataQueue       m_WaitingPassData;
 
@@ -79,8 +59,5 @@ namespace DX12
 
 
 		std::shared_mutex m_PassDataSceneMutex;
-		std::shared_mutex m_PassDataQueueMutex;
-		std::shared_mutex m_PassDataPoolMutex;
-		
 	};
 }

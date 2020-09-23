@@ -3,11 +3,14 @@
 
 #ifdef GAMEFRAMEWORK_EXPORT
 
-#define GFW_API __declspec(dllexport)
+#define GAMEFRAMEWORK_API __declspec(dllexport)
 
 #else
 
-#define GFW_API __declspec(dllimport)
+#define GAMEFRAMEWORK_API __declspec(dllimport)
 
 #endif
-//#include "CommonCore.h"
+#include "CommonCore.h"
+#include "GraphicsIF.h"
+
+//

@@ -98,15 +98,11 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;..\Source\Core\GraphicsEngine\Main;..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;..\Source\Core\GraphicsEngine\Main;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -117,7 +113,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;..\Source\Core\GraphicsEngine\Main;..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;..\Source\Core\GraphicsEngine\Main;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -125,10 +121,6 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -140,7 +132,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;..\Source\Core\GraphicsEngine\Main;..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;..\Source\Core\GraphicsEngine\Main;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -148,10 +140,6 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -163,7 +151,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;..\Source\Core\GraphicsEngine\Main;..\Source\Core\GraphicsEngine\GPU_API\DirectX12\Main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;..\Source\Core\GraphicsEngine\Main;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -171,10 +159,6 @@
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;..\UnitTest\UTWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -191,21 +175,11 @@
     <ClCompile Include="..\UnitTest\UTWindows\UTWindows.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\UnitTest\UTWindows\UTWindows.ico" />
-    <None Include="..\UnitTest\UTWindows\small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\UnitTest\UTWindows\UTWindows.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="Common.vcxproj">
       <Project>{8EEA3EAC-7A8C-6982-6347-7DD64F88F0D2}</Project>
     </ProjectReference>
-    <ProjectReference Include="DirectX12.vcxproj">
-      <Project>{5b877304-c7f1-277b-1030-d9207cd905d0}</Project>
-    </ProjectReference>
     <ProjectReference Include="GraphicsEngine.vcxproj">
-      <Project>{ac8e76be-985c-6ac4-81f0-daea6d5d4629}</Project>
+      <Project>{AC8E76BE-985C-6AC4-81F0-DAEA6D5D4629}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

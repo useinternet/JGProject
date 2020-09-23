@@ -255,11 +255,11 @@ namespace DX12
 
 
 		// Shader »ý¼º
-		static VertexShader  CreateVertexShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros);
-		static HullShader    CreateHullShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros);
-		static DomainShader  CreateDomainShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros);
-		static PixelShader   CreatePixelShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros);
-		static ComputeShader CreateComputeShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros);
+		static VertexShader  CreateVertexShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros = std::vector<std::pair<std::string, std::string>>());
+		static HullShader    CreateHullShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros = std::vector<std::pair<std::string, std::string>>());
+		static DomainShader  CreateDomainShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros = std::vector<std::pair<std::string, std::string>>());
+		static PixelShader   CreatePixelShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros = std::vector<std::pair<std::string, std::string>>());
+		static ComputeShader CreateComputeShaderFromFile(const std::string& path, const std::vector<std::pair<std::string, std::string>>& definedMacros = std::vector<std::pair<std::string, std::string>>());
 
 
 		
@@ -287,7 +287,7 @@ namespace DX12
 		static void SetViewports(GraphicsCommandKeyPtr cmdKey, const std::vector<Viewport>& viewports);
 		static void SetScissorRect(GraphicsCommandKeyPtr cmdKey, const ScissorRect& rect);
 		static void SetScissorRects(GraphicsCommandKeyPtr cmdKey, const std::vector<ScissorRect>& rects);
-		static void ClearRenderTarget(GraphicsCommandKeyPtr cmdKey, RenderTarget& renderTarget, bool is_depthClear = true);
+		static void ClearRenderTarget(GraphicsCommandKeyPtr cmdKey, RenderTarget& renderTarget, D3D12_CLEAR_FLAGS clearFlags = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL);
 		static void SetRenderTarget(GraphicsCommandKeyPtr cmdKey, RenderTarget& renderTarget);
 		static void BindRootSignature(GraphicsCommandKeyPtr cmdKey, RootSignature& rootSig);
 		static void BindPipelineState(GraphicsCommandKeyPtr cmdKey, GraphicsPipelineState& pso);
@@ -1157,6 +1157,7 @@ namespace DX12
 				{
 					m_Textures[i].Resize(width, height);
 				}
+				else break;
 			}
 			if (m_DepthTexture.IsValid())
 				m_DepthTexture.Resize(width, height);
@@ -1167,7 +1168,9 @@ namespace DX12
 			 
 			*m_RTVDescs[slot] = desc;
 		}
-
+		void SetNullRTVDesc(int slot) {
+			m_RTVDescs[slot] = nullptr;
+		}
 		D3D12_RENDER_TARGET_VIEW_DESC* GetRTVDesc(int slot) const {
 			return m_RTVDescs[slot].get();
 		}
@@ -1191,6 +1194,11 @@ namespace DX12
 			*m_DSVDesc = desc;
 
 		}
+		void SetNullDSVDesc()
+		{
+			m_DSVDesc = nullptr;
+		}
+
 		D3D12_DEPTH_STENCIL_VIEW_DESC* GetDSVDesc() const {
 			return m_DSVDesc.get();
 		}

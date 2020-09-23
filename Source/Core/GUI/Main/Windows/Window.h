@@ -1,10 +1,11 @@
 #pragma once
+#include <map>
 #include "GUIObject.h"
 
 #if defined CreateWindow
 #undef CreateWindow
 #endif
-namespace GUI
+namespace JGUI
 {
 	class GUI_API Window : public GUIObject
 	{
@@ -33,7 +34,7 @@ namespace GUI
 		virtual void OnMouseClick(KeyCode bt)       {}
 		virtual void OnMouseDoubleClick(KeyCode bt) {}
 
-
+		virtual void OnChar(wchar_t c) {}
 		virtual void OnMouseEnter() {}
 		virtual void OnMouseMove() {}
 		virtual void OnMouseExit()  {}
@@ -48,12 +49,15 @@ namespace GUI
 		virtual void OnFocusEnter() {}
 		virtual void OnFocus() {}
 		virtual void OnFocusExit() {}
+
+		virtual void OnDropItem(const GUIDropItem& item) {}
 	public: // 생성 관련
 		template<typename T>
 		T* CreateElement(const std::wstring& name, ElementFlags flags = ElementFlag_None) {
 			T* element = GUIIF::AllocateGUIObject<T>();
 			element->SetName(name);
 			element->m_OwnerWindow = this;
+			element->m_Flags = flags;
 			element->GUIAwake();
 			element->GetTransform()->SetParent(m_ElementRoot->GetTransform());
 			return element;
@@ -84,14 +88,12 @@ namespace GUI
 
 		void SetFocusWindow(Window* win);
 		void SetFocusElement(Element* element);
+		JRect GetClientRect() const;
 	public:
 		Transform* GetTransform() const;
 		JVector2   GetMousePos() const;
 		void SetBackGroundColor(const JColor& color);
 		void SetFlags(WindowFlags flag);
-		uint64_t IssueDrawPriority() {
-			return m_ElementDrawPriorityOffset++;
-		}
 		uint64_t GetDrawPriority() const {
 			return m_DrawPriority;
 		}
@@ -109,6 +111,8 @@ namespace GUI
 		void ReceiveKeyEvent(KeyCode code);
 		void ReceiveMouseMoveEvent(const JVector2& delta);
 		void ReceiveFocusEvent(int exit);
+		void ReceiveDropItemEvent(const GUIDropItem& item);
+		void ReceiveCharEvent(wchar_t s);
 	private:
 		void CreateRootElement();
 		void SceneUpdate();
@@ -117,16 +121,17 @@ namespace GUI
 		void SettingUpdate();
 		void FocusWindowUpdate(Window* focusedWin);
 		void TrackingFocusWindow();
-		void TrackingFocusElement();
+		void TrackingFocusElement(bool is_under);
+		void TrackingItemFlush(Element* prevFocusElement);
 	private:
 		struct EssentialElementCollection
 		{
-			class Border*     border     = nullptr;
-			class ResizeGrip* resizeGrip = nullptr;
-			class TitleBar*   titleBar = nullptr;
-			class Button*     closeBt = nullptr;
-			class Button*     hideBt = nullptr;
-			class Button*     maxBt = nullptr;
+			class Element* border     = nullptr;
+			class Element* resizeGrip = nullptr;
+			class Element* titleBar = nullptr;
+			class Element* closeBt = nullptr;
+			class Element* hideBt = nullptr;
+			class Element* maxBt = nullptr;
 		};
 
 		/*
@@ -138,9 +143,14 @@ namespace GUI
 
 		// Setting Var
 		WindowFlags m_Flags;
-		bool  m_IsMouseDown  = false;
+		JRect m_WorkAreaOff;
+		bool  m_IsMouseDown      = false;
 		bool  m_IsPrevMouseEnter = false;
-
+		bool  m_IsMaximizeState  = false;
+		//bool  m_Maximizing       = false;
+		JRect    m_RestoreWindowRect;
+		JVector2 m_RestorePivot;
+		
 		// Double Click Var
 		bool     m_IsMouseClick = false;
 		KeyCode  m_MouseClickedButton;
@@ -154,7 +164,6 @@ namespace GUI
 
 		// Window Priority
 		uint64_t m_DrawPriority              = GUIDraw_Priority_Window;
-		uint64_t m_ElementDrawPriorityOffset = GUIDraw_Priority_Element;
 
 
 		// ChildWindow
@@ -165,6 +174,9 @@ namespace GUI
 		using InteractionItemPool = std::unordered_map<Element*, std::shared_ptr<GUIInteractionItem>>;
 		Element* m_ElementRoot = nullptr;
 		InteractionItemPool m_InteractionItems;
+		std::stack<GUIInteractionItem*> m_IteractionStack;
+		std::map<uint64_t, std::vector<GUIInteractionItem*>> m_UnderInteractionItems;
+		std::map<uint64_t, std::vector<GUIInteractionItem*>> m_AboveInteractionItems;
 
 		EssentialElementCollection m_Collection;
 		bool m_IsExecuteStart = false;

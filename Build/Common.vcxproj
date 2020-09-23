@@ -95,7 +95,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_DEVELOP_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -111,7 +111,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -131,7 +131,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE_ONDEBUG;_DEVELOP_GAME_ONRELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -151,7 +151,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE;_GAME_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\Common;..\Source\ThirdParty\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -166,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Common\App\AssetManager.h" />
     <ClInclude Include="..\Source\Common\App\EngineTimer.h" />
     <ClInclude Include="..\Source\Common\App\Event.h" />
     <ClInclude Include="..\Source\Common\App\GlobalSharedData.h" />
@@ -175,11 +176,16 @@
     <ClInclude Include="..\Source\Common\App\Plugin.h" />
     <ClInclude Include="..\Source\Common\App\SystemCore.h" />
     <ClInclude Include="..\Source\Common\CommonCore.h" />
+    <ClInclude Include="..\Source\Common\Data\Builder.h" />
     <ClInclude Include="..\Source\Common\Data\Color.h" />
     <ClInclude Include="..\Source\Common\Data\KeyCode.h" />
     <ClInclude Include="..\Source\Common\Data\SDCollection.h" />
+    <ClInclude Include="..\Source\Common\Math\JBBox.h" />
+    <ClInclude Include="..\Source\Common\Math\JFrustum.h" />
     <ClInclude Include="..\Source\Common\Math\JMatrix.h" />
+    <ClInclude Include="..\Source\Common\Math\JPlane.h" />
     <ClInclude Include="..\Source\Common\Math\JQuaternion.h" />
+    <ClInclude Include="..\Source\Common\Math\JRay.h" />
     <ClInclude Include="..\Source\Common\Math\JRect.h" />
     <ClInclude Include="..\Source\Common\Math\JVector.h" />
     <ClInclude Include="..\Source\Common\Math\Math.h" />
@@ -188,6 +194,7 @@
     <ClInclude Include="..\Source\Common\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Common\App\AssetManager.cpp" />
     <ClCompile Include="..\Source\Common\App\EngineTimer.cpp" />
     <ClCompile Include="..\Source\Common\App\GlobalSharedData.cpp" />
     <ClCompile Include="..\Source\Common\App\JWindow.cpp" />
@@ -195,9 +202,12 @@
     <ClCompile Include="..\Source\Common\App\Message.cpp" />
     <ClCompile Include="..\Source\Common\App\Plugin.cpp" />
     <ClCompile Include="..\Source\Common\App\SystemCore.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JFrustum.cpp" />
     <ClCompile Include="..\Source\Common\Math\JMatrix.cpp" />
+    <ClCompile Include="..\Source\Common\Math\JPlane.cpp" />
     <ClCompile Include="..\Source\Common\Math\JQuaternion.cpp" />
     <ClCompile Include="..\Source\Common\Math\JVector.cpp" />
+    <ClCompile Include="..\Source\Common\Utill\MeshGenerater.cpp" />
     <ClCompile Include="..\Source\Common\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

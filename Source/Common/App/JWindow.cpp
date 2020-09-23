@@ -190,15 +190,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	auto windowManager = GlobalSharedData::GetWindowManager();
 
-	switch (msg)
-	{
-	case WM_DESTROY:
-		if (windowManager->MainhWnd == hWnd)
-		{
-			PostQuitMessage(0);
-		}
-		break;
-	}
+
 	if (windowManager)
 	{
 		Concurrency::task_group tasks;
@@ -212,6 +204,14 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		tasks.wait();
 	}
-
+	switch (msg)
+	{
+	case WM_DESTROY:
+		if (windowManager->MainhWnd == hWnd)
+		{
+			PostQuitMessage(0);
+		}
+		return 0;
+	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }

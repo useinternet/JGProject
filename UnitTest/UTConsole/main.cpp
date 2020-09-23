@@ -6,39 +6,34 @@ using namespace std;
 
 class A
 {
+	int* n = nullptr;
 public:
-	virtual void print() const
+	A()
 	{
-		cout << "A" << endl;
+		n = new int;
+		*n = 5;
+		printf("%d \n", *n);
+	}
+	A(const A& a)
+	{
+		n = a.n;
+	}
+	A& operator=(const A& a)
+	{
+		n = a.n;
+		return *this;
+	}
+	~A()
+	{
+		printf("%d ", (*n) * 2);
+		delete n;
+		n = nullptr;
 	}
 };
-
-class B : public A
-{
-public:
-	virtual void print() const
-	{
-		cout << "B" << endl;
-	}
-};
-
-class C : public A
-{
-public:
-	virtual void print() const
-	{
-		cout << "C" << endl;
-	}
-};
-
-
-void sampleFunc(const A& a)
-{
-	a.print();
-}
 int main()
 {
-	C c;
-	sampleFunc(c);
+	A a;
+
+	A b = a;
 
 }

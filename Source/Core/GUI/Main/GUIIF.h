@@ -11,7 +11,7 @@
 #define GUILOG_ERROR(contents, ...) GUILOG(LogLevel::Error, contents, __VA_ARGS__)
 #define GUILOG_FATAL(contents, ...) GUILOG(LogLevel::Fatal, contents, __VA_ARGS__)
 
-namespace GUI
+namespace JGUI
 {
 	class GUIObject;
 	class Element;
@@ -48,9 +48,13 @@ namespace GUI
 		static JFont*      LoadFont(const std::wstring& path);
 		static MaterialRef GetGUIMaterialRef(GUI_PreGenerated_Material m);
 		static Window*     GetMainWindow();
+		static void SetCursorPos(const JVector2& pos);
 		static JVector2    GetCursorPos() {
 			return GetInstance()->m_IO.MousePos;
 		}
+		static void CursorLock(const JRect& area);
+		static void CursorUnLock();
+		static void CursorVisible(bool is_visible);
 
 		static GUIIO& GetIO();
 		static GUIStyle& GetStyle();
@@ -121,7 +125,16 @@ namespace GUI
 		class Window* m_MainWindow = nullptr;
 		class Window* m_SelectedWindow = nullptr;
 		class Window* m_FocusWindow = nullptr;
+
+
+		bool m_IsCloseApp = false;
 	};
 }
 
-#define REGISTER_MAIN_WINFORM(classType, titleName, flag) class classType; extern "C" __declspec(dllexport) void _CreateMainWindowForm() { GUI::GUIIF::CreateMainWindowForm<##classType>(##titleName,##flag); }
+#define REGISTER_MAIN_WINFORM(classType, titleName, flag) \
+REGISTER_GLOBAL_SHARED_DATA \
+class classType; \
+extern "C" __declspec(dllexport) void _CreateMainWindowForm() \
+{ \
+JGUI::GUIIF::CreateMainWindowForm<##classType>(##titleName,##flag);\
+} \

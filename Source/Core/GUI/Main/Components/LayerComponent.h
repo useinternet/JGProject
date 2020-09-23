@@ -2,7 +2,7 @@
 
 #include "Component.h"
 
-namespace GUI
+namespace JGUI
 {
 	class GUI_API LayerComponent : public Component
 	{
@@ -15,12 +15,8 @@ namespace GUI
 		void SetLayer(uint64_t layer) {
 			m_Layer = layer;
 		}
-		uint64_t GetLayer() const {
-			return m_Layer;
-		}
-		uint64_t IssueLayer() {
-			return m_Layer + m_LayerOffset++;
-		}
+		uint64_t GetLayer() const; 
+		uint64_t IssueLayer(); 
 	public:
 		uint64_t m_Layer = 0;
 		uint64_t m_LayerOffset = 0;

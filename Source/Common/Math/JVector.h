@@ -5,6 +5,7 @@
 
 
 //
+class JQuaternion;
 class JMatrix;
 class JColor;
 template<typename T>
@@ -143,6 +144,7 @@ public:
 			return true;
 		return false;
 	}
+
 private:
 	inline static DirectX::XMVECTOR GetSIMD(const JVector2& v)
 	{
@@ -159,6 +161,7 @@ private:
 		DirectX::XMStoreFloat2(&value, sim_vec);
 		in_v.x = value.x; in_v.y = value.y;
 	}
+	
 
 };
 class JVector4
@@ -170,9 +173,75 @@ public:
 	JVector4(float x, float y, float z, float w) :
 		x(x), y(y), z(z), w(w) {}
 	JVector4(const JColor& c);
+public:
+	inline JVector4 operator*(float k) const {
+		return JVector4(x * k, y * k, z * k, w * k);
+	}
+	inline JVector4 operator/(float k) const {
+		float inv_k = 1.0f / k;
+		return JVector4(x * inv_k, y * inv_k, z * inv_k, w * inv_k);
+	}
+	inline JVector4& operator*=(float k) {
+		x *= k; y *= k; z *= k; w *= k;
+		return *this;
+	}
+	inline 	JVector4& operator/=(float k) {
+		float inv_k = 1.0f / k;
+		x *= inv_k; y *= inv_k; z *= inv_k; w *= inv_k;
+		return *this;
+	}
+public:
+	inline float& operator[](int idx) {
+		switch (idx)
+		{
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		case 3:
+			return w;
+		}
+		assert(false && "Vector Index exceed..");
+		return x;
+	}
+	inline float At(int idx) const {
+		switch (idx)
+		{
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		case 3:
+			return w;
+		}
+		assert(false && "Vector Index exceed..");
+		return FLT_MAX;
+
+	}
+public:
+	inline static DirectX::XMVECTOR GetSIMD(const JVector4& v)
+	{
+		DirectX::XMFLOAT4 value(v.x, v.y, v.z,v.w);
+		return DirectX::XMLoadFloat4(&value);
+	}
+	inline static JVector4 ConvertJVector4(DirectX::XMVECTOR sim_vec) {
+		DirectX::XMFLOAT4 value;
+		DirectX::XMStoreFloat4(&value, sim_vec);
+		return JVector4(value.x, value.y, value.z, value.w);
+	}
+	inline static void ConvertJVector4(DirectX::XMVECTOR sim_vec, JVector4& in_v) {
+		DirectX::XMFLOAT4 value;
+		DirectX::XMStoreFloat4(&value, sim_vec);
+		in_v.x = value.x; in_v.y = value.y; in_v.z = value.z; in_v.w = value.w;
+	}
 };
 class JVector3
 {
+	friend JQuaternion;
 	friend JMatrix;
 	using SimVec = DirectX::XMVECTOR;
 public:
@@ -181,6 +250,7 @@ public: // 생성자 및 소멸자
 	JVector3() : x(0), y(0), z(0) {}
 	JVector3(float init_value) : x(init_value), y(init_value), z(init_value) {}
 	JVector3(float x, float y, float z) : x(x), y(y), z(z) {}
+	JVector3(const JVector4& v) : x(v.x), y(v.y), z(v.z) {}
 	JVector3(const JVector3& v) = default;
 	JVector3(JVector3&& v) = default;
 public: // 연산자
@@ -231,6 +301,19 @@ public: // 연산자
 		assert(false && "Vector Index exceed..");
 		return x;
 	}
+	inline float At(int idx) const {
+		switch (idx)
+		{
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		}
+		assert(false && "Vector Index exceed..");
+		return FLT_MAX;
+	}
 public: // 기능들
 	inline void  Set(float x, float y, float z) {
 		this->x = x;
@@ -272,8 +355,9 @@ public: // static 기능
 			return true;
 		return false;
 	}
+	static JVector3 UnProject(const JVector3& v, const JMatrix& proj, const JMatrix& view, const JMatrix& world, const JVector2& viewPortXY, const JVector2& viewportSize, float minZ = 0.0F, float maxZ = 1.0F);
 private:
-	inline static DirectX::XMVECTOR GetSIMD(const JVector3& v)
+	inline static DirectX::XMVECTOR GetSIMD(const JVector3& v) 
 	{
 		DirectX::XMFLOAT3 value(v.x, v.y, v.z);
 		return DirectX::XMLoadFloat3(&value);
@@ -294,3 +378,4 @@ private:
 
 JVector2 operator* (float k, const JVector2& v);
 JVector3 operator* (float k, const JVector3& v);
+JVector4 operator* (float k, const JVector4& v);

@@ -8,11 +8,11 @@
 #include "GUIDefine.h"
 #include "GUIIF.h"
 
-#include <string>
+#include <string>	
 
 
 
-namespace GUI
+namespace JGUI
 {
 	class GUI_API GUIObject
 	{
