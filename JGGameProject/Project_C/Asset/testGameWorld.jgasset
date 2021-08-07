@@ -1,0 +1,278 @@
+{
+    "AssetFormat": 6,
+    "Asset": {
+        "Name": "GameWorld",
+        "Components": [
+            {
+                "ComponentType": "JG::Transform",
+                "Name": "Transform",
+                "IsActive": true,
+                "Location": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        ],
+        "Childs": [
+            {
+                "Name": "EditorCamera",
+                "Components": [
+                    {
+                        "ComponentType": "JG::Transform",
+                        "Name": "Transform",
+                        "IsActive": true,
+                        "Location": [
+                            1.7248830795288087,
+                            0.5505553483963013,
+                            -10.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.9999810457229614,
+                            0.9999750852584839,
+                            0.9999850392341614
+                        ]
+                    },
+                    {
+                        "ComponentType": "JG::EditorCamera",
+                        "Name": "EditorCamera",
+                        "IsActive": true,
+                        "Resolution": [
+                            1920.0,
+                            1080.0
+                        ],
+                        "NearZ": 0.0010000000474974514,
+                        "FarZ": 10000.0,
+                        "FOV": 90.0,
+                        "ClearColor": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "CullingLayerMask": 18446744073709551615,
+                        "IsOrthographic": false
+                    }
+                ],
+                "Childs": []
+            },
+            {
+                "Name": "QuadList",
+                "Components": [
+                    {
+                        "ComponentType": "JG::Transform",
+                        "Name": "Transform",
+                        "IsActive": true,
+                        "Location": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                "Childs": [
+                    {
+                        "Name": "Quad",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    250.0,
+                                    10.0,
+                                    9.113713161923443e-8
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.000001534284479021153,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::SpriteRenderer",
+                                "Name": "SpriteRenderer",
+                                "IsActive": true,
+                                "Color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "SpritePath": "Asset\\Resources\\UV.Grid.jgasset"
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Cube",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    4.5495405197143559,
+                                    -0.03335118293762207,
+                                    0.0
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
+                                "Materials": {}
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Quad2",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    -210.0,
+                                    -25.0,
+                                    1.2151616601840943e-7
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::SpriteRenderer",
+                                "Name": "SpriteRenderer",
+                                "IsActive": true,
+                                "Color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "SpritePath": "Asset\\Resources\\NullTexture.jgasset"
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Sphere",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    -0.45045945048332217,
+                                    -0.03335118293762207,
+                                    -5.0
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    0.9999995231628418,
+                                    0.9999995231628418,
+                                    0.9999901652336121
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Sphere.001.jgasset",
+                                "Materials": {}
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "object",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    5.216736316680908,
+                                    0.0,
+                                    -5.0
+                                ],
+                                "Rotation": [
+                                    313.4741516113281,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    0.9999934434890747,
+                                    0.9999934434890747
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Torus.jgasset",
+                                "Materials": {}
+                            }
+                        ],
+                        "Childs": []
+                    }
+                ]
+            }
+        ]
+    }
+}

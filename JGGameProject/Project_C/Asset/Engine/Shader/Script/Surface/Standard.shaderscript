@@ -1,0 +1,19 @@
+_Resources {
+	Texture2D NormalTexture;
+}
+
+
+_Variables {
+	float  TestValue;
+	float4 TestColor;
+}
+
+_Init {
+	TestValue = 1.0f;
+	TestColor = { 1.0f, 1.0f, 1.0f 1.0f }
+}
+
+
+_Surface {
+	_output.albedo = float4(TestColor);
+}
