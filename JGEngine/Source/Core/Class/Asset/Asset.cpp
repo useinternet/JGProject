@@ -6,7 +6,7 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Material.h"
-
+#include "ExternalImpl/JGImGui.h"
 #include "Imgui/imgui.h"
 namespace JG
 {
@@ -167,10 +167,6 @@ if (val)
 			ShaderScript = val->GetString();
 		}
 	}
-
-
-
-
 	void AssetInspectorGUI::InspectorGUI(IAsset* targetAsset)
 	{
 		if (targetAsset == nullptr)
@@ -196,7 +192,7 @@ if (val)
 		{
 			auto type = property.first;
 			auto name = property.second;
-			ImGui::Text(ShaderDataTypeToString(type).c_str());
+			ImGui::Text(name.c_str()); ImGui::SameLine();
 			switch (property.first)
 			{
 			case EShaderDataType::_int:
@@ -285,7 +281,7 @@ if (val)
 			{
 				f32 value;
 				material->GetFloat(name, &value);
-				if (ImGui::InputFloat2("##Material_InputFloat", (f32*)&(value)) == true)
+				if (ImGui::InputFloat("##Material_InputFloat", (f32*)&(value)) == true)
 				{
 					material->SetFloat(name, value);
 				}
@@ -321,49 +317,32 @@ if (val)
 				}
 			}
 				break;
-			case EShaderDataType::_float3x3:
-				break;
-			case EShaderDataType::_float4x4:
-				break;
 			case EShaderDataType::texture2D:
+			{
+				String resourcePath;
+				SharedPtr<ITexture> texture = nullptr;
+				material->GetTexture(name, 0, &texture);
+
+				if (texture != nullptr)
+				{
+					auto texutreID = JGImGui::GetInstance().ConvertImGuiTextureID(texture->GetTextureID());
+					ImGui::Image((ImTextureID)texutreID, ImVec2(200, 200));
+				}
+				if (ImGui::AssetField("##TextureAssetField", resourcePath, EAssetFormat::Texture, resourcePath) == true)
+				{
+					auto assetID = AssetDataBase::GetInstance().LoadOriginAsset(resourcePath);
+					auto asset = AssetDataBase::GetInstance().GetAsset<ITexture>(assetID);
+					if (asset && asset->Get())
+					{
+						material->SetTexture(name, 0, asset->Get());
+					}
+				}
+			}
 				break;
 			default:
 				break;
 			}
-
-			//switch (property.first)
-			//{
-			//case EShaderDataType::texture2D:
-			//	break;
-			//case EShaderDataType::_float:
-			//	break;
-			//case EShaderDataType::_float2:
-			//	break;
-			//case EShaderDataType::_float3:
-			//	break;
-			//case EShaderDataType::_float4:
-			//	break;
-			//case EShaderDataType::_uint:
-			//	break;
-			//case EShaderDataType::texture2D:
-			//	break;
-			//case EShaderDataType::texture2D:
-			//	break;
-			//case EShaderDataType::texture2D:
-			//	break;
-			//case EShaderDataType::texture2D:
-			//	break;
-			//case EShaderDataType::texture2D:
-			//	break;
-			//}
-
-
 		}
-
-
-
-
-
 
 		if (ImGui::Button("Save") == true)
 		{
@@ -487,7 +466,33 @@ if (val)
 	}
 	AssetID AssetDataBase::LoadReadWriteAsset(AssetID originID)
 	{
-		return AssetID();
+		auto iter = mAssetDataPool.find(originID);
+		if (iter == mAssetDataPool.end())
+		{
+			return AssetID();
+		}
+		auto assetRWID = RequestRWAssetID(originID);
+		auto originAssetData = mAssetDataPool[originID].get();
+
+
+
+		auto assetData = CreateUniquePtr<AssetData>();
+		assetData->ID    = assetRWID;
+		assetData->State = EAssetDataState::Loading;
+		assetData->Path  = originAssetData->Path;
+		assetData->RefCount = 1;
+		
+
+		AssetLoadData assetLoadData;
+		assetLoadData.ID = assetRWID;
+		strcpy(assetLoadData.Path, assetData->Path.c_str());
+
+
+
+		mLoadAssetDataQueue.push(assetLoadData);
+		mAssetDataPool.emplace(assetRWID, std::move(assetData));
+
+		return assetRWID;
 	}
 	void AssetDataBase::UnLoadAsset(AssetID id)
 	{
@@ -644,7 +649,11 @@ if (val)
 					if (iter != mAssetDataPool.end())
 					{
 						JG_CORE_ERROR("Asset Load Fail  : {0}", iter->second->Path);
-						mOriginAssetDataPool.erase(iter->second->Path);
+						if (compeleteData.ID.IsOrigin())
+						{
+							mOriginAssetDataPool.erase(iter->second->Path);
+						}
+		
 						mAssetDataPool.erase(compeleteData.ID);
 					}
 				}

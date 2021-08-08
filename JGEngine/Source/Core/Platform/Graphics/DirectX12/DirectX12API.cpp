@@ -38,9 +38,6 @@ namespace JG
 	static SharedPtr<ComputePipelineState>  gComputePSO;
 	static SharedPtr<RootSignature> gRootSignature;
 
-
-	// thread id = rendererID, commandList È¹µæ  =  FrameBufferf
-	// mutex = 
 	EGraphicsAPI DirectX12API::GetAPI() const
 	{
 		return EGraphicsAPI::DirectX12;
@@ -232,7 +229,6 @@ namespace JG
 		gComputePSO    = CreateSharedPtr<ComputePipelineState>();
 		gRootSignature = CreateSharedPtr<RootSignature>();
 
-
 		JG_CORE_INFO("DirectX12 Init End");
 		return true;
 	}
@@ -254,11 +250,6 @@ namespace JG
 		RootSignature::ClearCache();
 		ResourceStateTracker::ClearCache();
 
-		//gGraphicsCommandLists.clear();
-		//gComputeCommandLists.clear();
-		//gCopyCommandLists.clear();
-
-		
 		gCSUAllocator.reset();
 		gRTVAllocator.reset();
 		gDSVAllocator.reset();

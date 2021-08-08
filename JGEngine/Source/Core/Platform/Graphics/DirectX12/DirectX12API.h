@@ -10,7 +10,7 @@ struct ID3D12Resource;
 struct D3D12_DEPTH_STENCIL_DESC;
 struct D3D12_RENDER_TARGET_BLEND_DESC;
 struct D3D12_RASTERIZER_DESC;
-
+struct D3D12_CPU_DESCRIPTOR_HANDLE;
 namespace JG
 {
 	class ITexture;
@@ -24,7 +24,6 @@ namespace JG
 	class GraphicsPipelineState;
 	class ComputePipelineState;
 	class TextureAssetStock;
-
 	class DirectX12API : public IGraphicsAPI
 	{
 	public:

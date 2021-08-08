@@ -39,6 +39,6 @@ namespace JG
 	private:
 		void OnInspector_MeshGUI();
 		void OnInspector_MaterialGUI();
-		void OnInspector_MaterialPropertyGUI(SharedPtr<IMaterial> material);
+		void OnInspector_MaterialPropertyGUI(Asset<IMaterial>* materialAsset);
 	};
 }

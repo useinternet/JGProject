@@ -184,6 +184,7 @@ namespace JG
 	}
 	void JGImGui::NewFrame()
 	{
+		DirectX12::gCurrentSrvIndex = DirectX12::gSrvStartIndex;
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();

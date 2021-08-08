@@ -47,6 +47,7 @@ struct PS_SURFACE_INPUT
 	float3 normal;
 	float3 tangent;
 	float3 bitangent;
+	float2 tex;
 };
 
 PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
@@ -71,21 +72,28 @@ VS_OUT vs_main(VS_IN vin)
 	vout.posH = mul(float4(posW, 1.0f), gViewProj);
 	vout.posW = posW;
 	vout.normalW = normalize(normalW);
+	vout.tanW = normalize(tanW);
+	vout.bitW = normalize(bitW);
 	vout.tex   = vin.tex;
 	return vout;
 }
+
 float4 ps_main(VS_OUT pin) : SV_TARGET
 {
 	PS_SURFACE_INPUT input;
+	input.position = pin.posW;
+	input.normal   = normalize(pin.normalW);
+	input.tangent  = normalize(pin.tanW);
+	input.bitangent = normalize(pin.bitW);
+	input.tex       = pin.tex;
 	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
 
 	float3 dirLightColor = float3(0.9f, 0.95f, 1.0f);
 	float3 dirLight = float3(0.0f, 0.0f, 1.0f);
-
-	float4 ambientLight = float4(0.2f, 0.2f, 0.25f, 1.0f);
+	float4 ambientLight = output.albedo * float4(0.2f, 0.2f, 0.25f, 1.0f);
 
 	float3 N = normalize(pin.normalW);
 	float3 L = normalize(-dirLight);
 	float NdotL = saturate(dot(N,L));
-	return output.albedo * NdotL + ambientLight;
+	return  output.albedo * NdotL + ambientLight;
 }

@@ -15,10 +15,6 @@ namespace JG
 	StaticMeshRenderer::StaticMeshRenderer()
 	{
 		mStaticRI = CreateSharedPtr<StandardStaticMeshRenderItem>();
-		// Material Asset
-		//mStaticRI->Materials.resize(1);
-		//mStaticRI->Materials[0] = IMaterial::Create("DefaultMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Standard3DShader, { "StandardScript" }));
-		//mStaticRI->Materials[0]->SetFloat4("TestColor", JVector4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 	void StaticMeshRenderer::Awake()
 	{
@@ -85,8 +81,7 @@ namespace JG
 			{
 				auto material = val->GetJsonDataFromIndex(i);
 				auto path = material->GetString();
-
-				mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMaterial>(path);
+				mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
 
 			}
 		}
@@ -117,10 +112,11 @@ namespace JG
 			}
 		}
 		mStaticRI->Materials.resize(matAssetCnt);
+
 		if (matAssetCnt == 0 && mStaticRI->Materials.empty()) {
 			if (mNullMaterial == nullptr)
 			{
-				mNullMaterial = IMaterial::Create("DefaultMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
+				mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
 			}
 			mStaticRI->Materials.push_back(mNullMaterial);
 		}
@@ -165,7 +161,11 @@ namespace JG
 		}ImGui::SameLine();
 		if (ImGui::SmallButton("-"))
 		{
-			mMaterialAssetHandleList.pop_back();
+			if (mMaterialAssetHandleList.empty() == false)
+			{
+				mMaterialAssetHandleList.pop_back();
+			}
+
 		}
 
 
@@ -183,13 +183,13 @@ namespace JG
 
 				if (ImGui::AssetField("Slot " + std::to_string(i), in, EAssetFormat::Material, out))
 				{
-					mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMaterial>(out);
+					mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
 				}
 				if (ImGui::TreeNodeEx("Property"))
 				{
 					if (mMaterialAssetHandleList[i] && mMaterialAssetHandleList[i]->IsValid())
 					{
-						OnInspector_MaterialPropertyGUI(mMaterialAssetHandleList[i]->GetAsset()->Get());
+						OnInspector_MaterialPropertyGUI(mMaterialAssetHandleList[i]->GetAsset());
 					}
 					ImGui::TreePop();
 				}
@@ -197,46 +197,8 @@ namespace JG
 			ImGui::TreePop();
 		}
 	}
-	void StaticMeshRenderer::OnInspector_MaterialPropertyGUI(SharedPtr<IMaterial> material)
+	void StaticMeshRenderer::OnInspector_MaterialPropertyGUI(Asset<IMaterial>* materialAsset)
 	{
-		//auto propertyList = material->GetPropertyList();
-		//for (auto& _pair : propertyList)
-		//{
-		//	auto type = _pair.first;
-		//	auto name = _pair.second;
-		//	ImGui::Text(("Name : " + name).c_str());
-		//	switch (type)
-		//	{
-		//	case EShaderDataType::_bool:
-		//		break;
-		//	case EShaderDataType::_float:
-		//		break;
-		//	case EShaderDataType::_float2:
-		//		break;
-		//	case EShaderDataType::_float3:
-		//		break;
-		//	case EShaderDataType::_float4:
-		//		break;
-		//	case EShaderDataType::_int:
-		//		break;
-		//	case EShaderDataType::_int2:
-		//		break;
-		//	case EShaderDataType::_int3:
-		//		break;
-		//	case EShaderDataType::_int4:
-		//		break;
-		//	case EShaderDataType::_uint:
-		//		break;
-		//	case EShaderDataType::_uint2:
-		//		break;
-		//	case EShaderDataType::_uint3:
-		//		break;
-		//	case EShaderDataType::_uint4:
-		//		break;
-
-
-
-		//	}
-		//}
+		materialAsset->OnInspectorGUI();
 	}
 }

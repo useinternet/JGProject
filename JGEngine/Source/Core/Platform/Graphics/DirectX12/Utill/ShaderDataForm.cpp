@@ -1195,6 +1195,7 @@ namespace JG
 						}
 					}
 
+
 					if (handles.empty() == false)
 					{
 						commandList->BindTextures((u32)textureData->RootParm, handles);
@@ -1261,17 +1262,11 @@ namespace JG
 						{
 							handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
 						}
-						else
-						{
-							break;
-						}
 					}
-
 					if (handles.empty() == false)
 					{
 						commandList->BindTextures((u32)textureData->RootParm, handles);
 					}
-
 				}
 
 				// RWTexture
@@ -1524,7 +1519,19 @@ namespace JG
 
 	bool ShaderData::GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value)
 	{
-		return false;
+		if (mTextureDatas.find(name) == mTextureDatas.end())
+		{
+			return false;
+		}
+
+		auto& textureList = mTextureDatas[name];
+		u64 textureCount = textureList.size();
+		if (textureCount <= textureSlot)
+		{
+			return false;
+		}
+		*out_value = textureList[textureSlot];
+		return true;
 	}
 	UploadAllocator::Allocation ShaderData::GetRWData(const String& name)
 	{

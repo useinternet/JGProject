@@ -67,7 +67,7 @@ namespace JG
 				return false;
 			}
 		}
-
+		mSourceCode = code;
 
 		JG_CORE_INFO("{0} Compile Success", GetName());
 		return true;

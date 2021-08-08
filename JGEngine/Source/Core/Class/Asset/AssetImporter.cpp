@@ -135,6 +135,26 @@ namespace JG
 				}
 			}
 
+			int multipleTex = 0;
+			int texCount = 0;
+			while (mesh->HasTextureCoords(texCount) == true)
+			{
+				texCount++;
+				multipleTex++;
+			}
+			if (multipleTex >= 2)
+			{
+				JG_CORE_ERROR("This Mesh is multiple texcoord : {0}", output->Name);
+			}
+
+
+			if (mesh->HasTextureCoords(0))
+			{
+				auto& ai_tex = mesh->mTextureCoords[0][i];
+				v.Texcoord.x = ai_tex.x;
+				v.Texcoord.y = ai_tex.y;
+			}
+
 			if (mesh->HasNormals() == true)
 			{
 				auto& ai_nor = mesh->mNormals[i];

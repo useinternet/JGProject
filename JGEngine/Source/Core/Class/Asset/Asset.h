@@ -24,6 +24,7 @@ namespace JG
 			inputLayout->Add(EShaderDataType::_float3, "NORMAL", 0);
 			inputLayout->Add(EShaderDataType::_float3, "TANGENT", 0);
 			inputLayout->Add(EShaderDataType::_float3, "BITANGENT", 0);
+
 			return inputLayout;
 		}
 	public:

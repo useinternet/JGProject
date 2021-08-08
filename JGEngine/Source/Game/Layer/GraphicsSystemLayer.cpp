@@ -98,6 +98,7 @@ namespace JG
 		String rawAssetPath = CombinePath(Application::GetAssetPath(), "RawResources");
 		String outputPath = CombinePath(Application::GetAssetPath(), "Resources");
 
+
 		for (auto& iter : fs::recursive_directory_iterator(rawAssetPath))
 		{
 			auto extenstion = iter.path().extension().string();
@@ -245,7 +246,7 @@ namespace JG
 				auto _3dItem = static_cast<StandardStaticMeshRenderItem*>(item.get());
 				if (_3dItem->Materials.empty())
 				{
-					_3dItem->Materials.push_back(IMaterial::Create("DefaultMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader)));
+					_3dItem->Materials.push_back(IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader)));
 				}
 				cameraItem->Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
 			}

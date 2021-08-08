@@ -31,7 +31,7 @@ namespace JG
 	void CommandList::Reset()
 	{
 		mResourceStateTracker->Reset();
-		mDynamicDescriptorAllocator->Reset();
+		mDynamicDescriptorAllocator->Reset(true);
 		mTempObjectList.clear();
 
 		mD3DAllocator->Reset();
@@ -433,7 +433,7 @@ namespace JG
 	void GraphicsCommandList::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation,
 		u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
 	void ComputeCommandList::BindRootSignature(SharedPtr<RootSignature> rootSig)
@@ -531,7 +531,7 @@ namespace JG
 	}
 	void ComputeCommandList::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
 	}
 }

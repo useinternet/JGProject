@@ -21,6 +21,7 @@ namespace JG
 	private:
 		String mName;
 		String mOriginCode;
+		String mSourceCode;
 		UniquePtr<ShaderDataForm> mShaderDataForm;
 		ComPtr<ID3DBlob> mVSData;
 		ComPtr<ID3DBlob> mDSData;

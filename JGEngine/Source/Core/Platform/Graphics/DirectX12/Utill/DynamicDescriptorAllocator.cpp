@@ -37,22 +37,26 @@ namespace JG
 		auto& cpuHandles = mCPUCache[rootParam].CPUHandles;
 		cpuHandles.insert(cpuHandles.end(), handles.begin(), handles.end());
 	}
-	void DynamicDescriptorAllocator::Reset()
+	void DynamicDescriptorAllocator::Reset(bool clearHandleOffset)
 	{
-		mPushedHandleOffset = 0;
+		if (clearHandleOffset)
+		{
+			mPushedHandleOffset = 0;
+		}
+
 		mRootParamInitTypeMap.clear();
 		mDescriptorTableType.clear();
 		mCPUCache.clear();
 	}
 
 
-	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap> d3dDescriptorHeap, bool is_graphics)
+	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics)
 	{
-		if (d3dDescriptorHeap != mD3DHeap)
+		if (*d3dDescriptorHeap != mD3DHeap)
 		{
 			RequestDescriptorHeap();
-			d3dDescriptorHeap = mD3DHeap;
-			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap.GetAddressOf());
+			(*d3dDescriptorHeap) = mD3DHeap;
+			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap->GetAddressOf());
 		}
 		if (!mCPUCache.empty())
 		{
