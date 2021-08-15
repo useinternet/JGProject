@@ -31,24 +31,20 @@ namespace JG
 	class Type
 	{
 		u64    mID = TYPE_NULL_ID;
-		std::string mName;
+		mutable bool   mIsNameDirty = true;
+		mutable std::string mName;
 	public:
 		Type()
 		{
 			mID   = TYPE_NULL_ID;
-			mName = "null";
 		}
 
 		template<class T>
 		constexpr Type(const TypeID<T>& typeID)
 		{
-			mID = typeID.ID;
+			mID   = typeID.ID;
 			mName = typeid(T).name();
-			u64 pos = mName.find(" ", 0);
-			if (pos != std::string::npos)
-			{
-				mName = mName.substr(pos + 1);
-			}
+			mIsNameDirty = true;
 		}
 		
 
@@ -57,17 +53,13 @@ namespace JG
 		{
 			mID = typeID.ID;
 			mName = typeid(T).name();
-			u64 pos = mName.find(TT(" "), 0);
-			if (pos != std::string::npos)
-			{
-				mName = mName.substr(pos + 1);
-			}
+			mIsNameDirty = true;
 			return *this;
 		}
 		Type& operator=(const Type& type)
 		{
 			mID   = type.mID;
-			mName = type.mName;
+			mName = type.GetName();
 			return *this;
 		}
 		bool operator==(const Type& type) const
@@ -83,6 +75,16 @@ namespace JG
 			return mID;
 		}
 		const String& GetName() const {
+			if (mIsNameDirty)
+			{
+				mIsNameDirty = false;
+				u64 pos = mName.find(" ", 0);
+				if (pos != std::string::npos)
+				{
+					mName = mName.substr(pos + 1);
+				}
+			}
+
 			return mName;
 		}
 	private:

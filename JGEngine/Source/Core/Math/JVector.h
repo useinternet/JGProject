@@ -26,6 +26,18 @@ namespace JG
 		bool operator!=(const JVector2Template& v) const {
 			return (v.x != x || v.y != y);
 		}
+		T& operator[](int idx) {
+			switch (idx)
+			{
+			case 0:
+				return x;
+			case 1:
+				return y;
+			default:
+				assert(false && "Vector Index exceed..");
+				return x;
+			}
+		}
 	};
 
 	template<typename T>
@@ -35,6 +47,21 @@ namespace JG
 		T x, y, z;
 	public:
 		JVector3Template(T x = 0, T y = 0, T z = 0) : x(x), y(y), z(z) {}
+	public:
+		T& operator[](int idx) {
+			switch (idx)
+			{
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			default:
+				assert(false && "Vector Index exceed..");
+				return x;
+			}
+		}
 	};
 
 	template<typename T>
@@ -44,6 +71,23 @@ namespace JG
 		T x, y, z, w;
 	public:
 		JVector4Template(T x = 0, T y = 0, T z = 0, T w = 0) : x(x), y(y), z(z), w(w) {}
+	public:
+		T& operator[](int idx) {
+			switch (idx)
+			{
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			case 3:
+				return w;
+			default:
+				assert(false && "Vector Index exceed..");
+				return x;
+			}
+		}
 	};
 
 	using JVector2Int = JVector2Template<int>;

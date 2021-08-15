@@ -16,4 +16,5 @@ namespace ImGui
 
 
 	bool AssetField(const JG::String& label, const JG::String& inputText, JG::EAssetFormat format, JG::String& out_AssetPath);
+	bool TextureAssetField(JG::u64 textureID,  JG::String& out_Assetpath);
 }

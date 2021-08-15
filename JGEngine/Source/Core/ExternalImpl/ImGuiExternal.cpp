@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "ImGuiExternal.h"
+#include "JGImGui.h"
 #include "Application.h"
 #include "Common/Type.h"
 #include "Common/DragAndDrop.h"
 #include "Class/Asset/Asset.h"
+
 namespace ImGui
 {
 	void OnGui(const char* label, JG::JVector3* v, float label_spacing)
@@ -91,6 +93,46 @@ namespace ImGui
 		}
 
 
+		return result;
+	}
+	bool TextureAssetField(JG::u64 textureID, JG::String& out_Assetpath)
+	{
+		bool result = false;
+		JG::String resourcePath;
+		if (textureID != 0)
+		{
+			ImGui::Image((ImTextureID)textureID, ImVec2(200, 200));
+		}
+		else
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+			ImGui::Selectable("##DummyTextureSelectable", true, 0, ImVec2(200, 200));
+			ImGui::PopStyleColor();
+		}
+		
+
+		if (ImGui::BeginDragDropTarget() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		{
+			auto payLoad = ImGui::GetDragDropPayload();
+			if (payLoad != nullptr)
+			{
+				JG::IDragAndDropData* ddd = (JG::IDragAndDropData*)payLoad->Data;
+
+
+				if (ddd->GetType() == JGTYPE(JG::DDDContentsFile))
+				{
+					auto dddContentsFile = (JG::DDDContentsFile*)ddd;
+
+					auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(dddContentsFile->FilePath);
+					if (assetFormat == JG::EAssetFormat::Texture)
+					{
+						out_Assetpath = dddContentsFile->FilePath;
+						result = true;
+					}
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
 		return result;
 	}
 }

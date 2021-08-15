@@ -171,6 +171,7 @@ namespace JG
 		String Name;
 		String ShaderTemplate;
 		String ShaderScript;
+		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> MaterialDatas;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
@@ -239,6 +240,8 @@ namespace JG
 		static void InspectorGUI(IAsset* targetAsset);
 	private:
 		static void Material_InsepctorGUI(Asset<IMaterial>* targetAsset);
+	private:
+		static void Material_Save(Asset<IMaterial>* targetAsset);
 	};
 
 
@@ -305,6 +308,7 @@ namespace JG
 
 
 	class AssetManager;
+	class IMaterial;
 	class AssetDataBase : public GlobalSingleton<AssetDataBase>
 	{
 		friend class Application;
@@ -354,6 +358,14 @@ namespace JG
 			u32 FrameCount  = 0;
 		};
 
+		struct MaterialToLoadTextureData
+		{
+			SharedPtr<IMaterial> Material;
+			String Name;
+			List<String> TexturePathList;
+			i32 Count = 0;
+		};
+
 
 
 		// 에셋 데이터 Pool;
@@ -366,6 +378,9 @@ namespace JG
 		Queue<AssetLoadCompeleteData>   mLoadCompeleteAssetDataQueue;
 		Queue<AssetUnLoadData> mUnLoadAssetDataQueue;
 
+
+		std::mutex mPendingMatToLoadTextureMutex;
+		Queue<SharedPtr<MaterialToLoadTextureData>> mPendingMatToLoadTextureQueue;
 
 	
 		u64 mAssetIDOffset = 0;
@@ -429,6 +444,10 @@ namespace JG
 
 
 		EScheduleResult LoadAsset_Update();
+		void LoadCompeleteData_Update();
+		void PendingMaterialToLoadTextureData_Update();
+		void LoadAssetData_Update();
+
 		EScheduleResult UnLoadAsset_Update();
 		bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
 	private:

@@ -7,6 +7,7 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Material.h"
 #include "ExternalImpl/JGImGui.h"
+#include "AssetImporter.h"
 #include "Imgui/imgui.h"
 namespace JG
 {
@@ -146,6 +147,29 @@ if (val)
 		jsonData->AddMember("Name", Name);
 		jsonData->AddMember("ShaderTemplate", ShaderTemplate);
 		jsonData->AddMember("ShaderScript", ShaderScript);
+		auto dataMapJson = jsonData->CreateJsonData();
+		for (auto& _pair : MaterialDatas)
+		{
+			//
+			auto name  = _pair.first;
+			auto type  = _pair.second.first;
+			auto value = _pair.second.second;
+
+			//
+			auto nameJson = jsonData->CreateJsonData();
+			auto typeJson = jsonData->CreateJsonData();
+			auto valueJson = value;
+
+			nameJson->SetString(name);
+			typeJson->SetString(ShaderDataTypeToString(type));
+
+			auto dataJson = jsonData->CreateJsonData();
+			dataJson->AddMember(nameJson);
+			dataJson->AddMember(typeJson);
+			dataJson->AddMember(valueJson);
+			dataMapJson->AddMember(dataJson);
+		}
+		jsonData->AddMember("MaterialDataMap", dataMapJson);
 	}
 	void MaterialAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
@@ -165,6 +189,21 @@ if (val)
 		if (val && val->IsString())
 		{
 			ShaderScript = val->GetString();
+		}
+
+		val = jsonData->GetMember("MaterialDataMap");
+		if (val)
+		{
+			for (u64 i = 0; i < val->GetSize(); ++i)
+			{
+				auto dataJson = val->GetJsonDataFromIndex(i);
+
+				auto name  = dataJson->GetJsonDataFromIndex(0)->GetString();
+				auto type  = dataJson->GetJsonDataFromIndex(1)->GetString();
+				auto value = dataJson->GetJsonDataFromIndex(2);
+
+				MaterialDatas.emplace(name, std::pair<EShaderDataType, SharedPtr<JsonData>>(StringToShaderDataType(type), value));
+			}
 		}
 	}
 	void AssetInspectorGUI::InspectorGUI(IAsset* targetAsset)
@@ -186,12 +225,15 @@ if (val)
 			return;
 		}
 		auto propertyList = targetAsset->Get()->GetPropertyList();
-		auto material     = targetAsset->Get();
-
+		auto material = targetAsset->Get();
+		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
+		auto json = CreateSharedPtr<Json>();
+		// Property Settings
 		for (auto& property : propertyList)
 		{
 			auto type = property.first;
 			auto name = property.second;
+			auto dataJson = json->CreateJsonData();
 			ImGui::Text(name.c_str()); ImGui::SameLine();
 			switch (property.first)
 			{
@@ -203,7 +245,7 @@ if (val)
 				{
 					material->SetInt(name, value);
 				}
-				
+				dataJson->SetInt32(value);
 			}
 				break;
 			case EShaderDataType::_int2:
@@ -214,6 +256,7 @@ if (val)
 				{
 					material->SetInt2(name, value);
 				}
+				dataJson->SetVector2Int(value);
 			}
 				break;
 			case EShaderDataType::_int3:
@@ -224,7 +267,7 @@ if (val)
 				{
 					material->SetInt3(name, value);
 				}
-
+				dataJson->SetVector3Int(value);
 			}
 				break;
 			case EShaderDataType::_int4:
@@ -235,6 +278,7 @@ if (val)
 				{
 					material->SetInt4(name, value);
 				}
+				dataJson->SetVector4Int(value);
 			}
 				break;
 			case EShaderDataType::_uint:
@@ -245,6 +289,7 @@ if (val)
 				{
 					material->SetUint(name, value);
 				}
+				dataJson->SetUint32(value);
 			}
 				break;
 			case EShaderDataType::_uint2:
@@ -255,6 +300,7 @@ if (val)
 				{
 					material->SetUint2(name, value);
 				}
+				dataJson->SetVector2Uint(value);
 			}
 				break;
 			case EShaderDataType::_uint3:
@@ -265,6 +311,7 @@ if (val)
 				{
 					material->SetUint3(name, value);
 				}
+				dataJson->SetVector3Uint(value);
 			}
 				break;
 			case EShaderDataType::_uint4:
@@ -275,6 +322,7 @@ if (val)
 				{
 					material->SetUint4(name, value);
 				}
+				dataJson->SetVector4Uint(value);
 			}
 				break;
 			case EShaderDataType::_float:
@@ -285,6 +333,7 @@ if (val)
 				{
 					material->SetFloat(name, value);
 				}
+				dataJson->SetFloat(value);
 			}
 				break;
 			case EShaderDataType::_float2:
@@ -295,6 +344,7 @@ if (val)
 				{
 					material->SetFloat2(name, value);
 				}
+				dataJson->SetVector2(value);
 			}
 				break;
 			case EShaderDataType::_float3:
@@ -305,6 +355,7 @@ if (val)
 				{
 					material->SetFloat3(name, value);
 				}
+				dataJson->SetVector3(value);
 			}
 				break;
 			case EShaderDataType::_float4:
@@ -315,39 +366,95 @@ if (val)
 				{
 					material->SetFloat4(name, value);
 				}
+				dataJson->SetVector4(value);
 			}
 				break;
 			case EShaderDataType::texture2D:
 			{
-				String resourcePath;
 				SharedPtr<ITexture> texture = nullptr;
 				material->GetTexture(name, 0, &texture);
 
-				if (texture != nullptr)
+
+				u64 textureID = 0;
+				if (texture != nullptr && texture->IsValid())
 				{
-					auto texutreID = JGImGui::GetInstance().ConvertImGuiTextureID(texture->GetTextureID());
-					ImGui::Image((ImTextureID)texutreID, ImVec2(200, 200));
+					textureID = texture->GetTextureID();
+					textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
 				}
-				if (ImGui::AssetField("##TextureAssetField", resourcePath, EAssetFormat::Texture, resourcePath) == true)
+
+				String texturePath;
+				if (ImGui::TextureAssetField(textureID, texturePath) == true)
 				{
-					auto assetID = AssetDataBase::GetInstance().LoadOriginAsset(resourcePath);
-					auto asset = AssetDataBase::GetInstance().GetAsset<ITexture>(assetID);
+					auto id    = AssetDataBase::GetInstance().LoadOriginAsset(texturePath);
+					auto asset = AssetDataBase::GetInstance().GetAsset<ITexture>(id);
 					if (asset && asset->Get())
 					{
 						material->SetTexture(name, 0, asset->Get());
+						texture = asset->Get();
 					}
 				}
+				if (texture != nullptr)
+				{
+					dataJson->SetString(texture->GetName());
+				}
+
+
 			}
 				break;
 			default:
 				break;
 			}
-		}
 
+			materialDatas[name] = std::pair<EShaderDataType, SharedPtr<JsonData>>(type, dataJson);
+		}
 		if (ImGui::Button("Save") == true)
 		{
-			// targetAsset Save
+			auto fullPath     = targetAsset->GetAssetFullPath();
+			auto materialJson = CreateSharedPtr<Json>();
+			if (Json::Read(fullPath, materialJson) == true)
+			{
+				auto assetVal = materialJson->GetMember(JG_ASSET_KEY);
+				if (assetVal != nullptr)
+				{
+					MaterialAssetStock stock;
+					stock.LoadJson(assetVal);
+
+					// Property
+					for (auto& _pair : materialDatas)
+					{
+						auto name = _pair.first;
+						auto type = _pair.second.first;
+						auto dataJson = _pair.second.second;
+						
+						auto iter = stock.MaterialDatas.find(name);
+						if (iter == stock.MaterialDatas.end())
+						{
+							continue;
+						}
+
+						if (stock.MaterialDatas[name].first != type) {
+							continue;
+						}
+
+						stock.MaterialDatas[name].second = dataJson;
+					}
+					// 저장
+					//MaterialAssetImportSettings settings;
+					//settings.FileName   = targetAsset->GetAssetName();
+					//settings.OutputPath = targetAsset->GetAssetPath();
+
+				}
+
+				
+
+			}
+				
 		}
+	}
+
+	void AssetInspectorGUI::Material_Save(Asset<IMaterial>* targetAsset)
+	{
+
 	}
 
 
@@ -615,6 +722,139 @@ if (val)
 				auto materialAsset = CreateSharedPtr<Asset<IMaterial>>(assetPath.string());
 				materialAsset->mData = IMaterial::Create(assetPath.string(), shader);
 
+				for (auto& _pair : stock.MaterialDatas)
+				{
+					auto name  = _pair.first;
+					auto type  = _pair.second.first;
+					auto value = _pair.second.second;
+					switch (type)
+					{
+					case JG::EShaderDataType::_int:
+					{
+						i32 int_value = value->GetInt32();
+						if (materialAsset->mData->SetInt(name, int_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Int", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_int2:
+					{
+						JVector2Int int2_value = value->GetVector2Int();
+						if (materialAsset->mData->SetInt2(name, int2_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Int2", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_int3:
+					{
+						JVector3Int int3_value = value->GetVector3Int();
+						if (materialAsset->mData->SetInt3(name, int3_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Int3", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_int4:
+					{
+						JVector4Int int4_value = value->GetVector4Int();
+						if (materialAsset->mData->SetInt4(name, int4_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Int4", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_uint:
+					{
+						u32 uint_value = value->GetUint32();
+						if (materialAsset->mData->SetUint(name, uint_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_uint2:
+					{
+						JVector2Uint uint2_value = value->GetVector2Uint();
+						if (materialAsset->mData->SetUint2(name, uint2_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint2", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_uint3:
+					{
+						JVector3Uint uint3_value = value->GetVector3Uint();
+						if (materialAsset->mData->SetUint3(name, uint3_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint3", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_uint4:
+					{
+						JVector4Uint uint4_value = value->GetVector4Uint();
+						if (materialAsset->mData->SetUint4(name, uint4_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint4", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_float:
+					{
+						f32 f32_value = value->GetFloat();
+						if (materialAsset->mData->SetFloat(name, f32_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Float", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_float2:
+					{
+						JVector2 float2_value = value->GetVector2();
+						if (materialAsset->mData->SetFloat2(name, float2_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Float2", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_float3:
+					{
+						JVector3 float3_value = value->GetVector3();
+						if (materialAsset->mData->SetFloat3(name, float3_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Float3", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::_float4:
+					{
+						JVector4 float4_value = value->GetVector4();
+						if (materialAsset->mData->SetFloat4(name, float4_value) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
+						}
+					}
+						break;
+					case JG::EShaderDataType::texture2D:
+					{
+						auto matToLoadTexturedata = CreateSharedPtr<MaterialToLoadTextureData>();
+						matToLoadTexturedata->Name = name;
+						matToLoadTexturedata->TexturePathList.push_back(value->GetString());
+						matToLoadTexturedata->Material = materialAsset->mData;
+
+
+
+						std::lock_guard<std::mutex> lock(mPendingMatToLoadTextureMutex);
+						mPendingMatToLoadTextureQueue.push(matToLoadTexturedata);
+						
+					}
+						break;
+					default:
+						break;
+					}
+				}
 
 
 				LoadData->Asset = materialAsset;
@@ -636,44 +876,100 @@ if (val)
 
 	EScheduleResult AssetDataBase::LoadAsset_Update()
 	{
-	
-		{
-			std::lock_guard<std::mutex> lock(mCompeleteMutex);
-			while (mLoadCompeleteAssetDataQueue.empty() == false)
-			{
-				auto compeleteData = mLoadCompeleteAssetDataQueue.front(); mLoadCompeleteAssetDataQueue.pop();
+		LoadCompeleteData_Update();
+		PendingMaterialToLoadTextureData_Update();
+		LoadAssetData_Update();
 
-				if (compeleteData.Asset == nullptr)
+		return EScheduleResult::Continue;
+	}
+	void AssetDataBase::LoadCompeleteData_Update()
+	{
+		std::lock_guard<std::mutex> lock(mCompeleteMutex);
+		while (mLoadCompeleteAssetDataQueue.empty() == false)
+		{
+			auto compeleteData = mLoadCompeleteAssetDataQueue.front(); mLoadCompeleteAssetDataQueue.pop();
+
+			if (compeleteData.Asset == nullptr)
+			{
+				auto iter = mAssetDataPool.find(compeleteData.ID);
+				if (iter != mAssetDataPool.end())
 				{
-					auto iter = mAssetDataPool.find(compeleteData.ID);
-					if (iter != mAssetDataPool.end())
+					JG_CORE_ERROR("Asset Load Fail  : {0}", iter->second->Path);
+					if (compeleteData.ID.IsOrigin())
 					{
-						JG_CORE_ERROR("Asset Load Fail  : {0}", iter->second->Path);
-						if (compeleteData.ID.IsOrigin())
-						{
-							mOriginAssetDataPool.erase(iter->second->Path);
-						}
-		
-						mAssetDataPool.erase(compeleteData.ID);
+						mOriginAssetDataPool.erase(iter->second->Path);
 					}
+
+					mAssetDataPool.erase(compeleteData.ID);
+				}
+			}
+			else
+			{
+				if (compeleteData.OnComplete)
+				{
+					compeleteData.OnComplete(&compeleteData);
+				}
+				auto iter = mAssetDataPool.find(compeleteData.ID);
+				if (iter != mAssetDataPool.end())
+				{
+					iter->second->Asset = compeleteData.Asset;
+					iter->second->State = EAssetDataState::None;
+					JG_CORE_INFO("Asset Load Success : {0}", iter->second->Path);
+				}
+			}
+
+		}
+	}
+	void AssetDataBase::PendingMaterialToLoadTextureData_Update()
+	{
+		std::lock_guard<std::mutex> lock(mPendingMatToLoadTextureMutex);
+		Queue<SharedPtr<MaterialToLoadTextureData>> tempPendingMatToLoadTextureQueue;
+		while (mPendingMatToLoadTextureQueue.empty() == false)
+		{
+			auto data = mPendingMatToLoadTextureQueue.front(); mPendingMatToLoadTextureQueue.pop();
+			bool isRecycle = false;
+			//
+			List <std::pair<i32, SharedPtr<ITexture>>> textureList;
+			i32  slot = 0;
+
+			// 텍스쳐 로드
+			for (auto& texturePath : data->TexturePathList)
+			{
+				auto id = LoadOriginAsset(texturePath);
+				auto asset = GetAsset<ITexture>(id);
+				if (asset != nullptr && asset->mData && asset->Get()->IsValid())
+				{
+					textureList.push_back(std::pair<i32, SharedPtr<ITexture>>(slot, asset->Get()));
 				}
 				else
 				{
-					if (compeleteData.OnComplete)
-					{
-						compeleteData.OnComplete(&compeleteData);
-					}
-					auto iter = mAssetDataPool.find(compeleteData.ID);
-					if (iter != mAssetDataPool.end())
-					{
-						iter->second->Asset = compeleteData.Asset;
-						iter->second->State = EAssetDataState::None;
-						JG_CORE_INFO("Asset Load Success : {0}", iter->second->Path);
-					}
+					isRecycle = true;
 				}
+				++slot;
+			}
 
+			// 텍스쳐 로드가 완전히 끝나지 않았다면 큐에 게속 잔류
+			if (isRecycle)
+			{
+				data->Count += 1;
+				if (data->Count < 10)
+				{
+					tempPendingMatToLoadTextureQueue.push(data);
+				}
+			}
+
+			// 로드된 텍스쳐 머터리얼에 셋팅
+			for (auto& texture : textureList)
+			{
+				if (data->Material->SetTexture(data->Name, texture.first, texture.second) == false)
+				{
+					JG_CORE_WARN("Failed {0]'s Param {1} Set Texture", data->Material->GetName(), data->Name);
+				}
 			}
 		}
+	}
+	void AssetDataBase::LoadAssetData_Update()
+	{
 		u32 loopCnt = 0;
 		while (mLoadAssetDataQueue.empty() == false)
 		{
@@ -685,9 +981,9 @@ if (val)
 				LoadAssetInternal((AssetLoadData*)userData);
 				AssetLoadData* _LoadData = (AssetLoadData*)userData;
 				AssetLoadCompeleteData data;
-				data.Asset		= _LoadData->Asset;
-				data.ID			= _LoadData->ID;
-				data.Stock		= _LoadData->Stock;
+				data.Asset = _LoadData->Asset;
+				data.ID = _LoadData->ID;
+				data.Stock = _LoadData->Stock;
 				data.OnComplete = _LoadData->OnComplete;
 				{
 					std::lock_guard<std::mutex> lock(mCompeleteMutex);
@@ -701,7 +997,6 @@ if (val)
 				break;
 			}
 		}
-		return EScheduleResult::Continue;
 	}
 	EScheduleResult AssetDataBase::UnLoadAsset_Update()
 	{
@@ -744,7 +1039,9 @@ if (val)
 			return;
 		}
 		auto textureAsset = static_cast<Asset<ITexture>*>(data->Asset.get());
-		textureAsset->mData = ITexture::Create(*(static_cast<TextureAssetStock*>(data->Stock.get())));
+		auto textureStock = static_cast<TextureAssetStock*>(data->Stock.get());
+		textureStock->Name = data->Asset->GetAssetPath();
+		textureAsset->mData = ITexture::Create(*textureStock);
 	}
 
 	bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const

@@ -20,20 +20,6 @@
 
 namespace JG
 {
-	//enum class EEventType
-	//{
-	//	// Application
-	//	AppOpen, AppClose,  AppResize,
-
-	//	// Input
-	//	KeyPressed, KeyReleased, KeyTyping,
-	//	MouseMoved, MouseButtonPressed, MouseButtonReleased,
-	//	MouseScrollMoved,
-
-	//	// Game
-	//};
-
-
 	ENUM_FLAG(EEventCategory)
 	enum class EEventCategory
 	{
@@ -50,10 +36,26 @@ namespace JG
 		Destroy         = 0x800,
 	};
 
-#define  EVENTCLASS(category) \
+#define  EVENTCLASS(className, category) \
 public: \
-	virtual Type GetEventType()  const override { return Type(TypeID(this)); } \
+	virtual Type GetEventType()  const override {\
+		static Type type;\
+		if (type.GetID() == TYPE_NULL_ID)\
+		{\
+			type = Type(TypeID<##className>());\
+		}\
+		return type;\
+	} \
 	virtual EEventCategory GetCategory() const override { return category; } \
+	static  Type GetStaticEventType()\
+	{\
+		static Type type;\
+		if (type.GetID() == TYPE_NULL_ID)\
+		{\
+			type = Type(TypeID<##className>());\
+		}\
+		return type;\
+	} \
 private: \
 
 
@@ -89,7 +91,7 @@ private: \
 		template<class T, class Func>
 		bool Dispatch(const Func& func)
 		{
-			if(mEvent.GetEventType() == Type(TypeID<T>()))
+			if(mEvent.GetEventType() == T::GetStaticEventType())
 			{
 				mEvent.Handled |= func(static_cast<T&>(mEvent));
 				return true;
@@ -99,43 +101,69 @@ private: \
 	};
 
 
-#define CREATE_EVENT(category, className) \
+
+
+
+#define CREATE_EVENT_(category, className, toString)\
 	class className : public IEvent \
 	{ \
-		EVENTCLASS(##category)\
+	private: \
+		EVENTCLASS(className, ##category)\
 	public:\
 		virtual ~##className() = default; \
 		virtual String ToString() const override\
 		{\
-			return #className;\
+			return #toString;\
 		}\
 	};\
 
-#define CREATE_EVENT_ONE_ARG(category, className, argType_1, argName_1) \
+#define CREATE_EVENT_ONE_ARG_(category, className, argType_1, argName_1, argInit_1, toString) \
 	class className : public IEvent \
 	{ \
-		EVENTCLASS(##category)\
+	private: \
+		EVENTCLASS(className, ##category)\
 	public: \
-		argType_1 argName_1; \
+		argType_1 argName_1 = argInit_1; \
 	public:\
 		virtual ~##className() = default; \
 		virtual String ToString() const override\
 		{\
-			return #className;\
+			return toString;\
 		}\
 	};\
+
+#define CREATE_EVENT_TWO_ARG_(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2, toString) \
+	class className : public IEvent \
+	{ \
+	private: \
+		EVENTCLASS(className, ##category)\
+	public: \
+		argType_1 argName_1 = argInit_1; \
+		argType_2 argName_2 = argInit_2; \
+	public:\
+		virtual ~##className() = default; \
+		virtual String ToString() const override\
+		{\
+			return toString;\
+		}\
+	};\
+
+#define CREATE_EVENT(category, className) CREATE_EVENT_(category, className, #className) 
+#define CREATE_EVENT_ONE_ARG(category, className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG_(category, className, argType_1, argName_1,argInit_1, #className)
+#define CREATE_EVENT_TWO_ARG(category, className, argType_1, argName_1, argType_2, argName_2) CREATE_EVENT_TWO_ARG_(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2,argInit_2, #className)
 
 
 
 
 #define NOTIFY_EVENT(className) CREATE_EVENT(EEventCategory::Notify, className)
-#define NOTIFY_ONE_ARG_EVENT(className, argType_1, argName_2) CREATE_EVENT_ONE_ARG(EEventCategory::Notify, className, argType_1, argName_2)
-#define REQUEST_ONE_ARG_EVENT(className, argType_1, argName_2) CREATE_EVENT_ONE_ARG(EEventCategory::Request, className, argType_1, argName_2)
+#define NOTIFY_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Notify, className, argType_1, argName_1,argInit_1)
+#define REQUEST_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Request, className, argType_1, argName_1, argInit_1)
 
 
 
 
 	// Notify
+	class IJGObject;
 	class ITexture;
 	class GameWorld;
 	class IRenderItem;
@@ -143,17 +171,19 @@ private: \
 	class GameNode;
 	class IAsset;
 	class AssetID;
+
 	NOTIFY_EVENT(NotifyRenderingReadyCompeleteEvent)
-	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<ITexture>, SceneTexture)
-	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld)
-	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos)
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode)
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, SharedPtr<AssetID>, SelectedAsset)
+	NOTIFY_ONE_ARG_EVENT(NotifyDestroyJGObjectEvent, IJGObject*, DestroyedObject, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<ITexture>, SceneTexture, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0,0))
+	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, SharedPtr<AssetID>, SelectedAsset, nullptr)
 		
-	REQUEST_ONE_ARG_EVENT(RequestGetGameWorldEvent, GameWorld*, GameWorld)
-	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem)
-	REQUEST_ONE_ARG_EVENT(RequestRegisterCameraEvent, Camera*, pCamera)
-	REQUEST_ONE_ARG_EVENT(RequestUnRegisterCameraEvent, Camera*, pCamera)
-	REQUEST_ONE_ARG_EVENT(RequestRegisterMainCameraEvent, Camera*, MainCamera)
-	REQUEST_ONE_ARG_EVENT(RequestUnRegisterMainCameraEvent, Camera*, MainCamera)
+	REQUEST_ONE_ARG_EVENT(RequestGetGameWorldEvent, GameWorld*, GameWorld, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestRegisterCameraEvent, Camera*, pCamera, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestUnRegisterCameraEvent, Camera*, pCamera, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestRegisterMainCameraEvent, Camera*, MainCamera, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestUnRegisterMainCameraEvent, Camera*, MainCamera, nullptr)
 }
