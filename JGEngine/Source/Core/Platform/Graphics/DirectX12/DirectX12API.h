@@ -80,9 +80,11 @@ namespace JG
 		virtual SharedPtr<IComputeBuffer> CreateComputeBuffer(const String& name, u64 btSize) override;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) override;
 		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
+		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IShader> shader) override;
 		virtual SharedPtr<IMesh>		  CreateMesh(const String& name) override;
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) override;
+		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) override;
 	};

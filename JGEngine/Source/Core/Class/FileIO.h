@@ -137,6 +137,7 @@ namespace JG
 		JVector2 GetVector2() const 
 		{
 			JVector2 result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -147,6 +148,7 @@ namespace JG
 		JVector3 GetVector3() const 
 		{
 			JVector3 result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -156,8 +158,10 @@ namespace JG
 		}
 		JVector4 GetVector4() const
 		{
+
 			JVector4 result;
 			i32 index = 0;
+			if (mValue.IsArray() == false) return result;
 			for (auto& v : mValue.GetArray())
 			{
 				result[index++] = v.GetFloat();
@@ -167,6 +171,7 @@ namespace JG
 		JVector2Int GetVector2Int() const {
 			JVector2Int result;
 			i32 index = 0;
+			if (mValue.IsArray() == false) return result;
 			for (auto& v : mValue.GetArray())
 			{
 				result[index++] = v.GetInt();
@@ -176,6 +181,7 @@ namespace JG
 		JVector3Int GetVector3Int() const {
 			JVector3Int result;
 			i32 index = 0;
+			if (mValue.IsArray() == false) return result;
 			for (auto& v : mValue.GetArray())
 			{
 				result[index++] = v.GetInt();
@@ -184,6 +190,7 @@ namespace JG
 		}
 		JVector4Int GetVector4Int() const {
 			JVector4Int result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -193,6 +200,7 @@ namespace JG
 		}
 		JVector2Uint GetVector2Uint() const {
 			JVector2Uint result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -202,6 +210,7 @@ namespace JG
 		}
 		JVector3Uint GetVector3Uint() const {
 			JVector3Uint result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -211,6 +220,7 @@ namespace JG
 		}
 		JVector4Uint GetVector4Uint() const {
 			JVector4Uint result;
+			if (mValue.IsArray() == false) return result;
 			i32 index = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -222,6 +232,7 @@ namespace JG
 		JMatrix GetMatrix() const 
 		{
 			JMatrix result;
+			if (mValue.IsArray() == false) return result;
 			i32 col = 0; i32 row = 0;
 			for (auto& v : mValue.GetArray())
 			{
@@ -237,6 +248,7 @@ namespace JG
 		JBBox GetBoundingBox() const
 		{
 			JBBox jbbox;
+			if (mValue.IsArray() == false) return JBBox();
 			i32 index = 0;
 			for (auto& val : mValue.GetArray())
 			{
@@ -266,19 +278,19 @@ namespace JG
 		void SetUint64(u64 _u64) { mValue.SetUint64(_u64); }
 		void SetFloat(f32 _f32) { mValue.SetFloat(_f32); }
 		void SetDouble(f64 _f64) { mValue.SetDouble(_f64); }
-		void SetVector2Int(const JVector2Int& v) { MakeJsonValue(v); }
-		void SetVector3Int(const JVector3Int& v) { MakeJsonValue(v); }
-		void SetVector4Int(const JVector4Int& v) { MakeJsonValue(v); }
-		void SetVector2Uint(const JVector2Uint& v) { MakeJsonValue(v); }
-		void SetVector3Uint(const JVector3Uint& v) { MakeJsonValue(v); }
-		void SetVector4Uint(const JVector4Uint& v) { MakeJsonValue(v); }
+		void SetVector2Int(const JVector2Int& v) { mValue = MakeJsonValue(v); }
+		void SetVector3Int(const JVector3Int& v) { mValue = MakeJsonValue(v); }
+		void SetVector4Int(const JVector4Int& v) { mValue = MakeJsonValue(v); }
+		void SetVector2Uint(const JVector2Uint& v) { mValue = MakeJsonValue(v); }
+		void SetVector3Uint(const JVector3Uint& v) { mValue = MakeJsonValue(v); }
+		void SetVector4Uint(const JVector4Uint& v) { mValue = MakeJsonValue(v); }
 
-		void SetVector2(const JVector2& v) { MakeJsonValue(v); }
-		void SetVector3(const JVector3& v) { MakeJsonValue(v); }
-		void SetVector4(const JVector4& v) { MakeJsonValue(v); }
+		void SetVector2(const JVector2& v) { mValue = MakeJsonValue(v); }
+		void SetVector3(const JVector3& v) { mValue = MakeJsonValue(v); }
+		void SetVector4(const JVector4& v) { mValue = MakeJsonValue(v); }
 
-		void SetMatrix(const JMatrix& m) { MakeJsonValue(m); }
-		void SetBoundingBox(const JBBox& jbbox) { MakeJsonValue(jbbox); }
+		void SetMatrix(const JMatrix& m) { mValue = MakeJsonValue(m); }
+		void SetBoundingBox(const JBBox& jbbox) { mValue = MakeJsonValue(jbbox); }
 	public:
 		bool IsBool() const { return mValue.IsBool(); }
 		bool IsInt32() const { return mValue.IsInt(); }

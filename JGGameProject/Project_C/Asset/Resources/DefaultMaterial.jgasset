@@ -1,8 +1,0 @@
-{
-    "AssetFormat": 3,
-    "Asset": {
-        "Name": "DefaultMaterial",
-        "ShaderTemplate": "Standard3DShader",
-        "ShaderScript": "Surface/Standard"
-    }
-}

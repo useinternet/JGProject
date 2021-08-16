@@ -40,24 +40,24 @@ namespace JG
 		{
 			return;
 		}
-		mMeshAssetHandle = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(path);
+		mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(path);
 	}
 	void StaticMeshRenderer::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		BaseRenderer::MakeJson(jsonData);
-		if (mMeshAssetHandle && mMeshAssetHandle->IsValid())
+		if (mMesh)
 		{
-			jsonData->AddMember("MeshPath", mMeshAssetHandle->GetAsset()->GetAssetPath());
+			jsonData->AddMember("MeshPath", mMesh->GetAssetPath());
 		}
 
 
 		auto materialListJson = jsonData->CreateJsonData();
-		for (auto& material : mMaterialAssetHandleList)
+		for (auto& material : mMaterialList)
 		{
-			if (material == nullptr || material->IsValid() == false) continue;
+			if (material == nullptr) continue;
 			auto materialJson = jsonData->CreateJsonData();
 
-			materialJson->SetString(material->GetAsset()->GetAssetPath());
+			materialJson->SetString(material->GetAssetPath());
 			materialListJson->AddMember(materialJson);
 		}
 		auto type = materialListJson->GetValue().GetType();
@@ -76,12 +76,12 @@ namespace JG
 		if (val && val->IsArray())
 		{
 			auto type = val->GetValue().GetType();
-			mMaterialAssetHandleList.resize(val->GetSize());
+			mMaterialList.resize(val->GetSize());
 			for (i32 i = 0; i < val->GetSize(); ++i)
 			{
 				auto material = val->GetJsonDataFromIndex(i);
 				auto path = material->GetString();
-				mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
+				mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
 
 			}
 		}
@@ -91,24 +91,24 @@ namespace JG
 		auto transform = GetOwner()->GetTransform();
 		mStaticRI->WorldMatrix = transform->GetWorldMatrix();
 
-		if (mMeshAssetHandle && mMeshAssetHandle->IsValid())
+		if (mMesh)
 		{
-			mStaticRI->Mesh = mMeshAssetHandle->GetAsset()->Get();
+			mStaticRI->Mesh = mMesh->Get();
 			GetOwner()->SetBoundingBox(mStaticRI->Mesh->GetBoundingBox());
 		}
 
-		auto matAssetCnt = mMaterialAssetHandleList.size();
+		auto matAssetCnt = mMaterialList.size();
 		for (u64 i = 0; i < matAssetCnt; ++i)
 		{
-			auto material = mMaterialAssetHandleList[i];
-			if (material == nullptr || material->IsValid() == false) continue;
+			auto material = mMaterialList[i];
+			if (material == nullptr) continue;
 
 			if (mStaticRI->Materials.size() > i) {
-				mStaticRI->Materials[i] = material->GetAsset()->Get();
+				mStaticRI->Materials[i] = material->Get();
 			}
 			else
 			{
-				mStaticRI->Materials.push_back(material->GetAsset()->Get());
+				mStaticRI->Materials.push_back(material->Get());
 			}
 		}
 		mStaticRI->Materials.resize(matAssetCnt);
@@ -136,13 +136,13 @@ namespace JG
 	{
 		String out;
 		String in = "None";
-		if (mMeshAssetHandle && mMeshAssetHandle->IsValid())
+		if (mMesh)
 		{
-			in = mMeshAssetHandle->GetAsset()->GetAssetName();
+			in = mMesh->GetAssetName();
 		}
 		if (ImGui::AssetField("Mesh    ", in, EAssetFormat::Mesh, out))
 		{
-			mMeshAssetHandle = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(out);
+			mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(out);
 		}
 	}
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
@@ -152,18 +152,18 @@ namespace JG
 
 
 
-		auto cnt = mMaterialAssetHandleList.size();
+		auto cnt = mMaterialList.size();
 		bool isOpenTree = ImGui::TreeNodeEx(("Material : " + std::to_string(cnt)).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 		ImGui::SameLine();
 		if (ImGui::SmallButton("+"))
 		{
-			mMaterialAssetHandleList.push_back(nullptr);
+			mMaterialList.push_back(nullptr);
 		}ImGui::SameLine();
 		if (ImGui::SmallButton("-"))
 		{
-			if (mMaterialAssetHandleList.empty() == false)
+			if (mMaterialList.empty() == false)
 			{
-				mMaterialAssetHandleList.pop_back();
+				mMaterialList.pop_back();
 			}
 
 		}
@@ -171,25 +171,25 @@ namespace JG
 
 		if (isOpenTree)
 		{
-			cnt = mMaterialAssetHandleList.size();
+			cnt = mMaterialList.size();
 			for (i32 i = 0; i < cnt; ++i)
 			{
 				String out;
 				String in = "None";
-				if (mMaterialAssetHandleList[i] && mMaterialAssetHandleList[i]->IsValid())
+				if (mMaterialList[i])
 				{
-					in = mMaterialAssetHandleList[i]->GetAsset()->GetAssetName();
+					in = mMaterialList[i]->GetAssetName();
 				}
 
 				if (ImGui::AssetField("Slot " + std::to_string(i), in, EAssetFormat::Material, out))
 				{
-					mMaterialAssetHandleList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
+					mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
 				}
 				if (ImGui::TreeNodeEx("Property"))
 				{
-					if (mMaterialAssetHandleList[i] && mMaterialAssetHandleList[i]->IsValid())
+					if (mMaterialList[i])
 					{
-						OnInspector_MaterialPropertyGUI(mMaterialAssetHandleList[i]->GetAsset());
+						OnInspector_MaterialPropertyGUI(mMaterialList[i]);
 					}
 					ImGui::TreePop();
 				}

@@ -13,8 +13,8 @@ namespace JG
 
 
 
-		SharedPtr<AssetHandle<IMesh>> mMeshAssetHandle = nullptr;
-		List<SharedPtr<AssetHandle<IMaterial>>> mMaterialAssetHandleList;
+		Asset<IMesh>* mMesh = nullptr;
+		List<Asset<IMaterial>*> mMaterialList;
 	public:
 		virtual ~StaticMeshRenderer() = default;
 	public:

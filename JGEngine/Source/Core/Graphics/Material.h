@@ -68,7 +68,7 @@ namespace JG
 
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName() const = 0;
-
+		virtual void SetShader(SharedPtr<IShader> shader) = 0;
 		virtual List<std::pair<EShaderDataType, String>> GetPropertyList() const = 0;
 	protected:
 		virtual void Init(SharedPtr<IShader> shader) = 0;
@@ -77,6 +77,7 @@ namespace JG
 	public:
 		virtual ~IMaterial() = default;
 	public:
+		static SharedPtr<IMaterial> Create(const String& name);
 		static SharedPtr<IMaterial> Create(const String& name, SharedPtr<IShader> shader);
 
 	};

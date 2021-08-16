@@ -497,6 +497,12 @@ namespace JG
 		}
 		return shader;
 	}
+	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name)
+	{
+		auto material = CreateSharedPtr<DirectX12Material>();
+		material->SetName(name);
+		return material;
+	}
 	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name, SharedPtr<IShader> shader)
 	{
 		if (shader == nullptr)
@@ -520,6 +526,12 @@ namespace JG
 		auto mesh = CreateSharedPtr<DirectX12SubMesh>();
 		mesh->SetName(name);
 		return mesh;
+	}
+	SharedPtr<ITexture> DirectX12API::CreateTexture(const String& name)
+	{
+		auto texture = CreateSharedPtr<DirectX12Texture>();
+		texture->SetName(name);
+		return texture;
 	}
 	SharedPtr<ITexture> DirectX12API::CreateTexture(const String& name, const TextureInfo& info)
 	{

@@ -26,11 +26,10 @@ namespace JG
         
         return api->CreateMesh(name);
     }
-    SharedPtr<IMesh> IMesh::Create(const StaticMeshAssetStock& stock)
+    void IMesh::SetMeshStock(const StaticMeshAssetStock& stock)
     {
         auto cnt = stock.SubMeshNames.size();
-        SharedPtr<IMesh> mesh = IMesh::Create(stock.Name);
-        mesh->SetInputLayout(JGVertex::GetInputLayout());
+        SetInputLayout(JGVertex::GetInputLayout());
         for (u64 i = 0; i < cnt; ++i)
         {
             auto vBuffer = IVertexBuffer::Create(stock.SubMeshNames[i] + "_VBuffer", EBufferLoadMethod::CPULoad);
@@ -41,9 +40,15 @@ namespace JG
             iBuffer->SetData(stock.Indices[i].data(), stock.Indices[i].size());
             subMesh->SetVertexBuffer(vBuffer);
             subMesh->SetIndexBuffer(iBuffer);
-            mesh->AddMesh(subMesh);
+            AddMesh(subMesh);
         }
-        mesh->SetBoundingBox(stock.BoundingBox);
+        SetBoundingBox(stock.BoundingBox);
+    }
+    SharedPtr<IMesh> IMesh::Create(const StaticMeshAssetStock& stock)
+    {
+        SharedPtr<IMesh> mesh = IMesh::Create(stock.Name);
+        mesh->SetMeshStock(stock);
         return mesh;
     }
+
 }

@@ -9,7 +9,7 @@
 #include "Class/Game/GameSettings.h"
 #include "Class/Game/Components/Camera.h"
 #include "Class/Asset/AssetImporter.h"
-
+#include "Class/Asset/Asset.h"
 #include "Imgui/ImGuizmo.h"
 
 
@@ -133,7 +133,6 @@ namespace JG
 				}
 			}
 		}
-
 		for (auto& iter : fs::recursive_directory_iterator(outputPath))
 		{
 			AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());

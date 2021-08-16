@@ -36,6 +36,12 @@ namespace JG
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 		return api->CreateComputeBuffer(name, btSize);
 	}
+	SharedPtr<ITexture> ITexture::Create(const String& name)
+	{
+		auto api = Application::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+		return api->CreateTexture(name);
+	}
 	SharedPtr<ITexture> ITexture::Create(const String& name, const TextureInfo& info)
 	{
 		auto api = Application::GetInstance().GetGraphicsAPI();

@@ -68,7 +68,7 @@ namespace JG
 
 		virtual void  SetName(const String& name) override;
 		virtual const String& GetName() const override;
-
+		virtual void  SetShader(SharedPtr<IShader> shader) override;
 
 		virtual List<std::pair<EShaderDataType, String>> GetPropertyList() const override;
 	public:

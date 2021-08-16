@@ -106,41 +106,41 @@ namespace JG
 		{
 			BoundingBox = val->GetBoundingBox();
 		}
-val = jsonData->GetMember("SubMeshs");
-if (val)
-{
-	auto cnt = val->GetSize();
-	Vertices.resize(cnt);
-	Indices.resize(cnt);
-	SubMeshNames.resize(cnt);
-	for (auto i = 0; i < cnt; ++i)
-	{
-		auto meshJson = val->GetJsonDataFromIndex(i);
-
-		auto verticesJson = meshJson->GetMember("Vertices");
-		auto indicesJson = meshJson->GetMember("Indices");
-		auto meshName = meshJson->GetMember("Name");
-
-		SubMeshNames[i] = meshName->GetString();
-		Vertices[i].resize(verticesJson->GetSize());
-		Indices[i].resize(indicesJson->GetSize());
-		for (auto j = 0; j < verticesJson->GetSize(); ++j)
+		val = jsonData->GetMember("SubMeshs");
+		if (val)
 		{
-			auto vJson = verticesJson->GetJsonDataFromIndex(j);
-			JGVertex v;
-			v.LoadJson(vJson);
-			Vertices[i][j] = v;
-		}
-		for (auto j = 0; j < indicesJson->GetSize(); ++j)
-		{
-			auto iJson = indicesJson->GetJsonDataFromIndex(j);
-			u32 index;
-			index = iJson->GetUint32();
-			Indices[i][j] = index;
-		}
+			auto cnt = val->GetSize();
+			Vertices.resize(cnt);
+			Indices.resize(cnt);
+			SubMeshNames.resize(cnt);
+			for (auto i = 0; i < cnt; ++i)
+			{
+				auto meshJson = val->GetJsonDataFromIndex(i);
 
-	}
-}
+				auto verticesJson = meshJson->GetMember("Vertices");
+				auto indicesJson = meshJson->GetMember("Indices");
+				auto meshName = meshJson->GetMember("Name");
+
+				SubMeshNames[i] = meshName->GetString();
+				Vertices[i].resize(verticesJson->GetSize());
+				Indices[i].resize(indicesJson->GetSize());
+				for (auto j = 0; j < verticesJson->GetSize(); ++j)
+				{
+					auto vJson = verticesJson->GetJsonDataFromIndex(j);
+					JGVertex v;
+					v.LoadJson(vJson);
+					Vertices[i][j] = v;
+				}
+				for (auto j = 0; j < indicesJson->GetSize(); ++j)
+				{
+					auto iJson = indicesJson->GetJsonDataFromIndex(j);
+					u32 index;
+					index = iJson->GetUint32();
+					Indices[i][j] = index;
+				}
+
+			}
+		}
 	}
 	void MaterialAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -164,9 +164,9 @@ if (val)
 			typeJson->SetString(ShaderDataTypeToString(type));
 
 			auto dataJson = jsonData->CreateJsonData();
-			dataJson->AddMember(nameJson);
-			dataJson->AddMember(typeJson);
-			dataJson->AddMember(valueJson);
+			dataJson->AddMember("Name",nameJson);
+			dataJson->AddMember("Type",typeJson);
+			dataJson->AddMember("Value", valueJson);
 			dataMapJson->AddMember(dataJson);
 		}
 		jsonData->AddMember("MaterialDataMap", dataMapJson);
@@ -192,20 +192,44 @@ if (val)
 		}
 
 		val = jsonData->GetMember("MaterialDataMap");
-		if (val)
+		if (val && val->IsArray())
 		{
 			for (u64 i = 0; i < val->GetSize(); ++i)
 			{
 				auto dataJson = val->GetJsonDataFromIndex(i);
 
-				auto name  = dataJson->GetJsonDataFromIndex(0)->GetString();
-				auto type  = dataJson->GetJsonDataFromIndex(1)->GetString();
-				auto value = dataJson->GetJsonDataFromIndex(2);
-
-				MaterialDatas.emplace(name, std::pair<EShaderDataType, SharedPtr<JsonData>>(StringToShaderDataType(type), value));
+				auto dataVal = dataJson->GetMember("Name");
+				String name;
+				if (dataVal)
+				{
+					name = dataVal->GetString();
+				}
+				EShaderDataType type;
+				dataVal = dataJson->GetMember("Type");
+				if (dataVal)
+				{
+					type = StringToShaderDataType(dataVal->GetString());
+				}
+				dataVal = dataJson->GetMember("Value");
+				if (dataVal)
+				{
+					MaterialDatas.emplace(name, std::pair<EShaderDataType, SharedPtr<JsonData>>(type, dataVal));
+				}
 			}
 		}
 	}
+
+	bool MaterialAssetStock::Write(const String& path, const MaterialAssetStock& stock)
+	{
+		auto filePath = CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
+
+		auto json = CreateSharedPtr<Json>();
+		json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::Material);
+		json->AddMember(JG_ASSET_KEY, stock);
+
+		return Json::Write(filePath, json);
+	}
+
 	void AssetInspectorGUI::InspectorGUI(IAsset* targetAsset)
 	{
 		if (targetAsset == nullptr)
@@ -228,6 +252,7 @@ if (val)
 		auto material = targetAsset->Get();
 		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
 		auto json = CreateSharedPtr<Json>();
+
 		// Property Settings
 		for (auto& property : propertyList)
 		{
@@ -381,24 +406,20 @@ if (val)
 					textureID = texture->GetTextureID();
 					textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
 				}
-
 				String texturePath;
 				if (ImGui::TextureAssetField(textureID, texturePath) == true)
 				{
-					auto id    = AssetDataBase::GetInstance().LoadOriginAsset(texturePath);
-					auto asset = AssetDataBase::GetInstance().GetAsset<ITexture>(id);
-					if (asset && asset->Get())
+					auto asset    = AssetDataBase::GetInstance().LoadOriginAsset(texturePath);
+					auto tAsset   = asset->As<ITexture>();
+					if (tAsset)
 					{
-						material->SetTexture(name, 0, asset->Get());
-						texture = asset->Get();
+						material->SetTexture(name, 0, tAsset->Get());
 					}
 				}
 				if (texture != nullptr)
 				{
 					dataJson->SetString(texture->GetName());
 				}
-
-
 			}
 				break;
 			default:
@@ -420,33 +441,12 @@ if (val)
 					stock.LoadJson(assetVal);
 
 					// Property
-					for (auto& _pair : materialDatas)
-					{
-						auto name = _pair.first;
-						auto type = _pair.second.first;
-						auto dataJson = _pair.second.second;
-						
-						auto iter = stock.MaterialDatas.find(name);
-						if (iter == stock.MaterialDatas.end())
-						{
-							continue;
-						}
+					stock.MaterialDatas = materialDatas;
 
-						if (stock.MaterialDatas[name].first != type) {
-							continue;
-						}
-
-						stock.MaterialDatas[name].second = dataJson;
-					}
-					// 저장
-					//MaterialAssetImportSettings settings;
-					//settings.FileName   = targetAsset->GetAssetName();
-					//settings.OutputPath = targetAsset->GetAssetPath();
-
+					auto outputPath = ReplaceAll(targetAsset->GetAssetFullPath(), targetAsset->GetAssetName() + targetAsset->GetExtension(), "");
+					MaterialAssetStock::Write(outputPath, stock);
+					AssetDataBase::GetInstance().RefreshAsset(targetAsset->GetAssetID());
 				}
-
-				
-
 			}
 				
 		}
@@ -510,7 +510,7 @@ if (val)
 		mAssetManagerPool.erase(assetManager.get());
 	}
 
-	EAssetFormat AssetDataBase::GetAssetFormat(const String& path)
+	EAssetFormat AssetDataBase::GetAssetFormat(const String& path, bool is_load_origin)
 	{
 		String absolutePath;
 		String resourcePath;
@@ -526,19 +526,20 @@ if (val)
 				return iter->second;
 			}
 		}
-
-
-		LoadOriginAsset(resourcePath);
+		if (is_load_origin)
+		{
+			LoadOriginAsset(resourcePath);
+		}
 		return Json::GetAssetFormat(absolutePath);
 	}
 
-	AssetID AssetDataBase::LoadOriginAsset(const String& path)
+	SharedPtr<IAsset> AssetDataBase::LoadOriginAsset(const String& path)
 	{
 		String resourcePath;
 		String absolutePath;
 		if (GetResourcePath(path, absolutePath, resourcePath) == false)
 		{
-			return AssetID();
+			return nullptr;
 		}
 
 		if (mAssetLoadScheduleHandle == nullptr)
@@ -546,12 +547,14 @@ if (val)
 			mAssetLoadScheduleHandle = 
 				Scheduler::GetInstance().ScheduleByFrame(0, 1, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&AssetDataBase::LoadAsset_Update));
 		}
+
+
+		std::lock_guard<std::mutex> lock(mAssetPoolMutex);
 		// 에셋 검사
 		auto iter = mOriginAssetDataPool.find(resourcePath);
 		if (iter != mOriginAssetDataPool.end())
 		{
-			iter->second->RefCount++;
-			return iter->second->ID;
+			return iter->second->Asset->Copy();
 		}
 	
 		auto assetID   = RequestOriginAssetID(resourcePath);
@@ -561,22 +564,27 @@ if (val)
 		assetData->ID       = assetID;
 		assetData->State    = EAssetDataState::Loading;
 		assetData->Path		= absolutePath;
+		assetData->Asset    = CreateAsset(assetID, absolutePath);
+		auto result = assetData->Asset;
+
+
 		assetLoadData.ID	= assetID;
-		strcpy(assetLoadData.Path, path.c_str());
+		assetLoadData.Asset = assetData->Asset;
+		strcpy(assetLoadData.Path, absolutePath.c_str());
 
 		// 에셋 추가
 		mOriginAssetDataPool.emplace(resourcePath, assetData.get());
 		mLoadAssetDataQueue.push(assetLoadData);
 		mAssetDataPool.emplace(assetID, std::move(assetData));
 	
-		return assetID;
+		return result;
 	}
-	AssetID AssetDataBase::LoadReadWriteAsset(AssetID originID)
+	SharedPtr<IAsset> AssetDataBase::LoadReadWriteAsset(AssetID originID)
 	{
 		auto iter = mAssetDataPool.find(originID);
 		if (iter == mAssetDataPool.end())
 		{
-			return AssetID();
+			return nullptr;
 		}
 		auto assetRWID = RequestRWAssetID(originID);
 		auto originAssetData = mAssetDataPool[originID].get();
@@ -587,19 +595,20 @@ if (val)
 		assetData->ID    = assetRWID;
 		assetData->State = EAssetDataState::Loading;
 		assetData->Path  = originAssetData->Path;
-		assetData->RefCount = 1;
-		
-
+		assetData->Asset = CreateAsset(assetRWID, originAssetData->Path);
+		auto result = assetData->Asset;
 		AssetLoadData assetLoadData;
-		assetLoadData.ID = assetRWID;
+		assetLoadData.ID    = assetRWID;
+		assetLoadData.Asset = assetData->Asset;
 		strcpy(assetLoadData.Path, assetData->Path.c_str());
 
 
 
 		mLoadAssetDataQueue.push(assetLoadData);
+		mAssetDependencies[originID].insert(assetRWID);
 		mAssetDataPool.emplace(assetRWID, std::move(assetData));
 
-		return assetRWID;
+		return result;
 	}
 	void AssetDataBase::UnLoadAsset(AssetID id)
 	{
@@ -613,34 +622,76 @@ if (val)
 		{
 			return;
 		}
-		iter->second->RefCount--;
-		if (iter->second->RefCount <= 0)
+		AssetUnLoadData unLoadData;
+		unLoadData.Asset = iter->second->Asset;
+		unLoadData.ID = iter->second->ID;
+		mUnLoadAssetDataQueue.push(unLoadData);
+		if (id.IsOrigin())
 		{
-			AssetUnLoadData unLoadData;
-			unLoadData.Asset = iter->second->Asset;
-			unLoadData.ID = iter->second->ID;
-			mUnLoadAssetDataQueue.push(unLoadData);
-			if (id.IsOrigin())
+			mOriginAssetDataPool.erase(id.ResourcePath);
+		}
+		else
+		{
+			AssetID originID;
+			originID.ID = id.GetOriginID();
+			originID.Origin = id.GetOriginID();
+			mAssetDependencies[originID].erase(id);
+		}
+		mAssetDataPool.erase(id);
+	}
+
+	void AssetDataBase::RefreshAsset(AssetID originID)
+	{
+		if (originID.IsOrigin()== false) return;
+		if (mAssetDependencies.find(originID) == mAssetDependencies.end())
+		{
+			return;
+		}
+
+		// Origin Update
+		{
+			if (mAssetDataPool.find(originID) == mAssetDataPool.end()) return;
+
+			auto originAssetData = mAssetDataPool[originID].get();
+
+			AssetLoadData assetLoadData;
+			assetLoadData.ID = originAssetData->ID;
+			assetLoadData.Asset = originAssetData->Asset;
+			strcpy(assetLoadData.Path, (originAssetData->Asset->GetAssetFullPath()).c_str());
+			mLoadAssetDataQueue.push(assetLoadData);
+
+		}
+
+
+
+		// Dependency Asset Update
+		auto& dependenciesSet = mAssetDependencies[originID];
+		List<AssetID> garbageAssetList;
+		for (auto& assetID : dependenciesSet)
+		{
+			if (mAssetDataPool.find(assetID) == mAssetDataPool.end())
 			{
-				mOriginAssetDataPool.erase(id.ResourcePath);
-			}
-			mAssetDataPool.erase(id);
+				garbageAssetList.push_back(assetID);
+			};
+			auto rwAssetData = mAssetDataPool[assetID].get();
+			AssetLoadData assetLoadData;
+			assetLoadData.ID    = rwAssetData->ID;
+			assetLoadData.Asset = rwAssetData->Asset;
+			strcpy(assetLoadData.Path, (rwAssetData->Asset->GetAssetFullPath()).c_str());
+			mLoadAssetDataQueue.push(assetLoadData);
+		}
+
+		for (auto& garbage : garbageAssetList)
+		{
+			dependenciesSet.erase(garbage);
 		}
 	}
 
 	AssetID AssetDataBase::RequestOriginAssetID(const String& resourcePath)
 	{
 		AssetID id;
-		if (mAssetIDQueue.empty() == false)
-		{
-			id.Origin	 = mAssetIDQueue.front(); mAssetIDQueue.pop();
-			id.ID		 = id.Origin;
-		}
-		else
-		{
-			id.Origin    = mAssetIDOffset++;
-			id.ID		 = id.Origin;
-		}
+		id.Origin = mAssetIDOffset++;
+		id.ID = id.Origin;
 		strcpy(id.ResourcePath, resourcePath.c_str());
 		return id;
 	}
@@ -659,20 +710,22 @@ if (val)
 
 		AssetID id = RequestOriginAssetID(originID.ResourcePath);
 		id.Origin = originID.GetID();
+
+		mAssetDependencies[originID].insert(id);
 		return id;
 	}
-	void AssetDataBase::LoadAssetInternal(AssetLoadData* LoadData)
+	bool AssetDataBase::LoadAssetInternal(AssetLoadData* LoadData)
 	{
 		fs::path assetPath = LoadData->Path;
 		if (fs::exists(assetPath) == false)
 		{
-			return;
+			return false;
 		}
 		EAssetFormat assetFormat = EAssetFormat::None;
 		auto json = CreateSharedPtr<Json>();
 		if (Json::Read(assetPath.string(), json) == false)
 		{
-			return;
+			return false;
 		}
 		auto assetFormatVal = json->GetMember(JG_ASSET_FORMAT_KEY);
 		if (assetFormatVal)
@@ -682,7 +735,7 @@ if (val)
 		auto assetVal = json->GetMember(JG_ASSET_KEY);
 		if (assetVal == nullptr)
 		{
-			return;
+			return false;
 		}
 
 		// 에셋 로드
@@ -691,7 +744,6 @@ if (val)
 		case EAssetFormat::Texture:
 		{
 			LoadData->Stock = CreateSharedPtr<TextureAssetStock>();
-			LoadData->Asset = CreateSharedPtr<Asset<ITexture>>(assetPath.string());
 			LoadData->OnComplete = std::bind(&AssetDataBase::TextureAsset_OnCompelete, this, std::placeholders::_1);
 			LoadData->Stock->LoadJson(assetVal);
 			break;
@@ -700,27 +752,27 @@ if (val)
 		{
 			StaticMeshAssetStock stock;
 			stock.LoadJson(assetVal);
-
-
-			auto meshAsset = CreateSharedPtr<Asset<IMesh>>(assetPath.string());
-			meshAsset->mData = IMesh::Create(stock);
-
-
-			LoadData->Asset = meshAsset;
+			auto mAsset = LoadData->Asset->As<IMesh>();
+			if (mAsset != nullptr)
+			{
+				mAsset->mData->SetMeshStock(stock);
+			}
+			else return false;
 			break;
 		}
 		case EAssetFormat::Material:
 		{
 			MaterialAssetStock stock;
 			stock.LoadJson(assetVal);
-
-
-			// 
 			auto shader = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
 			if (shader != nullptr)
 			{
-				auto materialAsset = CreateSharedPtr<Asset<IMaterial>>(assetPath.string());
-				materialAsset->mData = IMaterial::Create(assetPath.string(), shader);
+				auto materialAsset = LoadData->Asset->As<IMaterial>();
+				if (materialAsset == nullptr)
+				{
+					return false;
+				}
+				materialAsset->mData->SetShader(shader);
 
 				for (auto& _pair : stock.MaterialDatas)
 				{
@@ -839,25 +891,22 @@ if (val)
 						break;
 					case JG::EShaderDataType::texture2D:
 					{
-						auto matToLoadTexturedata = CreateSharedPtr<MaterialToLoadTextureData>();
-						matToLoadTexturedata->Name = name;
-						matToLoadTexturedata->TexturePathList.push_back(value->GetString());
-						matToLoadTexturedata->Material = materialAsset->mData;
+						auto textureAsset = LoadOriginAsset(value->GetString());
 
-
-
-						std::lock_guard<std::mutex> lock(mPendingMatToLoadTextureMutex);
-						mPendingMatToLoadTextureQueue.push(matToLoadTexturedata);
-						
+						if (textureAsset != nullptr & textureAsset->GetType() == JGTYPE(Asset<ITexture>))
+						{
+							auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
+							if (materialAsset->mData->SetTexture(name, 0, t) == false)
+							{
+								JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
+							}
+						}
 					}
 						break;
 					default:
 						break;
 					}
 				}
-
-
-				LoadData->Asset = materialAsset;
 			}
 			break;
 		}
@@ -870,14 +919,13 @@ if (val)
 			std::lock_guard<std::shared_mutex> lock(mAssetFormatMutex);
 			mOriginAssetFormatPool[LoadData->ID.ResourcePath] = assetFormat;
 		}
-
+		return true;
 	}
 
 
 	EScheduleResult AssetDataBase::LoadAsset_Update()
 	{
 		LoadCompeleteData_Update();
-		PendingMaterialToLoadTextureData_Update();
 		LoadAssetData_Update();
 
 		return EScheduleResult::Continue;
@@ -900,6 +948,7 @@ if (val)
 						mOriginAssetDataPool.erase(iter->second->Path);
 					}
 
+
 					mAssetDataPool.erase(compeleteData.ID);
 				}
 			}
@@ -920,54 +969,6 @@ if (val)
 
 		}
 	}
-	void AssetDataBase::PendingMaterialToLoadTextureData_Update()
-	{
-		std::lock_guard<std::mutex> lock(mPendingMatToLoadTextureMutex);
-		Queue<SharedPtr<MaterialToLoadTextureData>> tempPendingMatToLoadTextureQueue;
-		while (mPendingMatToLoadTextureQueue.empty() == false)
-		{
-			auto data = mPendingMatToLoadTextureQueue.front(); mPendingMatToLoadTextureQueue.pop();
-			bool isRecycle = false;
-			//
-			List <std::pair<i32, SharedPtr<ITexture>>> textureList;
-			i32  slot = 0;
-
-			// 텍스쳐 로드
-			for (auto& texturePath : data->TexturePathList)
-			{
-				auto id = LoadOriginAsset(texturePath);
-				auto asset = GetAsset<ITexture>(id);
-				if (asset != nullptr && asset->mData && asset->Get()->IsValid())
-				{
-					textureList.push_back(std::pair<i32, SharedPtr<ITexture>>(slot, asset->Get()));
-				}
-				else
-				{
-					isRecycle = true;
-				}
-				++slot;
-			}
-
-			// 텍스쳐 로드가 완전히 끝나지 않았다면 큐에 게속 잔류
-			if (isRecycle)
-			{
-				data->Count += 1;
-				if (data->Count < 10)
-				{
-					tempPendingMatToLoadTextureQueue.push(data);
-				}
-			}
-
-			// 로드된 텍스쳐 머터리얼에 셋팅
-			for (auto& texture : textureList)
-			{
-				if (data->Material->SetTexture(data->Name, texture.first, texture.second) == false)
-				{
-					JG_CORE_WARN("Failed {0]'s Param {1} Set Texture", data->Material->GetName(), data->Name);
-				}
-			}
-		}
-	}
 	void AssetDataBase::LoadAssetData_Update()
 	{
 		u32 loopCnt = 0;
@@ -978,17 +979,21 @@ if (val)
 			Scheduler::GetInstance().ScheduleAsync(
 				[&](void* userData)
 			{
-				LoadAssetInternal((AssetLoadData*)userData);
+				bool result = LoadAssetInternal((AssetLoadData*)userData);
 				AssetLoadData* _LoadData = (AssetLoadData*)userData;
 				AssetLoadCompeleteData data;
-				data.Asset = _LoadData->Asset;
 				data.ID = _LoadData->ID;
-				data.Stock = _LoadData->Stock;
+				if (result)
+				{
+					data.Asset = _LoadData->Asset;
+					data.Stock = _LoadData->Stock;
+				}
 				data.OnComplete = _LoadData->OnComplete;
 				{
 					std::lock_guard<std::mutex> lock(mCompeleteMutex);
 					mLoadCompeleteAssetDataQueue.push(data);
 				}
+
 			}, &loadData, sizeof(AssetLoadData));
 			++loopCnt;
 
@@ -1016,7 +1021,6 @@ if (val)
 			{
 				unLoadData.Asset.reset();
 				unLoadData.Asset = nullptr;
-				mAssetIDQueue.push(unLoadData.ID.GetID());
 			}
 			++unLoadData.FrameCount;
 			++loopCnt;
@@ -1029,7 +1033,7 @@ if (val)
 		{
 			mUnLoadAssetDataQueue.push(data);
 		}
-
+		
 		return EScheduleResult::Continue;
 	}
 	void AssetDataBase::TextureAsset_OnCompelete(AssetLoadCompeleteData* data)
@@ -1041,7 +1045,7 @@ if (val)
 		auto textureAsset = static_cast<Asset<ITexture>*>(data->Asset.get());
 		auto textureStock = static_cast<TextureAssetStock*>(data->Stock.get());
 		textureStock->Name = data->Asset->GetAssetPath();
-		textureAsset->mData = ITexture::Create(*textureStock);
+		textureAsset->mData->SetTextureMemory((const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
 	}
 
 	bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const
@@ -1086,6 +1090,23 @@ if (val)
 		JG_CORE_ERROR("{0} is not exist in AssetFolder", path);
 		return false;
 	}
+
+	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
+	{
+		// Mesh, Material, Texture
+		auto assetFormat = GetAssetFormat(path, false);
+
+		switch (assetFormat)
+		{
+		case EAssetFormat::Material: return CreateSharedPtr<Asset<IMaterial>>(assetID, path);
+		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path);
+		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path);
+		}
+
+
+		return nullptr;
+	}
+
 
 
 

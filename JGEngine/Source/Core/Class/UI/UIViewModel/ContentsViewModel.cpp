@@ -184,8 +184,7 @@ namespace JG
 
 		mSelectedAssetPath = path;
 		NotifySelectedAssetInEditorEvent e;
-		e.SelectedAsset = CreateSharedPtr<AssetID>();
-		(*e.SelectedAsset) = AssetDataBase::GetInstance().LoadOriginAsset(mSelectedAssetPath);
+		e.SelectedAsset = AssetDataBase::GetInstance().LoadOriginAsset(mSelectedAssetPath);
 		SendEvent(e);
 	}
 	void ContentsViewModel::ForEeach(ContentsDirectoryNode* CurrNode, const std::function<bool(ContentsDirectoryNode*)>& pushAction, const std::function<void(ContentsDirectoryNode*)>& action, const std::function<void(ContentsDirectoryNode*)>& popAction)

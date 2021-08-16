@@ -8,7 +8,8 @@ namespace JG
 	class InspectorModel;
 	class InspectorViewModel : public UIViewModel
 	{
-		InspectorModel* mInspectorModel = nullptr;
+		InspectorModel*   mInspectorModel = nullptr;
+		SharedPtr<IAsset> mAssetInstance = nullptr;
 	protected:
 		virtual void Initialize() override;
 		virtual void Destroy() override;

@@ -8,7 +8,7 @@
 #include "Utill/DescriptorAllocator.h"
 #include "Utill/CommandList.h"
 #include "Utill/PipelineState.h"
-#include "Dev/Dev.h"
+#include "Class/Asset/Asset.h"
 namespace JG
 {
 	DirectX12VertexBuffer::~DirectX12VertexBuffer()
@@ -703,6 +703,20 @@ namespace JG
 			ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_COMMON);
 		}
 	}
+	void DirectX12Texture::SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
+	{
+		TextureInfo info;
+		info.ArraySize = 1;
+		info.Flags = ETextureFlags::None;
+		info.MipLevel = 1;
+		info.Width = (u32)width;
+		info.Height = (u32)height;
+		info.Format = ETextureFormat::R8G8B8A8_Unorm;
+		info.PixelPerUnit = pixelPerUnit;
+		SetTextureInfo(info);
+		auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
+		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels);
+	}
 	void DirectX12Texture::SetClearColor(const Color& clearColor)
 	{
 		mTextureInfo.ClearColor = clearColor;
@@ -710,36 +724,20 @@ namespace JG
 	bool DirectX12Texture::IsValid() const
 	{
 		
-		return mD3DResource != nullptr && mIsEnd == true;
+		return mD3DResource != nullptr;
 	}
 
 	void DirectX12Texture::Create(const String& name, const TextureInfo& info)
 	{
 		SetName(name);
 		SetTextureInfo(info);
-		mIsEnd = true;
 	}
 
 	void DirectX12Texture::CreateFromMemory(const String& name, const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
 	{
-		TextureInfo info;
-		info.ArraySize = 1;
-		info.Flags	   = ETextureFlags::None;
-		info.MipLevel  = 1;
-		info.Width     = (u32)width;
-		info.Height    = (u32)height;
-		info.Format    = ETextureFormat::R8G8B8A8_Unorm;
-		info.PixelPerUnit = pixelPerUnit;
+
 		SetName(name);
-		SetTextureInfo(info);
-		auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
-		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels);
-		Scheduler::GetInstance().ScheduleByFrame(DirectX12API::GetFrameBufferCount() + 1, 0, 1,
-			0, [&]() -> EScheduleResult
-		{
-			mIsEnd = true;
-			return EScheduleResult::Break;
-		});
+		SetTextureMemory(pixels, width, height, channels, pixelPerUnit);
 	}
 
 	void DirectX12Texture::Reset()

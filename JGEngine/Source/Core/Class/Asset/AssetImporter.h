@@ -44,7 +44,6 @@ namespace JG
 	};
 	struct MaterialAssetImportSettings
 	{
-
 		String Shader;
 		String ShaderScript;
 		String FileName;

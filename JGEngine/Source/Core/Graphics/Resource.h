@@ -143,11 +143,13 @@ namespace JG
 		virtual TextureID          GetTextureID()   const = 0;
 		virtual const TextureInfo& GetTextureInfo() const = 0;
 		virtual void  SetTextureInfo(const TextureInfo& info) = 0;
+		virtual void  SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit = 1) = 0;
 		virtual void  SetClearColor(const Color& clearColor) = 0;
 	private:
 		ITexture(const ITexture& texture) = delete;
 		const ITexture& operator=(const ITexture& texture) = delete;
 	public:
+		static SharedPtr<ITexture> Create(const String& name);
 		static SharedPtr<ITexture> Create(const String& name, const TextureInfo& info);
 		static SharedPtr<ITexture> Create(const TextureAssetStock& stock);
 	};

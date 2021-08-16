@@ -3,34 +3,6 @@
 #include "Asset.h"
 namespace JG
 {
-	template<class T>
-	class AssetHandle
-	{
-		friend class AssetManager;
-	private:
-		mutable Asset<T>* mAsset = nullptr;
-		AssetID   mID;
-	public:
-		Asset<T>* GetAsset() const {
-			if (mAsset == nullptr && mID.IsValid())
-			{
-				mAsset = AssetDataBase::GetInstance().GetAsset<T>(mID);
-			}
-			return mAsset;
-		}
-		AssetID GetID() const {
-			return mID;
-		}
-		bool IsValid() const  {
-			if (GetAsset() == nullptr)
-			{
-				return false;
-			}
-			return mAsset->Get() != nullptr;
-		}
-	};
-
-	// ÂüÁ¶¸¸
 	class AssetManager
 	{
 		struct AssetIDHash
@@ -39,31 +11,44 @@ namespace JG
 				return id.ID;
 			}
 		};
-
-		std::unordered_set<AssetID, AssetIDHash> mAssetIDPool;
+		
+		std::unordered_map<AssetID, SharedPtr<IAsset>, AssetIDHash> mAssetPool;
 	public:
 		~AssetManager();
 	public:
 		template<class T>
-		SharedPtr<AssetHandle<T>> RequestOriginAsset(const String& path)
+		Asset<T>* RequestOriginAsset(const String& path)
 		{
-			auto handle   = CreateSharedPtr<AssetHandle<T>>();
-			handle->mID    = AssetDataBase::GetInstance().LoadOriginAsset(path);
-			handle->mAsset = AssetDataBase::GetInstance().GetAsset<T>(handle->mID);
-
-			mAssetIDPool.insert(handle->mID);
-			return handle;
+			auto asset = AssetDataBase::GetInstance().LoadOriginAsset(path);
+			if (asset == nullptr)
+			{
+				return nullptr;
+			}
+			if (mAssetPool.find(asset->GetAssetID()) == mAssetPool.end())
+			{
+				mAssetPool[asset->GetAssetID()] = asset;
+			}
+			return mAssetPool[asset->GetAssetID()]->As<T>();
 		}
 		template<class T>
-		SharedPtr<AssetHandle<T>> RequestRWAsset(const String& path)
+		Asset<T>* RequestRWAsset(const String& path)
 		{
-			auto originID = AssetDataBase::GetInstance().LoadOriginAsset(path);
-			auto handle = CreateSharedPtr<AssetHandle<T>>();
-			handle->mID    = AssetDataBase::GetInstance().LoadReadWriteAsset(originID);
-			handle->mAsset = AssetDataBase::GetInstance().GetAsset<T>(handle->mID);
+			auto originAsset  = AssetDataBase::GetInstance().LoadOriginAsset(path);
+			if (originAsset == nullptr)
+			{
+				return nullptr;
+			}
 
-			mAssetIDPool.insert(handle->mID);
-			return handle;
+			auto rwAsset = AssetDataBase::GetInstance().LoadReadWriteAsset(originAsset->GetAssetID());
+			if (rwAsset == nullptr)
+			{
+				return nullptr;
+			}
+			if (mAssetPool.find(rwAsset->GetAssetID()) == mAssetPool.end())
+			{
+				mAssetPool[rwAsset->GetAssetID()] = rwAsset;
+			}
+			return mAssetPool[rwAsset->GetAssetID()]->As<T>();
 		}
 		EAssetFormat GetAssetFormat(const String& path);
 	};

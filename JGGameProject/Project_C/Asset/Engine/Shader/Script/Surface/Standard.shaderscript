@@ -4,12 +4,12 @@ _Resources {
 
 
 _Variables {
-	float4 TestColor;
+	float3 TestColor;
 	float  TextValue;
 }
 
 _Init {
-	TestColor = { 1.0f, 1.0f, 1.0f 1.0f }
+
 }
 
 

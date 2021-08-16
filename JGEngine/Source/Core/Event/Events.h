@@ -178,7 +178,7 @@ private: \
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0,0))
 	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, SharedPtr<AssetID>, SelectedAsset, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, SharedPtr<IAsset>, SelectedAsset, nullptr)
 		
 	REQUEST_ONE_ARG_EVENT(RequestGetGameWorldEvent, GameWorld*, GameWorld, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem, nullptr)

@@ -89,10 +89,10 @@ namespace JG
 	}
 	bool InspectorViewModel::ResponseSelectedAssetInEditor(NotifySelectedAssetInEditorEvent& e)
 	{
-		auto asset = AssetDataBase::GetInstance().GetIAsset((*e.SelectedAsset));
-		if (asset != nullptr)
+		if (e.SelectedAsset != nullptr)
 		{
-			SetTargetObject(asset);
+			mAssetInstance = e.SelectedAsset;
+			SetTargetObject(e.SelectedAsset.get());
 		}
 		return false;
 	}

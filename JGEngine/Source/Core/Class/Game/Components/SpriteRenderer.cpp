@@ -24,7 +24,7 @@ namespace JG
 	void SpriteRenderer::Start()
 	{
 		BaseRenderer::Start();
-		if (mSpriteAssetHandle == nullptr)
+		if (mSprite == nullptr)
 		{
 			SetSprite("Asset/Resources/NullTexture.jgasset");
 		}
@@ -49,9 +49,12 @@ namespace JG
 		BaseRenderer::MakeJson(jsonData);
 		jsonData->AddMember("Color", JVector4(mSpriteRI->Color));
 
-		if (mSpriteAssetHandle && mSpriteAssetHandle->IsValid())
+
+
+
+		if (mSprite)
 		{
-			jsonData->AddMember("SpritePath", mSpriteAssetHandle->GetAsset()->GetAssetPath());
+			jsonData->AddMember("SpritePath", mSprite->GetAssetPath());
 		}
 	
 
@@ -79,7 +82,7 @@ namespace JG
 		{
 			return;
 		}
-		mSpriteAssetHandle = assetManager->RequestOriginAsset<ITexture>(path);
+		mSprite = assetManager->RequestOriginAsset<ITexture>(path);
 	}
 
 	SharedPtr<IRenderItem> SpriteRenderer::PushRenderItem()
@@ -87,10 +90,10 @@ namespace JG
 		auto transform = GetOwner()->GetTransform();
 		mSpriteRI->WorldMatrix = transform->GetWorldMatrix();
 
-		if (mSpriteAssetHandle && mSpriteAssetHandle->IsValid())
+		if (mSprite && mSprite->Get()->IsValid())
 		{
-			auto info = mSpriteAssetHandle->GetAsset()->Get()->GetTextureInfo();
-			mSpriteRI->Texture = mSpriteAssetHandle->GetAsset()->Get();
+			auto info = mSprite->Get()->GetTextureInfo();
+			mSpriteRI->Texture = mSprite->Get();
 			f32 adjust = (f32)info.PixelPerUnit / (f32)GameSettings::GetUnitSize();
 			f32 spriteWidth  = info.Width  * adjust;
 			f32 spriteHeight = info.Height * adjust;
@@ -122,18 +125,18 @@ namespace JG
 		ImGui::ColorEdit4("##Color Editor", (float*)(&mSpriteRI->Color));
 		
 		String path;
-		if (mSpriteAssetHandle && mSpriteAssetHandle->IsValid())
+		if (mSprite)
 		{
-			if (ImGui::AssetField("Sprite ", mSpriteAssetHandle->GetAsset()->GetAssetName(), EAssetFormat::Texture, path) == true)
+			if (ImGui::AssetField("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path) == true)
 			{
-				mSpriteAssetHandle = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
+				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
 			}
 		}
 		else
 		{
 			if (ImGui::AssetField("Sprite ", "none", EAssetFormat::Texture, path) == true)
 			{
-				mSpriteAssetHandle = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
+				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
 			}
 		}
 	}

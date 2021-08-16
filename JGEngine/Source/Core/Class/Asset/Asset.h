@@ -181,13 +181,14 @@ namespace JG
 		virtual EAssetFormat GetAssetFormat() const override {
 			return EAssetFormat::Material;
 		}
+		static bool Write(const String& path, const MaterialAssetStock& stock);
 	};
 	
 
 #define ASSET_NULL_ID -1
-
 	class AssetID
 	{
+		// 참조하고있는 에셋
 		friend class AssetDataBase;
 		friend class AssetManager;
 	private:
@@ -218,16 +219,40 @@ namespace JG
 		}
 	};
 
+	template<class T>
+	class Asset;
+
 	class IAsset : public IJGObject
 	{
 	public:
-		virtual u64 GetAssetID() const = 0;
+		virtual AssetID GetAssetID() const = 0;
 		virtual const String& GetAssetFullPath() const = 0;
 		virtual const String& GetAssetPath() const     = 0;
 		virtual const String& GetAssetName() const     = 0;
 		virtual const String& GetExtension() const = 0;
+
+	public:
+		template<class T>
+		Asset<T>* As() {
+			if (Is<T>())
+			{
+				return static_cast<Asset<T>*>(this);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+
+		template<class T>
+		bool Is() {
+			return GetType() == JGTYPE(Asset<T>);
+		}
 	public:
 		virtual ~IAsset() = default;
+	private:
+		friend class AssetDataBase;
+		virtual SharedPtr<IAsset> Copy() const = 0;
 	};
 
 
@@ -251,26 +276,27 @@ namespace JG
 		JGCLASS
 		friend class AssetDataBase;
 		friend class AssetManager;
-		u64    mAssetID = ASSET_NULL_ID;
-		String mAssetPath;
-		String mAssetFullPath;
-		String mExtension;
-		String mName;
+		AssetID mAssetID;
+		String  mAssetPath;
+		String  mAssetFullPath;
+		String  mExtension;
+		String  mName;
 
 		SharedPtr<T> mData = nullptr;
 	public:
-		Asset(const String& assetPath)
+		Asset(AssetID assetID, const String& assetPath)
 		{
 			fs::path p(assetPath);
 			fs::path contentsPath = fs::absolute(Application::GetAssetPath()).string();
-			mAssetID = (u64)this;
+			mAssetID = assetID;
 			mAssetFullPath = fs::absolute(assetPath).string();
 			mAssetPath	   = ReplaceAll(mAssetFullPath, contentsPath.string(), "Asset");
 			mExtension     = p.extension().string();
 			mName = ReplaceAll(p.filename().string() ,mExtension, "");
+			mData = T::Create(mAssetPath);
 		}
 	public:
-		virtual u64 GetAssetID() const override
+		virtual AssetID GetAssetID() const override
 		{
 			return mAssetID;
 		}
@@ -298,14 +324,13 @@ namespace JG
 		}
 	public:
 		virtual ~Asset() = default;
+	private:
+		virtual SharedPtr<IAsset> Copy() const override {
+			auto asset = CreateSharedPtr<Asset<T>>(mAssetID, mAssetFullPath);
+			asset->mData = mData;
+			return asset;
+		}
 	};
-
-
-
-
-
-
-
 
 	class AssetManager;
 	class IMaterial;
@@ -328,7 +353,6 @@ namespace JG
 		{
 			AssetID ID;
 			String  Path;
-			u32               RefCount  = 0;
 			EAssetDataState   State     = EAssetDataState::None;
 			SharedPtr<IAsset> Asset		= nullptr;
 		};
@@ -341,6 +365,7 @@ namespace JG
 			SharedPtr<IAsset> Asset = nullptr;
 			SharedPtr<IAssetStock> Stock = nullptr;
 			std::function<void(AssetLoadCompeleteData*)> OnComplete;
+
 		};
 		// 로드 완료된 에셋 데이터
 		struct AssetLoadCompeleteData
@@ -358,18 +383,10 @@ namespace JG
 			u32 FrameCount  = 0;
 		};
 
-		struct MaterialToLoadTextureData
-		{
-			SharedPtr<IMaterial> Material;
-			String Name;
-			List<String> TexturePathList;
-			i32 Count = 0;
-		};
-
-
 
 		// 에셋 데이터 Pool;
 		std::unordered_map<AssetID, UniquePtr<AssetData>, AssetIDHash> mAssetDataPool;
+		std::unordered_map<AssetID, std::unordered_set<AssetID, AssetIDHash>, AssetIDHash> mAssetDependencies;
 		Dictionary<String, AssetData*>			  mOriginAssetDataPool;
 		Dictionary<String, EAssetFormat>		  mOriginAssetFormatPool;
 
@@ -379,10 +396,7 @@ namespace JG
 		Queue<AssetUnLoadData> mUnLoadAssetDataQueue;
 
 
-		std::mutex mPendingMatToLoadTextureMutex;
-		Queue<SharedPtr<MaterialToLoadTextureData>> mPendingMatToLoadTextureQueue;
-
-	
+		std::mutex mAssetPoolMutex;
 		u64 mAssetIDOffset = 0;
 		Queue<u64> mAssetIDQueue;
 
@@ -405,64 +419,27 @@ namespace JG
 		SharedPtr<AssetManager> RequestAssetManager();
 		void ReturnAssetManager(SharedPtr<AssetManager> assetManager);
 	public:
-		EAssetFormat GetAssetFormat(const String& path);
-		AssetID LoadOriginAsset(const String& path);
-		AssetID LoadReadWriteAsset(AssetID originID);
+		EAssetFormat      GetAssetFormat(const String& path, bool is_load_origin = true);
+		SharedPtr<IAsset> LoadOriginAsset(const String& path);
+		SharedPtr<IAsset> LoadReadWriteAsset(AssetID originID);
 		void	UnLoadAsset(AssetID id);
-
-		template<class T>
-		Asset<T>* GetAsset(AssetID assetID) const
-		{
-			auto iter = mAssetDataPool.find(assetID);
-			if (iter == mAssetDataPool.end())
-			{
-				return nullptr;
-			}
-			if (iter->second->State == EAssetDataState::None && iter->second->Asset->GetType() == JGTYPE(Asset<T>))
-			{
-				return static_cast<Asset<T>*>(iter->second->Asset.get());
-			}
-			return nullptr;
-		}
-		IAsset* GetIAsset(AssetID assetID) const 
-		{
-			auto iter = mAssetDataPool.find(assetID);
-			if (iter == mAssetDataPool.end())
-			{
-				return nullptr;
-			}
-			if (iter->second->State == EAssetDataState::None)
-			{
-				return iter->second->Asset.get();
-			}
-			return nullptr;
-		}
+		void RefreshAsset(AssetID originID);
 	private:
 		AssetID RequestOriginAssetID(const String& resourcePath);
 		AssetID RequestRWAssetID(AssetID originID);
-		void LoadAssetInternal(AssetLoadData* LoadData);
+		bool LoadAssetInternal(AssetLoadData* LoadData);
 
 
 		EScheduleResult LoadAsset_Update();
 		void LoadCompeleteData_Update();
-		void PendingMaterialToLoadTextureData_Update();
 		void LoadAssetData_Update();
 
 		EScheduleResult UnLoadAsset_Update();
 		bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
+		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);
-
-		// 요청 받기
-
-		// 여기에 비동기로 에셋 로딩 로직 생성
-		// 에셋 종류
-		// 오리진 에셋
-		// 변형된 에셋
-
-
-		// 변형된 에셋은 오리진 에셋을 참조
-		// GetOriginAsset
-		// GetAsset( id 를 불러온다. )
 	};
+
+
 }
