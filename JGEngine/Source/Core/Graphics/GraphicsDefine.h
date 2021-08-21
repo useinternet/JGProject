@@ -31,15 +31,18 @@ namespace JG
 		None,
 		R8G8B8A8_Unorm,
 		R16G16B16A16_Unorm,
+		R32G32B32A32_Float,
 		D24_Unorm_S8_Uint
 	};
 	inline String TextureFormatToString(ETextureFormat format)
 	{
 		switch (format)
 		{
-		case ETextureFormat::R8G8B8A8_Unorm: return "R8G8B8A8_Unorm";
+		case ETextureFormat::R8G8B8A8_Unorm:     return "R8G8B8A8_Unorm";
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
-		case ETextureFormat::D24_Unorm_S8_Uint: return "D24_Unorm_S8_Uint";
+		case ETextureFormat::R32G32B32A32_Float: return  "R32G32B32A32_Float";
+		case ETextureFormat::D24_Unorm_S8_Uint:  return "D24_Unorm_S8_Uint";
+
 		default: return "None";
 		}
 	}
@@ -52,6 +55,7 @@ namespace JG
 		{
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
+		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			JG_CORE_ERROR("This {0} DirectX12 TextureFormat is not supported convert ETextureFormat", TextureFormatToString(format));
@@ -357,6 +361,54 @@ namespace JG
 		List<SharedPtr<IMaterial>> Materials;
 	};
 
+
+
+	// LightItem
+	class ILightItem : public IJGObject
+	{
+		JGCLASS
+	protected:
+		void PushData(List<jbyte>& btData, void* data, u64 size)  {
+			u64 offset = btData.size();
+
+			btData.resize(offset + size);
+			memcpy(&btData[offset], data, size);
+		}
+	public:
+		virtual void PushBtData(List<jbyte>& btData)  = 0;
+		virtual u64 GetBtSize() const = 0;
+	};
+	class PointLightItem : public ILightItem
+	{
+		JGCLASS
+	public:
+		JVector3 Color;
+		JVector3 Position;
+		f32 Intensity = 1.0f;
+		f32 Range = 0.0f;
+		f32 Att0 = 0.0f;
+		f32 Att1 = 0.0f;
+		f32 Att2 = 0.0f;
+	public:
+		virtual void PushBtData(List<jbyte>& btData)  override
+		{
+			PushData(btData , &Position, sizeof(JVector3));
+			PushData(btData , &Range, sizeof(float));
+			PushData(btData , &Color, sizeof(JVector3));
+			PushData(btData , &Intensity, sizeof(float));
+			PushData(btData , &Att0, sizeof(float));
+			PushData(btData , &Att1, sizeof(float));
+			PushData(btData , &Att2, sizeof(float));
+		}
+		virtual u64 GetBtSize() const override {
+			return 44;
+		}
+	};
+
+	
+
+
+
 	namespace ShaderScript
 	{
 		namespace Template
@@ -373,7 +425,12 @@ namespace JG
 		namespace Standard3D
 		{
 			constexpr char* ViewProj = "gViewProj";
+			constexpr char* Eye      = "gEye";
 			constexpr char* World    = "gWorld";
+
+
+			constexpr char* PointLightList = "gPointLightList";
+			constexpr char* PointLightCount = "gPointLightCount";
 		}
 
 		namespace Type

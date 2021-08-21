@@ -103,6 +103,33 @@ namespace JG
 		return nullptr;
 	}
 
+	bool ShaderLibrary::LoadGlobalShaderLib()
+	{
+		auto globalLibPath = Application::GetShaderGlobalLibPath();
+		globalLibPath = CombinePath(globalLibPath, "GlobalShaderLibrary.shaderLib");
+		auto p = fs::path(globalLibPath);
+		std::ifstream fin(p.string());
+
+		if (fin.is_open() == true)
+		{
+			std::stringstream ss;
+			ss << fin.rdbuf();
+			mGlobalShaderLibCode = ss.str();
+			fin.close();
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	String ShaderLibrary::GetGlobalShaderLibCode() const
+	{
+		return mGlobalShaderLibCode;
+	}
+
 
 
 

@@ -33,19 +33,19 @@
                         "Name": "Transform",
                         "IsActive": true,
                         "Location": [
-                            1.7248830795288087,
-                            0.5505553483963013,
-                            -10.0
+                            -22.35032081604004,
+                            11.166030883789063,
+                            -15.837494850158692
                         ],
                         "Rotation": [
-                            0.0,
-                            0.0,
+                            9.49894905090332,
+                            20.920948028564454,
                             0.0
                         ],
                         "Scale": [
-                            0.9999810457229614,
-                            0.9999750852584839,
-                            0.9999850392341614
+                            0.9999188780784607,
+                            0.9997653961181641,
+                            0.9997997283935547
                         ]
                     },
                     {
@@ -97,44 +97,6 @@
                 ],
                 "Childs": [
                     {
-                        "Name": "Quad",
-                        "Components": [
-                            {
-                                "ComponentType": "JG::Transform",
-                                "Name": "Transform",
-                                "IsActive": true,
-                                "Location": [
-                                    250.0,
-                                    10.0,
-                                    9.113713161923443e-8
-                                ],
-                                "Rotation": [
-                                    0.0,
-                                    0.000001534284479021153,
-                                    0.0
-                                ],
-                                "Scale": [
-                                    1.0,
-                                    1.0,
-                                    1.0
-                                ]
-                            },
-                            {
-                                "ComponentType": "JG::SpriteRenderer",
-                                "Name": "SpriteRenderer",
-                                "IsActive": true,
-                                "Color": [
-                                    1.0,
-                                    1.0,
-                                    1.0,
-                                    1.0
-                                ],
-                                "SpritePath": "Asset\\Resources\\UV.Grid.jgasset"
-                            }
-                        ],
-                        "Childs": []
-                    },
-                    {
                         "Name": "Cube",
                         "Components": [
                             {
@@ -143,7 +105,7 @@
                                 "IsActive": true,
                                 "Location": [
                                     4.5495405197143559,
-                                    -0.03335118293762207,
+                                    10.0,
                                     0.0
                                 ],
                                 "Rotation": [
@@ -162,45 +124,9 @@
                                 "Name": "StaticMeshRenderer",
                                 "IsActive": true,
                                 "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
-                                "Materials": {}
-                            }
-                        ],
-                        "Childs": []
-                    },
-                    {
-                        "Name": "Quad2",
-                        "Components": [
-                            {
-                                "ComponentType": "JG::Transform",
-                                "Name": "Transform",
-                                "IsActive": true,
-                                "Location": [
-                                    -210.0,
-                                    -25.0,
-                                    1.2151616601840943e-7
-                                ],
-                                "Rotation": [
-                                    0.0,
-                                    0.0,
-                                    0.0
-                                ],
-                                "Scale": [
-                                    1.0,
-                                    1.0,
-                                    1.0
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial_1.jgasset"
                                 ]
-                            },
-                            {
-                                "ComponentType": "JG::SpriteRenderer",
-                                "Name": "SpriteRenderer",
-                                "IsActive": true,
-                                "Color": [
-                                    1.0,
-                                    1.0,
-                                    1.0,
-                                    1.0
-                                ],
-                                "SpritePath": "Asset\\Resources\\NullTexture.jgasset"
                             }
                         ],
                         "Childs": []
@@ -213,9 +139,9 @@
                                 "Name": "Transform",
                                 "IsActive": true,
                                 "Location": [
-                                    -0.45045945048332217,
-                                    -0.03335118293762207,
-                                    -5.0
+                                    -7.889327049255371,
+                                    5.0,
+                                    -5.837316513061523
                                 ],
                                 "Rotation": [
                                     0.0,
@@ -223,17 +149,19 @@
                                     0.0
                                 ],
                                 "Scale": [
-                                    0.9999995231628418,
-                                    0.9999995231628418,
-                                    0.9999901652336121
+                                    2.0,
+                                    2.0,
+                                    2.0
                                 ]
                             },
                             {
                                 "ComponentType": "JG::StaticMeshRenderer",
                                 "Name": "StaticMeshRenderer",
                                 "IsActive": true,
-                                "MeshPath": "Asset\\Resources\\Sphere.001.jgasset",
-                                "Materials": {}
+                                "MeshPath": "Asset\\Resources\\Sphere.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial_1.jgasset"
+                                ]
                             }
                         ],
                         "Childs": []
@@ -247,26 +175,273 @@
                                 "IsActive": true,
                                 "Location": [
                                     5.216736316680908,
-                                    0.0,
+                                    5.0,
                                     -5.0
                                 ],
                                 "Rotation": [
-                                    313.4741516113281,
+                                    313.4747314453125,
                                     0.0,
                                     0.0
                                 ],
                                 "Scale": [
-                                    1.0,
-                                    0.9999934434890747,
-                                    0.9999934434890747
+                                    2.0,
+                                    1.9999960660934449,
+                                    2.0
                                 ]
                             },
                             {
                                 "ComponentType": "JG::StaticMeshRenderer",
                                 "Name": "StaticMeshRenderer",
                                 "IsActive": true,
-                                "MeshPath": "Asset\\Resources\\Torus.jgasset",
-                                "Materials": {}
+                                "MeshPath": "Asset\\Resources\\Sphere.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial_1.jgasset"
+                                ]
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Ground",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    0.0,
+                                    -5.0,
+                                    0.0
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    32.23799133300781,
+                                    1.0,
+                                    18.387317657470704
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial_1.jgasset"
+                                ]
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Ground2",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    -33.0,
+                                    7.926385879516602,
+                                    -0.41904497146606448
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    15.0,
+                                    18.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial.jgasset"
+                                ]
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Ground3",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    0.0,
+                                    8.062615394592286,
+                                    20.0
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    33.0,
+                                    15.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial.jgasset"
+                                ]
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "Ground4",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    33.482173919677737,
+                                    7.9489521980285648,
+                                    0.0
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    15.0,
+                                    20.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::StaticMeshRenderer",
+                                "Name": "StaticMeshRenderer",
+                                "IsActive": true,
+                                "MeshPath": "Asset\\Resources\\Cube.001.jgasset",
+                                "Materials": [
+                                    "Asset\\Resources\\DefaultMaterial.jgasset"
+                                ]
+                            }
+                        ],
+                        "Childs": []
+                    }
+                ]
+            },
+            {
+                "Name": "Lights",
+                "Components": [
+                    {
+                        "ComponentType": "JG::Transform",
+                        "Name": "Transform",
+                        "IsActive": true,
+                        "Location": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                "Childs": [
+                    {
+                        "Name": "PointLight1",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    9.728352546691895,
+                                    4.758337020874023,
+                                    -1.817450761795044
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::PointLight",
+                                "Color": [
+                                    0.8650693893432617,
+                                    0.9409282803535461,
+                                    0.09131373465061188
+                                ],
+                                "Intensity": 1.0,
+                                "Range": 100.0,
+                                "Att0": 0.0,
+                                "Att1": 0.19099999964237214,
+                                "Att2": 0.0
+                            }
+                        ],
+                        "Childs": []
+                    },
+                    {
+                        "Name": "PointLight2",
+                        "Components": [
+                            {
+                                "ComponentType": "JG::Transform",
+                                "Name": "Transform",
+                                "IsActive": true,
+                                "Location": [
+                                    -19.03850555419922,
+                                    9.331657409667969,
+                                    -5.8221049308776859
+                                ],
+                                "Rotation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "Scale": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            {
+                                "ComponentType": "JG::PointLight",
+                                "Color": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "Intensity": 5.0,
+                                "Range": 100.0,
+                                "Att0": 0.0,
+                                "Att1": 1.0,
+                                "Att2": 0.0
                             }
                         ],
                         "Childs": []

@@ -11,7 +11,7 @@
 #include "Class/Game/Components/Camera.h"
 #include "Class/Game/Components/SpriteRenderer.h"
 #include "Class/Game/Components/StaticMeshRenderer.h"
-
+#include "Class/Game/Components/PointLight.h"
 #include "Class/Asset/Asset.h"
 
 #include "Class/UI/ModalUI/ProgressBarModalView.h"
@@ -71,11 +71,18 @@ namespace JG
 	{
 		if (mGameWorld != nullptr)
 		{
-			auto item = mGameWorld->PushRenderItem();
-			if (item != nullptr)
+			auto renderItem = mGameWorld->PushRenderItem();
+			if (renderItem != nullptr)
 			{
 				RequestPushRenderItemEvent e;
-				e.RenderItem = item;
+				e.RenderItem = renderItem;
+				Application::GetInstance().SendEvent(e);
+			}
+			auto lightItem = mGameWorld->PushLightItem();
+			if (lightItem != nullptr)
+			{
+				RequestPushLightItemEvent e;
+				e.LightItem = lightItem;
 				Application::GetInstance().SendEvent(e);
 			}
 		}
@@ -121,6 +128,9 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<EditorCamera>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SpriteRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
+		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
+
+
 	}
 	void GameLogicSystemLayer::SaveGameWorld()
 	{

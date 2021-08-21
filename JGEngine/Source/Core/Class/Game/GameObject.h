@@ -62,6 +62,9 @@ namespace JG
 		virtual SharedPtr<IRenderItem> PushRenderItem() {
 			return nullptr;
 		}
+		virtual SharedPtr<ILightItem> PushLightItem() {
+			return nullptr;
+		}
 
 	protected: // 스케쥴 관련
 		SharedPtr<ScheduleHandle> Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);

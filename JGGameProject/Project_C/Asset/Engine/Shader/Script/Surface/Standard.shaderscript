@@ -1,11 +1,9 @@
-_Resources {
-	Texture2D NormalTexture;
-}
-
 
 _Variables {
-	float3 TestColor;
-	float  TextValue;
+	float3 BaseColor;
+	float  Roughness;
+	float3 Specular;
+	float  Metallc;
 }
 
 _Init {
@@ -14,6 +12,8 @@ _Init {
 
 
 _Surface {
-	float4 textureColor = NormalTexture.Sample(gPointSampler, _input.tex);
-	_output.albedo = textureColor;
+	_output.albedo    = float4(BaseColor, 1.0f);
+	_output.roughness = Roughness;
+	_output.specular  = Specular;
+	_output.metallic  = Metallc;
 }

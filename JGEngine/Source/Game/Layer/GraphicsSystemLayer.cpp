@@ -8,6 +8,8 @@
 #include "Graphics/GraphicsAPI.h"
 #include "Class/Game/GameSettings.h"
 #include "Class/Game/Components/Camera.h"
+#include "Class/Game/Components/Transform.h"
+#include "Class/Game/GameNode.h"
 #include "Class/Asset/AssetImporter.h"
 #include "Class/Asset/Asset.h"
 #include "Imgui/ImGuizmo.h"
@@ -99,40 +101,40 @@ namespace JG
 		String outputPath = CombinePath(Application::GetAssetPath(), "Resources");
 
 
-		for (auto& iter : fs::recursive_directory_iterator(rawAssetPath))
-		{
-			auto extenstion = iter.path().extension().string();
-			if (extenstion == ".fbx")
-			{
-				FBXAssetImportSettings settings;
-				settings.AssetPath = iter.path().string();
-				settings.OutputPath = outputPath;
-				auto result = AssetImporter::Import(settings);
-				if (result == EAssetImportResult::Success)
-				{
-					JG_CORE_INFO("Success Import {0}", iter.path().string());
-				}
-				else
-				{
-					JG_CORE_INFO("Fail Import {0}", iter.path().string());
-				}
-			}
-			if (extenstion == ".png" || extenstion == ".jpg" || extenstion == ".TGA")
-			{
-				TextureAssetImportSettings settings;
-				settings.AssetPath = iter.path().string();
-				settings.OutputPath = outputPath;
-				auto result = AssetImporter::Import(settings);
-				if (result == EAssetImportResult::Success)
-				{
-					JG_CORE_INFO("Success Import {0}", iter.path().string());
-				}
-				else
-				{
-					JG_CORE_INFO("Fail Import {0}", iter.path().string());
-				}
-			}
-		}
+		//for (auto& iter : fs::recursive_directory_iterator(rawAssetPath))
+		//{
+		//	auto extenstion = iter.path().extension().string();
+		//	if (extenstion == ".fbx")
+		//	{
+		//		FBXAssetImportSettings settings;
+		//		settings.AssetPath = iter.path().string();
+		//		settings.OutputPath = outputPath;
+		//		auto result = AssetImporter::Import(settings);
+		//		if (result == EAssetImportResult::Success)
+		//		{
+		//			JG_CORE_INFO("Success Import {0}", iter.path().string());
+		//		}
+		//		else
+		//		{
+		//			JG_CORE_INFO("Fail Import {0}", iter.path().string());
+		//		}
+		//	}
+		//	if (extenstion == ".png" || extenstion == ".jpg" || extenstion == ".TGA")
+		//	{
+		//		TextureAssetImportSettings settings;
+		//		settings.AssetPath = iter.path().string();
+		//		settings.OutputPath = outputPath;
+		//		auto result = AssetImporter::Import(settings);
+		//		if (result == EAssetImportResult::Success)
+		//		{
+		//			JG_CORE_INFO("Success Import {0}", iter.path().string());
+		//		}
+		//		else
+		//		{
+		//			JG_CORE_INFO("Fail Import {0}", iter.path().string());
+		//		}
+		//	}
+		//}
 		for (auto& iter : fs::recursive_directory_iterator(outputPath))
 		{
 			AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());
@@ -143,12 +145,14 @@ namespace JG
 	{
 		mRegisteredRenderCameras.clear();
 		mPushedRenderItems.clear();
+		mPushedLightItems.clear();
 	}
 
 	void GraphicsSystemLayer::OnEvent(IEvent& e)
 	{
 		EventDispatcher eventDispatcher(e);
 		eventDispatcher.Dispatch<RequestPushRenderItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushRenderItem));
+		eventDispatcher.Dispatch<RequestPushLightItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushLightItem));
 		eventDispatcher.Dispatch<RequestRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterCamera));
 		eventDispatcher.Dispatch<RequestUnRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseUnRegisterCamera));
 		eventDispatcher.Dispatch<RequestRegisterMainCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterMainCamera));
@@ -170,6 +174,17 @@ namespace JG
 		auto priority = mRenderItemPriority[type];
 		mPushedRenderItems[(u64)priority][type].push_back(e.RenderItem);
 
+		return true;
+	}
+
+	bool GraphicsSystemLayer::ResponsePushLightItem(RequestPushLightItemEvent& e)
+	{
+		if (e.LightItem == nullptr)
+		{
+			return true;
+		}
+
+		mPushedLightItems.push_back(e.LightItem);
 		return true;
 	}
 
@@ -297,7 +312,7 @@ namespace JG
 				mainTexInfo.Width = std::max<u32>(1, mMainCamera->Resolution.x);
 				mainTexInfo.Height = std::max<u32>(1, mMainCamera->Resolution.y);
 				mainTexInfo.ArraySize = 1;
-				mainTexInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
+				mainTexInfo.Format = ETextureFormat::R32G32B32A32_Float;
 				mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
 				mainTexInfo.MipLevel = 1;
 				mainTexInfo.ClearColor = mainCam->GetClearColor();
@@ -319,7 +334,8 @@ namespace JG
 		RenderInfo info; auto mainCam = mMainCamera->pCamera;
 		info.CurrentBufferIndex = mMainCamera->CurrentIndex;
 		info.Resolutoin			= mMainCamera->pCamera->GetResolution();
-		info.ViewProj = mMainCamera->pCamera->GetViewProjMatrix();
+		info.ViewProj    = mMainCamera->pCamera->GetViewProjMatrix();
+		info.EyePosition = mMainCamera->pCamera->GetOwner()->GetTransform()->GetWorldLocation();
 		info.TargetTexture		= mMainCamera->TargetTextures[info.CurrentBufferIndex];
 		info.TargetDepthTexture = mMainCamera->TargetDepthTextures[info.CurrentBufferIndex];
 		info.TargetTexture->SetClearColor(mainCam->GetClearColor());
@@ -329,7 +345,7 @@ namespace JG
 		Scheduler::GetInstance().ScheduleAsync([&](void* data)
 		{
 			mMainCamera->Renderer->SetCommandID(1);
-			if (mMainCamera->Renderer->Begin(*(RenderInfo*)data, { mMainCamera->_2DBatch }) == true)
+			if (mMainCamera->Renderer->Begin(*(RenderInfo*)data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
 			{
 				for (auto& _pair : mPushedRenderItems)
 				{
@@ -362,12 +378,18 @@ namespace JG
 		if (mIsRenderCompelete == true)
 		{
 			mPushedRenderItems.clear();
+			mPushedLightItems.clear();
 		}
 
 		return EScheduleResult::Continue;
 	}
 	void GraphicsSystemLayer::LoadShaderScript()
 	{
+		// Load Global Shader Lib
+		ShaderLibrary::GetInstance().LoadGlobalShaderLib();
+
+
+		// TemplateLoad
 		auto templatePath = Application::GetShaderTemplatePath();
 
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
@@ -419,6 +441,10 @@ namespace JG
 				fin.close();
 			}
 		}
+
+
+
+		// Script Load
 		auto scriptPath = Application::GetShaderScriptPath();
 
 		for (auto& iter : fs::recursive_directory_iterator(scriptPath))

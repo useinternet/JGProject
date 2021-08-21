@@ -152,7 +152,7 @@ namespace JG
 
 		Dictionary<String, List<SharedPtr<ITexture>>> mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mRWTextureDatas;
-		WeakPtr<IShader>					          mOwnerShader;
+		SharedPtr<IShader>					          mOwnerShader;
 		
 
 		std::shared_mutex mMutex;
@@ -214,6 +214,7 @@ namespace JG
 		template<class T, EShaderDataType type>
 		bool SetData(const String& name, const T* value)
 		{
+			std::shared_lock<std::shared_mutex> lock(mMutex);
 			auto data = GetAndCheckData(name, type);
 			if (data == nullptr)
 			{
@@ -224,7 +225,6 @@ namespace JG
 			u64 dataPos    = data->DataPos;
 			String& cbName = data->Owner->Name;
 
-			std::lock_guard<std::shared_mutex> lock(mMutex);
 			auto& alloc = mReadDatas[cbName];
 			void* dest = (void*)((ptraddr)alloc.CPU + dataPos);
 			memcpy(dest, value, dataSize);
@@ -236,6 +236,7 @@ namespace JG
 		template<class T, EShaderDataType type>
 		bool SetDataArray(const String& name, const List<T>& dataArray)
 		{
+			std::lock_guard<std::shared_mutex> lock(mMutex);
 			if (CheckDataArray(name, type) == false)
 			{
 				return false;
@@ -246,7 +247,7 @@ namespace JG
 				btSize = sizeof(T) * MaxElementCount;
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
-			std::lock_guard<std::shared_mutex> lock(mMutex);
+	
 			auto& alloc = mReadDatas[name];
 			memcpy(alloc.CPU, dataArray.data(), btSize);
 			return true;
@@ -254,6 +255,7 @@ namespace JG
 
 		bool SetDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize)
 		{
+			std::lock_guard<std::shared_mutex> lock(mMutex);
 			if (CheckDataArray(name, elementSize) == false)
 			{
 				return false;
@@ -264,7 +266,7 @@ namespace JG
 				btSize = elementSize * MaxElementCount;
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
-			std::lock_guard<std::shared_mutex> lock(mMutex);
+
 			auto& alloc = mReadDatas[name];
 			memcpy(alloc.CPU, datas, btSize);
 			return true;
@@ -274,6 +276,7 @@ namespace JG
 		template<class T, EShaderDataType type>
 		bool GetData(const String& name, T* value)
 		{
+			std::shared_lock<std::shared_mutex> lock(mMutex);
 			if (value == nullptr)
 			{
 				return false;
@@ -287,8 +290,6 @@ namespace JG
 			u64 dataPos    = data->DataPos;
 			String& cbName = data->Owner->Name;
 
-			
-			std::shared_lock<std::shared_mutex> lock(mMutex);
 			void* src = (void*)((ptraddr)(mReadDatas[cbName].CPU) + dataPos);
 			memcpy(value, src , dataSize);
 			return true;

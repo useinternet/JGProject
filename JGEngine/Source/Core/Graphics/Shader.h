@@ -62,17 +62,16 @@ namespace JG
 	private:
 		Dictionary<String, SharedPtr<IShader>> mShaders;
 		Dictionary<String, SharedPtr<IShaderScript>> mMaterialScirpts;
+		String mGlobalShaderLibCode;
 		std::shared_mutex mMutex;
 	public:
 		void RegisterShader(SharedPtr<IShader> shader);
 		void RegisterScirpt(SharedPtr<IShaderScript> script);
-
-
-
-
 		SharedPtr<IShader> GetShader(const String& name);
 		SharedPtr<IShader> GetShader(const String& name, const List<String>& scriptNameList);
 		SharedPtr<IShaderScript> GetScript(const String& name);
+		bool   LoadGlobalShaderLib();
+		String GetGlobalShaderLibCode() const;
 	};
 
 

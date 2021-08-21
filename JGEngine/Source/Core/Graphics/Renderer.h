@@ -23,6 +23,7 @@ namespace JG
 		SharedPtr<ITexture> TargetDepthTexture;
 		JVector2 Resolutoin;
 		JMatrix  ViewProj;
+		JVector3 EyePosition;
 		u64 CurrentBufferIndex = 0;
 	};
 
@@ -35,7 +36,7 @@ namespace JG
 		IRenderer() = default;
 		virtual ~IRenderer() = default;
 	public:
-		virtual bool Begin(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList) = 0;
+		virtual bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList) = 0;
 		virtual void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList) = 0;
 		virtual void End() = 0;
 
@@ -47,15 +48,22 @@ namespace JG
 
 	class FowardRenderer : public IRenderer
 	{
+		struct LightInfo
+		{
+			i32 Count = 0;
+			u64 Size = 0;
+			List<jbyte> ByteData;
+		};
 	private:
 		bool mIsRun = false;
-		List<SharedPtr<ITexture>> mRenderTarges;
+		List<SharedPtr<ITexture>>   mRenderTarges;
+		Dictionary<Type, LightInfo> mLightInfos;
 		RenderInfo mCurrentRenderInfo;
 	public:
 		FowardRenderer() = default;
 		virtual ~FowardRenderer() = default;
 	public:
-		virtual bool Begin(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList) override;
+		virtual bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList) override;
 		virtual void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList) override;
 		virtual void End() override;
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Foward; }

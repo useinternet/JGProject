@@ -20,8 +20,14 @@ namespace JG
 		bool mIsRunAwake = false;
 		bool mIsRunStart = false;
 		Transform* mTransform = nullptr;
-		UniquePtr<JBBox> mBoundingBox;
+	
 		String mTargetLayer = GameLayer::DEFAULT_LAYER;
+
+
+		UniquePtr<JBBox> mPickingBoundingBox;
+		std::function<bool(const JBBox*, const JRay&, void*)> mPicking3DInteractionFunc;
+		std::function<bool(const JBBox*, const JVector2&, void*)> mPicking2DInteractionFunc;
+		List<byte> mInteractionUserData;
 	protected:
 		virtual void Start() override;
 		virtual void Destory() override;
@@ -38,6 +44,7 @@ namespace JG
 	public:
 		virtual void OnInspectorGUI() override;
 		virtual SharedPtr<IRenderItem> PushRenderItem() override;
+		virtual SharedPtr<ILightItem>  PushLightItem() override;
 	public:
 		GameNode* AddNode(const String& name);
 
@@ -86,8 +93,11 @@ namespace JG
 		GameNode*    GetParent() const;
 		Transform*   GetTransform() const;
 
-		void SetBoundingBox(const JBBox& boundingBox);
-		const JBBox* GetBoundingBox() const;
+		void SetPickingBoundingBox(const JBBox& boundingBox,
+			const std::function<bool(const JBBox*, const JRay&, void*)>& picking3DInteraction     = nullptr,
+			const std::function<bool(const JBBox*, const JVector2&, void*)>& picking2DInteraction = nullptr,
+			void* interactionUserData = nullptr, u64 userDataSize = 0);
+		const JBBox* GetPickingBoundingBox() const;
 
 		void SetLayer(const String& layer);
 		const String& GetLayer();

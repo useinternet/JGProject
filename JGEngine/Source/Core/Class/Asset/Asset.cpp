@@ -256,9 +256,11 @@ namespace JG
 		// Property Settings
 		for (auto& property : propertyList)
 		{
+			
 			auto type = property.first;
 			auto name = property.second;
 			auto dataJson = json->CreateJsonData();
+			auto imguiID = "##" + name;
 			ImGui::Text(name.c_str()); ImGui::SameLine();
 			switch (property.first)
 			{
@@ -266,7 +268,7 @@ namespace JG
 			{
 				i32 value = 0;
 				material->GetInt(name, &value);
-				if (ImGui::InputInt("##Material_InputInt", &value) == true)
+				if (ImGui::InputInt(imguiID.c_str(), &value) == true)
 				{
 					material->SetInt(name, value);
 				}
@@ -277,7 +279,7 @@ namespace JG
 			{
 				JVector2Int value = 0;
 				material->GetInt2(name, &value);
-				if (ImGui::InputInt2("##Material_InputInt2", (i32*)&value) == true)
+				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetInt2(name, value);
 				}
@@ -288,7 +290,7 @@ namespace JG
 			{
 				JVector3Int value = 0;
 				material->GetInt3(name, &value);
-				if (ImGui::InputInt2("##Material_InputInt3", (i32*)&value) == true)
+				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetInt3(name, value);
 				}
@@ -299,7 +301,7 @@ namespace JG
 			{
 				JVector4Int value = 0;
 				material->GetInt4(name, &value);
-				if (ImGui::InputInt4("##Material_InputInt4", (i32*)&value) == true)
+				if (ImGui::InputInt4(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetInt4(name, value);
 				}
@@ -310,7 +312,7 @@ namespace JG
 			{
 				u32 value = 0;
 				material->GetUint(name, &value);
-				if (ImGui::InputInt("##Material_InputUint", (i32*)&value) == true)
+				if (ImGui::InputInt(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetUint(name, value);
 				}
@@ -321,7 +323,7 @@ namespace JG
 			{
 				JVector2Uint value;
 				material->GetUint2(name, &value);
-				if (ImGui::InputInt2("##Material_InputUint2", (i32*)&value) == true)
+				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetUint2(name, value);
 				}
@@ -332,7 +334,7 @@ namespace JG
 			{
 				JVector3Uint value;
 				material->GetUint3(name, &value);
-				if (ImGui::InputInt3("##Material_InputUint3", (i32*)&value) == true)
+				if (ImGui::InputInt3(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetUint3(name, value);
 				}
@@ -343,7 +345,7 @@ namespace JG
 			{
 				JVector4Uint value;
 				material->GetUint4(name, &value);
-				if (ImGui::InputInt4("##Material_InputUint4", (i32*)&value) == true)
+				if (ImGui::InputInt4(imguiID.c_str(), (i32*)&value) == true)
 				{
 					material->SetUint4(name, value);
 				}
@@ -352,9 +354,10 @@ namespace JG
 				break;
 			case EShaderDataType::_float:
 			{
+				
 				f32 value;
 				material->GetFloat(name, &value);
-				if (ImGui::InputFloat("##Material_InputFloat", (f32*)&(value)) == true)
+				if (ImGui::SliderFloat(imguiID.c_str(), &value, 0.0f, 1.0f) == true)
 				{
 					material->SetFloat(name, value);
 				}
@@ -365,7 +368,7 @@ namespace JG
 			{
 				JVector2 value;
 				material->GetFloat2(name, &value);
-				if (ImGui::InputFloat2("##Material_InputFloat2", (f32*)&(value)) == true)
+				if (ImGui::InputFloat2(imguiID.c_str(), (f32*)&(value)) == true)
 				{
 					material->SetFloat2(name, value);
 				}
@@ -376,7 +379,7 @@ namespace JG
 			{
 				JVector3 value;
 				material->GetFloat3(name, &value);
-				if (ImGui::InputFloat3("##Material_InputFloat3", (f32*)&(value)) == true)
+				if (ImGui::SliderFloat3(imguiID.c_str(), (f32*)&(value), 0.0f, 1.0f) == true)
 				{
 					material->SetFloat3(name, value);
 				}
@@ -387,7 +390,7 @@ namespace JG
 			{
 				JVector4 value;
 				material->GetFloat4(name, &value);
-				if (ImGui::InputFloat4("##Material_InputFloat4", (float*)&(value)) == true)
+				if (ImGui::InputFloat4(imguiID.c_str(), (float*)&(value)) == true)
 				{
 					material->SetFloat4(name, value);
 				}

@@ -33,6 +33,10 @@ namespace JG
 		String code = sourceCode;
 		mPropertyList.clear();
 		InsertScript(code, scriptList);
+		auto libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode();
+		code = libCode + "\n" + code;
+
+
 		if (mShaderDataForm == nullptr)
 		{
 			mShaderDataForm = CreateUniquePtr<ShaderDataForm>();

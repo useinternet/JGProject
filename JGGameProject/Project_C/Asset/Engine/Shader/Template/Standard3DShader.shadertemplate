@@ -6,6 +6,7 @@ SamplerState gPointSampler
 cbuffer Camera
 {
 	float4x4 gViewProj;
+	float3   gEye;
 };
 cbuffer ObjectParams
 {
@@ -40,6 +41,10 @@ struct PS_SURFACE_OUTPUT
 {
 	float4 albedo;
 	float3 normal;
+	
+	float3 specular;
+	float roughness;
+	float metallic;
 };
 struct PS_SURFACE_INPUT
 {
@@ -53,8 +58,11 @@ struct PS_SURFACE_INPUT
 PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 {
 	PS_SURFACE_OUTPUT _output;
-	_output.albedo = float4(1.0f,1.0f,1.0f,1.0f);
-
+	_output.albedo    = float4(1.0f,1.0f,1.0f,1.0f);
+	_output.specular  = float3(0.5f, 0.5f, 0.5f);
+	_output.normal    = _input.normal;
+    _output.roughness = 0.0f;
+	_output.metallic  = 0.0f;
 
 	__PS_SURFACE_FUNCTION_SCRIPT__
 	return _output;
@@ -88,12 +96,46 @@ float4 ps_main(VS_OUT pin) : SV_TARGET
 	input.tex       = pin.tex;
 	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
 
-	float3 dirLightColor = float3(0.9f, 0.95f, 1.0f);
-	float3 dirLight = float3(0.0f, 0.0f, 1.0f);
-	float4 ambientLight = output.albedo * float4(0.2f, 0.2f, 0.25f, 1.0f);
+
+	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
+
 
 	float3 N = normalize(pin.normalW);
-	float3 L = normalize(-dirLight);
-	float NdotL = saturate(dot(N,L));
-	return  output.albedo * NdotL + ambientLight;
+	float3 V = normalize(gEye - pin.posW);
+
+
+    float3 Lo = float3(0.0f,0.0f,0.0f);
+
+	Material material;
+	material.WorldPosition = pin.posW;
+	material.Albedo = output.albedo.rgb;
+	material.Roughness = output.roughness;
+	material.Metallic = output.metallic;
+
+
+	for(int i = 0; i<gPointLightCount; ++i)
+	{
+		PointLight pl = gPointLightList[i];
+		Lo += CalcPointLight(N, V, material, pl);
+	}
+
+
+
+	//DirectionalLight light;
+	//light.Direction  = float3(0.0f, 0.5f, -1.0f);
+	//light.LightColor = float3(1.0F,1.0F,1.0F);
+
+
+
+	//Lo += CalcDirLight(N,V,  material, light);
+
+
+	float3 final = saturate(Lo);
+	float Gamma = 1.0f / 2.2f;
+
+    final = final / (final + float3(1.0f, 1.0f, 1.0f));
+    final = pow(final, float3(Gamma, Gamma, Gamma));
+
+
+	return float4(final, 1.0f);
 }

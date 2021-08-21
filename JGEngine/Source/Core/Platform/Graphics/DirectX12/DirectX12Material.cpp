@@ -126,10 +126,6 @@ namespace JG
 		{
 			return false;
 		}
-		if (mShaderData == nullptr)
-		{
-			return false;
-		}
 		return mShaderData->SetFloatArray(name, value);
 	}
 

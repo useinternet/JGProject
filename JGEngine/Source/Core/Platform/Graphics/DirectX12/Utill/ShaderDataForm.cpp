@@ -1102,8 +1102,7 @@ namespace JG
 
 		mOwnerShader = shader;
 		mUploadAllocator = CreateUniquePtr<UploadAllocator>();
-		auto loadShader = mOwnerShader.lock();
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadShader.get());
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		if (dx12Shader != nullptr)
 		{
 			auto shaderDataForm = dx12Shader->GetShaderDataForm();
@@ -1139,9 +1138,8 @@ namespace JG
 	}
 	bool ShaderData::Bind(u64 commandID)
 	{
-
-		auto loadedShader = mOwnerShader.lock();
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadedShader.get());
+		std::lock_guard<std::shared_mutex> lock(mMutex);
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 
 		if (dx12Shader != nullptr)
 		{
@@ -1543,18 +1541,16 @@ namespace JG
 	}
 	DirectX12Shader* ShaderData::GetOwnerShader() const
 	{
-		auto loadShader = mOwnerShader.lock();
-		if (loadShader == nullptr)
+		if (mOwnerShader == nullptr)
 		{
 			return nullptr;
 		}
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadShader.get());
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		return dx12Shader;
 	}
 	ShaderDataForm::Data* ShaderData::GetAndCheckData(const String& name, EShaderDataType checkType)
 	{
-		auto loadShader = mOwnerShader.lock();
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadShader.get());
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		if (dx12Shader != nullptr)
 		{
 			auto shaderDataForm = dx12Shader->GetShaderDataForm();
@@ -1579,8 +1575,7 @@ namespace JG
 	}
 	bool ShaderData::CheckDataArray(const String& name, EShaderDataType checkType)
 	{
-		auto loadShader = mOwnerShader.lock();
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadShader.get());
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		if (dx12Shader != nullptr)
 		{
 			auto shaderDataForm = dx12Shader->GetShaderDataForm();
@@ -1605,8 +1600,7 @@ namespace JG
 	}
 	bool ShaderData::CheckDataArray(const String& name, u64 elementSize)
 	{
-		auto loadShader = mOwnerShader.lock();
-		auto dx12Shader = static_cast<DirectX12Shader*>(loadShader.get());
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		if (dx12Shader != nullptr)
 		{
 			auto shaderDataForm = dx12Shader->GetShaderDataForm();

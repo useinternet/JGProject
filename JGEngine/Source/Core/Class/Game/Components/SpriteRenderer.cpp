@@ -87,6 +87,7 @@ namespace JG
 
 	SharedPtr<IRenderItem> SpriteRenderer::PushRenderItem()
 	{
+		if (mSprite == nullptr) return nullptr;
 		auto transform = GetOwner()->GetTransform();
 		mSpriteRI->WorldMatrix = transform->GetWorldMatrix();
 
@@ -103,7 +104,7 @@ namespace JG
 				JBBox bbox;
 				bbox.min = JVector3(-spriteWidth * 0.5f, -spriteHeight * 0.5f, 0.0f);
 				bbox.max = JVector3(spriteWidth * 0.5f, spriteHeight * 0.5f, 0.0f);
-				GetOwner()->SetBoundingBox(bbox);
+				GetOwner()->SetPickingBoundingBox(bbox);
 				mSpriteSize = JVector2(spriteWidth, spriteHeight);
 				
 			}

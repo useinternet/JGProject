@@ -167,6 +167,7 @@ private: \
 	class ITexture;
 	class GameWorld;
 	class IRenderItem;
+	class ILightItem;
 	class Camera;
 	class GameNode;
 	class IAsset;
@@ -182,6 +183,7 @@ private: \
 		
 	REQUEST_ONE_ARG_EVENT(RequestGetGameWorldEvent, GameWorld*, GameWorld, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestPushLightItemEvent, SharedPtr<ILightItem>, LightItem, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestRegisterCameraEvent, Camera*, pCamera, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestUnRegisterCameraEvent, Camera*, pCamera, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestRegisterMainCameraEvent, Camera*, MainCamera, nullptr)

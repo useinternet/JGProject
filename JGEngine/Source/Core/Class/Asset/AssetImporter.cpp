@@ -238,8 +238,7 @@ namespace JG
 
 	void AssetImporter::WriteMaterial(const String& outputPath, MaterialAssetStock& stock)
 	{
-		auto filePath = CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
-		if (MaterialAssetStock::Write(filePath, stock) == false)
+		if (MaterialAssetStock::Write(outputPath, stock) == false)
 		{
 			JG_CORE_ERROR("Fail Write Material : {0} ", outputPath);
 		}

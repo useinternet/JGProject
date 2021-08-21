@@ -268,6 +268,38 @@ namespace JG
 
 		return nullptr;
 	}
+	SharedPtr<ILightItem> GameNode::PushLightItem()
+	{
+		for (auto& com : mComponents)
+		{
+			if (com->IsActive())
+			{
+				auto item = com->PushLightItem();
+				if (item != nullptr)
+				{
+					RequestPushLightItemEvent e;
+					e.LightItem = item;
+					SendEvent(e);
+				}
+			}
+
+		}
+		for (auto& child : mChilds)
+		{
+			if (child->IsActive())
+			{
+				auto item = child->PushLightItem();
+				if (item != nullptr)
+				{
+					RequestPushLightItemEvent e;
+					e.LightItem = item;
+					SendEvent(e);
+				}
+			}
+		}
+
+		return nullptr;
+	}
 	GameNode* GameNode::AddNode(const String& name)
 	{
 		auto obj = GameObjectFactory::GetInstance().CreateObject<GameNode>();
@@ -393,17 +425,29 @@ namespace JG
 	{
 		return mTransform;
 	}
-	void GameNode::SetBoundingBox(const JBBox& boundingBox)
+	void GameNode::SetPickingBoundingBox(const JBBox& boundingBox, 
+		const std::function<bool(const JBBox*, const JRay&, void*)>&     picking3DInteraction,
+		const std::function<bool(const JBBox*, const JVector2&, void*)>& picking2DInteraction,
+		void* interactionUserData, u64 userDataSize)
 	{
-		if (mBoundingBox == nullptr)
+		if (mPickingBoundingBox == nullptr)
 		{
-			mBoundingBox = CreateUniquePtr<JBBox>();
+			mPickingBoundingBox = CreateUniquePtr<JBBox>();
 		}
-		*mBoundingBox = boundingBox;
+		*mPickingBoundingBox    = boundingBox;
+		mPicking3DInteractionFunc = picking3DInteraction;
+		mPicking2DInteractionFunc = picking2DInteraction;
+		if (interactionUserData != nullptr)
+		{
+			mInteractionUserData.clear();
+			mInteractionUserData.resize(userDataSize);
+			memcpy(&mInteractionUserData[0], interactionUserData, userDataSize);
+		}
+
 	}
-	const JBBox* GameNode::GetBoundingBox() const
+	const JBBox* GameNode::GetPickingBoundingBox() const
 	{
-		return mBoundingBox.get();
+		return mPickingBoundingBox.get();
 	}
 	void GameNode::SetLayer(const String& layer)
 	{
@@ -434,18 +478,30 @@ namespace JG
 		{
 			child->Picking3DRecursive(refPickingObjectList, pickingRay);
 		}
-		auto bbox = GetBoundingBox();
+		auto bbox = GetPickingBoundingBox();
 		if (bbox)
 		{
-			auto localRay = pickingRay;
-			auto& invWorld = GetTransform()->GetInvWorldMatrix();
-			localRay.dir    = invWorld.TransformVector(localRay.dir);
-			localRay.origin = invWorld.TransformPoint(localRay.origin);
-
-			if (bbox->Intersection(localRay) == true)
+			if (mPicking3DInteractionFunc == nullptr)
 			{
-				refPickingObjectList.push_back(this);
+				auto localRay = pickingRay;
+				auto& invWorld = GetTransform()->GetInvWorldMatrix();
+				localRay.dir = invWorld.TransformVector(localRay.dir);
+				localRay.origin = invWorld.TransformPoint(localRay.origin);
+
+				if (bbox->Intersection(localRay) == true)
+				{
+					refPickingObjectList.push_back(this);
+				}
 			}
+			else
+			{
+				bool result = mPicking3DInteractionFunc(bbox, pickingRay, mInteractionUserData.data());
+				if (result)
+				{
+					refPickingObjectList.push_back(this);
+				}
+			}
+
 		}
 	}
 	void GameNode::Picking2DRecursive(List<GameNode*>& refPickingObjectList, const JVector2& pickingPos)
@@ -459,19 +515,32 @@ namespace JG
 		{
 			child->Picking2DRecursive(refPickingObjectList, pickingPos);
 		}
-		auto bbox = GetBoundingBox();
+		auto bbox = GetPickingBoundingBox();
 		if (bbox)
 		{
-			auto worldMatrix = GetTransform()->GetWorldMatrix();
-			JBBox worldBBox;
-			worldBBox.min = worldMatrix.TransformPoint(bbox->min);
-			worldBBox.max = worldMatrix.TransformPoint(bbox->max);
-			worldBBox.min.z = 0.0f;
-			worldBBox.max.z = 0.0f;
-
-			if (worldBBox.Contain(JVector3(pickingPos, 0.0f)) == true)
+			if (mPicking2DInteractionFunc == nullptr)
 			{
-				return refPickingObjectList.push_back(this);
+				JBBox worldBBox;
+				JMatrix worldMatrix = GetTransform()->GetWorldMatrix();
+
+				worldBBox.min = worldMatrix.TransformPoint(bbox->min);
+				worldBBox.max = worldMatrix.TransformPoint(bbox->max);
+				worldBBox.min.z = 0.0f;
+				worldBBox.max.z = 0.0f;
+
+
+				if (worldBBox.Contain(JVector3(pickingPos, 0.0f)) == true)
+				{
+					refPickingObjectList.push_back(this);
+				}
+			}
+			else
+			{
+				bool result = mPicking2DInteractionFunc(bbox, pickingPos, mInteractionUserData.data());
+				if (result)
+				{
+					refPickingObjectList.push_back(this);
+				}
 			}
 		}
 	}

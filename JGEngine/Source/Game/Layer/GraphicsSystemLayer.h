@@ -57,10 +57,10 @@ namespace JG
 
 		Dictionary<Type, u64> mRenderItemPriority;
 		SortedDictionary<u64, Dictionary<Type, List<SharedPtr<IRenderItem>>>> mPushedRenderItems;
+		List<SharedPtr<ILightItem>> mPushedLightItems;
 
-		//SharedPtr<IMaterial> mStandardDefaultMaterial;
 
-		//bool mIsRenderCompelete = false;
+
 		std::atomic_bool mIsRenderCompelete = false;
 	public:
 		virtual ~GraphicsSystemLayer() {}
@@ -75,6 +75,7 @@ namespace JG
 		virtual String GetLayerName() override;
 	private:
 		bool ResponsePushRenderItem(RequestPushRenderItemEvent& e);
+		bool ResponsePushLightItem(RequestPushLightItemEvent& e);
 
 		bool ResponseRegisterCamera(RequestRegisterCameraEvent& e);
 		bool ResponseUnRegisterCamera(RequestUnRegisterCameraEvent& e);

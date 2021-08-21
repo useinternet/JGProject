@@ -1,7 +1,7 @@
 {
     "AssetFormat": 3,
     "Asset": {
-        "Name": "DefaultMaterial_1",
+        "Name": "DefaultMaterial",
         "ShaderTemplate": "Standard3DShader",
         "ShaderScript": "Surface/Standard",
         "MaterialDataMap": [
@@ -10,14 +10,14 @@
                 "Type": "float3",
                 "Value": [
                     1.0,
-                    1.0,
-                    1.0
+                    0.0,
+                    0.0
                 ]
             },
             {
                 "Name": "Roughness",
                 "Type": "float",
-                "Value": 0.22599999606609345
+                "Value": 0.6050000190734863
             },
             {
                 "Name": "Specular",
@@ -31,7 +31,7 @@
             {
                 "Name": "Metallc",
                 "Type": "float",
-                "Value": 0.21400000154972077
+                "Value": 0.8259999752044678
             }
         ]
     }

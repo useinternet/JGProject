@@ -12,7 +12,7 @@ namespace JG
 		JVector2 mSpriteSize;
 
 
-		Asset<ITexture>* mSprite;
+		Asset<ITexture>* mSprite = nullptr;
 	public:
 		virtual ~SpriteRenderer() = default;
 	public:

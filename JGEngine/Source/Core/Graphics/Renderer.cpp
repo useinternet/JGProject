@@ -41,7 +41,7 @@ namespace JG
 	}
 
 
-	bool FowardRenderer::Begin(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList)
+	bool FowardRenderer::Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList)
 	{
 		if (mIsRun == true)
 		{
@@ -67,6 +67,19 @@ namespace JG
 		api->ClearRenderTarget(GetCommandID(),mRenderTarges, info.TargetDepthTexture);
 		api->SetRenderTarget(GetCommandID(),mRenderTarges, info.TargetDepthTexture);
 		
+		mLightInfos.clear();
+		// Light Info 정보 수집
+		for (auto item : lightItemList)
+		{
+			auto& info = mLightInfos[item->GetType()];
+			info.Count++;
+			info.Size = item->GetBtSize();
+			item->PushBtData(info.ByteData);
+		}
+
+
+
+
 		return BeginBatch(info, batchList);
 	}
 	void FowardRenderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
@@ -108,7 +121,12 @@ namespace JG
 			auto transposedWorld = JMatrix::Transpose(worldMatrix);
 			if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
 			{
-				JG_CORE_INFO("{0} : Fail SetViewProjMatrix in ObjectParams", material->GetName());
+				JG_CORE_INFO("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
+				continue;
+			}
+			if (material->SetFloat3(ShaderScript::Standard3D::Eye, mCurrentRenderInfo.EyePosition) == false)
+			{
+				JG_CORE_INFO("{0} : Fail SetEye in CameraParam", material->GetName());
 				continue;
 			}
 			if (material->SetFloat4x4(ShaderScript::Standard3D::World, transposedWorld) == false)
@@ -116,6 +134,33 @@ namespace JG
 				JG_CORE_INFO("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
 				continue;
 			}
+
+
+			// 라이트 정보 심어주기
+			{
+				// 
+				auto pointLightInfo = mLightInfos[JGTYPE(PointLightItem)];
+				if (material->SetInt(ShaderScript::Standard3D::PointLightCount, pointLightInfo.Count) == false)
+				{
+
+				}
+				if (pointLightInfo.Count > 0)
+				{
+					if (material->SetStructDataArray(ShaderScript::Standard3D::PointLightList, pointLightInfo.ByteData.data(), pointLightInfo.Count, pointLightInfo.Size) == false)
+					{
+
+					}
+				}
+
+
+	
+
+
+
+			}
+	
+
+
 			material->SetCommandID(GetCommandID());
 			if (material->Bind() == false)
 			{

@@ -224,7 +224,7 @@ namespace JG
 
 
 		// Picking & 2D & 이동 모드 일시 화면 이동
-		if (ImGui::IsMouseClicked(0) == true && ImGui::IsWindowHovered()) 
+		if (ImGui::IsMouseClicked(0) == true && ImGui::IsWindowHovered() && ImGuizmo::IsUsing()== false)
 		{
 			auto winPos   = ImGui::GetItemRectMin();
 			auto mousePos = ImGui::GetMousePos();

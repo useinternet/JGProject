@@ -25,6 +25,11 @@ namespace JG
 		return CombinePath(GetAssetPath(), "Engine");
 	}
 
+	const String Application::GetShaderGlobalLibPath()
+	{
+		return CombinePath(GetAssetPath(), "Engine/Shader/GlobalLib");
+	}
+
 	const String Application::GetShaderScriptPath()
 	{
 		return CombinePath(GetAssetPath(), "Engine/Shader/Script");

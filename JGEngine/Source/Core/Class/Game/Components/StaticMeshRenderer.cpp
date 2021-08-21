@@ -94,7 +94,7 @@ namespace JG
 		if (mMesh)
 		{
 			mStaticRI->Mesh = mMesh->Get();
-			GetOwner()->SetBoundingBox(mStaticRI->Mesh->GetBoundingBox());
+			GetOwner()->SetPickingBoundingBox(mStaticRI->Mesh->GetBoundingBox());
 		}
 
 		auto matAssetCnt = mMaterialList.size();
@@ -185,20 +185,8 @@ namespace JG
 				{
 					mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
 				}
-				if (ImGui::TreeNodeEx("Property"))
-				{
-					if (mMaterialList[i])
-					{
-						OnInspector_MaterialPropertyGUI(mMaterialList[i]);
-					}
-					ImGui::TreePop();
-				}
 			}
 			ImGui::TreePop();
 		}
-	}
-	void StaticMeshRenderer::OnInspector_MaterialPropertyGUI(Asset<IMaterial>* materialAsset)
-	{
-		materialAsset->OnInspectorGUI();
 	}
 }

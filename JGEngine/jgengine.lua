@@ -7,14 +7,14 @@ local PCH_CPP_PATH    = "Source/Core/pch.cpp"
 function DebugConfig()
     symbols  "On"
     optimize "Off"
-    defines {"_DEBUG"}
+    defines {"_DEBUG", "JG_EDITOR"}
     cppdialect "C++17"
   end
 
 
 function ReleaseConfig()
     optimize "Full" 
-    defines {"_RELEASE"}
+    defines {"_RELEASE", "JG_EDITOR"}
     cppdialect "C++17"
 end
 
