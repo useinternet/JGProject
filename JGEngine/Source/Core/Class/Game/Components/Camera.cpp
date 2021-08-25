@@ -329,7 +329,7 @@ namespace JG
 		JVector3 target = JVector3(0, 0, 1);
 		auto rotation = GetOwner()->GetTransform()->GetWorldRotation();
 		rotation = Math::ConvertToRadians(rotation);
-		auto& location = GetOwner()->GetTransform()->GetWorldLocation();
+		auto location = GetOwner()->GetTransform()->GetWorldLocation();
 		location.z -= GetNearZ();
 		target = JMatrix::Rotation(rotation).TransformVector(target);
 		mViewMatrix = JMatrix::LookAtLH(location, location + target, JVector3(0, 1, 0));

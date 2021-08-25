@@ -272,6 +272,15 @@ namespace JG
 			return FLT_MAX;
 
 		}
+	public: // static ±â´É
+		inline static float Length(const JVector4& v) {
+			auto length = DirectX::XMVector4Length(GetSIMD(v));
+			return DirectX::XMVectorGetX(length);
+		}
+		inline static JVector4 Normalize(const JVector4& v) {
+			auto sim = DirectX::XMVector4Normalize(GetSIMD(v));
+			return ConvertJVector4(sim);
+		}
 	public:
 		inline static DirectX::XMVECTOR GetSIMD(const JVector4& v)
 		{

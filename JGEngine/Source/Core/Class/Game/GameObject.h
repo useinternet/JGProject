@@ -33,12 +33,13 @@ namespace JG
 		Type Type;
 		IGameObject* Object = nullptr;
 		u64 Flags = 0;
+		u64 UserMsg = 0;
 	};
 
 	ENUM_FLAG(EChangeDataFlags)
 	enum class EChangeDataFlags
 	{
-		Default = 0x0001,
+		None  = 0x0000, 
 
 	};
 

@@ -68,7 +68,7 @@ namespace JG
 
 
 
-		void SendChangeData(const ChangeData& data, EChangeDataFlags flags = EChangeDataFlags::Default);
+		void SendChangeData(const ChangeData& data, EChangeDataFlags flags = EChangeDataFlags::None);
 
 	public:
 		GameNode* FindNode(const String& name) const;

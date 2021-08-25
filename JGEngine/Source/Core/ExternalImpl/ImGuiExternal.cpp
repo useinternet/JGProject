@@ -110,29 +110,41 @@ namespace ImGui
 			ImGui::PopStyleColor();
 		}
 		
-
-		if (ImGui::BeginDragDropTarget() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
 		{
-			auto payLoad = ImGui::GetDragDropPayload();
-			if (payLoad != nullptr)
+			auto dddContentsFile = (JG::DDDContentsFile*)ddd;
+
+			auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(dddContentsFile->FilePath);
+			if (assetFormat == JG::EAssetFormat::Texture)
 			{
-				JG::IDragAndDropData* ddd = (JG::IDragAndDropData*)payLoad->Data;
-
-
-				if (ddd->GetType() == JGTYPE(JG::DDDContentsFile))
-				{
-					auto dddContentsFile = (JG::DDDContentsFile*)ddd;
-
-					auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(dddContentsFile->FilePath);
-					if (assetFormat == JG::EAssetFormat::Texture)
-					{
-						out_Assetpath = dddContentsFile->FilePath;
-						result = true;
-					}
-				}
+				out_Assetpath = dddContentsFile->FilePath;
+				result = true;
 			}
-			ImGui::EndDragDropTarget();
-		}
+		});
+
+
+		//if (ImGui::BeginDragDropTarget() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		//{
+		//	auto payLoad = ImGui::GetDragDropPayload();
+		//	if (payLoad != nullptr)
+		//	{
+		//		JG::IDragAndDropData* ddd = (JG::IDragAndDropData*)payLoad->Data;
+
+
+		//		if (ddd->GetType() == JGTYPE(JG::DDDContentsFile))
+		//		{
+		//			auto dddContentsFile = (JG::DDDContentsFile*)ddd;
+
+		//			auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(dddContentsFile->FilePath);
+		//			if (assetFormat == JG::EAssetFormat::Texture)
+		//			{
+		//				out_Assetpath = dddContentsFile->FilePath;
+		//				result = true;
+		//			}
+		//		}
+		//	}
+		//	ImGui::EndDragDropTarget();
+		//}
 		return result;
 	}
 }

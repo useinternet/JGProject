@@ -6,35 +6,47 @@ namespace JG
 {
 	void Transform::SetLocalLocation(const JVector3& location)
 	{
-		bool isDirty = mLocation != location;
+		bool mIsLocationDirty = mLocation != location;
 		mLocation = location;
-		if (isDirty)
+		if (mIsLocationDirty)
 		{
-			SendDirty();
+			SendDirty(SendDirtyFlag_LocationDirty);
 		}
 	}
 	void Transform::SetLocalRotation(const JVector3& rotation)
 	{
 
-		bool isDirty = mRotation != rotation;
+		bool mIsRotationDirty = mRotation != rotation;
 		mRotation = rotation;
 		CheckLimitRotation(mRotation);
-		if (isDirty)
+		if (mIsRotationDirty)
 		{
-			SendDirty();
+			SendDirty(SendDirtyFlag_RoationDirty);
 		}
 	}
-	void Transform::SetScale(const JVector3& scale)
+	void Transform::SetLocalScale(const JVector3& scale)
 	{
-		bool isDirty = mScale != scale;
+		bool mIsScaleDirty = mScale != scale;
 		mScale = scale;
 		mScale.x = std::max<float>(0.0000001f, scale.x);
 		mScale.y = std::max<float>(0.0000001f, scale.y);
 		mScale.z = std::max<float>(0.0000001f, scale.z);
-		if (isDirty)
+		if (mIsScaleDirty)
 		{
-			SendDirty();
+			SendDirty(SendDirtyFlag_ScaleDirty);
 		}
+	}
+	void Transform::SetWorldLocation(const JVector3& location)
+	{
+		SetLocalLocation(GetLocalLocation() + (location - GetWorldLocation()));
+	}
+	void Transform::SetWorldRotation(const JVector3& rotation)
+	{
+		SetLocalRotation(GetLocalRotation() + (rotation - GetWorldRotation()));
+	}
+	void Transform::SetWorldScale(const JVector3& scale)
+	{
+		SetLocalScale(GetLocalScale() + (scale - GetWorldScale()));
 	}
 	const JVector3& Transform::GetLocalLocation() const
 	{
@@ -44,18 +56,26 @@ namespace JG
 	{
 		return mRotation;
 	}
-	JVector3 Transform::GetWorldLocation() const
-	{
-		return mLocation;
-	}
-	JVector3 Transform::GetWorldRotation() const
-	{
-		return mRotation;
-	}
-	const JVector3& Transform::GetScale() const
+	const JVector3& Transform::GetLocalScale() const
 	{
 		return mScale;
 	}
+	const JVector3& Transform::GetWorldLocation() const
+	{
+		UpdateWorldLocation();
+		return mWorldLocation;
+	}
+	const JVector3& Transform::GetWorldRotation() const
+	{
+		UpdateWorldRotation();
+		return mWorldRotation;
+	}
+	const JVector3& Transform::GetWorldScale() const
+	{
+		UpdateWorldScale();
+		return mWorldScale;
+	}
+
 	const JMatrix& Transform::GetWorldMatrix() const
 	{
 		UpdateWorldMatrix();
@@ -66,12 +86,16 @@ namespace JG
 		UpdateInvWorldMatrix();
 		return mInvWorldMatrix;
 	}
+	void Transform::Refresh()
+	{
+		SendDirty(SendDirtyFlag_All);
+	}
 	void Transform::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		GameComponent::MakeJson(jsonData);
 		jsonData->AddMember("Location", GetLocalLocation());
 		jsonData->AddMember("Rotation", GetLocalRotation());
-		jsonData->AddMember("Scale", GetScale());
+		jsonData->AddMember("Scale", GetLocalScale());
 
 	}
 	void Transform::LoadJson(SharedPtr<JsonData> jsonData)
@@ -91,7 +115,7 @@ namespace JG
 		val = jsonData->GetMember("Scale");
 		if (val)
 		{
-			SetScale(val->GetVector3());
+			SetLocalScale(val->GetVector3());
 		}
 	}
 	void Transform::UpdateWorldMatrix() const
@@ -100,13 +124,77 @@ namespace JG
 		{
 			return;
 		}
-		mIsDirty = false;
+		mIsDirty    = false;
 		mIsInvDirty = true;
-		auto toRadian = Math::ConvertToRadians(mRotation);
+
+		auto worldLocation = GetWorldLocation();
+		auto worldRotation = GetWorldRotation();
+		auto worldScale    = GetWorldScale();
+		auto toRadian      = Math::ConvertToRadians(worldRotation);
 		CheckLimitRadian(toRadian);
 
-		mLocalMatrix = JMatrix::Scaling(mScale) * JMatrix::Rotation(JQuaternion::ToQuaternion(toRadian)) * JMatrix::Translation(mLocation);
-		mWorldMatrix = mLocalMatrix;
+		mWorldMatrix = JMatrix::Scaling(worldScale) * JMatrix::Rotation(JQuaternion::ToQuaternion(toRadian)) * JMatrix::Translation(worldLocation);
+	}
+	void Transform::UpdateWorldLocation() const
+	{
+		if (mIsLocationDirty == false)
+		{
+			return;
+		}
+		if (GetOwner()->GetName() == "Test")
+		{
+			JG_CORE_INFO("Update WorldLocation : {0}", GetOwner()->GetName());
+		}
+		mIsLocationDirty = false;
+
+		auto parent = GetOwner()->GetParent();
+		if (parent == nullptr)
+		{
+			mWorldLocation = GetLocalLocation();
+		}
+		else
+		{
+			auto pwp = parent->GetTransform()->GetWorldLocation();
+			auto local = GetLocalLocation();
+			mWorldLocation = GetLocalLocation() + parent->GetTransform()->GetWorldLocation();
+		}
+	}
+	void Transform::UpdateWorldRotation() const
+	{
+		if (mIsRotationDirty == false)
+		{
+			return;
+		}
+		mIsRotationDirty = false;
+		auto parent = GetOwner()->GetParent();
+		if (parent == nullptr)
+		{
+			mWorldRotation = GetLocalRotation();
+		}
+		else
+		{
+			mWorldRotation = GetLocalRotation() + parent->GetTransform()->GetWorldRotation();
+		}
+
+	}
+	void Transform::UpdateWorldScale() const
+	{
+		if (mIsScaleDirty == false)
+		{
+			return;
+		}
+		mIsScaleDirty = false;
+		auto parent = GetOwner()->GetParent();
+		if (parent == nullptr)
+		{
+			mWorldScale = GetLocalScale();
+		}
+		else
+		{
+			auto localScale = GetLocalScale();
+			auto p_worldScale = parent->GetTransform()->GetWorldScale();
+			mWorldScale = JVector3(localScale.x * p_worldScale.x, localScale.y * p_worldScale.y, localScale.z * p_worldScale.z);
+		}
 	}
 	void Transform::UpdateInvWorldMatrix() const
 	{
@@ -144,7 +232,7 @@ namespace JG
 			toRadian.z -= JG_2PI;
 		}
 	}
-	void Transform::CheckLimitRotation(JVector3& toDegree)
+	void Transform::CheckLimitRotation(JVector3& toDegree) const
 	{
 		while (toDegree.x <= 0.0f)
 		{
@@ -177,7 +265,7 @@ namespace JG
 		
 		auto location = GetLocalLocation();
 		auto rotation = GetLocalRotation();
-		auto scale = GetScale();
+		auto scale = GetLocalScale();
 
 
 
@@ -187,14 +275,39 @@ namespace JG
 
 		SetLocalLocation(location);
 		SetLocalRotation(rotation);
-		SetScale(scale);
+		SetLocalScale(scale);
 	}
-	void Transform::SendDirty()
+	void Transform::OnChange(const ChangeData& data)
 	{
-		mIsDirty = true;
+		if (data.Type == JGTYPE(Transform))
+		{
+			ApplyDirtyFlag((SendDirtyFlags)data.UserMsg);
+		}
+	}
+	void Transform::SendDirty(SendDirtyFlags flags)
+	{
+		ApplyDirtyFlag(flags);
 		ChangeData data;
-		data.Type = GetType();
+		data.Type   = GetType();
 		data.Object = this;
+		data.UserMsg = flags;
+		
 		GetOwner()->SendChangeData(data);
+	}
+	void Transform::ApplyDirtyFlag(SendDirtyFlags flags)
+	{
+		if (flags & SendDirtyFlag_LocationDirty)
+		{
+			mIsLocationDirty = true;
+		}
+		if (flags & SendDirtyFlag_RoationDirty)
+		{
+			mIsRotationDirty = true;
+		}
+		if (flags & SendDirtyFlag_ScaleDirty)
+		{
+			mIsScaleDirty = true;
+		}
+		mIsDirty = true;
 	}
 }

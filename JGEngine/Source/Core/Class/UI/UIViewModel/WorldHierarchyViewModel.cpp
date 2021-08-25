@@ -4,7 +4,9 @@
 #include "Class/Game/GameNode.h"
 #include "Class/Game/GameWorld.h"
 #include "Class/UI/UIView/InspectorView.h"
-
+#include "Class/Game/Components/SpriteRenderer.h"
+#include "Class/Game/Components/StaticMeshRenderer.h"
+#include "Class/Game/Components/PointLight.h"
 
 namespace JG
 {
@@ -18,8 +20,8 @@ namespace JG
 		SendEventImmediate(e);
 		mGameWorld = e.GameWorld;
 
-		AddEmptyObject = CreateUniquePtr<Command<GameNode*>>();
-		AddEmptyObject->Subscribe(this, [&](GameNode* parent)
+		CreateEmptyObject = CreateUniquePtr<Command<GameNode*>>();
+		CreateEmptyObject->Subscribe(this, [&](GameNode* parent)
 		{
 			if (parent == nullptr)
 			{
@@ -27,6 +29,60 @@ namespace JG
 			}
 			parent->AddNode("Empty");
 		});
+
+
+		CreateSprite = CreateUniquePtr<Command<GameNode*>>();
+		CreateSprite->Subscribe(this, [&](GameNode* parent)
+		{
+			if (parent == nullptr)
+			{
+				return;
+			}
+			auto node = parent->AddNode("Sprite");
+			node->AddComponent<SpriteRenderer>();
+		});
+
+		CreateCube = CreateUniquePtr<Command<GameNode*>>();
+		CreateCube->Subscribe(this, [&](GameNode* parent)
+		{
+			if (parent == nullptr)
+			{
+				return;
+			}
+			auto node = parent->AddNode("Cube");
+			auto renderer = node->AddComponent<StaticMeshRenderer>();
+			renderer->SetMesh("Asset/Engine/Mesh/Cube.jgasset");
+		});
+
+
+		CreateSphere = CreateUniquePtr<Command<GameNode*>>();
+		CreateSphere->Subscribe(this, [&](GameNode* parent)
+		{
+			if (parent == nullptr)
+			{
+				return;
+			}
+			auto node = parent->AddNode("Sphere");
+			auto renderer = node->AddComponent<StaticMeshRenderer>();
+			renderer->SetMesh("Asset/Engine/Mesh/Sphere.jgasset");
+		});
+
+
+		CreatePointLight = CreateUniquePtr<Command<GameNode*>>();
+		CreatePointLight->Subscribe(this, [&](GameNode* parent)
+		{
+			if (parent == nullptr)
+			{
+				return;
+			}
+			auto node = parent->AddNode("PointLight");
+			node->AddComponent<PointLight>();
+		});
+
+
+
+
+
 
 		DeleteGameNode = CreateUniquePtr<Command<GameNode*>>();
 		DeleteGameNode->Subscribe(this, [&](GameNode* node)
@@ -48,10 +104,16 @@ namespace JG
 	{
 		UIViewModel::Destroy();
 
-		AddEmptyObject->UnSubscribe(this);
+		CreateEmptyObject->UnSubscribe(this);
+		CreateSprite->UnSubscribe(this);
+		CreateCube->UnSubscribe(this);
+		CreateSphere->UnSubscribe(this);
+		CreatePointLight->UnSubscribe(this);
+		DeleteGameNode->UnSubscribe(this);
+
 		DeleteGameNode->UnSubscribe(this);
 		mTreeNodePool.clear();
-		AddEmptyObject = nullptr;
+		CreateEmptyObject = nullptr;
 		DeleteGameNode = nullptr;
 		mGameWorld     = nullptr;
 		mCurrentSelectedNodeInInspector   = nullptr;
@@ -61,8 +123,9 @@ namespace JG
 	void WorldHierarchyViewModel::OnEvent(IEvent& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&WorldHierarchyViewModel::NotifyDestroyGameObject));
-		dispatcher.Dispatch<NotifyChangeGameWorldEvent>(EVENT_BIND_FN(&WorldHierarchyViewModel::NotifyChangeGameWorld));
+		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&WorldHierarchyViewModel::ResponseDestroyGameObject));
+		dispatcher.Dispatch<NotifyChangeGameWorldEvent>(EVENT_BIND_FN(&WorldHierarchyViewModel::ResponseChangeGameWorld));
+		dispatcher.Dispatch<NotifySelectedGameNodeInEditorEvent>(EVENT_BIND_FN(&WorldHierarchyViewModel::ResponseSelectedGameNodeInEditor));
 	}
 
 	void WorldHierarchyViewModel::ForEach(
@@ -83,6 +146,7 @@ namespace JG
 		{
 			return;
 		}
+
 		auto& treeNode = mTreeNodePool[node];
 		treeNode.IsSelected = true;
 
@@ -103,7 +167,6 @@ namespace JG
 		NotifySelectedGameNodeInEditorEvent e;
 		e.SelectedGameNode = node;
 		SendEvent(e);
-
 	}
 
 	GameNode* WorldHierarchyViewModel::GetSelectedNodeInInspector() const
@@ -186,7 +249,9 @@ namespace JG
 		}
 	}
 
-	bool WorldHierarchyViewModel::NotifyDestroyGameObject(NotifyDestroyJGObjectEvent& e)
+
+
+	bool WorldHierarchyViewModel::ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e)
 	{
 		auto currentSelectedNodeInContextMenu = GetSelectdNodeInContextMenu();
 		if (currentSelectedNodeInContextMenu != nullptr)
@@ -208,10 +273,18 @@ namespace JG
 		return false;
 	}
 
-	bool WorldHierarchyViewModel::NotifyChangeGameWorld(NotifyChangeGameWorldEvent& e)
+	bool WorldHierarchyViewModel::ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e)
 	{
 		mGameWorld = e.GameWorld;
 		return false;
 	}
+	bool WorldHierarchyViewModel::ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e)
+	{
+		if (mCurrentSelectedNodeInInspector != e.SelectedGameNode)
+		{
+			SetSelectedNodeInInspector(e.SelectedGameNode);
+		}
 
+		return false;
+	}
 }

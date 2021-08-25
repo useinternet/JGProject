@@ -24,7 +24,11 @@ namespace JG
 	private:
 		Dictionary<GameNode*, WorldHierarchyTreeNode> mTreeNodePool;
 	public:
-		UniquePtr<Command<GameNode*>> AddEmptyObject;
+		UniquePtr<Command<GameNode*>> CreateEmptyObject;
+		UniquePtr<Command<GameNode*>> CreateSprite;
+		UniquePtr<Command<GameNode*>> CreateCube;
+		UniquePtr<Command<GameNode*>> CreateSphere;
+		UniquePtr<Command<GameNode*>> CreatePointLight;
 		UniquePtr<Command<GameNode*>> DeleteGameNode;
 	public:
 		virtual ~WorldHierarchyViewModel() = default;
@@ -50,7 +54,8 @@ namespace JG
 			const std::function<void(WorldHierarchyTreeNode&)>& action,
 			const std::function<void(WorldHierarchyTreeNode&)>& popAction);
 	private:
-		bool NotifyDestroyGameObject(NotifyDestroyJGObjectEvent& e);
-		bool NotifyChangeGameWorld(NotifyChangeGameWorldEvent& e);
+		bool ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e);
+		bool ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e);
+		bool ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e);
 	};
 }

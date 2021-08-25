@@ -2,12 +2,24 @@
 #include "JGCore.h"
 #include "Class/UI/UIView.h"
 #include "Class/UI/UIViewModel/SceneViewModel.h"
-
+#include "Class/Asset/Asset.h"
 namespace JG
 {
 	class SceneView : public UIView<SceneViewModel>
 	{
 		JGCLASS
+			
+	private:
+		enum
+		{
+			Icon_Move,
+			Icon_Rotation,
+			Icon_Scale,
+			Icon_Max,
+		};
+		Asset<ITexture>* mIcons[Icon_Max];
+		u64 mIconIDs[Icon_Max];
+	private:
 		bool mOpenGUI = true;
 
 
@@ -35,6 +47,8 @@ namespace JG
 
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	private:
+		void OnGUI_ToolBar();
 	private:
 		void ControllEditorCamera();
 	};

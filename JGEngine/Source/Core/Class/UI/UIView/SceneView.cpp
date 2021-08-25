@@ -17,11 +17,13 @@ namespace JG
 		}, nullptr);
 
 		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-		mCurrentGizmoMode = ImGuizmo::LOCAL;
+		mCurrentGizmoMode      = ImGuizmo::LOCAL;
 	}
 	void SceneView::Load()
 	{
-
+		mIcons[Icon_Move] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Move_Icon.jgasset")->As<ITexture>();
+		mIcons[Icon_Rotation] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Rotation_Icon.jgasset")->As<ITexture>();
+		mIcons[Icon_Scale] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Scale_Icon.jgasset")->As<ITexture>();
 	}
 	void SceneView::Initialize()
 	{
@@ -70,10 +72,11 @@ namespace JG
 				snapValue[i] = mSnapValue[snapIndex];
 			}
 
+			JVector3 location = node->GetTransform()->GetWorldLocation();
+			JVector3 rotation = Math::ConvertToRadians(node->GetTransform()->GetWorldRotation());
+			JVector3 scale = node->GetTransform()->GetWorldScale();
 
-			JVector3 location = node->GetTransform()->GetLocalLocation();
-			JVector3 rotation = Math::ConvertToRadians(node->GetTransform()->GetLocalRotation());
-			JVector3 scale = node->GetTransform()->GetScale();
+
 			JMatrix worldMat;
 			ImGuizmo::RecomposeMatrixFromComponents((float*)&location, (float*)&rotation, (float*)&scale, worldMat.GetFloatPtr());
 			auto itemMin = ImGui::GetItemRectMin();
@@ -88,22 +91,39 @@ namespace JG
 
 
 			ImGui::PushClipRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), true);
+
 			bool result = ImGuizmo::Manipulate(
 				view.GetFloatPtr(), proj.GetFloatPtr(), 
 				(ImGuizmo::OPERATION)mCurrentGizmoOperation, (ImGuizmo::MODE)mCurrentGizmoMode,
 				worldMat.GetFloatPtr(), nullptr , (mIsSnap) ? snapValue : nullptr, nullptr, nullptr);
+
+
 			ImGui::PopClipRect();
 			JVector3 matrixTranslation, matrixRotation, matrixScale;
 			ImGuizmo::DecomposeMatrixToComponents(worldMat.GetFloatPtr(), (float*)&matrixTranslation, (float*)&matrixRotation, (float*)&matrixScale);
-			node->GetTransform()->SetLocalLocation(matrixTranslation);
-			node->GetTransform()->SetLocalRotation(Math::ConvertToDegrees(matrixRotation));
-			node->GetTransform()->SetScale(matrixScale);
+
+			node->GetTransform()->SetWorldLocation(matrixTranslation);
+			node->GetTransform()->SetWorldRotation(Math::ConvertToDegrees(matrixRotation));
+			node->GetTransform()->SetWorldScale(matrixScale);
 
 		});
 
 	}
 	void SceneView::OnGUI()
 	{
+		for (int i = 0; i < Icon_Max; ++i)
+		{
+			if (mIcons[i] != nullptr && mIcons[i]->Get() && mIcons[i]->Get()->IsValid())
+			{
+				mIconIDs[i] = JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[i]->Get()->GetTextureID());
+			}
+			else
+			{
+				mIconIDs[i] = 0;
+			}
+		}
+
+
 		auto viewModel = GetViewModel();
 		ImGuizmo::BeginFrame();
 
@@ -121,83 +141,8 @@ namespace JG
 		}
 
 
-		auto mainCam = Camera::GetMainCamera();
 
-
-
-		ImGui::Text("T"); ImGui::SameLine(); 
-		if (ImGui::RadioButton("##TranslateRadioButton", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-		{
-			mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-		}ImGui::SameLine();
-
-		ImGui::Text("R"); ImGui::SameLine();
-		if (ImGui::RadioButton("##RotateRadioButton", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-		{
-			mCurrentGizmoOperation = ImGuizmo::ROTATE;
-		}ImGui::SameLine();
-
-		ImGui::Text("S"); ImGui::SameLine();
-		if (ImGui::RadioButton("##ScalingRadioButton", mCurrentGizmoOperation == ImGuizmo::SCALE))
-		{
-			mCurrentGizmoOperation = ImGuizmo::SCALE;
-		}ImGui::SameLine();
-
-		
-		std::string name = "";
-
-
-		// Gizmo ¸ðµå
-		{
-			if (mCurrentGizmoMode == ImGuizmo::LOCAL) name = "Local";
-			else name = "World";
-
-			if (ImGui::Button(name.c_str()) == true)
-			{
-				mCurrentGizmoMode = !mCurrentGizmoMode;
-			}ImGui::SameLine();
-		}
-
-		// Gizmo Camera Mode
-		{
-			auto mainCam = Camera::GetMainCamera();
-
-			if (mCurrentCameraMode == 0)
-			{
-				name = "2D";
-				mainCam->GetOwner()->GetTransform()->SetLocalRotation(JVector3(0, 0, 0));
-				auto location = mainCam->GetOwner()->GetTransform()->GetLocalLocation(); location.z = -10;
-				mainCam->GetOwner()->GetTransform()->SetLocalLocation(location);
-			}
-			else name = "3D";
-
-			if (ImGui::Button(name.c_str()) == true)
-			{
-				mCurrentCameraMode = !mCurrentCameraMode;
-			}ImGui::SameLine();
-
-			if (mainCam != nullptr)
-			{
-				mainCam->SetOrthographic(!mCurrentCameraMode);
-			}
-		}
-
-		// Gizmo Snap
-		{
-			if (ImGui::RadioButton("Snap", mIsSnap))
-			{
-				mIsSnap = !mIsSnap;
-			} ImGui::SameLine();
-			ImGui::SetNextItemWidth(210.0f);
-			ImGui::InputFloat3("##Snap_InputFloat", mSnapValue); ImGui::SameLine();
-		}
-		{
-			ImGui::Text("FPS : %d", Application::GetInstance().GetAppTimer()->GetFPS());
-
-		}
-
-		// Camera Settings
-		
+		OnGUI_ToolBar();
 		// SceneTexture
 		f32 sceneRatio = 0.0f;
 		f32 fixSceneHeight = 0.0f;
@@ -253,6 +198,7 @@ namespace JG
 
 		// Ä«¸Þ¶ó ÁÜ ¾Æ¿ô
 		// 
+		auto mainCam = Camera::GetMainCamera();
 		if (ImGui::IsWindowHovered() && ImGui::IsWindowFocused() == true && mainCam->GetType() == JGTYPE(EditorCamera) && mCurrentCameraMode == 0)
 		{
 			auto editCamera = static_cast<EditorCamera*>(mainCam);
@@ -340,6 +286,127 @@ namespace JG
 			mSnapValue[2] = val->GetFloat();
 		}
 	}
+	void SceneView::OnGUI_ToolBar()
+	{
+		if (mIconIDs[Icon_Move])
+		{
+			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
+			if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
+			{
+				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
+			}
+			ImGui::Image((ImTextureID)mIconIDs[Icon_Move], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
+			if (ImGui::IsItemClicked())
+			{
+				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+			}ImGui::SameLine();
+		}
+		else
+		{
+			ImGui::Text("T");
+			if (ImGui::RadioButton("##TranslateRadioButton", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+			{
+				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+			}ImGui::SameLine();
+		}
+
+		if (mIconIDs[Icon_Rotation])
+		{
+			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
+			if (mCurrentGizmoOperation == ImGuizmo::ROTATE)
+			{
+				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
+			}
+			ImGui::Image((ImTextureID)mIconIDs[Icon_Rotation], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
+			if (ImGui::IsItemClicked())
+			{
+				mCurrentGizmoOperation = ImGuizmo::ROTATE;
+			}ImGui::SameLine();
+		}
+		else
+		{
+			ImGui::Text("R"); ImGui::SameLine();
+			if (ImGui::RadioButton("##RotateRadioButton", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+			{
+				mCurrentGizmoOperation = ImGuizmo::ROTATE;
+			}ImGui::SameLine();
+		}
+
+
+
+		if (mIconIDs[Icon_Scale])
+		{
+			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
+			if (mCurrentGizmoOperation == ImGuizmo::SCALE)
+			{
+				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
+			}
+			ImGui::Image((ImTextureID)mIconIDs[Icon_Scale], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
+			if (ImGui::IsItemClicked())
+			{
+				mCurrentGizmoOperation = ImGuizmo::SCALE;
+			}ImGui::SameLine();
+		}
+		else
+		{
+			ImGui::Text("S"); ImGui::SameLine();
+			if (ImGui::RadioButton("##ScalingRadioButton", mCurrentGizmoOperation == ImGuizmo::SCALE))
+			{
+				mCurrentGizmoOperation = ImGuizmo::SCALE;
+			}ImGui::SameLine();
+		}
+
+		JG::Camera* mainCam = Camera::GetMainCamera();
+		std::string name = "";
+
+		// Gizmo ¸ðµå
+		{
+			if (mCurrentGizmoMode == ImGuizmo::LOCAL) name = "Local";
+			else name = "World";
+
+			if (ImGui::Button(name.c_str()) == true)
+			{
+				mCurrentGizmoMode = !mCurrentGizmoMode;
+			}ImGui::SameLine();
+		}
+
+		// Gizmo Camera Mode
+		{
+
+			if (mCurrentCameraMode == 0)
+			{
+				name = "2D";
+				mainCam->GetOwner()->GetTransform()->SetLocalRotation(JVector3(0, 0, 0));
+				JVector3 location = mainCam->GetOwner()->GetTransform()->GetLocalLocation(); location.z = -10;
+				mainCam->GetOwner()->GetTransform()->SetLocalLocation(location);
+			}
+			else name = "3D";
+
+			if (ImGui::Button(name.c_str()) == true)
+			{
+				mCurrentCameraMode = !mCurrentCameraMode;
+			}ImGui::SameLine();
+
+			if (mainCam != nullptr)
+			{
+				mainCam->SetOrthographic(!mCurrentCameraMode);
+			}
+		}
+
+		// Gizmo Snap
+		{
+			if (ImGui::RadioButton("Snap", mIsSnap))
+			{
+				mIsSnap = !mIsSnap;
+			} ImGui::SameLine();
+			ImGui::SetNextItemWidth(210.0f);
+			ImGui::InputFloat3("##Snap_InputFloat", mSnapValue); ImGui::SameLine();
+		}
+		{
+			ImGui::Text("FPS : %d", Application::GetInstance().GetAppTimer()->GetFPS());
+
+		}
+	}
 	void SceneView::ControllEditorCamera()
 	{
 	
@@ -360,7 +427,7 @@ namespace JG
 		}
 
 
-		static f32 cameraSensitivity = 30.0f;
+		static f32 cameraSensitivity = 60.0f;
 		static f32 cameraSpeed = 15.0f;
 		auto appTimer = Application::GetInstance().GetAppTimer();
 		auto tick = appTimer->GetTick();

@@ -100,7 +100,6 @@ namespace JG
 		String rawAssetPath = CombinePath(Application::GetAssetPath(), "RawResources");
 		String outputPath = CombinePath(Application::GetAssetPath(), "Resources");
 
-
 		//for (auto& iter : fs::recursive_directory_iterator(rawAssetPath))
 		//{
 		//	auto extenstion = iter.path().extension().string();

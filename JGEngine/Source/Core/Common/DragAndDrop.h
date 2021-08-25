@@ -19,4 +19,11 @@ namespace JG
 		char FilePath[256] = {};
 	};
 
+	class DDDGameNode : public IDragAndDropData
+	{
+		JGCLASS
+	public:
+		class GameNode* GameNode = nullptr;
+	};
+
 }

@@ -49,7 +49,6 @@ namespace JG
 
 		static JQuaternion ToQuaternion(const JVector3& euler);
 		static JQuaternion ToQuaternion(float pitch, float yaw, float roll);
-		//static JVector3 ToEuler(const JQuaternion& q);
 
 		inline static JQuaternion Identity()
 		{

@@ -16,11 +16,26 @@ namespace JG
 	{
 
 
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Add/EmptyObject", 0, [&]()
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/EmptyObject", 0, [&]()
 		{
-			mVm->AddEmptyObject->Execute(mVm->GetSelectdNodeInContextMenu());
+			mVm->CreateEmptyObject->Execute(mVm->GetSelectdNodeInContextMenu());
 		}, nullptr);
-
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/2D/Sprite", 0, [&]()
+		{
+			mVm->CreateSprite->Execute(mVm->GetSelectdNodeInContextMenu());
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/3D/Cube", 0, [&]()
+		{
+			mVm->CreateCube->Execute(mVm->GetSelectdNodeInContextMenu());
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/3D/Sphere", 0, [&]()
+		{
+			mVm->CreateSphere->Execute(mVm->GetSelectdNodeInContextMenu());
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Light/PointLight", 0, [&]()
+		{
+			mVm->CreatePointLight->Execute(mVm->GetSelectdNodeInContextMenu());
+		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Delete", 0, 
 			[&]()
 		{
@@ -62,9 +77,25 @@ namespace JG
 			}
 			else
 			{
-				isOpen = ImGui::TreeNodeEx((void*)nodeData.Object, nodeData.UserFlags, nodeData.Object->GetName().c_str());
+				
+				isOpen = ImGui::TreeNodeEx((void*)nodeData.Object, nodeData.UserFlags, nodeData.Object->GetName().c_str()); 
 				nodeData.IsTreePop = isOpen;
 			}
+
+
+
+
+
+			DragAndDropTarget<DDDGameNode>([&](DDDGameNode* ddd)
+			{
+				ddd->GameNode->SetParent(nodeData.Object);
+			});
+
+			DragAndDropSource<JG::DDDGameNode>([&](DDDGameNode* ddd)
+			{
+				ddd->GameNode = nodeData.Object;
+				ImGui::TextUnformatted(ddd->GameNode->GetName().c_str());
+			});
 
 			return isOpen;
 		},
@@ -84,6 +115,12 @@ namespace JG
 			else
 			{
 				isContextOpen = false;
+				if (ImGui::IsKeyDown((int)EKeyCode::Ctrl) == true)
+				{
+					JG_INFO("Key Down Ctrl");
+				}
+
+
 				if (ImGui::IsItemClicked() == true)
 				{
 					mVm->SetSelectedNodeInInspector(nodeData.Object);

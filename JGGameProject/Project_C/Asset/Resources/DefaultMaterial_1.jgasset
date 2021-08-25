@@ -17,7 +17,7 @@
             {
                 "Name": "Roughness",
                 "Type": "float",
-                "Value": 0.22599999606609345
+                "Value": 0.1080000028014183
             },
             {
                 "Name": "Specular",
@@ -31,7 +31,7 @@
             {
                 "Name": "Metallc",
                 "Type": "float",
-                "Value": 0.21400000154972077
+                "Value": 0.17000000178813935
             }
         ]
     }
