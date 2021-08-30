@@ -19,6 +19,7 @@ namespace JG
 	public:
 		static const String& GetAssetPath();
 		static const String  GetEnginePath();
+		static const String  GetIconPath();
 		static const String  GetShaderGlobalLibPath();
 		static const String  GetShaderScriptPath();
 		static const String  GetShaderTemplatePath();

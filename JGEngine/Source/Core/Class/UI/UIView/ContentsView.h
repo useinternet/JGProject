@@ -10,7 +10,20 @@ namespace JG
 	{
 		JGCLASS
 		class Directory {};
+	private:
+		enum
+		{
+			ICON_NONE,
+			ICON_DIRECTORY,
+			ICON_MATERIAL,
+			ICON_GAMEWORLD,
+			ICON_TEXTURE,
+			ICON_MESH,
+			MAX_ICON
+		};
 
+	private:
+		List<Asset<ITexture>*> mIcons;
 
 		ContentsViewModel* mVm = nullptr;
 	private:
@@ -27,5 +40,8 @@ namespace JG
 	private:
 		void OnGui_ContentsDirectory();
 		void OnGui_ContentsDirectoryDetail();
+	private:
+		void LoadIcons();
+		i32  GetIconID(EAssetFormat format);
 	};
 }

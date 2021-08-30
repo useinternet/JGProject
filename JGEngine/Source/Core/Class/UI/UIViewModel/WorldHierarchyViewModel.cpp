@@ -20,9 +20,10 @@ namespace JG
 		SendEventImmediate(e);
 		mGameWorld = e.GameWorld;
 
-		CreateEmptyObject = CreateUniquePtr<Command<GameNode*>>();
-		CreateEmptyObject->Subscribe(this, [&](GameNode* parent)
+		CreateEmptyObject = CreateUniquePtr<Command<>>();
+		CreateEmptyObject->Subscribe(this, [&]()
 		{
+			auto parent = GetSelectdNodeInContextMenu();
 			if (parent == nullptr)
 			{
 				return;
@@ -31,9 +32,10 @@ namespace JG
 		});
 
 
-		CreateSprite = CreateUniquePtr<Command<GameNode*>>();
-		CreateSprite->Subscribe(this, [&](GameNode* parent)
+		CreateSprite = CreateUniquePtr<Command<>>();
+		CreateSprite->Subscribe(this, [&]()
 		{
+			auto parent = GetSelectdNodeInContextMenu();
 			if (parent == nullptr)
 			{
 				return;
@@ -42,9 +44,10 @@ namespace JG
 			node->AddComponent<SpriteRenderer>();
 		});
 
-		CreateCube = CreateUniquePtr<Command<GameNode*>>();
-		CreateCube->Subscribe(this, [&](GameNode* parent)
+		CreateCube = CreateUniquePtr<Command<>>();
+		CreateCube->Subscribe(this, [&]()
 		{
+			auto parent = GetSelectdNodeInContextMenu();
 			if (parent == nullptr)
 			{
 				return;
@@ -55,9 +58,10 @@ namespace JG
 		});
 
 
-		CreateSphere = CreateUniquePtr<Command<GameNode*>>();
-		CreateSphere->Subscribe(this, [&](GameNode* parent)
+		CreateSphere = CreateUniquePtr<Command<>>();
+		CreateSphere->Subscribe(this, [&]()
 		{
+			auto parent = GetSelectdNodeInContextMenu();
 			if (parent == nullptr)
 			{
 				return;
@@ -68,9 +72,10 @@ namespace JG
 		});
 
 
-		CreatePointLight = CreateUniquePtr<Command<GameNode*>>();
-		CreatePointLight->Subscribe(this, [&](GameNode* parent)
+		CreatePointLight = CreateUniquePtr<Command<>>();
+		CreatePointLight->Subscribe(this, [&]()
 		{
+			auto parent = GetSelectdNodeInContextMenu();
 			if (parent == nullptr)
 			{
 				return;
@@ -81,22 +86,69 @@ namespace JG
 
 
 
-
-
-
-		DeleteGameNode = CreateUniquePtr<Command<GameNode*>>();
-		DeleteGameNode->Subscribe(this, [&](GameNode* node)
-		{
-			if (node == nullptr)
+		CopyGameNodes = CreateUniquePtr<Command<>>();
+		CopyGameNodes->Subscribe(this, [&]() {
+			if (mCurrentSelectedNodeList.empty())
 			{
 				return;
 			}
-			node->Destroy(node);
-			Scheduler::GetInstance().ScheduleOnce(0, 0, [&]()
+
+			mCopyJson.reset(); mCopyJson = nullptr;
+			mCopyJson = CreateSharedPtr<Json>();
+			auto nodeListJson = mCopyJson->CreateJsonData();
+
+			for (auto node : mCurrentSelectedNodeList)
 			{
-				mTreeNodePool.erase(node);
-				return EScheduleResult::Break;
+				auto jsonData = nodeListJson->CreateJsonData();
+				node->MakeJson(jsonData);
+				nodeListJson->AddMember(jsonData);
+			}
+			mCopyJson->AddMember("NodeList", nodeListJson);
+			UIManager::GetInstance().SetClipBoard((u64)this, mCopyJson.get(), sizeof(ptraddr));
+		});
+
+
+		PasteGameNodes = CreateUniquePtr<Command<>>();
+		PasteGameNodes->Subscribe(this, [&]() {
+			auto parent = GetSelectdNodeInContextMenu();
+			if (parent == nullptr)
+			{
+				return;
+			}
+			if (mCopyJson == nullptr) {
+				return;
+			}
+			auto nodeListJson = mCopyJson->GetMember("NodeList");
+			for (i32 i = 0; i < nodeListJson->GetSize(); ++i)
+			{
+				auto jsonData = nodeListJson->GetJsonDataFromIndex(i);
+
+				auto node = parent->AddNode(std::to_string(i));
+				node->LoadJson(jsonData);
+			}
+			mCopyJson = nullptr;
+		
+		});
+
+		DeleteGameNode = CreateUniquePtr<Command<>>();
+		DeleteGameNode->Subscribe(this, [&]() {
+			if (mCurrentSelectedNodeList.empty())
+			{
+				return;
+			}
+			Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::BeginSystem, [&]() -> EScheduleResult
+			{
+				for (auto& node : mCurrentSelectedNodeList)
+				{
+					node->Destroy(node);
+					mTreeNodePool.erase(node);
+				}
+				ClearSelectedNode();
+				return EScheduleResult::Continue;
 			});
+		
+
+		
 		});
 	}
 
@@ -109,9 +161,10 @@ namespace JG
 		CreateCube->UnSubscribe(this);
 		CreateSphere->UnSubscribe(this);
 		CreatePointLight->UnSubscribe(this);
+		CopyGameNodes->UnSubscribe(this);
+		PasteGameNodes->UnSubscribe(this);
 		DeleteGameNode->UnSubscribe(this);
 
-		DeleteGameNode->UnSubscribe(this);
 		mTreeNodePool.clear();
 		CreateEmptyObject = nullptr;
 		DeleteGameNode = nullptr;
@@ -148,17 +201,14 @@ namespace JG
 		}
 
 		auto& treeNode = mTreeNodePool[node];
-		treeNode.IsSelected = true;
 
 		if (mCurrentSelectedNodeInInspector != nullptr)
 		{
 			auto& treeNode = mTreeNodePool[mCurrentSelectedNodeInInspector];
-			treeNode.IsSelected = false;
 		}
 		if (mCurrentSelectedNodeInContextMenu != nullptr)
 		{
 			auto& treeNode = mTreeNodePool[mCurrentSelectedNodeInContextMenu];
-			treeNode.IsSelected = false;
 			mCurrentSelectedNodeInContextMenu = nullptr;
 		}
 
@@ -181,18 +231,15 @@ namespace JG
 			return;
 		}
 		auto& treeNode = mTreeNodePool[node];
-		treeNode.IsSelected = true;
 
 		if (mCurrentSelectedNodeInContextMenu != nullptr)
 		{
 			auto& treeNode = mTreeNodePool[mCurrentSelectedNodeInContextMenu];
-			treeNode.IsSelected = false;
 		}
 
 		if (mCurrentSelectedNodeInInspector != nullptr)
 		{
 			auto& treeNode = mTreeNodePool[mCurrentSelectedNodeInInspector];
-			treeNode.IsSelected = false;
 			mCurrentSelectedNodeInInspector = nullptr;
 		}
 		mCurrentSelectedNodeInContextMenu = node;
@@ -201,6 +248,38 @@ namespace JG
 	GameNode* WorldHierarchyViewModel::GetSelectdNodeInContextMenu() const
 	{
 		return mCurrentSelectedNodeInContextMenu;
+	}
+
+	void WorldHierarchyViewModel::AddSelectedNode(GameNode* node)
+	{
+		if (mTreeNodePool.find(node) == mTreeNodePool.end())
+		{
+			return;
+		}
+		auto& treeNode = mTreeNodePool[node];
+		treeNode.IsSelected = true;
+
+
+
+		mCurrentSelectedNodeList.emplace(node);
+	}
+
+	void WorldHierarchyViewModel::ClearSelectedNode()
+	{
+		for (auto& selectedNode : mCurrentSelectedNodeList)
+		{
+			if (mTreeNodePool.find(selectedNode) == mTreeNodePool.end()) continue;
+			auto& treeNode = mTreeNodePool[selectedNode];
+			treeNode.IsSelected = false;
+		}
+
+
+		mCurrentSelectedNodeList.clear();
+	}
+
+	const HashSet<GameNode*>& WorldHierarchyViewModel::GetSelectedNodeList() const
+	{
+		return mCurrentSelectedNodeList;
 	}
 
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ContentsView.h"
 #include "Common/DragAndDrop.h"
-
+#include "ExternalImpl/JGImGui.h"
 namespace JG
 {
 	ContentsView::ContentsView()
@@ -42,6 +42,7 @@ namespace JG
 				mVm->Delete->Execute();
 			}
 		}, nullptr);
+		LoadIcons();
 	}
 	void ContentsView::Initialize()
 	{
@@ -166,23 +167,63 @@ namespace JG
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.0f, 0.5f));
 		Vm->ForEach([&](ContentsFileInfo* fileInfo)
 		{
-		
-			ImGui::Dummy(ImVec2(20.0f, 20.0f)); ImGui::SameLine();
+
+			ImTextureID tID = 0;
+			i32 ICON = GetIconID(fileInfo->FileFormat);
+
+			if (ICON != -1)
+			{
+				if (mIcons[ICON] && mIcons[ICON]->Get() && mIcons[ICON]->Get()->IsValid())
+				{
+					tID = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[ICON]->Get()->GetTextureID());
+				}
+			}
 			
+			if (tID != 0)
+			{
+				ImGui::Image(tID, ImVec2(20, 20));
+			}
+			else {
+				ImGui::Dummy(ImVec2(20, 20));
+			}
+			ImGui::SameLine();
+
 			if (ImGui::Selectable(fileInfo->Name.c_str(), false, ImGuiSelectableFlags_None, ImVec2(0, 20.0f)) == true)
 			{
 				Vm->SelectedAssetFile(fileInfo->Path);
 			}
-			if (ImGui::BeginDragDropSource())
+			DragAndDropSource<DDDContentsFile>([&](DDDContentsFile* ddd)
 			{
-				DDDContentsFile ddd;
-				strcpy(ddd.FilePath, fileInfo->Path.c_str());
-				ImGui::SetDragDropPayload(ddd.GetType().GetName().c_str(), &ddd, sizeof(DDDContentsFile));
+				ddd->FilePath = fileInfo->Path;
 				ImGui::TextUnformatted(fileInfo->Name.c_str());
-				ImGui::EndDragDropSource();
-			}
+			});
 		});
 		ImGui::PopStyleVar();
+	}
+	void ContentsView::LoadIcons()
+	{
+		mIcons.resize(MAX_ICON);
+		mIcons[ICON_NONE]      = UIManager::GetInstance().GetIcon("Text_Icon");
+		mIcons[ICON_DIRECTORY] = UIManager::GetInstance().GetIcon("Directory_Icon");
+		mIcons[ICON_MATERIAL]  = UIManager::GetInstance().GetIcon("Material_Icon");
+		mIcons[ICON_GAMEWORLD] = UIManager::GetInstance().GetIcon("GameWorld_Icon");
+		mIcons[ICON_MESH] = UIManager::GetInstance().GetIcon("Mesh_Icon");
+		mIcons[ICON_TEXTURE]   = UIManager::GetInstance().GetIcon("Texture_Icon");
+	}
+	i32 ContentsView::GetIconID(EAssetFormat format)
+	{
+		switch (format)
+		{
+		case JG::EAssetFormat::Directory: return ICON_DIRECTORY;
+		case JG::EAssetFormat::Material:  return ICON_MATERIAL;
+		case JG::EAssetFormat::Texture:   return ICON_TEXTURE;
+		case JG::EAssetFormat::GameWorld: return ICON_GAMEWORLD;
+		case JG::EAssetFormat::Mesh:   return ICON_MESH;
+		case JG::EAssetFormat::Skeletal:
+		default:
+			return ICON_NONE;
+		}
+		return -1;
 	}
 }
 

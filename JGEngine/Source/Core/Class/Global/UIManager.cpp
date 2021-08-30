@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "UIManager.h"
 #include "Class/UI/UIView.h"
-
+#include "Application.h"
+#include "Graphics/Resource.h"
+#include "Class/Asset/Asset.h"
 namespace JG
 {
 	UIManager::UIManager()
@@ -12,7 +14,16 @@ namespace JG
 			OnGUI();
 			return EScheduleResult::Continue;
 		});
-
+		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::BeginSystem,
+			[&]()-> EScheduleResult
+		{
+			if(mIsLoadIcons == false)
+			{
+				LoadIcons();
+			}
+	
+			return EScheduleResult::Continue;
+		});
 	}
 	UIManager::~UIManager()
 	{
@@ -24,6 +35,32 @@ namespace JG
 			}
 		}
 		mUIViewPool.clear();
+	}
+	Asset<ITexture>* UIManager::GetIcon(const String& iconName)
+	{
+		if (mIsLoadIcons == false)
+		{
+			LoadIcons();
+		}
+
+
+		auto iter = mIcons.find(iconName);
+		if (iter == mIcons.end())
+		{
+			return nullptr;
+		}
+		return iter->second;
+	}
+	void UIManager::SetClipBoard(u64 ID, void* data, u64 size)
+	{
+		mClipBoard.ID = ID;
+		mClipBoard.Data.clear();
+		mClipBoard.Data.resize(size);
+		memcpy(mClipBoard.Data.data(), data, size);
+	}
+	const ClipBoard& UIManager::GetClipBoard() const
+	{
+		return mClipBoard;
 	}
 	void UIManager::RegisterMainMenuItem(const String& menuPath, u64 priority, const std::function<void()>& action, const std::function<bool()> enableAction)
 	{
@@ -86,6 +123,25 @@ namespace JG
 			return;
 		}
 		ForEach(iter->second.get(), beginAction, endAction);
+	}
+	void UIManager::LoadIcons()
+	{
+		auto iconPath = Application::GetInstance().GetIconPath();
+		for (auto& iter : fs::recursive_directory_iterator(iconPath))
+		{
+			auto pt = AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());
+			if (pt == nullptr)
+			{
+				continue;
+			}
+			auto t = pt->As<ITexture>();
+			if (t != nullptr)
+			{
+				mIcons.emplace(t->GetAssetName(), t);
+				JG_CORE_INFO("Load Success Icon : {0} ", t->GetAssetName());
+			}
+		}
+		mIsLoadIcons = true;
 	}
 	void UIManager::OnGUI()
 	{
@@ -369,5 +425,6 @@ namespace JG
 
 
 	}
+
 }
 

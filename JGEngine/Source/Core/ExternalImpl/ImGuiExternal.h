@@ -33,42 +33,48 @@ namespace JG
 {
 
 	template<class T>
-	void DragAndDropSource(const std::function<void(T*)>& action)
+	bool DragAndDropSource(const std::function<void(T*)>& action)
 	{
 		if (std::is_base_of<JG::IDragAndDropData, T>::value == false)
 		{
-			return;
+			return false;
 		}
 		if (ImGui::BeginDragDropSource())
 		{
 			T ddd;
 			action(&ddd);
-			ImGui::SetDragDropPayload(ddd.GetType().GetName().c_str(), &ddd, sizeof(DDDGameNode));
+			List<jbyte> btData;
+			ddd.GetData(btData);
+			ImGui::SetDragDropPayload(ddd.GetType().GetName().c_str(), btData.data(), btData.size());
 			ImGui::EndDragDropSource();
+			return true;
 		}
+		return false;
 	}
 
 	template<class T>
-	void DragAndDropTarget(const std::function<void(T*)>& action)
+	bool DragAndDropTarget(const std::function<void(T*)>& action)
 	{
 		if (std::is_base_of<JG::IDragAndDropData, T>::value == false)
 		{
-			return;
+			return false;
 		}
 		if (ImGui::BeginDragDropTarget() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 		{
 			auto payLoad = ImGui::GetDragDropPayload();
 			if (payLoad != nullptr)
 			{
-				JG::IDragAndDropData* ddd = (JG::IDragAndDropData*)payLoad->Data;
-
-				if (ddd->GetType() == JGTYPE(T))
+				T ddd;
+				if (ddd.GetType() == JGTYPE(T))
 				{
-					action(static_cast<T*>(ddd));
+					ddd.SetData(payLoad->Data);
+					action(static_cast<T*>(&ddd));
 				}
 			}
 
 			ImGui::EndDragDropTarget();
+			return true;
 		}
+		return false;
 	}
 }

@@ -137,13 +137,9 @@ namespace JG
 	}
 	void Transform::UpdateWorldLocation() const
 	{
-		if (mIsLocationDirty == false)
+		if (mIsLocationDirty == false || GetOwner() == nullptr)
 		{
 			return;
-		}
-		if (GetOwner()->GetName() == "Test")
-		{
-			JG_CORE_INFO("Update WorldLocation : {0}", GetOwner()->GetName());
 		}
 		mIsLocationDirty = false;
 
@@ -161,7 +157,7 @@ namespace JG
 	}
 	void Transform::UpdateWorldRotation() const
 	{
-		if (mIsRotationDirty == false)
+		if (mIsRotationDirty == false || GetOwner() == nullptr)
 		{
 			return;
 		}
@@ -179,7 +175,7 @@ namespace JG
 	}
 	void Transform::UpdateWorldScale() const
 	{
-		if (mIsScaleDirty == false)
+		if (mIsScaleDirty == false || GetOwner() == nullptr)
 		{
 			return;
 		}
@@ -292,7 +288,11 @@ namespace JG
 		data.Object = this;
 		data.UserMsg = flags;
 		
-		GetOwner()->SendChangeData(data);
+		if (GetOwner() != nullptr)
+		{
+			GetOwner()->SendChangeData(data);
+		}
+
 	}
 	void Transform::ApplyDirtyFlag(SendDirtyFlags flags)
 	{

@@ -21,7 +21,8 @@ namespace JG
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
 		virtual void Destroy() override;
-
+	private:
+		void UpdateDragAndDrop(GameNode* targetNode);
 	};
 
 }

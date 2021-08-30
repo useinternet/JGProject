@@ -7,6 +7,12 @@ namespace JG
 {
 	class IUIView;
 	class IPopupUIView;
+	class ITexture;
+
+	template<class T>
+	class Asset;
+
+
 	struct MenuItem
 	{
 		String ShortCut;
@@ -28,6 +34,12 @@ namespace JG
 		friend class UIManager;
 		SortedDictionary<u64, List<UniquePtr<MenuItemNode>>> ChildNodes;
 	};
+	struct ClipBoard
+	{
+		u64 ID = 0;
+		List<jbyte> Data;
+	};
+
 	class UIManager : public GlobalSingleton<UIManager>
 	{
 		friend class Application;
@@ -41,17 +53,26 @@ namespace JG
 		Dictionary<JG::Type, UniquePtr<IUIView>>      mUIViewPool;
 		Dictionary<JG::Type, UniquePtr<IPopupUIView>> mPopupUIViewPool;
 		Dictionary<JG::Type, UniquePtr<MenuItemNode>> mUIViewContextMenu;
-		
-		UniquePtr<MenuItemNode> mMainMenuItemRootNode;
+
+		UniquePtr<MenuItemNode>  mMainMenuItemRootNode;
 		mutable std::shared_mutex   mMutex;
 
 
 		std::function<bool(Type)> mShowContextMenuFunc;
+
+		
+		ClipBoard mClipBoard;
+
+		Dictionary<String, Asset<ITexture>*>  mIcons;
+		bool mIsLoadIcons = false;
 	public:
 		UIManager();
 		~UIManager();
 	public:
-
+		Asset<ITexture>* GetIcon(const String& iconName);
+		void SetClipBoard(u64 ID, void* data, u64 size);
+		const ClipBoard& GetClipBoard() const;
+	public:
 		// µî·Ï
 		template<class UIViewType>
 		void RegisterUIView()
@@ -149,6 +170,7 @@ namespace JG
 			const std::function<void(const MenuItemNode*)>& beginAction,
 			const std::function<void(const MenuItemNode*)>& endAction);
 	private:
+		void LoadIcons();
 		void OnGUI();
 		void OnEvent(IEvent& e);
 		void ForEach(

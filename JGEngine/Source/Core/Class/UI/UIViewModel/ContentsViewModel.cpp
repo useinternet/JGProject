@@ -404,6 +404,7 @@ namespace JG
 
 		mThreadLoadData->ContentsFileInfoPool[result] = std::move(contentsInfo);
 
+		
 
 		result->Name = name;
 		result->Path = path;
@@ -470,13 +471,13 @@ namespace JG
 			}
 			else if (filePath.extension() == JG_ASSET_FORMAT)
 			{
-				EAssetFormat fileFormat = EAssetFormat::None;
+				EAssetFormat fileFormat = AssetDataBase::GetInstance().GetAssetFormat(filePath.string(), false);
 				Async_CreateContentsFileInfo(filePath.filename().string(), filePath.string(), fileFormat, currentFileInfo, false);
 			}
 			else
 			{
 				// 다른 에셋이라면
-				Async_CreateContentsFileInfo(filePath.filename().string(), filePath.string(), EAssetFormat::None , currentFileInfo, false);
+				Async_CreateContentsFileInfo(filePath.filename().string(), filePath.string(), EAssetFormat::None, currentFileInfo, false);
 			}
 
 		}

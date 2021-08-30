@@ -25,6 +25,11 @@ namespace JG
 		return CombinePath(GetAssetPath(), "Engine");
 	}
 
+	const String Application::GetIconPath()
+	{
+		return CombinePath(GetAssetPath(), "Engine/Icon");
+	}
+
 	const String Application::GetShaderGlobalLibPath()
 	{
 		return CombinePath(GetAssetPath(), "Engine/Shader/GlobalLib");
@@ -65,6 +70,8 @@ namespace JG
 		UIManager::Create();
 		GameLayerManager::Create();
 		AssetDataBase::Create();
+
+
 		// TODO
 		// 필요한 멤버 클래스 생성
 		mLayerStack  = CreateUniquePtr<SystemLayerStack>();
@@ -96,8 +103,6 @@ namespace JG
 			JG_CORE_INFO("Successed Create Window");
 			mGraphcisAPI->Create();
 			ShaderLibrary::Create();
-
-			
 			mIsRunning = true;
 		}
 		mAppTimer = Timer::Create();

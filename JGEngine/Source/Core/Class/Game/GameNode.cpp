@@ -37,6 +37,7 @@ namespace JG
 
 		for (auto& child : mChilds)
 		{
+			if (child == nullptr) continue;
 			if (child->mIsRunAwake == false)
 			{
 				child->mIsRunAwake = true;
@@ -385,13 +386,53 @@ namespace JG
 		}
 		return nullptr;
 	}
-	GameNode* GameNode::FindNode(u32 index) const
+	GameNode* GameNode::FindNode(i64 index) const
 	{
 		if (mChilds.size() <= index)
 		{
 			return nullptr;
 		}
 		return mChilds[index];
+	}
+
+	void GameNode::Swap(GameNode* node1, GameNode* node2)
+	{
+		i64 n1 = GetNodeIndex(node1);
+		i64 n2 = GetNodeIndex(node2);
+		Swap(n1, n2);
+	}
+	void GameNode::Swap(i64 n1, i64 n2)
+	{
+		if (n1 == n2) return;
+		if (n1 == -1 || n2 == -1) return;
+		auto size = mChilds.size();
+		if (size <= n1 || size <= n2) return;
+
+
+		auto node1 = mChilds[n1];
+		auto node2 = mChilds[n2];
+
+		
+		auto temp = mChilds[n1];
+		mChilds[n1] = node2;
+		mChilds[n2] = node1;
+
+	}
+	i64 GameNode::GetNodeIndex(GameNode* gameNode)
+	{
+		i64 result = -1;
+		i32 cnt = 0;
+		ForEach([&](GameNode* node)
+		{
+			if (gameNode == node)
+			{
+				result = cnt;
+				return;
+			}
+			cnt++;
+		});
+
+		return result;
 	}
 	u64 GameNode::GetChildCount() const
 	{
@@ -416,6 +457,7 @@ namespace JG
 			mParent = node;
 			mParent->mChilds.push_back(this);
 		}
+		GetTransform()->Refresh();
 	}
 	GameNode* GameNode::GetParent() const
 	{

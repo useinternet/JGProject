@@ -21,15 +21,21 @@ namespace JG
 		HashSet<GameNode*> mSelectedNodes;
 		GameNode*	mCurrentSelectedNodeInContextMenu   = nullptr;
 		GameNode*	mCurrentSelectedNodeInInspector     = nullptr;
+		HashSet<GameNode*> mCurrentSelectedNodeList;
+
+
+		SharedPtr<Json> mCopyJson = nullptr;
 	private:
 		Dictionary<GameNode*, WorldHierarchyTreeNode> mTreeNodePool;
 	public:
-		UniquePtr<Command<GameNode*>> CreateEmptyObject;
-		UniquePtr<Command<GameNode*>> CreateSprite;
-		UniquePtr<Command<GameNode*>> CreateCube;
-		UniquePtr<Command<GameNode*>> CreateSphere;
-		UniquePtr<Command<GameNode*>> CreatePointLight;
-		UniquePtr<Command<GameNode*>> DeleteGameNode;
+		UniquePtr<Command<>> CreateEmptyObject;
+		UniquePtr<Command<>> CreateSprite;
+		UniquePtr<Command<>> CreateCube;
+		UniquePtr<Command<>> CreateSphere;
+		UniquePtr<Command<>> CreatePointLight;
+		UniquePtr<Command<>> CopyGameNodes;
+		UniquePtr<Command<>> PasteGameNodes;
+		UniquePtr<Command<>> DeleteGameNode;
 	public:
 		virtual ~WorldHierarchyViewModel() = default;
 	protected:
@@ -47,6 +53,11 @@ namespace JG
 
 		void SetSelectedNodeInContextMenu(GameNode* node);
 		GameNode* GetSelectdNodeInContextMenu() const;
+
+
+		void AddSelectedNode(GameNode* node);
+		void ClearSelectedNode();
+		const HashSet<GameNode*>& GetSelectedNodeList() const;
 	private:
 		void ForEach(
 			GameNode* gameNode,

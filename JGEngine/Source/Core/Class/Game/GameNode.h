@@ -72,8 +72,10 @@ namespace JG
 
 	public:
 		GameNode* FindNode(const String& name) const;
-		GameNode* FindNode(u32 index) const;
-
+		GameNode* FindNode(i64 index) const;
+		void Swap(GameNode* node1, GameNode* node2);
+		void Swap(i64 n1, i64 n2);
+		
 
 		template<class T>
 		T* FindComponent() const
@@ -87,6 +89,7 @@ namespace JG
 			}
 			return nullptr;
 		}
+		i64 GetNodeIndex(GameNode* gameNode);
 	public:
 		u64 GetChildCount() const;
 		virtual void SetParent(GameNode* node);

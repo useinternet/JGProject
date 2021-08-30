@@ -325,8 +325,38 @@ namespace JG
 			return mDoc;
 		}
 	public:
+		static String ToString(SharedPtr<Json> json)
+		{
+			if (json == nullptr) {
+				return "";
+			}
+			auto& doc = json->GetDocument();
+			rapidjson::StringBuffer buffer;
+			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+			if (doc.Accept(writer) == false)
+			{
+				return "";
+			}
+
+			String out_string;
+			out_string.resize(buffer.GetSize());
+			memcpy(out_string.data(), buffer.GetString(), buffer.GetSize());
+
+			return out_string;
+		}
+		static SharedPtr<Json> ToObject(const String& jsonText)
+		{
+			SharedPtr<Json> json = CreateSharedPtr<Json>();
+			auto& doc = json->GetDocument();
+			
+			doc.Parse(jsonText.c_str());
+			return json;
+		}
 		static bool Write(const String& path, SharedPtr<Json> json)
 		{
+			if (json == nullptr) {
+				return false;
+			}
 			auto& doc = json->GetDocument();
 			
 			rapidjson::StringBuffer buffer;
@@ -352,6 +382,9 @@ namespace JG
 		}
 		static bool Read(const String& path, SharedPtr<Json> json)
 		{
+			if (json == nullptr) {
+				return false;
+			}
 			auto& doc = json->GetDocument();
 			
 

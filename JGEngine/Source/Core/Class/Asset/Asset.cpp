@@ -533,7 +533,10 @@ namespace JG
 		{
 			LoadOriginAsset(resourcePath);
 		}
-		return Json::GetAssetFormat(absolutePath);
+		auto assetFormat = Json::GetAssetFormat(absolutePath);
+		std::lock_guard<std::shared_mutex> lock(mAssetFormatMutex);
+		mOriginAssetFormatPool[resourcePath] = assetFormat;
+		return assetFormat;
 	}
 
 	SharedPtr<IAsset> AssetDataBase::LoadOriginAsset(const String& path)
