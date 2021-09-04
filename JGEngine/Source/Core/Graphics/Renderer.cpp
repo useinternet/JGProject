@@ -121,17 +121,17 @@ namespace JG
 			auto transposedWorld = JMatrix::Transpose(worldMatrix);
 			if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
 			{
-				JG_CORE_INFO("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
+				JG_CORE_ERROR("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
 				continue;
 			}
 			if (material->SetFloat3(ShaderScript::Standard3D::Eye, mCurrentRenderInfo.EyePosition) == false)
 			{
-				JG_CORE_INFO("{0} : Fail SetEye in CameraParam", material->GetName());
+				JG_CORE_ERROR("{0} : Fail SetEye in CameraParam", material->GetName());
 				continue;
 			}
 			if (material->SetFloat4x4(ShaderScript::Standard3D::World, transposedWorld) == false)
 			{
-				JG_CORE_INFO("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
+				JG_CORE_ERROR("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
 				continue;
 			}
 

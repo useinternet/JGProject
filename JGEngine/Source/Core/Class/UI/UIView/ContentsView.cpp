@@ -2,6 +2,7 @@
 #include "ContentsView.h"
 #include "Common/DragAndDrop.h"
 #include "ExternalImpl/JGImGui.h"
+#include "ExternalImpl/ImFileDialog.h"
 namespace JG
 {
 	ContentsView::ContentsView()
@@ -51,10 +52,13 @@ namespace JG
 	}
 	void ContentsView::OnGUI()
 	{
+		mIsCtrl = ImGui::IsKeyDown((i32)EKeyCode::Ctrl);
+
 		ImGui::Begin("ContentsView", &mOpenGUI);
 		// 기능 버튼
 
-		ImGui::Button("Button01"); ImGui::SameLine(); ImGui::Button("Button02");
+		OnGui_TopBar();
+
 		ImGui::Separator();
 
 		// 두개로 나누기 차일드 윈도우
@@ -110,7 +114,7 @@ namespace JG
 			}
 			bool isRoot = fileInfo->OwnerDirectory == nullptr;
 			bool isLeaf = fileInfo->DirectoryList.size() == 0;
-			bool isSelectedInfo = Vm->IsSelectedContentsDirectory(fileInfo);
+			bool isSelectedInfo = Vm->IsSelectedContentsFile(fileInfo);
 
 			node->UserFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
 
@@ -123,7 +127,7 @@ namespace JG
 
 			if (isRoot == true)
 			{
-				isOpen = ImGui::CollapsingHeader((fileInfo->Name + "##ContentsDirectory").c_str());
+				isOpen = ImGui::CollapsingHeader((fileInfo->Name + "##ContentsDirectory").c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnDoubleClick);
 				node->IsTreePop = false;
 			}
 			else
@@ -139,16 +143,31 @@ namespace JG
 		{
 			static bool isContextOpen = false;
 			ImGui::PushID(node);
-			node->IsSelected = ImGui::IsItemClicked();
+			bool isItemClicked = ImGui::IsItemClicked();
+
 			if (UIManager::GetInstance().ShowContextMenu(GetType()) == true)
 			{
+				if (node->IsSelected == false)
+				{
+					mVm->ReleaseSelectedContentsFiles();
+				}
 				node->IsTarget = true;
+				isItemClicked  = true;
 			}
 			else
 			{
 				node->IsTarget = false;
 			}
 
+
+			if (isItemClicked)
+			{
+				if (mIsCtrl == false)
+				{
+					mVm->ReleaseSelectedContentsFiles();
+				}
+				node->IsSelected = true;
+			}
 
 			ImGui::PopID();
 		},
@@ -165,19 +184,11 @@ namespace JG
 			return;
 		}
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.0f, 0.5f));
-		Vm->ForEach([&](ContentsFileInfo* fileInfo)
+		Vm->ForEach([&](ContentsFileNode* fileNode)
 		{
-
-			ImTextureID tID = 0;
+			auto fileInfo = fileNode->FileInfo;
 			i32 ICON = GetIconID(fileInfo->FileFormat);
-
-			if (ICON != -1)
-			{
-				if (mIcons[ICON] && mIcons[ICON]->Get() && mIcons[ICON]->Get()->IsValid())
-				{
-					tID = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[ICON]->Get()->GetTextureID());
-				}
-			}
+			ImTextureID tID = GetIconTextureID(ICON);
 			
 			if (tID != 0)
 			{
@@ -200,14 +211,41 @@ namespace JG
 		});
 		ImGui::PopStyleVar();
 	}
+	void ContentsView::OnGui_TopBar()
+	{
+		OnGui_ImportDialog();
+	}
+	void ContentsView::OnGui_ImportDialog()
+	{
+		ImTextureID icon = 0;
+		icon = GetIconTextureID(ICON_IMPORT);
+		if (icon != 0)
+		{
+			if (ImGui::ImageButton(icon, ImVec2(20, 20)) == true)
+			{
+				ImGui::FileDialog::Instance().Open(GetType().GetName(), "Import Dialog", "", true, Application::GetInstance().GetAssetPath());
+			}
+		}
+		if (ImGui::FileDialog::Instance().IsDone(GetType().GetName()))
+		{
+			if (ImGui::FileDialog::Instance().HasResult() == true)
+			{
+				// 현재 위치에서 임포트
+				auto results = ImGui::FileDialog::Instance().GetResults();
+
+			}
+			ImGui::FileDialog::Instance().Close();
+		}
+	}
 	void ContentsView::LoadIcons()
 	{
 		mIcons.resize(MAX_ICON);
 		mIcons[ICON_NONE]      = UIManager::GetInstance().GetIcon("Text_Icon");
+		mIcons[ICON_IMPORT]    = UIManager::GetInstance().GetIcon("Import_Icon");
 		mIcons[ICON_DIRECTORY] = UIManager::GetInstance().GetIcon("Directory_Icon");
 		mIcons[ICON_MATERIAL]  = UIManager::GetInstance().GetIcon("Material_Icon");
 		mIcons[ICON_GAMEWORLD] = UIManager::GetInstance().GetIcon("GameWorld_Icon");
-		mIcons[ICON_MESH] = UIManager::GetInstance().GetIcon("Mesh_Icon");
+		mIcons[ICON_MESH]      = UIManager::GetInstance().GetIcon("Mesh_Icon");
 		mIcons[ICON_TEXTURE]   = UIManager::GetInstance().GetIcon("Texture_Icon");
 	}
 	i32 ContentsView::GetIconID(EAssetFormat format)
@@ -224,6 +262,18 @@ namespace JG
 			return ICON_NONE;
 		}
 		return -1;
+	}
+	ImTextureID ContentsView::GetIconTextureID(i32 iconEnum)
+	{
+		if (iconEnum == -1) return 0;
+		ImTextureID id = 0;
+		if (mIcons[iconEnum] && mIcons[iconEnum]->Get() && mIcons[iconEnum]->Get()->IsValid())
+		{
+			id = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[iconEnum]->Get()->GetTextureID());
+		}
+
+
+		return id;
 	}
 }
 

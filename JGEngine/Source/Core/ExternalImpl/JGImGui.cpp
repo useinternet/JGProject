@@ -12,7 +12,8 @@
 #include "Platform/Graphics/DirectX12/Utill/CommandList.h"
 #include "Platform/Graphics/DirectX12/Utill/DirectX12Helper.h"
 #include "Application.h"
-
+#include "Class/Asset/Asset.h"
+#include "ImFileDialog.h"
 // NOTE
 // DIRECTX 12 INCLUDE
 #include <d3d12.h>
@@ -30,11 +31,14 @@ namespace JG
 		static ComPtr<ID3D12DescriptorHeap> gSrvDescriptorHeap;
 		static ComPtr<ID3D12CommandAllocator>    gCommandAlloc;
 		static ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
 		static u32 gIncreaseSize = 0;
 		static u32 gCurrentSrvIndex     = 0;
-		static const u32 gSrvStartIndex = 1;
+		static u32 gSrvStartIndex = 1;
 		static const u32 gMaxSrvCount   = 1024;
 	}
+
+	static SharedPtr<ITexture> gFileDialogTexture;
 	JGImGui::JGImGui()
 	{
 		auto size        = Application::GetInstance().GetDisplaySize();
@@ -133,9 +137,25 @@ namespace JG
 		default:
 			JGASSERT("not supported Graphics API");
 		}
+
+
+
+		ImGui::FileDialog::Instance().CreateTexture = [&](uint8_t* data, int w, int h, char fmt) -> void*
+		{
+			gFileDialogTexture = ITexture::Create("DialogFileFonts");
+			gFileDialogTexture->SetTextureMemory(data, w, h, 4);
+
+			return (void*)ConvertImGuiTextureID(gFileDialogTexture->GetTextureID());
+		};
+
+		ImGui::FileDialog::Instance().DeleteTexture = [&](void* pixels)
+		{
+
+		};
 	}
 	JGImGui::~JGImGui()
 	{
+		gFileDialogTexture.reset(); gFileDialogTexture = nullptr;
 		auto window = Application::GetInstance().GetWindow();
 		auto platform = window->GetPlatform();
 		auto api      = Application::GetInstance().GetGraphicsAPI()->GetAPI();
@@ -184,8 +204,16 @@ namespace JG
 	}
 	void JGImGui::NewFrame()
 	{
-		DirectX12::gCurrentSrvIndex = DirectX12::gSrvStartIndex;
-		ImGui_ImplDX12_NewFrame();
+		auto api = Application::GetInstance().GetGraphicsAPI()->GetAPI();
+
+		switch (api)
+		{
+		case JG::EGraphicsAPI::DirectX12:
+			DirectX12::gCurrentSrvIndex = DirectX12::gSrvStartIndex;
+			ImGui_ImplDX12_NewFrame();
+			break;
+		}
+
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}

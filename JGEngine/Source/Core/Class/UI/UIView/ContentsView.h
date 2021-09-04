@@ -19,6 +19,7 @@ namespace JG
 			ICON_GAMEWORLD,
 			ICON_TEXTURE,
 			ICON_MESH,
+			ICON_IMPORT,
 			MAX_ICON
 		};
 
@@ -29,6 +30,7 @@ namespace JG
 	private:
 		bool mOpenGUI = true;
 		bool mIsColumnInit = true;
+		bool mIsCtrl = false;
 	public:
 		ContentsView();
 		virtual ~ContentsView() = default;
@@ -41,7 +43,11 @@ namespace JG
 		void OnGui_ContentsDirectory();
 		void OnGui_ContentsDirectoryDetail();
 	private:
+		void OnGui_TopBar();
+		void OnGui_ImportDialog();
+	private:
 		void LoadIcons();
 		i32  GetIconID(EAssetFormat format);
+		ImTextureID GetIconTextureID(i32 iconEnum);
 	};
 }

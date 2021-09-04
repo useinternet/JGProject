@@ -85,7 +85,6 @@ namespace JG
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetOrthographic(mainCam->IsOrthographic());
 	
-			//ImGuizmo::SetGizmoSizeClipSpace
 			auto view = mainCam->GetViewMatrix();
 			auto proj = mainCam->GetProjMatrix();
 
@@ -449,6 +448,19 @@ namespace JG
 			rotation.x += mouseDelta.y * cameraSensitivity * tick;
 			rotation.y += mouseDelta.x * cameraSensitivity * tick;
 
+
+
+			if (rotation.x < 260.0f && rotation.x >= 180.0f)
+			{
+				rotation.x = std::max<f32>(rotation.x, 260.0f);
+			}
+			if (rotation.x >= 80.0f && rotation.x < 180.0f)
+			{
+				rotation.x = std::min<f32>(rotation.x, 80.0f);
+			}
+
+		
+			
 			camTransform->SetLocalRotation(rotation);
 
 			JVector3 location = camTransform->GetLocalLocation();

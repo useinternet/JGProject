@@ -6,16 +6,21 @@ namespace JG
 {
 	void ImGuiSystemLayer::OnAttach()
 	{
-		JGImGui::Create();
+	
 	}
 	void ImGuiSystemLayer::OnDetach()
 	{
-		JGImGui::Destroy();
+		
 	}
 	void ImGuiSystemLayer::Begin() 
 	{
+		JGImGui::Create();
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::ImGuiSystemLayer, SCHEDULE_BIND_FN(&ImGuiSystemLayer::Update));
 		
+	}
+	void ImGuiSystemLayer::Destroy()
+	{
+		JGImGui::Destroy();
 	}
 	void ImGuiSystemLayer::OnEvent(IEvent& e)
 	{

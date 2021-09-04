@@ -1,13 +1,13 @@
 #include "pch.h"
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
 #include "AssetImporter.h"
 #include "Application.h"
 #include "Graphics/Shader.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+
 
 
 namespace JG

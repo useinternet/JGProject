@@ -134,10 +134,10 @@ namespace JG
 		//		}
 		//	}
 		//}
-		for (auto& iter : fs::recursive_directory_iterator(outputPath))
-		{
-			AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());
-		}
+		//for (auto& iter : fs::recursive_directory_iterator(outputPath))
+		//{
+		//	AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());
+		//}
 	}
 
 	void GraphicsSystemLayer::Destroy()

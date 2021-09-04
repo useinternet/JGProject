@@ -8,8 +8,10 @@ namespace JG
 	void ContentsViewModel::Initialize()
 	{
 		mSelectedDir.clear();
+		mSelectedFileListInSelectedDirectory.clear();
+		mSelectedFileList.clear();
 		mTargetNode = nullptr;
-		mTargetNodeList.clear();
+
 
 		if (mThreadLoadData == nullptr)
 		{
@@ -18,7 +20,6 @@ namespace JG
 		mControlUpdateHandle = Scheduler::GetInstance().Schedule(0.0f, 0.5f, -1, SchedulePriority::Default,
 			[&]()-> EScheduleResult
 		{
-
 
 			EScheduleState currState = EScheduleState::Wait;
 			if (mAsyncUpdateHandle != nullptr)
@@ -30,7 +31,7 @@ namespace JG
 			if (currState == EScheduleState::Compelete || mAsyncUpdateHandle == nullptr)
 			{
 
-				mContentsFileInfoPool = std::move(mThreadLoadData->ContentsFileInfoPool);
+				mContentsFileInfoPool   = std::move(mThreadLoadData->ContentsFileInfoPool);
 				mContentsFileInfoByPath = std::move(mThreadLoadData->ContentsFileInfoByPath);
 
 				// 추가된어진 파일 추가
@@ -87,14 +88,16 @@ namespace JG
 		Paste	  = CreateUniquePtr<Command<>>();
 		Move	  = CreateUniquePtr<Command<>>();
 		Delete	  = CreateUniquePtr<Command<>>();
-
+		Import    = CreateUniquePtr<Command<String>>();
 		Create_Folder = CreateUniquePtr<Command<>>();
 		Create_Material_Surface = CreateUniquePtr<Command<>>();
+		Subscribe();
 	}
 
 	void ContentsViewModel::Destroy()
 	{
-
+		UnSubscribe();
+		Import->Clear();    Import = nullptr;
 		Copy->Clear();	    Copy = nullptr;
 		Paste->Clear();	    Paste = nullptr;
 		Move->Clear();	    Move = nullptr;
@@ -105,7 +108,7 @@ namespace JG
 
 
 		mTargetNode = nullptr;
-		mTargetNodeList.clear();
+		mSelectedFileList.clear();
 
 
 		mControlUpdateHandle->Reset();
@@ -130,24 +133,27 @@ namespace JG
 		ForEeach(&mContentsDirRootNode, pushAction, action, popAction);
 	}
 
-	void ContentsViewModel::ForEach(const std::function<void(ContentsFileInfo*)>& guiAction)
+	void ContentsViewModel::ForEach(const std::function<void(ContentsFileNode*)>& guiAction)
 	{
-		if (mSelectedDir.length() == 0) {
+		if (GetSelectedContentsDirectory().length() == 0) {
 			return;
 		}
-		auto currSelectedFileInfo = GetContentsFileInfo(mSelectedDir);
+
+
+
+
+		// 현재 디렉토리 위치에 있는 파일을 긁어온다.
+		auto currSelectedFileInfo = GetContentsFileInfo(GetSelectedContentsDirectory());
 		if (currSelectedFileInfo == nullptr)
 		{
 			return;
 		}
 
-		for (auto& dir : currSelectedFileInfo->DirectoryList)
+		for (auto& fileNode : mSelectedFileListInSelectedDirectory)
 		{
-			guiAction(dir);
-		}
-		for (auto& file : currSelectedFileInfo->FileList)
-		{
-			guiAction(file);
+			fileNode.FileInfo = GetContentsFileInfo(fileNode.Path);
+			if (fileNode.FileInfo == nullptr) continue;
+			guiAction(&fileNode);
 		}
 	}
 
@@ -161,18 +167,45 @@ namespace JG
 		return iter->second;
 	}
 
+	void ContentsViewModel::SetSelectedContentsDirectory(const String& dir)
+	{
+		auto fileInfo = GetContentsFileInfo(dir);
+		if (fileInfo == nullptr) return;
+		if (mSelectedDir != dir) 
+		{
+			mSelectedFileListInSelectedDirectory.clear();
+			
+			ContentsFileNode node;
+			for (auto& dir : fileInfo->DirectoryList)
+			{
+				node.Path = dir->Path;
+				mSelectedFileListInSelectedDirectory.push_back(node);
+			}
+			for (auto& file : fileInfo->FileList)
+			{
+				node.Path = file->Path;
+				mSelectedFileListInSelectedDirectory.push_back(node);
+			}
+		}
+		mSelectedDir = dir;
+	}
+
 	const String& ContentsViewModel::GetSelectedContentsDirectory() const
 	{
 		return mSelectedDir;
 	}
-	bool ContentsViewModel::IsSelectedContentsDirectory(ContentsFileInfo* info) const
+	void ContentsViewModel::ReleaseSelectedContentsFiles()
+	{
+		for (auto& directoryNode : mContentsDirectoryNodePool)
+		{
+			directoryNode.second.IsSelected = false;
+		}
+	}
+	bool ContentsViewModel::IsSelectedContentsFile(ContentsFileInfo* info) const
 	{
 		if (info == nullptr) return false;
 
-		auto selectedInfo = GetContentsFileInfo(mSelectedDir);
-		if (selectedInfo == nullptr) return false;
-
-		return info == selectedInfo;
+		return mSelectedFileList.find(info) != mSelectedFileList.end();
 	}
 	void ContentsViewModel::SelectedAssetFile(const String& path)
 	{
@@ -193,23 +226,28 @@ namespace JG
 		{
 			return;
 		}
-
+		auto fileInfo = GetContentsFileInfo(CurrNode->Path);
 		bool isOpen = pushAction(CurrNode);
 		action(CurrNode);
 
+
+	
 		if (CurrNode->IsSelected == true && CurrNode->IsIgnoreSelect == false)
 		{
-			mSelectedDir = CurrNode->Path;
+			SetSelectedContentsDirectory(CurrNode->Path);
+			mSelectedFileList.insert(fileInfo);
+		}
+		else
+		{
+			mSelectedFileList.erase(fileInfo);
 		}
 		if (CurrNode->IsTarget == true)
 		{
 			mTargetNode = CurrNode;
-			Subscribe(CurrNode);
 		}
 		else
 		{
 			if (mTargetNode == CurrNode) mTargetNode = nullptr;
-			UnSubscribe(CurrNode);
 		}
 		// Select File
 		if (isOpen == true)
@@ -229,18 +267,9 @@ namespace JG
 			popAction(CurrNode);
 		}
 	}
-	void ContentsViewModel::Subscribe(ContentsDirectoryNode* node)
+	void ContentsViewModel::Subscribe()
 	{
-		if (node == nullptr)
-		{
-			return;
-		}
-		if (mTargetNodeList.find(node) != mTargetNodeList.end())
-		{
-			return;
-		}
-		mTargetNodeList.insert(node);
-		Create_Folder->Subscribe(node, [&]()
+		Create_Folder->Subscribe(this, [&]()
 		{
 			if (mTargetNode == nullptr)
 			{
@@ -264,71 +293,166 @@ namespace JG
 				fs::create_directory(newPath);
 			}
 		});
-		Copy->Subscribe(node, [&]()
+		Copy->Subscribe(this, [&]()
+		{
+			mCopyFileList.clear();
+			if (mSelectedFileList.empty() == true)
+			{
+				return;
+			}
+
+
+			for (auto& fileInfo : mSelectedFileList)
+			{
+				mCopyFileList.insert(fileInfo->Path);
+			}
+		});
+		Paste->Subscribe(this, [&]()
 		{
 			if (mTargetNode == nullptr)
 			{
 				return;
 			}
+			if (mCopyFileList.empty() == true)
+			{
+				return;
+			}
+
 			auto fileInfo = GetContentsFileInfo(mTargetNode->Path);
 			if (fileInfo == nullptr)
 			{
 				return;
 			}
 
-			// TODO Copy
+			for (auto& path : mCopyFileList)
+			{
+				fs::path p = path;
+				if (fs::exists(p) == false) continue;
 
-		});
-		Paste->Subscribe(node, [&]()
-		{
-			if (mTargetNode == nullptr)
-			{
-				return;
-			}
-			auto fileInfo = GetContentsFileInfo(mTargetNode->Path);
-			if (fileInfo == nullptr)
-			{
-				return;
-			}
-
-			// TODO Paste
-
-		});
-		Move->Subscribe(node, [&]()
-		{
-			if (mTargetNode == nullptr)
-			{
-				return;
-			}
-			auto fileInfo = GetContentsFileInfo(mTargetNode->Path);
-			if (fileInfo == nullptr)
-			{
-				return;
-			}
-		});
-		Delete->Subscribe(node, [&]()
-		{
-			for (auto node : mTargetNodeList)
-			{
-				auto fileInfo = GetContentsFileInfo(node->Path);
-				if (fileInfo == nullptr)
+				std::error_code err;
+				fs::copy(mTargetNode->Path, p, fs::copy_options::recursive, err);
+				if (err.message().length() > 0)
 				{
-					return;
+					JG_CORE_ERROR("Paste Error : {0}", err.message());
 				}
+			}
+			mCopyFileList.clear();
+		});
+		Move->Subscribe(this, [&]()
+		{
+			if (mTargetNode == nullptr)
+			{
+				return;
+			}
+			if (mCopyFileList.empty() == true)
+			{
+				return;
+			}
+			auto fileInfo = GetContentsFileInfo(mTargetNode->Path);
+			if (fileInfo == nullptr)
+			{
+				return;
+			}
+
+			for (auto& path : mCopyFileList)
+			{
+				fs::path p = path;
+				if (fs::exists(p) == false) continue;
+				std::error_code err;
+
+				auto new_p = CombinePath(mTargetNode->Path, p.filename().string());
+				fs::rename(p, new_p, err);
+				if (err.message().length() > 0)
+				{
+					JG_CORE_ERROR("Move Error : {0}", err.message());
+				}
+			}
+
+
+		});
+
+		Import->Subscribe(this, [&](String path)
+		{
+			String destPath;
+			if (mTargetNode == nullptr)
+			{
+				destPath = Application::GetAssetPath();
+			}
+			else {
+				destPath = mTargetNode->Path;
+			}
+
+			fs::path srcPath = path;
+			auto srcExtension = srcPath.extension().string();
+			std::transform(srcExtension.begin(), srcExtension.end(), srcExtension.begin(), ::tolower);
+
+
+			if (fs::exists(srcPath) == false)
+			{
+				JG_CORE_ERROR("Not Exist Import File : {0}", srcPath.string());
+				return;
+			}
+			// Mesh
+			EAssetImportResult result;
+			if (srcExtension == ".fbx")
+			{
+				FBXAssetImportSettings settings;
+				settings.AssetPath  = srcPath.string();
+				settings.OutputPath = destPath;
+				settings.Flags = EFBXAssetImportFlags::None;
+				result = AssetImporter::Import(settings);
+			}
+			// Texture
+			else if (srcExtension == ".png" || srcExtension == ".jpg" || srcExtension == ".tga")
+			{
+				TextureAssetImportSettings settings;
+				settings.AssetPath = srcPath.string();
+				settings.OutputPath = destPath;
+				settings.Flags = ETextureAssetImportFlags::None;
+				result = AssetImporter::Import(settings);
+			}
+			else
+			{
+				JG_CORE_ERROR("Not Supported Import File : {0}", srcPath.string());
+			}
+
+			if (result != EAssetImportResult::Success)
+			{
+				JG_CORE_ERROR("Failed File Import : {0}", srcPath.string());
+			}
+		});
+
+		Delete->Subscribe(this, [&]()
+		{
+			if (mSelectedFileList.empty() == true)
+			{
+				return;
+			}
+			for (auto& fileInfo : mSelectedFileList)
+			{
 				if (fs::exists(fileInfo->Path))
 				{
+					std::error_code err;
 					if (fileInfo->FileFormat == EAssetFormat::Directory)
 					{
-						fs::remove_all(fileInfo->Path);
+						fs::remove_all(fileInfo->Path, err);
 					}
 					else
 					{
-						fs::remove(fileInfo->Path);
+						fs::remove(fileInfo->Path, err);
+					}
+					if (err.message().length() > 0)
+					{
+						JG_CORE_ERROR("Delete Error : {0}", err.message());
 					}
 				}
+
+				mCopyFileList.insert(fileInfo->Path);
 			}
+
+			mSelectedFileList.clear();
 		});
-		Create_Material_Surface->Subscribe(node, [&]()
+		Create_Material_Surface->Subscribe(this, [&]()
 		{
 			if (mTargetNode == nullptr)
 			{
@@ -345,31 +469,16 @@ namespace JG
 			}
 		});
 	}
-	void ContentsViewModel::UnSubscribe(ContentsDirectoryNode* node, bool is_remove_hashset)
-	{
-		if (node == nullptr)
-		{
-			return;
-		}
-		if (is_remove_hashset == true)
-		{
-			mTargetNodeList.erase(node);
-		}
-
-		Copy->UnSubscribe(node);
-		Paste->UnSubscribe(node);
-		Move->UnSubscribe(node);
-		Delete->UnSubscribe(node);
-		Create_Material_Surface->UnSubscribe(node);
-		Create_Folder->UnSubscribe(node);
-	}
 	void ContentsViewModel::UnSubscribe()
 	{
-		for (auto& node : mTargetNodeList)
-		{
-			UnSubscribe(node, false);
-		}
-		mTargetNodeList.clear();
+
+		Copy->UnSubscribe(this);
+		Paste->UnSubscribe(this);
+		Move->UnSubscribe(this);
+		Delete->UnSubscribe(this);
+		Import->UnSubscribe(this);
+		Create_Material_Surface->UnSubscribe(this);
+		Create_Folder->UnSubscribe(this);
 	}
 	void ContentsViewModel::CreateSurfaceMaterial(const String& parentDir)
 	{

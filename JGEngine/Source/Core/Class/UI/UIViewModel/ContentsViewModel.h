@@ -20,7 +20,17 @@ namespace JG
 		List<ContentsFileInfo*> FileList;
 	};
 
-	struct ContentsDirectoryNode : public ISubscriber
+	class ContentsFileNode
+	{
+	public:
+		ContentsFileInfo* FileInfo = nullptr;
+		String Path;
+		u64  UserFlags = 0;
+		bool IsSelected = false;
+		bool IsTarget   = false;
+	};
+
+	class ContentsDirectoryNode
 	{
 	public:
 		String Path;
@@ -29,8 +39,6 @@ namespace JG
 		bool IsIgnoreSelect = false;
 		bool IsSelected     = false;
 		bool IsTarget = false;
-	public:
-		virtual ~ContentsDirectoryNode() = default;
 	};
 
 	
@@ -62,6 +70,7 @@ namespace JG
 
 		// 1초에 한번 식 검사
 		Dictionary<ContentsFileInfo*, UniquePtr<ContentsFileInfo>> mContentsFileInfoPool;
+
 		Dictionary<String, ContentsFileInfo*>                      mContentsFileInfoByPath;
 
 		//
@@ -69,14 +78,18 @@ namespace JG
 		ContentsDirectoryNode mContentsDirRootNode;
 
 		Queue<String> mHistoryQueue;
+		List<ContentsFileNode> mSelectedFileListInSelectedDirectory;
 		String mSelectedDir;
 
-		HashSet<ContentsDirectoryNode*> mTargetNodeList;
+
+
+
+		HashSet<ContentsFileInfo*> mSelectedFileList;
+		HashSet<String> mCopyFileList;
+
+
+
 		ContentsDirectoryNode* mTargetNode = nullptr;
-
-		bool mIsCtrl = false;
-
-
 		String mSelectedAssetPath;
 	public:
 
@@ -87,6 +100,9 @@ namespace JG
 
 		UniquePtr<Command<>> Create_Folder;
 		UniquePtr<Command<>> Create_Material_Surface;
+
+
+		UniquePtr<Command<String>> Import;
 	protected:
 		virtual void Initialize() override;
 		virtual void Destroy() override;
@@ -96,26 +112,39 @@ namespace JG
 			const std::function<bool(ContentsDirectoryNode*)>& pushAction,
 			const std::function<void(ContentsDirectoryNode*)>& action,
 			const std::function<void(ContentsDirectoryNode*)>& popAction);
-		void ForEach(const std::function<void(ContentsFileInfo*)>& guiAction);
+		void ForEach(const std::function<void(ContentsFileNode*)>& guiAction);
 
 
 		ContentsFileInfo* GetContentsFileInfo(const String& path) const;
+
+
+		void SetSelectedContentsDirectory(const String& dir);
 		const String& GetSelectedContentsDirectory() const;
 
-		bool IsSelectedContentsDirectory(ContentsFileInfo* info) const;
+
+
+		void ReleaseSelectedContentsFiles();
+		bool IsSelectedContentsFile(ContentsFileInfo* info) const;
 		void SelectedAssetFile(const String& path);
+	
+
+
+
+
 	private:
 		void ForEeach(
 			ContentsDirectoryNode* CurrNode,
 			const std::function<bool(ContentsDirectoryNode*)>& pushAction,
 			const std::function<void(ContentsDirectoryNode*)>& action,
 			const std::function<void(ContentsDirectoryNode*)>& popAction);
-		void Subscribe(ContentsDirectoryNode* node);
-		void UnSubscribe(ContentsDirectoryNode* node, bool is_remove_hashset = true);
+		void Subscribe();
 		void UnSubscribe();
+
 		// 생성 함수
 	private:
 		void CreateSurfaceMaterial(const String& parentDir);
+
+
 
 		// 비동기 함수
 	private:

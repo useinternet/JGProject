@@ -19,7 +19,7 @@ namespace JG
 
 
 		virtual void Begin() override;
-		virtual void Destroy() override {}
+		virtual void Destroy() override;
 
 		virtual void OnEvent(IEvent& e) override;
 

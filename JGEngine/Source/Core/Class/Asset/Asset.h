@@ -395,8 +395,6 @@ namespace JG
 		Queue<AssetLoadCompeleteData>   mLoadCompeleteAssetDataQueue;
 		Queue<AssetUnLoadData> mUnLoadAssetDataQueue;
 
-
-		std::mutex mAssetPoolMutex;
 		u64 mAssetIDOffset = 0;
 		Queue<u64> mAssetIDQueue;
 

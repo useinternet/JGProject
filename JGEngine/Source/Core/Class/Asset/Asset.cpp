@@ -554,8 +554,6 @@ namespace JG
 				Scheduler::GetInstance().ScheduleByFrame(0, 1, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&AssetDataBase::LoadAsset_Update));
 		}
 
-
-		std::lock_guard<std::mutex> lock(mAssetPoolMutex);
 		// 에셋 검사
 		auto iter = mOriginAssetDataPool.find(resourcePath);
 		if (iter != mOriginAssetDataPool.end())
@@ -569,7 +567,7 @@ namespace JG
 
 		assetData->ID       = assetID;
 		assetData->State    = EAssetDataState::Loading;
-		assetData->Path		= absolutePath;
+		assetData->Path		= resourcePath;
 		assetData->Asset    = CreateAsset(assetID, absolutePath);
 		auto result = assetData->Asset;
 
@@ -595,18 +593,24 @@ namespace JG
 		auto assetRWID = RequestRWAssetID(originID);
 		auto originAssetData = mAssetDataPool[originID].get();
 
+		String resourcePath;
+		String absolutePath;
+		if (GetResourcePath(originAssetData->Path, absolutePath, resourcePath) == false)
+		{
+			return nullptr;
+		}
 
 
 		auto assetData = CreateUniquePtr<AssetData>();
 		assetData->ID    = assetRWID;
 		assetData->State = EAssetDataState::Loading;
-		assetData->Path  = originAssetData->Path;
-		assetData->Asset = CreateAsset(assetRWID, originAssetData->Path);
+		assetData->Path  = resourcePath;
+		assetData->Asset = CreateAsset(assetRWID, absolutePath);
 		auto result = assetData->Asset;
 		AssetLoadData assetLoadData;
 		assetLoadData.ID    = assetRWID;
 		assetLoadData.Asset = assetData->Asset;
-		strcpy(assetLoadData.Path, assetData->Path.c_str());
+		strcpy(assetLoadData.Path, absolutePath.c_str());
 
 
 
