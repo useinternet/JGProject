@@ -28,15 +28,15 @@ namespace JG
 	}
 	void GameLogicSystemLayer::Begin()
 	{
-		static bool testopen = false;
-		UIManager::GetInstance().RegisterMainMenuItem("File/Save World %_S", 0, [&]() {
-			SaveGameWorld();
-		}, nullptr);
+		//static bool testopen = false;
+		//UIManager::GetInstance().RegisterMainMenuItem("File/Save World %_S", 0, [&]() {
+		//	SaveGameWorld();
+		//}, nullptr);
 
-		UIManager::GetInstance().RegisterMainMenuItem("File/Load World", 0, [&]() {
-		
-			LoadGameWrold();
-		}, nullptr);
+		//UIManager::GetInstance().RegisterMainMenuItem("File/Load World", 0, [&]() {
+		//
+		//	LoadGameWrold();
+		//}, nullptr);
 
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
@@ -45,7 +45,7 @@ namespace JG
 		auto camNode = mGameWorld->AddNode("EditorCamera");
 		auto editorCam = camNode->AddComponent<EditorCamera>();
 		Camera::SetMainCamera(editorCam);
-		LoadGameWrold();
+		//LoadGameWrold();
 	}
 	void GameLogicSystemLayer::Destroy()
 	{
@@ -132,180 +132,180 @@ namespace JG
 
 
 	}
-	void GameLogicSystemLayer::SaveGameWorld()
-	{
-		if (mGameWorld == nullptr)
-		{
-			return;
-		}
-		static SharedPtr<ScheduleHandle> handle = nullptr;
-		Scheduler::GetInstance().ScheduleOnce(0.0f, 0, [&]() -> EScheduleResult
-		{
-			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-			if (progressBar->IsOpen() == false)
-			{
-				UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save World"));
-				progressBar->Display("Save.. ", 0.5f);
+	//void GameLogicSystemLayer::SaveGameWorld()
+	//{
+	//	if (mGameWorld == nullptr)
+	//	{
+	//		return;
+	//	}
+	//	static SharedPtr<ScheduleHandle> handle = nullptr;
+	//	Scheduler::GetInstance().ScheduleOnce(0.0f, 0, [&]() -> EScheduleResult
+	//	{
+	//		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//		if (progressBar->IsOpen() == false)
+	//		{
+	//			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save World"));
+	//			progressBar->Display("Save.. ", 0.5f);
 
-				handle = Scheduler::GetInstance().ScheduleAsync([&](void* data)
-				{
-					auto savePath = CombinePath(Application::GetAssetPath(),"testGameWorld") + JG_ASSET_FORMAT;
-					if (mGameWorld != nullptr)
-					{
-						auto json = CreateSharedPtr<Json>();
-						json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::GameWorld);
-						auto assetJson = json->CreateJsonData();
-						mGameWorld->MakeJson(assetJson);
-						json->AddMember(JG_ASSET_KEY, assetJson);
-						Json::Write(savePath, json);
-					}
-					else
-					{
-						JG_CORE_ERROR("Failed Save GameWorld : GameWorld is null");
-					}
-				});
-			}
-			Scheduler::GetInstance().Schedule(0.1f, 0.2f, -1, 0,  [&]()->EScheduleResult
-			{
-				// 완성했으면 
-				if (handle->GetState() == EScheduleState::Compelete)
-				{
-					auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-					progressBar->Display("Compete", 1.0f);
-
-
-					handle->Reset();
-					handle = nullptr;
-
-					// 0.5f 뒤에 완료
-					Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
-					{
-						auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-						progressBar->Close();
-						JG_CORE_INFO("Comepete Save GameWorld");
-						return EScheduleResult::Break;
-					});
-					return EScheduleResult::Break;
-				}
-
-	
-
-				return EScheduleResult::Continue;
-			});
-
-			return EScheduleResult::Continue;
-		});
-	}
-	void GameLogicSystemLayer::LoadGameWrold()
-	{
-		static GameWorld* newGameWorld = nullptr;
-		static GameWorld* oldGameWorld = nullptr;
-		static bool is_LoadSucess = false;
-		// 갈아 치우고
-		// 
-		static SharedPtr<ScheduleHandle> handle = nullptr;
-		Scheduler::GetInstance().ScheduleOnce(0.0f, 0, [&]() -> EScheduleResult
-		{
-			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-			
-			if (progressBar->IsOpen() == false)
-			{
-				UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Load World"));
-				progressBar->Display("Load.. ", 0.5f);
-
-				handle = Scheduler::GetInstance().ScheduleAsync([&](void* data)
-				{
-					auto loadPath = CombinePath(Application::GetAssetPath(), "testGameWorld") + JG_ASSET_FORMAT;
-					auto json = CreateSharedPtr<Json>();
-					if (Json::Read(loadPath, json) == true)
-					{
-						EAssetFormat assetFormat = EAssetFormat::None;
-						auto assetFormatVal = json->GetMember(JG_ASSET_FORMAT_KEY);
-						if (assetFormatVal)
-						{
-							assetFormat = (EAssetFormat)assetFormatVal->GetUint64();
-						}
-
-						if (EAssetFormat::GameWorld == assetFormat)
-						{
-							auto assetVal = json->GetMember(JG_ASSET_KEY);
-							if (assetVal)
-							{
-								newGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
-								newGameWorld->SetGlobalGameSystemList(mGameSystemList);
-								newGameWorld->LoadJson(assetVal);
-								is_LoadSucess = true;
-							}
-						}
-					}
-				});
-			}
-			Scheduler::GetInstance().Schedule(0.1f, 0.2f, -1, 0, [&]()->EScheduleResult
-			{
-				
-				// 완성했으면 
-				if (handle->GetState() == EScheduleState::Compelete)
-				{
-					if (is_LoadSucess)
-					{
-						auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-						progressBar->Display("Compete", 1.0f);
-
-						oldGameWorld = mGameWorld;
-						mGameWorld = newGameWorld;
-						NotifyChangeGameWorldEvent e;
-						e.GameWorld = mGameWorld;
-						Application::GetInstance().SendEvent(e);
-
-						handle->Reset();
-						handle = nullptr;
-						newGameWorld = nullptr;
-
-						// 0.5f 뒤에 완료
-						Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
-						{
-							auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-							progressBar->Close();
-							JG_CORE_INFO("Comepete Save GameWorld");
-
-							return EScheduleResult::Break;
-						});
-						Scheduler::GetInstance().ScheduleOnceByFrame(1, 0, [&]() ->EScheduleResult
-						{
-							if (oldGameWorld)
-							{
-								oldGameWorld->Destroy(oldGameWorld);
-							}
-							return EScheduleResult::Break;
-						});
-					}
-					else
-					{
-						auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-						progressBar->Display("Failed", 1.0f);
-						Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
-						{
-							auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-							progressBar->Close();
-							JG_CORE_INFO("Comepete Load GameWorld");
-
-							return EScheduleResult::Break;
-						});
-					}
+	//			handle = Scheduler::GetInstance().ScheduleAsync([&](void* data)
+	//			{
+	//				auto savePath = CombinePath(Application::GetAssetPath(),"testGameWorld") + JG_ASSET_FORMAT;
+	//				if (mGameWorld != nullptr)
+	//				{
+	//					auto json = CreateSharedPtr<Json>();
+	//					json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::GameWorld);
+	//					auto assetJson = json->CreateJsonData();
+	//					mGameWorld->MakeJson(assetJson);
+	//					json->AddMember(JG_ASSET_KEY, assetJson);
+	//					Json::Write(savePath, json);
+	//				}
+	//				else
+	//				{
+	//					JG_CORE_ERROR("Failed Save GameWorld : GameWorld is null");
+	//				}
+	//			});
+	//		}
+	//		Scheduler::GetInstance().Schedule(0.1f, 0.2f, -1, 0,  [&]()->EScheduleResult
+	//		{
+	//			// 완성했으면 
+	//			if (handle->GetState() == EScheduleState::Compelete)
+	//			{
+	//				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//				progressBar->Display("Compete", 1.0f);
 
 
+	//				handle->Reset();
+	//				handle = nullptr;
 
-					return EScheduleResult::Break;
-				}
+	//				// 0.5f 뒤에 완료
+	//				Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
+	//				{
+	//					auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//					progressBar->Close();
+	//					JG_CORE_INFO("Comepete Save GameWorld");
+	//					return EScheduleResult::Break;
+	//				});
+	//				return EScheduleResult::Break;
+	//			}
+
+	//
+
+	//			return EScheduleResult::Continue;
+	//		});
+
+	//		return EScheduleResult::Continue;
+	//	});
+	//}
+	//void GameLogicSystemLayer::LoadGameWrold()
+	//{
+	//	static GameWorld* newGameWorld = nullptr;
+	//	static GameWorld* oldGameWorld = nullptr;
+	//	static bool is_LoadSucess = false;
+	//	// 갈아 치우고
+	//	// 
+	//	static SharedPtr<ScheduleHandle> handle = nullptr;
+	//	Scheduler::GetInstance().ScheduleOnce(0.0f, 0, [&]() -> EScheduleResult
+	//	{
+	//		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//		
+	//		if (progressBar->IsOpen() == false)
+	//		{
+	//			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Load World"));
+	//			progressBar->Display("Load.. ", 0.5f);
+
+	//			handle = Scheduler::GetInstance().ScheduleAsync([&](void* data)
+	//			{
+	//				auto loadPath = CombinePath(Application::GetAssetPath(), "testGameWorld") + JG_ASSET_FORMAT;
+	//				auto json = CreateSharedPtr<Json>();
+	//				if (Json::Read(loadPath, json) == true)
+	//				{
+	//					EAssetFormat assetFormat = EAssetFormat::None;
+	//					auto assetFormatVal = json->GetMember(JG_ASSET_FORMAT_KEY);
+	//					if (assetFormatVal)
+	//					{
+	//						assetFormat = (EAssetFormat)assetFormatVal->GetUint64();
+	//					}
+
+	//					if (EAssetFormat::GameWorld == assetFormat)
+	//					{
+	//						auto assetVal = json->GetMember(JG_ASSET_KEY);
+	//						if (assetVal)
+	//						{
+	//							newGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
+	//							newGameWorld->SetGlobalGameSystemList(mGameSystemList);
+	//							newGameWorld->LoadJson(assetVal);
+	//							is_LoadSucess = true;
+	//						}
+	//					}
+	//				}
+	//			});
+	//		}
+	//		Scheduler::GetInstance().Schedule(0.1f, 0.2f, -1, 0, [&]()->EScheduleResult
+	//		{
+	//			
+	//			// 완성했으면 
+	//			if (handle->GetState() == EScheduleState::Compelete)
+	//			{
+	//				if (is_LoadSucess)
+	//				{
+	//					auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//					progressBar->Display("Compete", 1.0f);
+
+	//					oldGameWorld = mGameWorld;
+	//					mGameWorld = newGameWorld;
+	//					NotifyChangeGameWorldEvent e;
+	//					e.GameWorld = mGameWorld;
+	//					Application::GetInstance().SendEvent(e);
+
+	//					handle->Reset();
+	//					handle = nullptr;
+	//					newGameWorld = nullptr;
+
+	//					// 0.5f 뒤에 완료
+	//					Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
+	//					{
+	//						auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//						progressBar->Close();
+	//						JG_CORE_INFO("Comepete Save GameWorld");
+
+	//						return EScheduleResult::Break;
+	//					});
+	//					Scheduler::GetInstance().ScheduleOnceByFrame(1, 0, [&]() ->EScheduleResult
+	//					{
+	//						if (oldGameWorld)
+	//						{
+	//							oldGameWorld->Destroy(oldGameWorld);
+	//						}
+	//						return EScheduleResult::Break;
+	//					});
+	//				}
+	//				else
+	//				{
+	//					auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//					progressBar->Display("Failed", 1.0f);
+	//					Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&]()->EScheduleResult
+	//					{
+	//						auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+	//						progressBar->Close();
+	//						JG_CORE_INFO("Comepete Load GameWorld");
+
+	//						return EScheduleResult::Break;
+	//					});
+	//				}
 
 
 
-				return EScheduleResult::Continue;
-			});
-			return EScheduleResult::Continue;
-		});
+	//				return EScheduleResult::Break;
+	//			}
 
 
 
-	}
+	//			return EScheduleResult::Continue;
+	//		});
+	//		return EScheduleResult::Continue;
+	//	});
+
+
+
+	//}
 }

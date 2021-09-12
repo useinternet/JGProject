@@ -179,6 +179,7 @@ namespace JG
 	public:
 		u64 GetThreadMappingID(std::thread::id threadID) const;
 		u64 GetThisThreadMappingID() const;
+		u64 GetThreadCount() const;
 	private:
 		void Update();
 		void Update(SyncTaskByTick* task);

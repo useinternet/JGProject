@@ -24,6 +24,7 @@ namespace JG
 
 	inline String ReplaceAll(const String& message, const String& pattern, const String& replace)
 	{
+		if (pattern.empty() == true) return message;
 		String result = message;
 		String::size_type pos = 0;
 		String::size_type offset = 0;
@@ -54,5 +55,39 @@ namespace JG
 		}
 		return result;
 	}
+	inline String GetUniqueFileName(const String& filePath)
+	{
+		auto p = fs::path(filePath);
+		String extension      = p.extension().string();
+		String originFileName = ReplaceAll(p.filename().string(), extension, "");
+		String fileName       = originFileName;
 
+		String targetDir = p.parent_path().string();
+
+
+
+		auto path = CombinePath(targetDir, originFileName + extension);
+		i32  cnt = 0;
+		bool is_exist = fs::exists(path);
+		while (is_exist == true)
+		{
+			++cnt;
+			fileName = originFileName + "_" + std::to_string(cnt);
+			path = CombinePath(targetDir, fileName + extension);
+			is_exist = fs::exists(path);
+		}
+
+		return path;
+	}
+	inline List<String> Split(const String& str, char delimiter)
+	{
+		List<String> result;
+		std::stringstream ss(str);
+		String tmp;
+
+		while (std::getline(ss, tmp, delimiter)) {
+			result.push_back(tmp);
+		}
+		return result;
+	}
 }

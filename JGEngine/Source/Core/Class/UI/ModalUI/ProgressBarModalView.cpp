@@ -16,8 +16,8 @@ namespace JG
 	{
 		auto id = mTitle + "##" + std::to_string(GetType().GetID());
 		auto displaySize = ImGui::GetIO().DisplaySize;
-		auto appPos = Application::GetInstance().GetWindow()->GetPosition();
-		auto winSize = ImVec2(500, 55);
+		auto appPos  = Application::GetInstance().GetWindow()->GetPosition();
+		auto winSize = ImVec2(500, 65);
 
 
 		if (mIsOpenPopup == false)
@@ -44,6 +44,7 @@ namespace JG
 	}
 	void ProgressBarModalView::Display(const String& contents, f32 ratio)
 	{
+		std::lock_guard<std::mutex> lock(mMutex);
 		mContents = contents;
 		mCurrProgressRatio = ratio;
 	}

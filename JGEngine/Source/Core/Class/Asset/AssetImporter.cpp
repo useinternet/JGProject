@@ -32,7 +32,7 @@ namespace JG
 			aiProcess_SortByPType |               // 단일타입의  프리미티브로 구성된 '깨끗한' 매쉬를 만듬
 			aiProcess_CalcTangentSpace            // 탄젠트 공간 계산 )
 		);
-
+		
 
 		if (scene != nullptr)
 		{
@@ -62,7 +62,11 @@ namespace JG
 			}
 			
 		}
-
+		else
+		{
+			JG_CORE_ERROR("Assimp Importer ReadFiles Error : {0}", importer.GetErrorString());
+			return EAssetImportResult::Fail;
+		}
 
 
 
@@ -213,10 +217,9 @@ namespace JG
 
 		auto filePath = CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
 		auto json = CreateSharedPtr<Json>();
-		json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::Mesh);
 		json->AddMember(JG_ASSET_KEY, stock);
 
-		if (Json::Write(filePath, json) == false)
+		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Mesh, json) == false)
 		{
 			JG_CORE_ERROR("Fail Write Mesh : {0} ", outputPath);
 		}
@@ -227,12 +230,10 @@ namespace JG
 		auto filePath = CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
 
 		auto json = CreateSharedPtr<Json>();
-		json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::Texture);
 		json->AddMember(JG_ASSET_KEY, stock);
-
-		if (Json::Write(filePath, json) == false)
+		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Texture, json) == false)
 		{
-			JG_CORE_ERROR("Fail Write Texture : {0} ", outputPath);
+			JG_CORE_ERROR("Fail Write Mesh : {0} ", outputPath);
 		}
 	}
 

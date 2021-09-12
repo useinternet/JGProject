@@ -13,74 +13,74 @@ namespace JG
 		mTargetNode = nullptr;
 
 
-		if (mThreadLoadData == nullptr)
-		{
-			mThreadLoadData = CreateUniquePtr<ThreadLoadData>();
-		}
-		mControlUpdateHandle = Scheduler::GetInstance().Schedule(0.0f, 0.5f, -1, SchedulePriority::Default,
-			[&]()-> EScheduleResult
-		{
+		//if (mThreadLoadData == nullptr)
+		//{
+		//	mThreadLoadData = CreateUniquePtr<ThreadLoadData>();
+		//}
+		//mControlUpdateHandle = Scheduler::GetInstance().Schedule(0.0f, 0.5f, -1, SchedulePriority::Default,
+		//	[&]()-> EScheduleResult
+		//{
 
-			EScheduleState currState = EScheduleState::Wait;
-			if (mAsyncUpdateHandle != nullptr)
-			{
-				currState = mAsyncUpdateHandle->GetState();
-			}
+		//	EScheduleState currState = EScheduleState::Wait;
+		//	if (mAsyncUpdateHandle != nullptr)
+		//	{
+		//		currState = mAsyncUpdateHandle->GetState();
+		//	}
 
-			// 해당 업무가 완료가 되었거나 처음 할당되는 업무라면 ㄱㄱ
-			if (currState == EScheduleState::Compelete || mAsyncUpdateHandle == nullptr)
-			{
+		//	// 해당 업무가 완료가 되었거나 처음 할당되는 업무라면 ㄱㄱ
+		//	if (currState == EScheduleState::Compelete || mAsyncUpdateHandle == nullptr)
+		//	{
 
-				mContentsFileInfoPool   = std::move(mThreadLoadData->ContentsFileInfoPool);
-				mContentsFileInfoByPath = std::move(mThreadLoadData->ContentsFileInfoByPath);
+		//		mContentsFileInfoPool   = std::move(mThreadLoadData->ContentsFileInfoPool);
+		//		mContentsFileInfoByPath = std::move(mThreadLoadData->ContentsFileInfoByPath);
 
-				// 추가된어진 파일 추가
-				for (auto& path : mThreadLoadData->AddedDirectoryList)
-				{
-					if (mContentsDirectoryNodePool.find(path) == mContentsDirectoryNodePool.end())
-					{
-						auto& node = mContentsDirectoryNodePool[path];
-						node.Path = path;
-					}
-				}
+		//		// 추가된어진 파일 추가
+		//		for (auto& path : mThreadLoadData->AddedDirectoryList)
+		//		{
+		//			if (mContentsDirectoryNodePool.find(path) == mContentsDirectoryNodePool.end())
+		//			{
+		//				auto& node = mContentsDirectoryNodePool[path];
+		//				node.Path = path;
+		//			}
+		//		}
 
-				// 제거되어진 파일 추가
-				for (auto& path : mThreadLoadData->RemovedDirectoryList)
-				{
-					if (mContentsDirectoryNodePool.find(path) != mContentsDirectoryNodePool.end())
-					{
-						mContentsDirectoryNodePool.erase(path);
-					}
-				}
+		//		// 제거되어진 파일 추가
+		//		for (auto& path : mThreadLoadData->RemovedDirectoryList)
+		//		{
+		//			if (mContentsDirectoryNodePool.find(path) != mContentsDirectoryNodePool.end())
+		//			{
+		//				mContentsDirectoryNodePool.erase(path);
+		//			}
+		//		}
 
-				if (mThreadLoadData->ContentsRoot != nullptr)
-				{
-					mContentsDirRootNode.Path = mThreadLoadData->ContentsRoot->Path;
-				}
-				 
-				// 쓰레드 데이터 주입
-				mThreadLoadData->ContentsDirectoryNodePool = mContentsDirectoryNodePool;
+		//		if (mThreadLoadData->ContentsRoot != nullptr)
+		//		{
+		//			mContentsDirRootNode.Path = mThreadLoadData->ContentsRoot->Path;
+		//		}
+		//		 
+		//		// 쓰레드 데이터 주입
+		//		mThreadLoadData->ContentsDirectoryNodePool = mContentsDirectoryNodePool;
 
-				// 쓰레드 데이터 초기화
-				mThreadLoadData->ContentsFileInfoByPath.clear();
-				mThreadLoadData->ContentsFileInfoPool.clear();
-				mThreadLoadData->ContentsRoot = nullptr;
-				mThreadLoadData->DirectoryList.clear();
-				mThreadLoadData->AddedDirectoryList.clear();
-				mThreadLoadData->RemovedDirectoryList.clear();
+		//		// 쓰레드 데이터 초기화
+		//		mThreadLoadData->ContentsFileInfoByPath.clear();
+		//		mThreadLoadData->ContentsFileInfoPool.clear();
+		//		mThreadLoadData->ContentsRoot = nullptr;
+		//		mThreadLoadData->DirectoryList.clear();
+		//		mThreadLoadData->AddedDirectoryList.clear();
+		//		mThreadLoadData->RemovedDirectoryList.clear();
 
-				mAsyncUpdateHandle.reset();
-				mAsyncUpdateHandle = nullptr;
-				mAsyncUpdateHandle = Scheduler::GetInstance().ScheduleAsync([&](void* threadData)
-				{
-					Async_UpdateContentsDirectory();
-				});
-			}
+		//		mAsyncUpdateHandle.reset();
+		//		mAsyncUpdateHandle = nullptr;
+		//		mAsyncUpdateHandle = Scheduler::GetInstance().ScheduleAsync([&](void* threadData)
+		//		{
+		//			Async_UpdateContentsDirectory();
+		//		});
+		//	}
 
 
 
-			return EScheduleResult::Continue;
-		});
+		//	return EScheduleResult::Continue;
+		//});
 		
 
 
@@ -111,11 +111,11 @@ namespace JG
 		mSelectedFileList.clear();
 
 
-		mControlUpdateHandle->Reset();
-		mControlUpdateHandle = nullptr;
+		//mControlUpdateHandle->Reset();
+		//mControlUpdateHandle = nullptr;
 
-		mAsyncUpdateHandle->Reset();
-		mAsyncUpdateHandle = nullptr;
+		//mAsyncUpdateHandle->Reset();
+		//mAsyncUpdateHandle = nullptr;
 	}
 
 	void ContentsViewModel::OnEvent(IEvent& e)
@@ -205,7 +205,7 @@ namespace JG
 	{
 		if (info == nullptr) return false;
 
-		return mSelectedFileList.find(info) != mSelectedFileList.end();
+		return mSelectedFileList.find(info->Path) != mSelectedFileList.end();
 	}
 	void ContentsViewModel::SelectedAssetFile(const String& path)
 	{
@@ -235,11 +235,11 @@ namespace JG
 		if (CurrNode->IsSelected == true && CurrNode->IsIgnoreSelect == false)
 		{
 			SetSelectedContentsDirectory(CurrNode->Path);
-			mSelectedFileList.insert(fileInfo);
+			mSelectedFileList.insert(fileInfo->Path);
 		}
 		else
 		{
-			mSelectedFileList.erase(fileInfo);
+			mSelectedFileList.erase(fileInfo->Path);
 		}
 		if (CurrNode->IsTarget == true)
 		{
@@ -302,9 +302,11 @@ namespace JG
 			}
 
 
-			for (auto& fileInfo : mSelectedFileList)
+			for (auto& filePath : mSelectedFileList)
 			{
-				mCopyFileList.insert(fileInfo->Path);
+				auto fileInfo = GetContentsFileInfo(filePath);
+				if (fileInfo == nullptr) continue;
+				mCopyFileList.insert(filePath);
 			}
 		});
 		Paste->Subscribe(this, [&]()
@@ -428,8 +430,12 @@ namespace JG
 			{
 				return;
 			}
-			for (auto& fileInfo : mSelectedFileList)
+			for (auto& filePath : mSelectedFileList)
 			{
+				auto fileInfo = GetContentsFileInfo(filePath);
+				if (fileInfo == nullptr) continue;
+
+
 				if (fs::exists(fileInfo->Path))
 				{
 					std::error_code err;
@@ -580,7 +586,7 @@ namespace JG
 			}
 			else if (filePath.extension() == JG_ASSET_FORMAT)
 			{
-				EAssetFormat fileFormat = AssetDataBase::GetInstance().GetAssetFormat(filePath.string(), false);
+				EAssetFormat fileFormat = AssetDataBase::GetInstance().GetAssetFormat(filePath.string());
 				Async_CreateContentsFileInfo(filePath.filename().string(), filePath.string(), fileFormat, currentFileInfo, false);
 			}
 			else

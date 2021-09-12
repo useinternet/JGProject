@@ -13,6 +13,7 @@
 #include "Class/UI/ContextUI/AssetFinderContextView.h"
 //
 #include "Class/UI/ModalUI/ProgressBarModalView.h"
+#include "Class/UI/ModalUI/MessageBoxModalView.h"
 
 #include "Class/Game/GameWorld.h"
 namespace JG
@@ -31,8 +32,19 @@ namespace JG
 	{
 		
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::UISystemLayer, SCHEDULE_BIND_FN(&UISystemLayer::MenuUpdate));
-		UIManager::GetInstance().BindShowContextMenuFunc([&](Type type) -> bool {
-			if (ImGui::BeginPopupContextItem())
+		UIManager::GetInstance().BindShowContextMenuFunc([&](Type type, bool isWhenItemHovered) -> bool {
+
+			bool isOpenPopup = false;
+			if (isWhenItemHovered)
+			{
+				isOpenPopup = ImGui::BeginPopupContextItem();
+			}
+			else
+			{
+				isOpenPopup = ImGui::BeginPopupContextWindow();
+			}
+
+			if (isOpenPopup)
 			{
 				UIManager::GetInstance().ForEach(type, UISystemLayer::BeginMenu, UISystemLayer::EndMenu);
 				ImGui::EndPopup();
@@ -52,6 +64,8 @@ namespace JG
 		UIManager::GetInstance().RegisterPopupUIView<AssetFinderContextView>();
 		// Modal
 		UIManager::GetInstance().RegisterPopupUIView<ProgressBarModalView>();
+		UIManager::GetInstance().RegisterPopupUIView<MessageBoxModalView>();
+
 		LoadUISettings("JGUI.jgconfig");
 	}
 	void UISystemLayer::Destroy()

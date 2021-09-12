@@ -388,7 +388,6 @@ namespace JG
 		std::unordered_map<AssetID, UniquePtr<AssetData>, AssetIDHash> mAssetDataPool;
 		std::unordered_map<AssetID, std::unordered_set<AssetID, AssetIDHash>, AssetIDHash> mAssetDependencies;
 		Dictionary<String, AssetData*>			  mOriginAssetDataPool;
-		Dictionary<String, EAssetFormat>		  mOriginAssetFormatPool;
 
 		// 현재 로딩/언로드 중인 에셋 데이터 
 		Queue<AssetLoadData>   mLoadAssetDataQueue;
@@ -398,14 +397,15 @@ namespace JG
 		u64 mAssetIDOffset = 0;
 		Queue<u64> mAssetIDQueue;
 
-		const u32 mMaxLoadAssetDataCount   = 10;
+		u32 mMaxLoadAssetDataCount   = 10;
 		const u32 mMaxUnLoadAssetDataCount = 10;
 
+		List<SharedPtr<ScheduleHandle>> mAyncLoadAssetHandleList;
 		SharedPtr<ScheduleHandle> mAssetLoadScheduleHandle = nullptr;
 		SharedPtr<ScheduleHandle> mAssetUnLoadScheduleHandle = nullptr;
 
 		std::mutex mCompeleteMutex;
-		std::shared_mutex mAssetFormatMutex;
+		std::mutex mAssetRWMutex;
 
 
 
@@ -417,7 +417,6 @@ namespace JG
 		SharedPtr<AssetManager> RequestAssetManager();
 		void ReturnAssetManager(SharedPtr<AssetManager> assetManager);
 	public:
-		EAssetFormat      GetAssetFormat(const String& path, bool is_load_origin = true);
 		SharedPtr<IAsset> LoadOriginAsset(const String& path);
 		SharedPtr<IAsset> LoadReadWriteAsset(AssetID originID);
 		void	UnLoadAsset(AssetID id);
@@ -432,11 +431,18 @@ namespace JG
 		void LoadCompeleteData_Update();
 		void LoadAssetData_Update();
 
+		// UnUsedAsset 제대로 작동안함 나중에 확인
+		// RefCount를 사용해서 
 		EScheduleResult UnLoadAsset_Update();
 		bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
 		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);
+	public:
+
+		bool WriteAsset(const String& path, EAssetFormat format, SharedPtr<Json> json);
+		bool ReadAsset(const String& path, EAssetFormat* out_format, SharedPtr<Json>* json);
+		EAssetFormat  GetAssetFormat(const String& path);
 	};
 
 

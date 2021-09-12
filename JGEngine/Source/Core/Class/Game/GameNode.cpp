@@ -37,7 +37,6 @@ namespace JG
 
 		for (auto& child : mChilds)
 		{
-			if (child == nullptr) continue;
 			if (child->mIsRunAwake == false)
 			{
 				child->mIsRunAwake = true;

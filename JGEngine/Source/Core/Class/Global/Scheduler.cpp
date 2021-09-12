@@ -229,6 +229,10 @@ namespace JG
     {
         return GetThreadMappingID(std::this_thread::get_id());
     }
+    u64 Scheduler::GetThreadCount() const
+    {
+        return mMaxThreadCount;
+    }
     void Scheduler::Update()
     {
         mIsRunSyncTaskAll = true;

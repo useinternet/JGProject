@@ -224,10 +224,9 @@ namespace JG
 		auto filePath = CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
 
 		auto json = CreateSharedPtr<Json>();
-		json->AddMember(JG_ASSET_FORMAT_KEY, (u64)EAssetFormat::Material);
 		json->AddMember(JG_ASSET_KEY, stock);
 
-		return Json::Write(filePath, json);
+		return AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Material, json);
 	}
 
 	void AssetInspectorGUI::InspectorGUI(IAsset* targetAsset)
@@ -471,7 +470,7 @@ namespace JG
 
 	AssetDataBase::AssetDataBase()
 	{
-
+	
 	}
 	AssetDataBase::~AssetDataBase()
 	{
@@ -513,31 +512,7 @@ namespace JG
 		mAssetManagerPool.erase(assetManager.get());
 	}
 
-	EAssetFormat AssetDataBase::GetAssetFormat(const String& path, bool is_load_origin)
-	{
-		String absolutePath;
-		String resourcePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
-		{
-			return EAssetFormat::None;
-		}
-		{
-			std::shared_lock<std::shared_mutex> lock(mAssetFormatMutex);
-			auto iter = mOriginAssetFormatPool.find(resourcePath);
-			if (iter != mOriginAssetFormatPool.end())
-			{
-				return iter->second;
-			}
-		}
-		if (is_load_origin)
-		{
-			LoadOriginAsset(resourcePath);
-		}
-		auto assetFormat = Json::GetAssetFormat(absolutePath);
-		std::lock_guard<std::shared_mutex> lock(mAssetFormatMutex);
-		mOriginAssetFormatPool[resourcePath] = assetFormat;
-		return assetFormat;
-	}
+
 
 	SharedPtr<IAsset> AssetDataBase::LoadOriginAsset(const String& path)
 	{
@@ -552,6 +527,8 @@ namespace JG
 		{
 			mAssetLoadScheduleHandle = 
 				Scheduler::GetInstance().ScheduleByFrame(0, 1, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&AssetDataBase::LoadAsset_Update));
+			mMaxLoadAssetDataCount = (Scheduler::GetInstance().GetThreadCount() / 3) * 2;
+			mAyncLoadAssetHandleList.resize(mMaxLoadAssetDataCount);
 		}
 
 		// 에셋 검사
@@ -724,6 +701,18 @@ namespace JG
 		mAssetDependencies[originID].insert(id);
 		return id;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 	bool AssetDataBase::LoadAssetInternal(AssetLoadData* LoadData)
 	{
 		fs::path assetPath = LoadData->Path;
@@ -733,14 +722,9 @@ namespace JG
 		}
 		EAssetFormat assetFormat = EAssetFormat::None;
 		auto json = CreateSharedPtr<Json>();
-		if (Json::Read(assetPath.string(), json) == false)
+		if (ReadAsset(assetPath.string(), &assetFormat, &json) == false)
 		{
 			return false;
-		}
-		auto assetFormatVal = json->GetMember(JG_ASSET_FORMAT_KEY);
-		if (assetFormatVal)
-		{
-			assetFormat = (EAssetFormat)assetFormatVal->GetUint64();
 		}
 		auto assetVal = json->GetMember(JG_ASSET_KEY);
 		if (assetVal == nullptr)
@@ -924,11 +908,6 @@ namespace JG
 			JG_CORE_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
 			break;
 		}
-
-		{
-			std::lock_guard<std::shared_mutex> lock(mAssetFormatMutex);
-			mOriginAssetFormatPool[LoadData->ID.ResourcePath] = assetFormat;
-		}
 		return true;
 	}
 
@@ -955,7 +934,7 @@ namespace JG
 					JG_CORE_ERROR("Asset Load Fail  : {0}", iter->second->Path);
 					if (compeleteData.ID.IsOrigin())
 					{
-						mOriginAssetDataPool.erase(iter->second->Path);
+						mOriginAssetDataPool.erase(compeleteData.ID.ResourcePath);
 					}
 
 
@@ -984,30 +963,37 @@ namespace JG
 		u32 loopCnt = 0;
 		while (mLoadAssetDataQueue.empty() == false)
 		{
-			auto loadData = mLoadAssetDataQueue.front(); mLoadAssetDataQueue.pop();
-			JG_CORE_INFO("Asset Loading... : {0}", loadData.Path);
-			Scheduler::GetInstance().ScheduleAsync(
-				[&](void* userData)
+			if (mAyncLoadAssetHandleList[loopCnt] == nullptr)
 			{
-				bool result = LoadAssetInternal((AssetLoadData*)userData);
-				AssetLoadData* _LoadData = (AssetLoadData*)userData;
-				AssetLoadCompeleteData data;
-				data.ID = _LoadData->ID;
-				if (result)
+				auto loadData = mLoadAssetDataQueue.front(); mLoadAssetDataQueue.pop();
+				JG_CORE_INFO("Asset Loading... : {0}", loadData.Path);
+				mAyncLoadAssetHandleList[loopCnt] = Scheduler::GetInstance().ScheduleAsync(
+					[&](void* userData)
 				{
-					data.Asset = _LoadData->Asset;
-					data.Stock = _LoadData->Stock;
-				}
-				data.OnComplete = _LoadData->OnComplete;
-				{
-					std::lock_guard<std::mutex> lock(mCompeleteMutex);
-					mLoadCompeleteAssetDataQueue.push(data);
-				}
+					bool result = LoadAssetInternal((AssetLoadData*)userData);
+					AssetLoadData* _LoadData = (AssetLoadData*)userData;
+					AssetLoadCompeleteData data;
+					data.ID = _LoadData->ID;
+					if (result)
+					{
+						data.Asset = _LoadData->Asset;
+						data.Stock = _LoadData->Stock;
+					}
+					data.OnComplete = _LoadData->OnComplete;
+					{
+						std::lock_guard<std::mutex> lock(mCompeleteMutex);
+						mLoadCompeleteAssetDataQueue.push(data);
+					}
 
-			}, &loadData, sizeof(AssetLoadData));
+				}, &loadData, sizeof(AssetLoadData));
+			}
+			if(mAyncLoadAssetHandleList[loopCnt] && mAyncLoadAssetHandleList[loopCnt]->GetState() == EScheduleState::Compelete)
+			{
+				mAyncLoadAssetHandleList[loopCnt] = nullptr;
+			}
+		
 			++loopCnt;
-
-			if (loopCnt <= mMaxLoadAssetDataCount)
+			if (loopCnt >= mMaxLoadAssetDataCount)
 			{
 				break;
 			}
@@ -1021,7 +1007,7 @@ namespace JG
 		while (mUnLoadAssetDataQueue.empty() == false)
 		{
 			auto unLoadData = mUnLoadAssetDataQueue.front(); mUnLoadAssetDataQueue.pop();
-
+			++unLoadData.FrameCount;
 
 			if (unLoadData.FrameCount < bufferCnt)
 			{
@@ -1032,7 +1018,7 @@ namespace JG
 				unLoadData.Asset.reset();
 				unLoadData.Asset = nullptr;
 			}
-			++unLoadData.FrameCount;
+
 			++loopCnt;
 			if (loopCnt <= mMaxUnLoadAssetDataCount)
 			{
@@ -1104,7 +1090,7 @@ namespace JG
 	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
 	{
 		// Mesh, Material, Texture
-		auto assetFormat = GetAssetFormat(path, false);
+		auto assetFormat = GetAssetFormat(path);
 
 		switch (assetFormat)
 		{
@@ -1119,5 +1105,112 @@ namespace JG
 
 
 
+	bool AssetDataBase::WriteAsset(const String& path, EAssetFormat format, SharedPtr<Json> json)
+	{
+
+		String assetJsonText = Json::ToString(json);
+		u64 assetJsonLen = assetJsonText.length();
+
+
+		auto headerJson = CreateSharedPtr<Json>();
+		headerJson->AddMember("Version", "1.0");
+		headerJson->AddMember(JG_ASSET_FORMAT_KEY, (u64)format);
+		String headerJsonText = Json::ToString(headerJson);
+		u64 headerJsonLen = headerJsonText.length();
+
+
+		std::lock_guard<std::mutex> lock(mAssetRWMutex);
+		std::ofstream fout;
+		fout.open(path);
+
+		if (fout.is_open() == false)
+		{
+			return false;
+		}
+		fout.write((const char*)(&headerJsonLen), sizeof(u64));
+		fout.write(headerJsonText.c_str(), headerJsonLen);
+		fout.write((const char*)(&assetJsonLen), sizeof(u64));
+		fout.write(assetJsonText.c_str(), assetJsonLen);
+
+
+		fout.close();
+		return true;
+	}
+	bool AssetDataBase::ReadAsset(const String& path, EAssetFormat* out_format, SharedPtr<Json>* json)
+	{
+		std::lock_guard<std::mutex> lock(mAssetRWMutex);
+		std::ifstream fin;
+		fin.open(path);
+		if (fin.is_open() == false)
+		{
+			return false;
+		}
+
+		u64 assetJsonLen = 0;
+		String assetJsonText;
+
+		u64 headerJsonLen = 0;
+		String headerJsonText;
+
+
+		fin.read((char*)&headerJsonLen, sizeof(u64)); headerJsonText.resize(headerJsonLen);
+		fin.read((char*)&headerJsonText[0], headerJsonLen);
+		fin.read((char*)&assetJsonLen, sizeof(u64)); assetJsonText.resize(assetJsonLen);
+		fin.read((char*)&assetJsonText[0], assetJsonLen);
+
+
+
+
+		auto headerJson = Json::ToObject(headerJsonText);
+		auto assetJson = Json::ToObject(assetJsonText);
+
+
+		auto val = headerJson->GetMember(JG_ASSET_FORMAT_KEY);
+
+
+
+		if (val && val->IsUint64())
+		{
+			*out_format = (EAssetFormat)val->GetUint64();
+		}
+		else
+		{
+			return false;
+		}
+
+		*json = assetJson;
+		fin.close();
+
+		return true;
+	}
+
+	EAssetFormat AssetDataBase::GetAssetFormat(const String& path)
+	{
+		String absolutePath;
+		String resourcePath;
+		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		{
+			return EAssetFormat::None;
+		}
+		EAssetFormat assetFormat = EAssetFormat::None;
+
+		std::ifstream fin;
+		fin.open(path);
+		if (fin.is_open() == true)
+		{
+			u64 headerJsonLen = 0;
+			String headerJsonText;
+			fin.read((char*)&headerJsonLen, sizeof(u64)); headerJsonText.resize(headerJsonLen);
+			fin.read((char*)&headerJsonText[0], headerJsonLen);
+
+			auto headerJson = Json::ToObject(headerJsonText);
+			auto val = headerJson->GetMember(JG_ASSET_FORMAT_KEY);
+			if (val && val->IsUint64())
+			{
+				assetFormat = (EAssetFormat)val->GetUint64();
+			}
+		}
+		return assetFormat;
+	}
 
 }

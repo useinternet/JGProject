@@ -19,7 +19,7 @@ namespace JG
 	{
 		JGCLASS
 	private:
-
+		std::mutex mMutex;
 		String mTitle;
 		f32    mCurrProgressRatio = 0.0f;
 		String mContents;

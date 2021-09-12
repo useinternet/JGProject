@@ -88,15 +88,15 @@ namespace JG
 		}
 		RegisterMenuItem(mUIViewContextMenu[type].get(), menuPath, priority, action, enableAction);
 	}
-	void UIManager::BindShowContextMenuFunc(const std::function<bool(Type)>& func)
+	void UIManager::BindShowContextMenuFunc(const std::function<bool(Type, bool)>& func)
 	{
 		mShowContextMenuFunc = func;
 	}
-	bool UIManager::ShowContextMenu(const Type& type)
+	bool UIManager::ShowContextMenu(const Type& type, bool isWhenHoveredItem)
 	{
 		if (mShowContextMenuFunc != nullptr)
 		{
-			return mShowContextMenuFunc(type);
+			return mShowContextMenuFunc(type, isWhenHoveredItem);
 		}
 		return false;
 	}
@@ -134,6 +134,7 @@ namespace JG
 			{
 				continue;
 			}
+			mIconPool.push_back(pt);
 			auto t = pt->As<ITexture>();
 			if (t != nullptr)
 			{

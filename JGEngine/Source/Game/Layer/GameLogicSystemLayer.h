@@ -31,7 +31,7 @@ namespace JG
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
 	private:
-		void SaveGameWorld();
-		void LoadGameWrold();
+		//void SaveGameWorld();
+		//void LoadGameWrold();
 	};
 }

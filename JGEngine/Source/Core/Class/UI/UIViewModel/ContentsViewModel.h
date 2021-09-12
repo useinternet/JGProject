@@ -70,7 +70,6 @@ namespace JG
 
 		// 1초에 한번 식 검사
 		Dictionary<ContentsFileInfo*, UniquePtr<ContentsFileInfo>> mContentsFileInfoPool;
-
 		Dictionary<String, ContentsFileInfo*>                      mContentsFileInfoByPath;
 
 		//
@@ -84,7 +83,7 @@ namespace JG
 
 
 
-		HashSet<ContentsFileInfo*> mSelectedFileList;
+		HashSet<String> mSelectedFileList;
 		HashSet<String> mCopyFileList;
 
 

@@ -58,11 +58,11 @@ namespace JG
 		mutable std::shared_mutex   mMutex;
 
 
-		std::function<bool(Type)> mShowContextMenuFunc;
+		std::function<bool(Type, bool)> mShowContextMenuFunc;
 
 		
 		ClipBoard mClipBoard;
-
+		List<SharedPtr<IAsset>> mIconPool;
 		Dictionary<String, Asset<ITexture>*>  mIcons;
 		bool mIsLoadIcons = false;
 	public:
@@ -116,13 +116,14 @@ namespace JG
 		}
 
 		template<class UIPopupViewType, class InitData>
-		void OpenPopupUIView(const InitData& initData) const
+		UIPopupViewType* OpenPopupUIView(const InitData& initData) const
 		{
 			auto view = GetPopupUIView<UIPopupViewType>();
 			if (view != nullptr)
 			{
 				view->Open(initData);
 			}
+			return view;
 		}
 
 		template<class UIPopupViewType>
@@ -159,8 +160,8 @@ namespace JG
 
 		void RegisterMainMenuItem(const String& menuPath, u64 priority,  const std::function<void()>& action, const std::function<bool()> enableAction);
 		void RegisterContextMenuItem(const Type& type, const String& menuPath, u64 priority, const std::function<void()>& action, const std::function<bool()> enableAction);
-		void BindShowContextMenuFunc(const std::function<bool(Type)>& func);
-		bool ShowContextMenu(const Type& type);
+		void BindShowContextMenuFunc(const std::function<bool(Type, bool)>& func);
+		bool ShowContextMenu(const Type& type, bool isWhenHoveredItem = true);
 		void ForEach(const std::function<void(IUIView*)> action);
 		void ForEach(
 			const std::function<void(const MenuItemNode*)>& beginAction,

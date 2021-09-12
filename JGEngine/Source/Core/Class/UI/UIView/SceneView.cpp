@@ -21,9 +21,9 @@ namespace JG
 	}
 	void SceneView::Load()
 	{
-		mIcons[Icon_Move] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Move_Icon.jgasset")->As<ITexture>();
-		mIcons[Icon_Rotation] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Rotation_Icon.jgasset")->As<ITexture>();
-		mIcons[Icon_Scale] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Scale_Icon.jgasset")->As<ITexture>();
+		//mIcons[Icon_Move] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Move_Icon.jgasset")->As<ITexture>();
+		//mIcons[Icon_Rotation] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Rotation_Icon.jgasset")->As<ITexture>();
+		//mIcons[Icon_Scale] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Scale_Icon.jgasset")->As<ITexture>();
 	}
 	void SceneView::Initialize()
 	{
@@ -112,14 +112,15 @@ namespace JG
 	{
 		for (int i = 0; i < Icon_Max; ++i)
 		{
-			if (mIcons[i] != nullptr && mIcons[i]->Get() && mIcons[i]->Get()->IsValid())
-			{
-				mIconIDs[i] = JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[i]->Get()->GetTextureID());
-			}
-			else
-			{
-				mIconIDs[i] = 0;
-			}
+			//if (mIcons[i] != nullptr && mIcons[i]->Get() && mIcons[i]->Get()->IsValid())
+			//{
+			//	mIconIDs[i] = JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[i]->Get()->GetTextureID());
+			//}
+			//else
+			//{
+			//	mIconIDs[i] = 0;
+			//}
+			mIconIDs[i] = 0;
 		}
 
 
@@ -306,7 +307,7 @@ namespace JG
 			if (ImGui::RadioButton("##TranslateRadioButton", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
 			{
 				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-			}ImGui::SameLine();
+			} ImGui::SameLine();
 		}
 
 		if (mIconIDs[Icon_Rotation])

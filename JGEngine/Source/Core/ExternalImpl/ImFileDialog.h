@@ -53,7 +53,7 @@ namespace ImGui {
 		class FileTreeNode {
 		public:
 			FileTreeNode(const std::string& path) {
-				Path = std::filesystem::u8path(path);
+				Path = path;
 				Read = false;
 			}
 

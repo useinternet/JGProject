@@ -408,21 +408,6 @@ namespace JG
 			doc.Parse(jsonStr.c_str(), len);
 			return true;
 		}
-		static EAssetFormat GetAssetFormat(const String& path)
-		{
-			EAssetFormat assetFormat = EAssetFormat::None;
-			auto json = CreateSharedPtr<Json>();
-			if (Json::Read(path, json) == true)
-			{
-				
-				auto assetFormatVal = json->GetMember(JG_ASSET_FORMAT_KEY);
-				if (assetFormatVal)
-				{
-					assetFormat = (EAssetFormat)assetFormatVal->GetUint64();
-				}
-			}
-			return assetFormat;
-		}
 	};
 	inline rapidjson::Document::AllocatorType& JsonData::GetJsonAllocator()
 	{
