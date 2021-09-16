@@ -746,6 +746,10 @@ namespace JG
 		{
 			return;
 		}
+		mRTVs.clear();
+		mDSVs.clear();
+		mSRVs.clear();
+		mUAVs.clear();
 		ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
 		mD3DResource.Reset();
 	}

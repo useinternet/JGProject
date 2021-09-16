@@ -54,7 +54,7 @@ namespace JG
 		void SetNearZ(f32 nearZ);
 
 		void SetOrthographic(bool isOrthographic);
-		void SetResolution(const JVector2& resolution);
+		virtual void SetResolution(const JVector2& resolution);
 		void SetCullingLayerMask(u64 mask);
 		void SetClearColor(const Color& color);
 		void SetRendererPath(ERendererPath rendererPath);
@@ -95,16 +95,6 @@ namespace JG
 
 	class EditorCamera : public Camera
 	{
-
-		//float zoom = 2; // 200%
-//float xPos = 0.75 * m_displaySize.Width; // where we are centred
-//float yPos = 0.5 * m_displaySize.Height; // where we are centred
-//float left = -m_displaySize.Width / (2 * zoom) + xPos;
-//float right = m_displaySize.Width / (2 * zoom) + xPos;
-//float top = -m_displaySize.Height / (2 * zoom) + yPos;
-//float bottom = m_displaySize.Height / (2 * zoom) + yPos;
-//m_projectionMatrix = Matrix.OrthoOffCenterLH(left, right, bottom, top, 0f, 100.0f);
-//DirectX::XMMatrixOrthographicOffCenterLH()
 	private:
 		JGCLASS
 		f32      mZoom = 1.0f;
@@ -118,6 +108,8 @@ namespace JG
 
 		const JVector2& GetFocusCenter() const;
 		void SetFocusCenter(const JVector2& focusCenter);
+
+		virtual void SetResolution(const JVector2& resolution) override;
 
 		JRect GetOrthograhicRect() const;
 		JRect GetOrthograhicOriginRect() const;

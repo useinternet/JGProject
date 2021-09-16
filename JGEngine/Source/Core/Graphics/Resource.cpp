@@ -58,6 +58,31 @@ namespace JG
 
 		return api->CreateTexture(stock);
 	}
+	static SharedPtr<ITexture> gNullTexture = nullptr;
+	SharedPtr<ITexture> ITexture::NullTexture()
+	{
+		return gNullTexture;
+	}
+
+
+	void ITexture::CreateNullTexture()
+	{
+		TextureInfo textureInfo;
+		textureInfo.Width = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
+		textureInfo.ClearColor = Color::White();
+		textureInfo.Format = ETextureFormat::R8G8B8A8_Unorm; textureInfo.Flags = ETextureFlags::Allow_RenderTarget;
+		gNullTexture = ITexture::Create("WhiteTexture", textureInfo);
+
+		auto api = Application::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+		api->ClearRenderTarget(MAIN_GRAPHICS_COMMAND_ID, { gNullTexture }, nullptr);
+	}
+
+	void ITexture::DestroyNullTexture()
+	{
+		gNullTexture.reset();
+		gNullTexture = nullptr;
+	}
 
 
 

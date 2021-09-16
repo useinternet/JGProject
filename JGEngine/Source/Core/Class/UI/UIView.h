@@ -50,7 +50,7 @@ namespace JG
 		UniquePtr<ViewModelType> mViewModel;
 		bool mIsOpen = false;
 		bool mIsLoad = false;
-	private:
+	protected:
 		virtual void OnEvent(IEvent& e) override {
 			static_cast<IUIViewModel*>(mViewModel.get())->OnEvent(e);
 		}
@@ -116,6 +116,11 @@ namespace JG
 
 	public:
 		virtual ~UIView() = default;
+		template<class EventClass>
+		void SendEvent(EventClass& e)
+		{
+			Application::GetInstance().SendEvent(e);
+		}
 	};
 
 

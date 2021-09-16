@@ -57,6 +57,11 @@ namespace JG
 		return true;
 	}
 
+	bool DirectX12SubMesh::IsValid() const
+	{
+		return mVertexBuffer && mVertexBuffer->IsValid() && mIndexBuffer && mIndexBuffer->IsValid();
+	}
+
 
 	void DirectX12Mesh::AddMesh(SharedPtr<ISubMesh> subMesh)
 	{
@@ -114,6 +119,22 @@ namespace JG
 		pso->BindInputLayout(*mInputLayout);
 		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		return true;
+	}
+
+	bool DirectX12Mesh::IsValid() const
+	{
+		bool result = true;
+
+
+		for (auto& subMesh : mSubMeshList)
+		{
+			if (subMesh->IsValid() == false)
+			{
+				result = false;
+				break;
+			}
+		}
+		return mInputLayout != nullptr && result;
 	}
 
 }

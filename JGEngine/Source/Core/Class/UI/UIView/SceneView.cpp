@@ -8,6 +8,8 @@
 #include "Imgui/ImGuizmo.h"
 namespace JG
 {
+
+
 	SceneView::SceneView()
 	{
 		UIManager::GetInstance().RegisterMainMenuItem("Windows/SceneView", 0,
@@ -15,34 +17,21 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
-
-		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-		mCurrentGizmoMode      = ImGuizmo::LOCAL;
 	}
 	void SceneView::Load()
 	{
-		//mIcons[Icon_Move] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Move_Icon.jgasset")->As<ITexture>();
-		//mIcons[Icon_Rotation] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Rotation_Icon.jgasset")->As<ITexture>();
-		//mIcons[Icon_Scale] = AssetDataBase::GetInstance().LoadOriginAsset("Asset/Engine/Icon/Scale_Icon.jgasset")->As<ITexture>();
+
+		LoadIcons();
+		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+		mCurrentGizmoMode = ImGuizmo::WORLD;
+		mCurrentCameraMode = CameraMode_3D;
 	}
 	void SceneView::Initialize()
 	{
-		auto viewModel = GetViewModel();
-		viewModel->SetMinSize(JVector2(820, 620));
-		viewModel->ShowGizmo->Subscribe(viewModel, [&](GameNode* node)
+		mShowGizmo = CreateUniquePtr<Command<GameNode*>>();
+		mShowGizmo->Subscribe(this, [&](GameNode* node)
 		{
 			auto mainCam = Camera::GetMainCamera();
-
-			if (mEnableEditorCameraControll == false) {
-				if (ImGui::IsKeyPressed((int)EKeyCode::Q))
-					mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-				if (ImGui::IsKeyPressed((int)EKeyCode::W))
-					mCurrentGizmoOperation = ImGuizmo::ROTATE;
-				if (ImGui::IsKeyPressed((int)EKeyCode::E))
-					mCurrentGizmoOperation = ImGuizmo::SCALE;
-			}
-
-		
 			if (mainCam == nullptr) return;
 			if (node == nullptr || node->GetType() != JGTYPE(GameNode)) return;
 
@@ -110,123 +99,38 @@ namespace JG
 	}
 	void SceneView::OnGUI()
 	{
-		for (int i = 0; i < Icon_Max; ++i)
-		{
-			//if (mIcons[i] != nullptr && mIcons[i]->Get() && mIcons[i]->Get()->IsValid())
-			//{
-			//	mIconIDs[i] = JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[i]->Get()->GetTextureID());
-			//}
-			//else
-			//{
-			//	mIconIDs[i] = 0;
-			//}
-			mIconIDs[i] = 0;
-		}
-
-
-		auto viewModel = GetViewModel();
 		ImGuizmo::BeginFrame();
 
 		ImGui::Begin("SceneView", &mOpenGUI);
-		
-
-		auto minSize = viewModel->GetMinSize();
-		auto currSize = ImGui::GetWindowSize();
-	
 
 
-		if (currSize.x <= minSize.x || currSize.y <= minSize.y)
-		{
-			ImGui::SetWindowSize(ImVec2(minSize.x, minSize.y));
-		}
-
-
-
-		OnGUI_ToolBar();
-		// SceneTexture
-		f32 sceneRatio = 0.0f;
-		f32 fixSceneHeight = 0.0f;
-		f32 fixSceneWidth  = 0.0f;
-		f32 textureWidth = 0.0f;
-		f32 textureHeight = 0.0f;
-		auto sceneTexture = viewModel->GetSceneTexture();
-		if (sceneTexture != nullptr && sceneTexture->IsValid())
-		{
-			auto textureInfo = sceneTexture->GetTextureInfo();
-			sceneRatio     = (f32)textureInfo.Width / (f32)textureInfo.Height;
-			fixSceneHeight = 650;
-			fixSceneWidth  = fixSceneHeight * sceneRatio;
-			textureWidth   = textureInfo.Width;
-			textureHeight  = textureInfo.Height;
-			auto textureID = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(sceneTexture->GetTextureID());
-			ImGui::Image(textureID, ImVec2(fixSceneWidth, fixSceneHeight), ImVec2(0,0), ImVec2(0.9999f, 0.9999f));
-			viewModel->ShowGizmo->Execute(viewModel->GetSelectedGameNode());
-		}
-
-
-
-
-
-
-		// Picking & 2D & 이동 모드 일시 화면 이동
-		if (ImGui::IsMouseClicked(0) == true && ImGui::IsWindowHovered() && ImGuizmo::IsUsing()== false)
-		{
-			auto winPos   = ImGui::GetItemRectMin();
-			auto mousePos = ImGui::GetMousePos();
-
-			auto standardPos = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x ,winPos.y);
-			standardPos.x = (standardPos.x / fixSceneWidth) * textureWidth;
-			standardPos.y = (standardPos.y / fixSceneHeight) * textureHeight;
-
-			viewModel->OnClick(standardPos, 0);
-			JG_CORE_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
-		}
-
-
-		// 3d 화면 이동
-		bool isLeftMouseDown = ImGui::IsMouseDown(1) && ImGui::IsItemHovered();
-		if (mEnableEditorCameraControll == false && isLeftMouseDown)
-		{
-			mMousePos = JVector2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-			mPrevMousePos = mMousePos;
-		}
-		mEnableEditorCameraControll = isLeftMouseDown;
-		if (mEnableEditorCameraControll)
-		{
-			ControllEditorCamera();
-		}
-
-		// 카메라 줌 아웃
-		// 
 		auto mainCam = Camera::GetMainCamera();
-		if (ImGui::IsWindowHovered() && ImGui::IsWindowFocused() == true && mainCam->GetType() == JGTYPE(EditorCamera) && mCurrentCameraMode == 0)
+		bool isOrth = mainCam->IsOrthographic();
+		if (isOrth) mCurrentCameraMode = CameraMode_2D;
+		else mCurrentCameraMode = CameraMode_3D;
+
+
+
+		if (mEnableEditorCameraControll == false && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
 		{
-			auto editCamera = static_cast<EditorCamera*>(mainCam);
-			f32 zoom = editCamera->GetZoom();
-			f32 wheelDelta = ImGui::GetIO().MouseWheel;
-
-
-			if (wheelDelta != 0)
+			if ((ImGui::IsKeyPressed((i32)EKeyCode::Q)))
 			{
-				auto winPos = ImGui::GetItemRectMin();
-				auto mousePos = ImGui::GetMousePos();
-				auto appTimer = Application::GetInstance().GetAppTimer();
-				auto tick = appTimer->GetTick();
-
-				auto focusCenter = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
-
-				focusCenter.x = (focusCenter.x / fixSceneWidth);
-				focusCenter.y = (focusCenter.y / fixSceneHeight);
-
-				JG_CORE_INFO("focusCenter : {0}", focusCenter.ToString())
-				zoom += wheelDelta * tick * 20;
-				editCamera->SetZoom(zoom);
-				editCamera->SetFocusCenter(focusCenter);
+				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+			}
+			if ((ImGui::IsKeyPressed((i32)EKeyCode::W)))
+			{
+				mCurrentGizmoOperation = ImGuizmo::ROTATE;
+			}
+			if ((ImGui::IsKeyPressed((i32)EKeyCode::E)))
+			{
+				mCurrentGizmoOperation = ImGuizmo::SCALE;
 			}
 		}
-
+		OnGUI_Top();
+		OnGUI_Bottom();
 
 		ImGui::End();
+
 		if (mOpenGUI == false)
 		{
 			mOpenGUI = true;
@@ -236,181 +140,378 @@ namespace JG
 
 	void SceneView::Destroy()
 	{
-		auto viewModel = GetViewModel();
-		viewModel->ShowGizmo->UnSubscribe(viewModel);
+		mShowGizmo->UnSubscribe(this);
+		mShowGizmo = nullptr;
 	}
 	void SceneView::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		UIView<SceneViewModel>::MakeJson(jsonData);
-		jsonData->AddMember("GizmoOperation", mCurrentGizmoOperation);
-		jsonData->AddMember("GizmoMode", mCurrentGizmoMode);
-		jsonData->AddMember("CameraMode", mCurrentCameraMode);
 
-
-		jsonData->AddMember("SnapValue0", mSnapValue[0]);
-		jsonData->AddMember("SnapValue1", mSnapValue[1]);
-		jsonData->AddMember("SnapValue2", mSnapValue[2]);
 	}
 	void SceneView::LoadJson(SharedPtr<JsonData> jsonData)
 	{
 		UIView<SceneViewModel>::LoadJson(jsonData);
-		auto val = jsonData->GetMember("GizmoOperation");
-		if (val)
+
+	}
+	void SceneView::OnEvent(IEvent& e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<NotifyChangeMainSceneTextureEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeMainSceneTexture));
+		dispatcher.Dispatch<NotifySelectedGameNodeInEditorEvent>(EVENT_BIND_FN(&SceneView::ResponseSelectedGameNodeInEditor));
+	}
+	void SceneView::OnGUI_Top()
+	{
+		static ImVec4 pressedBtColor = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
+		static ImVec2 btSize = ImVec2(20.0f, 20.0f);
+		ImGui::BeginChild("SceneView_Top",ImVec2(0, 43.0f), true);
+		auto mainCam = Camera::GetMainCamera();
+		auto winSize = ImGui::GetWindowSize();
+
+		bool isPushStyle = false;
+		if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
 		{
-			mCurrentGizmoOperation = val->GetInt32();
+			isPushStyle = true;
+			ImGui::PushStyleColor(ImGuiCol_Button, pressedBtColor);
 		}
-		val = jsonData->GetMember("GizmoMode");
-		if (val)
+		if (ImGui::ImageButton(GetIconTextureID(Icon_TRANSLATE), btSize))
 		{
-			mCurrentGizmoMode = val->GetInt32();
+			mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 		}
-		val = jsonData->GetMember("CameraMode");
-		if (val)
+		ImGui::SameLine();
+		if (isPushStyle)
 		{
-			mCurrentCameraMode = val->GetInt32();
+			isPushStyle = false;
+			ImGui::PopStyleColor();
 		}
 
-		val = jsonData->GetMember("SnapValue0");
-		if (val)
+		if (mCurrentGizmoOperation == ImGuizmo::ROTATE)
 		{
-			mSnapValue[0] = val->GetFloat();
+			isPushStyle = true;
+			ImGui::PushStyleColor(ImGuiCol_Button, pressedBtColor);
 		}
-		val = jsonData->GetMember("SnapValue1");
-		if (val)
+		if (ImGui::ImageButton(GetIconTextureID(Icon_ROTATION), btSize))
 		{
-			mSnapValue[1] = val->GetFloat();
+			mCurrentGizmoOperation = ImGuizmo::ROTATE;
+		}ImGui::SameLine();
+		if (isPushStyle)
+		{
+			isPushStyle = false;
+			ImGui::PopStyleColor();
 		}
-		val = jsonData->GetMember("SnapValue2");
-		if (val)
+		if (mCurrentGizmoOperation == ImGuizmo::SCALE)
 		{
-			mSnapValue[2] = val->GetFloat();
+			isPushStyle = true;
+			ImGui::PushStyleColor(ImGuiCol_Button, pressedBtColor);
+		}
+		if (ImGui::ImageButton(GetIconTextureID(Icon_SCALE), btSize))
+		{
+			mCurrentGizmoOperation = ImGuizmo::SCALE;
+		}ImGui::SameLine();
+		if (isPushStyle)
+		{
+			isPushStyle = false;
+			ImGui::PopStyleColor();
+		}
+
+		ImGui::Dummy(ImVec2(25.0f, 0.0f)); ImGui::SameLine();
+		if (mCurrentCameraMode == CameraMode_2D)
+		{
+			if (ImGui::Button("2D", ImVec2(27, 27)) == true)
+			{
+				mCurrentCameraMode = CameraMode_3D;
+				if (mainCam)
+				{
+					mainCam->SetOrthographic(false);
+				}
+			}ImGui::SameLine();
+		}
+		else
+		{
+			if (ImGui::Button("3D", ImVec2(27, 27)) == true)
+			{
+				mCurrentCameraMode = CameraMode_2D;
+				if (mainCam)
+				{
+					mainCam->SetOrthographic(true);
+				}
+			}ImGui::SameLine();
+		}
+		
+		
+
+
+		if (mCurrentGizmoMode == ImGuizmo::WORLD)
+		{
+			if (ImGui::ImageButton(GetIconTextureID(Icon_WORLD), btSize) == true)
+			{
+				mCurrentGizmoMode = ImGuizmo::LOCAL;
+			}ImGui::SameLine();
+		}
+		else
+		{
+			if (ImGui::ImageButton(GetIconTextureID(Icon_LOCAL), btSize) == true)
+			{
+				mCurrentGizmoMode = ImGuizmo::WORLD;
+			}ImGui::SameLine();
+		}
+
+
+
+
+
+
+		isPushStyle = false;
+		f32 hw = winSize.x * 0.5f;
+		ImGui::SetCursorPosX(hw - 28.0f - ImGui::GetStyle().FramePadding.x);
+		if (mCurrentGameControll == Game_Play)
+		{
+			isPushStyle = true;
+			ImGui::PushStyleColor(ImGuiCol_Button, pressedBtColor);
+		}
+		if (ImGui::ImageButton(GetIconTextureID(Icon_PLAY), btSize))
+		{
+			if (mCurrentGameControll == Game_Wait) mCurrentGameControll = Game_Play;
+			else if (mCurrentGameControll == Game_Pause) mCurrentGameControll = Game_Play;
+			else mCurrentGameControll = Game_Wait;
+		}ImGui::SameLine();
+		if (isPushStyle)
+		{
+			isPushStyle = false;
+			ImGui::PopStyleColor();
+		}
+		if (mCurrentGameControll == Game_Pause)
+		{
+			isPushStyle = true;
+			ImGui::PushStyleColor(ImGuiCol_Button, pressedBtColor);
+		}
+		if (ImGui::ImageButton(GetIconTextureID(Icon_PAUSE), btSize))
+		{
+			if (mCurrentGameControll == Game_Play)       mCurrentGameControll = Game_Pause;
+			else if (mCurrentGameControll == Game_Pause) mCurrentGameControll = Game_Play;
+			else mCurrentGameControll = Game_Wait;
+		}ImGui::SameLine();
+		if (isPushStyle)
+		{
+			isPushStyle = false;
+			ImGui::PopStyleColor();
+		}
+
+
+
+
+	
+		auto resolutionStr = ResolutionToString(mCurrentResolution);
+		ImGui::SetCursorPosX(winSize.x - 258);
+		ImGui::SetNextItemWidth(250.0f);
+		ImGui::AlignTextToFramePadding();
+		if (ImGui::BeginCombo("##Resolution_Combo", resolutionStr.c_str()) == true)
+		{
+			for (i32 i = 0; i < Resolution_Max; ++i)
+			{
+				String str = ResolutionToString(i);
+				if (ImGui::Selectable(str.c_str(), false, ImGuiSelectableFlags_None) == true)
+				{
+					mCurrentResolution = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::EndChild();
+	}
+	void SceneView::OnGUI_Bottom()
+	{
+		ImGui::BeginChild("SceneView_Bottom", ImVec2(0, 0), true);
+		auto winSize = ImGui::GetWindowSize();
+		winSize.x -= 16.0f;
+		winSize.y -= 18.0f;
+		auto sceneTexture = GetSceneTexture();
+		auto mainCam = Camera::GetMainCamera();
+		if (sceneTexture && sceneTexture->IsValid())
+		{
+			JVector2 imageSize;
+
+			switch (mCurrentResolution)
+			{
+			case Resolution_FHD_1920_1080:
+				imageSize = GetFitSize(JVector2(winSize.x, winSize.y), 16, 9);
+				if (mainCam)
+				{
+					mainCam->SetResolution(JVector2(1920, 1080));
+				}
+				break;
+			case Resolution_QHD_2560_1440:
+
+				imageSize = GetFitSize(JVector2(winSize.x, winSize.y), 16, 9);
+				if (mainCam)
+				{
+					mainCam->SetResolution(JVector2(2560, 1440));
+				}
+				break;
+			case Resolution_FreeAspect:
+				imageSize = JVector2(winSize.x, winSize.y);
+				if (mainCam)
+				{
+					mainCam->SetResolution(JVector2(imageSize.x, imageSize.y));
+				}
+				break;
+			}
+			TextureInfo tInfo = sceneTexture->GetTextureInfo();
+			auto TexID = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(sceneTexture->GetTextureID());
+
+			ImGui::Image(TexID, ImVec2(imageSize.x, imageSize.y));
+
+
+			mShowGizmo->Execute(GetSelectedGameNode());
+			f32 fixSceneHeight = imageSize.y;
+			f32 fixSceneWidth = imageSize.x;
+			f32 textureWidth  = tInfo.Width;
+			f32 textureHeight = tInfo.Height;
+			if (ImGui::IsMouseClicked(0) == true && ImGui::IsItemHovered() && ImGuizmo::IsUsing() == false)
+			{
+				auto winPos   = ImGui::GetItemRectMin();
+				auto mousePos = ImGui::GetMousePos();
+
+				auto standardPos = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
+				standardPos.x = (standardPos.x / fixSceneWidth) * textureWidth;
+				standardPos.y = (standardPos.y / fixSceneHeight) * textureHeight;
+
+				NotifyEditorSceneOnClickEvent e;
+				e.ClickPos = standardPos;
+				SendEvent(e);
+				JG_CORE_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
+			}
+			if (ImGui::IsWindowHovered() && ImGui::IsWindowFocused() == true && mainCam->GetType() == JGTYPE(EditorCamera) && mCurrentCameraMode == 0)
+			{
+				auto editCamera = static_cast<EditorCamera*>(mainCam);
+				f32 zoom = editCamera->GetZoom();
+				f32 zoom_restrict = 1.0f;
+				if (zoom < 1.0f) zoom_restrict = zoom;
+				else zoom_restrict = 1 / zoom;
+
+
+				f32 wheelDelta = ImGui::GetIO().MouseWheel;
+				if (wheelDelta != 0)
+				{
+					auto winPos = ImGui::GetItemRectMin();
+					auto mousePos = ImGui::GetMousePos();
+					auto appTimer = Application::GetInstance().GetAppTimer();
+					auto tick = appTimer->GetTick();
+
+					auto focusCenter = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
+
+					focusCenter.x = (focusCenter.x / fixSceneWidth);
+					focusCenter.y = (focusCenter.y / fixSceneHeight);
+					zoom += wheelDelta * tick * 20 * zoom_restrict;
+					editCamera->SetZoom(zoom);
+					editCamera->SetFocusCenter(focusCenter);
+				}
+			}
+
+
+
+
+
+
+
+			// 3d 화면 이동
+			bool isLeftMouseDown = ImGui::IsMouseDown(1) && ImGui::IsItemHovered();
+			if (mEnableEditorCameraControll == false && isLeftMouseDown)
+			{
+				mMousePos = JVector2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+				mPrevMousePos = mMousePos;
+			}
+			mEnableEditorCameraControll = isLeftMouseDown;
+			if (mEnableEditorCameraControll)
+			{
+				ControllEditorCamera();
+			}
+
+		}
+		ImGui::EndChild();
+	}
+	void SceneView::SetSelectedGameNode(GameNode* gameNode)
+	{
+		mSelectedGameNode = gameNode;
+	}
+	GameNode* SceneView::GetSelectedGameNode() const
+	{
+		return mSelectedGameNode;
+	}
+	void SceneView::SetSceneTexture(SharedPtr<ITexture> sceneTexture)
+	{
+		mSceneTexture = sceneTexture;
+	}
+	SharedPtr<ITexture> SceneView::GetSceneTexture() const
+	{
+		return mSceneTexture;
+	}
+	bool SceneView::ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e)
+	{
+		SetSelectedGameNode(e.SelectedGameNode);
+		return false;
+	}
+	bool SceneView::ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e)
+	{
+		SetSceneTexture(e.SceneTexture);
+		return false;
+	}
+	String SceneView::ResolutionToString(i32 resolution)
+	{
+		switch (resolution)
+		{
+		case Resolution_FreeAspect: return "Free Aspect";
+		case Resolution_FHD_1920_1080: return "FHD_(1920 x 1080)";
+		case Resolution_QHD_2560_1440: return "QHD_(2560 x 1440)";
+		default:
+			return "None";
 		}
 	}
-	void SceneView::OnGUI_ToolBar()
+	void SceneView::LoadIcons()
 	{
-		if (mIconIDs[Icon_Move])
+		mIcons.resize(MAX_ICON);
+		mIcons[Icon_TRANSLATE] = UIManager::GetInstance().GetIcon("Icon_Translation");
+		mIcons[Icon_ROTATION] = UIManager::GetInstance().GetIcon("Icon_Rotate");
+		mIcons[Icon_SCALE] = UIManager::GetInstance().GetIcon("Icon_Scale");
+
+		mIcons[Icon_WORLD] = UIManager::GetInstance().GetIcon("Icon_World");
+		mIcons[Icon_LOCAL] = UIManager::GetInstance().GetIcon("Icon_Local");
+		mIcons[Icon_PLAY] = UIManager::GetInstance().GetIcon("Icon_Play");
+		mIcons[Icon_PAUSE] = UIManager::GetInstance().GetIcon("Icon_Pause");
+		mIcons[Icon_STOP] = UIManager::GetInstance().GetIcon("Icon_Stop");
+
+	}
+	ImTextureID SceneView::GetIconTextureID(i32 iconEnum) const
+	{
+		if (mIcons[iconEnum] && mIcons[iconEnum]->Get() && mIcons[iconEnum]->Get()->IsValid())
 		{
-			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
-			if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
-			{
-				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
-			}
-			ImGui::Image((ImTextureID)mIconIDs[Icon_Move], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
-			if (ImGui::IsItemClicked())
-			{
-				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-			}ImGui::SameLine();
+			return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[iconEnum]->Get()->GetTextureID());
+		}
+
+
+		return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(ITexture::NullTexture()->GetTextureID());
+		
+	}
+	JVector2 SceneView::GetFitSize(JVector2 originSize, f32 wratio, f32 hratio)
+	{
+		f32 total = originSize.x + originSize.y;
+		f32 x = total * wratio / (wratio + hratio);
+		f32 y = total - x;
+
+		if (x > originSize.x)
+		{
+			x = originSize.x;
+			y = x * hratio / wratio;
 		}
 		else
 		{
-			ImGui::Text("T");
-			if (ImGui::RadioButton("##TranslateRadioButton", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-			{
-				mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-			} ImGui::SameLine();
+			y = originSize.y;
+			x = y * wratio / hratio;
 		}
 
-		if (mIconIDs[Icon_Rotation])
-		{
-			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
-			if (mCurrentGizmoOperation == ImGuizmo::ROTATE)
-			{
-				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
-			}
-			ImGui::Image((ImTextureID)mIconIDs[Icon_Rotation], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
-			if (ImGui::IsItemClicked())
-			{
-				mCurrentGizmoOperation = ImGuizmo::ROTATE;
-			}ImGui::SameLine();
-		}
-		else
-		{
-			ImGui::Text("R"); ImGui::SameLine();
-			if (ImGui::RadioButton("##RotateRadioButton", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-			{
-				mCurrentGizmoOperation = ImGuizmo::ROTATE;
-			}ImGui::SameLine();
-		}
-
-
-
-		if (mIconIDs[Icon_Scale])
-		{
-			ImVec4 tinColor = ImVec4(1, 1, 1, 1);
-			if (mCurrentGizmoOperation == ImGuizmo::SCALE)
-			{
-				tinColor = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
-			}
-			ImGui::Image((ImTextureID)mIconIDs[Icon_Scale], ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), tinColor);
-			if (ImGui::IsItemClicked())
-			{
-				mCurrentGizmoOperation = ImGuizmo::SCALE;
-			}ImGui::SameLine();
-		}
-		else
-		{
-			ImGui::Text("S"); ImGui::SameLine();
-			if (ImGui::RadioButton("##ScalingRadioButton", mCurrentGizmoOperation == ImGuizmo::SCALE))
-			{
-				mCurrentGizmoOperation = ImGuizmo::SCALE;
-			}ImGui::SameLine();
-		}
-
-		JG::Camera* mainCam = Camera::GetMainCamera();
-		std::string name = "";
-
-		// Gizmo 모드
-		{
-			if (mCurrentGizmoMode == ImGuizmo::LOCAL) name = "Local";
-			else name = "World";
-
-			if (ImGui::Button(name.c_str()) == true)
-			{
-				mCurrentGizmoMode = !mCurrentGizmoMode;
-			}ImGui::SameLine();
-		}
-
-		// Gizmo Camera Mode
-		{
-
-			if (mCurrentCameraMode == 0)
-			{
-				name = "2D";
-				mainCam->GetOwner()->GetTransform()->SetLocalRotation(JVector3(0, 0, 0));
-				JVector3 location = mainCam->GetOwner()->GetTransform()->GetLocalLocation(); location.z = -10;
-				mainCam->GetOwner()->GetTransform()->SetLocalLocation(location);
-			}
-			else name = "3D";
-
-			if (ImGui::Button(name.c_str()) == true)
-			{
-				mCurrentCameraMode = !mCurrentCameraMode;
-			}ImGui::SameLine();
-
-			if (mainCam != nullptr)
-			{
-				mainCam->SetOrthographic(!mCurrentCameraMode);
-			}
-		}
-
-		// Gizmo Snap
-		{
-			if (ImGui::RadioButton("Snap", mIsSnap))
-			{
-				mIsSnap = !mIsSnap;
-			} ImGui::SameLine();
-			ImGui::SetNextItemWidth(210.0f);
-			ImGui::InputFloat3("##Snap_InputFloat", mSnapValue); ImGui::SameLine();
-		}
-		{
-			ImGui::Text("FPS : %d", Application::GetInstance().GetAppTimer()->GetFPS());
-
-		}
+		return JVector2(x, y);
 	}
 	void SceneView::ControllEditorCamera()
 	{
-	
-
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam == nullptr)
 		{
@@ -437,7 +538,7 @@ namespace JG
 
 		if (mCurrentCameraMode == 0)
 		{
-			f32 offset = cameraSpeed * tick * 10;
+			f32 offset = cameraSpeed * tick * cameraSpeed;
 			JVector3 location = camTransform->GetLocalLocation();
 			location.x += (-mouseDelta.x * offset);
 			location.y += (mouseDelta.y * offset);
@@ -501,8 +602,6 @@ namespace JG
 
 
 			camTransform->SetLocalLocation(location);
-
-
 		}
 		
 

@@ -20,6 +20,7 @@ namespace JG
 		virtual const String& GetName() const override;
 		virtual u32 GetIndexCount() const override;
 		virtual bool Bind() override;
+		virtual bool IsValid() const override;
 	};
 	class DirectX12Mesh : public IMesh
 	{
@@ -40,5 +41,6 @@ namespace JG
 		virtual const String& GetName() override;
 
 		virtual bool Bind() override;
+		virtual bool IsValid() const override;
 	};
 }

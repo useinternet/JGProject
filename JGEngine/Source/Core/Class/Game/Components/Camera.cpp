@@ -348,22 +348,32 @@ namespace JG
 	{
 
 		JVector2 resolution = GetResolution();
-		f32 fov   = GetFOV();
-		Color color = GetClearColor();
-		f32 nearZ = GetNearZ();
-		f32 farZ  = GetFarZ();
-		bool isOrth = IsOrthographic();
+		f32 fov				= GetFOV();
+		Color color			= GetClearColor();
+		f32 nearZ			= GetNearZ();
+		f32 farZ			= GetFarZ();
+		bool isOrth			= IsOrthographic();
 
-		ImGui::OnGui("Resolution   ", &resolution);
-		ImGui::OnGui("Field of View", &fov);
-		ImGui::OnGui("NearZ        ", &nearZ);
-		ImGui::OnGui("FarZ         ", &farZ);
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Orthographic  "); ImGui::SameLine();
-		ImGui::Checkbox("##Orthographic Toggle", &isOrth);
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text( "ClearColor    "); ImGui::SameLine();
-		ImGui::ColorEdit4("## ClearColor Edit ", (float*)&color);
+		f32 label_width = ImGui::CalcTextSize("Field of View").x;
+
+		ImGui::Vector2_OnGUI("Resolution", resolution, label_width);
+		ImGui::Float_OnGUI("Field of View", fov, label_width);
+		ImGui::Float_OnGUI("NearZ", nearZ, label_width);
+		ImGui::Float_OnGUI("FarZ", farZ, label_width);
+		ImGui::Bool_OnGUI("Orthographic", isOrth, label_width);
+		ImGui::Color4_OnGUI("ClearColor", color, label_width);
+
+
+		//ImGui::OnGui("Resolution   ", &resolution);
+		//ImGui::OnGui("Field of View", &fov);
+		//ImGui::OnGui("NearZ        ", &nearZ);
+		//ImGui::OnGui("FarZ         ", &farZ);
+		//ImGui::AlignTextToFramePadding();
+		//ImGui::Text("Orthographic  "); ImGui::SameLine();
+		//ImGui::Checkbox("##Orthographic Toggle", &isOrth);
+		//ImGui::AlignTextToFramePadding();
+		//ImGui::Text( "ClearColor    "); ImGui::SameLine();
+		//ImGui::ColorEdit4("## ClearColor Edit ", (float*)&color);
 
 
 		SetFOV(fov);
@@ -398,13 +408,29 @@ namespace JG
 		}
 		mFocusCenter = focusCenter;
 	}
+	void EditorCamera::SetResolution(const JVector2& resolution)
+	{
+		Camera::SetResolution(resolution);
+
+		if (mIsProjDirty == true)
+		{
+			SetZoom(1.0f);
+			SetFocusCenter(JVector2(0.5f, 0.5f));
+
+			f32 hw = resolution.x * 0.5f;
+			f32 hh = resolution.y * 0.5f;
+
+			mOrthoRect = JRect(-hw, hh, hw, -hh);
+		}
+
+	}
 	JRect EditorCamera::GetOrthograhicRect() const
 	{
 		f32 centerPosX = mOrthoRect.left + mOrthoRect.Width() * mFocusCenter.x;
 		f32 centerPosY = mOrthoRect.top  - mOrthoRect.Height() * mFocusCenter.y;
 		f32 zoomFactor = (1 / mZoom);
-		f32 hw = mResolution.x * 0.5f * zoomFactor;
-		f32 hh = mResolution.y * 0.5f * zoomFactor;
+		f32 hw = mResolution.x * zoomFactor;
+		f32 hh = mResolution.y * zoomFactor;
 
 		f32 leftOffset = mFocusCenter.x * hw;
 		f32 rightOffset = (1.0f - mFocusCenter.x) * hw;

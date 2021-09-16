@@ -96,10 +96,6 @@ namespace JG
 			JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
 		}
 
-
-
-
-
 		auto transposedViewProj = JMatrix::Transpose(mCurrentRenderInfo.ViewProj);
 		for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
 		{

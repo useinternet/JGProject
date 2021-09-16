@@ -53,7 +53,6 @@ namespace JG
 	void ContentsView::Initialize()
 	{
 		mHistroyIndex = -1;
-		//mIsColumnInit = true;
 		mSelectedFilesInFilePanel.clear();
 		mSelectedFilesInDirPanel.clear();
 		mDirectoryHistory.clear();
@@ -383,6 +382,12 @@ namespace JG
 		bool isRenmaing = treeNodeState->IsState(NodeState_Renaming);
 		isItemClick = ImGui::Selectable(id.c_str(), &isSelected, ImGuiSelectableFlags_AllowItemOverlap, ImVec2(mFileCellSize.x, mFileCellSize.y));
 
+		DragAndDropSource<DDDContentsFile>([&](DDDContentsFile* ddd)
+		{
+			ddd->FilePath = filePath;
+			ImGui::Text(ddd->FilePath.c_str());
+		});
+
 		if (ImGui::IsItemHovered() == true)
 		{
 			ImGui::SetTooltip(FileName.c_str());
@@ -482,6 +487,9 @@ namespace JG
 			ImGui::InputText((id + "inputText").c_str(), text.data(), 512);
 			if (ImGui::IsItemDeactivated() == true)
 			{
+				auto len = strlen(text.c_str());
+				text = text.substr(0, len);
+				text += JG_ASSET_FORMAT;
 				Rename(filePath, text);
 				treeNodeState->Off(NodeState_Renaming);
 			}
@@ -919,7 +927,7 @@ namespace JG
 		path = GetUniqueFileName(path);
 		path += JG_ASSET_FORMAT;
 
-
+		GameObjectFactory::GetInstance().DestroyObject(defaultGameWorld);
 		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
 		AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::GameWorld, json);
 	}

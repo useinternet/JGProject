@@ -21,6 +21,7 @@ namespace JG
 		virtual const String& GetName() const = 0;
 		virtual u32 GetIndexCount() const = 0;
 		virtual bool Bind() = 0;
+		virtual bool IsValid() const = 0;
 
 	public:
 		static SharedPtr<ISubMesh> Create(const String& name);
@@ -41,6 +42,7 @@ namespace JG
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName()   = 0;
 		virtual bool Bind() = 0;
+		virtual bool IsValid() const = 0;
 	public:
 		static SharedPtr<IMesh> Create(const String& name);
 		static SharedPtr<IMesh> Create(const StaticMeshAssetStock& stock);

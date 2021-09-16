@@ -107,6 +107,8 @@ namespace JG
 		}
 		mAppTimer = Timer::Create();
 		mAppTimer->Start();
+
+		ITexture::CreateNullTexture();
 		return true;
 	}
 	void Application::Run()
@@ -144,7 +146,6 @@ namespace JG
 			}
 
 			mGraphcisAPI->End();
-
 		}
 
 		
@@ -158,6 +159,7 @@ namespace JG
 	{
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
+		ITexture::DestroyNullTexture();
 		mGraphcisAPI->Flush();
 		UIManager::Destroy();
 		mLayerStack.reset();

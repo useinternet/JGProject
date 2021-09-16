@@ -232,7 +232,7 @@ namespace JG
 			auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
 			if (inspectorView)
 			{
-				inspectorView->GetViewModel()->SelectComponentType(selectedType);
+				inspectorView->SelectComponentType(selectedType);
 			}
 		}
 	}

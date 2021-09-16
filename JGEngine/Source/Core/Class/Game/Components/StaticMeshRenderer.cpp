@@ -91,7 +91,7 @@ namespace JG
 		auto transform = GetOwner()->GetTransform();
 		mStaticRI->WorldMatrix = transform->GetWorldMatrix();
 
-		if (mMesh)
+		if (mMesh && mMesh->Get() && mMesh->Get()->IsValid())
 		{
 			mStaticRI->Mesh = mMesh->Get();
 			GetOwner()->SetPickingBoundingBox(mStaticRI->Mesh->GetBoundingBox());

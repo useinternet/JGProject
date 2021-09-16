@@ -1107,7 +1107,12 @@ namespace JG
 
 	bool AssetDataBase::WriteAsset(const String& path, EAssetFormat format, SharedPtr<Json> json)
 	{
-
+		String absolutePath;
+		String resourcePath;
+		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		{
+			return false;
+		}
 		String assetJsonText = Json::ToString(json);
 		u64 assetJsonLen = assetJsonText.length();
 
@@ -1121,7 +1126,7 @@ namespace JG
 
 		std::lock_guard<std::mutex> lock(mAssetRWMutex);
 		std::ofstream fout;
-		fout.open(path);
+		fout.open(absolutePath);
 
 		if (fout.is_open() == false)
 		{
@@ -1138,9 +1143,15 @@ namespace JG
 	}
 	bool AssetDataBase::ReadAsset(const String& path, EAssetFormat* out_format, SharedPtr<Json>* json)
 	{
+		String absolutePath;
+		String resourcePath;
+		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		{
+			return false;
+		}
 		std::lock_guard<std::mutex> lock(mAssetRWMutex);
 		std::ifstream fin;
-		fin.open(path);
+		fin.open(absolutePath);
 		if (fin.is_open() == false)
 		{
 			return false;
@@ -1195,7 +1206,7 @@ namespace JG
 		EAssetFormat assetFormat = EAssetFormat::None;
 
 		std::ifstream fin;
-		fin.open(path);
+		fin.open(absolutePath);
 		if (fin.is_open() == true)
 		{
 			u64 headerJsonLen = 0;

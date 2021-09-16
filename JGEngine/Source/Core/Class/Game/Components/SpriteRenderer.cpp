@@ -122,24 +122,49 @@ namespace JG
 	{
 		BaseRenderer::OnInspectorGUI();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Color "); ImGui::SameLine();
-		ImGui::ColorEdit4("##Color Editor", (float*)(&mSpriteRI->Color));
-		
+		f32 label_width = ImGui::CalcTextSize("Sprite").x;
 		String path;
+
+		ImGui::Color4_OnGUI("Color", mSpriteRI->Color, label_width);
 		if (mSprite)
 		{
-			if (ImGui::AssetField("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path) == true)
+			if (ImGui::AssetField_OnGUI("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path, label_width) == true)
 			{
 				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
 			}
 		}
 		else
 		{
-			if (ImGui::AssetField("Sprite ", "none", EAssetFormat::Texture, path) == true)
+			if (ImGui::AssetField_OnGUI("Sprite ", "None", EAssetFormat::Texture, path, label_width) == true)
 			{
 				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
 			}
 		}
+
+
+
+
+
+
+
+		//ImGui::Text("Color "); ImGui::SameLine();
+		//ImGui::ColorEdit4("##Color Editor", (float*)(&mSpriteRI->Color));
+		
+		//String path;
+		//if (mSprite)
+		//{
+		//	if (ImGui::AssetField("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path) == true)
+		//	{
+		//		mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
+		//	}
+		//}
+		//else
+		//{
+		//	if (ImGui::AssetField("Sprite ", "None", EAssetFormat::Texture, path) == true)
+		//	{
+		//		mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
+		//	}
+		//}
 	}
 
 }

@@ -308,7 +308,7 @@ namespace JG
 		if (mMainCamera->pCamera != nullptr)
 		{
 			auto mainCam = mMainCamera->pCamera;
-			if (mMainCamera->IsValid() == false)
+			if (mMainCamera->IsValid() == false || isResize)
 			{
 				TextureInfo mainTexInfo;
 				mainTexInfo.Width = std::max<u32>(1, mMainCamera->Resolution.x);
@@ -321,15 +321,20 @@ namespace JG
 
 				for (auto& t : mMainCamera->TargetTextures)
 				{
-					t = ITexture::Create(mainCam->GetName() + "TargetTexture", mainTexInfo);
+					if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetTexture", mainTexInfo);
+					else t->SetTextureInfo(mainTexInfo);
+					
 				}
 
 				mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
 				mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
 				for (auto& t : mMainCamera->TargetDepthTextures)
 				{
-					t = ITexture::Create(mainCam->GetName() + "TargetDepthTexture", mainTexInfo);
+					if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetDepthTexture", mainTexInfo);
+					else t->SetTextureInfo(mainTexInfo);
+					
 				}
+				//return EScheduleResult::Continue;
 			}
 		}
 

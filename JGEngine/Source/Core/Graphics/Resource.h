@@ -152,6 +152,13 @@ namespace JG
 		static SharedPtr<ITexture> Create(const String& name);
 		static SharedPtr<ITexture> Create(const String& name, const TextureInfo& info);
 		static SharedPtr<ITexture> Create(const TextureAssetStock& stock);
+		static SharedPtr<ITexture> NullTexture();
+
+	private:
+
+		friend class Application;
+		static void CreateNullTexture();
+		static void DestroyNullTexture();
 	};
 }
 

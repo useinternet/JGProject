@@ -56,9 +56,9 @@
 #define JG_SHADER_SCRIPT_FORMAT   ".shaderscript"
 #define JG_SHADER_TEMPLATE_FORMAT ".shadertemplate"
 
-#define JG_SHADER_3D_STANDARD_TEMPLATE "Standard3DShader.shadertemplate"
-#define JG_SHADER_2D_STANDARD_TEMPLATE "Standard2DShader.shadertemplate"
-#define JG_SHADER_STANDARD_SURFACE_SCRIPT "Standard.shaderscript"
+#define JG_SHADER_3D_STANDARD_TEMPLATE "Standard3DShader"
+#define JG_SHADER_2D_STANDARD_TEMPLATE "Standard2DShader"
+#define JG_SHADER_STANDARD_SURFACE_SCRIPT "Standard"
 namespace JG
 {
 	using i8 = char;

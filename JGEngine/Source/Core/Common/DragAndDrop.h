@@ -46,7 +46,7 @@ namespace JG
 
 			memcpy(&len, (void*)((u64)data + offset), sizeof(u64)); offset += sizeof(u64);
 			FilePath.resize(len);
-			memcpy(&FilePath[0], (void*)((u64)data + offset), sizeof(u64));
+			memcpy(&FilePath[0], (void*)((u64)data + offset), len);
 		}
 
 	};

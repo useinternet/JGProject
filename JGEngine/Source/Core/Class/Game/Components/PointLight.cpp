@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "PointLight.h"
+#include "ExternalImpl/ImGuiExternal.h"
 #include "Transform.h"
 #include "Class/Game/GameNode.h"
 #include "Class/Game/Components/Camera.h"
@@ -165,40 +166,29 @@ namespace JG
 		Light::OnInspectorGUI();
 		ImGui::Spacing();
 
-
-		ImGui::ColorEdit3("Color", (float*)&(mRI->Color));
-
-
-	
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Intensity "); ImGui::SameLine();
-		ImGui::SetNextItemWidth(150.0f);
-		ImGui::InputFloat("##Intensity", &mRI->Intensity);
+		Color color = Color(mRI->Color.x, mRI->Color.y, mRI->Color.z, 1.0f);
+		f32 intensity = mRI->Intensity;
+		f32 range = mRI->Range;
+		f32 att0 = mRI->Att0;
+		f32 att1 = mRI->Att1;
+		f32 att2 = mRI->Att2;
 
 
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Range    "); ImGui::SameLine();
-		ImGui::SetNextItemWidth(150.0f);
-		ImGui::InputFloat("##Range", &mRI->Range);
 
+		f32 label_width = ImGui::CalcTextSize("Intensity").x;
+		ImGui::Color3_OnGUI("Color", color, label_width);
+		ImGui::Float_OnGUI("Intensity", intensity, label_width);
+		ImGui::Float_OnGUI("Range", range, label_width);
+		ImGui::Float_OnGUI("Att0", att0, label_width);
+		ImGui::Float_OnGUI("Att1", att1, label_width);
+		ImGui::Float_OnGUI("Att2", att2, label_width);
 
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Att0     "); ImGui::SameLine();
-		ImGui::SetNextItemWidth(150.0f);
-		ImGui::SliderFloat("##Att0", &mRI->Att0, 0.0f , 1.0f);
-
-
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Att1     "); ImGui::SameLine();
-		ImGui::SetNextItemWidth(150.0f);
-		ImGui::SliderFloat("##Att1", &mRI->Att1, 0.0f, 1.0f);
-
-
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Att2     "); ImGui::SameLine();
-		ImGui::SetNextItemWidth(150.0f);
-		ImGui::SliderFloat("##Att2", &mRI->Att2, 0.0f, 1.0f);
-
+		mRI->Color = JVector3(color.R, color.G, color.B);
+		mRI->Intensity = intensity;
+		mRI->Range = range;
+		mRI->Att0 = att0;
+		mRI->Att1 = att1;
+		mRI->Att2 = att2;
 	}
 
 }

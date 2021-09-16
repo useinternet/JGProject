@@ -7,9 +7,25 @@ namespace JG
 {
 	enum class EAssetFormat;
 	class DDDGameNode;
+
+	template<class T>
+	class Asset;
 }
 namespace ImGui
 {
+	void Vector4_OnGUI(const std::string& label, JG::JVector4& v, float label_space = 0.0f);
+	void Vector3_OnGUI(const std::string& label, JG::JVector3& v, float label_space = 0.0f);
+	void Vector2_OnGUI(const std::string& label, JG::JVector2& v, float label_space = 0.0f);
+	void Color4_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
+	void Color3_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
+	void Float_OnGUI(const std::string& label, float& f, float label_space = 0.0f);
+	void Int_OnGUI(const std::string& label, int& i, float label_space = 0.0f);
+	void Bool_OnGUI(const std::string& label, bool& b, float label_space = 0.0f);
+	bool AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, std::string& out_path, float label_space = 0.0f);
+
+
+
+
 	void OnGui(const char* label, JG::JVector3* v, float label_spacing = 0.0f);
 	void OnGui(const char* label, JG::JVector2* v, float label_spacing = 0.0f);
 	void OnGui(const char* label, JG::f32* v, float label_spacing = 0.0f);
@@ -18,14 +34,6 @@ namespace ImGui
 
 	bool AssetField(const JG::String& label, const JG::String& inputText, JG::EAssetFormat format, JG::String& out_AssetPath);
 	bool TextureAssetField(JG::u64 textureID,  JG::String& out_Assetpath);
-
-
-
-
-
-
-
-
 
 
 }

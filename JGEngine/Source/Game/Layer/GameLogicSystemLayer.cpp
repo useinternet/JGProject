@@ -95,9 +95,9 @@ namespace JG
 		{
 			List<IJGObject*> exceptObjectList;
 			auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
-			if (inspectorView && inspectorView->GetViewModel())
+			if (inspectorView)
 			{
-				exceptObjectList.push_back(inspectorView->GetViewModel()->GetTargetObject());
+				exceptObjectList.push_back(inspectorView->GetTargetObject());
 			}
 
 

@@ -261,13 +261,13 @@ namespace JG
 		
 		auto location = GetLocalLocation();
 		auto rotation = GetLocalRotation();
-		auto scale = GetLocalScale();
+		auto scale    = GetLocalScale();
 
 
-
-		ImGui::OnGui("Location", &location);
-		ImGui::OnGui("Rotation", &rotation);
-		ImGui::OnGui("Scale", &scale, padding);
+		f32 label_width = ImGui::CalcTextSize("Location").x;
+		ImGui::Vector3_OnGUI("Location", location, label_width);
+		ImGui::Vector3_OnGUI("Rotation", rotation, label_width);
+		ImGui::Vector3_OnGUI("Scale", scale, label_width);
 
 		SetLocalLocation(location);
 		SetLocalRotation(rotation);
