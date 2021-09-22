@@ -123,22 +123,22 @@ namespace JG
 		BaseRenderer::OnInspectorGUI();
 		ImGui::AlignTextToFramePadding();
 		f32 label_width = ImGui::CalcTextSize("Sprite").x;
-		String path;
 
 		ImGui::Color4_OnGUI("Color", mSpriteRI->Color, label_width);
 		if (mSprite)
 		{
-			if (ImGui::AssetField_OnGUI("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path, label_width) == true)
+			ImGui::AssetField_OnGUI("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, [&](const String& path)
 			{
 				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-			}
+			}, label_width);
+
 		}
 		else
 		{
-			if (ImGui::AssetField_OnGUI("Sprite ", "None", EAssetFormat::Texture, path, label_width) == true)
+			ImGui::AssetField_OnGUI("Sprite ", "None", EAssetFormat::Texture, [&](const String& path)
 			{
 				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-			}
+			}, label_width);
 		}
 
 

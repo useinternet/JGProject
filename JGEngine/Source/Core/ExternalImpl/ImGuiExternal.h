@@ -20,9 +20,16 @@ namespace ImGui
 	void Color3_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
 	void Float_OnGUI(const std::string& label, float& f, float label_space = 0.0f);
 	void Int_OnGUI(const std::string& label, int& i, float label_space = 0.0f);
+	void String_OnGUI(const std::string& label, std::string& str, float label_space = 0.0f);
 	void Bool_OnGUI(const std::string& label, bool& b, float label_space = 0.0f);
-	bool AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, std::string& out_path, float label_space = 0.0f);
+	void AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, const std::function<void(const std::string&)>& action, float label_space = 0.0f);
+	void AssetField_List_OnGUI(const std::string& label, JG::List<std::string>& inputTextList, JG::EAssetFormat format, 
+		const std::function<void(int, const std::string&)>& action, const std::function<void()>& add_action, const std::function<void()>& remove_action, float label_space = 0.0f);
 
+
+	void Float_List_OnGUI(const std::string& label, JG::List<float>& f_list, float label_space = 0.0f);
+	void Int_List_OnGUI(const std::string& label, JG::List<int>& i_list, float label_space = 0.0f);
+	void String_List_OnGUI(const std::string& label, JG::List<std::string>& str_list, float label_space = 0.0f);
 
 
 

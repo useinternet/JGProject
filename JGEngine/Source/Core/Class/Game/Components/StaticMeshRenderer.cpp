@@ -129,8 +129,56 @@ namespace JG
 	void StaticMeshRenderer::OnInspectorGUI()
 	{
 		BaseRenderer::OnInspectorGUI();
-		OnInspector_MeshGUI();
-		OnInspector_MaterialGUI();
+
+
+
+
+		f32 label_width = ImGui::CalcTextSize("Materials").x;
+
+
+
+		String inputText = "None";
+		if (mMesh)
+		{
+			inputText = mMesh->GetAssetName();
+		}
+		ImGui::AssetField_OnGUI("Mesh", inputText, EAssetFormat::Mesh, [&](const std::string& path)
+		{
+		}, label_width);
+
+
+
+
+
+
+
+		List<String> inputTextList;
+
+		for (auto& m : mMaterialList)
+		{
+			if (m == nullptr) {
+				inputTextList.push_back("None");
+			}
+			else
+			{
+				inputTextList.push_back(m->GetAssetName());
+			}
+
+	
+		}
+		ImGui::AssetField_List_OnGUI("Materials", inputTextList, EAssetFormat::Material,
+			[&](int index, const std::string& path)
+		{
+			mMaterialList[index] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
+		}, [&]()
+		{
+			mMaterialList.push_back(nullptr);
+		}, [&]()
+		{
+			mMaterialList.pop_back();
+		}, label_width);
+		//OnInspector_MeshGUI();
+		//OnInspector_MaterialGUI();
 	}
 	void StaticMeshRenderer::OnInspector_MeshGUI()
 	{
@@ -147,46 +195,45 @@ namespace JG
 	}
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
 	{
-		String out;
-		String in = "None";
 
 
 
-		auto cnt = mMaterialList.size();
-		bool isOpenTree = ImGui::TreeNodeEx(("Material : " + std::to_string(cnt)).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
-		ImGui::SameLine();
-		if (ImGui::SmallButton("+"))
-		{
-			mMaterialList.push_back(nullptr);
-		}ImGui::SameLine();
-		if (ImGui::SmallButton("-"))
-		{
-			if (mMaterialList.empty() == false)
-			{
-				mMaterialList.pop_back();
-			}
 
-		}
+		//auto cnt = mMaterialList.size();
+		//bool isOpenTree = ImGui::TreeNodeEx(("Material : " + std::to_string(cnt)).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+		//ImGui::SameLine();
+		//if (ImGui::SmallButton("+"))
+		//{
+		//	mMaterialList.push_back(nullptr);
+		//}ImGui::SameLine();
+		//if (ImGui::SmallButton("-"))
+		//{
+		//	if (mMaterialList.empty() == false)
+		//	{
+		//		mMaterialList.pop_back();
+		//	}
+
+		//}
 
 
-		if (isOpenTree)
-		{
-			cnt = mMaterialList.size();
-			for (i32 i = 0; i < cnt; ++i)
-			{
-				String out;
-				String in = "None";
-				if (mMaterialList[i])
-				{
-					in = mMaterialList[i]->GetAssetName();
-				}
+		//if (isOpenTree)
+		//{
+		//	cnt = mMaterialList.size();
+		//	for (i32 i = 0; i < cnt; ++i)
+		//	{
+		//		String out;
+		//		String in = "None";
+		//		if (mMaterialList[i])
+		//		{
+		//			in = mMaterialList[i]->GetAssetName();
+		//		}
 
-				if (ImGui::AssetField("Slot " + std::to_string(i), in, EAssetFormat::Material, out))
-				{
-					mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
-				}
-			}
-			ImGui::TreePop();
-		}
+		//		if (ImGui::AssetField("Slot " + std::to_string(i), in, EAssetFormat::Material, out))
+		//		{
+		//			mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
+		//		}
+		//	}
+		//	ImGui::TreePop();
+		//}
 	}
 }

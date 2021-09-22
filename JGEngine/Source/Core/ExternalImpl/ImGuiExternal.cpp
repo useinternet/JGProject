@@ -256,6 +256,9 @@ namespace ImGui
 		ImGui::InputInt(("##" + label).c_str(), &i);
 		ImGui::Columns(1);
 	}
+	void String_OnGUI(const std::string& label, std::string& str, float label_space)
+	{
+	}
 	void Bool_OnGUI(const std::string& label, bool& b, float label_space)
 	{
 		ImGui::Columns(2, 0, false);
@@ -276,9 +279,8 @@ namespace ImGui
 		ImGui::Columns(1);
 	}
 
-	bool AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, std::string& out_path, float label_space )
+	void AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, const std::function<void(const std::string&)>& action, float label_space )
 	{
-		bool result = false;
 		ImGui::Columns(2, 0, false);
 		ImGui::AlignTextToFramePadding();
 		if (label_space <= 0.0f)
@@ -301,13 +303,216 @@ namespace ImGui
 			auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
 			if (assetFormat == format)
 			{
-				out_path = ddd->FilePath;
-				result = true;
+				action(ddd->FilePath);
 			}
 		});
 
 		ImGui::Columns(1);
-		return result;
+	}
+
+	void AssetField_List_OnGUI(const std::string& label, JG::List<std::string>& inputTextList, JG::EAssetFormat format, 
+		const std::function<void(int, const std::string&)>& action, const std::function<void()>& add_action, const std::function<void()>& remove_action, float label_space)
+	{
+		ImGui::Columns(2, 0, false);
+		ImGui::AlignTextToFramePadding();
+		if (label_space <= 0.0f)
+		{
+			label_space = ImGui::CalcTextSize(label.c_str()).x;
+		}
+
+		if (label_space > 0.0f)
+		{
+			ImGui::SetColumnWidth(0, label_space + (ImGui::GetStyle().ItemSpacing.x * 2));
+		}
+
+		ImGui::Text(label.c_str()); ImGui::SameLine();
+		ImGui::NextColumn();
+		auto cnt = inputTextList.size();
+		bool isOpenTree = ImGui::TreeNodeEx(("##Tree" + label).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+		ImGui::SameLine();
+
+		ImGui::Text(("Size : " + std::to_string(cnt)).c_str()); ImGui::SameLine();
+		if (ImGui::SmallButton("+"))
+		{
+			inputTextList.push_back("None");
+			add_action();
+		}ImGui::SameLine();
+		if (ImGui::SmallButton("-"))
+		{
+			if (inputTextList.empty() == false)
+			{
+				inputTextList.pop_back();
+				remove_action();
+			}
+		}
+
+
+		if (isOpenTree)
+		{
+			cnt = inputTextList.size();
+			for (int i = 0; i < cnt; ++i)
+			{
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
+				ImGui::InputText(("##" + label + std::to_string(i)).c_str(), inputTextList[i].data(), ImGuiInputTextFlags_ReadOnly);
+				JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
+				{
+					auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
+					if (assetFormat == format)
+					{
+						action(i, ddd->FilePath);
+					}
+				});
+			}
+			ImGui::TreePop();
+		}
+
+		ImGui::Columns(1);
+	}
+
+	void Float_List_OnGUI(const std::string& label, JG::List<float>& f_list, float label_space)
+	{
+		ImGui::Columns(2, 0, false);
+		ImGui::AlignTextToFramePadding();
+		if (label_space <= 0.0f)
+		{
+			label_space = ImGui::CalcTextSize(label.c_str()).x;
+		}
+
+		if (label_space > 0.0f)
+		{
+			ImGui::SetColumnWidth(0, label_space + (ImGui::GetStyle().ItemSpacing.x * 2));
+		}
+
+		ImGui::Text(label.c_str()); ImGui::SameLine();
+		ImGui::NextColumn();
+		auto cnt = f_list.size();
+		//bool isOpenTree = ImGui::TreeNodeEx(("##Tree" + label).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+		//ImGui::SameLine();
+
+		ImGui::Text(("Size : " + std::to_string(cnt)).c_str()); ImGui::SameLine();
+
+		//if (ImGui::SmallButton("+"))
+		//{
+		//	f_list.push_back(0.0f);
+		//}ImGui::SameLine();
+		//if (ImGui::SmallButton("-"))
+		//{
+		//	if (f_list.empty() == false)
+		//	{
+		//		f_list.pop_back();
+		//	}
+		//
+		//}
+		//if (isOpenTree)
+		//{
+		//	cnt = f_list.size();
+		//	for (int i = 0; i < cnt; ++i)
+		//	{
+		//		ImGui::AlignTextToFramePadding();
+		//		ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
+		//		ImGui::InputFloat(("##" + label + "input").c_str(), &f_list[i]);
+		//	}
+		//	ImGui::TreePop();
+		//}
+
+		ImGui::Columns(1);
+	}
+
+	void Int_List_OnGUI(const std::string& label, JG::List<int>& i_list, float label_space)
+	{
+		ImGui::Columns(2, 0, false);
+		ImGui::AlignTextToFramePadding();
+		if (label_space <= 0.0f)
+		{
+			label_space = ImGui::CalcTextSize(label.c_str()).x;
+		}
+
+		if (label_space > 0.0f)
+		{
+			ImGui::SetColumnWidth(0, label_space + (ImGui::GetStyle().ItemSpacing.x * 2));
+		}
+		ImGui::Text(label.c_str()); ImGui::SameLine();
+		ImGui::NextColumn();
+
+		auto cnt = i_list.size();
+		bool isOpenTree = ImGui::TreeNodeEx(("##Tree" + label).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+		ImGui::SameLine();
+
+		ImGui::Text(("Size : " + std::to_string(cnt)).c_str()); ImGui::SameLine();
+		if (ImGui::SmallButton("+"))
+		{
+			i_list.push_back(0);
+		}ImGui::SameLine();
+		if (ImGui::SmallButton("-"))
+		{
+			i_list.pop_back();
+		}
+
+
+		if (isOpenTree)
+		{
+			cnt = i_list.size();
+			for (int i = 0; i < cnt; ++i)
+			{
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
+				ImGui::InputInt(("##" + label + "input").c_str(), &i_list[i]);
+			}
+			ImGui::TreePop();
+		}
+
+		ImGui::Columns(1);
+	}
+
+	void String_List_OnGUI(const std::string& label, JG::List<std::string>& str_list, float label_space)
+	{
+		ImGui::Columns(2, 0, false);
+		ImGui::AlignTextToFramePadding();
+		if (label_space <= 0.0f)
+		{
+			label_space = ImGui::CalcTextSize(label.c_str()).x;
+		}
+
+		if (label_space > 0.0f)
+		{
+			ImGui::SetColumnWidth(0, label_space + (ImGui::GetStyle().ItemSpacing.x * 2));
+		}
+		ImGui::Text(label.c_str()); ImGui::SameLine();
+		ImGui::NextColumn();
+
+		auto cnt = str_list.size();
+		bool isOpenTree = ImGui::TreeNodeEx(("##Tree" + label).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+		ImGui::SameLine();
+
+		ImGui::Text(("Size : " + std::to_string(cnt)).c_str()); ImGui::SameLine();
+		if (ImGui::SmallButton("+"))
+		{
+			str_list.push_back("");
+		}ImGui::SameLine();
+		if (ImGui::SmallButton("-"))
+		{
+			str_list.pop_back();
+		}
+
+
+		if (isOpenTree)
+		{
+			cnt = str_list.size();
+			for (int i = 0; i < cnt; ++i)
+			{
+				JG::String str = str_list[i];
+				str.resize(512);
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
+				ImGui::InputText(("##" + label + "input").c_str(), str.data(), 512);
+				str_list[i] = str;
+
+			}
+			ImGui::TreePop();
+		}
+
+		ImGui::Columns(1);
 	}
 
 
