@@ -334,25 +334,34 @@ namespace JG
 					else t->SetTextureInfo(mainTexInfo);
 					
 				}
-				//return EScheduleResult::Continue;
 			}
 		}
 
-		RenderInfo info; auto mainCam = mMainCamera->pCamera;
-		info.CurrentBufferIndex = mMainCamera->CurrentIndex;
-		info.Resolutoin			= mMainCamera->pCamera->GetResolution();
-		info.ViewProj    = mMainCamera->pCamera->GetViewProjMatrix();
-		info.EyePosition = mMainCamera->pCamera->GetOwner()->GetTransform()->GetWorldLocation();
-		info.TargetTexture		= mMainCamera->TargetTextures[info.CurrentBufferIndex];
-		info.TargetDepthTexture = mMainCamera->TargetDepthTextures[info.CurrentBufferIndex];
-		info.TargetTexture->SetClearColor(mainCam->GetClearColor());
+		SharedPtr<RenderInfo> info = CreateSharedPtr<RenderInfo>(); auto mainCam = mMainCamera->pCamera;
+		info->CurrentBufferIndex = mMainCamera->CurrentIndex;
+		info->Resolutoin			= mMainCamera->pCamera->GetResolution();
+		info->ViewProj    = mMainCamera->pCamera->GetViewProjMatrix();
+		info->EyePosition = mMainCamera->pCamera->GetOwner()->GetTransform()->GetWorldLocation();
+		info->TargetTexture		= mMainCamera->TargetTextures[info->CurrentBufferIndex];
+		info->TargetDepthTexture = mMainCamera->TargetDepthTextures[info->CurrentBufferIndex];
+		info->TargetTexture->SetClearColor(mainCam->GetClearColor());
 		mMainCamera->ChangeRenderer();
 
 		mIsRenderCompelete = false;
-		Scheduler::GetInstance().ScheduleAsync([&](void* data)
+		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
 		{
+			
+			if (userData->Is<RenderInfo>() == false)
+			{
+				mIsRenderCompelete = true;
+				return;
+			}
+			userData->As<RenderInfo>();
+			auto data = static_cast<RenderInfo*>(userData.get());
+			
+
 			mMainCamera->Renderer->SetCommandID(1);
-			if (mMainCamera->Renderer->Begin(*(RenderInfo*)data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
+			if (mMainCamera->Renderer->Begin(*data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
 			{
 				for (auto& _pair : mPushedRenderItems)
 				{
@@ -367,7 +376,7 @@ namespace JG
 				mMainCamera->Renderer->End();
 				mIsRenderCompelete = true;
 			}
-		}, & info, sizeof(RenderInfo));
+		},info);
 
 		mMainCamera->CurrentIndex = (mMainCamera->CurrentIndex + 1) % fmBufferCnt;
 		{

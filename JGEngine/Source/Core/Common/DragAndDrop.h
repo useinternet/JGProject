@@ -12,9 +12,6 @@ namespace JG
 	class IDragAndDropData : public IJGObject
 	{
 		JGCLASS
-	private:
-		List<jbyte> mByteData;
-		u64 mOffset = 0;
 	public:
 		virtual void GetData(List<jbyte>& byteData) = 0;
 		virtual void SetData(void* data) = 0;

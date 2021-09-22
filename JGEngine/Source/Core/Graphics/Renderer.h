@@ -17,8 +17,10 @@ namespace JG
 
 
 
-	struct RenderInfo
+	class RenderInfo : public IJGObject
 	{
+		JGCLASS
+	public:
 		SharedPtr<ITexture> TargetTexture;
 		SharedPtr<ITexture> TargetDepthTexture;
 		JVector2 Resolutoin;

@@ -1,24 +1,44 @@
 #pragma once
 #include "JGCore.h"
-
+#include "Class/Global/Scheduler.h"
 
 namespace JG
 {
+	class ScheduleHandle;
 	class TaskController
 	{
+
 		struct Task
 		{
-			i32 Switch = 0;
-			std::function<void()> Function;
+			i32 ID = 0;
+			std::function<void(SharedPtr<IJGObject>)> Ready;
+			std::function<void(SharedPtr<IJGObject>)> Run;
+			std::function<i32(SharedPtr<IJGObject>)>  Next;
+			
+			SharedPtr<ScheduleHandle> Handle;
 		};
+		Dictionary<i32, Task> mTaskPool;
+		SharedPtr<IJGObject> mUserData;
+		i32 mStartTaskID = -1;
+		i32 mCurrTaskID  = -1;
+		u64 mPriority = 0;
+
+		std::atomic_bool mIsRun = false;
+	public:
+		~TaskController();
+	public:
+		void AddTask(u32 id, 
+			const std::function<void(SharedPtr<IJGObject>)>& readyTask, 
+			const std::function<void(SharedPtr<IJGObject>)>& runTask, 
+			const std::function<i32(SharedPtr<IJGObject>)>& nextTask);
+		void SetPriority(u64 priority);
+		void SetStartID(i32 startTaskID);
+		void SetUserData(SharedPtr<IJGObject> userData);
+		bool IsRun() const;
+		void Run();
+		void Reset();
 	private:
-		i32 mTaskSwitch = 0;
-		List<Task> mTaskList;
-	public:
-		void AddTask(i32 _switch, const std::function<void()>& taskFunction);
-		void SwitchOn(i32 _switch);
-		void SwitchOff(i32 _switch);
-	public:
-		void Update();
+		bool IsExistTask(i32 taskID) const;
 	};
+
 }

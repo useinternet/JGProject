@@ -273,24 +273,9 @@ namespace JG
 		ImGui::Vector3_OnGUI("Rotation", rotation, label_width);
 		ImGui::Vector3_OnGUI("Scale", scale, label_width);
 
-		static List<float> testList;
-		ImGui::Float_List_OnGUI("12345", testList, label_width);
-
-
 		SetLocalLocation(location);
 		SetLocalRotation(rotation);
 		SetLocalScale(scale);
-
-
-
-		//static List<float> fList;
-		//static List<int> iList;
-		//static List<String> sList;
-
-
-		//ImGui::Float_List_OnGUI("FloatList", fList);
-		//ImGui::Int_List_OnGUI("IntList", iList);
-		//ImGui::String_List_OnGUI("StringList", sList);
 	}
 	void Transform::OnChange(const ChangeData& data)
 	{

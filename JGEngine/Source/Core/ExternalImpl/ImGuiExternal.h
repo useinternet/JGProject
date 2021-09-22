@@ -8,18 +8,27 @@ namespace JG
 	enum class EAssetFormat;
 	class DDDGameNode;
 
+	class IAsset;
 	template<class T>
 	class Asset;
 }
 namespace ImGui
 {
+	std::string GetUniqueID(const std::string& str, JG::u64 uID = -1);
 	void Vector4_OnGUI(const std::string& label, JG::JVector4& v, float label_space = 0.0f);
 	void Vector3_OnGUI(const std::string& label, JG::JVector3& v, float label_space = 0.0f);
 	void Vector2_OnGUI(const std::string& label, JG::JVector2& v, float label_space = 0.0f);
+	void Vector4Int_OnGUI(const std::string& label, JG::JVector4Int& v, float label_space = 0.0f);
+	void Vector3Int_OnGUI(const std::string& label, JG::JVector3Int& v, float label_space = 0.0f);
+	void Vector2Int_OnGUI(const std::string& label, JG::JVector2Int& v, float label_space = 0.0f);
+	void Vector4Uint_OnGUI(const std::string& label, JG::JVector4Uint& v, float label_space = 0.0f);
+	void Vector3Uint_OnGUI(const std::string& label, JG::JVector3Uint& v, float label_space = 0.0f);
+	void Vector2Uint_OnGUI(const std::string& label, JG::JVector2Uint& v, float label_space = 0.0f);
 	void Color4_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
 	void Color3_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
 	void Float_OnGUI(const std::string& label, float& f, float label_space = 0.0f);
 	void Int_OnGUI(const std::string& label, int& i, float label_space = 0.0f);
+	void Uint_OnGUI(const std::string& label, JG::u32& i, float label_space = 0.0f);
 	void String_OnGUI(const std::string& label, std::string& str, float label_space = 0.0f);
 	void Bool_OnGUI(const std::string& label, bool& b, float label_space = 0.0f);
 	void AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, const std::function<void(const std::string&)>& action, float label_space = 0.0f);
@@ -32,17 +41,7 @@ namespace ImGui
 	void String_List_OnGUI(const std::string& label, JG::List<std::string>& str_list, float label_space = 0.0f);
 
 
-
-	void OnGui(const char* label, JG::JVector3* v, float label_spacing = 0.0f);
-	void OnGui(const char* label, JG::JVector2* v, float label_spacing = 0.0f);
-	void OnGui(const char* label, JG::f32* v, float label_spacing = 0.0f);
-	void OnGui(const char* label, JG::i32* v, float label_spacing = 0.0f);
-
-
-	bool AssetField(const JG::String& label, const JG::String& inputText, JG::EAssetFormat format, JG::String& out_AssetPath);
-	bool TextureAssetField(JG::u64 textureID,  JG::String& out_Assetpath);
-
-
+	JG::SharedPtr<JG::IAsset> Texture_OnGUI(const std::string& label, JG::u64 textureID, float label_space = 0.0f);
 }
 namespace JG
 {

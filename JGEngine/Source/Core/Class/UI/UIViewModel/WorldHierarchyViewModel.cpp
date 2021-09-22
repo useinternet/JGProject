@@ -16,9 +16,9 @@ namespace JG
 
 	void WorldHierarchyViewModel::Initialize()
 	{
-		RequestGetGameWorldEvent e;
-		SendEventImmediate(e);
-		mGameWorld = e.GameWorld;
+		//RequestGetGameWorldEvent e;
+		//SendEventImmediate(e);
+		//mGameWorld = e.GameWorld;
 
 		CreateEmptyObject = CreateUniquePtr<Command<>>();
 		CreateEmptyObject->Subscribe(this, [&]()

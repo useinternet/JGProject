@@ -209,7 +209,7 @@ namespace JG
 	}
 	void ContentsViewModel::SelectedAssetFile(const String& path)
 	{
-		if (mSelectedAssetPath == path)
+	/*	if (mSelectedAssetPath == path)
 		{
 			return;
 		}
@@ -218,7 +218,7 @@ namespace JG
 		mSelectedAssetPath = path;
 		NotifySelectedAssetInEditorEvent e;
 		e.SelectedAsset = AssetDataBase::GetInstance().LoadOriginAsset(mSelectedAssetPath);
-		SendEvent(e);
+		SendEvent(e);*/
 	}
 	void ContentsViewModel::ForEeach(ContentsDirectoryNode* CurrNode, const std::function<bool(ContentsDirectoryNode*)>& pushAction, const std::function<void(ContentsDirectoryNode*)>& action, const std::function<void(ContentsDirectoryNode*)>& popAction)
 	{

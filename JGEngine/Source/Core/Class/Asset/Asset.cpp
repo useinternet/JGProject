@@ -251,7 +251,13 @@ namespace JG
 		auto material = targetAsset->Get();
 		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
 		auto json = CreateSharedPtr<Json>();
+		f32 label_space = 0.0f;
 
+		for (auto& property : propertyList)
+		{
+			auto name = property.second;
+			label_space = std::max<f32>(label_space, ImGui::CalcTextSize(name.c_str()).x);
+		}
 		// Property Settings
 		for (auto& property : propertyList)
 		{
@@ -267,10 +273,8 @@ namespace JG
 			{
 				i32 value = 0;
 				material->GetInt(name, &value);
-				if (ImGui::InputInt(imguiID.c_str(), &value) == true)
-				{
-					material->SetInt(name, value);
-				}
+				ImGui::Int_OnGUI(name, value, label_space);
+				material->SetInt(name, value);
 				dataJson->SetInt32(value);
 			}
 				break;
@@ -278,10 +282,8 @@ namespace JG
 			{
 				JVector2Int value = 0;
 				material->GetInt2(name, &value);
-				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetInt2(name, value);
-				}
+				ImGui::Vector2Int_OnGUI(name, value, label_space);
+				material->SetInt2(name, value);
 				dataJson->SetVector2Int(value);
 			}
 				break;
@@ -289,10 +291,8 @@ namespace JG
 			{
 				JVector3Int value = 0;
 				material->GetInt3(name, &value);
-				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetInt3(name, value);
-				}
+				ImGui::Vector3Int_OnGUI(name, value, label_space);
+				material->SetInt3(name, value);
 				dataJson->SetVector3Int(value);
 			}
 				break;
@@ -300,10 +300,8 @@ namespace JG
 			{
 				JVector4Int value = 0;
 				material->GetInt4(name, &value);
-				if (ImGui::InputInt4(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetInt4(name, value);
-				}
+				ImGui::Vector4Int_OnGUI(name, value, label_space);
+				material->SetInt4(name, value);
 				dataJson->SetVector4Int(value);
 			}
 				break;
@@ -311,10 +309,8 @@ namespace JG
 			{
 				u32 value = 0;
 				material->GetUint(name, &value);
-				if (ImGui::InputInt(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetUint(name, value);
-				}
+				ImGui::Uint_OnGUI(name, value, label_space);
+				material->SetUint(name, value);
 				dataJson->SetUint32(value);
 			}
 				break;
@@ -322,10 +318,8 @@ namespace JG
 			{
 				JVector2Uint value;
 				material->GetUint2(name, &value);
-				if (ImGui::InputInt2(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetUint2(name, value);
-				}
+				ImGui::Vector2Uint_OnGUI(name, value, label_space);
+				material->SetUint2(name, value);
 				dataJson->SetVector2Uint(value);
 			}
 				break;
@@ -333,10 +327,8 @@ namespace JG
 			{
 				JVector3Uint value;
 				material->GetUint3(name, &value);
-				if (ImGui::InputInt3(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetUint3(name, value);
-				}
+				ImGui::Vector3Uint_OnGUI(name, value, label_space);
+				material->SetUint3(name, value);
 				dataJson->SetVector3Uint(value);
 			}
 				break;
@@ -344,10 +336,8 @@ namespace JG
 			{
 				JVector4Uint value;
 				material->GetUint4(name, &value);
-				if (ImGui::InputInt4(imguiID.c_str(), (i32*)&value) == true)
-				{
-					material->SetUint4(name, value);
-				}
+				ImGui::Vector4Uint_OnGUI(name, value, label_space);
+				material->SetUint4(name, value);
 				dataJson->SetVector4Uint(value);
 			}
 				break;
@@ -356,10 +346,8 @@ namespace JG
 				
 				f32 value;
 				material->GetFloat(name, &value);
-				if (ImGui::SliderFloat(imguiID.c_str(), &value, 0.0f, 1.0f) == true)
-				{
-					material->SetFloat(name, value);
-				}
+				ImGui::Float_OnGUI(name, value, label_space);
+				material->SetFloat(name, value);
 				dataJson->SetFloat(value);
 			}
 				break;
@@ -367,10 +355,8 @@ namespace JG
 			{
 				JVector2 value;
 				material->GetFloat2(name, &value);
-				if (ImGui::InputFloat2(imguiID.c_str(), (f32*)&(value)) == true)
-				{
-					material->SetFloat2(name, value);
-				}
+				ImGui::Vector2_OnGUI(name, value, label_space);
+				material->SetFloat2(name, value);
 				dataJson->SetVector2(value);
 			}
 				break;
@@ -378,10 +364,8 @@ namespace JG
 			{
 				JVector3 value;
 				material->GetFloat3(name, &value);
-				if (ImGui::SliderFloat3(imguiID.c_str(), (f32*)&(value), 0.0f, 1.0f) == true)
-				{
-					material->SetFloat3(name, value);
-				}
+				ImGui::Vector3_OnGUI(name, value, label_space);
+				material->SetFloat3(name, value);
 				dataJson->SetVector3(value);
 			}
 				break;
@@ -389,10 +373,8 @@ namespace JG
 			{
 				JVector4 value;
 				material->GetFloat4(name, &value);
-				if (ImGui::InputFloat4(imguiID.c_str(), (float*)&(value)) == true)
-				{
-					material->SetFloat4(name, value);
-				}
+				ImGui::Vector4_OnGUI(name, value, label_space);
+				material->SetFloat4(name, value);
 				dataJson->SetVector4(value);
 			}
 				break;
@@ -408,16 +390,20 @@ namespace JG
 					textureID = texture->GetTextureID();
 					textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
 				}
-				String texturePath;
-				if (ImGui::TextureAssetField(textureID, texturePath) == true)
+
+				auto asset = ImGui::Texture_OnGUI(name, textureID, label_space);
+
+
+				if (asset && asset->Is<Asset<ITexture>>())
 				{
-					auto asset    = AssetDataBase::GetInstance().LoadOriginAsset(texturePath);
-					auto tAsset   = asset->As<ITexture>();
-					if (tAsset)
+					auto tasset = asset->As<Asset<ITexture>>();
+					if (tasset->IsValid())
 					{
-						material->SetTexture(name, 0, tAsset->Get());
+						material->SetTexture(name, 0, tasset->Get());
+						texture = tasset->Get();
 					}
 				}
+
 				if (texture != nullptr)
 				{
 					dataJson->SetString(texture->GetName());
@@ -540,7 +526,7 @@ namespace JG
 	
 		auto assetID   = RequestOriginAssetID(resourcePath);
 		auto assetData = CreateUniquePtr<AssetData>();
-		AssetLoadData assetLoadData;
+		SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
 
 		assetData->ID       = assetID;
 		assetData->State    = EAssetDataState::Loading;
@@ -549,9 +535,9 @@ namespace JG
 		auto result = assetData->Asset;
 
 
-		assetLoadData.ID	= assetID;
-		assetLoadData.Asset = assetData->Asset;
-		strcpy(assetLoadData.Path, absolutePath.c_str());
+		assetLoadData->ID	= assetID;
+		assetLoadData->Asset = assetData->Asset;
+		strcpy(assetLoadData->Path, absolutePath.c_str());
 
 		// 에셋 추가
 		mOriginAssetDataPool.emplace(resourcePath, assetData.get());
@@ -584,10 +570,10 @@ namespace JG
 		assetData->Path  = resourcePath;
 		assetData->Asset = CreateAsset(assetRWID, absolutePath);
 		auto result = assetData->Asset;
-		AssetLoadData assetLoadData;
-		assetLoadData.ID    = assetRWID;
-		assetLoadData.Asset = assetData->Asset;
-		strcpy(assetLoadData.Path, absolutePath.c_str());
+		SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
+		assetLoadData->ID    = assetRWID;
+		assetLoadData->Asset = assetData->Asset;
+		strcpy(assetLoadData->Path, absolutePath.c_str());
 
 
 
@@ -641,10 +627,10 @@ namespace JG
 
 			auto originAssetData = mAssetDataPool[originID].get();
 
-			AssetLoadData assetLoadData;
-			assetLoadData.ID = originAssetData->ID;
-			assetLoadData.Asset = originAssetData->Asset;
-			strcpy(assetLoadData.Path, (originAssetData->Asset->GetAssetFullPath()).c_str());
+			SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
+			assetLoadData->ID = originAssetData->ID;
+			assetLoadData->Asset = originAssetData->Asset;
+			strcpy(assetLoadData->Path, (originAssetData->Asset->GetAssetFullPath()).c_str());
 			mLoadAssetDataQueue.push(assetLoadData);
 
 		}
@@ -661,10 +647,10 @@ namespace JG
 				garbageAssetList.push_back(assetID);
 			};
 			auto rwAssetData = mAssetDataPool[assetID].get();
-			AssetLoadData assetLoadData;
-			assetLoadData.ID    = rwAssetData->ID;
-			assetLoadData.Asset = rwAssetData->Asset;
-			strcpy(assetLoadData.Path, (rwAssetData->Asset->GetAssetFullPath()).c_str());
+			SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
+			assetLoadData->ID    = rwAssetData->ID;
+			assetLoadData->Asset = rwAssetData->Asset;
+			strcpy(assetLoadData->Path, (rwAssetData->Asset->GetAssetFullPath()).c_str());
 			mLoadAssetDataQueue.push(assetLoadData);
 		}
 
@@ -746,7 +732,7 @@ namespace JG
 		{
 			StaticMeshAssetStock stock;
 			stock.LoadJson(assetVal);
-			auto mAsset = LoadData->Asset->As<IMesh>();
+			auto mAsset = LoadData->Asset->As<Asset<IMesh>>();
 			if (mAsset != nullptr)
 			{
 				mAsset->mData->SetMeshStock(stock);
@@ -761,7 +747,7 @@ namespace JG
 			auto shader = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
 			if (shader != nullptr)
 			{
-				auto materialAsset = LoadData->Asset->As<IMaterial>();
+				auto materialAsset = LoadData->Asset->As<Asset<IMaterial>>();
 				if (materialAsset == nullptr)
 				{
 					return false;
@@ -966,12 +952,12 @@ namespace JG
 			if (mAyncLoadAssetHandleList[loopCnt] == nullptr)
 			{
 				auto loadData = mLoadAssetDataQueue.front(); mLoadAssetDataQueue.pop();
-				JG_CORE_INFO("Asset Loading... : {0}", loadData.Path);
+				JG_CORE_INFO("Asset Loading... : {0}", loadData->Path);
 				mAyncLoadAssetHandleList[loopCnt] = Scheduler::GetInstance().ScheduleAsync(
-					[&](void* userData)
+					[&](SharedPtr<IJGObject> userData)
 				{
-					bool result = LoadAssetInternal((AssetLoadData*)userData);
-					AssetLoadData* _LoadData = (AssetLoadData*)userData;
+					bool result = LoadAssetInternal(userData->As<AssetLoadData>());
+					AssetLoadData* _LoadData = userData->As<AssetLoadData>();
 					AssetLoadCompeleteData data;
 					data.ID = _LoadData->ID;
 					if (result)
@@ -985,7 +971,7 @@ namespace JG
 						mLoadCompeleteAssetDataQueue.push(data);
 					}
 
-				}, &loadData, sizeof(AssetLoadData));
+				}, loadData);
 			}
 			if(mAyncLoadAssetHandleList[loopCnt] && mAyncLoadAssetHandleList[loopCnt]->GetState() == EScheduleState::Compelete)
 			{

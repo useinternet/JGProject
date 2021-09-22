@@ -30,7 +30,8 @@ namespace JG
 			Task_Import = 0x00008,
 			Task_OpenContextMenu = 0x00010,
 			Task_ColumnInit = 0x00020,
-			Task_ShowProgressBar = 0x00040
+			Task_ShowProgressBar = 0x00040,
+			Task_CloseProgressBar = 0x00080,
 		};
 		enum
 		{

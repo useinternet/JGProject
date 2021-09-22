@@ -7,12 +7,18 @@
 namespace JG
 {
 
+	class GameWorld;
 	class WorldHierarchyView : public UIView<WorldHierarchyViewModel>
 	{
 		JGCLASS
 
 		bool mOpenGUI = true;
-		WorldHierarchyViewModel* mVm = nullptr;
+		GameWorld* mGameWorld = nullptr;
+
+
+
+
+		//WorldHierarchyViewModel* mVm = nullptr;
 	public:
 		WorldHierarchyView();
 		virtual ~WorldHierarchyView() = default;
@@ -21,8 +27,15 @@ namespace JG
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
 		virtual void Destroy() override;
+		virtual void OnEvent(IEvent& e) override;
 	private:
-		void UpdateDragAndDrop(GameNode* targetNode);
+		void GameNode_OnGUI(GameNode* gameNode);
+	private:
+		bool ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e);
+		bool ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e);
+		bool ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e);
+	//private:
+	//	void UpdateDragAndDrop(GameNode* targetNode);
 	};
 
 }

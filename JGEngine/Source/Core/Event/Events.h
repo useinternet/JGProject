@@ -177,11 +177,11 @@ private: \
 	NOTIFY_ONE_ARG_EVENT(NotifyDestroyJGObjectEvent, IJGObject*, DestroyedObject, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<ITexture>, SceneTexture, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0,0))
+	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0, 0))
 	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, SharedPtr<IAsset>, SelectedAsset, nullptr)
-		
-	REQUEST_ONE_ARG_EVENT(RequestGetGameWorldEvent, GameWorld*, GameWorld, nullptr)
+	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, String, SelectedAssetPath, "")
+
+	REQUEST_ONE_ARG_EVENT(RequestImportGameWorldEvent, String, AssetPath, "")
 	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestPushLightItemEvent, SharedPtr<ILightItem>, LightItem, nullptr)
 	REQUEST_ONE_ARG_EVENT(RequestRegisterCameraEvent, Camera*, pCamera, nullptr)

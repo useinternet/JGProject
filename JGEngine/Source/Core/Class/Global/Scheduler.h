@@ -50,9 +50,13 @@ namespace JG
 		Break,
 	};
 
+	
+
+
 	class Timer;
 	class Application;
 	class Scheduler;
+
 	class ScheduleHandle
 	{
 		friend Scheduler;
@@ -60,6 +64,7 @@ namespace JG
 		u64 mID = 0;
 		EScheduleState mState;
 		EScheduleType  mType;
+		SharedPtr<IJGObject> mUserData = nullptr;
 	private:
 		ScheduleHandle(const ScheduleHandle& copy) = delete;
 		ScheduleHandle& operator=(const ScheduleHandle& copy) = delete;
@@ -78,11 +83,19 @@ namespace JG
 		}
 		bool IsValid() const;
 		void Reset();
-	public:
-		void* UserData = nullptr;
+		SharedPtr<IJGObject> GetUserData() const {
+			return mUserData;
+		}
 	};
+
+
+
+
+
 	using SyncTaskFunction  = std::function<EScheduleResult()>;
-	using AsyncTaskFunction = std::function<void(void*)>;
+	using SyncTaskUserDataFunction = std::function<EScheduleResult(SharedPtr<IJGObject> userData)>;
+	using AsyncTaskFunction = std::function<void()>;
+	using AsyncTaskUserDataFunction = std::function<void(SharedPtr<IJGObject> userData)>;
 	// Worker 를 생성하여 스케쥴 작성
 	class Scheduler : public GlobalSingleton<Scheduler>
 	{
@@ -97,6 +110,7 @@ namespace JG
 			u64 ID = SCHEDULE_NULL_ID;
 			i32 Repeat = 0;
 			i32 Priority = 0;
+			SyncTaskUserDataFunction UserDataFunction;
 			SyncTaskFunction Function;
 			i32 CallCount = 0;
 		public:
@@ -133,6 +147,7 @@ namespace JG
 		struct AsyncTask
 		{
 			SharedPtr<ScheduleHandle> Handle;
+			AsyncTaskUserDataFunction UserDataFunction;
 			AsyncTaskFunction Function;
 			void SetState(EScheduleState State) {
 				Handle->mState = State;
@@ -171,8 +186,18 @@ namespace JG
 		SharedPtr<ScheduleHandle> ScheduleOnce(f32 delay, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleByFrame(i32 delayFrame, i32 frameCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleOnceByFrame(i32 delayFrame, i32 priority, const SyncTaskFunction& task);
-		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task, void* userData = nullptr, u64 dataSize = 0);
 
+
+		SharedPtr<ScheduleHandle> Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData);
+		SharedPtr<ScheduleHandle> ScheduleOnce(f32 delay, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData);
+		SharedPtr<ScheduleHandle> ScheduleByFrame(i32 delayFrame, i32 frameCycle, i32 repeat, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData);
+		SharedPtr<ScheduleHandle> ScheduleOnceByFrame(i32 delayFrame, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData);
+
+
+
+
+		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task);
+		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData = nullptr);
 
 		void FlushAsyncTask(bool isRestart = true);
 		const Timer* GetScheduleTimer() const;

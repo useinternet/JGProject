@@ -57,7 +57,6 @@ namespace JG
 
 		List<Asset<ITexture>*>        mIcons;
 		UniquePtr<Command<GameNode*>> mShowGizmo;
-		TaskController mTaskController;
 
 
 		i32 mCurrentGizmoOperation = 0;

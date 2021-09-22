@@ -224,30 +224,13 @@ namespace JG
 
 	class IAsset : public IJGObject
 	{
+		JGCLASS
 	public:
 		virtual AssetID GetAssetID() const = 0;
 		virtual const String& GetAssetFullPath() const = 0;
 		virtual const String& GetAssetPath() const     = 0;
 		virtual const String& GetAssetName() const     = 0;
 		virtual const String& GetExtension() const = 0;
-
-	public:
-		template<class T>
-		Asset<T>* As() {
-			if (Is<T>())
-			{
-				return static_cast<Asset<T>*>(this);
-			}
-			else
-			{
-				return nullptr;
-			}
-		}
-
-		template<class T>
-		bool Is() {
-			return GetType() == JGTYPE(Asset<T>);
-		}
 	public:
 		virtual ~IAsset() = default;
 	private:
@@ -316,6 +299,9 @@ namespace JG
 		{
 			return mExtension;
 		}
+		bool IsValid() const {
+			return Get() != nullptr && Get()->IsValid();
+		}
 		SharedPtr<T> Get() const {
 			return mData;
 		}
@@ -358,8 +344,10 @@ namespace JG
 		};
 		// 로딩중인 에셋 데이터
 		struct AssetLoadCompeleteData;
-		struct AssetLoadData
+		class AssetLoadData : public IJGObject
 		{
+			JGCLASS
+		public:
 			AssetID ID;
 			char Path[256] = { 0, };
 			SharedPtr<IAsset> Asset = nullptr;
@@ -390,7 +378,7 @@ namespace JG
 		Dictionary<String, AssetData*>			  mOriginAssetDataPool;
 
 		// 현재 로딩/언로드 중인 에셋 데이터 
-		Queue<AssetLoadData>   mLoadAssetDataQueue;
+		Queue<SharedPtr<AssetLoadData>>   mLoadAssetDataQueue;
 		Queue<AssetLoadCompeleteData>   mLoadCompeleteAssetDataQueue;
 		Queue<AssetUnLoadData> mUnLoadAssetDataQueue;
 

@@ -381,6 +381,14 @@ namespace JG
 		bool isSelected = treeNodeState->IsState(NodeState_Selected);
 		bool isRenmaing = treeNodeState->IsState(NodeState_Renaming);
 		isItemClick = ImGui::Selectable(id.c_str(), &isSelected, ImGuiSelectableFlags_AllowItemOverlap, ImVec2(mFileCellSize.x, mFileCellSize.y));
+		if (isItemClick && format != EAssetFormat::Directory && format != EAssetFormat::GameWorld)
+		{
+			NotifySelectedAssetInEditorEvent e;
+			e.SelectedAssetPath = filePath;
+			SendEvent(e);
+		}
+
+
 
 		DragAndDropSource<DDDContentsFile>([&](DDDContentsFile* ddd)
 		{
@@ -602,7 +610,7 @@ namespace JG
 
 
 
-		mAsyncUpdateDirectory.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&](void* userData)
+		mAsyncUpdateDirectory.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 		{
 			mAsyncUpdateDirectory.ThreadData = CreateUniquePtr<ThreadData_UpdateDirectory>();
 			Async_UpdateAssetDirectory();
@@ -615,13 +623,14 @@ namespace JG
 		{
 			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData(mProgressBarTitle));
 		}
-		else
+		if(mTaskFlags & Task_CloseProgressBar)
 		{
 			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 			if (progressBar->IsOpen())
 			{
 				progressBar->Close();
 			}
+			mTaskFlags &= ~Task_CloseProgressBar;
 		}
 		// 복사 
 		if (mAsyncUpdatePaste.ThreadTaskHandle == nullptr && mTaskFlags & Task_Paste)
@@ -634,7 +643,7 @@ namespace JG
 			mTaskFlags &= ~Task_Move;
 			mTaskFlags |= Task_ShowProgressBar;
 			mCopyOrMoveFileList.clear();
-			mAsyncUpdatePaste.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&](void* userData)
+			mAsyncUpdatePaste.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
 				// Copy 나 Move 시작
 				std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
@@ -723,6 +732,7 @@ namespace JG
 		{
 			mAsyncUpdatePaste.ThreadTaskHandle = nullptr;
 			mTaskFlags &= ~Task_ShowProgressBar;
+			mTaskFlags |= Task_CloseProgressBar;
 		}
 
 
@@ -735,7 +745,7 @@ namespace JG
 			mProgressBarTitle = "Import";
 
 
-			mAsyncUpdatePaste.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&](void* userData)
+			mAsyncUpdatePaste.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
 				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 				i32 total = mAsyncUpdateImport.ThreadData->ImportFileList.size();
@@ -756,6 +766,7 @@ namespace JG
 		{
 			mAsyncUpdateImport.ThreadTaskHandle = nullptr;
 			mTaskFlags &= ~Task_ShowProgressBar;
+			mTaskFlags |= Task_CloseProgressBar;
 		}
 	}
 
@@ -765,6 +776,13 @@ namespace JG
 		{
 		case EAssetFormat::Directory:
 			SetTargetDirectory(path);
+			break;
+		case EAssetFormat::GameWorld:
+		{
+			RequestImportGameWorldEvent e;
+			e.AssetPath = path;
+			SendEvent(e);
+		}
 			break;
 		}
 
@@ -833,13 +851,6 @@ namespace JG
 		}
 		mDirectoryHistory.push_back(path);
 		mHistroyIndex = ((i32)mDirectoryHistory.size() - 1);
-
-		//for (auto& t : mTextureAssetPool)
-		//{
-		//	AssetDataBase::GetInstance().UnLoadAsset(t.second->GetAssetID());
-		//}
-		//mTextureAssetPool.clear();
-
 	}
 	void ContentsView::PrevTargetDirectory()
 	{
@@ -1204,10 +1215,10 @@ namespace JG
 				if (iter == mTextureAssetPool.end())
 				{
 					auto asset = AssetDataBase::GetInstance().LoadOriginAsset(filePath);
-					if (asset && asset->Is<ITexture>())
+					if (asset && asset->Is<Asset<ITexture>>())
 					{
 						mAssetPool.push_back(asset);
-						mTextureAssetPool.emplace(filePath, asset->As<ITexture>());
+						mTextureAssetPool.emplace(filePath, asset->As<Asset<ITexture>>());
 					}
 				}
 

@@ -182,16 +182,16 @@ namespace JG
 	}
 	void StaticMeshRenderer::OnInspector_MeshGUI()
 	{
-		String out;
-		String in = "None";
-		if (mMesh)
-		{
-			in = mMesh->GetAssetName();
-		}
-		if (ImGui::AssetField("Mesh    ", in, EAssetFormat::Mesh, out))
-		{
-			mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(out);
-		}
+		//String out;
+		//String in = "None";
+		//if (mMesh)
+		//{
+		//	in = mMesh->GetAssetName();
+		//}
+		//if (ImGui::AssetField("Mesh    ", in, EAssetFormat::Mesh, out))
+		//{
+		//	mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(out);
+		//}
 	}
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
 	{

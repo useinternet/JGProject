@@ -139,10 +139,15 @@ namespace JG
 	}
 	bool InspectorView::ResponseSelectedAssetInEditor(NotifySelectedAssetInEditorEvent& e)
 	{
-		if (e.SelectedAsset != nullptr)
+		if (fs::exists(e.SelectedAssetPath) == false) return false;
+
+		
+		auto asset = AssetDataBase::GetInstance().LoadOriginAsset(e.SelectedAssetPath);
+		
+		if (asset != nullptr)
 		{
-			mAssetInstance = e.SelectedAsset;
-			SetTargetObject(e.SelectedAsset.get());
+			mAssetInstance = asset;
+			SetTargetObject(mAssetInstance.get());
 		}
 		return false;
 	}

@@ -17,10 +17,9 @@ namespace JG
         {
             Scheduler::GetInstance().RemoveSchedule(*this);
             mID = Scheduler::SCHEDULE_NULL_ID;
-            if (UserData != nullptr)
+            if (mUserData != nullptr)
             {
-                free(UserData);
-                UserData = nullptr;
+                mUserData = nullptr;
             }
         }
     }
@@ -56,7 +55,14 @@ namespace JG
                     {
                         // Task ½ÇÇà
                         task->SetState(EScheduleState::Run);
-                        task->Function(task->Handle->UserData);
+                        if (task->UserDataFunction && task->Handle->GetUserData())
+                        {
+                            task->UserDataFunction(task->Handle->GetUserData());
+                        }
+                        if (task->Function && task->Handle->GetUserData() == nullptr)
+                        {
+                            task->Function();
+                        }
                         task->SetState(EScheduleState::Compelete);
                     }
 
@@ -165,7 +171,79 @@ namespace JG
     {
         return ScheduleByFrame(delayFrame, 0, 1, priority, task);
     }
-    SharedPtr<ScheduleHandle> Scheduler::ScheduleAsync(const AsyncTaskFunction& task, void* userData, u64 dataSize)
+    SharedPtr<ScheduleHandle> Scheduler::Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
+    {
+        auto SyncTask = CreateSharedPtr<SyncTaskByTick>();
+        SyncTask->Delay = delay;
+        SyncTask->TickCycle = tickCycle;
+        SyncTask->Repeat = repeat;
+        SyncTask->Priority = priority;
+        SyncTask->UserDataFunction = task;
+
+        auto handle = CreateSharedPtr<ScheduleHandle>();
+        handle->mState = EScheduleState::Wait;
+        handle->mType = EScheduleType::SyncByTick;
+        handle->mUserData = userData;
+        SyncTask->Handle = handle;
+
+
+
+
+        std::lock_guard<std::mutex> lock(mTaskMutex);
+        u64 ID = ReceiveScheduleID();
+        SyncTask->ID = ID;
+        handle->mID = ID;
+        mSyncTaskPool.emplace(ID, SyncTask);
+        if (mIsRunSyncTaskAll || mMainThreadID != std::this_thread::get_id())
+        {
+            mReservedSyncTasks.push(SyncTask);
+        }
+        else
+        {
+            mSortedSyncTasks[SyncTask->Priority].push_back(SyncTask);
+        }
+        return handle;
+    }
+    SharedPtr<ScheduleHandle> Scheduler::ScheduleOnce(f32 delay, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
+    {
+        return Schedule(delay, 0.0f, 1, priority, task, userData);
+    }
+    SharedPtr<ScheduleHandle> Scheduler::ScheduleByFrame(i32 delayFrame, i32 frameCycle, i32 repeat, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
+    {
+        auto SyncTask = CreateSharedPtr<SyncTaskByFrame>();
+        SyncTask->Delay = delayFrame;
+        SyncTask->FrameCycle = frameCycle;
+        SyncTask->Repeat = repeat;
+        SyncTask->Priority = priority;
+        SyncTask->UserDataFunction = task;
+
+        auto handle = CreateSharedPtr<ScheduleHandle>();
+        handle->mState = EScheduleState::Wait;
+        handle->mType = EScheduleType::SyncByFrame;
+        handle->mUserData = userData;
+        SyncTask->Handle = handle;
+
+
+        std::lock_guard<std::mutex> lock(mTaskMutex);
+        u64 ID = ReceiveScheduleID();
+        SyncTask->ID = ID;
+        handle->mID = ID;
+        mSyncTaskPool.emplace(ID, SyncTask);
+        if (mIsRunSyncTaskAll || mMainThreadID != std::this_thread::get_id())
+        {
+            mReservedSyncTasks.push(SyncTask);
+        }
+        else
+        {
+            mSortedSyncTasks[SyncTask->Priority].push_back(SyncTask);
+        }
+        return handle;
+    }
+    SharedPtr<ScheduleHandle> Scheduler::ScheduleOnceByFrame(i32 delayFrame, i32 priority, const SyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
+    {
+        return ScheduleByFrame(delayFrame, 0, 1, priority, task, userData);
+    }
+    SharedPtr<ScheduleHandle> Scheduler::ScheduleAsync(const AsyncTaskFunction& task)
     {
         auto asyncTask = CreateSharedPtr<AsyncTask>();
         auto handle    = CreateSharedPtr<ScheduleHandle>();
@@ -174,13 +252,27 @@ namespace JG
             handle->mID = 0;
             handle->mState = EScheduleState::Wait;
             handle->mType  = EScheduleType::Async;
-            if (userData != nullptr)
-            {
-                handle->UserData = malloc(dataSize);
-                memcpy(handle->UserData, userData, dataSize);
-            }
             asyncTask->Handle = handle;
             asyncTask->Function = task;
+
+            std::lock_guard<std::mutex> lock(mMutex);
+            mAsyncTaskQueue.push(asyncTask);
+        }
+        mRunAsyncTaskConVar.notify_one();
+        return handle;
+    }
+    SharedPtr<ScheduleHandle> Scheduler::ScheduleAsync(const AsyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
+    {
+        auto asyncTask = CreateSharedPtr<AsyncTask>();
+        auto handle = CreateSharedPtr<ScheduleHandle>();
+        {
+
+            handle->mID = 0;
+            handle->mState = EScheduleState::Wait;
+            handle->mType = EScheduleType::Async;
+            handle->mUserData = userData;
+            asyncTask->Handle = handle;
+            asyncTask->UserDataFunction = task;
 
             std::lock_guard<std::mutex> lock(mMutex);
             mAsyncTaskQueue.push(asyncTask);
@@ -308,11 +400,16 @@ namespace JG
                 task->Tick = 0.0f;
                 task->CallCount += 1;
 
-                if (task->Function)
+                EScheduleResult result = EScheduleResult::Break;
+                if (task->UserDataFunction && task->Handle->GetUserData())
                 {
-                    auto result = task->Function();
-                    ResultProcess(task, result);
+                    result = task->UserDataFunction(task->Handle->GetUserData());
                 }
+                if (task->Function && task->Handle->GetUserData() == nullptr)
+                {
+                    result = task->Function();
+                }
+                ResultProcess(task, result);
        
 
                 if (task->Repeat != -1 && task->CallCount >= task->Repeat)
@@ -347,11 +444,16 @@ namespace JG
                 task->Frame = 0;
                 task->CallCount += 1;
 
-                if (task->Function)
+                EScheduleResult result = EScheduleResult::Break;
+                if (task->UserDataFunction && task->Handle->GetUserData())
                 {
-                    auto result = task->Function();
-                    ResultProcess(task, result);
+                    result = task->UserDataFunction(task->Handle->GetUserData());
                 }
+                if (task->Function && task->Handle->GetUserData() == nullptr)
+                {
+                    result = task->Function();
+                }
+                ResultProcess(task, result);
 
                 if (task->Repeat != -1 && task->CallCount >= task->Repeat)
                 {

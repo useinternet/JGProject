@@ -15,6 +15,7 @@
 #include "Class/Asset/Asset.h"
 
 #include "Class/UI/ModalUI/ProgressBarModalView.h"
+#include "Class/UI/ModalUI/MessageBoxModalView.h"
 #include <Class/UI/UIView/InspectorView.h>
 namespace JG
 {
@@ -45,6 +46,20 @@ namespace JG
 		auto camNode = mGameWorld->AddNode("EditorCamera");
 		auto editorCam = camNode->AddComponent<EditorCamera>();
 		Camera::SetMainCamera(editorCam);
+
+		NotifyChangeGameWorldEvent e;
+		e.GameWorld = mGameWorld;
+		Application::GetInstance().SendEvent(e);
+
+
+
+	
+
+
+
+
+
+
 		//LoadGameWrold();
 	}
 	void GameLogicSystemLayer::Destroy()
@@ -54,17 +69,118 @@ namespace JG
 	void GameLogicSystemLayer::OnEvent(IEvent& e)
 	{
 		EventDispatcher eventDispatcher(e);
-		eventDispatcher.Dispatch<RequestGetGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseGetGameWorld));
+		eventDispatcher.Dispatch<RequestImportGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseImportGameWorld));
 		eventDispatcher.Dispatch<NotifyRenderingReadyCompeleteEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete));
-		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClickEvent));
+		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClick));
 	}
 	String GameLogicSystemLayer::GetLayerName()
 	{
 		return "GameLogicSystemLayer";
 	}
-	bool GameLogicSystemLayer::ResponseGetGameWorld(RequestGetGameWorldEvent& e)
+	bool GameLogicSystemLayer::ResponseImportGameWorld(RequestImportGameWorldEvent& e)
 	{
-		e.GameWorld = mGameWorld;
+		if (fs::exists(e.AssetPath) == false)
+		{
+			JG_CORE_ERROR("is not exist GameWorld Asset, Fail Import GameWorld");
+			return true;
+		}
+		if (mImportGameWorldTaskCtrl && mImportGameWorldTaskCtrl->IsRun())
+		{
+			return true;
+		}
+		enum
+		{
+			Task_Seq_ReadJson,
+			Task_Seq_LoadJson,
+		};
+
+
+		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+		UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Import GameWorld"));
+		mImportGameWorldTaskCtrl = CreateUniquePtr<TaskController>();
+		mImportGameWorldTaskCtrl->SetPriority(SchedulePriority::EndSystem);
+		mImportGameWorldTaskCtrl->SetStartID(Task_Seq_ReadJson);
+		mImportGameWorldTaskCtrl->SetUserData(CreateSharedPtr<ImportGameWorldData>(e.AssetPath));
+
+		Scheduler::GetInstance().ScheduleOnce(0.15f, 0, [&]() -> EScheduleResult
+		{
+
+
+
+
+			mImportGameWorldTaskCtrl->AddTask(Task_Seq_ReadJson, nullptr,
+				[&](SharedPtr<IJGObject> userData)
+			{
+				auto data = userData->As<ImportGameWorldData>();
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Display("Read Json...", 0.25f);
+				data->Json = CreateSharedPtr<Json>();
+				EAssetFormat format;
+
+				data->IsSuccessed = AssetDataBase::GetInstance().ReadAsset(data->Path, &format, &(data->Json)) && format == EAssetFormat::GameWorld;
+			}, [&](SharedPtr<IJGObject> userData) -> i32
+			{
+				auto data = userData->As<ImportGameWorldData>();
+				if (data->IsSuccessed == false)
+				{
+					JG_CORE_ERROR("Fail Read Asset, Fail Import GameWorld");
+					return -1;
+				}
+				return Task_Seq_LoadJson;
+			});
+
+
+			mImportGameWorldTaskCtrl->AddTask(Task_Seq_LoadJson, nullptr,
+				[&](SharedPtr<IJGObject> userData)
+			{
+
+				auto data = userData->As<ImportGameWorldData>();
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Display("Load Json...", 0.75f);
+
+				auto jsonData = data->Json->GetMember(JG_ASSET_KEY);
+				if (jsonData)
+				{
+					data->GameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
+					data->GameWorld->LoadJson(data->Json);
+					data->IsSuccessed = true;
+				}
+				else
+				{
+					data->IsSuccessed = false;
+				}
+			}, [&](SharedPtr<IJGObject> userData) -> i32
+			{
+				auto data = userData->As<ImportGameWorldData>();
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Display("Load Compelete", 1.0f);
+				progressBar->Close();
+				if (data->IsSuccessed)
+				{
+					if (mGameWorld)
+					{
+						GameObjectFactory::GetInstance().DestroyObject(mGameWorld);
+						mGameWorld = nullptr;
+					}
+					mGameWorld = data->GameWorld;
+					NotifyChangeGameWorldEvent e;
+					e.GameWorld = mGameWorld;
+					Application::GetInstance().SendEvent(e);
+
+				}
+				else
+				{
+					UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Load GameWorld"));
+				}
+
+				return -1;
+			});
+			mImportGameWorldTaskCtrl->Run();
+
+			return EScheduleResult::Break;
+		});
+
+		
 		return true;
 	}
 	bool GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e)
@@ -88,7 +204,7 @@ namespace JG
 		}
 		return true;
 	}
-	bool GameLogicSystemLayer::ResponseEditorSceneOnClickEvent(NotifyEditorSceneOnClickEvent& e)
+	bool GameLogicSystemLayer::ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e)
 	{
 		NotifySelectedGameNodeInEditorEvent pickingEvent;
 		if (mGameWorld != nullptr)

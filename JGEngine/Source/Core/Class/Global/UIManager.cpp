@@ -135,7 +135,7 @@ namespace JG
 				continue;
 			}
 			mIconPool.push_back(pt);
-			auto t = pt->As<ITexture>();
+			auto t = pt->As<Asset<ITexture>>();
 			if (t != nullptr)
 			{
 				mIcons.emplace(t->GetAssetName(), t);

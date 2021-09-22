@@ -30,7 +30,22 @@ private: \
 	{
 	public:
 		virtual Type GetType() const  = 0;
-		//virtual const String& GetName() const = 0;
+		template<class T> 
+		bool Is() const {
+			return JGTYPE(T) == GetType(); 
+		}
+		template<class T>
+		T* As() const {
+		
+			if (Is<T>() == false)
+			{
+				return nullptr; 
+			}
+			else
+			{
+				return (T*)(this);
+			}
+		}
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override {}
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override {}

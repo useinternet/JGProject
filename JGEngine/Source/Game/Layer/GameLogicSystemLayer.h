@@ -4,14 +4,32 @@
 
 namespace JG
 {
+	enum class EAssetFormat;
 	class GlobalGameSystem;
 	class GameWorld;
 	class IGameObject;
 	class GameLogicSystemLayer : public ISystemLayer
 	{
+		class ImportGameWorldData : public IJGObject
+		{
+			JGCLASS
+		public:
+			String     Path;
+			GameWorld* GameWorld = nullptr;
+			SharedPtr<Json> Json = nullptr;
+			bool IsSuccessed = false;
+		public:
+			ImportGameWorldData(const String& path) : Path(path) {}
+		};
+
+
+
+
 		GameWorld* mGameWorld = nullptr;
 		List<GlobalGameSystem*> mGameSystemList;
-		bool mIsPushRenderItem = false;
+
+
+		UniquePtr<TaskController> mImportGameWorldTaskCtrl;
 	public:
 		virtual ~GameLogicSystemLayer() {}
 	public:
@@ -24,9 +42,10 @@ namespace JG
 		virtual void OnEvent(IEvent& e) override;
 		virtual String GetLayerName() override;
 	public:
-		bool ResponseGetGameWorld(RequestGetGameWorldEvent& e);
+		bool ResponseImportGameWorld(RequestImportGameWorldEvent& e);
 		bool ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e);
-		bool ResponseEditorSceneOnClickEvent(NotifyEditorSceneOnClickEvent& e);
+		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
+	
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();

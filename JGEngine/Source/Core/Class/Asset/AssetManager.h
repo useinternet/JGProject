@@ -28,7 +28,7 @@ namespace JG
 			{
 				mAssetPool[asset->GetAssetID()] = asset;
 			}
-			return mAssetPool[asset->GetAssetID()]->As<T>();
+			return mAssetPool[asset->GetAssetID()]->As<Asset<T>>();
 		}
 		template<class T>
 		Asset<T>* RequestRWAsset(const String& path)
@@ -48,7 +48,7 @@ namespace JG
 			{
 				mAssetPool[rwAsset->GetAssetID()] = rwAsset;
 			}
-			return mAssetPool[rwAsset->GetAssetID()]->As<T>();
+			return mAssetPool[rwAsset->GetAssetID()]->As<Asset<T>>();
 		}
 		EAssetFormat GetAssetFormat(const String& path);
 	};
