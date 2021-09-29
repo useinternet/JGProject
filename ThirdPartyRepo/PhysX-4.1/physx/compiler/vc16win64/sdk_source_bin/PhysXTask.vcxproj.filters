@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\task\src\TaskManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include\task\PxCpuDispatcher.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include\task\PxTask.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include\task\PxTaskDefine.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include\task\PxTaskManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\compiler\cmake\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{A6E3F27D-6BA3-386B-B3CC-627E17256E29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{799C497A-6BC7-37DE-9610-3CC2B13E53F3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

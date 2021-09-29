@@ -1,12 +1,11 @@
 #pragma once
 #include "Class/UI/UIView.h"
-#include "Class/UI/UIViewModel/InspectorViewModel.h"
 
 
 namespace JG
 {
 	
-	class InspectorView : public UIView<InspectorViewModel>
+	class InspectorView : public UIView
 	{
 		JGCLASS
 

@@ -17,6 +17,7 @@ namespace JG
 
 	void GameNode::Update()
 	{
+		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{
 			if (com->mIsRunAwake == false)
@@ -55,6 +56,7 @@ namespace JG
 	}
 	void GameNode::LateUpdate()
 	{
+		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{
 			if (com->IsActive())
@@ -263,6 +265,31 @@ namespace JG
 					e.RenderItem = item;
 					SendEvent(e);
 				}
+			}
+		}
+
+		return nullptr;
+	}
+	SharedPtr<IRenderItem> GameNode::PushDebugRenderItem()
+	{
+		for (auto& com : mComponents)
+		{
+			auto item = com->PushDebugRenderItem();
+			if (item != nullptr)
+			{
+				RequestPushRenderItemEvent e;
+				e.RenderItem = item;
+				SendEvent(e);
+			}
+		}
+		for (auto& child : mChilds)
+		{
+			auto item = child->PushDebugRenderItem();
+			if (item != nullptr)
+			{
+				RequestPushRenderItemEvent e;
+				e.RenderItem = item;
+				SendEvent(e);
 			}
 		}
 
@@ -505,12 +532,12 @@ namespace JG
 	{
 		mIsActive = active;
 	}
+	bool GameNode::IsAlive() const
+	{
+		return mIsAlive;
+	}
 	void GameNode::Picking3DRecursive(List<GameNode*>& refPickingObjectList, const JRay& pickingRay)
 	{
-		if (IsActive() == false)
-		{
-			return;
-		}
 		for (auto& child : mChilds)
 		{
 			child->Picking3DRecursive(refPickingObjectList, pickingRay);
@@ -543,11 +570,6 @@ namespace JG
 	}
 	void GameNode::Picking2DRecursive(List<GameNode*>& refPickingObjectList, const JVector2& pickingPos)
 	{
-
-		if (IsActive() == false)
-		{
-			return;
-		}
 		for (auto& child : mChilds)
 		{
 			child->Picking2DRecursive(refPickingObjectList, pickingPos);
@@ -583,6 +605,7 @@ namespace JG
 	}
 	void GameNode::DestroyRecursive()
 	{
+		mIsAlive = false;
 		for (auto& child : mChilds)
 		{
 			child->DestroyRecursive();

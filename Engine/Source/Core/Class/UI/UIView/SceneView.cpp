@@ -111,7 +111,7 @@ namespace JG
 
 
 
-		if (mEnableEditorCameraControll == false && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+		if (mEnableEditorCameraControll == false)
 		{
 			if ((ImGui::IsKeyPressed((i32)EKeyCode::Q)))
 			{
@@ -145,12 +145,12 @@ namespace JG
 	}
 	void SceneView::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-		UIView<SceneViewModel>::MakeJson(jsonData);
+		UIView::MakeJson(jsonData);
 
 	}
 	void SceneView::LoadJson(SharedPtr<JsonData> jsonData)
 	{
-		UIView<SceneViewModel>::LoadJson(jsonData);
+		UIView::LoadJson(jsonData);
 
 	}
 	void SceneView::OnEvent(IEvent& e)
@@ -297,6 +297,9 @@ namespace JG
 		}
 
 
+		ImGui::AlignTextToFramePadding();
+		u64 fps = Application::GetInstance().GetAppTimer()->GetFPS();
+		ImGui::Text("FPS : %d", fps); ImGui::SameLine();
 
 
 	

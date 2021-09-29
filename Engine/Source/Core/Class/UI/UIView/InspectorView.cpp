@@ -4,7 +4,6 @@
 #include "Class/Asset/Asset.h"
 #include "Class/Game/GameObjectFactory.h"
 #include "Class/Game/GameNode.h"
-#include "Class/UI/UIModel/InspectorModel.h"
 #include "Class/UI/ContextUI/ComponentFinderContextView.h"
 
 namespace JG

@@ -528,22 +528,25 @@ namespace JG
 			ImGui::FileDialog::Instance().Close();
 		}
 
-
-
-		if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::C))
+		if (ImGui::IsWindowFocused())
 		{
-			Copy();
+			if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::C))
+			{
+				Copy();
+			}
+
+			if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::X))
+			{
+				Move();
+			}
+
+			if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::V))
+			{
+				Paste();
+			}
 		}
 
-		if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::X))
-		{
-			Move();
-		}
 
-		if (mIsCtrl && ImGui::IsKeyPressed((i32)EKeyCode::V))
-		{
-			Paste();
-		}
 
 	}
 
@@ -793,12 +796,12 @@ namespace JG
 	}
 	void ContentsView::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-		UIView<ContentsViewModel>::MakeJson(jsonData);
+		UIView::MakeJson(jsonData);
 	}
 	
 	void ContentsView::LoadJson(SharedPtr<JsonData> jsonData)
 	{
-		UIView<ContentsViewModel>::LoadJson(jsonData);
+		UIView::LoadJson(jsonData);
 	}
 	SharedPtr<ContentsView::NodeState> ContentsView::GetDirectoryNodeState(const String& path)
 	{
@@ -1097,6 +1100,10 @@ namespace JG
 		{
 			JG_CORE_ERROR("ReName Error : {0}", err.message());
 		}
+
+		auto assetID = AssetDataBase::GetInstance().GetAssetOriginID(dest);
+		AssetDataBase::GetInstance().RefreshAssetName(assetID, src);
+		//AssetDataBase""
 	}
 
 	void ContentsView::Copy()

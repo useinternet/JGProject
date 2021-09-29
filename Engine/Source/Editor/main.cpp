@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <crtdbg.h>
-
+#include "Resources/resource.h"
 #include "JGCore.h"
 #include "JGEditor.h"
 
@@ -15,6 +15,7 @@ int main(int argc, char** argv)
 	props.WindowProps.TitleName = L"JGEditor";
 	props.WindowProps.Width = 1920;
 	props.WindowProps.Height = 1080;
+	props.WindowProps.IconID = IDI_ICON1;
 	Application* app = new JGEditor();
 
 	if (app->Create(props))

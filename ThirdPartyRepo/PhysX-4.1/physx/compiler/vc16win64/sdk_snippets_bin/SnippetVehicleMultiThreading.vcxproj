@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="checked|x64">
+      <Configuration>checked</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5221752A-96BD-34C5-8677-22BE392DEC19}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>SnippetVehicleMultiThreading</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">SnippetVehicleMultiThreading.dir\debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">SnippetVehicleMultiThreading_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">SnippetVehicleMultiThreading.dir\checked\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='checked|x64'">SnippetVehicleMultiThreading_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='checked|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='checked|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='checked|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">SnippetVehicleMultiThreading.dir\profile\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|x64'">SnippetVehicleMultiThreading_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='profile|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='profile|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">SnippetVehicleMultiThreading.dir\release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release|x64'">SnippetVehicleMultiThreading_64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXExtensions_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysX_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXVehicle_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXCharacterKinematic_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXCooking_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXCommon_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\SnippetUtils_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\SnippetRender_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXTask_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\PhysXFoundation_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/debug/SnippetVehicleMultiThreading_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/debug/SnippetVehicleMultiThreading_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="checked";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"checked\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXExtensions_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysX_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXVehicle_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXCharacterKinematic_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXCooking_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXCommon_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\SnippetUtils_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\SnippetRender_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXTask_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\checked\PhysXFoundation_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/checked/SnippetVehicleMultiThreading_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/checked/SnippetVehicleMultiThreading_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR="profile";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_PROFILE=1;PX_NVTX=0;PX_SUPPORT_PVD=1;CMAKE_INTDIR=\"profile\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXExtensions_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysX_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXVehicle_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXCharacterKinematic_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXCooking_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXCommon_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\SnippetUtils_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\SnippetRender_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXTask_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\profile\PhysXFoundation_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/profile/SnippetVehicleMultiThreading_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/profile/SnippetVehicleMultiThreading_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4514;4820;4127;4710;4711;4577;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_SUPPORT_PVD=0;CMAKE_INTDIR="release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;NDEBUG;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;RENDER_SNIPPET;PX_SUPPORT_PVD=0;CMAKE_INTDIR=\"release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\..\pxshared\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\source\foundation\include;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\include\win32\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXExtensions_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysX_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXVehicle_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXCharacterKinematic_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXCooking_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXCommon_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\SnippetUtils_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\SnippetRender_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXTask_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXPvdSDK_static_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\PhysXFoundation_64.lib;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\Graphics\lib\win64\glut\glut32.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/release/SnippetVehicleMultiThreading_64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/bin/win.x86_64.vc142.mt/release/SnippetVehicleMultiThreading_64.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Building Custom Rule C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/public -BC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\ConfigureFileMT.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='checked|x64'">Building Custom Rule C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='checked|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/public -BC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\ConfigureFileMT.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='checked|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Building Custom Rule C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/public -BC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\ConfigureFileMT.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Building Custom Rule C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/public -BC:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/compiler/vc16win64/sdk_snippets_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\ConfigureFileMT.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\SnippetVehicleTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\CMakeLists.txt;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetRender.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetTemplate.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetUtils.cmake;C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\compiler\cmake\windows\SnippetVehicleTemplate.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetcommon\ClassicMain.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclemultithreading\SnippetVehicleMultiThreading.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicle4WCreate.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTankCreate.cpp" />
+    <ClCompile Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.cpp" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleConcurrency.h" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.h" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.h" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.h" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.h" />
+    <ClInclude Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleWheelQueryResult.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\ZERO_CHECK.vcxproj">
+      <Project>{0ED847B7-F2A8-3BC9-AB5F-8C676131651D}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysX.vcxproj">
+      <Project>{3182C6C9-0E26-3D5A-B905-37C787855E80}</Project>
+      <Name>PhysX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCharacterKinematic.vcxproj">
+      <Project>{A391535E-30B8-3FBC-9150-BBC3A528FEED}</Project>
+      <Name>PhysXCharacterKinematic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCommon.vcxproj">
+      <Project>{A1CB437F-3E9C-3424-9EA9-2E3CA72F70C5}</Project>
+      <Name>PhysXCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCooking.vcxproj">
+      <Project>{667041D9-238C-34DB-907F-809EA4EFFA1A}</Project>
+      <Name>PhysXCooking</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
+      <Project>{35F2DB10-3154-3EC7-B57E-D9BCFBF91069}</Project>
+      <Name>PhysXExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
+      <Project>{C7B07EA4-AF35-348B-953F-D9D4777CFB05}</Project>
+      <Name>PhysXFoundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXPvdSDK.vcxproj">
+      <Project>{64CF2DB1-A554-38BE-9794-55ED9711D19F}</Project>
+      <Name>PhysXPvdSDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXTask.vcxproj">
+      <Project>{7A1A28C2-06E3-38F2-A126-4378975FE972}</Project>
+      <Name>PhysXTask</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXVehicle.vcxproj">
+      <Project>{3D78C35F-950D-3D14-BF7C-C8743D89AE2A}</Project>
+      <Name>PhysXVehicle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\SnippetRender.vcxproj">
+      <Project>{4F3E2020-5B23-3191-BB85-3730C8D050E8}</Project>
+      <Name>SnippetRender</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\compiler\vc16win64\sdk_snippets_bin\SnippetUtils.vcxproj">
+      <Project>{F99525D4-48D8-31AE-B07F-C432CE93D6C2}</Project>
+      <Name>SnippetUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

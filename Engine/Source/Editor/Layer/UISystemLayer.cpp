@@ -7,6 +7,7 @@
 #include "Class/UI/UIView/WorldHierarchyView.h"
 #include "Class/UI/UIView/InspectorView.h"
 #include "Class/UI/UIView/ContentsView.h"
+#include "Class/UI/UIView/ProjectSettingView.h"
 
 // PopupUI
 #include "Class/UI/ContextUI/ComponentFinderContextView.h"
@@ -58,6 +59,8 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<WorldHierarchyView>();
 		UIManager::GetInstance().RegisterUIView<InspectorView>();
 		UIManager::GetInstance().RegisterUIView<ContentsView>();
+		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
+		
 
 		// PopupUI
 		UIManager::GetInstance().RegisterPopupUIView<ComponentFinderContextView>();

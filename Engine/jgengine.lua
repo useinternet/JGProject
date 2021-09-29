@@ -9,6 +9,8 @@ function DebugConfig()
     optimize "Off"
     defines {"_DEBUG", "JG_EDITOR"}
     cppdialect "C++17"
+    staticruntime "on"
+    runtime "Debug"
   end
 
 
@@ -16,6 +18,8 @@ function ReleaseConfig()
     optimize "Full" 
     defines {"_RELEASE", "JG_EDITOR"}
     cppdialect "C++17"
+    staticruntime "on"
+    runtime "Release"
 end
 
 workspace "JGEngine"
@@ -90,6 +94,8 @@ workspace "JGEngine"
         files {
             path .. "**.h",
             path .. "**.cpp",
+            path .. "**.ico",
+            path .. "**.rc",
             PCH_HEADER_PATH,
             PCH_CPP_PATH,
         }
@@ -120,11 +126,27 @@ workspace "JGEngine"
                 includedirs{
                     "Source/Core/",
                     "ThirdParty/",
+                    "ThirdParty/physx/"
                 }
                 links {
                     "Imgui",
                     "stb",
                     "Publish/%{cfg.buildcfg}/assimp-vc142-mt",
+                    "Publish/%{cfg.buildcfg}/PhysX_64",
+                    "Publish/%{cfg.buildcfg}/PhysXCommon_64",
+                    "Publish/%{cfg.buildcfg}/PhysXFoundation_64",
+                    "Publish/%{cfg.buildcfg}/PhysXCooking_64",
+                    "Publish/%{cfg.buildcfg}/LowLevel_static_64",
+                    "Publish/%{cfg.buildcfg}/LowLevelAABB_static_64",
+                    "Publish/%{cfg.buildcfg}/LowLevelDynamics_static_64",
+                    "Publish/%{cfg.buildcfg}/PhysXCharacterKinematic_static_64",
+                    "Publish/%{cfg.buildcfg}/PhysXExtensions_static_64",
+                    "Publish/%{cfg.buildcfg}/PhysXPvdSDK_static_64",
+                    "Publish/%{cfg.buildcfg}/PhysXTask_static_64",
+                    "Publish/%{cfg.buildcfg}/PhysXVehicle_static_64",
+                    "Publish/%{cfg.buildcfg}/SceneQuery_static_64",
+                    "Publish/%{cfg.buildcfg}/SimulationController_static_64",
+
                 }
                 pchheader (PCH_HEADER)
                 pchsource (PCH_CPP_PATH)

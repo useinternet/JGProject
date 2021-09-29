@@ -227,7 +227,10 @@ namespace JG
 
 		return AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Material, json);
 	}
-
+	const String& IAsset::GetAssetRootPath() const
+	{
+		return Application::GetAssetPath();
+	}
 	void AssetInspectorGUI::InspectorGUI(IAsset* targetAsset)
 	{
 		if (targetAsset == nullptr)
@@ -427,7 +430,7 @@ namespace JG
 				{
 					MaterialAssetStock stock;
 					stock.LoadJson(assetVal);
-
+					stock.Name = targetAsset->GetAssetName();
 					// Property
 					stock.MaterialDatas = materialDatas;
 
@@ -500,6 +503,22 @@ namespace JG
 
 
 
+	AssetID AssetDataBase::GetAssetOriginID(const String& path)
+	{
+		String resourcePath;
+		String absolutePath;
+		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		{
+			return AssetID();
+		}
+		if (mOriginAssetDataPool.find(resourcePath) == mOriginAssetDataPool.end())
+		{
+			return AssetID();
+		}
+
+		return mOriginAssetDataPool[resourcePath]->ID;
+	}
+
 	SharedPtr<IAsset> AssetDataBase::LoadOriginAsset(const String& path)
 	{
 		String resourcePath;
@@ -508,7 +527,10 @@ namespace JG
 		{
 			return nullptr;
 		}
-
+		if (fs::exists(absolutePath) == false)
+		{
+			return nullptr;
+		}
 		if (mAssetLoadScheduleHandle == nullptr)
 		{
 			mAssetLoadScheduleHandle = 
@@ -518,24 +540,35 @@ namespace JG
 		}
 
 		// 에셋 검사
+
+		std::lock_guard<std::mutex> lock(mAssetLoadMutex);
 		auto iter = mOriginAssetDataPool.find(resourcePath);
 		if (iter != mOriginAssetDataPool.end())
 		{
-			return iter->second->Asset->Copy();
+			if (iter->second->Asset == nullptr)
+			{
+				return nullptr;
+			}
+			else
+			{
+				return iter->second->Asset->Copy();
+			}
+		
 		}
 	
-		auto assetID   = RequestOriginAssetID(resourcePath);
+		auto assetID   = RequestOriginAssetID();
 		auto assetData = CreateUniquePtr<AssetData>();
 		SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
 
-		assetData->ID       = assetID;
+
 		assetData->State    = EAssetDataState::Loading;
 		assetData->Path		= resourcePath;
 		assetData->Asset    = CreateAsset(assetID, absolutePath);
+		assetData->ID = assetData->Asset->GetAssetID();
 		auto result = assetData->Asset;
 
 
-		assetLoadData->ID	= assetID;
+		assetLoadData->ID	 = assetData->ID;
 		assetLoadData->Asset = assetData->Asset;
 		strcpy(assetLoadData->Path, absolutePath.c_str());
 
@@ -553,7 +586,7 @@ namespace JG
 		{
 			return nullptr;
 		}
-		auto assetRWID = RequestRWAssetID(originID);
+
 		auto originAssetData = mAssetDataPool[originID].get();
 
 		String resourcePath;
@@ -563,15 +596,17 @@ namespace JG
 			return nullptr;
 		}
 
-
+		std::lock_guard<std::mutex> lock(mAssetLoadMutex);
+		auto assetRWID = RequestRWAssetID(originID);
 		auto assetData = CreateUniquePtr<AssetData>();
-		assetData->ID    = assetRWID;
+
 		assetData->State = EAssetDataState::Loading;
 		assetData->Path  = resourcePath;
 		assetData->Asset = CreateAsset(assetRWID, absolutePath);
+		assetData->ID = assetData->Asset->GetAssetID();
 		auto result = assetData->Asset;
 		SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
-		assetLoadData->ID    = assetRWID;
+		assetLoadData->ID    = assetData->ID;
 		assetLoadData->Asset = assetData->Asset;
 		strcpy(assetLoadData->Path, absolutePath.c_str());
 
@@ -613,22 +648,26 @@ namespace JG
 		mAssetDataPool.erase(id);
 	}
 
-	void AssetDataBase::RefreshAsset(AssetID originID)
+
+
+	void AssetDataBase::RefreshAsset(AssetID originID, const String& reName)
 	{
 		if (originID.IsOrigin()== false) return;
 		if (mAssetDependencies.find(originID) == mAssetDependencies.end())
 		{
 			return;
 		}
-
+		if (reName.length() > 0)
+		{
+			RefreshAssetName(originID, reName);
+		}
 		// Origin Update
 		{
 			if (mAssetDataPool.find(originID) == mAssetDataPool.end()) return;
 
 			auto originAssetData = mAssetDataPool[originID].get();
-
 			SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
-			assetLoadData->ID = originAssetData->ID;
+			assetLoadData->ID    = originAssetData->ID;
 			assetLoadData->Asset = originAssetData->Asset;
 			strcpy(assetLoadData->Path, (originAssetData->Asset->GetAssetFullPath()).c_str());
 			mLoadAssetDataQueue.push(assetLoadData);
@@ -659,13 +698,56 @@ namespace JG
 			dependenciesSet.erase(garbage);
 		}
 	}
+	void AssetDataBase::RefreshAssetName(AssetID originID, const String& reName)
+	{
+	
+		if (originID.IsOrigin() == false) return;
+		if (mAssetDataPool.find(originID) == mAssetDataPool.end()) return;
 
-	AssetID AssetDataBase::RequestOriginAssetID(const String& resourcePath)
+		 
+
+		auto originData = mAssetDataPool[originID].get();
+		String absolutePath;
+		String resourcePath;
+		if (GetResourcePath(reName, absolutePath, resourcePath) == false)
+		{
+			return;
+		}
+		auto oldResourcePath = originData->Asset->GetAssetPath();
+		originData->Asset->Set(originData->ID, reName);
+		originData->ID = originData->Asset->GetAssetID();
+		originData->Path = originData->Asset->GetAssetPath();
+
+
+		mOriginAssetDataPool.erase(oldResourcePath);
+		mOriginAssetDataPool.emplace(originData->Path, originData);
+
+		if (mAssetDependencies.find(originID) == mAssetDependencies.end())
+		{
+			return;
+		}
+
+		auto& dependenciesSet = mAssetDependencies[originData->ID];
+		List<AssetID> garbageAssetList;
+		for (auto& assetID : dependenciesSet)
+		{
+			if (mAssetDataPool.find(assetID) == mAssetDataPool.end())
+			{
+				garbageAssetList.push_back(assetID);
+			};
+
+			auto rwAssetData = mAssetDataPool[assetID].get();
+			rwAssetData->Asset->Set(rwAssetData->ID, reName);
+			rwAssetData->ID   = rwAssetData->Asset->GetAssetID();
+			rwAssetData->Path = rwAssetData->Asset->GetAssetPath();
+		}
+	}
+	AssetID AssetDataBase::RequestOriginAssetID()
 	{
 		AssetID id;
 		id.Origin = mAssetIDOffset++;
 		id.ID = id.Origin;
-		strcpy(id.ResourcePath, resourcePath.c_str());
+		//strcpy(id.ResourcePath, resourcePath.c_str());
 		return id;
 	}
 
@@ -681,7 +763,7 @@ namespace JG
 		}
 
 
-		AssetID id = RequestOriginAssetID(originID.ResourcePath);
+		AssetID id = RequestOriginAssetID();
 		id.Origin = originID.GetID();
 
 		mAssetDependencies[originID].insert(id);
@@ -890,6 +972,15 @@ namespace JG
 			}
 			break;
 		}
+		case EAssetFormat::GameWorld:
+		{
+			auto gwAsset = LoadData->Asset->As<Asset<GameWorld>>();
+			if (gwAsset != nullptr)
+			{
+				gwAsset->mData = json;
+			}
+			break;
+		}
 		default:
 			JG_CORE_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
 			break;
@@ -1080,6 +1171,7 @@ namespace JG
 		case EAssetFormat::Material: return CreateSharedPtr<Asset<IMaterial>>(assetID, path);
 		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path);
 		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path);
+		case EAssetFormat::GameWorld: return CreateSharedPtr<Asset<GameWorld>>(assetID, path);
 		}
 
 

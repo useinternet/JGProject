@@ -10,11 +10,27 @@ namespace JG
 		mAssetManager = AssetDataBase::GetInstance().RequestAssetManager();
 		mUpdateScheduleHandle = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
+			if (IsAlive() == false)
+			{
+				return EScheduleResult::Break;
+			}
+			if (mGameWorldFlags & EGameWorldFlags::Update_Lock)
+			{
+				return EScheduleResult::Continue;
+			}
 			Update();
 			return EScheduleResult::Continue;
 		});
 		mLateUpdateScheduleHandle = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
+			if (IsAlive() == false)
+			{
+				return EScheduleResult::Break;
+			}
+			if (mGameWorldFlags & EGameWorldFlags::LateUpdate_Lock)
+			{
+				return EScheduleResult::Continue;
+			}
 			LateUpdate();
 			return EScheduleResult::Continue;
 		});
@@ -124,6 +140,15 @@ namespace JG
 	{
 		GameObject::DestoryObject(world);
 	}
+	void GameWorld::AddFlags(EGameWorldFlags flags)
+	{
+		mGameWorldFlags = mGameWorldFlags | flags;
+	}
+	void GameWorld::RemoveFlags(EGameWorldFlags flags)
+	{
+		mGameWorldFlags = (EGameWorldFlags)((i32)mGameWorldFlags & (~(i32)flags));
+	}
+
 	GameNode* GameWorld::Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList)
 	{
 		auto mainCam = Camera::GetMainCamera();

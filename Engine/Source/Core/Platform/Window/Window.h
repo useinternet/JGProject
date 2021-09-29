@@ -14,6 +14,7 @@ namespace JG
 		const wchar_t* TitleName = nullptr;
 		u32 Width  = 0;
 		u32 Height = 0;
+		i32 IconID = -1;
 	};
 
 	class WindowCallBackFn

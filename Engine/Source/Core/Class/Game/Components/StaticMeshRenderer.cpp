@@ -6,7 +6,6 @@
 #include "Graphics/Material.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Mesh.h"
-#include "Class/UI/UIViewModel/ContentsViewModel.h"
 #include "Class/Game/GameWorld.h"
 
 
@@ -81,8 +80,7 @@ namespace JG
 			{
 				auto material = val->GetJsonDataFromIndex(i);
 				auto path = material->GetString();
-				mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
-
+				mMaterialList[i] =  GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
 			}
 		}
 	}
@@ -98,20 +96,22 @@ namespace JG
 		}
 
 		auto matAssetCnt = mMaterialList.size();
+		mStaticRI->Materials.resize(matAssetCnt);
+
+
 		for (u64 i = 0; i < matAssetCnt; ++i)
 		{
 			auto material = mMaterialList[i];
-			if (material == nullptr) continue;
-
-			if (mStaticRI->Materials.size() > i) {
-				mStaticRI->Materials[i] = material->Get();
+			if (material == nullptr)
+			{
+				mStaticRI->Materials[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
 			}
 			else
 			{
-				mStaticRI->Materials.push_back(material->Get());
+				mStaticRI->Materials[i] = material->Get();
 			}
 		}
-		mStaticRI->Materials.resize(matAssetCnt);
+
 
 		if (matAssetCnt == 0 && mStaticRI->Materials.empty()) {
 			if (mNullMaterial == nullptr)
@@ -144,6 +144,7 @@ namespace JG
 		}
 		ImGui::AssetField_OnGUI("Mesh", inputText, EAssetFormat::Mesh, [&](const std::string& path)
 		{
+			SetMesh(path);
 		}, label_width);
 
 

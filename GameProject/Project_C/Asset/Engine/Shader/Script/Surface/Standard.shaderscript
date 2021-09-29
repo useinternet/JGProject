@@ -16,7 +16,8 @@ _Init {
 
 
 _Surface {
-	_output.albedo    = float4(BaseColor, 1.0f);
+	float4 textureColor = Tex1.Sample(gPointSampler, _input.tex);
+	_output.albedo    = textureColor * float4(BaseColor, 1.0f);
 	_output.roughness = Roughness;
 	_output.specular  = Specular;
 	_output.metallic  = Metallc;

@@ -2,11 +2,10 @@
 
 
 #include "Class/UI/UIView.h"
-#include "Class/UI/UIViewModel/ContentsViewModel.h"
 
 namespace JG
 {
-	class ContentsView : public UIView<ContentsViewModel>
+	class ContentsView : public UIView
 	{
 		JGCLASS
 		class Directory {};

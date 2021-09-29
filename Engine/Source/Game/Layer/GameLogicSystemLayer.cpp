@@ -29,16 +29,6 @@ namespace JG
 	}
 	void GameLogicSystemLayer::Begin()
 	{
-		//static bool testopen = false;
-		//UIManager::GetInstance().RegisterMainMenuItem("File/Save World %_S", 0, [&]() {
-		//	SaveGameWorld();
-		//}, nullptr);
-
-		//UIManager::GetInstance().RegisterMainMenuItem("File/Load World", 0, [&]() {
-		//
-		//	LoadGameWrold();
-		//}, nullptr);
-
 		UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&](){
 
 			if (mGameWorld == nullptr) return;
@@ -62,13 +52,23 @@ namespace JG
 		auto editorCam = camNode->AddComponent<EditorCamera>();
 		Camera::SetMainCamera(editorCam);
 
-		NotifyChangeGameWorldEvent e;
-		e.GameWorld = mGameWorld;
-		Application::GetInstance().SendEvent(e);
+		{
+			NotifyChangeGameWorldEvent e;
+			e.GameWorld = mGameWorld;
+			Application::GetInstance().SendEvent(e);
+		}
 
 
 
-	
+		Scheduler::GetInstance().ScheduleOnce(1.0f, 0, []() -> EScheduleResult
+		{
+			RequestLoadGameWorldEvent e;
+			e.AssetPath = CombinePath(Application::GetAssetPath(), "Resources/World/TestGameWorld.jgasset");
+			Application::GetInstance().SendEvent(e);
+			return EScheduleResult::Continue;
+		});
+
+
 
 		//LoadGameWrold();
 	}
@@ -122,13 +122,14 @@ namespace JG
 				progressBar->Display("Write Json...", 0.25f);
 				data->GameWorld = mGameWorld;
 				data->Json = CreateSharedPtr<Json>();
-				if (mGameWorldJsonPath.empty())
+				if (mGameWorldAssetInstance == nullptr)
 				{
 					data->Path = CombinePath(Application::GetAssetPath(), "NewGameWorld.jgasset");
 				}
 				else
 				{
-					data->Path = mGameWorldJsonPath;
+
+					data->Path = mGameWorldAssetInstance->GetAssetFullPath();
 				}
 
 
@@ -230,7 +231,7 @@ namespace JG
 				}
 				else
 				{
-					mGameWorldJsonPath = data->Path;
+					mGameWorldAssetInstance = AssetDataBase::GetInstance().LoadOriginAsset(data->Path);
 				}
 				return Task_Seq_LoadJson;
 			});
@@ -247,6 +248,7 @@ namespace JG
 				if (jsonData)
 				{
 					data->GameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
+					data->GameWorld->AddFlags(EGameWorldFlags::All_Update_Lock);
 					data->GameWorld->LoadJson(jsonData);
 					data->IsSuccessed = true;
 				}
@@ -268,6 +270,7 @@ namespace JG
 						mGameWorld = nullptr;
 					}
 					mGameWorld = data->GameWorld;
+					mGameWorld->RemoveFlags(EGameWorldFlags::All_Update_Lock);
 					NotifyChangeGameWorldEvent e;
 					e.GameWorld = mGameWorld;
 					Application::GetInstance().SendEvent(e);
@@ -299,6 +302,14 @@ namespace JG
 				e.RenderItem = renderItem;
 				Application::GetInstance().SendEvent(e);
 			}
+			renderItem = mGameWorld->PushDebugRenderItem();
+			if (renderItem != nullptr)
+			{
+				RequestPushRenderItemEvent e;
+				e.RenderItem = renderItem;
+				Application::GetInstance().SendEvent(e);
+			}
+
 			auto lightItem = mGameWorld->PushLightItem();
 			if (lightItem != nullptr)
 			{
@@ -306,6 +317,8 @@ namespace JG
 				e.LightItem = lightItem;
 				Application::GetInstance().SendEvent(e);
 			}
+
+
 		}
 		return true;
 	}

@@ -1,0 +1,16 @@
+﻿  SqAABBPruner.cpp
+  SqAABBTree.cpp
+  SqIncrementalAABBPruner.cpp
+  SqIncrementalAABBPrunerCore.cpp
+  SqIncrementalAABBTree.cpp
+  SqAABBTreeUpdateMap.cpp
+  SqBounds.cpp
+  SqCompoundPruner.cpp
+  SqCompoundPruningPool.cpp
+  SqBucketPruner.cpp
+  SqExtendedBucketPruner.cpp
+  SqMetaData.cpp
+  SqPruningPool.cpp
+  SqPruningStructure.cpp
+  SqSceneQueryManager.cpp
+  SceneQuery.vcxproj -> C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\debug\SceneQuery_static_64.lib

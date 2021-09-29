@@ -1,15 +1,13 @@
 #pragma once
 #include "JGCore.h"
 #include "Class/UI/UIView.h"
-#include "Class/UI/UIViewModel/SceneViewModel.h"
 #include "Class/Asset/Asset.h"
 namespace JG
 {
 	class GameNode;
-	class SceneView : public UIView<SceneViewModel>
+	class SceneView : public UIView
 	{
 		JGCLASS
-			
 	private:
 		enum
 		{

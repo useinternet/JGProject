@@ -4,6 +4,17 @@
 #include "Class/Asset/AssetManager.h"
 namespace JG
 {
+	ENUM_FLAG(EGameWorldFlags)
+	enum class EGameWorldFlags
+	{
+		None,
+		Update_Lock = 0x00001,
+		LateUpdate_Lock = 0x00002,
+
+
+
+		All_Update_Lock = Update_Lock | LateUpdate_Lock
+	};
 	class GameWorld : public GameNode
 	{
 		JGCLASS
@@ -15,6 +26,7 @@ namespace JG
 
 		SharedPtr<ScheduleHandle> mUpdateScheduleHandle;
 		SharedPtr<ScheduleHandle> mLateUpdateScheduleHandle;
+		EGameWorldFlags mGameWorldFlags = EGameWorldFlags::None;
 	public:
 		GameWorld();
 	protected:
@@ -39,6 +51,8 @@ namespace JG
 		void AddGameSystem(const Type& type);
 		void Destroy(GameSystem* sys);
 		void Destroy(GameWorld* world);
+		void AddFlags(EGameWorldFlags flags);
+		void RemoveFlags(EGameWorldFlags flags);
 	public:
 		GameNode* Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList);
 		// 에디터 카메라 컬링

@@ -7,6 +7,7 @@
 #include "Class/Game/Components/SpriteRenderer.h"
 #include "Class/Game/Components/StaticMeshRenderer.h"
 #include "Class/Game/Components/PointLight.h"
+#include "Class/Game/Components/Camera.h"
 
 
 namespace JG
@@ -44,41 +45,55 @@ namespace JG
 			CreatePointLight();
 		}, nullptr);
 
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Copy", 0,
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Copy %_C", 0,
 			[&]()
 		{
-			//mVm->CopyGameNodes->Execute();
+			Copy();
 		},
 			[&]() -> bool
 		{
-			//if (mVm->GetSelectdNodeInContextMenu() != nullptr)
-			//{
-			//	return mVm->GetSelectdNodeInContextMenu()->GetParent() != nullptr;
-			//}
-			//return false;
-			return false;
+			bool result = true;
+			for (auto& node : mSelectedGameNode)
+			{
+				if (node->Is<GameWorld>() == true || node->Is<EditorCamera>())
+				{
+					result = false;
+					break;
+				}
+			}
+			return result;
 		});
-
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Move", 0,
+			[&]()
+		{
+			Copy(true);
+		},
+			[&]() -> bool
+		{
+			return IsCanAbleToCopy();
+		});
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Paste", 0,
 			[&]()
 		{
-			//mVm->PasteGameNodes->Execute();
-		}, nullptr);
+			Paste();
+		}, [&]() -> bool
+		{
+			return IsCanAbleToPaste();
+		});
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Delete", 0, 
 			[&]()
 		{
-			//mVm->DeleteGameNode->Execute();
+			for (auto& node : mSelectedGameNode)
+			{
+				GameObject::DestoryObject(node);
+			}
+			mSelectedGameNode.clear();
 		}, 
 			[&]() -> bool
 		{
-			//if (mVm->GetSelectdNodeInContextMenu() != nullptr)
-			//{
-			//	return mVm->GetSelectdNodeInContextMenu()->GetParent() != nullptr;
-			//}
-			//return false;
-			return false;
+			return IsCanAbleToDelete();
 		});
 	}
 	void WorldHierarchyView::Initialize()
@@ -90,18 +105,19 @@ namespace JG
 		mTargetGameNode = nullptr;
 		mSelectedGameNode.clear();
 		mTreeNodeStatePool.clear();
-		//mVm = GetViewModel();
 	}
 	void WorldHierarchyView::OnGUI()
 	{
 		mIsCtrl = ImGui::IsKeyDown((i32)EKeyCode::Ctrl);
+
 		ImGui::Begin("WorldHierarchy", &mOpenGUI);
 		UpdateNode();
-		if (ImGui::BeginTable("WorldHierarchy_Table", 3, ImGuiTableFlags_Borders) == true)
+		if (ImGui::BeginTable("WorldHierarchy_Table", 4) == true)
 		{
-			ImGui::TableSetupColumn("##Active", ImGuiTableColumnFlags_WidthFixed, 28.0f);
 			ImGui::TableSetupColumn("Object");
+			ImGui::TableSetupColumn("##Move", ImGuiTableColumnFlags_WidthFixed, 56.0f);
 			ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 100.0F);
+			ImGui::TableSetupColumn("##Active", ImGuiTableColumnFlags_WidthFixed, 28.0f);
 			ImGui::TableHeadersRow();
 			GameNode_OnGUI(mGameWorld);
 			if (ImGui::IsAnyItemHovered() == false)
@@ -114,116 +130,25 @@ namespace JG
 			}
 			ImGui::EndTable();
 		}
+		PostProcess();
+
+		if (mIsCtrl && ImGui::IsWindowFocused())
+		{
+			if (ImGui::IsKeyPressed((i32)EKeyCode::C) && IsCanAbleToCopy())
+			{
+				Copy();
+			}
+			if (ImGui::IsKeyPressed((i32)EKeyCode::X) && IsCanAbleToCopy())
+			{
+				Copy(true);
+			}
+			if (ImGui::IsKeyPressed((i32)EKeyCode::V) && IsCanAbleToPaste())
+			{
+				Paste();
+			}
+		}
+
 		ImGui::End();
-
-
-
-		//bool isCtrl = ImGui::IsKeyDown((int)EKeyCode::Ctrl);
-	
-
-		//mVm->ForEach(
-		//	[&](WorldHierarchyTreeNode& nodeData) -> bool
-		//{
-		//	bool isOpen = false;
-		//	bool isRoot = nodeData.Object->GetParent() == nullptr;
-		//	bool isLeaf = nodeData.Object->GetChildCount() == 0;
-		//	nodeData.UserFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
-
-		//	(isLeaf) ?
-		//		nodeData.UserFlags |= ImGuiTreeNodeFlags_Leaf :
-		//		nodeData.UserFlags &= ~(ImGuiTreeNodeFlags_Leaf);
-
-		//	if (isRoot == true)
-		//	{
-		//		isOpen = ImGui::CollapsingHeader((nodeData.Object->GetName() + "##GameWorld").c_str());
-		//		nodeData.IsTreePop = false;
-		//	}
-		//	else
-		//	{
-		//		
-		//		isOpen = ImGui::TreeNodeEx((void*)nodeData.Object, nodeData.UserFlags, nodeData.Object->GetName().c_str()); 
-		//		nodeData.IsTreePop = isOpen;
-		//	}
-		//	return isOpen;
-		//},
-		//	[&](WorldHierarchyTreeNode& nodeData)
-		//{
-		//	static bool isContextOpen         = false;
-
-		//	ImGui::PushID(nodeData.Object);
-
-
-		//	auto selectedNodeList = mVm->GetSelectedNodeList();
-		//	bool isSelectedNode   = selectedNodeList.find(nodeData.Object) != selectedNodeList.end();
-
-
-		//	if (UIManager::GetInstance().ShowContextMenu(GetType()) == true)
-		//	{
-		//		if (isContextOpen == false)
-		//		{
-		//			isContextOpen = true;
-		//			mVm->AddSelectedNode(nodeData.Object);
-		//			mVm->SetSelectedNodeInContextMenu(nodeData.Object);
-		//		}
-		//	}
-		//	else
-		//	{
-		//		isContextOpen = false;
-		//		if (ImGui::IsItemClicked() == true)
-		//		{
-		//			mVm->AddSelectedNode(nodeData.Object);
-		//			mVm->SetSelectedNodeInInspector(nodeData.Object);
-		//		}
-		//	}
-
-		//	// ¿ø·¡ isSelectedNode == false 
-		//	if (isCtrl == false && nodeData.IsSelected && ImGui::IsMouseReleased(0) && ImGui::IsItemHovered())
-		//	{
-		//		mVm->ClearSelectedNode();
-		//		mVm->AddSelectedNode(nodeData.Object);
-		//	}
-		//	else if (isCtrl == false && nodeData.IsSelected && isSelectedNode == false)
-		//	{
-		//		mVm->ClearSelectedNode();
-		//		mVm->AddSelectedNode(nodeData.Object);
-		//	}
-
-
-
-
-		//	(nodeData.IsSelected == true) ?
-		//		nodeData.UserFlags |= ImGuiTreeNodeFlags_Selected :
-		//		nodeData.UserFlags &= ~ImGuiTreeNodeFlags_Selected;
-
-
-		//	ImGui::PopID();
-		//	UpdateDragAndDrop(nodeData.Object);
-		//},
-		//	[&](WorldHierarchyTreeNode& nodeData)
-		//{
-		//	ImGui::TreePop();
-		//});
-		//ImGui::End();
-
-
-
-		//auto selectedNodeList = mVm->GetSelectedNodeList();
-		//for (auto& node : selectedNodeList)
-		//{
-		//	auto parentNode = node->GetParent();
-		//	if (parentNode == nullptr) continue;
-
-		//	i64 nodeIndex = parentNode->GetNodeIndex(node);
-		//	if (ImGui::IsKeyPressed((int)EKeyCode::NumPadAdd))
-		//	{
-		//		parentNode->Swap(nodeIndex, nodeIndex + 1);
-		//	}
-		//	if (ImGui::IsKeyPressed((int)EKeyCode::NumPadSubtract))
-		//	{
-		//		parentNode->Swap(nodeIndex, nodeIndex - 1);
-		//	}
-		//}
-
 		if (mOpenGUI == false)
 		{
 			mOpenGUI = true;
@@ -255,7 +180,9 @@ namespace JG
 			treeNodeState = GetTreeNodeState(gameNode);
 		}
 
-		i32 treeFlags = ImGuiTreeNodeFlags_OpenOnArrow;
+		i32  treeFlags  = ImGuiTreeNodeFlags_OpenOnArrow  | ImGuiTreeNodeFlags_FramePadding;
+		u32  tableColor = 0;
+		bool isActive  = gameNode->IsActive();
 		if (gameNode->GetParent() == nullptr)
 		{
 			treeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
@@ -268,24 +195,25 @@ namespace JG
 		{
 			treeFlags |= ImGuiTreeNodeFlags_Selected;
 		}
-	
-
-
 		ImGui::TableNextColumn();
-		ImGui::SetCursorPosX(ImGui::GetStyle().ItemSpacing.x * 2);
-		bool isActive = gameNode->IsActive();
+
 		if (isActive == false)
 		{
-			ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(100, 100, 100, 100), 0);
-			ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(100, 100, 100, 100), 1);
-			ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(100, 100, 100, 100), 2);
+			for (int i = 0; i < 4; ++i)
+			{
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(100, 100, 100, 100), i);
+			}
 		}
-		if (ImGui::Checkbox(("##Active_CheckBox" + gameNode->GetName()).c_str(), &isActive) && gameNode->GetParent() != nullptr)
+		else if (treeNodeState->IsState(NodeState_Selected) == true)
 		{
-			gameNode->SetActive(isActive);
+			
+			auto color = ImGui::GetStyle().Colors[ImGuiCol_Button];
+			for (int i = 0; i < 4; ++i)
+			{
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(color.x * 255, color.y * 255, color.z * 255, color.w * 100), i);
+			}
 		}
-
-		ImGui::TableNextColumn();
+		 
 		bool isOpen = ImGui::TreeNodeEx((const void*)gameNode, treeFlags, gameNode->GetName().c_str());
 		bool isItemClick = ImGui::IsItemClicked();
 		bool isClearSelectedFiles = mIsCtrl == false;
@@ -311,15 +239,39 @@ namespace JG
 			e.SelectedGameNode = gameNode;
 			SendEvent(e);
 		}
-
-
-
+	
+		ImGui::TableNextColumn();
+		if (ImGui::ArrowButton(("##UpButton" + gameNode->GetName()).c_str(), ImGuiDir_Up) || (mTargetGameNode == gameNode && ImGui::IsKeyPressed((i32)EKeyCode::NumPadSubtract)))
+		{
+			auto parent = gameNode->GetParent();
+			if (parent != nullptr)
+			{
+				auto ppData = CreateSharedPtr<PP_MoveInParentData>();
+				ppData->Command  = PostProcess_NodeMoveUp;
+				ppData->GameNode = gameNode;
+				mPostProcessQueue.push(ppData);
+			}
+		}ImGui::SameLine();
+		if (ImGui::ArrowButton(("##DownButton" + gameNode->GetName()).c_str(), ImGuiDir_Down) || (mTargetGameNode == gameNode && ImGui::IsKeyPressed((i32)EKeyCode::NumPadAdd)))
+		{
+			auto parent = gameNode->GetParent();
+			if (parent != nullptr)
+			{
+				auto ppData = CreateSharedPtr<PP_MoveInParentData>();
+				ppData->Command = PostProcess_NodeMoveDown;
+				ppData->GameNode = gameNode;
+				mPostProcessQueue.push(ppData);
+			}
+		}
 
 		ImGui::TableNextColumn();
 		ImGui::Text(ReplaceAll(gameNode->GetType().GetName(), "JG::", "").c_str());
+		ImGui::TableNextColumn();
 
-
-
+		if (ImGui::Checkbox(("##Active_CheckBox" + gameNode->GetName()).c_str(), &isActive) && gameNode->GetParent() != nullptr)
+		{
+			gameNode->SetActive(isActive);
+		}
 
 		if (isOpen == true)
 		{
@@ -330,7 +282,6 @@ namespace JG
 			}
 			ImGui::TreePop();
 		}
-
 		treeNodeState->Off(NodeState_Selected);
 	}
 
@@ -342,6 +293,48 @@ namespace JG
 			if (nodeState == nullptr) continue;
 			nodeState->On(NodeState_Selected);
 		}
+	}
+
+	void WorldHierarchyView::PostProcess()
+	{
+		while (mPostProcessQueue.empty() == false)
+		{
+			auto data = mPostProcessQueue.front(); mPostProcessQueue.pop();
+
+			switch (data->Command)
+			{
+			case PostProcess_NodeMoveUp:
+			{
+				auto move_in_parent_data = data->As<PP_MoveInParentData>();
+				if (move_in_parent_data != nullptr && move_in_parent_data->GameNode->GetParent())
+				{
+					auto p = move_in_parent_data->GameNode->GetParent();
+					u64 curIndex = p->GetNodeIndex(move_in_parent_data->GameNode);
+					if (curIndex > 0)
+					{
+						p->Swap(curIndex, curIndex - 1);
+					}
+				
+				}
+			}
+			break;
+			case PostProcess_NodeMoveDown:
+			{
+				auto move_in_parent_data = data->As<PP_MoveInParentData>();
+				if (move_in_parent_data != nullptr && move_in_parent_data->GameNode->GetParent())
+				{
+					auto p = move_in_parent_data->GameNode->GetParent();
+					u64 curIndex = p->GetNodeIndex(move_in_parent_data->GameNode);
+					p->Swap(curIndex, curIndex + 1);
+
+				}
+			}
+				break;
+			}
+
+
+		}
+
 	}
 
 	void WorldHierarchyView::CreateEmptyObject()
@@ -375,6 +368,85 @@ namespace JG
 		auto node = mTargetGameNode->AddNode("PointLight");
 		node->AddComponent<PointLight>();
 	}
+	void WorldHierarchyView::Copy(bool is_remove_gamenode_after_copy)
+	{
+		mGameNodeListToDeleteAfterCopy.clear();
+		List<GameNode*> removeList;
+		auto copyGameNodes = mSelectedGameNode;
+		for (auto& node : copyGameNodes)
+		{
+			for (auto& parentNode : copyGameNodes)
+			{
+				if (parentNode == node) continue;
+				if (node->GetParent() == parentNode)
+				{
+					removeList.push_back(node);
+					break;
+				}
+			}
+		}
+		for (auto& node : removeList)
+		{
+			copyGameNodes.erase(node);
+		}
+
+		mGameNodeJsonToCopy = CreateSharedPtr<Json>();
+		for (auto& node : copyGameNodes)
+		{
+			auto jsonData = mGameNodeJsonToCopy->CreateJsonData();
+			node->MakeJson(jsonData);
+			mGameNodeJsonToCopy->AddMember(jsonData);
+		}
+		if (is_remove_gamenode_after_copy)
+		{
+			mGameNodeListToDeleteAfterCopy = copyGameNodes;
+		}
+	}
+	void WorldHierarchyView::Paste()
+	{
+		if (mTargetGameNode == nullptr) return;
+		if (mGameNodeJsonToCopy == nullptr) return;
+
+		u64 copyCnt = mGameNodeJsonToCopy->GetSize();
+		for (u64 i = 0; i < copyCnt; ++i)
+		{
+			auto jsonData = mGameNodeJsonToCopy->GetJsonDataFromIndex(i);
+			auto node = mTargetGameNode->AddNode("PastedNode");
+			node->LoadJson(jsonData);
+		}
+
+		for (auto& node : mGameNodeListToDeleteAfterCopy)
+		{
+			GameObject::DestoryObject(node);
+		}
+	}
+
+	bool WorldHierarchyView::IsCanAbleToCopy()
+	{
+		bool result = true;
+		for (auto& node : mSelectedGameNode)
+		{
+			if (node->Is<GameWorld>() == true || node->Is<EditorCamera>())
+			{
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+
+	bool WorldHierarchyView::IsCanAbleToPaste()
+	{
+		return mGameNodeJsonToCopy != nullptr;
+	}
+
+	bool WorldHierarchyView::IsCanAbleToDelete()
+	{
+		return IsCanAbleToCopy();
+	}
+
+
+
 	WorldHierarchyView::NodeState* WorldHierarchyView::GetTreeNodeState(GameNode* gameNode)
 	{
 		if (mTreeNodeStatePool.find(gameNode) == mTreeNodeStatePool.end())
@@ -386,6 +458,7 @@ namespace JG
 			return mTreeNodeStatePool[gameNode].get();
 		}
 	}
+
 	bool WorldHierarchyView::ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e)
 	{
 		if (mTargetGameNode == e.DestroyedObject)

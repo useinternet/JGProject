@@ -63,6 +63,9 @@ namespace JG
 		virtual SharedPtr<IRenderItem> PushRenderItem() {
 			return nullptr;
 		}
+		virtual SharedPtr<IRenderItem> PushDebugRenderItem() {
+			return nullptr;
+		}
 		virtual SharedPtr<ILightItem> PushLightItem() {
 			return nullptr;
 		}

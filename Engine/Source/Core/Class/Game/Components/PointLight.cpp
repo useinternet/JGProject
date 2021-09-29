@@ -84,7 +84,7 @@ namespace JG
 		}
 	}
 #ifdef JG_EDITOR
-	SharedPtr<IRenderItem> PointLight::PushRenderItem()
+	SharedPtr<IRenderItem> PointLight::PushDebugRenderItem()
 	{
 
 		if (mTargetRI != nullptr)
@@ -120,7 +120,7 @@ namespace JG
 
 
 			f32 dis = JVector3::Length(location - mainCam->GetOwner()->GetTransform()->GetWorldLocation());
-			f32 scale = dis / 5;
+			f32 scale = dis / 10;
 			auto billboardMatrix = JMatrix::Scaling(JVector3(scale, scale, 1.0f)) * viewMatrix;
 			//
 			JBBox bbox;

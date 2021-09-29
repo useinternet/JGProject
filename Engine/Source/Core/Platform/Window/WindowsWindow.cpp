@@ -25,12 +25,15 @@ namespace JG
 		wcex.cbClsExtra  = 0;
 		wcex.cbWndExtra  = 0;
 		wcex.hInstance   = hInstance;
-		wcex.hIcon       = LoadIcon(0, IDI_APPLICATION);
+		if (props.IconID == -1) wcex.hIcon = LoadIcon(0, IDI_APPLICATION);
+		else wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(props.IconID));
+		if (props.IconID == -1) wcex.hIconSm = LoadIcon(0, IDI_APPLICATION);
+		else wcex.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(props.IconID));
 		wcex.hCursor     = LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.lpszMenuName  = 0;
 		wcex.lpszClassName = mProps.TitleName;
-		wcex.hIconSm = LoadIcon(0, IDI_APPLICATION);
+
 		RegisterClassExW(&wcex);
 		
 		mHandle = CreateWindowW(
@@ -46,7 +49,6 @@ namespace JG
 
 		ShowWindow(mHandle, SW_NORMAL);
 		UpdateWindow(mHandle);
-
 		return true;
 	}
 

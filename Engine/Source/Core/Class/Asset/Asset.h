@@ -191,6 +191,10 @@ namespace JG
 		// 참조하고있는 에셋
 		friend class AssetDataBase;
 		friend class AssetManager;
+
+		template<class T>
+		friend class Asset;
+
 	private:
 		u64  Origin = ASSET_NULL_ID;
 		u64  ID     = ASSET_NULL_ID;
@@ -225,6 +229,8 @@ namespace JG
 	class IAsset : public IJGObject
 	{
 		JGCLASS
+	protected:
+		virtual void Set(AssetID assetID, const String& assetPath) = 0;
 	public:
 		virtual AssetID GetAssetID() const = 0;
 		virtual const String& GetAssetFullPath() const = 0;
@@ -236,6 +242,8 @@ namespace JG
 	private:
 		friend class AssetDataBase;
 		virtual SharedPtr<IAsset> Copy() const = 0;
+	protected:
+		const String& GetAssetRootPath() const;
 	};
 
 
@@ -272,13 +280,16 @@ namespace JG
 			Set(assetID, assetPath);
 			mData = T::Create(mAssetPath);
 		}
-		void Set(AssetID assetID, const String& assetPath)
+	private:
+		virtual void Set(AssetID assetID, const String& assetPath) override
 		{
 			fs::path p(assetPath);
-			fs::path contentsPath = fs::absolute(Application::GetAssetPath()).string();
+			String contentsPath = ReplaceAll(fs::absolute(GetAssetRootPath()).string(), "\\", "/");
 			mAssetID = assetID;
-			mAssetFullPath = fs::absolute(assetPath).string();
-			mAssetPath = ReplaceAll(mAssetFullPath, contentsPath.string(), "Asset");
+		
+			mAssetFullPath = fs::absolute(assetPath).string(); mAssetFullPath = ReplaceAll(mAssetFullPath, "\\", "/");
+			mAssetPath = ReplaceAll(mAssetFullPath, contentsPath, "Asset");
+			strcpy(mAssetID.ResourcePath, mAssetPath.c_str());
 			mExtension = p.extension().string();
 			mName = ReplaceAll(p.filename().string(), mExtension, "");
 		}
@@ -321,6 +332,84 @@ namespace JG
 			return asset;
 		}
 	};
+
+	template<>
+	class Asset<GameWorld> : public IAsset
+	{
+		JGCLASS
+		friend class AssetDataBase;
+		friend class AssetManager;
+		AssetID mAssetID;
+		String  mAssetPath;
+		String  mAssetFullPath;
+		String  mExtension;
+		String  mName;
+		EAssetFormat mFormat;
+		SharedPtr<Json> mData = nullptr;
+	public:
+		Asset(AssetID assetID, const String& assetPath)
+		{
+			Set(assetID, assetPath);
+			mData = nullptr;
+		}
+		void Set(AssetID assetID, const String& assetPath)
+		{
+			fs::path p(assetPath);
+			fs::path contentsPath = fs::absolute(GetAssetRootPath()).string();
+			mAssetID = assetID;
+			mAssetFullPath = fs::absolute(assetPath).string();
+			mAssetPath = ReplaceAll(mAssetFullPath, contentsPath.string(), "Asset");
+			strcpy(mAssetID.ResourcePath, mAssetPath.c_str());
+			mExtension = p.extension().string();
+			mName = ReplaceAll(p.filename().string(), mExtension, "");
+		}
+	public:
+		virtual AssetID GetAssetID() const override
+		{
+			return mAssetID;
+		}
+		virtual const String& GetAssetFullPath() const override
+		{
+			return mAssetFullPath;
+		}
+		virtual const String& GetAssetPath() const override
+		{
+			return mAssetPath;
+		}
+		virtual const String& GetAssetName() const override
+		{
+			return mName;
+		}
+		virtual const String& GetExtension() const override
+		{
+			return mExtension;
+		}
+		bool IsValid() const {
+			return Get() != nullptr;
+		}
+		SharedPtr<JsonData> Get() const {
+			if (mData == nullptr)
+			{
+				return nullptr;
+			}
+			return mData->GetMember(JG_ASSET_KEY);
+		}
+		virtual void OnInspectorGUI() override {
+			AssetInspectorGUI::InspectorGUI(this);
+		}
+	public:
+		virtual ~Asset() = default;
+	private:
+		virtual SharedPtr<IAsset> Copy() const override {
+			auto asset = CreateSharedPtr<Asset<GameWorld>>(mAssetID, mAssetFullPath);
+			asset->mData = mData;
+			return asset;
+		}
+	};
+
+
+
+
 
 	class AssetManager;
 	class IMaterial;
@@ -396,6 +485,8 @@ namespace JG
 		SharedPtr<ScheduleHandle> mAssetLoadScheduleHandle = nullptr;
 		SharedPtr<ScheduleHandle> mAssetUnLoadScheduleHandle = nullptr;
 
+
+		std::mutex mAssetLoadMutex;
 		std::mutex mCompeleteMutex;
 		std::mutex mAssetRWMutex;
 
@@ -409,12 +500,14 @@ namespace JG
 		SharedPtr<AssetManager> RequestAssetManager();
 		void ReturnAssetManager(SharedPtr<AssetManager> assetManager);
 	public:
+		AssetID GetAssetOriginID(const String& path);
 		SharedPtr<IAsset> LoadOriginAsset(const String& path);
 		SharedPtr<IAsset> LoadReadWriteAsset(AssetID originID);
 		void	UnLoadAsset(AssetID id);
-		void RefreshAsset(AssetID originID);
+		void RefreshAsset(AssetID originID, const String& reName = String());
+		void RefreshAssetName(AssetID originID, const String& reName);
 	private:
-		AssetID RequestOriginAssetID(const String& resourcePath);
+		AssetID RequestOriginAssetID();
 		AssetID RequestRWAssetID(AssetID originID);
 		bool LoadAssetInternal(AssetLoadData* LoadData);
 

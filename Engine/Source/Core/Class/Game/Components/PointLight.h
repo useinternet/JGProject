@@ -31,8 +31,9 @@ namespace JG
 	private:
 		virtual void OnInspectorGUI() override;
 #ifdef JG_EDITOR
-		virtual SharedPtr<IRenderItem> PushRenderItem() override;
+		virtual SharedPtr<IRenderItem> PushDebugRenderItem() override;
 #endif
+
 		virtual SharedPtr<ILightItem> PushLightItem() override;
 	};
 }

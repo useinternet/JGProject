@@ -5,10 +5,6 @@
 
 namespace JG
 {
-	class IUIViewModel;
-	class UIViewModel;
-
-
 	class IUIError
 	{
 	public:
@@ -18,7 +14,6 @@ namespace JG
 
 	class IUIErrorReceiver
 	{
-		friend UIViewModel;
 	protected:
 		virtual void ReceiveError(SharedPtr<IUIError> error) = 0;
 	};
@@ -42,27 +37,21 @@ namespace JG
 		virtual ~IUIView() = default;
 	};
 
-	template<class ViewModelType>
+
 	class UIView : public IUIView
 	{
 		JGCLASS
 	private:
-		UniquePtr<ViewModelType> mViewModel;
 		bool mIsOpen = false;
 		bool mIsLoad = false;
 	protected:
-		virtual void OnEvent(IEvent& e) override {
-			static_cast<IUIViewModel*>(mViewModel.get())->OnEvent(e);
-		}
+		virtual void OnEvent(IEvent& e) override { }
 	protected:
 		virtual void Load()		  override {}
 		virtual void Initialize() override {}
 		virtual void OnGUI()	  override {}
 		virtual void Destroy()	  override {}
 	public:
-		ViewModelType* GetViewModel() const {
-			return mViewModel.get();
-		}
 		virtual bool IsOpen() const override {
 			return mIsOpen;
 		}
@@ -71,12 +60,6 @@ namespace JG
 			if (mIsOpen == false)
 			{
 				mIsOpen = true;
-				if (mViewModel == nullptr)
-				{
-					mViewModel = CreateUniquePtr<ViewModelType>();
-				}
-				static_cast<IUIViewModel*>(mViewModel.get())->Initialize();
-
 				if (mIsLoad == false)
 				{
 					Load();
@@ -90,7 +73,6 @@ namespace JG
 			if (mIsOpen == true)
 			{
 				mIsOpen = false;
-				static_cast<IUIViewModel*>(mViewModel.get())->Destroy();
 				Destroy();
 			}
 		}

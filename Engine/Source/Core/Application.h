@@ -4,7 +4,7 @@
 #include "Class/SystemLayerStack.h"
 #include "Graphics/GraphicsAPI.h"
 int main(int argc, char** argv);
-
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow);
 
 namespace JG
 {
@@ -25,6 +25,7 @@ namespace JG
 		static const String& GetShaderGlobalLibPath();
 		static const String& GetShaderScriptPath();
 		static const String& GetShaderTemplatePath();
+		static const String& GetConfigPath();
 	private:
 		static Application* smInstance;
 	private:
@@ -83,6 +84,8 @@ namespace JG
 		}
 	private:
 		friend int ::main(int argc, char** argv);
+		friend int APIENTRY ::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow);
+
 	};
 
 }

@@ -32,7 +32,8 @@ namespace JG
 		};
 
 
-		String mGameWorldJsonPath;
+
+		SharedPtr<IAsset> mGameWorldAssetInstance = nullptr;
 		GameWorld* mGameWorld = nullptr;
 		List<GlobalGameSystem*> mGameSystemList;
 

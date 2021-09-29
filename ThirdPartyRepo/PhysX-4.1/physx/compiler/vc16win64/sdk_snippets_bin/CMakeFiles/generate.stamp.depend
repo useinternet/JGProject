@@ -1,0 +1,15 @@
+# CMake generation dependency list for this directory.
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/externals/cmakemodules/ConfigureFileMT.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/externals/cmakemodules/GetCompilerAndPlatform.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/externals/cmakemodules/NvidiaBuildOptions.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/externals/cmakemodules/SetOutputPaths.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/CMakeLists.txt
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/SnippetRender.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/SnippetTemplate.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/SnippetUtils.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/SnippetVehicleTemplate.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/windows/CMakeLists.txt
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/windows/SnippetRender.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/windows/SnippetTemplate.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/windows/SnippetUtils.cmake
+C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/snippets/compiler/cmake/windows/SnippetVehicleTemplate.cmake

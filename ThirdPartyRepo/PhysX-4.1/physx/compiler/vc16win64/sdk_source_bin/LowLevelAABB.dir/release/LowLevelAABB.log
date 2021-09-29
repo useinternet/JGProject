@@ -1,0 +1,11 @@
+﻿  Building Custom Rule C:/JGProject/ThirdPartyRepo/PhysX-4.1/physx/source/compiler/cmake/CMakeLists.txt
+  BpAABBManager.cpp
+  BpBroadPhase.cpp
+  BpBroadPhaseABP.cpp
+  BpBroadPhaseMBP.cpp
+  BpBroadPhaseSap.cpp
+  BpBroadPhaseSapAux.cpp
+  BpBroadPhaseShared.cpp
+  BpMBPTasks.cpp
+  BpSAPTasks.cpp
+  LowLevelAABB.vcxproj -> C:\JGProject\ThirdPartyRepo\PhysX-4.1\physx\bin\win.x86_64.vc142.mt\release\LowLevelAABB_static_64.lib

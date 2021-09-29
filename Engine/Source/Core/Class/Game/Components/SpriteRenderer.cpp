@@ -7,7 +7,6 @@
 #include "Graphics/Resource.h"
 #include "Graphics/Mesh.h"
 #include "Class/Game/GameWorld.h"
-#include "Class/UI/UIViewModel/ContentsViewModel.h"
 #include "Common/DragAndDrop.h"
 namespace JG
 {

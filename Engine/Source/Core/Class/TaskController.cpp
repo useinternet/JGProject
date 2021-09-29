@@ -85,7 +85,17 @@ namespace JG
 				}
 
 				auto& task = mTaskPool[mCurrTaskID];
-
+				if (task.Handle && task.Handle->GetState() == EScheduleState::Compelete)
+				{
+					if (task.Next)
+					{
+						mCurrTaskID = task.Next(mUserData);
+					}
+					else
+					{
+						mCurrTaskID = -1;
+					}
+				}
 				// 핸들이 처음일 경우
 				if (task.Handle == nullptr)
 				{
@@ -96,18 +106,6 @@ namespace JG
 							task.Run(userData);
 						}
 					}, mUserData);
-				}
-				// 현재 도는 중이고 다음 껄로 넘어갈때
-				else if (task.Handle->GetState() == EScheduleState::Compelete)
-				{
-					if (task.Next)
-					{
-						mCurrTaskID = task.Next(mUserData);
-					}
-					else
-					{
-						mCurrTaskID = -1;
-					}
 				}
 			});
 

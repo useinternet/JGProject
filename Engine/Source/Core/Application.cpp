@@ -7,6 +7,10 @@
 #include "Platform/Window/WindowsWindow.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Shader.h"
+
+
+#include "Platform/Physics/PhysX/PhysXAPI.h"
+
 using namespace std;
 namespace JG
 {
@@ -17,6 +21,7 @@ namespace JG
 	static String gIconPath    = CombinePath(Application::GetEnginePath(), "Icon");
 	static String gTexturePath = CombinePath(Application::GetEnginePath(), "Texture");
 	static String gMeshPath    = CombinePath(Application::GetEnginePath(), "Mesh");
+	static String gConfigPath = CombinePath(Application::GetEnginePath(), "Config");
 	static String gShaderGlobalLibPath = CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
 	static String gShaderScriptPath   = CombinePath(Application::GetEnginePath(), "Shader/Script");
 	static String gShaderTemplatePath = CombinePath(Application::GetEnginePath(), "Shader/Template");
@@ -60,6 +65,11 @@ namespace JG
 	const String& Application::GetShaderTemplatePath()
 	{
 		return gShaderTemplatePath;
+	}
+
+	const String& Application::GetConfigPath()
+	{
+		return gConfigPath;
 	}
 
 
