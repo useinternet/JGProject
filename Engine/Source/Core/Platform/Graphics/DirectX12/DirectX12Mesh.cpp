@@ -30,6 +30,14 @@ namespace JG
 	{
 		return mIndexBuffer->GetIndexCount();
 	}
+	void DirectX12SubMesh::SetInstanceCount(u32 cnt)
+	{
+		mInstanceCount = cnt;
+	}
+	u32 DirectX12SubMesh::GetInstanceCount() const
+	{
+		return mInstanceCount;
+	}
 	bool DirectX12SubMesh::Bind()
 	{
 		if (mVertexBuffer == nullptr)

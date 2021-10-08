@@ -98,7 +98,9 @@ namespace JG
 		static JMatrix RotationAxis(const JVector3& axis, float angle);
 		static JMatrix Scaling(const JVector3& v);
 		static JMatrix LookAtLH(const JVector3& pos, const JVector3& target, const JVector3& up);
+		static JMatrix LookToLH(const JVector3& pos, const JVector3& targetDir, const JVector3& up);
 		static JMatrix LookToLH(const JVector3& pos, const JVector3& up, const JVector3& right, const JVector3& look);
+		static JVector3 ToEulerAngles(const JMatrix& m);
 		inline static JMatrix PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 		{
 			JMatrix result;

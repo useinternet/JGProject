@@ -147,12 +147,6 @@ namespace JG
 
 					}
 				}
-
-
-	
-
-
-
 			}
 	
 
@@ -163,7 +157,7 @@ namespace JG
 				JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
 				continue;
 			}
-			api->DrawIndexed(GetCommandID(), mesh->GetSubMesh(i)->GetIndexCount());
+			api->DrawIndexed(GetCommandID(), mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
 		}
 		
 		

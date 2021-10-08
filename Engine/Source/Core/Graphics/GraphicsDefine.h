@@ -280,7 +280,13 @@ namespace JG
 	};
 	using EComputerState = EComputeBufferState;
 	
-
+	enum class EGeometryType
+	{
+		Box,
+		Sphere,
+		Capsule,
+		Line,
+	};
 
 
 
@@ -361,6 +367,15 @@ namespace JG
 		List<SharedPtr<IMaterial>> Materials;
 	};
 
+	class DebugRenderItem : public IRenderItem
+	{
+		JGCLASS
+	public:
+		SharedPtr<IMesh> Mesh         = nullptr;
+		SharedPtr<IMaterial> Material = nullptr;
+		Color Color = Color::White();
+	};
+
 
 
 	// LightItem
@@ -415,6 +430,7 @@ namespace JG
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
 			constexpr char* Standard3DShader = "Standard3DShader";
+			constexpr char* DebugShader = "DebugShader";
 		}
 
 		namespace Standard2D

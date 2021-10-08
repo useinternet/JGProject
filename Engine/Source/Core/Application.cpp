@@ -7,10 +7,7 @@
 #include "Platform/Window/WindowsWindow.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Shader.h"
-
-
-#include "Platform/Physics/PhysX/PhysXAPI.h"
-
+#include "Graphics/DebugGeometryDrawer.h"
 using namespace std;
 namespace JG
 {
@@ -103,8 +100,6 @@ namespace JG
 		// 필요한 멤버 클래스 생성
 		mLayerStack  = CreateUniquePtr<SystemLayerStack>();
 		mGraphcisAPI = IGraphicsAPI::Create(EGraphicsAPI::DirectX12);
-		
-
 		// NOTE
 		// Window 생성
 		switch(prop.WindowPlatform)
@@ -132,10 +127,15 @@ namespace JG
 			ShaderLibrary::Create();
 			mIsRunning = true;
 		}
+		PhysicsManager::Create();
+
+
+
 		mAppTimer = Timer::Create();
 		mAppTimer->Start();
-
 		ITexture::CreateNullTexture();
+		DebugGeometryDrawer::Create();
+
 		return true;
 	}
 	void Application::Run()
@@ -186,7 +186,10 @@ namespace JG
 	{
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
+
+		DebugGeometryDrawer::Destroy();
 		ITexture::DestroyNullTexture();
+		PhysicsManager::Destroy();
 		mGraphcisAPI->Flush();
 		UIManager::Destroy();
 		mLayerStack.reset();

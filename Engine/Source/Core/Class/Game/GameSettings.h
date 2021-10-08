@@ -11,7 +11,7 @@ namespace JG
 	{
 	private:
 		static JVector2 Resolution;
-		static u32 UnitSize;
+		static u32      UnitSize;
 	public:
 		static const JVector2& GetResolution() {
 			return Resolution;

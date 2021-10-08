@@ -10,7 +10,7 @@ namespace JG
 		SharedPtr<IVertexBuffer> mVertexBuffer;
 		SharedPtr<IIndexBuffer> mIndexBuffer;
 		String mName;
-
+		u64 mInstanceCount = 1;
 	public:
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) override;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer) override;
@@ -19,6 +19,8 @@ namespace JG
 		virtual void SetName(const String& name) override;
 		virtual const String& GetName() const override;
 		virtual u32 GetIndexCount() const override;
+		virtual void SetInstanceCount(u32 cnt) override;
+		virtual u32 GetInstanceCount() const override;
 		virtual bool Bind() override;
 		virtual bool IsValid() const override;
 	};

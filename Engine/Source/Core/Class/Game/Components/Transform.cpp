@@ -18,7 +18,8 @@ namespace JG
 
 		bool mIsRotationDirty = mRotation != rotation;
 		mRotation = rotation;
-		CheckLimitRotation(mRotation);
+		NormalizeRotation(mRotation);
+		mQuaternion = JQuaternion::ToQuaternion(Math::ConvertToRadians(mRotation));
 		if (mIsRotationDirty)
 		{
 			SendDirty(SendDirtyFlag_RoationDirty);
@@ -47,6 +48,23 @@ namespace JG
 	void Transform::SetWorldScale(const JVector3& scale)
 	{
 		SetLocalScale(GetLocalScale() + (scale - GetWorldScale()));
+	}
+	void Transform::SetLocalQuaternion(const JQuaternion& q)
+	{
+		bool mIsRotationDirty = mQuaternion != q;
+
+		mQuaternion = q;
+		mRotation = Math::ConvertToDegrees(JQuaternion::ToEuler(q));
+		NormalizeRotation(mRotation);
+		if (mIsRotationDirty)
+		{
+			SendDirty(SendDirtyFlag_RoationDirty);
+		}
+	}
+	void Transform::SetWorldQuaternion(const JQuaternion& q)
+	{
+		auto local_q = GetLocalQuaternion() * JQuaternion::Inverse(GetWorldQuaternion()) * q;
+		SetLocalQuaternion(local_q);
 	}
 	const JVector3& Transform::GetLocalLocation() const
 	{
@@ -85,6 +103,48 @@ namespace JG
 	{
 		UpdateInvWorldMatrix();
 		return mInvWorldMatrix;
+	}
+	//const JMatrix& Transform::GetLocalRotationMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//const JMatrix& Transform::GetLocalTranslateMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//const JMatrix& Transform::GetLocalScaleMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//const JMatrix& Transform::GetUpdateRotationMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//const JMatrix& Transform::GetUpdateTranslateMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//const JMatrix& Transform::GetUpdateScaleMatrix() const
+	//{
+	//	// TODO: 여기에 return 문을 삽입합니다.
+	//}
+	//void Transform::SetLocalQuaternion(const JQuaternion& q)
+	//{
+
+
+	//}
+	//void Transform::SetWorldQuaternion(const JQuaternion& q)
+	//{
+
+	//}
+	const JQuaternion& Transform::GetLocalQuaternion() const
+	{
+		return mQuaternion;
+	}
+	const JQuaternion& Transform::GetWorldQuaternion() const
+	{
+		UpdateWorldRotation();
+		return mWorldQuaternion;
 	}
 	void Transform::Refresh()
 	{
@@ -130,12 +190,9 @@ namespace JG
 		mIsInvDirty = true;
 
 		auto worldLocation = GetWorldLocation();
-		auto worldRotation = GetWorldRotation();
+		auto worldQuat     = GetWorldQuaternion();
 		auto worldScale    = GetWorldScale();
-		auto toRadian      = Math::ConvertToRadians(worldRotation);
-		CheckLimitRadian(toRadian);
-
-		mWorldMatrix = JMatrix::Scaling(worldScale) * JMatrix::Rotation(JQuaternion::ToQuaternion(toRadian)) * JMatrix::Translation(worldLocation);
+		mWorldMatrix = JMatrix::Scaling(worldScale) * JMatrix::Rotation(worldQuat) * JMatrix::Translation(worldLocation);
 	}
 	void Transform::UpdateWorldLocation() const
 	{
@@ -167,13 +224,15 @@ namespace JG
 		auto parent = GetOwner()->GetParent();
 		if (parent == nullptr)
 		{
-			mWorldRotation = GetLocalRotation();
+			mWorldRotation   = GetLocalRotation();
+			mWorldQuaternion = GetLocalQuaternion();
 		}
 		else
 		{
-			mWorldRotation = GetLocalRotation() + parent->GetTransform()->GetWorldRotation();
+			mWorldRotation   = GetLocalRotation() + parent->GetTransform()->GetWorldRotation();
+			mWorldQuaternion = parent->GetTransform()->GetWorldQuaternion() * GetLocalQuaternion();
 		}
-
+		NormalizeRotation(mWorldRotation);
 	}
 	void Transform::UpdateWorldScale() const
 	{
@@ -203,34 +262,7 @@ namespace JG
 		mIsInvDirty = false;
 		mInvWorldMatrix = JMatrix::Inverse(GetWorldMatrix());
 	}
-	void Transform::CheckLimitRadian(JVector3& toRadian) const
-	{
-		while (toRadian.x <= 0.0f)
-		{
-			toRadian.x += JG_2PI;
-		}
-		while (toRadian.x >= JG_2PI)
-		{
-			toRadian.x -= JG_2PI;
-		}
-		while (toRadian.y <= 0.0f)
-		{
-			toRadian.y += JG_2PI;
-		}
-		while (toRadian.y >= JG_2PI)
-		{
-			toRadian.y -= JG_2PI;
-		}
-		while (toRadian.z <= 0.0f)
-		{
-			toRadian.z += JG_2PI;
-		}
-		while (toRadian.z >= JG_2PI)
-		{
-			toRadian.z -= JG_2PI;
-		}
-	}
-	void Transform::CheckLimitRotation(JVector3& toDegree) const
+	void Transform::NormalizeRotation(JVector3& toDegree) const
 	{
 		while (toDegree.x <= 0.0f)
 		{
@@ -269,13 +301,20 @@ namespace JG
 		f32 label_width = ImGui::CalcTextSize("Location").x;
 
 
-		ImGui::Vector3_OnGUI("Location", location, label_width);
-		ImGui::Vector3_OnGUI("Rotation", rotation, label_width);
-		ImGui::Vector3_OnGUI("Scale", scale, label_width);
+		if (ImGui::Vector3_OnGUI("Location", location, label_width) == true)
+		{
+			SetLocalLocation(location);
+		}
+		if (ImGui::Vector3_OnGUI("Rotation", rotation, label_width) == true)
+		{
+			SetLocalRotation(rotation);
+		}
+		if (ImGui::Vector3_OnGUI("Scale", scale, label_width) == true)
+		{
+			SetLocalScale(scale);
+		}
 
-		SetLocalLocation(location);
-		SetLocalRotation(rotation);
-		SetLocalScale(scale);
+
 	}
 	void Transform::OnChange(const ChangeData& data)
 	{

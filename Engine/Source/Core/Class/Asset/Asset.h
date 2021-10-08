@@ -110,6 +110,18 @@ namespace JG
 			}
 		}
 	};
+	struct JGDebugVertex
+	{
+		JVector3 Position;
+		Color Color = Color::White();
+		static SharedPtr<InputLayout> GetInputLayout() {
+			auto inputLayout = InputLayout::Create();
+			inputLayout->Add(EShaderDataType::_float3, "POSITION", 0);
+			inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
+
+			return inputLayout;
+		}
+	};
 	struct JGBone
 	{
 

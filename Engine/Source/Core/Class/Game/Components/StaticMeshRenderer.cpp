@@ -20,6 +20,7 @@ namespace JG
 	}
 	void StaticMeshRenderer::Start()
 	{
+
 	}
 	void StaticMeshRenderer::Destory()
 	{
@@ -178,63 +179,11 @@ namespace JG
 		{
 			mMaterialList.pop_back();
 		}, label_width);
-		//OnInspector_MeshGUI();
-		//OnInspector_MaterialGUI();
 	}
 	void StaticMeshRenderer::OnInspector_MeshGUI()
 	{
-		//String out;
-		//String in = "None";
-		//if (mMesh)
-		//{
-		//	in = mMesh->GetAssetName();
-		//}
-		//if (ImGui::AssetField("Mesh    ", in, EAssetFormat::Mesh, out))
-		//{
-		//	mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(out);
-		//}
 	}
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
 	{
-
-
-
-
-		//auto cnt = mMaterialList.size();
-		//bool isOpenTree = ImGui::TreeNodeEx(("Material : " + std::to_string(cnt)).c_str(), ImGuiTreeNodeFlags_DefaultOpen);
-		//ImGui::SameLine();
-		//if (ImGui::SmallButton("+"))
-		//{
-		//	mMaterialList.push_back(nullptr);
-		//}ImGui::SameLine();
-		//if (ImGui::SmallButton("-"))
-		//{
-		//	if (mMaterialList.empty() == false)
-		//	{
-		//		mMaterialList.pop_back();
-		//	}
-
-		//}
-
-
-		//if (isOpenTree)
-		//{
-		//	cnt = mMaterialList.size();
-		//	for (i32 i = 0; i < cnt; ++i)
-		//	{
-		//		String out;
-		//		String in = "None";
-		//		if (mMaterialList[i])
-		//		{
-		//			in = mMaterialList[i]->GetAssetName();
-		//		}
-
-		//		if (ImGui::AssetField("Slot " + std::to_string(i), in, EAssetFormat::Material, out))
-		//		{
-		//			mMaterialList[i] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(out);
-		//		}
-		//	}
-		//	ImGui::TreePop();
-		//}
 	}
 }

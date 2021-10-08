@@ -27,6 +27,9 @@ namespace JG
 		SharedPtr<ScheduleHandle> mUpdateScheduleHandle;
 		SharedPtr<ScheduleHandle> mLateUpdateScheduleHandle;
 		EGameWorldFlags mGameWorldFlags = EGameWorldFlags::None;
+
+		PhysicsHandle mPxSceneHandle = 0;
+		JVector3 mGravity;
 	public:
 		GameWorld();
 	protected:
@@ -53,6 +56,11 @@ namespace JG
 		void Destroy(GameWorld* world);
 		void AddFlags(EGameWorldFlags flags);
 		void RemoveFlags(EGameWorldFlags flags);
+	public:
+		void SetGravity(const JVector3& gravity);
+		const JVector3& GetGravity() const;
+
+		PhysicsHandle GetPxSceneHandle() const;
 	public:
 		GameNode* Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList);
 		// 에디터 카메라 컬링

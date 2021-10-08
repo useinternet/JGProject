@@ -267,6 +267,22 @@ namespace JG
 				cameraItem->Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
 			}
 		}
+		else if (type == JGTYPE(DebugRenderItem))
+		{
+			for (auto& item : renderItemList)
+			{
+				auto _3dItem = static_cast<DebugRenderItem*>(item.get());
+				if (_3dItem->Material == nullptr)
+				{
+					continue;
+				}
+				cameraItem->Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, { _3dItem->Material });
+			}
+
+
+
+
+		}
 		else
 		{
 			// Not Supported

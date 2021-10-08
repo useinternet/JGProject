@@ -40,6 +40,7 @@
 #include "Class/Global/Scheduler.h"
 #include "Class/Global/UIManager.h"
 #include "Class/Global/GameLayerManager.h"
+#include "Class/Global/PhysicsManager.h"
 
 
 #include "ExternalImpl/ImGuiExternal.h"

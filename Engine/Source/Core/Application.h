@@ -3,6 +3,7 @@
 #include "Platform/Window/Window.h"
 #include "Class/SystemLayerStack.h"
 #include "Graphics/GraphicsAPI.h"
+#include "Physcis/PhysicsAPI.h"
 int main(int argc, char** argv);
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow);
 
@@ -67,7 +68,8 @@ namespace JG
 	public:
 		IWindow*	  GetWindow() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
-		const Timer* GetAppTimer() const;
+		IPhysicsAPI*  GetPhysicsAPI() const;
+		const Timer*  GetAppTimer() const;
 		JVector2Uint  GetDisplaySize() const;
 	public:
 		template<class T>

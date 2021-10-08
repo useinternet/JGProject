@@ -1,0 +1,47 @@
+
+cbuffer Camera
+{
+	float4x4 gViewProj;
+	float3   gEye;
+};
+cbuffer ObjectParams
+{
+	float4x4 gWorld;
+}
+struct VS_IN
+{
+	float3 posL : POSITION;
+};
+struct VS_OUT
+{
+	float4 posH    : SV_POSITION;
+	float4 color    : COLOR;
+};
+
+struct DebugData
+{
+	float4 Color;
+	float4x4 WorldMatrix;	
+};
+
+StructuredBuffer<DebugData> gDebugDataInstances;
+	
+VS_OUT vs_main(VS_IN vin, uint insID : SV_InstanceID )
+{
+	VS_OUT vout;
+	DebugData debugData = gDebugDataInstances[insID];
+	float4x4 worldmat = debugData.WorldMatrix;
+	
+
+	//float3 posW = mul(float4(vin.posL, 1.0f), gWorld);
+	float3 posW = mul(float4(vin.posL, 1.0f), worldmat);
+	vout.posH = mul(float4(posW, 1.0f), gViewProj);
+	vout.color = debugData.Color;
+	//vout.color = float4(1.0f,1.0f,1.0f,1.0f);
+	return vout;
+}
+
+float4 ps_main(VS_OUT pin) : SV_TARGET
+{
+	return pin.color;
+}

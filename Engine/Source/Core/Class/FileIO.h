@@ -4,6 +4,7 @@
 #include "Common/Define.h"
 #include "Common/String.h"
 #include "Math/JVector.h"
+#include "Math/JQuaternion.h"
 #include "Math/JMatrix.h"
 #include "Math/JBBox.h"
 #include <rapidjson/ostreamwrapper.h>
@@ -57,6 +58,8 @@ namespace JG
 		rapidjson::Value MakeJsonValue(const JVector3& value);
 		template<>
 		rapidjson::Value MakeJsonValue(const JVector4& value);
+		template<>
+		rapidjson::Value MakeJsonValue(const JQuaternion& value);
 		template<>
 		rapidjson::Value MakeJsonValue(const JVector2Int& value);
 		template<>
@@ -160,6 +163,18 @@ namespace JG
 		{
 
 			JVector4 result;
+			i32 index = 0;
+			if (mValue.IsArray() == false) return result;
+			for (auto& v : mValue.GetArray())
+			{
+				result[index++] = v.GetFloat();
+			}
+			return result;
+		}
+		JQuaternion GetQuaternion() const
+		{
+
+			JQuaternion result;
 			i32 index = 0;
 			if (mValue.IsArray() == false) return result;
 			for (auto& v : mValue.GetArray())
@@ -463,6 +478,17 @@ namespace JG
 	}
 	template<>
 	inline rapidjson::Value JsonData::MakeJsonValue(const JVector4& value)
+	{
+		rapidjson::Value val;
+		val.SetArray();
+		val.PushBack(value.x, mJson->GetAllocator());
+		val.PushBack(value.y, mJson->GetAllocator());
+		val.PushBack(value.z, mJson->GetAllocator());
+		val.PushBack(value.w, mJson->GetAllocator());
+		return val;
+	}
+	template<>
+	inline rapidjson::Value JsonData::MakeJsonValue(const JQuaternion& value)
 	{
 		rapidjson::Value val;
 		val.SetArray();

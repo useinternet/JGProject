@@ -77,6 +77,14 @@ namespace JG
 		SharedPtr<ScheduleHandle> ScheduleOnceByFrame(i32 delayFrame, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task);
 
+		void DrawDebugRay(const JRay& ray, f32 length, Color& color);
+		void DrawDebugLine(const JVector3& startPos, const JVector3& endPos,Color& color);
+		void DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color);
+		void DrawDebugSphere(const JVector3& center, f32 r, const Color& color);
+		
+
+
+
 		template<class T>
 		void SendEvent(T& e)
 		{

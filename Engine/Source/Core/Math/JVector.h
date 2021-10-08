@@ -415,6 +415,11 @@ namespace JG
 			auto sim = DirectX::XMVector3Cross(GetSIMD(v1), GetSIMD(v2));
 			return ConvertJVector3(sim);
 		}
+		inline static f32 AnglesBetweenVectors(const JVector3& v1, const JVector3& v2)
+		{
+			auto sim = DirectX::XMVector3AngleBetweenVectors(GetSIMD(v1), GetSIMD(v2));
+			return ConvertJVector3(sim).x;
+		}
 		inline static bool Equals(const JVector3& v1, const JVector3& v2, float error_range = ERROR_RANGE)
 		{
 			JVector3 delta_v = v1 - v2;

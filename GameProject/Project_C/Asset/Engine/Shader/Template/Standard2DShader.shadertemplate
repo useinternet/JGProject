@@ -8,6 +8,7 @@ Texture2D gTexture[64];
 cbuffer Camera
 {
 	float4x4 gViewProj;
+	float3   gEye;
 };
 		
 struct VS_IN

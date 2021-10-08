@@ -5,7 +5,7 @@
 #include "GameWorld.h"
 #include "Components/Transform.h"
 #include "Class/Global/Scheduler.h"
-
+#include "Graphics/DebugGeometryDrawer.h"
 namespace JG
 {
 	GameObject::~GameObject()
@@ -47,6 +47,26 @@ namespace JG
 	SharedPtr<ScheduleHandle> GameObject::ScheduleAsync(const AsyncTaskFunction& task)
 	{
 		return Scheduler::GetInstance().ScheduleAsync(task);
+	}
+	void GameObject::DrawDebugRay(const JRay& ray, f32 length, Color& color)
+	{
+		DebugGeometryDrawer::GetInstance().DrawDebugLine(ray, length, color);
+	}
+	void GameObject::DrawDebugLine(const JVector3& startPos, const JVector3& endPos, Color& color)
+	{
+		JRay ray;
+		ray.origin = startPos;
+		ray.dir = JVector3::Normalize(endPos - startPos);
+		f32 len = JVector3::Length(endPos - startPos);
+		DrawDebugRay(ray, len, color);
+	}
+	void GameObject::DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color)
+	{
+		DebugGeometryDrawer::GetInstance().DrawDebugBox(location, quat, size, color);
+	}
+	void GameObject::DrawDebugSphere(const JVector3& center, f32 r, const Color& color)
+	{
+		DebugGeometryDrawer::GetInstance().DrawDebugSphere(center, r, color);
 	}
 	void GameObject::MakeJson(SharedPtr<JsonData> jsonData) const
 	{

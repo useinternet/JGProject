@@ -35,6 +35,9 @@ namespace JG
 			return EScheduleResult::Continue;
 		});
 
+
+
+		mPxSceneHandle = PhysicsManager::GetInstance().CreatePxScene();
 	}
 	void GameWorld::Update()
 	{
@@ -49,7 +52,7 @@ namespace JG
 		GameNode::Destory();
 
 
-
+		PhysicsManager::GetInstance().RemovePxScene(mPxSceneHandle);
 		AssetDataBase::GetInstance().ReturnAssetManager(mAssetManager);
 		mAssetManager = nullptr;
 
@@ -71,42 +74,48 @@ namespace JG
 		ImGui::Dummy(ImVec2(0, 1.0f));
 		ImGui::Separator();
 
-		for (auto& globalSystem : mGlobalGameSystemList)
-		{
-		
-			ImGui::Spacing();
-			String id = globalSystem->GetName() + "##" + std::to_string((ptraddr)globalSystem);
 
-			if (ImGui::CollapsingHeader(
-				id.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-			{
-				globalSystem->OnInspectorGUI();
-			}
+		if (ImGui::CollapsingHeader("Physcis", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
+		{
+			auto gravity = GetGravity();
+			i32 label_space = ImGui::CalcTextSize("Gravity").x;
+			ImGui::Vector3_OnGUI("Gravity", gravity, label_space);
 		}
 
+		//for (auto& globalSystem : mGlobalGameSystemList)
+		//{
+		//
+		//	ImGui::Spacing();
+		//	String id = globalSystem->GetName() + "##" + std::to_string((ptraddr)globalSystem);
 
-		List<GameSystem*> removeSysList;
-		for (auto& system : mWorldGameSystemList)
-		{
-			bool is_open = true;
-			ImGui::Spacing();
-			String id = system->GetName() + "##" + std::to_string((ptraddr)system);
-			if (ImGui::CollapsingHeader(
-				id.c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-			{
-				system->OnInspectorGUI();
-			}
+		//	if (ImGui::CollapsingHeader(
+		//		id.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
+		//	{
+		//		globalSystem->OnInspectorGUI();
+		//	}
+		//}
+		//List<GameSystem*> removeSysList;
+		//for (auto& system : mWorldGameSystemList)
+		//{
+		//	bool is_open = true;
+		//	ImGui::Spacing();
+		//	String id = system->GetName() + "##" + std::to_string((ptraddr)system);
+		//	if (ImGui::CollapsingHeader(
+		//		id.c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
+		//	{
+		//		system->OnInspectorGUI();
+		//	}
 
-			if (is_open == false)
-			{
-				removeSysList.push_back(system);
-			}
-		}
+		//	if (is_open == false)
+		//	{
+		//		removeSysList.push_back(system);
+		//	}
+		//}
 
-		for (auto& sys : removeSysList)
-		{
-			Destroy(sys);
-		}
+		//for (auto& sys : removeSysList)
+		//{
+		//	Destroy(sys);
+		//}
 
 	}
 	AssetManager* GameWorld::GetAssetManager() const
@@ -147,6 +156,24 @@ namespace JG
 	void GameWorld::RemoveFlags(EGameWorldFlags flags)
 	{
 		mGameWorldFlags = (EGameWorldFlags)((i32)mGameWorldFlags & (~(i32)flags));
+	}
+
+	void GameWorld::SetGravity(const JVector3& gravity)
+	{
+		PhysicsManager::GetInstance().PxSceneReadWrite(mPxSceneHandle,
+			[&](physx::PxScene* scene)
+		{
+			scene->setGravity(physx::PxVec3(gravity.x, gravity.y, gravity.z));
+		});
+	}
+	const JVector3& GameWorld::GetGravity() const
+	{
+		return mGravity;
+	}
+
+	PhysicsHandle GameWorld::GetPxSceneHandle() const
+	{
+		return mPxSceneHandle;
 	}
 
 	GameNode* GameWorld::Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList)

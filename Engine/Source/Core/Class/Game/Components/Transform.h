@@ -22,17 +22,40 @@ namespace JG
 	private:
 		JVector3 mLocation;
 		JVector3 mRotation;
+		JQuaternion mQuaternion;
 		JVector3 mScale = { 1.0f,1.0f,1.0f };
+
+
+		//JMatrix mLocalTranslateMatrix;
+		//JMatrix mLocalRotationMatrix;
+		//JMatrix mLocalScaleMatrix;
+
+
+		//JMatrix mWorldTranslateMatrix;
+		//JMatrix mWorldRotationMatrix;
+		//JMatrix mWorldScaleMatrix;
+
+
+
 
 
 		mutable JVector3 mWorldLocation;
 		mutable JVector3 mWorldRotation;
+		mutable JQuaternion mWorldQuaternion;
 		mutable JVector3 mWorldScale;
 
 
 		mutable JMatrix mWorldMatrix;
 		mutable JMatrix mInvWorldMatrix;
-		mutable JMatrix mLocalMatrix;
+
+
+
+
+
+
+
+
+
 		mutable bool mIsDirty = true;
 		mutable bool mIsLocationDirty = true;
 		mutable bool mIsRotationDirty = true;
@@ -49,6 +72,9 @@ namespace JG
 		void SetWorldScale(const JVector3& scale);
 
 
+		void SetLocalQuaternion(const JQuaternion& q);
+		void SetWorldQuaternion(const JQuaternion& q);
+
 
 		const JVector3& GetLocalLocation() const;
 		const JVector3& GetLocalRotation() const;
@@ -62,19 +88,27 @@ namespace JG
 		const JMatrix& GetWorldMatrix() const;
 		const JMatrix& GetInvWorldMatrix() const;
 
+
+		const JQuaternion& GetLocalQuaternion() const;
+		const JQuaternion& GetWorldQuaternion() const;
+
 		void Refresh();
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	private:
-		void UpdateWorldMatrix() const;
+		void UpdateWorldMatrix()   const;
 		void UpdateWorldLocation() const;
 		void UpdateWorldRotation() const;
-		void UpdateWorldScale() const;
+		void UpdateWorldScale()    const;
+
+
+
+
+
 
 		void UpdateInvWorldMatrix() const;
-		void CheckLimitRadian(JVector3& toRadian) const;
-		void CheckLimitRotation(JVector3& toDegree) const;
+		void NormalizeRotation(JVector3& toDegree) const;
 	public:
 		virtual void OnInspectorGUI() override;
 	private:

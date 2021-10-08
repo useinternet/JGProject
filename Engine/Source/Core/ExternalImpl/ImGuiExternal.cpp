@@ -16,9 +16,9 @@ namespace ImGui
 		Vector_Element_Float,
 	};
 
-	void Vector_OnGUI(const std::string& label,void* data,  int vector_element_enum, int elementCnt, float columnsWidth, int columOffsetIndex)
+	bool Vector_OnGUI(const std::string& label,void* data,  int vector_element_enum, int elementCnt, float columnsWidth, int columOffsetIndex)
 	{
-
+		bool isDeactive = false;
 		if (elementCnt <= 1 || elementCnt >= 5)
 		{
 			assert("not supported vector type");
@@ -45,7 +45,7 @@ namespace ImGui
 			ImGui::PopStyleColor(); ImGui::PopStyleColor(); ImGui::PopStyleColor();
 			ImGui::SameLine();  ImGui::SetNextItemWidth(columnsWidth - btWidth - ImGui::GetStyle().ItemSpacing.x * 3);
 
-
+			
 			switch (vector_element_enum)
 			{
 			case Vector_Element_Int:
@@ -59,10 +59,14 @@ namespace ImGui
 				break;
 			}
 
-
-		
+			if (ImGui::IsItemDeactivatedAfterEdit() == true)
+			{
+				isDeactive = true;
+			}
 			ImGui::NextColumn();
 		}
+
+		return isDeactive;
 	}
 
 
@@ -124,8 +128,9 @@ namespace ImGui
 		}
 	}
 
-	void Vector4_OnGUI(const std::string& label, JG::JVector4& v, float label_space)
+	bool Vector4_OnGUI(const std::string& label, JG::JVector4& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth        = 0.0f;
@@ -136,12 +141,14 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 4;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 4, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 4, oneColumnWidth, 1);
 		ImGui::Columns(1);
-	}
-	void Vector3_OnGUI(const std::string& label, JG::JVector3& v, float label_space)
-	{
 
+		return result;
+	}
+	bool Vector3_OnGUI(const std::string& label, JG::JVector3& v, float label_space)
+	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 
 		float oneColumnWidth = 0.0f;
@@ -153,11 +160,14 @@ namespace ImGui
 			btWidth = 0.0f;
 		});
 
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 3, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 3, oneColumnWidth, 1);
 		ImGui::Columns(1);
+
+		return result;
 	}
-	void Vector2_OnGUI(const std::string& label, JG::JVector2& v, float label_space)
+	bool Vector2_OnGUI(const std::string& label, JG::JVector2& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth = 0.0f;
@@ -167,12 +177,15 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 2;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 2, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Float, 2, oneColumnWidth, 1);
 		ImGui::Columns(1);
+
+		return result;
 	}
 
-	void Vector4Int_OnGUI(const std::string& label, JG::JVector4Int& v, float label_space)
+	bool Vector4Int_OnGUI(const std::string& label, JG::JVector4Int& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth = 0.0f;
@@ -183,11 +196,13 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 4;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 4, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 4, oneColumnWidth, 1);
 		ImGui::Columns(1);
+		return result;
 	}
-	void Vector3Int_OnGUI(const std::string& label, JG::JVector3Int& v, float label_space)
+	bool Vector3Int_OnGUI(const std::string& label, JG::JVector3Int& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 
 		float oneColumnWidth = 0.0f;
@@ -199,11 +214,14 @@ namespace ImGui
 			btWidth = 0.0f;
 		});
 
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 3, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 3, oneColumnWidth, 1);
 		ImGui::Columns(1);
+
+		return result;
 	}
-	void Vector2Int_OnGUI(const std::string& label, JG::JVector2Int& v, float label_space)
+	bool Vector2Int_OnGUI(const std::string& label, JG::JVector2Int& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth = 0.0f;
@@ -213,11 +231,14 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 2;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 2, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Int, 2, oneColumnWidth, 1);
 		ImGui::Columns(1);
+
+		return result;
 	}
-	void Vector4Uint_OnGUI(const std::string& label, JG::JVector4Uint& v, float label_space)
+	bool Vector4Uint_OnGUI(const std::string& label, JG::JVector4Uint& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth = 0.0f;
@@ -228,11 +249,13 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 4;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 4, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 4, oneColumnWidth, 1);
 		ImGui::Columns(1);
+		return result;
 	}
-	void Vector3Uint_OnGUI(const std::string& label, JG::JVector3Uint& v, float label_space)
+	bool Vector3Uint_OnGUI(const std::string& label, JG::JVector3Uint& v, float label_space)
 	{
+		bool result = false;
 		float winWidth = ImGui::GetWindowWidth();
 
 		float oneColumnWidth = 0.0f;
@@ -244,11 +267,15 @@ namespace ImGui
 			btWidth = 0.0f;
 		});
 
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 3, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 3, oneColumnWidth, 1);
 		ImGui::Columns(1);
+
+		return result;
 	}
-	void Vector2Uint_OnGUI(const std::string& label, JG::JVector2Uint& v, float label_space)
+	bool Vector2Uint_OnGUI(const std::string& label, JG::JVector2Uint& v, float label_space)
 	{
+		bool result = false;
+
 		float winWidth = ImGui::GetWindowWidth();
 		float oneColumnWidth = 0.0f;
 		float btWidth = 0.0f;
@@ -258,8 +285,9 @@ namespace ImGui
 			oneColumnWidth = (winWidth - label_space) / 2;
 			btWidth = 0.0f;
 		});
-		Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 2, oneColumnWidth, 1);
+		result = Vector_OnGUI(label, (float*)(&v), Vector_Element_Uint, 2, oneColumnWidth, 1);
 		ImGui::Columns(1);
+		return result;
 	}
 
 
@@ -275,12 +303,15 @@ namespace ImGui
 		ImGui::ColorEdit3(("##" + label).c_str(), (float*)&c);
 		ImGui::Columns(1);
 	}
-	void Float_OnGUI(const std::string& label, float& f, float label_space)
+	bool Float_OnGUI(const std::string& label, float& f, float label_space)
 	{
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
 		ImGui::InputFloat(("##" + label).c_str(), &f);
+
+		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
+		return result;
 	}
 	void Float_Slider_OnGUI(const std::string& label, float& f, float min, float max, float label_space)
 	{
@@ -289,26 +320,35 @@ namespace ImGui
 		ImGui::SliderFloat(("##" + label).c_str(), &f, min, max);
 		ImGui::Columns(1);
 	}
-	void Int_OnGUI(const std::string& label, int& i, float label_space)
+	bool Int_OnGUI(const std::string& label, int& i, float label_space)
 	{
+		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
 		ImGui::InputInt(("##" + label).c_str(), &i);
+		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
+		return result;
 	}
-	void Uint_OnGUI(const std::string& label, JG::u32& i, float label_space)
+	bool Uint_OnGUI(const std::string& label, JG::u32& i, float label_space)
 	{
+		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
 		ImGui::InputInt(("##" + label).c_str(), (int*)&i, ImGuiInputTextFlags_CharsDecimal);
+		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
+		return result;
 	}
-	void String_OnGUI(const std::string& label, std::string& str, float label_space)
+	bool String_OnGUI(const std::string& label, std::string& str, float label_space)
 	{
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		str.resize(512);
 		ImGui::InputText(("##" + label).c_str(), str.data(), 512);
 		int len = strlen(str.c_str());
 		str = str.substr(0, len);
+		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
+		return result;
+
 	}
 	void Bool_OnGUI(const std::string& label, bool& b, float label_space)
 	{

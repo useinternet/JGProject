@@ -122,6 +122,17 @@ namespace JG
 		return m;
 	}
 
+	JMatrix JMatrix::LookToLH(const JVector3& pos, const JVector3& targetDir, const JVector3& up)
+	{
+		JMatrix m;
+
+		m.SetSIMD(DirectX::XMMatrixLookToLH(
+			JVector3::GetSIMD(pos),
+			JVector3::GetSIMD(targetDir),
+			JVector3::GetSIMD(up)));
+		return m;
+	}
+
 	JMatrix JMatrix::LookToLH(const JVector3& pos, const JVector3& up, const JVector3& right, const JVector3& look)
 	{
 		JMatrix m;
@@ -153,5 +164,25 @@ namespace JG
 		m.Get(3, 3) = 1.0f;
 
 		return m;
+	}
+	JVector3 JMatrix::ToEulerAngles(const JMatrix& m)
+	{
+		float sy = sqrt(m.Get_C(0, 0) * m.Get_C(0, 0) + m.Get_C(1, 0) * m.Get_C(1, 0));
+		bool singular = sy < 1e-6;
+		float x, y, z;
+		if (!singular)
+		{
+			x = atan2(m.Get_C(2, 1), m.Get_C(2, 2));
+			y = atan2(-m.Get_C(2, 0), sy);
+			z = atan2(m.Get_C(1, 0), m.Get_C(0, 0));
+		}
+		else
+		{
+			x = atan2(-m.Get_C(1, 2), m.Get_C(1, 1));
+			y = atan2(-m.Get_C(2, 0), sy);
+			z = 0;
+		}
+
+		return JVector3(x,y,z);
 	}
 }

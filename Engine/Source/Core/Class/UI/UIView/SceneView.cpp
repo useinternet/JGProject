@@ -73,7 +73,7 @@ namespace JG
 			ImGuizmo::SetRect(itemMin.x, itemMin.y, itemSize.x, itemSize.y);
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetOrthographic(mainCam->IsOrthographic());
-	
+
 			auto view = mainCam->GetViewMatrix();
 			auto proj = mainCam->GetProjMatrix();
 
@@ -81,18 +81,23 @@ namespace JG
 			ImGui::PushClipRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), true);
 
 			bool result = ImGuizmo::Manipulate(
-				view.GetFloatPtr(), proj.GetFloatPtr(), 
+				view.GetFloatPtr(), proj.GetFloatPtr(),
 				(ImGuizmo::OPERATION)mCurrentGizmoOperation, (ImGuizmo::MODE)mCurrentGizmoMode,
-				worldMat.GetFloatPtr(), nullptr , (mIsSnap) ? snapValue : nullptr, nullptr, nullptr);
+				worldMat.GetFloatPtr(), nullptr, (mIsSnap) ? snapValue : nullptr, nullptr, nullptr);
 
 
 			ImGui::PopClipRect();
+
+
 			JVector3 matrixTranslation, matrixRotation, matrixScale;
 			ImGuizmo::DecomposeMatrixToComponents(worldMat.GetFloatPtr(), (float*)&matrixTranslation, (float*)&matrixRotation, (float*)&matrixScale);
 
-			node->GetTransform()->SetWorldLocation(matrixTranslation);
-			node->GetTransform()->SetWorldRotation(Math::ConvertToDegrees(matrixRotation));
-			node->GetTransform()->SetWorldScale(matrixScale);
+			if (result)
+			{
+				node->GetTransform()->SetWorldLocation(matrixTranslation);
+				node->GetTransform()->SetWorldRotation(Math::ConvertToDegrees(matrixRotation));
+				node->GetTransform()->SetWorldScale(matrixScale);
+			}
 
 		});
 
