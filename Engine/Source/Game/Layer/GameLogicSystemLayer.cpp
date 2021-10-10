@@ -361,7 +361,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SphereCollision>();
-
+		GameObjectFactory::GetInstance().RegisterComponentType<BoxCollision>();
 
 	}
 }

@@ -57,9 +57,9 @@ namespace JG
 		mScenePool[handle] = scene;
 		return handle;
 	}
-	PhysicsHandle PhysicsManager::CreatePxRigidStatic()
+	PhysicsHandle PhysicsManager::CreatePxRigidStatic(const JVector3& p, const JQuaternion& q)
 	{
-		auto rigidStatic = mPhysics->createRigidStatic(physx::PxTransform());
+		auto rigidStatic = mPhysics->createRigidStatic(physx::PxTransform(p.x, p.y, p.z, physx::PxQuat(q.x, q.y, q.z, q.w)));
 
 		PhysicsHandle handle = (PhysicsHandle)rigidStatic;
 
@@ -67,9 +67,9 @@ namespace JG
 
 		return handle;
 	}
-	PhysicsHandle PhysicsManager::CreatePxRigidDynamic()
+	PhysicsHandle PhysicsManager::CreatePxRigidDynamic(const JVector3& p, const JQuaternion& q)
 	{
-		auto rigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform());
+		auto rigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform(p.x, p.y, p.z, physx::PxQuat(q.x, q.y, q.z, q.w)));
 
 		PhysicsHandle handle = (PhysicsHandle)rigidDynamic;
 
@@ -146,14 +146,14 @@ namespace JG
 			action(mRigidStaticPool[handle]);
 		}
 	}
-	void PhysicsManager::PxRigidDynamicSceneReadWrite(PhysicsHandle handle, const std::function<void(physx::PxRigidDynamic*)>& action)
+	void PhysicsManager::PxRigidDynamicReadWrite(PhysicsHandle handle, const std::function<void(physx::PxRigidDynamic*)>& action)
 	{
 		if (mRigidDynamicPool.find(handle) != mRigidDynamicPool.end())
 		{
 			action(mRigidDynamicPool[handle]);
 		}
 	}
-	void PhysicsManager::PxShapeSceneReadWrite(PhysicsHandle handle, const std::function<void(physx::PxShape*, physx::PxMaterial*)>& action)
+	void PhysicsManager::PxShapeReadWrite(PhysicsHandle handle, const std::function<void(physx::PxShape*, physx::PxMaterial*)>& action)
 	{
 		if (mShapePool.find(handle) != mShapePool.end())
 		{
@@ -202,6 +202,7 @@ namespace JG
 		Scheduler::GetInstance().ScheduleByFrame(1, 0, -1, SchedulePriority::BeginSystem, [&]() -> EScheduleResult
 		{
 			f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+			if (tick <= 0.0f) return EScheduleResult::Continue;
 			for (auto& _pair : mScenePool)
 			{
 				_pair.second->simulate(tick);

@@ -79,7 +79,10 @@ namespace JG
 		{
 			auto gravity = GetGravity();
 			i32 label_space = ImGui::CalcTextSize("Gravity").x;
-			ImGui::Vector3_OnGUI("Gravity", gravity, label_space);
+			if (ImGui::Vector3_OnGUI("Gravity", gravity, label_space) == true)
+			{
+				SetGravity(gravity);
+			}
 		}
 
 		//for (auto& globalSystem : mGlobalGameSystemList)
@@ -117,6 +120,20 @@ namespace JG
 		//	Destroy(sys);
 		//}
 
+	}
+	void GameWorld::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+		GameNode::MakeJson(jsonData);
+		jsonData->AddMember("Gravity", GetGravity());
+	}
+	void GameWorld::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+		GameNode::LoadJson(jsonData);
+		auto val = jsonData->GetMember("Gravity");
+		if (val)
+		{
+			SetGravity(val->GetVector3());
+		}
 	}
 	AssetManager* GameWorld::GetAssetManager() const
 	{
@@ -160,6 +177,7 @@ namespace JG
 
 	void GameWorld::SetGravity(const JVector3& gravity)
 	{
+		mGravity = gravity;
 		PhysicsManager::GetInstance().PxSceneReadWrite(mPxSceneHandle,
 			[&](physx::PxScene* scene)
 		{

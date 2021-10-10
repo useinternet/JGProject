@@ -43,8 +43,8 @@ namespace JG
 		physx::PxPhysics* GetPxPhysics() const;
 	public:
 		PhysicsHandle  CreatePxScene();
-		PhysicsHandle CreatePxRigidStatic();
-		PhysicsHandle CreatePxRigidDynamic();
+		PhysicsHandle CreatePxRigidStatic(const JVector3& p, const JQuaternion& q);
+		PhysicsHandle CreatePxRigidDynamic(const JVector3& p, const JQuaternion& q);
 		PhysicsHandle CreatePxShape(const std::function<PxShapeData()>& returnAction);
 
 
@@ -56,8 +56,8 @@ namespace JG
 
 		void PxSceneReadWrite(PhysicsHandle handle, const std::function<void(physx::PxScene*)>& action);
 		void PxRigidStaticReadWrite(PhysicsHandle handle, const std::function<void(physx::PxRigidStatic*)>& action);
-		void PxRigidDynamicSceneReadWrite(PhysicsHandle handle, const std::function<void(physx::PxRigidDynamic*)>& action);
-		void PxShapeSceneReadWrite(PhysicsHandle handle, const std::function<void(physx::PxShape*, physx::PxMaterial*)>& action);
+		void PxRigidDynamicReadWrite(PhysicsHandle handle, const std::function<void(physx::PxRigidDynamic*)>& action);
+		void PxShapeReadWrite(PhysicsHandle handle, const std::function<void(physx::PxShape*, physx::PxMaterial*)>& action);
 	private:
 		void Init();
 

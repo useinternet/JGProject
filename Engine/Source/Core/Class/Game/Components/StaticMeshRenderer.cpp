@@ -42,6 +42,32 @@ namespace JG
 		}
 		mMesh = GetGameWorld()->GetAssetManager()->RequestOriginAsset<IMesh>(path);
 	}
+	void StaticMeshRenderer::SetMaterial(const String& path)
+	{
+		if (mMaterialList.empty())
+		{
+			mMaterialList.resize(1);
+		}
+		mMaterialList[0] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
+	}
+	void StaticMeshRenderer::SetMaterial(i32 slot, const String& path)
+	{
+		if (slot < 0) return;
+		auto cnt = GetMaterialCount();
+		if (slot >= cnt)
+		{
+			return;
+		}
+		mMaterialList[slot] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
+	}
+	void StaticMeshRenderer::AddMaterial(const String& path)
+	{
+		mMaterialList.push_back(GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path));
+	}
+	i32 StaticMeshRenderer::GetMaterialCount() const
+	{
+		return mMaterialList.size();
+	}
 	void StaticMeshRenderer::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		BaseRenderer::MakeJson(jsonData);

@@ -32,7 +32,7 @@ namespace JG
 			mRTVs[i] = DirectX12API::RTVAllocate();
 			mSwapChain->GetBuffer((u32)i, IID_PPV_ARGS(mBackBuffers[i].GetAddressOf()));
 			DirectX12API::GetD3DDevice()->CreateRenderTargetView(mBackBuffers[i].Get(), nullptr, mRTVs[i].CPU());
-			mBackBuffers[i]->SetName(TT("FrameBufferResource"));
+			mBackBuffers[i]->SetName((TT("FrameBufferResource_") + std::to_wstring(i)).c_str());
 		}
 		return true;
 	}
@@ -48,7 +48,6 @@ namespace JG
 
 		commandList->Get()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
 			backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
 
 		// TODO
 		// 설정 값으로

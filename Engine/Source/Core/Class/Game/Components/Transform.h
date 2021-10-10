@@ -22,7 +22,7 @@ namespace JG
 	private:
 		JVector3 mLocation;
 		JVector3 mRotation;
-		JQuaternion mQuaternion;
+		JQuaternion mQuaternion = JQuaternion::Identity();
 		JVector3 mScale = { 1.0f,1.0f,1.0f };
 
 
@@ -41,7 +41,7 @@ namespace JG
 
 		mutable JVector3 mWorldLocation;
 		mutable JVector3 mWorldRotation;
-		mutable JQuaternion mWorldQuaternion;
+		mutable JQuaternion mWorldQuaternion = JQuaternion::Identity();
 		mutable JVector3 mWorldScale;
 
 

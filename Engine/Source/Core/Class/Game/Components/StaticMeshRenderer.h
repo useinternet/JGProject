@@ -28,6 +28,10 @@ namespace JG
 		virtual void LateUpdate() override;
 	public:
 		void SetMesh(const String& path);
+		void SetMaterial(const String& path);
+		void SetMaterial(i32 slot, const String& path);
+		void AddMaterial(const String& path);
+		i32 GetMaterialCount() const;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;

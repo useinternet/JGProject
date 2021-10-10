@@ -16,7 +16,7 @@ function DebugConfig()
 
 function ReleaseConfig()
     optimize "Full" 
-    defines {"_RELEASE", "JG_EDITOR"}
+    defines {"_RELEASE", "JG_EDITOR", "NDEBUG"}
     cppdialect "C++17"
     staticruntime "on"
     runtime "Release"

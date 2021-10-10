@@ -7,13 +7,11 @@ namespace JG
 	class Collision : public GameComponent
 	{
 		JGCLASS
-	private:
-		String mCollisionType;
+	protected:
+		String   mCollisionType;
 		JVector3 mCenter;
 		f32 mMass = 10.0f;
 
-
-		bool mIsShapeDirty = true;
 		bool mIsRigidDirty = true;
 		PhysicsHandle mRigidHandle;
 		PhysicsHandle mShapeHandle;
@@ -32,21 +30,27 @@ namespace JG
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 		virtual void OnInspectorGUI() override;
-	private:
+	protected:
 		void CreateRigid();
 		void UpdateRigid();
 		void RemoveRigid();
 		void CreateShape();
+		void UpdateShape();
 		void RemoveShape();
 	protected:
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() { return nullptr; }
-		virtual void DrawDebugShape(physx::PxRigidStatic* rigidStatic) {}
-		void SendShapeDirty();
-
-
+		virtual void DrawDebugShape(physx::PxRigidActor* actor) {}
 	public:
 		void SetCenter(const JVector3& center);
 		const JVector3& GetCenter() const;
+
+		bool IsSimulate() const;
+		void SetSimulate(bool isSimulate);
+
+		bool IsDebugDraw() const;
+		void SetDebugDraw(bool isDebugDraw);
+
+	
 	protected:
 		Color GetDebugColor() const {
 			return Color::Green();
@@ -66,7 +70,7 @@ namespace JG
 		virtual void OnInspectorGUI() override;
 
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() override;
-		virtual void DrawDebugShape(physx::PxRigidStatic* rigidStatic) override;
+		virtual void DrawDebugShape(physx::PxRigidActor* actor) override;
 	public:
 		void SetRadius(f32 r);
 		f32  GetRadius() const;
@@ -85,7 +89,7 @@ namespace JG
 
 
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() override;
-		virtual void DrawDebugShape(physx::PxRigidStatic* rigidStatic) override;
+		virtual void DrawDebugShape(physx::PxRigidActor* actor) override;
 	public:
 		void SetSize(const JVector3& size);
 		const JVector3&  GetSize() const;

@@ -39,7 +39,8 @@ namespace JG
 	public:
 		virtual void SetParent(GameNode* node) override {}
 		virtual void OnInspectorGUI() override;
-		
+		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
 		AssetManager* GetAssetManager() const;
 	public:
