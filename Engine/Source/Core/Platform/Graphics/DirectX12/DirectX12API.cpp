@@ -129,6 +129,11 @@ namespace JG
 		case EDepthStencilStateTemplate::NoDepth:
 			desc.DepthEnable = false;
 			break;
+		case EDepthStencilStateTemplate::LessEqual:
+			desc.DepthEnable    = true;
+			desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc      = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			break;
 		default:
 			break;
 		}
@@ -172,6 +177,13 @@ namespace JG
 	void DirectX12API::GetRasterizerDesc(ERasterizerStateTemplate _template, D3D12_RASTERIZER_DESC* out)
 	{
 		auto desc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+
+		switch (_template)
+		{
+		case ERasterizerStateTemplate::Cull_None:
+			desc.CullMode = D3D12_CULL_MODE_NONE;
+			break;
+		}
 
 		if (out != nullptr)
 		{

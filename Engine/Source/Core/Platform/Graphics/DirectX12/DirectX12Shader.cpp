@@ -349,7 +349,9 @@ namespace JG
 		{
 			return false;
 		}
-		u64 end = code.find("}", start);
+
+
+		u64 end = code.find("};", start);
 		if (start == String::npos)
 		{
 			return false;

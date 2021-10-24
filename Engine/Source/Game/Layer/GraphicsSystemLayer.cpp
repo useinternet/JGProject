@@ -35,7 +35,7 @@ namespace JG
 	void GraphicsSystemLayer::CameraItem::ChangeRenderer()
 	{
 		if (pCamera == nullptr) return;
-		if (Renderer != nullptr && pCamera->GetRendererPath() == Renderer->GetRendererPath())
+		if (_Renderer != nullptr && pCamera->GetRendererPath() == _Renderer->GetRendererPath())
 		{
 			return;
 		}
@@ -43,10 +43,10 @@ namespace JG
 		auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
 		
-		if (Renderer != nullptr)
+		if (_Renderer != nullptr)
 		{
 			bool isMakeSchedule = PendingRendererQueue.empty();
-			PendingRendererQueue.push(Renderer);
+			PendingRendererQueue.push(_Renderer);
 
 			if (isMakeSchedule)
 			{
@@ -68,7 +68,7 @@ namespace JG
 		switch (pCamera->GetRendererPath())
 		{
 		case ERendererPath::Foward:
-			Renderer = CreateSharedPtr<FowardRenderer>();
+			_Renderer = CreateSharedPtr<FowardRenderer>();
 			break;
 		case ERendererPath::Deferred:
 			break;
@@ -95,52 +95,6 @@ namespace JG
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&GraphicsSystemLayer::Wait));
 
 		mRenderItemPriority[JGTYPE(Standard2DRenderItem)] = (u64)ERenderItemPriority::_2D;
-
-
-		String rawAssetPath = CombinePath(Application::GetAssetPath(), "RawResources");
-		String outputPath = CombinePath(Application::GetAssetPath(), "Resources");
-
-
-
-
-		//for (auto& iter : fs::recursive_directory_iterator(rawAssetPath))
-		//{
-		//	auto extenstion = iter.path().extension().string();
-		//	if (extenstion == ".fbx")
-		//	{
-		//		FBXAssetImportSettings settings;
-		//		settings.AssetPath = iter.path().string();
-		//		settings.OutputPath = outputPath;
-		//		auto result = AssetImporter::Import(settings);
-		//		if (result == EAssetImportResult::Success)
-		//		{
-		//			JG_CORE_INFO("Success Import {0}", iter.path().string());
-		//		}
-		//		else
-		//		{
-		//			JG_CORE_INFO("Fail Import {0}", iter.path().string());
-		//		}
-		//	}
-		//	if (extenstion == ".png" || extenstion == ".jpg" || extenstion == ".TGA")
-		//	{
-		//		TextureAssetImportSettings settings;
-		//		settings.AssetPath = iter.path().string();
-		//		settings.OutputPath = outputPath;
-		//		auto result = AssetImporter::Import(settings);
-		//		if (result == EAssetImportResult::Success)
-		//		{
-		//			JG_CORE_INFO("Success Import {0}", iter.path().string());
-		//		}
-		//		else
-		//		{
-		//			JG_CORE_INFO("Fail Import {0}", iter.path().string());
-		//		}
-		//	}
-		//}
-		//for (auto& iter : fs::recursive_directory_iterator(outputPath))
-		//{
-		//	AssetDataBase::GetInstance().LoadOriginAsset(iter.path().string());
-		//}
 	}
 
 	void GraphicsSystemLayer::Destroy()
@@ -264,7 +218,7 @@ namespace JG
 				{
 					_3dItem->Materials.push_back(IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader)));
 				}
-				cameraItem->Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
+				cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
 			}
 		}
 		else if (type == JGTYPE(DebugRenderItem))
@@ -276,7 +230,7 @@ namespace JG
 				{
 					continue;
 				}
-				cameraItem->Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, { _3dItem->Material });
+				cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, { _3dItem->Material });
 			}
 
 
@@ -376,8 +330,8 @@ namespace JG
 			auto data = static_cast<RenderInfo*>(userData.get());
 			
 
-			mMainCamera->Renderer->SetCommandID(1);
-			if (mMainCamera->Renderer->Begin(*data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
+			mMainCamera->_Renderer->SetCommandID(1);
+			if (mMainCamera->_Renderer->Begin(*data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
 			{
 				for (auto& _pair : mPushedRenderItems)
 				{
@@ -389,7 +343,7 @@ namespace JG
 						itemList.clear();
 					}
 				}
-				mMainCamera->Renderer->End();
+				mMainCamera->_Renderer->End();
 				mIsRenderCompelete = true;
 			}
 		},info);

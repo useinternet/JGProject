@@ -12,7 +12,73 @@
 
 namespace JG
 {
-	bool IRenderer::BeginBatch(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList)
+	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList)
+	{
+		auto api = Application::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		mCurrentRenderInfo = info;
+		if (info.TargetTexture == nullptr)
+		{
+			return false;
+		}
+		if (mRenderTarges.empty())
+		{
+			mRenderTarges.resize(MAX_RENDERTARGET, nullptr);
+		}
+
+		mRenderTarges[0] = info.TargetTexture;
+
+		api->SetViewports(GetCommandID(), { Viewport(info.Resolutoin.x, info.Resolutoin.y) });
+		api->SetScissorRects(GetCommandID(), { ScissorRect(0,0, info.Resolutoin.x,info.Resolutoin.y) });
+		api->ClearRenderTarget(GetCommandID(), mRenderTarges, info.TargetDepthTexture);
+		api->SetRenderTarget(GetCommandID(), mRenderTarges, info.TargetDepthTexture);
+
+		mLightInfos.clear();
+		// Light Info 정보 수집
+		for (auto item : lightItemList)
+		{
+			auto& info = mLightInfos[item->GetType()];
+			info.Count++;
+			info.Size = item->GetBtSize();
+			item->PushBtData(info.ByteData);
+		}
+
+
+
+
+		return BeginBatch(info, batchList);
+	}
+	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
+	{
+		if (mesh == nullptr || materialList.empty())
+		{
+			return;
+		}
+		ObjectInfo info;
+		info.WorldMatrix = worldMatrix;
+		info.Mesh = mesh;
+		info.MaterialList = materialList;
+		i32 type = ArrangeObject(info);
+		mObjectInfoListDic[type].push_back(info);
+	}
+	void Renderer::End()
+	{
+		for (auto& drawFunc : mDrawFuncList)
+		{
+			for (auto& _pair : mObjectInfoListDic)
+			{
+				drawFunc(_pair.first, _pair.second);
+			}
+		}
+
+		mObjectInfoListDic.clear();
+		EndBatch();
+	}
+
+
+
+	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList)
 	{
 		bool result = true;
 		mBatchList = batchList;
@@ -31,7 +97,7 @@ namespace JG
 		return result;
 	}
 
-	void IRenderer::EndBatch()
+	void Renderer::EndBatch()
 	{
 		for (auto& batch : mBatchList)
 		{
@@ -40,132 +106,118 @@ namespace JG
 		mBatchList.clear();
 	}
 
-
-	bool FowardRenderer::Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList)
+	const RenderInfo& Renderer::GetRenderInfo() const
 	{
-		if (mIsRun == true)
-		{
-			return false;
-		}
-		auto api = Application::GetInstance().GetGraphicsAPI();
-		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-
-		mCurrentRenderInfo = info;
-		if (info.TargetTexture == nullptr)
-		{
-			return false;
-		}
-		if (mRenderTarges.empty())
-		{
-			mRenderTarges.resize(MAX_RENDERTARGET, nullptr);
-		}
-
-		mRenderTarges[0] = info.TargetTexture;
-
-		api->SetViewports(GetCommandID(), { Viewport(info.Resolutoin.x, info.Resolutoin.y) });
-		api->SetScissorRects(GetCommandID() ,{ ScissorRect(0,0, info.Resolutoin.x,info.Resolutoin.y) });
-		api->ClearRenderTarget(GetCommandID(),mRenderTarges, info.TargetDepthTexture);
-		api->SetRenderTarget(GetCommandID(),mRenderTarges, info.TargetDepthTexture);
-		
-		mLightInfos.clear();
-		// Light Info 정보 수집
-		for (auto item : lightItemList)
-		{
-			auto& info = mLightInfos[item->GetType()];
-			info.Count++;
-			info.Size = item->GetBtSize();
-			item->PushBtData(info.ByteData);
-		}
-
-
-
-
-		return BeginBatch(info, batchList);
+		return mCurrentRenderInfo;
 	}
-	void FowardRenderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
+
+	const Dictionary<Type, Renderer::LightInfo>& Renderer::GetLightInfos() const
 	{
-		if (mesh == nullptr || materialList.empty())
-		{
-			return;
-		}
+		return mLightInfos;
+	}
+
+	void Renderer::PushDrawFunc(const DrawFunc& func)
+	{
+		mDrawFuncList.push_back(func);
+	}
+
+
+	DefferedBuffer::DefferedBuffer()
+	{
+	}
+	FowardRenderer::FowardRenderer()
+	{
+		PushDrawFunc(std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2));
+	}
+
+	int FowardRenderer::ArrangeObject(const ObjectInfo& info)
+	{
+		return 0;
+	}
+
+	void FowardRenderer::Draw(int objectType, const List<ObjectInfo>& objectList)
+	{
 		auto api = Application::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-		mesh->SetCommandID(GetCommandID());
-		if (mesh->Bind() == false)
+
+		auto renderInfo = GetRenderInfo();
+		auto lightInfos = GetLightInfos();
+		for (auto& info : objectList)
 		{
-			JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
-		}
+			auto mesh          = info.Mesh;
+			auto& materialList = info.MaterialList;
+			auto& worldMatrix  = info.WorldMatrix;
 
-		auto transposedViewProj = JMatrix::Transpose(mCurrentRenderInfo.ViewProj);
-		for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
-		{
-			mesh->GetSubMesh(i)->SetCommandID(GetCommandID());
-			if (mesh->GetSubMesh(i)->Bind() == false)
+			mesh->SetCommandID(GetCommandID());
+			if (mesh->Bind() == false)
 			{
-				JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(0)->GetName());
-				continue;
-			}
-			SharedPtr<IMaterial> material = nullptr;
-			if (materialList.size() <= i)
-			{
-				material = materialList[0];
-			}
-			else
-			{
-				material = materialList[i];
-			}
-			auto transposedWorld = JMatrix::Transpose(worldMatrix);
-			if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
-			{
-				JG_CORE_ERROR("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
-				continue;
-			}
-			if (material->SetFloat3(ShaderScript::Standard3D::Eye, mCurrentRenderInfo.EyePosition) == false)
-			{
-				JG_CORE_ERROR("{0} : Fail SetEye in CameraParam", material->GetName());
-				continue;
-			}
-			if (material->SetFloat4x4(ShaderScript::Standard3D::World, transposedWorld) == false)
-			{
-				JG_CORE_ERROR("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
-				continue;
+				JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
 			}
 
-
-			// 라이트 정보 심어주기
+			auto transposedViewProj = JMatrix::Transpose(renderInfo.ViewProj);
+			for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
 			{
-				// 
-				auto pointLightInfo = mLightInfos[JGTYPE(PointLightItem)];
-				if (material->SetInt(ShaderScript::Standard3D::PointLightCount, pointLightInfo.Count) == false)
+				mesh->GetSubMesh(i)->SetCommandID(GetCommandID());
+				if (mesh->GetSubMesh(i)->Bind() == false)
 				{
-
+					JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(0)->GetName());
+					continue;
 				}
-				if (pointLightInfo.Count > 0)
+				SharedPtr<IMaterial> material = nullptr;
+				if (materialList.size() <= i)
 				{
-					if (material->SetStructDataArray(ShaderScript::Standard3D::PointLightList, pointLightInfo.ByteData.data(), pointLightInfo.Count, pointLightInfo.Size) == false)
+					material = materialList[0];
+				}
+				else
+				{
+					material = materialList[i];
+				}
+				auto transposedWorld = JMatrix::Transpose(worldMatrix);
+				if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
+				{
+					JG_CORE_ERROR("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
+					continue;
+				}
+				if (material->SetFloat3(ShaderScript::Standard3D::Eye, renderInfo.EyePosition) == false)
+				{
+					JG_CORE_ERROR("{0} : Fail SetEye in CameraParam", material->GetName());
+					continue;
+				}
+				if (material->SetFloat4x4(ShaderScript::Standard3D::World, transposedWorld) == false)
+				{
+					JG_CORE_ERROR("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
+					continue;
+				}
+
+
+				// 라이트 정보 심어주기
+				{
+					// 
+					auto pointLightInfo = lightInfos[JGTYPE(PointLightItem)];
+					if (material->SetInt(ShaderScript::Standard3D::PointLightCount, pointLightInfo.Count) == false)
 					{
 
 					}
+					if (pointLightInfo.Count > 0)
+					{
+						if (material->SetStructDataArray(ShaderScript::Standard3D::PointLightList, pointLightInfo.ByteData.data(), pointLightInfo.Count, pointLightInfo.Size) == false)
+						{
+
+						}
+					}
 				}
-			}
-	
 
 
-			material->SetCommandID(GetCommandID());
-			if (material->Bind() == false)
-			{
-				JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
-				continue;
+
+				material->SetCommandID(GetCommandID());
+				if (material->Bind() == false)
+				{
+					JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
+					continue;
+				}
+				api->DrawIndexed(GetCommandID(), mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
 			}
-			api->DrawIndexed(GetCommandID(), mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
 		}
-		
-		
-
-	}
-	void FowardRenderer::End()
-	{
-		EndBatch();
 	}
 
 	Render2DBatch::Render2DBatch()
@@ -379,6 +431,11 @@ namespace JG
 		api->DrawIndexed(GetCommandID(), quadIndexCount);
 		StartBatch();
 	}
+
+
+
+
+
 
 
 

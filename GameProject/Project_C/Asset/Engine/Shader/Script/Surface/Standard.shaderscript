@@ -1,24 +1,24 @@
 
 _Resources{
 	Texture2D Tex1;
-}
+};
 
 _Variables {
 	float3 BaseColor;
 	float  Roughness;
 	float3 Specular;
 	float  Metallc;
-}
+};
 
 _Init {
 
-}
+};
 
 
 _Surface {
 	float4 textureColor = Tex1.Sample(gPointSampler, _input.tex);
-	_output.albedo    = textureColor * float4(BaseColor, 1.0f);
-	_output.roughness = Roughness;
-	_output.specular  = Specular;
-	_output.metallic  = Metallc;
-}
+	_output.albedo      = textureColor * float4(BaseColor, 1.0f);
+	_output.roughness   = Roughness;
+	_output.specular    = Specular;
+	_output.metallic    = Metallc;
+};

@@ -13,6 +13,7 @@
 #include "Class/Game/Components/StaticMeshRenderer.h"
 #include "Class/Game/Components/PointLight.h"
 #include "Class/Game/Components/Collision.h"
+#include "Class/Game/Components/SkyDome.h"
 
 
 
@@ -362,6 +363,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SphereCollision>();
 		GameObjectFactory::GetInstance().RegisterComponentType<BoxCollision>();
+		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
 
 	}
 }

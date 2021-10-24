@@ -52,7 +52,7 @@ namespace JG
 		GameNode::Destory();
 
 
-		PhysicsManager::GetInstance().RemovePxScene(mPxSceneHandle);
+		PhysicsManager::GetInstance().PushRemoveCommand(mPxSceneHandle);
 		AssetDataBase::GetInstance().ReturnAssetManager(mAssetManager);
 		mAssetManager = nullptr;
 
@@ -177,12 +177,19 @@ namespace JG
 
 	void GameWorld::SetGravity(const JVector3& gravity)
 	{
+		bool isDirty = mGravity != gravity;
 		mGravity = gravity;
-		PhysicsManager::GetInstance().PxSceneReadWrite(mPxSceneHandle,
-			[&](physx::PxScene* scene)
+		if (isDirty)
 		{
-			scene->setGravity(physx::PxVec3(gravity.x, gravity.y, gravity.z));
-		});
+			PhysicsManager::GetInstance().PushWriteCommand<physx::PxScene>(
+				mPxSceneHandle, [&](physx::PxScene* scene)
+			{
+				auto _garvity = GetGravity();
+				scene->setGravity(physx::PxVec3(_garvity.x, _garvity.y, _garvity.z));
+			});
+
+
+		}
 	}
 	const JVector3& GameWorld::GetGravity() const
 	{

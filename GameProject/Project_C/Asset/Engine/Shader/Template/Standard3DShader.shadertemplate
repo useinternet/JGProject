@@ -25,6 +25,7 @@ struct VS_OUT
 {
 	float4 posH    : SV_POSITION;
 	float3 posW    : POSITION;
+	float3 posL     : LOCAL_POSITION;
 	float3 normalW : NORMAL;
 	float3 tanW	   : TANGENT;
 	float3 bitW    : BITANGENT;
@@ -41,19 +42,23 @@ struct PS_SURFACE_OUTPUT
 {
 	float4 albedo;
 	float3 normal;
-	
 	float3 specular;
 	float roughness;
 	float metallic;
+    int flags;
 };
+
+
 struct PS_SURFACE_INPUT
 {
 	float3 position;
+	float3 local_position;
 	float3 normal;
 	float3 tangent;
 	float3 bitangent;
 	float2 tex;
 };
+
 
 PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 {
@@ -63,6 +68,7 @@ PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 	_output.normal    = _input.normal;
     _output.roughness = 0.0f;
 	_output.metallic  = 0.0f;
+	_output.flags = 0;
 
 	__PS_SURFACE_FUNCTION_SCRIPT__
 	return _output;
@@ -72,7 +78,7 @@ PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
-		    
+	vout.posL = vin.posL;
 	float3 posW = mul(float4(vin.posL, 1.0f), gWorld);
 	float3 normalW = mul(float4(vin.normalL, 0.0f), gWorld);
 	float3 tanW =  mul(float4(vin.tanL, 0.0f), gWorld);
@@ -86,17 +92,9 @@ VS_OUT vs_main(VS_IN vin)
 	return vout;
 }
 
-float4 ps_main(VS_OUT pin) : SV_TARGET
+
+float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 {
-	PS_SURFACE_INPUT input;
-	input.position = pin.posW;
-	input.normal   = normalize(pin.normalW);
-	input.tangent  = normalize(pin.tanW);
-	input.bitangent = normalize(pin.bitW);
-	input.tex       = pin.tex;
-	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
-
-
 	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
 
 
@@ -134,7 +132,29 @@ float4 ps_main(VS_OUT pin) : SV_TARGET
 	float Gamma = 1.0f / 2.2f;
 
     final = final / (final + float3(1.0f, 1.0f, 1.0f));
-    final = pow(final, float3(Gamma, Gamma, Gamma));
+   	final = pow(final, float3(Gamma, Gamma, Gamma));
 
 	return float4(final, 1.0f);
+}
+
+float4 ps_main(VS_OUT pin) : SV_TARGET
+{
+	PS_SURFACE_INPUT input;
+	input.position = pin.posW;
+	input.local_position = pin.posL;
+	input.normal   = normalize(pin.normalW);
+	input.tangent  = normalize(pin.tanW);
+	input.bitangent = normalize(pin.bitW);
+	input.tex       = pin.tex;
+	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
+
+	if(output.flags & SCRIPT_FLAG_IGNORE_LIGHTPASS)
+	{
+		return output.albedo;
+	}
+	else
+	{
+		return Lo(pin, output);
+	}
+	
 }

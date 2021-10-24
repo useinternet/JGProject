@@ -11,15 +11,21 @@ namespace JG
 		String   mCollisionType;
 		JVector3 mCenter;
 		f32 mMass = 10.0f;
+		f32 mStaticFriction  = 0.5f;
+		f32 mDynamicFriction = 0.5f;
+		f32 mRestitution     = 0.5f;
 
-		bool mIsRigidDirty = true;
+
+		bool mIsDebugDraw = false;
+		bool mIsSimulate  = false;
+
+
 		PhysicsHandle mRigidHandle;
+		PhysicsHandle mMaterialHandle;
 		PhysicsHandle mShapeHandle;
 
 
-
-		bool mIsDebugDraw    = false;
-		bool mIsDynamicRigid = false;
+		bool mIsDirty = true;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
@@ -27,19 +33,18 @@ namespace JG
 	protected:
 		virtual void Update() override;
 		virtual void LateUpdate() override;
-		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 		virtual void OnInspectorGUI() override;
 	protected:
 		void CreateRigid();
-		void UpdateRigid();
-		void RemoveRigid();
+		void CreateMaterial();
 		void CreateShape();
-		void UpdateShape();
-		void RemoveShape();
+
+		void Reset();
 	protected:
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() { return nullptr; }
-		virtual void DrawDebugShape(physx::PxRigidActor* actor) {}
+		virtual void DrawDebugShape(const physx::PxRigidActor* actor) {}
 	public:
 		void SetCenter(const JVector3& center);
 		const JVector3& GetCenter() const;
@@ -49,13 +54,12 @@ namespace JG
 
 		bool IsDebugDraw() const;
 		void SetDebugDraw(bool isDebugDraw);
-
-	
 	protected:
 		Color GetDebugColor() const {
 			return Color::Green();
 		}
-
+	private:
+		virtual void OnChange(const ChangeData& data) override;
 	};
 
 
@@ -70,7 +74,7 @@ namespace JG
 		virtual void OnInspectorGUI() override;
 
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() override;
-		virtual void DrawDebugShape(physx::PxRigidActor* actor) override;
+		virtual void DrawDebugShape(const physx::PxRigidActor* actor) override;
 	public:
 		void SetRadius(f32 r);
 		f32  GetRadius() const;
@@ -89,7 +93,7 @@ namespace JG
 
 
 		virtual SharedPtr<physx::PxGeometry> CreatePxGeometry() override;
-		virtual void DrawDebugShape(physx::PxRigidActor* actor) override;
+		virtual void DrawDebugShape(const physx::PxRigidActor* actor) override;
 	public:
 		void SetSize(const JVector3& size);
 		const JVector3&  GetSize() const;

@@ -122,29 +122,6 @@ namespace JG
 			ImGui::TableHeadersRow();
 			GameNode_OnGUI(mGameWorld);
 
-			if (ImGui::IsKeyPressed((i32)EKeyCode::F))
-			{
-				std::random_device rd;
-				i32 n1 = rd() % 100000;
-				i32 n2 = rd() % 100000;
-				i32 n3 = rd() % 100000;
-
-				JVector3 p = JVector3((f32)n1 / 1000.0f, (f32)n2 / 1000.0f, (f32)n3 / 1000.0f);
-				p.y = 0.0f;
-
-
-
-				auto node = mGameWorld->FindNode("Physics")->AddNode("Sphere");
-				node->GetTransform()->SetLocalScale(JVector3(0.02f, 0.02f, 0.02f));
-				node->GetTransform()->SetLocalLocation(p);
-				auto renderer = node->AddComponent<StaticMeshRenderer>();
-				renderer->SetMesh("Asset/Engine/Mesh/Sphere.jgasset");
-				renderer->SetMaterial("Asset/Resources/Material/M_House.jgasset");
-				auto coll = node->AddComponent<SphereCollision>();
-				coll->SetDebugDraw(true);
-				coll->SetSimulate(true);
-				
-			}
 			if (ImGui::IsAnyItemHovered() == false)
 			{
 				if (ImGui::IsMouseClicked(0))

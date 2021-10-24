@@ -21,7 +21,7 @@ namespace JG
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class IMaterial;
-	class IRenderer;
+	class Renderer;
 	class Render2DBatch;
 	class GraphicsSystemLayer : public ISystemLayer
 	{
@@ -36,9 +36,9 @@ namespace JG
 			List<SharedPtr<ITexture>> TargetDepthTextures;
 			u64 CurrentIndex = 0;
 
-			SharedPtr<IRenderer>  Renderer;
+			SharedPtr<Renderer>  _Renderer;
 			SharedPtr<Render2DBatch> _2DBatch;
-			Queue<SharedPtr<IRenderer>> PendingRendererQueue;
+			Queue<SharedPtr<Renderer>> PendingRendererQueue;
 
 
 			CameraItem() = default;

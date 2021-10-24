@@ -14,6 +14,7 @@ namespace JG
 		struct CPUCache
 		{
 			List<D3D12_CPU_DESCRIPTOR_HANDLE> CPUHandles;
+			u64 HashCode = 0;
 			u32 NumDescriptor = 0;
 		};
 	private:
@@ -21,6 +22,8 @@ namespace JG
 		SortedDictionary<i32, i32>       mRootParamInitTypeMap;
 		SortedDictionary<i32, CPUCache>	 mCPUCache;
 		SortedDictionary<u32, D3D12_DESCRIPTOR_RANGE_TYPE> mDescriptorTableType;
+		Dictionary<u64, D3D12_GPU_DESCRIPTOR_HANDLE> mDescriptorCache;
+
 
 		bool mResizeDirty        = false;
 		u32 mNumDescriptor		 = 0;

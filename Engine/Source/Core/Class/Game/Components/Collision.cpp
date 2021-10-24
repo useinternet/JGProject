@@ -8,42 +8,68 @@ namespace JG
 
 	void Collision::Awake()
 	{
+
+
+
 	}
 	void Collision::Start()
 	{
+		//if (mRigidHandle == 0)
+		//{
+		//	CreateRigid();
+		//}
+	
 		ScheduleByFrame(0, 0, -1, 0, [&]()-> EScheduleResult
 		{
-			UpdateRigid();
+			//if (mRigidHandle == 0)
+			//{
+			//	return EScheduleResult::Continue;
+			//}
+			//if (mIsDebugDraw)
+			//{
+			//	PhysicsManager::GetInstance().ExcuteReadCommand<physx::PxRigidActor>(
+			//		mRigidHandle, [&](const physx::PxRigidActor* actor)
+			//	{
+			//		DrawDebugShape(actor);
+			//	});
+			//}
+			//if (mIsDirty)
+			//{
+			//	PhysicsManager::GetInstance().PushWriteCommand<physx::PxRigidActor>(
+			//		mRigidHandle, [&](physx::PxRigidActor* actor)
+			//	{
+			//		auto translate = GetOwner()->GetTransform()->GetWorldLocation() + GetCenter();
+			//		auto rotation = GetOwner()->GetTransform()->GetWorldQuaternion();
 
-			if (mIsDebugDraw == true)
-			{
-				if (mIsDynamicRigid)
-				{
-					PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-					{
-						DrawDebugShape(rigidDynamic);
-					});
-				}
-				else
-				{
-					PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-					{
-						DrawDebugShape(rigidStatic);
-					});
-				}
 
-			}
+			//		physx::PxTransform t;
+			//		t.p = physx::PxVec3(translate.x, translate.y, translate.z);
+			//		t.q = physx::PxQuat(rotation.x, rotation.y, rotation.z, rotation.w);
+
+			//		actor->setGlobalPose(t);
+			//	});
+			//	mIsDirty = false;
+			//}
+			//else
+			//{
+			//	if (IsSimulate())
+			//	{
+			//		PhysicsManager::GetInstance().ExcuteReadCommand<physx::PxRigidActor>(
+			//			mRigidHandle, [&](const physx::PxRigidActor* actor)
+			//		{
+			//			auto t = actor->getGlobalPose();
+			//			GetOwner()->GetTransform()->SetWorldLocation(JVector3(t.p.x, t.p.y, t.p.z));
+			//			GetOwner()->GetTransform()->SetWorldQuaternion(JQuaternion(t.q.x, t.q.y, t.q.z, t.q.w));
+			//		});
+			//	}
+			//}
 			return EScheduleResult::Continue;
 		});
-		CreateShape();
-		CreateRigid();
-
 	}
 
 	void Collision::Destory()
 	{
-		RemoveRigid();
-		RemoveShape();
+		
 	}
 
 	void Collision::Update()
@@ -87,191 +113,105 @@ namespace JG
 	void Collision::OnInspectorGUI()
 	{
 		GameComponent::OnInspectorGUI();
-		auto center = GetCenter();
+		//auto center = GetCenter();
 
-		auto label_space = ImGui::CalcTextSize("DebugDraw").x;
-		bool isSimulate = IsSimulate();
-		bool isDebugDraw = IsDebugDraw();
-		ImGui::Bool_OnGUI("Debug Draw", isDebugDraw, label_space);
-		ImGui::Bool_OnGUI("IsSimulate", isSimulate, label_space);
-		ImGui::Vector3_OnGUI("Center", center, label_space);
+		//auto label_space = ImGui::CalcTextSize("DebugDraw").x;
+		//bool isSimulate = IsSimulate();
+		//bool isDebugDraw = IsDebugDraw();
+		//ImGui::Bool_OnGUI("Debug Draw", isDebugDraw, label_space);
+		//ImGui::Bool_OnGUI("IsSimulate", isSimulate, label_space);
+		//ImGui::Vector3_OnGUI("Center", center, label_space);
 
 
-		SetSimulate(isSimulate);
-		SetCenter(center);
-		SetDebugDraw(isDebugDraw);
+		//SetSimulate(isSimulate);
+		//SetCenter(center);
+		//SetDebugDraw(isDebugDraw);
 	}
 
 	void Collision::CreateRigid()
 	{
+		auto sceneHandle = GetGameWorld()->GetPxSceneHandle();
 		if (mRigidHandle != 0)
 		{
-			RemoveRigid();
+			PhysicsManager::GetInstance().PushDetachCommand(sceneHandle, mRigidHandle);
+			PhysicsManager::GetInstance().PushRemoveCommand(mRigidHandle);
+		}
+		if (mShapeHandle == 0)
+		{
+			CreateShape();
 		}
 
-		auto location = GetOwner()->GetTransform()->GetWorldLocation() + GetCenter();
+
+		auto translate = GetOwner()->GetTransform()->GetWorldLocation() + GetCenter();
 		auto rotation = GetOwner()->GetTransform()->GetWorldQuaternion();
-		if (mIsDynamicRigid == false)
+
+		if (mIsSimulate)
 		{
-			mRigidHandle = PhysicsManager::GetInstance().CreatePxRigidStatic(location, rotation);
-			auto sceneHandle = GetGameWorld()->GetPxSceneHandle();
-			PhysicsManager::GetInstance().PxSceneReadWrite(sceneHandle, [&](physx::PxScene* scene)
-			{
-				PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-				{
-					scene->addActor(*rigidStatic);
-				});
-			});
-			PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-			{
-				PhysicsManager::GetInstance().PxShapeReadWrite(mShapeHandle, [&](physx::PxShape* shape, physx::PxMaterial* material)
-				{
-					rigidStatic->attachShape(*shape);
-				});
-			});
+			mRigidHandle = PhysicsManager::GetInstance().CreatePxRigidDynamic(translate, rotation);
+			PhysicsManager::GetInstance().PushAttachCommand(sceneHandle, mRigidHandle);
 		}
 		else
 		{
-			mRigidHandle = PhysicsManager::GetInstance().CreatePxRigidDynamic(location, rotation);
-			auto sceneHandle = GetGameWorld()->GetPxSceneHandle();
-			PhysicsManager::GetInstance().PxSceneReadWrite(sceneHandle, [&](physx::PxScene* scene)
-			{
-				PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-				{
-					scene->addActor(*rigidDynamic);
-				});
-			});
-			PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-			{
-				PhysicsManager::GetInstance().PxShapeReadWrite(mShapeHandle, [&](physx::PxShape* shape, physx::PxMaterial* material)
-				{
-					rigidDynamic->attachShape(*shape);
-				});
-			});
+			mRigidHandle = PhysicsManager::GetInstance().CreatePxRigidStatic(translate, rotation);
+			PhysicsManager::GetInstance().PushAttachCommand(sceneHandle, mRigidHandle);
 		}
 
 
-		UpdateRigid();
-	}
-
-	void Collision::UpdateRigid()
-	{
-
-		if (mIsRigidDirty)
+		if (mShapeHandle != 0)
 		{
-			mIsRigidDirty = false;
-			auto location = GetOwner()->GetTransform()->GetWorldLocation() + GetCenter();
-			auto rotation = GetOwner()->GetTransform()->GetWorldQuaternion();
-
-
-			
-			static physx::PxTransform transform;
-			transform.p = physx::PxVec3(location.x, location.y, location.z);
-			transform.q = physx::PxQuat(rotation.x, rotation.y, rotation.z, rotation.w);
-			if (mIsDynamicRigid)
-			{
-				PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-				{
-					rigidDynamic->setGlobalPose(transform);
-				});
-			}
-			else
-			{
-				PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-				{
-					rigidStatic->setGlobalPose(transform);
-				});
-			}
-		}
-
-		if (mIsDynamicRigid)
-		{
-			PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-			{
-				auto pose = rigidDynamic->getGlobalPose();
-				GetOwner()->GetTransform()->SetWorldLocation(JVector3(pose.p.x, pose.p.y, pose.p.z));
-				GetOwner()->GetTransform()->SetWorldQuaternion(JQuaternion(pose.q.x, pose.q.y, pose.q.z, pose.q.w));
-			});
+			PhysicsManager::GetInstance().PushAttachCommand(mRigidHandle, mShapeHandle);
 		}
 	}
 
-	void Collision::RemoveRigid()
+	void Collision::CreateMaterial()
 	{
-		auto sceneHandle = GetGameWorld()->GetPxSceneHandle();
-
-		if (mIsDynamicRigid == true)
+		if (mMaterialHandle != 0)
 		{
-			PhysicsManager::GetInstance().PxSceneReadWrite(sceneHandle, [&](physx::PxScene* scene)
-			{
-				PhysicsManager::GetInstance().PxRigidDynamicReadWrite(mRigidHandle, [&](physx::PxRigidDynamic* rigidDynamic)
-				{
-					scene->removeActor(*rigidDynamic);
-				});
-			});
-
-			PhysicsManager::GetInstance().RemovePxRigidDynamic(mRigidHandle);
-		}
-		else
-		{
-			PhysicsManager::GetInstance().PxSceneReadWrite(sceneHandle, [&](physx::PxScene* scene)
-			{
-				PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-				{
-					scene->removeActor(*rigidStatic);
-				});
-			});
-
-			PhysicsManager::GetInstance().RemovePxRigidStatic(mRigidHandle);
+			PhysicsManager::GetInstance().PushRemoveCommand(mMaterialHandle);
 		}
 
-		mRigidHandle = 0;
+		mMaterialHandle = PhysicsManager::GetInstance().CreatePxMaterial(mStaticFriction, mDynamicFriction, mRestitution);
 	}
 
 	void Collision::CreateShape()
 	{
 		if (mShapeHandle != 0)
 		{
-			RemoveShape();
+			if (mRigidHandle != 0)
+			{
+				PhysicsManager::GetInstance().PushDetachCommand(mRigidHandle, mShapeHandle);
+			}
+			PhysicsManager::GetInstance().PushRemoveCommand(mShapeHandle);
 		}
+		if (mMaterialHandle == 0)
+		{
+			CreateMaterial();
+		}
+
 		mShapeHandle = PhysicsManager::GetInstance().CreatePxShape([&]() -> PxShapeData
 		{
 			PxShapeData data;
-			data.Restitution = 0.8f;
-			data.DynamicFriction = 0.2f;
-			data.StaticFriction = 0.2f;
-			data.Geometry = CreatePxGeometry();
+			data.Geometry       = CreatePxGeometry();
+			data.MaterialHandle = mMaterialHandle;
 			return data;
 		});
 	}
-	void Collision::UpdateShape()
-	{
-		PhysicsManager::GetInstance().PxShapeReadWrite(mShapeHandle,
-			[&](physx::PxShape* shape, physx::PxMaterial* material)
-		{
-			shape->setGeometry(*CreatePxGeometry());
-		});
-	}
-	void Collision::RemoveShape()
-	{
-		PhysicsManager::GetInstance().PxRigidStaticReadWrite(mRigidHandle, [&](physx::PxRigidStatic* rigidStatic)
-		{
-			PhysicsManager::GetInstance().PxShapeReadWrite(mShapeHandle, [&](physx::PxShape* shape, physx::PxMaterial* material)
-			{
-				rigidStatic->detachShape(*shape);
-			});
-		});
 
-		PhysicsManager::GetInstance().RemovePxShape(mShapeHandle);
-		mShapeHandle = 0;
+	void Collision::Reset()
+	{
+		PhysicsManager::GetInstance().PushRemoveCommand(mMaterialHandle);
+		PhysicsManager::GetInstance().PushRemoveCommand(mShapeHandle);
+		PhysicsManager::GetInstance().PushRemoveCommand(mRigidHandle);
 	}
+
 	void Collision::SetCenter(const JVector3& center)
 	{
-		if (mCenter != center)
-		{
-			mIsRigidDirty = true; 
-		}
+		bool isDirty = mCenter != center;
 		mCenter = center;
-
+		if (isDirty)
+		{
+			mIsDirty = true;
+		}
 	}
 
 	const JVector3& Collision::GetCenter() const
@@ -281,15 +221,15 @@ namespace JG
 
 	bool Collision::IsSimulate() const
 	{
-		return mIsDynamicRigid;
+		return mIsSimulate;
 	}
 
 	void Collision::SetSimulate(bool isSimulate)
 	{
-		if (mIsDynamicRigid != isSimulate)
+		bool isDirty = mIsSimulate != isSimulate;
+		mIsSimulate = isSimulate;
+		if (isDirty)
 		{
-			RemoveRigid();
-			mIsDynamicRigid = isSimulate;
 			CreateRigid();
 		}
 	}
@@ -302,6 +242,15 @@ namespace JG
 	void Collision::SetDebugDraw(bool isDebugDraw)
 	{
 		mIsDebugDraw = isDebugDraw;
+	}
+
+	void Collision::OnChange(const ChangeData& data)
+	{
+		// ∞‘¿” ∂Ù
+		//if (data.Type == JGTYPE(Transform))
+		//{
+		//	mIsDirty = true;
+		//}
 	}
 
 
@@ -340,7 +289,7 @@ namespace JG
 		return CreateSharedPtr<physx::PxSphereGeometry>(GetRadius());
 	}
 
-	void SphereCollision::DrawDebugShape(physx::PxRigidActor* actor)
+	void SphereCollision::DrawDebugShape(const physx::PxRigidActor* actor)
 	{
 		auto l = actor->getGlobalPose().p;
 
@@ -354,9 +303,8 @@ namespace JG
 		mRadius = r;
 		if (isDirty)
 		{
-			UpdateShape();
+			CreateShape();
 		}
-
 	}
 
 	f32 SphereCollision::GetRadius() const
@@ -394,7 +342,7 @@ namespace JG
 		auto halfSize = GetSize() * 0.5f;
 		return CreateSharedPtr<physx::PxBoxGeometry>(halfSize.x, halfSize.y, halfSize.z);
 	}
-	void BoxCollision::DrawDebugShape(physx::PxRigidActor* actor)
+	void BoxCollision::DrawDebugShape(const physx::PxRigidActor* actor)
 	{
 
 		auto l = actor->getGlobalPose().p;
@@ -409,7 +357,7 @@ namespace JG
 		mSize = size;
 		if (isDirty)
 		{
-			UpdateShape();
+			CreateShape();
 		}
 	}
 	const JVector3& BoxCollision::GetSize() const

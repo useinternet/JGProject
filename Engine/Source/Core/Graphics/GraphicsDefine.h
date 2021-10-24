@@ -240,6 +240,7 @@ namespace JG
 	{
 		Default = 0,
 		NoDepth = 1,
+		LessEqual  = 2,
 	};
 
 	enum class EBlendStateTemplate
@@ -251,6 +252,7 @@ namespace JG
 	enum class ERasterizerStateTemplate
 	{
 		Default = 0,
+		Cull_None = 1,
 	};
 
 	class DepthStencilState

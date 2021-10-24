@@ -34,8 +34,13 @@ namespace JG
 	}
 	void DynamicDescriptorAllocator::CommitDescriptorTable(u32 rootParam, const List<D3D12_CPU_DESCRIPTOR_HANDLE>& handles)
 	{
-		auto& cpuHandles = mCPUCache[rootParam].CPUHandles;
-		cpuHandles.insert(cpuHandles.end(), handles.begin(), handles.end());
+		mCPUCache[rootParam].CPUHandles = handles;
+		u64 hash = handles.size();
+		for (auto& handle : handles)
+		{
+			hash ^= handle.ptr + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+		}
+		mCPUCache[rootParam].HashCode = hash;
 	}
 	void DynamicDescriptorAllocator::Reset(bool clearHandleOffset)
 	{
@@ -43,7 +48,7 @@ namespace JG
 		{
 			mPushedHandleOffset = 0;
 		}
-
+		mDescriptorCache.clear();
 		mRootParamInitTypeMap.clear();
 		mDescriptorTableType.clear();
 		mCPUCache.clear();
@@ -66,36 +71,47 @@ namespace JG
 			for (auto& cache_pair : mCPUCache)
 			{
 				i32  rootParam = cache_pair.first;
-				auto handles = cache_pair.second.CPUHandles.data();
-
-
-				u32 handleCount = (u32)cache_pair.second.CPUHandles.size();
-				if (handleCount == 0) continue;
-				auto gpu = startGPU.Offset(mPushedHandleOffset, mIncreaseSize);
-				auto cpu = startCPU.Offset(mPushedHandleOffset, mIncreaseSize);
-
-				mPushedHandleOffset += handleCount;
-
-				if (mPushedHandleOffset >= mNumDescriptor)
+				u64  hashCode = cache_pair.second.HashCode;
+				D3D12_GPU_DESCRIPTOR_HANDLE submitGPU;
+				if (mDescriptorCache.find(hashCode) == mDescriptorCache.end())
 				{
-					mPushedHandleOffset = mNumDescriptor;
-					JG_CORE_CRITICAL("Need Add DynamicDescriptorAllocator Size  {0} => {1} ", mNumDescriptor, mNumDescriptor * 2);
-				}
+					auto handles = cache_pair.second.CPUHandles.data();
 
-				List<u32> srcDescriptorRangeSize(handleCount, 1);
 
-				DirectX12API::GetD3DDevice()->CopyDescriptors(
-					1, &cpu, &handleCount,
-					handleCount, handles, srcDescriptorRangeSize.data(),
-					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					u32 handleCount = (u32)cache_pair.second.CPUHandles.size();
+					if (handleCount == 0) continue;
+					auto gpu = startGPU.Offset(mPushedHandleOffset, mIncreaseSize);
+					auto cpu = startCPU.Offset(mPushedHandleOffset, mIncreaseSize);
 
-				if (is_graphics)
-				{
-					d3dCmdList->SetGraphicsRootDescriptorTable(rootParam, gpu);
+					mPushedHandleOffset += handleCount;
+					if (mPushedHandleOffset >= mNumDescriptor)
+					{
+						mPushedHandleOffset = mNumDescriptor;
+						JG_CORE_CRITICAL("Need Add DynamicDescriptorAllocator Size  {0} => {1} ", mNumDescriptor, mNumDescriptor * 2);
+					}
+
+					List<u32> srcDescriptorRangeSize(handleCount, 1);
+
+					DirectX12API::GetD3DDevice()->CopyDescriptors(
+						1, &cpu, &handleCount,
+						handleCount, handles, srcDescriptorRangeSize.data(),
+						D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+					submitGPU = gpu;
+					mDescriptorCache[hashCode] = gpu;
 				}
 				else
 				{
-					d3dCmdList->SetComputeRootDescriptorTable(rootParam, gpu);
+					submitGPU = mDescriptorCache[hashCode];
+				}
+
+				if (is_graphics)
+				{
+					d3dCmdList->SetGraphicsRootDescriptorTable(rootParam, submitGPU);
+				}
+				else
+				{
+					d3dCmdList->SetComputeRootDescriptorTable(rootParam, submitGPU);
 				}
 				cache_pair.second.CPUHandles.clear();
 			}

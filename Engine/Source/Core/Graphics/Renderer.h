@@ -29,64 +29,100 @@ namespace JG
 		u64 CurrentBufferIndex = 0;
 	};
 
-
-	class IRenderer : public GraphicsCommandable
+	// RenderProcess 라는 클래스 추가
+	class Renderer : public GraphicsCommandable
 	{
-	private:
-		List<SharedPtr<IRenderBatch>> mBatchList;
-	public:
-		IRenderer() = default;
-		virtual ~IRenderer() = default;
-	public:
-		virtual bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList) = 0;
-		virtual void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList) = 0;
-		virtual void End() = 0;
-
-		virtual ERendererPath GetRendererPath() const = 0;
 	protected:
-		bool BeginBatch(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList);
-		void EndBatch();
-	};
-
-	class FowardRenderer : public IRenderer
-	{
 		struct LightInfo
 		{
 			i32 Count = 0;
 			u64 Size = 0;
 			List<jbyte> ByteData;
 		};
+		struct ObjectInfo
+		{
+			JMatrix WorldMatrix;
+			SharedPtr<IMesh> Mesh;
+			List<SharedPtr<IMaterial>> MaterialList;
+		};
+		class IProcess
+		{
+
+		};
+
+		using DrawFunc     = std::function<void(int, const List<ObjectInfo>&)>;
+
 	private:
-		bool mIsRun = false;
-		List<SharedPtr<ITexture>>   mRenderTarges;
-		Dictionary<Type, LightInfo> mLightInfos;
+		List<SharedPtr<IRenderBatch>> mBatchList;
+		List<SharedPtr<ITexture>>     mRenderTarges;
+
+
+		Dictionary<Type, LightInfo>   mLightInfos;
+		SortedDictionary<int, List<ObjectInfo>> mObjectInfoListDic;
+		List<DrawFunc> mDrawFuncList;
+
+
 		RenderInfo mCurrentRenderInfo;
 	public:
-		FowardRenderer() = default;
+		Renderer() = default;
+		virtual ~Renderer() = default;
+	public:
+		bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList);
+		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
+		void End();
+
+		virtual ERendererPath GetRendererPath() const = 0;
+	protected:
+		bool BeginBatch(const RenderInfo& info, List<SharedPtr<IRenderBatch>> batchList);
+		void EndBatch();
+	protected:
+		const RenderInfo& GetRenderInfo() const;
+		const Dictionary<Type, LightInfo>& GetLightInfos() const;
+		void PushDrawFunc(const DrawFunc& func);
+	protected:
+		virtual int ArrangeObject(const ObjectInfo& info) = 0;
+	};
+
+	class DefferedBuffer : public Renderer
+	{
+	public:
+		DefferedBuffer();
+		virtual ~DefferedBuffer() = default;
+	public:
+		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Deferred; }
+	};
+
+
+
+	class FowardRenderer : public Renderer
+	{
+	public:
+		FowardRenderer();
 		virtual ~FowardRenderer() = default;
 	public:
-		virtual bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList) override;
-		virtual void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList) override;
-		virtual void End() override;
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Foward; }
+		virtual int ArrangeObject(const ObjectInfo& info) override;
+	private:
+		void Draw(int objectType, const List<ObjectInfo>& objectList);
+		
 	};
 
 	class IRenderBatch : public GraphicsCommandable
 	{
-		IRenderer* mConnectedRenderer = nullptr;
+		Renderer* mConnectedRenderer = nullptr;
 	public:
 		IRenderBatch() = default;
 		virtual ~IRenderBatch() = default;
 	public:
-		void ConnectRenderer(IRenderer* renderer) {
+		void ConnectRenderer(Renderer* renderer) {
 			mConnectedRenderer = renderer;
 		}
-		IRenderer* GetConnectedRenderer() const {
+		Renderer* GetConnectedRenderer() const {
 			return mConnectedRenderer;
 		}
 
 	protected:
-		friend IRenderer;
+		friend Renderer;
 		virtual bool Begin(const RenderInfo& info) = 0;
 		virtual void End() = 0;
 	};
