@@ -15,6 +15,7 @@ namespace JG
 
 	JGGraphics::JGGraphics()
 	{
+
 	}
 
 	JGGraphics::~JGGraphics()
@@ -23,7 +24,34 @@ namespace JG
 
 	Graphics::Scene* JGGraphics::CreateScene(const String& name)
 	{
-		return nullptr;
+		return CreateGObject<Graphics::Scene>(name);
+	}
+
+	Graphics::StaticRenderObject* JGGraphics::CreateStaticRenderObject(const String& name)
+	{
+		return CreateGObject<Graphics::StaticRenderObject>(name);
+	}
+
+	Graphics::PointLight* JGGraphics::CreatePointLight(const String& name)
+	{
+		return CreateGObject<Graphics::PointLight>(name);
+	}
+
+	void JGGraphics::DestroyObject(Graphics::GObject* gobject)
+	{
+		if (mGraphcisAPI == nullptr)
+		{
+			return;
+		}
+		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::BeginSystem,
+			[&]() -> EScheduleResult
+		{
+
+
+
+
+			return EScheduleResult::Continue;
+		});
 	}
 
 	IGraphicsAPI* JGGraphics::GetGraphicsAPI() const
@@ -59,6 +87,21 @@ namespace JG
 		u64 GObject::GetLayer()
 		{
 			return mLayer;
+		}
+
+		void GObject::Lock()
+		{
+			mLock = true;
+		}
+
+		void GObject::UnLock()
+		{
+			mLock = false;
+		}
+
+		bool GObject::IsLock()
+		{
+			return mLock;
 		}
 
 
@@ -177,6 +220,121 @@ namespace JG
 
 
 
-	}
+		void StaticRenderObject::SetMesh(SharedPtr<IMesh> mesh)
+		{
+			mMesh = mesh;
+		}
+
+		void StaticRenderObject::SetMaterialList(const List<SharedPtr<IMaterial>> materialList)
+		{
+			mMaterialList = materialList;
+		}
+
+		SharedPtr<IMesh> StaticRenderObject::GetMesh() const
+		{
+			return mMesh;
+		}
+
+		const List<SharedPtr<IMaterial>> StaticRenderObject::GetMaterialList() const
+		{
+			return mMaterialList;
+		}
+
+		bool StaticRenderObject::IsValid() const
+		{
+			bool result = true;
+
+			if (mMesh == nullptr || mMesh->IsValid() == false)
+			{
+				result = false;
+			}
+			if (mMaterialList.empty())
+			{
+				result = false;
+			}
+			else
+			{
+				for (auto& m : mMaterialList)
+				{
+					if (m == nullptr)
+					{
+						result = false;
+						break;
+					}
+				}
+			}
+
+			return result;
+		}
+
+		void PointLight::PushBtData(List<jbyte>& btData)
+		{
+			PushData(btData, &mPosition, sizeof(JVector3));
+			PushData(btData, &mRange, sizeof(float));
+			PushData(btData, &mColor, sizeof(JVector3));
+			PushData(btData, &mIntensity, sizeof(float));
+			PushData(btData, &mAtt0, sizeof(float));
+			PushData(btData, &mAtt1, sizeof(float));
+			PushData(btData, &mAtt2, sizeof(float));
+		}
+		void PointLight::SetColor(const Color& color)
+		{
+			mColor = JVector3(color.R, color.G, color.B);
+		}
+		void PointLight::SetPosition(const JVector3& position)
+		{
+			mPosition = position;
+		}
+		void PointLight::SetIntensity(f32 intensity)
+		{
+			mIntensity = intensity;
+		}
+		void PointLight::SetRange(f32 range)
+		{
+			mRange = range;
+		}
+		void PointLight::SetAtt0(f32 att0)
+		{
+			mAtt0 = att0;
+		}
+		void PointLight::SetAtt1(f32 att1)
+		{
+			mAtt1 = att1;
+		}
+		void PointLight::SetAtt2(f32 att2)
+		{
+			mAtt2 = att2;
+		}
+
+
+		Color PointLight::GetColor(const Color& color)
+		{
+			return Color(mColor.x, mColor.y, mColor.z, 1.0f);
+		}
+		const JVector3& PointLight::GetPosition() const
+		{
+			return mPosition;
+		}
+		f32 PointLight::GetIntensity() const
+		{
+			return mIntensity;
+		}
+		f32 PointLight::GetRange() const
+		{
+			return mRange;
+		}
+		f32 PointLight::GetAtt0() const
+		{
+			return mAtt0;
+		}
+		f32 PointLight::GetAtt1() const
+		{
+			return mAtt1;
+		}
+		f32 PointLight::GetAtt2() const
+		{
+			return mAtt2;
+		}
+}
 }
 
