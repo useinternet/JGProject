@@ -1,62 +1,129 @@
 #include "pch.h"
 #include "JGGraphics.h"
-
+#include "Application.h"
 
 namespace JG
 {
-
-
-
-
-
-
-
-
-
-	JGGraphics::JGGraphics()
+	JGGraphics::JGGraphics(const String& shaderPath)
 	{
-
+		LoadShader();
 	}
 
 	JGGraphics::~JGGraphics()
 	{
 	}
 
-	Graphics::Scene* JGGraphics::CreateScene(const String& name)
+	Graphics::Scene* JGGraphics::CreateScene(const String& name, const Graphics::SceneInfo& info)
 	{
-		return CreateGObject<Graphics::Scene>(name);
+		return CreateGObject<Graphics::Scene>(name,  info);
 	}
-
-	Graphics::StaticRenderObject* JGGraphics::CreateStaticRenderObject(const String& name)
-	{
-		return CreateGObject<Graphics::StaticRenderObject>(name);
-	}
-
-	Graphics::PointLight* JGGraphics::CreatePointLight(const String& name)
-	{
-		return CreateGObject<Graphics::PointLight>(name);
-	}
-
 	void JGGraphics::DestroyObject(Graphics::GObject* gobject)
 	{
 		if (mGraphcisAPI == nullptr)
 		{
 			return;
 		}
+
 		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::BeginSystem,
-			[&]() -> EScheduleResult
+			[&](SharedPtr<IJGObject> userData) -> EScheduleResult
 		{
 
-
-
-
+			if (userData->Is<RemoveObjectData>())
+			{
+				RemoveObject(userData->As<RemoveObjectData>()->GObject);
+			}
 			return EScheduleResult::Continue;
-		});
+		}, CreateSharedPtr<RemoveObjectData>(gobject));
 	}
 
 	IGraphicsAPI* JGGraphics::GetGraphicsAPI() const
 	{
 		return mGraphcisAPI.get();
+	}
+
+	void JGGraphics::LoadShader()
+	{
+		ShaderLibrary::GetInstance().LoadGlobalShaderLib();
+		auto templatePath = Application::GetShaderTemplatePath();
+
+		for (auto& iter : fs::recursive_directory_iterator(templatePath))
+		{
+			auto p = iter.path();
+			if (p.extension() != ".shadertemplate")
+			{
+				continue;
+			}
+			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+			EShaderFlags shaderFlags = EShaderFlags::None;
+
+			std::ifstream fin(p.string());
+
+			if (fin.is_open() == true)
+			{
+				std::stringstream ss;
+				ss << fin.rdbuf();
+				String sourceCode = ss.str();
+				if (sourceCode.find(HLSL::CSEntry) != String::npos)
+				{
+					shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
+				}
+				else
+				{
+					if (sourceCode.find(HLSL::VSEntry) != String::npos)
+					{
+						shaderFlags = shaderFlags | EShaderFlags::Allow_VertexShader;
+					}
+					if (sourceCode.find(HLSL::GSEntry) != String::npos)
+					{
+						shaderFlags = shaderFlags | EShaderFlags::Allow_GeometryShader;
+					}
+					if (sourceCode.find(HLSL::HSEntry) != String::npos)
+					{
+						shaderFlags = shaderFlags | EShaderFlags::Allow_HullShader;
+					}
+					if (sourceCode.find(HLSL::DSEntry) != String::npos)
+					{
+						shaderFlags = shaderFlags | EShaderFlags::Allow_DomainShader;
+					}
+					if (sourceCode.find(HLSL::PSEntry) != String::npos)
+					{
+						shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
+					}
+				}
+				auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
+				ShaderLibrary::GetInstance().RegisterShader(shader);
+				fin.close();
+			}
+		}
+		auto scriptPath = Application::GetShaderScriptPath();
+		for (auto& iter : fs::recursive_directory_iterator(scriptPath))
+		{
+			auto p = iter.path();
+
+			if (p.extension() != ".shaderscript")
+			{
+				continue;
+			}
+			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+			std::ifstream fin(p.string());
+
+			if (fin.is_open() == true)
+			{
+				std::stringstream ss;
+				ss << fin.rdbuf();
+				String scriptCode = ss.str();
+				SharedPtr<IShaderScript> script;
+				if (scriptCode.find(ShaderScript::Type::Surface) != String::npos)
+				{
+					script = IShaderScript::CreateMaterialScript("Surface/" + fileName, scriptCode);
+				}
+
+
+				ShaderLibrary::GetInstance().RegisterScirpt(script);
+				fin.close();
+			}
+
+		}
 	}
 
 
@@ -108,15 +175,33 @@ namespace JG
 
 		Scene::Scene(const SceneInfo& info)
 		{
+			static u64 s_CommandIDOffset = 0;
+
+
+
+
 			auto bufferCount = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 			mTargetTextures.resize(bufferCount, nullptr);
 			mTargetDepthTextures.resize(bufferCount, nullptr);
-			CurrentIndex = 0;
-
+			mCurrentIndex = 0;
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
 			SetSceneInfo(info);
-		}
 
+			if (sm_CommandIDQueue.empty() == false)
+			{
+				mCommandID = sm_CommandIDQueue.front();
+				sm_CommandIDQueue.pop();
+			}
+			else
+			{
+				mCommandID = ++s_CommandIDOffset;
+			}
+
+		}
+		Scene::~Scene()
+		{
+			sm_CommandIDQueue.push(mCommandID);
+		}
 		void Scene::SetSceneInfo(const SceneInfo& info)
 		{
 			if (mRenderer == nullptr || mSceneInfo.RenderPath != info.RenderPath)
@@ -134,13 +219,54 @@ namespace JG
 		{
 			return mSceneInfo;
 		}
-		void Scene::PushSceneObject(SceneObject* object)
+
+
+		void Scene::Rendering()
 		{
+			if (mRenderer == nullptr || m2DBatch == nullptr)
+			{
+				return;
+			}
+			if (mRenderScheduleHandle != nullptr || IsLock())
+			{
+				JG_CORE_ERROR("It's still being rendered.");
+				return;
+			}
+			Lock();
+			
+			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
+			{
+				RenderInfo info;
+				info.TargetTexture		= mTargetTextures[mCurrentIndex];
+				info.TargetDepthTexture = mTargetDepthTextures[mCurrentIndex];
+				info.Resolutoin			= mSceneInfo.Resolution;
+				info.ViewProj			= mSceneInfo.ViewProjMatrix;
+				info.EyePosition		= mSceneInfo.EyePos;
+				info.CurrentBufferIndex = mCurrentIndex;
+
+				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
+				{
+
+
+
+
+
+					mRenderer->End();
+				}
+
+				
+				//mRenderer->Begin()
+
+			});
 
 		}
-		void Scene::PushLight(Light* light)
+
+		SharedPtr<SceneResultInfo> Scene::FetchResultFinish()
 		{
 
+
+
+			return SharedPtr<SceneResultInfo>();
 		}
 
 
@@ -184,157 +310,6 @@ namespace JG
 
 			}
 		}
-
-		void SceneObject::SetWorldMatrix(const JMatrix& m)
-		{
-			mWorldMatrix = m;
-		}
-
-		const JMatrix& SceneObject::GetWorldMatrix() const
-		{
-			return mWorldMatrix;
-		}
-
-
-
-
-
-		void Render2DObject::SetColor(const Color& color)
-		{
-			mColor = color;
-		}
-		void Render2DObject::SetTexture(SharedPtr<ITexture> tex)
-		{
-			mTexture = tex;
-		}
-
-
-		const Color& Render2DObject::GetColor() const
-		{
-
-		}
-		SharedPtr<ITexture> Render2DObject::GetTexture() const
-		{
-
-		}
-
-
-
-		void StaticRenderObject::SetMesh(SharedPtr<IMesh> mesh)
-		{
-			mMesh = mesh;
-		}
-
-		void StaticRenderObject::SetMaterialList(const List<SharedPtr<IMaterial>> materialList)
-		{
-			mMaterialList = materialList;
-		}
-
-		SharedPtr<IMesh> StaticRenderObject::GetMesh() const
-		{
-			return mMesh;
-		}
-
-		const List<SharedPtr<IMaterial>> StaticRenderObject::GetMaterialList() const
-		{
-			return mMaterialList;
-		}
-
-		bool StaticRenderObject::IsValid() const
-		{
-			bool result = true;
-
-			if (mMesh == nullptr || mMesh->IsValid() == false)
-			{
-				result = false;
-			}
-			if (mMaterialList.empty())
-			{
-				result = false;
-			}
-			else
-			{
-				for (auto& m : mMaterialList)
-				{
-					if (m == nullptr)
-					{
-						result = false;
-						break;
-					}
-				}
-			}
-
-			return result;
-		}
-
-		void PointLight::PushBtData(List<jbyte>& btData)
-		{
-			PushData(btData, &mPosition, sizeof(JVector3));
-			PushData(btData, &mRange, sizeof(float));
-			PushData(btData, &mColor, sizeof(JVector3));
-			PushData(btData, &mIntensity, sizeof(float));
-			PushData(btData, &mAtt0, sizeof(float));
-			PushData(btData, &mAtt1, sizeof(float));
-			PushData(btData, &mAtt2, sizeof(float));
-		}
-		void PointLight::SetColor(const Color& color)
-		{
-			mColor = JVector3(color.R, color.G, color.B);
-		}
-		void PointLight::SetPosition(const JVector3& position)
-		{
-			mPosition = position;
-		}
-		void PointLight::SetIntensity(f32 intensity)
-		{
-			mIntensity = intensity;
-		}
-		void PointLight::SetRange(f32 range)
-		{
-			mRange = range;
-		}
-		void PointLight::SetAtt0(f32 att0)
-		{
-			mAtt0 = att0;
-		}
-		void PointLight::SetAtt1(f32 att1)
-		{
-			mAtt1 = att1;
-		}
-		void PointLight::SetAtt2(f32 att2)
-		{
-			mAtt2 = att2;
-		}
-
-
-		Color PointLight::GetColor(const Color& color)
-		{
-			return Color(mColor.x, mColor.y, mColor.z, 1.0f);
-		}
-		const JVector3& PointLight::GetPosition() const
-		{
-			return mPosition;
-		}
-		f32 PointLight::GetIntensity() const
-		{
-			return mIntensity;
-		}
-		f32 PointLight::GetRange() const
-		{
-			return mRange;
-		}
-		f32 PointLight::GetAtt0() const
-		{
-			return mAtt0;
-		}
-		f32 PointLight::GetAtt1() const
-		{
-			return mAtt1;
-		}
-		f32 PointLight::GetAtt2() const
-		{
-			return mAtt2;
-		}
-}
+	}
 }
 

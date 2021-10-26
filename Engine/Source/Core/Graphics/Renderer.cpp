@@ -1,18 +1,10 @@
 ﻿#include "pch.h"
 #include "Renderer.h"
 #include "Application.h"
-
-#include "Class/Game/Components/Camera.h"
-#include "Class/Asset/Asset.h"
-#include "Graphics/Resource.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Material.h"
-#include "GraphicsAPI.h"
-
+#include "JGGraphics.h"
 namespace JG
 {
-	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList)
+	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<IRenderBatch>> batchList)
 	{
 		auto api = Application::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
@@ -36,17 +28,13 @@ namespace JG
 
 		mLightInfos.clear();
 		// Light Info 정보 수집
-		for (auto item : lightItemList)
+		for (auto item : lightList)
 		{
-			auto& info = mLightInfos[item->GetType()];
+			auto& info = mLightInfos[item->GetLightType()];
 			info.Count++;
 			info.Size = item->GetBtSize();
 			item->PushBtData(info.ByteData);
 		}
-
-
-
-
 		return BeginBatch(info, batchList);
 	}
 	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
@@ -111,7 +99,7 @@ namespace JG
 		return mCurrentRenderInfo;
 	}
 
-	const Dictionary<Type, Renderer::LightInfo>& Renderer::GetLightInfos() const
+	const Dictionary<Graphics::ELightType, Renderer::LightInfo>& Renderer::GetLightInfos() const
 	{
 		return mLightInfos;
 	}
@@ -122,9 +110,6 @@ namespace JG
 	}
 
 
-	DefferedBuffer::DefferedBuffer()
-	{
-	}
 	FowardRenderer::FowardRenderer()
 	{
 		PushDrawFunc(std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2));
@@ -193,7 +178,7 @@ namespace JG
 				// 라이트 정보 심어주기
 				{
 					// 
-					auto pointLightInfo = lightInfos[JGTYPE(PointLightItem)];
+					auto pointLightInfo = lightInfos[Graphics::ELightType::PointLight];
 					if (material->SetInt(ShaderScript::Standard3D::PointLightCount, pointLightInfo.Count) == false)
 					{
 

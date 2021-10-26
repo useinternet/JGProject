@@ -18,7 +18,9 @@ namespace JG
 	namespace Graphics
 	{
 		class Scene;
+		class SceneInfo;
 		class GObject;
+		class SceneObject;
 		class RenderObject;
 		class StaticRenderObject;
 		class Light;
@@ -29,22 +31,20 @@ namespace JG
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
 		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
 	public:
-		JGGraphics();
+		JGGraphics(const String& shaderPath);
 		~JGGraphics();
 
 
-		Graphics::Scene*			  CreateScene(const String& name);
-		Graphics::StaticRenderObject* CreateStaticRenderObject(const String& name);
-		Graphics::PointLight*         CreatePointLight(const String& name);
+		Graphics::Scene*			  CreateScene(const String& name, const Graphics::SceneInfo& info);
 
 
 		void DestroyObject(Graphics::GObject* gobject);
 		IGraphicsAPI* GetGraphicsAPI() const;
 	private:
-		template<class T>
-		T* CreateGObject(const String& name)
+		template<class T, class ...Args>
+		T* CreateGObject(const String& name, Args&& ... args)
 		{
-			auto gobj = CreateUniquePtr<T>();
+			auto gobj = CreateUniquePtr<T>(std::forward<Args>(args)...);
 			gobj->SetName(name);
 			
 			auto result = gobj.get();
@@ -55,8 +55,15 @@ namespace JG
 		{
 			mObjectPool.erase(gobj);
 		}
+		void LoadShader();
 	private:
-		//class 
+		class RemoveObjectData : public IJGObject
+		{
+			JGCLASS
+		public:
+			Graphics::GObject* GObject = nullptr;
+			RemoveObjectData(Graphics::GObject* obj) : GObject(obj) {}
+		};
 	};
 }
 
@@ -64,6 +71,18 @@ namespace JG
 {
 	namespace Graphics
 	{
+		enum class ELightType
+		{
+			PointLight,
+		};
+		enum class ESceneObjectType
+		{
+			Static,
+			Paper,
+			Debug,
+		};
+
+
 		class SceneInfo
 		{
 		public:
@@ -77,6 +96,13 @@ namespace JG
 			JMatrix  ViewProjMatrix = JMatrix::Identity();
 
 			Color    ClearColor;
+		};
+
+		class SceneResultInfo
+		{
+		public:
+			SharedPtr<ITexture> Texture;
+			SharedPtr<ITexture> DepthTexture;
 		};
 
 
@@ -106,103 +132,122 @@ namespace JG
 		//
 		class Scene : public GObject
 		{
+			static Queue<u64> sm_CommandIDQueue;
+
+
+		private:
 			SceneInfo mSceneInfo;
 
 			List<SharedPtr<ITexture>> mTargetTextures;
 			List<SharedPtr<ITexture>> mTargetDepthTextures;
-			u64 CurrentIndex = 0;
 
-			SharedPtr<Renderer>      mRenderer;
-			SharedPtr<Render2DBatch> m2DBatch;
+
+			Queue<SharedPtr<SceneObject>> mSceneObjectQueue;
+			List<SharedPtr<Light>>        mLightList;
+
+
+			u64 mCurrentIndex = 0;
+			u64 mCommandID    = 0;
+
+			SharedPtr<Renderer>       mRenderer;
+			SharedPtr<Render2DBatch>  m2DBatch;
+			SharedPtr<ScheduleHandle> mRenderScheduleHandle;
 		public:
 			Scene(const SceneInfo& info);
-			virtual ~Scene() = default;
+			virtual ~Scene();
 		public:
 			void SetSceneInfo(const SceneInfo& info);
 			const SceneInfo& GetSceneInfo() const;
 
-			void PushSceneObject(SceneObject* object);
-			void PushLight(Light* light);
+			template<class SceneObjectClass>
+			void PushSceneObject(const SceneObjectClass& sceneObject)
+			{
+				auto pSceneObject = CreateSharedPtr<SceneObjectClass>();
+				*pSceneObject = sceneObject;
+
+				mSceneObjectQueue.push(pSceneObject);
+			}
+
+			template<class LightClass>
+			void PushLight(const LightClass& l)
+			{
+				auto pLight = CreateSharedPtr<LightClass>();
+				*pLight = sceneObject;
+
+				mLightList.push_back(pLight);
+			}
+		public:
+			void Rendering();
+			SharedPtr<SceneResultInfo> FetchResultFinish();
+
+
 		private:
 			void InitRenderer(ERendererPath path);
 			void InitTexture(const JVector2& size, const Color& clearColor);
 		};
 
 
-
-		// 
-		class SceneObject : public GObject
+		// SceneObject //
+		class SceneObject
 		{
-		private:
-			JMatrix			 mWorldMatrix;
 		public:
-			virtual ~SceneObject() = default;
-
-
+			JMatrix	WorldMatrix;
+			u64     Layer = 0;
 		public:
-			void SetWorldMatrix(const JMatrix& m);
-			const JMatrix& GetWorldMatrix() const;
-
-		public:
+			virtual ESceneObjectType GetSceneObjectType() const = 0;
 			virtual bool IsValid() const = 0;
-
-
 		};
 
 
-		class Render2DObject : public SceneObject
+		class PaperObject : public SceneObject
 		{
 		private:
-			Color  mColor = Color::White();
-			SharedPtr<ITexture> mTexture = nullptr;
+			Color  Color = Color::White();
+			SharedPtr<ITexture> Texture = nullptr;
 		public:
-			virtual ~Render2DObject() = default;
-		public:
-			void SetColor(const Color& color);
-			void SetTexture(SharedPtr<ITexture> tex);
-
-
-			const Color& GetColor() const;
-			SharedPtr<ITexture> GetTexture() const;
-
-		public:
+			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Paper; }
 			virtual bool IsValid() const override { return true; }
 		};
 
 
-		class Render3DObject : public SceneObject
-		{
-		public:
-			virtual ~Render3DObject() = default;
-		};
-
-
-
-
-		class StaticRenderObject : public Render2DObject
+		class StaticRenderObject : public SceneObject
 		{
 		private:
-			SharedPtr<IMesh> mMesh;
-			List<SharedPtr<IMaterial>> mMaterialList;
+			SharedPtr<IMesh> Mesh;
+			List<SharedPtr<IMaterial>> MaterialList;
 		public:
-			virtual ~StaticRenderObject() = default;
+			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Paper; }
+			virtual bool IsValid() const override { 
+				bool result = true;
 
-		public:
-			void SetMesh(SharedPtr<IMesh> mesh);
-			void SetMaterialList(const List<SharedPtr<IMaterial>> materialList);
+				if (Mesh == nullptr || Mesh->IsValid() == false)
+				{
+					result = false;
+				}
+				if (MaterialList.empty())
+				{
+					result = false;
+				}
+				else
+				{
+					for (auto& m : MaterialList)
+					{
+						if (m == nullptr)
+						{
+							result = false;
+							break;
+						}
+					}
+				}
 
-
-			SharedPtr<IMesh> GetMesh() const;
-			const List<SharedPtr<IMaterial>> GetMaterialList() const;
-		public:
-			virtual bool IsValid() const override;
+				return result;
+			}
 		};
-
+	
 
 
 		/// Light ///
-		//
-		class Light : public SceneObject
+		class Light 
 		{
 		protected:
 			void PushData(List<jbyte>& btData, void* data, u64 size) {
@@ -212,45 +257,35 @@ namespace JG
 				memcpy(&btData[offset], data, size);
 			}
 		public:
-			virtual ~Light() = default;
-		public:
+			virtual ELightType GetLightType() const = 0;
 			virtual void PushBtData(List<jbyte>& btData) = 0;
-			virtual u64 GetBtSize() const = 0;
+			virtual u64  GetBtSize() const = 0;
 		};
 
 
 		//
 		class PointLight : public Light
 		{
-		private:
-			JVector3 mColor;
-			JVector3 mPosition;
-			f32 mIntensity = 1.0f;
-			f32 mRange = 0.0f;
-			f32 mAtt0 = 0.0f;
-			f32 mAtt1 = 0.0f;
-			f32 mAtt2 = 0.0f;
 		public:
-			virtual ~PointLight() = default;
+			JVector3 Color;
+			JVector3 Position;
+			f32 Intensity = 1.0f;
+			f32 Range = 0.0f;
+			f32 Att0 = 0.0f;
+			f32 Att1 = 0.0f;
+			f32 Att2 = 0.0f;
 		public:
-			void SetColor(const Color& color);
-			void SetPosition(const JVector3& position);
-			void SetIntensity(f32 intensity);
-			void SetRange(f32 range);
-			void SetAtt0(f32 att0);
-			void SetAtt1(f32 att1);
-			void SetAtt2(f32 att2);
-
-
-			Color GetColor(const Color& color);
-			const JVector3& GetPosition() const;
-			f32 GetIntensity() const;
-			f32 GetRange() const;
-			f32 GetAtt0() const;
-			f32 GetAtt1() const;
-			f32 GetAtt2() const;
-		public:
-			virtual void PushBtData(List<jbyte>& btData)  override;
+			virtual ELightType GetLightType() const override { return ELightType::PointLight; }
+			virtual void PushBtData(List<jbyte>& btData)  override
+			{
+				PushData(btData, &Position, sizeof(JVector3));
+				PushData(btData, &Range, sizeof(float));
+				PushData(btData, &Color, sizeof(JVector3));
+				PushData(btData, &Intensity, sizeof(float));
+				PushData(btData, &Att0, sizeof(float));
+				PushData(btData, &Att1, sizeof(float));
+				PushData(btData, &Att2, sizeof(float));
+			}
 			virtual u64 GetBtSize() const override {
 				return 44;
 			}

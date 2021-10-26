@@ -1,6 +1,23 @@
 ﻿#pragma once
 #include "JGCore.h"
 #include "GraphicsDefine.h"
+
+namespace JG
+{
+	namespace Graphics
+	{
+		class Scene;
+		class SceneInfo;
+		class GObject;
+		class SceneObject;
+		class RenderObject;
+		class StaticRenderObject;
+		class Light;
+		class PointLight;
+		enum class ELightType;
+	}
+}
+
 namespace JG
 {
 	class IRenderContext;
@@ -17,9 +34,8 @@ namespace JG
 
 
 
-	class RenderInfo : public IJGObject
+	class RenderInfo
 	{
-		JGCLASS
 	public:
 		SharedPtr<ITexture> TargetTexture;
 		SharedPtr<ITexture> TargetDepthTexture;
@@ -45,11 +61,6 @@ namespace JG
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		};
-		class IProcess
-		{
-
-		};
-
 		using DrawFunc     = std::function<void(int, const List<ObjectInfo>&)>;
 
 	private:
@@ -57,7 +68,7 @@ namespace JG
 		List<SharedPtr<ITexture>>     mRenderTarges;
 
 
-		Dictionary<Type, LightInfo>   mLightInfos;
+		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int, List<ObjectInfo>> mObjectInfoListDic;
 		List<DrawFunc> mDrawFuncList;
 
@@ -67,7 +78,7 @@ namespace JG
 		Renderer() = default;
 		virtual ~Renderer() = default;
 	public:
-		bool Begin(const RenderInfo& info, List<SharedPtr<ILightItem>> lightItemList, List<SharedPtr<IRenderBatch>> batchList);
+		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<IRenderBatch>> batchList);
 		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
 		void End();
 
@@ -77,22 +88,11 @@ namespace JG
 		void EndBatch();
 	protected:
 		const RenderInfo& GetRenderInfo() const;
-		const Dictionary<Type, LightInfo>& GetLightInfos() const;
+		const Dictionary<Graphics::ELightType, LightInfo>& GetLightInfos() const;
 		void PushDrawFunc(const DrawFunc& func);
 	protected:
 		virtual int ArrangeObject(const ObjectInfo& info) = 0;
 	};
-
-	class DefferedBuffer : public Renderer
-	{
-	public:
-		DefferedBuffer();
-		virtual ~DefferedBuffer() = default;
-	public:
-		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Deferred; }
-	};
-
-
 
 	class FowardRenderer : public Renderer
 	{

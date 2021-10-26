@@ -17,64 +17,64 @@
 
 namespace JG
 {
-	GraphicsSystemLayer::CameraItem::CameraItem(Camera* cam) : pCamera(cam)
-	{
-		auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
-		TargetTextures.resize(bufferCnt, nullptr);
-		TargetDepthTextures.resize(bufferCnt, nullptr);
-		CurrentIndex = 0;
+	//GraphicsSystemLayer::CameraItem::CameraItem(Camera* cam) : pCamera(cam)
+	//{
+	//	auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
+	//	TargetTextures.resize(bufferCnt, nullptr);
+	//	TargetDepthTextures.resize(bufferCnt, nullptr);
+	//	CurrentIndex = 0;
 
-		_2DBatch = CreateSharedPtr<Render2DBatch>();
-	}
+	//	_2DBatch = CreateSharedPtr<Render2DBatch>();
+	//}
 
-	bool GraphicsSystemLayer::CameraItem::IsValid() const
-	{
-		return TargetTextures[0] != nullptr;
-	}
+	//bool GraphicsSystemLayer::CameraItem::IsValid() const
+	//{
+	//	return TargetTextures[0] != nullptr;
+	//}
 
-	void GraphicsSystemLayer::CameraItem::ChangeRenderer()
-	{
-		if (pCamera == nullptr) return;
-		if (_Renderer != nullptr && pCamera->GetRendererPath() == _Renderer->GetRendererPath())
-		{
-			return;
-		}
+	//void GraphicsSystemLayer::CameraItem::ChangeRenderer()
+	//{
+	//	if (pCamera == nullptr) return;
+	//	if (_Renderer != nullptr && pCamera->GetRendererPath() == _Renderer->GetRendererPath())
+	//	{
+	//		return;
+	//	}
 
-		auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
+	//	auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
-		
-		if (_Renderer != nullptr)
-		{
-			bool isMakeSchedule = PendingRendererQueue.empty();
-			PendingRendererQueue.push(_Renderer);
+	//	
+	//	if (_Renderer != nullptr)
+	//	{
+	//		bool isMakeSchedule = PendingRendererQueue.empty();
+	//		PendingRendererQueue.push(_Renderer);
 
-			if (isMakeSchedule)
-			{
-				Scheduler::GetInstance().ScheduleOnceByFrame(bufferCnt, 0,
-					[&]() -> EScheduleResult
-				{
+	//		if (isMakeSchedule)
+	//		{
+	//			Scheduler::GetInstance().ScheduleOnceByFrame(bufferCnt, 0,
+	//				[&]() -> EScheduleResult
+	//			{
 
-					while (!PendingRendererQueue.empty())
-					{
-						PendingRendererQueue.front().reset();
-						PendingRendererQueue.pop();
-					}
-					return EScheduleResult::Continue;
-				});
-			}
-		}
-	
+	//				while (!PendingRendererQueue.empty())
+	//				{
+	//					PendingRendererQueue.front().reset();
+	//					PendingRendererQueue.pop();
+	//				}
+	//				return EScheduleResult::Continue;
+	//			});
+	//		}
+	//	}
+	//
 
-		switch (pCamera->GetRendererPath())
-		{
-		case ERendererPath::Foward:
-			_Renderer = CreateSharedPtr<FowardRenderer>();
-			break;
-		case ERendererPath::Deferred:
-			break;
-		}
+	//	switch (pCamera->GetRendererPath())
+	//	{
+	//	case ERendererPath::Foward:
+	//		_Renderer = CreateSharedPtr<FowardRenderer>();
+	//		break;
+	//	case ERendererPath::Deferred:
+	//		break;
+	//	}
 
-	}
+	//}
 
 
 	void GraphicsSystemLayer::OnAttach()
@@ -91,28 +91,28 @@ namespace JG
 
 	void GraphicsSystemLayer::Begin()
 	{
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem, SCHEDULE_BIND_FN(&GraphicsSystemLayer::Update));
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&GraphicsSystemLayer::Wait));
+		//Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem, SCHEDULE_BIND_FN(&GraphicsSystemLayer::Update));
+		//Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&GraphicsSystemLayer::Wait));
 
-		mRenderItemPriority[JGTYPE(Standard2DRenderItem)] = (u64)ERenderItemPriority::_2D;
+		//mRenderItemPriority[JGTYPE(Standard2DRenderItem)] = (u64)ERenderItemPriority::_2D;
 	}
 
 	void GraphicsSystemLayer::Destroy()
 	{
-		mRegisteredRenderCameras.clear();
-		mPushedRenderItems.clear();
-		mPushedLightItems.clear();
+		//mRegisteredRenderCameras.clear();
+		//mPushedRenderItems.clear();
+		//mPushedLightItems.clear();
 	}
 
 	void GraphicsSystemLayer::OnEvent(IEvent& e)
 	{
 		EventDispatcher eventDispatcher(e);
-		eventDispatcher.Dispatch<RequestPushRenderItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushRenderItem));
-		eventDispatcher.Dispatch<RequestPushLightItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushLightItem));
-		eventDispatcher.Dispatch<RequestRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterCamera));
-		eventDispatcher.Dispatch<RequestUnRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseUnRegisterCamera));
-		eventDispatcher.Dispatch<RequestRegisterMainCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterMainCamera));
-		eventDispatcher.Dispatch<RequestUnRegisterMainCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseUnRegisterMainCamera));
+		//eventDispatcher.Dispatch<RequestPushRenderItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushRenderItem));
+		//eventDispatcher.Dispatch<RequestPushLightItemEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponsePushLightItem));
+		//eventDispatcher.Dispatch<RequestRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterCamera));
+		//eventDispatcher.Dispatch<RequestUnRegisterCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseUnRegisterCamera));
+		//eventDispatcher.Dispatch<RequestRegisterMainCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseRegisterMainCamera));
+		//eventDispatcher.Dispatch<RequestUnRegisterMainCameraEvent>(EVENT_BIND_FN(&GraphicsSystemLayer::ResponseUnRegisterMainCamera));
 	}
 
 	String GraphicsSystemLayer::GetLayerName()
@@ -120,255 +120,255 @@ namespace JG
 		return "GraphicsSystemLayer";
 	}
 
-	bool GraphicsSystemLayer::ResponsePushRenderItem(RequestPushRenderItemEvent& e)
-	{
-		if (e.RenderItem == nullptr)
-		{
-			return true;
-		}
-		auto type     = e.RenderItem->GetType();
-		auto priority = mRenderItemPriority[type];
-		mPushedRenderItems[(u64)priority][type].push_back(e.RenderItem);
+	//bool GraphicsSystemLayer::ResponsePushRenderItem(RequestPushRenderItemEvent& e)
+	//{
+	//	if (e.RenderItem == nullptr)
+	//	{
+	//		return true;
+	//	}
+	//	auto type     = e.RenderItem->GetType();
+	//	auto priority = mRenderItemPriority[type];
+	//	mPushedRenderItems[(u64)priority][type].push_back(e.RenderItem);
 
-		return true;
-	}
+	//	return true;
+	//}
 
-	bool GraphicsSystemLayer::ResponsePushLightItem(RequestPushLightItemEvent& e)
-	{
-		if (e.LightItem == nullptr)
-		{
-			return true;
-		}
+	//bool GraphicsSystemLayer::ResponsePushLightItem(RequestPushLightItemEvent& e)
+	//{
+	//	if (e.LightItem == nullptr)
+	//	{
+	//		return true;
+	//	}
 
-		mPushedLightItems.push_back(e.LightItem);
-		return true;
-	}
-
-
-	bool GraphicsSystemLayer::ResponseRegisterCamera(RequestRegisterCameraEvent& e)
-	{
-		if (mRegisteredRenderCameras.find(e.pCamera) != mRegisteredRenderCameras.end())
-		{
-			return true;
-		}
-		
-		mRegisteredRenderCameras[e.pCamera] = CreateUniquePtr<CameraItem>(e.pCamera);
-
-		return true;
-	}
-
-	bool GraphicsSystemLayer::ResponseUnRegisterCamera(RequestUnRegisterCameraEvent& e)
-	{
-		if (mRegisteredRenderCameras.find(e.pCamera) == mRegisteredRenderCameras.end())
-		{
-			return true;
-		}
-
-		mRegisteredRenderCameras.erase(e.pCamera);
-		return true;
-	}
-
-	bool GraphicsSystemLayer::ResponseRegisterMainCamera(RequestRegisterMainCameraEvent& e)
-	{
-		if (mMainCamera == nullptr)
-		{
-			mMainCamera = CreateUniquePtr<CameraItem>(e.MainCamera);
-		}
-		else
-		{
-			mMainCamera->pCamera = e.MainCamera;
-		}
-		return true;
-	}
-
-	bool GraphicsSystemLayer::ResponseUnRegisterMainCamera(RequestUnRegisterMainCameraEvent& e)
-	{
-		if (mMainCamera->pCamera == e.MainCamera)
-		{
-			mMainCamera->pCamera = nullptr;
-		}
-		return true;
-	}
-
-	void GraphicsSystemLayer::Rendering(CameraItem* cameraItem, Type type, const List<SharedPtr<IRenderItem>>& renderItemList)
-	{
-		if (type == JGTYPE(Standard2DRenderItem))
-		{
-			u64 layerMask = cameraItem->pCamera->GetCullingLayerMask();
-			
-			for (auto& item : renderItemList)
-			{
-				auto itemMask = GameLayer::GetMask(item->TargetLayer);
-				if ((itemMask & layerMask) == false) continue;
-
-				auto _2dItem = static_cast<Standard2DRenderItem*>(item.get());
-				cameraItem->_2DBatch->DrawCall(_2dItem->WorldMatrix, _2dItem->Texture, _2dItem->Color);
-			}
-		}
-		else if (type == JGTYPE(StandardStaticMeshRenderItem))
-		{
-			u64 layerMask = cameraItem->pCamera->GetCullingLayerMask();
-			for (auto& item : renderItemList)
-			{
-				auto itemMask = GameLayer::GetMask(item->TargetLayer);
-				if ((itemMask & layerMask) == false) continue;
-
-				auto _3dItem = static_cast<StandardStaticMeshRenderItem*>(item.get());
-				if (_3dItem->Materials.empty())
-				{
-					_3dItem->Materials.push_back(IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader)));
-				}
-				cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
-			}
-		}
-		else if (type == JGTYPE(DebugRenderItem))
-		{
-			for (auto& item : renderItemList)
-			{
-				auto _3dItem = static_cast<DebugRenderItem*>(item.get());
-				if (_3dItem->Material == nullptr)
-				{
-					continue;
-				}
-				cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, { _3dItem->Material });
-			}
+	//	mPushedLightItems.push_back(e.LightItem);
+	//	return true;
+	//}
 
 
+	//bool GraphicsSystemLayer::ResponseRegisterCamera(RequestRegisterCameraEvent& e)
+	//{
+	//	if (mRegisteredRenderCameras.find(e.pCamera) != mRegisteredRenderCameras.end())
+	//	{
+	//		return true;
+	//	}
+	//	
+	//	mRegisteredRenderCameras[e.pCamera] = CreateUniquePtr<CameraItem>(e.pCamera);
+
+	//	return true;
+	//}
+
+	//bool GraphicsSystemLayer::ResponseUnRegisterCamera(RequestUnRegisterCameraEvent& e)
+	//{
+	//	if (mRegisteredRenderCameras.find(e.pCamera) == mRegisteredRenderCameras.end())
+	//	{
+	//		return true;
+	//	}
+
+	//	mRegisteredRenderCameras.erase(e.pCamera);
+	//	return true;
+	//}
+
+	//bool GraphicsSystemLayer::ResponseRegisterMainCamera(RequestRegisterMainCameraEvent& e)
+	//{
+	//	if (mMainCamera == nullptr)
+	//	{
+	//		mMainCamera = CreateUniquePtr<CameraItem>(e.MainCamera);
+	//	}
+	//	else
+	//	{
+	//		mMainCamera->pCamera = e.MainCamera;
+	//	}
+	//	return true;
+	//}
+
+	//bool GraphicsSystemLayer::ResponseUnRegisterMainCamera(RequestUnRegisterMainCameraEvent& e)
+	//{
+	//	if (mMainCamera->pCamera == e.MainCamera)
+	//	{
+	//		mMainCamera->pCamera = nullptr;
+	//	}
+	//	return true;
+	//}
+
+	//void GraphicsSystemLayer::Rendering(CameraItem* cameraItem, Type type, const List<SharedPtr<IRenderItem>>& renderItemList)
+	//{
+	//	if (type == JGTYPE(Standard2DRenderItem))
+	//	{
+	//		u64 layerMask = cameraItem->pCamera->GetCullingLayerMask();
+	//		
+	//		for (auto& item : renderItemList)
+	//		{
+	//			auto itemMask = GameLayer::GetMask(item->TargetLayer);
+	//			if ((itemMask & layerMask) == false) continue;
+
+	//			auto _2dItem = static_cast<Standard2DRenderItem*>(item.get());
+	//			cameraItem->_2DBatch->DrawCall(_2dItem->WorldMatrix, _2dItem->Texture, _2dItem->Color);
+	//		}
+	//	}
+	//	else if (type == JGTYPE(StandardStaticMeshRenderItem))
+	//	{
+	//		u64 layerMask = cameraItem->pCamera->GetCullingLayerMask();
+	//		for (auto& item : renderItemList)
+	//		{
+	//			auto itemMask = GameLayer::GetMask(item->TargetLayer);
+	//			if ((itemMask & layerMask) == false) continue;
+
+	//			auto _3dItem = static_cast<StandardStaticMeshRenderItem*>(item.get());
+	//			if (_3dItem->Materials.empty())
+	//			{
+	//				_3dItem->Materials.push_back(IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader)));
+	//			}
+	//			cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, _3dItem->Materials);
+	//		}
+	//	}
+	//	else if (type == JGTYPE(DebugRenderItem))
+	//	{
+	//		for (auto& item : renderItemList)
+	//		{
+	//			auto _3dItem = static_cast<DebugRenderItem*>(item.get());
+	//			if (_3dItem->Material == nullptr)
+	//			{
+	//				continue;
+	//			}
+	//			cameraItem->_Renderer->DrawCall(_3dItem->WorldMatrix, _3dItem->Mesh, { _3dItem->Material });
+	//		}
 
 
-		}
-		else
-		{
-			// Not Supported
-		}
-	}
-	EScheduleResult GraphicsSystemLayer::Update()
-	{
-		{
-			NotifyRenderingReadyCompeleteEvent e;
-			Application::GetInstance().SendEvent(e);
-		}
-		if (mMainCamera == nullptr)
-		{
-			return EScheduleResult::Continue;
-		}
-		bool isResize = false;
-		if (mMainCamera->pCamera != nullptr && mMainCamera->Resolution != mMainCamera->pCamera->GetResolution())
-		{
-			isResize = true;
-			mMainCamera->IsResizeDirty = true;
-			mMainCamera->Resolution = mMainCamera->pCamera->GetResolution();
-		}
-		for (auto& _pair : mRegisteredRenderCameras)
-		{
-			auto& camItem = _pair.second;
-			if (camItem->Resolution != camItem->pCamera->GetResolution())
-			{
-				isResize = true;
-				camItem->IsResizeDirty = true;
-				camItem->Resolution = camItem->pCamera->GetResolution();
-			}
-		}
-		if (isResize == true)
-		{
-			JG_CORE_INFO("Graphics API Flush");
-			Application::GetInstance().GetGraphicsAPI()->Flush();
-		}
-		auto fmBufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
-		if (mMainCamera->pCamera != nullptr)
-		{
-			auto mainCam = mMainCamera->pCamera;
-			if (mMainCamera->IsValid() == false || isResize)
-			{
-				TextureInfo mainTexInfo;
-				mainTexInfo.Width = std::max<u32>(1, mMainCamera->Resolution.x);
-				mainTexInfo.Height = std::max<u32>(1, mMainCamera->Resolution.y);
-				mainTexInfo.ArraySize = 1;
-				mainTexInfo.Format = ETextureFormat::R32G32B32A32_Float;
-				mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
-				mainTexInfo.MipLevel = 1;
-				mainTexInfo.ClearColor = mainCam->GetClearColor();
-
-				for (auto& t : mMainCamera->TargetTextures)
-				{
-					if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetTexture", mainTexInfo);
-					else t->SetTextureInfo(mainTexInfo);
-					
-				}
-
-				mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
-				mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
-				for (auto& t : mMainCamera->TargetDepthTextures)
-				{
-					if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetDepthTexture", mainTexInfo);
-					else t->SetTextureInfo(mainTexInfo);
-					
-				}
-			}
-		}
-
-		SharedPtr<RenderInfo> info = CreateSharedPtr<RenderInfo>(); auto mainCam = mMainCamera->pCamera;
-		info->CurrentBufferIndex = mMainCamera->CurrentIndex;
-		info->Resolutoin			= mMainCamera->pCamera->GetResolution();
-		info->ViewProj    = mMainCamera->pCamera->GetViewProjMatrix();
-		info->EyePosition = mMainCamera->pCamera->GetOwner()->GetTransform()->GetWorldLocation();
-		info->TargetTexture		= mMainCamera->TargetTextures[info->CurrentBufferIndex];
-		info->TargetDepthTexture = mMainCamera->TargetDepthTextures[info->CurrentBufferIndex];
-		info->TargetTexture->SetClearColor(mainCam->GetClearColor());
-		mMainCamera->ChangeRenderer();
-
-		mIsRenderCompelete = false;
-		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
-		{
-			
-			if (userData->Is<RenderInfo>() == false)
-			{
-				mIsRenderCompelete = true;
-				return;
-			}
-			userData->As<RenderInfo>();
-			auto data = static_cast<RenderInfo*>(userData.get());
-			
-
-			mMainCamera->_Renderer->SetCommandID(1);
-			if (mMainCamera->_Renderer->Begin(*data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
-			{
-				for (auto& _pair : mPushedRenderItems)
-				{
-					for (auto& itemPair : _pair.second)
-					{
-						auto& type = itemPair.first;
-						auto& itemList = itemPair.second;
-						Rendering(mMainCamera.get(), type, itemList);
-						itemList.clear();
-					}
-				}
-				mMainCamera->_Renderer->End();
-				mIsRenderCompelete = true;
-			}
-		},info);
-
-		mMainCamera->CurrentIndex = (mMainCamera->CurrentIndex + 1) % fmBufferCnt;
-		{
-			NotifyChangeMainSceneTextureEvent e;
-			e.SceneTexture = mMainCamera->TargetTextures[mMainCamera->CurrentIndex];
-			Application::GetInstance().SendEvent(e);
-		}
 
 
-		return EScheduleResult::Continue;
-	}
-	EScheduleResult GraphicsSystemLayer::Wait()
-	{
-		while (mIsRenderCompelete == false) {}
-		if (mIsRenderCompelete == true)
-		{
-			mPushedRenderItems.clear();
-			mPushedLightItems.clear();
-		}
+	//	}
+	//	else
+	//	{
+	//		// Not Supported
+	//	}
+	//}
+	//EScheduleResult GraphicsSystemLayer::Update()
+	//{
+	//	{
+	//		NotifyRenderingReadyCompeleteEvent e;
+	//		Application::GetInstance().SendEvent(e);
+	//	}
+	//	if (mMainCamera == nullptr)
+	//	{
+	//		return EScheduleResult::Continue;
+	//	}
+	//	bool isResize = false;
+	//	if (mMainCamera->pCamera != nullptr && mMainCamera->Resolution != mMainCamera->pCamera->GetResolution())
+	//	{
+	//		isResize = true;
+	//		mMainCamera->IsResizeDirty = true;
+	//		mMainCamera->Resolution = mMainCamera->pCamera->GetResolution();
+	//	}
+	//	for (auto& _pair : mRegisteredRenderCameras)
+	//	{
+	//		auto& camItem = _pair.second;
+	//		if (camItem->Resolution != camItem->pCamera->GetResolution())
+	//		{
+	//			isResize = true;
+	//			camItem->IsResizeDirty = true;
+	//			camItem->Resolution = camItem->pCamera->GetResolution();
+	//		}
+	//	}
+	//	if (isResize == true)
+	//	{
+	//		JG_CORE_INFO("Graphics API Flush");
+	//		Application::GetInstance().GetGraphicsAPI()->Flush();
+	//	}
+	//	auto fmBufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
+	//	if (mMainCamera->pCamera != nullptr)
+	//	{
+	//		auto mainCam = mMainCamera->pCamera;
+	//		if (mMainCamera->IsValid() == false || isResize)
+	//		{
+	//			TextureInfo mainTexInfo;
+	//			mainTexInfo.Width = std::max<u32>(1, mMainCamera->Resolution.x);
+	//			mainTexInfo.Height = std::max<u32>(1, mMainCamera->Resolution.y);
+	//			mainTexInfo.ArraySize = 1;
+	//			mainTexInfo.Format = ETextureFormat::R32G32B32A32_Float;
+	//			mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
+	//			mainTexInfo.MipLevel = 1;
+	//			mainTexInfo.ClearColor = mainCam->GetClearColor();
 
-		return EScheduleResult::Continue;
-	}
+	//			for (auto& t : mMainCamera->TargetTextures)
+	//			{
+	//				if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetTexture", mainTexInfo);
+	//				else t->SetTextureInfo(mainTexInfo);
+	//				
+	//			}
+
+	//			mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
+	//			mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
+	//			for (auto& t : mMainCamera->TargetDepthTextures)
+	//			{
+	//				if (t == nullptr) t = ITexture::Create(mainCam->GetName() + "TargetDepthTexture", mainTexInfo);
+	//				else t->SetTextureInfo(mainTexInfo);
+	//				
+	//			}
+	//		}
+	//	}
+
+	//	SharedPtr<RenderInfo> info = CreateSharedPtr<RenderInfo>(); auto mainCam = mMainCamera->pCamera;
+	//	info->CurrentBufferIndex = mMainCamera->CurrentIndex;
+	//	info->Resolutoin			= mMainCamera->pCamera->GetResolution();
+	//	info->ViewProj    = mMainCamera->pCamera->GetViewProjMatrix();
+	//	info->EyePosition = mMainCamera->pCamera->GetOwner()->GetTransform()->GetWorldLocation();
+	//	info->TargetTexture		= mMainCamera->TargetTextures[info->CurrentBufferIndex];
+	//	info->TargetDepthTexture = mMainCamera->TargetDepthTextures[info->CurrentBufferIndex];
+	//	info->TargetTexture->SetClearColor(mainCam->GetClearColor());
+	//	mMainCamera->ChangeRenderer();
+
+	//	mIsRenderCompelete = false;
+	//	Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
+	//	{
+	//		
+	//		if (userData->Is<RenderInfo>() == false)
+	//		{
+	//			mIsRenderCompelete = true;
+	//			return;
+	//		}
+	//		userData->As<RenderInfo>();
+	//		auto data = static_cast<RenderInfo*>(userData.get());
+	//		
+
+	//		mMainCamera->_Renderer->SetCommandID(1);
+	//		if (mMainCamera->_Renderer->Begin(*data, mPushedLightItems, { mMainCamera->_2DBatch }) == true)
+	//		{
+	//			for (auto& _pair : mPushedRenderItems)
+	//			{
+	//				for (auto& itemPair : _pair.second)
+	//				{
+	//					auto& type = itemPair.first;
+	//					auto& itemList = itemPair.second;
+	//					Rendering(mMainCamera.get(), type, itemList);
+	//					itemList.clear();
+	//				}
+	//			}
+	//			mMainCamera->_Renderer->End();
+	//			mIsRenderCompelete = true;
+	//		}
+	//	},info);
+
+	//	mMainCamera->CurrentIndex = (mMainCamera->CurrentIndex + 1) % fmBufferCnt;
+	//	{
+	//		NotifyChangeMainSceneTextureEvent e;
+	//		e.SceneTexture = mMainCamera->TargetTextures[mMainCamera->CurrentIndex];
+	//		Application::GetInstance().SendEvent(e);
+	//	}
+
+
+	//	return EScheduleResult::Continue;
+	//}
+	//EScheduleResult GraphicsSystemLayer::Wait()
+	//{
+	//	while (mIsRenderCompelete == false) {}
+	//	if (mIsRenderCompelete == true)
+	//	{
+	//		mPushedRenderItems.clear();
+	//		mPushedLightItems.clear();
+	//	}
+
+	//	return EScheduleResult::Continue;
+	//}
 	void GraphicsSystemLayer::LoadShaderScript()
 	{
 		// Load Global Shader Lib
