@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Camera.h"
 #include "Transform.h"
-#include "Class/Game/GameNode.h"
+#include "Class/Game/GameWorld.h"
 #include "Graphics/JGGraphics.h"
 namespace JG
 {
@@ -17,9 +17,6 @@ namespace JG
 			return;
 		}
 		smMainCamera = mainCamera;
-		//RequestRegisterMainCameraEvent e;
-		//e.MainCamera = mainCamera;
-		//mainCamera->SendEvent(e);
 	}
 	Camera::Camera()
 	{
@@ -40,17 +37,14 @@ namespace JG
 
 	void Camera::Start()
 	{
-		if (mScene == nullptr)
+		UpdateGraphicsScene();
+		mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
+		mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
+		mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
 		{
-			Graphics::SceneInfo sceneInfo;
-			sceneInfo.EyePos     = GetOwner()->GetTransform()->GetWorldLocation();
-			sceneInfo.Resolution = GetResolution();
-			sceneInfo.ClearColor = GetClearColor();
-			sceneInfo.ViewMatrix = GetViewMatrix();
-			sceneInfo.ProjMatrix = GetProjMatrix();
-			sceneInfo.ViewProjMatrix = GetViewProjMatrix();
-			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
-		}
+			UpdateGraphicsScene();
+			return EScheduleResult::Continue;
+		});
 	}
 	void Camera::Update()
 	{
@@ -64,14 +58,27 @@ namespace JG
 		if (smMainCamera == this)
 		{
 			smMainCamera = nullptr;
-			//RequestUnRegisterMainCameraEvent e;
-			//e.MainCamera = this;
-			//SendEvent(e);
 		}
 		if (mScene != nullptr)
 		{
+			GetGameWorld()->UnRegisterGraphicsScene(mScene);
 			JGGraphics::GetInstance().DestroyObject(mScene);
 			mScene = nullptr;
+		}
+		if (mRenderingScheduleHandle != nullptr)
+		{
+			mRenderingScheduleHandle->Reset();
+			mRenderingScheduleHandle = nullptr;
+		}
+		if (mRenderFinishScheduleHandle != nullptr)
+		{
+			mRenderFinishScheduleHandle->Reset();
+			mRenderFinishScheduleHandle = nullptr;
+		}
+		if (mUpdateSceneInfoScheduleHandle != nullptr)
+		{
+			mUpdateSceneInfoScheduleHandle->Reset();
+			mUpdateSceneInfoScheduleHandle = nullptr;
 		}
 	}
 	void Camera::MakeJson(SharedPtr<JsonData> jsonData) const
@@ -376,17 +383,6 @@ namespace JG
 		ImGui::Color4_OnGUI("ClearColor", color, label_width);
 
 
-		//ImGui::OnGui("Resolution   ", &resolution);
-		//ImGui::OnGui("Field of View", &fov);
-		//ImGui::OnGui("NearZ        ", &nearZ);
-		//ImGui::OnGui("FarZ         ", &farZ);
-		//ImGui::AlignTextToFramePadding();
-		//ImGui::Text("Orthographic  "); ImGui::SameLine();
-		//ImGui::Checkbox("##Orthographic Toggle", &isOrth);
-		//ImGui::AlignTextToFramePadding();
-		//ImGui::Text( "ClearColor    "); ImGui::SameLine();
-		//ImGui::ColorEdit4("## ClearColor Edit ", (float*)&color);
-
 
 		SetFOV(fov);
 		SetClearColor(color);
@@ -394,6 +390,57 @@ namespace JG
 		SetNearZ(nearZ);
 		SetOrthographic(isOrth);
 		SetResolution(resolution);
+	}
+	void Camera::UpdateGraphicsScene()
+	{
+
+		Graphics::SceneInfo sceneInfo;
+		if (mScene != nullptr)
+		{
+			sceneInfo = mScene->GetSceneInfo();
+		}
+		sceneInfo.RenderPath = ERendererPath::Foward;
+		sceneInfo.EyePos = GetOwner()->GetTransform()->GetWorldLocation();
+		sceneInfo.Resolution = GetResolution();
+		sceneInfo.ClearColor = GetClearColor();
+		sceneInfo.ViewMatrix = GetViewMatrix();
+		sceneInfo.ProjMatrix = GetProjMatrix();
+		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
+
+		if (mScene == nullptr)
+		{
+			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
+			GetGameWorld()->RegisterGraphicsScene(mScene);
+		}
+
+		mScene->SetSceneInfo(sceneInfo);
+	}
+	EScheduleResult Camera::Rendering()
+	{
+		if (mScene == nullptr)
+		{
+			return EScheduleResult::Continue;
+		}
+		mScene->Rendering();
+		return EScheduleResult::Continue;
+	}
+	EScheduleResult Camera::RenderFinish()
+	{
+		if (mScene == nullptr)
+		{
+			return EScheduleResult::Continue;
+		}
+		mSceneResultInfo = mScene->FetchResultFinish();
+		if (mSceneResultInfo != nullptr)
+		{
+			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid())
+			{
+				NotifyChangeMainSceneTextureEvent e;
+				e.SceneTexture = mSceneResultInfo->Texture;
+				SendEvent(e);
+			}
+		}
+		return EScheduleResult::Continue;
 	}
 	f32 EditorCamera::GetZoom() const
 	{

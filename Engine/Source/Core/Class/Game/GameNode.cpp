@@ -18,6 +18,7 @@ namespace JG
 
 	void GameNode::Update()
 	{
+		GameObject::Update();
 		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{
@@ -57,6 +58,7 @@ namespace JG
 	}
 	void GameNode::LateUpdate()
 	{
+		GameObject::LateUpdate();
 		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{

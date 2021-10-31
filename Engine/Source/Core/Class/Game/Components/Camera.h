@@ -45,6 +45,10 @@ namespace JG
 		ERendererPath mRendererPath = ERendererPath::Foward;
 
 		Graphics::Scene* mScene = nullptr;
+		SharedPtr<Graphics::SceneResultInfo> mSceneResultInfo = nullptr;
+		SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
+		SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
+		SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
 	public:
 		Camera();
 	protected:
@@ -97,7 +101,10 @@ namespace JG
 	protected:
 		virtual void OnChange(const ChangeData& data) override;
 		virtual void OnInspectorGUI() override;
-
+	private:
+		void UpdateGraphicsScene();
+		EScheduleResult Rendering();
+		EScheduleResult RenderFinish();
 	};
 
 	class EditorCamera : public Camera

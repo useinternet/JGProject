@@ -226,7 +226,7 @@ namespace JG
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		public:
-			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Paper; }
+			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Static; }
 			virtual bool IsValid() const override { 
 				bool result = true;
 

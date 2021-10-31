@@ -289,37 +289,6 @@ namespace JG
 	
 		return true;
 	}
-	//bool GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e)
-	//{
-	//	if (mGameWorld != nullptr)
-	//	{
-	//		auto renderItem = mGameWorld->PushRenderItem();
-	//		if (renderItem != nullptr)
-	//		{
-	//			RequestPushRenderItemEvent e;
-	//			e.RenderItem = renderItem;
-	//			Application::GetInstance().SendEvent(e);
-	//		}
-	//		renderItem = mGameWorld->PushDebugRenderItem();
-	//		if (renderItem != nullptr)
-	//		{
-	//			RequestPushRenderItemEvent e;
-	//			e.RenderItem = renderItem;
-	//			Application::GetInstance().SendEvent(e);
-	//		}
-
-	//		auto lightItem = mGameWorld->PushLightItem();
-	//		if (lightItem != nullptr)
-	//		{
-	//			RequestPushLightItemEvent e;
-	//			e.LightItem = lightItem;
-	//			Application::GetInstance().SendEvent(e);
-	//		}
-
-
-	//	}
-	//	return true;
-	//}
 	bool GameLogicSystemLayer::ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e)
 	{
 		NotifySelectedGameNodeInEditorEvent pickingEvent;

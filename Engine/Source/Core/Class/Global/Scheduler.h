@@ -14,9 +14,15 @@ namespace JG
 		enum 
 		{
 			// System 
-			Graphics_PushSceneObject  = -2000000,
-			Graphics_BeginFrame       = -1999999,
-			BeginSystem				  = -1000000,
+			Graphics_DestroyObject    = -2000000,
+			Graphics_PushSceneObject  = Graphics_DestroyObject + 1,
+			Graphics_BeginFrame       = Graphics_DestroyObject + 2,
+			Graphics_Rendering        = Graphics_DestroyObject + 3,
+
+
+
+
+			BeginSystem				  = -1000000,    
 			// Layer
 			ImGuiSystemLayer		 = -900000,
 			GameLayer				 = -800000,
@@ -32,7 +38,8 @@ namespace JG
 			OnGUI			  = 1000000,
 			DestroyObject	  = 2000000,
 			EndSystem		  = 10000000,
-			Graphics_EndFrame = 10000001,
+			Graphics_RenderFinish = EndSystem + 1,
+			Graphics_EndFrame	  = EndSystem + 2,
 		};
 	};
 	enum class EScheduleState

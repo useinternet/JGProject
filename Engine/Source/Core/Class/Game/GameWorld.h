@@ -4,6 +4,10 @@
 #include "Class/Asset/AssetManager.h"
 namespace JG
 {
+	namespace Graphics
+	{
+		class Scene;
+	}
 	ENUM_FLAG(EGameWorldFlags)
 	enum class EGameWorldFlags
 	{
@@ -15,6 +19,8 @@ namespace JG
 
 		All_Update_Lock = Update_Lock | LateUpdate_Lock
 	};
+
+	class Camera;
 	class GameWorld : public GameNode
 	{
 		JGCLASS
@@ -23,13 +29,23 @@ namespace JG
 		SharedPtr<AssetManager> mAssetManager;
 		List<GameSystem*>	    mWorldGameSystemList;
 		List<GlobalGameSystem*> mGlobalGameSystemList;
+		HashSet<Graphics::Scene*> mGraphicsSceneSet;
+
+
 
 		SharedPtr<ScheduleHandle> mUpdateScheduleHandle;
 		SharedPtr<ScheduleHandle> mLateUpdateScheduleHandle;
 		EGameWorldFlags mGameWorldFlags = EGameWorldFlags::None;
 
+
+
+
+
+
+
 		PhysicsHandle mPxSceneHandle = 0;
 		JVector3 mGravity;
+
 	public:
 		GameWorld();
 	protected:
@@ -45,6 +61,9 @@ namespace JG
 		AssetManager* GetAssetManager() const;
 		void PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject);
 		void PushRenderLightObject(SharedPtr<Graphics::Light> lightObject);
+		void RegisterGraphicsScene(Graphics::Scene* scene);
+		void UnRegisterGraphicsScene(Graphics::Scene* scene);
+		
 	public:
 		template<class T>
 		T* AddGameSystem()

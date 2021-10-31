@@ -1,7 +1,6 @@
 #pragma once
 #include "BaseRenderer.h"
-#include "Class/Asset/Asset.h"
-#include "Class/Asset/AssetManager.h"
+
 namespace JG
 {
 	class SpriteRenderer : public BaseRenderer
@@ -9,14 +8,13 @@ namespace JG
 		JGCLASS
 	private:
 		//SharedPtr<Standard2DRenderItem> mSpriteRI;
+
+		Color mColor;
 		JVector2 mSpriteSize;
-
-
 		Asset<ITexture>* mSprite = nullptr;
+		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle = nullptr;
 	public:
 		virtual ~SpriteRenderer() = default;
-	public:
-		SpriteRenderer();
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
@@ -29,12 +27,15 @@ namespace JG
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
 		void SetSprite(const String& path);
+		void SetColor(const Color& color);
+
+		const Color& GetColor() const;
 	public:
 		virtual void OnChange(const ChangeData& data) override;
 		virtual void OnInspectorGUI() override;
 
 	private:
-		void PushRenderSceneObject();
+		EScheduleResult PushRenderSceneObject();
 	};
 
 }

@@ -46,7 +46,7 @@ namespace JG
 		void SetAtt1(f32 att1);
 		void SetAtt2(f32 att2);
 
-		const Color& GetColor() const;
+		Color GetColor() const;
 		f32 GetIntensity() const;
 		f32 GetRange() const;
 		f32 GetAtt0() const;

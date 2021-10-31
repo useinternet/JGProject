@@ -26,19 +26,6 @@ namespace JG
 		JVector3 mScale = { 1.0f,1.0f,1.0f };
 
 
-		//JMatrix mLocalTranslateMatrix;
-		//JMatrix mLocalRotationMatrix;
-		//JMatrix mLocalScaleMatrix;
-
-
-		//JMatrix mWorldTranslateMatrix;
-		//JMatrix mWorldRotationMatrix;
-		//JMatrix mWorldScaleMatrix;
-
-
-
-
-
 		mutable JVector3 mWorldLocation;
 		mutable JVector3 mWorldRotation;
 		mutable JQuaternion mWorldQuaternion = JQuaternion::Identity();
@@ -47,13 +34,6 @@ namespace JG
 
 		mutable JMatrix mWorldMatrix;
 		mutable JMatrix mInvWorldMatrix;
-
-
-
-
-
-
-
 
 
 		mutable bool mIsDirty = true;

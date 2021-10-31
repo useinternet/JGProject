@@ -2,7 +2,6 @@
 #include "PointLight.h"
 #include "ExternalImpl/ImGuiExternal.h"
 #include "Transform.h"
-#include "Graphics/JGGraphics.h"
 #include "Class/Game/GameNode.h"
 #include "Class/Game/Components/Camera.h"
 #include "Class/Game/GameWorld.h"
@@ -106,7 +105,7 @@ namespace JG
 		mAtt2 = att2;
 	}
 
-	const Color& PointLight::GetColor() const
+	Color PointLight::GetColor() const
 	{
 		return Color(mColor.x, mColor.y, mColor.z, 1.0f);
 	}
@@ -139,8 +138,10 @@ namespace JG
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam == nullptr)
 		{
-			return;
+			return EScheduleResult::Continue;
 		}
+
+
 		auto camPos = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		auto location = GetOwner()->GetTransform()->GetWorldLocation();
 
@@ -195,6 +196,10 @@ namespace JG
 #endif
 	EScheduleResult PointLight::PushLightItem()
 	{
+		if (IsActive() == false)
+		{
+			return EScheduleResult::Continue;
+		}
 		auto lightObject = CreateSharedPtr<Graphics::PointLight>();
 		lightObject->Color = mColor;
 		lightObject->Intensity = mIntensity;

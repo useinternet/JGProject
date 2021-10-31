@@ -2,36 +2,38 @@
 #include "StaticMeshRenderer.h"
 #include "Transform.h"
 #include "Common/DragAndDrop.h"
-#include "Graphics/Resource.h"
-#include "Graphics/Material.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/JGGraphics.h"
 #include "Class/Game/GameWorld.h"
 
 
 namespace JG
 {
-	StaticMeshRenderer::StaticMeshRenderer()
-	{
-		mStaticRI = CreateSharedPtr<StandardStaticMeshRenderItem>();
-	}
 	void StaticMeshRenderer::Awake()
 	{
+		BaseRenderer::Awake();
 	}
 	void StaticMeshRenderer::Start()
 	{
-
+		BaseRenderer::Start();
+		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&StaticMeshRenderer::PushRenderSceneObject));
 	}
 	void StaticMeshRenderer::Destory()
 	{
-
+		BaseRenderer::Destory();
+		if (mPushRenderSceneObjectScheduleHandle != nullptr)
+		{
+			mPushRenderSceneObjectScheduleHandle->Reset();
+			mPushRenderSceneObjectScheduleHandle = nullptr;
+		}
 	}
 	void StaticMeshRenderer::Update()
 	{
-
+		BaseRenderer::Update();
 	}
 	void StaticMeshRenderer::LateUpdate()
 	{
+		BaseRenderer::LateUpdate();
+
 	}
 	void StaticMeshRenderer::SetMesh(const String& path)
 	{
@@ -111,44 +113,6 @@ namespace JG
 			}
 		}
 	}
-	SharedPtr<IRenderItem> StaticMeshRenderer::PushRenderItem()
-	{
-		auto transform = GetOwner()->GetTransform();
-		mStaticRI->WorldMatrix = transform->GetWorldMatrix();
-
-		if (mMesh && mMesh->Get() && mMesh->Get()->IsValid())
-		{
-			mStaticRI->Mesh = mMesh->Get();
-			GetOwner()->SetPickingBoundingBox(mStaticRI->Mesh->GetBoundingBox());
-		}
-
-		auto matAssetCnt = mMaterialList.size();
-		mStaticRI->Materials.resize(matAssetCnt);
-
-
-		for (u64 i = 0; i < matAssetCnt; ++i)
-		{
-			auto material = mMaterialList[i];
-			if (material == nullptr)
-			{
-				mStaticRI->Materials[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
-			}
-			else
-			{
-				mStaticRI->Materials[i] = material->Get();
-			}
-		}
-
-
-		if (matAssetCnt == 0 && mStaticRI->Materials.empty()) {
-			if (mNullMaterial == nullptr)
-			{
-				mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
-			}
-			mStaticRI->Materials.push_back(mNullMaterial);
-		}
-		return mStaticRI;
-	}
 	void StaticMeshRenderer::OnChange(const ChangeData& data)
 	{
 		BaseRenderer::OnChange(data);
@@ -211,5 +175,53 @@ namespace JG
 	}
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
 	{
+	}
+	EScheduleResult StaticMeshRenderer::PushRenderSceneObject()
+	{
+		if (mMesh == nullptr || mMesh->IsValid() == false)
+		{
+			return EScheduleResult::Continue;
+		}
+
+
+		auto sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
+		auto transform = GetOwner()->GetTransform();
+		sceneObject->WorldMatrix = transform->GetWorldMatrix();
+
+		sceneObject->Mesh = mMesh->Get();
+		GetOwner()->SetPickingBoundingBox(sceneObject->Mesh->GetBoundingBox());
+
+
+
+		auto matAssetCnt = mMaterialList.size();
+		sceneObject->MaterialList.resize(matAssetCnt);
+
+
+		for (u64 i = 0; i < matAssetCnt; ++i)
+		{
+			auto material = mMaterialList[i];
+			if (material == nullptr)
+			{
+				sceneObject->MaterialList[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
+			}
+			else
+			{
+				sceneObject->MaterialList[i] = material->Get();
+			}
+		}
+
+
+		if (matAssetCnt == 0 && sceneObject->MaterialList.empty()) {
+			if (mNullMaterial == nullptr)
+			{
+				mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
+			}
+			sceneObject->MaterialList.push_back(mNullMaterial);
+		}
+
+
+		GetGameWorld()->PushRenderSceneObject(sceneObject);
+
+		return EScheduleResult::Continue;
 	}
 }

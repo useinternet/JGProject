@@ -14,6 +14,7 @@ namespace JG
 	JGGraphics::~JGGraphics()
 	{
 		Flush();
+		mObjectPool.clear();
 		ShaderLibrary::Destroy();
 		mGraphcisAPI->Destroy();
 		mGraphcisAPI.reset();
@@ -30,7 +31,7 @@ namespace JG
 			return;
 		}
 
-		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::BeginSystem,
+		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::Graphics_DestroyObject,
 			[&](SharedPtr<IJGObject> userData) -> EScheduleResult
 		{
 
@@ -74,7 +75,7 @@ namespace JG
 		mGraphcisAPI = IGraphicsAPI::Create(mDesc.GraphicsAPI);
 		mGraphcisAPI->Create();
 
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem,
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame,
 			[&]() -> EScheduleResult
 		{
 
@@ -88,7 +89,7 @@ namespace JG
 			return EScheduleResult::Continue;
 		});
 
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem,
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_EndFrame,
 			[&]() -> EScheduleResult
 		{
 			if (mGraphcisAPI == nullptr)
@@ -279,6 +280,10 @@ namespace JG
 
 		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)
 		{
+			if (mRenderer == nullptr || m2DBatch == nullptr)
+			{
+				return false;
+			}
 			if (IsLock() || sceneObject == nullptr)
 			{
 				return false;
@@ -290,7 +295,11 @@ namespace JG
 
 		bool Scene::PushLight(SharedPtr<Light> l)
 		{
-			if (IsLock())
+			if (mRenderer == nullptr || m2DBatch == nullptr)
+			{
+				return false;
+			}
+			if (IsLock() || l == nullptr)
 			{
 				return false;
 			}
@@ -367,12 +376,15 @@ namespace JG
 			{
 				//
 			}
+			mRenderScheduleHandle->Reset();
+			mRenderScheduleHandle = nullptr;
 			UnLock();
 
-			result->Texture = mTargetTextures[mCurrentIndex];
+			result->Texture      = mTargetTextures[mCurrentIndex];
 			result->DepthTexture = mTargetDepthTextures[mCurrentIndex];
 			mCurrentIndex = (mCurrentIndex + 1) % JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
+			mLightList.clear();
 			return result;
 		}
 

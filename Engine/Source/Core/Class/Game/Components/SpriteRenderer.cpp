@@ -7,19 +7,15 @@
 #include "Common/DragAndDrop.h"
 namespace JG
 {
-	SpriteRenderer::SpriteRenderer()
-	{
-		mSpriteRI = CreateUniquePtr<Standard2DRenderItem>();
-		mSpriteRI->WorldMatrix = JMatrix::Identity();
-		mSpriteRI->Color = Color::White();
-	}
 	void SpriteRenderer::Awake()
 	{
-		mSpriteRI->TargetLayer = GetOwner()->GetLayer();
+		BaseRenderer::Awake();
 	}
 	void SpriteRenderer::Start()
 	{
 		BaseRenderer::Start();
+		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SpriteRenderer::PushRenderSceneObject));
+
 		if (mSprite == nullptr)
 		{
 			SetSprite("Asset/Resources/NullTexture.jgasset");
@@ -29,21 +25,27 @@ namespace JG
 	void SpriteRenderer::Destory()
 	{
 		BaseRenderer::Destory();
+		if (mPushRenderSceneObjectScheduleHandle != nullptr)
+		{
+			mPushRenderSceneObjectScheduleHandle->Reset();
+			mPushRenderSceneObjectScheduleHandle = nullptr;
+		}
 	}
 	void SpriteRenderer::Update()
 	{
-
+		BaseRenderer::Update();
 	}
 
 	void SpriteRenderer::LateUpdate()
 	{
+		BaseRenderer::LateUpdate();
 
 	}
 
 	void SpriteRenderer::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		BaseRenderer::MakeJson(jsonData);
-		jsonData->AddMember("Color", JVector4(mSpriteRI->Color));
+		jsonData->AddMember("Color", JVector4(GetColor()));
 
 
 
@@ -62,7 +64,7 @@ namespace JG
 		auto val = jsonData->GetMember("Color");
 		if (val)
 		{
-			mSpriteRI->Color = Color(val->GetVector4());
+			SetColor(Color(val->GetVector4()));
 		}
 		val = jsonData->GetMember("SpritePath");
 		if (val && val->IsString())
@@ -81,6 +83,16 @@ namespace JG
 		mSprite = assetManager->RequestOriginAsset<ITexture>(path);
 	}
 
+	void SpriteRenderer::SetColor(const Color& color)
+	{
+		mColor = color;
+	}
+
+	const Color& SpriteRenderer::GetColor() const
+	{
+		return mColor;
+	}
+
 
 	void SpriteRenderer::OnChange(const ChangeData& data)
 	{
@@ -91,9 +103,13 @@ namespace JG
 	{
 		BaseRenderer::OnInspectorGUI();
 		ImGui::AlignTextToFramePadding();
+
+		auto color = GetColor();
+
 		f32 label_width = ImGui::CalcTextSize("Sprite").x;
 
-		ImGui::Color4_OnGUI("Color", mSpriteRI->Color, label_width);
+		ImGui::Color4_OnGUI("Color", color, label_width);
+
 		if (mSprite)
 		{
 			ImGui::AssetField_OnGUI("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, [&](const String& path)
@@ -110,36 +126,15 @@ namespace JG
 			}, label_width);
 		}
 
-
-
-
-
-
-
-		//ImGui::Text("Color "); ImGui::SameLine();
-		//ImGui::ColorEdit4("##Color Editor", (float*)(&mSpriteRI->Color));
-		
-		//String path;
-		//if (mSprite)
-		//{
-		//	if (ImGui::AssetField("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, path) == true)
-		//	{
-		//		mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-		//	}
-		//}
-		//else
-		//{
-		//	if (ImGui::AssetField("Sprite ", "None", EAssetFormat::Texture, path) == true)
-		//	{
-		//		mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-		//	}
-		//}
+		SetColor(color);
 	}
 
-	void SpriteRenderer::PushRenderSceneObject()
+	EScheduleResult SpriteRenderer::PushRenderSceneObject()
 	{
-		if (mSprite == nullptr) return;
-
+		if (IsActive() == false || mSprite == nullptr || mSprite->IsValid() == false)
+		{
+			return EScheduleResult::Continue;
+		}
 		auto sceneObject = CreateSharedPtr<Graphics::PaperObject>();
 		auto transform   = GetOwner()->GetTransform();
 		sceneObject->WorldMatrix = transform->GetWorldMatrix();
@@ -166,6 +161,7 @@ namespace JG
 
 
 		GetGameWorld()->PushRenderSceneObject(sceneObject);
+		return EScheduleResult::Continue;
 
 	}
 

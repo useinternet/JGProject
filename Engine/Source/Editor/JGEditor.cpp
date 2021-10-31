@@ -3,7 +3,6 @@
 #include "Layer/DevLayer.h"
 #include "Layer/ImGuiSystemLayer.h"
 #include "Layer/UISystemLayer.h"
-#include "Layer/GraphicsSystemLayer.h"
 #include "Layer/GameLogicSystemLayer.h"
 namespace JG
 {
@@ -19,7 +18,6 @@ namespace JG
 	{
 		PushLayer(CreateSharedPtr<ImGuiSystemLayer>());
 		PushLayer(CreateSharedPtr<GameLogicSystemLayer>());
-		PushLayer(CreateSharedPtr<GraphicsSystemLayer>());
 		PushLayer(CreateSharedPtr<UISystemLayer>());
 	}
 }

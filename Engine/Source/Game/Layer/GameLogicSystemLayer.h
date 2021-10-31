@@ -54,15 +54,11 @@ namespace JG
 	public:
 		bool ResponseSaveGameWorld(RequestSaveGameWorldEvent& e);
 		bool ResponseLoadGameWorld(RequestLoadGameWorldEvent& e);
-		//bool ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e);
 		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
 	public:
 
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
-	private:
-		//void SaveGameWorld();
-		//void LoadGameWrold();
 	};
 }

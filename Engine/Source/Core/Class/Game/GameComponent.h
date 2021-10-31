@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
-
+#include "Graphics/JGGraphics.h"
+#include "Class/Asset/Asset.h"
+#include "Class/Asset/AssetManager.h"
 
 namespace JG
 {
