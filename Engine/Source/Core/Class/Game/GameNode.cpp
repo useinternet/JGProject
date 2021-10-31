@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GameNode.h"
+#include "GameWorld.h"
 #include "Components/Transform.h"
 #include "Class/UI/UIView/InspectorView.h"
 #include "Class/UI/ContextUI/ComponentFinderContextView.h"
@@ -238,95 +239,7 @@ namespace JG
 			}
 		}
 	}
-	SharedPtr<IRenderItem> GameNode::PushRenderItem()
-	{
-		for (auto& com : mComponents)
-		{
-			if (com->IsActive())
-			{
-				auto item = com->PushRenderItem();
-				if (item != nullptr)
-				{
-					RequestPushRenderItemEvent e;
-					e.RenderItem = item;
-					SendEvent(e);
-				}
-			}
-			
-		}
-		for (auto& child : mChilds)
-		{
-			if (child->IsActive())
-			{
-				auto item = child->PushRenderItem();
-				if (item != nullptr)
-				{
-					RequestPushRenderItemEvent e;
-					e.RenderItem = item;
-					SendEvent(e);
-				}
-			}
-		}
 
-		return nullptr;
-	}
-	SharedPtr<IRenderItem> GameNode::PushDebugRenderItem()
-	{
-		for (auto& com : mComponents)
-		{
-			auto item = com->PushDebugRenderItem();
-			if (item != nullptr)
-			{
-				RequestPushRenderItemEvent e;
-				e.RenderItem = item;
-				SendEvent(e);
-			}
-		}
-		for (auto& child : mChilds)
-		{
-			auto item = child->PushDebugRenderItem();
-			if (item != nullptr)
-			{
-				RequestPushRenderItemEvent e;
-				e.RenderItem = item;
-				SendEvent(e);
-			}
-		}
-
-		return nullptr;
-	}
-	SharedPtr<ILightItem> GameNode::PushLightItem()
-	{
-		for (auto& com : mComponents)
-		{
-			if (com->IsActive())
-			{
-				auto item = com->PushLightItem();
-				if (item != nullptr)
-				{
-					RequestPushLightItemEvent e;
-					e.LightItem = item;
-					SendEvent(e);
-				}
-			}
-
-		}
-		for (auto& child : mChilds)
-		{
-			if (child->IsActive())
-			{
-				auto item = child->PushLightItem();
-				if (item != nullptr)
-				{
-					RequestPushLightItemEvent e;
-					e.LightItem = item;
-					SendEvent(e);
-				}
-			}
-		}
-
-		return nullptr;
-	}
 	GameNode* GameNode::AddNode(const String& name)
 	{
 		auto obj = GameObjectFactory::GetInstance().CreateObject<GameNode>();
@@ -480,6 +393,10 @@ namespace JG
 	GameNode* GameNode::GetParent() const
 	{
 		return mParent;
+	}
+	GameWorld* GameNode::GetGameWorld() const
+	{
+		return mGameWorld;
 	}
 	Transform* GameNode::GetTransform() const
 	{

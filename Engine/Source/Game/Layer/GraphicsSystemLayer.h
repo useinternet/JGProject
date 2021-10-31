@@ -88,7 +88,7 @@ namespace JG
 		//EScheduleResult Update();
 		//EScheduleResult Wait();
 	private:
-		void LoadShaderScript();
+		//void LoadShaderScript();
 		
 	};
 }

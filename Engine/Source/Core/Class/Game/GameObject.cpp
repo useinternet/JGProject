@@ -50,7 +50,7 @@ namespace JG
 	}
 	void GameObject::DrawDebugRay(const JRay& ray, f32 length, Color& color)
 	{
-		DebugGeometryDrawer::GetInstance().DrawDebugLine(ray, length, color);
+		//DebugGeometryDrawer::GetInstance().DrawDebugLine(ray, length, color);
 	}
 	void GameObject::DrawDebugLine(const JVector3& startPos, const JVector3& endPos, Color& color)
 	{
@@ -62,11 +62,11 @@ namespace JG
 	}
 	void GameObject::DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color)
 	{
-		DebugGeometryDrawer::GetInstance().DrawDebugBox(location, quat, size, color);
+		//DebugGeometryDrawer::GetInstance().DrawDebugBox(location, quat, size, color);
 	}
 	void GameObject::DrawDebugSphere(const JVector3& center, f32 r, const Color& color)
 	{
-		DebugGeometryDrawer::GetInstance().DrawDebugSphere(center, r, color);
+		//DebugGeometryDrawer::GetInstance().DrawDebugSphere(center, r, color);
 	}
 	void GameObject::MakeJson(SharedPtr<JsonData> jsonData) const
 	{

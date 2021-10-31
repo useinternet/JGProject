@@ -1,13 +1,14 @@
 ﻿#include "pch.h"
 #include "Shader.h"
 #include "Application.h"
+#include "Graphics/JGGraphics.h"
 #include "GraphicsAPI.h"
 
 namespace JG
 {
 	SharedPtr<IShader> IShader::Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateShader(name, sourceCode, flags, scriptList);
@@ -103,9 +104,9 @@ namespace JG
 		return nullptr;
 	}
 
-	bool ShaderLibrary::LoadGlobalShaderLib()
+	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
 	{
-		auto globalLibPath = Application::GetShaderGlobalLibPath();
+		auto globalLibPath = path;
 		globalLibPath = CombinePath(globalLibPath, "GlobalShaderLibrary.shaderLib");
 		auto p = fs::path(globalLibPath);
 		std::ifstream fin(p.string());

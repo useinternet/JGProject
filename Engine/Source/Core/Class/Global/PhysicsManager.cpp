@@ -397,7 +397,7 @@ namespace JG
 		}
 		else
 		{
-			mHandleDataPool[handle].get();
+			return mHandleDataPool[handle].get();
 		}
 	}
 }

@@ -2,6 +2,7 @@
 #include "Resource.h"
 #include "stb/stb_image.h"
 #include "Application.h"
+#include "JGGraphics.h"
 #include "Platform/Graphics/DirectX12/DirectX12Resource.h"
 #include "Class/Asset/Asset.h"
 
@@ -9,7 +10,7 @@ namespace JG
 {
 	SharedPtr<IVertexBuffer> IVertexBuffer::Create(String name, EBufferLoadMethod method)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateVertexBuffer(name, method);
@@ -17,33 +18,33 @@ namespace JG
 
 	SharedPtr<IIndexBuffer> IIndexBuffer::Create(String name, EBufferLoadMethod method)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateIndexBuffer(name, method);
 	}
 	SharedPtr<IComputer> IComputer::Create(const String& name, SharedPtr<IShader> shader)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateComputer(name, shader);
 	}
 	SharedPtr<IComputeBuffer> IComputeBuffer::Create(const String& name, u64 btSize)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 		return api->CreateComputeBuffer(name, btSize);
 	}
 	SharedPtr<ITexture> ITexture::Create(const String& name)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 		return api->CreateTexture(name);
 	}
 	SharedPtr<ITexture> ITexture::Create(const String& name, const TextureInfo& info)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 
@@ -52,7 +53,7 @@ namespace JG
 
 	SharedPtr<ITexture> ITexture::Create(const TextureAssetStock& stock)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateTexture(stock);
@@ -109,7 +110,7 @@ namespace JG
 			textureInfo.Format = ETextureFormat::R8G8B8A8_Unorm; textureInfo.Flags = ETextureFlags::Allow_RenderTarget;
 			gNullTexture = ITexture::Create("WhiteTexture", textureInfo);
 
-			auto api = Application::GetInstance().GetGraphicsAPI();
+			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 			api->ClearRenderTarget(MAIN_GRAPHICS_COMMAND_ID, { gNullTexture }, nullptr);
 		}

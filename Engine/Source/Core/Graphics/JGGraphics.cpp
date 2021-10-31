@@ -4,13 +4,19 @@
 
 namespace JG
 {
-	JGGraphics::JGGraphics(const String& shaderPath)
+	JGGraphics::JGGraphics(const JGGraphicsDesc& desc)
 	{
-		LoadShader();
+		mDesc = desc;
+
+		Init();
 	}
 
 	JGGraphics::~JGGraphics()
 	{
+		Flush();
+		ShaderLibrary::Destroy();
+		mGraphcisAPI->Destroy();
+		mGraphcisAPI.reset();
 	}
 
 	Graphics::Scene* JGGraphics::CreateScene(const String& name, const Graphics::SceneInfo& info)
@@ -41,9 +47,63 @@ namespace JG
 		return mGraphcisAPI.get();
 	}
 
+	u64 JGGraphics::GetBufferCount() const
+	{
+		if (mGraphcisAPI == nullptr)
+		{
+			return 0;
+		}
+		return mGraphcisAPI->GetBufferCount();
+	}
+
+	const JGGraphicsDesc& JGGraphics::GetDesc() const
+	{
+		return mDesc;
+	}
+
+	void JGGraphics::Flush()
+	{
+		if (mGraphcisAPI != nullptr)
+		{
+			mGraphcisAPI->Flush();
+		}
+	}
+
+	void JGGraphics::Init()
+	{
+		mGraphcisAPI = IGraphicsAPI::Create(mDesc.GraphicsAPI);
+		mGraphcisAPI->Create();
+
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem,
+			[&]() -> EScheduleResult
+		{
+
+			if (mGraphcisAPI == nullptr)
+			{
+				return EScheduleResult::Break;
+			}
+			mGraphcisAPI->Begin();
+
+
+			return EScheduleResult::Continue;
+		});
+
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem,
+			[&]() -> EScheduleResult
+		{
+			if (mGraphcisAPI == nullptr)
+			{
+				return EScheduleResult::Break;
+			}
+			mGraphcisAPI->End();
+			return EScheduleResult::Continue;
+		});
+		ShaderLibrary::Create();
+	}
+
 	void JGGraphics::LoadShader()
 	{
-		ShaderLibrary::GetInstance().LoadGlobalShaderLib();
+		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
 		auto templatePath = Application::GetShaderTemplatePath();
 
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
@@ -125,10 +185,6 @@ namespace JG
 
 		}
 	}
-
-
-
-
 }
 
 
@@ -172,14 +228,10 @@ namespace JG
 		}
 
 
-
+		Queue<u64> Scene::sm_CommandIDQueue;
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
-
-
-
-
 			auto bufferCount = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 			mTargetTextures.resize(bufferCount, nullptr);
 			mTargetDepthTextures.resize(bufferCount, nullptr);
@@ -202,8 +254,12 @@ namespace JG
 		{
 			sm_CommandIDQueue.push(mCommandID);
 		}
-		void Scene::SetSceneInfo(const SceneInfo& info)
+		bool Scene::SetSceneInfo(const SceneInfo& info)
 		{
+			if (IsLock())
+			{
+				return false;
+			}
 			if (mRenderer == nullptr || mSceneInfo.RenderPath != info.RenderPath)
 			{
 				InitRenderer(info.RenderPath);
@@ -213,11 +269,34 @@ namespace JG
 				InitTexture(info.Resolution, info.ClearColor);
 			}
 			mSceneInfo = info;
+			return true;
 		}
 
 		const SceneInfo& Scene::GetSceneInfo() const
 		{
 			return mSceneInfo;
+		}
+
+		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)
+		{
+			if (IsLock() || sceneObject == nullptr)
+			{
+				return false;
+			}
+			mSceneObjectQueue.push(sceneObject);
+
+			return true;
+		}
+
+		bool Scene::PushLight(SharedPtr<Light> l)
+		{
+			if (IsLock())
+			{
+				return false;
+			}
+			mLightList.push_back(l);
+
+			return true;
 		}
 
 
@@ -247,26 +326,54 @@ namespace JG
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
 
+					while (mSceneObjectQueue.empty() == false)
+					{
+						auto obj = mSceneObjectQueue.front(); mSceneObjectQueue.pop();
+						switch (obj->GetSceneObjectType())
+						{
+						case ESceneObjectType::Paper:
+						{
+							auto paperObj = static_cast<PaperObject*>(obj.get());
+							m2DBatch->DrawCall(paperObj->WorldMatrix, paperObj->Texture, paperObj->Color);
+						}
+							break;
+						case ESceneObjectType::Debug:
+						{
+							//auto debugObj = static_cast<Debugobj
+						}
+							break;
+						case ESceneObjectType::Static:
+							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
+							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
+							break;
+						}
 
-
-
-
+					}
 					mRenderer->End();
 				}
-
-				
-				//mRenderer->Begin()
-
 			});
 
 		}
 
 		SharedPtr<SceneResultInfo> Scene::FetchResultFinish()
 		{
+			if (mRenderScheduleHandle == nullptr)
+			{
+				return nullptr;
+			}
+			SharedPtr<SceneResultInfo> result = CreateSharedPtr<SceneResultInfo>();
 
+			while (mRenderScheduleHandle->GetState() != EScheduleState::Compelete)
+			{
+				//
+			}
+			UnLock();
 
+			result->Texture = mTargetTextures[mCurrentIndex];
+			result->DepthTexture = mTargetDepthTextures[mCurrentIndex];
+			mCurrentIndex = (mCurrentIndex + 1) % JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
-			return SharedPtr<SceneResultInfo>();
+			return result;
 		}
 
 

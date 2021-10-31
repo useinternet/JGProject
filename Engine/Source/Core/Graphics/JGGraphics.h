@@ -26,20 +26,33 @@ namespace JG
 		class Light;
 		class PointLight;
 	}
-	class JGGraphics : public GlobalSingleton<JGGraphics>
+	struct JGGraphicsDesc
 	{
+		EGraphicsAPI GraphicsAPI;
+		String GlobalShaderLibPath;
+		String ShaderTemplatePath;
+		String ShaderScriptPath;
+	};
+	class JGGraphics : public GlobalSingleton<JGGraphics, JGGraphicsDesc>
+	{
+		friend class Application;
+	private:
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
+		JGGraphicsDesc mDesc;
 		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
 	public:
-		JGGraphics(const String& shaderPath);
+		JGGraphics(const JGGraphicsDesc& desc);
 		~JGGraphics();
-
 
 		Graphics::Scene*			  CreateScene(const String& name, const Graphics::SceneInfo& info);
 
 
+
 		void DestroyObject(Graphics::GObject* gobject);
 		IGraphicsAPI* GetGraphicsAPI() const;
+		u64           GetBufferCount() const;
+		const JGGraphicsDesc& GetDesc() const;
+		void  Flush();
 	private:
 		template<class T, class ...Args>
 		T* CreateGObject(const String& name, Args&& ... args)
@@ -55,6 +68,7 @@ namespace JG
 		{
 			mObjectPool.erase(gobj);
 		}
+		void Init();
 		void LoadShader();
 	private:
 		class RemoveObjectData : public IJGObject
@@ -133,8 +147,6 @@ namespace JG
 		class Scene : public GObject
 		{
 			static Queue<u64> sm_CommandIDQueue;
-
-
 		private:
 			SceneInfo mSceneInfo;
 
@@ -156,26 +168,11 @@ namespace JG
 			Scene(const SceneInfo& info);
 			virtual ~Scene();
 		public:
-			void SetSceneInfo(const SceneInfo& info);
+			bool SetSceneInfo(const SceneInfo& info);
 			const SceneInfo& GetSceneInfo() const;
 
-			template<class SceneObjectClass>
-			void PushSceneObject(const SceneObjectClass& sceneObject)
-			{
-				auto pSceneObject = CreateSharedPtr<SceneObjectClass>();
-				*pSceneObject = sceneObject;
-
-				mSceneObjectQueue.push(pSceneObject);
-			}
-
-			template<class LightClass>
-			void PushLight(const LightClass& l)
-			{
-				auto pLight = CreateSharedPtr<LightClass>();
-				*pLight = sceneObject;
-
-				mLightList.push_back(pLight);
-			}
+			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
+			bool PushLight(SharedPtr<Light> l);
 		public:
 			void Rendering();
 			SharedPtr<SceneResultInfo> FetchResultFinish();
@@ -185,6 +182,19 @@ namespace JG
 			void InitRenderer(ERendererPath path);
 			void InitTexture(const JVector2& size, const Color& clearColor);
 		};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		// SceneObject //
@@ -201,7 +211,7 @@ namespace JG
 
 		class PaperObject : public SceneObject
 		{
-		private:
+		public:
 			Color  Color = Color::White();
 			SharedPtr<ITexture> Texture = nullptr;
 		public:
@@ -212,7 +222,7 @@ namespace JG
 
 		class StaticRenderObject : public SceneObject
 		{
-		private:
+		public:
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		public:

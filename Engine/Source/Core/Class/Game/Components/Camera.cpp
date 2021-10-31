@@ -1,12 +1,8 @@
-#include "Camera.h"
-#include "Camera.h"
-#include "Camera.h"
 #include "pch.h"
 #include "Camera.h"
 #include "Transform.h"
 #include "Class/Game/GameNode.h"
-
-#include "Graphics/Resource.h"
+#include "Graphics/JGGraphics.h"
 namespace JG
 {
 	Camera* Camera::smMainCamera = nullptr;
@@ -21,9 +17,9 @@ namespace JG
 			return;
 		}
 		smMainCamera = mainCamera;
-		RequestRegisterMainCameraEvent e;
-		e.MainCamera = mainCamera;
-		mainCamera->SendEvent(e);
+		//RequestRegisterMainCameraEvent e;
+		//e.MainCamera = mainCamera;
+		//mainCamera->SendEvent(e);
 	}
 	Camera::Camera()
 	{
@@ -39,11 +35,22 @@ namespace JG
 		{
 			SetMainCamera(this);
 		}
+
 	}
 
 	void Camera::Start()
 	{
-
+		if (mScene == nullptr)
+		{
+			Graphics::SceneInfo sceneInfo;
+			sceneInfo.EyePos     = GetOwner()->GetTransform()->GetWorldLocation();
+			sceneInfo.Resolution = GetResolution();
+			sceneInfo.ClearColor = GetClearColor();
+			sceneInfo.ViewMatrix = GetViewMatrix();
+			sceneInfo.ProjMatrix = GetProjMatrix();
+			sceneInfo.ViewProjMatrix = GetViewProjMatrix();
+			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
+		}
 	}
 	void Camera::Update()
 	{
@@ -57,9 +64,14 @@ namespace JG
 		if (smMainCamera == this)
 		{
 			smMainCamera = nullptr;
-			RequestUnRegisterMainCameraEvent e;
-			e.MainCamera = this;
-			SendEvent(e);
+			//RequestUnRegisterMainCameraEvent e;
+			//e.MainCamera = this;
+			//SendEvent(e);
+		}
+		if (mScene != nullptr)
+		{
+			JGGraphics::GetInstance().DestroyObject(mScene);
+			mScene = nullptr;
 		}
 	}
 	void Camera::MakeJson(SharedPtr<JsonData> jsonData) const

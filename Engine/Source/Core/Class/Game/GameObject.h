@@ -6,10 +6,11 @@
 #include "Application.h"
 namespace JG		
 {
-	template<class T>
-	using GamePtr = WeakPtr<T>;
-
-
+	namespace Graphics
+	{
+		class SceneObject;
+		class Light;
+	}
 
 	class IGameObject : public IJGObject
 	{
@@ -60,16 +61,6 @@ namespace JG
 		virtual void Destory() override {}
 		virtual void Update() {}
 		virtual void LateUpdate() {}
-		virtual SharedPtr<IRenderItem> PushRenderItem() {
-			return nullptr;
-		}
-		virtual SharedPtr<IRenderItem> PushDebugRenderItem() {
-			return nullptr;
-		}
-		virtual SharedPtr<ILightItem> PushLightItem() {
-			return nullptr;
-		}
-
 	protected: // ½ºÄÉÁì °ü·Ã
 		SharedPtr<ScheduleHandle> Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleOnce(f32 delay, i32 priority, const SyncTaskFunction& task);

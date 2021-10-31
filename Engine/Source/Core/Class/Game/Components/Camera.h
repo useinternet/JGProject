@@ -1,10 +1,15 @@
 #pragma once
 #include "Class/Game/GameComponent.h"
+
 #include "Math/JRect.h"
 
 
 namespace JG
 {
+	namespace Graphics
+	{
+		class Scene;
+	}
 	class Camera : public GameComponent
 	{
 		static Camera* smMainCamera;
@@ -38,6 +43,8 @@ namespace JG
 		bool mIsMainCamera    = false;
 
 		ERendererPath mRendererPath = ERendererPath::Foward;
+
+		Graphics::Scene* mScene = nullptr;
 	public:
 		Camera();
 	protected:

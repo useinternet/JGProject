@@ -2,10 +2,7 @@
 #include "SpriteRenderer.h"
 #include "Transform.h"
 
-#include "Graphics/Material.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Resource.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/JGGraphics.h"
 #include "Class/Game/GameWorld.h"
 #include "Common/DragAndDrop.h"
 namespace JG
@@ -84,33 +81,6 @@ namespace JG
 		mSprite = assetManager->RequestOriginAsset<ITexture>(path);
 	}
 
-	SharedPtr<IRenderItem> SpriteRenderer::PushRenderItem()
-	{
-		if (mSprite == nullptr) return nullptr;
-		auto transform = GetOwner()->GetTransform();
-		mSpriteRI->WorldMatrix = transform->GetWorldMatrix();
-
-		if (mSprite && mSprite->Get()->IsValid())
-		{
-			auto info = mSprite->Get()->GetTextureInfo();
-			mSpriteRI->Texture = mSprite->Get();
-			f32 adjust = (f32)info.PixelPerUnit / (f32)GameSettings::GetUnitSize();
-			f32 spriteWidth  = info.Width  * adjust;
-			f32 spriteHeight = info.Height * adjust;
-
-			if (mSpriteSize.x != spriteWidth || mSpriteSize.y != spriteHeight)
-			{
-				JBBox bbox;
-				bbox.min = JVector3(-spriteWidth * 0.5f, -spriteHeight * 0.5f, 0.0f);
-				bbox.max = JVector3(spriteWidth * 0.5f, spriteHeight * 0.5f, 0.0f);
-				GetOwner()->SetPickingBoundingBox(bbox);
-				mSpriteSize = JVector2(spriteWidth, spriteHeight);
-				
-			}
-			mSpriteRI->WorldMatrix = JMatrix::Scaling(JVector3(spriteWidth, spriteHeight, 1)) * mSpriteRI->WorldMatrix;
-		}
-		return mSpriteRI;
-	}
 
 	void SpriteRenderer::OnChange(const ChangeData& data)
 	{
@@ -164,6 +134,39 @@ namespace JG
 		//		mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
 		//	}
 		//}
+	}
+
+	void SpriteRenderer::PushRenderSceneObject()
+	{
+		if (mSprite == nullptr) return;
+
+		auto sceneObject = CreateSharedPtr<Graphics::PaperObject>();
+		auto transform   = GetOwner()->GetTransform();
+		sceneObject->WorldMatrix = transform->GetWorldMatrix();
+
+		if (mSprite && mSprite->Get()->IsValid())
+		{
+			auto info = mSprite->Get()->GetTextureInfo();
+			sceneObject->Texture = mSprite->Get();
+			f32 adjust = (f32)info.PixelPerUnit / (f32)GameSettings::GetUnitSize();
+			f32 spriteWidth = info.Width * adjust;
+			f32 spriteHeight = info.Height * adjust;
+
+			if (mSpriteSize.x != spriteWidth || mSpriteSize.y != spriteHeight)
+			{
+				JBBox bbox;
+				bbox.min = JVector3(-spriteWidth * 0.5f, -spriteHeight * 0.5f, 0.0f);
+				bbox.max = JVector3(spriteWidth * 0.5f, spriteHeight * 0.5f, 0.0f);
+				GetOwner()->SetPickingBoundingBox(bbox);
+				mSpriteSize = JVector2(spriteWidth, spriteHeight);
+
+			}
+			sceneObject->WorldMatrix = JMatrix::Scaling(JVector3(spriteWidth, spriteHeight, 1)) * sceneObject->WorldMatrix;
+		}
+
+
+		GetGameWorld()->PushRenderSceneObject(sceneObject);
+
 	}
 
 }

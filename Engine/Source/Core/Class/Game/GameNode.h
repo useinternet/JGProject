@@ -45,12 +45,9 @@ namespace JG
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
 		virtual void OnInspectorGUI() override;
-		virtual SharedPtr<IRenderItem> PushRenderItem() override;
-		virtual SharedPtr<IRenderItem> PushDebugRenderItem() override;
-		virtual SharedPtr<ILightItem>  PushLightItem() override;
+
 	public:
 		GameNode* AddNode(const String& name);
-
 		template<class T>
 		T* AddComponent()
 		{
@@ -97,6 +94,7 @@ namespace JG
 		u64 GetChildCount() const;
 		virtual void SetParent(GameNode* node);
 		GameNode*    GetParent() const;
+		virtual GameWorld*   GetGameWorld() const;
 		Transform*   GetTransform() const;
 
 		void SetPickingBoundingBox(const JBBox& boundingBox,

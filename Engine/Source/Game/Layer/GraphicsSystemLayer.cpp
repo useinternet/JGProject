@@ -79,7 +79,7 @@ namespace JG
 
 	void GraphicsSystemLayer::OnAttach()
 	{
-		LoadShaderScript();
+		//LoadShaderScript();
 	}
 
 	void GraphicsSystemLayer::OnDetach()
@@ -369,99 +369,99 @@ namespace JG
 
 	//	return EScheduleResult::Continue;
 	//}
-	void GraphicsSystemLayer::LoadShaderScript()
-	{
-		// Load Global Shader Lib
-		ShaderLibrary::GetInstance().LoadGlobalShaderLib();
+	//void GraphicsSystemLayer::LoadShaderScript()
+	//{
+	//	// Load Global Shader Lib
+	//	ShaderLibrary::GetInstance().LoadGlobalShaderLib();
 
 
-		// TemplateLoad
-		auto templatePath = Application::GetShaderTemplatePath();
+	//	// TemplateLoad
+	//	auto templatePath = Application::GetShaderTemplatePath();
 
-		for (auto& iter : fs::recursive_directory_iterator(templatePath))
-		{
-			auto p = iter.path();
-			if (p.extension() != ".shadertemplate")
-			{
-				continue;
-			}
-			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
-			EShaderFlags shaderFlags = EShaderFlags::None;
+	//	for (auto& iter : fs::recursive_directory_iterator(templatePath))
+	//	{
+	//		auto p = iter.path();
+	//		if (p.extension() != ".shadertemplate")
+	//		{
+	//			continue;
+	//		}
+	//		auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+	//		EShaderFlags shaderFlags = EShaderFlags::None;
 
-			std::ifstream fin(p.string());
+	//		std::ifstream fin(p.string());
 
-			if (fin.is_open() == true)
-			{
-				std::stringstream ss;
-				ss << fin.rdbuf();
-				String sourceCode = ss.str();
-				if (sourceCode.find(HLSL::CSEntry) != String::npos)
-				{
-					shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
-				}
-				else
-				{
-					if (sourceCode.find(HLSL::VSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_VertexShader;
-					}
-					if (sourceCode.find(HLSL::GSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_GeometryShader;
-					}
-					if (sourceCode.find(HLSL::HSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_HullShader;
-					}
-					if (sourceCode.find(HLSL::DSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_DomainShader;
-					}
-					if (sourceCode.find(HLSL::PSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
-					}
-				}
-				auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
-				ShaderLibrary::GetInstance().RegisterShader(shader);
-				fin.close();
-			}
-		}
-
-
-
-		// Script Load
-		auto scriptPath = Application::GetShaderScriptPath();
-
-		for (auto& iter : fs::recursive_directory_iterator(scriptPath))
-		{
-			auto p = iter.path();
-
-			if (p.extension() != ".shaderscript")
-			{
-				continue;
-			}
-			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
-			std::ifstream fin(p.string());
-
-			if (fin.is_open() == true)
-			{
-				std::stringstream ss;
-				ss << fin.rdbuf();
-				String scriptCode = ss.str();
-				SharedPtr<IShaderScript> script;
-				if (scriptCode.find(ShaderScript::Type::Surface) != String::npos)
-				{
-					script = IShaderScript::CreateMaterialScript("Surface/" + fileName, scriptCode);
-				}
+	//		if (fin.is_open() == true)
+	//		{
+	//			std::stringstream ss;
+	//			ss << fin.rdbuf();
+	//			String sourceCode = ss.str();
+	//			if (sourceCode.find(HLSL::CSEntry) != String::npos)
+	//			{
+	//				shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
+	//			}
+	//			else
+	//			{
+	//				if (sourceCode.find(HLSL::VSEntry) != String::npos)
+	//				{
+	//					shaderFlags = shaderFlags | EShaderFlags::Allow_VertexShader;
+	//				}
+	//				if (sourceCode.find(HLSL::GSEntry) != String::npos)
+	//				{
+	//					shaderFlags = shaderFlags | EShaderFlags::Allow_GeometryShader;
+	//				}
+	//				if (sourceCode.find(HLSL::HSEntry) != String::npos)
+	//				{
+	//					shaderFlags = shaderFlags | EShaderFlags::Allow_HullShader;
+	//				}
+	//				if (sourceCode.find(HLSL::DSEntry) != String::npos)
+	//				{
+	//					shaderFlags = shaderFlags | EShaderFlags::Allow_DomainShader;
+	//				}
+	//				if (sourceCode.find(HLSL::PSEntry) != String::npos)
+	//				{
+	//					shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
+	//				}
+	//			}
+	//			auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
+	//			ShaderLibrary::GetInstance().RegisterShader(shader);
+	//			fin.close();
+	//		}
+	//	}
 
 
-				ShaderLibrary::GetInstance().RegisterScirpt(script);
-				fin.close();
-			}
-			
-		}
-	}
+
+	//	// Script Load
+	//	auto scriptPath = Application::GetShaderScriptPath();
+
+	//	for (auto& iter : fs::recursive_directory_iterator(scriptPath))
+	//	{
+	//		auto p = iter.path();
+
+	//		if (p.extension() != ".shaderscript")
+	//		{
+	//			continue;
+	//		}
+	//		auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+	//		std::ifstream fin(p.string());
+
+	//		if (fin.is_open() == true)
+	//		{
+	//			std::stringstream ss;
+	//			ss << fin.rdbuf();
+	//			String scriptCode = ss.str();
+	//			SharedPtr<IShaderScript> script;
+	//			if (scriptCode.find(ShaderScript::Type::Surface) != String::npos)
+	//			{
+	//				script = IShaderScript::CreateMaterialScript("Surface/" + fileName, scriptCode);
+	//			}
+
+
+	//			ShaderLibrary::GetInstance().RegisterScirpt(script);
+	//			fin.close();
+	//		}
+	//		
+	//	}
+	//}
 
 }
 

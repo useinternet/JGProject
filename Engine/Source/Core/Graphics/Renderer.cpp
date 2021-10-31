@@ -6,7 +6,7 @@ namespace JG
 {
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<IRenderBatch>> batchList)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		mCurrentRenderInfo = info;
@@ -122,7 +122,7 @@ namespace JG
 
 	void FowardRenderer::Draw(int objectType, const List<ObjectInfo>& objectList)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		auto renderInfo = GetRenderInfo();
@@ -207,7 +207,7 @@ namespace JG
 
 	Render2DBatch::Render2DBatch()
 	{
-		auto bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
+		auto bufferCnt = JGGraphics::GetInstance().GetBufferCount();
 		mFrameResources.resize(bufferCnt);
 
 		auto inputLayout = InputLayout::Create();
@@ -278,7 +278,7 @@ namespace JG
 		mTextureArray.resize(MaxTextureCount, nullptr);
 		mTextureArray[0] = mWhiteTexture;
 
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 		api->ClearRenderTarget(MAIN_GRAPHICS_COMMAND_ID, { mWhiteTexture }, nullptr);
 
@@ -382,7 +382,7 @@ namespace JG
 	{
 		if (mQuadCount == 0) return;
 		
-		auto api = Application::GetInstance().GetGraphicsAPI();
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		if (mCurrFrameResource->Standard2DMaterial->Bind() == false)

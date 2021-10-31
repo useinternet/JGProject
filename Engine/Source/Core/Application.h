@@ -33,7 +33,7 @@ namespace JG
 		ApplicaionProps         mProps;
 		UniquePtr<IWindow>		mWindow;
 		UniquePtr<SystemLayerStack>	mLayerStack;
-		UniquePtr<IGraphicsAPI> mGraphcisAPI;
+		//UniquePtr<IGraphicsAPI> mGraphcisAPI;
 
 		Queue<UniquePtr<IEvent>> mEventQueue;
 
@@ -67,8 +67,8 @@ namespace JG
 		}
 	public:
 		IWindow*	  GetWindow() const;
-		IGraphicsAPI* GetGraphicsAPI() const;
-		IPhysicsAPI*  GetPhysicsAPI() const;
+		//IGraphicsAPI* GetGraphicsAPI() const;
+		//IPhysicsAPI*  GetPhysicsAPI() const;
 		const Timer*  GetAppTimer() const;
 		JVector2Uint  GetDisplaySize() const;
 	public:

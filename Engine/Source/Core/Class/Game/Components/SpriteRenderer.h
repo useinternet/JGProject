@@ -8,7 +8,7 @@ namespace JG
 	{
 		JGCLASS
 	private:
-		SharedPtr<Standard2DRenderItem> mSpriteRI;
+		//SharedPtr<Standard2DRenderItem> mSpriteRI;
 		JVector2 mSpriteSize;
 
 
@@ -30,10 +30,11 @@ namespace JG
 	public:
 		void SetSprite(const String& path);
 	public:
-		virtual SharedPtr<IRenderItem> PushRenderItem() override;
-	public:
 		virtual void OnChange(const ChangeData& data) override;
 		virtual void OnInspectorGUI() override;
+
+	private:
+		void PushRenderSceneObject();
 	};
 
 }

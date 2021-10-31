@@ -35,6 +35,7 @@ namespace JG
 		virtual u64 GetBufferIndex() const = 0;
 	protected:
 		friend class Application;
+		friend class JGGraphics;
 		virtual bool Create() = 0;
 		virtual void Destroy() = 0;
 

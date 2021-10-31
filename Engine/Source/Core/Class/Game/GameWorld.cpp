@@ -140,6 +140,12 @@ namespace JG
 
 		return mAssetManager.get();
 	}
+	void GameWorld::PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject)
+	{
+	}
+	void GameWorld::PushRenderLightObject(SharedPtr<Graphics::Light> lightObject)
+	{
+	}
 	void GameWorld::AddGameSystem(const Type& type)
 	{
 		bool isGameSystem = GameObjectFactory::GetInstance().IsGameSystem(type);

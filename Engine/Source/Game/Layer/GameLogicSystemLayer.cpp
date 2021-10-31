@@ -79,7 +79,7 @@ namespace JG
 		EventDispatcher eventDispatcher(e);
 		eventDispatcher.Dispatch<RequestSaveGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseSaveGameWorld));
 		eventDispatcher.Dispatch<RequestLoadGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseLoadGameWorld));
-		eventDispatcher.Dispatch<NotifyRenderingReadyCompeleteEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete));
+		//eventDispatcher.Dispatch<NotifyRenderingReadyCompeleteEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete));
 		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClick));
 	}
 	String GameLogicSystemLayer::GetLayerName()
@@ -289,37 +289,37 @@ namespace JG
 	
 		return true;
 	}
-	bool GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e)
-	{
-		if (mGameWorld != nullptr)
-		{
-			auto renderItem = mGameWorld->PushRenderItem();
-			if (renderItem != nullptr)
-			{
-				RequestPushRenderItemEvent e;
-				e.RenderItem = renderItem;
-				Application::GetInstance().SendEvent(e);
-			}
-			renderItem = mGameWorld->PushDebugRenderItem();
-			if (renderItem != nullptr)
-			{
-				RequestPushRenderItemEvent e;
-				e.RenderItem = renderItem;
-				Application::GetInstance().SendEvent(e);
-			}
+	//bool GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e)
+	//{
+	//	if (mGameWorld != nullptr)
+	//	{
+	//		auto renderItem = mGameWorld->PushRenderItem();
+	//		if (renderItem != nullptr)
+	//		{
+	//			RequestPushRenderItemEvent e;
+	//			e.RenderItem = renderItem;
+	//			Application::GetInstance().SendEvent(e);
+	//		}
+	//		renderItem = mGameWorld->PushDebugRenderItem();
+	//		if (renderItem != nullptr)
+	//		{
+	//			RequestPushRenderItemEvent e;
+	//			e.RenderItem = renderItem;
+	//			Application::GetInstance().SendEvent(e);
+	//		}
 
-			auto lightItem = mGameWorld->PushLightItem();
-			if (lightItem != nullptr)
-			{
-				RequestPushLightItemEvent e;
-				e.LightItem = lightItem;
-				Application::GetInstance().SendEvent(e);
-			}
+	//		auto lightItem = mGameWorld->PushLightItem();
+	//		if (lightItem != nullptr)
+	//		{
+	//			RequestPushLightItemEvent e;
+	//			e.LightItem = lightItem;
+	//			Application::GetInstance().SendEvent(e);
+	//		}
 
 
-		}
-		return true;
-	}
+	//	}
+	//	return true;
+	//}
 	bool GameLogicSystemLayer::ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e)
 	{
 		NotifySelectedGameNodeInEditorEvent pickingEvent;

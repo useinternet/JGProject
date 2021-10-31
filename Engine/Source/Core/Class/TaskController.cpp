@@ -107,6 +107,8 @@ namespace JG
 						}
 					}, mUserData);
 				}
+
+				return EScheduleResult::Continue;
 			});
 
 		}

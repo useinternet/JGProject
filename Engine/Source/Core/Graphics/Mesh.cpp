@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "Application.h"
 #include "GraphicsAPI.h"
+#include "JGGraphics.h"
 #include "Graphics/Resource.h"
 #include "Class/Asset/Asset.h"
 #include "Class/Asset/AssetImporter.h"
@@ -12,7 +13,7 @@ namespace JG
 {
     SharedPtr<ISubMesh> ISubMesh::Create(const String& name)
     {
-        auto api = Application::GetInstance().GetGraphicsAPI();
+        auto api = JGGraphics::GetInstance().GetGraphicsAPI();
         JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 
@@ -20,7 +21,7 @@ namespace JG
     }
     SharedPtr<IMesh> IMesh::Create(const String& name)
     {
-        auto api = Application::GetInstance().GetGraphicsAPI();
+        auto api = JGGraphics::GetInstance().GetGraphicsAPI();
         JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
         

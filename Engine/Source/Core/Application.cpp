@@ -5,6 +5,7 @@
 
 
 #include "Platform/Window/WindowsWindow.h"
+#include "Graphics/JGGraphics.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Shader.h"
 #include "Graphics/DebugGeometryDrawer.h"
@@ -99,7 +100,6 @@ namespace JG
 		// TODO
 		// 필요한 멤버 클래스 생성
 		mLayerStack  = CreateUniquePtr<SystemLayerStack>();
-		mGraphcisAPI = IGraphicsAPI::Create(EGraphicsAPI::DirectX12);
 		// NOTE
 		// Window 생성
 		switch(prop.WindowPlatform)
@@ -123,8 +123,13 @@ namespace JG
 		else
 		{
 			JG_CORE_INFO("Successed Create Window");
-			mGraphcisAPI->Create();
-			ShaderLibrary::Create();
+			JGGraphicsDesc desc;
+			desc.GraphicsAPI = EGraphicsAPI::DirectX12;
+			desc.GlobalShaderLibPath = Application::GetShaderGlobalLibPath();
+			desc.ShaderScriptPath    = Application::GetShaderScriptPath();
+			desc.ShaderTemplatePath  = Application::GetShaderTemplatePath();
+			JGGraphics::Create(desc);
+			JGGraphics::GetInstance().LoadShader();
 			mIsRunning = true;
 		}
 		PhysicsManager::Create();
@@ -158,7 +163,7 @@ namespace JG
 				TimerManager::GetInstance().Update();
 			}
 
-			mGraphcisAPI->Begin();
+			//mGraphcisAPI->Begin();
 
 
 			while (mEventQueue.empty() == false)
@@ -172,7 +177,7 @@ namespace JG
 				Scheduler::GetInstance().Update();
 			}
 
-			mGraphcisAPI->End();
+			//mGraphcisAPI->End();
 		}
 
 		
@@ -190,14 +195,12 @@ namespace JG
 		DebugGeometryDrawer::Destroy();
 		ITexture::DestroyNullTexture();
 		PhysicsManager::Destroy();
-		mGraphcisAPI->Flush();
+		JGGraphics::GetInstance().Flush();
 		UIManager::Destroy();
 		mLayerStack.reset();
 		GameLayerManager::Destroy();
 		AssetDataBase::Destroy();
-		ShaderLibrary::Destroy();
-		mGraphcisAPI->Destroy();
-		mGraphcisAPI.reset();
+		JGGraphics::Destroy();
 		mWindow->Destroy();
 		mWindow.reset();
 		Scheduler::Destroy();
@@ -269,10 +272,6 @@ namespace JG
 	IWindow* Application::GetWindow() const
 	{
 		return mWindow.get();
-	}
-	IGraphicsAPI* Application::GetGraphicsAPI() const
-	{
-		return mGraphcisAPI.get();
 	}
 	const Timer* Application::GetAppTimer() const
 	{

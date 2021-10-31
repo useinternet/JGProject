@@ -54,7 +54,7 @@ namespace JG
 	public:
 		bool ResponseSaveGameWorld(RequestSaveGameWorldEvent& e);
 		bool ResponseLoadGameWorld(RequestLoadGameWorldEvent& e);
-		bool ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e);
+		//bool ResponseNotfyRenderingReadyCompelete(NotifyRenderingReadyCompeleteEvent& e);
 		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
 	public:
 

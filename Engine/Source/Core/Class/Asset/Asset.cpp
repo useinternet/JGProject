@@ -2,10 +2,7 @@
 #include "Asset.h"
 #include "AssetManager.h"
 #include "Application.h"
-#include "Graphics/GraphicsAPI.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Shader.h"
-#include "Graphics/Material.h"
+#include "Graphics/JGGraphics.h"
 #include "ExternalImpl/JGImGui.h"
 #include "AssetImporter.h"
 #include "Imgui/imgui.h"
@@ -1078,7 +1075,7 @@ namespace JG
 	}
 	EScheduleResult AssetDataBase::UnLoadAsset_Update()
 	{
-		u32 bufferCnt = Application::GetInstance().GetGraphicsAPI()->GetBufferCount();
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
 		List<AssetUnLoadData> aliveList;
 		u32 loopCnt = 0;
 		while (mUnLoadAssetDataQueue.empty() == false)

@@ -3,6 +3,8 @@
 #include "JGCore.h"
 #include "GraphicsDefine.h"
 #include <shared_mutex>
+
+
 namespace JG
 {
 	class IComputeBuffer;
@@ -58,7 +60,7 @@ namespace JG
 
 	class ShaderLibrary : public GlobalSingleton<ShaderLibrary>
 	{
-		friend class Application;
+		friend class JGGraphics;
 	private:
 		Dictionary<String, SharedPtr<IShader>> mShaders;
 		Dictionary<String, SharedPtr<IShaderScript>> mMaterialScirpts;
@@ -70,7 +72,7 @@ namespace JG
 		SharedPtr<IShader> GetShader(const String& name);
 		SharedPtr<IShader> GetShader(const String& name, const List<String>& scriptNameList);
 		SharedPtr<IShaderScript> GetScript(const String& name);
-		bool   LoadGlobalShaderLib();
+		bool   LoadGlobalShaderLib(const String& path);
 		String GetGlobalShaderLibCode() const;
 	};
 

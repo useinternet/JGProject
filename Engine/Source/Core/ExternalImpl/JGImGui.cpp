@@ -5,6 +5,7 @@
 #include "Imgui/imgui_impl_win32.h"
 #include "Platform/Window/WindowsWindow.h"
 #include "Graphics/GraphicsDefine.h"
+#include "Graphics/JGGraphics.h"
 #include "Graphics/FrameBuffer.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 #include "Platform/Graphics/DirectX12/DirectX12Resource.h"
@@ -45,7 +46,7 @@ namespace JG
 		auto window      = Application::GetInstance().GetWindow();
 		auto platform    = window->GetPlatform();
 		auto handle      = window->GetHandle();
-		auto api         = Application::GetInstance().GetGraphicsAPI()->GetAPI();
+		auto api = JGGraphics::GetInstance().GetDesc().GraphicsAPI;
 		auto bufferCount = DirectX12API::GetFrameBufferCount();
 
 
@@ -158,7 +159,7 @@ namespace JG
 		gFileDialogTexture.reset(); gFileDialogTexture = nullptr;
 		auto window = Application::GetInstance().GetWindow();
 		auto platform = window->GetPlatform();
-		auto api      = Application::GetInstance().GetGraphicsAPI()->GetAPI();
+		auto api = JGGraphics::GetInstance().GetDesc().GraphicsAPI;
 		switch (api)
 		{
 		case JG::EGraphicsAPI::DirectX12:
@@ -183,7 +184,7 @@ namespace JG
 	}
 	u64 JGImGui::ConvertImGuiTextureID(TextureID id)
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI()->GetAPI();
+		auto api = JGGraphics::GetInstance().GetDesc().GraphicsAPI;
 		switch (api)
 		{
 		case JG::EGraphicsAPI::DirectX12:
@@ -204,7 +205,7 @@ namespace JG
 	}
 	void JGImGui::NewFrame()
 	{
-		auto api = Application::GetInstance().GetGraphicsAPI()->GetAPI();
+		auto api = JGGraphics::GetInstance().GetDesc().GraphicsAPI;
 
 		switch (api)
 		{
