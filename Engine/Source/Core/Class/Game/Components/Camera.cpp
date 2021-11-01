@@ -18,28 +18,30 @@ namespace JG
 		}
 		smMainCamera = mainCamera;
 	}
-	Camera::Camera()
+	void Camera::Awake()
 	{
+		GameComponent::Awake();
 		SetFOV(90);
 		SetNearZ(0.001f);
 		SetFarZ(10000.0f);
 		SetOrthographic(true);
 		SetResolution(GameSettings::GetResolution());
-	}
-	void Camera::Awake()
-	{
+
 		if (smMainCamera == nullptr)
 		{
 			SetMainCamera(this);
 		}
 
+
+
 	}
 
 	void Camera::Start()
 	{
+		GameComponent::Start();
 		UpdateGraphicsScene();
-		mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
-		mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
+		mRenderingScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
+		mRenderFinishScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
 		mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
 		{
 			UpdateGraphicsScene();
@@ -48,6 +50,7 @@ namespace JG
 	}
 	void Camera::Update()
 	{
+		GameComponent::Update();
 		if (smMainCamera == nullptr)
 		{
 			SetMainCamera(this);
@@ -55,6 +58,7 @@ namespace JG
 	}
 	void Camera::Destory()
 	{
+		GameComponent::Destory();
 		if (smMainCamera == this)
 		{
 			smMainCamera = nullptr;

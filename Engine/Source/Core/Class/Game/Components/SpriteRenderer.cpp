@@ -10,17 +10,16 @@ namespace JG
 	void SpriteRenderer::Awake()
 	{
 		BaseRenderer::Awake();
-	}
-	void SpriteRenderer::Start()
-	{
-		BaseRenderer::Start();
 		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SpriteRenderer::PushRenderSceneObject));
 
 		if (mSprite == nullptr)
 		{
 			SetSprite("Asset/Resources/NullTexture.jgasset");
 		}
-
+	}
+	void SpriteRenderer::Start()
+	{
+		BaseRenderer::Start();
 	}
 	void SpriteRenderer::Destory()
 	{
@@ -46,9 +45,6 @@ namespace JG
 	{
 		BaseRenderer::MakeJson(jsonData);
 		jsonData->AddMember("Color", JVector4(GetColor()));
-
-
-
 
 		if (mSprite)
 		{

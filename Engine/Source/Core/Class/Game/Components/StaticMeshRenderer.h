@@ -12,7 +12,6 @@ namespace JG
 
 
 		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle;
-
 	public:
 		virtual ~StaticMeshRenderer() = default;
 	protected:

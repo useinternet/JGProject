@@ -7,14 +7,18 @@
 #include "Class/Game/GameWorld.h"
 namespace JG
 {
-	void PointLight::Start()
+	void PointLight::Awake()
 	{
-		Light::Start();
 #ifdef JG_EDITOR
 		mIcon = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>("Asset/Engine/Icon/Icon_Light.jgasset");
 		mPushDebugHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&PointLight::PushDebugRenderItem));
 #endif
 		mPushLightScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&PointLight::PushLightItem));
+	}
+	void PointLight::Start()
+	{
+		Light::Start();
+
 
 	}
 	void PointLight::Destory()

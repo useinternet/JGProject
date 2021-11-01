@@ -39,13 +39,8 @@ namespace JG
 
 
 
-
-
-
-
 		PhysicsHandle mPxSceneHandle = 0;
 		JVector3 mGravity;
-
 	public:
 		GameWorld();
 	protected:
@@ -61,6 +56,7 @@ namespace JG
 		AssetManager* GetAssetManager() const;
 		void PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject);
 		void PushRenderLightObject(SharedPtr<Graphics::Light> lightObject);
+
 		void RegisterGraphicsScene(Graphics::Scene* scene);
 		void UnRegisterGraphicsScene(Graphics::Scene* scene);
 		

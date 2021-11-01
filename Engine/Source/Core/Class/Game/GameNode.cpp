@@ -22,11 +22,6 @@ namespace JG
 		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{
-			if (com->mIsRunAwake == false)
-			{
-				com->mIsRunAwake = true;
-				com->Awake();
-			}
 			if (com->IsActive())
 			{
 				if (com->mIsRunStart == false)
@@ -40,11 +35,6 @@ namespace JG
 
 		for (auto& child : mChilds)
 		{
-			if (child->mIsRunAwake == false)
-			{
-				child->mIsRunAwake = true;
-				child->Awake();
-			}
 			if (child->IsActive())
 			{
 				if (child->mIsRunStart == false)
@@ -248,6 +238,7 @@ namespace JG
 		obj->SetName(name);
 		obj->SetParent(this);
 		obj->mGameWorld = mGameWorld;
+		obj->Awake();
 		return obj;
 	}
 	GameComponent* GameNode::AddComponent(const Type& type)
@@ -268,6 +259,7 @@ namespace JG
 		auto com = static_cast<GameComponent*>(obj);
 		com->mOwnerNode = this;
 		com->mGameWorld = mGameWorld;
+		com->Awake();
 		mComponents.push_back(com);
 
 		return com;

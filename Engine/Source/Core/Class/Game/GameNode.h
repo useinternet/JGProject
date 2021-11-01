@@ -19,7 +19,6 @@ namespace JG
 		bool mIsActiveSelf = true;
 		bool mIsActive     = true;
 		bool mIsAlive = true;
-		bool mIsRunAwake = false;
 		bool mIsRunStart = false;
 		Transform* mTransform = nullptr;
 	

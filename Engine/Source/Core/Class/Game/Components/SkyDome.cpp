@@ -11,6 +11,7 @@ namespace JG
 {
 	void SkyDome::Awake()
 	{
+		GameComponent::Awake();
 		CreateGeometry();
 		auto shader = ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader, { "Surface/SkyDome" });
 		mMaterial = IMaterial::Create("SkyDome_Material", shader);
@@ -22,11 +23,11 @@ namespace JG
 	}
 	void SkyDome::Start()
 	{
-
+		GameComponent::Start();
 	}
 	void SkyDome::Destory()
 	{
-
+		GameComponent::Destory();
 
 	}
 
@@ -53,10 +54,12 @@ namespace JG
 
 	void SkyDome::Update()
 	{
+		GameComponent::Update();
 	}
 
 	void SkyDome::LateUpdate()
 	{
+		GameComponent::LateUpdate();
 	}
 
 	void SkyDome::MakeJson(SharedPtr<JsonData> jsonData) const
@@ -75,6 +78,8 @@ namespace JG
 
 	void SkyDome::OnInspectorGUI()
 	{
+		GameComponent::OnInspectorGUI();
+
 	}
 
 	void SkyDome::CreateGeometry()

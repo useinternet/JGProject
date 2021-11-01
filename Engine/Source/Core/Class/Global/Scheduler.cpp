@@ -245,8 +245,11 @@ namespace JG
     }
     SharedPtr<ScheduleHandle> Scheduler::ScheduleAsync(const AsyncTaskFunction& task)
     {
+        std::lock_guard<std::mutex> lock(mMutex);
         auto asyncTask = CreateSharedPtr<AsyncTask>();
         auto handle    = CreateSharedPtr<ScheduleHandle>();
+
+    
         {
 
             handle->mID = 0;
@@ -255,7 +258,7 @@ namespace JG
             asyncTask->Handle = handle;
             asyncTask->Function = task;
 
-            std::lock_guard<std::mutex> lock(mMutex);
+     
             mAsyncTaskQueue.push(asyncTask);
         }
         mRunAsyncTaskConVar.notify_one();
@@ -263,6 +266,7 @@ namespace JG
     }
     SharedPtr<ScheduleHandle> Scheduler::ScheduleAsync(const AsyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData)
     {
+        std::lock_guard<std::mutex> lock(mMutex);
         auto asyncTask = CreateSharedPtr<AsyncTask>();
         auto handle = CreateSharedPtr<ScheduleHandle>();
         {
@@ -274,7 +278,7 @@ namespace JG
             asyncTask->Handle = handle;
             asyncTask->UserDataFunction = task;
 
-            std::lock_guard<std::mutex> lock(mMutex);
+
             mAsyncTaskQueue.push(asyncTask);
         }
         mRunAsyncTaskConVar.notify_one();

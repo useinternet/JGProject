@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "JGGraphics.h"
+#include "Graphics/Batch/Render2DBatch.h"
+#include "Graphics/Renderer/FowardRenderer.h"
+#include "Graphics/Renderer/DeferredRenderer.h"
 #include "Application.h"
 
 namespace JG
@@ -230,6 +233,7 @@ namespace JG
 
 
 		Queue<u64> Scene::sm_CommandIDQueue;
+		std::mutex Scene::sm_CommandIDMutex;
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
@@ -238,17 +242,23 @@ namespace JG
 			mTargetDepthTextures.resize(bufferCount, nullptr);
 			mCurrentIndex = 0;
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
-			SetSceneInfo(info);
 
-			if (sm_CommandIDQueue.empty() == false)
+
 			{
-				mCommandID = sm_CommandIDQueue.front();
-				sm_CommandIDQueue.pop();
+				std::lock_guard<std::mutex> lock(sm_CommandIDMutex);
+				if (sm_CommandIDQueue.empty() == false)
+				{
+					mCommandID = sm_CommandIDQueue.front();
+					sm_CommandIDQueue.pop();
+				}
+				else
+				{
+					mCommandID = ++s_CommandIDOffset;
+				}
 			}
-			else
-			{
-				mCommandID = ++s_CommandIDOffset;
-			}
+
+
+			SetSceneInfo(info);
 
 		}
 		Scene::~Scene()
@@ -398,8 +408,10 @@ namespace JG
 				mRenderer = CreateSharedPtr<FowardRenderer>();
 				break;
 			case ERendererPath::Deferred:
+				mRenderer = CreateSharedPtr<DeferredRenderer>();
 				break;
 			}
+			mRenderer->SetCommandID(mCommandID);
 		}
 
 		void Scene::InitTexture(const JVector2& resolution, const Color& clearColor)

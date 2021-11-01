@@ -50,8 +50,9 @@ namespace JG
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
 
+
 		mGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
-		mGameWorld->SetGlobalGameSystemList(mGameSystemList); 
+		mGameWorld->SetGlobalGameSystemList(mGameSystemList);
 		auto camNode = mGameWorld->AddNode("EditorCamera");
 		auto editorCam = camNode->AddComponent<EditorCamera>();
 		Camera::SetMainCamera(editorCam);
@@ -69,6 +70,7 @@ namespace JG
 			Application::GetInstance().SendEvent(e);
 			return EScheduleResult::Continue;
 		});
+
 	}
 	void GameLogicSystemLayer::Destroy()
 	{
@@ -79,7 +81,6 @@ namespace JG
 		EventDispatcher eventDispatcher(e);
 		eventDispatcher.Dispatch<RequestSaveGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseSaveGameWorld));
 		eventDispatcher.Dispatch<RequestLoadGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseLoadGameWorld));
-		//eventDispatcher.Dispatch<NotifyRenderingReadyCompeleteEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseNotfyRenderingReadyCompelete));
 		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClick));
 	}
 	String GameLogicSystemLayer::GetLayerName()
@@ -330,8 +331,6 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<SpriteRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
-		GameObjectFactory::GetInstance().RegisterComponentType<SphereCollision>();
-		GameObjectFactory::GetInstance().RegisterComponentType<BoxCollision>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
 
 	}

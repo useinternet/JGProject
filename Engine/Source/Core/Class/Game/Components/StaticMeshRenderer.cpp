@@ -11,11 +11,12 @@ namespace JG
 	void StaticMeshRenderer::Awake()
 	{
 		BaseRenderer::Awake();
+		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&StaticMeshRenderer::PushRenderSceneObject));
 	}
 	void StaticMeshRenderer::Start()
 	{
 		BaseRenderer::Start();
-		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&StaticMeshRenderer::PushRenderSceneObject));
+
 	}
 	void StaticMeshRenderer::Destory()
 	{

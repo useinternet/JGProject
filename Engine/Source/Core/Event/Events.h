@@ -184,10 +184,4 @@ private: \
 
 	REQUEST_EVENT(RequestSaveGameWorldEvent)
 	REQUEST_ONE_ARG_EVENT(RequestLoadGameWorldEvent, String, AssetPath, "")
-	REQUEST_ONE_ARG_EVENT(RequestPushRenderItemEvent, SharedPtr<IRenderItem>, RenderItem, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestPushLightItemEvent, SharedPtr<ILightItem>, LightItem, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestRegisterCameraEvent, Camera*, pCamera, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestUnRegisterCameraEvent, Camera*, pCamera, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestRegisterMainCameraEvent, Camera*, MainCamera, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestUnRegisterMainCameraEvent, Camera*, MainCamera, nullptr)
 }

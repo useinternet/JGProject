@@ -26,6 +26,7 @@ namespace JG
 		class Light;
 		class PointLight;
 	}
+	class Render2DBatch;
 	struct JGGraphicsDesc
 	{
 		EGraphicsAPI GraphicsAPI;
@@ -37,9 +38,10 @@ namespace JG
 	{
 		friend class Application;
 	private:
+		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
 		JGGraphicsDesc mDesc;
-		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
+
 	public:
 		JGGraphics(const JGGraphicsDesc& desc);
 		~JGGraphics();
@@ -147,6 +149,7 @@ namespace JG
 		class Scene : public GObject
 		{
 			static Queue<u64> sm_CommandIDQueue;
+			static std::mutex sm_CommandIDMutex;
 		private:
 			SceneInfo mSceneInfo;
 
@@ -182,19 +185,6 @@ namespace JG
 			void InitRenderer(ERendererPath path);
 			void InitTexture(const JVector2& size, const Color& clearColor);
 		};
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 		// SceneObject //

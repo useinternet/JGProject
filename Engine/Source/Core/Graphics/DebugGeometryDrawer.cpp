@@ -51,9 +51,9 @@ namespace JG
 			ri->Material = mDebugMaterial;
 			ri->Mesh = mMesh;
 		
-			RequestPushRenderItemEvent e;
-			e.RenderItem = ri;
-			Application::GetInstance().SendEvent(e);
+			//RequestPushRenderItemEvent e;
+			//e.RenderItem = ri;
+			//Application::GetInstance().SendEvent(e);
 
 			mLineCount = 0;
 			mDebugDataList.clear();

@@ -28,9 +28,11 @@ namespace JG
 		SharedPtr<ScheduleHandle> mPushDebugHandle;
 		Asset<ITexture>* mIcon = nullptr;
 #endif // DEBUG
-
+	public:
+		virtual ~PointLight() = default;
 	
 	protected:
+		virtual void Awake() override;
 		virtual void Start() override;
 		virtual void Destory() override;
 	public:

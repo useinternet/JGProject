@@ -17,7 +17,6 @@ namespace JG
 		static Camera* GetMainCamera();
 		static void SetMainCamera(Camera* mainCamera);
 	private:
-		friend class GraphicsSystemLayer;
 		JGCLASS
 	protected:
 		mutable bool mIsViewDirty = true;
@@ -49,8 +48,6 @@ namespace JG
 		SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
 		SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
 		SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
-	public:
-		Camera();
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
