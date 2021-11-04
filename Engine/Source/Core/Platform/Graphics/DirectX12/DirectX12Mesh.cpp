@@ -71,6 +71,8 @@ namespace JG
 	}
 
 
+
+
 	void DirectX12Mesh::AddMesh(SharedPtr<ISubMesh> subMesh)
 	{
 		if (subMesh == nullptr)

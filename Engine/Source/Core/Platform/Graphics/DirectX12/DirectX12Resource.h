@@ -85,9 +85,9 @@ namespace JG
 		ComPtr<ID3D12Resource> mD3DResource;
 		EComputeBufferState mState = EComputeBufferState::Wait;
 		void* mCPU      = nullptr;
-		u64 mBufferSize = 0;
+		u64   mBufferSize = 0;
 	public:
-		virtual ~DirectX12ComputeBuffer() = default;
+		virtual ~DirectX12ComputeBuffer();
 	public:
 		virtual void SetData(u64 btSize) override;
 		virtual bool GetData(void** out_data) override;
@@ -99,6 +99,8 @@ namespace JG
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
+	protected:
+		void Reset();
 	private:
 		friend class DirectX12Computer;
 		void ReserveCompletion();

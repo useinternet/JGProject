@@ -53,12 +53,13 @@ namespace JG
 		virtual String GetLayerName() override;
 	public:
 		bool ResponseSaveGameWorld(RequestSaveGameWorldEvent& e);
-		bool ResponseLoadGameWorld(RequestLoadGameWorldEvent& e);
 		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
 	public:
 
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
+		void LoadGameWorld();
+		void DeleteGameWorld();
 	};
 }

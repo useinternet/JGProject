@@ -7,8 +7,8 @@ namespace JG
 	class Collision : public GameComponent
 	{
 		JGCLASS
-	protected:
-
+	public:
+		virtual ~Collision() = default;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;

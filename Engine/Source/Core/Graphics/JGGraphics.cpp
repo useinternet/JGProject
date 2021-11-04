@@ -264,6 +264,16 @@ namespace JG
 		Scene::~Scene()
 		{
 			sm_CommandIDQueue.push(mCommandID);
+			for (auto& t : mTargetTextures)
+			{
+				t.reset();
+				t = nullptr;
+			}
+			for (auto& t : mTargetDepthTextures)
+			{
+				t.reset();
+				t = nullptr;
+			}
 		}
 		bool Scene::SetSceneInfo(const SceneInfo& info)
 		{
@@ -275,7 +285,7 @@ namespace JG
 			{
 				InitRenderer(info.RenderPath);
 			}
-			if (mTargetTextures.empty() || mSceneInfo.Resolution != info.Resolution)
+			if (mTargetTextures.empty() || mSceneInfo.Resolution != info.Resolution || mSceneInfo.ClearColor != info.ClearColor)
 			{
 				InitTexture(info.Resolution, info.ClearColor);
 			}
@@ -425,10 +435,12 @@ namespace JG
 			mainTexInfo.MipLevel   = 1;
 			mainTexInfo.ClearColor = clearColor;
 
+			i32 index = 0;
 			for (auto& t : mTargetTextures)
 			{
-				if (t == nullptr) t = ITexture::Create(GetName() + "_TargetTexture", mainTexInfo);
+				if (t == nullptr) t = ITexture::Create(GetName() + std::to_string(mCommandID) + "_TargetTexture_" + std::to_string(index), mainTexInfo);
 				else t->SetTextureInfo(mainTexInfo);
+				++index;
 
 			}
 

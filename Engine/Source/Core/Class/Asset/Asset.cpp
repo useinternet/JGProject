@@ -1089,8 +1089,19 @@ namespace JG
 			}
 			else
 			{
+				if (unLoadData.Asset->GetAssetID().IsOrigin())
+				{
+					JG_CORE_INFO("UnLoad Asset : {0}", unLoadData.Asset->GetAssetPath());
+
+				}
+				else
+				{
+					JG_CORE_INFO("UnLoad ReadWrite Asset : {0}", unLoadData.Asset->GetAssetPath());
+				}
 				unLoadData.Asset.reset();
 				unLoadData.Asset = nullptr;
+
+		
 			}
 
 			++loopCnt;

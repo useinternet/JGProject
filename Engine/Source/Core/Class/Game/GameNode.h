@@ -19,6 +19,7 @@ namespace JG
 		bool mIsActiveSelf = true;
 		bool mIsActive     = true;
 		bool mIsAlive = true;
+		bool mIsAwake = false;
 		bool mIsRunStart = false;
 		Transform* mTransform = nullptr;
 	
@@ -53,8 +54,8 @@ namespace JG
 			auto obj = GameObjectFactory::GetInstance().CreateObject<T>();
 			obj->mOwnerNode = this;
 			obj->mGameWorld = mGameWorld;
-			mComponents.push_back(obj);
 			static_cast<IGameObject*>(obj)->Awake();
+			mComponents.push_back(obj);
 			return obj;
 		}
 		GameComponent* AddComponent(const Type& type);

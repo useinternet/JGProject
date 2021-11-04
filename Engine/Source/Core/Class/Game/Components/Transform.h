@@ -44,6 +44,8 @@ namespace JG
 
 		mutable bool mIsInvDirty = true;
 	public:
+		virtual ~Transform() = default;
+	public:
 		void SetLocalLocation(const JVector3& location);
 		void SetLocalRotation(const JVector3& rotation);
 		void SetLocalScale(const JVector3& scale);

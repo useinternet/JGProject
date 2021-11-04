@@ -7,6 +7,10 @@ namespace JG
 {
 	AssetManager::~AssetManager()
 	{
+		for (auto& asset : mAssetPool)
+		{
+			AssetDataBase::GetInstance().UnLoadAsset(asset.first);
+		}
 		mAssetPool.clear();
 	}
 	EAssetFormat AssetManager::GetAssetFormat(const String& path)

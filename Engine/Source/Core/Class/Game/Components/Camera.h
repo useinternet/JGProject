@@ -13,6 +13,7 @@ namespace JG
 	class Camera : public GameComponent
 	{
 		static Camera* smMainCamera;
+		static Camera* smEditorCamera;
 	public:
 		static Camera* GetMainCamera();
 		static void SetMainCamera(Camera* mainCamera);
@@ -48,6 +49,8 @@ namespace JG
 		SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
 		SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
 		SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
+	public:
+		virtual ~Camera() = default;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
@@ -93,8 +96,6 @@ namespace JG
 	protected:
 		virtual void UpdateProj() const;
 		void UpdateView() const;
-	public:
-		virtual ~Camera() = default;
 	protected:
 		virtual void OnChange(const ChangeData& data) override;
 		virtual void OnInspectorGUI() override;

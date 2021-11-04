@@ -13,6 +13,8 @@ namespace JG
 	class ISubMesh : public GraphicsCommandable
 	{
 	public:
+		virtual ~ISubMesh() = default;
+	public:
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) = 0;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer)    = 0;
 
@@ -30,6 +32,8 @@ namespace JG
 	};
 	class IMesh : public GraphicsCommandable
 	{
+	public:
+		virtual ~IMesh() = default;
 	public:
 		virtual void SetMeshStock(const StaticMeshAssetStock& stock);
 		virtual void AddMesh(SharedPtr<ISubMesh> subMesh) = 0;

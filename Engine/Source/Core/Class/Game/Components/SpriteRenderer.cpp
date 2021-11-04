@@ -11,11 +11,6 @@ namespace JG
 	{
 		BaseRenderer::Awake();
 		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SpriteRenderer::PushRenderSceneObject));
-
-		if (mSprite == nullptr)
-		{
-			SetSprite("Asset/Resources/NullTexture.jgasset");
-		}
 	}
 	void SpriteRenderer::Start()
 	{
@@ -127,7 +122,7 @@ namespace JG
 
 	EScheduleResult SpriteRenderer::PushRenderSceneObject()
 	{
-		if (IsActive() == false || mSprite == nullptr || mSprite->IsValid() == false)
+		if (IsActive() == false)
 		{
 			return EScheduleResult::Continue;
 		}
@@ -137,25 +132,28 @@ namespace JG
 
 		if (mSprite && mSprite->Get()->IsValid())
 		{
-			auto info = mSprite->Get()->GetTextureInfo();
 			sceneObject->Texture = mSprite->Get();
-			f32 adjust = (f32)info.PixelPerUnit / (f32)GameSettings::GetUnitSize();
-			f32 spriteWidth = info.Width * adjust;
-			f32 spriteHeight = info.Height * adjust;
-
-			if (mSpriteSize.x != spriteWidth || mSpriteSize.y != spriteHeight)
-			{
-				JBBox bbox;
-				bbox.min = JVector3(-spriteWidth * 0.5f, -spriteHeight * 0.5f, 0.0f);
-				bbox.max = JVector3(spriteWidth * 0.5f, spriteHeight * 0.5f, 0.0f);
-				GetOwner()->SetPickingBoundingBox(bbox);
-				mSpriteSize = JVector2(spriteWidth, spriteHeight);
-
-			}
-			sceneObject->WorldMatrix = JMatrix::Scaling(JVector3(spriteWidth, spriteHeight, 1)) * sceneObject->WorldMatrix;
+		}
+		else
+		{
+			sceneObject->Texture = ITexture::NullTexture();
 		}
 
+		auto info = sceneObject->Texture->GetTextureInfo();
+		f32 adjust = (f32)info.PixelPerUnit / (f32)GameSettings::GetUnitSize();
+		f32 spriteWidth = info.Width * adjust;
+		f32 spriteHeight = info.Height * adjust;
 
+		if (mSpriteSize.x != spriteWidth || mSpriteSize.y != spriteHeight)
+		{
+			JBBox bbox;
+			bbox.min = JVector3(-spriteWidth * 0.5f, -spriteHeight * 0.5f, 0.0f);
+			bbox.max = JVector3(spriteWidth * 0.5f, spriteHeight * 0.5f, 0.0f);
+			GetOwner()->SetPickingBoundingBox(bbox);
+			mSpriteSize = JVector2(spriteWidth, spriteHeight);
+
+		}
+		sceneObject->WorldMatrix = JMatrix::Scaling(JVector3(spriteWidth, spriteHeight, 1)) * sceneObject->WorldMatrix;
 		GetGameWorld()->PushRenderSceneObject(sceneObject);
 		return EScheduleResult::Continue;
 

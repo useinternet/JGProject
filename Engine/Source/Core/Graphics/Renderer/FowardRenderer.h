@@ -14,7 +14,9 @@ namespace JG
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Foward; }
 		virtual int ArrangeObject(const ObjectInfo& info) override;
 	private:
+		void Ready(IGraphicsAPI* api, const RenderInfo& info);
 		void Draw(int objectType, const List<ObjectInfo>& objectList);
+
 
 	};
 }

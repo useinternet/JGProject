@@ -38,6 +38,7 @@ namespace JG
 	{
 		friend class Application;
 	private:
+		std::mutex mMutex;
 		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
 		JGGraphicsDesc mDesc;
@@ -59,6 +60,7 @@ namespace JG
 		template<class T, class ...Args>
 		T* CreateGObject(const String& name, Args&& ... args)
 		{
+			std::lock_guard<std::mutex> lock(mMutex);
 			auto gobj = CreateUniquePtr<T>(std::forward<Args>(args)...);
 			gobj->SetName(name);
 			
@@ -68,6 +70,7 @@ namespace JG
 		}
 		void RemoveObject(Graphics::GObject* gobj)
 		{
+			std::lock_guard<std::mutex> lock(mMutex);
 			mObjectPool.erase(gobj);
 		}
 		void Init();
@@ -194,6 +197,8 @@ namespace JG
 			JMatrix	WorldMatrix;
 			u64     Layer = 0;
 		public:
+			virtual ~SceneObject() = default;
+		public:
 			virtual ESceneObjectType GetSceneObjectType() const = 0;
 			virtual bool IsValid() const = 0;
 		};
@@ -205,6 +210,8 @@ namespace JG
 			Color  Color = Color::White();
 			SharedPtr<ITexture> Texture = nullptr;
 		public:
+			virtual ~PaperObject() = default;
+		public:
 			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Paper; }
 			virtual bool IsValid() const override { return true; }
 		};
@@ -215,6 +222,8 @@ namespace JG
 		public:
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
+		public:
+			virtual ~StaticRenderObject() = default;
 		public:
 			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Static; }
 			virtual bool IsValid() const override { 
@@ -249,6 +258,8 @@ namespace JG
 		/// Light ///
 		class Light 
 		{
+		public:
+			virtual ~Light() = default;
 		protected:
 			void PushData(List<jbyte>& btData, void* data, u64 size) {
 				u64 offset = btData.size();
@@ -266,6 +277,8 @@ namespace JG
 		//
 		class PointLight : public Light
 		{
+		public:
+			virtual ~PointLight() = default;
 		public:
 			JVector3 Color;
 			JVector3 Position;

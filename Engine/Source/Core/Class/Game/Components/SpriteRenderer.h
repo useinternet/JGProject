@@ -9,7 +9,7 @@ namespace JG
 	private:
 		//SharedPtr<Standard2DRenderItem> mSpriteRI;
 
-		Color mColor;
+		Color mColor = Color::White();
 		JVector2 mSpriteSize;
 		Asset<ITexture>* mSprite = nullptr;
 		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle = nullptr;

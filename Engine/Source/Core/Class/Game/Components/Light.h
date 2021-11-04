@@ -8,6 +8,8 @@ namespace JG
 	class Light : public GameComponent
 	{
 		JGCLASS
+	public:
+		virtual ~Light() = default;
 	protected:
 		virtual void Start() override;
 		virtual void Destory() override;

@@ -6,8 +6,13 @@
 namespace JG
 {
 	Camera* Camera::smMainCamera = nullptr;
+	Camera* Camera::smEditorCamera = nullptr;
 	Camera* Camera::GetMainCamera()
 	{
+		if (smMainCamera == nullptr)
+		{
+			return smEditorCamera;
+		}
 		return smMainCamera;
 	}
 	void Camera::SetMainCamera(Camera* mainCamera)
@@ -27,34 +32,35 @@ namespace JG
 		SetOrthographic(true);
 		SetResolution(GameSettings::GetResolution());
 
-		if (smMainCamera == nullptr)
+
+
+		if (GetType() == JGTYPE(EditorCamera))
 		{
-			SetMainCamera(this);
+			smEditorCamera = this;
 		}
 
 
 
-	}
-
-	void Camera::Start()
-	{
-		GameComponent::Start();
 		UpdateGraphicsScene();
-		mRenderingScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
-		mRenderFinishScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
+		mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
+		mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
 		mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
 		{
 			UpdateGraphicsScene();
 			return EScheduleResult::Continue;
 		});
 	}
+
+	void Camera::Start()
+	{
+		GameComponent::Start();
+		
+
+	}
 	void Camera::Update()
 	{
 		GameComponent::Update();
-		if (smMainCamera == nullptr)
-		{
-			SetMainCamera(this);
-		}
+
 	}
 	void Camera::Destory()
 	{

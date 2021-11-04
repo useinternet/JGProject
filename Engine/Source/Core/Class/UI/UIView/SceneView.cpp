@@ -110,7 +110,13 @@ namespace JG
 
 
 		auto mainCam = Camera::GetMainCamera();
-		bool isOrth = mainCam->IsOrthographic();
+		bool isOrth = true;
+		if (mainCam != nullptr)
+		{
+			isOrth = mainCam->IsOrthographic();
+
+		}
+
 		if (isOrth) mCurrentCameraMode = CameraMode_2D;
 		else mCurrentCameraMode = CameraMode_3D;
 

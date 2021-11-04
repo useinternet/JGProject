@@ -7,12 +7,22 @@ namespace JG
 
 	FowardRenderer::FowardRenderer()
 	{
-		PushDrawFunc(std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2));
+		AddDrawFunc(
+			std::bind(&FowardRenderer::Ready, this, std::placeholders::_1, std::placeholders::_2),
+			std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
 	int FowardRenderer::ArrangeObject(const ObjectInfo& info)
 	{
 		return 0;
+	}
+
+	void FowardRenderer::Ready(IGraphicsAPI* api, const RenderInfo& info)
+	{
+		api->SetViewports(GetCommandID(), { Viewport(info.Resolutoin.x, info.Resolutoin.y) });
+		api->SetScissorRects(GetCommandID(), { ScissorRect(0,0, info.Resolutoin.x,info.Resolutoin.y) });
+		api->ClearRenderTarget(GetCommandID(), { info.TargetTexture }, info.TargetDepthTexture);
+		api->SetRenderTarget(GetCommandID(), { info.TargetTexture }, info.TargetDepthTexture);
 	}
 
 	void FowardRenderer::Draw(int objectType, const List<ObjectInfo>& objectList)

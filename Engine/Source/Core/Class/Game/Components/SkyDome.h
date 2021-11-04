@@ -20,6 +20,8 @@ namespace JG
 
 		SharedPtr<IMesh> mMesh = nullptr;
 		SharedPtr<IMaterial> mMaterial = nullptr;
+	public:
+		virtual ~SkyDome() = default;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;

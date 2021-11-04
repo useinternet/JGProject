@@ -33,6 +33,8 @@ namespace JG
 		bool mIsCompileSuccess = false;
 		List<std::pair<EShaderDataType, String>> mPropertyList;
 	public:
+		virtual ~DirectX12Shader() = default;
+	public:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
 		virtual bool Bind() override;
 	public:

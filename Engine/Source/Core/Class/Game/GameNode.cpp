@@ -22,6 +22,11 @@ namespace JG
 		if (mIsAlive == false) return;
 		for (auto& com : mComponents)
 		{
+			//if (com->mIsAwake == false)
+			//{
+			//	com->Awake();
+			//	com->mIsAwake = true;
+			//}
 			if (com->IsActive())
 			{
 				if (com->mIsRunStart == false)
@@ -35,6 +40,11 @@ namespace JG
 
 		for (auto& child : mChilds)
 		{
+			//if (child->mIsAwake == false)
+			//{
+			//	child->Awake();
+			//	child->mIsAwake = true;
+			//}
 			if (child->IsActive())
 			{
 				if (child->mIsRunStart == false)

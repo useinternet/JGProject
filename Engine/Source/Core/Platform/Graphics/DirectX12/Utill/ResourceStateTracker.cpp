@@ -193,8 +193,16 @@ namespace JG
 		}
 		else
 		{
+			if ((*iter).second.Name != name)
+			{
+				JG_CORE_CRITICAL("Add Counting Resource : {0}   Ref : {1}", gResourceRefMap[d3dResource].Name, gResourceRefMap[d3dResource].RefCount);
+			}
 			(*iter).second.RefCount += 1;
 		
+		}
+		if (gResourceRefMap[d3dResource].Name == "1_TargetTexture_1" && gResourceRefMap[d3dResource].RefCount == 2)
+		{
+			int n = 0;
 		}
 		JG_CORE_TRACE("Add Counting Resource : {0}   Ref : {1}", gResourceRefMap[d3dResource].Name, gResourceRefMap[d3dResource].RefCount);
 	}

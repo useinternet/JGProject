@@ -21,7 +21,10 @@ namespace JG
 		GameNode*  mOwnerNode = nullptr;
 		GameWorld* mGameWorld = nullptr;
 		bool mIsActive = true;
+		bool mIsAwake = false;
 		bool mIsRunStart = false;
+	public:
+		virtual ~GameComponent() = default;
 	protected:
 		virtual void Start() override;
 		virtual void Destory() override;

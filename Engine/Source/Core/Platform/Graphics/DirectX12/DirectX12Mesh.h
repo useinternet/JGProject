@@ -12,6 +12,8 @@ namespace JG
 		String mName;
 		u64 mInstanceCount = 1;
 	public:
+		virtual ~DirectX12SubMesh() = default;
+	public:
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) override;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer) override;
 
@@ -31,6 +33,8 @@ namespace JG
 		SharedPtr<InputLayout> mInputLayout;
 		JBBox mBoundingBox;
 		String mName;
+	public:
+		virtual ~DirectX12Mesh() = default;
 	public:
 		virtual void AddMesh(SharedPtr<ISubMesh> subMesh) override;
 		virtual void SetBoundingBox(const JBBox& boundingBox) override;

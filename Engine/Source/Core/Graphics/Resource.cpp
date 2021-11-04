@@ -81,7 +81,7 @@ namespace JG
 					stock.LoadJson(val);
 
 					gNullTexture = ITexture::Create(nullTexturePath);
-					gNullTexture->SetTextureMemory((const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels);
+					gNullTexture->SetTextureMemory((const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
 				}
 				else
 				{

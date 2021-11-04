@@ -28,7 +28,17 @@ namespace JG
 	void SkyDome::Destory()
 	{
 		GameComponent::Destory();
+		if (mMesh != nullptr)
+		{
+			mMesh.reset();
+			mMesh = nullptr;
 
+		}
+		if (mMaterial != nullptr)
+		{
+			mMaterial.reset();
+			mMaterial = nullptr;
+		}
 	}
 
 	SharedPtr<IRenderItem> SkyDome::PushRenderItem()

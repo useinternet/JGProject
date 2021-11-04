@@ -43,7 +43,9 @@ namespace JG
 		JVector3 mGravity;
 	public:
 		GameWorld();
+		virtual ~GameWorld() = default;
 	protected:
+		virtual void Awake()  override;
 		virtual void Update() override;
 		virtual void LateUpdate() override;
 		virtual void Destory() override;

@@ -136,6 +136,7 @@ namespace JG
 #ifdef JG_EDITOR
 	EScheduleResult PointLight::PushDebugRenderItem()
 	{
+		
 		auto debugObject = CreateSharedPtr<Graphics::PaperObject>();
 
 

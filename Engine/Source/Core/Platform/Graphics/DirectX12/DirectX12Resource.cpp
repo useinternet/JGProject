@@ -260,17 +260,16 @@ namespace JG
 	}
 
 
+	DirectX12ComputeBuffer::~DirectX12ComputeBuffer()
+	{
+		Reset();
+	}
+
 	void DirectX12ComputeBuffer::SetData(u64 btSize)
 	{
 		if (mD3DResource != nullptr && mBufferSize != btSize)
 		{
-			mD3DResource->Unmap(0, nullptr);
-			mCPU        = nullptr;
-			mBufferSize = 0;
-			mState = EComputeBufferState::Wait;
-			ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
-			mD3DResource.Reset();
-			mD3DResource = nullptr;
+			Reset();
 		}
 
 		mBufferSize = btSize;
@@ -317,6 +316,19 @@ namespace JG
 	EComputeBufferState DirectX12ComputeBuffer::GetState() const
 	{
 		return mState;
+	}
+	void DirectX12ComputeBuffer::Reset()
+	{
+		if (mD3DResource)
+		{
+			mD3DResource->Unmap(0, nullptr);
+			mCPU = nullptr;
+			mBufferSize = 0;
+			mState = EComputeBufferState::Wait;
+			ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
+			mD3DResource.Reset();
+			mD3DResource = nullptr;
+		}
 	}
 	void DirectX12ComputeBuffer::ReserveCompletion()
 	{
@@ -623,7 +635,7 @@ namespace JG
 
 	DirectX12Texture::~DirectX12Texture()
 	{
-		
+		Reset();
 	}
 
 	void DirectX12Texture::SetName(const String& name)

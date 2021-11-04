@@ -34,10 +34,11 @@ namespace JG
 			LateUpdate();
 			return EScheduleResult::Continue;
 		});
-
-
-
 		mPxSceneHandle = PhysicsManager::GetInstance().CreatePxScene();
+	}
+	void GameWorld::Awake()
+	{
+		GameNode::Awake();
 	}
 	void GameWorld::Update()
 	{
@@ -154,6 +155,7 @@ namespace JG
 			scene->PushLight(lightObject);
 		}
 	}
+
 	void GameWorld::RegisterGraphicsScene(Graphics::Scene* scene)
 	{
 		mGraphicsSceneSet.insert(scene);

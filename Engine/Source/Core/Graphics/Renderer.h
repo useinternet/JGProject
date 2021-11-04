@@ -20,6 +20,7 @@ namespace JG
 
 namespace JG
 {
+	class IGraphicsAPI;
 	class IRenderContext;
 	class InputLayout;
 	class IShader;
@@ -64,17 +65,14 @@ namespace JG
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		};
-		using DrawFunc     = std::function<void(int, const List<ObjectInfo>&)>;
-
+		using DrawFunc      = std::function<void(int, const List<ObjectInfo>&)>;
+		using ReadyDrawFunc = std::function<void(IGraphicsAPI*, const RenderInfo& info)>;
 	private:
 		List<SharedPtr<RenderBatch>> mBatchList;
-		List<SharedPtr<ITexture>>     mRenderTarges;
-
-
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int, List<ObjectInfo>> mObjectInfoListDic;
 		List<DrawFunc> mDrawFuncList;
-
+		List<ReadyDrawFunc> mReadyDrawFuncList;
 
 		RenderInfo mCurrentRenderInfo;
 	public:
@@ -92,7 +90,7 @@ namespace JG
 	protected:
 		const RenderInfo& GetRenderInfo() const;
 		const Dictionary<Graphics::ELightType, LightInfo>& GetLightInfos() const;
-		void PushDrawFunc(const DrawFunc& func);
+		void AddDrawFunc(const ReadyDrawFunc& readyFunc, const DrawFunc& drawFunc);
 	protected:
 		virtual int ArrangeObject(const ObjectInfo& info) = 0;
 	};

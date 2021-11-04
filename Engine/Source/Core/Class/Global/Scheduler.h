@@ -36,10 +36,11 @@ namespace JG
 
 			// System
 			OnGUI			  = 1000000,
-			DestroyObject	  = 2000000,
+			DestroyObject     = 2000000,
 			EndSystem		  = 10000000,
-			Graphics_RenderFinish = EndSystem + 1,
-			Graphics_EndFrame	  = EndSystem + 2,
+
+			Graphics_RenderFinish = EndSystem + 2,
+			Graphics_EndFrame	  = EndSystem + 3,
 		};
 	};
 	enum class EScheduleState

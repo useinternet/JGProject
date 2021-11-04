@@ -12,6 +12,8 @@ namespace JG
 	class ITexture;
 	class IShader : public GraphicsCommandable
 	{
+	public:
+		virtual ~IShader() = default;
 	protected:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
 		virtual bool Bind() = 0;
@@ -44,6 +46,8 @@ namespace JG
 	private:
 		String mName;
 		String mCode;
+	public:
+		virtual ~MaterialScript() = default;
 	public:
 		MaterialScript(const String& name, const String& code) : mName(name), mCode(code) {}
 	public:
