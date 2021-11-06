@@ -12,6 +12,8 @@ namespace JG
 		virtual void Start()   override;
 		virtual void Destory() override;
 	public:
+		virtual ~GlobalGameSystem() = default;
+	public:
 		virtual void OnInspectorGUI() override;
 	};
 
@@ -24,6 +26,8 @@ namespace JG
 		friend class GameObject;
 		friend class GameWorld;
 		GameWorld* mGameWorld = nullptr;
+	public:
+		virtual ~GameSystem() = default;
 	protected:
 		virtual void Start()   override;
 		virtual void Destory() override;

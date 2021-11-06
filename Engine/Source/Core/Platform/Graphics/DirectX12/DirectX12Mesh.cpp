@@ -54,12 +54,14 @@ namespace JG
 
 
 		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
+		dx12VBuffer->SetCommandID(GetCommandID());
 		dx12VBuffer->Bind();
 		commandList->FlushVertexBuffer();
 
 
 
 		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
+		dx12IBuffer->SetCommandID(GetCommandID());
 		dx12IBuffer->Bind();
 
 		return true;
@@ -125,9 +127,14 @@ namespace JG
 		{
 			return false;
 		}
-		auto pso = DirectX12API::GetGraphicsPipelineState();
+		auto pso = DirectX12API::GetGraphicsPipelineState(GetCommandID());
 		pso->BindInputLayout(*mInputLayout);
 		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+
+		for (auto& mesh : mSubMeshList)
+		{
+			mesh->SetCommandID(GetCommandID());
+		}
 		return true;
 	}
 

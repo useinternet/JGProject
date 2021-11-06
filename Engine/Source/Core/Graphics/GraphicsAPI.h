@@ -51,9 +51,9 @@ namespace JG
 		virtual void DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 		// State
 
-		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
-		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
-		virtual void SetRasterizerState(ERasterizerStateTemplate _template) = 0;
+		virtual void SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template) = 0;
+		virtual void SetBlendState(u64 commandID, u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
+		virtual void SetRasterizerState(u64 commandID, ERasterizerStateTemplate _template) = 0;
 
 		// Create Resource
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;

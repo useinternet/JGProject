@@ -29,6 +29,8 @@ namespace JG
 		Queue<u64> mIDQueue;
 		Dictionary<u64, SharedPtr<Timer>> mTimers;
 	public:
+		virtual ~TimerManager() = default;
+	public:
 		void Update();
 	private:
 		SharedPtr<Timer> CreateTimer();

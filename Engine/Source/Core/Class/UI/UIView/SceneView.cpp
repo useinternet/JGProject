@@ -169,6 +169,9 @@ namespace JG
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<NotifyChangeMainSceneTextureEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeMainSceneTexture));
 		dispatcher.Dispatch<NotifySelectedGameNodeInEditorEvent>(EVENT_BIND_FN(&SceneView::ResponseSelectedGameNodeInEditor));
+
+		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&SceneView::ResponseDestroyGameObject));
+		dispatcher.Dispatch<NotifyChangeGameWorldEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeGameWorld));
 	}
 	void SceneView::OnGUI_Top()
 	{
@@ -340,7 +343,8 @@ namespace JG
 		winSize.y -= 18.0f;
 		auto sceneTexture = GetSceneTexture();
 		auto mainCam = Camera::GetMainCamera();
-		if (sceneTexture && sceneTexture->IsValid())
+		
+		if (mainCam && sceneTexture && sceneTexture->IsValid())
 		{
 			JVector2 imageSize;
 
@@ -467,6 +471,19 @@ namespace JG
 	bool SceneView::ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e)
 	{
 		SetSceneTexture(e.SceneTexture);
+		return false;
+	}
+	bool SceneView::ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e)
+	{
+		if (GetSelectedGameNode() == e.DestroyedObject)
+		{
+			SetSelectedGameNode(nullptr);
+		}
+		return false;
+	}
+	bool SceneView::ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e)
+	{
+		SetSelectedGameNode(nullptr);
 		return false;
 	}
 	String SceneView::ResolutionToString(i32 resolution)

@@ -22,6 +22,7 @@ namespace JG
 		rapidjson::Value mValue = rapidjson::Value(rapidjson::kObjectType);
 	public:
 		JsonData(Json* json, bool isRoot = false) : mJson(json), mIsRoot(isRoot) {}
+		virtual ~JsonData() = default;
 	public:
 		SharedPtr<JsonData> CreateJsonData() const {
 			return CreateSharedPtr<JsonData>(mJson);
@@ -333,6 +334,7 @@ namespace JG
 
 	public:
 		Json() : JsonData(this, true) {}
+		virtual ~Json() = default;
 		rapidjson::Document::AllocatorType& GetAllocator() {
 			return mDoc.GetAllocator();
 		}

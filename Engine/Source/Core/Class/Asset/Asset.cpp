@@ -531,7 +531,7 @@ namespace JG
 		if (mAssetLoadScheduleHandle == nullptr)
 		{
 			mAssetLoadScheduleHandle = 
-				Scheduler::GetInstance().ScheduleByFrame(0, 1, -1, SchedulePriority::EndSystem, SCHEDULE_BIND_FN(&AssetDataBase::LoadAsset_Update));
+				Scheduler::GetInstance().ScheduleByFrame(0, 1, -1, SchedulePriority::AssetDataBase_Update, SCHEDULE_BIND_FN(&AssetDataBase::LoadAsset_Update));
 			mMaxLoadAssetDataCount = (Scheduler::GetInstance().GetThreadCount() / 3) * 2;
 			mAyncLoadAssetHandleList.resize(mMaxLoadAssetDataCount);
 		}
@@ -786,12 +786,13 @@ namespace JG
 			return false;
 		}
 		EAssetFormat assetFormat = EAssetFormat::None;
-		auto json = CreateSharedPtr<Json>();
-		if (ReadAsset(assetPath.string(), &assetFormat, &json) == false)
+		LoadData->Json = CreateSharedPtr<Json>();
+
+		if (ReadAsset(assetPath.string(), &assetFormat, &LoadData->Json) == false)
 		{
 			return false;
 		}
-		auto assetVal = json->GetMember(JG_ASSET_KEY);
+		auto assetVal = LoadData->Json->GetMember(JG_ASSET_KEY);
 		if (assetVal == nullptr)
 		{
 			return false;
@@ -821,152 +822,155 @@ namespace JG
 		}
 		case EAssetFormat::Material:
 		{
-			MaterialAssetStock stock;
-			stock.LoadJson(assetVal);
-			auto shader = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
-			if (shader != nullptr)
-			{
-				auto materialAsset = LoadData->Asset->As<Asset<IMaterial>>();
-				if (materialAsset == nullptr)
-				{
-					return false;
-				}
-				materialAsset->mData->SetShader(shader);
+			LoadData->Stock      = CreateSharedPtr<MaterialAssetStock>();
+			LoadData->OnComplete = std::bind(&AssetDataBase::MaterialAsset_OnCompelete, this, std::placeholders::_1);
+			LoadData->Stock->LoadJson(assetVal);
+			//MaterialAssetStock stock;
+			//stock.LoadJson(assetVal);
+			//auto shader = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
+			//if (shader != nullptr)
+			//{
+			//	auto materialAsset = LoadData->Asset->As<Asset<IMaterial>>();
+			//	if (materialAsset == nullptr)
+			//	{
+			//		return false;
+			//	}
+			//	materialAsset->mData->SetShader(shader);
 
-				for (auto& _pair : stock.MaterialDatas)
-				{
-					auto name  = _pair.first;
-					auto type  = _pair.second.first;
-					auto value = _pair.second.second;
-					switch (type)
-					{
-					case JG::EShaderDataType::_int:
-					{
-						i32 int_value = value->GetInt32();
-						if (materialAsset->mData->SetInt(name, int_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Int", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_int2:
-					{
-						JVector2Int int2_value = value->GetVector2Int();
-						if (materialAsset->mData->SetInt2(name, int2_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Int2", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_int3:
-					{
-						JVector3Int int3_value = value->GetVector3Int();
-						if (materialAsset->mData->SetInt3(name, int3_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Int3", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_int4:
-					{
-						JVector4Int int4_value = value->GetVector4Int();
-						if (materialAsset->mData->SetInt4(name, int4_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Int4", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_uint:
-					{
-						u32 uint_value = value->GetUint32();
-						if (materialAsset->mData->SetUint(name, uint_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_uint2:
-					{
-						JVector2Uint uint2_value = value->GetVector2Uint();
-						if (materialAsset->mData->SetUint2(name, uint2_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint2", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_uint3:
-					{
-						JVector3Uint uint3_value = value->GetVector3Uint();
-						if (materialAsset->mData->SetUint3(name, uint3_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint3", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_uint4:
-					{
-						JVector4Uint uint4_value = value->GetVector4Uint();
-						if (materialAsset->mData->SetUint4(name, uint4_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Uint4", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_float:
-					{
-						f32 f32_value = value->GetFloat();
-						if (materialAsset->mData->SetFloat(name, f32_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Float", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_float2:
-					{
-						JVector2 float2_value = value->GetVector2();
-						if (materialAsset->mData->SetFloat2(name, float2_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Float2", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_float3:
-					{
-						JVector3 float3_value = value->GetVector3();
-						if (materialAsset->mData->SetFloat3(name, float3_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Float3", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::_float4:
-					{
-						JVector4 float4_value = value->GetVector4();
-						if (materialAsset->mData->SetFloat4(name, float4_value) == false)
-						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
-						}
-					}
-						break;
-					case JG::EShaderDataType::texture2D:
-					{
-						auto textureAsset = LoadOriginAsset(value->GetString());
+			//	for (auto& _pair : stock.MaterialDatas)
+			//	{
+			//		auto name  = _pair.first;
+			//		auto type  = _pair.second.first;
+			//		auto value = _pair.second.second;
+			//		switch (type)
+			//		{
+			//		case JG::EShaderDataType::_int:
+			//		{
+			//			i32 int_value = value->GetInt32();
+			//			if (materialAsset->mData->SetInt(name, int_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Int", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_int2:
+			//		{
+			//			JVector2Int int2_value = value->GetVector2Int();
+			//			if (materialAsset->mData->SetInt2(name, int2_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Int2", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_int3:
+			//		{
+			//			JVector3Int int3_value = value->GetVector3Int();
+			//			if (materialAsset->mData->SetInt3(name, int3_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Int3", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_int4:
+			//		{
+			//			JVector4Int int4_value = value->GetVector4Int();
+			//			if (materialAsset->mData->SetInt4(name, int4_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Int4", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_uint:
+			//		{
+			//			u32 uint_value = value->GetUint32();
+			//			if (materialAsset->mData->SetUint(name, uint_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Uint", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_uint2:
+			//		{
+			//			JVector2Uint uint2_value = value->GetVector2Uint();
+			//			if (materialAsset->mData->SetUint2(name, uint2_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Uint2", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_uint3:
+			//		{
+			//			JVector3Uint uint3_value = value->GetVector3Uint();
+			//			if (materialAsset->mData->SetUint3(name, uint3_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Uint3", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_uint4:
+			//		{
+			//			JVector4Uint uint4_value = value->GetVector4Uint();
+			//			if (materialAsset->mData->SetUint4(name, uint4_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Uint4", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_float:
+			//		{
+			//			f32 f32_value = value->GetFloat();
+			//			if (materialAsset->mData->SetFloat(name, f32_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Float", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_float2:
+			//		{
+			//			JVector2 float2_value = value->GetVector2();
+			//			if (materialAsset->mData->SetFloat2(name, float2_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Float2", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_float3:
+			//		{
+			//			JVector3 float3_value = value->GetVector3();
+			//			if (materialAsset->mData->SetFloat3(name, float3_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Float3", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::_float4:
+			//		{
+			//			JVector4 float4_value = value->GetVector4();
+			//			if (materialAsset->mData->SetFloat4(name, float4_value) == false)
+			//			{
+			//				JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
+			//			}
+			//		}
+			//			break;
+			//		case JG::EShaderDataType::texture2D:
+			//		{
+			//			auto textureAsset = LoadOriginAsset(value->GetString());
 
-						if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
-						{
-							auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
-							if (materialAsset->mData->SetTexture(name, 0, t) == false)
-							{
-								JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
-							}
-						}
-					}
-						break;
-					default:
-						break;
-					}
-				}
-			}
+			//			if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
+			//			{
+			//				auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
+			//				if (materialAsset->mData->SetTexture(name, 0, t) == false)
+			//				{
+			//					JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", LoadData->Path, name);
+			//				}
+			//			}
+			//		}
+			//			break;
+			//		default:
+			//			break;
+			//		}
+			//	}
+			//}
 			break;
 		}
 		case EAssetFormat::GameWorld:
@@ -974,7 +978,7 @@ namespace JG
 			auto gwAsset = LoadData->Asset->As<Asset<GameWorld>>();
 			if (gwAsset != nullptr)
 			{
-				gwAsset->mData = json;
+				gwAsset->mData = LoadData->Json;
 			}
 			break;
 		}
@@ -1052,6 +1056,7 @@ namespace JG
 					{
 						data.Asset = _LoadData->Asset;
 						data.Stock = _LoadData->Stock;
+						data.Json  = _LoadData->Json;
 					}
 					data.OnComplete = _LoadData->OnComplete;
 					{
@@ -1127,6 +1132,157 @@ namespace JG
 		auto textureStock = static_cast<TextureAssetStock*>(data->Stock.get());
 		textureStock->Name = data->Asset->GetAssetPath();
 		textureAsset->mData->SetTextureMemory((const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
+	}
+
+	void AssetDataBase::MaterialAsset_OnCompelete(AssetLoadCompeleteData* data)
+	{
+		if (data == nullptr || data->Stock == nullptr || data->Asset == nullptr)
+		{
+			return;
+		}
+		auto materialAsset = static_cast<Asset<IMaterial>*>(data->Asset.get());
+		auto materialStock = static_cast<MaterialAssetStock*>(data->Stock.get());
+		materialStock->Name = data->Asset->GetAssetPath();
+
+		auto shader = ShaderLibrary::GetInstance().GetShader(materialStock->ShaderTemplate, { materialStock->ShaderScript });
+		if (shader != nullptr)
+		{
+			materialAsset->mData->SetShader(shader);
+
+			for (auto& _pair : materialStock->MaterialDatas)
+			{
+				auto name = _pair.first;
+				auto type = _pair.second.first;
+				auto value = _pair.second.second;
+				switch (type)
+				{
+				case JG::EShaderDataType::_int:
+				{
+					i32 int_value = value->GetInt32();
+					if (materialAsset->mData->SetInt(name, int_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Int", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_int2:
+				{
+					JVector2Int int2_value = value->GetVector2Int();
+					if (materialAsset->mData->SetInt2(name, int2_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Int2", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_int3:
+				{
+					JVector3Int int3_value = value->GetVector3Int();
+					if (materialAsset->mData->SetInt3(name, int3_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Int3", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_int4:
+				{
+					JVector4Int int4_value = value->GetVector4Int();
+					if (materialAsset->mData->SetInt4(name, int4_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Int4", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_uint:
+				{
+					u32 uint_value = value->GetUint32();
+					if (materialAsset->mData->SetUint(name, uint_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_uint2:
+				{
+					JVector2Uint uint2_value = value->GetVector2Uint();
+					if (materialAsset->mData->SetUint2(name, uint2_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint2", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_uint3:
+				{
+					JVector3Uint uint3_value = value->GetVector3Uint();
+					if (materialAsset->mData->SetUint3(name, uint3_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint3", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_uint4:
+				{
+					JVector4Uint uint4_value = value->GetVector4Uint();
+					if (materialAsset->mData->SetUint4(name, uint4_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint4", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_float:
+				{
+					f32 f32_value = value->GetFloat();
+					if (materialAsset->mData->SetFloat(name, f32_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Float", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_float2:
+				{
+					JVector2 float2_value = value->GetVector2();
+					if (materialAsset->mData->SetFloat2(name, float2_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Float2", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_float3:
+				{
+					JVector3 float3_value = value->GetVector3();
+					if (materialAsset->mData->SetFloat3(name, float3_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Float3", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::_float4:
+				{
+					JVector4 float4_value = value->GetVector4();
+					if (materialAsset->mData->SetFloat4(name, float4_value) == false)
+					{
+						JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+					}
+				}
+				break;
+				case JG::EShaderDataType::texture2D:
+				{
+					auto textureAsset = LoadOriginAsset(value->GetString());
+
+					if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
+					{
+						auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
+						if (materialAsset->mData->SetTexture(name, 0, t) == false)
+						{
+							JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+						}
+					}
+				}
+				break;
+				default:
+					break;
+				}
+			}
+		}
 	}
 
 	bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const

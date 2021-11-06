@@ -84,7 +84,7 @@ namespace JG
 			JG_CORE_ERROR("Failed Bind Shader : is not Compiled Shader ");
 			return false;
 		}
-		auto RootSig = DirectX12API::GetRootSignature();
+		auto RootSig = DirectX12API::GetRootSignature(GetCommandID());
 		RootSig->Reset();
 
 		for (auto& rpPair : mShaderDataForm->RootParamMap)
@@ -209,7 +209,7 @@ namespace JG
 		commandList->BindRootSignature(RootSig);
 
 
-		auto PSO = DirectX12API::GetGraphicsPipelineState();
+		auto PSO = DirectX12API::GetGraphicsPipelineState(GetCommandID());
 		PSO->BindRootSignature(*RootSig);
 		PSO->BindShader(*this);
 	}
@@ -234,7 +234,7 @@ namespace JG
 		commandList->BindRootSignature(RootSig);
 
 
-		auto PSO = DirectX12API::GetComputePipelineState();
+		auto PSO = DirectX12API::GetComputePipelineState(GetCommandID());
 		PSO->BindRootSignature(*RootSig);
 		PSO->BindShader(*this);
 	}

@@ -67,7 +67,7 @@ namespace JG
 		bool mIsLoadIcons = false;
 	public:
 		UIManager();
-		~UIManager();
+		virtual ~UIManager();
 	public:
 		Asset<ITexture>* GetIcon(const String& iconName);
 		void SetClipBoard(u64 ID, void* data, u64 size);

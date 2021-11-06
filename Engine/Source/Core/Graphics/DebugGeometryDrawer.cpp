@@ -29,7 +29,7 @@ namespace JG
 		vBuffer->SetData(vertices.data(), sizeof(JGDebugVertex), vertices.size());
 		iBuffer->SetData(indices.data(), indices.size());
 
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem + 1000,
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject,
 			[&]() -> EScheduleResult
 		{
 			if (mDebugMaterial == nullptr)
@@ -46,10 +46,10 @@ namespace JG
 
 
 
-			auto ri = CreateSharedPtr<DebugRenderItem>();
-			ri->WorldMatrix = JMatrix::Identity();
-			ri->Material = mDebugMaterial;
-			ri->Mesh = mMesh;
+			//auto ri = CreateSharedPtr<DebugRenderItem>();
+			//ri->WorldMatrix = JMatrix::Identity();
+			//ri->Material = mDebugMaterial;
+			//ri->Mesh = mMesh;
 		
 			//RequestPushRenderItemEvent e;
 			//e.RenderItem = ri;

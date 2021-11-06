@@ -463,6 +463,10 @@ namespace JG
 
 	bool WorldHierarchyView::ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e)
 	{
+		if (mGameWorld == e.DestroyedObject)
+		{
+			mGameWorld = nullptr;
+		}
 		if (mTargetGameNode == e.DestroyedObject)
 		{
 			mTargetGameNode = nullptr;

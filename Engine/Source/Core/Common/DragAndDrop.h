@@ -13,6 +13,7 @@ namespace JG
 	{
 		JGCLASS
 	public:
+		virtual ~IDragAndDropData() = default;
 		virtual void GetData(List<jbyte>& byteData) = 0;
 		virtual void SetData(void* data) = 0;
 	};
@@ -23,6 +24,7 @@ namespace JG
 	public:
 		String FilePath;
 	public:
+		virtual ~DDDContentsFile() = default;
 		virtual void GetData(List<jbyte>& byteData) override
 		{
 			u64 offset = 0;
@@ -53,8 +55,10 @@ namespace JG
 	{
 		JGCLASS
 	public:
+
 		List<GameNode*> GameNodeList;
 	public:
+		virtual ~DDDGameNode() = default;
 		virtual void GetData(List<jbyte>& byteData) override
 		{
 			u64 offset = 0;

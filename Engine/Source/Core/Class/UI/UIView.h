@@ -170,6 +170,8 @@ namespace JG
 	{
 		JGCLASS
 	public:
+		virtual ~ContextUIView() = default;
+	public:
 		virtual EPopupType GetPopupType() { return EPopupType::Context; }
 	};
 
@@ -177,6 +179,8 @@ namespace JG
 	class ModalUIView : public PopupUIView<ModalInitData>
 	{
 		JGCLASS
+	public:
+		virtual ~ModalUIView() = default;
 	public:
 		virtual EPopupType GetPopupType() { return EPopupType::Modal; }
 	};

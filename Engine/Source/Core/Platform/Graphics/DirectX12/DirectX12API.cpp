@@ -34,9 +34,19 @@ namespace JG
 	static const u64 gFrameBufferCount = 3;
 	static u64       gFrameBufferIndex = 0;
 
-	static SharedPtr<GraphicsPipelineState> gGracphisPSO;
-	static SharedPtr<ComputePipelineState>  gComputePSO;
-	static SharedPtr<RootSignature> gRootSignature;
+	std::mutex gGraphicsPSOMutex;
+	std::mutex gComputePSOMutex;
+	std::mutex gRootSigMutex;
+
+
+	static Dictionary<u64, SharedPtr<GraphicsPipelineState>> gGraphicsPSOs;
+	static Dictionary<u64, SharedPtr<ComputePipelineState>>  gComputePSOs;
+	static Dictionary<u64, SharedPtr<RootSignature>> gRootSignatures;
+	//static SharedPtr<GraphicsPipelineState> gGracphisPSO;
+	//static SharedPtr<ComputePipelineState>  gComputePSO;
+	//static SharedPtr<RootSignature> gRootSignature;
+
+	static std::mutex gDeviceMutex;
 
 	EGraphicsAPI DirectX12API::GetAPI() const
 	{
@@ -106,19 +116,34 @@ namespace JG
 		return static_cast<CopyCommandList*>(gCopyCommandQueue->RequestCommandList(ID));
 	}
 
-	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState()
+	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState(u64 ID)
 	{
-		return gGracphisPSO;
+		std::lock_guard<std::mutex> lock(gGraphicsPSOMutex);
+		if (gGraphicsPSOs[ID] == nullptr)
+		{
+			gGraphicsPSOs[ID] = CreateSharedPtr<GraphicsPipelineState>();
+		}
+		return gGraphicsPSOs[ID];
 	}
 
-	SharedPtr<ComputePipelineState> DirectX12API::GetComputePipelineState()
+	SharedPtr<ComputePipelineState> DirectX12API::GetComputePipelineState(u64 ID)
 	{
-		return gComputePSO;
+		std::lock_guard<std::mutex> lock(gComputePSOMutex);
+		if (gComputePSOs[ID] == nullptr)
+		{
+			gComputePSOs[ID] = CreateSharedPtr<ComputePipelineState>();
+		}
+		return gComputePSOs[ID];
 	}
 
-	SharedPtr<RootSignature> DirectX12API::GetRootSignature()
+	SharedPtr<RootSignature> DirectX12API::GetRootSignature(u64 ID)
 	{
-		return gRootSignature;
+		std::lock_guard<std::mutex> lock(gRootSigMutex);
+		if (gRootSignatures[ID] == nullptr)
+		{
+			gRootSignatures[ID] = CreateSharedPtr<RootSignature>();
+		}
+		return gRootSignatures[ID];
 	}
 
 	void DirectX12API::GetDepthStencilDesc(EDepthStencilStateTemplate _template, D3D12_DEPTH_STENCIL_DESC* out)
@@ -191,6 +216,36 @@ namespace JG
 		}
 	}
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> DirectX12API::CreateCommittedResource(
+		const String& name,
+		const D3D12_HEAP_PROPERTIES* pHeapProperties, 
+		D3D12_HEAP_FLAGS HeapFlags, 
+		const D3D12_RESOURCE_DESC* pDesc,
+		D3D12_RESOURCE_STATES InitialResourceState, 
+		const D3D12_CLEAR_VALUE* pOptimizedClearValue)
+	{
+		Microsoft::WRL::ComPtr<ID3D12Resource> resultResource;
+		HRESULT hResult = S_OK;
+		{
+			std::lock_guard<std::mutex> lock(gDeviceMutex);
+			hResult = gDevice->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, IID_PPV_ARGS(resultResource.GetAddressOf()));
+		}
+		if (SUCCEEDED(hResult))
+		{
+			ResourceStateTracker::RegisterResource(name, resultResource.Get(), InitialResourceState);
+		}
+		return resultResource;
+	}
+
+	void DirectX12API::DestroyCommittedResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource)
+	{
+		if (resource == nullptr)
+		{
+			return;
+		}
+		ResourceStateTracker::UnRegisterResource(resource.Get());
+	}
+
 
 
 	bool DirectX12API::Create()
@@ -237,9 +292,9 @@ namespace JG
 		gCopyCommandQueue     = CreateUniquePtr<CommandQueue>(gFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
 
 
-		gGracphisPSO   = CreateSharedPtr<GraphicsPipelineState>();
-		gComputePSO    = CreateSharedPtr<ComputePipelineState>();
-		gRootSignature = CreateSharedPtr<RootSignature>();
+		//gGracphisPSO   = CreateSharedPtr<GraphicsPipelineState>();
+		//gComputePSO    = CreateSharedPtr<ComputePipelineState>();
+		//gRootSignature = CreateSharedPtr<RootSignature>();
 
 		JG_CORE_INFO("DirectX12 Init End");
 		return true;
@@ -249,9 +304,9 @@ namespace JG
 	void DirectX12API::Destroy()
 	{
 		Flush();
-		gGracphisPSO.reset(); gGracphisPSO = nullptr;
-		gComputePSO.reset(); gComputePSO = nullptr;
-		gRootSignature.reset(); gRootSignature = nullptr;
+		gGraphicsPSOs.clear();
+		gComputePSOs.clear(); 
+		gRootSignatures.clear(); 
 
 		for (auto& _pair : gFrameBuffers)
 		{
@@ -360,7 +415,7 @@ namespace JG
 	void DirectX12API::SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
 	{
 		auto commandList = GetGraphicsCommandList(commandID);
-		auto pso = GetGraphicsPipelineState();
+		auto pso = GetGraphicsPipelineState(commandID);
 		List<DXGI_FORMAT> rtFormats;
 		DXGI_FORMAT dsFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
 
@@ -405,31 +460,31 @@ namespace JG
 	void DirectX12API::DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
 	{
 		auto commandList = GetGraphicsCommandList(commandID);
-
-		if (gGracphisPSO->Finalize() == false)
+		auto pso = GetGraphicsPipelineState(commandID);
+		if (pso->Finalize() == false)
 		{
 			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
 			return;
 		}
-		commandList->BindPipelineState(gGracphisPSO);
+		commandList->BindPipelineState(pso);
 		commandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
 	}
 
-	void DirectX12API::SetDepthStencilState(EDepthStencilStateTemplate _template)
+	void DirectX12API::SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template)
 	{
-		auto pso = GetGraphicsPipelineState();
+		auto pso = GetGraphicsPipelineState(commandID);
 		D3D12_DEPTH_STENCIL_DESC desc = {};
 		GetDepthStencilDesc(_template, &desc);
 		pso->SetDepthStencilState(desc);
 	}
 
-	void DirectX12API::SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template)
+	void DirectX12API::SetBlendState(u64 commandID, u32 renderTargetSlot, EBlendStateTemplate _template)
 	{
 		if (renderTargetSlot >= MAX_RENDERTARGET)
 		{
 			return;
 		}
-		auto pso = GetGraphicsPipelineState();
+		auto pso = GetGraphicsPipelineState(commandID);
 		auto blendDesc = pso->GetBlendDesc();
 		D3D12_RENDER_TARGET_BLEND_DESC desc = {};
 
@@ -438,9 +493,9 @@ namespace JG
 		pso->SetBlendState(blendDesc);
 	}
 
-	void DirectX12API::SetRasterizerState(ERasterizerStateTemplate _template)
+	void DirectX12API::SetRasterizerState(u64 commandID, ERasterizerStateTemplate _template)
 	{
-		auto pso = GetGraphicsPipelineState();
+		auto pso = GetGraphicsPipelineState(commandID);
 
 		D3D12_RASTERIZER_DESC desc = {};
 		GetRasterizerDesc(_template, &desc);

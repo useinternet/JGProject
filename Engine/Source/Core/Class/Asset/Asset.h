@@ -212,6 +212,8 @@ namespace JG
 		u64  ID     = ASSET_NULL_ID;
 		char ResourcePath[256] = { 0, };
 	public:
+		virtual ~AssetID() = default;
+	public:
 		u64 GetID() const {
 			return ID;
 		}
@@ -259,11 +261,14 @@ namespace JG
 	};
 
 
+
+	class IMaterial;
 	class AssetInspectorGUI
 	{
 		template<class T>
 		friend class Asset;
-
+	public:
+		virtual ~AssetInspectorGUI() = default;
 	private:
 		static void InspectorGUI(IAsset* targetAsset);
 	private:
@@ -364,6 +369,7 @@ namespace JG
 			Set(assetID, assetPath);
 			mData = nullptr;
 		}
+		~Asset() = default;
 		void Set(AssetID assetID, const String& assetPath)
 		{
 			fs::path p(assetPath);
@@ -409,8 +415,6 @@ namespace JG
 		virtual void OnInspectorGUI() override {
 			AssetInspectorGUI::InspectorGUI(this);
 		}
-	public:
-		virtual ~Asset() = default;
 	private:
 		virtual SharedPtr<IAsset> Copy() const override {
 			auto asset = CreateSharedPtr<Asset<GameWorld>>(mAssetID, mAssetFullPath);
@@ -455,8 +459,9 @@ namespace JG
 		public:
 			AssetID ID;
 			char Path[256] = { 0, };
-			SharedPtr<IAsset> Asset = nullptr;
+			SharedPtr<IAsset>      Asset = nullptr;
 			SharedPtr<IAssetStock> Stock = nullptr;
+			SharedPtr<Json>        Json = nullptr;
 			std::function<void(AssetLoadCompeleteData*)> OnComplete;
 
 		};
@@ -464,6 +469,7 @@ namespace JG
 		struct AssetLoadCompeleteData
 		{
 			AssetID ID;
+			SharedPtr<Json>   Json  = nullptr;
 			SharedPtr<IAsset> Asset = nullptr;
 			SharedPtr<IAssetStock> Stock = nullptr;
 			std::function<void(AssetLoadCompeleteData*)> OnComplete;
@@ -535,6 +541,7 @@ namespace JG
 		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);
+		void MaterialAsset_OnCompelete(AssetLoadCompeleteData* data);
 	public:
 
 		bool WriteAsset(const String& path, EAssetFormat format, SharedPtr<Json> json);

@@ -49,7 +49,7 @@ namespace JG
 
 
 
-
+		
 		ImGui::End();
 		if (mOpenGUI == false)
 		{
@@ -107,20 +107,42 @@ namespace JG
 		case Category_Input: Input_OnGUI(); break;
 		}
 
+
+
+		auto windowSize = ImGui::GetWindowSize();
+		auto padding    = ImGui::GetStyle().FramePadding;
+		auto buttonSize = ImVec2(100, 40);
+		ImGui::SetCursorPos(ImVec2(windowSize.x - buttonSize.x - padding.x, windowSize.y - buttonSize.y - padding.y));
+		if (ImGui::Button("Save", buttonSize) == true)
+		{
+			ProjectSetting::GetInstance().Save();
+		}
 		ImGui::EndChild();
 	}
 	void ProjectSettingView::StartSetting_OnGUI()
 	{
+		String startGameWorld = ProjectSetting::GetInstance().GetStartGameWorldPath();
+
+
+
 
 		ImGui::Text("Start Project"); 
 		ImGui::Separator();
 		ImGui::AlignTextToFramePadding();
-		char str[128] = { 0, };
-		ImGui::Text("Start GameWorld : "); ImGui::SameLine(); 
-		ImGui::InputText("##...", str, 128); ImGui::SameLine();
-		ImGui::Button("...");
+		ImGui::Text("Start GameWorld : "); ImGui::SameLine();
 
 
+
+
+		char temp[256] = { 0, };
+		strcpy(temp, startGameWorld.c_str());
+		ImGui::InputText("##...", temp, 256);
+
+
+
+
+
+		ProjectSetting::GetInstance().SetStartGameWorldPath(temp);
 	}
 	void ProjectSettingView::Input_OnGUI()
 	{
@@ -168,19 +190,6 @@ namespace JG
 	}
 	void ProjectSettingView::LoadConfig()
 	{
-		auto configPath = CombinePath(Application::GetConfigPath(), "ProjectSettings.json");
-		mProjectSettingsJson = CreateSharedPtr<Json>();
-
-
-		//if (fs::exists(configPath) == false)
-		//{
-		//	for (auto& category : mCategoryList)
-		//	{
-		//		category.JsonData = configPath.
-		//	}
-
-
-		//}
 
 
 		

@@ -1,0 +1,5 @@
+{
+    "StartSettings": {
+        "StartGameWorld": "Asset/Engine/TestGameWorld.jgasset"
+    }
+}

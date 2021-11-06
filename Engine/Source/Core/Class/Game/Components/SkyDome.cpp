@@ -9,6 +9,10 @@
 #include "Class/Game/Components/Camera.h"
 namespace JG
 {
+	SkyDome::~SkyDome()
+	{
+
+	}
 	void SkyDome::Awake()
 	{
 		GameComponent::Awake();
@@ -19,7 +23,7 @@ namespace JG
 		mMaterial->SetFloat3("CenterColor", JVector3(0.0f, 0.5f, 0.8f));
 		mMaterial->SetDepthStencilState(EDepthStencilStateTemplate::LessEqual);
 		mMaterial->SetRasterizerState(ERasterizerStateTemplate::Cull_None);
-
+		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SkyDome::PushRenderSceneObject));
 	}
 	void SkyDome::Start()
 	{
@@ -28,40 +32,11 @@ namespace JG
 	void SkyDome::Destory()
 	{
 		GameComponent::Destory();
-		if (mMesh != nullptr)
+		if (mPushRenderSceneObjectScheduleHandle != nullptr)
 		{
-			mMesh.reset();
-			mMesh = nullptr;
-
-		}
-		if (mMaterial != nullptr)
-		{
-			mMaterial.reset();
-			mMaterial = nullptr;
+			mPushRenderSceneObjectScheduleHandle->Reset();
 		}
 	}
-
-	SharedPtr<IRenderItem> SkyDome::PushRenderItem()
-	{
-		if (mMaterial == nullptr || (mMesh == nullptr || mMesh->IsValid() == false))
-			return nullptr;
-
-		auto ri = CreateSharedPtr<StandardStaticMeshRenderItem>();
-		JVector3 radius;
-		JVector3 location;
-		auto mainCam = Camera::GetMainCamera();
-		if (mainCam)
-		{
-			f32 farZ = mainCam->GetFarZ() * 0.4f;
-			radius = JVector3(farZ, farZ, farZ);
-			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
-		}
-		ri->WorldMatrix = JMatrix::Scaling(radius) *JMatrix::Translation(location);
-		ri->Materials.push_back(mMaterial);
-		ri->Mesh = mMesh;
-		return ri;
-	}
-
 	void SkyDome::Update()
 	{
 		GameComponent::Update();
@@ -90,6 +65,28 @@ namespace JG
 	{
 		GameComponent::OnInspectorGUI();
 
+	}
+
+	EScheduleResult SkyDome::PushRenderSceneObject()
+	{
+		if (mMaterial == nullptr || (mMesh == nullptr || mMesh->IsValid() == false))
+			return EScheduleResult::Continue;
+
+		auto sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
+		JVector3 radius;
+		JVector3 location;
+		auto mainCam = Camera::GetMainCamera();
+		if (mainCam)
+		{
+			f32 farZ = mainCam->GetFarZ() * 0.4f;
+			radius = JVector3(farZ, farZ, farZ);
+			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
+		}
+		sceneObject->WorldMatrix = JMatrix::Scaling(radius) * JMatrix::Translation(location);
+		sceneObject->MaterialList.push_back(mMaterial);
+		sceneObject->Mesh = mMesh;
+		GetGameWorld()->PushRenderSceneObject(sceneObject);
+		return EScheduleResult::Continue;
 	}
 
 	void SkyDome::CreateGeometry()

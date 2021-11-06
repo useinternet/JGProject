@@ -17,6 +17,8 @@ namespace JG
 		List<ISubscriber*> mSubscriberList;
 		List<Function> mFunctionList;
 	public:
+		virtual ~CommandBase() = default;
+	public:
 		void Subscribe(ISubscriber* subscriber, const Function& func)
 		{
 			mSubscriberList.push_back(subscriber);
@@ -48,6 +50,8 @@ namespace JG
 	class ICommand
 	{
 	public:
+		virtual ~ICommand() = default;
+	public:
 		virtual void Execute(Args... args) = 0;
 	};
 
@@ -55,6 +59,8 @@ namespace JG
 	template<class ... Args>
 	class Command : public CommandBase<Args...>, public ICommand<Args...>
 	{
+	public:
+		virtual ~Command() = default;
 	public:
 		virtual void Execute(Args... args) override
 		{
@@ -74,6 +80,8 @@ namespace JG
 	class CommandProperty : public CommandBase<T>
 	{
 		T Value;
+	public:
+		virtual ~CommandProperty() = default;
 	public:
 		void SetValue(const T& value)
 		{

@@ -20,6 +20,7 @@ namespace JG
 			bool IsSuccessed = false;
 		public:
 			LoadGameWorldData(const String& path) : Path(path) {}
+			virtual ~LoadGameWorldData() = default;
 		};
 		class SaveGameWorldData : public IJGObject
 		{
@@ -29,11 +30,13 @@ namespace JG
 			GameWorld* GameWorld = nullptr;
 			SharedPtr<Json> Json = nullptr;
 			bool IsSuccessed = false;
+		public:
+			virtual ~SaveGameWorldData() = default;
 		};
 
 
 
-		SharedPtr<IAsset> mGameWorldAssetInstance = nullptr;
+		String mGameWorldAssetPath;
 		GameWorld* mGameWorld = nullptr;
 		List<GlobalGameSystem*> mGameSystemList;
 
@@ -53,9 +56,8 @@ namespace JG
 		virtual String GetLayerName() override;
 	public:
 		bool ResponseSaveGameWorld(RequestSaveGameWorldEvent& e);
+		bool ResponseLoadGameWorld(RequestLoadGameWorldEvent& e);
 		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
-	public:
-
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();

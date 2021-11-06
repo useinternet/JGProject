@@ -31,8 +31,6 @@ namespace JG
 		};
 	private:
 		bool mOpenGUI = true;
-
-		SharedPtr<Json> mProjectSettingsJson = nullptr;
 		Category mCategoryList[Category_Count];
 		Asset<ITexture>* mIcons[Icon_Count];
 		i32 mCurrentCategory = 0;

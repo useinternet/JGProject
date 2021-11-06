@@ -34,7 +34,7 @@ namespace JG
 
 
 
-		if (GetType() == JGTYPE(EditorCamera))
+		if (GetType() == JGTYPE(EditorCamera) && smEditorCamera == nullptr)
 		{
 			smEditorCamera = this;
 		}
@@ -54,7 +54,10 @@ namespace JG
 	void Camera::Start()
 	{
 		GameComponent::Start();
-		
+		//if (mIsMainCamera == true)
+		//{
+		//	SetMainCamera(this);
+		//}
 
 	}
 	void Camera::Update()
@@ -68,6 +71,10 @@ namespace JG
 		if (smMainCamera == this)
 		{
 			smMainCamera = nullptr;
+		}
+		if (smEditorCamera == this)
+		{
+			smEditorCamera = nullptr;
 		}
 		if (mScene != nullptr)
 		{
@@ -443,7 +450,7 @@ namespace JG
 		mSceneResultInfo = mScene->FetchResultFinish();
 		if (mSceneResultInfo != nullptr)
 		{
-			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid())
+			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid() && this == GetMainCamera())
 			{
 				NotifyChangeMainSceneTextureEvent e;
 				e.SceneTexture = mSceneResultInfo->Texture;

@@ -430,7 +430,7 @@ namespace JG
 		{
 			return false;
 		}
-		auto pso = DirectX12API::GetGraphicsPipelineState();
+		auto pso = DirectX12API::GetGraphicsPipelineState(GetCommandID());
 		pso->SetDepthStencilState(mDepthStencilDesc);
 		pso->SetBlendState(mBlendDesc);
 		pso->SetRasterizerState(mRasterzerDesc);

@@ -19,6 +19,8 @@ namespace JG
 		friend class GameObjectFactory;
 		friend class GameLogicSystemLayer;
 	public:
+		virtual ~IGameObject() = default;
+	public:
 		virtual void Awake() = 0;
 		virtual void Start()   = 0;
 		virtual void Destory() = 0;

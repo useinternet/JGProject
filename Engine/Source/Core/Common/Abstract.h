@@ -24,6 +24,8 @@ namespace JG
 			smInstance = nullptr;
 		}
 	public:
+		virtual ~GlobalSingleton() = default;
+	public:
 		static bool IsValid()
 		{
 			return smInstance != nullptr;
@@ -36,58 +38,6 @@ namespace JG
 
 	template<class T, class ...Args>
 	T* GlobalSingleton<T, Args...>::smInstance = nullptr;
-
-
-	//template<class T>
-	//class CustomWeakPtr
-	//{
-	//protected:
-	//	T*            mPtr = nullptr;
-	//	WeakPtr<bool> mIsValid;
-	//public:
-	//	CustomWeakPtr(T* ptr) : mPtr(ptr)
-	//	{
-	//		ConstructorImpl();
-	//	}
-	//	CustomWeakPtr(const CustomWeakPtr& copy)
-	//	{
-	//		mPtr = copy.mPtr;
-	//		mIsValid = copy.mIsValid;
-	//	}
-	//	CustomWeakPtr& operator=(const CustomWeakPtr& copy)
-	//	{
-	//		mPtr = copy.mPtr;
-	//		mIsValid = copy.mIsValid;
-	//		return *this;
-	//	}
-	//	T* operator->()
-	//	{
-	//		return mPtr;
-	//	}
-	//	~CustomWeakPtr()
-	//	{
-	//		DestructorImpl();
-	//	}
-	//	bool IsValid() const
-	//	{
-	//		auto _bool = mIsValid.lock();
-	//		if (_bool)
-	//		{
-	//			return *(_bool.get());
-	//		}
-	//		return false;
-	//	}
-	//private:
-	//	CustomWeakPtr(CustomWeakPtr&& rhs) = delete;
-	//	CustomWeakPtr& operator=(CustomWeakPtr&& rhs) = delete;
-
-	//protected:
-	//	//bool 
-	//	virtual void ConstructorImpl() = 0;
-	//	virtual void DestructorImpl() = 0;
-	//};
-
-
 
 
 	template<class FactoryClass, class InterfaceClass, i32 BufferCount>
@@ -105,22 +55,19 @@ namespace JG
 			Scheduler::GetInstance().ScheduleByFrame(0, 3, -1, SchedulePriority::DestroyObject, [&]() -> EScheduleResult
 			{
 				auto& currQueue = mReservedDestroyObjectQueue[mQueueBufferIndex];
-				if (currQueue.empty())
+				if (currQueue.empty() == false)
 				{
-					return EScheduleResult::Continue;
+					while (currQueue.empty() == false)
+					{
+						auto destroyObject = currQueue.front(); currQueue.pop();
+						DestroyObjectImmediate(destroyObject);
+					}
 				}
-
-
-				while (currQueue.empty() == false)
-				{
-					auto destroyObject = currQueue.front(); currQueue.pop();
-					DestroyObjectImmediate(destroyObject);
-				}
-
 				mQueueBufferIndex = (mQueueBufferIndex + 1) % BufferCount;
 				return EScheduleResult::Continue;
 			});
 		}
+		virtual ~ObjectFactory() = default;
 	public:
 		template<class T>
 		T* CreateObject()

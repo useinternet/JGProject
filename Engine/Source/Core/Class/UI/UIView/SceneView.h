@@ -94,6 +94,8 @@ namespace JG
 	private:
 		bool ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e);
 		bool ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e);
+		bool ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e);
+		bool ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e);
 	private:
 		String ResolutionToString(i32 resolution);
 		void LoadIcons();

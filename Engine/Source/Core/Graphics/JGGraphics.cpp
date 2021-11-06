@@ -341,7 +341,6 @@ namespace JG
 				return;
 			}
 			Lock();
-			
 			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
 				RenderInfo info;
@@ -378,6 +377,7 @@ namespace JG
 						}
 
 					}
+
 					mRenderer->End();
 				}
 			});

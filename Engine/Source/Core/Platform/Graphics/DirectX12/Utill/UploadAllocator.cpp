@@ -10,14 +10,12 @@ namespace JG
 		mCPUptr(nullptr),
 		mGPUptr(D3D12_GPU_VIRTUAL_ADDRESS(0))
 	{
-		HRESULT hr = device->CreateCommittedResource(
+		mD3D12Resource = DirectX12API::CreateCommittedResource("UploadAllocator",
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(mPageSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(mD3D12Resource.GetAddressOf()));
-
+			nullptr);
 		mGPUptr = mD3D12Resource->GetGPUVirtualAddress();
 		mD3D12Resource->Map(0, nullptr, &mCPUptr);
 	}
@@ -26,6 +24,9 @@ namespace JG
 		mD3D12Resource->Unmap(0, nullptr);
 		mCPUptr = nullptr;
 		mGPUptr = D3D12_GPU_VIRTUAL_ADDRESS(0);
+		DirectX12API::DestroyCommittedResource(mD3D12Resource);
+		mD3D12Resource.Reset();
+		mD3D12Resource = nullptr;
 	}
 
 	bool UploadAllocator::Page::HasSpace(u64 sizeInBytes, u64 alignment) const

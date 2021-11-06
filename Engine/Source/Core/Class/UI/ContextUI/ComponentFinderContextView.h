@@ -20,6 +20,8 @@ namespace JG
 		String            mFilterStr;
 		HashSet<Type>     mComponentTypeSet;
 		SortedSet<String> mFilteredTypeList;
+	public:
+		virtual ~ComponentFinderContextView() = default;
 	protected:
 		virtual void Initialize(const ComponentFinderInitData& data) override;
 		virtual void Destroy() override;

@@ -25,6 +25,8 @@ namespace JG
 		String mContents;
 
 		bool mIsOpenPopup = false;
+	public:
+		virtual ~ProgressBarModalView() = default;
 	protected:
 		virtual void Initialize(const ProgressBarInitData& data) override;
 		virtual void Destroy() override;

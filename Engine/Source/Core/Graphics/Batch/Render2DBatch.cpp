@@ -191,6 +191,8 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
+
+		mCurrFrameResource->Standard2DMaterial->SetCommandID(GetCommandID());
 		if (mCurrFrameResource->Standard2DMaterial->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind StandardMaterial");

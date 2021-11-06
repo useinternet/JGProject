@@ -21,6 +21,7 @@ namespace JG
 		Dictionary<String, Type> mObjectTypeByName;
 		Dictionary<u64, Type>    mObjectTypeByID;
 	public:
+		virtual ~GameObjectFactory() = default;
 	public:
 		template<class T>
 		void RegisterNodeType()

@@ -51,8 +51,15 @@ namespace JG
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
 		
+		auto gameWorldAssetPath = ProjectSetting::GetInstance().GetStartGameWorldPath();
+		if (gameWorldAssetPath.empty() == false)
+		{
+			RequestLoadGameWorldEvent e;
+			e.AssetPath = gameWorldAssetPath;
+			Application::GetInstance().SendEvent(e);
+		}
 
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_DestroyObject + 1, [&]() -> EScheduleResult
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem, [&]() -> EScheduleResult
 		{
 
 			if (ImGui::IsKeyPressed((i32)EKeyCode::Y))
@@ -80,6 +87,7 @@ namespace JG
 	{
 		EventDispatcher eventDispatcher(e);
 		eventDispatcher.Dispatch<RequestSaveGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseSaveGameWorld));
+		eventDispatcher.Dispatch<RequestLoadGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseLoadGameWorld));
 		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClick));
 	}
 	String GameLogicSystemLayer::GetLayerName()
@@ -92,89 +100,107 @@ namespace JG
 		{
 			return true;
 		}
-		if (mGameWorld == nullptr)
+		if (mGameWorld == nullptr || mGameWorldAssetPath.empty())
 		{
 			return true;
 		}
-		enum
+
+
 		{
-			Task_Seq_WriteJson,
-			Task_Seq_SaveJson,
-		};
-		
+			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save GameWorld"));
 
-		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-		UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save GameWorld"));
-		mSaveGameWorldTaskCtrl = CreateUniquePtr<TaskController>();
-		mSaveGameWorldTaskCtrl->SetPriority(SchedulePriority::EndSystem);
-		mSaveGameWorldTaskCtrl->SetStartID(Task_Seq_WriteJson);
-		mSaveGameWorldTaskCtrl->SetUserData(CreateSharedPtr<SaveGameWorldData>());
-
-		Scheduler::GetInstance().ScheduleOnce(0.15f, 0, [&]() -> EScheduleResult
+			progressBar->Display("Save GameWorld", 0.0f);
+		}
+		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem, [&]()->EScheduleResult
 		{
-			mSaveGameWorldTaskCtrl->AddTask(Task_Seq_WriteJson, nullptr,
-				[&](SharedPtr<IJGObject> userData)
+			auto json = CreateSharedPtr<Json>();
+			auto assetJson = json->CreateJsonData();
+			mGameWorld->MakeJson(assetJson);
+			json->AddMember(JG_ASSET_KEY, assetJson);
+
+
+
+			bool result = AssetDataBase::GetInstance().WriteAsset(mGameWorldAssetPath, EAssetFormat::GameWorld, json);
+
+			if (result == false)
 			{
-				auto data = userData->As<SaveGameWorldData>();
 				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Display("Write Json...", 0.25f);
-				data->GameWorld = mGameWorld;
-				data->Json = CreateSharedPtr<Json>();
-				data->Path = GameWorldPath;
+				UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Save GameWorld"));
+				progressBar->Close();
+			}
 
 
-			}, [&](SharedPtr<IJGObject> userData) -> i32
+			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&]()->EScheduleResult
 			{
-				auto data = userData->As<SaveGameWorldData>();
-
-
-				auto assetJson = data->Json->CreateJsonData();
-				data->GameWorld->MakeJson(assetJson);
-				data->Json->AddMember(JG_ASSET_KEY, assetJson);
-
-
-			
-
-				return Task_Seq_SaveJson;
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Display("Save GameWorld", 1.0f);
+				progressBar->Close();
+				return EScheduleResult::Continue;
 			});
-
-
-			mSaveGameWorldTaskCtrl->AddTask(Task_Seq_SaveJson, nullptr,
-				[&](SharedPtr<IJGObject> userData)
-			{
-
-				auto data = userData->As<SaveGameWorldData>();
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Display("Save Json...", 0.75f);
-
-				data->IsSuccessed = AssetDataBase::GetInstance().WriteAsset(data->Path, EAssetFormat::GameWorld, data->Json);
-
-			}, [&](SharedPtr<IJGObject> userData) -> i32
-			{
-				auto data = userData->As<SaveGameWorldData>();
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Display("Save Compelete", 1.0f);
-
-				Scheduler::GetInstance().ScheduleOnce(1.0f, 0, []()->EScheduleResult
-				{
-					auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-					progressBar->Close();
-					return EScheduleResult::Break;
-				});
-			
-
-				if (data->IsSuccessed == false)
-				{
-					UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Save GameWorld"));
-				}
-				return -1;
-			});
-			mSaveGameWorldTaskCtrl->Run();
-
-			return EScheduleResult::Break;
+			return EScheduleResult::Continue;
 		});
 
+		return true;
+	}
 
+	bool GameLogicSystemLayer::ResponseLoadGameWorld(RequestLoadGameWorldEvent& e)
+	{
+		{
+			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Load GameWorld"));
+
+			progressBar->Display("Load GameWorld", 0.0f);
+		}
+
+
+		
+		mGameWorldAssetPath = e.AssetPath;
+		if (mGameWorld != nullptr)
+		{
+			GameObject::DestoryObject(mGameWorld);
+			mGameWorld = nullptr;
+		}
+		Scheduler::GetInstance().ScheduleOnceByFrame(15, SchedulePriority::EndSystem, [&]()->EScheduleResult
+		{
+			auto json = CreateSharedPtr<Json>();
+			EAssetFormat assetFormat;
+			bool result = AssetDataBase::GetInstance().ReadAsset(mGameWorldAssetPath, &assetFormat, &json);
+			if (assetFormat != EAssetFormat::GameWorld)
+			{
+				result = false;
+			}
+
+
+			if (result == false)
+			{
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Close();
+				UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Load GameWorld"));
+			}
+			mGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
+			mGameWorld->SetGlobalGameSystemList(mGameSystemList);
+			mGameWorld->AddFlags(EGameWorldFlags::All_Update_Lock);
+			auto worldAssetJsonData = json->GetMember(JG_ASSET_KEY);
+			mGameWorld->LoadJson(worldAssetJsonData);
+
+
+			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&]()->EScheduleResult
+			{
+				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+				progressBar->Display("Load GameWorld", 1.0f);
+				progressBar->Close();
+
+				NotifyChangeGameWorldEvent e;
+				e.GameWorld = mGameWorld;
+				Application::GetInstance().SendEvent(e);
+
+				return EScheduleResult::Continue;
+			});
+			return EScheduleResult::Continue;
+		});
+
+		
 		return true;
 	}
 
@@ -224,6 +250,7 @@ namespace JG
 	}
 	void GameLogicSystemLayer::LoadGameWorld()
 	{
+		JGGraphics::GetInstance().Flush();
 		mGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
 		mGameWorld->SetGlobalGameSystemList(mGameSystemList);
 		mGameWorld->AddFlags(EGameWorldFlags::All_Update_Lock);

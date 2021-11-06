@@ -174,7 +174,6 @@ private: \
 	class IAsset;
 	class AssetID;
 
-	NOTIFY_EVENT(NotifyRenderingReadyCompeleteEvent)
 	NOTIFY_ONE_ARG_EVENT(NotifyDestroyJGObjectEvent, IJGObject*, DestroyedObject, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<ITexture>, SceneTexture, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld, nullptr)

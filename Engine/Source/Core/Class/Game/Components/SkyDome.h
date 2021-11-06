@@ -20,14 +20,14 @@ namespace JG
 
 		SharedPtr<IMesh> mMesh = nullptr;
 		SharedPtr<IMaterial> mMaterial = nullptr;
+
+		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle;
 	public:
-		virtual ~SkyDome() = default;
+		virtual ~SkyDome();
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
 		virtual void Destory() override;
-
-		virtual SharedPtr<IRenderItem> PushRenderItem();
 	protected:
 		virtual void Update() override;
 		virtual void LateUpdate() override;
@@ -35,6 +35,7 @@ namespace JG
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 		virtual void OnInspectorGUI() override;
 	private:
+		EScheduleResult SkyDome::PushRenderSceneObject();
 		void CreateGeometry();
 	};
 }

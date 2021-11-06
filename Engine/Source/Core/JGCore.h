@@ -41,7 +41,7 @@
 #include "Class/Global/UIManager.h"
 #include "Class/Global/GameLayerManager.h"
 #include "Class/Global/PhysicsManager.h"
-
+#include "Class/Global/ProjectSetting.h"
 
 #include "ExternalImpl/ImGuiExternal.h"
 

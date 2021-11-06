@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "GameObjectFactory.h"
 #include "Application.h"
+#include "Graphics/JGGraphics.h"
 
 
 namespace JG

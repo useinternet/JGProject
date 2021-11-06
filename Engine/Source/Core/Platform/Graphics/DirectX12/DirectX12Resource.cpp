@@ -29,18 +29,16 @@ namespace JG
 		case EBufferLoadMethod::GPULoad:
 		{
 			Reset();
-			auto d3dDevice = DirectX12API::GetD3DDevice();
-			HRESULT hResult = d3dDevice->CreateCommittedResource(
+			mD3DResource = DirectX12API::CreateCommittedResource(
+				GetName(),
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 				D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
 				D3D12_RESOURCE_STATE_COMMON,
-				nullptr,
-				IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-			if (SUCCEEDED(hResult))
-			{
-				ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_COMMON);
+				nullptr);
 
+			if (mD3DResource)
+			{
 				auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
 				commandList->CopyBuffer(mD3DResource.Get(), datas, elementSize, elementCount);
 			}
@@ -53,17 +51,16 @@ namespace JG
 			}
 			if (mD3DResource == nullptr)
 			{
-				auto d3dDevice = DirectX12API::GetD3DDevice();
-				HRESULT hResult = d3dDevice->CreateCommittedResource(
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
 					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 					D3D12_HEAP_FLAG_NONE,
 					&CD3DX12_RESOURCE_DESC::Buffer(btSize),
 					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-				if (SUCCEEDED(hResult))
+					nullptr
+				);
+				if (mD3DResource)
 				{
-					ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ);
 					mD3DResource->Map(0, nullptr, &mCPUData);
 				}
 			}
@@ -112,25 +109,17 @@ namespace JG
 
 	void DirectX12VertexBuffer::Reset()
 	{
-		switch (mLoadMethod)
+		if (mD3DResource == nullptr)
 		{
-		case EBufferLoadMethod::CPULoad:
-			if (mD3DResource)
-			{
-				mD3DResource->Unmap(0, nullptr);
-				ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
-				mD3DResource.Reset(); mD3DResource = nullptr;
-				mCPUData = nullptr;
-			}
-			break;
-		case EBufferLoadMethod::GPULoad:
-			if (mD3DResource)
-			{
-				ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
-				mD3DResource.Reset(); mD3DResource = nullptr;
-			}
-			break;
+			return;
 		}
+		if (mLoadMethod == EBufferLoadMethod::CPULoad)
+		{
+			mD3DResource->Unmap(0, nullptr);
+			mCPUData = nullptr;
+		}
+		DirectX12API::DestroyCommittedResource(mD3DResource);
+		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
 
@@ -153,18 +142,16 @@ namespace JG
 		case EBufferLoadMethod::GPULoad:
 		{
 			Reset();
-			auto d3dDevice = DirectX12API::GetD3DDevice();
-			HRESULT hResult = d3dDevice->CreateCommittedResource(
+			mD3DResource = DirectX12API::CreateCommittedResource(
+				GetName(),
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 				D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
 				D3D12_RESOURCE_STATE_COMMON,
-				nullptr,
-				IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-			if (SUCCEEDED(hResult))
+				nullptr
+			);
+			if (mD3DResource != nullptr)
 			{
-				ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_COMMON);
-
 				auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
 				commandList->CopyBuffer(mD3DResource.Get(), datas, sizeof(u32), mIndexCount);
 			}
@@ -177,18 +164,18 @@ namespace JG
 			}
 			if (mD3DResource == nullptr)
 			{
-				auto d3dDevice = DirectX12API::GetD3DDevice();
-				HRESULT hResult = d3dDevice->CreateCommittedResource(
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
 					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 					D3D12_HEAP_FLAG_NONE,
 					&CD3DX12_RESOURCE_DESC::Buffer(btSize),
 					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-				if (SUCCEEDED(hResult))
+					nullptr
+				);
+
+				if (mD3DResource)
 				{
-					ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ);
-					hResult = mD3DResource->Map(0, nullptr, (void**)&mCPUData);
+					auto hResult = mD3DResource->Map(0, nullptr, (void**)&mCPUData);
 					if (FAILED(hResult))
 					{
 						JG_CORE_WARN("{0} Buffer Fail Map", GetName());
@@ -238,25 +225,17 @@ namespace JG
 
 	void DirectX12IndexBuffer::Reset()
 	{
-		switch (mLoadMethod)
+		if (mD3DResource == nullptr)
 		{
-		case EBufferLoadMethod::CPULoad:
-			if (mD3DResource)
-			{
-				mD3DResource->Unmap(0, nullptr);
-				ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
-				mD3DResource.Reset(); mD3DResource = nullptr;
-				mCPUData = nullptr;
-			}
-			break;
-		case EBufferLoadMethod::GPULoad:
-			if (mD3DResource)
-			{
-				ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
-				mD3DResource.Reset(); mD3DResource = nullptr;
-			}
-			break;
+			return;
 		}
+		if (mLoadMethod == EBufferLoadMethod::CPULoad)
+		{
+			mD3DResource->Unmap(0, nullptr);
+			mCPUData = nullptr;
+		}
+		DirectX12API::DestroyCommittedResource(mD3DResource);
+		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
 
@@ -275,19 +254,15 @@ namespace JG
 		mBufferSize = btSize;
 		if (mD3DResource == nullptr)
 		{
-			auto d3dDevice = DirectX12API::GetD3DDevice();
-			HRESULT hResult = d3dDevice->CreateCommittedResource(
+			mD3DResource = DirectX12API::CreateCommittedResource(GetName(),
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
 				D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
 				D3D12_RESOURCE_STATE_COPY_DEST,
-				nullptr,
-				IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-
-
-			if (SUCCEEDED(hResult))
+				nullptr
+			);
+			if (mD3DResource != nullptr)
 			{
-				ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_COPY_DEST);
 				mD3DResource->Map(0, nullptr, &mCPU);
 			}
 		}
@@ -325,7 +300,7 @@ namespace JG
 			mCPU = nullptr;
 			mBufferSize = 0;
 			mState = EComputeBufferState::Wait;
-			ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
+			DirectX12API::DestroyCommittedResource(mD3DResource);
 			mD3DResource.Reset();
 			mD3DResource = nullptr;
 		}
@@ -600,7 +575,7 @@ namespace JG
 		{
 			return false;
 		}
-		auto PSO = DirectX12API::GetComputePipelineState();
+		auto PSO = DirectX12API::GetComputePipelineState(GetCommandID());
 		if (PSO->Finalize() == false)
 		{
 			return false;
@@ -702,17 +677,15 @@ namespace JG
 			clearValue->Format = ConvertDXGIFormat(info.Format);
 		}
 
-		
-
-		HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		mD3DResource = DirectX12API::CreateCommittedResource(GetName(),
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 			&rscDesc,
 			D3D12_RESOURCE_STATE_COMMON,
-			clearValue.get(), IID_PPV_ARGS(mD3DResource.GetAddressOf()));
-		if (SUCCEEDED(hResult))
+			clearValue.get());
+
+		if (mD3DResource)
 		{
 			mD3DResource->SetName(s2ws(GetName()).c_str());
-			ResourceStateTracker::RegisterResource(GetName(), mD3DResource.Get(), D3D12_RESOURCE_STATE_COMMON);
 		}
 	}
 	void DirectX12Texture::SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
@@ -762,8 +735,9 @@ namespace JG
 		mDSVs.clear();
 		mSRVs.clear();
 		mUAVs.clear();
-		ResourceStateTracker::UnRegisterResource(mD3DResource.Get());
+		DirectX12API::DestroyCommittedResource(mD3DResource);
 		mD3DResource.Reset();
+		mD3DResource = nullptr;
 	}
 	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetRTV() const
 	{

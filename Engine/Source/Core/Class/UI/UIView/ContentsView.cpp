@@ -930,21 +930,40 @@ namespace JG
 
 	void ContentsView::CreateGameWorld(const String& targetDir)
 	{
-		auto defaultGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
-		defaultGameWorld->AddNode("EditorCamera")->AddComponent<EditorCamera>();
+		static GameWorld* gameWorld = nullptr;
+		if (gameWorld != nullptr)
+		{
+			return;
+		}
+		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem, [&]()->EScheduleResult
+		{
+			gameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
+			gameWorld->AddNode("EditorCamera")->AddComponent<EditorCamera>();
 
-		auto json = CreateSharedPtr<Json>();
-		auto assetJson = json->CreateJsonData();
+			auto json = CreateSharedPtr<Json>();
+			auto assetJson = json->CreateJsonData();
 
-		defaultGameWorld->MakeJson(assetJson);
-		json->AddMember(JG_ASSET_KEY, assetJson);
+			gameWorld->MakeJson(assetJson);
+			json->AddMember(JG_ASSET_KEY, assetJson);
 
-		auto path = CombinePath(targetDir, std::string("NewGameWorld") + JG_ASSET_FORMAT);
-		path = GetUniqueFileName(path);
+			auto path = CombinePath(targetDir, std::string("NewGameWorld") + JG_ASSET_FORMAT);
+			path = GetUniqueFileName(path);
 
-		GameObjectFactory::GetInstance().DestroyObject(defaultGameWorld);
-		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
-		AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::GameWorld, json);
+			
+
+			std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
+			AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::GameWorld, json);
+
+			Scheduler::GetInstance().ScheduleOnceByFrame(10, SchedulePriority::EndSystem, [&]()->EScheduleResult
+			{
+				GameObjectFactory::GetInstance().DestroyObject(gameWorld);
+				gameWorld = nullptr;
+				return EScheduleResult::Continue;
+			});
+	
+			return EScheduleResult::Continue;
+		});
+
 	}
 
 	void ContentsView::CreateSurfaceMaterial(const String& targetDir)

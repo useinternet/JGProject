@@ -14,6 +14,8 @@ namespace JG
 	class AssetFinderContextView : public ContextUIView<AssetFinderInitData>
 	{
 		JGCLASS
+	public:
+		virtual ~AssetFinderContextView() = default;
 	protected:
 		virtual void Initialize(const AssetFinderInitData& data) override;
 		virtual void Destroy() override;

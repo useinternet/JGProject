@@ -35,6 +35,8 @@ namespace JG
 		f32 mBtAreaHeight = 50.0f;
 		f32 mBtWidth = 100.0f;
 		bool mIsOpenPopup = false;
+	public:
+		virtual ~MessageBoxModalView() = default;
 	protected:
 		virtual void Initialize(const MessageBoxInitData& data) override;
 		virtual void Destroy() override;

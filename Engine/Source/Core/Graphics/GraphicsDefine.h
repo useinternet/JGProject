@@ -10,7 +10,7 @@ namespace JG
 {
 #define MAX_RENDERTARGET 8
 #define TEXTURE_ID_NULL  0
-#define MAIN_GRAPHICS_COMMAND_ID 0
+#define MAIN_GRAPHICS_COMMAND_ID 1
 
 	using TextureID = u64;
 
@@ -19,7 +19,7 @@ namespace JG
 		u64 mCommandID = MAIN_GRAPHICS_COMMAND_ID;
 	public:
 		void SetCommandID(u64 id) {
-			mCommandID;
+			mCommandID = id;
 		}
 		u64 GetCommandID() const {
 			return mCommandID;
@@ -322,107 +322,6 @@ namespace JG
 		Viewport(f32 w, f32 h) : Width(w), Height(h) {}
 		Viewport(f32 topLeftX, f32 topLeftY, f32 w, f32 h) {}
 	};
-
-
-
-	// RenderItem
-	// ·»´õ¸µ Á¤º¸
-	class IMesh;
-	class IMaterial;
-	class ITexture;
-
-	class IRenderItem : public IJGObject
-	{
-		JGCLASS
-	public:
-		String  TargetLayer  = "Default";
-		JMatrix WorldMatrix = JMatrix::Identity();
-	public:
-		virtual ~IRenderItem() = default;
-	};
-
-	class Standard2DRenderItem : public IRenderItem
-	{
-		JGCLASS
-	public:
-		Color  Color = Color::White();
-		String SortingLayer = "Default";
-		i64    SortingOrder = 0;
-		SharedPtr<ITexture> Texture = nullptr;
-	public:
-		virtual ~Standard2DRenderItem() = default;
-	};
-
-	class StandardStaticMeshRenderItem : public IRenderItem
-	{
-		JGCLASS
-	public:
-		SharedPtr<IMesh> Mesh = nullptr;
-		List<SharedPtr<IMaterial>> Materials;
-	};
-
-	class StandardSkeletonMeshRenderItem : public IRenderItem
-	{
-		JGCLASS
-	public:
-		SharedPtr<IMesh> Mesh = nullptr;
-		List<SharedPtr<IMaterial>> Materials;
-	};
-
-	class DebugRenderItem : public IRenderItem
-	{
-		JGCLASS
-	public:
-		SharedPtr<IMesh> Mesh         = nullptr;
-		SharedPtr<IMaterial> Material = nullptr;
-		Color Color = Color::White();
-	};
-
-
-
-	// LightItem
-	class ILightItem : public IJGObject
-	{
-		JGCLASS
-	protected:
-		void PushData(List<jbyte>& btData, void* data, u64 size)  {
-			u64 offset = btData.size();
-
-			btData.resize(offset + size);
-			memcpy(&btData[offset], data, size);
-		}
-	public:
-		virtual void PushBtData(List<jbyte>& btData)  = 0;
-		virtual u64 GetBtSize() const = 0;
-	};
-	class PointLightItem : public ILightItem
-	{
-		JGCLASS
-	public:
-		JVector3 Color;
-		JVector3 Position;
-		f32 Intensity = 1.0f;
-		f32 Range = 0.0f;
-		f32 Att0 = 0.0f;
-		f32 Att1 = 0.0f;
-		f32 Att2 = 0.0f;
-	public:
-		virtual void PushBtData(List<jbyte>& btData)  override
-		{
-			PushData(btData , &Position, sizeof(JVector3));
-			PushData(btData , &Range, sizeof(float));
-			PushData(btData , &Color, sizeof(JVector3));
-			PushData(btData , &Intensity, sizeof(float));
-			PushData(btData , &Att0, sizeof(float));
-			PushData(btData , &Att1, sizeof(float));
-			PushData(btData , &Att2, sizeof(float));
-		}
-		virtual u64 GetBtSize() const override {
-			return 44;
-		}
-	};
-
-	
 
 
 

@@ -14,7 +14,9 @@ private: \
 	class IInspectorGUI
 	{
 	public:
+		virtual ~IInspectorGUI() = default;
 		virtual void OnInspectorGUI() = 0;
+	
 	};
 
 	class ISubscriber

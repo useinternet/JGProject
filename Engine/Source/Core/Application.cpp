@@ -95,7 +95,7 @@ namespace JG
 		UIManager::Create();
 		GameLayerManager::Create();
 		AssetDataBase::Create();
-
+		ProjectSetting::Create();
 
 		// TODO
 		// 필요한 멤버 클래스 생성
@@ -201,6 +201,7 @@ namespace JG
 		GameLayerManager::Destroy();
 		AssetDataBase::Destroy();
 		JGGraphics::Destroy();
+		ProjectSetting::Destroy();
 		mWindow->Destroy();
 		mWindow.reset();
 		Scheduler::Destroy();
