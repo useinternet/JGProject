@@ -14,7 +14,7 @@
 #include "Class/Game/Components/PointLight.h"
 #include "Class/Game/Components/Collision.h"
 #include "Class/Game/Components/SkyDome.h"
-
+#include "Dev/Dev.h"
 
 
 #include "Class/Asset/Asset.h"
@@ -38,12 +38,10 @@ namespace JG
 		UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&](){
 
 			if (mGameWorld == nullptr) return;
-
+			if (mIsGamePlaying == true) return;
 
 			RequestSaveGameWorldEvent e;
 			Application::GetInstance().SendEvent(e);
-
-
 
 		}, nullptr);
 
@@ -58,26 +56,6 @@ namespace JG
 			e.AssetPath = gameWorldAssetPath;
 			Application::GetInstance().SendEvent(e);
 		}
-
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::EndSystem, [&]() -> EScheduleResult
-		{
-
-			if (ImGui::IsKeyPressed((i32)EKeyCode::Y))
-			{
-				if (mGameWorld != nullptr)
-				{
-					DeleteGameWorld();
-				}
-				else
-				{
-					LoadGameWorld();
-
-				}
-			
-			}
-
-			return EScheduleResult::Continue;
-		});
 	}
 	void GameLogicSystemLayer::Destroy()
 	{
@@ -88,6 +66,11 @@ namespace JG
 		EventDispatcher eventDispatcher(e);
 		eventDispatcher.Dispatch<RequestSaveGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseSaveGameWorld));
 		eventDispatcher.Dispatch<RequestLoadGameWorldEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseLoadGameWorld));
+
+		eventDispatcher.Dispatch<RequestPlayGameEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponsePlayGame));
+		eventDispatcher.Dispatch<RequestPauseGameEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponsePauseGame));
+		eventDispatcher.Dispatch<RequestStopGameEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseStopGame));
+
 		eventDispatcher.Dispatch<NotifyEditorSceneOnClickEvent>(EVENT_BIND_FN(&GameLogicSystemLayer::ResponseEditorSceneOnClick));
 	}
 	String GameLogicSystemLayer::GetLayerName()
@@ -96,10 +79,6 @@ namespace JG
 	}
 	bool GameLogicSystemLayer::ResponseSaveGameWorld(RequestSaveGameWorldEvent& e)
 	{
-		if (mSaveGameWorldTaskCtrl && mSaveGameWorldTaskCtrl->IsRun())
-		{
-			return true;
-		}
 		if (mGameWorld == nullptr || mGameWorldAssetPath.empty())
 		{
 			return true;
@@ -110,9 +89,10 @@ namespace JG
 			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save GameWorld"));
 
-			progressBar->Display("Save GameWorld", 0.0f);
+			progressBar->Display("Save GameWorld", 0.5f);
 		}
-		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem, [&]()->EScheduleResult
+		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem,
+			[&](SharedPtr<IJGObject> userData)->EScheduleResult
 		{
 			auto json = CreateSharedPtr<Json>();
 			auto assetJson = json->CreateJsonData();
@@ -131,15 +111,21 @@ namespace JG
 			}
 
 
-			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&]()->EScheduleResult
+			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
 				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 				progressBar->Display("Save GameWorld", 1.0f);
 				progressBar->Close();
+				ActionData* actionData = userData->As<ActionData>();
+				if (actionData && actionData->CompeleteAction != nullptr)
+				{
+					actionData->CompeleteAction();
+				}
 				return EScheduleResult::Continue;
-			});
+			}, CreateSharedPtr<ActionData>(userData->As<ActionData>()->CompeleteAction));
+
 			return EScheduleResult::Continue;
-		});
+		}, CreateSharedPtr<ActionData>(e.CompeleteAction));
 
 		return true;
 	}
@@ -150,7 +136,7 @@ namespace JG
 			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Load GameWorld"));
 
-			progressBar->Display("Load GameWorld", 0.0f);
+			progressBar->Display("Load GameWorld", 0.5f);
 		}
 
 
@@ -161,7 +147,7 @@ namespace JG
 			GameObject::DestoryObject(mGameWorld);
 			mGameWorld = nullptr;
 		}
-		Scheduler::GetInstance().ScheduleOnceByFrame(15, SchedulePriority::EndSystem, [&]()->EScheduleResult
+		Scheduler::GetInstance().ScheduleOnceByFrame(15, SchedulePriority::EndSystem, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 		{
 			auto json = CreateSharedPtr<Json>();
 			EAssetFormat assetFormat;
@@ -185,25 +171,81 @@ namespace JG
 			mGameWorld->LoadJson(worldAssetJsonData);
 
 
-			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&]()->EScheduleResult
+			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
 				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 				progressBar->Display("Load GameWorld", 1.0f);
 				progressBar->Close();
-
+				ActionData* actionData = userData->As<ActionData>();
+				if (actionData && actionData->CompeleteAction != nullptr)
+				{
+					actionData->CompeleteAction();
+				}
 				NotifyChangeGameWorldEvent e;
 				e.GameWorld = mGameWorld;
 				Application::GetInstance().SendEvent(e);
-
 				return EScheduleResult::Continue;
-			});
+			}, CreateSharedPtr<ActionData>(userData->As<ActionData>()->CompeleteAction));
 			return EScheduleResult::Continue;
-		});
+		}, CreateSharedPtr<ActionData>(e.CompeleteAction));
 
 		
 		return true;
 	}
+	bool GameLogicSystemLayer::ResponsePlayGame(RequestPlayGameEvent& e)
+	{
+		if (mGameWorld == nullptr)
+		{
+			return true;
+		}
+		if (mIsGamePlaying == false)
+		{
+			RequestSaveGameWorldEvent e;
+			e.CompeleteAction = [&]()
+			{
+				mGameWorld->RemoveFlags(EGameWorldFlags::All_Update_Lock);
+				mIsGamePlaying = true;
+			};
+			Application::GetInstance().SendEvent(e);
+		}
+		else
+		{
+			mGameWorld->RemoveFlags(EGameWorldFlags::All_Update_Lock);
+		}
 
+		return true;
+	}
+	bool GameLogicSystemLayer::ResponsePauseGame(RequestPauseGameEvent& e)
+	{
+		if (mGameWorld == nullptr)
+		{
+			return true;
+		}
+		mGameWorld->AddFlags(EGameWorldFlags::All_Update_Lock);
+		return true;
+	}
+	bool GameLogicSystemLayer::ResponseStopGame(RequestStopGameEvent& e)
+	{
+		if (mGameWorld == nullptr)
+		{
+			return true;
+		}
+
+		if (mIsGamePlaying == true)
+		{
+			RequestLoadGameWorldEvent e;
+			e.AssetPath = mGameWorldAssetPath;
+			e.CompeleteAction = [&]()
+			{
+				mIsGamePlaying = false;
+			};
+			Application::GetInstance().SendEvent(e);
+		}
+		
+	
+
+		return true;
+	}
 	bool GameLogicSystemLayer::ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e)
 	{
 		NotifySelectedGameNodeInEditorEvent pickingEvent;
@@ -246,29 +288,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
-
+		GameObjectFactory::GetInstance().RegisterComponentType<Dev::DevComponent>();
 	}
-	void GameLogicSystemLayer::LoadGameWorld()
-	{
-		JGGraphics::GetInstance().Flush();
-		mGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
-		mGameWorld->SetGlobalGameSystemList(mGameSystemList);
-		mGameWorld->AddFlags(EGameWorldFlags::All_Update_Lock);
 
-		auto worldAssetJson = CreateSharedPtr<Json>();
-		AssetDataBase::GetInstance().ReadAsset(GameWorldPath, nullptr, &(worldAssetJson));
-		auto worldAssetJsonData = worldAssetJson->GetMember(JG_ASSET_KEY);
-		mGameWorld->LoadJson(worldAssetJsonData);
-
-		{
-			NotifyChangeGameWorldEvent e;
-			e.GameWorld = mGameWorld;
-			Application::GetInstance().SendEvent(e);
-		}
-	}
-	void GameLogicSystemLayer::DeleteGameWorld()
-	{
-		GameObject::DestoryObject(mGameWorld);
-		mGameWorld = nullptr;
-	}
 }

@@ -14,9 +14,9 @@ namespace JG
 	{
 		static Camera* smMainCamera;
 		static Camera* smEditorCamera;
+		static void SetMainCamera(Camera* mainCamera);
 	public:
 		static Camera* GetMainCamera();
-		static void SetMainCamera(Camera* mainCamera);
 	private:
 		JGCLASS
 	protected:
@@ -41,6 +41,7 @@ namespace JG
 		//
 		bool mIsOrthographic  = false;
 		bool mIsMainCamera    = false;
+		bool mIsRendering = false;
 
 		ERendererPath mRendererPath = ERendererPath::Foward;
 
@@ -93,6 +94,8 @@ namespace JG
 
 		u64 GetCullingLayerMask() const;
 		ERendererPath GetRendererPath() const;
+
+		bool IsMainCamera() const;
 	protected:
 		virtual void UpdateProj() const;
 		void UpdateView() const;
@@ -120,7 +123,6 @@ namespace JG
 
 		const JVector2& GetFocusCenter() const;
 		void SetFocusCenter(const JVector2& focusCenter);
-
 		virtual void SetResolution(const JVector2& resolution) override;
 
 		JRect GetOrthograhicRect() const;

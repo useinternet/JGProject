@@ -6,7 +6,7 @@ namespace JG
 {
 	class ITexture;
 	class IShader;
-	class IResource : public GraphicsCommandable
+	class IResource
 	{
 	private:
 		String mName   = "IResource";
@@ -40,7 +40,7 @@ namespace JG
 		virtual bool SetData(const void* datas, u64 elementSize, u64 elementCount) = 0;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 	protected:
-		virtual void Bind() = 0;
+		virtual void Bind(u64 commandID) = 0;
 	public:
 		static SharedPtr<IVertexBuffer> Create(String name, EBufferLoadMethod method);
 	};
@@ -56,7 +56,7 @@ namespace JG
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 		virtual u32 GetIndexCount() const = 0;
 	protected:
-		virtual void Bind() = 0;
+		virtual void Bind(u64 commandID) = 0;
 	public:
 		static SharedPtr<IIndexBuffer> Create(String name, EBufferLoadMethod method);
 	};
@@ -73,7 +73,7 @@ namespace JG
 		static SharedPtr<IComputeBuffer> Create(const String& name, u64 btSize);
 	};
 
-	class IComputer : public GraphicsCommandable
+	class IComputer 
 	{
 	public:
 		virtual bool SetComputeBuffer(SharedPtr<IComputeBuffer> computeBuffer) = 0;

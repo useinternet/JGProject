@@ -77,14 +77,14 @@ namespace JG
 		return true;
 	}
 
-	bool DirectX12Shader::Bind()
+	bool DirectX12Shader::Bind(u64 commandID)
 	{
 		if (mIsCompileSuccess == false)
 		{
 			JG_CORE_ERROR("Failed Bind Shader : is not Compiled Shader ");
 			return false;
 		}
-		auto RootSig = DirectX12API::GetRootSignature(GetCommandID());
+		auto RootSig = DirectX12API::GetRootSignature(commandID);
 		RootSig->Reset();
 
 		for (auto& rpPair : mShaderDataForm->RootParamMap)
@@ -136,11 +136,11 @@ namespace JG
 		
 		if (mFlags & EShaderFlags::Allow_ComputeShader)
 		{
-			ComputeBind(RootSig);
+			ComputeBind(commandID, RootSig);
 		}
 		else
 		{
-			GraphicsBind(RootSig);
+			GraphicsBind(commandID, RootSig);
 		}
 		
 
@@ -203,13 +203,13 @@ namespace JG
 		return true;
 	}
 
-	void DirectX12Shader::GraphicsBind(SharedPtr<RootSignature> RootSig)
+	void DirectX12Shader::GraphicsBind(u64 commandID, SharedPtr<RootSignature> RootSig)
 	{
-		auto commandList = DirectX12API::GetGraphicsCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
 		commandList->BindRootSignature(RootSig);
 
 
-		auto PSO = DirectX12API::GetGraphicsPipelineState(GetCommandID());
+		auto PSO = DirectX12API::GetGraphicsPipelineState(commandID);
 		PSO->BindRootSignature(*RootSig);
 		PSO->BindShader(*this);
 	}
@@ -226,15 +226,15 @@ namespace JG
 		return false;
 	}
 
-	void DirectX12Shader::ComputeBind(SharedPtr<RootSignature> RootSig)
+	void DirectX12Shader::ComputeBind(u64 commandID, SharedPtr<RootSignature> RootSig)
 	{
 		// TODO 
 		// Bind
-		auto commandList = DirectX12API::GetComputeCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetComputeCommandList(commandID);
 		commandList->BindRootSignature(RootSig);
 
 
-		auto PSO = DirectX12API::GetComputePipelineState(GetCommandID());
+		auto PSO = DirectX12API::GetComputePipelineState(commandID);
 		PSO->BindRootSignature(*RootSig);
 		PSO->BindShader(*this);
 	}

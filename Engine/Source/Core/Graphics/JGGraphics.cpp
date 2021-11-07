@@ -350,6 +350,7 @@ namespace JG
 				info.ViewProj			= mSceneInfo.ViewProjMatrix;
 				info.EyePosition		= mSceneInfo.EyePos;
 				info.CurrentBufferIndex = mCurrentIndex;
+				info.CommandID          = mCommandID;
 
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
@@ -421,7 +422,6 @@ namespace JG
 				mRenderer = CreateSharedPtr<DeferredRenderer>();
 				break;
 			}
-			mRenderer->SetCommandID(mCommandID);
 		}
 
 		void Scene::InitTexture(const JVector2& resolution, const Color& clearColor)

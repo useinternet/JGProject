@@ -191,9 +191,7 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-
-		mCurrFrameResource->Standard2DMaterial->SetCommandID(GetCommandID());
-		if (mCurrFrameResource->Standard2DMaterial->Bind() == false)
+		if (mCurrFrameResource->Standard2DMaterial->Bind(GetCommandID()) == false)
 		{
 			JG_CORE_ERROR("Failed Bind StandardMaterial");
 			StartBatch();
@@ -206,21 +204,18 @@ namespace JG
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		mCurrFrameResource->QuadMesh->SetCommandID(GetCommandID());
-		if (mCurrFrameResource->QuadMesh->Bind() == false)
+		if (mCurrFrameResource->QuadMesh->Bind(GetCommandID()) == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		mCurrFrameResource->QuadMesh->GetSubMesh(0)->SetCommandID(GetCommandID());
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind() == false)
+		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind(GetCommandID()) == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-
 		api->DrawIndexed(GetCommandID(), quadIndexCount);
 		StartBatch();
 	}

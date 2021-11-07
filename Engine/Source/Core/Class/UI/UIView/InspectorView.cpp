@@ -129,7 +129,7 @@ namespace JG
 	}
 	bool InspectorView::ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e)
 	{
-		if (e.SelectedGameNode != nullptr)
+		if (e.SelectedGameNode != nullptr && e.SelectedGameNode->IsAlive() == true)
 		{
 			SetTargetObject(e.SelectedGameNode);
 		}

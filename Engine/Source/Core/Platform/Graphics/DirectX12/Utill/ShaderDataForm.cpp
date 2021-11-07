@@ -1143,8 +1143,7 @@ namespace JG
 
 		if (dx12Shader != nullptr)
 		{
-			dx12Shader->SetCommandID(commandID);
-			if (dx12Shader->Bind() == false)
+			if (dx12Shader->Bind(commandID) == false)
 			{
 				JG_CORE_ERROR("Failed Bind {0} Shader", dx12Shader->GetName());
 				return false;

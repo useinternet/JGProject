@@ -32,7 +32,7 @@ namespace JG
 		virtual void SetBufferLoadMethod(EBufferLoadMethod type) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
 	protected:
-		virtual void Bind() override;
+		virtual void Bind(u64 commandID) override;
 		void Reset();
 	public:
 		void* GetData() const
@@ -68,7 +68,7 @@ namespace JG
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
 	protected:
-		virtual void Bind() override;
+		virtual void Bind(u64 commandID) override;
 		void Reset();
 	public:
 		u32* GetData() const

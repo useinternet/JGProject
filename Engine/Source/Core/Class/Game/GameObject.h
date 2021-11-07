@@ -21,9 +21,10 @@ namespace JG
 	public:
 		virtual ~IGameObject() = default;
 	public:
-		virtual void Awake() = 0;
+		virtual void Awake()   = 0;
 		virtual void Start()   = 0;
 		virtual void Destory() = 0;
+		virtual bool IsAlive() const = 0;
 	public:
 		virtual const String& GetName() const = 0;
 		virtual void  SetName(const String& name) = 0;
@@ -53,6 +54,7 @@ namespace JG
 	private:
 		mutable u64    mID = 0;
 		mutable String mName;
+		bool mIsAlive = true;
 		List<SharedPtr<ScheduleHandle>> mScheduleHandleList;
 	public:
 		GameObject() = default;
@@ -60,9 +62,10 @@ namespace JG
 	protected:
 		virtual void Awake() override {}
 		virtual void Start() override {}
-		virtual void Destory() override {}
+		virtual void Destory() override { mIsAlive = false; }
 		virtual void Update() {}
 		virtual void LateUpdate() {}
+		virtual bool IsAlive() const override { return mIsAlive; }
 	protected: // ½ºÄÉÁì °ü·Ã
 		SharedPtr<ScheduleHandle> Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleOnce(f32 delay, i32 priority, const SyncTaskFunction& task);

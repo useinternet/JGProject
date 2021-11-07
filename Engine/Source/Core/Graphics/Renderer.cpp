@@ -56,7 +56,10 @@ namespace JG
 		EndBatch();
 	}
 
-
+	u64 Renderer::GetCommandID() const
+	{
+		return mCurrentRenderInfo.CommandID;
+	}
 
 	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)
 	{
@@ -66,7 +69,6 @@ namespace JG
 		{
 			for (auto& batch : mBatchList)
 			{
-				batch->SetCommandID(GetCommandID());
 				batch->ConnectRenderer(this);
 				if (batch->Begin(info) == false)
 				{
@@ -85,6 +87,8 @@ namespace JG
 		}
 		mBatchList.clear();
 	}
+
+
 
 	const RenderInfo& Renderer::GetRenderInfo() const
 	{

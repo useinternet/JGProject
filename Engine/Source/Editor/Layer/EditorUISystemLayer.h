@@ -8,11 +8,11 @@ namespace JG
 		MainMenu,
 		ContextMenu,
 	};
-	class UISystemLayer : public ISystemLayer
+	class EditorUISystemLayer : public ISystemLayer
 	{
 
 	public:
-		virtual ~UISystemLayer() {}
+		virtual ~EditorUISystemLayer() {}
 	public:
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
@@ -28,7 +28,18 @@ namespace JG
 		void LoadUISettings(const String& fileName);
 		void SaveUISettings(const String& fileName);
 	private:
+		void Init();
+		EScheduleResult Update();
 		EScheduleResult MenuUpdate();
+		bool Resize(AppResizeEvent& e);
+		void RegisterUIView();
+		void RegisterPopupUIView();
+
+
+
+
+
+	private:
 		static void BeginMenu(const MenuItemNode* Node);
 		static void EndMenu(const MenuItemNode* Node);
 	};

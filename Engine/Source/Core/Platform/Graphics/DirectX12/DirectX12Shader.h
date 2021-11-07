@@ -36,7 +36,7 @@ namespace JG
 		virtual ~DirectX12Shader() = default;
 	public:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
-		virtual bool Bind() override;
+		virtual bool Bind(u64 commandID) override;
 	public:
 		virtual void  SetName(const String& name) override;
 		virtual const String& GetName() const override;
@@ -48,9 +48,9 @@ namespace JG
 
 	private:
 		bool GraphicsCompile(const String& code, String* error);
-		void GraphicsBind(SharedPtr<RootSignature> RootSig);
+		void GraphicsBind(u64 commandID, SharedPtr<RootSignature> RootSig);
 		bool ComputeCompile(const String& code, String* error);
-		void ComputeBind(SharedPtr<RootSignature> RootSig);
+		void ComputeBind(u64 commandID, SharedPtr<RootSignature> RootSig);
 
 		void InsertScript(String& code, const List<SharedPtr<IShaderScript>>& scriptList);
 		bool InsertScriptInternal(String& code, SharedPtr<IShaderScript> script);

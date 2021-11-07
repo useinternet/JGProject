@@ -92,6 +92,7 @@ namespace JG
 		void CreateCube();
 		void CreateSphere();
 		void CreatePointLight();
+		void CreateCamera();
 		void Copy(bool is_remove_gamenode_after_copy = false);
 		void Paste();
 		bool IsCanAbleToCopy();

@@ -31,10 +31,16 @@ namespace JG
 		mShowGizmo = CreateUniquePtr<Command<GameNode*>>();
 		mShowGizmo->Subscribe(this, [&](GameNode* node)
 		{
+			
 			auto mainCam = Camera::GetMainCamera();
 			if (mainCam == nullptr) return;
 			if (node == nullptr || node->GetType() != JGTYPE(GameNode)) return;
-
+			if (node->IsAlive() == false)
+			{
+				SetSelectedGameNode(nullptr);
+				node = nullptr;
+				return;
+			}
 			i32 snapIndex = 0;
 			if (mCurrentGizmoMode & ImGuizmo::TRANSLATE_X ||
 				mCurrentGizmoMode & ImGuizmo::TRANSLATE_Y ||
@@ -114,7 +120,6 @@ namespace JG
 		if (mainCam != nullptr)
 		{
 			isOrth = mainCam->IsOrthographic();
-
 		}
 
 		if (isOrth) mCurrentCameraMode = CameraMode_2D;
@@ -122,7 +127,7 @@ namespace JG
 
 
 
-		if (mEnableEditorCameraControll == false)
+		if (mEnableEditorCameraControll == false && ImGui::IsWindowFocused())
 		{
 			if ((ImGui::IsKeyPressed((i32)EKeyCode::Q)))
 			{
@@ -284,10 +289,19 @@ namespace JG
 		}
 		if (ImGui::ImageButton(GetIconTextureID(Icon_PLAY), btSize))
 		{
-			if (mCurrentGameControll == Game_Wait) mCurrentGameControll = Game_Play;
-			else if (mCurrentGameControll == Game_Pause) mCurrentGameControll = Game_Play;
-			else mCurrentGameControll = Game_Wait;
-		}ImGui::SameLine();
+			if (mCurrentGameControll == Game_Wait || mCurrentGameControll == Game_Pause)
+			{
+				mCurrentGameControll = Game_Play;
+				RequestPlayGameEvent e;
+				SendEvent(e);
+			}
+			else
+			{
+				mCurrentGameControll = Game_Wait;
+				RequestStopGameEvent e;
+				SendEvent(e);
+			}
+		} ImGui::SameLine();
 		if (isPushStyle)
 		{
 			isPushStyle = false;
@@ -300,8 +314,18 @@ namespace JG
 		}
 		if (ImGui::ImageButton(GetIconTextureID(Icon_PAUSE), btSize))
 		{
-			if (mCurrentGameControll == Game_Play)       mCurrentGameControll = Game_Pause;
-			else if (mCurrentGameControll == Game_Pause) mCurrentGameControll = Game_Play;
+			if (mCurrentGameControll == Game_Play)
+			{
+				mCurrentGameControll = Game_Pause;
+				RequestPauseGameEvent e;
+				SendEvent(e);
+			}
+			else if (mCurrentGameControll == Game_Pause)
+			{
+				mCurrentGameControll = Game_Play;
+				RequestPlayGameEvent e;
+				SendEvent(e);
+			}
 			else mCurrentGameControll = Game_Wait;
 		}ImGui::SameLine();
 		if (isPushStyle)
@@ -465,6 +489,10 @@ namespace JG
 	}
 	bool SceneView::ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e)
 	{
+		if (e.SelectedGameNode != nullptr && e.SelectedGameNode->IsActive() == false)
+		{
+			return false;
+		}
 		SetSelectedGameNode(e.SelectedGameNode);
 		return false;
 	}

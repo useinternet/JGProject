@@ -7,14 +7,6 @@ namespace JG
 {
 	Camera* Camera::smMainCamera = nullptr;
 	Camera* Camera::smEditorCamera = nullptr;
-	Camera* Camera::GetMainCamera()
-	{
-		if (smMainCamera == nullptr)
-		{
-			return smEditorCamera;
-		}
-		return smMainCamera;
-	}
 	void Camera::SetMainCamera(Camera* mainCamera)
 	{
 		if (mainCamera == nullptr)
@@ -23,6 +15,15 @@ namespace JG
 		}
 		smMainCamera = mainCamera;
 	}
+	Camera* Camera::GetMainCamera()
+	{
+		if (smMainCamera == nullptr)
+		{
+			return smEditorCamera;
+		}
+		return smMainCamera;
+	}
+
 	void Camera::Awake()
 	{
 		GameComponent::Awake();
@@ -54,23 +55,27 @@ namespace JG
 	void Camera::Start()
 	{
 		GameComponent::Start();
-		//if (mIsMainCamera == true)
-		//{
-		//	SetMainCamera(this);
-		//}
+		if (mIsMainCamera == true)
+		{
+			SetMainCamera(this);
+		}
 
 	}
 	void Camera::Update()
 	{
 		GameComponent::Update();
-
+		if (GetMainCamera() == nullptr)
+		{
+			SetMainCamera(this);
+			mIsMainCamera = true;
+		}
 	}
 	void Camera::Destory()
 	{
 		GameComponent::Destory();
-		if (smMainCamera == this)
+		if (GetMainCamera() == this)
 		{
-			smMainCamera = nullptr;
+			SetMainCamera(nullptr);
 		}
 		if (smEditorCamera == this)
 		{
@@ -78,7 +83,7 @@ namespace JG
 		}
 		if (mScene != nullptr)
 		{
-			GetGameWorld()->UnRegisterGraphicsScene(mScene);
+			GetGameWorld()->UnRegisterGraphicsScene(this);
 			JGGraphics::GetInstance().DestroyObject(mScene);
 			mScene = nullptr;
 		}
@@ -108,6 +113,7 @@ namespace JG
 		jsonData->AddMember("ClearColor", JVector4(GetClearColor()));
 		jsonData->AddMember("CullingLayerMask", GetCullingLayerMask());
 		jsonData->AddMember("IsOrthographic", IsOrthographic());
+		jsonData->AddMember("IsMainCamera", IsMainCamera());
 
 	}
 	void Camera::LoadJson(SharedPtr<JsonData> jsonData)
@@ -147,6 +153,11 @@ namespace JG
 		if (val)
 		{
 			SetOrthographic(val->GetBool());
+		}
+		val = jsonData->GetMember("IsMainCamera");
+		if (val)
+		{
+			mIsMainCamera = val->GetBool();
 		}
 	}
 	void Camera::SetFOV(f32 fov)
@@ -352,6 +363,11 @@ namespace JG
 		mIsViewProjDirty = true;
 	}
 
+	bool Camera::IsMainCamera() const
+	{
+		return mIsMainCamera;
+	}
+
 	void Camera::UpdateView() const
 	{
 		if (mIsViewDirty == false)
@@ -423,40 +439,53 @@ namespace JG
 		sceneInfo.ViewMatrix = GetViewMatrix();
 		sceneInfo.ProjMatrix = GetProjMatrix();
 		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
-
+		if (GetType() != JGTYPE(EditorCamera))
+		{
+			int n = 0;
+		}
 		if (mScene == nullptr)
 		{
 			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
-			GetGameWorld()->RegisterGraphicsScene(mScene);
+			GetGameWorld()->RegisterGraphicsScene(this, mScene);
 		}
 
 		mScene->SetSceneInfo(sceneInfo);
 	}
 	EScheduleResult Camera::Rendering()
 	{
-		if (mScene == nullptr)
+		if (IsActive() == false)
 		{
 			return EScheduleResult::Continue;
 		}
+		if (mScene == nullptr)
+		{
+			return EScheduleResult::Continue;
+		
+		}
+		mIsRendering = true;
 		mScene->Rendering();
+
 		return EScheduleResult::Continue;
 	}
 	EScheduleResult Camera::RenderFinish()
 	{
-		if (mScene == nullptr)
+		
+		if (mScene == nullptr || mIsRendering == false)
 		{
 			return EScheduleResult::Continue;
 		}
+		mIsRendering = false;
 		mSceneResultInfo = mScene->FetchResultFinish();
-		if (mSceneResultInfo != nullptr)
+		if (mSceneResultInfo != nullptr && IsActive() == true && GetMainCamera() == this)
 		{
-			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid() && this == GetMainCamera())
+			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid())
 			{
 				NotifyChangeMainSceneTextureEvent e;
 				e.SceneTexture = mSceneResultInfo->Texture;
 				SendEvent(e);
 			}
 		}
+
 		return EScheduleResult::Continue;
 	}
 	f32 EditorCamera::GetZoom() const

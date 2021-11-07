@@ -29,7 +29,7 @@ namespace JG
 		SharedPtr<AssetManager> mAssetManager;
 		List<GameSystem*>	    mWorldGameSystemList;
 		List<GlobalGameSystem*> mGlobalGameSystemList;
-		HashSet<Graphics::Scene*> mGraphicsSceneSet;
+		Dictionary<GameComponent*, Graphics::Scene*> mGraphicsSceneDic;
 
 
 
@@ -59,8 +59,8 @@ namespace JG
 		void PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject);
 		void PushRenderLightObject(SharedPtr<Graphics::Light> lightObject);
 
-		void RegisterGraphicsScene(Graphics::Scene* scene);
-		void UnRegisterGraphicsScene(Graphics::Scene* scene);
+		void RegisterGraphicsScene(GameComponent* com, Graphics::Scene* scene);
+		void UnRegisterGraphicsScene(GameComponent* com);
 		
 	public:
 		template<class T>

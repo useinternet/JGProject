@@ -143,26 +143,34 @@ namespace JG
 	}
 	void GameWorld::PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject)
 	{
-		for (auto& scene : mGraphicsSceneSet)
+		for (auto& scene_pair : mGraphicsSceneDic)
 		{
-			scene->PushSceneObject(sceneObject);
+			if (scene_pair.first->IsActive() == false)
+			{
+				return;
+			}
+			scene_pair.second->PushSceneObject(sceneObject);
 		}
 	}
 	void GameWorld::PushRenderLightObject(SharedPtr<Graphics::Light> lightObject)
 	{
-		for (auto& scene : mGraphicsSceneSet)
+		for (auto& scene_pair : mGraphicsSceneDic)
 		{
-			scene->PushLight(lightObject);
+			if (scene_pair.first->IsActive() == false)
+			{
+				return;
+			}
+			scene_pair.second->PushLight(lightObject);
 		}
 	}
 
-	void GameWorld::RegisterGraphicsScene(Graphics::Scene* scene)
+	void GameWorld::RegisterGraphicsScene(GameComponent* com, Graphics::Scene* scene)
 	{
-		mGraphicsSceneSet.insert(scene);
+		mGraphicsSceneDic.emplace(com, scene);
 	}
-	void GameWorld::UnRegisterGraphicsScene(Graphics::Scene* scene)
+	void GameWorld::UnRegisterGraphicsScene(GameComponent* com)
 	{
-		mGraphicsSceneSet.erase(scene);
+		mGraphicsSceneDic.erase(com);
 	}
 	void GameWorld::AddGameSystem(const Type& type)
 	{

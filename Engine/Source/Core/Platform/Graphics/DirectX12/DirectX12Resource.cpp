@@ -39,7 +39,7 @@ namespace JG
 
 			if (mD3DResource)
 			{
-				auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
+				auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
 				commandList->CopyBuffer(mD3DResource.Get(), datas, elementSize, elementCount);
 			}
 		}
@@ -91,13 +91,13 @@ namespace JG
 	{
 		mLoadMethod = method;
 	}
-	void DirectX12VertexBuffer::Bind()
+	void DirectX12VertexBuffer::Bind(u64 commandID)
 	{
 		if (IsValid() == false)
 		{
 			return;
 		}
-		auto commandList = DirectX12API::GetGraphicsCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
 
 
 		D3D12_VERTEX_BUFFER_VIEW View = {};
@@ -152,7 +152,7 @@ namespace JG
 			);
 			if (mD3DResource != nullptr)
 			{
-				auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
+				auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
 				commandList->CopyBuffer(mD3DResource.Get(), datas, sizeof(u32), mIndexCount);
 			}
 		}
@@ -208,13 +208,13 @@ namespace JG
 		mLoadMethod = method;
 	}
 
-	void DirectX12IndexBuffer::Bind()
+	void DirectX12IndexBuffer::Bind(u64 commandID)
 	{
 		if (IsValid() == false)
 		{
 			return;
 		}
-		auto commandList = DirectX12API::GetGraphicsCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
 		D3D12_INDEX_BUFFER_VIEW View;
 		View.BufferLocation = mD3DResource->GetGPUVirtualAddress();
 		View.Format = DXGI_FORMAT_R32_UINT;
@@ -343,7 +343,7 @@ namespace JG
 		auto srcResource = alloc.OwnerPage->Get();
 		auto srcOffset = alloc.GPU - srcResource->GetGPUVirtualAddress();
 
-		auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
 		dx12Buffer->mState = EComputeBufferState::Run;
 		commandList->CopyBufferRegion(dx12Buffer->Get(), 0, srcResource, srcOffset, computeBuffer->GetDataSize());
 		dx12Buffer->ReserveCompletion();
@@ -571,11 +571,11 @@ namespace JG
 		{
 			return false;
 		}
-		if (mShaderData->Bind(GetCommandID()) == false)
+		if (mShaderData->Bind(MAIN_GRAPHICS_COMMAND_ID) == false)
 		{
 			return false;
 		}
-		auto PSO = DirectX12API::GetComputePipelineState(GetCommandID());
+		auto PSO = DirectX12API::GetComputePipelineState(MAIN_GRAPHICS_COMMAND_ID);
 		if (PSO->Finalize() == false)
 		{
 			return false;
@@ -586,7 +586,7 @@ namespace JG
 
 
 		mState = EComputerState::Run;
-		auto commandList = DirectX12API::GetComputeCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetComputeCommandList(MAIN_GRAPHICS_COMMAND_ID);
 		commandList->BindPipelineState(PSO);
 		commandList->Dispatch(groupX, groupY, groupZ);
 
@@ -699,7 +699,7 @@ namespace JG
 		info.Format = ETextureFormat::R8G8B8A8_Unorm;
 		info.PixelPerUnit = pixelPerUnit;
 		SetTextureInfo(info);
-		auto commandList = DirectX12API::GetCopyCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
 		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels);
 	}
 	void DirectX12Texture::SetClearColor(const Color& clearColor)

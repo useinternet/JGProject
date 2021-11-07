@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GameComponent.h"
-
+#include "GameNode.h"
 
 
 namespace JG
@@ -42,6 +42,6 @@ namespace JG
 	}
 	bool GameComponent::IsActive() const
 	{
-		return mIsActive;
+		return mIsActive && GetOwner()->IsActive();
 	}
 }

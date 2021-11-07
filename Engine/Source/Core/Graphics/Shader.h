@@ -10,13 +10,13 @@ namespace JG
 	class IComputeBuffer;
 	class IShaderScript;
 	class ITexture;
-	class IShader : public GraphicsCommandable
+	class IShader
 	{
 	public:
 		virtual ~IShader() = default;
 	protected:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
-		virtual bool Bind() = 0;
+		virtual bool Bind(u64 commandID) = 0;
 	public:
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName() const    = 0;

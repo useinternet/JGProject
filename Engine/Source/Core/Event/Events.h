@@ -132,6 +132,7 @@ private: \
 		}\
 	};\
 
+
 #define CREATE_EVENT_TWO_ARG_(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2, toString) \
 	class className : public IEvent \
 	{ \
@@ -150,7 +151,7 @@ private: \
 
 #define CREATE_EVENT(category, className) CREATE_EVENT_(category, className, #className) 
 #define CREATE_EVENT_ONE_ARG(category, className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG_(category, className, argType_1, argName_1,argInit_1, #className)
-#define CREATE_EVENT_TWO_ARG(category, className, argType_1, argName_1, argType_2, argName_2) CREATE_EVENT_TWO_ARG_(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2,argInit_2, #className)
+#define CREATE_EVENT_TWO_ARG(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2) CREATE_EVENT_TWO_ARG_(category, className, argType_1, argName_1, argInit_1, argType_2, argName_2,argInit_2, #className)
 
 
 
@@ -159,9 +160,7 @@ private: \
 #define NOTIFY_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Notify, className, argType_1, argName_1,argInit_1)
 #define REQUEST_EVENT(className) CREATE_EVENT(EEventCategory::Request, className)
 #define REQUEST_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Request, className, argType_1, argName_1, argInit_1)
-
-
-
+#define REQUEST_TWO_ARG_EVENT(className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2) CREATE_EVENT_TWO_ARG(EEventCategory::Request, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2)
 
 	// Notify
 	class IJGObject;
@@ -181,6 +180,10 @@ private: \
 	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, String, SelectedAssetPath, "")
 
-	REQUEST_EVENT(RequestSaveGameWorldEvent)
-	REQUEST_ONE_ARG_EVENT(RequestLoadGameWorldEvent, String, AssetPath, "")
+
+	REQUEST_ONE_ARG_EVENT(RequestPlayGameEvent, std::function<void()>, CompeleteAction, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestStopGameEvent, std::function<void()>, CompeleteAction, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestPauseGameEvent, std::function<void()>, CompeleteAction, nullptr)
+	REQUEST_ONE_ARG_EVENT(RequestSaveGameWorldEvent, std::function<void()>, CompeleteAction, nullptr)
+	REQUEST_TWO_ARG_EVENT(RequestLoadGameWorldEvent, String, AssetPath, "", std::function<void()>, CompeleteAction, nullptr)
 }

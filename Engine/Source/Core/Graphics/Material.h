@@ -7,7 +7,7 @@ namespace JG
 	class IShader;
 	class ITexture;
 	class IShaderScript;
-	class IMaterial : public GraphicsCommandable
+	class IMaterial 
 	{
 	public:
 		virtual bool SetFloat(const String& name, float value) = 0;
@@ -73,7 +73,7 @@ namespace JG
 	protected:
 		virtual void Init(SharedPtr<IShader> shader) = 0;
 	public:
-		virtual bool Bind() = 0;
+		virtual bool Bind(u64 commandID) = 0;
 	public:
 		virtual ~IMaterial() = default;
 	public:

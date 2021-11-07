@@ -38,8 +38,7 @@ namespace JG
 			auto& materialList = info.MaterialList;
 			auto& worldMatrix = info.WorldMatrix;
 
-			mesh->SetCommandID(GetCommandID());
-			if (mesh->Bind() == false)
+			if (mesh->Bind(GetCommandID()) == false)
 			{
 				JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
 			}
@@ -47,7 +46,7 @@ namespace JG
 			auto transposedViewProj = JMatrix::Transpose(renderInfo.ViewProj);
 			for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
 			{
-				if (mesh->GetSubMesh(i)->Bind() == false)
+				if (mesh->GetSubMesh(i)->Bind(GetCommandID()) == false)
 				{
 					JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(0)->GetName());
 					continue;
@@ -61,7 +60,6 @@ namespace JG
 				{
 					material = materialList[i];
 				}
-				material->SetCommandID(GetCommandID());
 				auto transposedWorld = JMatrix::Transpose(worldMatrix);
 				if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
 				{
@@ -96,7 +94,7 @@ namespace JG
 						}
 					}
 				}
-				if (material->Bind() == false)
+				if (material->Bind(GetCommandID()) == false)
 				{
 					JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
 					continue;

@@ -13,19 +13,6 @@ namespace JG
 #define MAIN_GRAPHICS_COMMAND_ID 1
 
 	using TextureID = u64;
-
-	class GraphicsCommandable
-	{
-		u64 mCommandID = MAIN_GRAPHICS_COMMAND_ID;
-	public:
-		void SetCommandID(u64 id) {
-			mCommandID = id;
-		}
-		u64 GetCommandID() const {
-			return mCommandID;
-		}
-	};
-
 	enum class ETextureFormat
 	{
 		None,

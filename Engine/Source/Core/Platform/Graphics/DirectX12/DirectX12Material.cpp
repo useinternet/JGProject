@@ -424,17 +424,17 @@ namespace JG
 		return List<std::pair<EShaderDataType, String>>();
 	}
 
-	bool DirectX12Material::Bind()
+	bool DirectX12Material::Bind(u64 commandID)
 	{
 		if (mShaderData == nullptr)
 		{
 			return false;
 		}
-		auto pso = DirectX12API::GetGraphicsPipelineState(GetCommandID());
+		auto pso = DirectX12API::GetGraphicsPipelineState(commandID);
 		pso->SetDepthStencilState(mDepthStencilDesc);
 		pso->SetBlendState(mBlendDesc);
 		pso->SetRasterizerState(mRasterzerDesc);
-		return mShaderData->Bind(GetCommandID());
+		return mShaderData->Bind(commandID);
 	}
 
 	void DirectX12Material::Init(SharedPtr<IShader> shader)

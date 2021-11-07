@@ -5,7 +5,7 @@ namespace JG
 {
 	class Renderer;
 	class RenderInfo;
-	class RenderBatch : public GraphicsCommandable
+	class RenderBatch
 	{
 	
 		Renderer* mConnectedRenderer = nullptr;
@@ -15,6 +15,8 @@ namespace JG
 	public:
 		void ConnectRenderer(Renderer* renderer);
 		Renderer* GetConnectedRenderer() const;
+
+		u64 GetCommandID() const;
 	protected:
 		friend Renderer;
 		virtual bool Begin(const RenderInfo & info) = 0;

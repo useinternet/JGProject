@@ -10,39 +10,22 @@ namespace JG
 	class IGameObject;
 	class GameLogicSystemLayer : public ISystemLayer
 	{
-		class LoadGameWorldData : public IJGObject
+		class ActionData : public IJGObject
 		{
 			JGCLASS
 		public:
-			String     Path;
-			GameWorld* GameWorld = nullptr;
-			SharedPtr<Json> Json = nullptr;
-			bool IsSuccessed = false;
+			std::function<void()> CompeleteAction = nullptr;
 		public:
-			LoadGameWorldData(const String& path) : Path(path) {}
-			virtual ~LoadGameWorldData() = default;
-		};
-		class SaveGameWorldData : public IJGObject
-		{
-			JGCLASS
-		public:
-			String     Path;
-			GameWorld* GameWorld = nullptr;
-			SharedPtr<Json> Json = nullptr;
-			bool IsSuccessed = false;
-		public:
-			virtual ~SaveGameWorldData() = default;
+			ActionData(const std::function<void()>& compeleteAction) : CompeleteAction(compeleteAction) {}
+			virtual ~ActionData() = default;
 		};
 
 
 
-		String mGameWorldAssetPath;
+		String     mGameWorldAssetPath;
 		GameWorld* mGameWorld = nullptr;
+		bool       mIsGamePlaying = false;
 		List<GlobalGameSystem*> mGameSystemList;
-
-
-		UniquePtr<TaskController> mLoadGameWorldTaskCtrl;
-		UniquePtr<TaskController> mSaveGameWorldTaskCtrl;
 	public:
 		virtual ~GameLogicSystemLayer() {}
 	public:
@@ -57,11 +40,12 @@ namespace JG
 	public:
 		bool ResponseSaveGameWorld(RequestSaveGameWorldEvent& e);
 		bool ResponseLoadGameWorld(RequestLoadGameWorldEvent& e);
+		bool ResponsePlayGame(RequestPlayGameEvent& e);
+		bool ResponsePauseGame(RequestPauseGameEvent& e);
+		bool ResponseStopGame(RequestStopGameEvent& e);
 		bool ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e);
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
-		void LoadGameWorld();
-		void DeleteGameWorld();
 	};
 }

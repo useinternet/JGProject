@@ -38,7 +38,7 @@ namespace JG
 	{
 		return mInstanceCount;
 	}
-	bool DirectX12SubMesh::Bind()
+	bool DirectX12SubMesh::Bind(u64 commandID)
 	{
 		if (mVertexBuffer == nullptr)
 		{
@@ -49,20 +49,18 @@ namespace JG
 			return false;
 		}
 		// vertexBuffer, IndexBuffer ¹ÙÀÎµù
-		auto commandList = DirectX12API::GetGraphicsCommandList(GetCommandID());
+		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
 		commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
 		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
-		dx12VBuffer->SetCommandID(GetCommandID());
-		dx12VBuffer->Bind();
+		dx12VBuffer->Bind(commandID);
 		commandList->FlushVertexBuffer();
 
 
 
 		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
-		dx12IBuffer->SetCommandID(GetCommandID());
-		dx12IBuffer->Bind();
+		dx12IBuffer->Bind(commandID);
 
 		return true;
 	}
@@ -121,20 +119,15 @@ namespace JG
 	{
 		return mName;
 	}
-	bool DirectX12Mesh::Bind()
+	bool DirectX12Mesh::Bind(u64 commandID)
 	{
 		if (mInputLayout == nullptr)
 		{
 			return false;
 		}
-		auto pso = DirectX12API::GetGraphicsPipelineState(GetCommandID());
+		auto pso = DirectX12API::GetGraphicsPipelineState(commandID);
 		pso->BindInputLayout(*mInputLayout);
 		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-
-		for (auto& mesh : mSubMeshList)
-		{
-			mesh->SetCommandID(GetCommandID());
-		}
 		return true;
 	}
 

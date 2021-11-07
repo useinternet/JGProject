@@ -29,6 +29,10 @@ namespace JG
 		{
 			CreateEmptyObject();
 		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Camera", 0, [&]()
+		{
+			CreateCamera();
+		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/2D/Sprite", 0, [&]()
 		{
 			CreateSprite();
@@ -86,11 +90,16 @@ namespace JG
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Delete", 0, 
 			[&]()
 		{
-			for (auto& node : mSelectedGameNode)
+			Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::DestroyObject, [&]() -> EScheduleResult
 			{
-				GameObject::DestoryObject(node);
-			}
-			mSelectedGameNode.clear();
+				for (auto& node : mSelectedGameNode)
+				{
+					GameObject::DestoryObject(node);
+				}
+				mSelectedGameNode.clear();
+				return EScheduleResult::Continue;
+			});
+
 		}, 
 			[&]() -> bool
 		{
@@ -369,6 +378,12 @@ namespace JG
 		if (mTargetGameNode == nullptr) return;
 		auto node = mTargetGameNode->AddNode("PointLight");
 		node->AddComponent<PointLight>();
+	}
+	void WorldHierarchyView::CreateCamera()
+	{
+		if (mTargetGameNode == nullptr) return;
+		auto node = mTargetGameNode->AddNode("Camera");
+		auto camera = node->AddComponent<Camera>();
 	}
 	void WorldHierarchyView::Copy(bool is_remove_gamenode_after_copy)
 	{

@@ -1,14 +1,42 @@
 #include "pch.h"
 #include "Dev.h"
-#include <comdef.h>
+#include "Application.h"
 
-
-namespace Dev
+namespace JG
 {
-	std::wstring Com_Error(HRESULT hResult)
+	namespace Dev
 	{
-		_com_error err(hResult);
-		LPCTSTR errMsg = err.ErrorMessage();
-		return errMsg;
+		void DevComponent::Start()
+		{
+			GameComponent::Start();
+		}
+		void DevComponent::Update()
+		{
+			GameComponent::Update();
+			f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+			static f32 accTime = 0.0f;
+			accTime += tick;
+
+
+			if (accTime > 1.0f)
+			{
+				JG_CORE_INFO("Test Simulate Update!!");
+				accTime = 0.0f;
+			}
+
+
+		}
+		void DevComponent::Destory()
+		{
+			GameComponent::Destory();
+		}
+		void DevComponent::MakeJson(SharedPtr<JsonData> jsonData) const
+		{
+			GameComponent::MakeJson(jsonData);
+		}
+		void DevComponent::LoadJson(SharedPtr<JsonData> jsonData)
+		{
+			GameComponent::LoadJson(jsonData);
+		}
 	}
 }

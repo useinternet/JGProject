@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "UISystemLayer.h"
+#include "EditorUISystemLayer.h"
 #include "Imgui/imgui.h"
-
+#include "ExternalImpl/JGImGui.h"
 // UI
 #include "Class/UI/UIView/SceneView.h"
 #include "Class/UI/UIView/WorldHierarchyView.h"
@@ -19,81 +19,45 @@
 #include "Class/Game/GameWorld.h"
 namespace JG
 {
-	void UISystemLayer::OnAttach()
+	void EditorUISystemLayer::OnAttach()
 	{
 	
 	}
-	void UISystemLayer::OnDetach()
+	void EditorUISystemLayer::OnDetach()
 	{
 
 	}
 
 
-	void UISystemLayer::Begin()
+	void EditorUISystemLayer::Begin()
 	{
-		
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::UISystemLayer, SCHEDULE_BIND_FN(&UISystemLayer::MenuUpdate));
-		UIManager::GetInstance().BindShowContextMenuFunc([&](Type type, bool isWhenItemHovered) -> bool {
-
-			bool isOpenPopup = false;
-			if (isWhenItemHovered)
-			{
-				isOpenPopup = ImGui::BeginPopupContextItem();
-			}
-			else
-			{
-				isOpenPopup = ImGui::BeginPopupContextWindow();
-			}
-
-			if (isOpenPopup)
-			{
-				UIManager::GetInstance().ForEach(type, UISystemLayer::BeginMenu, UISystemLayer::EndMenu);
-				ImGui::EndPopup();
-				return true;
-			}
-			return false;
-		});
+		Init();
 		SetMainMenu();
-		// UI
-		UIManager::GetInstance().RegisterUIView<SceneView>();
-		UIManager::GetInstance().RegisterUIView<WorldHierarchyView>();
-		UIManager::GetInstance().RegisterUIView<InspectorView>();
-		UIManager::GetInstance().RegisterUIView<ContentsView>();
-		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
-		
-
-		// PopupUI
-		UIManager::GetInstance().RegisterPopupUIView<ComponentFinderContextView>();
-		UIManager::GetInstance().RegisterPopupUIView<AssetFinderContextView>();
-		// Modal
-		UIManager::GetInstance().RegisterPopupUIView<ProgressBarModalView>();
-		UIManager::GetInstance().RegisterPopupUIView<MessageBoxModalView>();
-
+		RegisterUIView();
+		RegisterPopupUIView();
 		LoadUISettings("JGUI.jgconfig");
-	
-
-
-
 	}
-	void UISystemLayer::Destroy()
+	void EditorUISystemLayer::Destroy()
 	{
 		SaveUISettings("JGUI.jgconfig");
+		JGImGui::Destroy();
 	}
-	void UISystemLayer::OnEvent(IEvent& e)
+	void EditorUISystemLayer::OnEvent(IEvent& e)
 	{
-
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<AppResizeEvent>(EVENT_BIND_FN(&EditorUISystemLayer::Resize));
 	}
-	String UISystemLayer::GetLayerName()
+	String EditorUISystemLayer::GetLayerName()
 	{
 		return "UISystemLayer";
 	}
 
-	void UISystemLayer::SetMainMenu()
+	void EditorUISystemLayer::SetMainMenu()
 	{
 		UIManager::GetInstance().RegisterMainMenuItem("File/", 0, nullptr, nullptr);
 	}
 
-	void UISystemLayer::LoadUISettings(const String& fileName)
+	void EditorUISystemLayer::LoadUISettings(const String& fileName)
 	{
 		auto json = CreateSharedPtr<Json>();
 		if (Json::Read(fileName, json) == false)
@@ -109,7 +73,7 @@ namespace JG
 			}
 		});
 	}
-	void UISystemLayer::SaveUISettings(const String& fileName)
+	void EditorUISystemLayer::SaveUISettings(const String& fileName)
 	{
 
 		Dictionary<String, bool> IsOpen;
@@ -127,7 +91,41 @@ namespace JG
 		Json::Write(fileName, json);
 	}
 
-	EScheduleResult UISystemLayer::MenuUpdate()
+	void EditorUISystemLayer::Init()
+	{
+		JGImGui::Create();
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::ImGuiSystemLayer, SCHEDULE_BIND_FN(&EditorUISystemLayer::Update));
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::UISystemLayer, SCHEDULE_BIND_FN(&EditorUISystemLayer::MenuUpdate));
+		UIManager::GetInstance().BindShowContextMenuFunc([&](Type type, bool isWhenItemHovered) -> bool {
+
+			bool isOpenPopup = false;
+			if (isWhenItemHovered)
+			{
+				isOpenPopup = ImGui::BeginPopupContextItem();
+			}
+			else
+			{
+				isOpenPopup = ImGui::BeginPopupContextWindow();
+			}
+
+			if (isOpenPopup)
+			{
+				UIManager::GetInstance().ForEach(type, EditorUISystemLayer::BeginMenu, EditorUISystemLayer::EndMenu);
+				ImGui::EndPopup();
+				return true;
+			}
+			return false;
+		});
+	}
+
+	EScheduleResult EditorUISystemLayer::Update()
+	{
+		JGImGui::GetInstance().NewFrame();
+
+		return EScheduleResult::Continue;
+	}
+
+	EScheduleResult EditorUISystemLayer::MenuUpdate()
 	{
 		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
 		ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
@@ -154,7 +152,7 @@ namespace JG
 
 		if (ImGui::BeginMenuBar())
 		{
-			UIManager::GetInstance().ForEach(UISystemLayer::BeginMenu, UISystemLayer::EndMenu);
+			UIManager::GetInstance().ForEach(EditorUISystemLayer::BeginMenu, EditorUISystemLayer::EndMenu);
 			ImGui::EndMenuBar();
 		}
 
@@ -162,7 +160,36 @@ namespace JG
 		return EScheduleResult::Continue;
 	}
 
-	void UISystemLayer::BeginMenu(const MenuItemNode* Node)
+	bool EditorUISystemLayer::Resize(AppResizeEvent& e)
+	{
+		if (JGImGui::IsValid() == true)
+		{
+			JGImGui::GetInstance().Resize(e.Width, e.Height);
+		}
+		return true;
+	}
+
+	void EditorUISystemLayer::RegisterUIView()
+	{
+		// UI
+		UIManager::GetInstance().RegisterUIView<SceneView>();
+		UIManager::GetInstance().RegisterUIView<WorldHierarchyView>();
+		UIManager::GetInstance().RegisterUIView<InspectorView>();
+		UIManager::GetInstance().RegisterUIView<ContentsView>();
+		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
+	}
+
+	void EditorUISystemLayer::RegisterPopupUIView()
+	{
+		// PopupUI
+		UIManager::GetInstance().RegisterPopupUIView<ComponentFinderContextView>();
+		UIManager::GetInstance().RegisterPopupUIView<AssetFinderContextView>();
+		// Modal
+		UIManager::GetInstance().RegisterPopupUIView<ProgressBarModalView>();
+		UIManager::GetInstance().RegisterPopupUIView<MessageBoxModalView>();
+	}
+
+	void EditorUISystemLayer::BeginMenu(const MenuItemNode* Node)
 	{
 
 		if (Node->MenuItem == nullptr)
@@ -228,7 +255,7 @@ namespace JG
 		}
 	}
 
-	void UISystemLayer::EndMenu(const MenuItemNode* Node)
+	void EditorUISystemLayer::EndMenu(const MenuItemNode* Node)
 	{
 		if (Node->MenuItem == nullptr && Node->IsOpen)
 		{

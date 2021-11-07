@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "JGEditor.h"
 #include "Layer/DevLayer.h"
-#include "Layer/ImGuiSystemLayer.h"
-#include "Layer/UISystemLayer.h"
+#include "Layer/EditorUISystemLayer.h"
 #include "Layer/GameLogicSystemLayer.h"
 namespace JG
 {
@@ -16,8 +15,7 @@ namespace JG
 	}
 	void JGEditor::LoadImpl()
 	{
-		PushLayer(CreateSharedPtr<ImGuiSystemLayer>());
+		PushLayer(CreateSharedPtr<EditorUISystemLayer>());
 		PushLayer(CreateSharedPtr<GameLogicSystemLayer>());
-		PushLayer(CreateSharedPtr<UISystemLayer>());
 	}
 }

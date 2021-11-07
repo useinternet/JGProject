@@ -23,7 +23,7 @@ namespace JG
 		virtual u32 GetIndexCount() const override;
 		virtual void SetInstanceCount(u32 cnt) override;
 		virtual u32 GetInstanceCount() const override;
-		virtual bool Bind() override;
+		virtual bool Bind(u64 commandID) override;
 		virtual bool IsValid() const override;
 	};
 	class DirectX12Mesh : public IMesh
@@ -46,7 +46,7 @@ namespace JG
 		virtual void SetName(const String& name) override;
 		virtual const String& GetName() override;
 
-		virtual bool Bind() override;
+		virtual bool Bind(u64 commandID) override;
 		virtual bool IsValid() const override;
 	};
 }
