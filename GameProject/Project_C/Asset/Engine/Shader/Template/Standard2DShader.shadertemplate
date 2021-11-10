@@ -4,11 +4,10 @@ SamplerState gPointSampler
 };
 		
 Texture2D gTexture[64];
-		
-cbuffer Camera
+
+cbuffer __PASS_DATA__
 {
-	float4x4 gViewProj;
-	float3   gEye;
+	float4x4 __ViewProjMatrix__;
 };
 		
 struct VS_IN
@@ -30,7 +29,7 @@ VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
 		    
-	vout.posH = mul(float4(vin.posL, 1.0f), gViewProj);
+	vout.posH = mul(float4(vin.posL, 1.0f), __ViewProjMatrix__);
 	vout.tex = vin.tex;
 	vout.color = vin.color;
 	vout.textureIndex = vin.textureIndex;

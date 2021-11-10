@@ -15,6 +15,7 @@ namespace JG
 		D3D12_DEPTH_STENCIL_DESC mDepthStencilDesc;
 		D3D12_RASTERIZER_DESC    mRasterzerDesc;
 	public:
+		virtual void SetPassData(u64 commandID, void* data, u64 dataSize) override;
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
 		virtual bool SetFloat3(const String& name, const JVector3& value) override;

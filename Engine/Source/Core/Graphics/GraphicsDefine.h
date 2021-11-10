@@ -354,6 +354,11 @@ namespace JG
 			constexpr char* SurfaceVariables = "__PS_SURFACE_VARIABLES_SCRIPT__";
 			constexpr char* SurfaceContents  = "__PS_SURFACE_FUNCTION_SCRIPT__";
 		}
+
+		namespace Token
+		{
+			constexpr char* PassData = "__PASS_DATA__";
+		}
 	}
 	namespace HLSL
 	{

@@ -67,6 +67,9 @@ namespace JG
 		JVector2 mMousePos;
 		JVector2 mPrevMousePos;
 
+		const ImVec4 mPressedButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
+		const ImVec2 mButtonSize = ImVec2(20, 20);
+
 	public:
 		SceneView();
 		virtual ~SceneView() = default;
@@ -84,24 +87,32 @@ namespace JG
 	private:
 		void OnGUI_Top();
 		void OnGUI_Bottom();
-
-	private:
-		void SetSelectedGameNode(GameNode* gameNode);
-		GameNode* GetSelectedGameNode() const;
-
-		void SetSceneTexture(SharedPtr<ITexture> sceneTexture);
-		SharedPtr<ITexture> GetSceneTexture() const;
+		void OnGUI_GizmoTool();
+		void OnGui_GameLogicTool();
+		void OnGui_FPS();
+		void OnGui_ResolutionTool();
 	private:
 		bool ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e);
 		bool ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e);
 		bool ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e);
 		bool ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e);
 	private:
-		String ResolutionToString(i32 resolution);
-		void LoadIcons();
+		void      SetSelectedGameNode(GameNode* gameNode);
+		GameNode* GetSelectedGameNode() const;
+
+		void                SetSceneTexture(SharedPtr<ITexture> sceneTexture);
+		SharedPtr<ITexture> GetSceneTexture() const;
 		ImTextureID GetIconTextureID(i32 iconEnum) const;
-		JVector2 GetFitSize(JVector2 originSize, f32 wratio, f32 hratio);
+		JVector2    GetFitSize(JVector2 originSize, f32 wratio, f32 hratio);
+	private:
+		String ResolutionToString(i32 resolution);
+		void   LoadIcons();
+		void   PlayGame();
+		void   StopGame();
+		void   PauseGame();
+
 	private:
 		void ControllEditorCamera();
+
 	};
 }

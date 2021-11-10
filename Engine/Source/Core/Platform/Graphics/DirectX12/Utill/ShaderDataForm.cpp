@@ -200,11 +200,19 @@ namespace JG
 		cBuffer->DataSize = uploadDataSize;
 		cBuffer->ElementType = HLSL::EHLSLElement::CBuffer;
 		cBuffer->RootParm = RootParamOffset++;
-		cBuffer->RegisterNum = (u32)CBufferDataMap.size() - 1;
+		cBuffer->RegisterNum = CBufferRegisterNumberOffset;
 
 		code.insert(endPos, " : register(b" + std::to_string(CBufferRegisterNumberOffset++) + ")");
 
 		RootParamMap[cBuffer->RootParm] = cBuffer;
+
+		if (cBuffer->Name == ShaderScript::Token::PassData)
+		{
+			auto cbName = cBuffer->Name;
+			PassData = std::move(CBufferDataMap[cbName]);
+			CBufferDataMap.erase(cbName);
+		}
+
 		return startPos;
 	}
 	u64 ShaderDataForm::AnalysisStructuredBuffer(String& code, u64 startPos, bool* result)
@@ -1138,7 +1146,6 @@ namespace JG
 	}
 	bool ShaderData::Bind(u64 commandID)
 	{
-		std::lock_guard<std::shared_mutex> lock(mMutex);
 		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 
 		if (dx12Shader != nullptr)
@@ -1152,6 +1159,7 @@ namespace JG
 	
 			auto shaderDataForm = dx12Shader->GetShaderDataForm();
 
+			std::shared_lock<std::shared_mutex> lock(mMutex);
 			if (dx12Shader->GetFlags() & EShaderFlags::Allow_ComputeShader)
 			{
 				auto commandList = DirectX12API::GetComputeCommandList(commandID);
@@ -1160,6 +1168,10 @@ namespace JG
 					auto cBufferName = _pair.first;
 					auto cBufferData = _pair.second.get();
 					commandList->BindConstantBuffer(cBufferData->RootParm, mReadDatas[cBufferName]);
+				}
+				if (shaderDataForm->PassData)
+				{
+					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID]);
 				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
@@ -1229,6 +1241,10 @@ namespace JG
 					auto cBufferName = _pair.first;
 					auto cBufferData = _pair.second.get();
 					commandList->BindConstantBuffer(cBufferData->RootParm, mReadDatas[cBufferName]);
+				}
+				if (shaderDataForm->PassData)
+				{
+					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID]);
 				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
@@ -1302,6 +1318,40 @@ namespace JG
 		mTextureDatas.clear();
 		mRWTextureDatas.clear();
 		mOwnerShader.reset();
+	}
+	void ShaderData::SetPassData(u64 commandID, void* passData, u64 dataSize)
+	{
+		if (mOwnerShader == nullptr)
+		{
+			return;
+		}
+
+		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+		auto shaderDataForm = dx12Shader->GetShaderDataForm();
+
+		if (shaderDataForm == nullptr || shaderDataForm->PassData == nullptr)
+		{
+			return;
+		}
+
+		if (shaderDataForm->PassData->DataSize != dataSize)
+		{
+			JG_CORE_ERROR("Not Match PassDataSize {0} : {1}", shaderDataForm->PassData->DataSize, dataSize);
+			return;
+		}
+
+		void* CPU = nullptr;
+
+		{
+			std::lock_guard<std::shared_mutex> lock(mMutex);
+			if (mPassDatas.find(commandID) == mPassDatas.end())
+			{
+				mPassDatas[commandID] = mUploadAllocator->Allocate(dataSize, 256);
+			}
+			CPU = mPassDatas[commandID].CPU;
+		}
+
+		memcpy(CPU, passData, dataSize);
 	}
 	bool ShaderData::SetFloat(const String& name, float value)
 	{

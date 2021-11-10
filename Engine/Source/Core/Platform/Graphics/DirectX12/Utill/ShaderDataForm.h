@@ -90,6 +90,7 @@ namespace JG
 		Dictionary<String, Data*>		                CBufferVarMap;
 
 		Dictionary<String, UniquePtr<StructData>> StructDataMap;
+		UniquePtr<CBufferData> PassData;
 	private:
 		u64 RootParamOffset = 0;
 		u64 CBufferRegisterNumberOffset = 0;
@@ -149,19 +150,20 @@ namespace JG
 		UniquePtr<UploadAllocator> mUploadAllocator;
 		Dictionary<String, UploadAllocator::Allocation> mReadDatas;
 		Dictionary<String, UploadAllocator::Allocation> mReadWriteDatas;
-
 		Dictionary<String, List<SharedPtr<ITexture>>> mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mRWTextureDatas;
 		SharedPtr<IShader>					          mOwnerShader;
 		
 
 		std::shared_mutex mMutex;
+		Dictionary<u64, UploadAllocator::Allocation> mPassDatas;
 	public:
 		ShaderData(SharedPtr<IShader> shader);
 	public:
 		bool Bind(u64 commandID);
 		void Reset();
 	public:
+		void SetPassData(u64 commandID, void* passData, u64 dataSize);
 		bool SetFloat(const String& name, float value);
 		bool SetFloat2(const String& name, const JVector2& value);
 		bool SetFloat3(const String& name, const JVector3& value);

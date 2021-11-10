@@ -32,6 +32,20 @@ namespace JG
 
 		auto renderInfo = GetRenderInfo();
 		auto lightInfos = GetLightInfos();
+
+
+		struct PassCB
+		{
+			JMatrix ViewProjMatrix;
+			JMatrix WorldMatrix;
+			JVector3 EyePos;
+		};
+		PassCB passCB;
+		passCB.ViewProjMatrix = JMatrix::Transpose(renderInfo.ViewProj);
+		passCB.EyePos = renderInfo.EyePosition;
+
+
+
 		for (auto& info : objectList)
 		{
 			auto mesh = info.Mesh;
@@ -42,8 +56,6 @@ namespace JG
 			{
 				JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
 			}
-
-			auto transposedViewProj = JMatrix::Transpose(renderInfo.ViewProj);
 			for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
 			{
 				if (mesh->GetSubMesh(i)->Bind(GetCommandID()) == false)
@@ -60,24 +72,8 @@ namespace JG
 				{
 					material = materialList[i];
 				}
-				auto transposedWorld = JMatrix::Transpose(worldMatrix);
-				if (material->SetFloat4x4(ShaderScript::Standard3D::ViewProj, transposedViewProj) == false)
-				{
-					JG_CORE_ERROR("{0} : Fail SetViewProjMatrix in CameraParam", material->GetName());
-					continue;
-				}
-				if (material->SetFloat3(ShaderScript::Standard3D::Eye, renderInfo.EyePosition) == false)
-				{
-					JG_CORE_ERROR("{0} : Fail SetEye in CameraParam", material->GetName());
-					continue;
-				}
-				if (material->SetFloat4x4(ShaderScript::Standard3D::World, transposedWorld) == false)
-				{
-					JG_CORE_ERROR("{0} : Fail SetWorldMatrix in ObjectParams", material->GetName());
-					continue;
-				}
-
-
+				passCB.WorldMatrix = JMatrix::Transpose(worldMatrix);
+				material->SetPassData(GetCommandID(), &passCB, sizeof(PassCB));
 				// 라이트 정보 심어주기
 				{
 					// 

@@ -103,12 +103,18 @@ namespace JG
 
 
 		mCurrFrameResource = &mFrameResources[info.CurrentBufferIndex];
-		auto transposedViewProj = JMatrix::Transpose(info.ViewProj);
-		if (mCurrFrameResource->Standard2DMaterial->SetFloat4x4(ShaderScript::Standard2D::ViewProj, transposedViewProj) == false)
+
+
+
+		struct PassCB
 		{
-			JG_CORE_ERROR("Failed Set ViewProjMatrix in Renderer2D");
-			return false;
-		}
+			JMatrix ViewProjMatrix;
+		};
+
+		PassCB passCB;
+		passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProj);
+
+		mCurrFrameResource->Standard2DMaterial->SetPassData(GetCommandID(), &passCB, sizeof(PassCB));
 		return true;
 	}
 

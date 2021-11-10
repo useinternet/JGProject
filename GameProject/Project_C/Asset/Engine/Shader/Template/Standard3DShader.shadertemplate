@@ -2,17 +2,6 @@ SamplerState gPointSampler
 {
 	Template = Point_Wrap
 };
-
-cbuffer Camera
-{
-	float4x4 gViewProj;
-	float3   gEye;
-};
-cbuffer ObjectParams
-{
-	float4x4 gWorld;
-}
-
 struct VS_IN
 {
 	float3 posL : POSITION;
@@ -32,6 +21,12 @@ struct VS_OUT
 	float2 tex     : TEXCOORD;
 };
 
+cbuffer __PASS_DATA__
+{
+	float4x4 __ViewProjMatrix__;
+	float4x4 __WorldMatrix__;
+	float3   __EyePosition__;
+};
 
 
 
@@ -79,11 +74,11 @@ VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
 	vout.posL = vin.posL;
-	float3 posW = mul(float4(vin.posL, 1.0f), gWorld);
-	float3 normalW = mul(float4(vin.normalL, 0.0f), gWorld);
-	float3 tanW =  mul(float4(vin.tanL, 0.0f), gWorld);
-	float3 bitW =  mul(float4(vin.bitL, 0.0f), gWorld);
-	vout.posH = mul(float4(posW, 1.0f), gViewProj);
+	float3 posW = mul(float4(vin.posL, 1.0f), __WorldMatrix__);
+	float3 normalW = mul(float4(vin.normalL, 0.0f), __WorldMatrix__);
+	float3 tanW =  mul(float4(vin.tanL, 0.0f), __WorldMatrix__);
+	float3 bitW =  mul(float4(vin.bitL, 0.0f), __WorldMatrix__);
+	vout.posH = mul(float4(posW, 1.0f), __ViewProjMatrix__);
 	vout.posW = posW;
 	vout.normalW = normalize(normalW);
 	vout.tanW = normalize(tanW);
@@ -99,7 +94,7 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 
 
 	float3 N = normalize(pin.normalW);
-	float3 V = normalize(gEye - pin.posW);
+	float3 V = normalize(__EyePosition__ - pin.posW);
 
 
     float3 Lo = float3(0.0f,0.0f,0.0f);

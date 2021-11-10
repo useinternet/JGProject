@@ -6,6 +6,14 @@
 #include "Utill/ShaderDataForm.h"
 namespace JG
 {
+	void DirectX12Material::SetPassData(u64 commandID, void* data, u64 dataSize)
+	{
+		if (mShaderData == nullptr)
+		{
+			return;
+		}
+		mShaderData->SetPassData(commandID, data, dataSize);
+	}
 	bool DirectX12Material::SetFloat(const String& name, float value)
 	{
 		if (mShaderData == nullptr)
