@@ -1,6 +1,8 @@
 #pragma once
 #include "Class/SystemLayer.h"
 #include "Class/FileIO.h"
+#include "Event/EditorEvent.h"
+#include "UI/UIManager.h"
 namespace JG
 {
 	enum class MenuType
@@ -34,14 +36,16 @@ namespace JG
 		bool Resize(AppResizeEvent& e);
 		void RegisterUIView();
 		void RegisterPopupUIView();
-
-
-
-
-
+	private:
+		bool ResponseOpenProgressBar(RequestOpenProgressBarEvent& e);
+		bool ResponseDisplayProgressBar(RequestDisplayProgressBarEvent& e);
+		bool ResponseCloseProgressBar(RequestCloseProgressBarEvent& e);
+		bool ResponseOpenMessageBox(RequestOpenMessageBoxEvent& e);
 	private:
 		static void BeginMenu(const MenuItemNode* Node);
 		static void EndMenu(const MenuItemNode* Node);
+
+
 	};
 
 }

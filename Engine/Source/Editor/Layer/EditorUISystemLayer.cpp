@@ -3,29 +3,28 @@
 #include "Imgui/imgui.h"
 #include "ExternalImpl/JGImGui.h"
 // UI
-#include "Class/UI/UIView/SceneView.h"
-#include "Class/UI/UIView/WorldHierarchyView.h"
-#include "Class/UI/UIView/InspectorView.h"
-#include "Class/UI/UIView/ContentsView.h"
-#include "Class/UI/UIView/ProjectSettingView.h"
+#include "UI/UIView/SceneView.h"
+#include "UI/UIView/WorldHierarchyView.h"
+#include "UI/UIView/InspectorView.h"
+#include "UI/UIView/ContentsView.h"
+#include "UI/UIView/ProjectSettingView.h"
 
 // PopupUI
-#include "Class/UI/ContextUI/ComponentFinderContextView.h"
-#include "Class/UI/ContextUI/AssetFinderContextView.h"
+#include "UI/ContextUI/ComponentFinderContextView.h"
+#include "UI/ContextUI/AssetFinderContextView.h"
 //
-#include "Class/UI/ModalUI/ProgressBarModalView.h"
-#include "Class/UI/ModalUI/MessageBoxModalView.h"
+#include "UI/ModalUI/ProgressBarModalView.h"
+#include "UI/ModalUI/MessageBoxModalView.h"
 
-#include "Class/Game/GameWorld.h"
 namespace JG
 {
 	void EditorUISystemLayer::OnAttach()
 	{
-	
+		UIManager::Create();
 	}
 	void EditorUISystemLayer::OnDetach()
 	{
-
+		UIManager::Destroy();
 	}
 
 
@@ -46,6 +45,17 @@ namespace JG
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<AppResizeEvent>(EVENT_BIND_FN(&EditorUISystemLayer::Resize));
+		dispatcher.Dispatch<RequestOpenProgressBarEvent>(EVENT_BIND_FN(&EditorUISystemLayer::ResponseOpenProgressBar));
+		dispatcher.Dispatch<RequestDisplayProgressBarEvent>(EVENT_BIND_FN(&EditorUISystemLayer::ResponseDisplayProgressBar));
+		dispatcher.Dispatch<RequestCloseProgressBarEvent>(EVENT_BIND_FN(&EditorUISystemLayer::ResponseCloseProgressBar));
+		dispatcher.Dispatch<RequestOpenMessageBoxEvent>(EVENT_BIND_FN(&EditorUISystemLayer::ResponseOpenMessageBox));
+
+
+
+		if (e.Handled == false)
+		{
+			UIManager::GetInstance().OnEvent(e);
+		}
 	}
 	String EditorUISystemLayer::GetLayerName()
 	{
@@ -188,7 +198,50 @@ namespace JG
 		UIManager::GetInstance().RegisterPopupUIView<ProgressBarModalView>();
 		UIManager::GetInstance().RegisterPopupUIView<MessageBoxModalView>();
 	}
+	bool EditorUISystemLayer::ResponseOpenProgressBar(RequestOpenProgressBarEvent& e)
+	{
+		auto progressBar = UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData(e.OpenData.Title));
+		if (progressBar != nullptr)
+		{
+			progressBar->Display(e.OpenData.Contents, e.OpenData.Ratio);
+		}
 
+		return true;
+	}
+	bool EditorUISystemLayer::ResponseDisplayProgressBar(RequestDisplayProgressBarEvent& e)
+	{
+		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+		if (progressBar != nullptr)
+		{
+			progressBar->Display(e.DisplayData.Contents, e.DisplayData.Ratio);
+		}
+		return true;
+	}
+	bool EditorUISystemLayer::ResponseCloseProgressBar(RequestCloseProgressBarEvent& e)
+	{
+		auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
+		if (progressBar != nullptr)
+		{
+			progressBar->Close();
+		}
+		return true;
+	}
+	bool EditorUISystemLayer::ResponseOpenMessageBox(RequestOpenMessageBoxEvent& e)
+	{
+		MessageBoxInitData initData;
+		initData.Title = e.OpenData.Title;
+		initData.Contents = e.OpenData.Contents;
+		initData.MsgType  = (EMessageBoxType)e.OpenData.MsgType;
+		initData.ParamName[0] = e.OpenData.ParamName[0];
+		initData.ParamName[1] = e.OpenData.ParamName[1];
+		initData.ParamAction[0] = e.OpenData.ParamAction[0];
+		initData.ParamAction[1] = e.OpenData.ParamAction[1];
+
+		UIManager::GetInstance().OpenPopupUIView<MessageBoxModalView>(initData);
+
+
+		return true;
+	}
 	void EditorUISystemLayer::BeginMenu(const MenuItemNode* Node)
 	{
 

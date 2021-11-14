@@ -1,7 +1,8 @@
 #pragma once
 #include "JGCore.h"
 #include "Class/SystemLayer.h"
-
+#include "Event/GameEvent.h"
+#include "Event/EditorEvent.h"
 namespace JG
 {
 	enum class EAssetFormat;

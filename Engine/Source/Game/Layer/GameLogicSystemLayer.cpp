@@ -1,49 +1,44 @@
 #include "pch.h"
 #include "GameLogicSystemLayer.h"
 #include "Application.h"
-#include "Class/Game/GameObject.h"
-
-#include "Class/Game/GameNode.h"
-#include "Class/Game/GameWorld.h"
-
-#include "Class/Game/GameComponent.h"
-#include "Class/Game/Components/Transform.h"
-#include "Class/Game/Components/Camera.h"
-#include "Class/Game/Components/SpriteRenderer.h"
-#include "Class/Game/Components/StaticMeshRenderer.h"
-#include "Class/Game/Components/PointLight.h"
-#include "Class/Game/Components/Collision.h"
-#include "Class/Game/Components/SkyDome.h"
-#include "Dev/Dev.h"
-
-
+#include "GameObject.h"
+#include "GameNode.h"
+#include "GameWorld.h"
+#include "GameComponent.h"
+#include "Components/Transform.h"
+#include "Components/Camera.h"
+#include "Components/SpriteRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/PointLight.h"
+#include "Components/Collision.h"
+#include "Components/SkyDome.h"
+#include "Manager/GameLayerManager.h"
 #include "Class/Asset/Asset.h"
 
-#include "Class/UI/ModalUI/ProgressBarModalView.h"
-#include "Class/UI/ModalUI/MessageBoxModalView.h"
-#include <Class/UI/UIView/InspectorView.h>
 namespace JG
 {
-	String GameWorldPath = CombinePath(Application::GetEnginePath(), "TestGameWorld.jgasset");
 	void GameLogicSystemLayer::OnAttach()
 	{
+		GameLayerManager::Create();
 		GameObjectFactory::Create();
 	}
 	void GameLogicSystemLayer::OnDetach()
 	{
+
 		GameObjectFactory::Destroy();
+		GameLayerManager::Destroy();
 	}
 	void GameLogicSystemLayer::Begin()
 	{
-		UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&](){
+		//UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&](){
 
-			if (mGameWorld == nullptr) return;
-			if (mIsGamePlaying == true) return;
+		//	if (mGameWorld == nullptr) return;
+		//	if (mIsGamePlaying == true) return;
 
-			RequestSaveGameWorldEvent e;
-			Application::GetInstance().SendEvent(e);
+		//	RequestSaveGameWorldEvent e;
+		//	Application::GetInstance().SendEvent(e);
 
-		}, nullptr);
+		//}, nullptr);
 
 
 		RegisterGameObjectType();
@@ -86,11 +81,14 @@ namespace JG
 
 
 		{
-			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Save GameWorld"));
-
-			progressBar->Display("Save GameWorld", 0.5f);
+			RequestOpenProgressBarEvent e;
+			e.OpenData.Title    = "Save GameWorld";
+			e.OpenData.Contents = "Save GameWorld...";
+			e.OpenData.Ratio    = 0.5f;
+			Application::GetInstance().SendEvent(e);
 		}
+
+
 		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem,
 			[&](SharedPtr<IJGObject> userData)->EScheduleResult
 		{
@@ -105,17 +103,25 @@ namespace JG
 
 			if (result == false)
 			{
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Save GameWorld"));
-				progressBar->Close();
+				{
+					RequestCloseProgressBarEvent e;
+					Application::GetInstance().SendEvent(e);
+				}
+				{
+					RequestOpenMessageBoxEvent e;
+					e.OpenData.Title    = "Error";
+					e.OpenData.Contents = "Fail Save GameWorld";
+					Application::GetInstance().SendEvent(e);
+				}
 			}
 
 
 			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Display("Save GameWorld", 1.0f);
-				progressBar->Close();
+				{
+					RequestCloseProgressBarEvent e;
+					Application::GetInstance().SendEvent(e);
+				}
 				ActionData* actionData = userData->As<ActionData>();
 				if (actionData && actionData->CompeleteAction != nullptr)
 				{
@@ -133,10 +139,11 @@ namespace JG
 	bool GameLogicSystemLayer::ResponseLoadGameWorld(RequestLoadGameWorldEvent& e)
 	{
 		{
-			auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-			UIManager::GetInstance().OpenPopupUIView<ProgressBarModalView>(ProgressBarInitData("Load GameWorld"));
-
-			progressBar->Display("Load GameWorld", 0.5f);
+			RequestOpenProgressBarEvent e;
+			e.OpenData.Title = "Load GameWorld";
+			e.OpenData.Contents = "Load GameWorld...";
+			e.OpenData.Ratio = 0.5f;
+			Application::GetInstance().SendEvent(e);
 		}
 
 
@@ -160,9 +167,16 @@ namespace JG
 
 			if (result == false)
 			{
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Close();
-				UIManager::GetInstance().OpenPopupUIView< MessageBoxModalView>(MessageBoxInitData("Error", "Fail Load GameWorld"));
+				{
+					RequestCloseProgressBarEvent e;
+					Application::GetInstance().SendEvent(e);
+				}
+				{
+					RequestOpenMessageBoxEvent e;
+					e.OpenData.Title = "Error";
+					e.OpenData.Contents = "Fail Load GameWorld";
+					Application::GetInstance().SendEvent(e);
+				}
 			}
 			mGameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
 			mGameWorld->SetGlobalGameSystemList(mGameSystemList);
@@ -173,17 +187,23 @@ namespace JG
 
 			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
-				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
-				progressBar->Display("Load GameWorld", 1.0f);
-				progressBar->Close();
+				{
+					RequestCloseProgressBarEvent e;
+					Application::GetInstance().SendEvent(e);
+				}
 				ActionData* actionData = userData->As<ActionData>();
 				if (actionData && actionData->CompeleteAction != nullptr)
 				{
 					actionData->CompeleteAction();
 				}
-				NotifyChangeGameWorldEvent e;
-				e.GameWorld = mGameWorld;
-				Application::GetInstance().SendEvent(e);
+
+
+				{
+					NotifyChangeGameWorldEvent e;
+					e.GameWorld = mGameWorld;
+					Application::GetInstance().SendEvent(e);
+				}
+
 				return EScheduleResult::Continue;
 			}, CreateSharedPtr<ActionData>(userData->As<ActionData>()->CompeleteAction));
 			return EScheduleResult::Continue;
@@ -251,15 +271,7 @@ namespace JG
 		NotifySelectedGameNodeInEditorEvent pickingEvent;
 		if (mGameWorld != nullptr)
 		{
-			List<IJGObject*> exceptObjectList;
-			auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
-			if (inspectorView)
-			{
-				exceptObjectList.push_back(inspectorView->GetTargetObject());
-			}
-
-
-			pickingEvent.SelectedGameNode = mGameWorld->Picking(e.ClickPos, exceptObjectList);
+			pickingEvent.SelectedGameNode = mGameWorld->Picking(e.ClickPos, e.ExceptObjectList);
 		}
 		else
 		{
@@ -288,7 +300,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
-		GameObjectFactory::GetInstance().RegisterComponentType<Dev::DevComponent>();
+		//GameObjectFactory::GetInstance().RegisterComponentType<Dev::DevComponent>();
 	}
 
 }

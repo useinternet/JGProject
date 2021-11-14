@@ -350,78 +350,7 @@ namespace JG
 		}
 	};
 
-	template<>
-	class Asset<GameWorld> : public IAsset
-	{
-		JGCLASS
-		friend class AssetDataBase;
-		friend class AssetManager;
-		AssetID mAssetID;
-		String  mAssetPath;
-		String  mAssetFullPath;
-		String  mExtension;
-		String  mName;
-		EAssetFormat mFormat;
-		SharedPtr<Json> mData = nullptr;
-	public:
-		Asset(AssetID assetID, const String& assetPath)
-		{
-			Set(assetID, assetPath);
-			mData = nullptr;
-		}
-		~Asset() = default;
-		void Set(AssetID assetID, const String& assetPath)
-		{
-			fs::path p(assetPath);
-			fs::path contentsPath = fs::absolute(GetAssetRootPath()).string();
-			mAssetID = assetID;
-			mAssetFullPath = fs::absolute(assetPath).string();
-			mAssetPath = ReplaceAll(mAssetFullPath, contentsPath.string(), "Asset");
-			strcpy(mAssetID.ResourcePath, mAssetPath.c_str());
-			mExtension = p.extension().string();
-			mName = ReplaceAll(p.filename().string(), mExtension, "");
-		}
-	public:
-		virtual AssetID GetAssetID() const override
-		{
-			return mAssetID;
-		}
-		virtual const String& GetAssetFullPath() const override
-		{
-			return mAssetFullPath;
-		}
-		virtual const String& GetAssetPath() const override
-		{
-			return mAssetPath;
-		}
-		virtual const String& GetAssetName() const override
-		{
-			return mName;
-		}
-		virtual const String& GetExtension() const override
-		{
-			return mExtension;
-		}
-		bool IsValid() const {
-			return Get() != nullptr;
-		}
-		SharedPtr<JsonData> Get() const {
-			if (mData == nullptr)
-			{
-				return nullptr;
-			}
-			return mData->GetMember(JG_ASSET_KEY);
-		}
-		virtual void OnInspectorGUI() override {
-			AssetInspectorGUI::InspectorGUI(this);
-		}
-	private:
-		virtual SharedPtr<IAsset> Copy() const override {
-			auto asset = CreateSharedPtr<Asset<GameWorld>>(mAssetID, mAssetFullPath);
-			asset->mData = mData;
-			return asset;
-		}
-	};
+
 
 
 

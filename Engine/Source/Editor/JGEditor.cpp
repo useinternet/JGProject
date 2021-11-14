@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "JGEditor.h"
-#include "Layer/DevLayer.h"
 #include "Layer/EditorUISystemLayer.h"
 #include "Layer/GameLogicSystemLayer.h"
 namespace JG
