@@ -55,9 +55,6 @@ namespace JG
 		f32 GetAtt1() const;
 		f32 GetAtt2() const;
 
-
-	private:
-		virtual void OnInspectorGUI() override;
 #ifdef JG_EDITOR
 		EScheduleResult PushDebugRenderItem();
 #endif

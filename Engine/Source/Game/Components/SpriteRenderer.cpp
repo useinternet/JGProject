@@ -84,42 +84,17 @@ namespace JG
 		return mColor;
 	}
 
+	const Asset<ITexture>* SpriteRenderer::GetSprite() const
+	{
+		return mSprite;
+	}
+
 
 	void SpriteRenderer::OnChange(const ChangeData& data)
 	{
 		BaseRenderer::OnChange(data);
 
 	}
-	void SpriteRenderer::OnInspectorGUI()
-	{
-		BaseRenderer::OnInspectorGUI();
-		ImGui::AlignTextToFramePadding();
-
-		auto color = GetColor();
-
-		f32 label_width = ImGui::CalcTextSize("Sprite").x;
-
-		ImGui::Color4_OnGUI("Color", color, label_width);
-
-		if (mSprite)
-		{
-			ImGui::AssetField_OnGUI("Sprite ", mSprite->GetAssetName(), EAssetFormat::Texture, [&](const String& path)
-			{
-				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-			}, label_width);
-
-		}
-		else
-		{
-			ImGui::AssetField_OnGUI("Sprite ", "None", EAssetFormat::Texture, [&](const String& path)
-			{
-				mSprite = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>(path);
-			}, label_width);
-		}
-
-		SetColor(color);
-	}
-
 	EScheduleResult SpriteRenderer::PushRenderSceneObject()
 	{
 		if (IsActive() == false)

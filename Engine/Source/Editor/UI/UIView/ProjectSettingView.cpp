@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ProjectSettingView.h"
+#include "UI/UIManager.h"
 #include "Class/Asset/Asset.h"
 #include "ExternalImpl/JGImGui.h"
 #include "Application.h"

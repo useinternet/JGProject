@@ -260,24 +260,6 @@ namespace JG
 		const String& GetAssetRootPath() const;
 	};
 
-
-
-	class IMaterial;
-	class AssetInspectorGUI
-	{
-		template<class T>
-		friend class Asset;
-	public:
-		virtual ~AssetInspectorGUI() = default;
-	private:
-		static void InspectorGUI(IAsset* targetAsset);
-	private:
-		static void Material_InsepctorGUI(Asset<IMaterial>* targetAsset);
-	private:
-		static void Material_Save(Asset<IMaterial>* targetAsset);
-	};
-
-
 	template<class T>
 	class Asset : public IAsset
 	{
@@ -337,9 +319,9 @@ namespace JG
 		SharedPtr<T> Get() const {
 			return mData;
 		}
-		virtual void OnInspectorGUI() override {
-			AssetInspectorGUI::InspectorGUI(this);
-		}
+		//virtual void OnInspectorGUI() override {
+		//	AssetInspectorGUI::InspectorGUI(this);
+		//}
 	public:
 		virtual ~Asset() = default;
 	private:

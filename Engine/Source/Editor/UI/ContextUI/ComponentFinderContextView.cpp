@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ComponentFinderContextView.h"
-#include "Class/Game/GameObjectFactory.h"
+#include "GameObjectFactory.h"
 namespace JG
 {
 
@@ -15,9 +15,6 @@ namespace JG
 		mComponentTypeSet.clear();
 		mFilteredTypeList.clear();
 		mFilterStr.resize(256);
-	}
-	void ComponentFinderContextView::OnEvent(IEvent& e)
-	{
 	}
 	bool ComponentFinderContextView::OnGUI()
 	{
@@ -84,10 +81,4 @@ namespace JG
 		}
 
 	}
-
-	bool ComponentFinderContextView::ResponseGameComponentTypeSet(NotifyGameComponentTypeSet& e)
-	{
-		return false;
-	}
-
 }

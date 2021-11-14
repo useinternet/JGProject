@@ -26,7 +26,6 @@ namespace JG
 	protected:
 		virtual void Initialize(const ComponentFinderInitData& data) override;
 		virtual void Destroy() override;
-		virtual void OnEvent(IEvent& e) override;
 		virtual bool OnGUI() override;
 		
 	public:
@@ -34,8 +33,6 @@ namespace JG
 
 	private:
 		void FindComponentTypeList(const String& filter);
-	private:
-		bool ResponseGameComponentTypeSet(NotifyGameComponentTypeSet& e);
 
 	};
 

@@ -63,65 +63,7 @@ namespace JG
 		mUpdateScheduleHandle = nullptr;
 		mLateUpdateScheduleHandle = nullptr;
 	}
-	void GameWorld::OnInspectorGUI()
-	{
-		ImGui::Dummy(ImVec2(0, 1.0f));
 
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Name : "); ImGui::SameLine();
-		ImGui::Text(GetName().c_str()); ImGui::SameLine();
-		ImGui::Text("Instance : "); ImGui::SameLine();
-		ImGui::Text(std::to_string((u64)this).c_str());
-		ImGui::Dummy(ImVec2(0, 1.0f));
-		ImGui::Separator();
-
-
-		if (ImGui::CollapsingHeader("Physcis", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-		{
-			auto gravity = GetGravity();
-			i32 label_space = ImGui::CalcTextSize("Gravity").x;
-			if (ImGui::Vector3_OnGUI("Gravity", gravity, label_space) == true)
-			{
-				SetGravity(gravity);
-			}
-		}
-
-		//for (auto& globalSystem : mGlobalGameSystemList)
-		//{
-		//
-		//	ImGui::Spacing();
-		//	String id = globalSystem->GetName() + "##" + std::to_string((ptraddr)globalSystem);
-
-		//	if (ImGui::CollapsingHeader(
-		//		id.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-		//	{
-		//		globalSystem->OnInspectorGUI();
-		//	}
-		//}
-		//List<GameSystem*> removeSysList;
-		//for (auto& system : mWorldGameSystemList)
-		//{
-		//	bool is_open = true;
-		//	ImGui::Spacing();
-		//	String id = system->GetName() + "##" + std::to_string((ptraddr)system);
-		//	if (ImGui::CollapsingHeader(
-		//		id.c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-		//	{
-		//		system->OnInspectorGUI();
-		//	}
-
-		//	if (is_open == false)
-		//	{
-		//		removeSysList.push_back(system);
-		//	}
-		//}
-
-		//for (auto& sys : removeSysList)
-		//{
-		//	Destroy(sys);
-		//}
-
-	}
 	void GameWorld::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		GameNode::MakeJson(jsonData);

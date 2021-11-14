@@ -13,8 +13,6 @@ namespace JG
 		virtual void Destory() override;
 	public:
 		virtual ~GlobalGameSystem() = default;
-	public:
-		virtual void OnInspectorGUI() override;
 	};
 
 
@@ -35,7 +33,5 @@ namespace JG
 		GameWorld* GetOwnerGameWorld() const {
 			return mGameWorld;
 		}
-	public:
-		virtual void OnInspectorGUI() override;
 	};
 }

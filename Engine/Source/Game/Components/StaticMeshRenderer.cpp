@@ -65,11 +65,46 @@ namespace JG
 	}
 	void StaticMeshRenderer::AddMaterial(const String& path)
 	{
-		mMaterialList.push_back(GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path));
+		if (path.empty())
+		{
+			mMaterialList.push_back(nullptr);
+
+		}
+		else
+		{
+			mMaterialList.push_back(GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path));
+		}
+	
+	}
+	void StaticMeshRenderer::PopMaterial()
+	{
+		if (mMaterialList.empty() == false)
+		{
+			mMaterialList.pop_back();
+		}
 	}
 	i32 StaticMeshRenderer::GetMaterialCount() const
 	{
 		return mMaterialList.size();
+	}
+	Asset<IMesh>* StaticMeshRenderer::GetMesh() const
+	{
+		return mMesh;
+	}
+	Asset<IMaterial>* StaticMeshRenderer::GetMaterial(i32 slot) const
+	{
+		if (mMaterialList.size() <= slot)
+		{
+			return nullptr;
+		}
+		return mMaterialList[slot];
+	}
+	void StaticMeshRenderer::ForEach(const std::function<void(Asset<IMaterial>*)>& action)
+	{
+		for (auto& m : mMaterialList)
+		{
+			action(m);
+		}
 	}
 	void StaticMeshRenderer::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -117,59 +152,6 @@ namespace JG
 	void StaticMeshRenderer::OnChange(const ChangeData& data)
 	{
 		BaseRenderer::OnChange(data);
-	}
-	void StaticMeshRenderer::OnInspectorGUI()
-	{
-		BaseRenderer::OnInspectorGUI();
-
-
-
-
-		f32 label_width = ImGui::CalcTextSize("Materials").x;
-
-
-
-		String inputText = "None";
-		if (mMesh)
-		{
-			inputText = mMesh->GetAssetName();
-		}
-		ImGui::AssetField_OnGUI("Mesh", inputText, EAssetFormat::Mesh, [&](const std::string& path)
-		{
-			SetMesh(path);
-		}, label_width);
-
-
-
-
-
-
-
-		List<String> inputTextList;
-
-		for (auto& m : mMaterialList)
-		{
-			if (m == nullptr) {
-				inputTextList.push_back("None");
-			}
-			else
-			{
-				inputTextList.push_back(m->GetAssetName());
-			}
-
-	
-		}
-		ImGui::AssetField_List_OnGUI("Materials", inputTextList, EAssetFormat::Material,
-			[&](int index, const std::string& path)
-		{
-			mMaterialList[index] = GetGameWorld()->GetAssetManager()->RequestRWAsset<IMaterial>(path);
-		}, [&]()
-		{
-			mMaterialList.push_back(nullptr);
-		}, [&]()
-		{
-			mMaterialList.pop_back();
-		}, label_width);
 	}
 	void StaticMeshRenderer::OnInspector_MeshGUI()
 	{

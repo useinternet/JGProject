@@ -11,10 +11,6 @@ namespace JG
 	{
 
 	}
-	void GlobalGameSystem::OnInspectorGUI()
-	{
-
-	}
 
 
 	void GameSystem::Start()
@@ -22,10 +18,6 @@ namespace JG
 
 	}
 	void GameSystem::Destory()
-	{
-
-	}
-	void GameSystem::OnInspectorGUI()
 	{
 
 	}

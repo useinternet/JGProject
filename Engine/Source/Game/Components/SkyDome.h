@@ -31,7 +31,7 @@ namespace JG
 		virtual void LateUpdate() override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
-		virtual void OnInspectorGUI() override;
+		//virtual void OnInspectorGUI() override;
 	private:
 		EScheduleResult SkyDome::PushRenderSceneObject();
 		void CreateGeometry();

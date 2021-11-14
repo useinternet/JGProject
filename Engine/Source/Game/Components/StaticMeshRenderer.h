@@ -25,14 +25,19 @@ namespace JG
 		void SetMesh(const String& path);
 		void SetMaterial(const String& path);
 		void SetMaterial(i32 slot, const String& path);
-		void AddMaterial(const String& path);
+		void AddMaterial(const String& path = String());
+		void PopMaterial();
 		i32 GetMaterialCount() const;
+
+
+		Asset<IMesh>*     GetMesh() const;
+		Asset<IMaterial>* GetMaterial(i32 slot) const;
+		void ForEach(const std::function<void(Asset<IMaterial>*)>& action);
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
 		virtual void OnChange(const ChangeData & data) override;
-		virtual void OnInspectorGUI() override;
 	private:
 		void OnInspector_MeshGUI();
 		void OnInspector_MaterialGUI();

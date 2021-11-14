@@ -43,13 +43,6 @@ namespace JG
 
 	}
 
-	void Collision::OnInspectorGUI()
-	{
-		GameComponent::OnInspectorGUI();
-
-	}
-
-
 	void Collision::OnChange(const ChangeData& data)
 	{
 

@@ -8,7 +8,10 @@ namespace JG
 	class IUIView;
 	class IPopupUIView;
 	class ITexture;
+	class IInspectorUI;
 
+
+	class IAsset;
 	template<class T>
 	class Asset;
 
@@ -52,6 +55,7 @@ namespace JG
 	private:
 		Dictionary<JG::Type, UniquePtr<IUIView>>      mUIViewPool;
 		Dictionary<JG::Type, UniquePtr<IPopupUIView>> mPopupUIViewPool;
+		Dictionary<JG::Type, UniquePtr<IInspectorUI>> mInspectorUIPool;
 		Dictionary<JG::Type, UniquePtr<MenuItemNode>> mUIViewContextMenu;
 
 		UniquePtr<MenuItemNode>  mMainMenuItemRootNode;
@@ -98,6 +102,17 @@ namespace JG
 				return;
 			}
 			mPopupUIViewPool[type] = CreateUniquePtr<UIPopupViewType>();
+		}
+		template<class InspectorUIType>
+		void RegisterInspectorUI()
+		{
+			auto inspectorUI = CreateUniquePtr<InspectorUIType>();
+			Type type = inspectorUI->GetObjectType();
+			if (mInspectorUIPool.find(type) != mInspectorUIPool.end())
+			{
+				return;
+			}
+			mInspectorUIPool[type] = std::move(inspectorUI);
 		}
 
 		template<class UIViewType>
@@ -162,6 +177,7 @@ namespace JG
 		void RegisterContextMenuItem(const Type& type, const String& menuPath, u64 priority, const std::function<void()>& action, const std::function<bool()> enableAction);
 		void BindShowContextMenuFunc(const std::function<bool(Type, bool)>& func);
 		bool ShowContextMenu(const Type& type, bool isWhenHoveredItem = true);
+		bool ShowInspectorUI(IJGObject* object);
 		void ForEach(const std::function<void(IUIView*)> action);
 		void ForEach(
 			const std::function<void(const MenuItemNode*)>& beginAction,

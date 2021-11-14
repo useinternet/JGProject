@@ -135,6 +135,10 @@ namespace JG
 					auto comTypeName = comVal->GetMember("ComponentType")->GetString();
 					auto comType = GameObjectFactory::GetInstance().GetGameObjectType(comTypeName);
 					auto com = AddComponent(comType);
+					if (com == nullptr)
+					{
+						continue;
+					}
 					com->LoadJson(comVal);
 				}
 			}
@@ -155,91 +159,6 @@ namespace JG
 		}
 
 	}
-	void GameNode::OnInspectorGUI() 
-	{
-		const float width = ImGui::GetWindowWidth();
-		const float wpadding = ImGui::GetStyle().FramePadding.x;
-
-		ImGui::Dummy(ImVec2(0, 1.0f));
-
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Name"); ImGui::SameLine();
-
-		char objName[128] = { 0, };
-		strcpy(objName, GetName().c_str());
-		const float input_width = width * 0.4f;
-		ImGui::SetNextItemWidth(input_width);
-		if (ImGui::InputText(("##GameNode InputName"), objName, 128))
-		{
-			SetName(objName);
-		}
-
-
-
-
-
-
-		const float combo_width = width * 0.2f;
-		ImGui::SameLine(width - ImGui::CalcTextSize("Layer").x - wpadding * 2 - combo_width);
-		ImGui::Text("Layer"); ImGui::SameLine();
-		ImGui::SetNextItemWidth(combo_width);
-		ImGui::SameLine(width - combo_width - wpadding);
-		if (ImGui::BeginCombo("##Layer Combo Box", mTargetLayer.c_str()))
-		{
-			GameLayerManager::GetInstance().ForEach([&](const String& layerName)
-			{
-				bool _bool = false;
-				if (ImGui::Selectable(layerName.c_str(), &_bool))
-				{
-					SetLayer(layerName);
-				}
-			});
-			ImGui::EndCombo();
-		}
-
-
-		ImGui::Dummy(ImVec2(0, 1.0f));
-		ImGui::Separator();
-		List<GameComponent*> removeComList;
-		for (auto& com : mComponents)
-		{
-			bool is_open = true;
-			ImGui::Spacing();
-			auto id = com->GetName() + "##" + std::to_string((ptraddr)com);
-			if (ImGui::CollapsingHeader(
-				id.c_str(), &is_open, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader) == true)
-			{
-				com->OnInspectorGUI();
-			}
-
-			if (is_open == false)
-			{
-				removeComList.push_back(com);
-			}
-		}
-
-		for (auto& com : removeComList)
-		{
-			Destroy(com);
-		}
-		ImGui::Spacing();	ImGui::Spacing();	ImGui::Spacing();
-		//auto padding = ImGui::GetStyle().FramePadding;
-		//if (ImGui::Button("Add Component", ImVec2(ImGui::GetWindowSize().x - (padding.x * 4), 0)) == true)
-		//{
-		//	UIManager::GetInstance().OpenPopupUIView<ComponentFinderContextView>(ComponentFinderInitData());
-		//}
-		//if (UIManager::GetInstance().OnContextUIView<ComponentFinderContextView>())
-		//{
-		//	auto comFinder     = UIManager::GetInstance().GetPopupUIView<ComponentFinderContextView>();
-		//	auto selectedType  = comFinder->GetSelectedComponent();
-		//	auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
-		//	if (inspectorView)
-		//	{
-		//		inspectorView->SelectComponentType(selectedType);
-		//	}
-		//}
-	}
-
 	GameNode* GameNode::AddNode(const String& name)
 	{
 		auto obj = GameObjectFactory::GetInstance().CreateObject<GameNode>();
@@ -285,6 +204,13 @@ namespace JG
 		for (auto& node : mChilds)
 		{
 			action(node);
+		}
+	}
+	void GameNode::ForEach(const std::function<void(GameComponent*)>& action)
+	{
+		for (auto& com : mComponents)
+		{
+			action(com);
 		}
 	}
 	void GameNode::SendChangeData(const ChangeData& data, EChangeDataFlags flags)

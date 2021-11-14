@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "PointLight.h"
-#include "ExternalImpl/ImGuiExternal.h"
 #include "Transform.h"
 #include "GameNode.h"
 #include "Components/Camera.h"
@@ -217,35 +216,4 @@ namespace JG
 
 		return EScheduleResult::Continue;
 	}
-
-	void PointLight::OnInspectorGUI()
-	{
-		Light::OnInspectorGUI();
-		ImGui::Spacing();
-
-		Color color   = GetColor();
-		f32 intensity = GetIntensity();
-		f32 range     = GetRange();
-		f32 att0      = GetAtt0();
-		f32 att1      = GetAtt1();
-		f32 att2      = GetAtt2();
-
-
-
-		f32 label_width = ImGui::CalcTextSize("Intensity").x;
-		ImGui::Color3_OnGUI("Color", color, label_width);
-		ImGui::Float_OnGUI("Intensity", intensity,  label_width);
-		ImGui::Float_OnGUI("Range", range, label_width);
-		ImGui::Float_Slider_OnGUI("Att0", att0, 0.0f, 1.0f, label_width);
-		ImGui::Float_Slider_OnGUI("Att1", att1, 0.0f, 1.0f, label_width);
-		ImGui::Float_Slider_OnGUI("Att2", att2, 0.0f, 1.0f, label_width);
-
-		SetColor(Color(color.R, color.G, color.B, 1.0f));
-		SetIntensity(intensity);
-		SetRange(range);
-		SetAtt0(att0);
-		SetAtt1(att1);
-		SetAtt2(att2);
-	}
-
 }

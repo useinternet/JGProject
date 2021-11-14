@@ -16,6 +16,11 @@
 #include "UI/ModalUI/ProgressBarModalView.h"
 #include "UI/ModalUI/MessageBoxModalView.h"
 
+
+
+#include "UI/InspectorUI/GameInspectorUI.h"
+#include "UI/InspectorUI/AssetInspectorUI.h"
+
 namespace JG
 {
 	void EditorUISystemLayer::OnAttach()
@@ -34,6 +39,7 @@ namespace JG
 		SetMainMenu();
 		RegisterUIView();
 		RegisterPopupUIView();
+		RegisterInspectorUI();
 		LoadUISettings("JGUI.jgconfig");
 	}
 	void EditorUISystemLayer::Destroy()
@@ -197,6 +203,21 @@ namespace JG
 		// Modal
 		UIManager::GetInstance().RegisterPopupUIView<ProgressBarModalView>();
 		UIManager::GetInstance().RegisterPopupUIView<MessageBoxModalView>();
+	}
+	void EditorUISystemLayer::RegisterInspectorUI()
+	{
+		UIManager::GetInstance().RegisterInspectorUI<GameNodeInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<GameWorldInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<TransformInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<CameraInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<PointLightInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<SkyDomeInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<SpriteRendererInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<StaticMeshRendererInspectorUI>();
+
+		//
+
+		UIManager::GetInstance().RegisterInspectorUI<MaterialAssetInspectorUI>();
 	}
 	bool EditorUISystemLayer::ResponseOpenProgressBar(RequestOpenProgressBarEvent& e)
 	{

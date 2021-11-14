@@ -396,34 +396,6 @@ namespace JG
 			mIsViewDirty = true;
 		}
 	}
-	void Camera::OnInspectorGUI()
-	{
-
-		JVector2 resolution = GetResolution();
-		f32 fov				= GetFOV();
-		Color color			= GetClearColor();
-		f32 nearZ			= GetNearZ();
-		f32 farZ			= GetFarZ();
-		bool isOrth			= IsOrthographic();
-
-		f32 label_width = ImGui::CalcTextSize("Field of View").x;
-
-		ImGui::Vector2_OnGUI("Resolution", resolution, label_width);
-		ImGui::Float_OnGUI("Field of View", fov, label_width);
-		ImGui::Float_OnGUI("NearZ", nearZ, label_width);
-		ImGui::Float_OnGUI("FarZ", farZ, label_width);
-		ImGui::Bool_OnGUI("Orthographic", isOrth, label_width);
-		ImGui::Color4_OnGUI("ClearColor", color, label_width);
-
-
-
-		SetFOV(fov);
-		SetClearColor(color);
-		SetFarZ(farZ);
-		SetNearZ(nearZ);
-		SetOrthographic(isOrth);
-		SetResolution(resolution);
-	}
 	void Camera::UpdateGraphicsScene()
 	{
 

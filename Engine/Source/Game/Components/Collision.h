@@ -18,7 +18,6 @@ namespace JG
 		virtual void LateUpdate() override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
-		virtual void OnInspectorGUI() override;
 	private:
 		virtual void OnChange(const ChangeData& data) override;
 	};

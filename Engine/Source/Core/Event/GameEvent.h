@@ -3,7 +3,6 @@
 #include "Class/Data/Shared/EventData.h"
 namespace JG
 {
-	NOTIFY_ONE_ARG_EVENT(NotifyGameComponentTypeSet, HashSet<Type>, GameComponentTypeList, HashSet<Type>())
 	NOTIFY_ONE_ARG_EVENT(NotifyDestroyJGObjectEvent, class IJGObject*, DestroyedObject, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<class ITexture>, SceneTexture, nullptr)
 	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, class GameWorld*, GameWorld, nullptr)

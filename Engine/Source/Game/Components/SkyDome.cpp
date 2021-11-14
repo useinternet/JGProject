@@ -61,11 +61,11 @@ namespace JG
 
 	}
 
-	void SkyDome::OnInspectorGUI()
-	{
-		GameComponent::OnInspectorGUI();
+	//void SkyDome::OnInspectorGUI()
+	//{
+	//	GameComponent::OnInspectorGUI();
 
-	}
+	//}
 
 	EScheduleResult SkyDome::PushRenderSceneObject()
 	{

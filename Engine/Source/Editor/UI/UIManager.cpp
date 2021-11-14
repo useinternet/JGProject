@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "UIManager.h"
 #include "UI/UIView.h"
+#include "InspectorUI/InspectorUI.h"
 #include "Application.h"
 #include "Graphics/Resource.h"
+
 #include "Class/Asset/Asset.h"
 namespace JG
 {
@@ -99,6 +101,18 @@ namespace JG
 			return mShowContextMenuFunc(type, isWhenHoveredItem);
 		}
 		return false;
+	}
+	bool UIManager::ShowInspectorUI(IJGObject* object)
+	{
+		if (object == nullptr)
+		{
+			return false;
+		}
+		if (mInspectorUIPool.find(object->GetType()) == mInspectorUIPool.end())
+		{
+			return false;
+		}
+		return mInspectorUIPool[object->GetType()]->OnGUI(object);
 	}
 	void UIManager::ForEach(const std::function<void(IUIView*)> action)
 	{

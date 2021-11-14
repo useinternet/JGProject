@@ -28,10 +28,9 @@ namespace JG
 		void SetColor(const Color& color);
 
 		const Color& GetColor() const;
+		const Asset<ITexture>* GetSprite() const;
 	public:
 		virtual void OnChange(const ChangeData& data) override;
-		virtual void OnInspectorGUI() override;
-
 	private:
 		EScheduleResult PushRenderSceneObject();
 	};

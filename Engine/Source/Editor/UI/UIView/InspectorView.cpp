@@ -28,11 +28,7 @@ namespace JG
 	void InspectorView::OnGUI()
 	{
 		ImGui::Begin("Inspector", &mOpenGUI);
-		IJGObject* object = GetTargetObject();
-		if (object != nullptr)
-		{
-			object->OnInspectorGUI();
-		}
+		UIManager::GetInstance().ShowInspectorUI(GetTargetObject());
 		ImGui::End();
 		if (mOpenGUI == false)
 		{

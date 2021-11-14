@@ -1,7 +1,5 @@
 #pragma once
 #include "JGCore.h"
-#include "Imgui/imgui.h"
-#include "Common/Type.h"
 #include "GameSettings.h"
 #include "Application.h"
 #include "Manager/GameLayerManager.h"
@@ -104,7 +102,7 @@ namespace JG
 		virtual const String& GetName() const override;
 		virtual void SetName(const String& name) override;
 		virtual void OnChange(const ChangeData& data) {};
-		virtual void OnInspectorGUI() {}
+		//virtual void OnInspectorGUI() {}
 	private:
 		void ArrangeScheduleHandle();
 	public:

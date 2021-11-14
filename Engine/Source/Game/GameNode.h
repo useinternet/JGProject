@@ -44,9 +44,6 @@ namespace JG
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
-		virtual void OnInspectorGUI() override;
-
-	public:
 		GameNode* AddNode(const String& name);
 		template<class T>
 		T* AddComponent()
@@ -65,7 +62,7 @@ namespace JG
 
 
 		void ForEach(const std::function<void(GameNode*)>& action);
-
+		void ForEach(const std::function<void(GameComponent*)>& action);
 
 
 		void SendChangeData(const ChangeData& data, EChangeDataFlags flags = EChangeDataFlags::None);

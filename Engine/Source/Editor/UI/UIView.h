@@ -2,7 +2,7 @@
 #include "JGCore.h"
 #include "Event/EditorEvent.h"
 #include "Event/GameEvent.h"
-
+#include "ExternalImpl/ImGuiExternal.h"
 
 namespace JG
 {

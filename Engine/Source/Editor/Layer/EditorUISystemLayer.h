@@ -36,6 +36,7 @@ namespace JG
 		bool Resize(AppResizeEvent& e);
 		void RegisterUIView();
 		void RegisterPopupUIView();
+		void RegisterInspectorUI();
 	private:
 		bool ResponseOpenProgressBar(RequestOpenProgressBarEvent& e);
 		bool ResponseDisplayProgressBar(RequestDisplayProgressBarEvent& e);

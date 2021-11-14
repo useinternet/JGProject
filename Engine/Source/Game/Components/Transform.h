@@ -88,8 +88,6 @@ namespace JG
 
 		void UpdateInvWorldMatrix() const;
 		void NormalizeRotation(JVector3& toDegree) const;
-	public:
-		virtual void OnInspectorGUI() override;
 	private:
 		virtual void OnChange(const ChangeData& data) override;
 		void SendDirty(SendDirtyFlags flags);

@@ -100,7 +100,6 @@ namespace JG
 		void UpdateView() const;
 	protected:
 		virtual void OnChange(const ChangeData& data) override;
-		virtual void OnInspectorGUI() override;
 	private:
 		void UpdateGraphicsScene();
 		EScheduleResult Rendering();

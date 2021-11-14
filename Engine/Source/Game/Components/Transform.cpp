@@ -104,39 +104,7 @@ namespace JG
 		UpdateInvWorldMatrix();
 		return mInvWorldMatrix;
 	}
-	//const JMatrix& Transform::GetLocalRotationMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//const JMatrix& Transform::GetLocalTranslateMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//const JMatrix& Transform::GetLocalScaleMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//const JMatrix& Transform::GetUpdateRotationMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//const JMatrix& Transform::GetUpdateTranslateMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//const JMatrix& Transform::GetUpdateScaleMatrix() const
-	//{
-	//	// TODO: 여기에 return 문을 삽입합니다.
-	//}
-	//void Transform::SetLocalQuaternion(const JQuaternion& q)
-	//{
 
-
-	//}
-	//void Transform::SetWorldQuaternion(const JQuaternion& q)
-	//{
-
-	//}
 	const JQuaternion& Transform::GetLocalQuaternion() const
 	{
 		return mQuaternion;
@@ -288,33 +256,6 @@ namespace JG
 		{
 			toDegree.z -= 360.0f;
 		}
-	}
-	void Transform::OnInspectorGUI()
-	{
-		float padding = ImGui::CalcTextSize("Location").x - ImGui::CalcTextSize("Scale").x;
-		
-		auto location = GetLocalLocation();
-		auto rotation = GetLocalRotation();
-		auto scale    = GetLocalScale();
-
-
-		f32 label_width = ImGui::CalcTextSize("Location").x;
-
-
-		if (ImGui::Vector3_OnGUI("Location", location, label_width) == true)
-		{
-			SetLocalLocation(location);
-		}
-		if (ImGui::Vector3_OnGUI("Rotation", rotation, label_width) == true)
-		{
-			SetLocalRotation(rotation);
-		}
-		if (ImGui::Vector3_OnGUI("Scale", scale, label_width) == true)
-		{
-			SetLocalScale(scale);
-		}
-
-
 	}
 	void Transform::OnChange(const ChangeData& data)
 	{
