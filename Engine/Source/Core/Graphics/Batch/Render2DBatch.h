@@ -5,6 +5,7 @@
 namespace JG
 {
 	class IMesh;
+	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class IMaterial;

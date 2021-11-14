@@ -4,6 +4,7 @@ local PCH_HEADER_PATH = "Source/Core/pch.h"
 local PCH_CPP_PATH    = "Source/Core/pch.cpp"
 
 
+
 function DebugConfig()
     symbols  "On"
     optimize "Off"
@@ -181,6 +182,34 @@ workspace "JGEngine"
                     "Core"
                 }
                 SetStaticLibConfig("Source/Game/")
+        group "User/SandBox"
+            project "SandBox_Game"
+                includedirs{
+                    "Source/Core/",
+                    "Source/Game/",
+                    "ThirdParty",
+                }
+                pchheader (PCH_HEADER)
+                pchsource (PCH_CPP_PATH)
+                links{
+                    "Core", "Game"
+                }
+                SetSharedLibConfig(SandBox_Game_API,"../GameProject/Project_C/Asset/Cpp/Game")
+            project "SandBox_Editor"
+                includedirs{
+                    "Source/Core/",
+                    "Source/Editor/",
+                    "Source/Game/",
+                    "ThirdParty",
+                }
+                pchheader (PCH_HEADER)
+                pchsource (PCH_CPP_PATH)
+                links{
+                    "Core", "Game", "Editor"
+                }
+                SetSharedLibConfig(SandBox_Editor_API, "../GameProject/Project_C/Asset/Cpp/Editor")
+            
+            
     group "ThirdParty"
         project "Imgui"
             SetStaticLibConfig("ThirdParty/Imgui/")

@@ -11,14 +11,6 @@ public: \
 private: \
 
 
-	class IInspectorGUI
-	{
-	public:
-		virtual ~IInspectorGUI() = default;
-		virtual void OnInspectorGUI() = 0;
-	
-	};
-
 	class ISubscriber
 	{
 	public:
@@ -28,7 +20,7 @@ private: \
 
 
 	
-	class IJGObject : public IInspectorGUI, public ISubscriber, public IJson
+	class IJGObject : public ISubscriber, public IJson
 	{
 	public:
 		virtual Type GetType() const  = 0;
@@ -49,10 +41,8 @@ private: \
 			}
 		}
 	public:
-		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override {}
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override {}
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override {}
-	public:
-		virtual void OnInspectorGUI() override {}
 		virtual ~IJGObject() = default;
 	};
 }

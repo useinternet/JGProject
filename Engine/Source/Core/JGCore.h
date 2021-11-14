@@ -38,12 +38,8 @@
 #include "Class/TaskController.h"
 #include "Class/Global/TimerManager.h"
 #include "Class/Global/Scheduler.h"
-#include "Class/Global/UIManager.h"
-#include "Class/Global/GameLayerManager.h"
 #include "Class/Global/PhysicsManager.h"
 #include "Class/Global/ProjectSetting.h"
-
-#include "ExternalImpl/ImGuiExternal.h"
 
 
 

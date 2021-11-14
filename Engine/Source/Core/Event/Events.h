@@ -158,32 +158,9 @@ private: \
 
 #define NOTIFY_EVENT(className) CREATE_EVENT(EEventCategory::Notify, className)
 #define NOTIFY_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Notify, className, argType_1, argName_1,argInit_1)
+#define NOTIFY_TWO_ARG_EVENT(className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2) CREATE_EVENT_TWO_ARG(EEventCategory::Notify, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2)
 #define REQUEST_EVENT(className) CREATE_EVENT(EEventCategory::Request, className)
 #define REQUEST_ONE_ARG_EVENT(className, argType_1, argName_1, argInit_1) CREATE_EVENT_ONE_ARG(EEventCategory::Request, className, argType_1, argName_1, argInit_1)
 #define REQUEST_TWO_ARG_EVENT(className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2) CREATE_EVENT_TWO_ARG(EEventCategory::Request, className, argType_1, argName_1, argInit_1, argType_2, argName_2, argInit_2)
 
-	// Notify
-	class IJGObject;
-	class ITexture;
-	class GameWorld;
-	class IRenderItem;
-	class ILightItem;
-	class Camera;
-	class GameNode;
-	class IAsset;
-	class AssetID;
-
-	NOTIFY_ONE_ARG_EVENT(NotifyDestroyJGObjectEvent, IJGObject*, DestroyedObject, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifyChangeMainSceneTextureEvent, SharedPtr<ITexture>, SceneTexture, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifyChangeGameWorldEvent, GameWorld*, GameWorld, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0, 0))
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedGameNodeInEditorEvent, GameNode*, SelectedGameNode, nullptr)
-	NOTIFY_ONE_ARG_EVENT(NotifySelectedAssetInEditorEvent, String, SelectedAssetPath, "")
-
-
-	REQUEST_ONE_ARG_EVENT(RequestPlayGameEvent, std::function<void()>, CompeleteAction, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestStopGameEvent, std::function<void()>, CompeleteAction, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestPauseGameEvent, std::function<void()>, CompeleteAction, nullptr)
-	REQUEST_ONE_ARG_EVENT(RequestSaveGameWorldEvent, std::function<void()>, CompeleteAction, nullptr)
-	REQUEST_TWO_ARG_EVENT(RequestLoadGameWorldEvent, String, AssetPath, "", std::function<void()>, CompeleteAction, nullptr)
 }

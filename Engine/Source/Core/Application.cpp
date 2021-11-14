@@ -92,8 +92,6 @@ namespace JG
 		Log::Create();
 		TimerManager::Create();
 		Scheduler::Create();
-		UIManager::Create();
-		GameLayerManager::Create();
 		AssetDataBase::Create();
 		ProjectSetting::Create();
 
@@ -196,9 +194,7 @@ namespace JG
 		ITexture::DestroyNullTexture();
 		PhysicsManager::Destroy();
 		JGGraphics::GetInstance().Flush();
-		UIManager::Destroy();
 		mLayerStack.reset();
-		GameLayerManager::Destroy();
 		AssetDataBase::Destroy();
 		JGGraphics::Destroy();
 		ProjectSetting::Destroy();
@@ -222,13 +218,7 @@ namespace JG
 			{
 				layer->OnEvent(e);
 			}
-		});
-
-		if (e.Handled == false)
-		{
-			UIManager::GetInstance().OnEvent(e);
-		}
-	
+		});	
 	}
 	bool Application::Open(AppOpenEvent& e)
 	{
