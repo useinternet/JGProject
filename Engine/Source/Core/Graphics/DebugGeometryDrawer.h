@@ -14,9 +14,8 @@ namespace JG
 	class IMesh;
 	class IVertexBuffer;
 	class IIndexBuffer;
-	class DebugGeometryDrawer : public GlobalSingleton<DebugGeometryDrawer>
+	class DebugGeometryDrawer 
 	{
-		friend Application;
 	private:
 		class DebugLineData : public IJGObject
 		{

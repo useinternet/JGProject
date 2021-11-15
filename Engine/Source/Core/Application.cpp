@@ -92,8 +92,10 @@ namespace JG
 		Log::Create();
 		TimerManager::Create();
 		Scheduler::Create();
-		AssetDataBase::Create();
 		ProjectSetting::Create();
+		AssetDataBase::Create();
+		InputManager::Create();
+	
 
 		// TODO
 		// 필요한 멤버 클래스 생성
@@ -137,7 +139,6 @@ namespace JG
 		mAppTimer = Timer::Create();
 		mAppTimer->Start();
 		ITexture::CreateNullTexture();
-		DebugGeometryDrawer::Create();
 
 		return true;
 	}
@@ -161,9 +162,6 @@ namespace JG
 				TimerManager::GetInstance().Update();
 			}
 
-			//mGraphcisAPI->Begin();
-
-
 			while (mEventQueue.empty() == false)
 			{
 				auto e = std::move(mEventQueue.front()); mEventQueue.pop();
@@ -174,8 +172,6 @@ namespace JG
 			{
 				Scheduler::GetInstance().Update();
 			}
-
-			//mGraphcisAPI->End();
 		}
 
 		
@@ -189,17 +185,18 @@ namespace JG
 	{
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
-
-		DebugGeometryDrawer::Destroy();
 		ITexture::DestroyNullTexture();
 		PhysicsManager::Destroy();
 		JGGraphics::GetInstance().Flush();
 		mLayerStack.reset();
 		AssetDataBase::Destroy();
 		JGGraphics::Destroy();
+		InputManager::Destroy();
 		ProjectSetting::Destroy();
+
 		mWindow->Destroy();
 		mWindow.reset();
+	
 		Scheduler::Destroy();
 		TimerManager::Destroy();
 		Log::Destroy();

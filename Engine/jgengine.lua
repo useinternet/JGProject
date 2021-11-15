@@ -8,20 +8,22 @@ local PCH_CPP_PATH    = "Source/Core/pch.cpp"
 function DebugConfig()
     symbols  "On"
     optimize "Off"
-    defines {"_DEBUG", "JG_EDITOR"}
+    defines {"_DEBUG"}
     cppdialect "C++17"
     staticruntime "on"
     runtime "Debug"
-  end
+end
 
 
 function ReleaseConfig()
     optimize "Full" 
-    defines {"_RELEASE", "JG_EDITOR", "NDEBUG"}
+    defines {"_RELEASE", "NDEBUG"}
     cppdialect "C++17"
     staticruntime "on"
     runtime "Release"
 end
+
+
 
 workspace "JGEngine"
     architecture "x64"
@@ -32,14 +34,16 @@ workspace "JGEngine"
         "Release"
     }
 
-    function SetStaticLibConfig(path)
+    function SetStaticLibConfig(path, defined)
         location  "Build"
         kind "StaticLib"
         language "C++"
         debugdir  ("Bin/%{cfg.buildcfg}/")
         targetdir ("Bin/%{cfg.buildcfg}/")
         objdir("Build/Obj/%{cfg.buildcfg}/")
-
+        if defined ~= nil then
+            defines {defined}
+        end
 
 
         -- file
@@ -59,24 +63,28 @@ workspace "JGEngine"
             ReleaseConfig()
     end
 
-    function SetSharedLibConfig(defined, path)
+    function SetSharedLibConfig(path, bridgePath, defined)
         location  "Build"
         kind "SharedLib"
         language "C++"
         debugdir  ("Bin/%{cfg.buildcfg}/")
         targetdir ("Bin/%{cfg.buildcfg}/")
         objdir("Build/Obj/%{cfg.buildcfg}/")
-        defines(defined)
+        if defined ~= nil then
+            defines {defined}
+        end
 
         -- file
         files {
             path .. "**.h",
             path .. "**.cpp",
             path .. "**.c",
+            bridgePath .. "**.h",
+            bridgePath .. "**.cpp",
+            bridgePath .. "**.c",
             PCH_HEADER_PATH,
             PCH_CPP_PATH,
         }
-
         filter "configurations:Debug"
             DebugConfig()
         filter "configurations:Release"
@@ -84,13 +92,16 @@ workspace "JGEngine"
 
     end
 
-    function SetConsoleAppConfig(path)
+    function SetConsoleAppConfig(path, defined)
         location  "Build"
         kind "ConsoleApp"
         language "C++"
         debugdir  ("Bin/%{cfg.buildcfg}/")
         targetdir ("Bin/%{cfg.buildcfg}/")
         objdir("Build/Obj/%{cfg.buildcfg}/")
+        if defined ~= nil then
+            defines {defined}
+        end
         -- file
         files {
             path .. "**.h",
@@ -168,7 +179,7 @@ workspace "JGEngine"
                 links {
                     "Core", "Game",
                 }
-                SetConsoleAppConfig("Source/Editor/")
+                SetConsoleAppConfig("Source/Editor/", "JG_EDITOR")
         group "Engine/Game"
             project "Game"
                 includedirs{
@@ -181,12 +192,13 @@ workspace "JGEngine"
                 links{
                     "Core"
                 }
-                SetStaticLibConfig("Source/Game/")
+                SetStaticLibConfig("Source/Game/", "JG_EDITOR")
         group "User/SandBox"
             project "SandBox_Game"
                 includedirs{
                     "Source/Core/",
                     "Source/Game/",
+                    "Source/Bridge/Game/",
                     "ThirdParty",
                 }
                 pchheader (PCH_HEADER)
@@ -194,12 +206,13 @@ workspace "JGEngine"
                 links{
                     "Core", "Game"
                 }
-                SetSharedLibConfig(SandBox_Game_API,"../GameProject/Project_C/Asset/Cpp/Game")
+                SetSharedLibConfig("../GameProject/Project_C/Asset/Cpp/Game/", "Source/Bridge/Game/", "GAME_DLL_EXPORT")
             project "SandBox_Editor"
                 includedirs{
                     "Source/Core/",
                     "Source/Editor/",
                     "Source/Game/",
+                    "Source/Bridge/Editor/",
                     "ThirdParty",
                 }
                 pchheader (PCH_HEADER)
@@ -207,7 +220,7 @@ workspace "JGEngine"
                 links{
                     "Core", "Game", "Editor"
                 }
-                SetSharedLibConfig(SandBox_Editor_API, "../GameProject/Project_C/Asset/Cpp/Editor")
+                SetSharedLibConfig("../GameProject/Project_C/Asset/Cpp/Editor/", "Source/Bridge/Editor/", "EDITOR_DLL_EXPORT")
             
             
     group "ThirdParty"

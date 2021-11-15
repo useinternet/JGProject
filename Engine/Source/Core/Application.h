@@ -33,9 +33,7 @@ namespace JG
 		ApplicaionProps         mProps;
 		UniquePtr<IWindow>		mWindow;
 		UniquePtr<SystemLayerStack>	mLayerStack;
-		//UniquePtr<IGraphicsAPI> mGraphcisAPI;
-
-		Queue<UniquePtr<IEvent>> mEventQueue;
+		Queue<UniquePtr<IEvent>>    mEventQueue;
 
 		SharedPtr<Timer> mAppTimer;
 

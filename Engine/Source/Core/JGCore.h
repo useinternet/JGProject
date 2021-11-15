@@ -17,7 +17,7 @@
 #include "Common/Object.h"
 #include "Common/DragAndDrop.h"
 
-#include"Math/Math.h"
+#include "Math/Math.h"
 #include "Math/JVector.h"
 #include "Math/JRect.h"
 #include "Math/JRay.h"
@@ -40,6 +40,7 @@
 #include "Class/Global/Scheduler.h"
 #include "Class/Global/PhysicsManager.h"
 #include "Class/Global/ProjectSetting.h"
+#include "Class/Global/InputManager.h"
 
 
 

@@ -15,6 +15,9 @@
 #include "Manager/GameLayerManager.h"
 #include "Class/Asset/Asset.h"
 
+#define GAME_DLL_NAME "SandBox_Game.dll"
+
+
 namespace JG
 {
 	void GameLogicSystemLayer::OnAttach()
@@ -40,6 +43,16 @@ namespace JG
 
 		//}, nullptr);
 
+		mGamePlugin = CreateUniquePtr<Plugin>(GAME_DLL_NAME);
+		if (mGamePlugin->IsVaild())
+		{
+			JG_INFO("Successed Connect Game Plugin");
+			auto func = mGamePlugin->LoadFunction<void>("TestFunction");
+			if (func.IsVaild())
+			{
+				func();
+			}
+		}
 
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
@@ -51,6 +64,9 @@ namespace JG
 			e.AssetPath = gameWorldAssetPath;
 			Application::GetInstance().SendEvent(e);
 		}
+
+		
+
 	}
 	void GameLogicSystemLayer::Destroy()
 	{

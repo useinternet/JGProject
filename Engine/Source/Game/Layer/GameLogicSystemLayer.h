@@ -1,8 +1,10 @@
 #pragma once
 #include "JGCore.h"
 #include "Class/SystemLayer.h"
+#include "Class/Plugin.h"
 #include "Event/GameEvent.h"
 #include "Event/EditorEvent.h"
+
 namespace JG
 {
 	enum class EAssetFormat;
@@ -27,6 +29,9 @@ namespace JG
 		GameWorld* mGameWorld = nullptr;
 		bool       mIsGamePlaying = false;
 		List<GlobalGameSystem*> mGameSystemList;
+
+
+		UniquePtr<Plugin> mGamePlugin;
 	public:
 		virtual ~GameLogicSystemLayer() {}
 	public:

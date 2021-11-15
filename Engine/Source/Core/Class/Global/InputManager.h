@@ -36,7 +36,7 @@ namespace JG
 	};
 	class InputManager : public GlobalSingleton<InputManager>
 	{
-
+		friend class Application;
 	private:
 		struct KeyState
 		{
@@ -54,7 +54,7 @@ namespace JG
 
 		KeyState mKeyState[256];
 		List<SharedPtr<ActionMappingData>> mActionMappingsDataList;
-		List<SharedPtr<AxisMappingData>> mAxisMappingsDataList;
+		List<SharedPtr<AxisMappingData>>   mAxisMappingsDataList;
 
 		Dictionary<String, ActionMappingData*>  mActionMappingsDataDic;
 		Dictionary<String, AxisMappingData*>    mAxisMappingsDataDic;
@@ -62,13 +62,14 @@ namespace JG
 
 	public:
 		InputManager();
+		virtual ~InputManager() = default;
 	public:
-		//void AddActionMappings(const String& name);
-		//void AddAxisMappings(const String& name);
-		//void RemoveActionMappings(const String& name);
-		//void RemoveAxisMappings(const String& name);
-		//void ForEach(const std::function<void(ActionMappingData*)>& action);
-		//void ForEach(const std::function<void(AxisMappingData*)>& action);
+		void AddActionMappings(const String& name);
+		void AddAxisMappings(const String& name);
+		void RemoveActionMappings(const String& name);
+		void RemoveAxisMappings(const String& name);
+		void ForEach(const std::function<void(ActionMappingData*)>& action);
+		void ForEach(const std::function<void(AxisMappingData*)>& action);
 	public:
 		bool IsKeyPressed(EKeyCode code);
 		bool IsKeyReleased(EKeyCode code);
@@ -77,7 +78,7 @@ namespace JG
 
 
 	private:
-		EScheduleResult Update();
+		void Update();
 
 	};
 }

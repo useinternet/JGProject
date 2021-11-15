@@ -30,8 +30,10 @@ namespace JG
 		void Load();
 	private:
 		void Save_StartSetting(SharedPtr<Json> json);
+		void Save_InputSetting(SharedPtr<Json> json);
 	private:
 		void Load_StartSetting(SharedPtr<Json> json);
+		void Load_InputSetting(SharedPtr<Json> json);
 	};
 }
 

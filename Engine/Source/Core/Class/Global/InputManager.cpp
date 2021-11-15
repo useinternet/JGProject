@@ -1,82 +1,78 @@
 #include "pch.h"
 #include "InputManager.h"
-#include "Scheduler.h"
-#include "physx/PxPhysicsAPI.h"
-
 
 namespace JG
 {
 	InputManager::InputManager()
 	{
-
-		
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem, [&]() -> EScheduleResult { return Update(); });
-
-
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem,
+			[&]() -> EScheduleResult { 
+			Update(); 
+			return EScheduleResult::Continue;
+		});
 	}
-	//void InputManager::AddActionMappings(const String& name)
-	//{
-	//	if (mActionMappingsDataDic.find(name) == mActionMappingsDataDic.end())
-	//	{
-	//		auto data = CreateSharedPtr<ActionMappingData>(name);
-	//		mActionMappingsDataList.push_back(data);
-	//		mActionMappingsDataDic[name] = data.get();
-	//	}
-	//}
-	//void InputManager::AddAxisMappings(const String& name)
-	//{
-	//	if (mAxisMappingsDataDic.find(name) == mAxisMappingsDataDic.end())
-	//	{
-	//		auto data = CreateSharedPtr<AxisMappingData>(name);
-	//		mAxisMappingsDataList.push_back(data);
-	//		mAxisMappingsDataDic[name] = data.get();
-	//	}
-	//}
-	//void InputManager::RemoveActionMappings(const String& name)
-	//{
-	//	for (auto iter = mActionMappingsDataList.begin(); iter != mActionMappingsDataList.end();)
-	//	{
-	//		if ((*iter)->Name == name)
-	//		{
-	//			iter = mActionMappingsDataList.erase(iter);
-	//			mActionMappingsDataDic.erase(name);
-	//		}
-	//		else
-	//		{
-	//			++iter;
-	//		}
-	//	}
-
-	//}
-	//void InputManager::RemoveAxisMappings(const String& name)
-	//{
-	//	for (auto iter = mAxisMappingsDataList.begin(); iter != mAxisMappingsDataList.end();)
-	//	{
-	//		if ((*iter)->Name == name)
-	//		{
-	//			iter = mAxisMappingsDataList.erase(iter);
-	//			mAxisMappingsDataDic.erase(name);
-	//		}
-	//		else
-	//		{
-	//			++iter;
-	//		}
-	//	}
-	//}
-	//void InputManager::ForEach(const std::function<void(ActionMappingData*)>& action)
-	//{
-	//	for (auto& data : mActionMappingsDataList)
-	//	{
-	//		action(data.get());
-	//	}
-	//}
-	//void InputManager::ForEach(const std::function<void(AxisMappingData*)>& action)
-	//{
-	//	for (auto& data : mAxisMappingsDataList)
-	//	{
-	//		action(data.get());
-	//	}
-	//}
+	void InputManager::AddActionMappings(const String& name)
+	{
+		if (mActionMappingsDataDic.find(name) == mActionMappingsDataDic.end())
+		{
+			auto data = CreateSharedPtr<ActionMappingData>(name);
+			mActionMappingsDataList.push_back(data);
+			mActionMappingsDataDic[name] = data.get();
+		}
+	}
+	void InputManager::AddAxisMappings(const String& name)
+	{
+		if (mAxisMappingsDataDic.find(name) == mAxisMappingsDataDic.end())
+		{
+			auto data = CreateSharedPtr<AxisMappingData>(name);
+			mAxisMappingsDataList.push_back(data);
+			mAxisMappingsDataDic[name] = data.get();
+		}
+	}
+	void InputManager::RemoveActionMappings(const String& name)
+	{
+		for (auto iter = mActionMappingsDataList.begin(); iter != mActionMappingsDataList.end();)
+		{
+			if ((*iter)->Name == name)
+			{
+				iter = mActionMappingsDataList.erase(iter);
+				mActionMappingsDataDic.erase(name);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+	}
+	void InputManager::RemoveAxisMappings(const String& name)
+	{
+		for (auto iter = mAxisMappingsDataList.begin(); iter != mAxisMappingsDataList.end();)
+		{
+			if ((*iter)->Name == name)
+			{
+				iter = mAxisMappingsDataList.erase(iter);
+				mAxisMappingsDataDic.erase(name);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+	}
+	void InputManager::ForEach(const std::function<void(ActionMappingData*)>& action)
+	{
+		for (auto& data : mActionMappingsDataList)
+		{
+			action(data.get());
+		}
+	}
+	void InputManager::ForEach(const std::function<void(AxisMappingData*)>& action)
+	{
+		for (auto& data : mAxisMappingsDataList)
+		{
+			action(data.get());
+		}
+	}
 	bool InputManager::IsKeyPressed(EKeyCode code)
 	{
 		return mKeyState[(i32)code].State & KeyState::Pressed;
@@ -93,7 +89,7 @@ namespace JG
 	{
 		return mKeyState[(i32)code].State & KeyState::Up;
 	}
-	EScheduleResult InputManager::Update()
+	void InputManager::Update()
 	{
 		for (i32 i = 0; i < 256; ++i)
 		{
@@ -104,10 +100,12 @@ namespace JG
 				{
 					state.State |= KeyState::Pressed;
 					state.State |= KeyState::Down;
+					JG_CORE_INFO("KeyPressed : {0}", KeyCodeToString((EKeyCode)i));
 				}
 				else
 				{
 					state.State = KeyState::Down;
+					JG_CORE_INFO("KeyDown : {0}", KeyCodeToString((EKeyCode)i));
 				}
 			}
 			else
@@ -116,6 +114,8 @@ namespace JG
 				{
 					state.State |= KeyState::Up;
 					state.State |= KeyState::Released;
+					JG_CORE_INFO("KeyUp : {0}", KeyCodeToString((EKeyCode)i));
+					JG_CORE_INFO("KeyReleased : {0}", KeyCodeToString((EKeyCode)i));
 				}
 				if (state.State & KeyState::Up)
 				{
@@ -123,11 +123,5 @@ namespace JG
 				}
 			}
 		}
-
-
-
-
-
-		return EScheduleResult::Continue;
 	}
 }
