@@ -115,8 +115,8 @@ namespace JG
 	// Worker 를 생성하여 스케쥴 작성
 	class Scheduler : public GlobalSingleton<Scheduler>
 	{
+		friend class Application;
 		friend ScheduleHandle;
-		friend Application;
 		static const u64 SCHEDULE_NULL_ID = -1;
 	private:
 		class SyncTask

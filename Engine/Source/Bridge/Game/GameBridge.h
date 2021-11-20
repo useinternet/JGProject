@@ -10,7 +10,16 @@
 #endif 
 
 #include "JGCore.h"
+#include "Linker/GamePluginLinker.h"
+#include "GameObjectFactory.h"
 
+GAME_API void Start_Plugin(JG::SharedPtr<JG::GamePluginLinker> linker);
 
+// 게임 컴포넌트 
+//x##
+#define REGISTER_GAMECOMPONENT(x) \
+void x_Register_GameComponent() \
+{ \
+	JG::GameObjectFactory::GetInstance().RegisterComponentType<##x>(); \
+} \
 
-GAME_API void TestFunction();

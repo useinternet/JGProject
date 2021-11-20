@@ -210,6 +210,7 @@ namespace JG
 		UIManager::GetInstance().RegisterInspectorUI<GameWorldInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<TransformInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<CameraInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<EditorCameraInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<PointLightInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<SkyDomeInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<SpriteRendererInspectorUI>();

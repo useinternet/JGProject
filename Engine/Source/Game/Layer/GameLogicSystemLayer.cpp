@@ -14,6 +14,7 @@
 #include "Components/SkyDome.h"
 #include "Manager/GameLayerManager.h"
 #include "Class/Asset/Asset.h"
+#include "Linker/GamePluginLinker.h"
 
 #define GAME_DLL_NAME "SandBox_Game.dll"
 
@@ -44,6 +45,7 @@ namespace JG
 		//}, nullptr);
 
 		mGamePlugin = CreateUniquePtr<Plugin>(GAME_DLL_NAME);
+		mGamePlugin->Link(CreateSharedPtr<GamePluginLinker>());
 		if (mGamePlugin->IsVaild())
 		{
 			JG_INFO("Successed Connect Game Plugin");
@@ -64,9 +66,6 @@ namespace JG
 			e.AssetPath = gameWorldAssetPath;
 			Application::GetInstance().SendEvent(e);
 		}
-
-		
-
 	}
 	void GameLogicSystemLayer::Destroy()
 	{

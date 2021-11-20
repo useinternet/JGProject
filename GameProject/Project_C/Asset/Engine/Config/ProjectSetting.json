@@ -1,5 +1,70 @@
 {
     "StartSettings": {
         "StartGameWorld": "Asset/Engine/TestGameWorld.jgasset"
+    },
+    "InputSettings": {
+        "AxisMappingDataList": [
+            {
+                "Name": "Foward",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "W",
+                        "Scale": -1.0
+                    },
+                    {
+                        "KeyCode": "S",
+                        "Scale": 1.0
+                    }
+                ]
+            },
+            {
+                "Name": "RightLeft",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "A",
+                        "Scale": -1.0
+                    },
+                    {
+                        "KeyCode": "D",
+                        "Scale": 1.0
+                    }
+                ]
+            }
+        ],
+        "ActionMappingDataList": [
+            {
+                "Name": "TestAction_1",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "A",
+                        "IsShift": true,
+                        "IsCtrl": true,
+                        "IsAlt": false
+                    }
+                ]
+            },
+            {
+                "Name": "TestAction_2",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "B",
+                        "IsShift": false,
+                        "IsCtrl": false,
+                        "IsAlt": true
+                    }
+                ]
+            },
+            {
+                "Name": "TestAction_3",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "S",
+                        "IsShift": false,
+                        "IsCtrl": false,
+                        "IsAlt": false
+                    }
+                ]
+            }
+        ]
     }
 }

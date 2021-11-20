@@ -48,6 +48,7 @@ namespace JG
 	{
 		return Scheduler::GetInstance().ScheduleAsync(task);
 	}
+
 	void GameObject::DrawDebugRay(const JRay& ray, f32 length, Color& color)
 	{
 		//DebugGeometryDrawer::GetInstance().DrawDebugLine(ray, length, color);

@@ -129,6 +129,18 @@ namespace JG
 			}
 			return (mValue.MemberBegin() + index)->name.GetString();
 		}
+		void ForEach(const std::function<void(SharedPtr<JsonData>)>& action)
+		{
+			if (action == nullptr)
+			{
+				return;
+			}
+			u64 cnt = GetSize();
+			for (auto i = 0; i < cnt; ++i)
+			{
+				action(GetJsonDataFromIndex(i));
+			}
+		}
 		List<jbyte> GetByteList() const
 		{
 			auto rawData = mValue.GetString();

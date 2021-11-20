@@ -178,6 +178,19 @@ namespace JG
 		void BindShowContextMenuFunc(const std::function<bool(Type, bool)>& func);
 		bool ShowContextMenu(const Type& type, bool isWhenHoveredItem = true);
 		bool ShowInspectorUI(IJGObject* object);
+		template<class T>
+		bool ForceShowInspectorUI(T* object)
+		{
+			if (object == nullptr)
+			{
+				return false;
+			}
+			if (mInspectorUIPool.find(JGTYPE(T)) == mInspectorUIPool.end())
+			{
+				return false;
+			}
+			return mInspectorUIPool[JGTYPE(T)]->OnGUI(object, true);
+		}
 		void ForEach(const std::function<void(IUIView*)> action);
 		void ForEach(
 			const std::function<void(const MenuItemNode*)>& beginAction,

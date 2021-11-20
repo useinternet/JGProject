@@ -18,7 +18,6 @@ namespace JG
 
 		bool mIsActiveSelf = true;
 		bool mIsActive     = true;
-		bool mIsAlive = true;
 		bool mIsAwake = false;
 		bool mIsRunStart = false;
 		Transform* mTransform = nullptr;
@@ -105,7 +104,6 @@ namespace JG
 
 		bool IsActive() const;
 		void SetActive(bool active);
-		bool IsAlive() const;
 	protected:
 		void Picking3DRecursive(List<GameNode*>& refPickingObjectList, const JRay& pickingRay);
 		void Picking2DRecursive(List<GameNode*>& refPickingObjectList, const JVector2& pickingPos);

@@ -114,6 +114,7 @@ namespace JG
 		}
 		return mInspectorUIPool[object->GetType()]->OnGUI(object);
 	}
+
 	void UIManager::ForEach(const std::function<void(IUIView*)> action)
 	{
 		for (auto& _pair : mUIViewPool)

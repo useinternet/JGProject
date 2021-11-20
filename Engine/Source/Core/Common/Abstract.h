@@ -3,12 +3,30 @@
 #include "Type.h"
 namespace JG
 {
+	class IGlobalSingletonLinker
+	{
+	public:
+		virtual void Set() = 0;
+		virtual void Apply() = 0;
+	protected:
+		template<class T>
+		T* GetInstance() const 
+		{
+			return T::GetInstancePtr();
+		}
+		template<class T>
+		void SetInstance(T* instance)
+		{
+			T::smInstance = instance;
+		}
+	};
 
 
 	template<class T, class ...Args>
 	class GlobalSingleton
 	{
 	private:
+		friend class IGlobalSingletonLinker;
 		static T* smInstance;
 	protected:
 		static void Create(Args... args)
@@ -23,6 +41,7 @@ namespace JG
 			delete smInstance;
 			smInstance = nullptr;
 		}
+
 	public:
 		virtual ~GlobalSingleton() = default;
 	public:
@@ -32,6 +51,9 @@ namespace JG
 		}
 		static T& GetInstance() {
 			return *smInstance;
+		}
+		static T* GetInstancePtr() {
+			return smInstance;
 		}
 	};
 
@@ -43,7 +65,6 @@ namespace JG
 	template<class FactoryClass, class InterfaceClass, i32 BufferCount>
 	class ObjectFactory : public GlobalSingleton<FactoryClass>
 	{
-
 	protected:
 		Dictionary<InterfaceClass*, SharedPtr<InterfaceClass>> mObjectPool;
 		Queue<InterfaceClass*> mReservedDestroyObjectQueue[BufferCount];

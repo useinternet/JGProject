@@ -98,7 +98,13 @@ namespace JG
 		Semicolon		= VK_OEM_1,		Plus			= VK_OEM_PLUS,
 		Comma			= VK_OEM_COMMA,	Minus			= VK_OEM_MINUS,
 		Period			= VK_OEM_PERIOD,Slash			= VK_OEM_2,
-		GraveAccent		= VK_OEM_3
+		GraveAccent		= VK_OEM_3,
+
+		MouseLeftButton  = VK_LBUTTON,
+		MouseRightButton = VK_RBUTTON,
+		MouseMidButton	 = VK_MBUTTON,
+		Mouse_X = 0x1000,
+		Mouse_Y = 0x1001,
 	};
 	inline String KeyCodeToString(EKeyCode code)
 	{
@@ -211,6 +217,13 @@ namespace JG
 		case EKeyCode::Period:			return ".";
 		case EKeyCode::Slash:			return "/";
 		case EKeyCode::GraveAccent:		return "`";
+		case EKeyCode::MouseLeftButton: return "MouseLeftButton";
+		case EKeyCode::MouseRightButton:return "MouseRightButton";
+		case EKeyCode::MouseMidButton:  return "MouseMidButton";
+			
+
+		case EKeyCode::Mouse_X: return "Mouse_X";
+		case EKeyCode::Mouse_Y: return "Mouse_Y";
 		default:
 			return "None";
 		}
@@ -327,6 +340,11 @@ namespace JG
 		else if (code == ".") { return EKeyCode::Period; }
 		else if (code == "/") { return EKeyCode::Slash; }
 		else if (code == "`") { return EKeyCode::GraveAccent; }
+		else if (code == "MouseLeftButton") { return EKeyCode::MouseLeftButton; }
+		else if (code == "MouseRightButton") { return EKeyCode::MouseRightButton; }
+		else if (code == "MouseMidButton") { return EKeyCode::MouseMidButton; }
+		else if (code == "Mouse_X") { return EKeyCode::Mouse_X; }
+		else if (code == "Mouse_Y") { return EKeyCode::Mouse_Y; }
 		else { return EKeyCode::Unknown; }
 	}
 

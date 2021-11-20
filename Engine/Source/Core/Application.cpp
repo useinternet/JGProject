@@ -92,10 +92,10 @@ namespace JG
 		Log::Create();
 		TimerManager::Create();
 		Scheduler::Create();
-		ProjectSetting::Create();
+
 		AssetDataBase::Create();
 		InputManager::Create();
-	
+		ProjectSetting::Create();
 
 		// TODO
 		// 필요한 멤버 클래스 생성
@@ -191,8 +191,9 @@ namespace JG
 		mLayerStack.reset();
 		AssetDataBase::Destroy();
 		JGGraphics::Destroy();
-		InputManager::Destroy();
 		ProjectSetting::Destroy();
+		InputManager::Destroy();
+
 
 		mWindow->Destroy();
 		mWindow.reset();

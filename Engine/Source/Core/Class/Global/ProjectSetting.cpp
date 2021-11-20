@@ -30,7 +30,7 @@ namespace JG
 	{
 		auto json = CreateSharedPtr<Json>();
 		Save_StartSetting(json);
-
+		Save_InputSetting(json);
 
 		auto path = CombinePath(Application::GetConfigPath(), "ProjectSetting.json");
 		Json::Write(path, json);
@@ -44,6 +44,7 @@ namespace JG
 		if (result == true)
 		{
 			Load_StartSetting(json);
+			Load_InputSetting(json);
 		}
 
 	}
@@ -61,8 +62,6 @@ namespace JG
 	void ProjectSetting::Save_InputSetting(SharedPtr<Json> json)
 	{
 		auto inputSettingJson = json->CreateJsonData();
-
-
 		auto axisMappingListJson = inputSettingJson->CreateJsonData();
 		InputManager::GetInstance().ForEach([&](AxisMappingData* data)
 		{
@@ -73,7 +72,7 @@ namespace JG
 			for (auto keyData : data->KeyList)
 			{
 				auto keyDataJson = keyDataListJson->CreateJsonData();
-				keyDataJson->AddMember("KeyCode", (u64)keyData.Code);
+				keyDataJson->AddMember("KeyCode", KeyCodeToString(keyData.Code));
 				keyDataJson->AddMember("Scale", keyData.Scale);
 				keyDataListJson->AddMember(keyDataJson);
 			}
@@ -95,7 +94,7 @@ namespace JG
 			for (auto keyData : data->KeyList)
 			{
 				auto keyDataJson = keyDataListJson->CreateJsonData();
-				keyDataJson->AddMember("KeyCode", (u64)keyData.Code);
+				keyDataJson->AddMember("KeyCode", KeyCodeToString(keyData.Code));
 				keyDataJson->AddMember("IsShift", keyData.IsShift);
 				keyDataJson->AddMember("IsCtrl",  keyData.IsCtrl);
 				keyDataJson->AddMember("IsAlt",  keyData.IsAlt);
@@ -128,9 +127,6 @@ namespace JG
 		{
 			mStartGameWorldPath = val->GetString();
 		}
-
-
-
 	}
 	void ProjectSetting::Load_InputSetting(SharedPtr<Json> json)
 	{
@@ -153,6 +149,45 @@ namespace JG
 			return;
 		}
 
+		axisMappingDataListJson->ForEach([&](SharedPtr<JsonData> mappingJson)
+		{
+			auto val = mappingJson->GetMember("Name");
+			AxisMappingData* data = nullptr;
+			if (val && val->IsString())
+			{
+				data = InputManager::GetInstance().AddAxisMappings(val->GetString());
+			}
+			else
+			{
+				data = InputManager::GetInstance().AddAxisMappings("None");
+			}
+
+			auto keyDataListJson = mappingJson->GetMember("KeyDataList");
+			if (keyDataListJson)
+			{
+				keyDataListJson->ForEach([&](SharedPtr<JsonData> keyDataJson)
+				{
+					AxisMappingData::KeyData keyData;
+					auto val = keyDataJson->GetMember("KeyCode");
+					if (val && val->IsString())
+					{
+						keyData.Code = StringToKeyCode(val->GetString());
+					}
+					val = keyDataJson->GetMember("Scale");
+					if (val && val->IsFloat())
+					{
+						keyData.Scale = val->GetFloat();
+					}
+					data->KeyList.push_back(keyData);
+				});
+
+
+			}
+		});
+
+
+
+
 
 
 		// Action Mapping Data
@@ -163,7 +198,52 @@ namespace JG
 		}
 
 
+		actionMappingDataListJson->ForEach([&](SharedPtr<JsonData> mappingJson)
+		{
+			auto val = mappingJson->GetMember("Name");
+			ActionMappingData* data = nullptr;
+			if (val && val->IsString())
+			{
+				data = InputManager::GetInstance().AddActionMappings(val->GetString());
+			}
+			else
+			{
+				data = InputManager::GetInstance().AddActionMappings("None");
+			}
 
+			auto keyDataListJson = mappingJson->GetMember("KeyDataList");
+			if (keyDataListJson)
+			{
+				keyDataListJson->ForEach([&](SharedPtr<JsonData> keyDataJson)
+				{
+					ActionMappingData::KeyData keyData;
+					auto val = keyDataJson->GetMember("KeyCode");
+					if (val && val->IsString())
+					{
+						keyData.Code = StringToKeyCode(val->GetString());
+					}
+					val = keyDataJson->GetMember("IsShift");
+					if (val && val->IsBool())
+					{
+						keyData.IsShift = val->GetBool();
+					}
+					val = keyDataJson->GetMember("IsCtrl");
+					if (val && val->IsBool())
+					{
+						keyData.IsCtrl = val->GetBool();
+					}
+					val = keyDataJson->GetMember("IsAlt");
+					if (val && val->IsBool())
+					{
+						keyData.IsAlt = val->GetBool();
+					}
+
+					data->KeyList.push_back(keyData);
+				});
+
+
+			}
+		});
 
 
 	}

@@ -1,7 +1,12 @@
 #include "pch.h"
 #include "GameBridge.h"
 
-void TestFunction()
+
+void Start_Plugin(JG::SharedPtr<JG::GamePluginLinker> linker)
 {
-	JG::Scheduler::GetInstance();
+	if (linker == nullptr)
+	{
+		return;
+	}
+	linker->Apply();
 }

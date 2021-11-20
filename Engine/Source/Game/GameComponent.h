@@ -23,6 +23,9 @@ namespace JG
 		bool mIsActive = true;
 		bool mIsAwake = false;
 		bool mIsRunStart = false;
+
+		HashSet<String> mBindedActionNames;
+		HashSet<String> mBindedAxisNames;
 	public:
 		virtual ~GameComponent() = default;
 	protected:
@@ -31,10 +34,14 @@ namespace JG
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+		
+	protected: // 컴포넌트 유틸 함수
+		void BindAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action);
+		void BindAxis(const String& axisName,const std::function<void(float)>& action);
+
 	public:
 		GameNode*  GetOwner() const;
 		GameWorld* GetGameWorld() const;
-	public:
 		void SetActive(bool isActive);
 		bool IsActive() const;
 	};

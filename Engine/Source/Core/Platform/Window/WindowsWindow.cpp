@@ -94,6 +94,24 @@ namespace JG
 		return JVector2Int(rect.left, rect.top);
 	}
 
+	void WindowsWindow::SetShowCursor(bool isShow)
+	{
+		mIsShowCursor = isShow;
+		if (mIsShowCursor)
+		{
+			while (::ShowCursor(true) <= 0) {}
+		}
+		else
+		{
+			while (::ShowCursor(false) >= 0) {}
+		}
+	}
+
+	bool WindowsWindow::IsShowCursor() const
+	{
+		return mIsShowCursor;
+	}
+
 	void WindowsWindow::AddWindowProcCallBack(const WindowProcCallBack& callBack)
 	{
 		smCallBackList.push_back(callBack);

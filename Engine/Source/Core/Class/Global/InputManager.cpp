@@ -1,42 +1,39 @@
 #include "pch.h"
 #include "InputManager.h"
-
+#include "Application.h"
 namespace JG
 {
 	InputManager::InputManager()
 	{
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::BeginSystem,
 			[&]() -> EScheduleResult { 
-			Update(); 
+			if (IWindow::GetFocus() == Application::GetInstance().GetWindow()->GetHandle())
+			{
+				RefreshInput();
+			}
 			return EScheduleResult::Continue;
 		});
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Default, SCHEDULE_BIND_FN(&InputManager::Update));
 	}
-	void InputManager::AddActionMappings(const String& name)
+	ActionMappingData* InputManager::AddActionMappings(const String& name)
 	{
-		if (mActionMappingsDataDic.find(name) == mActionMappingsDataDic.end())
-		{
-			auto data = CreateSharedPtr<ActionMappingData>(name);
-			mActionMappingsDataList.push_back(data);
-			mActionMappingsDataDic[name] = data.get();
-		}
+		auto data = CreateSharedPtr<ActionMappingData>(name);
+		mActionMappingsDataList.push_back(data);
+		return data.get();
 	}
-	void InputManager::AddAxisMappings(const String& name)
+	AxisMappingData* InputManager::AddAxisMappings(const String& name)
 	{
-		if (mAxisMappingsDataDic.find(name) == mAxisMappingsDataDic.end())
-		{
-			auto data = CreateSharedPtr<AxisMappingData>(name);
-			mAxisMappingsDataList.push_back(data);
-			mAxisMappingsDataDic[name] = data.get();
-		}
+		auto data = CreateSharedPtr<AxisMappingData>(name);
+		mAxisMappingsDataList.push_back(data);
+		return data.get();
 	}
-	void InputManager::RemoveActionMappings(const String& name)
+	void InputManager::RemoveActionMappings(ActionMappingData* data)
 	{
 		for (auto iter = mActionMappingsDataList.begin(); iter != mActionMappingsDataList.end();)
 		{
-			if ((*iter)->Name == name)
+			if ((*iter).get() == data)
 			{
 				iter = mActionMappingsDataList.erase(iter);
-				mActionMappingsDataDic.erase(name);
 			}
 			else
 			{
@@ -44,14 +41,13 @@ namespace JG
 			}
 		}
 	}
-	void InputManager::RemoveAxisMappings(const String& name)
+	void InputManager::RemoveAxisMappings(AxisMappingData* data)
 	{
 		for (auto iter = mAxisMappingsDataList.begin(); iter != mAxisMappingsDataList.end();)
 		{
-			if ((*iter)->Name == name)
+			if ((*iter).get() == data)
 			{
 				iter = mAxisMappingsDataList.erase(iter);
-				mAxisMappingsDataDic.erase(name);
 			}
 			else
 			{
@@ -59,6 +55,7 @@ namespace JG
 			}
 		}
 	}
+
 	void InputManager::ForEach(const std::function<void(ActionMappingData*)>& action)
 	{
 		for (auto& data : mActionMappingsDataList)
@@ -72,6 +69,47 @@ namespace JG
 		{
 			action(data.get());
 		}
+	}
+	void InputManager::BindAction(IJGObject* _object, const String& actionName, EInputAction inputAction, const std::function<void()>& action, bool* pIsActive)
+	{
+		if (_object == nullptr)
+		{
+			return;
+		}
+		ActionBindData data;
+		data.Func   = action;
+		data.pIsActive = pIsActive;
+		mActionBindedDatas[inputAction][actionName][_object] = data;
+	}
+	void InputManager::UnBindAction(IJGObject* _object, const String& actionName)
+	{
+		if (_object == nullptr)
+		{
+			return;
+		}
+		for (auto& _pair : mActionBindedDatas)
+		{
+			_pair.second[actionName].erase(_object);
+		}
+	}
+	void InputManager::BindAxis(IJGObject* _object, const String& axisName,  const std::function<void(float)>& action, bool* pIsActive)
+	{
+		if (_object == nullptr)
+		{
+			return;
+		}
+		AxisBindData data;
+		data.Func      = action;
+		data.pIsActive = pIsActive;
+		mAxisBindedDatas[axisName][_object] = data;
+	}
+	void InputManager::UnBindAxis(IJGObject* _object, const String& axisName)
+	{
+		if (_object == nullptr)
+		{
+			return;
+		}
+		mAxisBindedDatas[axisName].erase(_object);
 	}
 	bool InputManager::IsKeyPressed(EKeyCode code)
 	{
@@ -89,7 +127,19 @@ namespace JG
 	{
 		return mKeyState[(i32)code].State & KeyState::Up;
 	}
-	void InputManager::Update()
+	f32  InputManager::GetMouseDeltaX() const
+	{
+		return mMouseDelta.x;
+	}
+	f32  InputManager::GetMouseDeltaY() const
+	{
+		return mMouseDelta.y;
+	}
+	const JVector2& InputManager::GetMouseDelta() const
+	{
+		return mMouseDelta;
+	}
+	void InputManager::RefreshInput()
 	{
 		for (i32 i = 0; i < 256; ++i)
 		{
@@ -100,12 +150,10 @@ namespace JG
 				{
 					state.State |= KeyState::Pressed;
 					state.State |= KeyState::Down;
-					JG_CORE_INFO("KeyPressed : {0}", KeyCodeToString((EKeyCode)i));
 				}
 				else
 				{
 					state.State = KeyState::Down;
-					JG_CORE_INFO("KeyDown : {0}", KeyCodeToString((EKeyCode)i));
 				}
 			}
 			else
@@ -114,8 +162,6 @@ namespace JG
 				{
 					state.State |= KeyState::Up;
 					state.State |= KeyState::Released;
-					JG_CORE_INFO("KeyUp : {0}", KeyCodeToString((EKeyCode)i));
-					JG_CORE_INFO("KeyReleased : {0}", KeyCodeToString((EKeyCode)i));
 				}
 				if (state.State & KeyState::Up)
 				{
@@ -123,5 +169,181 @@ namespace JG
 				}
 			}
 		}
+
+
+		static bool isAxisInit = false;
+		static JVector2 cursorPos;
+		static JVector2 prevCursorPos;
+
+		static bool isShowCursor = true;
+		static JVector2 originCursorPos;
+
+		if (isAxisInit == false)
+		{
+			isAxisInit = true;
+			cursorPos	  = IWindow::GetCursorPos();
+			prevCursorPos = cursorPos;
+		}
+		else
+		{
+			cursorPos = IWindow::GetCursorPos();
+			if (cursorPos != prevCursorPos)
+			{
+				auto delta = cursorPos - prevCursorPos;
+				SetAxisValue(EKeyCode::Mouse_X, delta.x);
+				SetAxisValue(EKeyCode::Mouse_Y, delta.y);
+				prevCursorPos = cursorPos;
+			}
+			auto window = Application::GetInstance().GetWindow();
+			if (window->IsShowCursor() == false)
+			{
+				if (isShowCursor == true)
+				{
+					originCursorPos = cursorPos;
+					isShowCursor    = false;
+				}
+				JRect    clientRect = IWindow::GetClientRect(window->GetHandle());
+				JVector2 centerPos  = IWindow::ClientToScreen(window->GetHandle(), clientRect.Center());
+				IWindow::SetCursorPos(centerPos);
+			}
+			else {
+				if (isShowCursor == false)
+				{
+					isShowCursor = true;
+					IWindow::SetCursorPos(originCursorPos);
+				}
+			
+			}
+
+
+		}
+
+
+	}
+	void InputManager::ActionMappingData_Update(EInputAction inputEvent, const String& mappingName)
+	{
+		auto bindDatas = mActionBindedDatas[inputEvent][mappingName];
+		for (auto& _pair : bindDatas)
+		{
+			auto& data = _pair.second;
+			if (data.pIsActive == nullptr || (*data.pIsActive) == true)
+			{
+				if (data.Func)
+				{
+					data.Func();
+				}
+			}
+		}
+	}
+	void InputManager::AxisMappingData_Update(const String& mappingName, f32 value)
+	{
+		auto& bindDatas = mAxisBindedDatas[mappingName];
+		for (auto& _pair : bindDatas)
+		{
+			auto& data = _pair.second;
+			if (data.pIsActive == nullptr || (*data.pIsActive) == true)
+			{
+				if (data.Func)
+				{
+					data.Func(value);
+				}
+			}
+		}
+	}
+	EScheduleResult InputManager::Update()
+	{
+		for (auto& mappingData : mActionMappingsDataList)
+		{
+			for (auto& keyData : mappingData->KeyList)
+			{
+				if (keyData.Code == EKeyCode::Unknown) continue;
+				bool isTrigger = true;
+				if (keyData.IsAlt && IsKeyDown(EKeyCode::Alt) == false)
+				{
+					isTrigger = false;
+				}
+				if (keyData.IsCtrl && IsKeyDown(EKeyCode::Ctrl) == false)
+				{
+					isTrigger = false;
+				}
+				if (keyData.IsShift && IsKeyDown(EKeyCode::Shift) == false)
+				{
+					isTrigger = false;
+				}
+
+				if (isTrigger)
+				{
+					if (IsKeyPressed(keyData.Code) == true)
+					{
+						ActionMappingData_Update(EInputAction::Pressed, mappingData->Name);
+					}
+					if (IsKeyReleased(keyData.Code) == true)
+					{
+						ActionMappingData_Update(EInputAction::Released, mappingData->Name);
+					}
+				}
+			}
+
+		}
+		for (auto& mappingData : mAxisMappingsDataList)
+		{
+			for (auto& keyData : mappingData->KeyList)
+			{
+				if (IsAxisKeyCode(keyData.Code) == true)
+				{
+					f32 value = GetAxisValue(keyData.Code);
+					f32 deadZone = GetAxisDeadZone(keyData.Code);
+					if (Math::Abs(value) >= deadZone)
+					{
+						AxisMappingData_Update(mappingData->Name, value * keyData.Scale);
+					}
+				}
+				else
+				{
+					if (IsKeyPressed(keyData.Code) == true)
+					{
+						AxisMappingData_Update(mappingData->Name, keyData.Scale);
+					}
+					if (IsKeyReleased(keyData.Code) == true)
+					{
+						AxisMappingData_Update(mappingData->Name, 0.0f);
+					}
+				}
+
+
+
+
+			}
+
+
+		}
+		return EScheduleResult::Continue;
+	}
+	bool InputManager::IsAxisKeyCode(EKeyCode code) const
+	{
+		return code == EKeyCode::Mouse_X || code == EKeyCode::Mouse_Y;
+	}
+	void InputManager::SetAxisValue(EKeyCode code, f32 value)
+	{
+		if (IsAxisKeyCode(code))
+		{
+			mAxisDatas[code].Value = value;
+		}
+	}
+	f32 InputManager::GetAxisValue(EKeyCode code) const
+	{
+		if (IsAxisKeyCode(code))
+		{
+			return mAxisDatas.at(code).Value;
+		}
+		return 0.0f;
+	}
+	f32 InputManager::GetAxisDeadZone(EKeyCode code) const
+	{
+		if (IsAxisKeyCode(code))
+		{
+			return mAxisDatas.at(code).DeadZone;
+		}
+		return 0.0f;
 	}
 }

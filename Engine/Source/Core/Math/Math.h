@@ -18,6 +18,17 @@ namespace JG
 
 		static JVector3 ConvertToRadians(const JVector3& vDegrees);
 		static JVector3 ConvertToDegrees(const JVector3& vRadians);
+
+
+		template<class T>
+		inline static T Abs(T value)
+		{
+			if (value < 0)
+			{
+				value = value * -1;
+			}
+			return value;
+		}
 	};
 
 

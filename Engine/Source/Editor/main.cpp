@@ -17,7 +17,6 @@ int main(int argc, char** argv)
 	props.WindowProps.Height = 1080;
 	props.WindowProps.IconID = IDI_ICON1;
 	Application* app = new JGEditor();
-
 	if (app->Create(props))
 	{
 		app->Run();

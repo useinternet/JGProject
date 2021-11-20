@@ -4,6 +4,9 @@
 
 namespace JG
 {
+
+
+
 	template<class ReturnType, class ...Args>
 	class PluginFunction
 	{
@@ -19,6 +22,8 @@ namespace JG
 			return func != nullptr;
 		}
 	};
+
+
 	class Plugin
 	{
 		HINSTANCE mDll = nullptr;
@@ -28,6 +33,8 @@ namespace JG
 
 		bool IsVaild() const;
 	public:
+
+
 		template<class ReturnType, class ...Args>
 		PluginFunction<ReturnType, Args...> LoadFunction(const String& funcName)
 		{
@@ -40,5 +47,21 @@ namespace JG
 	
 			return result;
 		}
+		template<class LinkerClass>
+		bool Link(SharedPtr<LinkerClass> linker)
+		{
+			auto func = LoadFunction<void, SharedPtr<LinkerClass>>("Start_Plugin");
+			if (func.IsVaild())
+			{
+				func.func(linker);
+				return true;
+			}
+			return false;
+		}
 	};
+
+
+
+
+
 }

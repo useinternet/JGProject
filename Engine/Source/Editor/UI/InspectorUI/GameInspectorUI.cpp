@@ -168,6 +168,10 @@ namespace JG
 		obj->SetOrthographic(isOrth);
 		obj->SetResolution(resolution);
 	}
+	void EditorCameraInspectorUI::OnGUI_Impl(EditorCamera* obj)
+	{
+		UIManager::GetInstance().ForceShowInspectorUI<Camera>(obj);
+	}
 	void PointLightInspectorUI::OnGUI_Impl(PointLight* obj)
 	{
 		ImGui::Spacing();
@@ -269,4 +273,5 @@ namespace JG
 			obj->PopMaterial();
 		}, label_width);
 	}
+
 }

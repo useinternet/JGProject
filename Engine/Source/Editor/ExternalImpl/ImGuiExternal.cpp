@@ -582,5 +582,33 @@ namespace ImGui
 
 		return JG::AssetDataBase::GetInstance().LoadOriginAsset(texturePathDic[label]);
 	}
+	bool InputText(void* id, const JG::String& inputText, JG::String& out_str)
+	{
+		auto id_str = GetUniqueID("inputText_", (JG::u64)id);
+
+		std::string text = inputText;
+		text.resize(512);
+
+		if (ImGui::InputText(id_str.c_str(), text.data(), 512) == true)
+		{
+			int len = strlen(text.c_str());
+			out_str = text.substr(0, len);
+		}
+
+		bool result = ImGui::IsItemDeactivatedAfterEdit();
+		return result;
+	}
+
+	bool CheckBox(void* id, bool check)
+	{
+		bool result = check;
+		auto id_str = GetUniqueID("CheckBox_", (JG::u64)id);
+		if (ImGui::Checkbox(id_str.c_str(), &check) == true)
+		{
+			result = !result;
+		}
+		return result;
+	}
+
 
 }

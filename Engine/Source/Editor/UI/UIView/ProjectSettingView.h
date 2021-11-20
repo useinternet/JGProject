@@ -30,9 +30,14 @@ namespace JG
 			Category(const String& label) : Label(label) {}
 		};
 	private:
-		bool mOpenGUI = true;
+		bool	 mOpenGUI = true;
 		Category mCategoryList[Category_Count];
 		Asset<ITexture>* mIcons[Icon_Count];
+		SortedSet<String> mKeyNames;
+
+
+
+
 		i32 mCurrentCategory = 0;
 	public:
 		ProjectSettingView();
@@ -49,6 +54,9 @@ namespace JG
 	private:
 		void StartSetting_OnGUI();
 		void Input_OnGUI();
+	private:
+		bool ActionMappingData_OnGUI(ActionMappingData* data);
+		bool AxisMappingData_OnGUI(AxisMappingData* data);
 	private:
 		void LoadConfig();
 		void LoadIcons();

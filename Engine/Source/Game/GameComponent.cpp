@@ -12,6 +12,14 @@ namespace JG
 	void GameComponent::Destory()
 	{
 		GameObject::Destory();
+		for (auto& name : mBindedActionNames)
+		{
+			InputManager::GetInstance().UnBindAction(this, name);
+		}
+		for (auto& name : mBindedAxisNames)
+		{
+			InputManager::GetInstance().UnBindAxis(this, name);
+		}
 		mOwnerNode = nullptr;
 	}
 	void GameComponent::MakeJson(SharedPtr<JsonData> jsonData) const
@@ -28,6 +36,17 @@ namespace JG
 			SetActive(val->IsBool());
 		}
 	}
+	void GameComponent::BindAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action)
+	{
+		mBindedActionNames.insert(actionName);
+		InputManager::GetInstance().BindAction(this, actionName, inputAction, action, &mIsActive);
+	}
+	void GameComponent::BindAxis(const String& axisName,  const std::function<void(float)>& action)
+	{
+		mBindedAxisNames.insert(axisName);
+		InputManager::GetInstance().BindAxis(this, axisName, action, &mIsActive);
+	}
+
 	GameNode* GameComponent::GetOwner() const
 	{
 		return mOwnerNode;

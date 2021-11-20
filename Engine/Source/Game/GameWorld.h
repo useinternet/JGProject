@@ -60,7 +60,6 @@ namespace JG
 
 		void RegisterGraphicsScene(GameComponent* com, Graphics::Scene* scene);
 		void UnRegisterGraphicsScene(GameComponent* com);
-		
 	public:
 		template<class T>
 		T* AddGameSystem()

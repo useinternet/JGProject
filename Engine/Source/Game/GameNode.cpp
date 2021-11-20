@@ -17,14 +17,9 @@ namespace JG
 	void GameNode::Update()
 	{
 		GameObject::Update();
-		if (mIsAlive == false) return;
+		if (IsAlive() == false) return;
 		for (auto& com : mComponents)
 		{
-			//if (com->mIsAwake == false)
-			//{
-			//	com->Awake();
-			//	com->mIsAwake = true;
-			//}
 			if (com->IsActive())
 			{
 				if (com->mIsRunStart == false)
@@ -38,11 +33,6 @@ namespace JG
 
 		for (auto& child : mChilds)
 		{
-			//if (child->mIsAwake == false)
-			//{
-			//	child->Awake();
-			//	child->mIsAwake = true;
-			//}
 			if (child->IsActive())
 			{
 				if (child->mIsRunStart == false)
@@ -57,7 +47,7 @@ namespace JG
 	void GameNode::LateUpdate()
 	{
 		GameObject::LateUpdate();
-		if (mIsAlive == false) return;
+		if (IsAlive() == false) return;
 		for (auto& com : mComponents)
 		{
 			if (com->IsActive())
@@ -377,10 +367,6 @@ namespace JG
 	{
 		mIsActive = active;
 	}
-	bool GameNode::IsAlive() const
-	{
-		return mIsAlive;
-	}
 	void GameNode::Picking3DRecursive(List<GameNode*>& refPickingObjectList, const JRay& pickingRay)
 	{
 		for (auto& child : mChilds)
@@ -450,7 +436,6 @@ namespace JG
 	}
 	void GameNode::DestroyRecursive()
 	{
-		mIsAlive = false;
 		for (auto& child : mChilds)
 		{
 			child->DestroyRecursive();

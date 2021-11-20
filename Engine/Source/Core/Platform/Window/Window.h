@@ -51,12 +51,17 @@ namespace JG
 
 
 		virtual EWindowPlatform GetPlatform() const = 0;
-		virtual handle GetHandle() const   = 0;
+		virtual handle		GetHandle() const   = 0;
 		virtual JVector2Int GetPosition() const = 0;
-		static void BindCallBackEventFn(const EventCallBackFn& eventCallBackFn)
-		{
-			WindowCallBackFn::EventCallBack = eventCallBackFn;
-		}
+		virtual void SetShowCursor(bool isShow) = 0;
+		virtual bool IsShowCursor() const = 0;
+	public:
+		static void     BindCallBackEventFn(const EventCallBackFn& eventCallBackFn);
+		static JRect    GetClientRect(handle _handle);
+		static JVector2 ClientToScreen(handle _handle, const JVector2& clientPos);
+		static handle   GetFocus();
+		static JVector2 GetCursorPos();
+		static void		SetCursorPos(const JVector2& pos);
 	};
 }
 

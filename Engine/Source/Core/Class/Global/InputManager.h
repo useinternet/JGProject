@@ -2,14 +2,14 @@
 #include "JGCore.h"
 
 
-
 namespace JG
 {
+	enum class EScheduleResult;
 	struct ActionMappingData
 	{
 		struct KeyData
 		{
-			EKeyCode Code;
+			EKeyCode Code =  EKeyCode::Unknown;
 			bool IsShift = false;
 			bool IsCtrl  = false;
 			bool IsAlt   = false;
@@ -24,7 +24,7 @@ namespace JG
 	{
 		struct KeyData
 		{
-			EKeyCode Code;
+			EKeyCode Code = EKeyCode::Unknown;
 			f32 Scale = 0.0f;
 		};
 
@@ -34,10 +34,27 @@ namespace JG
 		AxisMappingData() = default;
 		AxisMappingData(const String & name) : Name(name) {}
 	};
+
 	class InputManager : public GlobalSingleton<InputManager>
 	{
 		friend class Application;
+
 	private:
+		struct ActionBindData
+		{
+			std::function<void()> Func;
+			bool* pIsActive = nullptr;
+		};
+		struct AxisBindData
+		{
+			std::function<void(float)> Func;
+			bool* pIsActive = nullptr;
+		};
+		struct AxisData
+		{
+			f32 DeadZone = 0.0f;
+			f32 Value    = 0.0f;
+		};
 		struct KeyState
 		{
 			enum
@@ -51,34 +68,55 @@ namespace JG
 			i32 State     = None;
 			f32 PressDurationTime = 0.0f;
 		};
+		using ActionBindDatas = Dictionary<EInputAction, Dictionary<String, Dictionary<IJGObject*, ActionBindData>>>;
+		using AxisBindDatas   = Dictionary<String, Dictionary<IJGObject*, AxisBindData>>;
 
 		KeyState mKeyState[256];
+		Dictionary<EKeyCode, AxisData>	   mAxisDatas;
 		List<SharedPtr<ActionMappingData>> mActionMappingsDataList;
 		List<SharedPtr<AxisMappingData>>   mAxisMappingsDataList;
-
-		Dictionary<String, ActionMappingData*>  mActionMappingsDataDic;
-		Dictionary<String, AxisMappingData*>    mAxisMappingsDataDic;
-
-
+		ActionBindDatas	mActionBindedDatas;
+		AxisBindDatas   mAxisBindedDatas;
+		JVector2		mMouseDelta;
 	public:
 		InputManager();
 		virtual ~InputManager() = default;
 	public:
-		void AddActionMappings(const String& name);
-		void AddAxisMappings(const String& name);
-		void RemoveActionMappings(const String& name);
-		void RemoveAxisMappings(const String& name);
+		ActionMappingData* AddActionMappings(const String& name);
+		AxisMappingData* AddAxisMappings(const String& name);
+
+		void RemoveActionMappings(ActionMappingData* data);
+		void RemoveAxisMappings(AxisMappingData* data);
+
+
+
 		void ForEach(const std::function<void(ActionMappingData*)>& action);
 		void ForEach(const std::function<void(AxisMappingData*)>& action);
+
+		void BindAction(IJGObject* _object, const String& actionName, EInputAction inputAction, const std::function<void()>& action, bool* pIsActive = nullptr);
+		void UnBindAction(IJGObject* _object, const String& actionName);
+
+
+		void BindAxis(IJGObject* _object, const String& axisName, const std::function<void(float)>& action, bool* pIsActive = nullptr);
+		void UnBindAxis(IJGObject* _object, const String& actionName);
 	public:
 		bool IsKeyPressed(EKeyCode code);
 		bool IsKeyReleased(EKeyCode code);
 		bool IsKeyDown(EKeyCode code);
 		bool IsKeyUp(EKeyCode code);
-
-
+		f32  GetMouseDeltaX() const;
+		f32  GetMouseDeltaY() const;
+		const JVector2& GetMouseDelta() const;
 	private:
-		void Update();
+		void RefreshInput();
+		void ActionMappingData_Update(EInputAction inputEvent, const String& mappingName);
+		void AxisMappingData_Update(const String& mappingName, f32 value);
+		EScheduleResult Update();
 
+
+		bool IsAxisKeyCode(EKeyCode code) const;
+		void SetAxisValue(EKeyCode code, f32 value);
+		f32  GetAxisValue(EKeyCode code) const;
+		f32  GetAxisDeadZone(EKeyCode code) const;
 	};
 }

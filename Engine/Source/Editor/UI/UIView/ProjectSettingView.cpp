@@ -24,6 +24,17 @@ namespace JG
 		mCategoryList[Category_Input] = Category("Input");
 
 		LoadIcons();
+
+
+
+		for (int i = 0; i < 256; ++i)
+		{
+			auto str = KeyCodeToString((EKeyCode)i);
+			if (str != "None")
+			{
+				mKeyNames.insert(str);
+			}
+		}
 	}
 	void ProjectSettingView::OnGUI()
 	{
@@ -158,10 +169,23 @@ namespace JG
 		ImGui::SameLine(); ImGui::Text("Action Mappings"); ImGui::SameLine();
 		if (ImGui::ImageButton(addIconID, btSize) == true)
 		{
-
+			InputManager::GetInstance().AddActionMappings("None");
 		}
 		if (isOpen)
 		{
+			List<ActionMappingData*> removeDataList;
+			InputManager::GetInstance().ForEach([&](ActionMappingData* data)
+			{
+				if (ActionMappingData_OnGUI(data) == false)
+				{
+					removeDataList.push_back(data);
+				}
+			});
+			for (auto& data : removeDataList)
+			{
+				InputManager::GetInstance().RemoveActionMappings(data);
+			}
+			// 
 			ImGui::TreePop();
 		}
 
@@ -172,11 +196,23 @@ namespace JG
 		 
 		if (ImGui::ImageButton(addIconID, btSize) == true)
 		{
-
+			InputManager::GetInstance().AddAxisMappings("None");
 		}
 
 		if (isOpen)
 		{
+			List<AxisMappingData*> removeDataList;
+			InputManager::GetInstance().ForEach([&](AxisMappingData* data)
+			{
+				if (AxisMappingData_OnGUI(data) == false)
+				{
+					removeDataList.push_back(data);
+				}
+			});
+			for (auto& data : removeDataList)
+			{
+				InputManager::GetInstance().RemoveAxisMappings(data);
+			}
 			ImGui::TreePop();
 		}
 
@@ -188,6 +224,174 @@ namespace JG
 			ImGui::TreePop();
 		}
 
+	}
+	bool ProjectSettingView::ActionMappingData_OnGUI(ActionMappingData* data)
+	{
+		String changeName;
+		static ImVec2 btSize = ImVec2(18.0f, 18.0f);
+		auto   addIconID   = GetTextureID(Icon_Add);
+		auto   closeIconID = GetTextureID(Icon_Close);
+		bool   result = true;
+		//static bool isOpen = false;
+
+		ImGui::Columns(2, 0, false);
+		ImGui::SetColumnWidth(0, 40.0f);
+		bool isOpen = ImGui::TreeNodeEx(ImGui::GetUniqueID("TreeNode_", (u64)data).c_str(), ImGuiTreeNodeFlags_FramePadding);
+
+		ImGui::NextColumn();
+		ImGui::SameLine();
+		ImGui::Spacing(); ImGui::SameLine();
+		ImGui::Spacing(); ImGui::SameLine();
+		ImGui::SetNextItemWidth(250.0f);
+		if (ImGui::InputText(data, data->Name, changeName) == true)
+		{
+			data->Name = changeName;
+		}ImGui::SameLine();
+		
+		// +
+		if (ImGui::ImageButton(addIconID, btSize) == true)
+		{
+			data->KeyList.push_back(ActionMappingData::KeyData());
+		}
+		ImGui::SameLine();
+		// -
+		if (ImGui::ImageButton(closeIconID, btSize) == true)
+		{
+			result = false;
+		}
+		if (isOpen)
+		{
+			auto cnt = data->KeyList.size();
+			auto removeIndex = -1;
+			for (auto i = 0; i < cnt; ++i)
+			{
+				ImGui::Spacing(); ImGui::SameLine();
+				ImGui::Spacing(); ImGui::SameLine();
+				auto keyData = data->KeyList[i];
+				auto id = ImGui::GetUniqueID("Combo" + std::to_string(i), (u64)data);
+				ImGui::SetNextItemWidth(200.0f);
+				if (ImGui::BeginCombo(id.c_str(), KeyCodeToString(keyData.Code).c_str()) == true)
+				{
+					for (auto& keyName : mKeyNames)
+					{
+						if (ImGui::Selectable(keyName.c_str(), false) == true)
+						{
+							data->KeyList[i].Code = StringToKeyCode(keyName);
+						}
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::SameLine();
+				ImGui::Text("Shift"); ImGui::SameLine();
+				ImGui::Checkbox(ImGui::GetUniqueID("Check_Shift" + std::to_string(i), (u64)data).c_str(), &data->KeyList[i].IsShift); ImGui::SameLine();
+				ImGui::Text("Ctrl"); ImGui::SameLine();
+				ImGui::Checkbox(ImGui::GetUniqueID("Check_Ctrl" + std::to_string(i), (u64)data).c_str(), &data->KeyList[i].IsCtrl); ImGui::SameLine();
+				ImGui::Text("Alt"); ImGui::SameLine();
+				ImGui::Checkbox(ImGui::GetUniqueID("Check_Alt" + std::to_string(i), (u64)data).c_str(), &data->KeyList[i].IsAlt); ImGui::SameLine();
+
+
+
+				id = ImGui::GetUniqueID("Key_CloseButton" + std::to_string(i), (u64)data);
+				ImGui::PushID(id.c_str());
+				if (ImGui::ImageButton(closeIconID, btSize) == true)
+				{
+					removeIndex = i;
+				}
+				ImGui::PopID();
+			}
+			if (removeIndex != -1)
+			{
+				data->KeyList.erase(data->KeyList.begin() + removeIndex);
+			}
+
+			ImGui::TreePop();
+		}
+		ImGui::Columns(1);
+		return result;
+	}
+	bool ProjectSettingView::AxisMappingData_OnGUI(AxisMappingData* data)
+	{
+		String changeName;
+		static ImVec2 btSize = ImVec2(18.0f, 18.0f);
+		auto   addIconID = GetTextureID(Icon_Add);
+		auto   closeIconID = GetTextureID(Icon_Close);
+		bool   result = true;
+		//static bool isOpen = false;
+
+		ImGui::Columns(2, 0, false);
+		ImGui::SetColumnWidth(0, 40.0f);
+		bool isOpen = ImGui::TreeNodeEx(ImGui::GetUniqueID("TreeNode_", (u64)data).c_str(), ImGuiTreeNodeFlags_FramePadding);
+
+		ImGui::NextColumn();
+		ImGui::SameLine();
+		ImGui::Spacing(); ImGui::SameLine();
+		ImGui::Spacing(); ImGui::SameLine();
+
+
+
+		ImGui::SetNextItemWidth(250.0f);
+		if (ImGui::InputText(data, data->Name, changeName) == true)
+		{
+			data->Name = changeName;
+		}ImGui::SameLine();
+
+		// +
+		if (ImGui::ImageButton(addIconID, btSize) == true)
+		{
+			data->KeyList.push_back(AxisMappingData::KeyData());
+		}
+		ImGui::SameLine();
+		// -
+		if (ImGui::ImageButton(closeIconID, btSize) == true)
+		{
+			result = false;
+		}
+		if (isOpen)
+		{
+			auto cnt = data->KeyList.size();
+			auto removeIndex = -1;
+			for (auto i = 0; i < cnt; ++i)
+			{
+				ImGui::Spacing(); ImGui::SameLine();
+				ImGui::Spacing(); ImGui::SameLine();
+				auto keyData = data->KeyList[i];
+				auto id = ImGui::GetUniqueID("Combo" + std::to_string(i), (u64)data);
+				ImGui::SetNextItemWidth(200.0f);
+				if (ImGui::BeginCombo(id.c_str(), KeyCodeToString(keyData.Code).c_str()) == true)
+				{
+					for (auto& keyName : mKeyNames)
+					{
+						if (ImGui::Selectable(keyName.c_str(), false) == true)
+						{
+							data->KeyList[i].Code = StringToKeyCode(keyName);
+						}
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::SameLine();
+				ImGui::Text("Scale"); ImGui::SameLine();
+				ImGui::SetNextItemWidth(150.0f);
+				ImGui::SliderFloat(ImGui::GetUniqueID("SliderFloat_" + std::to_string(i), (u64)data).c_str(), &data->KeyList[i].Scale, -1.0f, 1.0f);
+				ImGui::SameLine();
+
+
+				id = ImGui::GetUniqueID("Key_CloseButton" + std::to_string(i), (u64)data);
+				ImGui::PushID(id.c_str());
+				if (ImGui::ImageButton(closeIconID, btSize) == true)
+				{
+					removeIndex = i;
+				}
+				ImGui::PopID();
+			}
+			if (removeIndex != -1)
+			{
+				data->KeyList.erase(data->KeyList.begin() + removeIndex);
+			}
+
+			ImGui::TreePop();
+		}
+		ImGui::Columns(1);
+		return result;
 	}
 	void ProjectSettingView::LoadConfig()
 	{

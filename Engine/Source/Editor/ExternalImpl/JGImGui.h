@@ -6,10 +6,9 @@
 namespace JG
 {
 	class IFrameBuffer;
-	class EditorUISystemLayer;
 	class JGImGui : public GlobalSingleton<JGImGui>
 	{
-		friend EditorUISystemLayer;
+		friend class EditorUISystemLayer;
 	private:
 		SharedPtr<IFrameBuffer> mFrameBuffer;
 	public:

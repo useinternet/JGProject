@@ -43,6 +43,14 @@ namespace ImGui
 
 
 	JG::SharedPtr<JG::IAsset> Texture_OnGUI(const std::string& label, JG::u64 textureID, float label_space = 0.0f);
+
+
+
+
+
+
+	bool InputText(void* id, const JG::String& inputText, JG::String& out_str);
+	bool CheckBox(void* id, bool check);
 }
 namespace JG
 {

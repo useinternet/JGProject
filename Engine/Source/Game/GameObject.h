@@ -55,24 +55,25 @@ namespace JG
 	private:
 		mutable u64    mID = 0;
 		mutable String mName;
-		bool mIsAlive = true;
+		bool mIsAlive    = true;
 		List<SharedPtr<ScheduleHandle>> mScheduleHandleList;
+
 	public:
 		GameObject() = default;
 		virtual ~GameObject();
 	protected:
 		virtual void Awake() override {}
 		virtual void Start() override {}
-		virtual void Destory() override { mIsAlive = false; }
+		virtual void Destory() override {mIsAlive = false;}
 		virtual void Update() {}
 		virtual void LateUpdate() {}
-		virtual bool IsAlive() const override { return mIsAlive; }
 	protected: // ½ºÄÉÁì °ü·Ã
 		SharedPtr<ScheduleHandle> Schedule(f32 delay, f32 tickCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleOnce(f32 delay, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleByFrame(i32 delayFrame, i32 frameCycle, i32 repeat, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleOnceByFrame(i32 delayFrame, i32 priority, const SyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task);
+
 
 		void DrawDebugRay(const JRay& ray, f32 length, Color& color);
 		void DrawDebugLine(const JVector3& startPos, const JVector3& endPos,Color& color);
@@ -97,8 +98,8 @@ namespace JG
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
-
 	public:
+		virtual bool IsAlive() const override { return mIsAlive; }
 		virtual const String& GetName() const override;
 		virtual void SetName(const String& name) override;
 		virtual void OnChange(const ChangeData& data) {};
@@ -110,6 +111,5 @@ namespace JG
 		static void DestoryObject(class GameNode* gameNode);
 		static void DestoryObject(class GameWorld* gameWorld);
 		static void DestoryObject(class GameSystem* gameSys);
-		//void 
 	};
 }
