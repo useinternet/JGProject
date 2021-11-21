@@ -66,15 +66,16 @@ namespace JG
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		};
-		using DrawFunc      = std::function<void(int, const List<ObjectInfo>&)>;
-		using ReadyDrawFunc = std::function<void(IGraphicsAPI*, const RenderInfo& info)>;
+		using ObjectDrawFunc = std::function<void(int, const List<ObjectInfo>&)>;
+		using ReadyDrawFunc  = std::function<void(IGraphicsAPI*, const RenderInfo& info)>;
+		using SceneDrawFunc = std::function<void()>;
 	private:
 		List<SharedPtr<RenderBatch>> mBatchList;
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int, List<ObjectInfo>> mObjectInfoListDic;
-		List<DrawFunc> mDrawFuncList;
-		List<ReadyDrawFunc> mReadyDrawFuncList;
-
+		List<ObjectDrawFunc> mObjectDrawFuncList;
+		List<ReadyDrawFunc>  mReadyDrawFuncList;
+		List<SceneDrawFunc> mSceneDrawFuncList;
 		RenderInfo mCurrentRenderInfo;
 	public:
 		Renderer() = default;
@@ -91,7 +92,7 @@ namespace JG
 	protected:
 		const RenderInfo& GetRenderInfo() const;
 		const Dictionary<Graphics::ELightType, LightInfo>& GetLightInfos() const;
-		void AddDrawFunc(const ReadyDrawFunc& readyFunc, const DrawFunc& drawFunc);
+		void AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc);
 	protected:
 		virtual int ArrangeObject(const ObjectInfo& info) = 0;
 	};

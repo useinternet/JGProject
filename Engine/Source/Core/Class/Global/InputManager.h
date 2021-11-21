@@ -80,6 +80,7 @@ namespace JG
 		AxisBindDatas   mAxisBindedDatas;
 		JVector2		mMouseDelta;
 		JVector2 mCursorCenterPoint;
+		bool mIsLock = false;
 	public:
 		InputManager();
 		virtual ~InputManager() = default;
@@ -100,6 +101,8 @@ namespace JG
 		void BindAxis(IJGObject* _object, const String& axisName, const std::function<void(float)>& action, bool* pIsActive = nullptr);
 		void UnBindAxis(IJGObject* _object, const String& actionName);
 		void SetCenterPointWhenHideCursor(const JVector2& centerPos);
+		void SetInputLock(bool isLock);
+		bool IsInputLock() const;
 	public:
 		bool IsKeyPressed(EKeyCode code);
 		bool IsKeyReleased(EKeyCode code);

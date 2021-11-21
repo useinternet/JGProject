@@ -70,6 +70,10 @@ namespace JG
 		const ImVec4 mPressedButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
 		const JVector2 mButtonSize = JVector2(20, 20);
 
+
+
+		bool mIsEditorMode  = true;
+		bool mIsGamePlaying = false;
 	public:
 		SceneView();
 		virtual ~SceneView() = default;

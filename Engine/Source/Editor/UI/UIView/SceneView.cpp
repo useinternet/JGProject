@@ -33,7 +33,7 @@ namespace JG
 		mShowGizmo = CreateUniquePtr<Command<GameNode*>>();
 		mShowGizmo->Subscribe(this, [&](GameNode* node)
 		{
-			
+			if (mIsEditorMode == false) return;
 			auto mainCam = Camera::GetMainCamera();
 			if (mainCam == nullptr) return;
 			if (node == nullptr || node->GetType() != JGTYPE(GameNode)) return;
@@ -129,7 +129,7 @@ namespace JG
 
 
 
-		if (mEnableEditorCameraControll == false && ImGui::IsWindowFocused())
+		if (mIsEditorMode == true && mEnableEditorCameraControll == false && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
 		{
 			if ((ImGui::IsKeyPressed((i32)EKeyCode::Q)))
 			{
@@ -144,6 +144,36 @@ namespace JG
 				mCurrentGizmoOperation = ImGuizmo::SCALE;
 			}
 		}
+
+		if (mIsGamePlaying == true)
+		{
+			if (ImGui::IsKeyPressed((i32)EKeyCode::Esc))
+			{
+				static JVector3 originLocation;
+				static JVector3 originRotation;
+
+				if (mainCam)
+				{
+					if (mIsEditorMode == false)
+					{
+						originLocation = mainCam->GetOwner()->GetTransform()->GetLocalLocation();
+						originRotation = mainCam->GetOwner()->GetTransform()->GetLocalRotation();
+						if (Application::GetInstance().GetWindow()->IsShowCursor() == false)
+						{
+							Application::GetInstance().GetWindow()->SetShowCursor(true);
+						}
+					}
+					else
+					{
+						mainCam->GetOwner()->GetTransform()->SetLocalLocation(originLocation);
+						mainCam->GetOwner()->GetTransform()->SetLocalRotation(originRotation);
+					}
+				}
+				mIsEditorMode = !mIsEditorMode;
+			}
+		}
+		InputManager::GetInstance().SetInputLock(!mIsEditorMode);
+
 		OnGUI_Top();
 		OnGUI_Bottom();
 
@@ -235,85 +265,88 @@ namespace JG
 
 
 
-
-			mShowGizmo->Execute(GetSelectedGameNode());
-			f32 fixSceneHeight = imageSize.y;
-			f32 fixSceneWidth = imageSize.x;
-			f32 textureWidth  = tInfo.Width;
-			f32 textureHeight = tInfo.Height;
-			// 화면 센터 보내기
+			if (mIsEditorMode == true)
 			{
-				auto imageMin = ImGui::GetItemRectMin();
-				auto imageMax = ImGui::GetItemRectMax();
-				auto imageCenter = JRect(imageMin.x, imageMin.y, imageMax.x, imageMax.y).Center();
-				InputManager::GetInstance().SetCenterPointWhenHideCursor(imageCenter);
-				
-			}
-			if (ImGui::IsMouseClicked(0) == true && ImGui::IsItemHovered() && ImGuizmo::IsUsing() == false)
-			{
-				auto winPos   = ImGui::GetItemRectMin();
-				auto mousePos = ImGui::GetMousePos();
-
-				auto standardPos = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
-				standardPos.x = (standardPos.x / fixSceneWidth) * textureWidth;
-				standardPos.y = (standardPos.y / fixSceneHeight) * textureHeight;
-
-				NotifyEditorSceneOnClickEvent e;
-				e.ClickPos = standardPos;
-				auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
-				if (inspectorView)
+				mShowGizmo->Execute(GetSelectedGameNode());
+				f32 fixSceneHeight = imageSize.y;
+				f32 fixSceneWidth = imageSize.x;
+				f32 textureWidth = tInfo.Width;
+				f32 textureHeight = tInfo.Height;
+				// 화면 센터 보내기
 				{
-					e.ExceptObjectList.push_back(inspectorView->GetTargetObject());
+					auto imageMin = ImGui::GetItemRectMin();
+					auto imageMax = ImGui::GetItemRectMax();
+					auto imageCenter = JRect(imageMin.x, imageMin.y, imageMax.x, imageMax.y).Center();
+					InputManager::GetInstance().SetCenterPointWhenHideCursor(imageCenter);
 				}
-				SendEvent(e);
-				JG_CORE_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
-			}
-			if (ImGui::IsWindowHovered() && ImGui::IsWindowFocused() == true && mainCam->GetType() == JGTYPE(EditorCamera) && mCurrentCameraMode == 0)
-			{
-				auto editCamera = static_cast<EditorCamera*>(mainCam);
-				f32 zoom = editCamera->GetZoom();
-				f32 zoom_restrict = 1.0f;
-				if (zoom < 1.0f) zoom_restrict = zoom;
-				else zoom_restrict = 1 / zoom;
 
-
-				f32 wheelDelta = ImGui::GetIO().MouseWheel;
-				if (wheelDelta != 0)
+				if (ImGui::IsMouseClicked(0) == true &&
+					ImGui::IsItemHovered() &&
+					ImGuizmo::IsUsing() == false)
 				{
 					auto winPos = ImGui::GetItemRectMin();
 					auto mousePos = ImGui::GetMousePos();
-					auto appTimer = Application::GetInstance().GetAppTimer();
-					auto tick = appTimer->GetTick();
 
-					auto focusCenter = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
+					auto standardPos = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
+					standardPos.x = (standardPos.x / fixSceneWidth) * textureWidth;
+					standardPos.y = (standardPos.y / fixSceneHeight) * textureHeight;
 
-					focusCenter.x = (focusCenter.x / fixSceneWidth);
-					focusCenter.y = (focusCenter.y / fixSceneHeight);
-					zoom += wheelDelta * tick * 20 * zoom_restrict;
-					editCamera->SetZoom(zoom);
-					editCamera->SetFocusCenter(focusCenter);
+					NotifyEditorSceneOnClickEvent e;
+					e.ClickPos = standardPos;
+					auto inspectorView = UIManager::GetInstance().GetUIView<InspectorView>();
+					if (inspectorView)
+					{
+						e.ExceptObjectList.push_back(inspectorView->GetTargetObject());
+					}
+					SendEvent(e);
+					JG_CORE_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
+				}
+				if (ImGui::IsWindowHovered() &&
+					ImGui::IsWindowFocused() == true &&
+					mainCam->GetType() == JGTYPE(EditorCamera)
+					&& mCurrentCameraMode == 0)
+				{
+					auto editCamera = static_cast<EditorCamera*>(mainCam);
+					f32 zoom = editCamera->GetZoom();
+					f32 zoom_restrict = 1.0f;
+					if (zoom < 1.0f) zoom_restrict = zoom;
+					else zoom_restrict = 1 / zoom;
+
+
+					f32 wheelDelta = ImGui::GetIO().MouseWheel;
+					if (wheelDelta != 0)
+					{
+						auto winPos = ImGui::GetItemRectMin();
+						auto mousePos = ImGui::GetMousePos();
+						auto appTimer = Application::GetInstance().GetAppTimer();
+						auto tick = appTimer->GetTick();
+
+						auto focusCenter = JVector2(mousePos.x, mousePos.y) - JVector2(winPos.x, winPos.y);
+
+						focusCenter.x = (focusCenter.x / fixSceneWidth);
+						focusCenter.y = (focusCenter.y / fixSceneHeight);
+						zoom += wheelDelta * tick * 20 * zoom_restrict;
+						editCamera->SetZoom(zoom);
+						editCamera->SetFocusCenter(focusCenter);
+					}
+				}
+
+
+				bool isLeftMouseDown = ImGui::IsMouseDown(1) && ImGui::IsItemHovered();
+				if (mEnableEditorCameraControll == false && isLeftMouseDown)
+				{
+					mMousePos = JVector2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+					mPrevMousePos = mMousePos;
+				}
+				mEnableEditorCameraControll = isLeftMouseDown;
+				if (mEnableEditorCameraControll)
+				{
+					ControllEditorCamera();
 				}
 			}
 
 
-
-
-
-
-
-			// 3d 화면 이동
-			bool isLeftMouseDown = ImGui::IsMouseDown(1) && ImGui::IsItemHovered();
-			if (mEnableEditorCameraControll == false && isLeftMouseDown)
-			{
-				mMousePos = JVector2(ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-				mPrevMousePos = mMousePos;
-			}
-			mEnableEditorCameraControll = isLeftMouseDown;
-			if (mEnableEditorCameraControll)
-			{
-				ControllEditorCamera();
-			}
-
+			
 		}
 		ImGui::EndChild();
 	}
@@ -597,6 +630,8 @@ namespace JG
 	void SceneView::PlayGame()
 	{
 		mCurrentGameControll = Game_Play;
+		mIsEditorMode  = false;
+		mIsGamePlaying = true;
 		RequestPlayGameEvent e;
 		SendEvent(e);
 	}
@@ -604,6 +639,8 @@ namespace JG
 	void SceneView::StopGame()
 	{
 		mCurrentGameControll = Game_Wait;
+		mIsEditorMode = true;
+		mIsGamePlaying = false;
 		RequestStopGameEvent e;
 		SendEvent(e);
 	}
@@ -611,6 +648,8 @@ namespace JG
 	void SceneView::PauseGame()
 	{
 		mCurrentGameControll = Game_Pause;
+		mIsEditorMode  = true;
+		mIsGamePlaying = false;
 		RequestPauseGameEvent e;
 		SendEvent(e);
 	}

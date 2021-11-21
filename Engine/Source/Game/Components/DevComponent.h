@@ -6,8 +6,6 @@ namespace JG
 	class DevComponent : public GameComponent
 	{
 		JGCLASS
-	private:
-		bool mIsCursorShow = true;
 	protected:
 		virtual void Start()  override;
 		virtual void Update() override;

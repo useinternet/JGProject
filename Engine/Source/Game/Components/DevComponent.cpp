@@ -23,7 +23,7 @@ namespace JG
 
 	void DevComponent::MoveForward(f32 value)
 	{
-		if (mIsCursorShow == true) return;
+		if (IsShowCursor() == true) return;
 		if (Camera::GetMainCamera() == nullptr)
 		{
 			return;
@@ -39,7 +39,7 @@ namespace JG
 
 	void DevComponent::MoveRight(f32 value)
 	{
-		if (mIsCursorShow == true) return;
+		if (IsShowCursor() == true) return;
 		if (Camera::GetMainCamera() == nullptr)
 		{
 			return;
@@ -56,7 +56,7 @@ namespace JG
 
 	void DevComponent::YawRotate(f32 value)
 	{
-		if (mIsCursorShow == true) return;
+		if (IsShowCursor() == true) return;
 		if (Camera::GetMainCamera() == nullptr)
 		{
 			return;
@@ -73,7 +73,7 @@ namespace JG
 
 	void DevComponent::PitchRotate(f32 value)
 	{
-		if (mIsCursorShow == true) return;
+		if (IsShowCursor() == true) return;
 		if (Camera::GetMainCamera() == nullptr)
 		{
 			return;
@@ -102,8 +102,7 @@ namespace JG
 
 	void DevComponent::SetShowCursor()
 	{
-		mIsCursorShow = !mIsCursorShow;
-		GameComponent::SetShowCursor(mIsCursorShow);
+		GameComponent::SetShowCursor(!IsShowCursor());
 	}
 
 

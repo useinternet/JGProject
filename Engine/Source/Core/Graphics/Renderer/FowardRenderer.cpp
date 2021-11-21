@@ -9,7 +9,8 @@ namespace JG
 	{
 		AddDrawFunc(
 			std::bind(&FowardRenderer::Ready, this, std::placeholders::_1, std::placeholders::_2),
-			std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2));
+			std::bind(&FowardRenderer::Draw, this, std::placeholders::_1, std::placeholders::_2),
+			nullptr);
 	}
 
 	int FowardRenderer::ArrangeObject(const ObjectInfo& info)

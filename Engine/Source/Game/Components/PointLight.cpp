@@ -17,8 +17,13 @@ namespace JG
 	void PointLight::Start()
 	{
 		Light::Start();
-
-
+#ifdef JG_EDITOR
+		mIsEditorMode = false;
+#endif
+	}
+	void PointLight::Update()
+	{
+		Light::Update();
 	}
 	void PointLight::Destory()
 	{
@@ -46,8 +51,6 @@ namespace JG
 		jsonData->AddMember("Att0", mAtt0);
 		jsonData->AddMember("Att1", mAtt1);
 		jsonData->AddMember("Att2", mAtt2);
-
-
 	}
 	void PointLight::LoadJson(SharedPtr<JsonData> jsonData)
 	{
@@ -135,10 +138,11 @@ namespace JG
 #ifdef JG_EDITOR
 	EScheduleResult PointLight::PushDebugRenderItem()
 	{
-		
+		if (mIsEditorMode == false)
+		{
+			return EScheduleResult::Continue;
+		}
 		auto debugObject = CreateSharedPtr<Graphics::PaperObject>();
-
-
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam == nullptr)
 		{

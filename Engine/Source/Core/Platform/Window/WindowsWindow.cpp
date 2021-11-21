@@ -96,15 +96,20 @@ namespace JG
 
 	void WindowsWindow::SetShowCursor(bool isShow)
 	{
+		bool isDirty = mIsShowCursor != isShow;
 		mIsShowCursor = isShow;
-		if (mIsShowCursor)
+		if (isDirty)
 		{
-			while (::ShowCursor(true) <= 0) {}
+			if (mIsShowCursor)
+			{
+				while (::ShowCursor(true) <= 0) {}
+			}
+			else
+			{
+				while (::ShowCursor(false) >= 0) {}
+			}
 		}
-		else
-		{
-			while (::ShowCursor(false) >= 0) {}
-		}
+
 	}
 
 	bool WindowsWindow::IsShowCursor() const

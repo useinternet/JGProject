@@ -52,6 +52,11 @@ namespace JG
 		Application::GetInstance().GetWindow()->SetShowCursor(isShow);
 	}
 
+	bool GameComponent::IsShowCursor() const
+	{
+		return Application::GetInstance().GetWindow()->IsShowCursor();
+	}
+
 	GameNode* GameComponent::GetOwner() const
 	{
 		return mOwnerNode;

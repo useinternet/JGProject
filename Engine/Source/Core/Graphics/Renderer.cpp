@@ -43,13 +43,24 @@ namespace JG
 	void Renderer::End()
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-		auto cnt = mDrawFuncList.size();
+		auto cnt = mObjectDrawFuncList.size();
 		for (i32 i = 0; i < cnt; ++i)
 		{
-			mReadyDrawFuncList[i](api, mCurrentRenderInfo);
-			for (auto& _pair : mObjectInfoListDic)
+			if (mReadyDrawFuncList[i] != nullptr)
 			{
-				mDrawFuncList[i](_pair.first, _pair.second);
+				mReadyDrawFuncList[i](api, mCurrentRenderInfo);
+			}
+		
+			if (mObjectDrawFuncList[i] != nullptr)
+			{
+				for (auto& _pair : mObjectInfoListDic)
+				{
+					mObjectDrawFuncList[i](_pair.first, _pair.second);
+				}
+			}
+			if (mSceneDrawFuncList[i] != nullptr)
+			{
+				mSceneDrawFuncList[i]();
 			}
 		}
 		mObjectInfoListDic.clear();
@@ -100,9 +111,10 @@ namespace JG
 		return mLightInfos;
 	}
 
-	void Renderer::AddDrawFunc(const ReadyDrawFunc& readyFunc, const DrawFunc& drawFunc)
+	void Renderer::AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc)
 	{
 		mReadyDrawFuncList.push_back(readyFunc);
-		mDrawFuncList.push_back(drawFunc);
+		mObjectDrawFuncList.push_back(drawObjectFunc);
+		mSceneDrawFuncList.push_back(sceneDrawFunc);
 	}
 }

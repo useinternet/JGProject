@@ -115,6 +115,14 @@ namespace JG
 	{
 		mCursorCenterPoint = centerPos;
 	}
+	void InputManager::SetInputLock(bool isLock)
+	{
+		mIsLock = isLock;
+	}
+	bool InputManager::IsInputLock() const
+	{
+		return mIsLock;
+	}
 	bool InputManager::IsKeyPressed(EKeyCode code)
 	{
 		return mKeyState[(i32)code].State & KeyState::Pressed;
@@ -262,6 +270,7 @@ namespace JG
 	}
 	EScheduleResult InputManager::Update()
 	{
+		if (IsInputLock() == false) return EScheduleResult::Continue;
 		for (auto& mappingData : mActionMappingsDataList)
 		{
 			for (auto& keyData : mappingData->KeyList)

@@ -39,6 +39,7 @@ namespace JG
 		void BindInputAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action);
 		void BindInputAxis(const String& axisName,const std::function<void(float)>& action);
 		void SetShowCursor(bool isShow);
+		bool IsShowCursor() const;
 	public:
 		GameNode*  GetOwner() const;
 		GameWorld* GetGameWorld() const;

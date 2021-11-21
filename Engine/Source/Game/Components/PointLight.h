@@ -13,6 +13,8 @@ namespace JG
 	class PointLight : public Light
 	{
 		JGCLASS
+			
+	private:
 	    JVector3 mColor = Color::White();
 		f32 mIntensity = 1.0f;
 		f32 mRange = 0.0f;
@@ -21,12 +23,11 @@ namespace JG
 		f32 mAtt2 = 0.0f;
 
 		SharedPtr<ScheduleHandle> mPushLightScheduleHandle;
-
-
 #ifdef JG_EDITOR
 		SharedPtr<Graphics::PaperObject> mTargetObject;
-		SharedPtr<ScheduleHandle> mPushDebugHandle;
+		SharedPtr<ScheduleHandle>	     mPushDebugHandle;
 		Asset<ITexture>* mIcon = nullptr;
+		bool mIsEditorMode     = true;
 #endif // DEBUG
 	public:
 		virtual ~PointLight() = default;
@@ -34,6 +35,7 @@ namespace JG
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
+		virtual void Update() override;
 		virtual void Destory() override;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
