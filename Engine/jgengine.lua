@@ -165,7 +165,7 @@ workspace "JGEngine"
 
                 postbuildcommands {"copy /b /y \"..\\Publish/Debug\\*.lib\" \"..\\Bin\\%{cfg.buildcfg}\""}
                 postbuildcommands {"copy /b /y \"..\\Publish/Debug\\*.dll\" \"..\\Bin\\%{cfg.buildcfg}\""}
-                SetStaticLibConfig("Source/Core/")
+                SetStaticLibConfig("Source/Core/", "JG_EDITOR")
         group "Engine/Editor"
             project "Editor"
                 includedirs{

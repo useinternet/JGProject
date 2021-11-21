@@ -70,7 +70,7 @@ namespace JG
 
 		const JQuaternion& GetLocalQuaternion() const;
 		const JQuaternion& GetWorldQuaternion() const;
-
+		void NormalizeRotation(JVector3& toDegree) const;
 		void Refresh();
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
@@ -80,14 +80,7 @@ namespace JG
 		void UpdateWorldLocation() const;
 		void UpdateWorldRotation() const;
 		void UpdateWorldScale()    const;
-
-
-
-
-
-
 		void UpdateInvWorldMatrix() const;
-		void NormalizeRotation(JVector3& toDegree) const;
 	private:
 		virtual void OnChange(const ChangeData& data) override;
 		void SendDirty(SendDirtyFlags flags);

@@ -210,7 +210,7 @@ namespace JG
 		switch (api)
 		{
 		case JG::EGraphicsAPI::DirectX12:
-			DirectX12::gCurrentSrvIndex = DirectX12::gSrvStartIndex;
+			//DirectX12::gCurrentSrvIndex = DirectX12::gSrvStartIndex;
 			ImGui_ImplDX12_NewFrame();
 			break;
 		}

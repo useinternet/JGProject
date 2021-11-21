@@ -68,7 +68,7 @@ namespace JG
 		JVector2 mPrevMousePos;
 
 		const ImVec4 mPressedButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
-		const ImVec2 mButtonSize = ImVec2(20, 20);
+		const JVector2 mButtonSize = JVector2(20, 20);
 
 	public:
 		SceneView();
@@ -102,8 +102,8 @@ namespace JG
 
 		void                SetSceneTexture(SharedPtr<ITexture> sceneTexture);
 		SharedPtr<ITexture> GetSceneTexture() const;
-		ImTextureID GetIconTextureID(i32 iconEnum) const;
-		JVector2    GetFitSize(JVector2 originSize, f32 wratio, f32 hratio);
+		TextureID GetIconTextureID(i32 iconEnum) const;
+		JVector2  GetFitSize(JVector2 originSize, f32 wratio, f32 hratio);
 	private:
 		String ResolutionToString(i32 resolution);
 		void   LoadIcons();

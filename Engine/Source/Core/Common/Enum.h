@@ -103,8 +103,8 @@ namespace JG
 		MouseLeftButton  = VK_LBUTTON,
 		MouseRightButton = VK_RBUTTON,
 		MouseMidButton	 = VK_MBUTTON,
-		Mouse_X = 0x1000,
-		Mouse_Y = 0x1001,
+		Mouse_X = 0x100,
+		Mouse_Y = 0x101,
 	};
 	inline String KeyCodeToString(EKeyCode code)
 	{

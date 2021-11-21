@@ -1,7 +1,8 @@
 #pragma once
 #include "JGCore.h"
 
-
+#define INPUT_ACTION_BIND(func) std::bind(func, this)
+#define INPUT_AXIS_BIND(func) std::bind(func, this, std::placeholders::_1)
 namespace JG
 {
 	enum class EScheduleResult;
@@ -78,17 +79,16 @@ namespace JG
 		ActionBindDatas	mActionBindedDatas;
 		AxisBindDatas   mAxisBindedDatas;
 		JVector2		mMouseDelta;
+		JVector2 mCursorCenterPoint;
 	public:
 		InputManager();
 		virtual ~InputManager() = default;
 	public:
 		ActionMappingData* AddActionMappings(const String& name);
-		AxisMappingData* AddAxisMappings(const String& name);
+		AxisMappingData*   AddAxisMappings(const String& name);
 
 		void RemoveActionMappings(ActionMappingData* data);
 		void RemoveAxisMappings(AxisMappingData* data);
-
-
 
 		void ForEach(const std::function<void(ActionMappingData*)>& action);
 		void ForEach(const std::function<void(AxisMappingData*)>& action);
@@ -99,6 +99,7 @@ namespace JG
 
 		void BindAxis(IJGObject* _object, const String& axisName, const std::function<void(float)>& action, bool* pIsActive = nullptr);
 		void UnBindAxis(IJGObject* _object, const String& actionName);
+		void SetCenterPointWhenHideCursor(const JVector2& centerPos);
 	public:
 		bool IsKeyPressed(EKeyCode code);
 		bool IsKeyReleased(EKeyCode code);

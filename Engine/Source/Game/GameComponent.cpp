@@ -36,15 +36,20 @@ namespace JG
 			SetActive(val->IsBool());
 		}
 	}
-	void GameComponent::BindAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action)
+	void GameComponent::BindInputAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action)
 	{
 		mBindedActionNames.insert(actionName);
 		InputManager::GetInstance().BindAction(this, actionName, inputAction, action, &mIsActive);
 	}
-	void GameComponent::BindAxis(const String& axisName,  const std::function<void(float)>& action)
+	void GameComponent::BindInputAxis(const String& axisName,  const std::function<void(float)>& action)
 	{
 		mBindedAxisNames.insert(axisName);
 		InputManager::GetInstance().BindAxis(this, axisName, action, &mIsActive);
+	}
+
+	void GameComponent::SetShowCursor(bool isShow)
+	{
+		Application::GetInstance().GetWindow()->SetShowCursor(isShow);
 	}
 
 	GameNode* GameComponent::GetOwner() const

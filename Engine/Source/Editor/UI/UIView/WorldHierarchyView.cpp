@@ -95,6 +95,10 @@ namespace JG
 			{
 				for (auto& node : mSelectedGameNode)
 				{
+					if (node->Is<GameWorld>() == true || node->Is<EditorCamera>())
+					{
+						continue;
+					}
 					GameObject::DestoryObject(node);
 				}
 				mSelectedGameNode.clear();

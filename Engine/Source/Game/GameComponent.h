@@ -36,9 +36,9 @@ namespace JG
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 		
 	protected: // 컴포넌트 유틸 함수
-		void BindAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action);
-		void BindAxis(const String& axisName,const std::function<void(float)>& action);
-
+		void BindInputAction(const String& actionName, EInputAction inputAction, const std::function<void()>& action);
+		void BindInputAxis(const String& axisName,const std::function<void(float)>& action);
+		void SetShowCursor(bool isShow);
 	public:
 		GameNode*  GetOwner() const;
 		GameWorld* GetGameWorld() const;

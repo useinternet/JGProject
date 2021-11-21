@@ -939,7 +939,7 @@ namespace JG
 		Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::EndSystem, [&]()->EScheduleResult
 		{
 			gameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
-			gameWorld->AddNode("EditorCamera")->AddComponent<EditorCamera>();
+			gameWorld->AddNode("MainCamera")->AddComponent<EditorCamera>();
 
 			auto json = CreateSharedPtr<Json>();
 			auto assetJson = json->CreateJsonData();

@@ -131,6 +131,10 @@ namespace JG
 		}
 		void ForEach(const std::function<void(SharedPtr<JsonData>)>& action)
 		{
+			if (mValue.IsArray() == false)
+			{
+				return;
+			}
 			if (action == nullptr)
 			{
 				return;

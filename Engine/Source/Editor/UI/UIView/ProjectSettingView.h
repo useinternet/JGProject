@@ -60,7 +60,7 @@ namespace JG
 	private:
 		void LoadConfig();
 		void LoadIcons();
-		ImTextureID GetTextureID(i32 iconEnum) const;
+		TextureID GetTextureID(i32 iconEnum) const;
 	};
 
 

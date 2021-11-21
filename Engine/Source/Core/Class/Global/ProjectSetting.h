@@ -3,7 +3,6 @@
 
 namespace JG
 {
-
 	class ProjectSetting : public GlobalSingleton<ProjectSetting>
 	{
 		friend class Application;

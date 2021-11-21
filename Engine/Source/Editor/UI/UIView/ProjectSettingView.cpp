@@ -27,7 +27,7 @@ namespace JG
 
 
 
-		for (int i = 0; i < 256; ++i)
+		for (int i = 0; i < 512; ++i)
 		{
 			auto str = KeyCodeToString((EKeyCode)i);
 			if (str != "None")
@@ -164,10 +164,10 @@ namespace JG
 
 		auto addIconID = GetTextureID(Icon_Add);
 		
-		static ImVec2 btSize = ImVec2(18.0f, 18.0f);
+		static JVector2 btSize = JVector2(18.0f, 18.0f);
 		bool isOpen = ImGui::TreeNodeEx("##Action Mappings", ImGuiTreeNodeFlags_FramePadding);
 		ImGui::SameLine(); ImGui::Text("Action Mappings"); ImGui::SameLine();
-		if (ImGui::ImageButton(addIconID, btSize) == true)
+		if (ImGui::ImageButton(0, addIconID, btSize) == true)
 		{
 			InputManager::GetInstance().AddActionMappings("None");
 		}
@@ -194,7 +194,7 @@ namespace JG
 		isOpen = ImGui::TreeNodeEx("##Axis Mappings", ImGuiTreeNodeFlags_FramePadding);
 		ImGui::SameLine(); ImGui::Text("Axis Mappings"); ImGui::SameLine();
 		 
-		if (ImGui::ImageButton(addIconID, btSize) == true)
+		if (ImGui::ImageButton(0, addIconID, btSize) == true)
 		{
 			InputManager::GetInstance().AddAxisMappings("None");
 		}
@@ -228,15 +228,14 @@ namespace JG
 	bool ProjectSettingView::ActionMappingData_OnGUI(ActionMappingData* data)
 	{
 		String changeName;
-		static ImVec2 btSize = ImVec2(18.0f, 18.0f);
+		static JVector2 btSize = JVector2(18.0f, 18.0f);
 		auto   addIconID   = GetTextureID(Icon_Add);
 		auto   closeIconID = GetTextureID(Icon_Close);
 		bool   result = true;
-		//static bool isOpen = false;
 
 		ImGui::Columns(2, 0, false);
 		ImGui::SetColumnWidth(0, 40.0f);
-		bool isOpen = ImGui::TreeNodeEx(ImGui::GetUniqueID("TreeNode_", (u64)data).c_str(), ImGuiTreeNodeFlags_FramePadding);
+		bool isOpen = ImGui::TreeNodeEx(("##TreeNode_" + std::to_string((u64)data)).c_str(), ImGuiTreeNodeFlags_FramePadding);
 
 		ImGui::NextColumn();
 		ImGui::SameLine();
@@ -249,13 +248,13 @@ namespace JG
 		}ImGui::SameLine();
 		
 		// +
-		if (ImGui::ImageButton(addIconID, btSize) == true)
+		if (ImGui::ImageButton((u64)data, addIconID, btSize) == true)
 		{
 			data->KeyList.push_back(ActionMappingData::KeyData());
 		}
 		ImGui::SameLine();
 		// -
-		if (ImGui::ImageButton(closeIconID, btSize) == true)
+		if (ImGui::ImageButton((u64)data, closeIconID, btSize) == true)
 		{
 			result = false;
 		}
@@ -293,7 +292,7 @@ namespace JG
 
 				id = ImGui::GetUniqueID("Key_CloseButton" + std::to_string(i), (u64)data);
 				ImGui::PushID(id.c_str());
-				if (ImGui::ImageButton(closeIconID, btSize) == true)
+				if (ImGui::ImageButton(0, closeIconID, btSize) == true)
 				{
 					removeIndex = i;
 				}
@@ -312,7 +311,7 @@ namespace JG
 	bool ProjectSettingView::AxisMappingData_OnGUI(AxisMappingData* data)
 	{
 		String changeName;
-		static ImVec2 btSize = ImVec2(18.0f, 18.0f);
+		static JVector2 btSize = JVector2(18.0f, 18.0f);
 		auto   addIconID = GetTextureID(Icon_Add);
 		auto   closeIconID = GetTextureID(Icon_Close);
 		bool   result = true;
@@ -336,13 +335,13 @@ namespace JG
 		}ImGui::SameLine();
 
 		// +
-		if (ImGui::ImageButton(addIconID, btSize) == true)
+		if (ImGui::ImageButton((u64)data, addIconID, btSize) == true)
 		{
 			data->KeyList.push_back(AxisMappingData::KeyData());
 		}
 		ImGui::SameLine();
 		// -
-		if (ImGui::ImageButton(closeIconID, btSize) == true)
+		if (ImGui::ImageButton((u64)data, closeIconID, btSize) == true)
 		{
 			result = false;
 		}
@@ -377,7 +376,7 @@ namespace JG
 
 				id = ImGui::GetUniqueID("Key_CloseButton" + std::to_string(i), (u64)data);
 				ImGui::PushID(id.c_str());
-				if (ImGui::ImageButton(closeIconID, btSize) == true)
+				if (ImGui::ImageButton(0, closeIconID, btSize) == true)
 				{
 					removeIndex = i;
 				}
@@ -406,12 +405,12 @@ namespace JG
 		mIcons[Icon_Add] = UIManager::GetInstance().GetIcon("Icon_Add");
 		mIcons[Icon_Close] = UIManager::GetInstance().GetIcon("Icon_Close");
 	}
-	ImTextureID ProjectSettingView::GetTextureID(i32 iconEnum) const
+	TextureID ProjectSettingView::GetTextureID(i32 iconEnum) const
 	{
 		if (mIcons[iconEnum] && mIcons[iconEnum]->IsValid() == false)
 		{
-			return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(ITexture::NullTexture()->GetTextureID());
+			return ITexture::NullTexture()->GetTextureID();
 		}
-		return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[iconEnum]->Get()->GetTextureID());
+		return mIcons[iconEnum]->Get()->GetTextureID();
 	}
 }

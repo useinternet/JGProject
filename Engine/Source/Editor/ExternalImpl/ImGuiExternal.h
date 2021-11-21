@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JGCore.h"
+#include "Graphics/GraphicsDefine.h"
 #include "Imgui/imgui.h"
 
 namespace JG
@@ -48,6 +49,9 @@ namespace ImGui
 
 
 
+	bool ImageButton(JG::u64 ID, JG::TextureID textureID, const JG::JVector2& btSize = JG::JVector2(0, 0),
+		const JG::JVector2& uv0 = JG::JVector2(0, 0), const JG::JVector2 uv1 = JG::JVector2(1, 1),
+		int framePadding = -1, const JG::Color& bgColor = JG::Color(), const JG::Color& tinColor = JG::Color::White());
 
 	bool InputText(void* id, const JG::String& inputText, JG::String& out_str);
 	bool CheckBox(void* id, bool check);

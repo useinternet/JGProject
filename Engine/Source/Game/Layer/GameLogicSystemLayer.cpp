@@ -12,6 +12,7 @@
 #include "Components/PointLight.h"
 #include "Components/Collision.h"
 #include "Components/SkyDome.h"
+#include "Components/DevComponent.h"
 #include "Manager/GameLayerManager.h"
 #include "Class/Asset/Asset.h"
 #include "Linker/GamePluginLinker.h"
@@ -315,7 +316,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
-		//GameObjectFactory::GetInstance().RegisterComponentType<Dev::DevComponent>();
+		GameObjectFactory::GetInstance().RegisterComponentType<DevComponent>();
 	}
 
 }

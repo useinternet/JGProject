@@ -114,6 +114,33 @@ namespace JG
 		UpdateWorldRotation();
 		return mWorldQuaternion;
 	}
+	void Transform::NormalizeRotation(JVector3& toDegree) const
+	{
+		while (toDegree.x <= 0.0f)
+		{
+			toDegree.x += 360.0f;
+		}
+		while (toDegree.x >= 360.0f)
+		{
+			toDegree.x -= 360.0f;
+		}
+		while (toDegree.y <= 0.0f)
+		{
+			toDegree.y += 360.0f;
+		}
+		while (toDegree.y >= 360.0f)
+		{
+			toDegree.y -= 360.0f;
+		}
+		while (toDegree.z <= 0.0f)
+		{
+			toDegree.z += 360.0f;
+		}
+		while (toDegree.z >= 360.0f)
+		{
+			toDegree.z -= 360.0f;
+		}
+	}
 	void Transform::Refresh()
 	{
 		SendDirty(SendDirtyFlag_All);
@@ -230,33 +257,7 @@ namespace JG
 		mIsInvDirty = false;
 		mInvWorldMatrix = JMatrix::Inverse(GetWorldMatrix());
 	}
-	void Transform::NormalizeRotation(JVector3& toDegree) const
-	{
-		while (toDegree.x <= 0.0f)
-		{
-			toDegree.x += 360.0f;
-		}
-		while (toDegree.x >= 360.0f)
-		{
-			toDegree.x -= 360.0f;
-		}
-		while (toDegree.y <= 0.0f)
-		{
-			toDegree.y += 360.0f;
-		}
-		while (toDegree.y >= 360.0f)
-		{
-			toDegree.y -= 360.0f;
-		}
-		while (toDegree.z <= 0.0f)
-		{
-			toDegree.z += 360.0f;
-		}
-		while (toDegree.z >= 360.0f)
-		{
-			toDegree.z -= 360.0f;
-		}
-	}
+
 	void Transform::OnChange(const ChangeData& data)
 	{
 		if (data.Type == JGTYPE(Transform))

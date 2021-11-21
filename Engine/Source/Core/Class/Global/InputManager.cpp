@@ -111,6 +111,10 @@ namespace JG
 		}
 		mAxisBindedDatas[axisName].erase(_object);
 	}
+	void InputManager::SetCenterPointWhenHideCursor(const JVector2& centerPos)
+	{
+		mCursorCenterPoint = centerPos;
+	}
 	bool InputManager::IsKeyPressed(EKeyCode code)
 	{
 		return mKeyState[(i32)code].State & KeyState::Pressed;
@@ -144,6 +148,11 @@ namespace JG
 		for (i32 i = 0; i < 256; ++i)
 		{
 			auto& state = mKeyState[i];
+			if (state.State & KeyState::Released)
+			{
+				state.State = KeyState::None;
+			}
+
 			if (GetAsyncKeyState(i) & 0x08001)
 			{
 				if (state.State == KeyState::None)
@@ -162,10 +171,6 @@ namespace JG
 				{
 					state.State |= KeyState::Up;
 					state.State |= KeyState::Released;
-				}
-				if (state.State & KeyState::Up)
-				{
-					state.State = KeyState::None;
 				}
 			}
 		}
@@ -186,14 +191,13 @@ namespace JG
 		}
 		else
 		{
-			cursorPos = IWindow::GetCursorPos();
-			if (cursorPos != prevCursorPos)
-			{
-				auto delta = cursorPos - prevCursorPos;
-				SetAxisValue(EKeyCode::Mouse_X, delta.x);
-				SetAxisValue(EKeyCode::Mouse_Y, delta.y);
-				prevCursorPos = cursorPos;
-			}
+			cursorPos  = IWindow::GetCursorPos();
+			auto delta = cursorPos - prevCursorPos;
+			SetAxisValue(EKeyCode::Mouse_X, delta.x);
+			SetAxisValue(EKeyCode::Mouse_Y, delta.y);
+			prevCursorPos = cursorPos;
+
+
 			auto window = Application::GetInstance().GetWindow();
 			if (window->IsShowCursor() == false)
 			{
@@ -202,9 +206,18 @@ namespace JG
 					originCursorPos = cursorPos;
 					isShowCursor    = false;
 				}
+				
+#ifdef JG_EDITOR
+				JVector2 cursorCenter = mCursorCenterPoint - JVector2(window->GetPosition().x, window->GetPosition().y);
+#else
 				JRect    clientRect = IWindow::GetClientRect(window->GetHandle());
-				JVector2 centerPos  = IWindow::ClientToScreen(window->GetHandle(), clientRect.Center());
+				JVector2 cursorCenter = clientRect.Center();
+#endif // JG_EDITOR
+
+				JVector2 centerPos  = IWindow::ClientToScreen(window->GetHandle(), cursorCenter);
 				IWindow::SetCursorPos(centerPos);
+				prevCursorPos = centerPos;
+				cursorPos	  = centerPos;
 			}
 			else {
 				if (isShowCursor == false)
@@ -212,10 +225,7 @@ namespace JG
 					isShowCursor = true;
 					IWindow::SetCursorPos(originCursorPos);
 				}
-			
 			}
-
-
 		}
 
 
@@ -300,19 +310,11 @@ namespace JG
 				}
 				else
 				{
-					if (IsKeyPressed(keyData.Code) == true)
+					if (IsKeyDown(keyData.Code) == true)
 					{
 						AxisMappingData_Update(mappingData->Name, keyData.Scale);
 					}
-					if (IsKeyReleased(keyData.Code) == true)
-					{
-						AxisMappingData_Update(mappingData->Name, 0.0f);
-					}
 				}
-
-
-
-
 			}
 
 
@@ -332,7 +334,7 @@ namespace JG
 	}
 	f32 InputManager::GetAxisValue(EKeyCode code) const
 	{
-		if (IsAxisKeyCode(code))
+		if (IsAxisKeyCode(code) && mAxisDatas.find(code) != mAxisDatas.end())
 		{
 			return mAxisDatas.at(code).Value;
 		}
@@ -340,7 +342,7 @@ namespace JG
 	}
 	f32 InputManager::GetAxisDeadZone(EKeyCode code) const
 	{
-		if (IsAxisKeyCode(code))
+		if (IsAxisKeyCode(code) && mAxisDatas.find(code) != mAxisDatas.end())
 		{
 			return mAxisDatas.at(code).DeadZone;
 		}

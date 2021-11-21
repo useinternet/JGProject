@@ -2,10 +2,12 @@
 #include "ImGuiExternal.h"
 #include "JGImGui.h"
 #include "Application.h"
+#include "JGImGui.h"
 #include "Common/Type.h"
 #include "Common/DragAndDrop.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/Resource.h"
+#include <Imgui/imgui_internal.h>
 
 namespace ImGui
 {
@@ -582,6 +584,22 @@ namespace ImGui
 
 		return JG::AssetDataBase::GetInstance().LoadOriginAsset(texturePathDic[label]);
 	}
+
+	bool ImageButton(JG::u64 ID, JG::TextureID textureID, const JG::JVector2& btSize, const JG::JVector2& uv0, const JG::JVector2 uv1, int framePadding, const JG::Color& bgColor, const JG::Color& tinColor)
+	{
+		ImTextureID imTextureID = (ImTextureID)JG::JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
+		ImGuiContext& g = *GImGui;
+		ImGuiWindow* window = g.CurrentWindow;
+		if (window->SkipItems)
+			return false;
+
+		PushID((const void*)(textureID + (JG::u64)ID));
+		const ImGuiID im_id = window->GetID("#image");
+		PopID();
+
+		const ImVec2 padding = (framePadding >= 0) ? ImVec2((float)framePadding, (float)framePadding) : g.Style.FramePadding;
+		return ImageButtonEx(im_id, imTextureID, ImVec2(btSize.x, btSize.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y), padding, ImVec4(bgColor.R, bgColor.G, bgColor.B, bgColor.A), ImVec4(tinColor.R, tinColor.G, tinColor.B, tinColor.A));
+	}
 	bool InputText(void* id, const JG::String& inputText, JG::String& out_str)
 	{
 		auto id_str = GetUniqueID("inputText_", (JG::u64)id);
@@ -609,6 +627,8 @@ namespace ImGui
 		}
 		return result;
 	}
+
+
 
 
 }

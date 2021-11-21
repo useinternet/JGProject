@@ -29,6 +29,28 @@ namespace JG
 			}
 			return value;
 		}
+
+		template<class T>
+		inline static T Max(T v1, T v2)
+		{
+			if (v1 < v2) {
+				return v2;
+			}
+			else {
+				return v1;
+			}
+		}
+		 
+		template<class T>
+		inline static T Min(T v1, T v2)
+		{
+			if (v1 < v2) {
+				return v1;
+			}
+			else {
+				return v2;
+			}
+		}
 	};
 
 

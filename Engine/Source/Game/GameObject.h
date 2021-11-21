@@ -80,7 +80,9 @@ namespace JG
 		void DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color);
 		void DrawDebugSphere(const JVector3& center, f32 r, const Color& color);
 		
-
+		f32 GetTick() const {
+			return Application::GetInstance().GetAppTimer()->GetTick();
+		}
 
 
 		template<class T>

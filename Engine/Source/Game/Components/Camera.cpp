@@ -6,7 +6,6 @@
 namespace JG
 {
 	Camera* Camera::smMainCamera = nullptr;
-	Camera* Camera::smEditorCamera = nullptr;
 	void Camera::SetMainCamera(Camera* mainCamera)
 	{
 		if (mainCamera == nullptr)
@@ -17,10 +16,6 @@ namespace JG
 	}
 	Camera* Camera::GetMainCamera()
 	{
-		if (smMainCamera == nullptr)
-		{
-			return smEditorCamera;
-		}
 		return smMainCamera;
 	}
 
@@ -35,9 +30,9 @@ namespace JG
 
 
 
-		if (GetType() == JGTYPE(EditorCamera) && smEditorCamera == nullptr)
+		if (GetType() == JGTYPE(EditorCamera) && smMainCamera == nullptr)
 		{
-			smEditorCamera = this;
+			smMainCamera = this;
 		}
 
 
@@ -77,9 +72,9 @@ namespace JG
 		{
 			SetMainCamera(nullptr);
 		}
-		if (smEditorCamera == this)
+		if (smMainCamera == this)
 		{
-			smEditorCamera = nullptr;
+			smMainCamera = nullptr;
 		}
 		if (mScene != nullptr)
 		{

@@ -116,8 +116,8 @@ namespace JG
 
 		ImGui::Begin("SceneView", &mOpenGUI);
 
-
 		auto mainCam = Camera::GetMainCamera();
+		
 		bool isOrth = true;
 		if (mainCam != nullptr)
 		{
@@ -232,11 +232,23 @@ namespace JG
 			ImGui::Image(TexID, ImVec2(imageSize.x, imageSize.y));
 
 
+
+
+
+
 			mShowGizmo->Execute(GetSelectedGameNode());
 			f32 fixSceneHeight = imageSize.y;
 			f32 fixSceneWidth = imageSize.x;
 			f32 textureWidth  = tInfo.Width;
 			f32 textureHeight = tInfo.Height;
+			// 화면 센터 보내기
+			{
+				auto imageMin = ImGui::GetItemRectMin();
+				auto imageMax = ImGui::GetItemRectMax();
+				auto imageCenter = JRect(imageMin.x, imageMin.y, imageMax.x, imageMax.y).Center();
+				InputManager::GetInstance().SetCenterPointWhenHideCursor(imageCenter);
+				
+			}
 			if (ImGui::IsMouseClicked(0) == true && ImGui::IsItemHovered() && ImGuizmo::IsUsing() == false)
 			{
 				auto winPos   = ImGui::GetItemRectMin();
@@ -316,7 +328,8 @@ namespace JG
 			isPushStyle = true;
 			ImGui::PushStyleColor(ImGuiCol_Button, mPressedButtonColor);
 		}
-		if (ImGui::ImageButton(GetIconTextureID(Icon_TRANSLATE), mButtonSize))
+
+		if (ImGui::ImageButton(0, GetIconTextureID(Icon_TRANSLATE), mButtonSize))
 		{
 			mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 		}
@@ -332,7 +345,7 @@ namespace JG
 			isPushStyle = true;
 			ImGui::PushStyleColor(ImGuiCol_Button, mPressedButtonColor);
 		}
-		if (ImGui::ImageButton(GetIconTextureID(Icon_ROTATION), mButtonSize))
+		if (ImGui::ImageButton(0, GetIconTextureID(Icon_ROTATION), mButtonSize))
 		{
 			mCurrentGizmoOperation = ImGuizmo::ROTATE;
 		}ImGui::SameLine();
@@ -346,7 +359,7 @@ namespace JG
 			isPushStyle = true;
 			ImGui::PushStyleColor(ImGuiCol_Button, mPressedButtonColor);
 		}
-		if (ImGui::ImageButton(GetIconTextureID(Icon_SCALE), mButtonSize))
+		if (ImGui::ImageButton(0, GetIconTextureID(Icon_SCALE), mButtonSize))
 		{
 			mCurrentGizmoOperation = ImGuizmo::SCALE;
 		}ImGui::SameLine();
@@ -385,14 +398,14 @@ namespace JG
 
 		if (mCurrentGizmoMode == ImGuizmo::WORLD)
 		{
-			if (ImGui::ImageButton(GetIconTextureID(Icon_WORLD), mButtonSize) == true)
+			if (ImGui::ImageButton(0, GetIconTextureID(Icon_WORLD), mButtonSize) == true)
 			{
 				mCurrentGizmoMode = ImGuizmo::LOCAL;
 			}ImGui::SameLine();
 		}
 		else
 		{
-			if (ImGui::ImageButton(GetIconTextureID(Icon_LOCAL), mButtonSize) == true)
+			if (ImGui::ImageButton(0, GetIconTextureID(Icon_LOCAL), mButtonSize) == true)
 			{
 				mCurrentGizmoMode = ImGuizmo::WORLD;
 			}ImGui::SameLine();
@@ -411,7 +424,7 @@ namespace JG
 			isPushStyle = true;
 			ImGui::PushStyleColor(ImGuiCol_Button, mPressedButtonColor);
 		}
-		if (ImGui::ImageButton(GetIconTextureID(Icon_PLAY), mButtonSize))
+		if (ImGui::ImageButton(0, GetIconTextureID(Icon_PLAY), mButtonSize))
 		{
 			if (mCurrentGameControll == Game_Wait || mCurrentGameControll == Game_Pause)
 			{
@@ -432,7 +445,7 @@ namespace JG
 			isPushStyle = true;
 			ImGui::PushStyleColor(ImGuiCol_Button, mPressedButtonColor);
 		}
-		if (ImGui::ImageButton(GetIconTextureID(Icon_PAUSE), mButtonSize))
+		if (ImGui::ImageButton(0, GetIconTextureID(Icon_PAUSE), mButtonSize))
 		{
 			if (mCurrentGameControll == Game_Play)
 			{
@@ -525,15 +538,15 @@ namespace JG
 	{
 		return mSceneTexture;
 	}
-	ImTextureID SceneView::GetIconTextureID(i32 iconEnum) const
+	TextureID SceneView::GetIconTextureID(i32 iconEnum) const
 	{
 		if (mIcons[iconEnum] && mIcons[iconEnum]->Get() && mIcons[iconEnum]->Get()->IsValid())
 		{
-			return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(mIcons[iconEnum]->Get()->GetTextureID());
+			return mIcons[iconEnum]->Get()->GetTextureID();
 		}
 
 
-		return (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(ITexture::NullTexture()->GetTextureID());
+		return ITexture::NullTexture()->GetTextureID();
 
 	}
 	JVector2 SceneView::GetFitSize(JVector2 originSize, f32 wratio, f32 hratio)
