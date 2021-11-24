@@ -194,7 +194,14 @@ namespace JG
 				return true;
 			return false;
 		}
-
+		inline static JVector2 Max(const JVector2& v1, const JVector2& v2)
+		{
+			return JVector2(Math::Max(v1.x, v2.x), Math::Max(v1.y, v2.y));
+		}
+		inline static JVector2 Min(const JVector2& v1, const JVector2& v2)
+		{
+			return JVector2(Math::Min(v1.x, v2.x), Math::Min(v1.y, v2.y));
+		}
 	private:
 		inline static DirectX::XMVECTOR GetSIMD(const JVector2& v)
 		{
@@ -280,6 +287,14 @@ namespace JG
 		inline static JVector4 Normalize(const JVector4& v) {
 			auto sim = DirectX::XMVector4Normalize(GetSIMD(v));
 			return ConvertJVector4(sim);
+		}
+		inline static JVector4 Max(const JVector4& v1, const JVector4& v2)
+		{
+			return JVector4(Math::Max(v1.x, v2.x), Math::Max(v1.y, v2.y), Math::Max(v1.z, v2.z), Math::Max(v1.w, v2.w));
+		}
+		inline static JVector4 Min(const JVector4& v1, const JVector4& v2)
+		{
+			return JVector4(Math::Min(v1.x, v2.x), Math::Min(v1.y, v2.y), Math::Min(v1.z, v2.z), Math::Min(v1.w, v2.w));
 		}
 	public:
 		inline static DirectX::XMVECTOR GetSIMD(const JVector4& v)
@@ -419,6 +434,14 @@ namespace JG
 		{
 			auto sim = DirectX::XMVector3AngleBetweenVectors(GetSIMD(v1), GetSIMD(v2));
 			return ConvertJVector3(sim).x;
+		}
+		inline static JVector3 Max(const JVector3& v1, const JVector3& v2)
+		{
+			return JVector3(Math::Max(v1.x, v2.x), Math::Max(v1.y, v2.y), Math::Max(v1.z, v2.z));
+		}
+		inline static JVector3 Min(const JVector3& v1, const JVector3& v2)
+		{
+			return JVector3(Math::Min(v1.x, v2.x), Math::Min(v1.y, v2.y), Math::Min(v1.z, v2.z));
 		}
 		inline static bool Equals(const JVector3& v1, const JVector3& v2, float error_range = ERROR_RANGE)
 		{

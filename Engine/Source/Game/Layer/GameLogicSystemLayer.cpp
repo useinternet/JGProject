@@ -334,11 +334,12 @@ namespace JG
 		}
 		auto resolution = mainCam->GetResolution();
 		auto viewMatrix = mainCam->GetViewMatrix();
-		auto viewProj   = mainCam->GetProjMatrix();
-		auto farZ  = mainCam->GetFarZ();
+		auto projMatrix = mainCam->GetProjMatrix();
+		auto invProjMatrix = mainCam->GetInvProjMatrix();
+		auto farZ = mainCam->GetFarZ();
 		auto nearZ = mainCam->GetNearZ();
 		auto eyePosition = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
-		
+
 		// cluster shading test
 		struct Cluster
 		{
@@ -357,6 +358,30 @@ namespace JG
 		JVector2 tileSize = JVector2(resolution.x / numXSlice, resolution.y / numYSlice);
 
 		List<Cluster> clusters;
+
+
+		std::function<JVector3(const JVector4&)> ScreenToView = [&](const JVector4& screen)->JVector3
+		{
+
+			JVector2 texCoord = JVector2(screen.x / resolution.x, screen.y / resolution.y);
+			texCoord = JVector2(texCoord.x, 1.0f - texCoord.y) * 2.0f - JVector2(1.0f, 1.0f);
+			JVector4 clip = JVector4(texCoord.x, texCoord.y, screen.z, screen.w);
+			clip = invProjMatrix.Transform(clip);
+			clip = clip / clip.w;
+			return clip;
+		};
+		std::function<JVector3(const JVector3&, const JVector3&, f32)> LineIntersectionToZPlane =
+			[&](const JVector3& A, const JVector3& B, f32 zDistance) -> JVector3
+		{
+			JVector3 normal = JVector3(0, 0, 1);
+			JVector3 ab = B - A;
+			f32 t = (zDistance - JVector3::Dot(normal, A)) / JVector3::Dot(normal, ab);
+
+			JVector3 result = A + t * ab;
+			return result;
+		};
+
+
 		for (i32 i = 0; i < numZSlice; ++i)
 		{
 			Cluster cluster;
@@ -372,9 +397,23 @@ namespace JG
 				{
 					JVector4 minPoint_Ss = JVector4((f32)x * tileSize.x, (f32)y * tileSize.y, -1, 1);
 					JVector4 maxPoint_Ss = JVector4(tileSize.x, tileSize.y, -1, 1);
+										
+					JVector3 maxPoint_vS = ScreenToView(maxPoint_Ss);
+					JVector3 minPoint_vS = ScreenToView(minPoint_Ss);
 
 
-					// cluster °è»ê
+					JVector3 minPointNear = LineIntersectionToZPlane(eyePosition, minPoint_vS, clusterNear);
+					JVector3 minPointFar  = LineIntersectionToZPlane(eyePosition, minPoint_vS, clusterFarZ);
+					JVector3 maxPointNear = LineIntersectionToZPlane(eyePosition, maxPoint_vS, clusterNear);
+					JVector3 maxPointFar  = LineIntersectionToZPlane(eyePosition, maxPoint_vS, clusterFarZ);
+
+					
+					JVector3 minPointAABB = JVector3::Min(JVector3::Min(minPointNear, minPointFar), JVector3::Min(maxPointNear, maxPointFar));
+					JVector3 maxPointAABB = JVector3::Max(JVector3::Max(minPointNear, minPointFar), JVector3::Max(maxPointNear, maxPointFar));
+
+					cluster.Min = minPointAABB;
+					cluster.Max = maxPointAABB;
+					clusters.push_back(cluster);
 				}
 			}
 			// xSlice

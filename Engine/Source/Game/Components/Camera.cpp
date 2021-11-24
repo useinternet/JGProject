@@ -268,6 +268,12 @@ namespace JG
 		return mInvViewMatrix;
 	}
 
+	const JMatrix& Camera::GetInvProjMatrix() const
+	{
+		UpdateProj();
+		return mInvProjMatrix;
+	}
+
 	const JMatrix& Camera::GetProjMatrix() const
 	{
 		UpdateProj();
@@ -354,7 +360,7 @@ namespace JG
 		{
 			mProjMatrix = JMatrix::PerspectiveFovLH(mFov, GetAspectRatio(), mNearZ, mFarZ);
 		}
-
+		mInvProjMatrix   = JMatrix::Inverse(mProjMatrix);
 		mIsViewProjDirty = true;
 	}
 
@@ -541,7 +547,7 @@ namespace JG
 		{
 			mProjMatrix = JMatrix::PerspectiveFovLH(mFov, GetAspectRatio(), mNearZ, mFarZ);
 		}
-
+		mInvProjMatrix = JMatrix::Inverse(mProjMatrix);
 		mIsViewProjDirty = true;
 	}
 }

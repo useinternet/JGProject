@@ -27,6 +27,7 @@ namespace JG
 		mutable JMatrix  mProjMatrix;
 		mutable JMatrix  mViewMatrix;
 		mutable JMatrix  mInvViewMatrix;
+		mutable JMatrix  mInvProjMatrix;
 		mutable JMatrix  mViewProjMatrix;
 		//
 		JVector2 mResolution;
@@ -76,7 +77,9 @@ namespace JG
 		const JMatrix& GetViewProjMatrix() const;
 		const JMatrix& GetViewMatrix() const;
 		const JMatrix& GetInvViewMatrix() const;
+		const JMatrix& GetInvProjMatrix() const;
 		const JMatrix& GetProjMatrix() const;
+		
 
 		f32 GetFOV() const;
 		f32 GetFarZ() const;

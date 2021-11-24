@@ -31,7 +31,7 @@ namespace JG
 		}
 
 		template<class T>
-		inline static T Max(T v1, T v2)
+		inline static T Max(const T& v1, const T& v2)
 		{
 			if (v1 < v2) {
 				return v2;
@@ -42,7 +42,7 @@ namespace JG
 		}
 		 
 		template<class T>
-		inline static T Min(T v1, T v2)
+		inline static T Min(const T& v1, const T& v2)
 		{
 			if (v1 < v2) {
 				return v1;
