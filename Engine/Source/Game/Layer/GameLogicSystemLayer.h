@@ -53,5 +53,6 @@ namespace JG
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
+		void Test();
 	};
 }

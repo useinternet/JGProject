@@ -59,6 +59,9 @@ namespace JG
 
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
+
+		//Test
+		Scheduler::GetInstance().ScheduleOnceByFrame(100, 0, [&]() -> EScheduleResult {Test(); return EScheduleResult::Continue; });
 		
 		auto gameWorldAssetPath = ProjectSetting::GetInstance().GetStartGameWorldPath();
 		if (gameWorldAssetPath.empty() == false)
@@ -317,6 +320,83 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
 		GameObjectFactory::GetInstance().RegisterComponentType<DevComponent>();
+	}
+
+
+	// Cluster Shading Test Function
+	// 값 검증 후 Compute Shader로 옮기자.
+	void GameLogicSystemLayer::Test()
+	{
+		auto mainCam = Camera::GetMainCamera();
+		if (mainCam == nullptr)
+		{
+			return;
+		}
+		auto resolution = mainCam->GetResolution();
+		auto viewMatrix = mainCam->GetViewMatrix();
+		auto viewProj   = mainCam->GetProjMatrix();
+		auto farZ  = mainCam->GetFarZ();
+		auto nearZ = mainCam->GetNearZ();
+		auto eyePosition = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
+		
+		// cluster shading test
+		struct Cluster
+		{
+			JVector3 Min; // x,y, depth
+			JVector3 Max; // x,y, depth
+		};
+		// depth -> [0 ... 1]
+		// z Slice
+		// N * N 의 Tile에서 N개의 깊이만큼 가진다.
+
+		// 21 * 9 * 32
+		i32 numXSlice = 21;
+		i32 numYSlice = 9;
+		i32 numZSlice = 32;
+
+		JVector2 tileSize = JVector2(resolution.x / numXSlice, resolution.y / numYSlice);
+
+		List<Cluster> clusters;
+		for (i32 i = 0; i < numZSlice; ++i)
+		{
+			Cluster cluster;
+			
+			f32 cameraScale = 0.0f; // 
+			f32 clusterNear = nearZ * std::pow((farZ / nearZ), (f32)i / (f32)numZSlice);; //
+			f32 clusterFarZ = nearZ * std::pow((farZ / nearZ), (f32)(i + 1) / (f32)numZSlice);
+
+
+			for (i32 x = 0; x < numXSlice; ++x)
+			{
+				for (i32 y = 0; y < numYSlice; ++y)
+				{
+					JVector4 minPoint_Ss = JVector4((f32)x * tileSize.x, (f32)y * tileSize.y, -1, 1);
+					JVector4 maxPoint_Ss = JVector4(tileSize.x, tileSize.y, -1, 1);
+
+
+					// cluster 계산
+				}
+			}
+			// xSlice
+			// NDC
+			// [-1 .. 1]
+
+		}
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
 	}
 
 }
