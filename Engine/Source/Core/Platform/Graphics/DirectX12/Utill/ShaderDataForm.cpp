@@ -9,6 +9,7 @@ namespace JG
 {
 	bool ShaderDataForm::Set(String& code)
 	{
+		// Shader 코드 생성 및 정보 수집
 		bool result = true;
 		Reset();
 
@@ -56,9 +57,6 @@ namespace JG
 		{
 			pos = AnalysisSamplerState(code, pos, &result);
 		}
-
-
-		// Sampler는 이미 저
 
 		return result;
 	}

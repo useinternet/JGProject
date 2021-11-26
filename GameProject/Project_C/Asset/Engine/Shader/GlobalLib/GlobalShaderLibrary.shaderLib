@@ -13,7 +13,7 @@ float DistributionGGX(float NoH, float r)
     float denom = (NoH2 * (a2 - 1.0) + 1.0);
     denom = JG_PI * denom * denom;
 	
-    return a2 / denom;
+    return a2 / max(denom, 0.001f);
 }
 
 // GAF
@@ -39,6 +39,10 @@ float GeometrySmith(float NoV, float NoL, float r)
 // Fresnel
 float3 F_Schlick(float cosTheta, float3 F0)
 {
+    if(cosTheta > 1.0f)
+    {
+        cosTheta = 1.0f;
+    }
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
@@ -148,7 +152,7 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
     }
 
 
-	Lo += (kD * material.Albedo / JG_PI + numerator) * NoL;
+	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
     return saturate(Lo * att * light.Intensity * light.Color);
 }
 

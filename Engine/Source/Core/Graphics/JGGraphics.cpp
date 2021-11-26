@@ -340,7 +340,9 @@ namespace JG
 				JG_CORE_ERROR("It's still being rendered.");
 				return;
 			}
+			// Scene 정보 수정을 할수 없게 Lock
 			Lock();
+			// 비동기로 렌더링 시작
 			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
 				RenderInfo info;
@@ -368,13 +370,14 @@ namespace JG
 							break;
 						case ESceneObjectType::Debug:
 						{
-							//auto debugObj = static_cast<Debugobj
+
 						}
 							break;
 						case ESceneObjectType::Static:
 							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
 							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
 							break;
+						// Skeletal
 						}
 
 					}
@@ -385,20 +388,24 @@ namespace JG
 
 		}
 
+		// 완료 될때까지 기다렷다가, SceneResultInfo 리턴
 		SharedPtr<SceneResultInfo> Scene::FetchResultFinish()
 		{
+			//
 			if (mRenderScheduleHandle == nullptr)
 			{
 				return nullptr;
 			}
 			SharedPtr<SceneResultInfo> result = CreateSharedPtr<SceneResultInfo>();
 
+			// Rendering이 끝날때까지 기다린다.
 			while (mRenderScheduleHandle->GetState() != EScheduleState::Compelete)
 			{
 				//
 			}
 			mRenderScheduleHandle->Reset();
 			mRenderScheduleHandle = nullptr;
+			// Rendering 이 끝났으니. 다시 정보수정 Ok
 			UnLock();
 
 			result->Texture      = mTargetTextures[mCurrentIndex];

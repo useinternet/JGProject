@@ -13,7 +13,10 @@ namespace JG
 		{
 			return;
 		}
+		// Material 정보를 가져온다.
 		auto propertyList = obj->Get()->GetPropertyList();
+
+
 		auto material = obj->Get();
 		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
 		auto json = CreateSharedPtr<Json>();

@@ -11,6 +11,9 @@ namespace JG
 	{
 	public:
 		virtual void SetPassData(u64 commandID, void* data, u64 dataSize) = 0;
+
+
+
 		virtual bool SetFloat(const String& name, float value) = 0;
 		virtual bool SetFloat2(const String& name, const JVector2& value) = 0;
 		virtual bool SetFloat3(const String& name, const JVector3& value) = 0;

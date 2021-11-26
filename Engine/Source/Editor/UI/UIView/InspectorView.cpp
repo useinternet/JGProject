@@ -106,7 +106,7 @@ namespace JG
 
 	void InspectorView::OnEvent(IEvent& e)
 	{
-		EventDispatcher dispatcher(e); // ResponseSelectedGameNodeInEditor
+		EventDispatcher dispatcher(e); 
 		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&InspectorView::ResponseDestroyGameObject));
 		dispatcher.Dispatch<NotifySelectedGameNodeInEditorEvent>(EVENT_BIND_FN(&InspectorView::ResponseSelectedGameNodeInEditor));
 		dispatcher.Dispatch< NotifySelectedAssetInEditorEvent>(EVENT_BIND_FN(&InspectorView::ResponseSelectedAssetInEditor));

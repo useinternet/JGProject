@@ -211,7 +211,7 @@ namespace JG
 
 
 
-
+		
 		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task);
 		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskUserDataFunction& task, SharedPtr<IJGObject> userData = nullptr);
 

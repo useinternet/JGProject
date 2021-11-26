@@ -121,8 +121,6 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 
 
 	//Lo += CalcDirLight(N,V,  material, light);
-
-
 	float3 final = saturate(Lo);
 	float Gamma = 1.0f / 2.2f;
 

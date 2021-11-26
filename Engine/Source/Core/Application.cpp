@@ -162,12 +162,14 @@ namespace JG
 				TimerManager::GetInstance().Update();
 			}
 
+			// Event Loop
 			while (mEventQueue.empty() == false)
 			{
 				auto e = std::move(mEventQueue.front()); mEventQueue.pop();
 				OnEvent(*e);
 			}
 
+			// 스케쥴러 업데이트
 			if (Scheduler::IsValid())
 			{
 				Scheduler::GetInstance().Update();

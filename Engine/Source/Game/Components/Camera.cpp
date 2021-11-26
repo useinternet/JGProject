@@ -38,6 +38,8 @@ namespace JG
 
 
 		UpdateGraphicsScene();
+
+		// 스케쥴러에 렌더링 로직 등록
 		mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
 		mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
 		mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
@@ -412,10 +414,6 @@ namespace JG
 		sceneInfo.ViewMatrix = GetViewMatrix();
 		sceneInfo.ProjMatrix = GetProjMatrix();
 		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
-		if (GetType() != JGTYPE(EditorCamera))
-		{
-			int n = 0;
-		}
 		if (mScene == nullptr)
 		{
 			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
