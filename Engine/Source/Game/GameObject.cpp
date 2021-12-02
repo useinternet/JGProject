@@ -51,7 +51,8 @@ namespace JG
 
 	void GameObject::DrawDebugRay(const JRay& ray, f32 length, Color& color)
 	{
-		//DebugGeometryDrawer::GetInstance().DrawDebugLine(ray, length, color);
+		auto drawer = JGGraphics::GetInstance().GetDebugGeometryDrawer();
+		drawer->DrawDebugLine(ray, length, color);
 	}
 	void GameObject::DrawDebugLine(const JVector3& startPos, const JVector3& endPos, Color& color)
 	{
@@ -61,13 +62,26 @@ namespace JG
 		f32 len = JVector3::Length(endPos - startPos);
 		DrawDebugRay(ray, len, color);
 	}
+	void GameObject::DrawDebugLineBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color)
+	{
+		auto drawer = JGGraphics::GetInstance().GetDebugGeometryDrawer();
+		drawer->DrawDebugLineBox(location, quat, size, color);
+	}
+	void GameObject::DrawDebugLineSphere(const JVector3& center, f32 r, const Color& color)
+	{
+		auto drawer = JGGraphics::GetInstance().GetDebugGeometryDrawer();
+		drawer->DrawDebugLineSphere(center,r , color);
+	}
+
 	void GameObject::DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color)
 	{
-		//DebugGeometryDrawer::GetInstance().DrawDebugBox(location, quat, size, color);
+		auto drawer = JGGraphics::GetInstance().GetDebugGeometryDrawer();
+		drawer->DrawDebugBox(location, quat, size, color);
 	}
 	void GameObject::DrawDebugSphere(const JVector3& center, f32 r, const Color& color)
 	{
-		//DebugGeometryDrawer::GetInstance().DrawDebugSphere(center, r, color);
+		auto drawer = JGGraphics::GetInstance().GetDebugGeometryDrawer();
+		drawer->DrawDebugSphere(center, r, color);
 	}
 	void GameObject::MakeJson(SharedPtr<JsonData> jsonData) const
 	{

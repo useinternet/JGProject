@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DebugGeometryDrawer.h"
 #include "Application.h"
+#include "Graphics/JGGraphics.h"
 #include "Graphics/Material.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
@@ -9,54 +10,56 @@ namespace JG
 {
 	DebugGeometryDrawer::DebugGeometryDrawer()
 	{
-		auto vBuffer = IVertexBuffer::Create("Debug_VBuffer", EBufferLoadMethod::CPULoad);
-		auto iBuffer = IIndexBuffer::Create("Debug_IBuffer", EBufferLoadMethod::CPULoad);
-		mSubMesh = ISubMesh::Create("Debug_SubMesh");
-		mMesh    = IMesh::Create("Debug_Mesh");
-
-		mMesh->AddMesh(mSubMesh);
-		mMesh->SetInputLayout(JGDebugVertex::GetInputLayout());
-		mSubMesh->SetVertexBuffer(vBuffer);
-		mSubMesh->SetIndexBuffer(iBuffer);
-
-
-		List<JGDebugVertex> vertices;
-		List<u32>           indices;
-		CreateDebugLine(mThick, 1.0f, vertices, indices);
-
-
-
-		vBuffer->SetData(vertices.data(), sizeof(JGDebugVertex), vertices.size());
-		iBuffer->SetData(indices.data(), indices.size());
-
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject,
 			[&]() -> EScheduleResult
 		{
-			if (mDebugMaterial == nullptr)
+			while (mTaskCount != 0) {}
+			auto mesh = IMesh::Create("Debug_Mesh");
+			mesh->SetInputLayout(JGDebugVertex::GetInputLayout());
+
+			List<SharedPtr<IMaterial>> materialList;
+			for (auto& _pair : mDebugGeometryInfos)
 			{
-				auto shader = ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::DebugShader);
-				mDebugMaterial = IMaterial::Create("DebugMaterial", shader);
+				for (auto& debugGeoInfo : _pair.second)
+				{
+					auto instanceCount = debugGeoInfo.CBDataList.size();
+					if (instanceCount == 0)
+					{
+						continue;
+					}
+					debugGeoInfo.SubMesh->SetInstanceCount(instanceCount);
+					mesh->AddMesh(debugGeoInfo.SubMesh);
+					materialList.push_back(debugGeoInfo.Material);
+					bool result = debugGeoInfo.Material->SetStructDataArray("gDebugDataInstances", debugGeoInfo.CBDataList.data(), debugGeoInfo.CBDataList.size(),
+						sizeof(DebugCBData));
+				}
 			}
 
-			while (mTaskCount != 0) {}
+			if (materialList.size() > 0 && mesh->GetSubMeshCount() > 0)
+			{
+				auto debugObj = CreateSharedPtr<Graphics::DebugRenderObject>();
+				debugObj->Mesh = mesh;
+				debugObj->MaterialList = materialList;
 
-			mSubMesh->SetInstanceCount(mLineCount);
-			mDebugMaterial->SetStructDataArray("gDebugDataInstances", mDebugDataList.data(), mDebugDataList.size(), sizeof(DebugCBData));
+				// 하고 Mesh보내기
+				JGGraphics::GetInstance().ForEach([&](Graphics::Scene* scene)
+				{
+					scene->PushSceneObject(debugObj);
+				});
+			}
 
-
-
-
-			//auto ri = CreateSharedPtr<DebugRenderItem>();
-			//ri->WorldMatrix = JMatrix::Identity();
-			//ri->Material = mDebugMaterial;
-			//ri->Mesh = mMesh;
-		
-			//RequestPushRenderItemEvent e;
-			//e.RenderItem = ri;
-			//Application::GetInstance().SendEvent(e);
-
-			mLineCount = 0;
-			mDebugDataList.clear();
+			// 정보 비워주기
+			for (auto& _pair : mGeometryInfoIndexs)
+			{
+				_pair.second = 0;
+			}
+			for (auto& _pair : mDebugGeometryInfos)
+			{
+				for (auto& debugGeoInfo : _pair.second)
+				{
+					debugGeoInfo.CBDataList.clear();
+				}
+			}
 			return EScheduleResult::Continue;
 		});
 	}
@@ -91,6 +94,17 @@ namespace JG
 
 	}
 	void DebugGeometryDrawer::DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color)
+	{
+		++mTaskCount;
+		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
+		{
+			auto data = userData->As<DebugBoxData>();
+	
+			AddDebugBox(data->location, data->quaternion, data->size, data->color);
+			--mTaskCount;
+		}, CreateSharedPtr<DebugBoxData>(location, quat, Size, color));
+	}
+	void DebugGeometryDrawer::DrawDebugLineBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color)
 	{
 		++mTaskCount;
 		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
@@ -145,10 +159,21 @@ namespace JG
 			--mTaskCount;
 		}, CreateSharedPtr<DebugBoxData>(location, quat, Size, color));
 	}
+
 	void DebugGeometryDrawer::DrawDebugSphere(const JVector3& center, f32 r, const Color& color)
 	{
+		++mTaskCount;
+		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
+		{
+			auto data = userData->As<DebugSphereData>();
 
+			AddDebugSphere(data->center, data->r, data->color);
+			--mTaskCount;
+		}, CreateSharedPtr<DebugSphereData>(center, r, color));
+	}
 
+	void DebugGeometryDrawer::DrawDebugLineSphere(const JVector3& center, f32 r, const Color& color)
+	{
 		++mTaskCount;
 		Scheduler::GetInstance().ScheduleAsync([&](SharedPtr<IJGObject> userData)
 		{
@@ -201,6 +226,37 @@ namespace JG
 
 
 	}
+	void DebugGeometryDrawer::CreateDebugGeometryInfo(EGeometryType type)
+	{
+		List<JGDebugVertex>  vertices;
+		List<u32>            indices;
+		switch (type)
+		{
+		case EGeometryType::Line:			CreateDebugLine(mThick, 1.0f, vertices, indices);
+			break;
+		case EGeometryType::Box: 			CreateDebugBox(JVector3(1, 1, 1), vertices, indices);
+			break;
+		case EGeometryType::Sphere:			CreateDebugSphere(1.0f, vertices, indices);
+			break;
+		default:
+			return;
+		}
+		DebugGeometryInfo info;
+
+		auto vBuffer = IVertexBuffer::Create("Debug_VBuffer", EBufferLoadMethod::CPULoad);
+		auto iBuffer = IIndexBuffer::Create("Debug_IBuffer", EBufferLoadMethod::CPULoad);
+		vBuffer->SetData(vertices.data(), sizeof(JGDebugVertex), vertices.size());
+		iBuffer->SetData(indices.data(), indices.size());
+
+
+		info.SubMesh = ISubMesh::Create("Debug_SubMesh");
+		info.SubMesh->SetVertexBuffer(vBuffer);
+		info.SubMesh->SetIndexBuffer(iBuffer);
+		info.Material = IMaterial::Create("DebugMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::DebugShader));
+
+
+		mDebugGeometryInfos[type].push_back(info);
+	}
 
 	void DebugGeometryDrawer::AddDebugLines(const List<JVector3>& points, const Color& color)
 	{
@@ -215,7 +271,6 @@ namespace JG
 			AddDebugLine(ray, length, color);
 		}
 	}
-
 	void DebugGeometryDrawer::AddDebugLine(const JRay& ray, f32 length, const Color& color)
 	{
 		auto layDir = JVector3::Normalize(ray.dir);
@@ -247,10 +302,57 @@ namespace JG
 		cbData.WorldMatrix = JMatrix::Transpose(m);
 
 		std::lock_guard lock(mMutex);
-		++mLineCount;
-		mDebugDataList.push_back(cbData);
+		AddDebugObject(EGeometryType::Line, cbData);
 	}
+	void DebugGeometryDrawer::AddDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color)
+	{
+		JMatrix  s = JMatrix::Scaling(Size);
+		JMatrix  t = JMatrix::Translation(location);
+		JMatrix  r = JMatrix::Rotation(quat);
+		JMatrix  m = s * r * t;
 
+		DebugCBData cbData;
+		cbData.Color = color;
+		cbData.WorldMatrix = JMatrix::Transpose(m);
+
+
+		std::lock_guard lock(mMutex);
+		AddDebugObject(EGeometryType::Box, cbData);
+	}
+	void DebugGeometryDrawer::AddDebugSphere(const JVector3& location, f32 r, const Color& color)
+	{
+		JMatrix  s = JMatrix::Scaling(JVector3(r,r,r));
+		JMatrix  t = JMatrix::Translation(location);
+		JMatrix  m = s * t;
+
+		DebugCBData cbData;
+		cbData.Color = color;
+		cbData.WorldMatrix = JMatrix::Transpose(m);
+
+
+		std::lock_guard lock(mMutex);
+		AddDebugObject(EGeometryType::Sphere, cbData);
+
+	}
+	void DebugGeometryDrawer::AddDebugObject(EGeometryType type, const DebugCBData& cbData)
+	{
+		u32 index = mGeometryInfoIndexs[type];
+		if (index >= mDebugGeometryInfos[type].size())
+		{
+			CreateDebugGeometryInfo(type);
+		}
+
+
+		auto& debugGeoInfo = mDebugGeometryInfos[type][index];
+		debugGeoInfo.CBDataList.push_back(cbData);
+
+
+		u64 instanceCount = debugGeoInfo.CBDataList.size();
+		if (instanceCount >= mMaxInstanceCount)
+		{
+			mGeometryInfoIndexs[type] += 1;
+		}
+	}
 	void DebugGeometryDrawer::CreateDebugLine(f32 thick, f32 length, List<JGDebugVertex>& out_vertices, List<u32>& out_indices)
 	{
 
@@ -288,4 +390,114 @@ namespace JG
 
 	}
 
+	void DebugGeometryDrawer::CreateDebugBox(const JVector3& size, List<JGDebugVertex>& out_vertices, List<u32>& out_indices)
+	{
+		f32 hx = 0.5f * size.x;
+		f32 hy = 0.5f * size.y;
+		f32 hz = 0.5f * size.z;
+
+		out_vertices.clear();
+		out_vertices.resize(8);
+
+		out_vertices[0].Position = JVector3(-hx, -hy, -hz);
+		out_vertices[1].Position = JVector3(-hx, +hy, -hz);
+		out_vertices[2].Position = JVector3(+hx, +hy, -hz);
+		out_vertices[3].Position = JVector3(+hx, -hy, -hz);
+		out_vertices[4].Position = JVector3(-hx, -hy, hz);
+		out_vertices[5].Position = JVector3(-hx, +hy, hz);
+		out_vertices[6].Position = JVector3(+hx, +hy, hz);
+		out_vertices[7].Position = JVector3(+hx, -hy, hz);
+
+
+		out_indices.clear();
+		out_indices.resize(36);
+		out_indices[0] = 0; out_indices[1] = 1; out_indices[2] = 2;
+		out_indices[3] = 0; out_indices[4] = 2; out_indices[5] = 3;
+		out_indices[6] = 6; out_indices[7] = 5; out_indices[8] = 4;
+		out_indices[9] = 7; out_indices[10] = 6; out_indices[11] = 4;
+		out_indices[12] = 3; out_indices[13] = 2; out_indices[14] = 6;
+		out_indices[15] = 3; out_indices[16] = 6; out_indices[17] = 7;
+		out_indices[18] = 4; out_indices[19] = 1; out_indices[20] = 0;
+		out_indices[21] = 4; out_indices[22] = 5; out_indices[23] = 1;
+		out_indices[24] = 1; out_indices[25] = 5; out_indices[26] = 2;
+		out_indices[27] = 5; out_indices[28] = 6; out_indices[29] = 2;
+		out_indices[30] = 7; out_indices[31] = 4; out_indices[32] = 0;
+		out_indices[33] = 3; out_indices[34] = 7; out_indices[35] = 0;
+	}
+
+	void DebugGeometryDrawer::CreateDebugSphere(f32 radius, List<JGDebugVertex>& out_vertices, List<u32>& out_indices)
+	{
+
+		out_vertices.clear();
+		out_indices.clear();
+
+
+
+		JGDebugVertex topVertex(0.0f, +radius, 0.0f);
+		JGDebugVertex bottomVertex(0.0f, -radius, 0.0f); 
+
+		out_vertices.push_back(topVertex);
+
+		u32 stackCount = 20;
+		u32 sliceCount = 20;
+
+		float phiStep = JG_PI / stackCount;
+		float thetaStep = 2.0f * JG_PI / sliceCount;
+
+		for (u32 i = 1; i <= stackCount - 1; ++i)
+		{
+			float phi = i * phiStep;
+			for (u32 j = 0; j <= sliceCount; ++j)
+			{
+				float theta = j * thetaStep;
+
+				JGDebugVertex v;
+				v.Position.x = radius * sinf(phi) * cosf(theta);
+				v.Position.y = radius * cosf(phi);
+				v.Position.z = radius * sinf(phi) * sinf(theta);
+				out_vertices.push_back(v);
+			}
+		}
+
+		out_vertices.push_back(bottomVertex);
+
+
+		for (u32 i = 1; i <= sliceCount; ++i)
+		{
+			out_indices.push_back(0);
+			out_indices.push_back(i + 1);
+			out_indices.push_back(i);
+		}
+		u32 baseIndex = 1;
+		u32 ringVertexCount = sliceCount + 1;
+		for (u32 i = 0; i < stackCount - 2; ++i)
+		{
+			for (u32 j = 0; j < sliceCount; ++j)
+			{
+				out_indices.push_back(baseIndex + i * ringVertexCount + j);
+				out_indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				out_indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+		
+				out_indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+				out_indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				out_indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			}
+		}
+		u32 southPoleIndex = (u32)out_vertices.size() - 1;
+		baseIndex = southPoleIndex - ringVertexCount;
+
+		for (u32 i = 0; i < sliceCount; ++i)
+		{
+			out_indices.push_back(southPoleIndex);
+			out_indices.push_back(baseIndex + i);
+			out_indices.push_back(baseIndex + i + 1);
+		}
+
+	}
+
+	void DebugGeometryDrawer::CreateDebugTorous(f32 radius, f32 thick, List<JGDebugVertex>& out_vertices, List<u32>& out_indices)
+	{
+
+
+	}
 }

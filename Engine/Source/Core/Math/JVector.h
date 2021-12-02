@@ -10,6 +10,7 @@ namespace JG
 	class JQuaternion;
 	class JMatrix;
 	class Color;
+	class JVector3;
 	template<typename T>
 	class JVector2Template
 	{
@@ -229,6 +230,7 @@ namespace JG
 		JVector4() : x(0), y(0), z(0), w(0) {}
 		JVector4(float x, float y, float z, float w) :
 			x(x), y(y), z(z), w(w) {}
+		JVector4(const JVector3& v, float f);
 		JVector4(const Color& c);
 	public:
 		inline JVector4 operator*(float k) const {

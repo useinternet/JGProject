@@ -11,7 +11,7 @@
 #include "Common/Enum.h"
 #include "Common/Abstract.h"
 #include "Common/Type.h"
-#include "Common/String.h"
+#include "Common/Utility.h"
 #include "Common/Log.h"
 #include "Common/Color.h"
 #include "Common/Object.h"

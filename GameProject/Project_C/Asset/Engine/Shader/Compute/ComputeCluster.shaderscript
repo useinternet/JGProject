@@ -1,0 +1,36 @@
+
+
+struct Cluster
+{
+    float4 Min;
+    float4 Max;
+}
+
+
+
+
+cbuffer ConstantData
+{
+    float4x4 __ProjMatrix__;
+    float4x4 __InvProjMatrix__;
+    float3   __EyePosition__;
+};
+
+
+RWStructuredBuffer<Cluster> Result;
+RWStructuredBuffer<uint3> Test;
+
+// SV_GroupID : dispatch 호출의 스레드 그룹들 중 현재 스레드가 속한 그룹의 3차원 식별자
+// SV_GroupThreadID : 그 스레드 그룹 안에서의 현재 스레드의 3차원 식별자
+// SV_DispatchThreadID : 전체 dispatch 안에서의 현재 스레드 식별자
+// SV_GroupIndex : 현재 스레드가 속한 스레드 그룹의 3차원 식별자를 1차원으로 직렬화한 인덱스
+[numthread(8, 8, 16)]
+void CS(uint3 groupId : SV_GroupID,
+        uint3 dispatchThreadId : SV_DispatchThreadID,
+        uint3 groupThreadId    : SV_GroupThreadID)
+{
+
+    uint index = dispatchThreadId.x * dispatchThreadId.y * dispatchThreadId.z;
+    Test[index] = dispatchThreadId;
+}
+

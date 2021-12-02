@@ -9,6 +9,7 @@ namespace JG
 
 	void DevComponent::Start()
 	{
+		__super::Start();
 		BindInputAxis("Foward",  INPUT_AXIS_BIND(&DevComponent::MoveForward));
 		BindInputAxis("RightLeft", INPUT_AXIS_BIND(&DevComponent::MoveRight));
 		BindInputAxis("YawRotate", INPUT_AXIS_BIND(&DevComponent::YawRotate));
@@ -18,6 +19,7 @@ namespace JG
 	}
 	void DevComponent::Update()
 	{
+		__super::Update();
 
 	}
 

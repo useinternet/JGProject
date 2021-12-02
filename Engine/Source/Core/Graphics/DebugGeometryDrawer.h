@@ -65,31 +65,53 @@ namespace JG
 			Color   Color;
 			JMatrix WorldMatrix;
 		};
+		struct DebugGeometryInfo
+		{
+			SharedPtr<ISubMesh>  SubMesh  = nullptr;
+			SharedPtr<IMaterial> Material = nullptr;
+			List<DebugCBData>    CBDataList;
+		};
 	private:
 		const f32 mThick = 0.05f;
-		SharedPtr<ISubMesh>      mSubMesh;
-		SharedPtr<IMesh>         mMesh;
-		SharedPtr<IMaterial>     mDebugMaterial;
-		List<DebugCBData>        mDebugDataList;
-		u32 mLineCount = 0;
+		const u32 mMaxInstanceCount = 1024;
+		Dictionary<EGeometryType, List<DebugGeometryInfo>> mDebugGeometryInfos;
+		Dictionary<EGeometryType, u32> mGeometryInfoIndexs;
+		
 
+		u32 mNumSubdivision = 3;
 
 		std::mutex      mMutex;
 		std::atomic_int mTaskCount = 0;
 	public:
 		DebugGeometryDrawer();
 		virtual ~DebugGeometryDrawer();
+
+
+
+
 	public:
 		void DrawDebugLine(const JRay& ray, f32 length, const Color& color);
 		void DrawDebugLines(const List<JVector3>& points, const Color& color);
-
-
 		void DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color);
-		void DrawDebugSphere(const JVector3& location, f32 r, const Color& color);
-
+		void DrawDebugLineBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color);
+		void DrawDebugSphere(const JVector3& center, f32 r, const Color& color);
+		void DrawDebugLineSphere(const JVector3& location, f32 r, const Color& color);
 	private:
+		void CreateDebugGeometryInfo(EGeometryType type);
+
+
+
 		void AddDebugLines(const List<JVector3>& points, const Color& color);
 		void AddDebugLine(const JRay& ray, f32 length, const Color& color);
+		void AddDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& Size, const Color& color);
+		void AddDebugSphere(const JVector3& location, f32 r, const Color& color);
+
+
+		void AddDebugObject(EGeometryType type, const DebugCBData& cbData);
 		void CreateDebugLine(f32 thick, f32 length, List<JGDebugVertex>& out_vertices, List<u32>& out_indices);
+		void CreateDebugBox(const JVector3& size, List<JGDebugVertex>& out_vertices, List<u32>& out_indices);
+		void CreateDebugSphere(f32 radius, List<JGDebugVertex>& out_vertices, List<u32>& out_indices);
+		void CreateDebugTorous(f32 radius, f32 thick, List<JGDebugVertex>& out_vertices, List<u32>& out_indices);
+
 	};
 }

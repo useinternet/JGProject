@@ -32,6 +32,16 @@ namespace JG
 
 
 		UniquePtr<Plugin> mGamePlugin;
+
+
+
+
+		// 21 * 9 * 32
+		SharedPtr<IComputer> mComputer;
+		List<JBBox> mClusters;
+		i32 numXSlice = 8;
+		i32 numYSlice = 1;
+		i32 numZSlice = 32;
 	public:
 		virtual ~GameLogicSystemLayer() {}
 	public:

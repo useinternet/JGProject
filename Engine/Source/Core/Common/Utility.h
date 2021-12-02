@@ -90,4 +90,31 @@ namespace JG
 		}
 		return result;
 	}
+
+
+	namespace File
+	{
+		inline bool GetReadAllText(const String& path, String* out_str)
+		{
+			if (out_str == nullptr)
+			{
+				return false;
+			}
+			std::ifstream fin;
+			fin.open(path);
+			if (fin.is_open() == true)
+			{
+				std::stringstream ss;
+				ss << fin.rdbuf();
+				*out_str = ss.str();
+				return true;
+			}
+
+
+			fin.close();
+
+			return false;
+		}
+	}
+
 }

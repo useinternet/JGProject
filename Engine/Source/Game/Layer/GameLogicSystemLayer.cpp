@@ -17,6 +17,8 @@
 #include "Class/Asset/Asset.h"
 #include "Linker/GamePluginLinker.h"
 
+
+#include "Graphics/DebugGeometryDrawer.h"
 #define GAME_DLL_NAME "SandBox_Game.dll"
 
 
@@ -61,8 +63,66 @@ namespace JG
 		RegisterGlobalGameSystem();
 
 		//Test
-		Scheduler::GetInstance().ScheduleOnceByFrame(100, 0, [&]() -> EScheduleResult {Test(); return EScheduleResult::Continue; });
+		static Color colors[4];
+		colors[0] = Color::Red();
+		colors[1] = Color::Green();
+		colors[2] = Color::Blue();
+		colors[3] = Color::White();
+		Scheduler::GetInstance().ScheduleByFrame(10,0,-1, 0, [&]() -> EScheduleResult {
 		
+			Test(); 
+			i32 index = 0;
+			for (auto& cluster : mClusters)
+			{
+				bool result = index >= (numXSlice * numYSlice * 20) && index < (numXSlice * numYSlice * 21);
+				if (result == true)
+				{
+					JVector3 location = cluster.Center();
+					JVector3 size = JVector3::Abs(cluster.max - cluster.min);
+					JQuaternion quat = JQuaternion::Identity();
+
+
+					i32 colorIndex = index / (numXSlice * numYSlice);
+					i32 xcolorIndex = (index / numYSlice) % numXSlice;
+					i32 ycolorIndex = (index % numYSlice);
+					colorIndex = colorIndex % 4;
+					auto color = colors[colorIndex];
+					if (color.R > 0)
+					{
+						color.R -= (0.25f * (f32)xcolorIndex);
+					}
+					else
+					{
+						color.R += (0.25f * (f32)xcolorIndex);
+					}
+					if (color.G > 0)
+					{
+						color.G -= (0.25f * (f32)ycolorIndex);
+					}
+					else
+					{
+						color.G += (0.25f * (f32)ycolorIndex);
+					}
+
+					JGGraphics::GetInstance().GetDebugGeometryDrawer()->DrawDebugBox(location, quat, size, color);
+
+				}
+
+
+
+
+				++index;
+			}
+
+			
+			return EScheduleResult::Continue; });
+		
+
+
+
+
+
+
 		auto gameWorldAssetPath = ProjectSetting::GetInstance().GetStartGameWorldPath();
 		if (gameWorldAssetPath.empty() == false)
 		{
@@ -333,31 +393,27 @@ namespace JG
 			return;
 		}
 		auto resolution = mainCam->GetResolution();
-		auto viewMatrix = mainCam->GetViewMatrix();
-		auto projMatrix = mainCam->GetProjMatrix();
-		auto invProjMatrix = mainCam->GetInvProjMatrix();
-		auto farZ = mainCam->GetFarZ();
-		auto nearZ = mainCam->GetNearZ();
-		auto eyePosition = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
+		auto viewMatrix = JMatrix::LookAtLH(JVector3(0, 0, 0), JVector3(0, 0, 1), JVector3(0, 1, 0));
+		auto projMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(45), resolution.x / resolution.y, 0.1f, 100000);
+		auto invProjMatrix = JMatrix::Inverse(projMatrix);
+		auto farZ = 0.1f;
+		auto nearZ = 100000;
+		auto eyePosition = JVector3(0, 0, 0);// mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 
-		// cluster shading test
-		struct Cluster
-		{
-			JVector3 Min; // x,y, depth
-			JVector3 Max; // x,y, depth
-		};
+
 		// depth -> [0 ... 1]
 		// z Slice
 		// N * N 의 Tile에서 N개의 깊이만큼 가진다.
 
-		// 21 * 9 * 32
-		i32 numXSlice = 21;
-		i32 numYSlice = 9;
-		i32 numZSlice = 32;
+
+		//i32 numXSlice = 21;
+		//i32 numYSlice = 9;
+		//i32 numZSlice = 32;
+
 
 		JVector2 tileSize = JVector2(resolution.x / numXSlice, resolution.y / numYSlice);
 
-		List<Cluster> clusters;
+		List<JBBox> clusters;
 
 
 		std::function<JVector3(const JVector4&)> ScreenToView = [&](const JVector4& screen)->JVector3
@@ -381,22 +437,28 @@ namespace JG
 			return result;
 		};
 
+		i32 index = 0;
 
 		for (i32 i = 0; i < numZSlice; ++i)
 		{
-			Cluster cluster;
+			JBBox cluster;
 			
 			f32 cameraScale = 0.0f; // 
 			f32 clusterNear = nearZ * std::pow((farZ / nearZ), (f32)i / (f32)numZSlice);; //
 			f32 clusterFarZ = nearZ * std::pow((farZ / nearZ), (f32)(i + 1) / (f32)numZSlice);
 
-
 			for (i32 x = 0; x < numXSlice; ++x)
 			{
 				for (i32 y = 0; y < numYSlice; ++y)
 				{
+					bool result = index >= (numXSlice * numYSlice * 20) && index < (numXSlice* numYSlice * 21);
+					if (result == true)
+					{
+						int n = 0;
+					}
+
 					JVector4 minPoint_Ss = JVector4((f32)x * tileSize.x, (f32)y * tileSize.y, -1, 1);
-					JVector4 maxPoint_Ss = JVector4(tileSize.x, tileSize.y, -1, 1);
+					JVector4 maxPoint_Ss = JVector4((f32)(x + 1) * tileSize.x, (f32)(y + 1) * tileSize.y, -1, 1);
 										
 					JVector3 maxPoint_vS = ScreenToView(maxPoint_Ss);
 					JVector3 minPoint_vS = ScreenToView(minPoint_Ss);
@@ -407,31 +469,34 @@ namespace JG
 					JVector3 maxPointNear = LineIntersectionToZPlane(eyePosition, maxPoint_vS, clusterNear);
 					JVector3 maxPointFar  = LineIntersectionToZPlane(eyePosition, maxPoint_vS, clusterFarZ);
 
-					
 					JVector3 minPointAABB = JVector3::Min(JVector3::Min(minPointNear, minPointFar), JVector3::Min(maxPointNear, maxPointFar));
 					JVector3 maxPointAABB = JVector3::Max(JVector3::Max(minPointNear, minPointFar), JVector3::Max(maxPointNear, maxPointFar));
 
-					cluster.Min = minPointAABB;
-					cluster.Max = maxPointAABB;
+					cluster.min = JVector4(minPointAABB, 0.0f);
+					cluster.max = JVector4(maxPointAABB, 0.0f);
+
 					clusters.push_back(cluster);
+
+
+					++index;
 				}
 			}
-			// xSlice
-			// NDC
-			// [-1 .. 1]
-
 		}
 
 
 
 
 
-		
+		mClusters = clusters;
 
-
-
-
-
+		auto shaderPath = Application::GetEnginePath();
+		shaderPath = CombinePath(shaderPath, "Shader/Compute/ComputeCluster.shaderscript");
+		String sourceCode;
+		if (File::GetReadAllText(shaderPath, &sourceCode) == true)
+		{
+			auto shader = IShader::Create("ComputeTestShader", sourceCode, EShaderFlags::Allow_ComputeShader);
+			mComputer = IComputer::Create("Test", shader);
+		}
 
 
 

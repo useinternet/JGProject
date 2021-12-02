@@ -27,6 +27,7 @@ namespace JG
 		class PointLight;
 	}
 	class Render2DBatch;
+	class DebugGeometryDrawer;
 	struct JGGraphicsDesc
 	{
 		EGraphicsAPI GraphicsAPI;
@@ -40,7 +41,11 @@ namespace JG
 	private:
 		std::mutex mMutex;
 		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
+		Dictionary<Graphics::GObject*, Graphics::Scene*> mSceneDic;
+
+
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
+		UniquePtr<DebugGeometryDrawer> mDebugGeometryDrawer;
 		JGGraphicsDesc mDesc;
 
 	public:
@@ -52,6 +57,10 @@ namespace JG
 
 
 		void DestroyObject(Graphics::GObject* gobject);
+
+		void ForEach(const std::function<void(Graphics::Scene*)>& action);
+
+		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
 		u64           GetBufferCount() const;
 		const JGGraphicsDesc& GetDesc() const;
@@ -194,7 +203,7 @@ namespace JG
 		class SceneObject
 		{
 		public:
-			JMatrix	WorldMatrix;
+			JMatrix	WorldMatrix = JMatrix::Identity();
 			u64     Layer = 0;
 		public:
 			virtual ~SceneObject() = default;
@@ -216,6 +225,41 @@ namespace JG
 			virtual bool IsValid() const override { return true; }
 		};
 
+		class DebugRenderObject : public SceneObject
+		{
+		public:
+			SharedPtr<IMesh> Mesh;
+			List<SharedPtr<IMaterial>> MaterialList;
+		public:
+			virtual ~DebugRenderObject() = default;
+		public:
+			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Debug; }
+			virtual bool IsValid() const override {
+				bool result = true;
+
+				if (Mesh == nullptr || Mesh->IsValid() == false)
+				{
+					result = false;
+				}
+				if (MaterialList.empty())
+				{
+					result = false;
+				}
+				else
+				{
+					for (auto& m : MaterialList)
+					{
+						if (m == nullptr)
+						{
+							result = false;
+							break;
+						}
+					}
+				}
+
+				return result;
+			}
+		};
 
 		class StaticRenderObject : public SceneObject
 		{
@@ -252,7 +296,8 @@ namespace JG
 				return result;
 			}
 		};
-	
+
+
 
 
 		/// Light ///

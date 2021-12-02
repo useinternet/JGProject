@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "JGGraphics.h"
+#include "Graphics/DebugGeometryDrawer.h"
 #include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/Renderer/FowardRenderer.h"
 #include "Graphics/Renderer/DeferredRenderer.h"
@@ -25,7 +26,9 @@ namespace JG
 
 	Graphics::Scene* JGGraphics::CreateScene(const String& name, const Graphics::SceneInfo& info)
 	{
-		return CreateGObject<Graphics::Scene>(name,  info);
+		auto pScene = CreateGObject<Graphics::Scene>(name, info);
+		mSceneDic.emplace(pScene, pScene);
+		return pScene;
 	}
 	void JGGraphics::DestroyObject(Graphics::GObject* gobject)
 	{
@@ -33,6 +36,9 @@ namespace JG
 		{
 			return;
 		}
+		mSceneDic.erase(gobject);
+
+
 
 		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::Graphics_DestroyObject,
 			[&](SharedPtr<IJGObject> userData) -> EScheduleResult
@@ -44,6 +50,28 @@ namespace JG
 			}
 			return EScheduleResult::Continue;
 		}, CreateSharedPtr<RemoveObjectData>(gobject));
+	}
+
+	void JGGraphics::ForEach(const std::function<void(Graphics::Scene*)>& action)
+	{
+		for (auto& _pair : mSceneDic)
+		{
+			auto scene = _pair.second;
+			if (scene == nullptr)
+			{
+				continue;
+			}
+			if (action != nullptr)
+			{
+				action(scene);
+			}
+		}
+
+	}
+
+	DebugGeometryDrawer* JGGraphics::GetDebugGeometryDrawer() const
+	{
+		return mDebugGeometryDrawer.get();
 	}
 
 	IGraphicsAPI* JGGraphics::GetGraphicsAPI() const
@@ -77,7 +105,8 @@ namespace JG
 	{
 		mGraphcisAPI = IGraphicsAPI::Create(mDesc.GraphicsAPI);
 		mGraphcisAPI->Create();
-
+		mDebugGeometryDrawer = CreateUniquePtr<DebugGeometryDrawer>();
+		
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame,
 			[&]() -> EScheduleResult
 		{
@@ -370,7 +399,8 @@ namespace JG
 							break;
 						case ESceneObjectType::Debug:
 						{
-
+							auto debugObj = static_cast<DebugRenderObject*>(obj.get());
+							mRenderer->DrawCall(debugObj->WorldMatrix, debugObj->Mesh, debugObj->MaterialList);
 						}
 							break;
 						case ESceneObjectType::Static:

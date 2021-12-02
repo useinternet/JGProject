@@ -1,6 +1,6 @@
 #pragma once
 #include <Common/Define.h>
-#include <Common/String.h>
+#include <Common/Utility.h>
 #include <atomic>
 #include <typeinfo>
 

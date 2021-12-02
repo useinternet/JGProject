@@ -75,11 +75,16 @@ namespace JG
 		SharedPtr<ScheduleHandle> ScheduleAsync(const AsyncTaskFunction& task);
 
 
+
 		void DrawDebugRay(const JRay& ray, f32 length, Color& color);
 		void DrawDebugLine(const JVector3& startPos, const JVector3& endPos,Color& color);
+		void DrawDebugLineBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color);
+		void DrawDebugLineSphere(const JVector3& center, f32 r, const Color& color);
 		void DrawDebugBox(const JVector3& location, const JQuaternion& quat, const JVector3& size, const Color& color);
 		void DrawDebugSphere(const JVector3& center, f32 r, const Color& color);
-		
+
+
+
 		f32 GetTick() const {
 			return Application::GetInstance().GetAppTimer()->GetTick();
 		}

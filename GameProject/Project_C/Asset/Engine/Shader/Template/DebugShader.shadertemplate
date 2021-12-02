@@ -1,8 +1,9 @@
 
-cbuffer Camera
+cbuffer __PASS_DATA__
 {
-	float4x4 gViewProj;
-	float3   gEye;
+	float4x4 __ViewProjMatrix__;
+	float4x4 __WorldMatrix__;
+	float3   __EyePosition__;
 };
 cbuffer ObjectParams
 {
@@ -35,7 +36,7 @@ VS_OUT vs_main(VS_IN vin, uint insID : SV_InstanceID )
 
 	//float3 posW = mul(float4(vin.posL, 1.0f), gWorld);
 	float3 posW = mul(float4(vin.posL, 1.0f), worldmat);
-	vout.posH = mul(float4(posW, 1.0f), gViewProj);
+	vout.posH = mul(float4(posW, 1.0f), __ViewProjMatrix__);
 	vout.color = debugData.Color;
 	//vout.color = float4(1.0f,1.0f,1.0f,1.0f);
 	return vout;

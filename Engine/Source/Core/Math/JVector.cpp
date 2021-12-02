@@ -5,9 +5,11 @@
 
 namespace JG
 {
+
 	JVector4::JVector4(const Color& c) :
 		x(c.R), y(c.G), z(c.B), w(c.A) {}
-
+	JVector4::JVector4(const JVector3& v, float f) :
+		x(v.x), y(v.y), z(v.z), w(f) {} 
 	JVector2 operator* (float k, const JVector2& v)
 	{
 		return v * k;

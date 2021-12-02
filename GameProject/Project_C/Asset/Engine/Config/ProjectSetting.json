@@ -60,6 +60,28 @@
                         "IsAlt": false
                     }
                 ]
+            },
+            {
+                "Name": "DevTestAction_2",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "N",
+                        "IsShift": false,
+                        "IsCtrl": false,
+                        "IsAlt": false
+                    }
+                ]
+            },
+            {
+                "Name": "DevTestAction_3",
+                "KeyDataList": [
+                    {
+                        "KeyCode": "M",
+                        "IsShift": false,
+                        "IsCtrl": false,
+                        "IsAlt": false
+                    }
+                ]
             }
         ]
     }
