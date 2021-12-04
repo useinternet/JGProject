@@ -12,7 +12,8 @@ namespace JG
 #define TEXTURE_ID_NULL  0
 #define MAIN_GRAPHICS_COMMAND_ID 1
 
-	using TextureID = u64;
+	using TextureID  = u64;
+	using BufferID   = u64;
 	enum class ETextureFormat
 	{
 		None,
@@ -261,14 +262,16 @@ namespace JG
 		GPULoad,
 		CPULoad,
 	};
-	enum class EComputeBufferState
+	enum class EComputerState
 	{
-		Wait,
 		Run,
 		Compelete,
 	};
-	using EComputerState = EComputeBufferState;
-	
+	enum class EReadBackBufferState
+	{
+		Reading,
+		ReadCompelete,
+	};
 	enum class EGeometryType
 	{
 		Box,

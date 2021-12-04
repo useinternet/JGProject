@@ -141,7 +141,7 @@ namespace JG
 	class DirectX12Shader;
 	class IShader;
 	class ITexture;
-
+	class IReadWriteBuffer;
 	class ShaderData
 	{
 	public:
@@ -149,7 +149,7 @@ namespace JG
 	private:
 		UniquePtr<UploadAllocator> mUploadAllocator;
 		Dictionary<String, UploadAllocator::Allocation> mReadDatas;
-		Dictionary<String, UploadAllocator::Allocation> mReadWriteDatas;
+		Dictionary<String, SharedPtr<IReadWriteBuffer>> mReadWriteDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mRWTextureDatas;
 		SharedPtr<IShader>					          mOwnerShader;
@@ -210,7 +210,7 @@ namespace JG
 		bool GetFloat4x4(const String& name, JMatrix* outValue);
 		bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value);
 	public:
-		UploadAllocator::Allocation GetRWData(const String& name);
+		SharedPtr<IReadWriteBuffer> GetRWData(const String& name);
 		DirectX12Shader* GetOwnerShader() const;
 	public:
 		template<class T, EShaderDataType type>

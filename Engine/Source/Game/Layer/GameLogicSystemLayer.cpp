@@ -19,6 +19,7 @@
 
 
 #include "Graphics/DebugGeometryDrawer.h"
+#include "Graphics/Resource.h"
 #define GAME_DLL_NAME "SandBox_Game.dll"
 
 
@@ -68,13 +69,13 @@ namespace JG
 		colors[1] = Color::Green();
 		colors[2] = Color::Blue();
 		colors[3] = Color::White();
-		Scheduler::GetInstance().ScheduleByFrame(10,0,-1, 0, [&]() -> EScheduleResult {
-		
-			Test(); 
+		Scheduler::GetInstance().ScheduleByFrame(10, 0, -1, 0, [&]() -> EScheduleResult {
+
+			Test();
 			i32 index = 0;
 			for (auto& cluster : mClusters)
 			{
-				bool result = index >= (numXSlice * numYSlice * 20) && index < (numXSlice * numYSlice * 21);
+				bool result = true; // index >= (numXSlice * numYSlice * 20) && index < (numXSlice* numYSlice * 21);
 				if (result == true)
 				{
 					JVector3 location = cluster.Center();
@@ -114,12 +115,63 @@ namespace JG
 				++index;
 			}
 
-			
+
 			return EScheduleResult::Continue; });
-		
 
 
 
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_EndFrame, [&]()->EScheduleResult
+		{
+			if (mComputer == nullptr)
+			{
+				auto mainCam = Camera::GetMainCamera();
+				if (mainCam == nullptr)
+				{
+					return EScheduleResult::Continue;
+				}
+				constantData.__Resolution__ = mainCam->GetResolution();
+				constantData.__ProjMatrix__ = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(45), constantData.__Resolution__.x / constantData.__Resolution__.y, 0.1f, 100000);
+				constantData.__InvProjMatrix__ = JMatrix::Inverse(constantData.__ProjMatrix__);
+				constantData.__FarZ__ = 100000;
+				constantData.__NearZ__ = 0.1f;
+				constantData.__EyePosition__ = JVector3(0, 0, 0);// mainCam->GetOwner()->GetTransform()->GetWorldLocation();;
+				auto shaderPath = Application::GetEnginePath();
+				shaderPath = CombinePath(shaderPath, "Shader/Compute/ComputeCluster.shaderscript");
+				String sourceCode;
+				if (File::GetReadAllText(shaderPath, &sourceCode) == true)
+				{
+					auto shader = IShader::Create("ComputeTestShader", sourceCode, EShaderFlags::Allow_ComputeShader);
+					mComputer = IComputer::Create("Test", shader);
+					mComputer->SetFloat4x4("__ProjMatrix__", constantData.__ProjMatrix__);
+					mComputer->SetFloat4x4("__InvProjMatrix__", constantData.__InvProjMatrix__);
+					mComputer->SetFloat3("__EyePosition__", constantData.__EyePosition__);
+
+					mComputer->SetFloat("__FarZ__", constantData.__FarZ__);
+					mComputer->SetFloat("__NearZ__", constantData.__NearZ__);
+					mComputer->SetFloat2("__Resolution__", constantData.__Resolution__);
+					mComputer->Dispatch(1, 1, 1);
+				}
+			}
+			else
+			{
+				if (mComputer->GetState() == EComputerState::Compelete && mReadBackBuffer == nullptr)
+				{
+					auto rwBuffer = mComputer->GetRWBuffer("Test");
+					mReadBackBuffer = IReadBackBuffer::Create("TestReadBack", rwBuffer);
+				}
+				if (mReadBackBuffer && mReadBackBuffer->GetState() == EReadBackBufferState::ReadCompelete)
+				{
+					u64 dataSize = mReadBackBuffer->GetDataSize();
+					dataSize = dataSize / sizeof(JVector3);
+					List<JVector3> _list;
+					_list.resize(1024);
+					mReadBackBuffer->GetData(_list.data(), sizeof(JVector3) * 1024);
+				}
+				
+
+			}
+			return EScheduleResult::Continue;
+		});
 
 
 
@@ -396,11 +448,16 @@ namespace JG
 		auto viewMatrix = JMatrix::LookAtLH(JVector3(0, 0, 0), JVector3(0, 0, 1), JVector3(0, 1, 0));
 		auto projMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(45), resolution.x / resolution.y, 0.1f, 100000);
 		auto invProjMatrix = JMatrix::Inverse(projMatrix);
-		auto farZ = 0.1f;
-		auto nearZ = 100000;
+		auto nearZ = 0.1f;
+		auto farZ = 100000;
 		auto eyePosition = JVector3(0, 0, 0);// mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 
-
+		constantData.__Resolution__ = resolution;
+		constantData.__ProjMatrix__ = projMatrix;
+		constantData.__InvProjMatrix__ = invProjMatrix;
+		constantData.__FarZ__ = farZ;
+		constantData.__NearZ__ = nearZ;
+		constantData.__EyePosition__ = eyePosition;
 		// depth -> [0 ... 1]
 		// z Slice
 		// N * N 의 Tile에서 N개의 깊이만큼 가진다.
@@ -488,19 +545,6 @@ namespace JG
 
 
 		mClusters = clusters;
-
-		auto shaderPath = Application::GetEnginePath();
-		shaderPath = CombinePath(shaderPath, "Shader/Compute/ComputeCluster.shaderscript");
-		String sourceCode;
-		if (File::GetReadAllText(shaderPath, &sourceCode) == true)
-		{
-			auto shader = IShader::Create("ComputeTestShader", sourceCode, EShaderFlags::Allow_ComputeShader);
-			mComputer = IComputer::Create("Test", shader);
-		}
-
-
-
-
 	}
 
 }

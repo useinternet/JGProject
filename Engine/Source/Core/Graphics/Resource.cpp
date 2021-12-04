@@ -30,12 +30,33 @@ namespace JG
 
 		return api->CreateComputer(name, shader);
 	}
-	SharedPtr<IComputeBuffer> IComputeBuffer::Create(const String& name, u64 btSize)
+	SharedPtr<IReadWriteBuffer> IReadWriteBuffer::Create(String name, u64 btSize)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-		return api->CreateComputeBuffer(name, btSize);
+
+		return api->CreateReadWriteBuffer(name, btSize);
 	}
+	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name)
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		return api->CreateReadBackBuffer(name);
+	}
+	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer)
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		return api->CreateReadBackBuffer(name, readWriteBuffer);
+	}
+	//SharedPtr<IComputeBuffer> IComputeBuffer::Create(const String& name, u64 btSize)
+	//{
+	//	auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+	//	JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+	//	return api->CreateComputeBuffer(name, btSize);
+	//}
 	SharedPtr<ITexture> ITexture::Create(const String& name)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
@@ -121,6 +142,10 @@ namespace JG
 		gNullTexture.reset();
 		gNullTexture = nullptr;
 	}
+
+
+
+
 
 
 

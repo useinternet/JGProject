@@ -223,7 +223,7 @@ namespace JG
 				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	void DirectX12Shader::ComputeBind(u64 commandID, SharedPtr<RootSignature> RootSig)

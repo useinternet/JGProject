@@ -2,7 +2,7 @@
 #include <fstream>
 #include "Common/Enum.h"
 #include "Common/Define.h"
-#include "Common/String.h"
+#include "Common/Utility.h"
 #include "Math/JVector.h"
 #include "Math/JQuaternion.h"
 #include "Math/JMatrix.h"

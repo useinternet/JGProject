@@ -48,7 +48,6 @@ namespace JG
 			return mElementCount;
 		}
 	};
-
 	class DirectX12IndexBuffer : public IIndexBuffer
 	{
 		friend class DirectX12Mesh;
@@ -80,43 +79,68 @@ namespace JG
 			return mIndexCount;
 		}
 	};
-	class DirectX12ComputeBuffer : public IComputeBuffer
+
+	// ReadWriteBuffer
+	// ReadBackBuffer
+	class DirectX12ReadWriteBuffer : public IReadWriteBuffer
 	{
-		ComPtr<ID3D12Resource> mD3DResource;
-		EComputeBufferState mState = EComputeBufferState::Wait;
-		void* mCPU      = nullptr;
-		u64   mBufferSize = 0;
+		u64 mDataSize  = 0;
+		ComPtr<ID3D12Resource>  mD3DResource;
 	public:
-		virtual ~DirectX12ComputeBuffer();
-	public:
-		virtual void SetData(u64 btSize) override;
-		virtual bool GetData(void** out_data) override;
-		virtual u64  GetDataSize() const override;
+		virtual ~DirectX12ReadWriteBuffer();
+
 	public:
 		virtual bool IsValid() const override;
-		virtual EComputeBufferState GetState() const override;
+		virtual bool SetData(u64 btSize) override;
+		virtual u64  GetDataSize() const override;
+		virtual BufferID GetBufferID() const override;
 	public:
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
-	protected:
-		void Reset();
 	private:
-		friend class DirectX12Computer;
-		void ReserveCompletion();
+		void Reset();
 	};
+
+	class DirectX12ReadBackBuffer : public IReadBackBuffer
+	{
+		ComPtr<ID3D12Resource>  mD3DResource;
+		EReadBackBufferState    mState = EReadBackBufferState::ReadCompelete;
+		void* mCPU        = nullptr;
+		u64   mBufferSize = 0;
+	public:
+		virtual ~DirectX12ReadBackBuffer();
+	public:
+		virtual bool IsValid() const override;
+		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer) override;
+		virtual bool GetData(void* out_data, u64 out_data_size) override;
+		virtual u64 GetDataSize() const override;
+		virtual EReadBackBufferState GetState() const override;
+	public:
+		ID3D12Resource* Get() const {
+			return mD3DResource.Get();
+		}
+	private:
+		void Reset();
+	};
+
+
 	class DirectX12Computer : public IComputer
 	{
+		class BufferData : public IJGObject
+		{
+			JGCLASS
+		public:
+			String BufferName;
+			BufferData(const String& name) : BufferName(name) {}
+		};
 	private:
 		String         mName;
-		EComputerState mState = EComputerState::Wait;
+		EComputerState mState = EComputerState::Compelete;
 
 		UniquePtr<ShaderData>     mShaderData;
 		SharedPtr<ScheduleHandle> mScheduleHandle;
-
-		Dictionary<String, SharedPtr<IComputeBuffer>> mComputeBuffers;
 	public:
-		virtual bool SetComputeBuffer(SharedPtr<IComputeBuffer> computeBuffer) override;
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
 		virtual bool SetFloat3(const String& name, const JVector3& value) override;
@@ -161,6 +185,7 @@ namespace JG
 		virtual bool GetUint4(const String& name, JVector4Uint* value) override;
 		virtual bool GetFloat4x4(const String& name, JMatrix* out_value) override;
 		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) override;
+		virtual SharedPtr<IReadWriteBuffer> GetRWBuffer(const String& name) override;
 	public:
 		void Init(SharedPtr<IShader> shader);
 		virtual const String& GetName() const override;

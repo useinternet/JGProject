@@ -4,7 +4,6 @@
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 #include "Platform/Graphics/DirectX12/DirectX12Shader.h"
 #include "Platform/Graphics/DirectX12/DirectX12Resource.h"
-
 namespace JG
 {
 	bool ShaderDataForm::Set(String& code)
@@ -1107,7 +1106,7 @@ namespace JG
 	{
 
 		mOwnerShader = shader;
-		mUploadAllocator = CreateUniquePtr<UploadAllocator>();
+		mUploadAllocator   = CreateUniquePtr<UploadAllocator>();
 		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 		if (dx12Shader != nullptr)
 		{
@@ -1127,8 +1126,7 @@ namespace JG
 			}
 			for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
 			{
-				auto alloc = mUploadAllocator->Allocate(_pair.second->ElementDataSize * MaxElementCount, _pair.second->ElementDataSize);
-				mReadWriteDatas[_pair.first] = alloc;
+				mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, _pair.second->ElementDataSize * MaxElementCount);
 			}
 
 			for (auto& _pair : shaderDataForm->TextureDataMap)
@@ -1184,7 +1182,8 @@ namespace JG
 				{
 					auto structuredBufferName = _pair.first;
 					auto structuredBufferData = _pair.second.get();
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]);
+					auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
+					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
 				}
 				for (auto& _pair : shaderDataForm->TextureDataMap)
 				{
@@ -1257,7 +1256,8 @@ namespace JG
 				{
 					auto structuredBufferName = _pair.first;
 					auto structuredBufferData = _pair.second.get();
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]);
+					auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
+					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
 				}
 				for (auto& _pair : shaderDataForm->TextureDataMap)
 				{
@@ -1578,13 +1578,13 @@ namespace JG
 		*out_value = textureList[textureSlot];
 		return true;
 	}
-	UploadAllocator::Allocation ShaderData::GetRWData(const String& name)
+	SharedPtr<IReadWriteBuffer> ShaderData::GetRWData(const String& name)
 	{
 		if (mReadWriteDatas.find(name) != mReadWriteDatas.end())
 		{
 			return mReadWriteDatas[name];
 		}
-		return UploadAllocator::Allocation();
+		return nullptr;
 	}
 	DirectX12Shader* ShaderData::GetOwnerShader() const
 	{

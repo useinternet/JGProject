@@ -15,10 +15,12 @@ struct D3D12_CPU_DESCRIPTOR_HANDLE;
 namespace JG
 {
 	class ITexture;
-	class  IFrameBuffer;
+	class IReadWriteBuffer;
+	class IReadBackBuffer;
+	class IFrameBuffer;
 	class RootSignature;
-	class  CommandQueue;
-	class  DescriptorAllocation;
+	class CommandQueue;
+	class DescriptorAllocation;
 	class GraphicsCommandList;
 	class ComputeCommandList;
 	class CopyCommandList;
@@ -52,6 +54,9 @@ namespace JG
 		static SharedPtr<GraphicsPipelineState> GetGraphicsPipelineState(u64 ID);
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState(u64 ID);
 		static SharedPtr<RootSignature>			GetRootSignature(u64 ID);
+
+
+
 
 		static void GetDepthStencilDesc(EDepthStencilStateTemplate _template,  D3D12_DEPTH_STENCIL_DESC* out);
 		static void GetBlendDesc(EBlendStateTemplate _template,  D3D12_RENDER_TARGET_BLEND_DESC* out);
@@ -90,7 +95,9 @@ namespace JG
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& info) override;
 		virtual SharedPtr<IVertexBuffer>  CreateVertexBuffer(const String& name, EBufferLoadMethod method) override;
 		virtual SharedPtr<IIndexBuffer>   CreateIndexBuffer(const String& name, EBufferLoadMethod method) override;
-		virtual SharedPtr<IComputeBuffer> CreateComputeBuffer(const String& name, u64 btSize) override;
+		virtual SharedPtr<IReadWriteBuffer> CreateReadWriteBuffer(const String& name, u64 btSize) override;
+		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
+		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) override;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) override;
 		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;

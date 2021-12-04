@@ -308,7 +308,7 @@ namespace JG
 				return false;
 				assert("failed Create Compute PSO");
 			}
-			gComputePSOCache[hash].Attach(mD3DPSO.Get());
+			gComputePSOCache[hash] = mD3DPSO.Get();
 		}
 		else
 		{

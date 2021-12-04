@@ -239,25 +239,87 @@ namespace JG
 	}
 
 
-	DirectX12ComputeBuffer::~DirectX12ComputeBuffer()
+
+	DirectX12ReadWriteBuffer::~DirectX12ReadWriteBuffer()
 	{
 		Reset();
 	}
-
-	void DirectX12ComputeBuffer::SetData(u64 btSize)
+	bool DirectX12ReadWriteBuffer::IsValid() const
 	{
-		if (mD3DResource != nullptr && mBufferSize != btSize)
+		return mD3DResource != nullptr;
+	}
+	bool DirectX12ReadWriteBuffer::SetData(u64 btSize)
+	{
+		u64 originBtSize = mDataSize;
+		mDataSize = btSize;
+
+		if (mD3DResource != nullptr && originBtSize != btSize)
 		{
 			Reset();
 		}
 
-		mBufferSize = btSize;
+		mD3DResource = DirectX12API::CreateCommittedResource(
+			GetName(),
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr);
+
+		return mD3DResource != nullptr;
+	}
+	u64 DirectX12ReadWriteBuffer::GetDataSize() const
+	{
+		return mDataSize;
+	}
+	BufferID DirectX12ReadWriteBuffer::GetBufferID() const
+	{
+		if (IsValid() == true)
+		{
+			return mD3DResource->GetGPUVirtualAddress();
+		}
+		return 0;
+	}
+
+	void DirectX12ReadWriteBuffer::Reset()
+	{
+		if (mD3DResource == nullptr)
+		{
+			return;
+		}
+		DirectX12API::DestroyCommittedResource(mD3DResource);
+		mD3DResource.Reset(); mD3DResource = nullptr;
+	}
+
+	DirectX12ReadBackBuffer::~DirectX12ReadBackBuffer()
+	{
+		Reset();
+	}
+
+	bool DirectX12ReadBackBuffer::IsValid() const
+	{
+		return mD3DResource != nullptr;
+	}
+
+	bool DirectX12ReadBackBuffer::Read(SharedPtr<IReadWriteBuffer> readWriteBuffer)
+	{
+		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false || mState == EReadBackBufferState::Reading)
+		{
+			return false;
+		}
+		auto originBtSize = mBufferSize;
+		mBufferSize = readWriteBuffer->GetDataSize();
+		if (originBtSize != mBufferSize)
+		{
+			Reset();
+		}
+
 		if (mD3DResource == nullptr)
 		{
 			mD3DResource = DirectX12API::CreateCommittedResource(GetName(),
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
+				&CD3DX12_RESOURCE_DESC::Buffer(mBufferSize),
 				D3D12_RESOURCE_STATE_COPY_DEST,
 				nullptr
 			);
@@ -266,88 +328,55 @@ namespace JG
 				mD3DResource->Map(0, nullptr, &mCPU);
 			}
 		}
+
+		auto dxRWBuffer = static_cast<DirectX12ReadWriteBuffer*>(readWriteBuffer.get());
+		auto commandList = DirectX12API::GetComputeCommandList(MAIN_GRAPHICS_COMMAND_ID);
+		commandList->CopyResource(Get(), dxRWBuffer->Get());
+
+		mState = EReadBackBufferState::Reading;
+
+		Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount() + 1, 0, [&]()->EScheduleResult
+		{
+			mState = EReadBackBufferState::ReadCompelete;
+			return EScheduleResult::Break;
+		});
+
+		return IsValid();
 	}
 
-	bool DirectX12ComputeBuffer::GetData(void** out_data)
+	bool DirectX12ReadBackBuffer::GetData(void* out_data,u64 out_data_size)
 	{
-		if (mState != EComputeBufferState::Compelete || mD3DResource == nullptr || mCPU == nullptr)
+		if (IsValid() == false || mState == EReadBackBufferState::Reading)
 		{
 			return false;
 		}
-		memcpy(*out_data, mCPU, mBufferSize);
+		out_data_size = Math::Min(out_data_size, mBufferSize);
+		memcpy(out_data, mCPU, out_data_size);
 		return true;
 	}
 
-	u64 DirectX12ComputeBuffer::GetDataSize() const
+	u64 DirectX12ReadBackBuffer::GetDataSize() const
 	{
 		return mBufferSize;
 	}
 
-	bool DirectX12ComputeBuffer::IsValid() const
-	{
-		return mD3DResource != nullptr;
-	}
-
-	EComputeBufferState DirectX12ComputeBuffer::GetState() const
+	EReadBackBufferState DirectX12ReadBackBuffer::GetState() const
 	{
 		return mState;
 	}
-	void DirectX12ComputeBuffer::Reset()
+
+	void DirectX12ReadBackBuffer::Reset()
 	{
 		if (mD3DResource)
 		{
 			mD3DResource->Unmap(0, nullptr);
 			mCPU = nullptr;
 			mBufferSize = 0;
-			mState = EComputeBufferState::Wait;
+			mState = EReadBackBufferState::ReadCompelete;
 			DirectX12API::DestroyCommittedResource(mD3DResource);
 			mD3DResource.Reset();
 			mD3DResource = nullptr;
 		}
-	}
-	void DirectX12ComputeBuffer::ReserveCompletion()
-	{
-		if (mState != EComputeBufferState::Run)
-		{
-			return;
-		}
-
-		Scheduler::GetInstance().ScheduleByFrame(
-			DirectX12API::GetFrameBufferCount() + 1, 0, 1, 0,
-			[&]() -> EScheduleResult
-		{
-			mState = EComputeBufferState::Compelete;
-			return EScheduleResult::Break;
-		});
-	}
-	bool DirectX12Computer::SetComputeBuffer(SharedPtr<IComputeBuffer> computeBuffer)
-	{
-		if (mState != EComputerState::Compelete)
-		{
-			return false;
-		}
-		if (mComputeBuffers.find(computeBuffer->GetName()) != mComputeBuffers.end())
-		{
-			return false;
-		}
-	
-		auto alloc = mShaderData->GetRWData(computeBuffer->GetName());
-
-		if (alloc.CPU == nullptr || alloc.OwnerPage == nullptr)
-		{
-			return false;
-		}
-
-		DirectX12ComputeBuffer* dx12Buffer = static_cast<DirectX12ComputeBuffer*>(computeBuffer.get());
-
-		auto srcResource = alloc.OwnerPage->Get();
-		auto srcOffset = alloc.GPU - srcResource->GetGPUVirtualAddress();
-
-		auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
-		dx12Buffer->mState = EComputeBufferState::Run;
-		commandList->CopyBufferRegion(dx12Buffer->Get(), 0, srcResource, srcOffset, computeBuffer->GetDataSize());
-		dx12Buffer->ReserveCompletion();
-		return true;
 	}
 	bool DirectX12Computer::SetFloat(const String& name, float value)
 	{
@@ -545,6 +574,11 @@ namespace JG
 	bool DirectX12Computer::GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value)
 	{
 		return mShaderData->GetTexture(name, textureSlot, out_value);
+	}
+
+	SharedPtr<IReadWriteBuffer> DirectX12Computer::GetRWBuffer(const String& name)
+	{
+		return mShaderData->GetRWData(name);
 	}
 
 	void DirectX12Computer::Init(SharedPtr<IShader> shader)
@@ -904,6 +938,9 @@ namespace JG
 		return nullptr;
 	}
 	
+
+
+
 
 
 

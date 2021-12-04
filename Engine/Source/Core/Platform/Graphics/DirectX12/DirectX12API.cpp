@@ -304,18 +304,15 @@ namespace JG
 	void DirectX12API::Destroy()
 	{
 		Flush();
-		gGraphicsPSOs.clear();
-		gComputePSOs.clear(); 
-		gRootSignatures.clear(); 
 
+		gGraphicsPSOs.clear();
+		gComputePSOs.clear();
+		gRootSignatures.clear();
 		for (auto& _pair : gFrameBuffers)
 		{
 			_pair.second->Reset();
 		}
 		gFrameBuffers.clear();
-		PipelineState::ClearCache();
-		RootSignature::ClearCache();
-		ResourceStateTracker::ClearCache();
 
 		gCSUAllocator.reset();
 		gRTVAllocator.reset();
@@ -325,6 +322,10 @@ namespace JG
 		gComputeCommandQueue.reset();
 		gCopyCommandQueue.reset();
 
+
+		PipelineState::ClearCache();
+		RootSignature::ClearCache();
+		ResourceStateTracker::ClearCache();
 
 		gDevice.Reset();
 		gFactory.Reset();
@@ -534,13 +535,35 @@ namespace JG
 		iBuffer->SetBufferLoadMethod(method);
 		return iBuffer;
 	}
-	SharedPtr<IComputeBuffer> DirectX12API::CreateComputeBuffer(const String& name, u64 btSize)
+	SharedPtr<IReadWriteBuffer> DirectX12API::CreateReadWriteBuffer(const String& name, u64 btSize)
 	{
-		auto computeBuffer = CreateSharedPtr<DirectX12ComputeBuffer>();
-		computeBuffer->SetName(name);
-		computeBuffer->SetData(btSize);
-		return computeBuffer;
+		auto rwBuffer = CreateSharedPtr<DirectX12ReadWriteBuffer>();
+		rwBuffer->SetName(name);
+		rwBuffer->SetData(btSize);
+
+		return rwBuffer;
 	}
+	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name)
+	{
+		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
+		rbBuffer->SetName(name);
+	
+		return rbBuffer;
+	}
+	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer)
+	{
+		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
+		rbBuffer->SetName(name);
+		rbBuffer->Read(readWriteBuffer);
+		return rbBuffer;
+	}
+	//SharedPtr<IComputeBuffer> DirectX12API::CreateComputeBuffer(const String& name, u64 btSize)
+	//{
+	//	auto computeBuffer = CreateSharedPtr<DirectX12ComputeBuffer>();
+	//	computeBuffer->SetName(name);
+	//	computeBuffer->SetData(btSize);
+	//	return computeBuffer;
+	//}
 	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IShader> shader)
 	{
 		if (shader == nullptr)

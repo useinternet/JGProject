@@ -20,7 +20,10 @@ namespace JG
 		mDynamicDescriptorAllocator = CreateUniquePtr<DynamicDescriptorAllocator>();
 	}
 
-	CommandList::~CommandList() = default;
+	CommandList::~CommandList()
+	{
+		Reset();
+	}
 
 
 	void CommandList::BackupResource(ID3D12Object* d3dObj)
@@ -360,34 +363,48 @@ namespace JG
 	}
 	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
 	{
+		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
+	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
 		if (initType == RootSignature::__ConstantBufferView__)
 		{
-			mD3DCommandList->SetGraphicsRootConstantBufferView(rootParam, alloc.GPU);
-			BackupResource(alloc.OwnerPage->Get());
+			mD3DCommandList->SetGraphicsRootConstantBufferView(rootParam, gpu);
 		}
 		else
 		{
 			JGASSERT("BindConstantBuffer not support ShaderResourceView / UnorderedAccessView / Constant / DescriptorTable");
 		}
+		if (backUpResource != nullptr)
+		{
+			BackupResource(backUpResource);
+		}
 	}
 
 	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
+	{
+		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
 	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
 		switch (initType)
 		{
 		case RootSignature::__ShaderResourceView__:
-			mD3DCommandList->SetGraphicsRootShaderResourceView(rootParam, alloc.GPU);
+			mD3DCommandList->SetGraphicsRootShaderResourceView(rootParam, gpu);
 			break;
 		case RootSignature::__UnorderedAccessView__:
-			mD3DCommandList->SetGraphicsRootUnorderedAccessView(rootParam, alloc.GPU);
+			mD3DCommandList->SetGraphicsRootUnorderedAccessView(rootParam, gpu);
 			break;
 		default:
 			assert("BindStructuredBuffer not support ConstantBufferView / Constant / DescriptorTable");
 			break;
 		}
-		BackupResource(alloc.OwnerPage->Get());
+		if (backUpResource != nullptr)
+		{
+			BackupResource(backUpResource);
+		}
 	}
 	void GraphicsCommandList::BindConstants(u32 rootParam, u32 btSize, void* data, u32 offset)
 	{
@@ -488,33 +505,48 @@ namespace JG
 	}
 	void ComputeCommandList::BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
 	{
+		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void ComputeCommandList::BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
+	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
 		if (initType == RootSignature::__ConstantBufferView__)
 		{
-			mD3DCommandList->SetComputeRootConstantBufferView(rootParam, alloc.GPU);
-			BackupResource(alloc.OwnerPage->Get());
+			mD3DCommandList->SetComputeRootConstantBufferView(rootParam, gpu);
 		}
 		else
 		{
 			JGASSERT("BindConstantBuffer not support ShaderResourceView / UnorderedAccessView / Constant / DescriptorTable");
 		}
+
+		if (backUpResource != nullptr)
+		{
+			BackupResource(backUpResource);
+		}
 	}
 	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
+	{
+		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
 	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
 		switch (initType)
 		{
 		case RootSignature::__ShaderResourceView__:
-			mD3DCommandList->SetComputeRootShaderResourceView(rootParam, alloc.GPU);
+			mD3DCommandList->SetComputeRootShaderResourceView(rootParam, gpu);
 			break;
 		case RootSignature::__UnorderedAccessView__:
-			mD3DCommandList->SetComputeRootUnorderedAccessView(rootParam, alloc.GPU);
+			mD3DCommandList->SetComputeRootUnorderedAccessView(rootParam, gpu);
 			break;
 		default:
 			assert("BindStructuredBuffer not support ConstantBufferView / Constant / DescriptorTable");
 			break;
 		}
-		BackupResource(alloc.OwnerPage->Get());
+		if (backUpResource != nullptr)
+		{
+			BackupResource(backUpResource);
+		}
 	}
 	void ComputeCommandList::BindConstants(u32 rootparam, u32 btSize, void* data, u32 offset)
 	{

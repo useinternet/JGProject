@@ -61,22 +61,36 @@ namespace JG
 		static SharedPtr<IIndexBuffer> Create(String name, EBufferLoadMethod method);
 	};
 
-
-	class IComputeBuffer : public IBuffer
+	class IReadWriteBuffer : public IBuffer
 	{
 	public:
-		virtual void SetData(u64 btSize) = 0;
-		virtual bool GetData(void** out_data) = 0;
-		virtual u64  GetDataSize() const = 0;
-		virtual EComputeBufferState GetState() const = 0;
+		virtual ~IReadWriteBuffer() = default;
+	protected:
+		virtual bool SetData(u64 btSize)   = 0;
 	public:
-		static SharedPtr<IComputeBuffer> Create(const String& name, u64 btSize);
+		virtual u64  GetDataSize() const = 0;
+		virtual BufferID GetBufferID()   const = 0;
+	public:
+		static SharedPtr<IReadWriteBuffer> Create(String name, u64 btSize);
 	};
 
+
+	class IReadBackBuffer : public IBuffer
+	{
+	public:
+		virtual ~IReadBackBuffer() = default;
+	public:
+		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
+		virtual bool GetData(void* out_data, u64 out_data_size) = 0;
+		virtual u64  GetDataSize() const = 0;
+		virtual EReadBackBufferState GetState() const = 0;
+	public:
+		static SharedPtr<IReadBackBuffer> Create(const String& name);
+		static SharedPtr<IReadBackBuffer> Create(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer);
+	};
 	class IComputer 
 	{
 	public:
-		virtual bool SetComputeBuffer(SharedPtr<IComputeBuffer> computeBuffer) = 0;
 		virtual bool SetFloat(const String& name, float value) = 0;
 		virtual bool SetFloat2(const String& name, const JVector2& value) = 0;
 		virtual bool SetFloat3(const String& name, const JVector3& value) = 0;
@@ -121,8 +135,9 @@ namespace JG
 		virtual bool GetUint4(const String& name, JVector4Uint* value) = 0;
 		virtual bool GetFloat4x4(const String& name, JMatrix* out_value) = 0;
 		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) = 0;
+		virtual SharedPtr<IReadWriteBuffer> GetRWBuffer(const String& name) = 0;
 	public:
-		virtual const String& GetName() const = 0;
+		virtual const String& GetName() const    = 0;
 		virtual void SetName(const String& name) = 0;
 		virtual EComputerState GetState() const = 0;
 		virtual bool Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
