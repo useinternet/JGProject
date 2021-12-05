@@ -13,9 +13,9 @@ namespace JG
 
 		return api->CreateShader(name, sourceCode, flags, scriptList);
 	}
-	SharedPtr<IShaderScript> IShaderScript::CreateMaterialScript(const String& name, const String& code)
+	SharedPtr<IShaderScript> IShaderScript::CreateShaderScript(const String& name, const String& code)
 	{
-		auto script = CreateSharedPtr<MaterialScript>(name, code);
+		auto script = CreateSharedPtr<ShaderScript>(name, code);
 		return script;
 	}
 	void ShaderLibrary::RegisterShader(SharedPtr<IShader> shader)
@@ -107,7 +107,7 @@ namespace JG
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
 	{
 		auto globalLibPath = path;
-		globalLibPath = CombinePath(globalLibPath, "GlobalShaderLibrary.shaderLib");
+		globalLibPath = PathExtend::CombinePath(globalLibPath, "GlobalShaderLibrary.shaderLib");
 		auto p = fs::path(globalLibPath);
 		std::ifstream fin(p.string());
 
@@ -125,7 +125,6 @@ namespace JG
 			return false;
 		}
 	}
-
 	String ShaderLibrary::GetGlobalShaderLibCode() const
 	{
 		return mGlobalShaderLibCode;

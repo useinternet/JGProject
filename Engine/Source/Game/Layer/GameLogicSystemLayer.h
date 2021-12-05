@@ -36,27 +36,6 @@ namespace JG
 
 
 		UniquePtr<Plugin> mGamePlugin;
-
-
-
-
-		// 21 * 9 * 32
-		SharedPtr<IReadBackBuffer> mReadBackBuffer;
-		SharedPtr<IComputer> mComputer;
-		List<JBBox> mClusters;
-		i32 numXSlice = 8;
-		i32 numYSlice = 1;
-		i32 numZSlice = 32;
-		struct TestConstantData
-		{
-			JMatrix __ProjMatrix__;
-			JMatrix __InvProjMatrix__;
-			JVector3   __EyePosition__;
-			f32    __FarZ__;
-			JVector2   __Resolution__;
-			f32    __NearZ__;
-		};
-		TestConstantData constantData;
 	public:
 		virtual ~GameLogicSystemLayer() {}
 	public:
@@ -78,6 +57,5 @@ namespace JG
 	private:
 		void RegisterGlobalGameSystem();
 		void RegisterGameObjectType();
-		void Test();
 	};
 }

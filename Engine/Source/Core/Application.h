@@ -25,6 +25,7 @@ namespace JG
 		static const String& GetMeshPath();
 		static const String& GetShaderGlobalLibPath();
 		static const String& GetShaderScriptPath();
+		static const String& GetComputeShaderScriptPath();
 		static const String& GetShaderTemplatePath();
 		static const String& GetConfigPath();
 	private:

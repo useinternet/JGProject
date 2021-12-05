@@ -203,7 +203,7 @@ namespace JG
 
 		RootParamMap[cBuffer->RootParm] = cBuffer;
 
-		if (cBuffer->Name == ShaderScript::Token::PassData)
+		if (cBuffer->Name == ShaderDefine::Token::PassData)
 		{
 			auto cbName = cBuffer->Name;
 			PassData = std::move(CBufferDataMap[cbName]);
@@ -238,7 +238,7 @@ namespace JG
 
 
 			String typeCode = dataCode.substr(dataTypeStartPos, dataTypeEndPos - dataTypeStartPos);
-			typeCode = ReplaceAll(typeCode, " ", "");
+			typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
 
 		
 			String typeName;
@@ -257,7 +257,7 @@ namespace JG
 
 
 			String nameCode = dataCode.substr(dataTypeEndPos + 1, dataCode.length() - dataTypeEndPos - 1);
-			nameCode = ReplaceAll(nameCode, " ", "");
+			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
 
 			if (RegisterStructuredBuffer(nameCode) == false)
 			{
@@ -308,8 +308,8 @@ namespace JG
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
 
 
-			String nameCode = ReplaceAll(dataCode, HLSL::Token::Texture2D, "");
-			nameCode = ReplaceAll(nameCode, " ", "");
+			String nameCode = StringExtend::ReplaceAll(dataCode, HLSL::Token::Texture2D, "");
+			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
 
 			u64 arraySize = 1;
 
@@ -326,7 +326,7 @@ namespace JG
 
 
 				String arraySizeCode = dataCode.substr(arrayStartPos, arrayEndPos - arrayStartPos);
-				arraySizeCode = ReplaceAll(arraySizeCode, " ", "");
+				arraySizeCode = StringExtend::ReplaceAll(arraySizeCode, " ", "");
 
 				arraySize = atol(arraySizeCode.c_str());
 			}
@@ -375,10 +375,10 @@ namespace JG
 			u64 samplerDataStartPos = dataCode.find("{");
 
 			String nameCode = dataCode.substr(0, samplerDataStartPos);
-			nameCode = ReplaceAll(nameCode, HLSL::Token::SamplerState, "");
-			nameCode = ReplaceAll(nameCode, " ", "");
-			nameCode = ReplaceAll(nameCode, "\n", "");
-			nameCode = ReplaceAll(nameCode, "\t", "");
+			nameCode = StringExtend::ReplaceAll(nameCode, HLSL::Token::SamplerState, "");
+			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+			nameCode = StringExtend::ReplaceAll(nameCode, "\n", "");
+			nameCode = StringExtend::ReplaceAll(nameCode, "\t", "");
 
 			if (samplerDataStartPos != String::npos)
 			{
@@ -425,7 +425,7 @@ namespace JG
 
 				u64 replaceStartPos = code.find("{", dataTokenStartPos);
 				u64 replaceEndPos = code.find(";", replaceStartPos) + 1;
-				code = ReplaceAll(code, code.substr(replaceStartPos, replaceEndPos - replaceStartPos), "");
+				code = StringExtend::ReplaceAll(code, code.substr(replaceStartPos, replaceEndPos - replaceStartPos), "");
 
 
 				u64 insertStartPos = code.find(nameCode, dataTokenStartPos) + nameCode.length();
@@ -468,7 +468,7 @@ namespace JG
 
 
 			String typeCode = dataCode.substr(dataTypeStartPos, dataTypeEndPos - dataTypeStartPos);
-			typeCode = ReplaceAll(typeCode, " ", "");
+			typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
 
 			String typeName;
 			u64 typeSize = 0;
@@ -482,7 +482,7 @@ namespace JG
 			}
 
 			String nameCode = dataCode.substr(dataTypeEndPos + 1, dataCode.length() - dataTypeEndPos - 1);
-			nameCode = ReplaceAll(nameCode, " ", "");
+			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
 
 			if (RegisterRWStructuredBuffer(nameCode) == false)
 			{
@@ -524,8 +524,8 @@ namespace JG
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
 
 
-			String nameCode = ReplaceAll(dataCode, HLSL::Token::RWTexture2D, "");
-			nameCode = ReplaceAll(nameCode, " ", "");
+			String nameCode = StringExtend::ReplaceAll(dataCode, HLSL::Token::RWTexture2D, "");
+			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
 
 			u64 arraySize = 1;
 
@@ -542,7 +542,7 @@ namespace JG
 
 
 				String arraySizeCode = dataCode.substr(arrayStartPos, arrayEndPos - arrayStartPos);
-				arraySizeCode = ReplaceAll(arraySizeCode, " ", "");
+				arraySizeCode = StringExtend::ReplaceAll(arraySizeCode, " ", "");
 
 				arraySize = atol(arraySizeCode.c_str());
 			}
@@ -618,9 +618,9 @@ namespace JG
 		u64 startPos = pos + strlen(HLSL::Token::Struct);
 		u64 endPos = code.find_first_of("{", startPos);
 		String structName = code.substr(startPos, endPos - startPos);
-		structName = ReplaceAll(structName, "\n", "");
-		structName = ReplaceAll(structName, "\t", "");
-		structName = ReplaceAll(structName, " ", "");
+		structName = StringExtend::ReplaceAll(structName, "\n", "");
+		structName = StringExtend::ReplaceAll(structName, "\t", "");
+		structName = StringExtend::ReplaceAll(structName, " ", "");
 
 		if (out_value != nullptr)
 		{
@@ -632,9 +632,9 @@ namespace JG
 		u64 startPos = pos + strlen(HLSL::Token::CBuffer);
 		u64 endPos = code.find_first_of("{", startPos);
 		String cbName = code.substr(startPos, endPos - startPos);
-		cbName = ReplaceAll(cbName, "\n", "");
-		cbName = ReplaceAll(cbName, "\t", "");
-		cbName = ReplaceAll(cbName, " ", "");
+		cbName = StringExtend::ReplaceAll(cbName, "\n", "");
+		cbName = StringExtend::ReplaceAll(cbName, "\t", "");
+		cbName = StringExtend::ReplaceAll(cbName, " ", "");
 
 		if (out_value != nullptr)
 		{
@@ -651,8 +651,8 @@ namespace JG
 			if (endPos != String::npos)
 			{
 				String varCode = code.substr(startPos, endPos - startPos + 1);
-				varCode = ReplaceAll(varCode, "\n", "");
-				varCode = ReplaceAll(varCode, "\t", "");
+				varCode = StringExtend::ReplaceAll(varCode, "\n", "");
+				varCode = StringExtend::ReplaceAll(varCode, "\t", "");
 
 				if (out_value)
 				{
@@ -679,8 +679,8 @@ namespace JG
 		u64 result = endPos + 1;
 
 		String dataCode = samplerStateDataCode.substr(startPos, endPos - startPos);
-		dataCode = ReplaceAll(dataCode, "\t", "");
-		dataCode = ReplaceAll(dataCode, "\n", "");
+		dataCode = StringExtend::ReplaceAll(dataCode, "\t", "");
+		dataCode = StringExtend::ReplaceAll(dataCode, "\n", "");
 
 
 		startPos = 0;
@@ -690,13 +690,13 @@ namespace JG
 		if (out_key != nullptr)
 		{
 			*out_key = dataCode.substr(startPos, midPos - startPos);
-			*out_key = ReplaceAll(*out_key, " ", "");
+			*out_key = StringExtend::ReplaceAll(*out_key, " ", "");
 		}
 
 		if (out_value != nullptr)
 		{
 			*out_value = dataCode.substr(midPos + 1, endPos - midPos - 1);
-			*out_value = ReplaceAll(*out_value, " ", "");
+			*out_value = StringExtend::ReplaceAll(*out_value, " ", "");
 		}
 
 
@@ -971,10 +971,10 @@ namespace JG
 
 
 		String typeCode = varCode.substr(varStartPos, varMidPos - varStartPos);
-		typeCode = ReplaceAll(typeCode, " ", "");
+		typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
 		String nameCode = varCode.substr(varMidPos + 1, varEndPos - varMidPos);
-		nameCode = ReplaceAll(nameCode, " ", "");
-		nameCode = ReplaceAll(nameCode, ";", "");
+		nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+		nameCode = StringExtend::ReplaceAll(nameCode, ";", "");
 
 		u64 varSize = 0;
 		if (FindTypeInfo(typeCode, nullptr, &varSize) == false)
@@ -1060,10 +1060,10 @@ namespace JG
 
 
 		String typeCode = varCode.substr(varStartPos, varMidPos - varStartPos);
-		typeCode = ReplaceAll(typeCode, " ", "");
+		typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
 		String nameCode = varCode.substr(varMidPos + 1, varEndPos - varMidPos);
-		nameCode = ReplaceAll(nameCode, " ", "");
-		nameCode = ReplaceAll(nameCode, ";", "");
+		nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+		nameCode = StringExtend::ReplaceAll(nameCode, ";", "");
 
 
 

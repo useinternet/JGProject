@@ -146,7 +146,7 @@ namespace JG
 			{
 				continue;
 			}
-			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
 			EShaderFlags shaderFlags = EShaderFlags::None;
 
 			std::ifstream fin(p.string());
@@ -182,9 +182,10 @@ namespace JG
 					{
 						shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
 					}
+					auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
+					ShaderLibrary::GetInstance().RegisterShader(shader);
 				}
-				auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
-				ShaderLibrary::GetInstance().RegisterShader(shader);
+
 				fin.close();
 			}
 		}
@@ -197,7 +198,7 @@ namespace JG
 			{
 				continue;
 			}
-			auto fileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
 			std::ifstream fin(p.string());
 
 			if (fin.is_open() == true)
@@ -206,9 +207,9 @@ namespace JG
 				ss << fin.rdbuf();
 				String scriptCode = ss.str();
 				SharedPtr<IShaderScript> script;
-				if (scriptCode.find(ShaderScript::Type::Surface) != String::npos)
+				if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
 				{
-					script = IShaderScript::CreateMaterialScript("Surface/" + fileName, scriptCode);
+					script = IShaderScript::CreateShaderScript("Surface/" + fileName, scriptCode);
 				}
 
 
@@ -216,6 +217,40 @@ namespace JG
 				fin.close();
 			}
 
+		}
+
+
+		// Load ComputeShader
+		auto computeShaderPath = Application::GetComputeShaderScriptPath();
+		for (auto& iter : fs::recursive_directory_iterator(computeShaderPath))
+		{
+			auto p = iter.path();
+
+			if (p.extension() != ".computeshader")
+			{
+				continue;
+			}
+			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
+			EShaderFlags shaderFlags = EShaderFlags::None;
+
+
+			std::ifstream fin(p.string());
+	
+			if (fin.is_open() == true)
+			{
+				std::stringstream ss;
+
+				ss << fin.rdbuf();
+				String sourceCode = ss.str();
+				if (sourceCode.find(HLSL::CSEntry) != String::npos)
+				{
+					shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
+					auto computeShader = IShader::Create(fileName, sourceCode, shaderFlags);
+
+					ShaderLibrary::GetInstance().RegisterShader(computeShader);
+				}
+				fin.close();
+			}
 		}
 	}
 }

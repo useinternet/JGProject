@@ -30,7 +30,7 @@ namespace JG
 			bool _bool = false;
 			for (auto& type : mFilteredTypeList)
 			{
-				auto name = ReplaceAll(type, "JG::", "");
+				auto name = StringExtend::ReplaceAll(type, "JG::", "");
 				if (ImGui::Selectable(name.c_str(), &_bool))
 				{
 					mSelectedComponentType = type;
@@ -69,7 +69,7 @@ namespace JG
 				{
 					mFilteredTypeList.insert(type.GetName());
 				}
-				auto originName = ReplaceAll(type.GetName(), "JG::", "");
+				auto originName = StringExtend::ReplaceAll(type.GetName(), "JG::", "");
 				auto filterName = filter;
 
 				u64 pos = originName.find(filterName);

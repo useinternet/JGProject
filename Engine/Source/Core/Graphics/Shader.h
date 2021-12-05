@@ -32,24 +32,25 @@ namespace JG
 		enum : u64
 		{
 			Surface,
+			Compute,
 		};
 	public:
 		virtual const String& GetCode() const = 0;
 		virtual const String& GetName() const = 0;
 
 	public:
-		static SharedPtr<IShaderScript> CreateMaterialScript(const String& name, const String& code);
+		static SharedPtr<IShaderScript> CreateShaderScript(const String& name, const String& code);
 	};
 
-	class MaterialScript : public IShaderScript
+	class ShaderScript : public IShaderScript
 	{
 	private:
 		String mName;
 		String mCode;
 	public:
-		virtual ~MaterialScript() = default;
+		virtual ~ShaderScript() = default;
 	public:
-		MaterialScript(const String& name, const String& code) : mName(name), mCode(code) {}
+		ShaderScript(const String& name, const String& code) : mName(name), mCode(code) {}
 	public:
 		virtual const String& GetCode() const override 
 		{

@@ -17,7 +17,7 @@ namespace JG
 	{
 		GameComponent::Awake();
 		CreateGeometry();
-		auto shader = ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader, { "Surface/SkyDome" });
+		auto shader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader, { "Surface/SkyDome" });
 		mMaterial = IMaterial::Create("SkyDome_Material", shader);
 		mMaterial->SetFloat3("ApexColor", JVector3(0.0f, 0.05f, 0.6f));
 		mMaterial->SetFloat3("CenterColor", JVector3(0.0f, 0.5f, 0.8f));

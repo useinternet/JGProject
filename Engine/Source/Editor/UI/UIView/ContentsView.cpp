@@ -135,8 +135,8 @@ namespace JG
 		}ImGui::SameLine();
 		ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
 
-		auto contentsPath = ReplaceAll(GetTargetDirectory(), Application::GetAssetPath(), "Asset");
-		auto dirList = Split(contentsPath, '/');
+		auto contentsPath = StringExtend::ReplaceAll(GetTargetDirectory(), Application::GetAssetPath(), "Asset");
+		auto dirList = StringExtend::Split(contentsPath, '/');
 
 
 		i32 index = 0;
@@ -145,7 +145,7 @@ namespace JG
 		{
 			if (index > 0)
 			{
-				path = CombinePath(path, folder);
+				path = PathExtend::CombinePath(path, folder);
 			}
 			if (ImGui::Button(folder.c_str()) == true) 
 			{
@@ -700,7 +700,7 @@ namespace JG
 							auto fileName = fs::path(from).filename().string();
 							if (fs::is_directory(from))
 							{
-								to = CombinePath(to, fileName);
+								to = PathExtend::CombinePath(to, fileName);
 								if (fs::create_directory(to) == false)
 								{
 									JG_CORE_ERROR("Fail Create Directory");
@@ -712,7 +712,7 @@ namespace JG
 						else if (taskFlags & Task_Move)
 						{
 							auto _old = file;
-							auto _new = CombinePath(to, fs::path(_old).filename().string());
+							auto _new = PathExtend::CombinePath(to, fs::path(_old).filename().string());
 							fs::rename(_old, _new, err);
 						}
 						ratio += oneUnit;
@@ -921,8 +921,8 @@ namespace JG
 
 	void ContentsView::CreateFolder(const String& targetDir)
 	{
-		auto path = CombinePath(targetDir, "NewFolder");
-		path = GetUniqueFileName(path);
+		auto path = PathExtend::CombinePath(targetDir, "NewFolder");
+		path = PathExtend::GetUniqueFileName(path);
 
 
 		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
@@ -947,8 +947,8 @@ namespace JG
 			gameWorld->MakeJson(assetJson);
 			json->AddMember(JG_ASSET_KEY, assetJson);
 
-			auto path = CombinePath(targetDir, std::string("NewGameWorld") + JG_ASSET_FORMAT);
-			path = GetUniqueFileName(path);
+			auto path = PathExtend::CombinePath(targetDir, std::string("NewGameWorld") + JG_ASSET_FORMAT);
+			path = PathExtend::GetUniqueFileName(path);
 
 			
 
@@ -969,15 +969,15 @@ namespace JG
 
 	void ContentsView::CreateSurfaceMaterial(const String& targetDir)
 	{
-		auto path = CombinePath(targetDir, std::string("NewMaterial") + JG_ASSET_FORMAT);
-		path = GetUniqueFileName(path);
+		auto path = PathExtend::CombinePath(targetDir, std::string("NewMaterial") + JG_ASSET_FORMAT);
+		path = PathExtend::GetUniqueFileName(path);
 
 		auto p = fs::path(path);
 		auto extension = p.extension().string();
 		
 
 		MaterialAssetStock stock;
-		stock.Name = ReplaceAll(p.filename().string(), extension, "");
+		stock.Name = StringExtend::ReplaceAll(p.filename().string(), extension, "");
 		stock.ShaderTemplate = JG_SHADER_3D_STANDARD_TEMPLATE;
 		stock.ShaderScript   = JG_SHADER_STANDARD_SURFACE_SCRIPT;
 		auto shader          = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
@@ -1107,8 +1107,8 @@ namespace JG
 		auto filename = p.filename();
 		auto dir      = p.remove_filename();
 
-		auto dest = CombinePath(dir.string(), filename.string());
-		auto src = CombinePath(dir.string(), name);
+		auto dest = PathExtend::CombinePath(dir.string(), filename.string());
+		auto src = PathExtend::CombinePath(dir.string(), name);
 
 
 
@@ -1232,7 +1232,7 @@ namespace JG
 
 	void ContentsView::Async_UpdateAssetDirectory(DirectoryNode* parentDirNode)
 	{
-		auto curPath = ReplaceAll(fs::path(parentDirNode->Path).string(), "\\", "/");
+		auto curPath = StringExtend::ReplaceAll(fs::path(parentDirNode->Path).string(), "\\", "/");
 		auto dirIter = fs::directory_iterator(curPath);
 	
 	
@@ -1247,7 +1247,7 @@ namespace JG
 	
 		for (auto& file : dirIter)
 		{
-			auto filePath = ReplaceAll(file.path().string(), "\\", "/");
+			auto filePath = StringExtend::ReplaceAll(file.path().string(), "\\", "/");
 			if (fs::is_directory(filePath) == true)
 			{
 				auto dirNode = Async_CreateDirectoryNode(parentDirNode, filePath);
@@ -1301,7 +1301,7 @@ namespace JG
 		fileNode->Path = path;
 		fileNode->Format = format;
 		auto p = fs::path(path);
-		fileNode->FileName = ReplaceAll(p.filename().string(), p.extension().string(), "");
+		fileNode->FileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
 		
 		ownerDir->FileList.push_back(fileNode);
 		return fileNode;

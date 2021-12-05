@@ -1,0 +1,82 @@
+
+
+struct Cluster
+{
+    float4 Min;
+    float4 Max;
+    uint3 Indexs;
+};
+
+cbuffer ConstantData
+{
+    float4x4 __InvProjMatrix__;
+    float3   __EyePosition__;
+    float    __FarZ__;
+    float2   __Resolution__;
+    float2   __TileSize__;
+    float    __NearZ__;
+};
+
+
+#define NUM_X_SLICE 8
+#define NUM_Y_SLICE 8
+#define NUM_Z_SLICE 16
+
+RWStructuredBuffer<Cluster> Clusters;
+
+float3 ScreenToView(float4 screen)
+{
+    float2 texCoord = float2(screen.x / __Resolution__.x, screen.y / __Resolution__.y);
+    texCoord.x = texCoord.x * 2.0f - 1.0f;
+    texCoord.y = (1.0f - texCoord.y) * 2.0f - 1.0f;
+
+    float4 clip = float4(texCoord.x, texCoord.y , screen.z, screen.w);
+    clip = mul(clip, __InvProjMatrix__);
+    clip = clip / clip.w;
+    return clip.xyz;
+}
+float3 LineIntersectionToZPlane(float3 A, float3 B, float zDistance)
+{
+    float3 N = float3(0,0,1);
+    float3 AB = B - A;
+    float T = (zDistance - dot(N, A)) / dot(N, AB);
+    return A + T * AB;
+}
+
+// SV_GroupID : dispatch 호출의 스레드 그룹들 중 현재 스레드가 속한 그룹의 3차원 식별자
+// SV_GroupThreadID : 그 스레드 그룹 안에서의 현재 스레드의 3차원 식별자
+// SV_DispatchThreadID : 전체 dispatch 안에서의 현재 스레드 식별자
+// SV_GroupIndex : 현재 스레드가 속한 스레드 그룹의 3차원 식별자를 1차원으로 직렬화한 인덱스
+[numthreads(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE)]
+void cs_main(uint3 groupId : SV_GroupID,
+             uint3 dispatchThreadId : SV_DispatchThreadID,
+             uint3 groupThreadId    : SV_GroupThreadID,
+             uint groupIndex : SV_GroupIndex)
+{
+    float xIndex = dispatchThreadId.x;
+    float yIndex = dispatchThreadId.y;
+    float zIndex = dispatchThreadId.z;
+
+    float clusterNearZ = __NearZ__ * pow( (__FarZ__ / __NearZ__),  (float)zIndex / NUM_Z_SLICE);
+    float clusterFarZ  = __NearZ__ * pow( (__FarZ__ / __NearZ__), (float)(zIndex + 1) / NUM_Z_SLICE);
+
+    float4 minPoint_SS = float4(xIndex * __TileSize__.x, yIndex * __TileSize__.y, -1, 1);
+    float4 maxPoint_SS = float4((xIndex + 1) * __TileSize__.x, (yIndex + 1) * __TileSize__.y, -1, 1);
+
+
+    float3 minPoint_VS = ScreenToView(minPoint_SS);
+    float3 maxPoint_VS = ScreenToView(maxPoint_SS);
+
+    float3 minPointNear = LineIntersectionToZPlane(__EyePosition__, minPoint_VS, clusterNearZ);
+    float3 minPointFar  = LineIntersectionToZPlane(__EyePosition__, minPoint_VS, clusterFarZ);
+    float3 maxPointNear = LineIntersectionToZPlane(__EyePosition__, maxPoint_VS, clusterNearZ);
+    float3 maxPointFar  = LineIntersectionToZPlane(__EyePosition__, maxPoint_VS, clusterFarZ);
+
+    float3 minPointAABB = min(min(minPointNear, minPointFar), min(maxPointNear, maxPointFar));
+    float3 maxPointAABB = max(max(minPointNear, minPointFar), max(maxPointNear, maxPointFar));
+
+    Clusters[groupIndex].Min = float4(minPoint_VS, 0.0f);//float4(minPointAABB, 0.0f);
+    Clusters[groupIndex].Max = float4(maxPoint_VS, 0.0f);float4(maxPointAABB, 0.0f);
+    Clusters[groupIndex].Indexs = dispatchThreadId;
+}
+

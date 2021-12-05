@@ -185,7 +185,7 @@ namespace JG
 			auto material = mMaterialList[i];
 			if (material == nullptr)
 			{
-				sceneObject->MaterialList[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
+				sceneObject->MaterialList[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader));
 			}
 			else
 			{
@@ -197,7 +197,7 @@ namespace JG
 		if (matAssetCnt == 0 && sceneObject->MaterialList.empty()) {
 			if (mNullMaterial == nullptr)
 			{
-				mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard3DShader));
+				mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader));
 			}
 			sceneObject->MaterialList.push_back(mNullMaterial);
 		}

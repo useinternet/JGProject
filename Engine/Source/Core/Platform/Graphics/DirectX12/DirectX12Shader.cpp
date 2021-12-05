@@ -243,9 +243,9 @@ namespace JG
 	{
 		if (scriptList.empty() == true)
 		{
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceResources, "");
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceVariables, "");
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceContents, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
 		}
 		else
 		{
@@ -265,7 +265,7 @@ namespace JG
 	{
 		String scriptCode = script->GetCode();
 		String resourcesCode;
-		if (ExtractScriptContents(scriptCode, ShaderScript::Type::Resources, resourcesCode) == true)
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Resources, resourcesCode) == true)
 		{
 			//
 			u64 lineStart = 0;
@@ -279,9 +279,9 @@ namespace JG
 
 
 				auto mid  = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = ReplaceAll(type, "\n", "");  type = ReplaceAll(type, "\t", ""); type = ReplaceAll(type, " ", "");
+				auto type = line.substr(0, mid); type = StringExtend::ReplaceAll(type, "\n", "");  type = StringExtend::ReplaceAll(type, "\t", ""); type = StringExtend::ReplaceAll(type, " ", "");
 				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = ReplaceAll(name, "\n", "");  name = ReplaceAll(name, "\t", "");
+				name = StringExtend::ReplaceAll(name, "\n", "");  name = StringExtend::ReplaceAll(name, "\t", "");
 				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
 
 				lineStart = lineEnd + 1;
@@ -290,7 +290,7 @@ namespace JG
 		}
 
 		String variablesCode;
-		if (ExtractScriptContents(scriptCode, ShaderScript::Type::Variables, variablesCode) == true)
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Variables, variablesCode) == true)
 		{
 			u64 lineStart = 0;
 			u64 lineEnd = 0;
@@ -301,23 +301,23 @@ namespace JG
 				auto line = variablesCode.substr(lineStart, lineEnd - lineStart);
 
 				auto mid = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = ReplaceAll(type, "\n", "");  type = ReplaceAll(type, "\t", ""); type = ReplaceAll(type, " ", "");
+				auto type = line.substr(0, mid); type = StringExtend::ReplaceAll(type, "\n", "");  type = StringExtend::ReplaceAll(type, "\t", ""); type = StringExtend::ReplaceAll(type, " ", "");
 				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = ReplaceAll(name, "\n", "");  name = ReplaceAll(name, "\t", "");
+				name = StringExtend::ReplaceAll(name, "\n", "");  name = StringExtend::ReplaceAll(name, "\t", "");
 				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
 				lineStart = lineEnd + 1;
 			}
 
 
-			variablesCode = String(HLSL::Token::CBuffer) + ShaderScript::Variables::Surface + "\n { \n" + variablesCode;
+			variablesCode = String(HLSL::Token::CBuffer) + ShaderDefine::Variables::Surface + "\n { \n" + variablesCode;
 			variablesCode += "\n};";
 		}
 
 
 
-		String contentsCode;
+		String surfaceCode;
 		i32 type = -1;
-		if (ExtractScriptContents(scriptCode, ShaderScript::Type::Surface, contentsCode) == true)
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Surface, surfaceCode) == true)
 		{
 			type = IShaderScript::Surface;
 		}
@@ -330,9 +330,11 @@ namespace JG
 		switch (type)
 		{
 		case IShaderScript::Surface:
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceResources, resourcesCode);
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceVariables, variablesCode);
-			code = ReplaceAll(code, ShaderScript::Location::SurfaceContents, contentsCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, surfaceCode);
+			break;
+		case IShaderScript::Compute:
 			break;
 		default:
 			return false;

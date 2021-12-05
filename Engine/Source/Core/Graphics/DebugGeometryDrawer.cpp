@@ -252,7 +252,7 @@ namespace JG
 		info.SubMesh = ISubMesh::Create("Debug_SubMesh");
 		info.SubMesh->SetVertexBuffer(vBuffer);
 		info.SubMesh->SetIndexBuffer(iBuffer);
-		info.Material = IMaterial::Create("DebugMaterial", ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::DebugShader));
+		info.Material = IMaterial::Create("DebugMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::DebugShader));
 
 
 		mDebugGeometryInfos[type].push_back(info);

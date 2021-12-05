@@ -201,7 +201,7 @@ namespace JG
 					// Property
 					stock.MaterialDatas = materialDatas;
 
-					auto outputPath = ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
+					auto outputPath = StringExtend::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
 					MaterialAssetStock::Write(outputPath, stock);
 					AssetDataBase::GetInstance().RefreshAsset(obj->GetAssetID());
 				}

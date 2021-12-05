@@ -315,7 +315,7 @@ namespace JG
 
 
 
-	namespace ShaderScript
+	namespace ShaderDefine
 	{
 		namespace Template
 		{

@@ -269,7 +269,7 @@ namespace JG
 		if (gDevice)
 		{
 			JG_CORE_INFO("Success Create D3D12Device");
-			JG_CORE_TRACE("Description : " + ws2s(adapterDesc.Description));
+			JG_CORE_TRACE("Description : " + StringExtend::ws2s(adapterDesc.Description));
 			JG_CORE_TRACE("VideoMemory : {0}  MB", adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 		}
 		else

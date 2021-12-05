@@ -215,7 +215,7 @@ namespace JG
 			stock.Name = stock.SubMeshNames[0];
 		}
 
-		auto filePath = CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
+		auto filePath = PathExtend::CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
 		auto json = CreateSharedPtr<Json>();
 		json->AddMember(JG_ASSET_KEY, stock);
 
@@ -227,7 +227,7 @@ namespace JG
 
 	void AssetImporter::WriteTexture(const String& outputPath, TextureAssetStock& stock)
 	{
-		auto filePath = CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
+		auto filePath = PathExtend::CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
 
 		auto json = CreateSharedPtr<Json>();
 		json->AddMember(JG_ASSET_KEY, stock);

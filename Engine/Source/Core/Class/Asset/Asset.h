@@ -286,14 +286,14 @@ namespace JG
 		virtual void Set(AssetID assetID, const String& assetPath) override
 		{
 			fs::path p(assetPath);
-			String contentsPath = ReplaceAll(fs::absolute(GetAssetRootPath()).string(), "\\", "/");
+			String contentsPath = StringExtend::ReplaceAll(fs::absolute(GetAssetRootPath()).string(), "\\", "/");
 			mAssetID = assetID;
 		
-			mAssetFullPath = fs::absolute(assetPath).string(); mAssetFullPath = ReplaceAll(mAssetFullPath, "\\", "/");
-			mAssetPath = ReplaceAll(mAssetFullPath, contentsPath, "Asset");
+			mAssetFullPath = fs::absolute(assetPath).string(); mAssetFullPath = StringExtend::ReplaceAll(mAssetFullPath, "\\", "/");
+			mAssetPath = StringExtend::ReplaceAll(mAssetFullPath, contentsPath, "Asset");
 			strcpy(mAssetID.ResourcePath, mAssetPath.c_str());
 			mExtension = p.extension().string();
-			mName = ReplaceAll(p.filename().string(), mExtension, "");
+			mName = StringExtend::ReplaceAll(p.filename().string(), mExtension, "");
 		}
 	public:
 		virtual AssetID GetAssetID() const override

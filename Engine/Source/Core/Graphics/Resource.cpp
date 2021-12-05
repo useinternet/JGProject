@@ -89,7 +89,7 @@ namespace JG
 	void ITexture::CreateNullTexture()
 	{
 		bool isLoadWhiteTexture = false;
-		auto nullTexturePath = CombinePath(Application::GetTexturePath(), "NullTexture.jgasset");
+		auto nullTexturePath = PathExtend::CombinePath(Application::GetTexturePath(), "NullTexture.jgasset");
 		if (fs::exists(nullTexturePath) == true)
 		{
 			auto json = CreateSharedPtr<Json>();

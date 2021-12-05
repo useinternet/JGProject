@@ -390,7 +390,7 @@ namespace JG
 			if (out_shortCut)
 			{
 				auto short_cut = menuPath.substr(midPos + 1, menuPath.length() - midPos);
-				short_cut = ReplaceAll(short_cut, " ", "");
+				short_cut = StringExtend::ReplaceAll(short_cut, " ", "");
 
 				char splitToken = '_';
 				u64 splitPos = short_cut.find_first_of(splitToken);

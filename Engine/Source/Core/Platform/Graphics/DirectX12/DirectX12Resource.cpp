@@ -652,7 +652,7 @@ namespace JG
 		ITexture::SetName(name);
 		if (mD3DResource != nullptr)
 		{
-			mD3DResource->SetName(s2ws(name).c_str());
+			mD3DResource->SetName(StringExtend::s2ws(name).c_str());
 			ResourceStateTracker::SetResourceName(mD3DResource.Get(), name);
 		}
 	}
@@ -719,7 +719,7 @@ namespace JG
 
 		if (mD3DResource)
 		{
-			mD3DResource->SetName(s2ws(GetName()).c_str());
+			mD3DResource->SetName(StringExtend::s2ws(GetName()).c_str());
 		}
 	}
 	void DirectX12Texture::SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)

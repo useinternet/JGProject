@@ -215,7 +215,7 @@ namespace JG
 
 	bool MaterialAssetStock::Write(const String& path, const MaterialAssetStock& stock)
 	{
-		auto filePath = CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
+		auto filePath = PathExtend::CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
 
 		auto json = CreateSharedPtr<Json>();
 		json->AddMember(JG_ASSET_KEY, stock);
@@ -911,10 +911,10 @@ namespace JG
 		auto absoluteAssetPath = fs::absolute(Application::GetAssetPath()).string();
 		auto homePath = fs::current_path().string();
 
-		originPath        = ReplaceAll(originPath, "\\", "/");
-		absolutePath      = ReplaceAll(absolutePath, "\\", "/");
-		absoluteAssetPath = ReplaceAll(absoluteAssetPath, "\\", "/");
-		homePath		  = ReplaceAll(homePath, "\\", "/");
+		originPath        = StringExtend::ReplaceAll(originPath, "\\", "/");
+		absolutePath      = StringExtend::ReplaceAll(absolutePath, "\\", "/");
+		absoluteAssetPath = StringExtend::ReplaceAll(absoluteAssetPath, "\\", "/");
+		homePath		  = StringExtend::ReplaceAll(homePath, "\\", "/");
 
 
 		String resourcePath;
@@ -924,10 +924,10 @@ namespace JG
 		{
 			if (path.find_first_of("Asset/") != String::npos) {
 
-				resourcePath = ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = ReplaceAll(absolutePath, "Asset/", "");
-				absolutePath = CombinePath(absoluteAssetPath, absolutePath);
+				resourcePath = StringExtend::ReplaceAll(absolutePath, homePath + "/", "");
+				absolutePath = StringExtend::ReplaceAll(absolutePath, homePath + "/", "");
+				absolutePath = StringExtend::ReplaceAll(absolutePath, "Asset/", "");
+				absolutePath = PathExtend::CombinePath(absoluteAssetPath, absolutePath);
 				out_absolutePath = absolutePath;
 				out_resourcePath = resourcePath;
 				return true;
@@ -936,7 +936,7 @@ namespace JG
 		// in AssetPath
 		else
 		{
-			resourcePath = ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
+			resourcePath = StringExtend::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
 			out_absolutePath = absolutePath;
 			out_resourcePath = resourcePath;
 			return true;

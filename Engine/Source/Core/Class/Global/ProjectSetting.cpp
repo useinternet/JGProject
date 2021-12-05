@@ -32,13 +32,13 @@ namespace JG
 		Save_StartSetting(json);
 		Save_InputSetting(json);
 
-		auto path = CombinePath(Application::GetConfigPath(), "ProjectSetting.json");
+		auto path = PathExtend::CombinePath(Application::GetConfigPath(), "ProjectSetting.json");
 		Json::Write(path, json);
 	}
 	void ProjectSetting::Load()
 	{
 		auto json = CreateSharedPtr<Json>();
-		auto path = CombinePath(Application::GetConfigPath(), "ProjectSetting.json");
+		auto path = PathExtend::CombinePath(Application::GetConfigPath(), "ProjectSetting.json");
 		bool result = Json::Read(path, json);
 
 		if (result == true)

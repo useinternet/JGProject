@@ -79,13 +79,13 @@ namespace JG
 				{
 					// 
 					auto pointLightInfo = lightInfos[Graphics::ELightType::PointLight];
-					if (material->SetInt(ShaderScript::Standard3D::PointLightCount, pointLightInfo.Count) == false)
+					if (material->SetInt(ShaderDefine::Standard3D::PointLightCount, pointLightInfo.Count) == false)
 					{
 
 					}
 					if (pointLightInfo.Count > 0)
 					{
-						if (material->SetStructDataArray(ShaderScript::Standard3D::PointLightList, pointLightInfo.ByteData.data(), pointLightInfo.Count, pointLightInfo.Size) == false)
+						if (material->SetStructDataArray(ShaderDefine::Standard3D::PointLightList, pointLightInfo.ByteData.data(), pointLightInfo.Count, pointLightInfo.Size) == false)
 						{
 
 						}

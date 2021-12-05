@@ -309,11 +309,11 @@ namespace JG
 			bool isCtrl  = shortCut.find("Ctrl") != String::npos;
 			bool isShift = shortCut.find("Shift") != String::npos;
 			bool isAlt   = shortCut.find("Alt") != String::npos;
-			shortCut = ReplaceAll(shortCut, "Ctrl", "");
-			shortCut = ReplaceAll(shortCut, "Shift", "");
-			shortCut = ReplaceAll(shortCut, "Alt", "");
-			shortCut = ReplaceAll(shortCut, " ", "");
-			shortCut = ReplaceAll(shortCut, "+", "");
+			shortCut = StringExtend::ReplaceAll(shortCut, "Ctrl", "");
+			shortCut = StringExtend::ReplaceAll(shortCut, "Shift", "");
+			shortCut = StringExtend::ReplaceAll(shortCut, "Alt", "");
+			shortCut = StringExtend::ReplaceAll(shortCut, " ", "");
+			shortCut = StringExtend::ReplaceAll(shortCut, "+", "");
 
 			bool isPressed = false;
 			bool isSubPressed = false;

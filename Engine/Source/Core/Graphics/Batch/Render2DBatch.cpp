@@ -14,7 +14,7 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
-		auto _2dShader = ShaderLibrary::GetInstance().GetShader(ShaderScript::Template::Standard2DShader);
+		auto _2dShader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard2DShader);
 
 		TextureInfo textureInfo;
 		textureInfo.Width = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
@@ -139,7 +139,7 @@ namespace JG
 				{
 					mTextureCount++;
 					mTextureArray[textureIndex] = texture;
-					if (mCurrFrameResource->Standard2DMaterial->SetTexture(ShaderScript::Standard2D::Texture, textureIndex, mTextureArray[textureIndex]) == false)
+					if (mCurrFrameResource->Standard2DMaterial->SetTexture(ShaderDefine::Standard2D::Texture, textureIndex, mTextureArray[textureIndex]) == false)
 					{
 						JG_CORE_ERROR("Failed Set Texture Slot : {0}", textureIndex);
 					}

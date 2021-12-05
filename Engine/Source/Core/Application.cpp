@@ -15,14 +15,15 @@ namespace JG
 	Application* Application::smInstance = nullptr;
 
 	static String gAssetPath   = "../../../GameProject/Project_C/Asset";
-	static String gEnginePath  = CombinePath(Application::GetAssetPath(), "Engine");
-	static String gIconPath    = CombinePath(Application::GetEnginePath(), "Icon");
-	static String gTexturePath = CombinePath(Application::GetEnginePath(), "Texture");
-	static String gMeshPath    = CombinePath(Application::GetEnginePath(), "Mesh");
-	static String gConfigPath = CombinePath(Application::GetEnginePath(), "Config");
-	static String gShaderGlobalLibPath = CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
-	static String gShaderScriptPath   = CombinePath(Application::GetEnginePath(), "Shader/Script");
-	static String gShaderTemplatePath = CombinePath(Application::GetEnginePath(), "Shader/Template");
+	static String gEnginePath  = PathExtend::CombinePath(Application::GetAssetPath(), "Engine");
+	static String gIconPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Icon");
+	static String gTexturePath = PathExtend::CombinePath(Application::GetEnginePath(), "Texture");
+	static String gMeshPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Mesh");
+	static String gConfigPath = PathExtend::CombinePath(Application::GetEnginePath(), "Config");
+	static String gShaderGlobalLibPath = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
+	static String gShaderScriptPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Script");
+	static String gComputeShaderPath   = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Compute");
+	static String gShaderTemplatePath  = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Template");
 
 
 	const String& Application::GetAssetPath()
@@ -58,6 +59,11 @@ namespace JG
 	const String& Application::GetShaderScriptPath()
 	{
 		return gShaderScriptPath;
+	}
+
+	const String& Application::GetComputeShaderScriptPath()
+	{
+		return gComputeShaderPath;
 	}
 
 	const String& Application::GetShaderTemplatePath()
