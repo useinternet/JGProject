@@ -22,16 +22,8 @@ namespace JG
 		virtual ~DeferredRenderer() = default;
 	public:
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Deferred; }
+		virtual void ReadyImpl() override;
+		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) override;
 		virtual int ArrangeObject(const ObjectInfo & info) override;
-	private:
-		void Draw(int objectType, const List<ObjectInfo>&objectList);
-	private: // GBUffer
-		void GBuffer_Init();
-		void GBUffer_Ready(IGraphicsAPI* api, const RenderInfo& info);
-		void GBuffer_Draw(int objectType, const List<ObjectInfo>& objectList);
-	private: // Light
-		void Light_Init();
-		void Light_Ready();
-		void Light_Draw();
 	};
 }

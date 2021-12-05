@@ -335,7 +335,7 @@ namespace JG
 
 		mState = EReadBackBufferState::Reading;
 
-		Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount() + 1, 0, [&]()->EScheduleResult
+		Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem, [&]()->EScheduleResult
 		{
 			mState = EReadBackBufferState::ReadCompelete;
 			return EScheduleResult::Break;
@@ -629,8 +629,8 @@ namespace JG
 		{
 			mScheduleHandle->Reset();
 		}
-		mScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(
-			DirectX12API::GetFrameBufferCount() + 1, 0, 1, 0,
+		mScheduleHandle = Scheduler::GetInstance().ScheduleOnceByFrame(
+			DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem,
 			[&]() -> EScheduleResult
 		{
 			mState = EComputerState::Compelete;

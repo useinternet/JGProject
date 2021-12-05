@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "JGGraphics.h"
 #include "Graphics/RenderBatch.h"
+#include "Graphics/RenderProcess.h"
+
 
 namespace JG
 {
@@ -43,26 +45,58 @@ namespace JG
 	void Renderer::End()
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-		auto cnt = mObjectDrawFuncList.size();
-		for (i32 i = 0; i < cnt; ++i)
+		auto info = GetRenderInfo();
+
+		// PreProcess Run
+		for (auto& preProcess : mPreProcessList)
 		{
-			if (mReadyDrawFuncList[i] != nullptr)
+			preProcess->Run(api, mCurrentRenderInfo);
+		}
+
+	
+		while (true)
+		{
+			bool isCompelete = true;
+			for (auto& preProcess : mPreProcessList)
 			{
-				mReadyDrawFuncList[i](api, mCurrentRenderInfo);
-			}
-		
-			if (mObjectDrawFuncList[i] != nullptr)
-			{
-				for (auto& _pair : mObjectInfoListDic)
+				if (preProcess->IsCompelete() == false)
 				{
-					mObjectDrawFuncList[i](_pair.first, _pair.second);
+					isCompelete = false;
 				}
 			}
-			if (mSceneDrawFuncList[i] != nullptr)
-			{
-				mSceneDrawFuncList[i]();
-			}
+			if (isCompelete) break;
 		}
+
+		// Render
+		RenderImpl(api, mCurrentRenderInfo);
+
+
+
+		// PostProcess
+		for (auto& postProcess : mPostProcessList)
+		{
+			postProcess->Run(api, mCurrentRenderInfo);
+		}
+
+
+		while (true)
+		{
+			bool isCompelete = true;
+			for (auto& postProcess : mPostProcessList)
+			{
+				if (postProcess->IsCompelete() == false)
+				{
+					isCompelete = false;
+				}
+			}
+			if (isCompelete) break;
+		}
+
+
+
+
+
+
 		mObjectInfoListDic.clear();
 		EndBatch();
 	}
@@ -111,10 +145,39 @@ namespace JG
 		return mLightInfos;
 	}
 
-	void Renderer::AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc)
+	const SortedDictionary<int, List<Renderer::ObjectInfo>>& Renderer::GetObjectInfoLists() const
 	{
-		mReadyDrawFuncList.push_back(readyFunc);
-		mObjectDrawFuncList.push_back(drawObjectFunc);
-		mSceneDrawFuncList.push_back(sceneDrawFunc);
+		return mObjectInfoListDic;
 	}
+
+	void Renderer::ForEach(const std::function<void(Graphics::ELightType, const LightInfo&)>& action)
+	{
+		if (action == nullptr)
+		{
+			return;
+		}
+		for (auto& _pair : mLightInfos)
+		{
+			action(_pair.first, _pair.second);
+		}
+
+
+	}
+	void Renderer::ForEach(const std::function<void(i32, const List<ObjectInfo>&)>& action)
+	{
+		if (action == nullptr)
+		{
+			return;
+		}
+		for (auto& _pair : mObjectInfoListDic)
+		{
+			action(_pair.first, _pair.second);
+		}
+	}
+	//void Renderer::AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc)
+	//{
+	//	mReadyDrawFuncList.push_back(readyFunc);
+	//	mObjectDrawFuncList.push_back(drawObjectFunc);
+	//	mSceneDrawFuncList.push_back(sceneDrawFunc);
+	//}
 }

@@ -1,10 +1,8 @@
 #include "pch.h"
-#include "ComputeEngine.h"
-
+#include "RenderProcess.h"
 
 
 namespace JG
 {
-
 
 }

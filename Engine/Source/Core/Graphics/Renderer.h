@@ -21,7 +21,6 @@ namespace JG
 namespace JG
 {
 	class IGraphicsAPI;
-	class IRenderContext;
 	class InputLayout;
 	class IShader;
 	class ITexture;
@@ -34,7 +33,7 @@ namespace JG
 	class RenderBatch;
 	class FowardRenderer;
 	class DeferredRenderer;
-	//class IRenderBatch;
+	class IRenderProcess;
 
 
 
@@ -53,6 +52,18 @@ namespace JG
 	// RenderProcess 라는 클래스 추가
 	class Renderer 
 	{
+		// 셰이더 데이터
+	protected:
+		struct PassCB
+		{
+			JMatrix ViewProjMatrix;
+			JMatrix WorldMatrix;
+			JVector3 EyePos;
+		};
+		struct Cluster
+		{
+
+		};
 	protected:
 		struct LightInfo
 		{
@@ -66,16 +77,17 @@ namespace JG
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
 		};
-		using ObjectDrawFunc = std::function<void(int, const List<ObjectInfo>&)>;
-		using ReadyDrawFunc  = std::function<void(IGraphicsAPI*, const RenderInfo& info)>;
-		using SceneDrawFunc = std::function<void()>;
+
 	private:
-		List<SharedPtr<RenderBatch>> mBatchList;
+		List<SharedPtr<RenderBatch>>	mBatchList;
+		List<SharedPtr<IRenderProcess>> mPreProcessList;
+		List<SharedPtr<IRenderProcess>> mPostProcessList;
+
+
+
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
-		SortedDictionary<int, List<ObjectInfo>> mObjectInfoListDic;
-		List<ObjectDrawFunc> mObjectDrawFuncList;
-		List<ReadyDrawFunc>  mReadyDrawFuncList;
-		List<SceneDrawFunc> mSceneDrawFuncList;
+		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
+
 		RenderInfo mCurrentRenderInfo;
 	public:
 		Renderer() = default;
@@ -91,10 +103,32 @@ namespace JG
 		void EndBatch();
 	protected:
 		const RenderInfo& GetRenderInfo() const;
-		const Dictionary<Graphics::ELightType, LightInfo>& GetLightInfos() const;
-		void AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc);
+		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
+		const SortedDictionary<int, List<Renderer::ObjectInfo>>& GetObjectInfoLists() const;
+
+		void ForEach(const std::function<void(Graphics::ELightType, const LightInfo&)>& action);
+		void ForEach(const std::function<void(i32, const List<ObjectInfo>&)>& action);
+
+		template<class T>
+		T* AddPreProcess()
+		{
+			auto preProcess = CreateSharedPtr<T>();
+			mPreProccessList.push_back(preProcess);
+
+			return preProcess.get();
+		}
+		template<class T>
+		T* AddPostProcess()
+		{
+			auto postProcess = CreateSharedPtr<T>();
+			mPostProccessList.push_back(postProcess);
+
+			return postProcess.get();
+		}
 	protected:
-		virtual int ArrangeObject(const ObjectInfo& info) = 0;
+		virtual void ReadyImpl() = 0;
+		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
+		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};
 }
 

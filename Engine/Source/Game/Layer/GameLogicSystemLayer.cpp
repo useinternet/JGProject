@@ -280,9 +280,6 @@ namespace JG
 			};
 			Application::GetInstance().SendEvent(e);
 		}
-		
-	
-
 		return true;
 	}
 	bool GameLogicSystemLayer::ResponseEditorSceneOnClick(NotifyEditorSceneOnClickEvent& e)
