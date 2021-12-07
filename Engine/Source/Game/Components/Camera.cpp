@@ -413,6 +413,8 @@ namespace JG
 		sceneInfo.ClearColor = GetClearColor();
 		sceneInfo.ViewMatrix = GetViewMatrix();
 		sceneInfo.ProjMatrix = GetProjMatrix();
+		sceneInfo.FarZ = GetFarZ();
+		sceneInfo.NearZ = GetNearZ();
 		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
 		if (mScene == nullptr)
 		{

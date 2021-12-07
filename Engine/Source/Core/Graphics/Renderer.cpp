@@ -47,6 +47,8 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		auto info = GetRenderInfo();
 
+		ReadyImpl(api, info);
+
 		// PreProcess Run
 		for (auto& preProcess : mPreProcessList)
 		{
@@ -101,10 +103,10 @@ namespace JG
 		EndBatch();
 	}
 
-	u64 Renderer::GetCommandID() const
-	{
-		return mCurrentRenderInfo.CommandID;
-	}
+	//u64 Renderer::GetCommandID() const
+	//{
+	//	return mCurrentRenderInfo.CommandID;
+	//}
 
 	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)
 	{

@@ -11,10 +11,14 @@ namespace JG
 	class IComputer;
 	class IReadBackBuffer;
 
+
 	class PreRenderProcess_ComputeCluster : public IRenderProcess
 	{
 		// 
 	public:
+		const static i32 NUM_X_SLICE = 8;
+		const static i32 NUM_Y_SLICE = 8;
+		const static i32 NUM_Z_SLICE = 16;
 		struct CB
 		{
 			JMatrix InvProjMatrix;
@@ -25,9 +29,17 @@ namespace JG
 			f32 NearZ;
 		};
 		CB CB;
+
+		struct Cluster
+		{
+			JVector4 Min;
+			JVector4 Max;
+		};
+		List<Cluster> Clusters;
 	private:
 		List<SharedPtr<IComputer>>       mComputers;
 		List<SharedPtr<IReadBackBuffer>> mReadBackBuffers;
+		SharedPtr<ScheduleHandle> mScheduleHandle;
 	public:
 		PreRenderProcess_ComputeCluster();
 	public:

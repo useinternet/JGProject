@@ -1,7 +1,35 @@
 
 #define JG_PI 3.141592
-
 #define SCRIPT_FLAG_IGNORE_LIGHTPASS 1
+
+
+
+struct Material
+{
+    float3 WorldPosition;
+    float3 Albedo;
+    float Roughness;
+    float Metallic;
+};
+
+struct DirectionalLight
+{
+    float3 Direction;
+    float3 LightColor;
+};
+
+struct PointLight
+{
+    float3 Position;
+    float  Range;
+    float3 Color;
+    float  Intensity;
+    float  Att0;
+    float  Att1;
+    float  Att2;
+};
+
+
 
 // NDF
 float DistributionGGX(float NoH, float r)
@@ -48,30 +76,6 @@ float3 F_Schlick(float cosTheta, float3 F0)
 
 
 
-struct Material
-{
-    float3 WorldPosition;
-    float3 Albedo;
-    float Roughness;
-    float Metallic;
-};
-
-struct DirectionalLight
-{
-    float3 Direction;
-    float3 LightColor;
-};
-
-struct PointLight
-{
-    float3 Position;
-    float  Range;
-    float3 Color;
-    float  Intensity;
-    float  Att0;
-    float  Att1;
-    float  Att2;
-};
 
 
 

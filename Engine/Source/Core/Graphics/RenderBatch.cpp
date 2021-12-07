@@ -11,12 +11,12 @@ namespace JG
 	{
 		return mConnectedRenderer;
 	}
-	u64 RenderBatch::GetCommandID() const
-	{
-		if (mConnectedRenderer == nullptr)
-		{
-			return 0;
-		}
-		return mConnectedRenderer->GetCommandID();
-	}
+	//u64 RenderBatch::GetCommandID() const
+	//{
+	//	if (mConnectedRenderer == nullptr)
+	//	{
+	//		return 0;
+	//	}
+	//	return mConnectedRenderer->GetCommandID();
+	//}
 }

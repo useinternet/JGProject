@@ -92,11 +92,13 @@ namespace JG
 		{
 			return false;
 		}
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+
 		if (mIsClearWhiteTexture == false)
 		{
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget(GetCommandID(), { mWhiteTexture }, nullptr);
+			api->ClearRenderTarget(commandID, { mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
@@ -112,9 +114,9 @@ namespace JG
 		};
 
 		PassCB passCB;
-		passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProj);
+		passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
 
-		mCurrFrameResource->Standard2DMaterial->SetPassData(GetCommandID(), &passCB, sizeof(PassCB));
+		mCurrFrameResource->Standard2DMaterial->SetPassData(commandID, &passCB, sizeof(PassCB));
 		return true;
 	}
 
@@ -193,11 +195,11 @@ namespace JG
 	void Render2DBatch::NextBatch()
 	{
 		if (mQuadCount == 0) return;
-
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		if (mCurrFrameResource->Standard2DMaterial->Bind(GetCommandID()) == false)
+		if (mCurrFrameResource->Standard2DMaterial->Bind(commandID) == false)
 		{
 			JG_CORE_ERROR("Failed Bind StandardMaterial");
 			StartBatch();
@@ -210,19 +212,19 @@ namespace JG
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		if (mCurrFrameResource->QuadMesh->Bind(GetCommandID()) == false)
+		if (mCurrFrameResource->QuadMesh->Bind(commandID) == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind(GetCommandID()) == false)
+		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind(commandID) == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		api->DrawIndexed(GetCommandID(), quadIndexCount);
+		api->DrawIndexed(commandID, quadIndexCount);
 		StartBatch();
 	}
 

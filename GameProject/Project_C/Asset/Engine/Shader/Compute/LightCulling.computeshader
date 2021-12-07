@@ -1,0 +1,33 @@
+
+
+struct Cluster
+{
+    float4 Min;
+    float4 Max;
+};
+
+
+
+
+
+#define NUM_X_SLICE 8
+#define NUM_Y_SLICE 8
+#define NUM_Z_SLICE 16
+
+
+SturcturedBuffer<Cluster>    Clusters;
+
+
+
+
+
+[numthreads(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE)]
+void cs_main(uint3 groupId : SV_GroupID,
+             uint3 dispatchThreadId : SV_DispatchThreadID,
+             uint3 groupThreadId    : SV_GroupThreadID,
+             uint groupIndex : SV_GroupIndex)
+{
+
+
+}
+

@@ -43,10 +43,14 @@ namespace JG
 		SharedPtr<ITexture> TargetTexture;
 		SharedPtr<ITexture> TargetDepthTexture;
 		JVector2 Resolutoin;
-		JMatrix  ViewProj;
+		JMatrix  ViewProjMatrix;
+		JMatrix  ViewMatrix;
+		JMatrix  ProjMatrix;
 		JVector3 EyePosition;
+		f32 FarZ;
+		f32 NearZ;
 		u64 CurrentBufferIndex = 0;
-		u64 CommandID = 0;
+		//u64 CommandID = 0;
 	};
 
 	// RenderProcess 라는 클래스 추가
@@ -96,7 +100,7 @@ namespace JG
 		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
 		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
 		void End();
-		u64 GetCommandID() const;
+		//u64 GetCommandID() const;
 		virtual ERendererPath GetRendererPath() const = 0;
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
@@ -113,7 +117,7 @@ namespace JG
 		T* AddPreProcess()
 		{
 			auto preProcess = CreateSharedPtr<T>();
-			mPreProccessList.push_back(preProcess);
+			mPreProcessList.push_back(preProcess);
 
 			return preProcess.get();
 		}
@@ -121,12 +125,12 @@ namespace JG
 		T* AddPostProcess()
 		{
 			auto postProcess = CreateSharedPtr<T>();
-			mPostProccessList.push_back(postProcess);
+			mPostProcessList.push_back(postProcess);
 
 			return postProcess.get();
 		}
 	protected:
-		virtual void ReadyImpl() = 0;
+		virtual void ReadyImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};

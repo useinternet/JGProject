@@ -16,7 +16,7 @@ namespace JG
 		void ConnectRenderer(Renderer* renderer);
 		Renderer* GetConnectedRenderer() const;
 
-		u64 GetCommandID() const;
+		//u64 GetCommandID() const;
 	protected:
 		friend Renderer;
 		virtual bool Begin(const RenderInfo & info) = 0;

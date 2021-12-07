@@ -191,7 +191,7 @@ namespace JG
 		virtual const String& GetName() const override;
 		virtual void  SetName(const String& name) override;
 		virtual EComputerState GetState() const override;
-		virtual bool Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
+		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ) override;
 	};
 
 

@@ -42,12 +42,19 @@ namespace JG
 		std::mutex mMutex;
 		Dictionary<Graphics::GObject*, UniquePtr<Graphics::GObject>> mObjectPool;
 		Dictionary<Graphics::GObject*, Graphics::Scene*> mSceneDic;
-
+	
 
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
 		UniquePtr<DebugGeometryDrawer> mDebugGeometryDrawer;
 		JGGraphicsDesc mDesc;
 
+
+		
+
+		std::thread::id                  mMainThreadID;
+		Dictionary<std::thread::id, u64> mCommandIDPool;
+		std::mutex       mCommandIDMutex;
+		u64				 mCommandIDIndex = 1;
 	public:
 		JGGraphics(const JGGraphicsDesc& desc);
 		~JGGraphics();
@@ -63,6 +70,9 @@ namespace JG
 		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
 		u64           GetBufferCount() const;
+
+		u64           RequestCommandID();
+
 		const JGGraphicsDesc& GetDesc() const;
 		void  Flush();
 	private:
@@ -83,6 +93,7 @@ namespace JG
 			mObjectPool.erase(gobj);
 		}
 		void Init();
+		void Reset();
 		void LoadShader();
 	private:
 		class RemoveObjectData : public IJGObject
@@ -122,7 +133,8 @@ namespace JG
 			JMatrix  ViewMatrix = JMatrix::Identity();
 			JMatrix  ProjMatrix = JMatrix::Identity();
 			JMatrix  ViewProjMatrix = JMatrix::Identity();
-
+			f32 FarZ  = 0.0f;
+			f32 NearZ = 0.0f;
 			Color    ClearColor;
 		};
 
@@ -160,8 +172,6 @@ namespace JG
 		//
 		class Scene : public GObject
 		{
-			static Queue<u64> sm_CommandIDQueue;
-			static std::mutex sm_CommandIDMutex;
 		private:
 			SceneInfo mSceneInfo;
 
@@ -174,7 +184,6 @@ namespace JG
 
 
 			u64 mCurrentIndex = 0;
-			u64 mCommandID    = 0;
 
 			SharedPtr<Renderer>       mRenderer;
 			SharedPtr<Render2DBatch>  m2DBatch;

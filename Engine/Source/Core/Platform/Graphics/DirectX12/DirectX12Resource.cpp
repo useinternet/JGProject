@@ -599,17 +599,17 @@ namespace JG
 		return mState;
 	}
 
-	bool DirectX12Computer::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
+	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ)
 	{
 		if (mState == EComputerState::Run)
 		{
 			return false;
 		}
-		if (mShaderData->Bind(MAIN_GRAPHICS_COMMAND_ID) == false)
+		if (mShaderData->Bind(commandID) == false)
 		{
 			return false;
 		}
-		auto PSO = DirectX12API::GetComputePipelineState(MAIN_GRAPHICS_COMMAND_ID);
+		auto PSO = DirectX12API::GetComputePipelineState(commandID);
 		if (PSO->Finalize() == false)
 		{
 			return false;
@@ -620,7 +620,7 @@ namespace JG
 
 
 		mState = EComputerState::Run;
-		auto commandList = DirectX12API::GetComputeCommandList(MAIN_GRAPHICS_COMMAND_ID);
+		auto commandList = DirectX12API::GetComputeCommandList(commandID);
 		commandList->BindPipelineState(PSO);
 		commandList->Dispatch(groupX, groupY, groupZ);
 

@@ -4,7 +4,6 @@ struct Cluster
 {
     float4 Min;
     float4 Max;
-    uint3 Indexs;
 };
 
 
@@ -77,8 +76,7 @@ void cs_main(uint3 groupId : SV_GroupID,
     float3 minPointAABB = min(min(minPointNear, minPointFar), min(maxPointNear, maxPointFar));
     float3 maxPointAABB = max(max(minPointNear, minPointFar), max(maxPointNear, maxPointFar));
 
-    Clusters[groupIndex].Min = float4(minPoint_VS, 0.0f);//float4(minPointAABB, 0.0f);
-    Clusters[groupIndex].Max = float4(maxPoint_VS, 0.0f);float4(maxPointAABB, 0.0f);
-    Clusters[groupIndex].Indexs = dispatchThreadId;
+    Clusters[groupIndex].Min = float4(minPointAABB, 0.0f);
+    Clusters[groupIndex].Max = float4(maxPointAABB, 0.0f);
 }
 

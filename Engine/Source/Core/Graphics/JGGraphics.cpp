@@ -11,13 +11,14 @@ namespace JG
 	JGGraphics::JGGraphics(const JGGraphicsDesc& desc)
 	{
 		mDesc = desc;
-
+		mMainThreadID = std::this_thread::get_id();
 		Init();
 	}
 
 	JGGraphics::~JGGraphics()
 	{
 		Flush();
+		Reset();
 		mObjectPool.clear();
 		ShaderLibrary::Destroy();
 		mGraphcisAPI->Destroy();
@@ -50,6 +51,7 @@ namespace JG
 			}
 			return EScheduleResult::Continue;
 		}, CreateSharedPtr<RemoveObjectData>(gobject));
+
 	}
 
 	void JGGraphics::ForEach(const std::function<void(Graphics::Scene*)>& action)
@@ -87,6 +89,24 @@ namespace JG
 		}
 		return mGraphcisAPI->GetBufferCount();
 	}
+	u64 JGGraphics::RequestCommandID() 
+	{
+		if (mMainThreadID == std::this_thread::get_id())
+		{
+			return 0;
+		}
+		else
+		{
+			auto threadID = std::this_thread::get_id();
+			std::lock_guard<std::mutex> lock(mCommandIDMutex);
+			if (mCommandIDPool.find(threadID) == mCommandIDPool.end())
+			{
+				mCommandIDPool[threadID] = mCommandIDIndex;
+				++mCommandIDIndex;
+			}
+			return mCommandIDPool[threadID];
+		}
+	}
 
 	const JGGraphicsDesc& JGGraphics::GetDesc() const
 	{
@@ -116,7 +136,7 @@ namespace JG
 				return EScheduleResult::Break;
 			}
 			mGraphcisAPI->Begin();
-
+			Reset();
 
 			return EScheduleResult::Continue;
 		});
@@ -129,11 +149,17 @@ namespace JG
 				return EScheduleResult::Break;
 			}
 			mGraphcisAPI->End();
+
 			return EScheduleResult::Continue;
 		});
 		ShaderLibrary::Create();
 	}
+	void JGGraphics::Reset()
+	{
+		mCommandIDIndex = 1;
+		mCommandIDPool.clear();
 
+	}
 	void JGGraphics::LoadShader()
 	{
 		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
@@ -296,8 +322,8 @@ namespace JG
 		}
 
 
-		Queue<u64> Scene::sm_CommandIDQueue;
-		std::mutex Scene::sm_CommandIDMutex;
+		//Queue<u64> Scene::sm_CommandIDQueue;
+		//std::mutex Scene::sm_CommandIDMutex;
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
@@ -308,18 +334,18 @@ namespace JG
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
 
 
-			{
-				std::lock_guard<std::mutex> lock(sm_CommandIDMutex);
-				if (sm_CommandIDQueue.empty() == false)
-				{
-					mCommandID = sm_CommandIDQueue.front();
-					sm_CommandIDQueue.pop();
-				}
-				else
-				{
-					mCommandID = ++s_CommandIDOffset;
-				}
-			}
+			//{
+			//	std::lock_guard<std::mutex> lock(sm_CommandIDMutex);
+			//	if (sm_CommandIDQueue.empty() == false)
+			//	{
+			//		mCommandID = sm_CommandIDQueue.front();
+			//		sm_CommandIDQueue.pop();
+			//	}
+			//	else
+			//	{
+			//		mCommandID = ++s_CommandIDOffset;
+			//	}
+			//}
 
 
 			SetSceneInfo(info);
@@ -327,7 +353,7 @@ namespace JG
 		}
 		Scene::~Scene()
 		{
-			sm_CommandIDQueue.push(mCommandID);
+			//sm_CommandIDQueue.push(mCommandID);
 			for (auto& t : mTargetTextures)
 			{
 				t.reset();
@@ -413,10 +439,14 @@ namespace JG
 				info.TargetTexture		= mTargetTextures[mCurrentIndex];
 				info.TargetDepthTexture = mTargetDepthTextures[mCurrentIndex];
 				info.Resolutoin			= mSceneInfo.Resolution;
-				info.ViewProj			= mSceneInfo.ViewProjMatrix;
+				info.ViewProjMatrix	    = mSceneInfo.ViewProjMatrix;
+				info.ViewMatrix = mSceneInfo.ViewMatrix;
+				info.ProjMatrix = mSceneInfo.ProjMatrix;
+				info.FarZ  = mSceneInfo.FarZ;
+				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition		= mSceneInfo.EyePos;
 				info.CurrentBufferIndex = mCurrentIndex;
-				info.CommandID          = mCommandID;
+				//info.CommandID          = ;
 
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
@@ -510,7 +540,7 @@ namespace JG
 			i32 index = 0;
 			for (auto& t : mTargetTextures)
 			{
-				if (t == nullptr) t = ITexture::Create(GetName() + std::to_string(mCommandID) + "_TargetTexture_" + std::to_string(index), mainTexInfo);
+				if (t == nullptr) t = ITexture::Create(GetName() + "_TargetTexture_" + std::to_string(index), mainTexInfo);
 				else t->SetTextureInfo(mainTexInfo);
 				++index;
 
