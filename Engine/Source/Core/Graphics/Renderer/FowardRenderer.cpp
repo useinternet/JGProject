@@ -7,12 +7,15 @@ namespace JG
 
 	FowardRenderer::FowardRenderer()
 	{
-		mComputeCluster = AddPreProcess<PreRenderProcess_ComputeCluster>();
+		//mComputeCluster = AddPreProcess<PreRenderProcess_ComputeCluster>();
 
 	}
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, const RenderInfo& info)
 	{
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+
+		//api->BeginDraw(commandID);
 		if (mComputeCluster)
 		{
 			mComputeCluster->CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
@@ -23,10 +26,18 @@ namespace JG
 			mComputeCluster->CB.TileSize = JVector2(
 				info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
 				info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
-
-
 		}
 
+		Graphics::RenderPassData passData;
+		passData.ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
+		passData.ProjMatrix = JMatrix::Transpose(info.ProjMatrix);
+		passData.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
+		passData.EyePosition = info.EyePosition;
+		passData.Resolution = info.Resolutoin;
+		passData.FarZ = info.FarZ;
+		passData.NearZ = info.NearZ;
+
+		//api->SetRenderPassData(commandID, passData);
 	}
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info)
@@ -61,6 +72,8 @@ namespace JG
 						JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(0)->GetName());
 						continue;
 					}
+
+
 					SharedPtr<IMaterial> material = nullptr;
 					if (materialList.size() <= i)
 					{
@@ -70,6 +83,8 @@ namespace JG
 					{
 						material = materialList[i];
 					}
+
+
 					passCB.WorldMatrix = JMatrix::Transpose(worldMatrix);
 					material->SetPassData(commandID, &passCB, sizeof(PassCB));
 
@@ -106,6 +121,13 @@ namespace JG
 				}
 			}
 		});
+
+	}
+
+	void FowardRenderer::CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info)
+	{
+		//auto commandID = JGGraphics::GetInstance().RequestCommandID();
+		//api->EndDraw(commandID);
 
 	}
 

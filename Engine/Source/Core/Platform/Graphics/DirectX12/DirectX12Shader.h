@@ -10,14 +10,15 @@ namespace JG
 	class ITexture;
 	class ShaderDataForm;
 
+
+	struct CompileConfig
+	{
+		String Entry;
+		String Target;
+		CompileConfig(const String& entry, const String& target) : Entry(entry), Target(target) {}
+	};
 	class DirectX12Shader : public IShader
 	{
-		struct CompileConfig
-		{
-			String Entry;
-			String Target;
-			CompileConfig(const String& entry, const String& target) : Entry(entry), Target(target) {}
-		};
 	private:
 		String mName;
 		String mOriginCode;
@@ -85,6 +86,47 @@ namespace JG
 
 
 
+
+	class DirectX12GraphicsShader : public IGraphicsShader
+	{
+
+
+
+		ComPtr<ID3DBlob> mVSData;
+		ComPtr<ID3DBlob> mDSData;
+		ComPtr<ID3DBlob> mHSData;
+		ComPtr<ID3DBlob> mGSData;
+		ComPtr<ID3DBlob> mPSData;
+		EShaderFlags     mFlags;
+		String mSourceCode;
+		bool mIsCompileSuccess = false;
+		List<std::pair<EShaderDataType, String>> mPropertyList;
+	public:
+		virtual bool          Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
+		virtual const String& GetShaderCode() const override;
+		virtual EShaderFlags  GetFlags() const override;
+		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;
+	private:
+		bool Compile(const String& code, String* error);
+		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
+		void InsertScript(String& code, const List<SharedPtr<IShaderScript>>& scriptList);
+		bool InsertScriptInternal(String& code, SharedPtr<IShaderScript> script);
+		bool ExtractScriptContents(const String& code, const String& key, String& out_code);
+	};
+
+
+	class DirectX12ComputeShader : public IComputeShader
+	{
+	private:
+		ComPtr<ID3DBlob> mCSData;
+		String			 mSourceCode;
+		bool			 mIsCompileSuccess = false;
+	public:
+		virtual bool Compile(const String& sourceCode, String* error) override;
+		virtual const String& GetShaderCode() const override;
+	private:
+		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
+	};
 
 }
 

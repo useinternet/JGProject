@@ -26,10 +26,10 @@ namespace JG
 
 		struct FrameResource
 		{
-			SharedPtr<IMesh>    QuadMesh;
+			SharedPtr<IMesh>         QuadMesh;
 			SharedPtr<IVertexBuffer> QuadVBuffer;
-			SharedPtr<IIndexBuffer> QuadIBuffer;
-			SharedPtr<IMaterial> Standard2DMaterial;
+			SharedPtr<IIndexBuffer>  QuadIBuffer;
+			//SharedPtr<IMaterial> Standard2DMaterial;
 		};
 	private:
 		static const u32 MaxQuadCount = 1200;
@@ -43,10 +43,10 @@ namespace JG
 		JVector3 mStandardQuadPosition[4];
 		JVector2 mStandardQuadTexcoord[4];
 		List<FrameResource> mFrameResources;
-		List<QuadVertex> mVertices;
-		List<u32>        mIndices;
+		List<QuadVertex>    mVertices;
+		List<u32>           mIndices;
 		List<SharedPtr<ITexture>> mTextureArray;
-		SharedPtr<ITexture> mWhiteTexture;
+		SharedPtr<ITexture>       mWhiteTexture;
 
 		u64 mQuadCount = 0;
 		u64 mTextureCount = 0;

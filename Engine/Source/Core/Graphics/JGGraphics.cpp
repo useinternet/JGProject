@@ -135,7 +135,7 @@ namespace JG
 			{
 				return EScheduleResult::Break;
 			}
-			mGraphcisAPI->Begin();
+			mGraphcisAPI->BeginFrame();
 			Reset();
 
 			return EScheduleResult::Continue;
@@ -148,7 +148,7 @@ namespace JG
 			{
 				return EScheduleResult::Break;
 			}
-			mGraphcisAPI->End();
+			mGraphcisAPI->EndFrame();
 
 			return EScheduleResult::Continue;
 		});
@@ -164,6 +164,11 @@ namespace JG
 	{
 		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
 		auto templatePath = Application::GetShaderTemplatePath();
+
+
+
+
+
 
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
 		{
@@ -464,13 +469,13 @@ namespace JG
 							break;
 						case ESceneObjectType::Debug:
 						{
-							auto debugObj = static_cast<DebugRenderObject*>(obj.get());
-							mRenderer->DrawCall(debugObj->WorldMatrix, debugObj->Mesh, debugObj->MaterialList);
+							//auto debugObj = static_cast<DebugRenderObject*>(obj.get());
+							//mRenderer->DrawCall(debugObj->WorldMatrix, debugObj->Mesh, debugObj->MaterialList);
 						}
 							break;
 						case ESceneObjectType::Static:
-							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
-							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
+							//auto staticObj = static_cast<StaticRenderObject*>(obj.get());
+							//mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
 							break;
 						// Skeletal
 						}

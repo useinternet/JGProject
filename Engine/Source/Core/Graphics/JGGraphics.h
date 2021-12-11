@@ -360,5 +360,16 @@ namespace JG
 		};
 
 
+		class RenderPassData
+		{
+		public:
+			JMatrix ProjMatrix;
+			JMatrix ViewMatrix;
+			JMatrix ViewProjMatrix;
+			JVector2 Resolution;
+			f32 NearZ = 0.0f;
+			f32 FarZ = 0.0f;
+			JVector3 EyePosition;
+		};
 	}
 }

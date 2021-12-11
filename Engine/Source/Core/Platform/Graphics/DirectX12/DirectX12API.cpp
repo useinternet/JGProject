@@ -14,7 +14,7 @@
 #include "Utill/CommandList.h"
 #include "Utill/ResourceStateTracker.h"
 #include "Class/Asset/Asset.h"
-
+#include "Graphics/JGGraphics.h"
 namespace JG
 {
 
@@ -41,10 +41,7 @@ namespace JG
 
 	static Dictionary<u64, SharedPtr<GraphicsPipelineState>> gGraphicsPSOs;
 	static Dictionary<u64, SharedPtr<ComputePipelineState>>  gComputePSOs;
-	static Dictionary<u64, SharedPtr<RootSignature>> gRootSignatures;
-	//static SharedPtr<GraphicsPipelineState> gGracphisPSO;
-	//static SharedPtr<ComputePipelineState>  gComputePSO;
-	//static SharedPtr<RootSignature> gRootSignature;
+	static Dictionary<u64, SharedPtr<RootSignature>> gGraphicsRootSignatures;
 
 	static std::mutex gDeviceMutex;
 
@@ -136,15 +133,32 @@ namespace JG
 		return gComputePSOs[ID];
 	}
 
-	SharedPtr<RootSignature> DirectX12API::GetRootSignature(u64 ID)
+	SharedPtr<RootSignature> DirectX12API::GetGraphicsRootSignature(u64 ID)
 	{
 		std::lock_guard<std::mutex> lock(gRootSigMutex);
-		if (gRootSignatures[ID] == nullptr)
+		if (gGraphicsRootSignatures[ID] == nullptr)
 		{
-			gRootSignatures[ID] = CreateSharedPtr<RootSignature>();
+			gGraphicsRootSignatures[ID] = CreateGraphicsRootSignature();
 		}
-		return gRootSignatures[ID];
+		return gGraphicsRootSignatures[ID];
 	}
+
+	SharedPtr<RootSignature> DirectX12API::GetComputeRootSignature(u64 ID)
+	{
+		return nullptr;
+	}
+
+	//SharedPtr<RootSignature> DirectX12API::GetRootSignature(u64 ID)
+	//{
+	//	std::lock_guard<std::mutex> lock(gRootSigMutex);
+	//	if (gGraphicsRootSignatures[ID] == nullptr)
+	//	{
+	//		gGraphicsRootSignatures[ID] = CreateSharedPtr<RootSignature>();
+	//	}
+	//	return gGraphicsRootSignatures[ID];
+	//}
+
+
 
 	void DirectX12API::GetDepthStencilDesc(EDepthStencilStateTemplate _template, D3D12_DEPTH_STENCIL_DESC* out)
 	{
@@ -246,6 +260,26 @@ namespace JG
 		ResourceStateTracker::UnRegisterResource(resource.Get());
 	}
 
+	SharedPtr<RootSignature> DirectX12API::CreateGraphicsRootSignature()
+	{
+		auto rootSig = CreateSharedPtr<RootSignature>();
+		// PointLight
+		rootSig->InitAsSRV(0, HLSL::RegisterSpace::PointLightRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
+		// RenderPassData
+		rootSig->InitAsCBV(0, 0);
+		// Object
+		rootSig->InitAsCBV(1, 0);
+		// Material
+		rootSig->InitAsCBV(2, 0);
+
+		// Textures
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::Texture2DRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::TextureCubeRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, HLSL::RegisterSpace::RWTexture2DRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootSig->Finalize();
+		return rootSig;
+	}
+
 
 
 	bool DirectX12API::Create()
@@ -307,7 +341,7 @@ namespace JG
 
 		gGraphicsPSOs.clear();
 		gComputePSOs.clear();
-		gRootSignatures.clear();
+		gGraphicsRootSignatures.clear();
 		for (auto& _pair : gFrameBuffers)
 		{
 			_pair.second->Reset();
@@ -331,14 +365,13 @@ namespace JG
 		gFactory.Reset();
 	}
 
-
-	void DirectX12API::Begin()
+	void DirectX12API::BeginFrame()
 	{
 		gGraphicsCommandQueue->Begin();
 		gComputeCommandQueue->Begin();
 		gCopyCommandQueue->Begin();
 	}
-	void DirectX12API::End()
+	void DirectX12API::EndFrame()
 	{
 		// TODO
 		// FrameBuffer Update
@@ -370,6 +403,56 @@ namespace JG
 		gGraphicsCommandQueue->Flush();
 		gComputeCommandQueue->Flush();
 		gCopyCommandQueue->Flush();
+	}
+
+	void DirectX12API::BeginDraw(u64 commandID)
+	{
+		auto rootSig = GetGraphicsRootSignature(commandID);
+		auto cmdList = GetGraphicsCommandList(commandID);
+		cmdList->BindRootSignature(rootSig);
+	}
+
+	void DirectX12API::EndDraw(u64 commandID)
+	{
+		//
+	}
+
+	void DirectX12API::SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)
+	{
+		auto cmdList = GetGraphicsCommandList(commandID);
+		cmdList->BindConstantBuffer((u32)ERootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
+	}
+
+	void DirectX12API::SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures)
+	{
+		if (textures.empty()) return;
+
+		auto cmdList = GetGraphicsCommandList(commandID);
+		auto texCnt  = textures.size();
+
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+		for (u64 i = 0; i < texCnt; ++i)
+		{
+			auto& tex = textures[i];
+			if (tex == nullptr || tex->IsValid() == false)
+			{
+				continue;
+			}
+			auto handle = static_cast<DirectX12Texture*>(tex.get())->GetSRV();
+			handles.push_back(handle);
+		}
+
+		if (handles.empty() == false)
+		{
+			cmdList->BindTextures((u32)ERootParam::TEXTURE2D, handles);
+		}
+	}
+
+	void DirectX12API::SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount)
+	{
+		auto cmdList = GetGraphicsCommandList(commandID);
+		cmdList->BindConstantBuffer((u32)ERootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
 	}
 
 	void DirectX12API::SetViewports(u64 commandID, const List<Viewport>& viewPorts)
@@ -574,6 +657,34 @@ namespace JG
 		computer->SetName(name);
 		computer->Init(shader);
 		return computer;
+	}
+	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
+	{
+		String errorCode;
+		auto shader = CreateSharedPtr<DirectX12GraphicsShader>();
+
+		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
+		{
+			JG_CORE_ERROR("Failed Compile Shader \n Error : {1}  \n SourceCode : \n {2} ", errorCode, sourceCode);
+			return nullptr;
+		}
+
+
+		return shader;
+	}
+	SharedPtr<IComputeShader> DirectX12API::CreateComputeShader(const String& sourceCode)
+	{
+		String errorCode;
+		auto shader = CreateSharedPtr<DirectX12ComputeShader>();
+
+		if (shader->Compile(sourceCode, &errorCode) == false)
+		{
+			JG_CORE_ERROR("Failed Compile Shader \n Error : {1}  \n SourceCode : \n {2} ", errorCode, sourceCode);
+			return nullptr;
+		}
+
+
+		return shader;
 	}
 	SharedPtr<IShader> DirectX12API::CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{

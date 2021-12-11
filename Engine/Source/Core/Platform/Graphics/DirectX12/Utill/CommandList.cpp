@@ -18,6 +18,7 @@ namespace JG
 		
 		mResourceStateTracker	    = CreateUniquePtr<ResourceStateTracker>();
 		mDynamicDescriptorAllocator = CreateUniquePtr<DynamicDescriptorAllocator>();
+		mUploadAllocator = CreateUniquePtr<UploadAllocator>();
 	}
 
 	CommandList::~CommandList()
@@ -34,6 +35,7 @@ namespace JG
 	void CommandList::Reset()
 	{
 		mResourceStateTracker->Reset();
+		mUploadAllocator->Reset();
 		mDynamicDescriptorAllocator->Reset(true);
 		mTempObjectList.clear();
 
@@ -365,6 +367,13 @@ namespace JG
 	{
 		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
+	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, void* data, u64 dataSize)
+	{
+		auto alloc = mUploadAllocator->Allocate(dataSize, 256);
+		memcpy(alloc.CPU, data, dataSize);
+		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+
+	}
 	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
 	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
@@ -384,6 +393,13 @@ namespace JG
 
 	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
 	{
+		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize)
+	{
+		auto dataSize = elementCount * elementSize;
+		auto alloc = mUploadAllocator->Allocate(dataSize, elementSize);
+		memcpy(alloc.CPU, data, dataSize);
 		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
 	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
@@ -507,6 +523,12 @@ namespace JG
 	{
 		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
+	void ComputeCommandList::BindConstantBuffer(u32 rootParam, void* data, u64 dataSize)
+	{
+		auto alloc = mUploadAllocator->Allocate(dataSize, 256);
+		memcpy(alloc.CPU, data, dataSize);
+		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
 	void ComputeCommandList::BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)
 	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
@@ -526,6 +548,13 @@ namespace JG
 	}
 	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc)
 	{
+		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
+	}
+	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize)
+	{
+		auto dataSize = elementCount * elementSize;
+		auto alloc = mUploadAllocator->Allocate(dataSize, elementSize);
+		memcpy(alloc.CPU, data, dataSize);
 		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
 	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource)

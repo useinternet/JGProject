@@ -1,7 +1,4 @@
-SamplerState gPointSampler
-{
-	Template = Point_Wrap
-};
+
 struct VS_IN
 {
 	float3 posL : POSITION;

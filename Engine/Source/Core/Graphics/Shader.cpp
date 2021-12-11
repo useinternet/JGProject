@@ -13,6 +13,24 @@ namespace JG
 
 		return api->CreateShader(name, sourceCode, flags, scriptList);
 	}
+
+	SharedPtr<IGraphicsShader> IGraphicsShader::Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		return api->CreateGraphicsShader(sourceCode, flags, scriptList);
+	}
+
+	SharedPtr<IComputeShader> IComputeShader::Create(const String& sourceCode)
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		return api->CreateComputeShader(sourceCode);
+	}
+
+
 	SharedPtr<IShaderScript> IShaderScript::CreateShaderScript(const String& name, const String& code)
 	{
 		auto script = CreateSharedPtr<ShaderScript>(name, code);
@@ -106,29 +124,28 @@ namespace JG
 
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
 	{
-		auto globalLibPath = path;
-		globalLibPath = PathExtend::CombinePath(globalLibPath, "GlobalShaderLibrary.shaderLib");
-		auto p = fs::path(globalLibPath);
-		std::ifstream fin(p.string());
+		auto globalLibPath = PathExtend::CombinePath(path, "GlobalShaderLibrary.shaderLib");
+		FileExtend::GetReadAllText(globalLibPath, &mGlobalShaderLibCode);
 
-		if (fin.is_open() == true)
-		{
-			std::stringstream ss;
-			ss << fin.rdbuf();
-			mGlobalShaderLibCode = ss.str();
-			fin.close();
+		auto globalGraphicsLibPath = PathExtend::CombinePath(path, "GlobalGraphicsLibrary.shaderLib");
+		FileExtend::GetReadAllText(globalGraphicsLibPath, &mGlobalGraphicsLibCode);
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return true;
 	}
+	String ShaderLibrary::GetGlobalGraphicsLibCode() const
+	{
+		return mGlobalGraphicsLibCode;
+	}
+
 	String ShaderLibrary::GetGlobalShaderLibCode() const
 	{
 		return mGlobalShaderLibCode;
 	}
+
+
+
+
+
 
 
 

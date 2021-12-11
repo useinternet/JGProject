@@ -26,6 +26,32 @@ namespace JG
 		static SharedPtr<IShader> Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
 	};
 
+
+	class IGraphicsShader
+	{
+	protected:
+		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
+	public:
+		virtual const String& GetShaderCode() const = 0;
+		virtual EShaderFlags  GetFlags()      const = 0;
+		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
+	public:
+		static SharedPtr<IGraphicsShader> Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
+	};
+
+	class IComputeShader
+	{
+	protected:
+		virtual bool Compile(const String& sourceCode, String* error) = 0;
+	public:
+		virtual const String& GetShaderCode() const = 0;
+	public:
+		static SharedPtr<IComputeShader> Create(const String& sourceCode);
+	};
+
+
+
+
 	class IShaderScript
 	{
 	public:
@@ -70,6 +96,7 @@ namespace JG
 		Dictionary<String, SharedPtr<IShader>> mShaders;
 		Dictionary<String, SharedPtr<IShaderScript>> mMaterialScirpts;
 		String mGlobalShaderLibCode;
+		String mGlobalGraphicsLibCode;
 		std::shared_mutex mMutex;
 	public:
 		void RegisterShader(SharedPtr<IShader> shader);
@@ -78,7 +105,8 @@ namespace JG
 		SharedPtr<IShader> GetShader(const String& name, const List<String>& scriptNameList);
 		SharedPtr<IShaderScript> GetScript(const String& name);
 		bool   LoadGlobalShaderLib(const String& path);
-		String GetGlobalShaderLibCode() const;
+		String GetGlobalShaderLibCode()   const;
+		String GetGlobalGraphicsLibCode() const;
 	};
 
 

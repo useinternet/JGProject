@@ -27,6 +27,11 @@ namespace JG
 			info.Size = item->GetBtSize();
 			item->PushBtData(info.ByteData);
 		}
+
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+		api->BeginDraw(commandID);
+
+
 		return BeginBatch(info, batchList);
 	}
 	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
@@ -46,7 +51,6 @@ namespace JG
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		auto info = GetRenderInfo();
-
 		ReadyImpl(api, info);
 
 		// PreProcess Run
@@ -101,6 +105,11 @@ namespace JG
 
 		mObjectInfoListDic.clear();
 		EndBatch();
+
+		CompeleteImpl(api, info);
+
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+		api->EndDraw(commandID);
 	}
 
 	//u64 Renderer::GetCommandID() const

@@ -1115,14 +1115,12 @@ namespace JG
 
 			for (auto& _pair : shaderDataForm->CBufferDataMap)
 			{
-				auto alloc = mUploadAllocator->Allocate(_pair.second->DataSize, 256);
-				mReadDatas[_pair.first] = alloc;
+				mReadDatas[_pair.first].resize(_pair.second->DataSize);
 			}
 
 			for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
 			{
-				auto alloc = mUploadAllocator->Allocate(_pair.second->ElementDataSize * MaxElementCount, _pair.second->ElementDataSize);
-				mReadDatas[_pair.first] = alloc;
+				mReadDatas[_pair.first].resize(_pair.second->ElementDataSize);
 			}
 			for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
 			{
@@ -1163,18 +1161,24 @@ namespace JG
 				{
 					auto cBufferName = _pair.first;
 					auto cBufferData = _pair.second.get();
-					commandList->BindConstantBuffer(cBufferData->RootParm, mReadDatas[cBufferName]);
+					auto& btData = mReadDatas[cBufferName];
+
+					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
 				}
 				if (shaderDataForm->PassData)
 				{
-					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID]);
+					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID].data(), mPassDatas[commandID].size());
 				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
 				{
 					auto structuredBufferName = _pair.first;
 					auto structuredBufferData = _pair.second.get();
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadDatas[structuredBufferName]);
+					auto& btData = mReadDatas[structuredBufferName];
+					auto elementSize = structuredBufferData->ElementDataSize;
+					auto elementCount = btData.size() / elementSize;
+
+					commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
 				}
 
 				// RWStructuredBuffer
@@ -1237,18 +1241,24 @@ namespace JG
 				{
 					auto cBufferName = _pair.first;
 					auto cBufferData = _pair.second.get();
-					commandList->BindConstantBuffer(cBufferData->RootParm, mReadDatas[cBufferName]);
+					auto& btData = mReadDatas[cBufferName];
+
+					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
 				}
 				if (shaderDataForm->PassData)
 				{
-					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID]);
+					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID].data(), mPassDatas[commandID].size());
 				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
 				{
 					auto structuredBufferName = _pair.first;
 					auto structuredBufferData = _pair.second.get();
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadDatas[structuredBufferName]);
+					auto& btData = mReadDatas[structuredBufferName];
+					auto elementSize = structuredBufferData->ElementDataSize;
+					auto elementCount = btData.size() / elementSize;
+
+					commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
 				}
 
 				// RWStructuredBuffer
@@ -1344,9 +1354,9 @@ namespace JG
 			std::lock_guard<std::shared_mutex> lock(mMutex);
 			if (mPassDatas.find(commandID) == mPassDatas.end())
 			{
-				mPassDatas[commandID] = mUploadAllocator->Allocate(dataSize, 256);
+				mPassDatas[commandID].resize(dataSize);
 			}
-			CPU = mPassDatas[commandID].CPU;
+			CPU = mPassDatas[commandID].data();
 		}
 
 		memcpy(CPU, passData, dataSize);

@@ -132,6 +132,7 @@ namespace JG
 	protected:
 		virtual void ReadyImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
+		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};
 }

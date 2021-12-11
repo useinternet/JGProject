@@ -1,6 +1,7 @@
 
 _Resources{
 	Texture2D Tex1;
+	Texture2D Tex2;
 };
 
 _Variables {

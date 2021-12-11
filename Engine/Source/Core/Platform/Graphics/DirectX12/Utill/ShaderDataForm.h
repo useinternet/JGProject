@@ -148,7 +148,7 @@ namespace JG
 		const static u64 MaxElementCount = 10240;
 	private:
 		UniquePtr<UploadAllocator> mUploadAllocator;
-		Dictionary<String, UploadAllocator::Allocation> mReadDatas;
+		Dictionary<String, List<jbyte>> mReadDatas;
 		Dictionary<String, SharedPtr<IReadWriteBuffer>> mReadWriteDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>> mRWTextureDatas;
@@ -156,7 +156,7 @@ namespace JG
 		
 
 		std::shared_mutex mMutex;
-		Dictionary<u64, UploadAllocator::Allocation> mPassDatas;
+		Dictionary<u64, List<jbyte>> mPassDatas;
 	public:
 		ShaderData(SharedPtr<IShader> shader);
 	public:
@@ -227,8 +227,8 @@ namespace JG
 			u64 dataPos    = data->DataPos;
 			String& cbName = data->Owner->Name;
 
-			auto& alloc = mReadDatas[cbName];
-			void* dest = (void*)((ptraddr)alloc.CPU + dataPos);
+			auto& btList = mReadDatas[cbName];
+			void* dest = (void*)((ptraddr)btList.data() + dataPos);
 			memcpy(dest, value, dataSize);
 			return true;
 		}
@@ -250,8 +250,9 @@ namespace JG
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
 	
-			auto& alloc = mReadDatas[name];
-			memcpy(alloc.CPU, dataArray.data(), btSize);
+			auto& btList = mReadDatas[name]; btList.resize(btSize);
+
+			memcpy(btList.data(), dataArray.data(), btSize);
 			return true;
 		}
 
@@ -269,8 +270,8 @@ namespace JG
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
 
-			auto& alloc = mReadDatas[name];
-			memcpy(alloc.CPU, datas, btSize);
+			auto& btList = mReadDatas[name]; btList.resize(btSize);
+			memcpy(btList.data(), datas, btSize);
 			return true;
 		}
 
@@ -292,7 +293,7 @@ namespace JG
 			u64 dataPos    = data->DataPos;
 			String& cbName = data->Owner->Name;
 
-			void* src = (void*)((ptraddr)(mReadDatas[cbName].CPU) + dataPos);
+			void* src = (void*)((ptraddr)(mReadDatas[cbName].data()) + dataPos);
 			memcpy(value, src , dataSize);
 			return true;
 		}

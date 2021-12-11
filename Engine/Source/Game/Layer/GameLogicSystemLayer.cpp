@@ -70,6 +70,21 @@ namespace JG
 			e.AssetPath = gameWorldAssetPath;
 			Application::GetInstance().SendEvent(e);
 		}
+
+
+		auto templatePath = Application::GetShaderTemplatePath();
+		templatePath = PathExtend::CombinePath(templatePath, "Standard3DShader.shadertemplate");
+		auto surfacePath = Application::GetShaderScriptPath();
+		surfacePath = PathExtend::CombinePath(surfacePath, "Surface/Standard.shaderscript");
+
+
+		String templateSource;
+		String surfaceSource;
+		FileExtend::GetReadAllText(templatePath, &templateSource);
+		FileExtend::GetReadAllText(surfacePath, &surfaceSource);
+
+		auto script = IShaderScript::CreateShaderScript("test", surfaceSource);
+		IGraphicsShader::Create(templateSource, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader, { script });
 	}
 	void GameLogicSystemLayer::Destroy()
 	{

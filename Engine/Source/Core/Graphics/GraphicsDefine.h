@@ -429,7 +429,13 @@ namespace JG
 
 
 		}
-
+		namespace RegisterSpace
+		{
+			constexpr int Texture2DRegisterSpace   = 0;
+			constexpr int TextureCubeRegisterSpace = 1;
+			constexpr int RWTexture2DRegisterSpace = 2;
+			constexpr int PointLightRegisterSpace = 3;
+		}
 
 		constexpr char* VSEntry = "vs_main";
 		constexpr char* DSEntry = "ds_main";
@@ -443,6 +449,7 @@ namespace JG
 		constexpr char* GSTarget = "gs_5_1";
 		constexpr char* PSTarget = "ps_5_1";
 		constexpr char* CSTarget = "cs_5_1";
+
 
 
 

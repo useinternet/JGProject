@@ -412,7 +412,7 @@ namespace JG
 		return mName;
 	}
 
-	void DirectX12Material::SetShader(SharedPtr<IShader> shader)
+	void DirectX12Material::SetShader(SharedPtr<IGraphicsShader> shader)
 	{
 		Init(shader);
 	}
@@ -445,12 +445,45 @@ namespace JG
 		return mShaderData->Bind(commandID);
 	}
 
-	void DirectX12Material::Init(SharedPtr<IShader> shader)
+	void DirectX12Material::Init(SharedPtr<IGraphicsShader> shader)
 	{
-		mShaderData = CreateUniquePtr<ShaderData>(shader);
 		SetDepthStencilState(EDepthStencilStateTemplate::Default);
 		mBlendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		SetBlendState(0, EBlendStateTemplate::Default);
 		SetRasterizerState(ERasterizerStateTemplate::Default);
+
+
+
+
+		mGraphicsShader = shader;
+		
+
+		auto propertyList = mGraphicsShader->GetPropertyList();
+
+
+		for (auto& _pair : propertyList)
+		{
+			auto type = _pair.first;
+			auto name = _pair.second;
+			switch (type)
+			{
+			case EShaderDataType::texture2D:
+				mTextureDic[name] = nullptr;
+				break;
+			default:
+			{
+				u64 dataSize = GetShaderDataTypeSize(type);
+				mCBDatas[name].resize(dataSize);
+			}
+			
+			}
+		}
+
+
+
+
+		//mGraphicsShader->
+		//mShaderData = CreateUniquePtr<ShaderData>(shader);
+
 	}
 }

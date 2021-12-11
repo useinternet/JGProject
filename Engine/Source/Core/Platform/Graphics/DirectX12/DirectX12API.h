@@ -27,6 +27,18 @@ namespace JG
 	class GraphicsPipelineState;
 	class ComputePipelineState;
 	class TextureAssetStock;
+
+	enum class ERootParam
+	{
+		SB_POINT_LIGHTS    ,
+		CB_RENDER_PASS_DATA,
+		CB_OBJECTDATA,
+		CB_MATERIAL,
+		TEXTURE2D,
+		TEXTURECUBE,
+		RWTEXTURE2D,
+	};
+
 	class DirectX12API : public IGraphicsAPI
 	{
 	public:
@@ -53,10 +65,9 @@ namespace JG
 
 		static SharedPtr<GraphicsPipelineState> GetGraphicsPipelineState(u64 ID);
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState(u64 ID);
-		static SharedPtr<RootSignature>			GetRootSignature(u64 ID);
-
-
-
+		static SharedPtr<RootSignature>         GetGraphicsRootSignature(u64 ID);
+		static SharedPtr<RootSignature>         GetComputeRootSignature(u64 ID);
+		//static SharedPtr<RootSignature>         GetRootSignature(u64 ID);
 
 		static void GetDepthStencilDesc(EDepthStencilStateTemplate _template,  D3D12_DEPTH_STENCIL_DESC* out);
 		static void GetBlendDesc(EBlendStateTemplate _template,  D3D12_RENDER_TARGET_BLEND_DESC* out);
@@ -71,17 +82,24 @@ namespace JG
 			D3D12_RESOURCE_STATES InitialResourceState,
 			const D3D12_CLEAR_VALUE* pOptimizedClearValue);
 		static void DestroyCommittedResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource);
-
+	private:
+		static SharedPtr<RootSignature> CreateGraphicsRootSignature();
 
 	protected:
 		// Application
 		virtual bool Create() override;
 		virtual void Destroy() override;
 		// API
-		virtual void Begin() override;
-		virtual void End()   override;
+		virtual void BeginFrame() override;
+		virtual void EndFrame()   override;
 		virtual void Flush() override;
 	protected:
+		virtual void BeginDraw(u64 commandID) override;
+		virtual void EndDraw(u64 commandID)   override;
+
+		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)   override;
+		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) override;
+		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) override;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) override;
 		virtual void SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects) override;
 		virtual void ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) override;
@@ -99,6 +117,11 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) override;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) override;
+		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
+		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) override;
+
+
+
 		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IShader> shader) override;

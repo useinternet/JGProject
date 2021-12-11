@@ -17,9 +17,9 @@ namespace JG
 		auto _2dShader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard2DShader);
 
 		TextureInfo textureInfo;
-		textureInfo.Width = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
+		textureInfo.Width      = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
 		textureInfo.ClearColor = Color::White();
-		textureInfo.Format = ETextureFormat::R8G8B8A8_Unorm; textureInfo.Flags = ETextureFlags::Allow_RenderTarget;
+		textureInfo.Format     = ETextureFormat::R8G8B8A8_Unorm; textureInfo.Flags = ETextureFlags::Allow_RenderTarget;
 		mWhiteTexture = ITexture::Create("WhiteTexture", textureInfo);
 
 		for (i32 i = 0; i < bufferCnt; ++i)
@@ -108,15 +108,15 @@ namespace JG
 
 
 
-		struct PassCB
-		{
-			JMatrix ViewProjMatrix;
-		};
+		//struct PassCB
+		//{
+		//	JMatrix ViewProjMatrix;
+		//};
 
-		PassCB passCB;
-		passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
+		//PassCB passCB;
+		//passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
 
-		mCurrFrameResource->Standard2DMaterial->SetPassData(commandID, &passCB, sizeof(PassCB));
+		//mCurrFrameResource->Standard2DMaterial->SetPassData(commandID, &passCB, sizeof(PassCB));
 		return true;
 	}
 
@@ -141,10 +141,6 @@ namespace JG
 				{
 					mTextureCount++;
 					mTextureArray[textureIndex] = texture;
-					if (mCurrFrameResource->Standard2DMaterial->SetTexture(ShaderDefine::Standard2D::Texture, textureIndex, mTextureArray[textureIndex]) == false)
-					{
-						JG_CORE_ERROR("Failed Set Texture Slot : {0}", textureIndex);
-					}
 					break;
 				}
 				++textureIndex;

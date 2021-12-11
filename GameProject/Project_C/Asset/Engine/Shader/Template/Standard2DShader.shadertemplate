@@ -1,15 +1,5 @@
-SamplerState gPointSampler
-{
-	Template = Point_Wrap
-};
-		
-Texture2D gTexture[64];
+Texture2D _Textures[64] : register(t0, space0); 
 
-cbuffer __PASS_DATA__
-{
-	float4x4 __ViewProjMatrix__;
-};
-		
 struct VS_IN
 {
 	float3 posL : POSITION;
@@ -29,13 +19,13 @@ VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
 		    
-	vout.posH = mul(float4(vin.posL, 1.0f), __ViewProjMatrix__);
-	vout.tex = vin.tex;
+	vout.posH  = mul(float4(vin.posL, 1.0f), _ViewProjMatrix);
+	vout.tex   = vin.tex;
 	vout.color = vin.color;
 	vout.textureIndex = vin.textureIndex;
 	return vout;
 }
 float4 ps_main(VS_OUT pin) : SV_TARGET
 {
-	return gTexture[pin.textureIndex].Sample(gPointSampler, pin.tex) * pin.color;
+	return _Textures[pin.textureIndex].Sample(_AnisotropicSampler, pin.tex) * pin.color;
 }

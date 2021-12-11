@@ -9,11 +9,14 @@ namespace JG
 
 	
 	*/
+
 	enum class EShaderFlags;
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class IShader;
+	class IGraphicsShader;
+	class IComputeShader;
 	class IShaderScript;
 	class IFrameBuffer;
 	class IMaterial;
@@ -29,7 +32,10 @@ namespace JG
 
 	class TextureAssetStock;
 
-
+	namespace Graphics
+	{
+		class RenderPassData;
+	}
 	class IGraphicsAPI 
 	{
 	public:
@@ -43,10 +49,15 @@ namespace JG
 		virtual void Destroy() = 0;
 
 	public:
-		virtual void Begin() = 0;
-		virtual void End()	 = 0;
+		virtual void BeginFrame() = 0;
+		virtual void EndFrame()	 = 0;
 		virtual void Flush() = 0;
 		//
+		virtual void BeginDraw(u64 commandID) = 0;
+		virtual void EndDraw(u64 commandID)   = 0;
+		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData) = 0;
+		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) = 0;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) = 0;
 		virtual void SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects) = 0;
 		virtual void ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
@@ -68,6 +79,8 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) = 0;
+		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
+		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) = 0;
 		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IShader> shader) = 0;
