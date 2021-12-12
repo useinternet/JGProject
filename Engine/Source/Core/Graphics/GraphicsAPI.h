@@ -35,6 +35,7 @@ namespace JG
 	namespace Graphics
 	{
 		class RenderPassData;
+		class Light;
 	}
 	class IGraphicsAPI 
 	{
@@ -56,6 +57,7 @@ namespace JG
 		virtual void BeginDraw(u64 commandID) = 0;
 		virtual void EndDraw(u64 commandID)   = 0;
 		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData) = 0;
+		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) = 0;
 		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) = 0;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) = 0;
@@ -81,9 +83,8 @@ namespace JG
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) = 0;
-		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
-		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IShader> shader) = 0;
+		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) = 0;
 		virtual SharedPtr<IMesh>          CreateMesh(const String& name) = 0;
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;

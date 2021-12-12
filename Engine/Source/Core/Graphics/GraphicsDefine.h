@@ -429,6 +429,12 @@ namespace JG
 
 
 		}
+		namespace RegisterNumber
+		{
+			constexpr int RenderPassRegisterNumber = 0;
+			constexpr int ObjectRegisterNumber     = 1;
+			constexpr int MaterialRegisterNumber   = 2;
+		}
 		namespace RegisterSpace
 		{
 			constexpr int Texture2DRegisterSpace   = 0;

@@ -50,24 +50,9 @@ namespace JG
 		f32 FarZ;
 		f32 NearZ;
 		u64 CurrentBufferIndex = 0;
-		//u64 CommandID = 0;
 	};
-
-	// RenderProcess 라는 클래스 추가
 	class Renderer 
 	{
-		// 셰이더 데이터
-	protected:
-		struct PassCB
-		{
-			JMatrix ViewProjMatrix;
-			JMatrix WorldMatrix;
-			JVector3 EyePos;
-		};
-		struct Cluster
-		{
-
-		};
 	protected:
 		struct LightInfo
 		{
@@ -100,7 +85,6 @@ namespace JG
 		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
 		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
 		void End();
-		//u64 GetCommandID() const;
 		virtual ERendererPath GetRendererPath() const = 0;
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);

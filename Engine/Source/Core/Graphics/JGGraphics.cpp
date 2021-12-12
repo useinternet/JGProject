@@ -164,12 +164,6 @@ namespace JG
 	{
 		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
 		auto templatePath = Application::GetShaderTemplatePath();
-
-
-
-
-
-
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
 		{
 			auto p = iter.path();
@@ -181,44 +175,34 @@ namespace JG
 			EShaderFlags shaderFlags = EShaderFlags::None;
 
 			std::ifstream fin(p.string());
-
-			if (fin.is_open() == true)
+			String sourceCode;
+			FileExtend::ReadAllText(p.string(), &sourceCode);
+			if (sourceCode.empty() == false)
 			{
-				std::stringstream ss;
-				ss << fin.rdbuf();
-				String sourceCode = ss.str();
-				if (sourceCode.find(HLSL::CSEntry) != String::npos)
+				if (sourceCode.find(HLSL::VSEntry) != String::npos)
 				{
-					shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
+					shaderFlags = shaderFlags | EShaderFlags::Allow_VertexShader;
 				}
-				else
+				if (sourceCode.find(HLSL::GSEntry) != String::npos)
 				{
-					if (sourceCode.find(HLSL::VSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_VertexShader;
-					}
-					if (sourceCode.find(HLSL::GSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_GeometryShader;
-					}
-					if (sourceCode.find(HLSL::HSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_HullShader;
-					}
-					if (sourceCode.find(HLSL::DSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_DomainShader;
-					}
-					if (sourceCode.find(HLSL::PSEntry) != String::npos)
-					{
-						shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
-					}
-					auto shader = IShader::Create(fileName, sourceCode, shaderFlags);
-					ShaderLibrary::GetInstance().RegisterShader(shader);
+					shaderFlags = shaderFlags | EShaderFlags::Allow_GeometryShader;
 				}
-
-				fin.close();
+				if (sourceCode.find(HLSL::HSEntry) != String::npos)
+				{
+					shaderFlags = shaderFlags | EShaderFlags::Allow_HullShader;
+				}
+				if (sourceCode.find(HLSL::DSEntry) != String::npos)
+				{
+					shaderFlags = shaderFlags | EShaderFlags::Allow_DomainShader;
+				}
+				if (sourceCode.find(HLSL::PSEntry) != String::npos)
+				{
+					shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
+				}
+				auto shader = IGraphicsShader::Create(sourceCode, shaderFlags);
+				ShaderLibrary::GetInstance().RegisterGraphicsShader(fileName, shader);
 			}
+
 		}
 		auto scriptPath = Application::GetShaderScriptPath();
 		for (auto& iter : fs::recursive_directory_iterator(scriptPath))
@@ -230,24 +214,16 @@ namespace JG
 				continue;
 			}
 			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
-			std::ifstream fin(p.string());
+		
+			SharedPtr<IShaderScript> script;
+			String scriptCode;
 
-			if (fin.is_open() == true)
+			FileExtend::ReadAllText(p.string(), &scriptCode);
+			if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
 			{
-				std::stringstream ss;
-				ss << fin.rdbuf();
-				String scriptCode = ss.str();
-				SharedPtr<IShaderScript> script;
-				if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
-				{
-					script = IShaderScript::CreateShaderScript("Surface/" + fileName, scriptCode);
-				}
-
-
-				ShaderLibrary::GetInstance().RegisterScirpt(script);
-				fin.close();
+				script = IShaderScript::CreateSurfaceScript("Surface/" + fileName, scriptCode);
 			}
-
+			ShaderLibrary::GetInstance().RegisterShaderScript(script->GetName(), script);
 		}
 
 
@@ -262,25 +238,15 @@ namespace JG
 				continue;
 			}
 			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
-			EShaderFlags shaderFlags = EShaderFlags::None;
-
-
-			std::ifstream fin(p.string());
-	
-			if (fin.is_open() == true)
+			String sourceCode;
+			FileExtend::ReadAllText(p.string(), &sourceCode);
+			if (sourceCode.empty() == false)
 			{
-				std::stringstream ss;
-
-				ss << fin.rdbuf();
-				String sourceCode = ss.str();
 				if (sourceCode.find(HLSL::CSEntry) != String::npos)
 				{
-					shaderFlags = shaderFlags | EShaderFlags::Allow_ComputeShader;
-					auto computeShader = IShader::Create(fileName, sourceCode, shaderFlags);
-
-					ShaderLibrary::GetInstance().RegisterShader(computeShader);
+					auto computeShader = IComputeShader::Create(sourceCode);
+					ShaderLibrary::GetInstance().RegisterComputeShader(fileName, computeShader);
 				}
-				fin.close();
 			}
 		}
 	}
@@ -451,7 +417,7 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition		= mSceneInfo.EyePos;
 				info.CurrentBufferIndex = mCurrentIndex;
-				//info.CommandID          = ;
+
 
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
@@ -474,8 +440,8 @@ namespace JG
 						}
 							break;
 						case ESceneObjectType::Static:
-							//auto staticObj = static_cast<StaticRenderObject*>(obj.get());
-							//mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
+							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
+							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
 							break;
 						// Skeletal
 						}

@@ -14,52 +14,52 @@ namespace JG
 			[&]() -> EScheduleResult
 		{
 			while (mTaskCount != 0) {}
-			auto mesh = IMesh::Create("Debug_Mesh");
-			mesh->SetInputLayout(JGDebugVertex::GetInputLayout());
+			//auto mesh = IMesh::Create("Debug_Mesh");
+			//mesh->SetInputLayout(JGDebugVertex::GetInputLayout());
 
-			List<SharedPtr<IMaterial>> materialList;
-			for (auto& _pair : mDebugGeometryInfos)
-			{
-				for (auto& debugGeoInfo : _pair.second)
-				{
-					auto instanceCount = debugGeoInfo.CBDataList.size();
-					if (instanceCount == 0)
-					{
-						continue;
-					}
-					debugGeoInfo.SubMesh->SetInstanceCount(instanceCount);
-					mesh->AddMesh(debugGeoInfo.SubMesh);
-					materialList.push_back(debugGeoInfo.Material);
-					bool result = debugGeoInfo.Material->SetStructDataArray("gDebugDataInstances", debugGeoInfo.CBDataList.data(), debugGeoInfo.CBDataList.size(),
-						sizeof(DebugCBData));
-				}
-			}
+			//List<SharedPtr<IMaterial>> materialList;
+			//for (auto& _pair : mDebugGeometryInfos)
+			//{
+			//	for (auto& debugGeoInfo : _pair.second)
+			//	{
+			//		auto instanceCount = debugGeoInfo.CBDataList.size();
+			//		if (instanceCount == 0)
+			//		{
+			//			continue;
+			//		}
+			//		debugGeoInfo.SubMesh->SetInstanceCount(instanceCount);
+			//		mesh->AddMesh(debugGeoInfo.SubMesh);
+			//		materialList.push_back(debugGeoInfo.Material);
+			//		bool result = debugGeoInfo.Material->SetStructDataArray("gDebugDataInstances", debugGeoInfo.CBDataList.data(), debugGeoInfo.CBDataList.size(),
+			//			sizeof(DebugCBData));
+			//	}
+			//}
 
-			if (materialList.size() > 0 && mesh->GetSubMeshCount() > 0)
-			{
-				auto debugObj = CreateSharedPtr<Graphics::DebugRenderObject>();
-				debugObj->Mesh = mesh;
-				debugObj->MaterialList = materialList;
+			//if (materialList.size() > 0 && mesh->GetSubMeshCount() > 0)
+			//{
+			//	auto debugObj = CreateSharedPtr<Graphics::DebugRenderObject>();
+			//	debugObj->Mesh = mesh;
+			//	debugObj->MaterialList = materialList;
 
-				// 하고 Mesh보내기
-				JGGraphics::GetInstance().ForEach([&](Graphics::Scene* scene)
-				{
-					scene->PushSceneObject(debugObj);
-				});
-			}
+			//	// 하고 Mesh보내기
+			//	JGGraphics::GetInstance().ForEach([&](Graphics::Scene* scene)
+			//	{
+			//		scene->PushSceneObject(debugObj);
+			//	});
+			//}
 
-			// 정보 비워주기
-			for (auto& _pair : mGeometryInfoIndexs)
-			{
-				_pair.second = 0;
-			}
-			for (auto& _pair : mDebugGeometryInfos)
-			{
-				for (auto& debugGeoInfo : _pair.second)
-				{
-					debugGeoInfo.CBDataList.clear();
-				}
-			}
+			//// 정보 비워주기
+			//for (auto& _pair : mGeometryInfoIndexs)
+			//{
+			//	_pair.second = 0;
+			//}
+			//for (auto& _pair : mDebugGeometryInfos)
+			//{
+			//	for (auto& debugGeoInfo : _pair.second)
+			//	{
+			//		debugGeoInfo.CBDataList.clear();
+			//	}
+			//}
 			return EScheduleResult::Continue;
 		});
 	}
@@ -252,7 +252,7 @@ namespace JG
 		info.SubMesh = ISubMesh::Create("Debug_SubMesh");
 		info.SubMesh->SetVertexBuffer(vBuffer);
 		info.SubMesh->SetIndexBuffer(iBuffer);
-		info.Material = IMaterial::Create("DebugMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::DebugShader));
+		//info.Material = IMaterial::Create("DebugMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::DebugShader));
 
 
 		mDebugGeometryInfos[type].push_back(info);

@@ -7,34 +7,17 @@
 
 namespace JG
 {
-	class IComputeBuffer;
 	class IShaderScript;
-	class ITexture;
-	class IShader
-	{
-	public:
-		virtual ~IShader() = default;
-	protected:
-		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
-		virtual bool Bind(u64 commandID) = 0;
-	public:
-		virtual void SetName(const String& name) = 0;
-		virtual const String& GetName() const    = 0;
-		virtual const String& GetOriginCode() const	 = 0;
-		virtual EShaderFlags  GetFlags() const   = 0;
-	public:
-		static SharedPtr<IShader> Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
-	};
-
-
 	class IGraphicsShader
 	{
 	protected:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
 	public:
-		virtual const String& GetShaderCode() const = 0;
-		virtual EShaderFlags  GetFlags()      const = 0;
+		virtual const String& GetShaderCode()     const = 0;
+		virtual const String& GetFullShaderCode() const = 0;
+		virtual EShaderFlags  GetFlags()          const = 0;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
+		virtual bool IsSuccessed() const = 0;
 	public:
 		static SharedPtr<IGraphicsShader> Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
 	};
@@ -45,13 +28,17 @@ namespace JG
 		virtual bool Compile(const String& sourceCode, String* error) = 0;
 	public:
 		virtual const String& GetShaderCode() const = 0;
+		virtual bool IsSuccessed() const = 0;
 	public:
 		static SharedPtr<IComputeShader> Create(const String& sourceCode);
 	};
 
 
 
-
+	enum class EShaderScriptType
+	{
+		Surface
+	};
 	class IShaderScript
 	{
 	public:
@@ -63,9 +50,9 @@ namespace JG
 	public:
 		virtual const String& GetCode() const = 0;
 		virtual const String& GetName() const = 0;
-
+		virtual const EShaderScriptType GetScriptType() const = 0;
 	public:
-		static SharedPtr<IShaderScript> CreateShaderScript(const String& name, const String& code);
+		static SharedPtr<IShaderScript> CreateSurfaceScript(const String& name, const String& code);
 	};
 
 	class ShaderScript : public IShaderScript
@@ -73,10 +60,12 @@ namespace JG
 	private:
 		String mName;
 		String mCode;
+		EShaderScriptType mScriptType;
 	public:
 		virtual ~ShaderScript() = default;
 	public:
-		ShaderScript(const String& name, const String& code) : mName(name), mCode(code) {}
+		ShaderScript(const String& name, const String& code, EShaderScriptType type)
+			: mName(name), mCode(code), mScriptType(type) {}
 	public:
 		virtual const String& GetCode() const override 
 		{
@@ -86,6 +75,10 @@ namespace JG
 		{
 			return mName;
 		}
+		virtual const EShaderScriptType GetScriptType() const override
+		{
+			return mScriptType;
+		}
 	};
 
 
@@ -93,20 +86,35 @@ namespace JG
 	{
 		friend class JGGraphics;
 	private:
-		Dictionary<String, SharedPtr<IShader>> mShaders;
-		Dictionary<String, SharedPtr<IShaderScript>> mMaterialScirpts;
+		Dictionary<String, SharedPtr<IGraphicsShader>> mGraphicsShaderDic;
+		Dictionary<String, SharedPtr<IComputeShader>>  mComputeShaderDic;
+		Dictionary<String, SharedPtr<IShaderScript>>   mShaderScriptDic;
 		String mGlobalShaderLibCode;
 		String mGlobalGraphicsLibCode;
-		std::shared_mutex mMutex;
+		String mGlobalComputeLibCode;
+
+
+		std::shared_mutex mGraphicsMutex;
+		std::shared_mutex mComputeMutex;
+		std::shared_mutex mScriptMutex;
 	public:
-		void RegisterShader(SharedPtr<IShader> shader);
-		void RegisterScirpt(SharedPtr<IShaderScript> script);
-		SharedPtr<IShader> GetShader(const String& name);
-		SharedPtr<IShader> GetShader(const String& name, const List<String>& scriptNameList);
-		SharedPtr<IShaderScript> GetScript(const String& name);
+		void RegisterGraphicsShader(const String& name, SharedPtr<IGraphicsShader> shader);
+		void RegisterComputeShader(const String& name, SharedPtr<IComputeShader> shader);
+		void RegisterShaderScript(const String& name, SharedPtr<IShaderScript> script);
+
+
+		SharedPtr<IGraphicsShader> FindGraphicsShader(const String& name);
+		SharedPtr<IGraphicsShader> FindGraphicsShader(const String& name, const List<String>& scriptNameList);
+		SharedPtr<IComputeShader>  FindComputeShader(const String& name);
+		SharedPtr<IShaderScript>   FindScript(const String& name);
+
+
+
+
 		bool   LoadGlobalShaderLib(const String& path);
-		String GetGlobalShaderLibCode()   const;
-		String GetGlobalGraphicsLibCode() const;
+		const String& GetGlobalShaderLibCode()   const;
+		const String& GetGlobalGraphicsLibCode() const;
+		const String& GetGlobalComputeLibCode() const;
 	};
 
 

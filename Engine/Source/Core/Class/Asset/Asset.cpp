@@ -763,7 +763,7 @@ namespace JG
 		auto materialStock = static_cast<MaterialAssetStock*>(data->Stock.get());
 		materialStock->Name = data->Asset->GetAssetPath();
 
-		auto shader = ShaderLibrary::GetInstance().GetShader(materialStock->ShaderTemplate, { materialStock->ShaderScript });
+		auto shader = ShaderLibrary::GetInstance().FindGraphicsShader(materialStock->ShaderTemplate, { materialStock->ShaderScript });
 		if (shader != nullptr)
 		{
 			materialAsset->mData->SetShader(shader);

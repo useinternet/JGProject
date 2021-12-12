@@ -17,12 +17,12 @@ namespace JG
 	{
 		GameComponent::Awake();
 		CreateGeometry();
-		auto shader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader, { "Surface/SkyDome" });
-		mMaterial = IMaterial::Create("SkyDome_Material", shader);
+		//auto shader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader, { "Surface/SkyDome" });
+	/*	mMaterial = IMaterial::Create("SkyDome_Material", shader);
 		mMaterial->SetFloat3("ApexColor", JVector3(0.0f, 0.05f, 0.6f));
 		mMaterial->SetFloat3("CenterColor", JVector3(0.0f, 0.5f, 0.8f));
 		mMaterial->SetDepthStencilState(EDepthStencilStateTemplate::LessEqual);
-		mMaterial->SetRasterizerState(ERasterizerStateTemplate::Cull_None);
+		mMaterial->SetRasterizerState(ERasterizerStateTemplate::Cull_None);*/
 		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SkyDome::PushRenderSceneObject));
 	}
 	void SkyDome::Start()

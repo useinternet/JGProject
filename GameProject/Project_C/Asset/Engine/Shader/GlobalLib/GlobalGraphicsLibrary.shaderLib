@@ -165,6 +165,7 @@ cbuffer __RenderPassDataCB__ : register(b0)
     float    _NearZ;
     float    _FarZ;
     float3   _EyePosition;
+    uint     _PointLightCount;
 };
 cbuffer __ObjectDataCB__ : register(b1)
 {

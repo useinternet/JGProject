@@ -39,7 +39,7 @@ namespace JG
 		virtual bool GetUint3(const String& name, JVector3Uint* value) = 0;
 		virtual bool GetUint4(const String& name, JVector4Uint* value) = 0;
 		virtual bool GetFloat4x4(const String& name, JMatrix* out_value) = 0;
-		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) = 0;
+		virtual bool GetTexture(const String& name, SharedPtr<ITexture>* out_value) = 0;
 
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
 		virtual void SetBlendState(u32 slot, EBlendStateTemplate _template) = 0;
@@ -50,13 +50,12 @@ namespace JG
 		virtual const String& GetName() const    = 0;
 		virtual void SetShader(SharedPtr<IGraphicsShader> shader) = 0;
 		virtual List<std::pair<EShaderDataType, String>> GetPropertyList() const = 0;
-	protected:
 		virtual bool Bind(u64 commandID) = 0;
 	public:
 		virtual ~IMaterial() = default;
 	public:
 		static SharedPtr<IMaterial> Create(const String& name);
-		static SharedPtr<IMaterial> Create(const String& name, SharedPtr<IShader> shader);
+		static SharedPtr<IMaterial> Create(const String& name, SharedPtr<IGraphicsShader> shader);
 
 	};
 }

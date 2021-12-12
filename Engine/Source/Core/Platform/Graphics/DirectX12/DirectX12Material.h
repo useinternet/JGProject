@@ -8,6 +8,7 @@ namespace JG
 	class ShaderData;
 	class DirectX12Material : public IMaterial
 	{
+		using CBPair = std::pair<u64, u64>;
 	private:
 		String mName;
 		SharedPtr<IGraphicsShader> mGraphicsShader;
@@ -16,8 +17,13 @@ namespace JG
 		D3D12_RASTERIZER_DESC      mRasterzerDesc;
 
 
-		Dictionary<String, List<jbyte>>		    mCBDatas;
-		Dictionary<String, SharedPtr<ITexture>> mTextureDic;
+		List<jbyte> mBtData;
+		List<jbyte> mUploadBtData;
+		std::mutex  mMutex;
+
+
+		Dictionary<String, CBPair> mCBDatas;
+		Dictionary<String, SharedPtr<ITexture>> mTextures;
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
@@ -47,7 +53,7 @@ namespace JG
 		virtual bool GetUint3(const String& name, JVector3Uint* out_value) override;
 		virtual bool GetUint4(const String& name, JVector4Uint* out_value) override;
 		virtual bool GetFloat4x4(const String& name, JMatrix* outValue) override;
-		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) override;
+		virtual bool GetTexture(const String& name, SharedPtr<ITexture>* out_value) override;
 
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) override;
 		virtual void SetBlendState(u32 slot, EBlendStateTemplate _template) override;
@@ -66,14 +72,43 @@ namespace JG
 		bool SetData(const String& name, const T& value)
 		{
 			// 적기
+			if (mCBDatas.find(name) == mCBDatas.end())
+			{
+				return false;
+			}
 
+			u64 dataPos   = mCBDatas[name].first;
+			u64 cbSize	  = mCBDatas[name].second;
+			u64 valueSize = sizeof(T);
+
+			if (cbSize != valueSize)
+			{
+				return false;
+			}
+			void* dataPtr = (void*)(mBtData.data() + dataPos);
+
+			std::lock_guard<std::mutex> lock(mMutex);
+			memcpy(dataPtr, &value, cbSize);
 			return true;
 		}
 		template<class T>
 		bool GetData(const String& name, T* out_value)
 		{
-			// 적기
+			//
+			if (mCBDatas.find(name) == mCBDatas.end())
+			{
+				return false;
+			}
+			u64 dataPos = mCBDatas[name].first;
+			u64 cbSize = mCBDatas[name].second;
+			u64 valueSize = sizeof(T);
 
+			if (cbSize != valueSize)
+			{
+				return false;
+			}
+			void* dataPtr = (void*)(mBtData.data() + dataPos);
+			memcpy(out_value, dataPtr, cbSize);
 			return true;
 		}
 

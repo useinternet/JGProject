@@ -6,12 +6,13 @@
 
 namespace JG
 {
+	class ITexture;
 	class ShaderDataForm
 	{
 	public:
-		static const u64 Texture2DStartSpace = 0;
-		static const u64 TextureCubeStartSpace = 1;
-		static const u64 StructuredBufferStartSpace = 2;
+		static const u64 Tex2D_StartSpace		= 0;
+		static const u64 TextureCube_StartSpace = 1;
+		static const u64 SB_StartSpace	        = 2;
 	public:
 		class CBufferData;
 		class ShaderElement
@@ -33,7 +34,6 @@ namespace JG
 			u64 DataPos = 0;
 			CBufferData* Owner = nullptr;
 		};
-
 		class TextureData : public ShaderElement
 		{
 		public:
@@ -42,8 +42,6 @@ namespace JG
 		public:
 			virtual ~TextureData() = default;
 		};
-
-
 		class SamplerStateData : public ShaderElement
 		{
 		public:
@@ -51,8 +49,6 @@ namespace JG
 		public:
 			virtual ~SamplerStateData() = default;
 		};
-
-
 		class CBufferData : public ShaderElement
 		{
 		public:
@@ -61,15 +57,12 @@ namespace JG
 		public:
 			virtual ~CBufferData() = default;
 		};
-
-
 		class StructuredBufferData : public ShaderElement
 		{
 		public:
 			String Type;
 			u64 ElementDataSize = 0;
 		};
-
 		class StructData
 		{
 		public:
@@ -78,7 +71,6 @@ namespace JG
 			List<String> DataNameList;
 			u64 DataSize = 0;
 		};
-		
 	public:
 		SortedDictionary<u64, ShaderElement*>			RootParamMap;
 		Dictionary<String, UniquePtr<CBufferData>>		CBufferDataMap;
@@ -88,16 +80,17 @@ namespace JG
 		Dictionary<String, UniquePtr<TextureData>>		RWTextureDataMap;
 		Dictionary<String, UniquePtr<SamplerStateData>> SamplerStateDataMap;
 		Dictionary<String, Data*>		                CBufferVarMap;
-
-		Dictionary<String, UniquePtr<StructData>> StructDataMap;
-		UniquePtr<CBufferData> PassData;
+		Dictionary<String, UniquePtr<StructData>>       StructDataMap;
 	private:
 		u64 RootParamOffset = 0;
 		u64 CBufferRegisterNumberOffset = 0;
 		u64 TextureRegisterNumberOffset = 0;
 		u64 TextureCubeRegisterNumberOffset = 0;
 		u64 SamplerStateRegisterNumberOffset = 0;
-		u64 SpaceOffset = 0;
+
+
+		u64 T_SpaceOffset = 0;
+		u64 U_SpaceOffset = 0;
 	public:
 		bool Set(String& code);
 		void Reset();
@@ -137,33 +130,35 @@ namespace JG
 		bool RegisterSamplerStateData(const String& name);
 	};
 
-
-	class DirectX12Shader;
 	class IShader;
 	class ITexture;
 	class IReadWriteBuffer;
+	class RootSignature;
 	class ShaderData
 	{
 	public:
 		const static u64 MaxElementCount = 10240;
 	private:
-		UniquePtr<UploadAllocator> mUploadAllocator;
+		UniquePtr<UploadAllocator>      mUploadAllocator;
 		Dictionary<String, List<jbyte>> mReadDatas;
 		Dictionary<String, SharedPtr<IReadWriteBuffer>> mReadWriteDatas;
-		Dictionary<String, List<SharedPtr<ITexture>>> mTextureDatas;
-		Dictionary<String, List<SharedPtr<ITexture>>> mRWTextureDatas;
-		SharedPtr<IShader>					          mOwnerShader;
-		
-
+		Dictionary<String, List<SharedPtr<ITexture>>>   mTextureDatas;
+		Dictionary<String, List<SharedPtr<ITexture>>>   mRWTextureDatas;
+		SharedPtr<ShaderDataForm> mShaderDataForm;
+		SharedPtr<RootSignature>  mRootSignature;
 		std::shared_mutex mMutex;
-		Dictionary<u64, List<jbyte>> mPassDatas;
 	public:
-		ShaderData(SharedPtr<IShader> shader);
+		ShaderData(SharedPtr<ShaderDataForm> shaderDataForm);
 	public:
-		bool Bind(u64 commandID);
+		SharedPtr<RootSignature> GetRootSignature();
+		void ForEach_CB(const std::function<void(const ShaderDataForm::CBufferData*, const List<jbyte>&)>& action);
+		void ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action);
+		void ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action);
+		void ForEach_Tex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action);
+		void ForEach_RWTex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action);
+
 		void Reset();
 	public:
-		void SetPassData(u64 commandID, void* passData, u64 dataSize);
 		bool SetFloat(const String& name, float value);
 		bool SetFloat2(const String& name, const JVector2& value);
 		bool SetFloat3(const String& name, const JVector3& value);
@@ -211,7 +206,6 @@ namespace JG
 		bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value);
 	public:
 		SharedPtr<IReadWriteBuffer> GetRWData(const String& name);
-		DirectX12Shader* GetOwnerShader() const;
 	public:
 		template<class T, EShaderDataType type>
 		bool SetData(const String& name, const T* value)

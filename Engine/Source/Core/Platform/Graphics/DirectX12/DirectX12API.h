@@ -28,19 +28,19 @@ namespace JG
 	class ComputePipelineState;
 	class TextureAssetStock;
 
-	enum class ERootParam
-	{
-		SB_POINT_LIGHTS    ,
-		CB_RENDER_PASS_DATA,
-		CB_OBJECTDATA,
-		CB_MATERIAL,
-		TEXTURE2D,
-		TEXTURECUBE,
-		RWTEXTURE2D,
-	};
-
 	class DirectX12API : public IGraphicsAPI
 	{
+	public:
+		enum class ERootParam
+		{
+			SB_POINT_LIGHTS,
+			CB_RENDER_PASS_DATA,
+			CB_OBJECTDATA,
+			CB_MATERIAL,
+			TEXTURE2D,
+			TEXTURECUBE,
+			RWTEXTURE2D,
+		};
 	public:
 		virtual EGraphicsAPI GetAPI()const override;
 		virtual u64 GetBufferCount() const override;
@@ -67,7 +67,8 @@ namespace JG
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState(u64 ID);
 		static SharedPtr<RootSignature>         GetGraphicsRootSignature(u64 ID);
 		static SharedPtr<RootSignature>         GetComputeRootSignature(u64 ID);
-		//static SharedPtr<RootSignature>         GetRootSignature(u64 ID);
+
+
 
 		static void GetDepthStencilDesc(EDepthStencilStateTemplate _template,  D3D12_DEPTH_STENCIL_DESC* out);
 		static void GetBlendDesc(EBlendStateTemplate _template,  D3D12_RENDER_TARGET_BLEND_DESC* out);
@@ -84,7 +85,6 @@ namespace JG
 		static void DestroyCommittedResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource);
 	private:
 		static SharedPtr<RootSignature> CreateGraphicsRootSignature();
-
 	protected:
 		// Application
 		virtual bool Create() override;
@@ -98,6 +98,7 @@ namespace JG
 		virtual void EndDraw(u64 commandID)   override;
 
 		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)   override;
+		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) override;
 		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) override;
 		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) override;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) override;
@@ -119,12 +120,8 @@ namespace JG
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) override;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) override;
-
-
-
-		virtual SharedPtr<IShader>        CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
-		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IShader> shader) override;
+		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) override;
 		virtual SharedPtr<IMesh>		  CreateMesh(const String& name) override;
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;

@@ -80,10 +80,10 @@ namespace JG
 
 		String templateSource;
 		String surfaceSource;
-		FileExtend::GetReadAllText(templatePath, &templateSource);
-		FileExtend::GetReadAllText(surfacePath, &surfaceSource);
+		FileExtend::ReadAllText(templatePath, &templateSource);
+		FileExtend::ReadAllText(surfacePath, &surfaceSource);
 
-		auto script = IShaderScript::CreateShaderScript("test", surfaceSource);
+		auto script = IShaderScript::CreateSurfaceScript("test", surfaceSource);
 		IGraphicsShader::Create(templateSource, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader, { script });
 	}
 	void GameLogicSystemLayer::Destroy()

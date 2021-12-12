@@ -27,17 +27,6 @@ namespace JG
 				info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
 				info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
 		}
-
-		Graphics::RenderPassData passData;
-		passData.ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
-		passData.ProjMatrix = JMatrix::Transpose(info.ProjMatrix);
-		passData.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
-		passData.EyePosition = info.EyePosition;
-		passData.Resolution = info.Resolutoin;
-		passData.FarZ = info.FarZ;
-		passData.NearZ = info.NearZ;
-
-		//api->SetRenderPassData(commandID, passData);
 	}
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info)
@@ -48,18 +37,14 @@ namespace JG
 		api->ClearRenderTarget(commandID, { info.TargetTexture }, info.TargetDepthTexture);
 		api->SetRenderTarget(commandID, { info.TargetTexture }, info.TargetDepthTexture);
 		
-		PassCB passCB;
-		passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
-		passCB.EyePos = info.EyePosition;
-
-		auto lightInfos = GetLightInfos();
 		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
 		{
 			for (auto& info : objectList)
 			{
 				auto mesh = info.Mesh;
 				auto& materialList = info.MaterialList;
-				auto& worldMatrix = info.WorldMatrix;
+				auto& worldMatrix  = JMatrix::Transpose(info.WorldMatrix);
+				api->SetTransform(commandID, &worldMatrix);
 
 				if (mesh->Bind(commandID) == false)
 				{
@@ -69,11 +54,9 @@ namespace JG
 				{
 					if (mesh->GetSubMesh(i)->Bind(commandID) == false)
 					{
-						JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(0)->GetName());
+						JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(i)->GetName());
 						continue;
 					}
-
-
 					SharedPtr<IMaterial> material = nullptr;
 					if (materialList.size() <= i)
 					{
@@ -84,34 +67,6 @@ namespace JG
 						material = materialList[i];
 					}
 
-
-					passCB.WorldMatrix = JMatrix::Transpose(worldMatrix);
-					material->SetPassData(commandID, &passCB, sizeof(PassCB));
-
-					ForEach([&](Graphics::ELightType lightType, const LightInfo& lightInfo)
-					{
-
-						switch (lightType)
-						{
-						case Graphics::ELightType::PointLight:
-						{
-							
-							if (material->SetInt(ShaderDefine::Standard3D::PointLightCount, lightInfo.Count) == false)
-							{
-
-							}
-							if (lightInfo.Count > 0)
-							{
-								if (material->SetStructDataArray(ShaderDefine::Standard3D::PointLightList, (void*)lightInfo.ByteData.data(), lightInfo.Count, lightInfo.Size) == false)
-								{
-
-								}
-							}
-						}
-							break;
-						}
-					});
-
 					if (material->Bind(commandID) == false)
 					{
 						JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
@@ -121,13 +76,11 @@ namespace JG
 				}
 			}
 		});
-
 	}
 
 	void FowardRenderer::CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info)
 	{
-		//auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		//api->EndDraw(commandID);
+
 
 	}
 

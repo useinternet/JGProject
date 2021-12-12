@@ -17,7 +17,7 @@ _Init {
 
 
 _Surface {
-	float4 textureColor = Tex1.Sample(gPointSampler, _input.tex);
+	float4 textureColor = Tex1.Sample(_AnisotropicSampler, _input.tex);
 	_output.albedo      = textureColor * float4(BaseColor, 1.0f);
 	_output.roughness   = Roughness;
 	_output.specular    = Specular;

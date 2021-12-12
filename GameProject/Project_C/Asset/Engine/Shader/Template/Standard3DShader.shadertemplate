@@ -18,15 +18,6 @@ struct VS_OUT
 	float2 tex     : TEXCOORD;
 };
 
-cbuffer __PASS_DATA__
-{
-	float4x4 __ViewProjMatrix__;
-	float4x4 __WorldMatrix__;
-	float3   __EyePosition__;
-};
-
-
-
 __PS_SURFACE_VARIABLES_SCRIPT__
 __PS_SURFACE_RESOURCES_SCRIPT__
 
@@ -71,11 +62,11 @@ VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
 	vout.posL = vin.posL;
-	float3 posW = mul(float4(vin.posL, 1.0f), __WorldMatrix__);
-	float3 normalW = mul(float4(vin.normalL, 0.0f), __WorldMatrix__);
-	float3 tanW =  mul(float4(vin.tanL, 0.0f), __WorldMatrix__);
-	float3 bitW =  mul(float4(vin.bitL, 0.0f), __WorldMatrix__);
-	vout.posH = mul(float4(posW, 1.0f), __ViewProjMatrix__);
+	float3 posW = mul(float4(vin.posL, 1.0f), _WorldMatrix);
+	float3 normalW = mul(float4(vin.normalL, 0.0f), _WorldMatrix);
+	float3 tanW =  mul(float4(vin.tanL, 0.0f), _WorldMatrix);
+	float3 bitW =  mul(float4(vin.bitL, 0.0f), _WorldMatrix);
+	vout.posH = mul(float4(posW, 1.0f), _ViewProjMatrix);
 	vout.posW = posW;
 	vout.normalW = normalize(normalW);
 	vout.tanW = normalize(tanW);
@@ -91,7 +82,7 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 
 
 	float3 N = normalize(pin.normalW);
-	float3 V = normalize(__EyePosition__ - pin.posW);
+	float3 V = normalize(_EyePosition - pin.posW);
 
 
     float3 Lo = float3(0.0f,0.0f,0.0f);
@@ -102,28 +93,20 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 	material.Roughness = output.roughness;
 	material.Metallic = output.metallic;
 
+	uint cnt    = 0;
+	uint stride = 0;
 
-	for(int i = 0; i<gPointLightCount; ++i)
+	for(uint i = 0; i<_PointLightCount; ++i)
 	{
-		PointLight pl = gPointLightList[i];
+		PointLight pl = _PointLightList[i];
 		Lo += CalcPointLight(N, V, material, pl);
 	}
 
-
-
-	//DirectionalLight light;
-	//light.Direction  = float3(0.0f, 0.5f, -1.0f);
-	//light.LightColor = float3(1.0F,1.0F,1.0F);
-
-
-
-	//Lo += CalcDirLight(N,V,  material, light);
 	float3 final = saturate(Lo);
 	float Gamma = 1.0f / 2.2f;
 
     final = final / (final + float3(1.0f, 1.0f, 1.0f));
    	final = pow(final, float3(Gamma, Gamma, Gamma));
-
 	return float4(final, 1.0f);
 }
 

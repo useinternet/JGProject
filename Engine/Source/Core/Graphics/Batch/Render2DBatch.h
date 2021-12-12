@@ -29,7 +29,7 @@ namespace JG
 			SharedPtr<IMesh>         QuadMesh;
 			SharedPtr<IVertexBuffer> QuadVBuffer;
 			SharedPtr<IIndexBuffer>  QuadIBuffer;
-			//SharedPtr<IMaterial> Standard2DMaterial;
+			SharedPtr<IMaterial> Standard2DMaterial;
 		};
 	private:
 		static const u32 MaxQuadCount = 1200;

@@ -9,7 +9,7 @@ struct VS_IN
 };
 struct VS_OUT
 {
-	float4 posH : SV_POSITION;
+	float4 posH  : SV_POSITION;
 	float2 tex   : TEXCOORD;
 	float4 color : COLOR;
 	int textureIndex : TEXTUREINDEX;

@@ -104,7 +104,7 @@ namespace JG
 
 	namespace FileExtend
 	{
-		inline bool GetReadAllText(const String& path, String* out_str)
+		inline bool ReadAllText(const String& path, String* out_str)
 		{
 			if (out_str == nullptr)
 			{
@@ -117,14 +117,36 @@ namespace JG
 				std::stringstream ss;
 				ss << fin.rdbuf();
 				*out_str = ss.str();
+
+				fin.close();
 				return true;
 			}
-
-
-			fin.close();
-
-			return false;
+			else
+			{
+				fin.close();
+				return false;
+			}
 		}
+
+		inline bool WriteAllText(const String& path, const String& txt)
+		{
+			std::ofstream fout;
+			fout.open(path);
+
+			if (fout.is_open() == true)
+			{
+				fout << txt;
+				fout.close();
+				return true;
+			}
+			else
+			{
+				fout.close();
+				return false;
+			}
+		}
+
+
 	}
 
 }

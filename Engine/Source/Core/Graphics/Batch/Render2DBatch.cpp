@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Render2DBatch.h"
 #include "Graphics/JGGraphics.h"
+#include "Application.h"
 namespace JG
 {
 	Render2DBatch::Render2DBatch()
@@ -14,7 +15,11 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
-		auto _2dShader = ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard2DShader);
+
+		String _2dShaderPath = PathExtend::CombinePath(Application::GetShaderTemplatePath(), "Standard2DShader.shadertemplate");
+		String _2dShaderCode;
+		FileExtend::ReadAllText(_2dShaderPath, &_2dShaderCode);
+		auto _2dShader = IGraphicsShader::Create(_2dShaderCode, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader);
 
 		TextureInfo textureInfo;
 		textureInfo.Width      = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
@@ -38,12 +43,6 @@ namespace JG
 			rsc.QuadMesh->GetSubMesh(0)->SetIndexBuffer(rsc.QuadIBuffer);
 
 			rsc.Standard2DMaterial = IMaterial::Create("Standard2DMaterial", _2dShader);
-
-			if (rsc.Standard2DMaterial->SetTexture("gTexture", 0, mWhiteTexture) == false)
-			{
-				JG_CORE_ERROR("Failed Set Texture in WhiteTexture");
-				return;
-			}
 			rsc.Standard2DMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
 			rsc.Standard2DMaterial->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
 
@@ -192,7 +191,7 @@ namespace JG
 	{
 		if (mQuadCount == 0) return;
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		auto api       = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		if (mCurrFrameResource->Standard2DMaterial->Bind(commandID) == false)
@@ -201,6 +200,10 @@ namespace JG
 			StartBatch();
 			return;
 		}
+
+		api->SetTextures(commandID, mTextureArray);
+
+
 
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;
 		u32 quadIndexCount = mQuadCount * QuadIndexCount;

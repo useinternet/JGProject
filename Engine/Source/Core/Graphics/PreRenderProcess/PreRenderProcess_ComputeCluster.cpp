@@ -21,16 +21,16 @@ namespace JG
 		u64 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
 
 
-		auto shader = ShaderLibrary::GetInstance().GetShader(COMPUTE_CLUSTER_SHADER_NAME);
+		auto shader = ShaderLibrary::GetInstance().FindComputeShader(COMPUTE_CLUSTER_SHADER_NAME);
 		if (shader != nullptr)
 		{
 			for (u64 i = 0; i < bufferCnt; ++i)
 			{
-				auto computer = IComputer::Create("ClusterComputer", shader);
-				auto readBackBuffer = IReadBackBuffer::Create("ClusterComputer_ReadBackBuffer");
+				//auto computer = IComputer::Create("ClusterComputer", shader);
+				//auto readBackBuffer = IReadBackBuffer::Create("ClusterComputer_ReadBackBuffer");
 
-				mComputers.push_back(computer);
-				mReadBackBuffers.push_back(readBackBuffer);
+				//mComputers.push_back(computer);
+				//mReadBackBuffers.push_back(readBackBuffer);
 			}
 		}
 	}

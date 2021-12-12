@@ -7,6 +7,7 @@ namespace JG
 {
 	class RootSignature;
 	class DirectX12Shader;
+	class DirectX12GraphicsShader;
 	class DirectX12ComputeShader;
 	//class 
 	class PipelineState
@@ -39,6 +40,7 @@ namespace JG
 		void BindRenderTarget(const List< DXGI_FORMAT>& rtFormats, DXGI_FORMAT dvFormat = DXGI_FORMAT_UNKNOWN);
 		void BindInputLayout(const InputLayout& inputLayout);
 		void BindShader(const DirectX12Shader& shader);
+		void BindShader(const DirectX12GraphicsShader& shader);
 		void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE type);
 		void SetSampleMask(uint32_t sampleMask);
 		void SetRasterizerState(const D3D12_RASTERIZER_DESC& desc);
@@ -59,7 +61,7 @@ namespace JG
 	public:
 		ComputePipelineState();
 		void BindRootSignature(const RootSignature& rootSig);
-		void BindShader(const DirectX12Shader& shader);
+		//void BindShader(const DirectX12Shader& shader);
 
 
 		virtual bool Finalize() override;

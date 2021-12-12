@@ -147,19 +147,6 @@ namespace JG
 	{
 		return nullptr;
 	}
-
-	//SharedPtr<RootSignature> DirectX12API::GetRootSignature(u64 ID)
-	//{
-	//	std::lock_guard<std::mutex> lock(gRootSigMutex);
-	//	if (gGraphicsRootSignatures[ID] == nullptr)
-	//	{
-	//		gGraphicsRootSignatures[ID] = CreateSharedPtr<RootSignature>();
-	//	}
-	//	return gGraphicsRootSignatures[ID];
-	//}
-
-
-
 	void DirectX12API::GetDepthStencilDesc(EDepthStencilStateTemplate _template, D3D12_DEPTH_STENCIL_DESC* out)
 	{
 		auto desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -276,12 +263,39 @@ namespace JG
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::Texture2DRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::TextureCubeRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, HLSL::RegisterSpace::RWTexture2DRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
+
+
+		// Sampler
+		const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
+			0, // shaderRegister
+			D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+		const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
+			1, // shaderRegister
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+		const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+			2, // shaderRegister
+			D3D12_FILTER_ANISOTROPIC, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+			0.0f,                             // mipLODBias
+			8);                               // maxAnisotropy
+
+
+		rootSig->AddStaticSamplerState(pointWrap);
+		rootSig->AddStaticSamplerState(linearWrap);
+		rootSig->AddStaticSamplerState(anisotropicWrap);
+
 		rootSig->Finalize();
 		return rootSig;
 	}
-
-
-
 	bool DirectX12API::Create()
 	{
 		JG_CORE_INFO("DirectX12 Init Start");
@@ -408,7 +422,9 @@ namespace JG
 	void DirectX12API::BeginDraw(u64 commandID)
 	{
 		auto rootSig = GetGraphicsRootSignature(commandID);
+		auto pso = GetGraphicsPipelineState(commandID);
 		auto cmdList = GetGraphicsCommandList(commandID);
+		pso->BindRootSignature(*rootSig);
 		cmdList->BindRootSignature(rootSig);
 	}
 
@@ -421,6 +437,35 @@ namespace JG
 	{
 		auto cmdList = GetGraphicsCommandList(commandID);
 		cmdList->BindConstantBuffer((u32)ERootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
+	}
+
+	void DirectX12API::SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights)
+	{
+		Dictionary<Graphics::ELightType, List<jbyte>> lightDic;
+		Dictionary<Graphics::ELightType, u64> lightSizeDic;
+		for (auto& l : lights)
+		{
+			auto type = l->GetLightType();
+			l->PushBtData(lightDic[type]);
+
+			if (lightSizeDic.find(type) == lightSizeDic.end())
+			{
+				lightSizeDic.emplace(type, l->GetBtSize());
+			}
+		}
+
+
+		auto cmdList = GetGraphicsCommandList(commandID);
+
+		if (lightDic.find(Graphics::ELightType::PointLight) != lightDic.end())
+		{
+			void* pl_ptr = lightDic[Graphics::ELightType::PointLight].data();
+			u64 pl_size = lightSizeDic[Graphics::ELightType::PointLight];
+			u64 pl_count = lightDic[Graphics::ELightType::PointLight].size() / pl_size;
+			cmdList->BindStructuredBuffer((u32)ERootParam::SB_POINT_LIGHTS, pl_ptr, pl_count, pl_size);
+		}
+
+
 	}
 
 	void DirectX12API::SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures)
@@ -665,7 +710,7 @@ namespace JG
 
 		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader \n Error : {1}  \n SourceCode : \n {2} ", errorCode, sourceCode);
+			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, shader->GetFullShaderCode());
 			return nullptr;
 		}
 
@@ -679,23 +724,11 @@ namespace JG
 
 		if (shader->Compile(sourceCode, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader \n Error : {1}  \n SourceCode : \n {2} ", errorCode, sourceCode);
+			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, sourceCode);
 			return nullptr;
 		}
 
 
-		return shader;
-	}
-	SharedPtr<IShader> DirectX12API::CreateShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
-	{
-		String errorCode;
-		auto shader = CreateSharedPtr<DirectX12Shader>();
-		shader->SetName(name);
-		if (shader->Compile(sourceCode, scriptList, flags,&errorCode) == false)
-		{
-			JG_CORE_ERROR("Failed Compile Shader \n Name : {0} Error : {1}  \n SourceCode : \n {2} ", name, errorCode, sourceCode);
-			return nullptr;
-		}
 		return shader;
 	}
 	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name)
@@ -704,7 +737,7 @@ namespace JG
 		material->SetName(name);
 		return material;
 	}
-	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name, SharedPtr<IShader> shader)
+	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader)
 	{
 		if (shader == nullptr)
 		{

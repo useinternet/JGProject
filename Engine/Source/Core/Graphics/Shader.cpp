@@ -6,14 +6,6 @@
 
 namespace JG
 {
-	SharedPtr<IShader> IShader::Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
-	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-
-		return api->CreateShader(name, sourceCode, flags, scriptList);
-	}
-
 	SharedPtr<IGraphicsShader> IGraphicsShader::Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
@@ -31,91 +23,121 @@ namespace JG
 	}
 
 
-	SharedPtr<IShaderScript> IShaderScript::CreateShaderScript(const String& name, const String& code)
+	SharedPtr<IShaderScript> IShaderScript::CreateSurfaceScript(const String& name, const String& code)
 	{
-		auto script = CreateSharedPtr<ShaderScript>(name, code);
+		auto script = CreateSharedPtr<ShaderScript>(name, code, EShaderScriptType::Surface);
 		return script;
 	}
-	void ShaderLibrary::RegisterShader(SharedPtr<IShader> shader)
+	void ShaderLibrary::RegisterGraphicsShader(const String& name, SharedPtr<IGraphicsShader> shader)
 	{
-		if (shader == nullptr)
+		if (shader == nullptr || shader->IsSuccessed() == false)
 		{
 			return;
 		}
-		std::lock_guard<std::shared_mutex> lock(mMutex);
+		std::lock_guard<std::shared_mutex> lock(mGraphicsMutex);
 
-		auto iter = mShaders.find(shader->GetName());
-		if (iter == mShaders.end())
+		auto iter = mGraphicsShaderDic.find(name);
+		if (iter == mGraphicsShaderDic.end())
 		{
-			mShaders.emplace(shader->GetName(), shader);
+			mGraphicsShaderDic.emplace(name, shader);
 		}
 	}
-	void ShaderLibrary::RegisterScirpt(SharedPtr<IShaderScript> script)
+
+	void ShaderLibrary::RegisterComputeShader(const String& name, SharedPtr<IComputeShader> shader)
 	{
+		if (shader == nullptr || shader->IsSuccessed() == false)
+		{
+			return;
+		}
+		std::lock_guard<std::shared_mutex> lock(mComputeMutex);
+
+		auto iter = mComputeShaderDic.find(name);
+		if (iter == mComputeShaderDic.end())
+		{
+			mComputeShaderDic.emplace(name, shader);
+		}
+	}
+
+	void ShaderLibrary::RegisterShaderScript(const String& name, SharedPtr<IShaderScript> script)
+	{
+
 		if (script == nullptr)
 		{
 			return;
 		}
-		std::lock_guard<std::shared_mutex> lock(mMutex);
+		std::lock_guard<std::shared_mutex> lock(mScriptMutex);
 
-		auto iter = mMaterialScirpts.find(script->GetName());
-		if (iter == mMaterialScirpts.end())
+		auto iter = mShaderScriptDic.find(name);
+		if (iter == mShaderScriptDic.end())
 		{
-			mMaterialScirpts.emplace(script->GetName(), script);
+			mShaderScriptDic.emplace(name, script);
 		}
+
 	}
-	SharedPtr<IShader> ShaderLibrary::GetShader(const String& name)
+
+	SharedPtr<IGraphicsShader> ShaderLibrary::FindGraphicsShader(const String& name)
 	{
-		std::shared_lock<std::shared_mutex> lock(mMutex);
-		auto iter = mShaders.find(name);
-		if (iter != mShaders.end())
+		std::shared_lock<std::shared_mutex> lock(mGraphicsMutex);
+		auto iter = mGraphicsShaderDic.find(name);
+		if (iter != mGraphicsShaderDic.end())
 		{
 			return iter->second;
 		}
 		return nullptr;
 	}
 
-	SharedPtr<IShader> ShaderLibrary::GetShader(const String& name,const List<String>& scriptNameList)
+	SharedPtr<IGraphicsShader> ShaderLibrary::FindGraphicsShader(const String& name, const List<String>& scriptNameList)
 	{
 		String code = "";
-		auto originShader = GetShader(name);
+		auto originShader = FindGraphicsShader(name);
 		if (originShader == nullptr)
 		{
 			return nullptr;
 		}
-		code += originShader->GetName();
+		code += name;
 
 		List<SharedPtr<IShaderScript>> scriptList;
 		for (auto& scriptName : scriptNameList)
 		{
-			auto script = GetScript(scriptName);
+			auto script = FindScript(scriptName);
 			if (script == nullptr)
 			{
 				continue;
 			}
-			code += script->GetName();
+			code += "/" + script->GetName();
 			scriptList.push_back(script);
 		}
 
-		auto result = GetShader(code);
+		auto result = FindGraphicsShader(code);
 		if (result == nullptr)
 		{
-			result = IShader::Create(code, originShader->GetOriginCode(), originShader->GetFlags(), scriptList);
+			result = IGraphicsShader::Create(originShader->GetShaderCode(), originShader->GetFlags(), scriptList);
 			if (result == nullptr)
 			{
 				return nullptr;
 			}
-			RegisterShader(result);
+			RegisterGraphicsShader(code, result);
 		}
 		return result;
 	}
 
-	SharedPtr<IShaderScript> ShaderLibrary::GetScript(const String& name)
+	SharedPtr<IComputeShader> ShaderLibrary::FindComputeShader(const String& name)
+	{
+		std::shared_lock<std::shared_mutex> lock(mComputeMutex);
+		auto iter = mComputeShaderDic.find(name);
+		if (iter != mComputeShaderDic.end())
+		{
+			return iter->second;
+		}
+		return nullptr;
+	}
+
+	SharedPtr<IShaderScript> ShaderLibrary::FindScript(const String& name)
 	{
 
-		std::shared_lock<std::shared_mutex> lock(mMutex);
-		auto iter = mMaterialScirpts.find(name);
-		if (iter != mMaterialScirpts.end())
+		std::shared_lock<std::shared_mutex> lock(mScriptMutex);
+		auto iter = mShaderScriptDic.find(name);
+		if (iter != mShaderScriptDic.end())
 		{
 			return iter->second;
 		}
@@ -125,22 +147,32 @@ namespace JG
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
 	{
 		auto globalLibPath = PathExtend::CombinePath(path, "GlobalShaderLibrary.shaderLib");
-		FileExtend::GetReadAllText(globalLibPath, &mGlobalShaderLibCode);
+		FileExtend::ReadAllText(globalLibPath, &mGlobalShaderLibCode);
 
 		auto globalGraphicsLibPath = PathExtend::CombinePath(path, "GlobalGraphicsLibrary.shaderLib");
-		FileExtend::GetReadAllText(globalGraphicsLibPath, &mGlobalGraphicsLibCode);
+		FileExtend::ReadAllText(globalGraphicsLibPath, &mGlobalGraphicsLibCode);
 
+		auto globalComputeLibPath = PathExtend::CombinePath(path, "GlobalComputeLibrary.shaderLib");
+		FileExtend::ReadAllText(globalComputeLibPath, &mGlobalComputeLibCode);
 		return true;
 	}
-	String ShaderLibrary::GetGlobalGraphicsLibCode() const
+
+	const String& ShaderLibrary::GetGlobalShaderLibCode() const
+	{
+		return mGlobalShaderLibCode;
+	}
+	const String& ShaderLibrary::GetGlobalGraphicsLibCode() const
 	{
 		return mGlobalGraphicsLibCode;
 	}
 
-	String ShaderLibrary::GetGlobalShaderLibCode() const
+	const String& ShaderLibrary::GetGlobalComputeLibCode() const
 	{
-		return mGlobalShaderLibCode;
+		return mGlobalComputeLibCode;
 	}
+
+
+
 
 
 

@@ -370,6 +370,7 @@ namespace JG
 			f32 NearZ = 0.0f;
 			f32 FarZ = 0.0f;
 			JVector3 EyePosition;
+			u32 PointLightCount = 0;
 		};
 	}
 }

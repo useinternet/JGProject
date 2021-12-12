@@ -19,19 +19,43 @@ namespace JG
 			return false;
 		}
 		mLightInfos.clear();
+
+
+
 		// Light Info 정보 수집
+		u64 pl_count = 0;
 		for (auto item : lightList)
 		{
 			auto& info = mLightInfos[item->GetLightType()];
 			info.Count++;
 			info.Size = item->GetBtSize();
 			item->PushBtData(info.ByteData);
+
+			switch (item->GetLightType())
+			{
+			case Graphics::ELightType::PointLight:
+				++pl_count;
+				break;
+			}
 		}
 
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		api->BeginDraw(commandID);
 
 
+		// PassData  바인딩
+		// Light 정보 바인딩
+		Graphics::RenderPassData passData;
+		passData.ViewMatrix		= JMatrix::Transpose(info.ViewMatrix);
+		passData.ProjMatrix     = JMatrix::Transpose(info.ProjMatrix);
+		passData.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
+		passData.EyePosition	= info.EyePosition;
+		passData.FarZ			= info.FarZ;
+		passData.NearZ			= info.NearZ;
+		passData.Resolution		= info.Resolutoin;
+		passData.PointLightCount = pl_count;
+		api->SetRenderPassData(commandID, passData);
+		api->SetLights(commandID, lightList);
 		return BeginBatch(info, batchList);
 	}
 	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)

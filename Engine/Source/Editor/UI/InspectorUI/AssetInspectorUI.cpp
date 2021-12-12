@@ -150,34 +150,34 @@ namespace JG
 			break;
 			case EShaderDataType::texture2D:
 			{
-				SharedPtr<ITexture> texture = nullptr;
-				material->GetTexture(name, 0, &texture);
+				//SharedPtr<ITexture> texture = nullptr;
+				//material->GetTexture(name, 0, &texture);
 
 
-				u64 textureID = 0;
-				if (texture != nullptr && texture->IsValid())
-				{
-					textureID = texture->GetTextureID();
-					textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
-				}
+				//u64 textureID = 0;
+				//if (texture != nullptr && texture->IsValid())
+				//{
+				//	textureID = texture->GetTextureID();
+				//	textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
+				//}
 
-				auto asset = ImGui::Texture_OnGUI(name, textureID, label_space);
+				//auto asset = ImGui::Texture_OnGUI(name, textureID, label_space);
 
 
-				if (asset && asset->Is<Asset<ITexture>>())
-				{
-					auto tasset = asset->As<Asset<ITexture>>();
-					if (tasset->IsValid())
-					{
-						material->SetTexture(name, 0, tasset->Get());
-						texture = tasset->Get();
-					}
-				}
+				//if (asset && asset->Is<Asset<ITexture>>())
+				//{
+				//	auto tasset = asset->As<Asset<ITexture>>();
+				//	if (tasset->IsValid())
+				//	{
+				//		material->SetTexture(name, 0, tasset->Get());
+				//		texture = tasset->Get();
+				//	}
+				//}
 
-				if (texture != nullptr)
-				{
-					dataJson->SetString(texture->GetName());
-				}
+				//if (texture != nullptr)
+				//{
+				//	dataJson->SetString(texture->GetName());
+				//}
 			}
 			break;
 			default:

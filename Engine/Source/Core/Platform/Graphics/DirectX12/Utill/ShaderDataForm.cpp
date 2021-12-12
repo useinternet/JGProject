@@ -4,6 +4,8 @@
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 #include "Platform/Graphics/DirectX12/DirectX12Shader.h"
 #include "Platform/Graphics/DirectX12/DirectX12Resource.h"
+#include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
+
 namespace JG
 {
 	bool ShaderDataForm::Set(String& code)
@@ -11,8 +13,6 @@ namespace JG
 		// Shader 코드 생성 및 정보 수집
 		bool result = true;
 		Reset();
-
-
 		u64 pos = 0;
 		while (pos != String::npos)
 		{
@@ -62,7 +62,8 @@ namespace JG
 	void ShaderDataForm::Reset()
 	{
 		RootParamOffset = 0;
-		SpaceOffset = 0;
+		T_SpaceOffset = 0;
+		U_SpaceOffset = 0;
 		TextureRegisterNumberOffset = 0;
 		TextureCubeRegisterNumberOffset = 0;
 		SamplerStateRegisterNumberOffset = 0;
@@ -202,14 +203,6 @@ namespace JG
 		code.insert(endPos, " : register(b" + std::to_string(CBufferRegisterNumberOffset++) + ")");
 
 		RootParamMap[cBuffer->RootParm] = cBuffer;
-
-		if (cBuffer->Name == ShaderDefine::Token::PassData)
-		{
-			auto cbName = cBuffer->Name;
-			PassData = std::move(CBufferDataMap[cbName]);
-			CBufferDataMap.erase(cbName);
-		}
-
 		return startPos;
 	}
 	u64 ShaderDataForm::AnalysisStructuredBuffer(String& code, u64 startPos, bool* result)
@@ -273,7 +266,7 @@ namespace JG
 			structuredBufferData->Name = nameCode;
 			structuredBufferData->RootParm = RootParamOffset++;
 			structuredBufferData->RegisterNum = 0;
-			structuredBufferData->RegisterSpace = (u32)(ShaderDataForm::StructuredBufferStartSpace + SpaceOffset++);
+			structuredBufferData->RegisterSpace = (u32)(ShaderDataForm::SB_StartSpace + T_SpaceOffset++);
 			structuredBufferData->ElementType = HLSL::EHLSLElement::StructuredBuffer;
 			structuredBufferData->ElementDataSize = typeSize;
 			RootParamMap[structuredBufferData->RootParm] = structuredBufferData;
@@ -344,7 +337,7 @@ namespace JG
 			textureData->Name = nameCode;
 			textureData->RootParm = RootParamOffset++;
 			textureData->RegisterNum = (u32)TextureRegisterNumberOffset; TextureRegisterNumberOffset += arraySize;
-			textureData->RegisterSpace = ShaderDataForm::Texture2DStartSpace;
+			textureData->RegisterSpace = ShaderDataForm::Tex2D_StartSpace;
 			textureData->ElementType = HLSL::EHLSLElement::Texture;
 			textureData->Type = HLSL::EHLSLTextureType::_2D;
 			textureData->TextureCount = arraySize;
@@ -498,7 +491,7 @@ namespace JG
 			structuredBufferData->Name = nameCode;
 			structuredBufferData->RootParm = RootParamOffset++;
 			structuredBufferData->RegisterNum = 0;
-			structuredBufferData->RegisterSpace = (u32)(ShaderDataForm::StructuredBufferStartSpace + SpaceOffset++);
+			structuredBufferData->RegisterSpace = (u32)(ShaderDataForm::SB_StartSpace + U_SpaceOffset++);
 			structuredBufferData->ElementType = HLSL::EHLSLElement::RWStructuredBuffer;
 			structuredBufferData->ElementDataSize = typeSize;
 			RootParamMap[structuredBufferData->RootParm] = structuredBufferData;
@@ -560,7 +553,7 @@ namespace JG
 			textureData->Name = nameCode;
 			textureData->RootParm = RootParamOffset++;
 			textureData->RegisterNum = (u32)TextureRegisterNumberOffset; TextureRegisterNumberOffset += arraySize;
-			textureData->RegisterSpace = ShaderDataForm::Texture2DStartSpace;
+			textureData->RegisterSpace = ShaderDataForm::Tex2D_StartSpace;
 			textureData->ElementType = HLSL::EHLSLElement::RWTexture;
 			textureData->Type = HLSL::EHLSLTextureType::_2D;
 			textureData->TextureCount = arraySize;
@@ -1102,43 +1095,34 @@ namespace JG
 
 
 
-	ShaderData::ShaderData(SharedPtr<IShader> shader)
+	ShaderData::ShaderData(SharedPtr<ShaderDataForm> shaderDataForm)
 	{
-
-		mOwnerShader = shader;
-		mUploadAllocator   = CreateUniquePtr<UploadAllocator>();
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		if (dx12Shader != nullptr)
+		mShaderDataForm   = shaderDataForm;
+		mUploadAllocator  = CreateUniquePtr<UploadAllocator>();
+		for (auto& _pair : shaderDataForm->CBufferDataMap)
 		{
-			auto shaderDataForm = dx12Shader->GetShaderDataForm();
+			mReadDatas[_pair.first].resize(_pair.second->DataSize);
+		}
 
+		for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
+		{
+			mReadDatas[_pair.first].resize(_pair.second->ElementDataSize);
+		}
+		for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
+		{
+			mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, _pair.second->ElementDataSize * MaxElementCount);
+		}
 
-			for (auto& _pair : shaderDataForm->CBufferDataMap)
-			{
-				mReadDatas[_pair.first].resize(_pair.second->DataSize);
-			}
-
-			for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
-			{
-				mReadDatas[_pair.first].resize(_pair.second->ElementDataSize);
-			}
-			for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
-			{
-				mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, _pair.second->ElementDataSize * MaxElementCount);
-			}
-
-			for (auto& _pair : shaderDataForm->TextureDataMap)
-			{
-				mTextureDatas[_pair.first].resize(_pair.second->TextureCount, nullptr);
-			}
-			for (auto& _pair : shaderDataForm->RWTextureDataMap)
-			{
-				mRWTextureDatas[_pair.first].resize(_pair.second->TextureCount, nullptr);
-			}
-
+		for (auto& _pair : shaderDataForm->TextureDataMap)
+		{
+			mTextureDatas[_pair.first].resize(_pair.second->TextureCount, nullptr);
+		}
+		for (auto& _pair : shaderDataForm->RWTextureDataMap)
+		{
+			mRWTextureDatas[_pair.first].resize(_pair.second->TextureCount, nullptr);
 		}
 	}
-	bool ShaderData::Bind(u64 commandID)
+	bool ShaderData::Bind(u64 commandID, bool is_graphics)
 	{
 		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 
@@ -1164,10 +1148,6 @@ namespace JG
 					auto& btData = mReadDatas[cBufferName];
 
 					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
-				}
-				if (shaderDataForm->PassData)
-				{
-					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID].data(), mPassDatas[commandID].size());
 				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
@@ -1245,10 +1225,6 @@ namespace JG
 
 					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
 				}
-				if (shaderDataForm->PassData)
-				{
-					commandList->BindConstantBuffer(shaderDataForm->PassData->RootParm, mPassDatas[commandID].data(), mPassDatas[commandID].size());
-				}
 				// structuredBuffer
 				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
 				{
@@ -1318,6 +1294,86 @@ namespace JG
 		}
 		return true;
 	}
+	SharedPtr<RootSignature> ShaderData::GetRootSignature()
+	{
+		if (mRootSignature != nullptr)
+		{
+			return mRootSignature;
+		}
+
+		SharedPtr<RootSignature> RootSig = CreateSharedPtr<RootSignature>();
+		for (auto& rpPair : mShaderDataForm->RootParamMap)
+		{
+			u64 rootParam = rpPair.first;
+			auto element = rpPair.second;
+
+			switch (element->ElementType)
+			{
+			case HLSL::EHLSLElement::CBuffer:
+				RootSig->InitAsCBV(element->RegisterNum, element->RegisterSpace);
+				break;
+			case HLSL::EHLSLElement::StructuredBuffer:
+				RootSig->InitAsSRV(element->RegisterNum, element->RegisterSpace);
+				break;
+			case HLSL::EHLSLElement::RWStructuredBuffer:
+				RootSig->InitAsUAV(element->RegisterNum, element->RegisterSpace);
+				break;
+			case HLSL::EHLSLElement::Texture:
+				RootSig->InitAsDescriptorTable(
+					D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+					(u32)(static_cast<ShaderDataForm::TextureData*>(element))->TextureCount,
+					element->RegisterNum, element->RegisterSpace);
+				break;
+			case HLSL::EHLSLElement::RWTexture:
+				RootSig->InitAsDescriptorTable(
+					D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
+					(u32)(static_cast<ShaderDataForm::TextureData*>(element))->TextureCount,
+					element->RegisterNum, element->RegisterSpace);
+				break;
+			case HLSL::EHLSLElement::SamplerState:
+				JGASSERT("IS NOT IMPL");
+				break;
+			}
+		}
+		for (auto& _pair : mShaderDataForm->SamplerStateDataMap)
+		{
+			RootSig->AddStaticSamplerState(_pair.second->Desc);
+		}
+
+
+
+		if (RootSig->Finalize() == false)
+		{
+			JG_CORE_ERROR("Failed Bind Shader : Failed Create RootSignature");
+			return false;
+		}
+		mRootSignature = RootSig;
+		return mRootSignature;
+	}
+	void ShaderData::ForEach_CB(const std::function<void(const ShaderDataForm::CBufferData*, const List<jbyte>&)>& action)
+	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->CBufferDataMap)
+		{
+			auto cBufferName = _pair.first;
+			auto cBufferData = _pair.second.get();
+			auto& btData = mReadDatas[cBufferName];
+			action(cBufferData)
+			commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
+		}
+	}
+	void ShaderData::ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action)
+	{
+	}
+	void ShaderData::ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action)
+	{
+	}
+	void ShaderData::ForEach_Tex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action)
+	{
+	}
+	void ShaderData::ForEach_RWTex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action)
+	{
+	}
 	void ShaderData::Reset()
 	{
 		mUploadAllocator->Reset();
@@ -1325,41 +1381,6 @@ namespace JG
 		mReadWriteDatas.clear();
 		mTextureDatas.clear();
 		mRWTextureDatas.clear();
-		mOwnerShader.reset();
-	}
-	void ShaderData::SetPassData(u64 commandID, void* passData, u64 dataSize)
-	{
-		if (mOwnerShader == nullptr)
-		{
-			return;
-		}
-
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		auto shaderDataForm = dx12Shader->GetShaderDataForm();
-
-		if (shaderDataForm == nullptr || shaderDataForm->PassData == nullptr)
-		{
-			return;
-		}
-
-		if (shaderDataForm->PassData->DataSize != dataSize)
-		{
-			JG_CORE_ERROR("Not Match PassDataSize {0} : {1}", shaderDataForm->PassData->DataSize, dataSize);
-			return;
-		}
-
-		void* CPU = nullptr;
-
-		{
-			std::lock_guard<std::shared_mutex> lock(mMutex);
-			if (mPassDatas.find(commandID) == mPassDatas.end())
-			{
-				mPassDatas[commandID].resize(dataSize);
-			}
-			CPU = mPassDatas[commandID].data();
-		}
-
-		memcpy(CPU, passData, dataSize);
 	}
 	bool ShaderData::SetFloat(const String& name, float value)
 	{
@@ -1596,93 +1617,96 @@ namespace JG
 		}
 		return nullptr;
 	}
-	DirectX12Shader* ShaderData::GetOwnerShader() const
-	{
-		if (mOwnerShader == nullptr)
-		{
-			return nullptr;
-		}
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		return dx12Shader;
-	}
+	//DirectX12Shader* ShaderData::GetOwnerShader() const
+	//{
+	//	if (mOwnerShader == nullptr)
+	//	{
+	//		return nullptr;
+	//	}
+	//	auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+	//	return dx12Shader;
+	//}
 	ShaderDataForm::Data* ShaderData::GetAndCheckData(const String& name, EShaderDataType checkType)
 	{
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		if (dx12Shader != nullptr)
-		{
-			auto shaderDataForm = dx12Shader->GetShaderDataForm();
-			auto& CBufferVarMap = shaderDataForm->CBufferVarMap;
+		return nullptr;
+		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+		//if (dx12Shader != nullptr)
+		//{
+		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
+		//	auto& CBufferVarMap = shaderDataForm->CBufferVarMap;
 
-			auto iter = CBufferVarMap.find(name);
-			if (iter == CBufferVarMap.end())
-			{
-				return nullptr;
-			}
-			auto data = iter->second;
-			if (data->Type != checkType)
-			{
-				return nullptr;
-			}
-			return data;
-		}
-		else
-		{
-			return nullptr;
-		}
+		//	auto iter = CBufferVarMap.find(name);
+		//	if (iter == CBufferVarMap.end())
+		//	{
+		//		return nullptr;
+		//	}
+		//	auto data = iter->second;
+		//	if (data->Type != checkType)
+		//	{
+		//		return nullptr;
+		//	}
+		//	return data;
+		//}
+		//else
+		//{
+		//	return nullptr;
+		//}
 	}
 	bool ShaderData::CheckDataArray(const String& name, EShaderDataType checkType)
 	{
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		if (dx12Shader != nullptr)
-		{
-			auto shaderDataForm = dx12Shader->GetShaderDataForm();
-			auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
-			if (iter == shaderDataForm->StructuredBufferDataMap.end())
-			{
-				return false;
-			}
+		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+		//if (dx12Shader != nullptr)
+		//{
+		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
+		//	auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
+		//	if (iter == shaderDataForm->StructuredBufferDataMap.end())
+		//	{
+		//		return false;
+		//	}
 
-			auto data = iter->second.get();
-			if (data->Type != ShaderDataTypeToString(checkType))
-			{
-				return false;
-			}
+		//	auto data = iter->second.get();
+		//	if (data->Type != ShaderDataTypeToString(checkType))
+		//	{
+		//		return false;
+		//	}
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		//	return true;
+		//}
+		//else
+		//{
+		//	return false;
+		//}
+
+		return true;
 	}
 	bool ShaderData::CheckDataArray(const String& name, u64 elementSize)
 	{
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		if (dx12Shader != nullptr)
-		{
-			auto shaderDataForm = dx12Shader->GetShaderDataForm();
-			auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
-			if (iter == shaderDataForm->StructuredBufferDataMap.end())
-			{
-				return false;
-			}
-			u64 typeSize = 0;
-			auto data = iter->second.get();
-			if (shaderDataForm->FindTypeInfo(data->Type, nullptr, &typeSize) == false)
-			{
-				return false;
-			}
-			if (elementSize != typeSize)
-			{
-				return false;
-			}
+		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+		//if (dx12Shader != nullptr)
+		//{
+		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
+		//	auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
+		//	if (iter == shaderDataForm->StructuredBufferDataMap.end())
+		//	{
+		//		return false;
+		//	}
+		//	u64 typeSize = 0;
+		//	auto data = iter->second.get();
+		//	if (shaderDataForm->FindTypeInfo(data->Type, nullptr, &typeSize) == false)
+		//	{
+		//		return false;
+		//	}
+		//	if (elementSize != typeSize)
+		//	{
+		//		return false;
+		//	}
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		//	return true;
+		//}
+		//else
+		//{
+		//	return false;
+		//}
 
 
 		return false;
