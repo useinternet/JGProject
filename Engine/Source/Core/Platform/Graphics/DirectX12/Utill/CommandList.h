@@ -82,12 +82,12 @@ namespace JG
 
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
 		void BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
-		void BindConstantBuffer(u32 rootParam, void* data, u64 dataSize);
+		void BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize);
 		void BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
 		void BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
-		void BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize);
+		void BindStructuredBuffer(u32 rootParam, const void* data, u64 elementCount, u64 elementSize);
 		void BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
-		void BindConstants(u32 rootparam, u32 btSize, void* data, u32 offset = 0);
+		void BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset = 0);
 		void BindVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& view, bool isFlush = true);
 		void FlushVertexBuffer();
 
@@ -108,12 +108,12 @@ namespace JG
 		void BindPipelineState(SharedPtr<ComputePipelineState> pso);
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
 		void BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
-		void BindConstantBuffer(u32 rootParam, void* data, u64 dataSize);
+		void BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize);
 		void BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
 		void BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
-		void BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize);
+		void BindStructuredBuffer(u32 rootParam, const void* data, u64 elementCount, u64 elementSize);
 		void BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
-		void BindConstants(u32 rootparam, u32 btSize, void* data, u32 offset = 0);
+		void BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset = 0);
 		void Dispatch(u32 groupX, u32 groupY, u32 groupZ);
 	};
 

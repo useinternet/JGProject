@@ -144,7 +144,7 @@ namespace JG
 		Dictionary<String, SharedPtr<IReadWriteBuffer>> mReadWriteDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>>   mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>>   mRWTextureDatas;
-		SharedPtr<ShaderDataForm> mShaderDataForm;
+		SharedPtr<ShaderDataForm> mShaderDataForm = nullptr;
 		SharedPtr<RootSignature>  mRootSignature;
 		std::shared_mutex mMutex;
 	public:

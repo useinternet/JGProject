@@ -367,7 +367,7 @@ namespace JG
 	{
 		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
-	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, void* data, u64 dataSize)
+	void GraphicsCommandList::BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize)
 	{
 		auto alloc = mUploadAllocator->Allocate(dataSize, 256);
 		memcpy(alloc.CPU, data, dataSize);
@@ -395,7 +395,7 @@ namespace JG
 	{
 		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
-	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize)
+	void GraphicsCommandList::BindStructuredBuffer(u32 rootParam, const void* data, u64 elementCount, u64 elementSize)
 	{
 		auto dataSize = elementCount * elementSize;
 		auto alloc = mUploadAllocator->Allocate(dataSize, elementSize);
@@ -422,7 +422,7 @@ namespace JG
 			BackupResource(backUpResource);
 		}
 	}
-	void GraphicsCommandList::BindConstants(u32 rootParam, u32 btSize, void* data, u32 offset)
+	void GraphicsCommandList::BindConstants(u32 rootParam, u32 btSize, const void* data, u32 offset)
 	{
 		int initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
 		switch (initType)
@@ -523,7 +523,7 @@ namespace JG
 	{
 		BindConstantBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
-	void ComputeCommandList::BindConstantBuffer(u32 rootParam, void* data, u64 dataSize)
+	void ComputeCommandList::BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize)
 	{
 		auto alloc = mUploadAllocator->Allocate(dataSize, 256);
 		memcpy(alloc.CPU, data, dataSize);
@@ -550,7 +550,7 @@ namespace JG
 	{
 		BindStructuredBuffer(rootParam, alloc.GPU, alloc.OwnerPage->Get());
 	}
-	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, void* data, u64 elementCount, u64 elementSize)
+	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, const void* data, u64 elementCount, u64 elementSize)
 	{
 		auto dataSize = elementCount * elementSize;
 		auto alloc = mUploadAllocator->Allocate(dataSize, elementSize);
@@ -577,7 +577,7 @@ namespace JG
 			BackupResource(backUpResource);
 		}
 	}
-	void ComputeCommandList::BindConstants(u32 rootparam, u32 btSize, void* data, u32 offset)
+	void ComputeCommandList::BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset)
 	{
 		int initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootparam);
 		switch (initType)

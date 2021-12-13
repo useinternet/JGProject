@@ -1,29 +1,35 @@
 
 
+
+#define NUM_X_THREAD 8
+#define NUM_Y_THREAD 8
+#define NUM_Z_THREAD 16
+
+
 struct Cluster
 {
     float4 Min;
     float4 Max;
 };
+// groupshared
+
+
+// input
+StructuredBuffer<PointLight> _PointLights;
+S
+
+// output
+StructuredBuffer<uint> _ClusterLightIndices;
 
 
 
-
-
-#define NUM_X_SLICE 8
-#define NUM_Y_SLICE 8
-#define NUM_Z_SLICE 16
-
-
-SturcturedBuffer<Cluster>    Clusters;
-
-
-[numthreads(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE)]
+[numthreads(NUM_X_THREAD, NUM_Y_THREAD, NUM_Z_THREAD)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,
              uint3 groupThreadId    : SV_GroupThreadID,
              uint groupIndex : SV_GroupIndex)
 {
+        
 
 
 }

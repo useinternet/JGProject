@@ -685,14 +685,7 @@ namespace JG
 		rbBuffer->Read(readWriteBuffer);
 		return rbBuffer;
 	}
-	//SharedPtr<IComputeBuffer> DirectX12API::CreateComputeBuffer(const String& name, u64 btSize)
-	//{
-	//	auto computeBuffer = CreateSharedPtr<DirectX12ComputeBuffer>();
-	//	computeBuffer->SetName(name);
-	//	computeBuffer->SetData(btSize);
-	//	return computeBuffer;
-	//}
-	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IShader> shader)
+	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)
 	{
 		if (shader == nullptr)
 		{
@@ -700,7 +693,7 @@ namespace JG
 		}
 		auto computer = CreateSharedPtr<DirectX12Computer>();
 		computer->SetName(name);
-		computer->Init(shader);
+		computer->SetComputeShader(shader);
 		return computer;
 	}
 	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)

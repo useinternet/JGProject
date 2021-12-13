@@ -304,22 +304,18 @@ namespace JG
 		
 	}
 
-	//void ComputePipelineState::BindShader(const DirectX12Shader& shader)
-	//{
-	//	if ((shader.GetFlags() & EShaderFlags::Allow_ComputeShader) == false)
-	//	{
-	//		return;
-	//	}
-	//	mIsDirty = true;
-	//	if (shader.GetCSData() != nullptr)
-	//	{
-	//		mDesc.CS = {
-	//			reinterpret_cast<byte*>(shader.GetCSData()->GetBufferPointer()),
-	//			shader.GetCSData()->GetBufferSize()
-	//		};
-	//	}
+	void ComputePipelineState::BindShader(const DirectX12ComputeShader& shader)
+	{
+		mIsDirty = true;
+		if (shader.GetCSData() != nullptr)
+		{
+			mDesc.CS = {
+				reinterpret_cast<byte*>(shader.GetCSData()->GetBufferPointer()),
+				shader.GetCSData()->GetBufferSize()
+			};
+		}
 
-	//}
+	}
 
 	bool ComputePipelineState::Finalize()
 	{

@@ -625,7 +625,13 @@ namespace JG
 	}
 	bool DirectX12ComputeShader::Compile(const String& sourceCode, String* error)
 	{
-		mSourceCode = sourceCode;
+		mSourceCode     = sourceCode;
+		mShaderDataForm = CreateSharedPtr<ShaderDataForm>();
+		if (mShaderDataForm->Set(mSourceCode) == false)
+		{
+			return false;
+		}
+
 		if (Compile(mCSData, mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), error) == true)
 		{
 			return true;

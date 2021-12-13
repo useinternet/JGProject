@@ -5,7 +5,7 @@
 namespace JG
 {
 	class ITexture;
-	class IShader;
+	class IComputeShader;
 	class IResource
 	{
 	private:
@@ -142,7 +142,7 @@ namespace JG
 		virtual EComputerState GetState() const = 0;
 		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ) = 0;
 	public:
-		static SharedPtr<IComputer> Create(const String& name, SharedPtr<IShader> shader);
+		static SharedPtr<IComputer> Create(const String& name, SharedPtr<IComputeShader> shader);
 	};
 
 

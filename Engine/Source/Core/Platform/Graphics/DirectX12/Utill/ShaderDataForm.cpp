@@ -1122,178 +1122,178 @@ namespace JG
 			mRWTextureDatas[_pair.first].resize(_pair.second->TextureCount, nullptr);
 		}
 	}
-	bool ShaderData::Bind(u64 commandID, bool is_graphics)
-	{
-		auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
+	//bool ShaderData::Bind(u64 commandID, bool is_graphics)
+	//{
+	//	auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
 
-		if (dx12Shader != nullptr)
-		{
-			if (dx12Shader->Bind(commandID) == false)
-			{
-				JG_CORE_ERROR("Failed Bind {0} Shader", dx12Shader->GetName());
-				return false;
-			}
-	
-	
-			auto shaderDataForm = dx12Shader->GetShaderDataForm();
+	//	if (dx12Shader != nullptr)
+	//	{
+	//		if (dx12Shader->Bind(commandID) == false)
+	//		{
+	//			JG_CORE_ERROR("Failed Bind {0} Shader", dx12Shader->GetName());
+	//			return false;
+	//		}
+	//
+	//
+	//		auto shaderDataForm = dx12Shader->GetShaderDataForm();
 
-			std::shared_lock<std::shared_mutex> lock(mMutex);
-			if (dx12Shader->GetFlags() & EShaderFlags::Allow_ComputeShader)
-			{
-				auto commandList = DirectX12API::GetComputeCommandList(commandID);
-				for (auto& _pair : shaderDataForm->CBufferDataMap)
-				{
-					auto cBufferName = _pair.first;
-					auto cBufferData = _pair.second.get();
-					auto& btData = mReadDatas[cBufferName];
+	//		std::shared_lock<std::shared_mutex> lock(mMutex);
+	//		if (dx12Shader->GetFlags() & EShaderFlags::Allow_ComputeShader)
+	//		{
+	//			auto commandList = DirectX12API::GetComputeCommandList(commandID);
+	//			for (auto& _pair : shaderDataForm->CBufferDataMap)
+	//			{
+	//				auto cBufferName = _pair.first;
+	//				auto cBufferData = _pair.second.get();
+	//				auto& btData = mReadDatas[cBufferName];
 
-					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
-				}
-				// structuredBuffer
-				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
-				{
-					auto structuredBufferName = _pair.first;
-					auto structuredBufferData = _pair.second.get();
-					auto& btData = mReadDatas[structuredBufferName];
-					auto elementSize = structuredBufferData->ElementDataSize;
-					auto elementCount = btData.size() / elementSize;
+	//				commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
+	//			}
+	//			// structuredBuffer
+	//			for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
+	//			{
+	//				auto structuredBufferName = _pair.first;
+	//				auto structuredBufferData = _pair.second.get();
+	//				auto& btData = mReadDatas[structuredBufferName];
+	//				auto elementSize = structuredBufferData->ElementDataSize;
+	//				auto elementCount = btData.size() / elementSize;
 
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
-				}
+	//				commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
+	//			}
 
-				// RWStructuredBuffer
-				for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
-				{
-					auto structuredBufferName = _pair.first;
-					auto structuredBufferData = _pair.second.get();
-					auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
-				}
-				for (auto& _pair : shaderDataForm->TextureDataMap)
-				{
-					auto  textureData = _pair.second.get();
-					auto& textureList = mTextureDatas[_pair.first];
-					u64 textureCount = textureList.size();
-					List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-
-
-					for (u64 i = 0; i < textureCount; ++i)
-					{
-						if (textureList[i] != nullptr && textureList[i]->IsValid())
-						{
-							handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
-						}
-					}
+	//			// RWStructuredBuffer
+	//			for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
+	//			{
+	//				auto structuredBufferName = _pair.first;
+	//				auto structuredBufferData = _pair.second.get();
+	//				auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
+	//				commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
+	//			}
+	//			for (auto& _pair : shaderDataForm->TextureDataMap)
+	//			{
+	//				auto  textureData = _pair.second.get();
+	//				auto& textureList = mTextureDatas[_pair.first];
+	//				u64 textureCount = textureList.size();
+	//				List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
 
 
-					if (handles.empty() == false)
-					{
-						commandList->BindTextures((u32)textureData->RootParm, handles);
-					}
-
-				}
-
-				// RWTexture
-				for (auto& _pair : shaderDataForm->RWTextureDataMap)
-				{
-					auto textureData = _pair.second.get();
-					auto& textureList = mTextureDatas[_pair.first];
-					u64 textureCount = textureList.size();
-					List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-					for (u64 i = 0; i < textureCount; ++i)
-					{
-						if (textureList[i] != nullptr && textureList[i]->IsValid())
-						{
-							handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
-						}
-					}
-
-					if (handles.empty() == false)
-					{
-						commandList->BindTextures((u32)textureData->RootParm, handles);
-					}
-				}
-			}
-			else
-			{
-				auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
-				for (auto& _pair : shaderDataForm->CBufferDataMap)
-				{
-					auto cBufferName = _pair.first;
-					auto cBufferData = _pair.second.get();
-					auto& btData = mReadDatas[cBufferName];
-
-					commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
-				}
-				// structuredBuffer
-				for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
-				{
-					auto structuredBufferName = _pair.first;
-					auto structuredBufferData = _pair.second.get();
-					auto& btData = mReadDatas[structuredBufferName];
-					auto elementSize = structuredBufferData->ElementDataSize;
-					auto elementCount = btData.size() / elementSize;
-
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
-				}
-
-				// RWStructuredBuffer
-				for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
-				{
-					auto structuredBufferName = _pair.first;
-					auto structuredBufferData = _pair.second.get();
-					auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
-					commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
-				}
-				for (auto& _pair : shaderDataForm->TextureDataMap)
-				{
-					auto  textureData = _pair.second.get();
-					auto& textureList = mTextureDatas[_pair.first];
-					u64 textureCount = textureList.size();
-					List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+	//				for (u64 i = 0; i < textureCount; ++i)
+	//				{
+	//					if (textureList[i] != nullptr && textureList[i]->IsValid())
+	//					{
+	//						handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
+	//					}
+	//				}
 
 
-					for (u64 i = 0; i < textureCount; ++i)
-					{
-						if (textureList[i] != nullptr && textureList[i]->IsValid())
-						{
-							handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
-						}
-					}
-					if (handles.empty() == false)
-					{
-						commandList->BindTextures((u32)textureData->RootParm, handles);
-					}
-				}
+	//				if (handles.empty() == false)
+	//				{
+	//					commandList->BindTextures((u32)textureData->RootParm, handles);
+	//				}
 
-				// RWTexture
-				for (auto& _pair : shaderDataForm->RWTextureDataMap)
-				{
-					auto textureData = _pair.second.get();
-					auto& textureList = mTextureDatas[_pair.first];
-					u64 textureCount = textureList.size();
-					List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-					for (u64 i = 0; i < textureCount; ++i)
-					{
-						if (textureList[i] != nullptr && textureList[i]->IsValid())
-						{
-							handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
-						}
-					}
+	//			}
 
-					if (handles.empty() == false)
-					{
-						commandList->BindTextures((u32)textureData->RootParm, handles);
-					}
-				}
-			}
-		}
-		else
-		{
-			return false;
-		}
-		return true;
-	}
+	//			// RWTexture
+	//			for (auto& _pair : shaderDataForm->RWTextureDataMap)
+	//			{
+	//				auto textureData = _pair.second.get();
+	//				auto& textureList = mTextureDatas[_pair.first];
+	//				u64 textureCount = textureList.size();
+	//				List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+	//				for (u64 i = 0; i < textureCount; ++i)
+	//				{
+	//					if (textureList[i] != nullptr && textureList[i]->IsValid())
+	//					{
+	//						handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
+	//					}
+	//				}
+
+	//				if (handles.empty() == false)
+	//				{
+	//					commandList->BindTextures((u32)textureData->RootParm, handles);
+	//				}
+	//			}
+	//		}
+	//		else
+	//		{
+	//			auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
+	//			for (auto& _pair : shaderDataForm->CBufferDataMap)
+	//			{
+	//				auto cBufferName = _pair.first;
+	//				auto cBufferData = _pair.second.get();
+	//				auto& btData = mReadDatas[cBufferName];
+
+	//				commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
+	//			}
+	//			// structuredBuffer
+	//			for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
+	//			{
+	//				auto structuredBufferName = _pair.first;
+	//				auto structuredBufferData = _pair.second.get();
+	//				auto& btData = mReadDatas[structuredBufferName];
+	//				auto elementSize = structuredBufferData->ElementDataSize;
+	//				auto elementCount = btData.size() / elementSize;
+
+	//				commandList->BindStructuredBuffer(structuredBufferData->RootParm, btData.data(), elementCount, elementSize);
+	//			}
+
+	//			// RWStructuredBuffer
+	//			for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
+	//			{
+	//				auto structuredBufferName = _pair.first;
+	//				auto structuredBufferData = _pair.second.get();
+	//				auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(mReadWriteDatas[structuredBufferName].get());
+	//				commandList->BindStructuredBuffer(structuredBufferData->RootParm, mReadWriteDatas[structuredBufferName]->GetBufferID(), dx12RWBuffer->Get());
+	//			}
+	//			for (auto& _pair : shaderDataForm->TextureDataMap)
+	//			{
+	//				auto  textureData = _pair.second.get();
+	//				auto& textureList = mTextureDatas[_pair.first];
+	//				u64 textureCount = textureList.size();
+	//				List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+
+	//				for (u64 i = 0; i < textureCount; ++i)
+	//				{
+	//					if (textureList[i] != nullptr && textureList[i]->IsValid())
+	//					{
+	//						handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
+	//					}
+	//				}
+	//				if (handles.empty() == false)
+	//				{
+	//					commandList->BindTextures((u32)textureData->RootParm, handles);
+	//				}
+	//			}
+
+	//			// RWTexture
+	//			for (auto& _pair : shaderDataForm->RWTextureDataMap)
+	//			{
+	//				auto textureData = _pair.second.get();
+	//				auto& textureList = mTextureDatas[_pair.first];
+	//				u64 textureCount = textureList.size();
+	//				List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+	//				for (u64 i = 0; i < textureCount; ++i)
+	//				{
+	//					if (textureList[i] != nullptr && textureList[i]->IsValid())
+	//					{
+	//						handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
+	//					}
+	//				}
+
+	//				if (handles.empty() == false)
+	//				{
+	//					commandList->BindTextures((u32)textureData->RootParm, handles);
+	//				}
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//		return false;
+	//	}
+	//	return true;
+	//}
 	SharedPtr<RootSignature> ShaderData::GetRootSignature()
 	{
 		if (mRootSignature != nullptr)
@@ -1357,22 +1357,46 @@ namespace JG
 		{
 			auto cBufferName = _pair.first;
 			auto cBufferData = _pair.second.get();
-			auto& btData = mReadDatas[cBufferName];
-			action(cBufferData)
-			commandList->BindConstantBuffer(cBufferData->RootParm, btData.data(), btData.size());
+			action(cBufferData, mReadDatas[cBufferName]);
 		}
 	}
 	void ShaderData::ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action)
 	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->StructuredBufferDataMap)
+		{
+			auto structuredBufferName = _pair.first;
+			auto structuredBufferData = _pair.second.get();
+			action(structuredBufferData, mReadDatas[structuredBufferName]);
+		}
 	}
 	void ShaderData::ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action)
 	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->RWStructuredBufferDataMap)
+		{
+			auto structuredBufferName = _pair.first;
+			auto structuredBufferData = _pair.second.get();
+			action(structuredBufferData, mReadWriteDatas[structuredBufferName]);
+		}
 	}
 	void ShaderData::ForEach_Tex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action)
 	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->TextureDataMap)
+		{
+			auto  textureData = _pair.second.get();
+			action(textureData, mTextureDatas[_pair.first]);
+		}
 	}
 	void ShaderData::ForEach_RWTex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action)
 	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->RWTextureDataMap)
+		{
+			auto  textureData = _pair.second.get();
+			action(textureData, mRWTextureDatas[_pair.first]);
+		}
 	}
 	void ShaderData::Reset()
 	{
@@ -1617,98 +1641,54 @@ namespace JG
 		}
 		return nullptr;
 	}
-	//DirectX12Shader* ShaderData::GetOwnerShader() const
-	//{
-	//	if (mOwnerShader == nullptr)
-	//	{
-	//		return nullptr;
-	//	}
-	//	auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-	//	return dx12Shader;
-	//}
 	ShaderDataForm::Data* ShaderData::GetAndCheckData(const String& name, EShaderDataType checkType)
 	{
-		return nullptr;
-		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		//if (dx12Shader != nullptr)
-		//{
-		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
-		//	auto& CBufferVarMap = shaderDataForm->CBufferVarMap;
+		auto& CBufferVarMap = mShaderDataForm->CBufferVarMap;
 
-		//	auto iter = CBufferVarMap.find(name);
-		//	if (iter == CBufferVarMap.end())
-		//	{
-		//		return nullptr;
-		//	}
-		//	auto data = iter->second;
-		//	if (data->Type != checkType)
-		//	{
-		//		return nullptr;
-		//	}
-		//	return data;
-		//}
-		//else
-		//{
-		//	return nullptr;
-		//}
+		auto iter = CBufferVarMap.find(name);
+		if (iter == CBufferVarMap.end())
+		{
+			return nullptr;
+		}
+		auto data = iter->second;
+		if (data->Type != checkType)
+		{
+			return nullptr;
+		}
+		return data;
 	}
 	bool ShaderData::CheckDataArray(const String& name, EShaderDataType checkType)
 	{
-		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		//if (dx12Shader != nullptr)
-		//{
-		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
-		//	auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
-		//	if (iter == shaderDataForm->StructuredBufferDataMap.end())
-		//	{
-		//		return false;
-		//	}
+		auto iter = mShaderDataForm->StructuredBufferDataMap.find(name);
+		if (iter == mShaderDataForm->StructuredBufferDataMap.end())
+		{
+			return false;
+		}
 
-		//	auto data = iter->second.get();
-		//	if (data->Type != ShaderDataTypeToString(checkType))
-		//	{
-		//		return false;
-		//	}
-
-		//	return true;
-		//}
-		//else
-		//{
-		//	return false;
-		//}
+		auto data = iter->second.get();
+		if (data->Type != ShaderDataTypeToString(checkType))
+		{
+			return false;
+		}
 
 		return true;
 	}
 	bool ShaderData::CheckDataArray(const String& name, u64 elementSize)
 	{
-		//auto dx12Shader = static_cast<DirectX12Shader*>(mOwnerShader.get());
-		//if (dx12Shader != nullptr)
-		//{
-		//	auto shaderDataForm = dx12Shader->GetShaderDataForm();
-		//	auto iter = shaderDataForm->StructuredBufferDataMap.find(name);
-		//	if (iter == shaderDataForm->StructuredBufferDataMap.end())
-		//	{
-		//		return false;
-		//	}
-		//	u64 typeSize = 0;
-		//	auto data = iter->second.get();
-		//	if (shaderDataForm->FindTypeInfo(data->Type, nullptr, &typeSize) == false)
-		//	{
-		//		return false;
-		//	}
-		//	if (elementSize != typeSize)
-		//	{
-		//		return false;
-		//	}
-
-		//	return true;
-		//}
-		//else
-		//{
-		//	return false;
-		//}
-
-
-		return false;
+		auto iter = mShaderDataForm->StructuredBufferDataMap.find(name);
+		if (iter == mShaderDataForm->StructuredBufferDataMap.end())
+		{
+			return false;
+		}
+		u64 typeSize = 0;
+		auto data = iter->second.get();
+		if (mShaderDataForm->FindTypeInfo(data->Type, nullptr, &typeSize) == false)
+		{
+			return false;
+		}
+		if (elementSize != typeSize)
+		{
+			return false;
+		}
 	}
 }

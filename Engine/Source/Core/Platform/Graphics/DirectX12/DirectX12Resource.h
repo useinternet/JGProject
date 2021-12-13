@@ -13,6 +13,7 @@
 namespace JG
 {
 	class DescriptorAllocation;
+	class IComputeShader;
 	class DirectX12VertexBuffer : public IVertexBuffer
 	{
 		friend class DirectX12Mesh;
@@ -79,9 +80,6 @@ namespace JG
 			return mIndexCount;
 		}
 	};
-
-	// ReadWriteBuffer
-	// ReadBackBuffer
 	class DirectX12ReadWriteBuffer : public IReadWriteBuffer
 	{
 		u64 mDataSize  = 0;
@@ -127,17 +125,10 @@ namespace JG
 
 	class DirectX12Computer : public IComputer
 	{
-		class BufferData : public IJGObject
-		{
-			JGCLASS
-		public:
-			String BufferName;
-			BufferData(const String& name) : BufferName(name) {}
-		};
 	private:
 		String         mName;
 		EComputerState mState = EComputerState::Compelete;
-
+		SharedPtr<IComputeShader> mOwnerShader;
 		UniquePtr<ShaderData>     mShaderData;
 		SharedPtr<ScheduleHandle> mScheduleHandle;
 	public:
@@ -187,7 +178,7 @@ namespace JG
 		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) override;
 		virtual SharedPtr<IReadWriteBuffer> GetRWBuffer(const String& name) override;
 	public:
-		void Init(SharedPtr<IShader> shader);
+		void SetComputeShader(SharedPtr<IComputeShader> shader);
 		virtual const String& GetName() const override;
 		virtual void  SetName(const String& name) override;
 		virtual EComputerState GetState() const override;

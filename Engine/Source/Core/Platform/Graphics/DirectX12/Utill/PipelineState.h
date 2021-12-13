@@ -61,7 +61,7 @@ namespace JG
 	public:
 		ComputePipelineState();
 		void BindRootSignature(const RootSignature& rootSig);
-		//void BindShader(const DirectX12Shader& shader);
+		void BindShader(const DirectX12ComputeShader& shader);
 
 
 		virtual bool Finalize() override;

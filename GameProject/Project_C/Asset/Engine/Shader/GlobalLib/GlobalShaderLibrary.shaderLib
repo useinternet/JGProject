@@ -4,3 +4,29 @@
 
 
 
+
+
+struct Material
+{
+    float3 WorldPosition;
+    float3 Albedo;
+    float Roughness;
+    float Metallic;
+};
+
+struct DirectionalLight
+{
+    float3 Direction;
+    float3 LightColor;
+};
+
+struct PointLight
+{
+    float3 Position;
+    float  Range;
+    float3 Color;
+    float  Intensity;
+    float  Att0;
+    float  Att1;
+    float  Att2;
+};

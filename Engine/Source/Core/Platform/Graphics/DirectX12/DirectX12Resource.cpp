@@ -581,9 +581,16 @@ namespace JG
 		return mShaderData->GetRWData(name);
 	}
 
-	void DirectX12Computer::Init(SharedPtr<IShader> shader)
+	void DirectX12Computer::SetComputeShader(SharedPtr<IComputeShader> shader)
 	{
-		mShaderData = CreateUniquePtr<ShaderData>(shader);
+		if (shader == nullptr || shader->IsSuccessed() == false)
+		{
+			return;
+		}
+
+		mOwnerShader = shader;
+		auto dx12Shader = static_cast<DirectX12ComputeShader*>(shader.get());
+		mShaderData = CreateUniquePtr<ShaderData>(dx12Shader->GetShaderDataForm());
 	}
 	const String& DirectX12Computer::GetName() const
 	{
@@ -601,27 +608,101 @@ namespace JG
 
 	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ)
 	{
+		if (mOwnerShader == nullptr || mOwnerShader->IsSuccessed() == false)
+		{
+			return false;
+		}
 		if (mState == EComputerState::Run)
 		{
 			return false;
 		}
-		if (mShaderData->Bind(commandID) == false)
+		mState = EComputerState::Run;
+
+
+		auto commandList = DirectX12API::GetComputeCommandList(commandID);
+
+
+		//
+		auto RootSig = mShaderData->GetRootSignature();
+		commandList->BindRootSignature(RootSig);
+
+
+		// Data Bind
+		mShaderData->ForEach_CB([&](const ShaderDataForm::CBufferData* data, const List<jbyte>& btData)
 		{
-			return false;
-		}
+			commandList->BindConstantBuffer(data->RootParm, btData.data(), btData.size());
+		});
+		mShaderData->ForEach_SB([&](const ShaderDataForm::StructuredBufferData* data, const List<jbyte>& btData)
+		{
+			u64 elementSize  = data->ElementDataSize;
+			u64 elementCount = btData.size() / elementSize;
+			commandList->BindStructuredBuffer(data->RootParm, btData.data(), elementCount, elementSize);
+		});
+		mShaderData->ForEach_RWSB([&](const ShaderDataForm::StructuredBufferData* data, SharedPtr<IReadWriteBuffer> rwBuffer)
+		{
+			auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(rwBuffer.get());
+			commandList->BindStructuredBuffer(data->RootParm, dx12RWBuffer->GetBufferID(), dx12RWBuffer->Get());
+		});
+		mShaderData->ForEach_Tex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
+		{
+			u64 textureCount = textureList.size();
+			List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+
+			for (u64 i = 0; i < textureCount; ++i)
+			{
+				if (textureList[i] != nullptr && textureList[i]->IsValid())
+				{
+					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
+				}
+			}
+
+
+			if (handles.empty() == false)
+			{
+				commandList->BindTextures((u32)data->RootParm, handles);
+			}
+		});
+
+		mShaderData->ForEach_RWTex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
+		{
+			u64 textureCount = textureList.size();
+			List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+
+			for (u64 i = 0; i < textureCount; ++i)
+			{
+				if (textureList[i] != nullptr && textureList[i]->IsValid())
+				{
+					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
+				}
+			}
+
+
+			if (handles.empty() == false)
+			{
+				commandList->BindTextures((u32)data->RootParm, handles);
+			}
+		});
+
+
+
+
 		auto PSO = DirectX12API::GetComputePipelineState(commandID);
+		PSO->BindRootSignature(*RootSig);
+		PSO->BindShader(*(static_cast<DirectX12ComputeShader*>(mOwnerShader.get())));
 		if (PSO->Finalize() == false)
 		{
 			return false;
 		}
-
-
-
-
-
-		mState = EComputerState::Run;
-		auto commandList = DirectX12API::GetComputeCommandList(commandID);
 		commandList->BindPipelineState(PSO);
+
+
+
+
+		
+
+	
 		commandList->Dispatch(groupX, groupY, groupZ);
 
 

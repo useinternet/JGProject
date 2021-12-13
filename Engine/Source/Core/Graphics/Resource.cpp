@@ -23,7 +23,7 @@ namespace JG
 
 		return api->CreateIndexBuffer(name, method);
 	}
-	SharedPtr<IComputer> IComputer::Create(const String& name, SharedPtr<IShader> shader)
+	SharedPtr<IComputer> IComputer::Create(const String& name, SharedPtr<IComputeShader> shader)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");

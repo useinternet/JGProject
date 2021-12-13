@@ -7,15 +7,13 @@ namespace JG
 
 	FowardRenderer::FowardRenderer()
 	{
-		//mComputeCluster = AddPreProcess<PreRenderProcess_ComputeCluster>();
+		mComputeCluster = AddPreProcess<PreRenderProcess_ComputeCluster>();
 
 	}
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, const RenderInfo& info)
 	{
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-		//api->BeginDraw(commandID);
 		if (mComputeCluster)
 		{
 			mComputeCluster->CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));

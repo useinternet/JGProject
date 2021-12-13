@@ -14,7 +14,6 @@ namespace JG
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
-	class IShader;
 	class IGraphicsShader;
 	class IComputeShader;
 	class IShaderScript;
@@ -23,7 +22,6 @@ namespace JG
 	class IMesh;
 	class IReadWriteBuffer;
 	class IReadBackBuffer;
-	//class IComputeBuffer;
 	class IComputer;
 	class ISubMesh;
 	
@@ -80,7 +78,7 @@ namespace JG
 		virtual SharedPtr<IReadWriteBuffer> CreateReadWriteBuffer(const String& name, u64 btSize) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
-		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IShader> shader) = 0;
+		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;

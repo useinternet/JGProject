@@ -133,11 +133,18 @@ namespace JG
 		ComPtr<ID3DBlob> mCSData;
 		String			 mSourceCode;
 		bool			 mIsCompileSuccess = false;
-		UniquePtr<ShaderDataForm> mShaderDataForm;
+		SharedPtr<ShaderDataForm> mShaderDataForm;
 	public:
 		virtual bool  Compile(const String& sourceCode, String* error) override;
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;
+	public:
+		SharedPtr<ShaderDataForm> GetShaderDataForm() const {
+			return mShaderDataForm;
+		}
+		ID3DBlob* GetCSData() const {
+			return mCSData.Get();
+		}
 	private:
 		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
 	};
