@@ -39,8 +39,18 @@ namespace JG
 				mClusterInfosRBB.push_back(ci_rbb);
 			}
 		}
+
+		//  sizeX =  (unsigned int)std::ceilf(DisplayManager::SCREEN_WIDTH / (float)gridSizeX);
+		/*
+		  screen2View.tileSizes[0] = gridSizeX;
+        screen2View.tileSizes[1] = gridSizeY;
+        screen2View.tileSizes[2] = gridSizeZ;
+        screen2View.tileSizes[3] = sizeX;
+		screen2View.sliceScalingFactor = (float)gridSizeZ / std::log2f(zFar / zNear) ;
+		screen2View.sliceBiasFactor    = -((float)gridSizeZ * std::log2f(zNear) / std::log2f(zFar / zNear)) ;
+		*/
 	}
-	void PreRenderProcess_ComputeCluster::Run(IGraphicsAPI* api, const RenderInfo& info)
+	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info)
 	{
 		if (mComputers.empty() || mLightIndicesRBB.empty() || mClusterInfosRBB.empty())
 		{
@@ -53,7 +63,7 @@ namespace JG
 			auto commandID = JGGraphics::GetInstance().RequestCommandID();
 			i32 bufferIndex = info.CurrentBufferIndex;
 
-
+			auto lightInfo = renderer->GetLightInfo(Graphics::ELightType::PointLight);
 			// Dispatch
 			{
 
@@ -67,6 +77,7 @@ namespace JG
 				computer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
 				computer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
 				computer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
+				computer->SetStructDataArray(SHADERPARAM_POINTLIGHTS, lightInfo.ByteData.data(), lightInfo.Count, lightInfo.Size);
 				computer->Dispatch(commandID, 1, 1, 1);
 			}
 
@@ -78,15 +89,12 @@ namespace JG
 
 			});
 
-			ReadData(bufferIndex, SHADERPARAM_CLUSTERINFOS, mLightIndicesRBB,
+			ReadData(bufferIndex, SHADERPARAM_CLUSTERINFOS, mClusterInfosRBB,
 				[&](SharedPtr<IReadBackBuffer> rbBuffer)
 			{
 				mClusterInfos.resize(NUM_CLUSTER);
 				rbBuffer->GetData(mClusterInfos.data(), sizeof(ClusterInfo) * NUM_CLUSTER);
 			});
-
-
-
 
 		});
 
@@ -95,6 +103,10 @@ namespace JG
 
 	bool PreRenderProcess_ComputeCluster::IsCompelete()
 	{
+		if (mScheduleHandle == nullptr)
+		{
+			return true;
+		}
 		return mScheduleHandle->GetState() == EScheduleState::Compelete;
 	}
 
@@ -105,7 +117,7 @@ namespace JG
 		{
 			auto computerIndex = bufferIndex - 1;
 			if (computerIndex < 0) computerIndex = bufferCnt - 1;
-			auto rwBuffer = mComputers[computerIndex]->GetRWBuffer(SHADERPARAM_LIGHTINDICIES);
+			auto rwBuffer = mComputers[computerIndex]->GetRWBuffer(paramName);
 			auto readBackBuffer = rbList[bufferIndex];
 
 			if (rwBuffer != nullptr && rwBuffer->IsValid())

@@ -17,10 +17,12 @@ namespace JG
 		if (mComputeCluster)
 		{
 			mComputeCluster->CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
+			mComputeCluster->CB.ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
 			mComputeCluster->CB.EyePosition = info.EyePosition;
 			mComputeCluster->CB.Resolution = info.Resolutoin;
 			mComputeCluster->CB.FarZ  = info.FarZ;
 			mComputeCluster->CB.NearZ = info.NearZ;
+			mComputeCluster->CB.PointLightCount = GetLightInfo(Graphics::ELightType::PointLight).Count;
 			mComputeCluster->CB.TileSize = JVector2(
 				info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
 				info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);

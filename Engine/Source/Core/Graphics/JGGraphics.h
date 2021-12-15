@@ -371,6 +371,10 @@ namespace JG
 			f32 FarZ = 0.0f;
 			JVector3 EyePosition;
 			u32 PointLightCount = 0;
+			JVector2 ClusterSize;
+			f32 ClusterScale = 0.0f;
+			f32 ClusterBias = 0.0f;
+			JVector3Uint NumClusterSlice;
 		};
 	}
 }

@@ -8,6 +8,7 @@
 #include "UI/UIView/InspectorView.h"
 #include "UI/UIView/ContentsView.h"
 #include "UI/UIView/ProjectSettingView.h"
+#include "UI/UIView/DevelopView.h"
 
 // PopupUI
 #include "UI/ContextUI/ComponentFinderContextView.h"
@@ -193,6 +194,7 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<InspectorView>();
 		UIManager::GetInstance().RegisterUIView<ContentsView>();
 		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
+		UIManager::GetInstance().RegisterUIView<DevelopView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()

@@ -137,7 +137,7 @@ namespace JG
 	class ShaderData
 	{
 	public:
-		const static u64 MaxElementCount = 10240;
+		const static u64 MaxDataSize = _128KB;
 	private:
 		UniquePtr<UploadAllocator>      mUploadAllocator;
 		Dictionary<String, List<jbyte>> mReadDatas;
@@ -238,9 +238,9 @@ namespace JG
 				return false;
 			}
 			u64 btSize = sizeof(T) * dataArray.size();
-			if (MaxElementCount <= dataArray.size())
+			if (MaxDataSize <= btSize)
 			{
-				btSize = sizeof(T) * MaxElementCount;
+				btSize = MaxDataSize;
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
 	
@@ -258,9 +258,9 @@ namespace JG
 				return false;
 			}
 			u64 btSize = elementCount * elementSize;
-			if (MaxElementCount <= elementCount)
+			if (MaxDataSize <= btSize)
 			{
-				btSize = elementSize * MaxElementCount;
+				btSize = MaxDataSize;
 				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
 			}
 

@@ -35,6 +35,16 @@ namespace JG
 	class DeferredRenderer;
 	class IRenderProcess;
 
+	class RenderStatistics
+	{
+	public:
+		i32 TotalObjectCount   = 0;
+		i32 VisibleObjectCount = 0;
+		i32 CullingObjectCount = 0;
+
+
+
+	};
 
 
 	class RenderInfo
@@ -51,8 +61,14 @@ namespace JG
 		f32 NearZ;
 		u64 CurrentBufferIndex = 0;
 	};
+
+
+
+
 	class Renderer 
 	{
+	public:
+		static RenderStatistics Statistics;
 	protected:
 		struct LightInfo
 		{
@@ -89,9 +105,10 @@ namespace JG
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
 		void EndBatch();
-	protected:
+	public:
 		const RenderInfo& GetRenderInfo() const;
 		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
+		const LightInfo& GetLightInfo(Graphics::ELightType type);
 		const SortedDictionary<int, List<Renderer::ObjectInfo>>& GetObjectInfoLists() const;
 
 		void ForEach(const std::function<void(Graphics::ELightType, const LightInfo&)>& action);

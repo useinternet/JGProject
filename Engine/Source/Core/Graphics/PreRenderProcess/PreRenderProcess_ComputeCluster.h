@@ -53,7 +53,7 @@ namespace JG
 	public:
 		PreRenderProcess_ComputeCluster();
 	public:
-		virtual void Run(IGraphicsAPI* api, const RenderInfo& info) override;
+		virtual void Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info) override;
 		virtual bool IsCompelete() override;
 	private:
 		void ReadData(i32 bufferIndex, const String& paramName, const List<SharedPtr<IReadBackBuffer>>& rbList,

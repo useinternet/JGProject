@@ -292,9 +292,6 @@ namespace JG
 			return mLock;
 		}
 
-
-		//Queue<u64> Scene::sm_CommandIDQueue;
-		//std::mutex Scene::sm_CommandIDMutex;
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
@@ -303,28 +300,11 @@ namespace JG
 			mTargetDepthTextures.resize(bufferCount, nullptr);
 			mCurrentIndex = 0;
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
-
-
-			//{
-			//	std::lock_guard<std::mutex> lock(sm_CommandIDMutex);
-			//	if (sm_CommandIDQueue.empty() == false)
-			//	{
-			//		mCommandID = sm_CommandIDQueue.front();
-			//		sm_CommandIDQueue.pop();
-			//	}
-			//	else
-			//	{
-			//		mCommandID = ++s_CommandIDOffset;
-			//	}
-			//}
-
-
 			SetSceneInfo(info);
 
 		}
 		Scene::~Scene()
 		{
-			//sm_CommandIDQueue.push(mCommandID);
 			for (auto& t : mTargetTextures)
 			{
 				t.reset();

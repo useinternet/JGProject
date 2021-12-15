@@ -30,3 +30,16 @@ struct PointLight
     float  Att1;
     float  Att2;
 };
+
+struct LightGrid
+{
+    int PL_Count;
+    int PL_Offset;
+    int Enable;
+};
+
+struct Cluster
+{
+    float4 Min;
+    float4 Max;
+};

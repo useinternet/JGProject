@@ -1,27 +1,54 @@
-struct Material
+
+cbuffer __RenderPassDataCB__ : register(b0)
 {
-    float3 WorldPosition;
-    float3 Albedo;
-    float Roughness;
-    float Metallic;
+    float4x4 _ProjMatrix;
+    float4x4 _ViewMatrix;
+    float4x4 _ViewProjMatrix;
+    float2   _Resolution;
+    float    _NearZ;
+    float    _FarZ;
+    float3   _EyePosition;
+    uint     _PointLightCount;
+    float2   _ClusterSize;
+    float    _ClusterScale;
+    float    _ClusterBias;
+    uint3    _NumClusterSlice;
+
+    
+};
+cbuffer __ObjectDataCB__ : register(b1)
+{
+    float4x4 _WorldMatrix;
 };
 
-struct DirectionalLight
-{
-    float3 Direction;
-    float3 LightColor;
-};
+// Lights
+StructuredBuffer<PointLight> _PointLightList : register(t0, space3);
 
-struct PointLight
-{
-    float3 Position;
-    float  Range;
-    float3 Color;
-    float  Intensity;
-    float  Att0;
-    float  Att1;
-    float  Att2;
-};
+// Clusters
+StructuredBuffer<LightGrid> _LightGridList : register(t0, space11);
+StructuredBuffer<uint>        _ClusterLightIndexList : register(t0, space12);
+ 
+SamplerState _PointSampler  : register(s0);
+SamplerState _LinearSampler : register(s1);
+SamplerState _AnisotropicSampler : register(s2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -154,31 +181,29 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
     return saturate(Lo * att * light.Intensity * light.Color);
 }
 
-
-
-cbuffer __RenderPassDataCB__ : register(b0)
+float LinearDepth(float z)
 {
-    float4x4 _ProjMatrix;
-    float4x4 _ViewMatrix;
-    float4x4 _ViewProjMatrix;
-    float2   _Resolution;
-    float    _NearZ;
-    float    _FarZ;
-    float3   _EyePosition;
-    uint     _PointLightCount;
-};
-cbuffer __ObjectDataCB__ : register(b1)
+    float depthRange = 2.0 * z - 1.0;
+    return 2.0 * _NearZ * _FarZ / (_FarZ + _NearZ - depthRange * (_FarZ - _NearZ));
+}
+
+uint GetClusterIndex(float3 posH)
 {
-    float4x4 _WorldMatrix;
-};
+    float linearZ  = LinearDepth(posH.z);
+    uint zIndex    = max(log2(linearZ) * _ClusterScale + _ClusterBias, 0.0);
 
-// Lights
-StructuredBuffer<PointLight> _PointLightList : register(t0, space3);
 
- 
-SamplerState _PointSampler  : register(s0);
-SamplerState _LinearSampler : register(s1);
-SamplerState _AnisotropicSampler : register(s2);
+    uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
+    uint  tileIndex = clusterIndexs.x +
+                     _NumClusterSlice.x * clusterIndexs.y +
+                     (_NumClusterSlice.x * _NumClusterSlice.y) * clusterIndexs.z;
+
+    return tileIndex;
+}
+
+
+
+
 
 
 

@@ -20,7 +20,7 @@ namespace JG
 	public:
 		PreRenderProcess_LightCulling();
 	public:
-		virtual void Run(IGraphicsAPI* api, const RenderInfo& info) override;
+		virtual void Run(Renderer* renderer,IGraphicsAPI* api, const RenderInfo& info) override;
 		virtual bool IsCompelete() override;
 	};
 }

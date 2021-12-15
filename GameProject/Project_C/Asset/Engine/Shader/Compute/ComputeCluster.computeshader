@@ -1,20 +1,5 @@
 
 
-struct Cluster
-{
-    float4 Min;
-    float4 Max;
-};
-
-struct ClusterInfo
-{
-    int PL_Count;
-    int PL_Offset;
-    int Enable;
-}
-
-
-
 cbuffer ConstantData
 {
     float4x4 __InvProjMatrix__;
@@ -43,7 +28,7 @@ StructuredBuffer<PointLight> _PointLights;
 
 // output
 RWStructuredBuffer<uint>        _ClusterLightIndices;
-RWStructuredBuffer<ClusterInfo> _ClusterInfos;
+RWStructuredBuffer<LightGrid>   _LightGrids;
 
 
 
@@ -66,14 +51,14 @@ float3 LineIntersectionToZPlane(float3 A, float3 B, float zDistance)
     float T = (zDistance - dot(N, A)) / dot(N, AB);
     return A + T * AB;
 }
-float SquardDistPointAABB(float3 point, uint clusterIndex)
+float SquardDistPointAABB(float3 p, uint clusterIndex)
 {
     float result = 0.0f;
-    Cluster cluster = Clusters[clusterIndex];
+    Cluster cluster = gClusters[clusterIndex];
 
     for(int i = 0; i < 3; ++i)
     {
-        float v = point[i];
+        float v = p[i];
         if(v < cluster.Min[i])
         {
             result += (cluster.Min[i] - v) * (cluster.Min[i] - v);
@@ -88,10 +73,10 @@ float SquardDistPointAABB(float3 point, uint clusterIndex)
 }
 bool CheckPointLight(uint plIndex, uint tileIndex)
 {
-    float r = _PointLightList[plIndex].Range;
-    float p = _PointLightList[plIndex].Position;
-    float3 center = mul(float4(p, 1.0f), __ViewMatrix__);
-    float sqDist = SquardDistPointAABB(center, tileIndex);
+    float r = _PointLights[plIndex].Range;
+    float3 p = _PointLights[plIndex].Position;
+	float4 center = mul(float4(p, 1.0f), __ViewMatrix__);
+    float sqDist = SquardDistPointAABB(center.xyz, tileIndex);
 
     return sqDist <= (r * r);
 }
@@ -134,20 +119,16 @@ void cs_main(uint3 groupId : SV_GroupID,
     gClusters[groupIndex].Min = float4(minPointAABB, 0.0f);
     gClusters[groupIndex].Max = float4(maxPointAABB, 0.0f);
 
-
-    _ClusterInfos[groupIndex].PL_Count  = 0;
-    _ClusterInfos[groupIndex].PL_Offset = 0;
-    _ClusterInfos[groupIndex].Enable    = 0;
-
-
-
     GroupMemoryBarrierWithGroupSync();
 
+    _LightGrids[groupIndex].PL_Count  = 0;
+    _LightGrids[groupIndex].PL_Offset = 0;
+    _LightGrids[groupIndex].Enable    = 0;
 
 
     // Point Light
     int plCount = 0;
-    int plIndices[100];
+    int plIndices[128];
 
     for(int i = 0; i<__PointLightCount__; ++i)
     {
@@ -163,16 +144,16 @@ void cs_main(uint3 groupId : SV_GroupID,
     int offset;
     InterlockedAdd(gLightIndex, plCount, offset);
 
-    _ClusterInfos[groupIndex].PL_Count  = plCount;
-    _ClusterInfos[groupIndex].PL_Offset = offset;
+    _LightGrids[groupIndex].PL_Count  = plCount;
+    _LightGrids[groupIndex].PL_Offset = offset;
     for(int i = 0; i<plCount; ++i)
     {
         _ClusterLightIndices[offset + i] = plIndices[i];
     }
 
-    if(_ClusterInfoList[groupIndex].PL_Count > 0)
+    if(_LightGrids[groupIndex].PL_Count > 0)
     {
-        _ClusterInfos[groupIndex].Enable = 1;
+        _LightGrids[groupIndex].Enable    = 1;
     }
 }
 

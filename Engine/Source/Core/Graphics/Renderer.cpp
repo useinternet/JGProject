@@ -8,6 +8,7 @@
 
 namespace JG
 {
+	RenderStatistics Renderer::Statistics;
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
@@ -80,7 +81,7 @@ namespace JG
 		// PreProcess Run
 		for (auto& preProcess : mPreProcessList)
 		{
-			preProcess->Run(api, mCurrentRenderInfo);
+			preProcess->Run(this, api, mCurrentRenderInfo);
 		}
 
 	
@@ -105,7 +106,7 @@ namespace JG
 		// PostProcess
 		for (auto& postProcess : mPostProcessList)
 		{
-			postProcess->Run(api, mCurrentRenderInfo);
+			postProcess->Run(this, api, mCurrentRenderInfo);
 		}
 
 
@@ -178,6 +179,11 @@ namespace JG
 	const Dictionary<Graphics::ELightType, Renderer::LightInfo>& Renderer::GetLightInfos() const
 	{
 		return mLightInfos;
+	}
+
+	const Renderer::LightInfo& Renderer::GetLightInfo(Graphics::ELightType type)
+	{
+		return mLightInfos[type];
 	}
 
 	const SortedDictionary<int, List<Renderer::ObjectInfo>>& Renderer::GetObjectInfoLists() const
