@@ -317,6 +317,19 @@ namespace JG
 
 	namespace ShaderDefine
 	{
+		enum class ERootParam
+		{
+			SB_POINT_LIGHTS,
+			CB_RENDER_PASS_DATA,
+			CB_OBJECTDATA,
+			CB_MATERIAL,
+			TEXTURE2D,
+			TEXTURECUBE,
+			RWTEXTURE2D,
+			SB_LIGHTGRID,
+			SB_VISIBLE_LIGHT_INDICIES,
+		};
+
 		namespace Template
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
@@ -441,6 +454,9 @@ namespace JG
 			constexpr int TextureCubeRegisterSpace = 1;
 			constexpr int RWTexture2DRegisterSpace = 2;
 			constexpr int PointLightRegisterSpace = 3;
+
+			constexpr int LightGridRegisterSpace		   = 11;
+			constexpr int VisibleLightIndicesRegisterSpace = 12;
 		}
 
 		constexpr char* VSEntry = "vs_main";

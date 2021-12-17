@@ -501,7 +501,7 @@ namespace JG
 		return mShaderData->SetFloat4x4Array(name, value);
 	}
 
-	bool DirectX12Computer::SetStructDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize)
+	bool DirectX12Computer::SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
 	{
 		return mShaderData->SetStructDataArray(name, datas, elementCount, elementSize);
 	}

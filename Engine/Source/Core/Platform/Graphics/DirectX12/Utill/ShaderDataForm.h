@@ -187,7 +187,7 @@ namespace JG
 		bool SetUint3Array(const String& name, const List<JVector3Uint>& value);
 		bool SetUint4Array(const String& name, const List<JVector4Uint>& value);
 		bool SetFloat4x4Array(const String& name, const List<JMatrix>& value);
-		bool SetStructDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize);
+		bool SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize);
 
 
 		bool GetFloat(const String& name, float* out_value);
@@ -250,7 +250,7 @@ namespace JG
 			return true;
 		}
 
-		bool SetDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize)
+		bool SetDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
 		{
 			std::lock_guard<std::shared_mutex> lock(mMutex);
 			if (CheckDataArray(name, elementSize) == false)

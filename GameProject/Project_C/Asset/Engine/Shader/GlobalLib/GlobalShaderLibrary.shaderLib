@@ -35,7 +35,6 @@ struct LightGrid
 {
     int PL_Count;
     int PL_Offset;
-    int Enable;
 };
 
 struct Cluster

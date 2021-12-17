@@ -673,7 +673,7 @@ namespace JG
 
 
 		static f32 cameraSensitivity = 60.0f;
-		static f32 cameraSpeed = 15.0f;
+		static f32 cameraSpeed = 150.0f;
 		auto appTimer = Application::GetInstance().GetAppTimer();
 		auto tick = appTimer->GetTick();
 

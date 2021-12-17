@@ -31,16 +31,7 @@ namespace JG
 	class DirectX12API : public IGraphicsAPI
 	{
 	public:
-		enum class ERootParam
-		{
-			SB_POINT_LIGHTS,
-			CB_RENDER_PASS_DATA,
-			CB_OBJECTDATA,
-			CB_MATERIAL,
-			TEXTURE2D,
-			TEXTURECUBE,
-			RWTEXTURE2D,
-		};
+
 	public:
 		virtual EGraphicsAPI GetAPI()const override;
 		virtual u64 GetBufferCount() const override;
@@ -98,6 +89,8 @@ namespace JG
 		virtual void EndDraw(u64 commandID)   override;
 
 		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)   override;
+		virtual void SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids) override;
+		virtual void SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies) override;
 		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) override;
 		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) override;
 		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) override;

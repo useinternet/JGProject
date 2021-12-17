@@ -237,6 +237,7 @@ namespace JG
 		if(e.Width == 0 || e.Height == 0)
 		{
 			mMinimized = true;
+			JGGraphics::GetInstance().Flush();
 			JG_CORE_INFO("최소화 상태");
 		}
 		else

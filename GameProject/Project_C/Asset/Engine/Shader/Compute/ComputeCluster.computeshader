@@ -3,35 +3,19 @@
 cbuffer ConstantData
 {
     float4x4 __InvProjMatrix__;
-    float4x4 __ViewMatrix__;
-    float3   __EyePosition__;
-    float    __FarZ__;
     float2   __Resolution__;
     float2   __TileSize__;
+    float    __FarZ__;
     float    __NearZ__;
-    int      __PointLightCount__;
 };
 
 
 #define NUM_X_SLICE 8
 #define NUM_Y_SLICE 8
 #define NUM_Z_SLICE 16
-#define NUM_CLUSTER 1024
-
-// shared
-groupshared Cluster gClusters[NUM_CLUSTER];
-groupshared int gLightIndex;
-
-// input
-StructuredBuffer<PointLight> _PointLights;
-
 
 // output
-RWStructuredBuffer<uint>        _ClusterLightIndices;
-RWStructuredBuffer<LightGrid>   _LightGrids;
-
-
-
+RWStructuredBuffer<Cluster> _Clusters;
 
 float3 ScreenToView(float4 screen)
 {
@@ -51,38 +35,6 @@ float3 LineIntersectionToZPlane(float3 A, float3 B, float zDistance)
     float T = (zDistance - dot(N, A)) / dot(N, AB);
     return A + T * AB;
 }
-float SquardDistPointAABB(float3 p, uint clusterIndex)
-{
-    float result = 0.0f;
-    Cluster cluster = gClusters[clusterIndex];
-
-    for(int i = 0; i < 3; ++i)
-    {
-        float v = p[i];
-        if(v < cluster.Min[i])
-        {
-            result += (cluster.Min[i] - v) * (cluster.Min[i] - v);
-        }
-        if(v > cluster.Max[i])
-        {
-            result += (v - cluster.Max[i]) * (v - cluster.Max[i]);
-        }
-
-    }
-    return result;
-}
-bool CheckPointLight(uint plIndex, uint tileIndex)
-{
-    float r = _PointLights[plIndex].Range;
-    float3 p = _PointLights[plIndex].Position;
-	float4 center = mul(float4(p, 1.0f), __ViewMatrix__);
-    float sqDist = SquardDistPointAABB(center.xyz, tileIndex);
-
-    return sqDist <= (r * r);
-}
-
-//AllMemoryBarrierWithGroupSync
-
 
 // SV_GroupID : dispatch 호출의 스레드 그룹들 중 현재 스레드가 속한 그룹의 3차원 식별자
 // SV_GroupThreadID : 그 스레드 그룹 안에서의 현재 스레드의 3차원 식별자
@@ -94,9 +46,12 @@ void cs_main(uint3 groupId : SV_GroupID,
              uint3 groupThreadId    : SV_GroupThreadID,
              uint groupIndex : SV_GroupIndex)
 {
+    float3 eyePos = float3(0,0,0);
     float xIndex = dispatchThreadId.x;
     float yIndex = dispatchThreadId.y;
     float zIndex = dispatchThreadId.z;
+    int index = groupIndex;
+
 
     float clusterNearZ = __NearZ__ * pow( (__FarZ__ / __NearZ__),  (float)zIndex / NUM_Z_SLICE);
     float clusterFarZ  = __NearZ__ * pow( (__FarZ__ / __NearZ__), (float)(zIndex + 1) / NUM_Z_SLICE);
@@ -108,52 +63,15 @@ void cs_main(uint3 groupId : SV_GroupID,
     float3 minPoint_VS = ScreenToView(minPoint_SS);
     float3 maxPoint_VS = ScreenToView(maxPoint_SS);
 
-    float3 minPointNear = LineIntersectionToZPlane(__EyePosition__, minPoint_VS, clusterNearZ);
-    float3 minPointFar  = LineIntersectionToZPlane(__EyePosition__, minPoint_VS, clusterFarZ);
-    float3 maxPointNear = LineIntersectionToZPlane(__EyePosition__, maxPoint_VS, clusterNearZ);
-    float3 maxPointFar  = LineIntersectionToZPlane(__EyePosition__, maxPoint_VS, clusterFarZ);
+    float3 minPointNear = LineIntersectionToZPlane(eyePos, minPoint_VS, clusterNearZ);
+    float3 minPointFar  = LineIntersectionToZPlane(eyePos, minPoint_VS, clusterFarZ);
+    float3 maxPointNear = LineIntersectionToZPlane(eyePos, maxPoint_VS, clusterNearZ);
+    float3 maxPointFar  = LineIntersectionToZPlane(eyePos, maxPoint_VS, clusterFarZ);
 
     float3 minPointAABB = min(min(minPointNear, minPointFar), min(maxPointNear, maxPointFar));
     float3 maxPointAABB = max(max(minPointNear, minPointFar), max(maxPointNear, maxPointFar));
 
-    gClusters[groupIndex].Min = float4(minPointAABB, 0.0f);
-    gClusters[groupIndex].Max = float4(maxPointAABB, 0.0f);
-
-    GroupMemoryBarrierWithGroupSync();
-
-    _LightGrids[groupIndex].PL_Count  = 0;
-    _LightGrids[groupIndex].PL_Offset = 0;
-    _LightGrids[groupIndex].Enable    = 0;
-
-
-    // Point Light
-    int plCount = 0;
-    int plIndices[128];
-
-    for(int i = 0; i<__PointLightCount__; ++i)
-    {
-        bool result = CheckPointLight(i, groupIndex);
-        if(result)
-        {
-            plIndices[plCount] = i;
-            plCount += 1;
-        }
-    }
-
-
-    int offset;
-    InterlockedAdd(gLightIndex, plCount, offset);
-
-    _LightGrids[groupIndex].PL_Count  = plCount;
-    _LightGrids[groupIndex].PL_Offset = offset;
-    for(int i = 0; i<plCount; ++i)
-    {
-        _ClusterLightIndices[offset + i] = plIndices[i];
-    }
-
-    if(_LightGrids[groupIndex].PL_Count > 0)
-    {
-        _LightGrids[groupIndex].Enable    = 1;
-    }
+    _Clusters[index].Min = float4(minPointAABB, 0.0f);
+    _Clusters[index].Max = float4(maxPointAABB, 0.0f);
 }
 

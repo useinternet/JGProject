@@ -212,7 +212,7 @@ namespace JG
 		}
 
 
-		cmdList->BindConstantBuffer((u32)DirectX12API::ERootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
+		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
 		return true;
 	}
 

@@ -160,7 +160,7 @@ namespace JG
 		virtual bool SetUint3Array(const String& name, const List<JVector3Uint>& value) override;
 		virtual bool SetUint4Array(const String& name, const List<JVector4Uint>& value) override;
 		virtual bool SetFloat4x4Array(const String& name, const List<JMatrix>& value) override;
-		virtual bool SetStructDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize) override;
+		virtual bool SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize) override;
 
 		virtual bool GetFloat(const String& name, float* out_value) override;
 		virtual bool GetFloat2(const String& name, JVector2* out_value) override;

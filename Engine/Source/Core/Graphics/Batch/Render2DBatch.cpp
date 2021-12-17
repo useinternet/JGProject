@@ -104,18 +104,6 @@ namespace JG
 
 
 		mCurrFrameResource = &mFrameResources[info.CurrentBufferIndex];
-
-
-
-		//struct PassCB
-		//{
-		//	JMatrix ViewProjMatrix;
-		//};
-
-		//PassCB passCB;
-		//passCB.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
-
-		//mCurrFrameResource->Standard2DMaterial->SetPassData(commandID, &passCB, sizeof(PassCB));
 		return true;
 	}
 

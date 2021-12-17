@@ -26,29 +26,11 @@ StructuredBuffer<PointLight> _PointLightList : register(t0, space3);
 
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList : register(t0, space11);
-StructuredBuffer<uint>        _ClusterLightIndexList : register(t0, space12);
+StructuredBuffer<uint>      _VisibleLightIndices : register(t0, space12);
  
 SamplerState _PointSampler  : register(s0);
 SamplerState _LinearSampler : register(s1);
 SamplerState _AnisotropicSampler : register(s2);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -149,6 +131,9 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
 	float VoH = saturate(dot(V,H));
 
 
+
+
+
     float3 Lo = float3(0.0f,0.0f,0.0f);
     float3 F0  = lerp(float3(0.16f,0.16f,0.16f), material.Albedo, material.Metallic);
     float  D = DistributionGGX(NoH, material.Roughness);
@@ -177,7 +162,9 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
     }
 
 
+
 	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
+    Lo = material.Albedo * NoL;
     return saturate(Lo * att * light.Intensity * light.Color);
 }
 
@@ -199,6 +186,15 @@ uint GetClusterIndex(float3 posH)
                      (_NumClusterSlice.x * _NumClusterSlice.y) * clusterIndexs.z;
 
     return tileIndex;
+}
+uint3 GetClusterIndex3(float3 posH)
+{
+    float linearZ  = LinearDepth(posH.z);
+    uint zIndex    = max(log2(linearZ) * _ClusterScale + _ClusterBias, 0.0);
+
+
+    uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
+    return clusterIndexs;
 }
 
 

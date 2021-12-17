@@ -1,6 +1,6 @@
 {
     "StartSettings": {
-        "StartGameWorld": "Asset/Resources/World/NewGameWorld_2.jgasset"
+        "StartGameWorld": "Asset/Resources/World/NewGameWorld.jgasset"
     },
     "InputSettings": {
         "AxisMappingDataList": [

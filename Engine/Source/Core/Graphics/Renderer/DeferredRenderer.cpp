@@ -10,7 +10,7 @@ namespace JG
 	{
 
 	}
-	void DeferredRenderer::ReadyImpl(IGraphicsAPI* api, const RenderInfo& info)
+	void DeferredRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* data, const RenderInfo& info)
 	{
 	}
 	void DeferredRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info)

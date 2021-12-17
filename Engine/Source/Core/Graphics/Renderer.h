@@ -12,6 +12,7 @@ namespace JG
 		class SceneObject;
 		class RenderObject;
 		class StaticRenderObject;
+		class RenderPassData;
 		class Light;
 		class PointLight;
 		enum class ELightType;
@@ -85,6 +86,7 @@ namespace JG
 
 	private:
 		List<SharedPtr<RenderBatch>>	mBatchList;
+		Dictionary<Type, IRenderProcess*> mProcessPool;
 		List<SharedPtr<IRenderProcess>> mPreProcessList;
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
@@ -117,21 +119,50 @@ namespace JG
 		template<class T>
 		T* AddPreProcess()
 		{
+			Type type = JGTYPE(T);
+			if (mProcessPool.find(type) != mProcessPool.end())
+			{
+				return static_cast<T*>(mProcessPool[type]);
+			}
+
 			auto preProcess = CreateSharedPtr<T>();
 			mPreProcessList.push_back(preProcess);
+			
+			mProcessPool[type] = preProcess.get();
 
 			return preProcess.get();
 		}
 		template<class T>
 		T* AddPostProcess()
 		{
+			Type type = JGTYPE(T);
+			if (mProcessPool.find(type) != mProcessPool.end())
+			{
+				return static_cast<T*>(mProcessPool[type]);
+			}
+
 			auto postProcess = CreateSharedPtr<T>();
 			mPostProcessList.push_back(postProcess);
 
+			mProcessPool[type] = postProcess.get();
 			return postProcess.get();
 		}
+
+		template<class T>
+		T* FindProcess()
+		{
+			Type type = JGTYPE(T);
+			if (mProcessPool.find(type) != mProcessPool.end())
+			{
+				return static_cast<T*>(mProcessPool[type]);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
 	protected:
-		virtual void ReadyImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
+		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;

@@ -23,8 +23,8 @@ namespace JG
 	{
 		GameComponent::Awake();
 		SetFOV(90);
-		SetNearZ(0.001f);
-		SetFarZ(10000.0f);
+		SetNearZ(1.0f);
+		SetFarZ(1000000.0f);
 		SetOrthographic(true);
 		SetResolution(GameSettings::GetResolution());
 
@@ -182,7 +182,7 @@ namespace JG
 		{
 			mIsProjDirty = true;
 		}
-		mNearZ = nearZ;
+		mNearZ = Math::Max(0.001f, nearZ);
 	}
 
 	void Camera::SetOrthographic(bool isOrthographic)

@@ -1,36 +1,92 @@
 
-
-
-#define NUM_X_THREAD 8
-#define NUM_Y_THREAD 8
-#define NUM_Z_THREAD 16
-
-
-struct Cluster
+cbuffer ConstantData
 {
-    float4 Min;
-    float4 Max;
+    float4x4 _ViewMatrix;
+    int      _PointLightCount;
 };
-// groupshared
 
+ groupshared int _LightIndex;
 
 // input
 StructuredBuffer<PointLight> _PointLights;
-S
+StructuredBuffer<Cluster>    _Clusters;
 
 // output
-StructuredBuffer<uint> _ClusterLightIndices;
+RWStructuredBuffer<uint>      _VisibleLightIndices;
+RWStructuredBuffer<LightGrid> _LightGrids;
 
 
 
-[numthreads(NUM_X_THREAD, NUM_Y_THREAD, NUM_Z_THREAD)]
+float SquardDistPointAABB(float3 p, uint clusterIndex)
+{
+    float result = 0.0f;
+    Cluster cluster = _Clusters[clusterIndex];
+    for(int i = 0; i < 3; ++i)
+    {
+        float v = p[i];
+        if(v < cluster.Min[i])
+        {
+            result += (cluster.Min[i] - v) * (cluster.Min[i] - v);
+        }
+        if(v > cluster.Max[i])
+        {
+            result += (v - cluster.Max[i]) * (v - cluster.Max[i]);
+        }
+
+    }
+    return result;
+}
+bool CheckPointLight(uint plIndex, uint tileIndex)
+{
+    float r = _PointLights[plIndex].Range;
+    float3 p = _PointLights[plIndex].Position;
+	float4 center = mul(float4(p, 1.0f), _ViewMatrix);
+    float sqDist = SquardDistPointAABB(center.xyz, tileIndex);
+
+    return sqDist <= (r * r);
+}
+
+[numthreads(8, 8, 16)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,
              uint3 groupThreadId    : SV_GroupThreadID,
              uint groupIndex : SV_GroupIndex)
 {
-        
+    int index = groupIndex;
 
+    _LightIndex = 0;
+    _LightGrids[index].PL_Count  = 0;
+    _LightGrids[index].PL_Offset = 0;
+
+
+    GroupMemoryBarrierWithGroupSync();
+
+
+    int plCount = 0;
+    int plIndices[128];
+    for(int i = 0; i < _PointLightCount; i++)
+    {
+        bool result = CheckPointLight(i, index);
+        if(result)
+        {
+            plIndices[plCount] = i;
+            plCount += 1;
+        }
+    }
+
+    GroupMemoryBarrierWithGroupSync();
+    int offset;
+    InterlockedAdd(_LightIndex, plCount, offset);
+    GroupMemoryBarrierWithGroupSync();
+
+
+    _LightGrids[index].PL_Count  = plCount;
+    _LightGrids[index].PL_Offset = offset;
+
+    for(int k = 0; k < plCount; k++)
+    {
+       _VisibleLightIndices[offset + k] = plIndices[k];
+    }
 
 }
 

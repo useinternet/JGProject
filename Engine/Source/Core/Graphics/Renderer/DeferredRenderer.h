@@ -22,7 +22,7 @@ namespace JG
 		virtual ~DeferredRenderer() = default;
 	public:
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Deferred; }
-		virtual void ReadyImpl(IGraphicsAPI* api, const RenderInfo& info) override;
+		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData*  data, const RenderInfo& info) override;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) override;
 		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info) override {}
 		virtual int ArrangeObject(const ObjectInfo & info) override;

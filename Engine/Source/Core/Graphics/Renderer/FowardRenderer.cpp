@@ -2,31 +2,21 @@
 #include "FowardRenderer.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_ComputeCluster.h"
+#include "Graphics/PreRenderProcess/PreRenderProcess_LightCulling.h"
 namespace JG
 {
 
 	FowardRenderer::FowardRenderer()
 	{
-		mComputeCluster = AddPreProcess<PreRenderProcess_ComputeCluster>();
+		AddPreProcess<PreRenderProcess_ComputeCluster>();
+		AddPreProcess<PreRenderProcess_LightCulling>();
 
 	}
 
-	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, const RenderInfo& info)
+	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		if (mComputeCluster)
-		{
-			mComputeCluster->CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
-			mComputeCluster->CB.ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
-			mComputeCluster->CB.EyePosition = info.EyePosition;
-			mComputeCluster->CB.Resolution = info.Resolutoin;
-			mComputeCluster->CB.FarZ  = info.FarZ;
-			mComputeCluster->CB.NearZ = info.NearZ;
-			mComputeCluster->CB.PointLightCount = GetLightInfo(Graphics::ELightType::PointLight).Count;
-			mComputeCluster->CB.TileSize = JVector2(
-				info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
-				info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
-		}
+
 	}
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info)
@@ -67,9 +57,8 @@ namespace JG
 						material = materialList[i];
 					}
 
-					if (material->Bind(commandID) == false)
+					if (material == nullptr || material->Bind(commandID) == false)
 					{
-						JG_CORE_INFO("{0} : Fail Material Bind", material->GetName());
 						continue;
 					}
 					api->DrawIndexed(commandID, mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());

@@ -11,24 +11,32 @@ namespace JG
 	class IComputer;
 	class IReadBackBuffer;
 
+	class PreRenderProcess_LightCulling;
 
 	class PreRenderProcess_ComputeCluster : public IRenderProcess
 	{
-		// 
+	
 	public:
 		const static i32 NUM_X_SLICE = 8;
 		const static i32 NUM_Y_SLICE = 8;
 		const static i32 NUM_Z_SLICE = 16;
+		const static i32 NUM_CLUSTER = NUM_X_SLICE * NUM_Y_SLICE * NUM_Z_SLICE;
+
+		const static constexpr char* SHADER_NAME = "ComputeCluster";
+		const static constexpr char* SHADERPARAM_INVPROJMATRIX = "__InvProjMatrix__";
+		const static constexpr char* SHADERPARAM_RESOLUTION	   = "__Resolution__";
+		const static constexpr char* SHADERPARAM_TILESIZE	   = "__TileSize__";
+		const static constexpr char* SHADERPARAM_NEARZ		   = "__NearZ__";
+		const static constexpr char* SHADERPARAM_FARZ		   = "__FarZ__";
+		const static constexpr char* SHADERPARAM_CLUSTERS	   = "_Clusters";
+
 		struct CB
 		{
-			JMatrix InvProjMatrix;
-			JMatrix ViewMatrix;
-			JVector3 EyePosition;
-			f32 FarZ = 0.0f;
+			JMatrix  InvProjMatrix;
 			JVector2 Resolution;
 			JVector2 TileSize;
+			f32 FarZ = 0.0f;
 			f32 NearZ = 0.0f;
-			i32 PointLightCount = 0;
 		};
 		CB CB;
 
@@ -37,26 +45,26 @@ namespace JG
 			JVector4 Min;
 			JVector4 Max;
 		};
-		struct ClusterInfo
-		{
-			i32 PL_Count  = 0;
-			i32 PL_Offset = 0;
-			i32 Enable = 0;
-		};
-		List<ClusterInfo> mClusterInfos;
-		List<u32>		  mLightIndices;
+
+		List<Cluster>     Clusters;
 	private:
-		List<SharedPtr<IComputer>>       mComputers;
-		List<SharedPtr<IReadBackBuffer>> mLightIndicesRBB;
-		List<SharedPtr<IReadBackBuffer>> mClusterInfosRBB;
-		SharedPtr<ScheduleHandle> mScheduleHandle;
+		JMatrix mPrevProjMatrix;
+		SharedPtr<IComputer>       mComputer;
+		SharedPtr<IReadBackBuffer> mClusterRBB;
+
+		bool mIsDirty        = true;
+		bool mEnableDispatch = true;
+		bool mIsDataReading = false;
+
+		PreRenderProcess_LightCulling* mLightCullingProcess = nullptr;
 	public:
 		PreRenderProcess_ComputeCluster();
 	public:
+		virtual void Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info) override;
 		virtual void Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info) override;
 		virtual bool IsCompelete() override;
+		virtual Type GetType() const override;
 	private:
-		void ReadData(i32 bufferIndex, const String& paramName, const List<SharedPtr<IReadBackBuffer>>& rbList,
-			const std::function<void(SharedPtr<IReadBackBuffer>)>& action);
+		bool CheckDirty(const RenderInfo& info);
 	};
 }

@@ -1,146 +1,145 @@
 #include "pch.h"
 #include "PreRenderProcess_ComputeCluster.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/Renderer.h"
 
-
-#define COMPUTE_CLUSTER_SHADER_NAME "ComputeCluster"
-#define NUM_CLUSTER 1024
-
-#define SHADERPARAM_INVPROJMATRIX "__InvProjMatrix__"
-#define SHADERPARAM_VIEWMATRIX "__ViewMatrix__"
-#define SHADERPARAM_EYEPOSITION "__EyePosition__"
-#define SHADERPARAM_RESOLUTION "__Resolution__"
-#define SHADERPARAM_TILESIZE "__TileSize__"
-#define SHADERPARAM_NEARZ "__NearZ__"
-#define SHADERPARAM_FARZ "__FarZ__"
-#define SHADERPARAM_POINTLIGHTCOUNT "__PointLightCount__"
-
-
-#define SHADERPARAM_POINTLIGHTS   "_PointLights"
-#define SHADERPARAM_LIGHTINDICIES "_ClusterLightIndices"
-#define SHADERPARAM_CLUSTERINFOS  "_ClusterInfos"
+#include "PreRenderProcess_LightCulling.h"
 
 namespace JG
 {
 	PreRenderProcess_ComputeCluster::PreRenderProcess_ComputeCluster()
 	{
-		u64 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		auto shader   = ShaderLibrary::GetInstance().FindComputeShader(COMPUTE_CLUSTER_SHADER_NAME);
+		auto shader   = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
 		if (shader != nullptr)
 		{
-			for (u64 i = 0; i < bufferCnt; ++i)
-			{
-				auto computer = IComputer::Create("ClusterComputer", shader);
-				auto ll_rbb = IReadBackBuffer::Create("ClusterComputer_LightIndicesRBB");
-				auto ci_rbb = IReadBackBuffer::Create("ClusterComputer_ClusterInfosRBB");
-
-				mComputers.push_back(computer);
-				mLightIndicesRBB.push_back(ll_rbb);
-				mClusterInfosRBB.push_back(ci_rbb);
-			}
+			mComputer =  IComputer::Create("ClusterComputer", shader);
+			mClusterRBB = IReadBackBuffer::Create("ClusterRBB");
+		}
+		Clusters.resize(NUM_CLUSTER);
+	}
+	void PreRenderProcess_ComputeCluster::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
+	{
+		if (mLightCullingProcess == nullptr)
+		{
+			mLightCullingProcess = renderer->FindProcess<PreRenderProcess_LightCulling>();
 		}
 
-		//  sizeX =  (unsigned int)std::ceilf(DisplayManager::SCREEN_WIDTH / (float)gridSizeX);
-		/*
-		  screen2View.tileSizes[0] = gridSizeX;
-        screen2View.tileSizes[1] = gridSizeY;
-        screen2View.tileSizes[2] = gridSizeZ;
-        screen2View.tileSizes[3] = sizeX;
-		screen2View.sliceScalingFactor = (float)gridSizeZ / std::log2f(zFar / zNear) ;
-		screen2View.sliceBiasFactor    = -((float)gridSizeZ * std::log2f(zNear) / std::log2f(zFar / zNear)) ;
-		*/
-	}
-	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info)
-	{
-		if (mComputers.empty() || mLightIndicesRBB.empty() || mClusterInfosRBB.empty())
+		rednerPassData->NumClusterSlice.x = NUM_X_SLICE;
+		rednerPassData->NumClusterSlice.y = NUM_Y_SLICE;
+		rednerPassData->NumClusterSlice.z = NUM_Z_SLICE;
+		rednerPassData->ClusterSize.x = (u32)std::ceilf(info.Resolutoin.x / (float)NUM_X_SLICE);
+		rednerPassData->ClusterSize.y = (u32)std::ceilf(info.Resolutoin.y / (float)NUM_Y_SLICE);
+		rednerPassData->ClusterScale  = (f32)NUM_Z_SLICE / std::log2f(info.FarZ / info.NearZ);
+		rednerPassData->ClusterBias   = -((f32)NUM_Z_SLICE * std::log2f(info.NearZ) / std::log2f(info.FarZ / info.NearZ));
+
+
+
+		mIsDirty = CheckDirty(info);
+		if (mIsDirty == false)
 		{
 			return;
 		}
-		
-		mScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
+
+		CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
+		CB.Resolution    = info.Resolutoin;
+		CB.FarZ			 = info.FarZ;
+		CB.NearZ		 = info.NearZ;
+		CB.TileSize = JVector2(
+			info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
+			info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
+
+
+	}
+	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info)
+	{
+		if (mComputer == nullptr || mClusterRBB == nullptr)
 		{
-			u64  bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-			auto commandID = JGGraphics::GetInstance().RequestCommandID();
-			i32 bufferIndex = info.CurrentBufferIndex;
-
-			auto lightInfo = renderer->GetLightInfo(Graphics::ELightType::PointLight);
-			// Dispatch
+			return;
+		}
+		if (mEnableDispatch == false)
+		{
+			if (mIsDataReading == false && mComputer->GetState() == EComputerState::Compelete)
 			{
 
-				// 0
-				auto computer = mComputers[bufferIndex];
-				computer->SetFloat4x4(SHADERPARAM_INVPROJMATRIX, CB.InvProjMatrix);
-				computer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatrix);
-				computer->SetFloat3(SHADERPARAM_EYEPOSITION, CB.EyePosition);
-				computer->SetFloat2(SHADERPARAM_RESOLUTION, CB.Resolution);
-				computer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
-				computer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
-				computer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
-				computer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
-				computer->SetStructDataArray(SHADERPARAM_POINTLIGHTS, lightInfo.ByteData.data(), lightInfo.Count, lightInfo.Size);
-				computer->Dispatch(commandID, 1, 1, 1);
+				auto rwBuffer = mComputer->GetRWBuffer(SHADERPARAM_CLUSTERS);
+				if (rwBuffer != nullptr && rwBuffer->IsValid())
+				{
+					mClusterRBB->Read(rwBuffer);
+					mIsDataReading = true;
+				}
+				else
+				{
+					mIsDataReading  = false;
+					mEnableDispatch = true;
+				}
 			}
-
-			ReadData(bufferIndex, SHADERPARAM_LIGHTINDICIES, mLightIndicesRBB,
-				[&](SharedPtr<IReadBackBuffer> rbBuffer)
+			else if (mIsDataReading == true && mClusterRBB->GetState() == EReadBackBufferState::ReadCompelete)
 			{
-				mLightIndices.resize(10240);
-				rbBuffer->GetData(mLightIndices.data(), sizeof(u32) * 10240);
+				mClusterRBB->GetData(Clusters.data(), sizeof(Cluster) * NUM_CLUSTER);
+				if (mLightCullingProcess)
+				{
+					mLightCullingProcess->SetClusters(Clusters.data(), Clusters.size(), sizeof(Cluster));
+				}
+				mIsDataReading  = false;
+				mEnableDispatch = true;
+			}
+		}
+		else if (mIsDirty == true && mEnableDispatch == true)
+		{
+			auto commandID = JGGraphics::GetInstance().RequestCommandID();
 
-			});
+			mComputer->SetFloat4x4(SHADERPARAM_INVPROJMATRIX, CB.InvProjMatrix);
+			mComputer->SetFloat2(SHADERPARAM_RESOLUTION, CB.Resolution);
+			mComputer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
+			mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
+			mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
+			mComputer->Dispatch(commandID, 1, 1, 1);
+			mIsDirty        = false;
+			mEnableDispatch = false;
+		}
 
-			ReadData(bufferIndex, SHADERPARAM_CLUSTERINFOS, mClusterInfosRBB,
-				[&](SharedPtr<IReadBackBuffer> rbBuffer)
-			{
-				mClusterInfos.resize(NUM_CLUSTER);
-				rbBuffer->GetData(mClusterInfos.data(), sizeof(ClusterInfo) * NUM_CLUSTER);
-			});
-
-		});
-
-		
 	}
 
 	bool PreRenderProcess_ComputeCluster::IsCompelete()
 	{
-		if (mScheduleHandle == nullptr)
-		{
-			return true;
-		}
-		return mScheduleHandle->GetState() == EScheduleState::Compelete;
+		return true;
 	}
 
-	void PreRenderProcess_ComputeCluster::ReadData(i32 bufferIndex, const String& paramName, const List<SharedPtr<IReadBackBuffer>>& rbList, const std::function<void(SharedPtr<IReadBackBuffer>)>& action)
+	Type PreRenderProcess_ComputeCluster::GetType() const
 	{
-		u64  bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		// Read
+		return JGTYPE(PreRenderProcess_ComputeCluster);
+	}
+
+	bool PreRenderProcess_ComputeCluster::CheckDirty(const RenderInfo& info)
+	{
+		for (i32 i = 0; i < 4; ++i)
 		{
-			auto computerIndex = bufferIndex - 1;
-			if (computerIndex < 0) computerIndex = bufferCnt - 1;
-			auto rwBuffer = mComputers[computerIndex]->GetRWBuffer(paramName);
-			auto readBackBuffer = rbList[bufferIndex];
-
-			if (rwBuffer != nullptr && rwBuffer->IsValid())
+			for (i32 j = 0; j < 4; ++j)
 			{
-				readBackBuffer->Read(rwBuffer);
-			}
-		}
-
-		// »Æ¿Œ
-		{
-			auto readBackBufferIndex = bufferIndex - 1;
-			if (readBackBufferIndex < 0) readBackBufferIndex = bufferCnt - 1;
-
-
-			auto readBackBuffer = rbList[readBackBufferIndex];
-			if (readBackBuffer->IsValid() && readBackBuffer->GetState() == EReadBackBufferState::ReadCompelete)
-			{
-				if (action != nullptr)
+				if (mPrevProjMatrix.Get_C(i, j) != info.ProjMatrix.Get_C(i, j))
 				{
-					action(readBackBuffer);
+					mPrevProjMatrix = info.ProjMatrix;
+					return true;
 				}
 			}
 		}
+
+		if (CB.Resolution != info.Resolutoin)
+		{
+			return true;
+		}
+
+		if (CB.FarZ != info.FarZ)
+		{
+			return true;
+		}
+		if (CB.NearZ != info.NearZ)
+		{
+			return true;
+		}
+
+
+		return false;
 	}
 }
 

@@ -119,7 +119,7 @@ namespace JG
 		virtual bool SetUint3Array(const String& name, const List<JVector3Uint>& value) = 0;
 		virtual bool SetUint4Array(const String& name, const List<JVector4Uint>& value) = 0;
 		virtual bool SetFloat4x4Array(const String& name, const List<JMatrix>& value) = 0;
-		virtual bool SetStructDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize) = 0;
+		virtual bool SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize) = 0;
 
 		virtual bool GetFloat(const String& name, float* out_value) = 0;
 		virtual bool GetFloat2(const String& name, JVector2* out_value) = 0;

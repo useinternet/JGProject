@@ -4,8 +4,7 @@
 #include "JGGraphics.h"
 #include "Graphics/RenderBatch.h"
 #include "Graphics/RenderProcess.h"
-
-
+#include "PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 namespace JG
 {
 	RenderStatistics Renderer::Statistics;
@@ -55,6 +54,20 @@ namespace JG
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolutoin;
 		passData.PointLightCount = pl_count;
+
+
+
+		ReadyImpl(api, &passData, info);
+		for (auto& preProcess : mPreProcessList)
+		{
+			preProcess->Ready(this, api, &passData, mCurrentRenderInfo);
+		}
+		for (auto& postProcess : mPostProcessList)
+		{
+			postProcess->Ready(this, api, &passData, mCurrentRenderInfo);
+		}
+
+
 		api->SetRenderPassData(commandID, passData);
 		api->SetLights(commandID, lightList);
 		return BeginBatch(info, batchList);
@@ -74,9 +87,9 @@ namespace JG
 	}
 	void Renderer::End()
 	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		auto api  = JGGraphics::GetInstance().GetGraphicsAPI();
 		auto info = GetRenderInfo();
-		ReadyImpl(api, info);
+	
 
 		// PreProcess Run
 		for (auto& preProcess : mPreProcessList)
@@ -136,11 +149,6 @@ namespace JG
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		api->EndDraw(commandID);
 	}
-
-	//u64 Renderer::GetCommandID() const
-	//{
-	//	return mCurrentRenderInfo.CommandID;
-	//}
 
 	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)
 	{
@@ -215,10 +223,4 @@ namespace JG
 			action(_pair.first, _pair.second);
 		}
 	}
-	//void Renderer::AddDrawFunc(const ReadyDrawFunc& readyFunc, const ObjectDrawFunc& drawObjectFunc, const SceneDrawFunc& sceneDrawFunc)
-	//{
-	//	mReadyDrawFuncList.push_back(readyFunc);
-	//	mObjectDrawFuncList.push_back(drawObjectFunc);
-	//	mSceneDrawFuncList.push_back(sceneDrawFunc);
-	//}
 }

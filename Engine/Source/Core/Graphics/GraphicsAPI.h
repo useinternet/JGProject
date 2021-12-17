@@ -34,6 +34,7 @@ namespace JG
 	{
 		class RenderPassData;
 		class Light;
+		class LightGrid;
 	}
 	class IGraphicsAPI 
 	{
@@ -56,6 +57,8 @@ namespace JG
 		virtual void EndDraw(u64 commandID)   = 0;
 		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData) = 0;
 		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) = 0;
+		virtual void SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids) = 0;
+		virtual void SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies) = 0;
 		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) = 0;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) = 0;

@@ -376,5 +376,12 @@ namespace JG
 			f32 ClusterBias = 0.0f;
 			JVector3Uint NumClusterSlice;
 		};
+
+		class LightGrid
+		{
+		public:
+			i32 PL_Count  = 0;
+			i32 PL_Offset = 0;
+		};
 	}
 }

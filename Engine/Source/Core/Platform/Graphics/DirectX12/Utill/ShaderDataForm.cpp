@@ -1110,7 +1110,9 @@ namespace JG
 		}
 		for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
 		{
-			mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, MaxDataSize);
+			u64 alignment = _pair.second->ElementDataSize;
+			u64 alignDataSize = (MaxDataSize + (alignment - 1)) & ~(alignment - 1);
+			mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, alignDataSize);
 		}
 
 		for (auto& _pair : shaderDataForm->TextureDataMap)
@@ -1373,7 +1375,7 @@ namespace JG
 		return SetDataArray<JMatrix, EShaderDataType::_float4x4>(name, value);
 	}
 
-	bool ShaderData::SetStructDataArray(const String& name, void* datas, u64 elementCount, u64 elementSize)
+	bool ShaderData::SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
 	{
 		return SetDataArray(name, datas, elementCount, elementSize);
 	}
@@ -1518,5 +1520,7 @@ namespace JG
 		{
 			return false;
 		}
+
+		return true;
 	}
 }

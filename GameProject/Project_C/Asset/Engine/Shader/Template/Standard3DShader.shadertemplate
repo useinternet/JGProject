@@ -89,18 +89,26 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 
 	Material material;
 	material.WorldPosition = pin.posW;
-	material.Albedo = output.albedo.rgb;
+	material.Albedo    = output.albedo.rgb;
 	material.Roughness = output.roughness;
-	material.Metallic = output.metallic;
+	material.Metallic  = output.metallic;
 
-	uint cnt    = 0;
-	uint stride = 0;
+	
+	int clusterIndex = GetClusterIndex(pin.posH.xyz);
+	LightGrid lgrid  = _LightGridList[clusterIndex];
 
-	for(uint i = 0; i<_PointLightCount; ++i)
+	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
 	{
-		PointLight pl = _PointLightList[i];
-		Lo += CalcPointLight(N, V, material, pl);
+		int pl_start  = lgrid.PL_Offset;
+		int pl_end    = pl_start + lgrid.PL_Count;
+		for(int i = pl_start; i<pl_end; i++)
+		{
+			int lightIndex = _VisibleLightIndices[i];
+			PointLight pl = _PointLightList[lightIndex];
+			Lo += CalcPointLight(N, V, material, pl);
+		}
 	}
+
 
 	float3 final = saturate(Lo);
 	float Gamma = 1.0f / 2.2f;
