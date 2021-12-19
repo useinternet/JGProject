@@ -2,6 +2,7 @@
 #include "DevelopView.h"
 #include "Application.h"
 #include "UI/UIManager.h"
+#include "Graphics/Renderer.h"
 namespace JG
 {
 
@@ -52,6 +53,9 @@ namespace JG
 		int fps = Application::GetInstance().GetAppTimer()->GetFPS();
 		ImGui::Text("FPS : %d", fps);
 
+		ImGui::Text("Draw Total Object : %d", Renderer::Statistics.TotalObjectCount);
+		ImGui::Text("Draw Object : %d", Renderer::Statistics.VisibleObjectCount);
+		ImGui::Text("Culling Object : %d", Renderer::Statistics.CullingObjectCount);
 
 
 		ImGui::EndChild();

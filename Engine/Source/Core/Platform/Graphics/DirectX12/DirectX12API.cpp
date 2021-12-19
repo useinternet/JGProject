@@ -701,7 +701,7 @@ namespace JG
 	{
 		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
 		rbBuffer->SetName(name);
-		rbBuffer->Read(readWriteBuffer);
+		rbBuffer->Read(readWriteBuffer, nullptr);
 		return rbBuffer;
 	}
 	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)

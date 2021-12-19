@@ -30,13 +30,15 @@ namespace JG
 		String mFullSourceCode;
 		bool mIsCompileSuccess = false;
 		List<std::pair<EShaderDataType, String>> mPropertyList;
+		List<SharedPtr<IShaderScript>> mShaderScriptList;
 	public:
-		virtual bool          Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
+		virtual bool  Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
 		virtual const String& GetShaderCode() const override;
 		virtual const String& GetFullShaderCode() const override;
 		virtual EShaderFlags  GetFlags() const override;
 		virtual bool IsSuccessed() const override;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;
+		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
 		ID3DBlob* GetVSData() const {
 			return mVSData.Get();

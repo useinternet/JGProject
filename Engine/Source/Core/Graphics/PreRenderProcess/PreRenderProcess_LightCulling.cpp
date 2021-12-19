@@ -42,50 +42,53 @@ namespace JG
 			return;
 		}
 
-		if (mEnableDispatch == false)
-		{
-			if (mIsDataReading == false && mComputer->GetState() == EComputerState::Compelete)
-			{
-				auto lightGridRWB = mComputer->GetRWBuffer(SHADERPARAM_LIGHTGRIDS);
-				auto visibleLightIndicesRWB = mComputer->GetRWBuffer(SHADERPARAM_VISIBLE_LIGHTINDICES);
 
-				if (lightGridRWB != nullptr && lightGridRWB->IsValid() &&
-					visibleLightIndicesRWB != nullptr && visibleLightIndicesRWB->IsValid())
-				{
-					mVisibleLightIndicesRBB->Read(visibleLightIndicesRWB);
-					mLightGridRBB->Read(lightGridRWB);
-					mIsDataReading = true;
-				}
-				else
-				{
-					mIsDataReading = false;
-					mEnableDispatch = true;
-				}
-			}
-			else if (mIsDataReading == true &&
-				mLightGridRBB->GetState() == EReadBackBufferState::ReadCompelete &&
-				mVisibleLightIndicesRBB->GetState() == EReadBackBufferState::ReadCompelete)
-			{
-				mLightGridRBB->GetData(LightGrids.data(), sizeof(Graphics::LightGrid) * PreRenderProcess_ComputeCluster::NUM_CLUSTER);
-				mVisibleLightIndicesRBB->GetData(VisibleLightIndices.data(), MAX_VISIBLE_LIGHTINDEX_COUNT * sizeof(u32));
 
-				mIsDataReading = false;
-				mEnableDispatch = true;
-			}
-		}
-		else if (mEnableDispatch == true)
+
+		if (mEnableDispatch == true)
 		{
 			auto commandID = JGGraphics::GetInstance().RequestCommandID();
 			auto pointLightsInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
-
 			mComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
 			mComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
 			mComputer->SetStructDataArray(SHADERPARAM_POINTLIGHTS, pointLightsInfo.ByteData.data(), pointLightsInfo.Count, pointLightsInfo.Size);
 			mComputer->Dispatch(commandID, 1,1,1);
 			mEnableDispatch = false;
 		}
+		else
+		{
+			if (mComputer->GetState() == EComputerState::Compelete)
+			{
+				auto lightGridRWB		    = mComputer->GetRWBuffer(SHADERPARAM_LIGHTGRIDS);
+				auto visibleLightIndicesRWB = mComputer->GetRWBuffer(SHADERPARAM_VISIBLE_LIGHTINDICES);
 
 
+				if (lightGridRWB != nullptr && lightGridRWB->IsValid() &&
+					visibleLightIndicesRWB != nullptr && visibleLightIndicesRWB->IsValid())
+				{
+					mLightGridRBB->Read(lightGridRWB, [&]()
+					{
+						mLightGridRBB->GetData(LightGrids.data(), sizeof(Graphics::LightGrid) * PreRenderProcess_ComputeCluster::NUM_CLUSTER);
+						++mCompeleteRBBCount;
+					});
+					mVisibleLightIndicesRBB->Read(visibleLightIndicesRWB, [&]()
+					{
+						mVisibleLightIndicesRBB->GetData(VisibleLightIndices.data(), MAX_VISIBLE_LIGHTINDEX_COUNT * sizeof(u32));
+						++mCompeleteRBBCount;
+					});
+				}
+				else
+				{
+					mEnableDispatch = false;
+				}
+			}
+		}
+
+		if (mCompeleteRBBCount == NUM_RBB_COUNT)
+		{
+			mEnableDispatch = true;
+			mCompeleteRBBCount = 0;
+		}
 	}
 	bool PreRenderProcess_LightCulling::IsCompelete()
 	{

@@ -21,7 +21,6 @@ namespace JG
 		mLightInfos.clear();
 
 
-
 		// Light Info 정보 수집
 		u64 pl_count = 0;
 		for (auto item : lightList)
@@ -41,7 +40,6 @@ namespace JG
 
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		api->BeginDraw(commandID);
-
 
 		// PassData  바인딩
 		// Light 정보 바인딩
@@ -78,12 +76,18 @@ namespace JG
 		{
 			return;
 		}
+		Statistics.TotalObjectCount += 1;
+		// Culling
+
+
 		ObjectInfo info;
 		info.WorldMatrix = worldMatrix;
 		info.Mesh = mesh;
 		info.MaterialList = materialList;
 		i32 type = ArrangeObject(info);
 		mObjectInfoListDic[type].push_back(info);
+		
+		Statistics.VisibleObjectCount += 1;
 	}
 	void Renderer::End()
 	{

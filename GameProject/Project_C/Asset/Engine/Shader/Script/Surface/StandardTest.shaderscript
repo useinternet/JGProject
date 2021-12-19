@@ -11,8 +11,7 @@ _Variables {
 };
 
 _Surface {
-	//float4 textureColor = Tex1.Sample(_AnisotropicSampler, _input.tex);
-	_output.albedo      = float4(BaseColor.rgb, 1.0f);
+	_output.albedo      = float4(BaseColor, 1.0f);
 	_output.roughness   = Roughness;
 	_output.specular    = Specular;
 	_output.metallic    = Metallc;

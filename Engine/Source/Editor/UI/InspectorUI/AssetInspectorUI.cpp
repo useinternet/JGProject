@@ -15,24 +15,43 @@ namespace JG
 		}
 		// Material 정보를 가져온다.
 		auto propertyList = obj->Get()->GetPropertyList();
+		auto scriptList   = obj->Get()->GetScriptList();
 
 
-		auto material = obj->Get();
+
+		SharedPtr<IMaterial> material = obj->Get();
 		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
-		auto json = CreateSharedPtr<Json>();
+		auto json       = CreateSharedPtr<Json>();
 		f32 label_space = 0.0f;
 
 
+		// 머터리얼 이름
 		ImGui::Text(obj->GetAssetName().c_str()); ImGui::Spacing();
+
+		// Surface Script
+		if (scriptList.empty() == false)
+		{
+			if (ImGui::BeginCombo("##Script Combo Box", scriptList[0]->GetName().c_str()))
+			{
+				ShaderLibrary::GetInstance().ForEach(EShaderScriptType::Surface, [&](SharedPtr<IShaderScript> script)
+				{
+					bool _bool = false;
+					if (ImGui::Selectable(script->GetName().c_str(), &_bool))
+					{
+						// 추후 변경 가능하도록 고민
+					}
+				});
+				ImGui::EndCombo();
+			}
+		}
+
 		for (auto& property : propertyList)
 		{
 			auto name = property.second;
 			label_space = std::max<f32>(label_space, ImGui::CalcTextSize(name.c_str()).x);
 		}
-		// Property Settings
 		for (auto& property : propertyList)
 		{
-
 			auto type = property.first;
 			auto name = property.second;
 			auto dataJson = json->CreateJsonData();
@@ -150,34 +169,32 @@ namespace JG
 			break;
 			case EShaderDataType::texture2D:
 			{
-				//SharedPtr<ITexture> texture = nullptr;
-				//material->GetTexture(name, 0, &texture);
+				SharedPtr<ITexture> texture = nullptr;
+				material->GetTexture(name, &texture);
 
 
-				//u64 textureID = 0;
-				//if (texture != nullptr && texture->IsValid())
-				//{
-				//	textureID = texture->GetTextureID();
-				//	textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
-				//}
+				u64 textureID = 0;
+				if (texture != nullptr && texture->IsValid())
+				{
+					textureID = texture->GetTextureID();
+					textureID = JGImGui::GetInstance().ConvertImGuiTextureID(textureID);
+				}
 
-				//auto asset = ImGui::Texture_OnGUI(name, textureID, label_space);
+				auto asset = ImGui::Texture_OnGUI(name, textureID, label_space);
+				if (asset && asset->Is<Asset<ITexture>>())
+				{
+					auto tasset = asset->As<Asset<ITexture>>();
+					if (tasset->IsValid())
+					{
+						material->SetTexture(name, 0, tasset->Get());
+						texture = tasset->Get();
+					}
+				}
 
-
-				//if (asset && asset->Is<Asset<ITexture>>())
-				//{
-				//	auto tasset = asset->As<Asset<ITexture>>();
-				//	if (tasset->IsValid())
-				//	{
-				//		material->SetTexture(name, 0, tasset->Get());
-				//		texture = tasset->Get();
-				//	}
-				//}
-
-				//if (texture != nullptr)
-				//{
-				//	dataJson->SetString(texture->GetName());
-				//}
+				if (texture != nullptr)
+				{
+					dataJson->SetString(texture->GetName());
+				}
 			}
 			break;
 			default:
@@ -188,7 +205,7 @@ namespace JG
 		}
 		if (ImGui::Button("Save") == true)
 		{
-			auto fullPath = obj->GetAssetFullPath();
+			auto fullPath     = obj->GetAssetFullPath();
 			auto materialJson = CreateSharedPtr<Json>();
 			if (AssetDataBase::GetInstance().ReadAsset(fullPath, nullptr, &materialJson) == true)
 			{
@@ -198,9 +215,8 @@ namespace JG
 					MaterialAssetStock stock;
 					stock.LoadJson(assetVal);
 					stock.Name = obj->GetAssetName();
-					// Property
 					stock.MaterialDatas = materialDatas;
-
+					
 					auto outputPath = StringExtend::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
 					MaterialAssetStock::Write(outputPath, stock);
 					AssetDataBase::GetInstance().RefreshAsset(obj->GetAssetID());

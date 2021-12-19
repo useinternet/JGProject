@@ -81,7 +81,6 @@ namespace JG
 		u64 extentionPos = fileName.find_last_of(".");
 		stock.Name = fileName.substr(0, extentionPos);
 		
-		
 		byte* pixels = stbi_load(settings.AssetPath.c_str(), &stock.Width, &stock.Height, &stock.Channels, STBI_rgb_alpha);
 		if (pixels == nullptr)
 		{

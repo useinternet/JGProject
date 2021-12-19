@@ -580,7 +580,7 @@ namespace ImGui
 				
 			}
 		});
-
+		ImGui::Columns(1);
 
 		return JG::AssetDataBase::GetInstance().LoadOriginAsset(texturePathDic[label]);
 	}

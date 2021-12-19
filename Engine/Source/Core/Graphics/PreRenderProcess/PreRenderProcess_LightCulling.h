@@ -14,6 +14,7 @@ namespace JG
 	class PreRenderProcess_ComputeCluster;
 	class PreRenderProcess_LightCulling : public IRenderProcess
 	{
+		static const i32 NUM_RBB_COUNT = 2;
 	public:
 		static const i32 MAX_VISIBLE_LIGHTINDEX_COUNT = _128KB / sizeof(u32);
 
@@ -42,7 +43,7 @@ namespace JG
 		SharedPtr<IReadBackBuffer> mLightGridRBB;
 
 		bool mEnableDispatch = true;
-		bool mIsDataReading  = false;
+		i32  mCompeleteRBBCount = 0;
 		Renderer* mRenderer = nullptr;
 		PreRenderProcess_ComputeCluster* mComputeClusterProcess  = nullptr;
 	public:

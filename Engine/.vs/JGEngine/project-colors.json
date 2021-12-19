@@ -20,7 +20,12 @@
       "ProjectGuid": "7fa9857c-6be0-860d-14cd-6c1000e3020f",
       "DisplayName": "Game",
       "ColorIndex": 2
+    },
+    "a7a2a36c-3c53-4ccb-b52e-425623e2dda5": {
+      "ProjectGuid": "a7a2a36c-3c53-4ccb-b52e-425623e2dda5",
+      "DisplayName": "기타 파일",
+      "ColorIndex": 3
     }
   },
-  "NextColorIndex": 3
+  "NextColorIndex": 4
 }

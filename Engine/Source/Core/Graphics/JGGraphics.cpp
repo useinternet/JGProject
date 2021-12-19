@@ -156,6 +156,12 @@ namespace JG
 	}
 	void JGGraphics::Reset()
 	{
+		// Statics Reset
+		Renderer::Statistics.TotalObjectCount = 0;
+		Renderer::Statistics.CullingObjectCount = 0;
+		Renderer::Statistics.VisibleObjectCount = 0;
+
+
 		mCommandIDIndex = 1;
 		mCommandIDPool.clear();
 

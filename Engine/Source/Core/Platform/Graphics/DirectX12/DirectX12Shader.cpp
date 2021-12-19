@@ -11,6 +11,7 @@ namespace JG
 	bool DirectX12GraphicsShader::Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error)
 	{
 		mFlags = flags;
+		mShaderScriptList = scriptList;
 		// SourceCode
 		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode()   + "\n";
 		libCode       += ShaderLibrary::GetInstance().GetGlobalGraphicsLibCode() + "\n";
@@ -44,6 +45,10 @@ namespace JG
 	const List<std::pair<EShaderDataType, String>>& DirectX12GraphicsShader::GetPropertyList() const
 	{
 		return mPropertyList;
+	}
+	const List<SharedPtr<IShaderScript>>& DirectX12GraphicsShader::GetScriptList() const
+	{
+		return mShaderScriptList;
 	}
 	bool DirectX12GraphicsShader::Compile(const String& code, String* error)
 	{

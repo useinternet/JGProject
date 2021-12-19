@@ -80,7 +80,7 @@ namespace JG
 	public:
 		virtual ~IReadBackBuffer() = default;
 	public:
-		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
+		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer, const std::function<void()>& onCompelete = nullptr) = 0;
 		virtual bool GetData(void* out_data, u64 out_data_size) = 0;
 		virtual u64  GetDataSize() const = 0;
 		virtual EReadBackBufferState GetState() const = 0;
@@ -90,6 +90,8 @@ namespace JG
 	};
 	class IComputer 
 	{
+	public:
+		virtual ~IComputer() = default;
 	public:
 		virtual bool SetFloat(const String& name, float value) = 0;
 		virtual bool SetFloat2(const String& name, const JVector2& value) = 0;
@@ -140,7 +142,8 @@ namespace JG
 		virtual const String& GetName() const    = 0;
 		virtual void SetName(const String& name) = 0;
 		virtual EComputerState GetState() const = 0;
-		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ) = 0;
+		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
+			const std::function<void()>& onCompelete = nullptr) = 0;
 	public:
 		static SharedPtr<IComputer> Create(const String& name, SharedPtr<IComputeShader> shader);
 	};

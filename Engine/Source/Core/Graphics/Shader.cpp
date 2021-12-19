@@ -71,6 +71,7 @@ namespace JG
 		if (iter == mShaderScriptDic.end())
 		{
 			mShaderScriptDic.emplace(name, script);
+			mShaderScriptDicByType[script->GetScriptType()].push_back(script);
 		}
 
 	}
@@ -169,6 +170,15 @@ namespace JG
 	const String& ShaderLibrary::GetGlobalComputeLibCode() const
 	{
 		return mGlobalComputeLibCode;
+	}
+
+	void ShaderLibrary::ForEach(EShaderScriptType scriptType, const std::function<void(SharedPtr<IShaderScript>)>& action)
+	{
+		if (action == nullptr) return;
+		for (auto& script : mShaderScriptDicByType[scriptType])
+		{
+			action(script);
+		}
 	}
 
 

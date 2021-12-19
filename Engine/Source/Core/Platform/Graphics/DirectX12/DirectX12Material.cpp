@@ -183,13 +183,22 @@ namespace JG
 		Init(shader);
 	}
 
-	List<std::pair<EShaderDataType, String>> DirectX12Material::GetPropertyList() const
+	const List<std::pair<EShaderDataType, String>>& DirectX12Material::GetPropertyList() const
 	{
 		if (mGraphicsShader == nullptr)
 		{
 			return List<std::pair<EShaderDataType, String>>();
 		}
 		return mGraphicsShader->GetPropertyList();
+	}
+
+	const List<SharedPtr<IShaderScript>>& DirectX12Material::GetScriptList() const
+	{
+		if (mGraphicsShader == nullptr)
+		{
+			return List<SharedPtr<IShaderScript>>();
+		}
+		return mGraphicsShader->GetScriptList();
 	}
 
 	bool DirectX12Material::Bind(u64 commandID)
@@ -211,7 +220,18 @@ namespace JG
 			memcpy(mUploadBtData.data(), mBtData.data(), mBtData.size());
 		}
 
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+		for (auto _pair : mTextures)
+		{
+			auto tex = _pair.second;
 
+			if (tex == nullptr || tex->IsValid() == false)continue;
+
+			auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+			handles.push_back(dx12Tex->GetSRV());
+		}
+
+		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURE2D, handles);
 		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
 		return true;
 	}
@@ -227,8 +247,6 @@ namespace JG
 
 
 		mGraphicsShader = shader;
-		
-
 		auto propertyList = mGraphicsShader->GetPropertyList();
 
 		u64 btPos = 0;

@@ -56,35 +56,8 @@ namespace JG
 		{
 			return;
 		}
-		if (mEnableDispatch == false)
-		{
-			if (mIsDataReading == false && mComputer->GetState() == EComputerState::Compelete)
-			{
 
-				auto rwBuffer = mComputer->GetRWBuffer(SHADERPARAM_CLUSTERS);
-				if (rwBuffer != nullptr && rwBuffer->IsValid())
-				{
-					mClusterRBB->Read(rwBuffer);
-					mIsDataReading = true;
-				}
-				else
-				{
-					mIsDataReading  = false;
-					mEnableDispatch = true;
-				}
-			}
-			else if (mIsDataReading == true && mClusterRBB->GetState() == EReadBackBufferState::ReadCompelete)
-			{
-				mClusterRBB->GetData(Clusters.data(), sizeof(Cluster) * NUM_CLUSTER);
-				if (mLightCullingProcess)
-				{
-					mLightCullingProcess->SetClusters(Clusters.data(), Clusters.size(), sizeof(Cluster));
-				}
-				mIsDataReading  = false;
-				mEnableDispatch = true;
-			}
-		}
-		else if (mIsDirty == true && mEnableDispatch == true)
+		if (mEnableDispatch == true)
 		{
 			auto commandID = JGGraphics::GetInstance().RequestCommandID();
 
@@ -94,10 +67,33 @@ namespace JG
 			mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
 			mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
 			mComputer->Dispatch(commandID, 1, 1, 1);
-			mIsDirty        = false;
+			mIsDirty		= false;
 			mEnableDispatch = false;
 		}
+		else
+		{
+			if (mComputer->GetState() == EComputerState::Compelete)
+			{
+				auto rwBuffer = mComputer->GetRWBuffer(SHADERPARAM_CLUSTERS);
 
+				if (rwBuffer != nullptr && rwBuffer->IsValid())
+				{
+					mClusterRBB->Read(rwBuffer, [&]()
+					{
+						mClusterRBB->GetData(Clusters.data(), sizeof(Cluster) * NUM_CLUSTER);
+						if (mLightCullingProcess)
+						{
+							mLightCullingProcess->SetClusters(Clusters.data(), Clusters.size(), sizeof(Cluster));
+						}
+						mEnableDispatch = true;
+					});
+				}
+				else
+				{
+					mEnableDispatch = true;
+				}
+			}
+		}
 	}
 
 	bool PreRenderProcess_ComputeCluster::IsCompelete()

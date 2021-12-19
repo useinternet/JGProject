@@ -95,8 +95,8 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 
 	
 	int clusterIndex = GetClusterIndex(pin.posH.xyz);
+	uint3 clusterTestIndex = GetClusterIndex3(pin.posH.xyz);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
-
 	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
 	{
 		int pl_start  = lgrid.PL_Offset;

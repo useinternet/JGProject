@@ -264,11 +264,13 @@ namespace JG
 	};
 	enum class EComputerState
 	{
+		Wait,
 		Run,
 		Compelete,
 	};
 	enum class EReadBackBufferState
 	{
+		Wait,
 		Reading,
 		ReadCompelete,
 	};

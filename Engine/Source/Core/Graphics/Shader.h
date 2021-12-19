@@ -17,6 +17,7 @@ namespace JG
 		virtual const String& GetFullShaderCode() const = 0;
 		virtual EShaderFlags  GetFlags()          const = 0;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
+		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
 		virtual bool IsSuccessed() const = 0;
 	public:
 		static SharedPtr<IGraphicsShader> Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
@@ -89,6 +90,7 @@ namespace JG
 		Dictionary<String, SharedPtr<IGraphicsShader>> mGraphicsShaderDic;
 		Dictionary<String, SharedPtr<IComputeShader>>  mComputeShaderDic;
 		Dictionary<String, SharedPtr<IShaderScript>>   mShaderScriptDic;
+		Dictionary<EShaderScriptType, List<SharedPtr<IShaderScript>>> mShaderScriptDicByType;
 		String mGlobalShaderLibCode;
 		String mGlobalGraphicsLibCode;
 		String mGlobalComputeLibCode;
@@ -115,6 +117,8 @@ namespace JG
 		const String& GetGlobalShaderLibCode()   const;
 		const String& GetGlobalGraphicsLibCode() const;
 		const String& GetGlobalComputeLibCode() const;
+	public:
+		void ForEach(EShaderScriptType scriptType, const std::function<void(SharedPtr<IShaderScript>)>& action);
 	};
 
 

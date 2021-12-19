@@ -301,7 +301,7 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::Read(SharedPtr<IReadWriteBuffer> readWriteBuffer)
+	bool DirectX12ReadBackBuffer::Read(SharedPtr<IReadWriteBuffer> readWriteBuffer, const std::function<void()>& onCompelete)
 	{
 		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false || mState == EReadBackBufferState::Reading)
 		{
@@ -334,10 +334,15 @@ namespace JG
 		commandList->CopyResource(Get(), dxRWBuffer->Get());
 
 		mState = EReadBackBufferState::Reading;
-
-		Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem, [&]()->EScheduleResult
+		mOnCompelete = onCompelete;
+		mScheduleHandle = Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem, [&]()->EScheduleResult
 		{
 			mState = EReadBackBufferState::ReadCompelete;
+			if (mOnCompelete != nullptr)
+			{
+				mOnCompelete();
+				mOnCompelete = nullptr;
+			}
 			return EScheduleResult::Break;
 		});
 
@@ -346,12 +351,13 @@ namespace JG
 
 	bool DirectX12ReadBackBuffer::GetData(void* out_data,u64 out_data_size)
 	{
-		if (IsValid() == false || mState == EReadBackBufferState::Reading)
+		if (IsValid() == false || mState != EReadBackBufferState::ReadCompelete)
 		{
 			return false;
 		}
 		out_data_size = Math::Min(out_data_size, mBufferSize);
 		memcpy(out_data, mCPU, out_data_size);
+		mState = EReadBackBufferState::Wait;
 		return true;
 	}
 
@@ -372,11 +378,26 @@ namespace JG
 			mD3DResource->Unmap(0, nullptr);
 			mCPU = nullptr;
 			mBufferSize = 0;
-			mState = EReadBackBufferState::ReadCompelete;
+			mState = EReadBackBufferState::Wait;
 			DirectX12API::DestroyCommittedResource(mD3DResource);
 			mD3DResource.Reset();
 			mD3DResource = nullptr;
 		}
+		if (mScheduleHandle)
+		{
+			mScheduleHandle->Reset();
+			mScheduleHandle = nullptr;
+		}
+		mOnCompelete = nullptr;
+	}
+	DirectX12Computer::~DirectX12Computer()
+	{
+		if (mScheduleHandle != nullptr)
+		{
+			mScheduleHandle->Reset();
+			mScheduleHandle = nullptr;
+		}
+		mOnCompelete = nullptr;
 	}
 	bool DirectX12Computer::SetFloat(const String& name, float value)
 	{
@@ -606,7 +627,7 @@ namespace JG
 		return mState;
 	}
 
-	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ)
+	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, const std::function<void()>& onCompelete)
 	{
 		if (mOwnerShader == nullptr || mOwnerShader->IsSuccessed() == false)
 		{
@@ -696,13 +717,6 @@ namespace JG
 			return false;
 		}
 		commandList->BindPipelineState(PSO);
-
-
-
-
-		
-
-	
 		commandList->Dispatch(groupX, groupY, groupZ);
 
 
@@ -710,16 +724,24 @@ namespace JG
 		{
 			mScheduleHandle->Reset();
 		}
+		mOnCompelete = onCompelete;
 		mScheduleHandle = Scheduler::GetInstance().ScheduleOnceByFrame(
 			DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem,
 			[&]() -> EScheduleResult
 		{
 			mState = EComputerState::Compelete;
+			if (mOnCompelete != nullptr)
+			{
+				mOnCompelete();
+				mOnCompelete = nullptr;
+			}
 			return EScheduleResult::Break;
 		});
 
 		return true;
 	}
+
+
 
 
 
@@ -767,12 +789,11 @@ namespace JG
 			d3dRscFlags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 		}
 
-
 		D3D12_RESOURCE_DESC rscDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 			ConvertDXGIFormat(mTextureInfo.Format), mTextureInfo.Width, mTextureInfo.Height,
 			info.ArraySize, mTextureInfo.MipLevel, 1, 0,
 			d3dRscFlags, D3D12_TEXTURE_LAYOUT_UNKNOWN, 0);
-
+		
 
 		SharedPtr<D3D12_CLEAR_VALUE> clearValue = nullptr;
 		if (flags & ETextureFlags::Allow_RenderTarget)
@@ -936,6 +957,9 @@ namespace JG
 	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetSRV() const
 	{
 		if (IsValid() == false) return { 0 };
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC desc;
+
 
 		SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> srvDesc = CreateSRVDesc(mTextureInfo.Flags);
 

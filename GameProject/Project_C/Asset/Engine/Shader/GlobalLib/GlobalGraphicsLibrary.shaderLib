@@ -44,7 +44,7 @@ float DistributionGGX(float NoH, float r)
     float denom = (NoH2 * (a2 - 1.0) + 1.0);
     denom = JG_PI * denom * denom;
 	
-    return a2 / max(denom, 0.001f);
+    return a2 / denom;
 }
 
 // GAF
@@ -92,14 +92,14 @@ float3 CalcDirLight(float3 N, float3 V, Material material, DirectionalLight ligh
     float NoL = saturate(dot(N,L));
 	float NoH = saturate(dot(N,H));
 	float NoV = saturate(dot(N,V));
-	float VoH = saturate(dot(V,H));
+	float HoV = saturate(dot(H,V));
 
 
     float3 Lo = float3(0.0f,0.0f,0.0f);
     float3 F0  = lerp(float3(0.16f,0.16f,0.16f), material.Albedo, material.Metallic);
     float  D = DistributionGGX(NoH, material.Roughness);
 	float  G = GeometrySmith(NoV, NoL, material.Roughness);
-	float3 F = F_Schlick(VoH, F0);
+	float3 F = F_Schlick(HoV, F0);
 
 
     float3 numerator  = D * G * F;
@@ -143,7 +143,7 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
 
     float3 numerator  = D * G * F;
 	float  denom      = 4 * NoL * NoV;
-	float3 specular = numerator / max(denom, 0.001f);
+	float3 specular = numerator / max(denom, 0.0000001F);
 	float3 kS = F;
 	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
 	kD *= 1.0 - material.Metallic;

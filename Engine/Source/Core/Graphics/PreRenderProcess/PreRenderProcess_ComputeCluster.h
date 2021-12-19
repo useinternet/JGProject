@@ -54,7 +54,6 @@ namespace JG
 
 		bool mIsDirty        = true;
 		bool mEnableDispatch = true;
-		bool mIsDataReading = false;
 
 		PreRenderProcess_LightCulling* mLightCullingProcess = nullptr;
 	public:

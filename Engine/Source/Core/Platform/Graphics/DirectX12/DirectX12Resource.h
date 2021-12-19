@@ -103,14 +103,16 @@ namespace JG
 	class DirectX12ReadBackBuffer : public IReadBackBuffer
 	{
 		ComPtr<ID3D12Resource>  mD3DResource;
-		EReadBackBufferState    mState = EReadBackBufferState::ReadCompelete;
+		EReadBackBufferState    mState = EReadBackBufferState::Wait;
 		void* mCPU        = nullptr;
 		u64   mBufferSize = 0;
+		SharedPtr<ScheduleHandle> mScheduleHandle;
+		std::function<void()> mOnCompelete;
 	public:
 		virtual ~DirectX12ReadBackBuffer();
 	public:
 		virtual bool IsValid() const override;
-		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer) override;
+		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer, const std::function<void()>& onCompelete) override;
 		virtual bool GetData(void* out_data, u64 out_data_size) override;
 		virtual u64 GetDataSize() const override;
 		virtual EReadBackBufferState GetState() const override;
@@ -127,10 +129,14 @@ namespace JG
 	{
 	private:
 		String         mName;
-		EComputerState mState = EComputerState::Compelete;
+		EComputerState mState = EComputerState::Wait;
 		SharedPtr<IComputeShader> mOwnerShader;
 		UniquePtr<ShaderData>     mShaderData;
+
 		SharedPtr<ScheduleHandle> mScheduleHandle;
+		std::function<void()> mOnCompelete;
+	public:
+		virtual ~DirectX12Computer();
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
@@ -182,7 +188,9 @@ namespace JG
 		virtual const String& GetName() const override;
 		virtual void  SetName(const String& name) override;
 		virtual EComputerState GetState() const override;
-		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ) override;
+		virtual bool Dispatch(
+			u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
+			const std::function<void()>& onCompelete) override;
 	};
 
 

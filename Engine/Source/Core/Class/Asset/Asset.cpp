@@ -885,14 +885,17 @@ namespace JG
 				break;
 				case JG::EShaderDataType::texture2D:
 				{
-					auto textureAsset = LoadOriginAsset(value->GetString());
-
-					if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
+					if (value->IsString() == true)
 					{
-						auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
-						if (materialAsset->mData->SetTexture(name, 0, t) == false)
+						auto textureAsset = LoadOriginAsset(value->GetString());
+
+						if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
 						{
-							JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+							auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
+							if (materialAsset->mData->SetTexture(name, 0, t) == false)
+							{
+								JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+							}
 						}
 					}
 				}
