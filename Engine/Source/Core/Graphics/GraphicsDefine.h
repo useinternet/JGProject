@@ -62,6 +62,7 @@ namespace JG
 		None = 0x00001,
 		Allow_RenderTarget = 0x00002,
 		Allow_DepthStencil = 0x00004,
+		SRV_TextureCube   = 0x00008,
 	};
 
 
@@ -82,8 +83,7 @@ namespace JG
 		f32   ClearDepth = 1.0f;
 		u8    ClearStencil = 0;
 	};
-
-
+	
 
 	ENUM_FLAG(EShaderFlags)
 		enum class EShaderFlags
@@ -107,7 +107,7 @@ namespace JG
 		_float, _float2, _float3, _float4,
 		_float3x3, _float4x4,
 
-		texture2D,
+		texture2D, textureCube
 	};
 
 	inline u64 GetShaderDataTypeSize(EShaderDataType type)
@@ -154,6 +154,7 @@ namespace JG
 		case EShaderDataType::_float3x3: return "float3x3";
 		case EShaderDataType::_float4x4: return "float4x4";
 		case EShaderDataType::texture2D: return "Texture2D";
+		case EShaderDataType::textureCube: return"TextureCube";
 		default:
 			JG_CORE_CRITICAL("not supported ShaderDataType");
 			return "unknown";
@@ -177,6 +178,7 @@ namespace JG
 		else if (type == "float3x3") return EShaderDataType::_float3x3;
 		else if (type == "float4x4") return EShaderDataType::_float4x4;
 		else if (type == "Texture2D") return EShaderDataType::texture2D;
+		else if (type == "TextureCube") return EShaderDataType::textureCube;
 		else
 		{
 			return EShaderDataType::unknown;
@@ -282,11 +284,6 @@ namespace JG
 		Line,
 	};
 
-
-
-
-
-
 	class ScissorRect
 	{
 	public:
@@ -338,23 +335,6 @@ namespace JG
 			constexpr char* Standard3DShader = "Standard3DShader";
 			constexpr char* DebugShader = "DebugShader";
 		}
-
-		namespace Standard2D
-		{
-			constexpr char* ViewProj = "gViewProj";
-			constexpr char* Texture  = "gTexture";
-		}
-		namespace Standard3D
-		{
-			constexpr char* ViewProj = "gViewProj";
-			constexpr char* Eye      = "gEye";
-			constexpr char* World    = "gWorld";
-
-
-			constexpr char* PointLightList = "gPointLightList";
-			constexpr char* PointLightCount = "gPointLightCount";
-		}
-
 		namespace Type
 		{
 			constexpr char* Resources = "_Resources";
@@ -387,6 +367,7 @@ namespace JG
 			constexpr token* CBuffer = "cbuffer ";
 			constexpr token* StructuredBuffer = "StructuredBuffer";
 			constexpr token* Texture2D = "Texture2D ";
+			constexpr token* TextureCube = "TextureCube ";
 			constexpr token* RWStructuredBuffer = "RWStructuredBuffer";
 			constexpr token* RWTexture2D = "RWTexture2D ";
 			constexpr token* SamplerState = "SamplerState ";

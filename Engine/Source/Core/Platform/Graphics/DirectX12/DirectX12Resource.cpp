@@ -824,20 +824,22 @@ namespace JG
 			mD3DResource->SetName(StringExtend::s2ws(GetName()).c_str());
 		}
 	}
-	void DirectX12Texture::SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
+	void DirectX12Texture::SetTextureMemory(
+		const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit, u32 arraySize, u32 mipLevel, ETextureFlags flags, ETextureFormat format)
 	{
 		TextureInfo info;
-		info.ArraySize = 1;
-		info.Flags = ETextureFlags::None;
-		info.MipLevel = 1;
+		info.ArraySize = arraySize;
+		info.Flags = flags;
+		info.MipLevel = mipLevel;
 		info.Width = (u32)width;
 		info.Height = (u32)height;
-		info.Format = ETextureFormat::R8G8B8A8_Unorm;
+		info.Format = format;
 		info.PixelPerUnit = pixelPerUnit;
 		SetTextureInfo(info);
 		auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
-		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels);
+		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels, info.ArraySize);
 	}
+
 	void DirectX12Texture::SetClearColor(const Color& clearColor)
 	{
 		mTextureInfo.ClearColor = clearColor;
@@ -1035,7 +1037,19 @@ namespace JG
 
 	SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> DirectX12Texture::CreateSRVDesc(ETextureFlags flag) const
 	{
-		return nullptr;
+		SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> result;
+		if (flag & ETextureFlags::SRV_TextureCube)
+		{
+			result = CreateSharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC>();
+			auto desc = Get()->GetDesc();
+			result->Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			result->ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+			result->TextureCube.MostDetailedMip = 0;
+			result->TextureCube.MipLevels = desc.MipLevels;
+			result->TextureCube.ResourceMinLODClamp = 0.0f;
+			result->Format = desc.Format;
+		}
+		return result;
 	}
 
 	SharedPtr<D3D12_UNORDERED_ACCESS_VIEW_DESC> DirectX12Texture::CreateUAVDesc(ETextureFlags flag) const

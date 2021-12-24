@@ -6,20 +6,20 @@
 
 namespace JG
 {
-	SharedPtr<IGraphicsShader> IGraphicsShader::Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
+	SharedPtr<IGraphicsShader> IGraphicsShader::Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateGraphicsShader(sourceCode, flags, scriptList);
+		return api->CreateGraphicsShader(name, sourceCode, flags, scriptList);
 	}
 
-	SharedPtr<IComputeShader> IComputeShader::Create(const String& sourceCode)
+	SharedPtr<IComputeShader> IComputeShader::Create(const String& name, const String& sourceCode)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateComputeShader(sourceCode);
+		return api->CreateComputeShader(name, sourceCode);
 	}
 
 
@@ -73,7 +73,6 @@ namespace JG
 			mShaderScriptDic.emplace(name, script);
 			mShaderScriptDicByType[script->GetScriptType()].push_back(script);
 		}
-
 	}
 
 	SharedPtr<IGraphicsShader> ShaderLibrary::FindGraphicsShader(const String& name)
@@ -112,7 +111,7 @@ namespace JG
 		auto result = FindGraphicsShader(code);
 		if (result == nullptr)
 		{
-			result = IGraphicsShader::Create(originShader->GetShaderCode(), originShader->GetFlags(), scriptList);
+			result = IGraphicsShader::Create(code, originShader->GetShaderCode(), originShader->GetFlags(), scriptList);
 			if (result == nullptr)
 			{
 				return nullptr;

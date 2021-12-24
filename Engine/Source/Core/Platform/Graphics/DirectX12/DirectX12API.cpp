@@ -715,11 +715,11 @@ namespace JG
 		computer->SetComputeShader(shader);
 		return computer;
 	}
-	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
+	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
 		String errorCode;
 		auto shader = CreateSharedPtr<DirectX12GraphicsShader>();
-
+		shader->SetName(name);
 		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
 		{
 			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, shader->GetFullShaderCode());
@@ -729,11 +729,11 @@ namespace JG
 
 		return shader;
 	}
-	SharedPtr<IComputeShader> DirectX12API::CreateComputeShader(const String& sourceCode)
+	SharedPtr<IComputeShader> DirectX12API::CreateComputeShader(const String& name, const String& sourceCode)
 	{
 		String errorCode;
 		auto shader = CreateSharedPtr<DirectX12ComputeShader>();
-
+		shader->SetName(name);
 		if (shader->Compile(sourceCode, &errorCode) == false)
 		{
 			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, sourceCode);
@@ -787,13 +787,13 @@ namespace JG
 
 		return texture;
 	}
-	SharedPtr<ITexture> DirectX12API::CreateTexture(const TextureAssetStock& stock)
-	{
-		if (stock.Pixels.empty()) return nullptr;
-		auto texture = CreateSharedPtr<DirectX12Texture>();
-		texture->CreateFromMemory(stock.Name, (const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
-		return texture;
-	}
+	//SharedPtr<ITexture> DirectX12API::CreateTexture(const TextureAssetStock& stock)
+	//{
+	//	if (stock.Pixels.empty()) return nullptr;
+	//	auto texture = CreateSharedPtr<DirectX12Texture>();
+	//	texture->CreateFromMemory(stock.Name, (const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
+	//	return texture;
+	//}
 
 
 }

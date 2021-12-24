@@ -82,15 +82,15 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) = 0;
-		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
-		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) = 0;
+		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
+		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) = 0;
 		virtual SharedPtr<IMesh>          CreateMesh(const String& name) = 0;
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
-		virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) = 0;
+		//virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) = 0;
 		virtual void ClearTexture(u64 commandID, SharedPtr<ITexture> texture);
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);

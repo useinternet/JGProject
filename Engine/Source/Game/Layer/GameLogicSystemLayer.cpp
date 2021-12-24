@@ -23,6 +23,7 @@
 #define GAME_DLL_NAME "SandBox_Game.dll"
 
 
+#include "Class/Asset\AssetImporter.h"
 namespace JG
 {
 	void GameLogicSystemLayer::OnAttach()
@@ -71,20 +72,18 @@ namespace JG
 			Application::GetInstance().SendEvent(e);
 		}
 
+		//CubeMapAssetImportSettings settings;
 
-		auto templatePath = Application::GetShaderTemplatePath();
-		templatePath = PathExtend::CombinePath(templatePath, "Standard3DShader.shadertemplate");
-		auto surfacePath = Application::GetShaderScriptPath();
-		surfacePath = PathExtend::CombinePath(surfacePath, "Surface/Standard.shaderscript");
+		//settings.AssetPath[0] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/right.jpg";
+		//settings.AssetPath[1] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/left.jpg";
+		//settings.AssetPath[2] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/top.jpg";
+		//settings.AssetPath[3] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/bottom.jpg";
+		//settings.AssetPath[4] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/front.jpg";
+		//settings.AssetPath[5] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/back.jpg";
 
-
-		String templateSource;
-		String surfaceSource;
-		FileExtend::ReadAllText(templatePath, &templateSource);
-		FileExtend::ReadAllText(surfacePath, &surfaceSource);
-
-		auto script = IShaderScript::CreateSurfaceScript("test", surfaceSource);
-		IGraphicsShader::Create(templateSource, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader, { script });
+		//settings.OutputPath = PathExtend::CombinePath(Application::GetEnginePath(), "CubeMap");
+		//settings.Name = "DefaultSky";
+		//AssetImporter::Import(settings);
 	}
 	void GameLogicSystemLayer::Destroy()
 	{

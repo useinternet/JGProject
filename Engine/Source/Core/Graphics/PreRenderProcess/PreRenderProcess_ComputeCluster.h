@@ -17,9 +17,9 @@ namespace JG
 	{
 	
 	public:
-		const static i32 NUM_X_SLICE = 8;
-		const static i32 NUM_Y_SLICE = 8;
-		const static i32 NUM_Z_SLICE = 16;
+		const static i32 NUM_X_SLICE = 16;
+		const static i32 NUM_Y_SLICE = 9;
+		const static i32 NUM_Z_SLICE = 24;
 		const static i32 NUM_CLUSTER = NUM_X_SLICE * NUM_Y_SLICE * NUM_Z_SLICE;
 
 		const static constexpr char* SHADER_NAME = "ComputeCluster";
@@ -29,7 +29,9 @@ namespace JG
 		const static constexpr char* SHADERPARAM_NEARZ		   = "__NearZ__";
 		const static constexpr char* SHADERPARAM_FARZ		   = "__FarZ__";
 		const static constexpr char* SHADERPARAM_CLUSTERS	   = "_Clusters";
-
+		const static constexpr char* SHADERPARAM_NUM_X_SLICE = "_NUM_X_SLICE";
+		const static constexpr char* SHADERPARAM_NUM_Y_SLICE = "_NUM_Y_SLICE";
+		const static constexpr char* SHADERPARAM_NUM_Z_SLICE = "_NUM_Z_SLICE";
 		struct CB
 		{
 			JMatrix  InvProjMatrix;

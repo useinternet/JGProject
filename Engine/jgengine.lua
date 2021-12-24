@@ -143,6 +143,7 @@ workspace "JGEngine"
                 links {
                     "Imgui",
                     "stb",
+                    "zlib",
                     "Publish/%{cfg.buildcfg}/assimp-vc142-mt",
                     "Publish/%{cfg.buildcfg}/PhysX_64",
                     "Publish/%{cfg.buildcfg}/PhysXCommon_64",
@@ -228,6 +229,8 @@ workspace "JGEngine"
             SetStaticLibConfig("ThirdParty/Imgui/")
         project "stb"
             SetStaticLibConfig("ThirdParty/stb/")
+        project "zlib"
+            SetStaticLibConfig("ThirdParty/zlib/")
 
 
         

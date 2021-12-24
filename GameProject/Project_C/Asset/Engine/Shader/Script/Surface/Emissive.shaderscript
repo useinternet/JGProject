@@ -1,0 +1,20 @@
+
+_Resources{
+
+};
+
+_Variables {
+	float3 BaseColor;
+	float  Roughness;
+	float3 Specular;
+	float  Metallc;
+	float3 Emissive;
+};
+
+_Surface {
+	_output.albedo      = float4(BaseColor.rgb, 1.0f);
+	_output.roughness   = Roughness;
+	_output.specular    = Specular;
+	_output.metallic    = Metallc;
+	_output.emissive    = Emissive;
+};

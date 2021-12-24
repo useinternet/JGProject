@@ -16,12 +16,15 @@ namespace JG
 	{
 		static const i32 NUM_RBB_COUNT = 2;
 	public:
-		static const i32 MAX_VISIBLE_LIGHTINDEX_COUNT = _128KB / sizeof(u32);
+		static const i32 MAX_VISIBLE_LIGHTINDEX_COUNT = _256KB / sizeof(u32);
 
 
 		const static constexpr char* SHADER_NAME = "LightCulling";
 		const static constexpr char* SHADERPARAM_VIEWMATRIX				= "_ViewMatrix";
 		const static constexpr char* SHADERPARAM_POINTLIGHTCOUNT		= "_PointLightCount";
+		const static constexpr char* SHADERPARAM_NUM_X_SLICE = "_NUM_X_SLICE";
+		const static constexpr char* SHADERPARAM_NUM_Y_SLICE = "_NUM_Y_SLICE";
+		const static constexpr char* SHADERPARAM_NUM_Z_SLICE = "_NUM_Z_SLICE";
 		const static constexpr char* SHADERPARAM_POINTLIGHTS			= "_PointLights";
 		const static constexpr char* SHADERPARAM_CLUSTERS				= "_Clusters";
 		const static constexpr char* SHADERPARAM_VISIBLE_LIGHTINDICES   = "_VisibleLightIndices";

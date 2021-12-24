@@ -26,12 +26,17 @@ namespace JG
 		ComPtr<ID3DBlob> mGSData;
 		ComPtr<ID3DBlob> mPSData;
 		EShaderFlags     mFlags;
+		String mName;
 		String mSourceCode;
 		String mFullSourceCode;
 		bool mIsCompileSuccess = false;
 		List<std::pair<EShaderDataType, String>> mPropertyList;
 		List<SharedPtr<IShaderScript>> mShaderScriptList;
 	public:
+		const String& GetName() const override;
+		void SetName(const String& name);
+
+
 		virtual bool  Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
 		virtual const String& GetShaderCode() const override;
 		virtual const String& GetFullShaderCode() const override;
@@ -68,10 +73,13 @@ namespace JG
 	{
 	private:
 		ComPtr<ID3DBlob> mCSData;
+		String mName;
 		String			 mSourceCode;
 		bool			 mIsCompileSuccess = false;
 		SharedPtr<ShaderDataForm> mShaderDataForm;
 	public:
+		const String& GetName() const override;
+		void SetName(const String& name);
 		virtual bool  Compile(const String& sourceCode, String* error) override;
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;

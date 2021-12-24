@@ -3,8 +3,9 @@
 
 #include "Graphics/Material.h"
 #include "Graphics/Shader.h"
-
+#include "Graphics/GraphicsHelper.h"
 #include "ExternalImpl/JGImGui.h"
+
 namespace JG
 {
 	void MaterialAssetInspectorUI::OnGUI_Impl(Asset<IMaterial>* obj)
@@ -13,22 +14,28 @@ namespace JG
 		{
 			return;
 		}
-		// Material 정보를 가져온다.
-		auto propertyList = obj->Get()->GetPropertyList();
-		auto scriptList   = obj->Get()->GetScriptList();
 
+		// Material 정보를 가져온다.
+		auto scriptList = obj->Get()->GetScriptList();
 
 
 		SharedPtr<IMaterial> material = obj->Get();
+		String  templateName = GraphicsHelper::GetShaderTemplateName(material->GetShader());
 		Dictionary<String, std::pair<EShaderDataType, SharedPtr<JsonData>>> materialDatas;
 		auto json       = CreateSharedPtr<Json>();
 		f32 label_space = 0.0f;
 
 
 		// 머터리얼 이름
-		ImGui::Text(obj->GetAssetName().c_str()); ImGui::Spacing();
+		ImGui::Text("Asset Name      : %s", obj->GetAssetName().c_str()); ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Text("Shader Template : %s", templateName.c_str());  ImGui::Spacing(); ImGui::Spacing();
+
+
+
 
 		// Surface Script
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Shader Script "); ImGui::SameLine();
 		if (scriptList.empty() == false)
 		{
 			if (ImGui::BeginCombo("##Script Combo Box", scriptList[0]->GetName().c_str()))
@@ -39,12 +46,24 @@ namespace JG
 					if (ImGui::Selectable(script->GetName().c_str(), &_bool))
 					{
 						// 추후 변경 가능하도록 고민
+						auto shader = ShaderLibrary::GetInstance().FindGraphicsShader(templateName, {script->GetName()});
+						material->SetShader(shader);
+
+						
 					}
 				});
 				ImGui::EndCombo();
 			}
-		}
+		} 
+		ImGui::Spacing(); 	ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing(); 	ImGui::Spacing();
+	
 
+
+
+
+		auto propertyList = obj->Get()->GetPropertyList();
 		for (auto& property : propertyList)
 		{
 			auto name = property.second;
@@ -186,7 +205,7 @@ namespace JG
 					auto tasset = asset->As<Asset<ITexture>>();
 					if (tasset->IsValid())
 					{
-						material->SetTexture(name, 0, tasset->Get());
+						material->SetTexture(name, tasset->Get());
 						texture = tasset->Get();
 					}
 				}
@@ -216,7 +235,14 @@ namespace JG
 					stock.LoadJson(assetVal);
 					stock.Name = obj->GetAssetName();
 					stock.MaterialDatas = materialDatas;
+					stock.ShaderTemplate = GraphicsHelper::GetShaderTemplateName(material->GetShader());
 					
+					auto scriptList = material->GetScriptList();
+					for (auto& script : scriptList)
+					{
+						stock.ShaderScript = scriptList[0]->GetName();
+					}
+
 					auto outputPath = StringExtend::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
 					MaterialAssetStock::Write(outputPath, stock);
 					AssetDataBase::GetInstance().RefreshAsset(obj->GetAssetID());

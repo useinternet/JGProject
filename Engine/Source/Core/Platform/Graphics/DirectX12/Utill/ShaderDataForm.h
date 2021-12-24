@@ -137,7 +137,7 @@ namespace JG
 	class ShaderData
 	{
 	public:
-		const static u64 MaxDataSize = _128KB;
+		const static u64 MaxDataSize = _256KB;
 	private:
 		UniquePtr<UploadAllocator>      mUploadAllocator;
 		Dictionary<String, List<jbyte>> mReadDatas;

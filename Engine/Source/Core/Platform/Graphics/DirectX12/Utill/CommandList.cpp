@@ -133,7 +133,7 @@ namespace JG
 
 	}
 
-	void CommandList::CopyTextrueFromMemory(ID3D12Resource* resource,const void* pixels, i32 width, i32 height, i32 channels)
+	void CommandList::CopyTextrueFromMemory(ID3D12Resource* resource,const void* pixels, i32 width, i32 height, i32 channels, u64 arraySize)
 	{
 		if (resource == nullptr)
 		{
@@ -147,7 +147,7 @@ namespace JG
 		HRESULT hResult = d3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(uploadSize),
+			&CD3DX12_RESOURCE_DESC::Buffer(uploadSize * arraySize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(uploadBuffer.GetAddressOf()));
@@ -155,16 +155,23 @@ namespace JG
 
 
 
-		D3D12_SUBRESOURCE_DATA subResourceData = {};
-		subResourceData.pData      = pixels;
-		subResourceData.RowPitch   = width * channels;
-		subResourceData.SlicePitch = subResourceData.RowPitch * height;
+		List<D3D12_SUBRESOURCE_DATA> subResources;
+		
+		for (i32 i = 0; i < arraySize; ++i)
+		{
+			D3D12_SUBRESOURCE_DATA subResourceData = {};
+			subResourceData.pData      = (void*)((ptraddr)pixels + (ptraddr)(uploadSize * i));
+			subResourceData.RowPitch   = width * channels;
+			subResourceData.SlicePitch = subResourceData.RowPitch * height;
+			subResources.push_back(subResourceData);
+		}
+
 
 		TransitionBarrier(resource, D3D12_RESOURCE_STATE_COPY_DEST);
 		FlushResourceBarrier();
 
 
-		UpdateSubresources(mD3DCommandList.Get(), resource, uploadBuffer.Get(), 0, 0, 1, &subResourceData);
+		UpdateSubresources(mD3DCommandList.Get(), resource, uploadBuffer.Get(), 0, 0, subResources.size(), subResources.data());
 
 		BackupResource(resource);
 		BackupResource(uploadBuffer.Get());

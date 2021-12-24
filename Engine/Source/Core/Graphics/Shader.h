@@ -13,6 +13,7 @@ namespace JG
 	protected:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
 	public:
+		virtual const String& GetName()			  const = 0;
 		virtual const String& GetShaderCode()     const = 0;
 		virtual const String& GetFullShaderCode() const = 0;
 		virtual EShaderFlags  GetFlags()          const = 0;
@@ -20,7 +21,7 @@ namespace JG
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
 		virtual bool IsSuccessed() const = 0;
 	public:
-		static SharedPtr<IGraphicsShader> Create(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
+		static SharedPtr<IGraphicsShader> Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
 	};
 
 	class IComputeShader
@@ -28,10 +29,11 @@ namespace JG
 	protected:
 		virtual bool Compile(const String& sourceCode, String* error) = 0;
 	public:
+		virtual const String& GetName()		  const = 0;
 		virtual const String& GetShaderCode() const = 0;
 		virtual bool IsSuccessed() const = 0;
 	public:
-		static SharedPtr<IComputeShader> Create(const String& sourceCode);
+		static SharedPtr<IComputeShader> Create(const String& name, const String& sourceCode);
 	};
 
 
@@ -94,6 +96,10 @@ namespace JG
 		String mGlobalShaderLibCode;
 		String mGlobalGraphicsLibCode;
 		String mGlobalComputeLibCode;
+
+		// Script 를 합쳐서 키값으로 사용
+		// 현재 머터리얼의 Template Name과 Sript Name들 가져올려면
+
 
 
 		std::shared_mutex mGraphicsMutex;

@@ -28,6 +28,7 @@ struct PS_SURFACE_OUTPUT
 	float3 specular;
 	float roughness;
 	float metallic;
+	float3 emissive;
     int flags;
 };
 
@@ -51,6 +52,7 @@ PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 	_output.normal    = _input.normal;
     _output.roughness = 0.0f;
 	_output.metallic  = 0.0f;
+	_output.emissive = float3(0.0f,0.0f,0.0f);
 	_output.flags = 0;
 
 	__PS_SURFACE_FUNCTION_SCRIPT__
@@ -92,7 +94,7 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 	material.Albedo    = output.albedo.rgb;
 	material.Roughness = output.roughness;
 	material.Metallic  = output.metallic;
-
+	material.Emissive = output.emissive;
 	
 	int clusterIndex = GetClusterIndex(pin.posH.xyz);
 	uint3 clusterTestIndex = GetClusterIndex3(pin.posH.xyz);

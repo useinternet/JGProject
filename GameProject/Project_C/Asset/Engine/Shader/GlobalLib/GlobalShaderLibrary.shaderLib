@@ -12,6 +12,7 @@ struct Material
     float3 Albedo;
     float Roughness;
     float Metallic;
+    float3 Emissive;
 };
 
 struct DirectionalLight

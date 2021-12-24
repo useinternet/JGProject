@@ -8,6 +8,14 @@
 
 namespace JG
 {
+	const String& DirectX12GraphicsShader::GetName() const
+	{
+		return mName;
+	}
+	void DirectX12GraphicsShader::SetName(const String& name)
+	{
+		mName = name;
+	}
 	bool DirectX12GraphicsShader::Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error)
 	{
 		mFlags = flags;
@@ -142,6 +150,7 @@ namespace JG
 			u64 lineStart    = 0;
 			u64 lineEnd      = 0;
 			u32 texture2dCnt = 0;
+			u32 textureCubeCnt = 0;
 			while (true)
 			{
 				lineEnd = resourcesCode.find(";", lineStart);
@@ -156,6 +165,14 @@ namespace JG
 				{
 					String registerSpace = std::to_string(HLSL::RegisterSpace::Texture2DRegisterSpace);
 					String registerNum   = std::to_string(texture2dCnt++);
+					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
+					resourcesCode.insert(lineEnd, registerStr);
+					lineEnd += registerStr.length();
+				}
+				else if (type + " " == HLSL::Token::TextureCube)
+				{
+					String registerSpace = std::to_string(HLSL::RegisterSpace::TextureCubeRegisterSpace);
+					String registerNum = std::to_string(textureCubeCnt++);
 					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
 					resourcesCode.insert(lineEnd, registerStr);
 					lineEnd += registerStr.length();
@@ -232,6 +249,14 @@ namespace JG
 
 		out_code = code.substr(start + 1, end - start - 1);
 		return true;
+	}
+	const String& DirectX12ComputeShader::GetName() const
+	{
+		return mName;
+	}
+	void DirectX12ComputeShader::SetName(const String& name)
+	{
+		mName = name;
 	}
 	bool DirectX12ComputeShader::Compile(const String& sourceCode, String* error)
 	{

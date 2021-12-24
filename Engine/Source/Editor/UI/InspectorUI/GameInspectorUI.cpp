@@ -189,9 +189,12 @@ namespace JG
 		ImGui::Color3_OnGUI("Color", color, label_width);
 		ImGui::Float_OnGUI("Intensity", intensity, label_width);
 		ImGui::Float_OnGUI("Range", range, label_width);
-		ImGui::Float_Slider_OnGUI("Att0", att0, 0.0f, 1.0f, label_width);
-		ImGui::Float_Slider_OnGUI("Att1", att1, 0.0f, 1.0f, label_width);
-		ImGui::Float_Slider_OnGUI("Att2", att2, 0.0f, 1.0f, label_width);
+				ImGui::Float_OnGUI("Att0", att0, label_width);
+		ImGui::Float_OnGUI("Att1", att1, label_width);
+		ImGui::Float_OnGUI("Att2", att2,  label_width);
+		//ImGui::Float_Slider_OnGUI("Att0", att0, 0.0f, 1.0f, label_width);
+		//ImGui::Float_Slider_OnGUI("Att1", att1, 0.0f, 1.0f, label_width);
+		//ImGui::Float_Slider_OnGUI("Att2", att2, 0.0f, 1.0f, label_width);
 
 		obj->SetColor(Color(color.R, color.G, color.B, 1.0f));
 		obj->SetIntensity(intensity);

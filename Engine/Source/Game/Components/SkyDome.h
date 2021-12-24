@@ -14,11 +14,9 @@ namespace JG
 	{
 		JGCLASS
 
-		//Asset<IMesh>* mMesh = nullptr;
-
 		SharedPtr<IMesh> mMesh = nullptr;
 		SharedPtr<IMaterial> mMaterial = nullptr;
-
+		Asset<ITexture>* mCubeMap = nullptr;
 		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle;
 	public:
 		virtual ~SkyDome();
@@ -31,7 +29,6 @@ namespace JG
 		virtual void LateUpdate() override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
-		//virtual void OnInspectorGUI() override;
 	private:
 		EScheduleResult SkyDome::PushRenderSceneObject();
 		void CreateGeometry();

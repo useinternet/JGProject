@@ -59,7 +59,7 @@ namespace JG
 		return SetData(name, value);
 	}
 
-	bool DirectX12Material::SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture)
+	bool DirectX12Material::SetTexture(const String& name, SharedPtr<ITexture> texture)
 	{
 		if (mTextures.find(name) == mTextures.end())
 		{
@@ -67,6 +67,16 @@ namespace JG
 		}
 
 		mTextures[name] = texture;
+		return true;
+	}
+	bool DirectX12Material::SetTextureCube(const String& name, SharedPtr<ITexture> texture)
+	{
+		if (mTextureCubes.find(name) == mTextureCubes.end())
+		{
+			return false;
+		}
+
+		mTextureCubes[name] = texture;
 		return true;
 	}
 	bool DirectX12Material::GetFloat(const String& name, float* out_value)
@@ -148,6 +158,11 @@ namespace JG
 		return true;
 	}
 
+	bool DirectX12Material::GetTextureCube(const String& name, SharedPtr<ITexture>* out_value)
+	{
+		return false;
+	}
+
 	void DirectX12Material::SetDepthStencilState(EDepthStencilStateTemplate _template)
 	{
 		DirectX12API::GetDepthStencilDesc(_template, &mDepthStencilDesc);
@@ -178,6 +193,11 @@ namespace JG
 		return mName;
 	}
 
+	SharedPtr<IGraphicsShader> DirectX12Material::GetShader() const
+	{
+		return mGraphicsShader;
+	}
+
 	void DirectX12Material::SetShader(SharedPtr<IGraphicsShader> shader)
 	{
 		Init(shader);
@@ -187,7 +207,8 @@ namespace JG
 	{
 		if (mGraphicsShader == nullptr)
 		{
-			return List<std::pair<EShaderDataType, String>>();
+			static List<std::pair<EShaderDataType, String>> temp;
+			return temp;
 		}
 		return mGraphicsShader->GetPropertyList();
 	}
@@ -196,7 +217,8 @@ namespace JG
 	{
 		if (mGraphicsShader == nullptr)
 		{
-			return List<SharedPtr<IShaderScript>>();
+			static List<SharedPtr<IShaderScript>> tmp;
+			return tmp;
 		}
 		return mGraphicsShader->GetScriptList();
 	}
@@ -220,7 +242,7 @@ namespace JG
 			memcpy(mUploadBtData.data(), mBtData.data(), mBtData.size());
 		}
 
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> t_handles;
 		for (auto _pair : mTextures)
 		{
 			auto tex = _pair.second;
@@ -228,10 +250,21 @@ namespace JG
 			if (tex == nullptr || tex->IsValid() == false)continue;
 
 			auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-			handles.push_back(dx12Tex->GetSRV());
+			t_handles.push_back(dx12Tex->GetSRV());
+		}
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> tc_handles;
+		for (auto _pair : mTextureCubes)
+		{
+			auto tex = _pair.second;
+
+			if (tex == nullptr || tex->IsValid() == false)continue;
+
+			auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+			tc_handles.push_back(dx12Tex->GetSRV());
 		}
 
-		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURE2D, handles);
+		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURE2D, t_handles);
+		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURECUBE, tc_handles);
 		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
 		return true;
 	}
@@ -257,6 +290,9 @@ namespace JG
 			u64  size = 0;
 			switch (type)
 			{
+			case EShaderDataType::textureCube:
+				mTextureCubes[name] = nullptr;
+				break;
 			case EShaderDataType::texture2D:
 				mTextures[name] = nullptr;
 				break;

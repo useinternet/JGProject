@@ -52,7 +52,10 @@ namespace JG
 			mComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
 			mComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
 			mComputer->SetStructDataArray(SHADERPARAM_POINTLIGHTS, pointLightsInfo.ByteData.data(), pointLightsInfo.Count, pointLightsInfo.Size);
-			mComputer->Dispatch(commandID, 1,1,1);
+			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_X_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
+			mComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
 			mEnableDispatch = false;
 		}
 		else

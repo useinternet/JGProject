@@ -1,11 +1,14 @@
 
+
+
 cbuffer ConstantData
 {
     float4x4 _ViewMatrix;
     int      _PointLightCount;
+    uint _NUM_X_SLICE;
+    uint _NUM_Y_SLICE;
+    uint _NUM_Z_SLICE;
 };
-
- groupshared int _LightIndex;
 
 // input
 StructuredBuffer<PointLight> _PointLights;
@@ -14,8 +17,6 @@ StructuredBuffer<Cluster>    _Clusters;
 // output
 RWStructuredBuffer<uint>      _VisibleLightIndices;
 RWStructuredBuffer<LightGrid> _LightGrids;
-
-
 
 float SquardDistPointAABB(float3 p, uint clusterIndex)
 {
@@ -46,15 +47,17 @@ bool CheckPointLight(uint plIndex, uint tileIndex)
     return sqDist <= (r * r);
 }
 
-[numthreads(8, 8, 16)]
+[numthreads(1, 1, 1)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,
              uint3 groupThreadId    : SV_GroupThreadID,
              uint groupIndex : SV_GroupIndex)
 {
-    int index = groupIndex;
+    float xIndex = dispatchThreadId.x;
+    float yIndex = dispatchThreadId.y;
+    float zIndex = dispatchThreadId.z;
+    int index = zIndex * _NUM_X_SLICE * _NUM_Y_SLICE + yIndex * _NUM_X_SLICE + xIndex;
 
-    _LightIndex = 0;
     _LightGrids[index].PL_Count  = 0;
     _LightGrids[index].PL_Offset = 0;
 
@@ -63,7 +66,7 @@ void cs_main(uint3 groupId : SV_GroupID,
 
 
     int plCount = 0;
-    int plIndices[128];
+    int plIndices[16];
     for(int i = 0; i < _PointLightCount; i++)
     {
         bool result = CheckPointLight(i, index);
@@ -74,10 +77,8 @@ void cs_main(uint3 groupId : SV_GroupID,
         }
     }
 
-    GroupMemoryBarrierWithGroupSync();
-    int offset;
-    InterlockedAdd(_LightIndex, plCount, offset);
-    GroupMemoryBarrierWithGroupSync();
+    int offset = 16 * index;
+
 
 
     _LightGrids[index].PL_Count  = plCount;

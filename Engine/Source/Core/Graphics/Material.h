@@ -23,7 +23,8 @@ namespace JG
 		virtual bool SetUint3(const String& name, const JVector3Uint& value) = 0;
 		virtual bool SetUint4(const String& name, const JVector4Uint& value) = 0;
 		virtual bool SetFloat4x4(const String& name, const JMatrix& value) = 0;
-		virtual bool SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture) = 0;
+		virtual bool SetTexture(const String& name, SharedPtr<ITexture> texture) = 0;
+		virtual bool SetTextureCube(const String& name, SharedPtr<ITexture> texture) = 0;
 
 
 		virtual bool GetFloat(const String& name, float* out_value) = 0;
@@ -40,6 +41,7 @@ namespace JG
 		virtual bool GetUint4(const String& name, JVector4Uint* value) = 0;
 		virtual bool GetFloat4x4(const String& name, JMatrix* out_value) = 0;
 		virtual bool GetTexture(const String& name, SharedPtr<ITexture>* out_value) = 0;
+		virtual bool GetTextureCube(const String& name, SharedPtr<ITexture>* out_value) = 0;
 
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
 		virtual void SetBlendState(u32 slot, EBlendStateTemplate _template) = 0;
@@ -49,6 +51,7 @@ namespace JG
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName() const    = 0;
 		virtual void SetShader(SharedPtr<IGraphicsShader> shader) = 0;
+		virtual SharedPtr<IGraphicsShader> GetShader() const = 0;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
 		virtual bool Bind(u64 commandID) = 0;

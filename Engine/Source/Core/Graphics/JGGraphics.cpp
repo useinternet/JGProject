@@ -205,7 +205,7 @@ namespace JG
 				{
 					shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
 				}
-				auto shader = IGraphicsShader::Create(sourceCode, shaderFlags);
+				auto shader = IGraphicsShader::Create(fileName, sourceCode, shaderFlags);
 				ShaderLibrary::GetInstance().RegisterGraphicsShader(fileName, shader);
 			}
 
@@ -250,7 +250,7 @@ namespace JG
 			{
 				if (sourceCode.find(HLSL::CSEntry) != String::npos)
 				{
-					auto computeShader = IComputeShader::Create(sourceCode);
+					auto computeShader = IComputeShader::Create(fileName, sourceCode);
 					ShaderLibrary::GetInstance().RegisterComputeShader(fileName, computeShader);
 				}
 			}

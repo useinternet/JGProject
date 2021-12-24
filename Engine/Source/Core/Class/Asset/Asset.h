@@ -146,6 +146,7 @@ namespace JG
 		i32 Height   = 0;
 		i32 Channels = 0;
 		u32 PixelPerUnit = 100;
+		u32 OriginPixelSize = 0;
 		List<jbyte> Pixels;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
@@ -157,7 +158,6 @@ namespace JG
 			return EAssetFormat::Texture;
 		}
 	};
-
 
 	class StaticMeshAssetStock : public IAssetStock
 	{
@@ -247,13 +247,14 @@ namespace JG
 	{
 		JGCLASS
 	protected:
-		virtual void Set(AssetID assetID, const String& assetPath) = 0;
+		virtual void Set(AssetID assetID, const String& assetPath, EAssetFormat assetFormat) = 0;
 	public:
 		virtual AssetID GetAssetID() const = 0;
 		virtual const String& GetAssetFullPath() const = 0;
 		virtual const String& GetAssetPath() const     = 0;
 		virtual const String& GetAssetName() const     = 0;
 		virtual const String& GetExtension() const = 0;
+		virtual EAssetFormat GetAssetFormat() const = 0;
 	public:
 		virtual ~IAsset() = default;
 	private:
@@ -274,16 +275,16 @@ namespace JG
 		String  mAssetFullPath;
 		String  mExtension;
 		String  mName;
-
+		EAssetFormat mAssetFormat;
 		SharedPtr<T> mData = nullptr;
 	public:
-		Asset(AssetID assetID, const String& assetPath)
+		Asset(AssetID assetID, const String& assetPath, EAssetFormat assetFormat)
 		{
-			Set(assetID, assetPath);
+			Set(assetID, assetPath, assetFormat);
 			mData = T::Create(mAssetPath);
 		}
 	private:
-		virtual void Set(AssetID assetID, const String& assetPath) override
+		virtual void Set(AssetID assetID, const String& assetPath, EAssetFormat assetFormat) override
 		{
 			fs::path p(assetPath);
 			String contentsPath = StringExtend::ReplaceAll(fs::absolute(GetAssetRootPath()).string(), "\\", "/");
@@ -292,8 +293,9 @@ namespace JG
 			mAssetFullPath = fs::absolute(assetPath).string(); mAssetFullPath = StringExtend::ReplaceAll(mAssetFullPath, "\\", "/");
 			mAssetPath = StringExtend::ReplaceAll(mAssetFullPath, contentsPath, "Asset");
 			strcpy(mAssetID.ResourcePath, mAssetPath.c_str());
-			mExtension = p.extension().string();
-			mName = StringExtend::ReplaceAll(p.filename().string(), mExtension, "");
+			mExtension	 = p.extension().string();
+			mName		 = StringExtend::ReplaceAll(p.filename().string(), mExtension, "");
+			mAssetFormat = assetFormat;
 		}
 	public:
 		virtual AssetID GetAssetID() const override
@@ -316,20 +318,21 @@ namespace JG
 		{
 			return mExtension;
 		}
+		virtual EAssetFormat GetAssetFormat() const override
+		{
+			return mAssetFormat;
+		}
 		bool IsValid() const {
 			return Get() != nullptr && Get()->IsValid();
 		}
 		SharedPtr<T> Get() const {
 			return mData;
 		}
-		//virtual void OnInspectorGUI() override {
-		//	AssetInspectorGUI::InspectorGUI(this);
-		//}
 	public:
 		virtual ~Asset() = default;
 	private:
 		virtual SharedPtr<IAsset> Copy() const override {
-			auto asset = CreateSharedPtr<Asset<T>>(mAssetID, mAssetFullPath);
+			auto asset = CreateSharedPtr<Asset<T>>(mAssetID, mAssetFullPath, mAssetFormat);
 			asset->mData = mData;
 			return asset;
 		}
@@ -448,8 +451,6 @@ namespace JG
 		void LoadCompeleteData_Update();
 		void LoadAssetData_Update();
 
-		// UnUsedAsset 제대로 작동안함 나중에 확인
-		// RefCount를 사용해서 
 		EScheduleResult UnLoadAsset_Update();
 		bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
 		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);

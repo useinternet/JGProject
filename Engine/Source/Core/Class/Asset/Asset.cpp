@@ -4,6 +4,7 @@
 #include "Application.h"
 #include "Graphics/JGGraphics.h"
 #include "AssetImporter.h"
+
 namespace JG
 {
 	void TextureAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
@@ -12,6 +13,7 @@ namespace JG
 		jsonData->AddMember("Height", Height);
 		jsonData->AddMember("Channels", Channels);
 		jsonData->AddMember("PixelPerUnit", PixelPerUnit);
+		jsonData->AddMember("OriginPixelSize", OriginPixelSize);
 		jsonData->AddMember("Pixels", Pixels);
 
 	}
@@ -42,7 +44,11 @@ namespace JG
 		{
 			PixelPerUnit = Val->GetUint32();
 		}
-
+		Val = jsonData->GetMember("OriginPixelSize");
+		if (Val && Val->GetUint32())
+		{
+			OriginPixelSize = Val->GetUint32();
+		}
 		Val = jsonData->GetMember("Pixels");
 		if (Val && Val->IsByteList())
 		{
@@ -477,6 +483,7 @@ namespace JG
 		 
 
 		auto originData = mAssetDataPool[originID].get();
+		EAssetFormat assetFormat = originData->Asset->GetAssetFormat();
 		String absolutePath;
 		String resourcePath;
 		if (GetResourcePath(reName, absolutePath, resourcePath) == false)
@@ -484,7 +491,7 @@ namespace JG
 			return;
 		}
 		auto oldResourcePath = originData->Asset->GetAssetPath();
-		originData->Asset->Set(originData->ID, reName);
+		originData->Asset->Set(originData->ID, reName, assetFormat);
 		originData->ID = originData->Asset->GetAssetID();
 		originData->Path = originData->Asset->GetAssetPath();
 
@@ -507,7 +514,7 @@ namespace JG
 			};
 
 			auto rwAssetData = mAssetDataPool[assetID].get();
-			rwAssetData->Asset->Set(rwAssetData->ID, reName);
+			rwAssetData->Asset->Set(rwAssetData->ID, reName, assetFormat);
 			rwAssetData->ID   = rwAssetData->Asset->GetAssetID();
 			rwAssetData->Path = rwAssetData->Asset->GetAssetPath();
 		}
@@ -517,7 +524,6 @@ namespace JG
 		AssetID id;
 		id.Origin = mAssetIDOffset++;
 		id.ID = id.Origin;
-		//strcpy(id.ResourcePath, resourcePath.c_str());
 		return id;
 	}
 
@@ -539,16 +545,6 @@ namespace JG
 		mAssetDependencies[originID].insert(id);
 		return id;
 	}
-
-
-
-
-
-
-
-
-
-
 
 
 	bool AssetDataBase::LoadAssetInternal(AssetLoadData* LoadData)
@@ -574,11 +570,28 @@ namespace JG
 		// 에셋 로드
 		switch (assetFormat)
 		{
+		case EAssetFormat::CubeMap:
 		case EAssetFormat::Texture:
 		{
-			LoadData->Stock = CreateSharedPtr<TextureAssetStock>();
+			auto stock = CreateSharedPtr<TextureAssetStock>();
+			LoadData->Stock = stock;
 			LoadData->OnComplete = std::bind(&AssetDataBase::TextureAsset_OnCompelete, this, std::placeholders::_1);
 			LoadData->Stock->LoadJson(assetVal);
+			if (assetFormat == EAssetFormat::CubeMap)
+			{
+				int n = 0;
+			}
+			List<jbyte> uncom;
+			u64 originSize = stock->OriginPixelSize + 10;
+			uncom.resize(originSize);
+			if (uncompress((Bytef*)uncom.data(), (uLongf*)(&originSize), (const Bytef*)stock->Pixels.data(), stock->Pixels.size()) != Z_OK)
+			{
+			}
+			else
+			{
+				stock->Pixels = uncom;
+				stock->Pixels.resize(originSize);
+			}
 			break;
 		}
 		case EAssetFormat::Mesh:
@@ -750,9 +763,21 @@ namespace JG
 		auto textureAsset = static_cast<Asset<ITexture>*>(data->Asset.get());
 		auto textureStock = static_cast<TextureAssetStock*>(data->Stock.get());
 		textureStock->Name = data->Asset->GetAssetPath();
-		textureAsset->mData->SetTextureMemory((const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
-	}
 
+		switch (textureAsset->GetAssetFormat())
+		{
+		case EAssetFormat::Texture:
+			textureAsset->mData->SetTextureMemory((const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
+			break;
+		case EAssetFormat::CubeMap:
+			textureAsset->mData->SetTextureMemory(
+				(const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit, 
+				6, 1, ETextureFlags::SRV_TextureCube);
+			break;
+		}
+
+		
+	}
 	void AssetDataBase::MaterialAsset_OnCompelete(AssetLoadCompeleteData* data)
 	{
 		if (data == nullptr || data->Stock == nullptr || data->Asset == nullptr)
@@ -892,7 +917,7 @@ namespace JG
 						if (textureAsset != nullptr && textureAsset->GetType() == JGTYPE(Asset<ITexture>))
 						{
 							auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
-							if (materialAsset->mData->SetTexture(name, 0, t) == false)
+							if (materialAsset->mData->SetTexture(name, t) == false)
 							{
 								JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
 							}
@@ -954,9 +979,10 @@ namespace JG
 
 		switch (assetFormat)
 		{
-		case EAssetFormat::Material: return CreateSharedPtr<Asset<IMaterial>>(assetID, path);
-		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path);
-		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path);
+		case EAssetFormat::Material: return CreateSharedPtr<Asset<IMaterial>>(assetID, path, assetFormat);
+		case EAssetFormat::CubeMap:
+		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path, assetFormat);
+		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path, assetFormat);
 		}
 
 
@@ -1091,5 +1117,7 @@ namespace JG
 		}
 		return assetFormat;
 	}
+
+
 
 }

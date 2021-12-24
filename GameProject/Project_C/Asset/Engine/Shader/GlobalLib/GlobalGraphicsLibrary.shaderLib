@@ -152,17 +152,14 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
     float  d  = length(light.Position - material.WorldPosition);
     if(d <= light.Range)
     {
-            
+        
         att = light.Att0 + (light.Att1 * d) + (light.Att2 * d * d);
-        att = 1 / att;
+        att = 1 / att;      
     }
     else
     {
         att = 0.0f;
     }
-
-
-
 	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
     Lo = material.Albedo * NoL;
     return saturate(Lo * att * light.Intensity * light.Color);

@@ -8,6 +8,7 @@
 namespace JG
 {
 	RenderStatistics Renderer::Statistics;
+	RenderDebugger   Renderer::Debugger;
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();

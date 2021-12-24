@@ -6,6 +6,7 @@
 #include "Platform/Graphics/DirectX12/DirectX12Resource.h"
 #include "Class/Asset/Asset.h"
 
+
 namespace JG
 {
 	SharedPtr<IVertexBuffer> IVertexBuffer::Create(String name, EBufferLoadMethod method)
@@ -72,13 +73,13 @@ namespace JG
 		return api->CreateTexture(name, info);
 	}
 
-	SharedPtr<ITexture> ITexture::Create(const TextureAssetStock& stock)
-	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+	//SharedPtr<ITexture> ITexture::Create(const TextureAssetStock& stock)
+	//{
+	//	auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+	//	JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateTexture(stock);
-	}
+	//	return api->CreateTexture(stock);
+	//}
 	static SharedPtr<ITexture> gNullTexture = nullptr;
 	SharedPtr<ITexture> ITexture::NullTexture()
 	{
@@ -100,6 +101,16 @@ namespace JG
 				{
 					TextureAssetStock stock;
 					stock.LoadJson(val);
+					List<jbyte> uncom;
+					u64 originSize = stock.OriginPixelSize;
+					uncom.resize(originSize);
+
+					
+					if (uncompress((Bytef*)uncom.data(), (uLongf*)(&originSize), (const Bytef*)stock.Pixels.data(), stock.Pixels.size()) == Z_OK)
+					{
+						stock.Pixels = uncom;
+						stock.Pixels.resize(originSize);
+					}
 
 					gNullTexture = ITexture::Create(nullTexturePath);
 					gNullTexture->SetTextureMemory((const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);

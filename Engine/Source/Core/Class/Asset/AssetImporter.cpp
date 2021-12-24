@@ -7,6 +7,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "zlib/zlib.h"
 
 
 
@@ -88,12 +89,17 @@ namespace JG
 		}
 		stock.Channels = 4;
 		u64 size = (u64)stock.Width * (u64)stock.Height * (u64)stock.Channels;
+		stock.OriginPixelSize = size;
 		stock.Pixels.resize(size);
-		memcpy(&stock.Pixels[0], pixels, size);
-
+		i32 result = compress((Bytef*)stock.Pixels.data(), (uLongf*)(&size), pixels, size);
+		stock.Pixels.resize(size);
+	
 
 		stbi_image_free(pixels);
-
+		if (result != Z_OK)
+		{
+			return EAssetImportResult::Fail;
+		}
 		WriteTexture(settings.OutputPath, stock);
 		return EAssetImportResult::Success;
 	}
@@ -107,6 +113,58 @@ namespace JG
 		
 
 		WriteMaterial(settings.OutputPath, stock);
+		return EAssetImportResult::Success;
+	}
+	EAssetImportResult AssetImporter::Import(const CubeMapAssetImportSettings& settings)
+	{
+		TextureAssetStock stock;
+		i32 width    = 0.0f;
+		i32 height   = 0.0f;
+		i32 channels = 0;
+		u64 btPos    = 0;
+		List<jbyte> pixeldata;
+		
+		stock.Name = fs::path(settings.Name).filename().string();
+
+		for (i32 i = 0; i < 6; ++i)
+		{
+			// Px
+			byte* pixels = stbi_load(settings.AssetPath[i].c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			if (pixels == nullptr)
+			{
+				return EAssetImportResult::Fail;
+			}
+			stock.Channels = 4;
+			u64 btSize = width * height * stock.Channels;
+
+			pixeldata.resize(btPos + btSize);
+
+			memcpy(&pixeldata[btPos], pixels, btSize);
+			btPos += btSize;
+
+			stbi_image_free(pixels);
+
+			if (i > 0 && (stock.Width != width || stock.Height != height))
+			{
+				return EAssetImportResult::Fail;
+			}
+			stock.Width = width;
+			stock.Height = height;
+		}
+		stock.OriginPixelSize = btPos;
+		u64 btSize = btPos;
+
+		stock.Pixels.resize(btSize);
+		i32 result = compress((Bytef*)(stock.Pixels.data()), (uLongf*)(&btSize), (const Bytef*)pixeldata.data(), btSize);
+		stock.Pixels.resize(btSize);
+
+		if (result != Z_OK)
+		{
+			return EAssetImportResult::Fail;
+		}
+		
+		WriteCubeMap(settings.OutputPath, stock);
+
 		return EAssetImportResult::Success;
 	}
 	void AssetImporter::ReadMesh(aiMesh* mesh, StaticMeshAssetStock* output)
@@ -232,7 +290,20 @@ namespace JG
 		json->AddMember(JG_ASSET_KEY, stock);
 		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Texture, json) == false)
 		{
-			JG_CORE_ERROR("Fail Write Mesh : {0} ", outputPath);
+			JG_CORE_ERROR("Fail Write Texture : {0} ", outputPath);
+		}
+	}
+
+	void AssetImporter::WriteCubeMap(const String& outputPath, TextureAssetStock& stock)
+	{
+		auto filePath = PathExtend::CombinePath(outputPath, stock.Name) + JG_ASSET_FORMAT;
+
+
+		auto json = CreateSharedPtr<Json>();
+		json->AddMember(JG_ASSET_KEY, stock);
+		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::CubeMap, json) == false)
+		{
+			JG_CORE_ERROR("Fail Write CubeMap : {0} ", outputPath);
 		}
 	}
 

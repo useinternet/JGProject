@@ -24,6 +24,7 @@ namespace JG
 
 		Dictionary<String, CBPair> mCBDatas;
 		Dictionary<String, SharedPtr<ITexture>> mTextures;
+		Dictionary<String, SharedPtr<ITexture>> mTextureCubes;
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
@@ -38,7 +39,8 @@ namespace JG
 		virtual bool SetUint3(const String& name, const JVector3Uint& value) override;
 		virtual bool SetUint4(const String& name, const JVector4Uint& value) override;
 		virtual bool SetFloat4x4(const String& name, const JMatrix& value) override;
-		virtual bool SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture) override;
+		virtual bool SetTexture(const String& name, SharedPtr<ITexture> texture) override;
+		virtual bool SetTextureCube(const String& name, SharedPtr<ITexture> texture) override;
 
 		virtual bool GetFloat(const String& name, float* out_value) override;
 		virtual bool GetFloat2(const String& name, JVector2* out_value) override;
@@ -54,6 +56,7 @@ namespace JG
 		virtual bool GetUint4(const String& name, JVector4Uint* out_value) override;
 		virtual bool GetFloat4x4(const String& name, JMatrix* outValue) override;
 		virtual bool GetTexture(const String& name, SharedPtr<ITexture>* out_value) override;
+		virtual bool GetTextureCube(const String& name, SharedPtr<ITexture>* out_value) override;
 
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) override;
 		virtual void SetBlendState(u32 slot, EBlendStateTemplate _template) override;
@@ -61,6 +64,7 @@ namespace JG
 
 		virtual void  SetName(const String& name) override;
 		virtual const String& GetName() const override;
+		virtual SharedPtr<IGraphicsShader> GetShader() const override;
 		virtual void  SetShader(SharedPtr<IGraphicsShader> shader) override;
 
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;

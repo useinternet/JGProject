@@ -44,6 +44,17 @@ namespace JG
 		i32 CullingObjectCount = 0;
 	};
 
+	ENUM_FLAG(ERenderDebugFlags)
+	enum class ERenderDebugFlags
+	{
+		Visible_ActiveCluster,
+	};
+	class RenderDebugger
+	{
+	public:
+		ERenderDebugFlags Flags;
+	};
+
 
 	class RenderInfo
 	{
@@ -67,6 +78,7 @@ namespace JG
 	{
 	public:
 		static RenderStatistics Statistics;
+		static RenderDebugger   Debugger;
 	protected:
 		struct LightInfo
 		{

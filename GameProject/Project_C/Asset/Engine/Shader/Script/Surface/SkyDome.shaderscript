@@ -1,6 +1,6 @@
 
 _Resources{
-	Texture2D Tex1;
+	TextureCube Tex1;
 };
 
 _Variables {
@@ -13,15 +13,10 @@ _Surface {
 	float3 outputColor;
 	float height = _input.local_position.y;
 
-	height = height;
-	if(height < 0.0f)
-	{
-		height = 1.0f;
-	}
-
+	
     outputColor = lerp(CenterColor, ApexColor, height);
 
 
-	_output.albedo  = float4(outputColor, 1.0f);
+	_output.albedo  = Tex1.Sample(_AnisotropicSampler, _input.local_position); //float4(outputColor, 1.0f);
 	_output.flags = SCRIPT_FLAG_IGNORE_LIGHTPASS;
 };

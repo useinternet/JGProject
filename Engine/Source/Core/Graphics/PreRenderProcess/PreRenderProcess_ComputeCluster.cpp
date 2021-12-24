@@ -66,7 +66,10 @@ namespace JG
 			mComputer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
 			mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
 			mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
-			mComputer->Dispatch(commandID, 1, 1, 1);
+			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, NUM_X_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, NUM_Y_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, NUM_Z_SLICE);
+			mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE);
 			mIsDirty		= false;
 			mEnableDispatch = false;
 		}

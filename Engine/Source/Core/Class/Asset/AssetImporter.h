@@ -28,6 +28,10 @@ namespace JG
 	{
 		None,
 	};
+	enum class ECubeMapAssetImportFlags
+	{
+		None,
+	};
 
 
 	struct FBXAssetImportSettings
@@ -42,6 +46,14 @@ namespace JG
 		String OutputPath;
 		ETextureAssetImportFlags Flags = ETextureAssetImportFlags::None;
 	};
+	struct CubeMapAssetImportSettings
+	{
+		String Name;
+		// +X, -X, +Y, -Y, +Z, -Z
+		String AssetPath[6];
+		String OutputPath;
+		ECubeMapAssetImportFlags Flags = ECubeMapAssetImportFlags::None;
+	};
 	struct MaterialAssetImportSettings
 	{
 		String Shader;
@@ -55,12 +67,14 @@ namespace JG
 	public:
 		static EAssetImportResult Import(const FBXAssetImportSettings& setting);
 		static EAssetImportResult Import(const TextureAssetImportSettings& settings);
-		static EAssetImportResult Import(const MaterialAssetImportSettings& settings);
+		static EAssetImportResult Import(const MaterialAssetImportSettings& settings); 
+		static EAssetImportResult Import(const CubeMapAssetImportSettings& settings);
 	private:
 		static void ReadMesh(aiMesh* mesh, StaticMeshAssetStock* output);
 	private:
 		static void WriteMesh(const String& outputPath, StaticMeshAssetStock& info);
 		static void WriteTexture(const String& outputPath, TextureAssetStock& stock);
+		static void WriteCubeMap(const String& outputPath, TextureAssetStock& stock);
 		static void WriteMaterial(const String& outputPath, MaterialAssetStock& stock);
 	};
 }

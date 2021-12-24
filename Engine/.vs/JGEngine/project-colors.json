@@ -25,7 +25,17 @@
       "ProjectGuid": "a7a2a36c-3c53-4ccb-b52e-425623e2dda5",
       "DisplayName": "기타 파일",
       "ColorIndex": 3
+    },
+    "6eab880b-dab4-887c-6330-9f7ccf38947c": {
+      "ProjectGuid": "6eab880b-dab4-887c-6330-9f7ccf38947c",
+      "DisplayName": "stb",
+      "ColorIndex": 4
+    },
+    "16cfa17c-0206-a30d-abf2-881097081f0f": {
+      "ProjectGuid": "16cfa17c-0206-a30d-abf2-881097081f0f",
+      "DisplayName": "zlib",
+      "ColorIndex": 5
     }
   },
-  "NextColorIndex": 4
+  "NextColorIndex": 6
 }

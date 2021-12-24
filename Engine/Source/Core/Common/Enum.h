@@ -47,6 +47,7 @@ namespace JG
 		Texture,
 		Directory,
 		GameWorld,
+		CubeMap,
 	};
 
 	enum class ERendererPath

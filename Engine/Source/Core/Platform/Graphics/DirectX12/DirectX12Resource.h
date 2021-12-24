@@ -221,7 +221,8 @@ namespace JG
 		virtual TextureID          GetTextureID() const override;
 		virtual const TextureInfo& GetTextureInfo() const override;
 		virtual void SetTextureInfo(const TextureInfo& info) override;
-		virtual void SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit) override;
+		virtual void SetTextureMemory(const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit,
+			u32 arraySize = 1, u32 mipLevel = 1, ETextureFlags flags = ETextureFlags::None, ETextureFormat format = ETextureFormat::R8G8B8A8_Unorm) override;
 		virtual void SetClearColor(const Color& clearColor) override;
 		virtual bool IsValid() const override;
 	public:

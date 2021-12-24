@@ -7,15 +7,15 @@ cbuffer ConstantData
     float2   __TileSize__;
     float    __FarZ__;
     float    __NearZ__;
+    uint _NUM_X_SLICE;
+    uint _NUM_Y_SLICE;
+    uint _NUM_Z_SLICE;
 };
 
 
-#define NUM_X_SLICE 8
-#define NUM_Y_SLICE 8
-#define NUM_Z_SLICE 16
-
 // output
 RWStructuredBuffer<Cluster> _Clusters;
+RWStructuredBuffer<uint4> _IndexTest;
 
 float3 ScreenToView(float4 screen)
 {
@@ -40,7 +40,7 @@ float3 LineIntersectionToZPlane(float3 A, float3 B, float zDistance)
 // SV_GroupThreadID : 그 스레드 그룹 안에서의 현재 스레드의 3차원 식별자
 // SV_DispatchThreadID : 전체 dispatch 안에서의 현재 스레드 식별자
 // SV_GroupIndex : 현재 스레드가 속한 스레드 그룹의 3차원 식별자를 1차원으로 직렬화한 인덱스
-[numthreads(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE)]
+[numthreads(1, 1, 1)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,
              uint3 groupThreadId    : SV_GroupThreadID,
@@ -50,11 +50,10 @@ void cs_main(uint3 groupId : SV_GroupID,
     float xIndex = dispatchThreadId.x;
     float yIndex = dispatchThreadId.y;
     float zIndex = dispatchThreadId.z;
-    int index = groupIndex;
+    int index = zIndex * _NUM_X_SLICE * _NUM_Y_SLICE + yIndex * _NUM_X_SLICE + xIndex;
 
-
-    float clusterNearZ = __NearZ__ * pow( (__FarZ__ / __NearZ__),  (float)zIndex / NUM_Z_SLICE);
-    float clusterFarZ  = __NearZ__ * pow( (__FarZ__ / __NearZ__), (float)(zIndex + 1) / NUM_Z_SLICE);
+    float clusterNearZ = __NearZ__ * pow( (__FarZ__ / __NearZ__),  (float)zIndex / _NUM_Z_SLICE);
+    float clusterFarZ  = __NearZ__ * pow( (__FarZ__ / __NearZ__), (float)(zIndex + 1) / _NUM_Z_SLICE);
 
     float4 minPoint_SS = float4(xIndex * __TileSize__.x, yIndex * __TileSize__.y, -1, 1);
     float4 maxPoint_SS = float4((xIndex + 1) * __TileSize__.x, (yIndex + 1) * __TileSize__.y, -1, 1);

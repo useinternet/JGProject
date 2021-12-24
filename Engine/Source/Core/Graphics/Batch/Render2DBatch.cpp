@@ -16,10 +16,12 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
 
-		String _2dShaderPath = PathExtend::CombinePath(Application::GetShaderTemplatePath(), "Standard2DShader.shadertemplate");
-		String _2dShaderCode;
-		FileExtend::ReadAllText(_2dShaderPath, &_2dShaderCode);
-		auto _2dShader = IGraphicsShader::Create(_2dShaderCode, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader);
+		//String _2dShaderPath = PathExtend::CombinePath(Application::GetShaderTemplatePath(), "Standard2DShader.shadertemplate");
+		//String _2dShaderCode;
+		//FileExtend::ReadAllText(_2dShaderPath, &_2dShaderCode);
+		//auto _2dShader = IGraphicsShader::Create("Standard2DShader", _2dShaderCode, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader);
+
+		auto _2dShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::Standard2DShader); 
 
 		TextureInfo textureInfo;
 		textureInfo.Width      = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;

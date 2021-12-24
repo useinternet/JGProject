@@ -111,15 +111,15 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) override;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) override;
-		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
-		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& sourceCode) override;
+		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
+		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) override;
 		virtual SharedPtr<IMesh>		  CreateMesh(const String& name) override;
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
-		virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) override;
+		//virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) override;
 	};
 }
  
