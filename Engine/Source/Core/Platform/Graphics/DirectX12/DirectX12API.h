@@ -99,6 +99,7 @@ namespace JG
 		virtual void ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) override;
 		virtual void SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) override;
 		virtual void DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) override;
+		virtual void Draw(u64 commandID, u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) override;
 	protected:
 		virtual void SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template) override;
 		virtual void SetBlendState(u64 commandID, u32 renderTargetSlot, EBlendStateTemplate _template) override;

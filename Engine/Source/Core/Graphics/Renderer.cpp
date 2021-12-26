@@ -15,10 +15,6 @@ namespace JG
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		mCurrentRenderInfo = info;
-		if (info.TargetTexture == nullptr)
-		{
-			return false;
-		}
 		mLightInfos.clear();
 
 
@@ -51,9 +47,13 @@ namespace JG
 		passData.EyePosition	= info.EyePosition;
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;
-		passData.Resolution		= info.Resolutoin;
+		passData.Resolution		= info.Resolution;
 		passData.PointLightCount = pl_count;
 
+		if (Debugger.Mode == ERenderDebugMode::Visible_ActiveCluster)
+		{
+			passData.DebugMode = (u32)ERenderDebugMode::Visible_ActiveCluster;
+		}
 
 
 		ReadyImpl(api, &passData, info);
@@ -90,16 +90,17 @@ namespace JG
 		
 		Statistics.VisibleObjectCount += 1;
 	}
-	void Renderer::End()
+	SharedPtr<RenderResult> Renderer::End()
 	{
 		auto api  = JGGraphics::GetInstance().GetGraphicsAPI();
-		auto info = GetRenderInfo();
+		SharedPtr<RenderResult> result = CreateSharedPtr<RenderResult>();
 	
+
 
 		// PreProcess Run
 		for (auto& preProcess : mPreProcessList)
 		{
-			preProcess->Run(this, api, mCurrentRenderInfo);
+			preProcess->Run(this, api, mCurrentRenderInfo, result);
 		}
 
 	
@@ -117,14 +118,14 @@ namespace JG
 		}
 
 		// Render
-		RenderImpl(api, mCurrentRenderInfo);
+		RenderImpl(api, mCurrentRenderInfo, result);
 
 
 
 		// PostProcess
 		for (auto& postProcess : mPostProcessList)
 		{
-			postProcess->Run(this, api, mCurrentRenderInfo);
+			postProcess->Run(this, api, mCurrentRenderInfo, result);
 		}
 
 
@@ -149,10 +150,12 @@ namespace JG
 		mObjectInfoListDic.clear();
 		EndBatch();
 
-		CompeleteImpl(api, info);
+		CompeleteImpl(api, mCurrentRenderInfo, result);
 
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		api->EndDraw(commandID);
+
+		return result;
 	}
 
 	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)

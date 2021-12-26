@@ -5,6 +5,7 @@
 namespace JG
 {
 	class GameNode;
+	class EditorUIRenderer;
 	class SceneView : public UIView
 	{
 		JGCLASS
@@ -51,7 +52,7 @@ namespace JG
 		SharedPtr<ITexture> mSceneTexture;
 
 
-		i32 mCurrentResolution = Resolution_FHD_1920_1080;
+		i32 mCurrentResolution = Resolution_FreeAspect;
 
 		List<Asset<ITexture>*>        mIcons;
 		UniquePtr<Command<GameNode*>> mShowGizmo;
@@ -74,6 +75,11 @@ namespace JG
 
 		bool mIsEditorMode  = true;
 		bool mIsGamePlaying = false;
+
+
+		UniquePtr<EditorUIRenderer> mEditorUIRenderer;
+		Queue<Shared::Editor::EditorUIObjectData> mUIObjectQueue;
+		SharedPtr<ScheduleHandle> mUIRenderScheduleHandle;
 	public:
 		SceneView();
 		virtual ~SceneView() = default;
@@ -96,8 +102,8 @@ namespace JG
 		void OnGui_FPS();
 		void OnGui_ResolutionTool();
 	private:
+		bool ResponseDrawEditorUIInSceneView(RequestDrawEditorUIInSceneView& e);
 		bool ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e);
-		bool ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e);
 		bool ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e);
 		bool ResponseChangeGameWorld(NotifyChangeGameWorldEvent& e);
 	private:
@@ -117,6 +123,6 @@ namespace JG
 
 	private:
 		void ControllEditorCamera();
-
+		void RenderEditorUI();
 	};
 }

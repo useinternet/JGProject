@@ -40,22 +40,18 @@ namespace JG
 
 	enum class EShaderScriptType
 	{
-		Surface
+		Surface,
+		Scene
 	};
 	class IShaderScript
 	{
-	public:
-		enum : u64
-		{
-			Surface,
-			Compute,
-		};
 	public:
 		virtual const String& GetCode() const = 0;
 		virtual const String& GetName() const = 0;
 		virtual const EShaderScriptType GetScriptType() const = 0;
 	public:
 		static SharedPtr<IShaderScript> CreateSurfaceScript(const String& name, const String& code);
+		static SharedPtr<IShaderScript> CreateSceneScript(const String& name, const String& code);
 	};
 
 	class ShaderScript : public IShaderScript

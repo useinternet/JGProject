@@ -1,0 +1,30 @@
+
+_Resources{
+	Texture2D SceneTexture;
+};
+
+_Scene {
+    float2 resolution = _Resolution;
+    
+    // H
+    
+    float2 uv = float2(0,0);
+    float  tu  = 1.0f / resolution.x;
+    float  total = TotalWeight;
+
+
+    for(int i = -6; i < 6; ++i)
+    {
+        uv = _input.tex + float2(tu * i, 0);
+        _output.final += Weights[6 + i] * SceneTexture.Sample(_LinearClampSampler, uv);    
+    }
+    _output.final /= total;
+};
+
+_Function {
+    static const float Weights[13] = {
+        0.0561f, 0.1353f, 0.278f, 0.4868f, 0.7261f, 0.9231, 
+        1.0f, 0.9231f, 0.7261f, 0.4868f, 0.278f, 0.1353f, 0.0561f
+    } ;
+    static const float TotalWeight = 6.2108f;
+};

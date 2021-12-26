@@ -1,15 +1,17 @@
 #pragma once
-#include "Graphics/RenderBatch.h"
+#include "JGCore.h"
 
 
 namespace JG
 {
+	// Editor UI 용으로 제작
+	// SceneView 에 들어가는 아이콘을 그리는 렌더러
 	class IMesh;
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class IMaterial;
-	class Render2DBatch : public RenderBatch
+	class EditorUIRenderer
 	{
 	public:
 		struct QuadVertex
@@ -29,7 +31,6 @@ namespace JG
 			SharedPtr<IMesh>         QuadMesh;
 			SharedPtr<IVertexBuffer> QuadVBuffer;
 			SharedPtr<IIndexBuffer>  QuadIBuffer;
-			SharedPtr<IMaterial> Standard2DMaterial;
 		};
 	private:
 		static const u32 MaxQuadCount = 1200;
@@ -43,6 +44,7 @@ namespace JG
 		JVector3 mStandardQuadPosition[4];
 		JVector2 mStandardQuadTexcoord[4];
 		List<FrameResource> mFrameResources;
+		SharedPtr<IMaterial> mEditorUIMaterial;
 		List<QuadVertex>    mVertices;
 		List<u32>           mIndices;
 		List<SharedPtr<ITexture>> mTextureArray;
@@ -52,23 +54,14 @@ namespace JG
 		u64 mTextureCount = 0;
 
 		FrameResource* mCurrFrameResource = nullptr;
-		List<SharedPtr<ITexture>> mRenderTarges;
-
 		bool mIsClearWhiteTexture = false;
 	public:
-		Render2DBatch();
-		virtual ~Render2DBatch();
-	private:
-		virtual bool Begin(const RenderInfo& info) override;
-		virtual void End() override;
-	public:
+		EditorUIRenderer();
+		bool Begin(SharedPtr<ITexture> targetTexture);
+		void End();
 		void DrawCall(const JMatrix& transform, SharedPtr<ITexture> texture, const Color& color);
-		void DrawCall(const JVector2& Pos, const JVector2& Size, float rotation, SharedPtr<ITexture> texture, const Color& color);
-		void DrawCall(const JVector2& Pos, const JVector2& Size, float rotation, const Color& color);
-		void DrawCall(const JVector2& Pos, const JVector2& Size, float rotation, SharedPtr<ITexture> texture);
-		void DrawCall(const JVector2& Pos, const JVector2& Size, const Color& color);
-		void DrawCall(const JVector2& Pos, const JVector2& Size, SharedPtr<ITexture> texture);
 	private:
+		void Init();
 		void StartBatch();
 		void NextBatch();
 	};

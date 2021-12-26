@@ -980,7 +980,7 @@ namespace JG
 		stock.Name = StringExtend::ReplaceAll(p.filename().string(), extension, "");
 		stock.ShaderTemplate = JG_SHADER_3D_STANDARD_TEMPLATE;
 		stock.ShaderScript   = JG_SHADER_STANDARD_SURFACE_SCRIPT;
-		/*auto shader          = ShaderLibrary::GetInstance().GetShader(stock.ShaderTemplate, { stock.ShaderScript });
+		auto shader          = ShaderLibrary::GetInstance().FindGraphicsShader(stock.ShaderTemplate, { stock.ShaderScript });
 		auto material = IMaterial::Create("tmp", shader);
 		auto propertyList    = material->GetPropertyList();
 		auto materialJson = CreateSharedPtr<Json>();
@@ -1094,7 +1094,7 @@ namespace JG
 
 
 		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
-		AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::Material, json);*/
+		AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::Material, json);
 	}
 
 	void ContentsView::Rename(const String& path, const String& name)
@@ -1123,7 +1123,8 @@ namespace JG
 
 		auto assetID = AssetDataBase::GetInstance().GetAssetOriginID(dest);
 		AssetDataBase::GetInstance().RefreshAssetName(assetID, src);
-		//AssetDataBase""
+		RequestSaveGameWorldEvent e;
+		SendEvent(e);
 	}
 
 	void ContentsView::Copy()

@@ -41,7 +41,12 @@ namespace JG
 		//
 		bool mIsOrthographic  = false;
 		bool mIsMainCamera    = false;
+		bool mIsHDR			  = true;
+
+
+
 		bool mIsRendering = false;
+	
 
 		ERendererPath mRendererPath = ERendererPath::Foward;
 
@@ -64,7 +69,7 @@ namespace JG
 		void SetFOV(f32 fov);
 		void SetFarZ(f32 farZ);
 		void SetNearZ(f32 nearZ);
-
+		void SetHDR(bool ishdr);
 		void SetOrthographic(bool isOrthographic);
 		virtual void SetResolution(const JVector2& resolution);
 		void SetCullingLayerMask(u64 mask);
@@ -89,6 +94,7 @@ namespace JG
 		JVector3 GetRight() const;
 		JVector3 GetUp()    const;
 
+		bool IsHDR() const;
 		bool IsOrthographic() const;
 		float GetAspectRatio() const;
 		const JVector2& GetResolution() const;
@@ -98,6 +104,10 @@ namespace JG
 		ERendererPath GetRendererPath() const;
 
 		bool IsMainCamera() const;
+
+
+		Graphics::Scene*    GetScene() const;
+		SharedPtr<ITexture> GetTexture() const;
 	protected:
 		virtual void UpdateProj() const;
 		void UpdateView() const;

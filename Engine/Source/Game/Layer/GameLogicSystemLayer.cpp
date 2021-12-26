@@ -39,16 +39,6 @@ namespace JG
 	}
 	void GameLogicSystemLayer::Begin()
 	{
-		//UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&](){
-
-		//	if (mGameWorld == nullptr) return;
-		//	if (mIsGamePlaying == true) return;
-
-		//	RequestSaveGameWorldEvent e;
-		//	Application::GetInstance().SendEvent(e);
-
-		//}, nullptr);
-
 		mGamePlugin = CreateUniquePtr<Plugin>(GAME_DLL_NAME);
 		mGamePlugin->Link(CreateSharedPtr<GamePluginLinker>());
 		if (mGamePlugin->IsVaild())
@@ -84,6 +74,7 @@ namespace JG
 		//settings.OutputPath = PathExtend::CombinePath(Application::GetEnginePath(), "CubeMap");
 		//settings.Name = "DefaultSky";
 		//AssetImporter::Import(settings);
+
 	}
 	void GameLogicSystemLayer::Destroy()
 	{
@@ -107,7 +98,7 @@ namespace JG
 	}
 	bool GameLogicSystemLayer::ResponseSaveGameWorld(RequestSaveGameWorldEvent& e)
 	{
-		if (mGameWorld == nullptr || mGameWorldAssetPath.empty())
+		if (mGameWorld == nullptr || mGameWorldAssetPath.empty() && mIsGamePlaying == true)
 		{
 			return true;
 		}

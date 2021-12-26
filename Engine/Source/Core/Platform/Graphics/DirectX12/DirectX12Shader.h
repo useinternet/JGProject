@@ -63,7 +63,7 @@ namespace JG
 	private:
 		bool Compile(const String& code, String* error);
 		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
-		void InsertScript(String& code, const List<SharedPtr<IShaderScript>>& scriptList);
+		void InsertScript(String& code, SharedPtr<IShaderScript> script);
 		bool InsertScriptInternal(String& code, SharedPtr<IShaderScript> script);
 		bool ExtractScriptContents(const String& code, const String& key, String& out_code);
 	};

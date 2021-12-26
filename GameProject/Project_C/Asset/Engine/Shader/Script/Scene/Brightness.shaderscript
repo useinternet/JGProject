@@ -1,0 +1,25 @@
+
+_Resources{
+	Texture2D SceneTexture;
+};
+
+_Variables {
+
+};
+
+_Scene {
+
+	float4 sceneColor = SceneTexture.Sample(_AnisotropicSampler, _input.tex);
+    float brightness = dot(sceneColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+
+    if(brightness > 0.99f)
+    {
+        _output.final = float4(sceneColor.rgb, 1.0f);
+    }
+};
+
+
+_Function {
+
+
+};

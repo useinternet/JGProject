@@ -1,0 +1,13 @@
+
+_Resources{
+	Texture2D SceneTexture;
+    Texture2D BrightnessTexture;
+};
+
+_Scene {
+
+	float4 sceneColor = SceneTexture.Sample(_LinearClampSampler, _input.tex);
+    float4 brightColor = BrightnessTexture.Sample(_LinearClampSampler, _input.tex);
+
+    _output.final = sceneColor + brightColor;
+};

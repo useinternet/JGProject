@@ -35,7 +35,12 @@
       "ProjectGuid": "16cfa17c-0206-a30d-abf2-881097081f0f",
       "DisplayName": "zlib",
       "ColorIndex": 5
+    },
+    "e087650d-4c9c-8dbe-151e-311e81f189ef": {
+      "ProjectGuid": "e087650d-4c9c-8dbe-151e-311e81f189ef",
+      "DisplayName": "Imgui",
+      "ColorIndex": 6
     }
   },
-  "NextColorIndex": 6
+  "NextColorIndex": 7
 }

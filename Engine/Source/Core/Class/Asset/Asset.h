@@ -296,6 +296,10 @@ namespace JG
 			mExtension	 = p.extension().string();
 			mName		 = StringExtend::ReplaceAll(p.filename().string(), mExtension, "");
 			mAssetFormat = assetFormat;
+			if (IsValid() == true)
+			{
+				mData->SetName(mName);
+			}
 		}
 	public:
 		virtual AssetID GetAssetID() const override

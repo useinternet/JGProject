@@ -19,6 +19,7 @@ namespace JG
 		None,
 		R8G8B8A8_Unorm,
 		R16G16B16A16_Unorm,
+		R16G16B16A16_Float,
 		R32G32B32A32_Float,
 		D24_Unorm_S8_Uint
 	};
@@ -43,6 +44,7 @@ namespace JG
 		{
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
+		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
@@ -333,24 +335,31 @@ namespace JG
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
 			constexpr char* Standard3DShader = "Standard3DShader";
+			constexpr char* StandardSceneShader = "StandardSceneShader";
+			constexpr char* StandardEditorUIShader = "StandardEditorUIShader";
 			constexpr char* DebugShader = "DebugShader";
 		}
 		namespace Type
 		{
 			constexpr char* Resources = "_Resources";
+			constexpr char* Function = "_Function";
 			constexpr char* Variables = "_Variables";
 			constexpr char* Surface   = "_Surface";
-		}
-		namespace Variables
-		{
-			constexpr char* Surface = "__SurfaceConstantBuffer__";
+			constexpr char* Scene = "_Scene";
 		}
 
 		namespace Location
 		{
 			constexpr char* SurfaceResources = "__PS_SURFACE_RESOURCES_SCRIPT__";
 			constexpr char* SurfaceVariables = "__PS_SURFACE_VARIABLES_SCRIPT__";
-			constexpr char* SurfaceContents  = "__PS_SURFACE_FUNCTION_SCRIPT__";
+			constexpr char* SurfaceFunction = "__PS_SURFACE_FUNCTION_SCRIPT__";
+			constexpr char* SurfaceContents  = "__PS_SURFACE_CONTENTS_SCRIPT__";
+
+
+			constexpr char* SceneResources = "__PS_SCENE_RESOURCES_SCRIPT__";
+			constexpr char* SceneVariables = "__PS_SCENE_VARIABLES_SCRIPT__";
+			constexpr char* SceneFunction = "__PS_SCENE_FUNCTION_SCRIPT__";
+			constexpr char* SceneContents  = "__PS_SCENE_CONTENTS_SCRIPT__";
 		}
 
 		namespace Token

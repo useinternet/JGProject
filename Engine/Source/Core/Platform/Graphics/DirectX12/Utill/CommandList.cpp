@@ -476,6 +476,11 @@ namespace JG
 		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
+	void GraphicsCommandList::Draw(u32 vertexPerInstance, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
+	{
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
+		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+	}
 	void ComputeCommandList::BindRootSignature(SharedPtr<RootSignature> rootSig)
 	{
 		if (mBindedComputeRootSig.Get() == rootSig->Get())

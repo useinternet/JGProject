@@ -494,6 +494,7 @@ namespace JG
 		originData->Asset->Set(originData->ID, reName, assetFormat);
 		originData->ID = originData->Asset->GetAssetID();
 		originData->Path = originData->Asset->GetAssetPath();
+		
 
 
 		mOriginAssetDataPool.erase(oldResourcePath);

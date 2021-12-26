@@ -70,6 +70,7 @@ namespace JG
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
+		virtual bool IsValid() const override;
 		virtual bool Bind(u64 commandID) override;
 		void Init(SharedPtr<IGraphicsShader> shader);
 	private:

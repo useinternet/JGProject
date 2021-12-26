@@ -15,8 +15,8 @@ namespace JG
 		{
 			// System 
 			BeginSystem = -2000000,
-			Graphics_PushSceneObject  = BeginSystem + 1,
-			Graphics_BeginFrame       = BeginSystem + 2,
+			Graphics_BeginFrame = BeginSystem + 1,
+			Graphics_PushSceneObject  = BeginSystem + 2,
 			Graphics_Rendering        = BeginSystem + 3,
 
 	   

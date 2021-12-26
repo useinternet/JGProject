@@ -27,8 +27,8 @@ namespace JG
 		rednerPassData->NumClusterSlice.x = NUM_X_SLICE;
 		rednerPassData->NumClusterSlice.y = NUM_Y_SLICE;
 		rednerPassData->NumClusterSlice.z = NUM_Z_SLICE;
-		rednerPassData->ClusterSize.x = (u32)std::ceilf(info.Resolutoin.x / (float)NUM_X_SLICE);
-		rednerPassData->ClusterSize.y = (u32)std::ceilf(info.Resolutoin.y / (float)NUM_Y_SLICE);
+		rednerPassData->ClusterSize.x = (u32)std::ceilf(info.Resolution.x / (float)NUM_X_SLICE);
+		rednerPassData->ClusterSize.y = (u32)std::ceilf(info.Resolution.y / (float)NUM_Y_SLICE);
 		rednerPassData->ClusterScale  = (f32)NUM_Z_SLICE / std::log2f(info.FarZ / info.NearZ);
 		rednerPassData->ClusterBias   = -((f32)NUM_Z_SLICE * std::log2f(info.NearZ) / std::log2f(info.FarZ / info.NearZ));
 
@@ -41,16 +41,16 @@ namespace JG
 		}
 
 		CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
-		CB.Resolution    = info.Resolutoin;
+		CB.Resolution    = info.Resolution;
 		CB.FarZ			 = info.FarZ;
 		CB.NearZ		 = info.NearZ;
 		CB.TileSize = JVector2(
-			info.Resolutoin.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
-			info.Resolutoin.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
+			info.Resolution.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
+			info.Resolution.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
 
 
 	}
-	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info)
+	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
 		if (mComputer == nullptr || mClusterRBB == nullptr)
 		{
@@ -123,7 +123,7 @@ namespace JG
 			}
 		}
 
-		if (CB.Resolution != info.Resolutoin)
+		if (CB.Resolution != info.Resolution)
 		{
 			return true;
 		}

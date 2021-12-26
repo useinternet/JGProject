@@ -110,6 +110,7 @@ namespace JG
 		jsonData->AddMember("ClearColor", JVector4(GetClearColor()));
 		jsonData->AddMember("CullingLayerMask", GetCullingLayerMask());
 		jsonData->AddMember("IsOrthographic", IsOrthographic());
+		jsonData->AddMember("IsHDR", IsHDR());
 		jsonData->AddMember("IsMainCamera", IsMainCamera());
 
 	}
@@ -120,6 +121,11 @@ namespace JG
 		if (val)
 		{
 			SetResolution(val->GetVector2());
+		}
+		val = jsonData->GetMember("IsHDR");
+		if (val && val->IsBool())
+		{
+			SetHDR(val->GetBool());
 		}
 		val = jsonData->GetMember("NearZ");
 		if (val)
@@ -183,6 +189,11 @@ namespace JG
 			mIsProjDirty = true;
 		}
 		mNearZ = Math::Max(0.001f, nearZ);
+	}
+
+	void Camera::SetHDR(bool ishdr)
+	{
+		mIsHDR = ishdr;
 	}
 
 	void Camera::SetOrthographic(bool isOrthographic)
@@ -319,6 +330,11 @@ namespace JG
 		return JVector3::Normalize(JMatrix::Rotation(rotation).TransformVector(JVector3(0, 1, 0)));
 	}
 
+	bool Camera::IsHDR() const
+	{
+		return mIsHDR;
+	}
+
 	bool Camera::IsOrthographic() const
 	{
 		return mIsOrthographic;
@@ -371,6 +387,20 @@ namespace JG
 		return mIsMainCamera;
 	}
 
+	Graphics::Scene* Camera::GetScene() const
+	{
+		return mScene;
+	}
+
+	SharedPtr<ITexture> Camera::GetTexture() const
+	{
+		if (mSceneResultInfo != nullptr)
+		{
+			return mSceneResultInfo->Texture;
+		}
+		return nullptr;
+	}
+
 	void Camera::UpdateView() const
 	{
 		if (mIsViewDirty == false)
@@ -401,13 +431,13 @@ namespace JG
 	}
 	void Camera::UpdateGraphicsScene()
 	{
-
 		Graphics::SceneInfo sceneInfo;
 		if (mScene != nullptr)
 		{
 			sceneInfo = mScene->GetSceneInfo();
 		}
 		sceneInfo.RenderPath = ERendererPath::Foward;
+		sceneInfo.IsHDR = IsHDR();
 		sceneInfo.EyePos = GetOwner()->GetTransform()->GetWorldLocation();
 		sceneInfo.Resolution = GetResolution();
 		sceneInfo.ClearColor = GetClearColor();
@@ -449,15 +479,15 @@ namespace JG
 		}
 		mIsRendering = false;
 		mSceneResultInfo = mScene->FetchResultFinish();
-		if (mSceneResultInfo != nullptr && IsActive() == true && GetMainCamera() == this)
-		{
-			if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid())
-			{
-				NotifyChangeMainSceneTextureEvent e;
-				e.SceneTexture = mSceneResultInfo->Texture;
-				SendEvent(e);
-			}
-		}
+		//if (mSceneResultInfo != nullptr && IsActive() == true && GetMainCamera() == this)
+		//{
+		//	if (mSceneResultInfo->Texture != nullptr && mSceneResultInfo->Texture->IsValid())
+		//	{
+		//		NotifyChangeMainSceneTextureEvent e;
+		//		e.SceneTexture = mSceneResultInfo->Texture;
+		//		SendEvent(e);
+		//	}
+		//}
 
 		return EScheduleResult::Continue;
 	}

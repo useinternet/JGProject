@@ -42,6 +42,13 @@ namespace JG
 		RegisterPopupUIView();
 		RegisterInspectorUI();
 		LoadUISettings("JGUI.jgconfig");
+
+		UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&]() {
+
+			RequestSaveGameWorldEvent e;
+			Application::GetInstance().SendEvent(e);
+
+		}, nullptr);
 	}
 	void EditorUISystemLayer::Destroy()
 	{

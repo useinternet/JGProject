@@ -223,6 +223,11 @@ namespace JG
 		return mGraphicsShader->GetScriptList();
 	}
 
+	bool DirectX12Material::IsValid() const
+	{
+		return mGraphicsShader != nullptr && mGraphicsShader->IsSuccessed();
+	}
+
 	bool DirectX12Material::Bind(u64 commandID)
 	{
 		if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)

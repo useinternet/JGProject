@@ -96,6 +96,7 @@ namespace JG
 
 
 		void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0);
+		void Draw(u32 vertexPerInstance, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0);
 	};
 
 	class ComputeCommandList : public CommandList

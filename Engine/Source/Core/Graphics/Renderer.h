@@ -44,24 +44,22 @@ namespace JG
 		i32 CullingObjectCount = 0;
 	};
 
-	ENUM_FLAG(ERenderDebugFlags)
-	enum class ERenderDebugFlags
+	enum class ERenderDebugMode
 	{
+		None,
 		Visible_ActiveCluster,
 	};
 	class RenderDebugger
 	{
 	public:
-		ERenderDebugFlags Flags;
+		ERenderDebugMode Mode;
 	};
 
 
 	class RenderInfo
 	{
 	public:
-		SharedPtr<ITexture> TargetTexture;
-		SharedPtr<ITexture> TargetDepthTexture;
-		JVector2 Resolutoin;
+		JVector2 Resolution;
 		JMatrix  ViewProjMatrix;
 		JMatrix  ViewMatrix;
 		JMatrix  ProjMatrix;
@@ -69,10 +67,16 @@ namespace JG
 		f32 FarZ;
 		f32 NearZ;
 		u64 CurrentBufferIndex = 0;
+
+		Color ClearColor;
+		bool IsHDR;
 	};
 
-
-
+	class RenderResult
+	{
+	public:
+		SharedPtr<ITexture> SceneTexture;
+	};
 
 	class Renderer 
 	{
@@ -111,7 +115,7 @@ namespace JG
 	public:
 		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
 		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
-		void End();
+		SharedPtr<RenderResult> End();
 		virtual ERendererPath GetRendererPath() const = 0;
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
@@ -172,8 +176,8 @@ namespace JG
 		}
 	protected:
 		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
-		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
-		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info) = 0;
+		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
+		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};
 }

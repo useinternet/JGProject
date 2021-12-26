@@ -50,11 +50,15 @@ namespace JG
 
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName() const    = 0;
-		virtual void SetShader(SharedPtr<IGraphicsShader> shader) = 0;
-		virtual SharedPtr<IGraphicsShader> GetShader() const = 0;
+		virtual void  SetShader(SharedPtr<IGraphicsShader> shader) = 0;
+		virtual SharedPtr<IGraphicsShader> GetShader() const	  = 0;
+
+		
+
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
 		virtual bool Bind(u64 commandID) = 0;
+		virtual bool IsValid() const = 0;
 	public:
 		virtual ~IMaterial() = default;
 	public:

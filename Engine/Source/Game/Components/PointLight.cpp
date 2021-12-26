@@ -142,7 +142,7 @@ namespace JG
 		{
 			return EScheduleResult::Continue;
 		}
-		auto debugObject = CreateSharedPtr<Graphics::PaperObject>();
+		//auto debugObject = CreateSharedPtr<Graphics::PaperObject>();
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam == nullptr)
 		{
@@ -171,7 +171,7 @@ namespace JG
 
 
 		f32 dis = JVector3::Length(location - mainCam->GetOwner()->GetTransform()->GetWorldLocation());
-		f32 scale = dis / 10;
+		f32 scale = dis / 15;
 		auto billboardMatrix = JMatrix::Scaling(JVector3(scale, scale, 1.0f)) * viewMatrix;
 		//
 		JBBox bbox;
@@ -192,13 +192,20 @@ namespace JG
 		}, nullptr, &billboardMatrix, sizeof(JMatrix));
 
 
-		debugObject->WorldMatrix = billboardMatrix;
+		SharedPtr<ITexture> texture = nullptr;
+
+		//debugObject->WorldMatrix = billboardMatrix;
 		if (mIcon && mIcon->Get() && mIcon->Get()->IsValid())
 		{
-			debugObject->Texture = mIcon->Get();
+			texture = mIcon->Get();
+			//debugObject->Texture = mIcon->Get();
 		}
 
-		GetGameWorld()->PushRenderSceneObject(debugObject);
+		RequestDrawEditorUIInSceneView e;
+		e.Data.WorldMatrix = billboardMatrix;
+		e.Data.Texture = texture;
+		//GetGameWorld()->PushRenderSceneObject(debugObject);
+		SendEvent(e);
 		return EScheduleResult::Continue;
 	}
 #endif

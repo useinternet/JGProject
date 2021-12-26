@@ -138,6 +138,12 @@ namespace JG
 			mGraphcisAPI->BeginFrame();
 			Reset();
 
+			// Scene Reset
+			//for (auto& _pair : mSceneDic)
+			//{
+			//	_pair.second->Reset();
+			//}
+
 			return EScheduleResult::Continue;
 		});
 
@@ -165,10 +171,19 @@ namespace JG
 		mCommandIDIndex = 1;
 		mCommandIDPool.clear();
 
+		// Scene Reset
+		
 	}
 	void JGGraphics::LoadShader()
 	{
 		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
+		LoadShaderTemplate();
+		LoadShaderScript();
+		LoadComputeShader();
+	}
+	void JGGraphics::LoadShaderTemplate()
+	{
+		// Shader Template
 		auto templatePath = Application::GetShaderTemplatePath();
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
 		{
@@ -210,6 +225,10 @@ namespace JG
 			}
 
 		}
+	}
+	void JGGraphics::LoadShaderScript()
+	{
+		// Shader Script
 		auto scriptPath = Application::GetShaderScriptPath();
 		for (auto& iter : fs::recursive_directory_iterator(scriptPath))
 		{
@@ -220,7 +239,7 @@ namespace JG
 				continue;
 			}
 			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
-		
+
 			SharedPtr<IShaderScript> script;
 			String scriptCode;
 
@@ -229,10 +248,15 @@ namespace JG
 			{
 				script = IShaderScript::CreateSurfaceScript("Surface/" + fileName, scriptCode);
 			}
+			else if (scriptCode.find(ShaderDefine::Type::Scene) != String::npos)
+			{
+				script = IShaderScript::CreateSceneScript("Scene/" + fileName, scriptCode);
+			}
 			ShaderLibrary::GetInstance().RegisterShaderScript(script->GetName(), script);
 		}
-
-
+	}
+	void JGGraphics::LoadComputeShader()
+	{
 		// Load ComputeShader
 		auto computeShaderPath = Application::GetComputeShaderScriptPath();
 		for (auto& iter : fs::recursive_directory_iterator(computeShaderPath))
@@ -268,19 +292,9 @@ namespace JG
 			mName = name;
 		}
 
-		void GObject::SetLayer(u64 layer)
-		{
-			mLayer = layer;
-		}
-
 		const String& GObject::GetName()
 		{
 			return mName;
-		}
-
-		u64 GObject::GetLayer()
-		{
-			return mLayer;
 		}
 
 		void GObject::Lock()
@@ -301,9 +315,6 @@ namespace JG
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
-			auto bufferCount = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
-			mTargetTextures.resize(bufferCount, nullptr);
-			mTargetDepthTextures.resize(bufferCount, nullptr);
 			mCurrentIndex = 0;
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
 			SetSceneInfo(info);
@@ -311,16 +322,7 @@ namespace JG
 		}
 		Scene::~Scene()
 		{
-			for (auto& t : mTargetTextures)
-			{
-				t.reset();
-				t = nullptr;
-			}
-			for (auto& t : mTargetDepthTextures)
-			{
-				t.reset();
-				t = nullptr;
-			}
+
 		}
 		bool Scene::SetSceneInfo(const SceneInfo& info)
 		{
@@ -331,10 +333,6 @@ namespace JG
 			if (mRenderer == nullptr || mSceneInfo.RenderPath != info.RenderPath)
 			{
 				InitRenderer(info.RenderPath);
-			}
-			if (mTargetTextures.empty() || mSceneInfo.Resolution != info.Resolution || mSceneInfo.ClearColor != info.ClearColor)
-			{
-				InitTexture(info.Resolution, info.ClearColor);
 			}
 			mSceneInfo = info;
 			return true;
@@ -375,6 +373,21 @@ namespace JG
 			return true;
 		}
 
+		void Scene::PushPostRenderingEvent(i32 priority, const PostRenderingEvent& _e)
+		{
+			mPostRenderingEventQueue[priority].push(_e);
+		}
+
+
+		void Scene::Reset()
+		{
+			mSceneResult = nullptr;
+			while (mSceneObjectQueue.empty() == false) {
+				mSceneObjectQueue.pop();
+			}
+			mLightList.clear();
+			mPostRenderingEventQueue.clear();
+		}
 
 		void Scene::Rendering()
 		{
@@ -393,9 +406,7 @@ namespace JG
 			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
 				RenderInfo info;
-				info.TargetTexture		= mTargetTextures[mCurrentIndex];
-				info.TargetDepthTexture = mTargetDepthTextures[mCurrentIndex];
-				info.Resolutoin			= mSceneInfo.Resolution;
+				info.Resolution = mSceneInfo.Resolution;
 				info.ViewProjMatrix	    = mSceneInfo.ViewProjMatrix;
 				info.ViewMatrix = mSceneInfo.ViewMatrix;
 				info.ProjMatrix = mSceneInfo.ProjMatrix;
@@ -403,7 +414,8 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition		= mSceneInfo.EyePos;
 				info.CurrentBufferIndex = mCurrentIndex;
-
+				info.IsHDR = mSceneInfo.IsHDR;
+				info.ClearColor = mSceneInfo.ClearColor;
 
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
@@ -434,7 +446,33 @@ namespace JG
 
 					}
 
-					mRenderer->End();
+					auto result = mRenderer->End();
+					if (result != nullptr)
+					{
+						if (mSceneResult == nullptr)
+						{
+							mSceneResult = CreateSharedPtr<SceneResultInfo>();
+						}
+						mSceneResult->Texture = result->SceneTexture;
+
+						for (auto& _pair : mPostRenderingEventQueue)
+						{
+							while (_pair.second.empty() == false)
+							{
+								auto func = _pair.second.front(); _pair.second.pop();
+								if (func != nullptr)
+								{
+									func(mSceneResult);
+								}
+							}
+						}
+					}
+					else {
+						mSceneResult = nullptr;
+					}
+
+					mPostRenderingEventQueue.clear();
+					mLightList.clear();
 				}
 			});
 
@@ -448,24 +486,21 @@ namespace JG
 			{
 				return nullptr;
 			}
-			SharedPtr<SceneResultInfo> result = CreateSharedPtr<SceneResultInfo>();
-
 			// Rendering이 끝날때까지 기다린다.
 			while (mRenderScheduleHandle->GetState() != EScheduleState::Compelete)
 			{
 				//
 			}
+
 			mRenderScheduleHandle->Reset();
 			mRenderScheduleHandle = nullptr;
 			// Rendering 이 끝났으니. 다시 정보수정 Ok
 			UnLock();
 
-			result->Texture      = mTargetTextures[mCurrentIndex];
-			result->DepthTexture = mTargetDepthTextures[mCurrentIndex];
 			mCurrentIndex = (mCurrentIndex + 1) % JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
-			mLightList.clear();
-			return result;
+
+			return mSceneResult;
 		}
 
 
@@ -480,36 +515,6 @@ namespace JG
 			case ERendererPath::Deferred:
 				mRenderer = CreateSharedPtr<DeferredRenderer>();
 				break;
-			}
-		}
-
-		void Scene::InitTexture(const JVector2& resolution, const Color& clearColor)
-		{
-			TextureInfo mainTexInfo;
-			mainTexInfo.Width     = std::max<u32>(1, resolution.x);
-			mainTexInfo.Height    = std::max<u32>(1, resolution.y);
-			mainTexInfo.ArraySize = 1;
-			mainTexInfo.Format    = ETextureFormat::R32G32B32A32_Float;
-			mainTexInfo.Flags     = ETextureFlags::Allow_RenderTarget;
-			mainTexInfo.MipLevel   = 1;
-			mainTexInfo.ClearColor = clearColor;
-
-			i32 index = 0;
-			for (auto& t : mTargetTextures)
-			{
-				if (t == nullptr) t = ITexture::Create(GetName() + "_TargetTexture_" + std::to_string(index), mainTexInfo);
-				else t->SetTextureInfo(mainTexInfo);
-				++index;
-
-			}
-
-			mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
-			mainTexInfo.Flags  = ETextureFlags::Allow_DepthStencil;
-			for (auto& t : mTargetDepthTextures)
-			{
-				if (t == nullptr) t = ITexture::Create(GetName() + "_TargetDepthTexture", mainTexInfo);
-				else t->SetTextureInfo(mainTexInfo);
-
 			}
 		}
 	}

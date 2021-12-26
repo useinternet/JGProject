@@ -1,0 +1,31 @@
+Texture2D _Textures[64] : register(t0, space0); 
+
+struct VS_IN
+{
+	float3 posL : POSITION;
+	float2 tex  : TEXCOORD;
+	float4 color : COLOR;
+	int textureIndex : TEXTUREINDEX;
+};
+struct VS_OUT
+{
+	float4 posH  : SV_POSITION;
+	float2 tex   : TEXCOORD;
+	float4 color : COLOR;
+	int textureIndex : TEXTUREINDEX;
+};
+		
+VS_OUT vs_main(VS_IN vin)
+{
+	VS_OUT vout;
+		    
+	vout.posH  = mul(float4(vin.posL, 1.0f), _ViewProjMatrix);
+	vout.tex   = vin.tex;
+	vout.color = vin.color;
+	vout.textureIndex = vin.textureIndex;
+	return vout;
+}
+float4 ps_main(VS_OUT pin) : SV_TARGET
+{
+	return _Textures[pin.textureIndex].Sample(_AnisotropicSampler, pin.tex) * pin.color;
+}

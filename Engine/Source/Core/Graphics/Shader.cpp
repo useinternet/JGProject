@@ -28,6 +28,11 @@ namespace JG
 		auto script = CreateSharedPtr<ShaderScript>(name, code, EShaderScriptType::Surface);
 		return script;
 	}
+	SharedPtr<IShaderScript> IShaderScript::CreateSceneScript(const String& name, const String& code)
+	{
+		auto script = CreateSharedPtr<ShaderScript>(name, code, EShaderScriptType::Scene);
+		return script;
+	}
 	void ShaderLibrary::RegisterGraphicsShader(const String& name, SharedPtr<IGraphicsShader> shader)
 	{
 		if (shader == nullptr || shader->IsSuccessed() == false)

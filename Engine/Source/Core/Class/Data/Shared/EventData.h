@@ -4,6 +4,7 @@
 
 namespace JG
 {
+	class ITexture;
 	namespace Shared
 	{
 		namespace Editor
@@ -30,6 +31,12 @@ namespace JG
 				std::function<void()> ParamAction[2] = { nullptr, };
 			};
 
+			struct EditorUIObjectData
+			{
+				JMatrix WorldMatrix;
+				Color   Color = Color::White();
+				SharedPtr<ITexture> Texture;
+			};
 		}
 
 		namespace Game

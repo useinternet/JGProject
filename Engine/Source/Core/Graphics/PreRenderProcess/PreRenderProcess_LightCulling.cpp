@@ -35,7 +35,7 @@ namespace JG
 		CB.PointLightCount = renderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
 
 	}
-	void PreRenderProcess_LightCulling::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info)
+	void PreRenderProcess_LightCulling::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
 		if (mComputer == nullptr || mVisibleLightIndicesRBB == nullptr || mLightGridRBB == nullptr)
 		{

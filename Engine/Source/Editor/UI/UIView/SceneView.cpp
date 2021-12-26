@@ -2,12 +2,14 @@
 #include "SceneView.h"
 #include "UI/UIManager.h"
 #include "UI/UIView/InspectorView.h"
+#include "UI/EditorUIRenderer.h"
 #include "GameNode.h"
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "ExternalImpl/JGImGui.h"
 #include "Imgui/imgui.h"
 #include "Imgui/ImGuizmo.h"
+
 namespace JG
 {
 
@@ -22,11 +24,11 @@ namespace JG
 	}
 	void SceneView::Load()
 	{
-
 		LoadIcons();
 		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-		mCurrentGizmoMode = ImGuizmo::WORLD;
-		mCurrentCameraMode = CameraMode_3D;
+		mCurrentGizmoMode      = ImGuizmo::WORLD;
+		mCurrentCameraMode     = CameraMode_3D;
+		mEditorUIRenderer = CreateUniquePtr<EditorUIRenderer>();
 	}
 	void SceneView::Initialize()
 	{
@@ -108,7 +110,12 @@ namespace JG
 			}
 
 		});
-
+		mUIRenderScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(
+			0, 0, -1, SchedulePriority::EndSystem,[&]() -> EScheduleResult
+		{
+			RenderEditorUI();
+			return EScheduleResult::Continue;
+		});
 	}
 	void SceneView::OnGUI()
 	{
@@ -188,6 +195,8 @@ namespace JG
 
 	void SceneView::Destroy()
 	{
+		mUIRenderScheduleHandle->Reset();
+		mUIRenderScheduleHandle = nullptr;
 		mShowGizmo->UnSubscribe(this);
 		mShowGizmo = nullptr;
 	}
@@ -204,7 +213,7 @@ namespace JG
 	void SceneView::OnEvent(IEvent& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<NotifyChangeMainSceneTextureEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeMainSceneTexture));
+		dispatcher.Dispatch<RequestDrawEditorUIInSceneView>(EVENT_BIND_FN(&SceneView::ResponseDrawEditorUIInSceneView));
 		dispatcher.Dispatch<NotifySelectedGameNodeInEditorEvent>(EVENT_BIND_FN(&SceneView::ResponseSelectedGameNodeInEditor));
 		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&SceneView::ResponseDestroyGameObject));
 		dispatcher.Dispatch<NotifyChangeGameWorldEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeGameWorld));
@@ -224,9 +233,12 @@ namespace JG
 		auto winSize = ImGui::GetWindowSize();
 		winSize.x -= 16.0f;
 		winSize.y -= 18.0f;
-		auto sceneTexture = GetSceneTexture();
+		SharedPtr<ITexture> sceneTexture = nullptr;
 		auto mainCam = Camera::GetMainCamera();
-		
+		if (mainCam)
+		{
+			sceneTexture = mainCam->GetTexture();
+		}
 		if (mainCam && sceneTexture && sceneTexture->IsValid())
 		{
 			JVector2 imageSize;
@@ -525,7 +537,11 @@ namespace JG
 			ImGui::EndCombo();
 		}
 	}
-
+	bool SceneView::ResponseDrawEditorUIInSceneView(RequestDrawEditorUIInSceneView& e)
+	{
+		mUIObjectQueue.push(e.Data);
+		return true;
+	}
 	bool SceneView::ResponseSelectedGameNodeInEditor(NotifySelectedGameNodeInEditorEvent& e)
 	{
 		if (e.SelectedGameNode != nullptr && e.SelectedGameNode->IsActive() == false)
@@ -535,11 +551,7 @@ namespace JG
 		SetSelectedGameNode(e.SelectedGameNode);
 		return false;
 	}
-	bool SceneView::ResponseChangeMainSceneTexture(NotifyChangeMainSceneTextureEvent& e)
-	{
-		SetSceneTexture(e.SceneTexture);
-		return false;
-	}
+
 	bool SceneView::ResponseDestroyGameObject(NotifyDestroyJGObjectEvent& e)
 	{
 		if (GetSelectedGameNode() == e.DestroyedObject)
@@ -749,5 +761,37 @@ namespace JG
 		}
 		
 
+	}
+	void SceneView::RenderEditorUI()
+	{
+		auto mainCam = Camera::GetMainCamera();
+		if (mainCam == nullptr)
+		{
+			return;
+		}
+
+		auto scene = mainCam->GetScene();
+		
+		scene->PushPostRenderingEvent(JG_I32_MAX, [&](SharedPtr<Graphics::SceneResultInfo> resultInfo)
+		{
+			if (mEditorUIRenderer == nullptr || resultInfo == nullptr)
+			{
+				return;
+			}
+
+			if (mEditorUIRenderer->Begin(resultInfo->Texture) == true)
+			{
+				while (mUIObjectQueue.empty() == false)
+				{
+					auto data = mUIObjectQueue.front(); mUIObjectQueue.pop();
+
+					mEditorUIRenderer->DrawCall(data.WorldMatrix, data.Texture, data.Color);
+
+				}
+
+
+				mEditorUIRenderer->End();
+			}
+		});
 	}
 }

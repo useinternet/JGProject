@@ -26,7 +26,20 @@ namespace JG
 		mSourceCode = sourceCode;
 
 		String code = libCode + sourceCode;
-		InsertScript(code, scriptList);
+
+		if (scriptList.empty())
+		{
+			InsertScript(code, nullptr);
+		}
+		else
+		{
+			for (auto& script : scriptList)
+			{
+				InsertScript(code, script);
+			}
+		}
+
+		
 		mFullSourceCode = code;
 		if (Compile(code, error) == true)
 		{
@@ -121,22 +134,25 @@ namespace JG
 		mIsCompileSuccess = true;
 		return true;
 	}
-	void DirectX12GraphicsShader::InsertScript(String& code, const List<SharedPtr<IShaderScript>>& scriptList)
+	void DirectX12GraphicsShader::InsertScript(String& code, SharedPtr<IShaderScript> script)
 	{
-		if (scriptList.empty() == true)
+		if (script == nullptr)
 		{
 			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
 			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, "");
 			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
+
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneResources, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneVariables, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneFunction, "");
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneContents, "");
 		}
 		else
 		{
-			for (auto& script : scriptList)
+			if (InsertScriptInternal(code, script) == false)
 			{
-				if (InsertScriptInternal(code, script) == false)
-				{
-					JG_CORE_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
-				}
+				JG_CORE_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
 			}
 		}
 	}
@@ -200,26 +216,44 @@ namespace JG
 				lineStart = lineEnd + 1;
 			}
 			String registerStr = " : register(b" + std::to_string(HLSL::RegisterNumber::MaterialRegisterNumber) + ")";
-			variablesCode = String(HLSL::Token::CBuffer) + ShaderDefine::Variables::Surface + registerStr + "\n { \n" + variablesCode;
+			variablesCode = String(HLSL::Token::CBuffer) + "__ScriptConstantBuffer__" + registerStr + "\n { \n" + variablesCode;
 			variablesCode += "\n};";
 		}
 
-		String surfaceCode;
-		i32 type = -1;
-		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Surface, surfaceCode) == true)
+		// Function 코드를 마지막에
+		String functionCode;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Function, functionCode) == true)
 		{
-			type = IShaderScript::Surface;
+
 		}
+
+
+		String contentsCode;
+		EShaderScriptType type = EShaderScriptType::Surface;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Surface, contentsCode) == true)
+		{
+			type = EShaderScriptType::Surface;
+		}
+		else if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Scene, contentsCode) == true)
+		{
+			type = EShaderScriptType::Scene;
+		}
+
 
 
 		switch (type)
 		{
-		case IShaderScript::Surface:
+		case EShaderScriptType::Surface:
 			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
 			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, surfaceCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, functionCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, contentsCode);
 			break;
-		case IShaderScript::Compute:
+		case EShaderScriptType::Scene:
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneResources, resourcesCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneVariables, variablesCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneFunction, functionCode);
+			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneContents, contentsCode);
 			break;
 		default:
 			return false;

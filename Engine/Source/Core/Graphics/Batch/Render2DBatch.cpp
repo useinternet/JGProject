@@ -15,12 +15,6 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
-
-		//String _2dShaderPath = PathExtend::CombinePath(Application::GetShaderTemplatePath(), "Standard2DShader.shadertemplate");
-		//String _2dShaderCode;
-		//FileExtend::ReadAllText(_2dShaderPath, &_2dShaderCode);
-		//auto _2dShader = IGraphicsShader::Create("Standard2DShader", _2dShaderCode, EShaderFlags::Allow_VertexShader | EShaderFlags::Allow_PixelShader);
-
 		auto _2dShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::Standard2DShader); 
 
 		TextureInfo textureInfo;

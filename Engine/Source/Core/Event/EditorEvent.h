@@ -10,7 +10,7 @@ namespace JG
 
 
 	REQUEST_ONE_ARG_EVENT(RequestOpenMessageBoxEvent, Shared::Editor::MessageBoxOpenData, OpenData, {})
-
+	REQUEST_ONE_ARG_EVENT(RequestDrawEditorUIInSceneView, Shared::Editor::EditorUIObjectData, Data, {})
 
 
 
@@ -19,4 +19,5 @@ namespace JG
 
 
 	NOTIFY_TWO_ARG_EVENT(NotifyEditorSceneOnClickEvent, JVector2, ClickPos, JVector2(0, 0), List<IJGObject*>, ExceptObjectList, {})
+	
 }

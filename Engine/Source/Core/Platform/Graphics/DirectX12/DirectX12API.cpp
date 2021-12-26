@@ -189,7 +189,7 @@ namespace JG
 			desc.DestBlend      = D3D12_BLEND_INV_SRC_ALPHA;
 			desc.BlendOp        = D3D12_BLEND_OP_ADD;
 			desc.SrcBlendAlpha  = D3D12_BLEND_ONE;
-			desc.DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+			desc.DestBlendAlpha = D3D12_BLEND_ZERO;
 			desc.BlendOpAlpha   = D3D12_BLEND_OP_ADD;
 			desc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL & ~D3D12_COLOR_WRITE_ENABLE_ALPHA;
 		}
@@ -292,9 +292,35 @@ namespace JG
 			8);                               // maxAnisotropy
 
 
+		const CD3DX12_STATIC_SAMPLER_DESC pointClampWrap(
+			3, // shaderRegister
+			D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+		const CD3DX12_STATIC_SAMPLER_DESC linearClampWrap(
+			4, // shaderRegister
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+		const CD3DX12_STATIC_SAMPLER_DESC anisotropicClampWrap(
+			5, // shaderRegister
+			D3D12_FILTER_ANISOTROPIC, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
+			0.0f,                             // mipLODBias
+			8);                               // maxAnisotropy
+
+
 		rootSig->AddStaticSamplerState(pointWrap);
 		rootSig->AddStaticSamplerState(linearWrap);
 		rootSig->AddStaticSamplerState(anisotropicWrap);
+		rootSig->AddStaticSamplerState(pointClampWrap);
+		rootSig->AddStaticSamplerState(linearClampWrap);
+		rootSig->AddStaticSamplerState(anisotropicClampWrap);
 
 		rootSig->Finalize();
 		return rootSig;
@@ -616,6 +642,19 @@ namespace JG
 		}
 		commandList->BindPipelineState(pso);
 		commandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
+	}
+
+	void DirectX12API::Draw(u64 commandID, u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
+	{
+		auto commandList = GetGraphicsCommandList(commandID);
+		auto pso = GetGraphicsPipelineState(commandID);
+		if (pso->Finalize() == false)
+		{
+			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+			return;
+		}
+		commandList->BindPipelineState(pso);
+		commandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
 	void DirectX12API::SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template)

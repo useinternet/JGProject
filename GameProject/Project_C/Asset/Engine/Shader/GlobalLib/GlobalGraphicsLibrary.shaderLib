@@ -1,4 +1,10 @@
 
+
+#define DEBUG_MODE_NONE 0
+#define DEBUG_MODE_VISIBLE_ACTIVE_CLUSTER 1
+
+
+
 cbuffer __RenderPassDataCB__ : register(b0)
 {
     float4x4 _ProjMatrix;
@@ -13,8 +19,7 @@ cbuffer __RenderPassDataCB__ : register(b0)
     float    _ClusterScale;
     float    _ClusterBias;
     uint3    _NumClusterSlice;
-
-    
+    uint     _DebugMode;
 };
 cbuffer __ObjectDataCB__ : register(b1)
 {
@@ -31,7 +36,9 @@ StructuredBuffer<uint>      _VisibleLightIndices : register(t0, space12);
 SamplerState _PointSampler  : register(s0);
 SamplerState _LinearSampler : register(s1);
 SamplerState _AnisotropicSampler : register(s2);
-
+SamplerState _PointClampSampler  : register(s3);
+SamplerState _LinearClampSampler : register(s4);
+SamplerState _AnisotropicClampSampler : register(s5);
 
 
 // NDF
@@ -111,7 +118,7 @@ float3 CalcDirLight(float3 N, float3 V, Material material, DirectionalLight ligh
 
 
 	Lo += (kD * material.Albedo / JG_PI + numerator) * NoL;
-    return saturate(Lo);
+    return Lo;
 }
 
 
@@ -162,8 +169,9 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
     }
 	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
     Lo = material.Albedo * NoL;
-    return saturate(Lo * att * light.Intensity * light.Color);
+    return Lo * att * light.Intensity * light.Color;
 }
+
 
 float LinearDepth(float z)
 {
@@ -193,25 +201,3 @@ uint3 GetClusterIndex3(float3 posH)
     uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
     return clusterIndexs;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

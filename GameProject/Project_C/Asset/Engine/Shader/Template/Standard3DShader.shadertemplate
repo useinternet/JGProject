@@ -20,6 +20,7 @@ struct VS_OUT
 
 __PS_SURFACE_VARIABLES_SCRIPT__
 __PS_SURFACE_RESOURCES_SCRIPT__
+__PS_SURFACE_FUNCTION_SCRIPT__
 
 struct PS_SURFACE_OUTPUT
 {
@@ -55,7 +56,7 @@ PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
 	_output.emissive = float3(0.0f,0.0f,0.0f);
 	_output.flags = 0;
 
-	__PS_SURFACE_FUNCTION_SCRIPT__
+	__PS_SURFACE_CONTENTS_SCRIPT__
 	return _output;
 };
 		
@@ -81,7 +82,7 @@ VS_OUT vs_main(VS_IN vin)
 float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 {
 	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
-
+	float alpha = output.albedo.a;
 
 	float3 N = normalize(pin.normalW);
 	float3 V = normalize(_EyePosition - pin.posW);
@@ -96,9 +97,10 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 	material.Metallic  = output.metallic;
 	material.Emissive = output.emissive;
 	
-	int clusterIndex = GetClusterIndex(pin.posH.xyz);
-	uint3 clusterTestIndex = GetClusterIndex3(pin.posH.xyz);
+	int   clusterIndex = GetClusterIndex(pin.posH.xyz);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
+
+	// Calc PointLight
 	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
 	{
 		int pl_start  = lgrid.PL_Offset;
@@ -112,13 +114,24 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 	}
 
 
-	float3 final = saturate(Lo);
-	float Gamma = 1.0f / 2.2f;
-
-    final = final / (final + float3(1.0f, 1.0f, 1.0f));
-   	final = pow(final, float3(Gamma, Gamma, Gamma));
-	return float4(final, 1.0f);
+	float3 final = Lo + material.Emissive;
+	return float4(final, alpha);
 }
+float4 Debug_Visible_Cluster(VS_OUT pin, PS_SURFACE_OUTPUT output)
+{
+	int   clusterIndex = GetClusterIndex(pin.posH.xyz);
+	LightGrid lgrid  = _LightGridList[clusterIndex];
+
+	// Calc PointLight
+	if(lgrid.PL_Count > 0)
+	{
+		float att = (float)lgrid.PL_Count / (float)_PointLightCount;
+		return output.albedo * att;
+	}
+	return float4(0.0f,0.0f,0.0f,0.0f);
+}
+
+
 
 float4 ps_main(VS_OUT pin) : SV_TARGET
 {
@@ -131,15 +144,28 @@ float4 ps_main(VS_OUT pin) : SV_TARGET
 	input.tex       = pin.tex;
 	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
 
-	if(output.flags & SCRIPT_FLAG_IGNORE_LIGHTPASS)
+	if(_DebugMode == DEBUG_MODE_NONE)
 	{
-		return output.albedo;
+		if(output.flags & SCRIPT_FLAG_IGNORE_LIGHTPASS)
+		{
+			return output.albedo;
+		}
+		else
+		{
+			return Lo(pin, output);
+		}
 	}
 	else
 	{
-		return Lo(pin, output);
+		if(_DebugMode == DEBUG_MODE_VISIBLE_ACTIVE_CLUSTER)
+		{
+			return Debug_Visible_Cluster(pin, output);
+		}
+		else
+		{
+			return float4(0.0f,0.0f,0.0f,1.0f);
+		}
 	}
-	
 }
 
 

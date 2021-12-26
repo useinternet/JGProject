@@ -28,6 +28,9 @@ namespace JG
 	}
 	class Render2DBatch;
 	class DebugGeometryDrawer;
+
+
+
 	struct JGGraphicsDesc
 	{
 		EGraphicsAPI GraphicsAPI;
@@ -64,7 +67,7 @@ namespace JG
 
 
 		void DestroyObject(Graphics::GObject* gobject);
-
+		
 		void ForEach(const std::function<void(Graphics::Scene*)>& action);
 
 		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
@@ -95,6 +98,9 @@ namespace JG
 		void Init();
 		void Reset();
 		void LoadShader();
+		void LoadShaderTemplate();
+		void LoadShaderScript();
+		void LoadComputeShader();
 	private:
 		class RemoveObjectData : public IJGObject
 		{
@@ -136,13 +142,14 @@ namespace JG
 			f32 FarZ  = 0.0f;
 			f32 NearZ = 0.0f;
 			Color    ClearColor;
+
+			bool IsHDR = true;
 		};
 
 		class SceneResultInfo
 		{
 		public:
 			SharedPtr<ITexture> Texture;
-			SharedPtr<ITexture> DepthTexture;
 		};
 
 
@@ -150,18 +157,12 @@ namespace JG
 		{
 		private:
 			String mName;
-			u64    mLayer;
 			bool   mLock = false;
 		public:
 			virtual ~GObject() = default;
 		public:
-
 			void SetName(const String& name);
-			void SetLayer(u64 layer);
-
-
 			const String& GetName();
-			u64 GetLayer();
 		protected:
 			void Lock();
 			void UnLock();
@@ -172,13 +173,10 @@ namespace JG
 		//
 		class Scene : public GObject
 		{
+			using PostRenderingEvent = std::function<void(SharedPtr<SceneResultInfo>)>;
 		private:
 			SceneInfo mSceneInfo;
-
-			List<SharedPtr<ITexture>> mTargetTextures;
-			List<SharedPtr<ITexture>> mTargetDepthTextures;
-
-
+			SharedPtr<SceneResultInfo>	  mSceneResult;
 			Queue<SharedPtr<SceneObject>> mSceneObjectQueue;
 			List<SharedPtr<Light>>        mLightList;
 
@@ -188,6 +186,9 @@ namespace JG
 			SharedPtr<Renderer>       mRenderer;
 			SharedPtr<Render2DBatch>  m2DBatch;
 			SharedPtr<ScheduleHandle> mRenderScheduleHandle;
+
+
+			SortedDictionary<i32, Queue<PostRenderingEvent>> mPostRenderingEventQueue;
 		public:
 			Scene(const SceneInfo& info);
 			virtual ~Scene();
@@ -197,14 +198,16 @@ namespace JG
 
 			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
 			bool PushLight(SharedPtr<Light> l);
+
+			void PushPostRenderingEvent(i32 priority, const PostRenderingEvent& _e);
 		public:
+			void Reset();
 			void Rendering();
 			SharedPtr<SceneResultInfo> FetchResultFinish();
 
 
 		private:
 			void InitRenderer(ERendererPath path);
-			void InitTexture(const JVector2& size, const Color& clearColor);
 		};
 
 
@@ -220,7 +223,6 @@ namespace JG
 			virtual ESceneObjectType GetSceneObjectType() const = 0;
 			virtual bool IsValid() const = 0;
 		};
-
 
 		class PaperObject : public SceneObject
 		{
@@ -368,13 +370,14 @@ namespace JG
 			JMatrix ViewProjMatrix;
 			JVector2 Resolution;
 			f32 NearZ = 0.0f;
-			f32 FarZ = 0.0f;
+			f32 FarZ  = 0.0f;
 			JVector3 EyePosition;
 			u32 PointLightCount = 0;
 			JVector2 ClusterSize;
 			f32 ClusterScale = 0.0f;
 			f32 ClusterBias = 0.0f;
 			JVector3Uint NumClusterSlice;
+			u32 DebugMode = 0;
 		};
 
 		class LightGrid
