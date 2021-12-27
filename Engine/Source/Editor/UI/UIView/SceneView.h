@@ -52,7 +52,7 @@ namespace JG
 		SharedPtr<ITexture> mSceneTexture;
 
 
-		i32 mCurrentResolution = Resolution_FreeAspect;
+		i32 mCurrentResolution = Resolution_FHD_1920_1080;
 
 		List<Asset<ITexture>*>        mIcons;
 		UniquePtr<Command<GameNode*>> mShowGizmo;

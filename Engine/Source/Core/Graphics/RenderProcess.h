@@ -16,6 +16,7 @@ namespace JG
 	{
 
 	public:
+		virtual void Awake(Renderer* renderer) = 0;
 		virtual void Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info) = 0;
 		virtual void Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
 		virtual bool IsCompelete() = 0;

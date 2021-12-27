@@ -4,7 +4,7 @@ _Resources{
 };
 
 _Variables {
-
+    float Exposure;
 };
 
 _Scene {
@@ -29,7 +29,7 @@ float3 Tonemap_Partial(float3 x)
 
 float3 Filmic(float3 v)
 {
-    float exposure_bias = 2.0f;
+    float exposure_bias = Exposure;
     float3 curr = Tonemap_Partial(v * exposure_bias);
 
     float3 W = float3(11.2f, 11.2f, 11.2f);
@@ -40,7 +40,7 @@ float3 Filmic(float3 v)
 
 float3 ToneMapping(float3 final)
 {
-    return Filmic(final);
+    //return Filmic(final);
 
     float Gamma = 1.0f / 2.2f;
 

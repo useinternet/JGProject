@@ -198,8 +198,20 @@ namespace JG
 
 			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
 			bool PushLight(SharedPtr<Light> l);
-
 			void PushPostRenderingEvent(i32 priority, const PostRenderingEvent& _e);
+
+
+			template<class ProcessType, class DataType>
+			bool SetProcessShaderParam(const String& name, const DataType& data)
+			{
+				return mRenderer->SetProcessShaderParam< ProcessType, DataType>(name, data);
+			}
+			template<class ProcessType, class DataType>
+			bool GetProcessShaderParam(const String& name, DataType* out_data)
+			{
+				return mRenderer->GetProcessShaderParam< ProcessType, DataType>(name, out_data);
+			}
+
 		public:
 			void Reset();
 			void Rendering();

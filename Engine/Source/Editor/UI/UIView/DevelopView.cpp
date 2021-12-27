@@ -2,7 +2,12 @@
 #include "DevelopView.h"
 #include "Application.h"
 #include "UI/UIManager.h"
+
+#include "Components/Camera.h"
+
+
 #include "Graphics/Renderer.h"
+#include "Graphics/PostRenderProcess/PostProcess_ToneMapping.h"
 namespace JG
 {
 
@@ -28,11 +33,11 @@ namespace JG
 	{
 		ImGui::Begin("Develop", &mOpenGUI);
 
-		if (ImGui::CollapsingHeader("Statistics") == true)
+		if (ImGui::CollapsingHeader("Statistics", ImGuiTreeNodeFlags_DefaultOpen) == true)
 		{
 			Statistics_OnGUI();
 		}
-		if (ImGui::CollapsingHeader("Devlop Control") == true)
+		if (ImGui::CollapsingHeader("Devlop Control", ImGuiTreeNodeFlags_DefaultOpen) == true)
 		{
 			Dev_OnGUI();
 		}
@@ -72,25 +77,65 @@ namespace JG
 			Debug_Visible_Cluster,
 			Debug_Count,
 		};
-
-		static int checkIndex = 0;
-
-		ImGui::RadioButton("None", &checkIndex, Debug_None);
-		ImGui::RadioButton("Visible Cluster", &checkIndex, Debug_Visible_Cluster);
+		Camera* mainCamera = Camera::GetMainCamera();
+		Graphics::Scene* scene = nullptr;
 
 
-
-
-
-
-		switch (checkIndex)
+		if (mainCamera)
 		{
-		case Debug_Visible_Cluster:
-			Renderer::Debugger.Mode = ERenderDebugMode::Visible_ActiveCluster;
-			break;
-		default:
-			Renderer::Debugger.Mode = ERenderDebugMode::None;
+			scene = mainCamera->GetScene();
 		}
+
+
+		{
+			static int checkIndex = 0;
+			ImGui::Text("[ Render Process Debug ]");
+			ImGui::RadioButton("None", &checkIndex, Debug_None);
+			ImGui::RadioButton("Visible Cluster", &checkIndex, Debug_Visible_Cluster);
+
+			switch (checkIndex)
+			{
+			case Debug_Visible_Cluster:
+				Renderer::Debugger.Mode = ERenderDebugMode::Visible_ActiveCluster;
+				break;
+			default:
+				Renderer::Debugger.Mode = ERenderDebugMode::None;
+			}
+		}
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+
+
+
+
+
+		{
+			f32  exposure = 0.0f;
+			bool isEnable = true;
+			if (scene)
+			{
+				scene->GetProcessShaderParam<PostProcess_ToneMapping, f32>("Exposure", &exposure);
+				scene->GetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", &isEnable);
+			}
+
+			ImGui::Text("[ ToneMapping ]");
+
+			isEnable = ImGui::CheckBox("Enable", isEnable);
+			if(scene)
+			{
+				scene->SetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", isEnable);
+			}
+			ImGui::SetNextItemWidth(150.0f);
+			if (ImGui::InputFloat("Exposure", &exposure) == true && scene)
+			{
+				scene->SetProcessShaderParam<PostProcess_ToneMapping, f32>("Exposure", exposure);
+			}
+		}
+
+
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+
 
 
 	}

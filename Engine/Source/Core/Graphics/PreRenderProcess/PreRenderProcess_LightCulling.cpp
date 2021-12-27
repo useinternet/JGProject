@@ -16,6 +16,9 @@ namespace JG
 		LightGrids.resize(PreRenderProcess_ComputeCluster::NUM_CLUSTER);
 		VisibleLightIndices.resize(MAX_VISIBLE_LIGHTINDEX_COUNT, 0);
 	}
+	void PreRenderProcess_LightCulling::Awake(Renderer* renderer)
+	{
+	}
 	void PreRenderProcess_LightCulling::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
 		if (mComputeClusterProcess == nullptr)

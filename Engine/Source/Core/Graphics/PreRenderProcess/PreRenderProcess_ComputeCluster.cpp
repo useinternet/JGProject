@@ -17,6 +17,9 @@ namespace JG
 		}
 		Clusters.resize(NUM_CLUSTER);
 	}
+	void PreRenderProcess_ComputeCluster::Awake(Renderer* renderer)
+	{
+	}
 	void PreRenderProcess_ComputeCluster::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
 	{
 		if (mLightCullingProcess == nullptr)

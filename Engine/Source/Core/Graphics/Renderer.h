@@ -104,11 +104,16 @@ namespace JG
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
 
+		Dictionary<Type, Dictionary<String, List<jbyte>>> mProcessParamDic;
+		std::mutex mProcessShaderParamMutex;
+
 
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
 
 		RenderInfo mCurrentRenderInfo;
+
+
 	public:
 		Renderer() = default;
 		virtual ~Renderer() = default;
@@ -142,7 +147,7 @@ namespace JG
 			mPreProcessList.push_back(preProcess);
 			
 			mProcessPool[type] = preProcess.get();
-
+			preProcess->Awake(this);
 			return preProcess.get();
 		}
 		template<class T>
@@ -158,6 +163,7 @@ namespace JG
 			mPostProcessList.push_back(postProcess);
 
 			mProcessPool[type] = postProcess.get();
+			postProcess->Awake(this);
 			return postProcess.get();
 		}
 
@@ -174,6 +180,85 @@ namespace JG
 				return nullptr;
 			}
 		}
+
+		template<class T>
+		void RegisterProcessShaderParam(const String& name, u64 dataSize)
+		{
+			Type type = JGTYPE(T);
+			mProcessParamDic[type][name].resize(dataSize);
+		}
+
+		template<class ProcessType, class DataType>
+		bool SetProcessShaderParam(const String& name, const DataType& data)
+		{
+			if (std::is_base_of<IRenderProcess, ProcessType>::value == false) {
+				return false;
+			}
+			Type type = JGTYPE(ProcessType);
+			if (mProcessParamDic.find(type) == mProcessParamDic.end())
+			{
+				return false;
+			}
+
+
+
+			auto& shaderParamDic = mProcessParamDic[type];
+			if (shaderParamDic.find(name) == shaderParamDic.end())
+			{
+				return false;
+			}
+			List<jbyte>& btData = shaderParamDic[name];
+
+
+
+			
+			u64 dataSize = sizeof(DataType);
+			if (dataSize != btData.size())
+			{
+				return false;
+			}
+
+			std::lock_guard<std::mutex> lock(mProcessShaderParamMutex);
+			memcpy(btData.data(), &data, dataSize);
+
+			return true;
+		}
+
+		template<class ProcessType, class DataType>
+		bool GetProcessShaderParam(const String& name, DataType* out_data)
+		{
+			if (std::is_base_of<IRenderProcess, ProcessType>::value == false) {
+				return false;
+			}
+			if (out_data == nullptr)
+			{
+				return false;
+			}
+			Type type = JGTYPE(ProcessType);
+			if (mProcessParamDic.find(type) == mProcessParamDic.end())
+			{
+				return false;
+			}
+
+			auto& shaderParamDic = mProcessParamDic[type];
+			if (shaderParamDic.find(name) == shaderParamDic.end())
+			{
+				return false;
+			}
+			List<jbyte>& btData = shaderParamDic[name];
+			u64 dataSize = sizeof(DataType);
+			if (dataSize != btData.size())
+			{
+				return false;
+			}
+
+			std::lock_guard<std::mutex> lock(mProcessShaderParamMutex);
+			memcpy(out_data, btData.data(), dataSize);
+
+			return true;
+		}
+
+
 	protected:
 		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;

@@ -761,7 +761,7 @@ namespace JG
 		shader->SetName(name);
 		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, shader->GetFullShaderCode());
+			JG_CORE_ERROR("Failed Compile Shader : {0} \n Error : {1} ", name, errorCode);
 			return nullptr;
 		}
 
@@ -775,7 +775,7 @@ namespace JG
 		shader->SetName(name);
 		if (shader->Compile(sourceCode, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader \n Error : {0}  \n SourceCode : \n {1} ", errorCode, sourceCode);
+			JG_CORE_ERROR("Failed Compile Shader : {0} \n Error : {1}", name, errorCode);
 			return nullptr;
 		}
 
