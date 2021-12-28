@@ -6,6 +6,8 @@
 
 #include "Graphics/PostRenderProcess/PostProcess_Bloom.h"
 #include "Graphics/PostRenderProcess/PostProcess_ToneMapping.h"
+
+#include "Graphics/Batch/Render2DBatch.h"
 namespace JG
 {
 
@@ -97,11 +99,11 @@ namespace JG
 			}
 		});
 
-
+		
 
 		if (result != nullptr)
 		{
-			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
+			result->SceneTexture = targetTexture;
 		}
 
 

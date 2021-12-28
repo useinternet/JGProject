@@ -653,6 +653,7 @@ namespace JG
 			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
 			return;
 		}
+		commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->BindPipelineState(pso);
 		commandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}

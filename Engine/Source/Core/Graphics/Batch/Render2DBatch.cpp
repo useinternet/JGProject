@@ -108,7 +108,6 @@ namespace JG
 		NextBatch();
 	}
 
-
 	void Render2DBatch::DrawCall(const JMatrix& transform, SharedPtr<ITexture> texture, const Color& color)
 	{
 		if (mQuadCount >= MaxQuadCount || mTextureCount >= MaxTextureCount)
@@ -173,6 +172,7 @@ namespace JG
 
 	void Render2DBatch::NextBatch()
 	{
+
 		if (mQuadCount == 0) return;
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		auto api       = JGGraphics::GetInstance().GetGraphicsAPI();
@@ -186,7 +186,6 @@ namespace JG
 		}
 
 		api->SetTextures(commandID, mTextureArray);
-
 
 
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;

@@ -40,7 +40,7 @@ float3 Filmic(float3 v)
 
 float3 ToneMapping(float3 final)
 {
-    //return Filmic(final);
+    return Filmic(final);
 
     float Gamma = 1.0f / 2.2f;
 

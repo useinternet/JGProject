@@ -46,8 +46,7 @@ namespace JG
 			JVector2 resolution = info.Resolution * k;
 			
 			brightnessTextures[i] = Run_Brightness(commandID, info, i, resolution, result->SceneTexture);
-
-			for (i32 j = 0; j < 10; ++j)
+			for (i32 j = 0; j < mBlurCount; ++j)
 			{
 				brightnessTextures[i] = Run_BlurH(commandID, info, i, resolution, brightnessTextures[i]);
 				brightnessTextures[i] = Run_BlurV(commandID, info, i, resolution, brightnessTextures[i]);
@@ -55,13 +54,10 @@ namespace JG
 		}
 		
 
-		//for (i32 i = mDownSamplingCount - 1; i >= 0; --i)
-		//{
-
-		//	result->SceneTexture = Run_Bloom(commandID, info,i, result->SceneTexture, brightnessTextures[i]);
-		//}
-
-		result->SceneTexture = brightnessTextures[0];
+		for (i32 i = mDownSamplingCount - 1; i >= 0; --i)
+		{
+			result->SceneTexture = Run_Bloom(commandID, info,i, result->SceneTexture, brightnessTextures[i]);
+		}
 
 	}
 
@@ -111,8 +107,8 @@ namespace JG
 			SharedPtr<ITexture> targetTexture   = mBlurHTextures[index][info.CurrentBufferIndex];
 
 			api->SetViewports(commandID, { Viewport(resolution.x, resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
 			api->SetScissorRects(commandID, { ScissorRect(0,0, resolution.x, resolution.y) });
+			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
 			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
 
 			if (mBlurHMaterial->SetTexture("SceneTexture", sceneTexture) == false)
@@ -140,8 +136,8 @@ namespace JG
 			SharedPtr<ITexture> targetTexture     = mBlurVTextures[index][info.CurrentBufferIndex];
 
 			api->SetViewports(commandID, { Viewport(resolution.x, resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
 			api->SetScissorRects(commandID, { ScissorRect(0,0, resolution.x, resolution.y) });
+			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
 			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
 
 			if (mBlurVMaterial->SetTexture("SceneTexture", sceneTexture) == false)
@@ -169,7 +165,6 @@ namespace JG
 			SharedPtr<ITexture> targetTexture     = mBloomData.Textures[info.CurrentBufferIndex];
 
 			api->SetViewports(commandID, { Viewport(info.Resolution.x, info.Resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
 			api->SetScissorRects(commandID, { ScissorRect(0,0, info.Resolution.x, info.Resolution.y) });
 			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
 
@@ -332,9 +327,6 @@ namespace JG
 		mBrightnessTextures.resize(mDownSamplingCount);
 		for (i32 i = 0; i < mDownSamplingCount; ++i)
 		{
-
-
-
 			auto& h_texlist = mBlurHTextures[i];
 			h_texlist.resize(bufferCnt);
 
@@ -348,10 +340,9 @@ namespace JG
 			f32 w = resolution.x * k;
 			f32 h = resolution.y * k;
 
-			texInfo.Width = w;
+			texInfo.Width  = w;
 			texInfo.Height = h;
-			//texInfo.Width  = resolution.x * 0.5f;
-			//texInfo.Height = resolution.y * 0.5f;
+
 			for (auto& t : h_texlist)
 			{
 				if (t == nullptr) t = ITexture::Create("Blur_HTexture", texInfo);

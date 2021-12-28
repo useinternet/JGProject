@@ -86,7 +86,6 @@ namespace JG
 		mFence->IncreaseValue();
 		mD3DCmdQueue->Signal(mFence->Get(), mFence->GetValue());
 		mFenceValue[DirectX12API::GetFrameBufferIndex()] = mFence->GetValue();
-		
 		mIsCommandListExcute = false;
 	}
 

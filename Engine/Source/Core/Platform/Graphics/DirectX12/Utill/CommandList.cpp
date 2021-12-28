@@ -165,7 +165,7 @@ namespace JG
 			subResourceData.SlicePitch = subResourceData.RowPitch * height;
 			subResources.push_back(subResourceData);
 		}
-
+		
 
 		TransitionBarrier(resource, D3D12_RESOURCE_STATE_COPY_DEST);
 		FlushResourceBarrier();

@@ -13,12 +13,12 @@ namespace JG
 		};
 		
 
-		
+		// 그리고 바로 사용하는거는 위험 완료된 텍스쳐를 사용해야함
 		//Data mBrightnessData;
 
 
 
-		u32 mDownSamplingCount = 1;
+		u32 mDownSamplingCount = 4;
 		u32 mBlurCount = 5;
 		SharedPtr<IMaterial>			mBlurHMaterial;
 		List<List<SharedPtr<ITexture>>> mBlurHTextures;
@@ -31,18 +31,11 @@ namespace JG
 		SharedPtr<IMaterial> mBrightnessMaterial;
 		List<List<SharedPtr<ITexture>>> mBrightnessTextures;
 
-
-		//Data mBlurHData;
-		//Data mBlurVData;
 		Data mBloomData;
 
 
 		JVector2 mPrevResolution;
 		JVector2 mDownSamplingResolution;
-
-
-		// DowanSampling 하면서 Brightness
-		// UpSampling 하면서 Blur 멕이자
 	public:
 		PostProcess_Bloom();
 	public:

@@ -25,6 +25,7 @@ namespace JG
 
 	void PostProcess_ToneMapping::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
+
 		if (mSceneMaterial == nullptr)
 		{
 			SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { SCRIPT_NAME });
@@ -104,7 +105,7 @@ namespace JG
 		mainTexInfo.Width = std::max<u32>(1, size.x);
 		mainTexInfo.Height = std::max<u32>(1, size.y);
 		mainTexInfo.ArraySize = 1;
-		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
+		mainTexInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
 		mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
 		mainTexInfo.MipLevel = 1;
 
