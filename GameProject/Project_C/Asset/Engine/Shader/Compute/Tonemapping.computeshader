@@ -1,0 +1,60 @@
+
+// Bloom
+//S2tructuredBuffer<float> Exposure;
+//T2exture2D Bloom;
+
+
+
+
+
+Texture2D   SrcColor;
+RWTexture2D<float3> DestColor;
+//RWTexture2D<float>  OutLuma;
+
+
+
+
+SamplerState LinearSampler
+{
+    Template = Linear_Border_TransparentBlack
+};
+
+
+cbuffer CB0
+{
+    float2 RcpBufferDim;   // 1 / width, 1 / height
+    float BloomStrength;  
+
+};
+    //float PaperWhiteRatio;  // PaperWhite / MaxBrightness
+    //float MaxBrightness;
+
+float3 TM_Reinhard(float3 hdr, float k = 1.0)
+{
+    return hdr / (hdr + k);
+}
+float3 TM_Stanard(float3 hdr)
+{
+    return TM_Reinhard(hdr * sqrt(hdr), sqrt(4.0 / 27.0));
+}
+
+
+
+[numthreads( 8, 8, 1 )]
+void cs_main( uint3 DTid : SV_DispatchThreadID )
+{
+    float2 TexCoord = (DTid.xy + 0.5) * RcpBufferDim;
+
+    float3 hdrColor = SrcColor[DTid.xy];
+
+    //hdrColor += BloomStrength * Bloom.SampleLevel(LinearSampler, TexCoord, 0);
+    //hdrColor *= Exposure[0];
+
+    hdrColor = TM_Stanard(REC709toREC2020(hdrColor) * 1.0f) * 1.0f;
+
+
+
+    //hdrColor = TM_Stanard(REC709toREC2020(hdrColor) * PaperWhiteRatio) * MaxBrightness;
+    DestColor[DTid.xy] = hdrColor;
+    //OutLuma[DTid.xy] = RGBToLogLuminance(hdrColor);
+}

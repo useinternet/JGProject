@@ -6,8 +6,6 @@ _Resources{
 _Scene {
     float2 resolution = _Resolution;
     
-    // H
-    
     float2 uv = float2(0,0);
     float  tv = 1.0f / (resolution.y * 0.5f);
     for(int i = -6; i < 6; ++i)

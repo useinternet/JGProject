@@ -118,8 +118,7 @@ namespace JG
 
 		mEditorUIMaterial = IMaterial::Create("EditorUIMaterial", _editorUiShader);
 		mEditorUIMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-		mEditorUIMaterial->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
-
+	
 		mStandardQuadPosition[0] = JVector3(-0.5f, -0.5f, 0.0f);
 		mStandardQuadPosition[1] = JVector3(-0.5f, +0.5f, 0.0f);
 		mStandardQuadPosition[2] = JVector3(+0.5f, +0.5f, 0.0f);

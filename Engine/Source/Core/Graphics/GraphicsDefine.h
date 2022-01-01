@@ -19,17 +19,21 @@ namespace JG
 		None,
 		R8G8B8A8_Unorm,
 		R16G16B16A16_Unorm,
+		R11G11B10_Float,
 		R16G16B16A16_Float,
 		R32G32B32A32_Float,
+		R8_Uint,
 		D24_Unorm_S8_Uint
 	};
 	inline String TextureFormatToString(ETextureFormat format)
 	{
 		switch (format)
 		{
+		case ETextureFormat::R11G11B10_Float:    return "R11G11B10_Float";
 		case ETextureFormat::R8G8B8A8_Unorm:     return "R8G8B8A8_Unorm";
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
-		case ETextureFormat::R32G32B32A32_Float: return  "R32G32B32A32_Float";
+		case ETextureFormat::R32G32B32A32_Float: return "R32G32B32A32_Float";
+		case ETextureFormat::R8_Uint:			 return "R8_Uint";
 		case ETextureFormat::D24_Unorm_S8_Uint:  return "D24_Unorm_S8_Uint";
 
 		default: return "None";
@@ -39,13 +43,15 @@ namespace JG
 
 	inline DXGI_FORMAT ConvertDXGIFormat(ETextureFormat format)
 	{
-
+		
 		switch (format)
 		{
+		case ETextureFormat::R11G11B10_Float:    return DXGI_FORMAT_R11G11B10_FLOAT;
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case ETextureFormat::R8_Uint:			 return DXGI_FORMAT_R8_UINT;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			JG_CORE_ERROR("This {0} DirectX12 TextureFormat is not supported convert ETextureFormat", TextureFormatToString(format));
@@ -64,7 +70,8 @@ namespace JG
 		None = 0x00001,
 		Allow_RenderTarget = 0x00002,
 		Allow_DepthStencil = 0x00004,
-		SRV_TextureCube   = 0x00008,
+		Allow_UnorderedAccessView = 0x00008,
+		SRV_TextureCube   = 0x00010,
 	};
 
 
@@ -109,7 +116,8 @@ namespace JG
 		_float, _float2, _float3, _float4,
 		_float3x3, _float4x4,
 
-		texture2D, textureCube
+		texture2D, textureCube,
+		rwtexture2D,
 	};
 
 	inline u64 GetShaderDataTypeSize(EShaderDataType type)
@@ -157,6 +165,7 @@ namespace JG
 		case EShaderDataType::_float4x4: return "float4x4";
 		case EShaderDataType::texture2D: return "Texture2D";
 		case EShaderDataType::textureCube: return"TextureCube";
+		case EShaderDataType::rwtexture2D: return "RWTexture2D";
 		default:
 			JG_CORE_CRITICAL("not supported ShaderDataType");
 			return "unknown";
@@ -181,6 +190,7 @@ namespace JG
 		else if (type == "float4x4") return EShaderDataType::_float4x4;
 		else if (type == "Texture2D") return EShaderDataType::texture2D;
 		else if (type == "TextureCube") return EShaderDataType::textureCube;
+		else if (type == "RWTexture2D") return EShaderDataType::rwtexture2D;
 		else
 		{
 			return EShaderDataType::unknown;
@@ -193,16 +203,22 @@ namespace JG
 		Point_Wrap,
 		Point_Clamp,
 		Point_Border,
+		Point_Border_TransparentBlack,
+		Point_Border_OpaqueBlack,
 		Point_Mirror,
 		Point_MirrorOnce,
 		Linear_Wrap,
 		Linear_Clamp,
 		Linear_Border,
+		Linear_Border_TransparentBlack,
+		Linear_Border_OpaqueBlack,
 		Linear_Mirror,
 		Linear_MirrorOnce,
 		Anisotropic_Wrap,
 		Anisotropic_Clamp,
 		Anisotropic_Border,
+		Anisotropic_Border_TransparentBlack,
+		Anisotropic_Border_OpaqueBlack,
 		Anisotropic_Mirror,
 		Anisotropic_MirrorOnce,
 	};
@@ -212,16 +228,22 @@ namespace JG
 		if (_template == "Point_Wrap") return ESamplerStateTemplate::Point_Wrap;
 		else if (_template == "Point_Clamp") return ESamplerStateTemplate::Point_Clamp;
 		else if (_template == "Point_Border") return ESamplerStateTemplate::Point_Border;
+		else if (_template == "Point_Border_TransparentBlack") return ESamplerStateTemplate::Point_Border_TransparentBlack;
+		else if (_template == "Point_Border_OpaqueBlack") return ESamplerStateTemplate::Point_Border_OpaqueBlack;
 		else if (_template == "Point_Mirror") return ESamplerStateTemplate::Point_Mirror;
 		else if (_template == "Point_MirrorOnce") return ESamplerStateTemplate::Point_MirrorOnce;
 		else if (_template == "Linear_Wrap") return ESamplerStateTemplate::Linear_Wrap;
 		else if (_template == "Linear_Clamp") return ESamplerStateTemplate::Linear_Clamp;
 		else if (_template == "Linear_Border") return ESamplerStateTemplate::Linear_Border;
+		else if (_template == "Linear_Border_TransparentBlack") return ESamplerStateTemplate::Linear_Border_TransparentBlack;
+		else if (_template == "Linear_Border_OpaqueBlack") return ESamplerStateTemplate::Linear_Border_OpaqueBlack;
 		else if (_template == "Linear_Mirror") return ESamplerStateTemplate::Linear_Mirror;
 		else if (_template == "Linear_MirrorOnce") return ESamplerStateTemplate::Linear_MirrorOnce;
 		else if (_template == "Anisotropic_Wrap") return ESamplerStateTemplate::Anisotropic_Wrap;
 		else if (_template == "Anisotropic_Clamp") return ESamplerStateTemplate::Anisotropic_Clamp;
 		else if (_template == "Anisotropic_Border") return ESamplerStateTemplate::Anisotropic_Border;
+		else if (_template == "Anisotropic_Border_TransparentBlack") return ESamplerStateTemplate::Anisotropic_Border_TransparentBlack;
+		else if (_template == "Anisotropic_Border_OpaqueBlack") return ESamplerStateTemplate::Anisotropic_Border_OpaqueBlack;
 		else if (_template == "Anisotropic_Mirror") return ESamplerStateTemplate::Anisotropic_Mirror;
 		else if (_template == "Anisotropic_MirrorOnce") return ESamplerStateTemplate::Anisotropic_MirrorOnce;
 		else return ESamplerStateTemplate::Unknown;
@@ -375,12 +397,12 @@ namespace JG
 			constexpr token* Struct = "struct ";
 			constexpr token* CBuffer = "cbuffer ";
 			constexpr token* StructuredBuffer = "StructuredBuffer";
-			constexpr token* Texture2D = "Texture2D ";
-			constexpr token* TextureCube = "TextureCube ";
+			constexpr token* Texture2D = "Texture2D";
+			constexpr token* TextureCube = "TextureCube";
 			constexpr token* RWStructuredBuffer = "RWStructuredBuffer";
-			constexpr token* RWTexture2D = "RWTexture2D ";
-			constexpr token* SamplerState = "SamplerState ";
-			constexpr token* SamplerComparisonState = "SamplerComparisonState ";
+			constexpr token* RWTexture2D = "RWTexture2D<";
+			constexpr token* SamplerState = "SamplerState";
+			constexpr token* SamplerComparisonState = "SamplerComparisonState";
 
 			namespace SamplerStateElement
 			{

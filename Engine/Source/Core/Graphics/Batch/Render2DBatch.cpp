@@ -6,7 +6,7 @@ namespace JG
 {
 	Render2DBatch::Render2DBatch()
 	{
-		auto bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+		auto bufferCnt = JGGraphics::GetInstance().GetBufferCount() + 1;
 		mFrameResources.resize(bufferCnt);
 
 		auto inputLayout = InputLayout::Create();

@@ -627,7 +627,7 @@ namespace JG
 		return mState;
 	}
 
-	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, const std::function<void()>& onCompelete)
+	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, const std::function<void()>& onCompelete, bool asComputeCommand)
 	{
 		if (mOwnerShader == nullptr || mOwnerShader->IsSuccessed() == false)
 		{
@@ -640,7 +640,22 @@ namespace JG
 		mState = EComputerState::Run;
 
 
-		auto commandList = DirectX12API::GetComputeCommandList(commandID);
+		SharedPtr<ComputeCommandList> asComputeList;
+		ComputeCommandList* commandList = nullptr;
+
+		if (asComputeCommand)
+		{
+			commandList = DirectX12API::GetComputeCommandList(commandID);
+		}
+		else
+		{
+			auto graphicsCmdList = DirectX12API::GetGraphicsCommandList(commandID);
+			asComputeList = graphicsCmdList->AsCompute();
+			commandList = asComputeList.get();
+		}
+
+
+	
 
 
 		//
@@ -788,6 +803,10 @@ namespace JG
 		{
 			d3dRscFlags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 		}
+		if (flags & ETextureFlags::Allow_UnorderedAccessView)
+		{
+			d3dRscFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
 
 		D3D12_RESOURCE_DESC rscDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 			ConvertDXGIFormat(mTextureInfo.Format), mTextureInfo.Width, mTextureInfo.Height,
@@ -836,7 +855,7 @@ namespace JG
 		info.Format = format;
 		info.PixelPerUnit = pixelPerUnit;
 		SetTextureInfo(info);
-		auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
+		auto commandList = DirectX12API::GetGraphicsCommandList(MAIN_GRAPHICS_COMMAND_ID);
 		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels, info.ArraySize);
 	}
 

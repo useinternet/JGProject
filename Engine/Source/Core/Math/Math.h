@@ -51,6 +51,72 @@ namespace JG
 				return v2;
 			}
 		}
+
+
+        template <typename T> 
+        inline static T AlignUpWithMask(T value, size_t mask)
+        {
+            return (T)(((size_t)value + mask) & ~mask);
+        }
+
+        template <typename T> 
+        inline static T AlignDownWithMask(T value, size_t mask)
+        {
+            return (T)((size_t)value & ~mask);
+        }
+
+        template <typename T> 
+        inline static T AlignUp(T value, size_t alignment)
+        {
+            return AlignUpWithMask(value, alignment - 1);
+        }
+
+        template <typename T> 
+        inline static T AlignDown(T value, size_t alignment)
+        {
+            return AlignDownWithMask(value, alignment - 1);
+        }
+
+        template <typename T> 
+        inline static bool IsAligned(T value, size_t alignment)
+        {
+            return 0 == ((size_t)value & (alignment - 1));
+        }
+
+        template <typename T> 
+        inline static T DivideByMultiple(T value, size_t alignment)
+        {
+            return (T)((value + alignment - 1) / alignment);
+        }
+
+        template <typename T> 
+        inline static bool IsPowerOfTwo(T value)
+        {
+            return 0 == (value & (value - 1));
+        }
+
+        template <typename T> 
+        inline static bool IsDivisible(T value, T divisor)
+        {
+            return (value / divisor) * divisor == value;
+        }
+
+        inline static u8 Log2(u64 value)
+        {
+            unsigned long mssb;
+            unsigned long lssb; 
+
+            if (_BitScanReverse64(&mssb, value) > 0 && _BitScanForward64(&lssb, value) > 0)
+                return u8(mssb + (mssb == lssb ? 0 : 1));
+            else
+                return 0;
+        }
+
+        template <typename T> 
+        inline T AlignPowerOfTwo(T value)
+        {
+            return value == 0 ? 0 : 1 << Log2(value);
+        }
 	};
 
 

@@ -19,17 +19,13 @@ namespace JG
 		mResourceStateTracker	    = CreateUniquePtr<ResourceStateTracker>();
 		mDynamicDescriptorAllocator = CreateUniquePtr<DynamicDescriptorAllocator>();
 		mUploadAllocator = CreateUniquePtr<UploadAllocator>();
-	}
 
-	CommandList::~CommandList()
-	{
-		Reset();
+		mTempObjectList = CreateSharedPtr<List<ComPtr<ID3D12Object>>>();
 	}
-
 
 	void CommandList::BackupResource(ID3D12Object* d3dObj)
 	{
-		mTempObjectList.push_back(d3dObj);
+		mTempObjectList->push_back(d3dObj);
 	}
 
 	void CommandList::Reset()
@@ -37,7 +33,7 @@ namespace JG
 		mResourceStateTracker->Reset();
 		mUploadAllocator->Reset();
 		mDynamicDescriptorAllocator->Reset(true);
-		mTempObjectList.clear();
+		mTempObjectList->clear();
 
 		mD3DAllocator->Reset();
 		mD3DCommandList->Reset(mD3DAllocator.Get(), nullptr);
@@ -223,11 +219,15 @@ namespace JG
 
 
 
-
+	GraphicsCommandList::GraphicsCommandList(D3D12_COMMAND_LIST_TYPE d3dType) : CommandList(d3dType) 
+	{
+		mComputeDynamicDescriptorAllocator = CreateSharedPtr<DynamicDescriptorAllocator>();
+	}
 
 	void GraphicsCommandList::Reset()
 	{
 		CommandList::Reset();
+		mComputeDynamicDescriptorAllocator->Reset(true);
 		mVertexViews.clear();
 	}
 
@@ -481,6 +481,31 @@ namespace JG
 		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
+	SharedPtr<ComputeCommandList> GraphicsCommandList::AsCompute()
+	{
+		SharedPtr<ComputeCommandList> result = CreateSharedPtr<ComputeCommandList>();
+
+		// 공유할건 공유하고 따로 만들건 따로 만들기
+		result->mD3DType		= mD3DType;
+		result->mD3DCommandList = mD3DCommandList;
+		result->mD3DAllocator	= mD3DAllocator;
+
+		result->mTempObjectList			= mTempObjectList;
+		result->mResourceStateTracker	= mResourceStateTracker;
+		result->mUploadAllocator		= mUploadAllocator;
+		result->mDynamicDescriptorAllocator = mComputeDynamicDescriptorAllocator;
+
+
+
+		result->mBindedDescriptorHeap = mBindedDescriptorHeap;
+		result->mBindedComputeRootSig = mBindedComputeRootSig;
+		result->mBindedPipelineState = mBindedPipelineState;
+		return result;
+	}
+
+
+
+
 	void ComputeCommandList::BindRootSignature(SharedPtr<RootSignature> rootSig)
 	{
 		if (mBindedComputeRootSig.Get() == rootSig->Get())
@@ -607,5 +632,6 @@ namespace JG
 		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
 	}
+
 }
 

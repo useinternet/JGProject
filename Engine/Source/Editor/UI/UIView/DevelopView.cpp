@@ -110,26 +110,25 @@ namespace JG
 
 
 		{
-			f32  exposure = 0.0f;
-			bool isEnable = true;
-			if (scene)
-			{
-				scene->GetProcessShaderParam<PostProcess_ToneMapping, f32>("Exposure", &exposure);
-				scene->GetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", &isEnable);
-			}
+			//f32  exposure = 0.0f;
+			//bool isEnable = true;
+			//if (scene)
+			//{
+			//	scene->GetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", &isEnable);
+			//}
 
-			ImGui::Text("[ ToneMapping ]");
+			//ImGui::Text("[ ToneMapping ]");
 
-			isEnable = ImGui::CheckBox("Enable", isEnable);
-			if(scene)
-			{
-				scene->SetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", isEnable);
-			}
-			ImGui::SetNextItemWidth(150.0f);
-			if (ImGui::InputFloat("Exposure", &exposure) == true && scene)
-			{
-				scene->SetProcessShaderParam<PostProcess_ToneMapping, f32>("Exposure", exposure);
-			}
+			//isEnable = ImGui::CheckBox("Enable", isEnable);
+			//if(scene)
+			//{
+			//	scene->SetProcessShaderParam<PostProcess_ToneMapping, bool>("Enable", isEnable);
+			//}
+			//ImGui::SetNextItemWidth(150.0f);
+			//if (ImGui::InputFloat("Exposure", &exposure) == true && scene)
+			//{
+			//	scene->SetProcessShaderParam<PostProcess_ToneMapping, f32>("Exposure", exposure);
+			//}
 		}
 
 

@@ -33,7 +33,7 @@ namespace JG
 			SharedPtr<IIndexBuffer>  QuadIBuffer;
 		};
 	private:
-		static const u32 MaxQuadCount = 1200;
+		static const u32 MaxQuadCount = 256;
 		static const u32 MaxVertexCount = MaxQuadCount * 4;
 		static const u32 MaxIndexCount  = MaxQuadCount * 6;
 		static const u32 MaxTextureCount = 64;

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "PostProcess_Bloom.h"
-
+#include "Graphics/GraphicsHelper.h"
 
 
 
@@ -8,57 +8,117 @@ namespace JG
 {
 	PostProcess_Bloom::PostProcess_Bloom()
 	{
+
+
 	}
 
 	void PostProcess_Bloom::Awake(Renderer* renderer)
 	{
+		mEnable         = RP_Local_Bool::Create("Enable", true, GetType(), renderer);
+		mBloomThreshold = RP_Local_Float::Create("BloomThreshold", 4.0f, GetType(), renderer);
+		mUpSamplingFactor = RP_Local_Float::Create("UpSamplingFactor", 0.65f, GetType(), renderer);
+
+		mLumaResult     = RP_Global_Tex::Create("PostProcess/Bloom/LumaResult", nullptr, renderer);
+		mBloomResult    = RP_Global_Tex::Create("PostProcess/Bloom/BloomResult", nullptr, renderer);
+
 	}
 
 	void PostProcess_Bloom::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
 	{
-
-		InitMaterial();
-
-		if (mPrevResolution != info.Resolution)
+		if (mEnable.GetValue() == false)
 		{
+			return;
+		}
 
+		bool result = InitComputers();
+		if (result == false)
+		{
+			mEnable.SetValue(false);
+			return;
+		}
+
+
+		if (mLumaTextures.empty() || mPrevResolution != info.Resolution)
+		{
+			result = InitTextures(info.Resolution);
 			mPrevResolution = info.Resolution;
-
-			
-
-			InitTexture(info.Resolution);
+		}
+		if (result == false)
+		{
+			mEnable.SetValue(false);
+			return;
 		}
 
 	}
 
 	void PostProcess_Bloom::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-		List<SharedPtr<ITexture>> brightnessTextures;
-		brightnessTextures.resize(mDownSamplingCount);
-
-
-		f32 k = 1.0f;
-		for (i32 i = 0; i < mDownSamplingCount; ++i)
+		if (mEnable.GetValue() == false)
 		{
-			k *= 0.5f;
-			JVector2 resolution = info.Resolution * k;
-			
-			brightnessTextures[i] = Run_Brightness(commandID, info, i, resolution, result->SceneTexture);
-			for (i32 j = 0; j < mBlurCount; ++j)
+			return;
+		}
+
+
+		u64 commandID = JGGraphics::GetInstance().RequestCommandID();
+		// Bloom
+		{
+			f32 exposureVal = RP_Global_Float::Load("Renderer/Exposure", renderer).GetValue();
+			f32 initialMinLogVal = RP_Global_Float::Load("Renderer/InitialMinLog", renderer).GetValue();
+			f32 initialMaxLogVal = RP_Global_Float::Load("Renderer/InitialMaxLog", renderer).GetValue();
+
+
+			SharedPtr<IComputer>& targetComputer = mExtractBrightnessComputers[info.CurrentBufferIndex];
+
+
+			List<f32> exposure; exposure.resize(8);
+
+			exposure[0] = exposureVal;
+			exposure[1] = 1.0f / exposureVal;
+			exposure[2] = exposureVal;
+			exposure[3] = 0.0f;
+			exposure[4] = initialMinLogVal;
+			exposure[5] = initialMaxLogVal;
+			exposure[6] = initialMaxLogVal - initialMinLogVal;
+			exposure[7] = 1.0f / (initialMaxLogVal - initialMinLogVal);
+
+
+
+			if (targetComputer->SetStructDataArray("Exposure", exposure.data(), exposure.size(), sizeof(f32)) == false)
 			{
-				brightnessTextures[i] = Run_BlurH(commandID, info, i, resolution, brightnessTextures[i]);
-				brightnessTextures[i] = Run_BlurV(commandID, info, i, resolution, brightnessTextures[i]);
+				return;
 			}
-		}
-		
+			if (targetComputer->SetTexture("SourceTex", 0, result->SceneTexture) == false)
+			{
+				return;
+			}
+			if (targetComputer->SetFloat("BloomThreshold", mBloomThreshold.GetValue()) == false)
+			{
+				return;
+			}
+			u32 groupX = Math::DivideByMultiple(mBloomResolutoin.x, 8);
+			u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y, 8);
+			u32 groupZ = 1;
 
-		for (i32 i = mDownSamplingCount - 1; i >= 0; --i)
-		{
-			result->SceneTexture = Run_Bloom(commandID, info,i, result->SceneTexture, brightnessTextures[i]);
-		}
+			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, nullptr, false);
 
+		}
+		//// Downsample Bloom
+		//{
+		//	SharedPtr<IComputer>& targetComputer = mDownSampleBloomComputers[info.CurrentBufferIndex];
+
+		//	u32 groupX = Math::DivideByMultiple(mBloomResolutoin.x * 0.5f, 8);
+		//	u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y * 0.5f, 8);
+		//	u32 groupZ = 1;
+		//	targetComputer->Dispatch(commandID, groupX, groupY, groupZ, nullptr, false);
+		//}
+
+
+		//mLumaResult.SetValue(mLumaTextures[info.CompeleteBufferIndex]);
+		//mBloomResult.SetValue(mBloomTextures[info.CompeleteBufferIndex]);
+
+
+		result->SceneTexture   = mBloomTextures[0][0][info.CurrentBufferIndex];
+		//result->SceneTexture = mBloomTextures[info.CurrentBufferIndex];
 	}
 
 	bool PostProcess_Bloom::IsCompelete()
@@ -70,299 +130,91 @@ namespace JG
 	{
 		return JGTYPE(PostProcess_Bloom);
 	}
-	SharedPtr<ITexture> PostProcess_Bloom::Run_Brightness(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture)
+
+	bool PostProcess_Bloom::InitComputers()
 	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 
-		if (mBrightnessMaterial != nullptr && mBrightnessMaterial->IsValid())
+		if (mExtractBrightnessComputers.empty())
 		{
-			SharedPtr<ITexture> targetTexture = mBrightnessTextures[index][info.CurrentBufferIndex];
-			api->SetViewports(commandID, { Viewport(resolution.x, resolution.y) });
-			api->SetScissorRects(commandID, { ScissorRect(0,0, resolution.x, resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
-			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
-
-			if (mBrightnessMaterial->SetTexture("SceneTexture", sceneTexture) == false)
+			SharedPtr<IComputeShader> shader = ShaderLibrary::GetInstance().FindComputeShader("Bloom_ExtractBrightness");
+			if (shader == nullptr)
 			{
-				return nullptr;
+				return false;
 			}
-
-			if (mBrightnessMaterial->Bind(commandID) == false)
-			{
-				return nullptr;
-			}
-
-			api->Draw(commandID, 6);
-			return targetTexture;
+			GraphicsHelper::InitComputer("ExtractBrightness_Computer", shader, &mExtractBrightnessComputers);
 		}
-		return nullptr;
+
+		if (mBloomDownSampleComputers.empty())
+		{
+			auto shader = ShaderLibrary::GetInstance().FindComputeShader("Bloom_DwonSample");
+			if (shader == nullptr)
+			{
+				return false;
+			}
+			GraphicsHelper::InitComputer("Bloom_Downsample_Computer", shader, &mBloomDownSampleComputers);
+		}
+
+
+		return true;
 	}
-	SharedPtr<ITexture> PostProcess_Bloom::Run_BlurH(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture)
+
+	bool PostProcess_Bloom::InitTextures(const JVector2& resolution)
 	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-
-		if (mBlurHMaterial != nullptr && mBlurHMaterial->IsValid())
-		{
-
-			SharedPtr<ITexture> targetTexture   = mBlurHTextures[index][info.CurrentBufferIndex];
-
-			api->SetViewports(commandID, { Viewport(resolution.x, resolution.y) });
-			api->SetScissorRects(commandID, { ScissorRect(0,0, resolution.x, resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
-			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
-
-			if (mBlurHMaterial->SetTexture("SceneTexture", sceneTexture) == false)
-			{
-				return nullptr;
-			}
-			
-			if (mBlurHMaterial->Bind(commandID) == false)
-			{
-				return nullptr;
-			}
-
-			api->Draw(commandID, 6);
-			return targetTexture;
-		}
-		return nullptr;
-	}
-	SharedPtr<ITexture> PostProcess_Bloom::Run_BlurV(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture)
-	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-
-		if (mBlurVMaterial != nullptr && mBlurVMaterial->IsValid())
-		{
-
-			SharedPtr<ITexture> targetTexture     = mBlurVTextures[index][info.CurrentBufferIndex];
-
-			api->SetViewports(commandID, { Viewport(resolution.x, resolution.y) });
-			api->SetScissorRects(commandID, { ScissorRect(0,0, resolution.x, resolution.y) });
-			api->ClearRenderTarget(commandID, { targetTexture }, nullptr);
-			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
-
-			if (mBlurVMaterial->SetTexture("SceneTexture", sceneTexture) == false)
-			{
-				return nullptr;
-			}
-
-			if (mBlurVMaterial->Bind(commandID) == false)
-			{
-				return nullptr;
-			}
-
-			api->Draw(commandID, 6);
-			return targetTexture;
-		}
-		return nullptr;
-	}
-	SharedPtr<ITexture> PostProcess_Bloom::Run_Bloom(u64 commandID, const RenderInfo& info, i32 index, SharedPtr<ITexture> sceneTexture, SharedPtr<ITexture> brightnessTexture)
-	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-
-		if (mBloomData.Material != nullptr && mBloomData.Material->IsValid())
-		{
-
-			SharedPtr<ITexture> targetTexture     = mBloomData.Textures[info.CurrentBufferIndex];
-
-			api->SetViewports(commandID, { Viewport(info.Resolution.x, info.Resolution.y) });
-			api->SetScissorRects(commandID, { ScissorRect(0,0, info.Resolution.x, info.Resolution.y) });
-			api->SetRenderTarget(commandID, { targetTexture }, nullptr);
-
-			if (mBloomData.Material->SetTexture("SceneTexture", sceneTexture) == false)
-			{
-				return nullptr;
-			}
-			if (mBloomData.Material->SetTexture("BrightnessTexture", brightnessTexture) == false)
-			{
-				return nullptr;
-			}
-			if (mBloomData.Material->Bind(commandID) == false)
-			{
-				return nullptr;
-			}
-
-			api->Draw(commandID, 6);
-			return targetTexture;
-		}
-		return nullptr;
-	}
-	void PostProcess_Bloom::InitMaterial()
-	{
-		//if (mBrightnessData.Material == nullptr)
-		//{
-		//	SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/Brightness" });
-		//	if (shader != nullptr && shader->IsSuccessed())
-		//	{
-		//		mBrightnessData.Material = IMaterial::Create("Brightness", shader);
-		//		mBrightnessData.Material->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-		//	}
-		//}
-
-		//if (mBlurHData.Material == nullptr)
-		//{
-		//	SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/GaussianBlur_H" });
-		//	if (shader != nullptr && shader->IsSuccessed())
-		//	{
-		//		mBlurHData.Material = IMaterial::Create("GaussianBlur_H", shader);
-		//		mBlurHData.Material->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-		//	}
-		//}
-		//if (mBlurVData.Material == nullptr)
-		//{
-		//	SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/GaussianBlur_V" });
-		//	if (shader != nullptr && shader->IsSuccessed())
-		//	{
-		//		mBlurVData.Material = IMaterial::Create("GaussianBlur_V", shader);
-		//		mBlurVData.Material->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-		//	}
-		//}
-
-		if(mBrightnessMaterial == nullptr)
-		{
-			SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/Brightness" });
-			if (shader != nullptr && shader->IsSuccessed())
-			{
-				mBrightnessMaterial = IMaterial::Create("Brightness", shader);
-				mBrightnessMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-			}
-		}
-
-		if (mBlurHMaterial == nullptr)
-		{
-			SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/GaussianBlur_H" });
-			if (shader != nullptr && shader->IsSuccessed())
-			{
-				mBlurHMaterial = IMaterial::Create("GaussianBlur_H", shader);
-				mBlurHMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-			}
-		}
-
-
-		if (mBlurVMaterial == nullptr)
-		{
-			SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/GaussianBlur_V" });
-			if (shader != nullptr && shader->IsSuccessed())
-			{
-				mBlurVMaterial = IMaterial::Create("GaussianBlur_V", shader);
-				mBlurVMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-			}
-		}
-
-
-		if (mBloomData.Material == nullptr)
-		{
-			SharedPtr<IGraphicsShader> shader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/Bloom" });
-			if (shader != nullptr && shader->IsSuccessed())
-			{
-				mBloomData.Material = IMaterial::Create("Bloom", shader);
-				mBloomData.Material->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-			}
-		}
-	}
-	void PostProcess_Bloom::InitTexture(const JVector2& resolution)
-	{
-		auto bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+		mBloomResolutoin = resolution;
 
 		TextureInfo texInfo;
-		texInfo.Width     = std::max<u32>(1, resolution.x);
-		texInfo.Height    = std::max<u32>(1, resolution.y);
 		texInfo.ArraySize = 1;
 		texInfo.Format    = ETextureFormat::R16G16B16A16_Float;
-		texInfo.Flags     = ETextureFlags::Allow_RenderTarget;
+		texInfo.Flags     = ETextureFlags::Allow_RenderTarget | ETextureFlags::Allow_UnorderedAccessView;
 		texInfo.MipLevel  = 1;
 
+		// Bloom Texture »ý¼º
+		f32 k = 1.0f;
 
-
-		//{
-		//	i32 index = 0;
-		//	mBrightnessData.Textures.resize(bufferCnt);
-		//	for (auto& t : mBrightnessData.Textures)
-		//	{
-		//		if (t == nullptr) t = ITexture::Create("Bloom_Brightness_Texture_" + std::to_string(index), texInfo);
-		//		else t->SetTextureInfo(texInfo);
-		//		++index;
-		//	}
-		//}
-
-		//{
-		//	i32 index = 0;
-		//	mBlurHData.Textures.resize(bufferCnt);
-		//	for (auto& t : mBlurHData.Textures)
-		//	{
-		//		if (t == nullptr) t = ITexture::Create("Blur_H_Texture_" + std::to_string(index), texInfo);
-		//		else t->SetTextureInfo(texInfo);
-		//		++index;
-		//	}
-		//}
-		//{
-		//	i32 index = 0;
-		//	mBlurVData.Textures.resize(bufferCnt);
-		//	for (auto& t : mBlurVData.Textures)
-		//	{
-		//		if (t == nullptr) t = ITexture::Create("Blur_V_Texture_" + std::to_string(index), texInfo);
-		//		else t->SetTextureInfo(texInfo);
-		//		++index;
-		//	}
-		//}
-
+		for (i32 i = 0; i < 5; ++i)
 		{
-			i32 index = 0;
-			mBloomData.Textures.resize(bufferCnt);
-			texInfo.Width = resolution.x;
-			texInfo.Height = resolution.y;
-			for (auto& t : mBloomData.Textures)
+			texInfo.Width  = mBloomResolutoin.x * k;
+			texInfo.Height = mBloomResolutoin.y * k;
+
+			for (i32 j = 0; j < 2; ++j)
 			{
-				if (t == nullptr) t = ITexture::Create("Bloom_Texture_" + std::to_string(index), texInfo);
-				else t->SetTextureInfo(texInfo);
-				++index;
+				GraphicsHelper::InitRenderTextures(texInfo, "Bloom_Texture_" + std::to_string(i) + std::to_string(j), &mBloomTextures[i][j]);
 			}
+
+
+			k *= 0.5f;
+		}
+
+		texInfo.Width  = mBloomResolutoin.x;
+		texInfo.Height = mBloomResolutoin.y;
+		texInfo.Format = ETextureFormat::R8_Uint;
+		GraphicsHelper::InitRenderTextures(texInfo, "Luma_Textures", &mLumaTextures);
+
+
+
+
+		// Computer 
+		i32 index = 0;
+		for (auto& computer : mExtractBrightnessComputers)
+		{
+			if (computer->SetFloat2("InverseOutputSize", JVector2(1 / mBloomResolutoin.x, 1 / mBloomResolutoin.y)) == false)
+			{
+				return false;
+			}
+			if (computer->SetTexture("LumaResult", 0, mLumaTextures[index]) == false)
+			{
+				return false;
+			}
+			if (computer->SetTexture("BloomResult", 0, mBloomTextures[0][0][index]) == false)
+			{
+				return false;
+			}
+			
+			++index;
 		}
 
 
-
-
-		f32 k = 1.0F;
-		mBlurHTextures.resize(mDownSamplingCount);
-		mBlurVTextures.resize(mDownSamplingCount);
-		mBrightnessTextures.resize(mDownSamplingCount);
-		for (i32 i = 0; i < mDownSamplingCount; ++i)
-		{
-			auto& h_texlist = mBlurHTextures[i];
-			h_texlist.resize(bufferCnt);
-
-			auto& v_texlist = mBlurVTextures[i];
-			v_texlist.resize(bufferCnt);
-
-			auto& b_texlist = mBrightnessTextures[i];
-			b_texlist.resize(bufferCnt);
-
-			k *= 0.5F;
-			f32 w = resolution.x * k;
-			f32 h = resolution.y * k;
-
-			texInfo.Width  = w;
-			texInfo.Height = h;
-
-			for (auto& t : h_texlist)
-			{
-				if (t == nullptr) t = ITexture::Create("Blur_HTexture", texInfo);
-				else t->SetTextureInfo(texInfo);
-			}
-
-			for (auto& t : v_texlist)
-			{
-				if (t == nullptr) t = ITexture::Create("Blur_VTexture", texInfo);
-				else t->SetTextureInfo(texInfo);
-			}
-
-
-
-			for (auto& t : b_texlist)
-			{
-				if (t == nullptr) t = ITexture::Create("Brigtness_Texture", texInfo);
-				else t->SetTextureInfo(texInfo);
-			}
-		}
+		return true;
 	}
 }
 

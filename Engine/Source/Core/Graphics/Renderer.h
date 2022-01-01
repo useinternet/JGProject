@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "JGCore.h"
 #include "GraphicsDefine.h"
-
+#include "RenderParam.h"
 namespace JG
 {
 	namespace Graphics
@@ -66,7 +66,8 @@ namespace JG
 		JVector3 EyePosition;
 		f32 FarZ;
 		f32 NearZ;
-		u64 CurrentBufferIndex = 0;
+		u64 CurrentBufferIndex   = 0;
+		u64 CompeleteBufferIndex = 0;
 
 		Color ClearColor;
 		bool IsHDR;
@@ -104,16 +105,24 @@ namespace JG
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
 
-		Dictionary<Type, Dictionary<String, List<jbyte>>> mProcessParamDic;
-		std::mutex mProcessShaderParamMutex;
 
 
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
-
 		RenderInfo mCurrentRenderInfo;
 
 
+
+
+
+
+		// Renderer Param
+		Dictionary<Type, Dictionary<String, List<jbyte>>> mLocalParamDic;
+		Dictionary<Type, Dictionary<String, std::pair<SharedPtr<ITexture>, bool>>> mLocalParamTexDic;
+
+		Dictionary<String, List<jbyte>>		    mGlobalParamDic;
+		Dictionary<String, std::pair<SharedPtr<ITexture>, bool>> mGlobalParamTexDic;
+		std::mutex mRenderParamMutex;
 	public:
 		Renderer() = default;
 		virtual ~Renderer() = default;
@@ -145,7 +154,7 @@ namespace JG
 
 			auto preProcess = CreateSharedPtr<T>();
 			mPreProcessList.push_back(preProcess);
-			
+
 			mProcessPool[type] = preProcess.get();
 			preProcess->Awake(this);
 			return preProcess.get();
@@ -166,7 +175,6 @@ namespace JG
 			postProcess->Awake(this);
 			return postProcess.get();
 		}
-
 		template<class T>
 		T* FindProcess()
 		{
@@ -181,79 +189,127 @@ namespace JG
 			}
 		}
 
+
+
+
+
+		bool RegisterGlobalRenderParamTex(const String& name,  SharedPtr<ITexture> initTexture = nullptr, bool isPrivate = false);
+		bool SetGlobalRenderParamTex(const String& name, SharedPtr<ITexture> tex);
+		SharedPtr<ITexture> GetGlobalRenderParamTex(const String& name);
+
+
+
+		bool RegisterGlobalRenderParam(const String& name, u64 dataSize);
 		template<class T>
-		void RegisterProcessShaderParam(const String& name, u64 dataSize)
+		bool SetGlobalRenderParam(const String& name, const T& data)
 		{
-			Type type = JGTYPE(T);
-			mProcessParamDic[type][name].resize(dataSize);
-		}
-
-		template<class ProcessType, class DataType>
-		bool SetProcessShaderParam(const String& name, const DataType& data)
-		{
-			if (std::is_base_of<IRenderProcess, ProcessType>::value == false) {
-				return false;
-			}
-			Type type = JGTYPE(ProcessType);
-			if (mProcessParamDic.find(type) == mProcessParamDic.end())
+			if (mGlobalParamDic.find(name) == mGlobalParamDic.end())
 			{
 				return false;
 			}
 
-
-
-			auto& shaderParamDic = mProcessParamDic[type];
-			if (shaderParamDic.find(name) == shaderParamDic.end())
-			{
-				return false;
-			}
-			List<jbyte>& btData = shaderParamDic[name];
-
-
-
-			
-			u64 dataSize = sizeof(DataType);
-			if (dataSize != btData.size())
+			auto& btData = mGlobalParamDic[name];
+			u64 dataSize = btData.size();
+			if (dataSize != sizeof(T))
 			{
 				return false;
 			}
 
-			std::lock_guard<std::mutex> lock(mProcessShaderParamMutex);
-			memcpy(btData.data(), &data, dataSize);
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+			memcpy(btData.data(), (const void*)& data, dataSize);
 
 			return true;
 		}
-
-		template<class ProcessType, class DataType>
-		bool GetProcessShaderParam(const String& name, DataType* out_data)
+		template<class T>
+		bool GetGlobalRenderParam(const String& name, T* out_data)
 		{
-			if (std::is_base_of<IRenderProcess, ProcessType>::value == false) {
-				return false;
-			}
 			if (out_data == nullptr)
 			{
 				return false;
 			}
-			Type type = JGTYPE(ProcessType);
-			if (mProcessParamDic.find(type) == mProcessParamDic.end())
+
+			if (mGlobalParamDic.find(name) == mGlobalParamDic.end())
+			{
+				return false;
+			}
+			auto& btData = mGlobalParamDic[name];
+			u64 dataSize = btData.size();
+			if (dataSize != sizeof(T))
 			{
 				return false;
 			}
 
-			auto& shaderParamDic = mProcessParamDic[type];
-			if (shaderParamDic.find(name) == shaderParamDic.end())
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+			memcpy((void*)out_data, btData.data(), dataSize);
+			return true;
+		}
+
+
+
+
+
+
+		bool RegisterLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> initTexture = nullptr, bool isPrivate = false);
+		bool SetLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> tex);
+		SharedPtr<ITexture> GetLocalRenderParamTex(const Type& type, const String& name);
+
+
+		bool RegisterLocalRenderParam(const Type& type, const String& name, u64 dataSize);
+
+		template<class DataType>
+		bool SetLocalRenderParam(const Type& type, const String& name, const DataType& data)
+		{
+			if (mLocalParamDic.find(type) == mLocalParamDic.end())
 			{
 				return false;
 			}
-			List<jbyte>& btData = shaderParamDic[name];
+
+			auto& renderParamDic = mLocalParamDic[type];
+			if (renderParamDic.find(name) == renderParamDic.end())
+			{
+				return false;
+			}
+			List<jbyte>& btData = renderParamDic[name];
+
 			u64 dataSize = sizeof(DataType);
 			if (dataSize != btData.size())
 			{
 				return false;
 			}
 
-			std::lock_guard<std::mutex> lock(mProcessShaderParamMutex);
-			memcpy(out_data, btData.data(), dataSize);
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+			memcpy((void*)btData.data(), (const void*) & data, dataSize);
+
+			return true;
+		}
+
+		template<class DataType>
+		bool GetLocalRenderParam(const Type& type, const String& name, DataType* out_data)
+		{
+			if (out_data == nullptr)
+			{
+				return false;
+			}
+
+			if (mLocalParamDic.find(type) == mLocalParamDic.end())
+			{
+				return false;
+			}
+
+			auto& renderParamDic = mLocalParamDic[type];
+			if (renderParamDic.find(name) == renderParamDic.end())
+			{
+				return false;
+			}
+			List<jbyte>& btData = renderParamDic[name];
+			u64 dataSize = sizeof(DataType);
+			if (dataSize != btData.size())
+			{
+				return false;
+			}
+
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+			memcpy((void*)out_data, btData.data(), dataSize);
 
 			return true;
 		}

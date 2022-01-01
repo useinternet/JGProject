@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "FowardRenderer.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/GraphicsHelper.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_LightCulling.h"
 
@@ -13,17 +14,8 @@ namespace JG
 
 	FowardRenderer::FowardRenderer()
 	{
-		AddPreProcess<PreRenderProcess_ComputeCluster>();
-		AddPreProcess<PreRenderProcess_LightCulling>();
-
-		AddPostProcess<PostProcess_Bloom>();
-		AddPostProcess<PostProcess_ToneMapping>();
-
-
-
-		u64 bufferCnt = JGGraphics::GetInstance().GetBufferCount(); 
-		mTargetTextures.resize(bufferCnt, nullptr);
-		mTargetDepthTextures.resize(bufferCnt, nullptr);
+		InitProcesses();
+		InitGlobalRenderParams();
 	}
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
@@ -39,13 +31,15 @@ namespace JG
 			mPrevIsHDR = info.IsHDR;
 			mPrevResolution = info.Resolution;
 			mPrevClearColor = info.ClearColor;
-			InitTexture(info.Resolution, info.ClearColor, info.IsHDR);
+			InitTextures(info.Resolution, info.ClearColor, info.IsHDR);
 		}
 	}
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+
+
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
 
@@ -103,10 +97,8 @@ namespace JG
 
 		if (result != nullptr)
 		{
-			result->SceneTexture = targetTexture;
+			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
 		}
-
-
 	}
 
 	void FowardRenderer::CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
@@ -120,7 +112,7 @@ namespace JG
 		return 0;
 	}
 
-	void FowardRenderer::InitTexture(const JVector2& size, const Color& clearColor, bool ishdr)
+	void FowardRenderer::InitTextures(const JVector2& size, const Color& clearColor, bool ishdr)
 	{
 		TextureInfo mainTexInfo;
 		mainTexInfo.Width  = std::max<u32>(1, size.x);
@@ -131,22 +123,41 @@ namespace JG
 		mainTexInfo.MipLevel = 1;
 		mainTexInfo.ClearColor = clearColor;
 
-		i32 index = 0;
-		for (auto& t : mTargetTextures)
-		{
-			if (t == nullptr) t = ITexture::Create("_TargetTexture_" + std::to_string(index), mainTexInfo);
-			else t->SetTextureInfo(mainTexInfo);
-			++index;
 
-		}
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Foward_TargetTexture", &mTargetTextures);
 
 		mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
 		mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
-		for (auto& t : mTargetDepthTextures)
-		{
-			if (t == nullptr) t = ITexture::Create("_TargetDepthTexture", mainTexInfo);
-			else t->SetTextureInfo(mainTexInfo);
-		}
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Foward_TargetDepthTexture", &mTargetDepthTextures);
+	}
+
+	void FowardRenderer::InitProcesses()
+	{
+		AddPreProcess<PreRenderProcess_ComputeCluster>();
+		AddPreProcess<PreRenderProcess_LightCulling>();
+
+		AddPostProcess<PostProcess_Bloom>();
+		AddPostProcess<PostProcess_ToneMapping>();
+	}
+
+	void FowardRenderer::InitGlobalRenderParams()
+	{
+
+
+//    Exposure, 1.0f / Exposure, Exposure, 0.0f,
+//    kInitialMinLog, kInitialMaxLog, kInitialMaxLog - kInitialMinLog, 1.0f / (kInitialMaxLog - kInitialMinLog)
+
+		mExposure = RP_Global_Float::Create("Renderer/Exposure", 2.0f, this);
+		mInitialMinLog = RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, this);
+		mInitialMaxLog = RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, this);
+
+		// Bloom »ý¼º
+
+		// ToneMapHDRCS
+
+		// UpdateExposure
+
+
 	}
 
 

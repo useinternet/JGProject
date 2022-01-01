@@ -13,6 +13,12 @@ namespace JG
 		JVector2 mPrevResolution;
 		Color    mPrevClearColor;
 		bool     mPrevIsHDR = false;
+
+
+		// RenderParam
+		RP_Global_Float mExposure;
+		RP_Global_Float mInitialMinLog;
+		RP_Global_Float mInitialMaxLog;
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;
@@ -23,6 +29,8 @@ namespace JG
 		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) override;
 		virtual int ArrangeObject(const ObjectInfo& info) override;
 	private:
-		void InitTexture(const JVector2& size, const Color& clearColor, bool ishdr);
+		void InitTextures(const JVector2& size, const Color& clearColor, bool ishdr);
+		void InitProcesses();
+		void InitGlobalRenderParams();
 	};
 }

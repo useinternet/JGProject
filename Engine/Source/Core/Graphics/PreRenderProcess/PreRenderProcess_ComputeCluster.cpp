@@ -72,7 +72,7 @@ namespace JG
 			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, NUM_X_SLICE);
 			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, NUM_Y_SLICE);
 			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, NUM_Z_SLICE);
-			mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE);
+			mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, nullptr, false);
 			mIsDirty		= false;
 			mEnableDispatch = false;
 		}

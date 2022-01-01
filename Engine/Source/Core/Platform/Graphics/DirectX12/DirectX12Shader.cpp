@@ -177,7 +177,7 @@ namespace JG
 				auto name = line.substr(mid + 1, line.length() - mid - 1);
 				name = StringExtend::ReplaceAll(name, "\n", "");  name = StringExtend::ReplaceAll(name, "\t", "");
 				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
-				if (type + " "== HLSL::Token::Texture2D)
+				if (type == HLSL::Token::Texture2D)
 				{
 					String registerSpace = std::to_string(HLSL::RegisterSpace::Texture2DRegisterSpace);
 					String registerNum   = std::to_string(texture2dCnt++);
@@ -185,7 +185,7 @@ namespace JG
 					resourcesCode.insert(lineEnd, registerStr);
 					lineEnd += registerStr.length();
 				}
-				else if (type + " " == HLSL::Token::TextureCube)
+				else if (type == HLSL::Token::TextureCube)
 				{
 					String registerSpace = std::to_string(HLSL::RegisterSpace::TextureCubeRegisterSpace);
 					String registerNum = std::to_string(textureCubeCnt++);

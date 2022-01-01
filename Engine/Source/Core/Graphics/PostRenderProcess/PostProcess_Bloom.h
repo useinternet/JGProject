@@ -3,39 +3,43 @@
 
 namespace JG
 {
+
 	class IMaterial;
 	class PostProcess_Bloom : public IRenderProcess
 	{
-		struct Data
-		{
-			SharedPtr<IMaterial>	  Material;
-			List<SharedPtr<ITexture>> Textures;
-		};
-		
+		// 그릴 텍스쳐
+		JVector2 mBloomResolutoin;
+		//
+		//[Down/Up SamplingIndex][Dest/Src][bufferIndex]
+		List<SharedPtr<ITexture>>  mBloomTextures[5][2];
 
-		// 그리고 바로 사용하는거는 위험 완료된 텍스쳐를 사용해야함
-		//Data mBrightnessData;
+		List<SharedPtr<ITexture>>  mLumaTextures;
+		// Dispatch 할 Computer
+		List<SharedPtr<IComputer>> mExtractBrightnessComputers;
+		List<SharedPtr<IComputer>> mBloomDownSampleComputers;
 
-
-
-		u32 mDownSamplingCount = 4;
-		u32 mBlurCount = 5;
-		SharedPtr<IMaterial>			mBlurHMaterial;
-		List<List<SharedPtr<ITexture>>> mBlurHTextures;
-
-
-		SharedPtr<IMaterial>			mBlurVMaterial;
-		List<List<SharedPtr<ITexture>>> mBlurVTextures;
-
-
-		SharedPtr<IMaterial> mBrightnessMaterial;
-		List<List<SharedPtr<ITexture>>> mBrightnessTextures;
-
-		Data mBloomData;
 
 
 		JVector2 mPrevResolution;
-		JVector2 mDownSamplingResolution;
+
+		RP_Local_Bool  mEnable;
+		RP_Local_Float mBloomThreshold;    // 4.0f, 0.0f, 8.0f
+		RP_Local_Float mUpSamplingFactor;  // 0.65, 0.0f, 1.0f
+
+
+
+		RP_Global_Tex  mLumaResult;
+		RP_Global_Tex  mBloomResult;
+
+
+
+
+		// 1 2 3 4 5
+
+		// 1 -> brightness
+		// 2 3 4 5 -> downsample
+		// 5 -> 5 upsample
+		// 
 	public:
 		PostProcess_Bloom();
 	public:
@@ -45,12 +49,7 @@ namespace JG
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	private:
-		SharedPtr<ITexture> Run_Brightness(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture);
-		SharedPtr<ITexture> Run_BlurH(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture);
-		SharedPtr<ITexture> Run_BlurV(u64 commandID, const RenderInfo& info, i32 index, const JVector2& resolution, SharedPtr<ITexture> sceneTexture);
-		SharedPtr<ITexture> Run_Bloom(u64 commandID, const RenderInfo& info, i32 index, SharedPtr<ITexture> sceneTexture, SharedPtr<ITexture> brightnessTexture);
-	private:
-		void InitMaterial();
-		void InitTexture(const JVector2& resolution);
+		bool InitComputers();
+		bool InitTextures(const JVector2& resolution);
 	};
 }

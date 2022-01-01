@@ -1,3 +1,0 @@
-1. 라이트정보와 렌더링 패스 데이터를 공용데이터로 변경 ( Graphics API 에 바인딩하게 )
-2. 컴퓨트 셰이더는 GlobalGraphicsLibrary를 바인딩 안함(GlobalShaderLibrary -> GlobalGraphicsLibrary 로 이름 변경 )
-3. LightCulling 으로 변경

@@ -1,0 +1,96 @@
+
+
+
+
+
+
+
+
+
+
+
+
+RWTexture2D<uint>   LumaResult;
+
+SamplerState LinearClampSampler
+{
+    Template = Linear_Clamp
+};
+cbuffer CB
+{
+    float2 InverseOutputSize;
+    float  BloomThreshold;
+}
+RWTexture2D<float3> BloomResult;
+
+StructuredBuffer<float> Exposure;
+Texture2D<float3>   SourceTex;
+
+
+[numthreads( 8, 8, 1 )]
+void cs_main( uint3 DTid : SV_DispatchThreadID )
+{
+    float2 uv = (DTid.xy + 0.5) * InverseOutputSize;
+    float2 offset = InverseOutputSize * 0.25;
+
+
+    // 2배 이상 축소 시 언더샘플링을 하지 않도록 4개의 이중선 샘플을 사용합니다.
+    // Use 4 bilinear samples to guarantee we don't undersample when downsizing by more than 2x
+    float3 color1 = SourceTex.SampleLevel( LinearClampSampler, uv + float2(-offset.x, -offset.y), 0 );
+    float3 color2 = SourceTex.SampleLevel( LinearClampSampler, uv + float2( offset.x, -offset.y), 0 );
+    float3 color3 = SourceTex.SampleLevel( LinearClampSampler, uv + float2(-offset.x,  offset.y), 0 );
+    float3 color4 = SourceTex.SampleLevel( LinearClampSampler, uv + float2( offset.x,  offset.y), 0 );
+
+    float luma1 = RGBToLuminance(color1);
+    float luma2 = RGBToLuminance(color2);
+    float luma3 = RGBToLuminance(color3);
+    float luma4 = RGBToLuminance(color4);
+
+    const float kSmallEpsilon = 0.0001;
+
+    float ScaledThreshold = BloomThreshold * Exposure[1];    // BloomThreshold / Exposure
+
+
+    // 우리는 단독 밝기 픽셀이 덜 기여하는 밝기 필터 패스를 수행한다.
+    // We perform a brightness filter pass, where lone bright pixels will contribute less.
+    color1 *= max(kSmallEpsilon, luma1 - ScaledThreshold) / (luma1 + kSmallEpsilon);
+    color2 *= max(kSmallEpsilon, luma2 - ScaledThreshold) / (luma2 + kSmallEpsilon);
+    color3 *= max(kSmallEpsilon, luma3 - ScaledThreshold) / (luma3 + kSmallEpsilon);
+    color4 *= max(kSmallEpsilon, luma4 - ScaledThreshold) / (luma4 + kSmallEpsilon);
+
+    // 조광 필터는 역가중치를 적용하여 블룸 버퍼에서 표류 밝은 픽셀을 제거하는 데 도움이 됩니다.
+    // 휘도에 의해. 전체적인 효과는 테두리 주변의 밝은 픽셀 영역을 축소하는 것입니다.
+    // 외톨이 픽셀은 완전히 용해될 가능성이 높다. 이 효과는 쉬머를 조정하여 조정할 수 있습니다.
+    // 역강도를 필터링합니다. 크기가 클수록 픽셀의 휘도는 중요하지 않습니다.
+    // The shimmer filter helps remove stray bright pixels from the bloom buffer by inversely weighting
+    // them by their luminance.  The overall effect is to shrink bright pixel regions around the border.
+    // Lone pixels are likely to dissolve completely.  This effect can be tuned by adjusting the shimmer
+    // filter inverse strength.  The bigger it is, the less a pixel's luminance will matter.
+
+
+    const float kShimmerFilterInverseStrength = 1.0f;
+    float weight1 = 1.0f / (luma1 + kShimmerFilterInverseStrength);
+    float weight2 = 1.0f / (luma2 + kShimmerFilterInverseStrength);
+    float weight3 = 1.0f / (luma3 + kShimmerFilterInverseStrength);
+    float weight4 = 1.0f / (luma4 + kShimmerFilterInverseStrength);
+    float weightSum = weight1 + weight2 + weight3 + weight4;
+
+    BloomResult[DTid.xy] = (color1 * weight1 + color2 * weight2 + color3 * weight3 + color4 * weight4) / weightSum;
+
+
+    float luma = (luma1 + luma2 + luma3 + luma4) * 0.25;
+
+    // 로그(0)를 방지하고 히스토그램[0]에 순수 검은색 픽셀만 넣습니다.
+    if (luma == 0.0)
+    {
+        LumaResult[DTid.xy] = 0;
+    }
+    else
+    {
+        const float MinLog      = Exposure[4]; 
+        const float RcpLogRange = Exposure[7];
+
+        float logLuma = saturate((log2(luma) - MinLog) * RcpLogRange);    // Rescale to [0.0, 1.0]
+        LumaResult[DTid.xy] = logLuma * 254.0 + 1.0;                      // Rescale to [1, 255]
+    }
+}

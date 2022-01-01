@@ -4,6 +4,7 @@
 #include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/Renderer/FowardRenderer.h"
 #include "Graphics/Renderer/DeferredRenderer.h"
+#include "GraphicsHelper.h"
 #include "Application.h"
 
 namespace JG
@@ -405,6 +406,8 @@ namespace JG
 			// 비동기로 렌더링 시작
 			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
+				u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
+
 				RenderInfo info;
 				info.Resolution = mSceneInfo.Resolution;
 				info.ViewProjMatrix	    = mSceneInfo.ViewProjMatrix;
@@ -414,6 +417,7 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition		= mSceneInfo.EyePos;
 				info.CurrentBufferIndex = mCurrentIndex;
+				info.CompeleteBufferIndex = GraphicsHelper::GetCompeleteBufferIndex(mCurrentIndex);
 				info.IsHDR = mSceneInfo.IsHDR;
 				info.ClearColor = mSceneInfo.ClearColor;
 
@@ -497,7 +501,8 @@ namespace JG
 			// Rendering 이 끝났으니. 다시 정보수정 Ok
 			UnLock();
 
-			mCurrentIndex = (mCurrentIndex + 1) % JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
+			u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount() + 1;
+			mCurrentIndex = (mCurrentIndex + 1) % bufferCnt;
 
 
 			return mSceneResult;

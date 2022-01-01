@@ -9,20 +9,16 @@ namespace JG
 	public:
 		const static constexpr char* SCRIPT_NAME = "Scene/ToneMapping";
 		const static constexpr char* MATERIAL_PARAM_SCENETEXTURE = "SceneTexture";
-		const static constexpr char* MATERIAL_PARAM_EXPOSURE = "Exposure";
+		const static constexpr char* MATERIAL_PARAM_EXPOSURE     = "Exposure";
 
 	private:
-		List<SharedPtr<ITexture>> mTargetTextures;
-		SharedPtr<IMaterial>      mSceneMaterial;
-
-
-		f32 mExposure = 2.0f;
-		bool mIsEnable = true;
-
+		// 그릴 텍스쳐
+		List<SharedPtr<ITexture>>  mTargetTextures;
+		// Dispatch 할 Computer
+		List<SharedPtr<IComputer>> mComputers;
 
 
 		JVector2 mPrevResolution;
-	
 	public:
 		PostProcess_ToneMapping();
 	public:
@@ -32,6 +28,7 @@ namespace JG
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	private:
-		void InitTexture(const JVector2& size);
+		void InitComputers();
+		void InitTextures(const JVector2& size);
 	};
 }

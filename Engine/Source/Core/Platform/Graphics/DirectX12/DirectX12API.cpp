@@ -192,6 +192,7 @@ namespace JG
 			desc.DestBlendAlpha = D3D12_BLEND_ZERO;
 			desc.BlendOpAlpha   = D3D12_BLEND_OP_ADD;
 			desc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL & ~D3D12_COLOR_WRITE_ENABLE_ALPHA;
+			break;
 		}
 
 		if (out != nullptr)
@@ -281,6 +282,7 @@ namespace JG
 			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
 			D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
 			D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
 
 		const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
 			2, // shaderRegister
@@ -827,13 +829,4 @@ namespace JG
 
 		return texture;
 	}
-	//SharedPtr<ITexture> DirectX12API::CreateTexture(const TextureAssetStock& stock)
-	//{
-	//	if (stock.Pixels.empty()) return nullptr;
-	//	auto texture = CreateSharedPtr<DirectX12Texture>();
-	//	texture->CreateFromMemory(stock.Name, (const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
-	//	return texture;
-	//}
-
-
 }

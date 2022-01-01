@@ -46,6 +46,7 @@ namespace JG
 		}
 		// RWTexture
 		pos = 0;
+		while (pos != String::npos)
 		{
 			pos = AnalysisRWTexture2D(code, pos, &result);
 		}
@@ -298,11 +299,24 @@ namespace JG
 		{
 			u64 endPos = code.find(";", dataTokenStartPos);
 
+
+
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
 
-
 			String nameCode = StringExtend::ReplaceAll(dataCode, HLSL::Token::Texture2D, "");
+			u64 labPos = nameCode.find("<"); u64 rabPos = nameCode.find(">");
+			if (labPos != String::npos && rabPos != String::npos)
+			{
+				String dataType = nameCode.substr(labPos, rabPos - labPos + 1);
+				nameCode = StringExtend::ReplaceAll(nameCode, dataType, "");
+			}
+
 			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+			
+
+
+
+
 
 			u64 arraySize = 1;
 
@@ -354,6 +368,9 @@ namespace JG
 			return String::npos;
 		}
 		return startPos;
+	
+		//Math::DivideByMultiple(dstWidth, 8), Math::DivideByMultiple(dstHeight, 8) , 8);
+
 	}
 	u64 ShaderDataForm::AnalysisSamplerState(String& code, u64 startPos, bool* result)
 	{
@@ -405,7 +422,10 @@ namespace JG
 					}
 					return String::npos;
 				}
-
+				if (nameCode == "LinearClampSampler2")
+				{
+					int n = 0;
+				}
 				auto samplerStateData = SamplerStateDataMap[nameCode].get();
 				samplerStateData->Desc = CreateSamplerStateDesc(SamplerDataMap);
 
@@ -514,11 +534,10 @@ namespace JG
 		{
 			u64 endPos = code.find(";", dataTokenStartPos);
 
+			dataTokenStartPos = code.find(">", dataTokenStartPos) + 1;
+
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
-
-
-			String nameCode = StringExtend::ReplaceAll(dataCode, HLSL::Token::RWTexture2D, "");
-			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+			String nameCode = StringExtend::ReplaceAll(dataCode, " ", "");
 
 			u64 arraySize = 1;
 
@@ -703,6 +722,7 @@ namespace JG
 		if (samplerDataMap.find(HLSL::Token::SamplerStateElement::Template) != samplerDataMap.end())
 		{
 			CreateSamplerStateByTemplate(StringToSamplerStateTemplate(samplerDataMap.at(HLSL::Token::SamplerStateElement::Template)), &desc);
+			return desc;
 		}
 		else
 		{
@@ -810,6 +830,18 @@ namespace JG
 				D3D12_FILTER_MIN_MAG_MIP_POINT,
 				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER);
 			break;
+		case ESamplerStateTemplate::Point_Border_TransparentBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_MIN_MAG_MIP_POINT,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK);
+			break;
+		case ESamplerStateTemplate::Point_Border_OpaqueBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_MIN_MAG_MIP_POINT,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK);
+			break;
 		case ESamplerStateTemplate::Point_Mirror:
 			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
 				D3D12_FILTER_MIN_MAG_MIP_POINT,
@@ -835,6 +867,18 @@ namespace JG
 				D3D12_FILTER_MIN_MAG_MIP_LINEAR,
 				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER);
 			break;
+		case ESamplerStateTemplate::Linear_Border_TransparentBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK);
+			break;
+		case ESamplerStateTemplate::Linear_Border_OpaqueBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK);
+			break;
 		case ESamplerStateTemplate::Linear_Mirror:
 			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
 				D3D12_FILTER_MIN_MAG_MIP_LINEAR,
@@ -859,6 +903,18 @@ namespace JG
 			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
 				D3D12_FILTER_ANISOTROPIC,
 				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER);
+			break;
+		case ESamplerStateTemplate::Anisotropic_Border_TransparentBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_ANISOTROPIC,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK);
+			break;
+		case ESamplerStateTemplate::Anisotropic_Border_OpaqueBlack:
+			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
+				D3D12_FILTER_ANISOTROPIC,
+				D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+				0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK);
 			break;
 		case ESamplerStateTemplate::Anisotropic_Mirror:
 			*out_desc = CD3DX12_STATIC_SAMPLER_DESC(0,
@@ -1291,21 +1347,35 @@ namespace JG
 
 	bool ShaderData::SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture)
 	{
-		if (mTextureDatas.find(name) == mTextureDatas.end())
+		if (mTextureDatas.find(name) != mTextureDatas.end())
 		{
-			return false;
+			auto& textureList = mTextureDatas[name];
+			u64 textureCount = textureList.size();
+
+			if (textureCount <= textureSlot)
+			{
+				return false;
+			}
+
+			textureList[textureSlot] = texture;
+			return true;
+		}
+		if (mRWTextureDatas.find(name) != mRWTextureDatas.end())
+		{
+
+			auto& textureList = mRWTextureDatas[name];
+			u64 textureCount = textureList.size();
+
+			if (textureCount <= textureSlot)
+			{
+				return false;
+			}
+
+			textureList[textureSlot] = texture;
+			return true;
 		}
 
-		auto& textureList = mTextureDatas[name];
-		u64 textureCount = textureList.size();
-
-		if (textureCount <= textureSlot)
-		{
-			return false;
-		}
-
-		textureList[textureSlot] = texture;
-		return true;
+		return false;
 	}
 
 

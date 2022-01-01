@@ -201,3 +201,12 @@ uint3 GetClusterIndex3(float3 posH)
     uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
     return clusterIndexs;
 }
+
+
+
+
+
+
+
+
+

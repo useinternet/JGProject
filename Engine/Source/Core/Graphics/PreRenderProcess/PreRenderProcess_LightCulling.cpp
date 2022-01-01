@@ -58,7 +58,7 @@ namespace JG
 			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_X_SLICE);
 			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
 			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
-			mComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
+			mComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, nullptr, false);
 			mEnableDispatch = false;
 		}
 		else

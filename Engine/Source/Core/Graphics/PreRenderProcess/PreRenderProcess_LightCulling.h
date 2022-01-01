@@ -45,7 +45,7 @@ namespace JG
 		SharedPtr<IReadBackBuffer> mVisibleLightIndicesRBB;
 		SharedPtr<IReadBackBuffer> mLightGridRBB;
 
-		bool mEnableDispatch = true;
+		bool mEnableDispatch    = true;
 		i32  mCompeleteRBBCount = 0;
 		Renderer* mRenderer = nullptr;
 		PreRenderProcess_ComputeCluster* mComputeClusterProcess  = nullptr;

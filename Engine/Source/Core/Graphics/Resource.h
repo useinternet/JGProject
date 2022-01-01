@@ -143,7 +143,7 @@ namespace JG
 		virtual void SetName(const String& name) = 0;
 		virtual EComputerState GetState() const = 0;
 		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
-			const std::function<void()>& onCompelete = nullptr) = 0;
+			const std::function<void()>& onCompelete = nullptr, bool asComputeCommand = true) = 0;
 	public:
 		static SharedPtr<IComputer> Create(const String& name, SharedPtr<IComputeShader> shader);
 	};

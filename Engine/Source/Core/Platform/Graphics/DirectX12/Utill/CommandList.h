@@ -16,6 +16,8 @@ namespace JG
 	class DirectX12Texture;
 	class GraphicsPipelineState;
 	class ComputePipelineState;
+
+	class ComputeCommandList;
 	class CommandList
 	{
 	protected:
@@ -24,18 +26,21 @@ namespace JG
 		ComPtr<ID3D12RootSignature> mBindedComputeRootSig = nullptr;
 		ComPtr<ID3D12DescriptorHeap> mBindedDescriptorHeap = nullptr;
 
-		D3D12_COMMAND_LIST_TYPE           mD3DType;
-		ComPtr<ID3D12GraphicsCommandList> mD3DCommandList;
-		ComPtr<ID3D12CommandAllocator>    mD3DAllocator;
+		D3D12_COMMAND_LIST_TYPE           mD3DType;            // 공용
+		ComPtr<ID3D12GraphicsCommandList> mD3DCommandList;     // 공용
+		ComPtr<ID3D12CommandAllocator>    mD3DAllocator;       // 공용
 
-		List<ComPtr<ID3D12Object>> mTempObjectList;
-		UniquePtr<ResourceStateTracker> mResourceStateTracker;
-		UniquePtr<DynamicDescriptorAllocator> mDynamicDescriptorAllocator;
-		UniquePtr<UploadAllocator> mUploadAllocator;
+		SharedPtr<List<ComPtr<ID3D12Object>>>      mTempObjectList;       // 공용
+		SharedPtr<ResourceStateTracker> mResourceStateTracker; // 공용
+		SharedPtr<UploadAllocator>      mUploadAllocator;      // 공용
+
+
+		SharedPtr<DynamicDescriptorAllocator> mDynamicDescriptorAllocator; // 따로
 		bool mIsClose = false;
 	public:
+		CommandList() = default;
 		CommandList(D3D12_COMMAND_LIST_TYPE d3dType);
-		virtual ~CommandList();
+		virtual ~CommandList() = default;
 	public:
 		ID3D12GraphicsCommandList* Get() const {
 			return mD3DCommandList.Get();
@@ -60,8 +65,9 @@ namespace JG
 	{
 	private:
 		List<D3D12_VERTEX_BUFFER_VIEW> mVertexViews;
+		SharedPtr<DynamicDescriptorAllocator> mComputeDynamicDescriptorAllocator;
 	public:
-		GraphicsCommandList(D3D12_COMMAND_LIST_TYPE d3dType) : CommandList(d3dType) {};
+		GraphicsCommandList(D3D12_COMMAND_LIST_TYPE d3dType); 
 		virtual ~GraphicsCommandList() = default;
 	public:
 		virtual void Reset() override;
@@ -97,11 +103,15 @@ namespace JG
 
 		void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0);
 		void Draw(u32 vertexPerInstance, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0);
+
+		SharedPtr<ComputeCommandList> AsCompute();
 	};
 
 	class ComputeCommandList : public CommandList
 	{
+		friend GraphicsCommandList;
 	public:
+		ComputeCommandList() : CommandList() {}
 		ComputeCommandList(D3D12_COMMAND_LIST_TYPE d3dType) : CommandList(d3dType) {};
 		virtual ~ComputeCommandList() = default;
 	public:
@@ -118,6 +128,8 @@ namespace JG
 		void Dispatch(u32 groupX, u32 groupY, u32 groupZ);
 	};
 
+
+
 	class CopyCommandList : public CommandList
 	{
 	public:
@@ -125,5 +137,6 @@ namespace JG
 		virtual ~CopyCommandList() = default;
 	};
 	
+
 }
 

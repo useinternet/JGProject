@@ -190,7 +190,7 @@ namespace JG
 		virtual EComputerState GetState() const override;
 		virtual bool Dispatch(
 			u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
-			const std::function<void()>& onCompelete) override;
+			const std::function<void()>& onCompelete, bool asComputeCommand) override;
 	};
 
 
