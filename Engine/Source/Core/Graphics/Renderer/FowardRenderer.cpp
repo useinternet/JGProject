@@ -147,10 +147,17 @@ namespace JG
 //    Exposure, 1.0f / Exposure, Exposure, 0.0f,
 //    kInitialMinLog, kInitialMaxLog, kInitialMaxLog - kInitialMinLog, 1.0f / (kInitialMaxLog - kInitialMinLog)
 
-		mExposure = RP_Global_Float::Create("Renderer/Exposure", 2.0f, this);
-		mInitialMinLog = RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, this);
-		mInitialMaxLog = RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, this);
 
+		// 2.0f, -8.0f, 8.0f, 0.25f
+		RP_Global_Float::Create("Renderer/Exposure", 2.0f, this);
+		RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, this);
+		RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, this);
+		RP_Global_Float::Create("Renderer/HDRPaperWhite", 3.0f, this);
+		RP_Global_Float::Create("Renderer/MaxDisplayLuminance", 500.0f, this);
+
+		//200.0f, 100.0f, 500.0f, 50.0f
+// MaxDisplayLuminance = 1000.0f, 500.0f, 10000.0f, 100.0f
+		// RenderParam
 		// Bloom »ý¼º
 
 		// ToneMapHDRCS

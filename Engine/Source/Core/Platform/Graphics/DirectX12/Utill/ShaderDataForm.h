@@ -9,10 +9,10 @@ namespace JG
 	class ITexture;
 	class ShaderDataForm
 	{
-	public:
-		static const u64 Tex2D_StartSpace		= 0;
-		static const u64 TextureCube_StartSpace = 1;
-		static const u64 SB_StartSpace	        = 2;
+	private:
+		static const u64 MAX_CB_COUNT = 5;
+		static const u64 MAX_SB_COUNT   = 10;
+		static const u64 MAS_RWSB_COUNT = 10;
 	public:
 		class CBufferData;
 		class ShaderElement
@@ -42,13 +42,6 @@ namespace JG
 		public:
 			virtual ~TextureData() = default;
 		};
-		class SamplerStateData : public ShaderElement
-		{
-		public:
-			D3D12_STATIC_SAMPLER_DESC Desc;
-		public:
-			virtual ~SamplerStateData() = default;
-		};
 		class CBufferData : public ShaderElement
 		{
 		public:
@@ -72,25 +65,24 @@ namespace JG
 			u64 DataSize = 0;
 		};
 	public:
-		SortedDictionary<u64, ShaderElement*>			RootParamMap;
 		Dictionary<String, UniquePtr<CBufferData>>		CBufferDataMap;
 		Dictionary<String, UniquePtr<StructuredBufferData>> StructuredBufferDataMap;
 		Dictionary<String, UniquePtr<StructuredBufferData>> RWStructuredBufferDataMap;
 		Dictionary<String, UniquePtr<TextureData>>		TextureDataMap;
+		SortedDictionary<u64, TextureData*> SortedTextureDataMap;
+
 		Dictionary<String, UniquePtr<TextureData>>		RWTextureDataMap;
-		Dictionary<String, UniquePtr<SamplerStateData>> SamplerStateDataMap;
+		SortedDictionary<u64, TextureData*> SortedRWTextureDataMap;
+
 		Dictionary<String, Data*>		                CBufferVarMap;
 		Dictionary<String, UniquePtr<StructData>>       StructDataMap;
 	private:
-		u64 RootParamOffset = 0;
-		u64 CBufferRegisterNumberOffset = 0;
-		u64 TextureRegisterNumberOffset = 0;
-		u64 TextureCubeRegisterNumberOffset = 0;
-		u64 SamplerStateRegisterNumberOffset = 0;
+		u64 CBOffset = 0;
+		u64 SBOffset = 0;
+		u64 RWSBOffset = 0;
 
-
-		u64 T_SpaceOffset = 0;
-		u64 U_SpaceOffset = 0;
+		u64 TexRegisterNumOffset   = 0;
+		u64 RWTexRegisterNumOffset = 0;;
 	public:
 		bool Set(String& code);
 		void Reset();
@@ -99,7 +91,6 @@ namespace JG
 		u64 AnalysisCBuffer(String& code, u64 startPos, bool* result);
 		u64 AnalysisStructuredBuffer(String& code, u64 startPos, bool* result);
 		u64 AnalysisTexture2D(String& code, u64 startPos, bool* result);
-		u64 AnalysisSamplerState(String& code, u64 startPos, bool* result);
 		u64 AnalysisRWStructuredBuffer(String& code, u64 startPos, bool* result);
 		u64 AnalysisRWTexture2D(String& code, u64 startPos, bool* result);
 	public:
@@ -110,15 +101,6 @@ namespace JG
 		u64 ExtractVarCode(const String& code, u64 pos, String* out_value);
 		u64 ExtractSamplerStateValue(const String& samplerStateDataCode, u64 startPos, String* out_key, String* out_value);
 	private:
-		D3D12_STATIC_SAMPLER_DESC CreateSamplerStateDesc(const Dictionary<String, String>& samplerDataMap);
-		void CreateSamplerStateByTemplate(ESamplerStateTemplate _template, D3D12_STATIC_SAMPLER_DESC* out_desc);
-
-
-		D3D12_FILTER GetSamplerStateFilter(const String& Min, const String& Mag, const String& Mip);
-		D3D12_TEXTURE_ADDRESS_MODE GetTextureAddressMode(const String& addressMode);
-		D3D12_COMPARISON_FUNC GetComparisonFunc(const String& comparisonFunc);
-		D3D12_STATIC_BORDER_COLOR GetBorderColor(const String& borderColor);
-	private:
 		bool RegisterStruct(const String& name);
 		bool RegisterStructVar(StructData* structData, const String& varCode);
 		bool RegisterStructuredBuffer(const String& name);
@@ -127,7 +109,6 @@ namespace JG
 		bool RegisterTextureData(const String& name);
 		bool RegisterRWTextureData(const String& name);
 		bool RegisterCBufferVar(CBufferData* cBuffer, const String& varCode, u64& uploadDataSize);
-		bool RegisterSamplerStateData(const String& name);
 	};
 
 	class IShader;
@@ -150,7 +131,6 @@ namespace JG
 	public:
 		ShaderData(SharedPtr<ShaderDataForm> shaderDataForm);
 	public:
-		SharedPtr<RootSignature> GetRootSignature();
 		void ForEach_CB(const std::function<void(const ShaderDataForm::CBufferData*, const List<jbyte>&)>& action);
 		void ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action);
 		void ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action);

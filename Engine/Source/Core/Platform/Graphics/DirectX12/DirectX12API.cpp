@@ -42,6 +42,8 @@ namespace JG
 	static Dictionary<u64, SharedPtr<GraphicsPipelineState>> gGraphicsPSOs;
 	static Dictionary<u64, SharedPtr<ComputePipelineState>>  gComputePSOs;
 	static Dictionary<u64, SharedPtr<RootSignature>> gGraphicsRootSignatures;
+	static Dictionary<u64, SharedPtr<RootSignature>> gComputeRootSignatures;
+
 
 	static std::mutex gDeviceMutex;
 
@@ -145,7 +147,12 @@ namespace JG
 
 	SharedPtr<RootSignature> DirectX12API::GetComputeRootSignature(u64 ID)
 	{
-		return nullptr;
+		std::lock_guard<std::mutex> lock(gRootSigMutex);
+		if (gComputeRootSignatures[ID] == nullptr)
+		{
+			gComputeRootSignatures[ID] = CreateComputeRootSignature();
+		}
+		return gComputeRootSignatures[ID];
 	}
 	void DirectX12API::GetDepthStencilDesc(EDepthStencilStateTemplate _template, D3D12_DEPTH_STENCIL_DESC* out)
 	{
@@ -269,6 +276,49 @@ namespace JG
 		rootSig->InitAsSRV(0, HLSL::RegisterSpace::LightGridRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
 		rootSig->InitAsSRV(0, HLSL::RegisterSpace::VisibleLightIndicesRegisterSpace, D3D12_SHADER_VISIBILITY_PIXEL);
 
+		AddStaticSamplerState(rootSig);
+
+		rootSig->Finalize();
+		return rootSig;
+	}
+
+	SharedPtr<RootSignature> DirectX12API::CreateComputeRootSignature()
+	{
+		auto rootSig = CreateSharedPtr<RootSignature>();
+
+		// CB 0 ~ 4
+		rootSig->InitAsCBV(0, 0);
+		rootSig->InitAsCBV(1, 0);
+		rootSig->InitAsCBV(2, 0);
+		rootSig->InitAsCBV(3, 0);
+		rootSig->InitAsCBV(4, 0);
+
+
+
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::Texture2DRegisterSpace);
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::TextureCubeRegisterSpace);
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, HLSL::RegisterSpace::RWTexture2DRegisterSpace);
+
+
+		for (i32 i = 0; i < 10; ++i)
+		{
+			rootSig->InitAsSRV(0, HLSL::RegisterSpace::StructuredBufferRegisterSpace + i);
+
+		}
+		for (i32 i = 0; i < 10; ++i)
+		{
+			rootSig->InitAsUAV(0, HLSL::RegisterSpace::RWStructuredBufferRegisterSpace + i);
+		}
+
+		AddStaticSamplerState(rootSig);
+
+
+		rootSig->Finalize();
+
+		return rootSig;
+	}
+	void DirectX12API::AddStaticSamplerState(SharedPtr<RootSignature> rootSig)
+	{
 		// Sampler
 		const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
 			0, // shaderRegister
@@ -316,6 +366,15 @@ namespace JG
 			0.0f,                             // mipLODBias
 			8);                               // maxAnisotropy
 
+		const CD3DX12_STATIC_SAMPLER_DESC bilinearClamp(
+			6,
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+			D3D12_TEXTURE_ADDRESS_MODE_BORDER, 
+			D3D12_TEXTURE_ADDRESS_MODE_BORDER, 
+			D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+			0.0f, 16, D3D12_COMPARISON_FUNC_LESS_EQUAL, 
+			D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK);
+
 
 		rootSig->AddStaticSamplerState(pointWrap);
 		rootSig->AddStaticSamplerState(linearWrap);
@@ -323,9 +382,7 @@ namespace JG
 		rootSig->AddStaticSamplerState(pointClampWrap);
 		rootSig->AddStaticSamplerState(linearClampWrap);
 		rootSig->AddStaticSamplerState(anisotropicClampWrap);
-
-		rootSig->Finalize();
-		return rootSig;
+		rootSig->AddStaticSamplerState(bilinearClamp);
 	}
 	bool DirectX12API::Create()
 	{
@@ -371,10 +428,6 @@ namespace JG
 		gCopyCommandQueue     = CreateUniquePtr<CommandQueue>(gFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
 
 
-		//gGracphisPSO   = CreateSharedPtr<GraphicsPipelineState>();
-		//gComputePSO    = CreateSharedPtr<ComputePipelineState>();
-		//gRootSignature = CreateSharedPtr<RootSignature>();
-
 		JG_CORE_INFO("DirectX12 Init End");
 		return true;
 	}
@@ -387,6 +440,7 @@ namespace JG
 		gGraphicsPSOs.clear();
 		gComputePSOs.clear();
 		gGraphicsRootSignatures.clear();
+		gComputeRootSignatures.clear();
 		for (auto& _pair : gFrameBuffers)
 		{
 			_pair.second->Reset();
@@ -471,19 +525,19 @@ namespace JG
 	void DirectX12API::SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)
 	{
 		auto cmdList = GetGraphicsCommandList(commandID);
-		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
+		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
 	}
 
 	void DirectX12API::SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids)
 	{
 		auto cmdList = GetGraphicsCommandList(commandID);
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::ERootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
+		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
 	}
 
 	void DirectX12API::SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies)
 	{
 		auto cmdList = GetGraphicsCommandList(commandID);
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::ERootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
+		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
 	}
 
 	void DirectX12API::SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights)
@@ -509,7 +563,7 @@ namespace JG
 			void* pl_ptr = lightDic[Graphics::ELightType::PointLight].data();
 			u64 pl_size = lightSizeDic[Graphics::ELightType::PointLight];
 			u64 pl_count = lightDic[Graphics::ELightType::PointLight].size() / pl_size;
-			cmdList->BindStructuredBuffer((u32)ShaderDefine::ERootParam::SB_POINT_LIGHTS, pl_ptr, pl_count, pl_size);
+			cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_POINT_LIGHTS, pl_ptr, pl_count, pl_size);
 		}
 
 
@@ -537,14 +591,14 @@ namespace JG
 
 		if (handles.empty() == false)
 		{
-			cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURE2D, handles);
+			cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, handles);
 		}
 	}
 
 	void DirectX12API::SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount)
 	{
 		auto cmdList = GetGraphicsCommandList(commandID);
-		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
+		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
 	}
 
 	void DirectX12API::SetViewports(u64 commandID, const List<Viewport>& viewPorts)

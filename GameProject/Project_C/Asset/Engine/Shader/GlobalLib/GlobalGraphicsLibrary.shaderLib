@@ -33,12 +33,7 @@ StructuredBuffer<PointLight> _PointLightList : register(t0, space3);
 StructuredBuffer<LightGrid> _LightGridList : register(t0, space11);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t0, space12);
  
-SamplerState _PointSampler  : register(s0);
-SamplerState _LinearSampler : register(s1);
-SamplerState _AnisotropicSampler : register(s2);
-SamplerState _PointClampSampler  : register(s3);
-SamplerState _LinearClampSampler : register(s4);
-SamplerState _AnisotropicClampSampler : register(s5);
+
 
 
 // NDF
@@ -155,21 +150,32 @@ float3 CalcPointLight(float3 N, float3 V, Material material, PointLight light)
 	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
 	kD *= 1.0 - material.Metallic;
 
+
     float att = 0.0f;
-    float  d  = length(light.Position - material.WorldPosition);
+    float d  = length(light.Position - material.WorldPosition);
     if(d <= light.Range)
     {
-        
-        att = light.Att0 + (light.Att1 * d) + (light.Att2 * d * d);
-        att = 1 / att;      
+        if(d >= light.AttRange)
+        {
+            d = max(d - light.AttRange, 0.0f);
+            att = light.Att0 + (light.Att1 * d) + (light.Att2 * d * d);
+            att = 1 / att;  
+        }
+        else
+        {
+            att = 1.0f;
+        }
+    
     }
     else
     {
         att = 0.0f;
     }
+
+
 	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
     Lo = material.Albedo * NoL;
-    return Lo * att * light.Intensity * light.Color;
+    return Lo * att * light.Intensity * 0.3f * light.Color;
 }
 
 

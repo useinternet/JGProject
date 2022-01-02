@@ -76,6 +76,8 @@ namespace JG
 		static void DestroyCommittedResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource);
 	private:
 		static SharedPtr<RootSignature> CreateGraphicsRootSignature();
+		static SharedPtr<RootSignature> CreateComputeRootSignature();
+		static void AddStaticSamplerState(SharedPtr<RootSignature> rootSig);
 	protected:
 		// Application
 		virtual bool Create() override;

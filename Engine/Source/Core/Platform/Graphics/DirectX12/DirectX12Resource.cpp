@@ -633,106 +633,26 @@ namespace JG
 		{
 			return false;
 		}
-		if (mState == EComputerState::Run)
-		{
-			return false;
-		}
+		//if (mState == EComputerState::Run)
+		//{
+		//	return false;
+		//}
 		mState = EComputerState::Run;
 
 
-		SharedPtr<ComputeCommandList> asComputeList;
-		ComputeCommandList* commandList = nullptr;
-
 		if (asComputeCommand)
 		{
-			commandList = DirectX12API::GetComputeCommandList(commandID);
+			ComputeCommandList* commandList = DirectX12API::GetComputeCommandList(commandID);
+			DispatchInternal(commandID, commandList, groupX, groupY, groupZ);
 		}
 		else
 		{
 			auto graphicsCmdList = DirectX12API::GetGraphicsCommandList(commandID);
-			asComputeList = graphicsCmdList->AsCompute();
-			commandList = asComputeList.get();
+			graphicsCmdList->AsCompute([&](SharedPtr<ComputeCommandList> commandList)
+			{
+				DispatchInternal(commandID, commandList.get(), groupX, groupY, groupZ);
+			});
 		}
-
-
-	
-
-
-		//
-		auto RootSig = mShaderData->GetRootSignature();
-		commandList->BindRootSignature(RootSig);
-
-
-		// Data Bind
-		mShaderData->ForEach_CB([&](const ShaderDataForm::CBufferData* data, const List<jbyte>& btData)
-		{
-			commandList->BindConstantBuffer(data->RootParm, btData.data(), btData.size());
-		});
-		mShaderData->ForEach_SB([&](const ShaderDataForm::StructuredBufferData* data, const List<jbyte>& btData)
-		{
-			u64 elementSize  = data->ElementDataSize;
-			u64 elementCount = btData.size() / elementSize;
-			commandList->BindStructuredBuffer(data->RootParm, btData.data(), elementCount, elementSize);
-		});
-		mShaderData->ForEach_RWSB([&](const ShaderDataForm::StructuredBufferData* data, SharedPtr<IReadWriteBuffer> rwBuffer)
-		{
-			auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(rwBuffer.get());
-			commandList->BindStructuredBuffer(data->RootParm, dx12RWBuffer->GetBufferID(), dx12RWBuffer->Get());
-		});
-		mShaderData->ForEach_Tex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
-		{
-			u64 textureCount = textureList.size();
-			List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-
-
-			for (u64 i = 0; i < textureCount; ++i)
-			{
-				if (textureList[i] != nullptr && textureList[i]->IsValid())
-				{
-					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
-				}
-			}
-
-
-			if (handles.empty() == false)
-			{
-				commandList->BindTextures((u32)data->RootParm, handles);
-			}
-		});
-
-		mShaderData->ForEach_RWTex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
-		{
-			u64 textureCount = textureList.size();
-			List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-
-
-			for (u64 i = 0; i < textureCount; ++i)
-			{
-				if (textureList[i] != nullptr && textureList[i]->IsValid())
-				{
-					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
-				}
-			}
-
-
-			if (handles.empty() == false)
-			{
-				commandList->BindTextures((u32)data->RootParm, handles);
-			}
-		});
-
-
-
-
-		auto PSO = DirectX12API::GetComputePipelineState(commandID);
-		PSO->BindRootSignature(*RootSig);
-		PSO->BindShader(*(static_cast<DirectX12ComputeShader*>(mOwnerShader.get())));
-		if (PSO->Finalize() == false)
-		{
-			return false;
-		}
-		commandList->BindPipelineState(PSO);
-		commandList->Dispatch(groupX, groupY, groupZ);
 
 
 		if (mScheduleHandle && mScheduleHandle->IsValid())
@@ -753,6 +673,83 @@ namespace JG
 			return EScheduleResult::Break;
 		});
 
+		return true;
+	}
+
+	bool  DirectX12Computer::DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ)
+	{
+		auto RootSig = DirectX12API::GetComputeRootSignature(commandID); //mShaderData->GetRootSignature();
+		commandList->BindRootSignature(RootSig);
+
+
+		// Data Bind
+		mShaderData->ForEach_CB([&](const ShaderDataForm::CBufferData* data, const List<jbyte>& btData)
+		{
+			commandList->BindConstantBuffer(data->RootParm, btData.data(), btData.size());
+		});
+		mShaderData->ForEach_SB([&](const ShaderDataForm::StructuredBufferData* data, const List<jbyte>& btData)
+		{
+			u64 elementSize = data->ElementDataSize;
+			u64 elementCount = btData.size() / elementSize;
+			commandList->BindStructuredBuffer(data->RootParm, btData.data(), elementCount, elementSize);
+		});
+		mShaderData->ForEach_RWSB([&](const ShaderDataForm::StructuredBufferData* data, SharedPtr<IReadWriteBuffer> rwBuffer)
+		{
+			auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(rwBuffer.get());
+			commandList->BindStructuredBuffer(data->RootParm, dx12RWBuffer->GetBufferID(), dx12RWBuffer->Get());
+		});
+
+
+
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+		mShaderData->ForEach_Tex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
+		{
+			u64 textureCount = textureList.size();
+			for (u64 i = 0; i < textureCount; ++i)
+			{
+				if (textureList[i] != nullptr && textureList[i]->IsValid())
+				{
+					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
+				}
+			}
+		});
+		if (handles.empty() == false)
+		{
+			commandList->BindTextures((u32)ShaderDefine::EComputeRootParam::TEXTURE2D, handles);
+		}
+		handles.clear();
+
+
+
+		mShaderData->ForEach_RWTex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
+		{
+			u64 textureCount = textureList.size();
+			for (u64 i = 0; i < textureCount; ++i)
+			{
+				if (textureList[i] != nullptr && textureList[i]->IsValid())
+				{
+					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
+				}
+			}
+		});
+
+		if (handles.empty() == false)
+		{
+			commandList->BindTextures((u32)ShaderDefine::EComputeRootParam::RWTEXTURE2D, handles);
+		}
+
+
+
+
+		auto PSO = DirectX12API::GetComputePipelineState(commandID);
+		PSO->BindRootSignature(*RootSig);
+		PSO->BindShader(*(static_cast<DirectX12ComputeShader*>(mOwnerShader.get())));
+		if (PSO->Finalize() == false)
+		{
+			return false;
+		}
+		commandList->BindPipelineState(PSO);
+		commandList->Dispatch(groupX, groupY, groupZ);
 		return true;
 	}
 

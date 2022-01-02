@@ -17,6 +17,7 @@ namespace JG
 	enum class ETextureFormat
 	{
 		None,
+		R8_Unorm,
 		R8G8B8A8_Unorm,
 		R16G16B16A16_Unorm,
 		R11G11B10_Float,
@@ -30,6 +31,7 @@ namespace JG
 		switch (format)
 		{
 		case ETextureFormat::R11G11B10_Float:    return "R11G11B10_Float";
+		case ETextureFormat::R8_Unorm:			 return "R8_Unrom";
 		case ETextureFormat::R8G8B8A8_Unorm:     return "R8G8B8A8_Unorm";
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
 		case ETextureFormat::R32G32B32A32_Float: return "R32G32B32A32_Float";
@@ -47,6 +49,7 @@ namespace JG
 		switch (format)
 		{
 		case ETextureFormat::R11G11B10_Float:    return DXGI_FORMAT_R11G11B10_FLOAT;
+		case ETextureFormat::R8_Unorm:			 return DXGI_FORMAT_R8_UNORM;
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -340,7 +343,7 @@ namespace JG
 
 	namespace ShaderDefine
 	{
-		enum class ERootParam
+		enum class EGraphcisRootParam
 		{
 			SB_POINT_LIGHTS,
 			CB_RENDER_PASS_DATA,
@@ -351,6 +354,38 @@ namespace JG
 			RWTEXTURE2D,
 			SB_LIGHTGRID,
 			SB_VISIBLE_LIGHT_INDICIES,
+		};
+
+		enum class EComputeRootParam
+		{
+			CB_0,
+			CB_1,
+			CB_2,
+			CB_3,
+			CB_4,
+			TEXTURE2D,
+			TEXTURECUBE,
+			RWTEXTURE2D,
+			STRUCTUREDBUFFER_0,
+			STRUCTUREDBUFFER_1,
+			STRUCTUREDBUFFER_2,
+			STRUCTUREDBUFFER_3,
+			STRUCTUREDBUFFER_4,
+			STRUCTUREDBUFFER_5,
+			STRUCTUREDBUFFER_6,
+			STRUCTUREDBUFFER_7,
+			STRUCTUREDBUFFER_8,
+			STRUCTUREDBUFFER_9,
+			RWSTRUCTUREDBUFFER_0,
+			RWSTRUCTUREDBUFFER_1,
+			RWSTRUCTUREDBUFFER_2,
+			RWSTRUCTUREDBUFFER_3,
+			RWSTRUCTUREDBUFFER_4,
+			RWSTRUCTUREDBUFFER_5,
+			RWSTRUCTUREDBUFFER_6,
+			RWSTRUCTUREDBUFFER_7,
+			RWSTRUCTUREDBUFFER_8,
+			RWSTRUCTUREDBUFFER_9,
 		};
 
 		namespace Template
@@ -403,58 +438,6 @@ namespace JG
 			constexpr token* RWTexture2D = "RWTexture2D<";
 			constexpr token* SamplerState = "SamplerState";
 			constexpr token* SamplerComparisonState = "SamplerComparisonState";
-
-			namespace SamplerStateElement
-			{
-				constexpr token* Template = "Template";
-				constexpr token* Min = "Min";
-				constexpr token* Mag = "Mag";
-				constexpr token* Mip = "Mip";
-				constexpr token* AddressU = "AddressU";
-				constexpr token* AddressV = "AddressV";
-				constexpr token* AddressW = "AddressW";
-				constexpr token* ComparisonFunc = "ComparisonFunc";
-				constexpr token* BorderColor = "BorderColor";
-				constexpr token* MinLOD = "MinLOD";
-				constexpr token* MaxLOD = "MaxLOD";
-				constexpr token* MaxAnisotropy = "MaxAnisotropy";
-				constexpr token* MipLODBias = "MipLODBias";
-
-			}
-			namespace SamplerSatateFilter
-			{
-				constexpr token* Point = "Point";
-				constexpr token* Linear = "Linear";
-				constexpr token* Anisotropic = "Anisotropic";
-
-			}
-			namespace SamplerSatateAddressMode
-			{
-				constexpr token* Wrap = "Wrap";
-				constexpr token* Mirror = "Mirror";
-				constexpr token* Clamp = "Clamp";
-				constexpr token* Border = "Border";
-				constexpr token* MirrorOnce = "MirrorOnce";
-			}
-			namespace SamplerStateComparisonFunc
-			{
-				constexpr token* Never = "Never";
-				constexpr token* Less = "Less";
-				constexpr token* Equal = "Equal";
-				constexpr token* LessEqual = "LessEqual";
-				constexpr token* Greater = "Greater";
-				constexpr token* NotEqual = "NotEqual";
-				constexpr token* GreaterEqual = "GreaterEqual";
-				constexpr token* Always = "Always";
-			}
-			namespace SamplerStateBorderColor
-			{
-				constexpr token* TransparentBlack = "TransparentBlack";
-				constexpr token* OpaqueBlack = "OpaqueBlack";
-				constexpr token* OpaqueWhite = "OpaqueWhite";
-			}
-
-
 		}
 		namespace RegisterNumber
 		{
@@ -468,9 +451,12 @@ namespace JG
 			constexpr int TextureCubeRegisterSpace = 1;
 			constexpr int RWTexture2DRegisterSpace = 2;
 			constexpr int PointLightRegisterSpace = 3;
-
 			constexpr int LightGridRegisterSpace		   = 11;
 			constexpr int VisibleLightIndicesRegisterSpace = 12;
+
+
+			constexpr int StructuredBufferRegisterSpace   = 10;
+			constexpr int RWStructuredBufferRegisterSpace = 20;
 		}
 
 		constexpr char* VSEntry = "vs_main";
@@ -485,10 +471,6 @@ namespace JG
 		constexpr char* GSTarget = "gs_5_1";
 		constexpr char* PSTarget = "ps_5_1";
 		constexpr char* CSTarget = "cs_5_1";
-
-
-
-
 
 		enum class EHLSLElement
 		{

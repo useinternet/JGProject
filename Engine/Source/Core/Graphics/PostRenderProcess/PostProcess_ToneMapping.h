@@ -13,10 +13,14 @@ namespace JG
 
 	private:
 		// 그릴 텍스쳐
-		List<SharedPtr<ITexture>>  mTargetTextures;
+		List<SharedPtr<ITexture>>  mToneMappingTextures;
+		List<SharedPtr<ITexture>>  mOutLumaTextures;
 		// Dispatch 할 Computer
-		List<SharedPtr<IComputer>> mComputers;
+		List<SharedPtr<IComputer>> mToneMappingComputers;
 
+
+		RP_Local_Bool mEnable;
+		
 
 		JVector2 mPrevResolution;
 	public:
@@ -28,7 +32,7 @@ namespace JG
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	private:
-		void InitComputers();
-		void InitTextures(const JVector2& size);
+		bool InitComputers();
+		bool InitTextures(const JVector2& size);
 	};
 }

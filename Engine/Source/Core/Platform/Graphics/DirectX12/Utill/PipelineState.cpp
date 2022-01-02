@@ -299,9 +299,8 @@ namespace JG
 
 	void ComputePipelineState::BindRootSignature(const RootSignature& rootSig)
 	{
-		mIsDirty = true;
+		mIsDirty = mDesc.pRootSignature != rootSig.Get();
 		mDesc.pRootSignature = rootSig.Get();
-		
 	}
 
 	void ComputePipelineState::BindShader(const DirectX12ComputeShader& shader)

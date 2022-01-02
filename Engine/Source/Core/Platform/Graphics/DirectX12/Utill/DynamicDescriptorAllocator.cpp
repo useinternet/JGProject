@@ -55,19 +55,18 @@ namespace JG
 	}
 
 
-	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics)
+	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics)
 	{
-		if (*d3dDescriptorHeap != mD3DHeap)
+		if (d3dDescriptorHeap.Get() != mD3DHeap.Get())
 		{
 			RequestDescriptorHeap();
-			(*d3dDescriptorHeap) = mD3DHeap;
-			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap->GetAddressOf());
+			d3dDescriptorHeap = mD3DHeap;
+			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap.GetAddressOf());
 		}
 		if (!mCPUCache.empty())
 		{
 			List<D3D12_CPU_DESCRIPTOR_HANDLE> cpu_Handles;
-			CD3DX12_CPU_DESCRIPTOR_HANDLE startCPU(mD3DHeap->GetCPUDescriptorHandleForHeapStart());
-			CD3DX12_GPU_DESCRIPTOR_HANDLE startGPU(mD3DHeap->GetGPUDescriptorHandleForHeapStart());
+
 			for (auto& cache_pair : mCPUCache)
 			{
 				i32  rootParam = cache_pair.first;
@@ -76,7 +75,8 @@ namespace JG
 				if (mDescriptorCache.find(hashCode) == mDescriptorCache.end())
 				{
 					auto handles = cache_pair.second.CPUHandles.data();
-
+					CD3DX12_CPU_DESCRIPTOR_HANDLE startCPU(mD3DHeap->GetCPUDescriptorHandleForHeapStart());
+					CD3DX12_GPU_DESCRIPTOR_HANDLE startGPU(mD3DHeap->GetGPUDescriptorHandleForHeapStart());
 
 					u32 handleCount = (u32)cache_pair.second.CPUHandles.size();
 					if (handleCount == 0) continue;

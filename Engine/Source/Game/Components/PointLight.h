@@ -18,6 +18,7 @@ namespace JG
 	    JVector3 mColor = Color::White();
 		f32 mIntensity = 1.0f;
 		f32 mRange = 0.0f;
+		f32 mAttRange = 100.0f;
 		f32 mAtt0 = 0.0f;
 		f32 mAtt1 = 0.0f;
 		f32 mAtt2 = 0.0f;
@@ -46,6 +47,7 @@ namespace JG
 		void SetColor(const Color& color);
 		void SetIntensity(f32 intensity);
 		void SetRange(f32 range);
+		void SetAttRange(f32 attRange, bool auto_calc_att = true);
 		void SetAtt0(f32 att0);
 		void SetAtt1(f32 att1);
 		void SetAtt2(f32 att2);
@@ -53,10 +55,12 @@ namespace JG
 		Color GetColor() const;
 		f32 GetIntensity() const;
 		f32 GetRange() const;
+		f32 GetAttRange() const;
 		f32 GetAtt0() const;
 		f32 GetAtt1() const;
 		f32 GetAtt2() const;
-
+	private:
+		void CalcAtt();
 #ifdef JG_EDITOR
 		EScheduleResult PushDebugRenderItem();
 #endif

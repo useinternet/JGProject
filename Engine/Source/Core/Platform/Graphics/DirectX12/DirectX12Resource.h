@@ -12,6 +12,7 @@
 
 namespace JG
 {
+	class ComputeCommandList;
 	class DescriptorAllocation;
 	class IComputeShader;
 	class DirectX12VertexBuffer : public IVertexBuffer
@@ -191,6 +192,8 @@ namespace JG
 		virtual bool Dispatch(
 			u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
 			const std::function<void()>& onCompelete, bool asComputeCommand) override;
+	private:
+		bool DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ);
 	};
 
 

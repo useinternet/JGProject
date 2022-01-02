@@ -159,7 +159,7 @@ namespace JG
 			}
 
 			RP_LocalVar<T> val;
-			val.mpRenderer = renderer;
+			val.mRenderer = renderer;
 			val.mName = name;
 			val.Value = value;
 			val.Type_Key = type;

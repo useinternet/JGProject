@@ -268,9 +268,9 @@ namespace JG
 			tc_handles.push_back(dx12Tex->GetSRV());
 		}
 
-		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURE2D, t_handles);
-		cmdList->BindTextures((u32)ShaderDefine::ERootParam::TEXTURECUBE, tc_handles);
-		cmdList->BindConstantBuffer((u32)ShaderDefine::ERootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
+		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, t_handles);
+		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURECUBE, tc_handles);
+		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
 		return true;
 	}
 

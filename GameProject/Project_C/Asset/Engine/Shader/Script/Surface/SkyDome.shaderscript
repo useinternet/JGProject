@@ -17,6 +17,6 @@ _Surface {
     outputColor = lerp(CenterColor, ApexColor, height);
 
 
-	_output.albedo  = Tex1.Sample(_AnisotropicSampler, _input.local_position); //float4(outputColor, 1.0f);
+	_output.albedo  = Tex1.Sample(_AnisotropicWrap, _input.local_position); //float4(outputColor, 1.0f);
 	_output.flags = SCRIPT_FLAG_IGNORE_LIGHTPASS;
 };

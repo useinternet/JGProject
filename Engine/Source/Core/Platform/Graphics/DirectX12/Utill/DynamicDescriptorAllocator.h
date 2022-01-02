@@ -36,7 +36,7 @@ namespace JG
 		void CommitDescriptorTable(u32 rootParam, const List<D3D12_CPU_DESCRIPTOR_HANDLE>& handles);
 
 		void Reset(bool clearHandleOffset = false);
-		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics);
+		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics);
 
 
 		i32  GetDescriptorInitAsType(u32 rootParam) const;

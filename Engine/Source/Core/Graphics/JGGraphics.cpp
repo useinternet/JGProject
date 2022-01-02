@@ -1,3 +1,4 @@
+#include "JGGraphics.h"
 #include "pch.h"
 #include "JGGraphics.h"
 #include "Graphics/DebugGeometryDrawer.h"
@@ -342,6 +343,11 @@ namespace JG
 		const SceneInfo& Scene::GetSceneInfo() const
 		{
 			return mSceneInfo;
+		}
+
+		Renderer* Scene::GetRenderer() const
+		{
+			return mRenderer.get();
 		}
 
 		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)

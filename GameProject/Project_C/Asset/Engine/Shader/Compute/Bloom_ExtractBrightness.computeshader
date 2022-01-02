@@ -1,30 +1,18 @@
 
 
 
-
-
-
-
-
-
-
-
-
-RWTexture2D<uint>   LumaResult;
-
-SamplerState LinearClampSampler
-{
-    Template = Linear_Clamp
-};
 cbuffer CB
 {
     float2 InverseOutputSize;
     float  BloomThreshold;
 }
-RWTexture2D<float3> BloomResult;
 
 StructuredBuffer<float> Exposure;
 Texture2D<float3>   SourceTex;
+RWTexture2D<float3> BloomResult;
+RWTexture2D<uint>   LumaResult;
+
+
 
 
 [numthreads( 8, 8, 1 )]
@@ -32,14 +20,14 @@ void cs_main( uint3 DTid : SV_DispatchThreadID )
 {
     float2 uv = (DTid.xy + 0.5) * InverseOutputSize;
     float2 offset = InverseOutputSize * 0.25;
-
+    BloomResult[DTid.xy] = float3(1.0f,1.0f,1.0f);
 
     // 2배 이상 축소 시 언더샘플링을 하지 않도록 4개의 이중선 샘플을 사용합니다.
     // Use 4 bilinear samples to guarantee we don't undersample when downsizing by more than 2x
-    float3 color1 = SourceTex.SampleLevel( LinearClampSampler, uv + float2(-offset.x, -offset.y), 0 );
-    float3 color2 = SourceTex.SampleLevel( LinearClampSampler, uv + float2( offset.x, -offset.y), 0 );
-    float3 color3 = SourceTex.SampleLevel( LinearClampSampler, uv + float2(-offset.x,  offset.y), 0 );
-    float3 color4 = SourceTex.SampleLevel( LinearClampSampler, uv + float2( offset.x,  offset.y), 0 );
+    float3 color1 = SourceTex.SampleLevel( _LinearClamp, uv + float2(-offset.x, -offset.y), 0 );
+    float3 color2 = SourceTex.SampleLevel( _LinearClamp, uv + float2( offset.x, -offset.y), 0 );
+    float3 color3 = SourceTex.SampleLevel( _LinearClamp, uv + float2(-offset.x,  offset.y), 0 );
+    float3 color4 = SourceTex.SampleLevel( _LinearClamp, uv + float2( offset.x,  offset.y), 0 );
 
     float luma1 = RGBToLuminance(color1);
     float luma2 = RGBToLuminance(color2);

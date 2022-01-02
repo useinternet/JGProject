@@ -52,6 +52,12 @@ namespace JG
 			}
 		}
 
+        template<class T>
+        inline static T Lerp(const T& A, const T& B, const T& Alpha)
+        {
+            return A * (1 - Alpha) + B * Alpha;
+        }
+
 
         template <typename T> 
         inline static T AlignUpWithMask(T value, size_t mask)

@@ -12,7 +12,7 @@ _Variables {
 };
 
 _Surface {
-	float4 textureColor = Albedo.Sample(_AnisotropicSampler, _input.tex);
+	float4 textureColor = Albedo.Sample(_AnisotropicWrap, _input.tex);
 	_output.albedo      = textureColor * float4(BaseColor.rgb, 1.0f);
 	_output.roughness   = Roughness;
 	_output.specular    = Specular;

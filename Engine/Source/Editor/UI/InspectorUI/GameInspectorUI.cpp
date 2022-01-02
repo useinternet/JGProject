@@ -179,9 +179,7 @@ namespace JG
 		Color color = obj->GetColor();
 		f32 intensity = obj->GetIntensity();
 		f32 range = obj->GetRange();
-		f32 att0 = obj->GetAtt0();
-		f32 att1 = obj->GetAtt1();
-		f32 att2 = obj->GetAtt2();
+		f32 attRange = obj->GetAttRange();
 
 
 
@@ -189,19 +187,12 @@ namespace JG
 		ImGui::Color3_OnGUI("Color", color, label_width);
 		ImGui::Float_OnGUI("Intensity", intensity, label_width);
 		ImGui::Float_OnGUI("Range", range, label_width);
-				ImGui::Float_OnGUI("Att0", att0, label_width);
-		ImGui::Float_OnGUI("Att1", att1, label_width);
-		ImGui::Float_OnGUI("Att2", att2,  label_width);
-		//ImGui::Float_Slider_OnGUI("Att0", att0, 0.0f, 1.0f, label_width);
-		//ImGui::Float_Slider_OnGUI("Att1", att1, 0.0f, 1.0f, label_width);
-		//ImGui::Float_Slider_OnGUI("Att2", att2, 0.0f, 1.0f, label_width);
+		ImGui::Float_OnGUI("AttRange", attRange, label_width);
 
 		obj->SetColor(Color(color.R, color.G, color.B, 1.0f));
 		obj->SetIntensity(intensity);
 		obj->SetRange(range);
-		obj->SetAtt0(att0);
-		obj->SetAtt1(att1);
-		obj->SetAtt2(att2);
+		obj->SetAttRange(attRange);
 	}
 	void SkyDomeInspectorUI::OnGUI_Impl(SkyDome* obj)
 	{

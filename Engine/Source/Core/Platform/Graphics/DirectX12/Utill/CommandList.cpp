@@ -473,16 +473,20 @@ namespace JG
 	void GraphicsCommandList::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation,
 		u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
 	void GraphicsCommandList::Draw(u32 vertexPerInstance, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
-	SharedPtr<ComputeCommandList> GraphicsCommandList::AsCompute()
+	void GraphicsCommandList::AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action)
 	{
+		if (action == nullptr)
+		{
+			return;
+		}
 		SharedPtr<ComputeCommandList> result = CreateSharedPtr<ComputeCommandList>();
 
 		// 공유할건 공유하고 따로 만들건 따로 만들기
@@ -500,7 +504,13 @@ namespace JG
 		result->mBindedDescriptorHeap = mBindedDescriptorHeap;
 		result->mBindedComputeRootSig = mBindedComputeRootSig;
 		result->mBindedPipelineState = mBindedPipelineState;
-		return result;
+
+		action(result);
+
+		mBindedComputeRootSig = result->mBindedComputeRootSig;
+		mBindedPipelineState = result->mBindedPipelineState;
+		mBindedDescriptorHeap = result->mBindedDescriptorHeap;
+
 	}
 
 
@@ -629,7 +639,7 @@ namespace JG
 	}
 	void ComputeCommandList::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
 	}
 

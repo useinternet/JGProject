@@ -15,10 +15,6 @@ namespace JG
 		bool     mPrevIsHDR = false;
 
 
-		// RenderParam
-		RP_Global_Float mExposure;
-		RP_Global_Float mInitialMinLog;
-		RP_Global_Float mInitialMaxLog;
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;

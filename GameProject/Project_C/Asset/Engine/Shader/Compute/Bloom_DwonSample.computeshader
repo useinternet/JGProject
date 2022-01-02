@@ -4,10 +4,8 @@ RWTexture2D<float3> Result2;
 RWTexture2D<float3> Result3;
 RWTexture2D<float3> Result4;
 
-SamplerState BiLinearClamp
-{
-    Template = Linear_Border_TransparentBlack
-};
+
+
 
 cbuffer cb0
 {
@@ -25,7 +23,7 @@ void cs_main( uint GI : SV_GroupIndex, uint3 DTid : SV_DispatchThreadID )
 
     // Downsample and store the 8x8 block
     float2 centerUV = (float2(DTid.xy) * 2.0f + 1.0f) * InverseDimensions;
-    float3 avgPixel = BloomBuf.SampleLevel(BiLinearClamp, centerUV, 0.0f);
+    float3 avgPixel = BloomBuf.SampleLevel(_LinearBorder_TB, centerUV, 0.0f);
     Tile[GI] = avgPixel;
     Result1[DTid.xy] = avgPixel;
 

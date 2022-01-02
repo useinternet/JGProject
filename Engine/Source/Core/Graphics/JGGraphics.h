@@ -195,22 +195,11 @@ namespace JG
 		public:
 			bool SetSceneInfo(const SceneInfo& info);
 			const SceneInfo& GetSceneInfo() const;
+			Renderer* GetRenderer() const;
 
 			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
 			bool PushLight(SharedPtr<Light> l);
 			void PushPostRenderingEvent(i32 priority, const PostRenderingEvent& _e);
-
-
-			template<class ProcessType, class DataType>
-			bool SetProcessShaderParam(const String& name, const DataType& data)
-			{
-				return mRenderer->SetProcessShaderParam< ProcessType, DataType>(name, data);
-			}
-			template<class ProcessType, class DataType>
-			bool GetProcessShaderParam(const String& name, DataType* out_data)
-			{
-				return mRenderer->GetProcessShaderParam< ProcessType, DataType>(name, out_data);
-			}
 
 		public:
 			void Reset();
@@ -351,7 +340,8 @@ namespace JG
 			JVector3 Color;
 			JVector3 Position;
 			f32 Intensity = 1.0f;
-			f32 Range = 0.0f;
+			f32 Range    = 0.0f;
+			f32 AttRange = 0.0f;
 			f32 Att0 = 0.0f;
 			f32 Att1 = 0.0f;
 			f32 Att2 = 0.0f;
@@ -362,13 +352,14 @@ namespace JG
 				PushData(btData, &Position, sizeof(JVector3));
 				PushData(btData, &Range, sizeof(float));
 				PushData(btData, &Color, sizeof(JVector3));
+				PushData(btData, &AttRange, sizeof(float));
 				PushData(btData, &Intensity, sizeof(float));
 				PushData(btData, &Att0, sizeof(float));
 				PushData(btData, &Att1, sizeof(float));
 				PushData(btData, &Att2, sizeof(float));
 			}
 			virtual u64 GetBtSize() const override {
-				return 44;
+				return 48;
 			}
 
 		};

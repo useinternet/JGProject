@@ -27,5 +27,5 @@ VS_OUT vs_main(VS_IN vin)
 }
 float4 ps_main(VS_OUT pin) : SV_TARGET
 {
-	return _Textures[pin.textureIndex].Sample(_AnisotropicSampler, pin.tex) * pin.color;
+	return _Textures[pin.textureIndex].Sample(_AnisotropicWrap, pin.tex) * pin.color;
 }
