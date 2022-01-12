@@ -36,11 +36,12 @@ namespace JG
 		void CommitDescriptorTable(u32 rootParam, const List<D3D12_CPU_DESCRIPTOR_HANDLE>& handles);
 
 		void Reset(bool clearHandleOffset = false);
-		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics);
+		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics);
 
 
 		i32  GetDescriptorInitAsType(u32 rootParam) const;
 		D3D12_DESCRIPTOR_RANGE_TYPE GetDescriptorTableType(u32 rootParam) const;
+		D3D12_GPU_DESCRIPTOR_HANDLE UploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle, ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap);
 	private:
 		void RequestDescriptorHeap();
 

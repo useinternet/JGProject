@@ -15,15 +15,16 @@ namespace JG
 	Application* Application::smInstance = nullptr;
 
 	static String gAssetPath   = "../../../GameProject/Project_C/Asset";
-	static String gEnginePath  = PathExtend::CombinePath(Application::GetAssetPath(), "Engine");
-	static String gIconPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Icon");
-	static String gTexturePath = PathExtend::CombinePath(Application::GetEnginePath(), "Texture");
-	static String gMeshPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Mesh");
-	static String gConfigPath = PathExtend::CombinePath(Application::GetEnginePath(), "Config");
-	static String gShaderGlobalLibPath = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
-	static String gShaderScriptPath    = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Script");
-	static String gComputeShaderPath   = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Compute");
-	static String gShaderTemplatePath  = PathExtend::CombinePath(Application::GetEnginePath(), "Shader/Template");
+	static String gEnginePath  = PathHelper::CombinePath(Application::GetAssetPath(), "Engine");
+	static String gIconPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Icon");
+	static String gTexturePath = PathHelper::CombinePath(Application::GetEnginePath(), "Texture");
+	static String gMeshPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Mesh");
+	static String gConfigPath = PathHelper::CombinePath(Application::GetEnginePath(), "Config");
+	static String gCachePath = PathHelper::CombinePath(Application::GetEnginePath(), "Cache");
+	static String gShaderGlobalLibPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
+	static String gShaderScriptPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Script");
+	static String gComputeShaderPath   = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Compute");
+	static String gShaderTemplatePath  = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Template");
 
 
 	const String& Application::GetAssetPath()
@@ -74,6 +75,11 @@ namespace JG
 	const String& Application::GetConfigPath()
 	{
 		return gConfigPath;
+	}
+
+	const String& Application::GetCachePath()
+	{
+		return gCachePath;
 	}
 
 

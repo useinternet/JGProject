@@ -37,7 +37,7 @@ namespace JG
 
 		return factory;
 	}
-	Microsoft::WRL::ComPtr<ID3D12Device>  CreateD3DDevice(
+	Microsoft::WRL::ComPtr<ID3D12Device5>  CreateD3DDevice(
 		Microsoft::WRL::ComPtr<IDXGIFactory4> factory,
 		bool is_UseWrapDevice,
 		DXGI_ADAPTER_DESC1* OutadapterDesc)
@@ -46,7 +46,7 @@ namespace JG
 		if (is_UseWrapDevice)
 		{
 			Microsoft::WRL::ComPtr<IDXGIAdapter>  warpAdapter;
-			Microsoft::WRL::ComPtr<ID3D12Device>  pDevice;
+			Microsoft::WRL::ComPtr<ID3D12Device5>  pDevice;
 			hr = factory->EnumWarpAdapter(IID_PPV_ARGS(warpAdapter.GetAddressOf()));
 			assert(SUCCEEDED(hr) && "failed Create warpAdapter");
 
@@ -59,7 +59,7 @@ namespace JG
 		else
 		{
 			Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
-			Microsoft::WRL::ComPtr<ID3D12Device>  pDevice;
+			Microsoft::WRL::ComPtr<ID3D12Device5>  pDevice;
 
 			DXGI_ADAPTER_DESC1 adapterDesc = {};
 			SIZE_T maxSize = 0;
@@ -169,14 +169,14 @@ namespace JG
 	}
 
 
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateD3DCommandList(
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> CreateD3DCommandList(
 		Microsoft::WRL::ComPtr<ID3D12Device> device,
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdAllocator,
 		D3D12_COMMAND_LIST_TYPE type)
 	{
 
 		HRESULT hr = S_OK;
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList;
 		hr = device->CreateCommandList(0, type, cmdAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 		assert(SUCCEEDED(hr) && "failed Create ID3D12GraphicsCommandList");
 		return commandList;

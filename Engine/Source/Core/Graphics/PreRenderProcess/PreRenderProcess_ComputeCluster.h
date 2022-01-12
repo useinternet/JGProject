@@ -9,10 +9,7 @@
 namespace JG
 {
 	class IComputer;
-	class IReadBackBuffer;
-
 	class PreRenderProcess_LightCulling;
-
 	class PreRenderProcess_ComputeCluster : public IRenderProcess
 	{
 	
@@ -32,6 +29,7 @@ namespace JG
 		const static constexpr char* SHADERPARAM_NUM_X_SLICE = "_NUM_X_SLICE";
 		const static constexpr char* SHADERPARAM_NUM_Y_SLICE = "_NUM_Y_SLICE";
 		const static constexpr char* SHADERPARAM_NUM_Z_SLICE = "_NUM_Z_SLICE";
+
 		struct CB
 		{
 			JMatrix  InvProjMatrix;
@@ -41,21 +39,16 @@ namespace JG
 			f32 NearZ = 0.0f;
 		};
 		CB CB;
-
 		struct Cluster
 		{
 			JVector4 Min;
 			JVector4 Max;
 		};
-
-		List<Cluster>     Clusters;
 	private:
 		JMatrix mPrevProjMatrix;
-		SharedPtr<IComputer>       mComputer;
-		SharedPtr<IReadBackBuffer> mClusterRBB;
-
+		SharedPtr<IComputer>         mComputer;
+		SharedPtr<IStructuredBuffer> mClusterSB;
 		bool mIsDirty        = true;
-		bool mEnableDispatch = true;
 
 		PreRenderProcess_LightCulling* mLightCullingProcess = nullptr;
 	public:

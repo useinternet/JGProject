@@ -10,8 +10,6 @@ cbuffer CB0
 {
     float2 RcpBufferDim; 
     float BloomStrength;  
-    float PaperWhiteRatio; 
-    float MaxBrightness;
 };
 
 
@@ -36,7 +34,7 @@ void cs_main( uint3 DTid : SV_DispatchThreadID )
     hdrColor += BloomStrength * Bloom.SampleLevel(_LinearBorder_TB, TexCoord, 0);
     hdrColor *= Exposure[0];
 
-    hdrColor = TM_Stanard(REC709toREC2020(hdrColor) * PaperWhiteRatio) * MaxBrightness;
+    hdrColor = TM_Stanard(hdrColor);
     DestColor[DTid.xy] = hdrColor;
     OutLuma[DTid.xy] = RGBToLogLuminance(hdrColor);
 }

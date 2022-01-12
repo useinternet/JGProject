@@ -14,80 +14,37 @@ namespace JG
 
 	void PostProcess_Bloom::Awake(Renderer* renderer)
 	{
-		mEnable         = RP_Local_Bool::Create("Enable", true, GetType(), renderer);
-		mBloomThreshold = RP_Local_Float::Create("BloomThreshold", 4.0f, GetType(), renderer);
-		mBloomStrength  = RP_Local_Float::Create("BloomStrength", 0.1f, GetType(), renderer);
-		mUpSamplingFactor = RP_Local_Float::Create("UpSamplingFactor", 0.65f, GetType(), renderer);
+		mBloomThreshold   = RP_Global_Float::Create("PostProcess/Bloom/BloomThreshold", 4.0f, renderer->GetRenderParamManager());
+		mBloomStrength    = RP_Global_Float::Create("PostProcess/Bloom/BloomStrength", 0.1f, renderer->GetRenderParamManager());
+		mUpSamplingFactor = RP_Global_Float::Create("PostProcess/Bloom/UpSamplingFactor", 0.65f, renderer->GetRenderParamManager());
 
-		mLumaResult     = RP_Global_Tex::Create("PostProcess/Bloom/LumaResult", nullptr, renderer);
-		mBloomResult    = RP_Global_Tex::Create("PostProcess/Bloom/BloomResult", nullptr, renderer);
-
+		mLumaResult     = RP_Global_Tex::Create("PostProcess/Bloom/LumaResult", nullptr, renderer->GetRenderParamManager());
+		mBloomResult    = RP_Global_Tex::Create("PostProcess/Bloom/BloomResult", nullptr, renderer->GetRenderParamManager());
 	}
 
 	void PostProcess_Bloom::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
 	{
-		if (mEnable.GetValue() == false)
-		{
-			return;
-		}
-
-		bool result = InitComputers();
-		if (result == false)
-		{
-			mEnable.SetValue(false);
-			return;
-		}
-
-
+		InitComputers();
 		if (mLumaTextures.empty() || mPrevResolution != info.Resolution)
 		{
-			result = InitTextures(info.Resolution);
+			InitTextures(info.Resolution);
 			mPrevResolution = info.Resolution;
 		}
-		if (result == false)
-		{
-			mEnable.SetValue(false);
-			return;
-		}
-
 	}
 
 	void PostProcess_Bloom::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		if (mEnable.GetValue() == false)
-		{
-			return;
-		}
-
-
 		u64 commandID = JGGraphics::GetInstance().RequestCommandID();
 		// Extract Brightness
 		{
-			f32 exposureVal = RP_Global_Float::Load("Renderer/Exposure", renderer).GetValue();
-			f32 initialMinLogVal = RP_Global_Float::Load("Renderer/InitialMinLog", renderer).GetValue();
-			f32 initialMaxLogVal = RP_Global_Float::Load("Renderer/InitialMaxLog", renderer).GetValue();
+			SharedPtr<IComputer>& targetComputer    = mExtractBrightnessComputers[info.CurrentBufferIndex];
+			SharedPtr<IStructuredBuffer> exposureSB = RP_Global_SB::Load("Renderer/Exposure", renderer->GetRenderParamManager()).GetValue();
 
-
-			SharedPtr<IComputer>& targetComputer = mExtractBrightnessComputers[info.CurrentBufferIndex];
-
-
-			List<f32> exposure; exposure.resize(8);
-
-			exposure[0] = exposureVal;
-			exposure[1] = 1.0f / exposureVal;
-			exposure[2] = exposureVal;
-			exposure[3] = 0.0f;
-			exposure[4] = initialMinLogVal;
-			exposure[5] = initialMaxLogVal;
-			exposure[6] = initialMaxLogVal - initialMinLogVal;
-			exposure[7] = 1.0f / (initialMaxLogVal - initialMinLogVal);
-
-
-
-			if (targetComputer->SetStructDataArray("Exposure", exposure.data(), exposure.size(), sizeof(f32)) == false)
+			if (targetComputer->SetStructuredBuffer("Exposure", exposureSB) == false)
 			{
 				return;
 			}
+
 			if (targetComputer->SetTexture("SourceTex", 0, result->SceneTexture) == false)
 			{
 				return;
@@ -113,7 +70,7 @@ namespace JG
 			u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y, 8);
 			u32 groupZ = 1;
 
-			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, nullptr, false);
+			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, false);
 		}
 
 		// Bloom Downsample
@@ -124,7 +81,7 @@ namespace JG
 			u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y * 0.5f, 8);
 			u32 groupZ = 1;
 
-			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, nullptr, false);
+			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, false);
 		}
 
 
@@ -215,7 +172,7 @@ namespace JG
 		u32 groupY = Math::DivideByMultiple(texInfo.Height, 8);
 		u32 groupZ = 1;
 
-		targetComputer->Dispatch(commandID, groupX, groupY, 1, nullptr, false);
+		targetComputer->Dispatch(commandID, groupX, groupY, 1, false);
 
 
 		return true;
@@ -255,7 +212,7 @@ namespace JG
 
 
 		}
-
+	
 		return true;
 	}
 
@@ -310,7 +267,7 @@ namespace JG
 			{
 				return false;
 			}
-			
+
 			++index;
 		}
 

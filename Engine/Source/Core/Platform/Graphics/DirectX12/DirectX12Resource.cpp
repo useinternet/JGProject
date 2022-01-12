@@ -17,7 +17,7 @@ namespace JG
 	}
 
 
-	bool DirectX12VertexBuffer::SetData(const void* datas, u64 elementSize, u64 elementCount)
+	bool DirectX12VertexBuffer::SetData(const void* datas, u64 elementSize, u64 elementCount, u64 commandID)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
 		mElementSize = elementSize; mElementCount = elementCount;
@@ -39,7 +39,7 @@ namespace JG
 
 			if (mD3DResource)
 			{
-				auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
+				auto commandList = DirectX12API::GetGraphicsCommandList();
 				commandList->CopyBuffer(mD3DResource.Get(), datas, elementSize, elementCount);
 			}
 		}
@@ -97,7 +97,7 @@ namespace JG
 		{
 			return;
 		}
-		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
+		auto commandList = DirectX12API::GetGraphicsCommandList();
 
 
 		D3D12_VERTEX_BUFFER_VIEW View = {};
@@ -130,7 +130,7 @@ namespace JG
 		Reset();
 	}
 
-	bool DirectX12IndexBuffer::SetData(const u32* datas, u64 count)
+	bool DirectX12IndexBuffer::SetData(const u32* datas, u64 count, u64 commandID)
 	{
 		u64 originBtSize = sizeof(u32) * mIndexCount;
 		mIndexCount = count;
@@ -152,7 +152,7 @@ namespace JG
 			);
 			if (mD3DResource != nullptr)
 			{
-				auto commandList = DirectX12API::GetCopyCommandList(MAIN_GRAPHICS_COMMAND_ID);
+				auto commandList = DirectX12API::GetGraphicsCommandList();
 				commandList->CopyBuffer(mD3DResource.Get(), datas, sizeof(u32), mIndexCount);
 			}
 		}
@@ -214,7 +214,7 @@ namespace JG
 		{
 			return;
 		}
-		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
+		auto commandList = DirectX12API::GetGraphicsCommandList();
 		D3D12_INDEX_BUFFER_VIEW View;
 		View.BufferLocation = mD3DResource->GetGPUVirtualAddress();
 		View.Format = DXGI_FORMAT_R32_UINT;
@@ -238,50 +238,87 @@ namespace JG
 		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
-
-
-	DirectX12ReadWriteBuffer::~DirectX12ReadWriteBuffer()
-	{
-		Reset();
-	}
-	bool DirectX12ReadWriteBuffer::IsValid() const
+	bool DirectX12ByteAddressBuffer::IsValid() const
 	{
 		return mD3DResource != nullptr;
 	}
-	bool DirectX12ReadWriteBuffer::SetData(u64 btSize)
-	{
-		u64 originBtSize = mDataSize;
-		mDataSize = btSize;
 
-		if (mD3DResource != nullptr && originBtSize != btSize)
+	bool DirectX12ByteAddressBuffer::SetData(u64 elementCount, const void* initDatas, u64 commandID)
+	{
+		u64 originBtSize = mElementSize * mElementCount;
+		mElementCount    = elementCount;
+		u64 btSize       = mElementSize * mElementCount;
+
+
+		if (mD3DResource && (originBtSize != btSize))
 		{
 			Reset();
 		}
 
-		mD3DResource = DirectX12API::CreateCommittedResource(
-			GetName(),
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-			nullptr);
-
-		return mD3DResource != nullptr;
-	}
-	u64 DirectX12ReadWriteBuffer::GetDataSize() const
-	{
-		return mDataSize;
-	}
-	BufferID DirectX12ReadWriteBuffer::GetBufferID() const
-	{
-		if (IsValid() == true)
+		if (mD3DResource == nullptr)
 		{
-			return mD3DResource->GetGPUVirtualAddress();
+			mD3DResource = DirectX12API::CreateCommittedResource(
+				GetName(),
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+				D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+				D3D12_RESOURCE_STATE_COMMON,
+				nullptr);
+			CreateViews();
 		}
-		return 0;
+		if (mD3DResource && initDatas)
+		{
+			auto commandList = DirectX12API::GetGraphicsCommandList();
+			commandList->CopyBuffer(mD3DResource.Get(), initDatas, mElementSize, elementCount);
+		}
+		return IsValid();
+	}
+	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12ByteAddressBuffer::GetSRV() const
+	{
+		return mSRV->CPU();
 	}
 
-	void DirectX12ReadWriteBuffer::Reset()
+	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12ByteAddressBuffer::GetUAV() const
+	{
+		return mUAV->CPU();
+	}
+
+	ID3D12Resource* DirectX12ByteAddressBuffer::Get() const
+	{
+		return mD3DResource.Get();
+	}
+
+	void DirectX12ByteAddressBuffer::CreateViews()
+	{
+		mUAV = CreateUniquePtr<DescriptorAllocation>();
+		mSRV = CreateUniquePtr<DescriptorAllocation>();
+
+		u64 bufferSize = mElementCount * mElementSize;
+
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+		SRVDesc.ViewDimension			= D3D12_SRV_DIMENSION_BUFFER;
+		SRVDesc.Format					= DXGI_FORMAT_R32_TYPELESS;
+		SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		SRVDesc.Buffer.NumElements		= (UINT)bufferSize / 4;
+		SRVDesc.Buffer.Flags			= D3D12_BUFFER_SRV_FLAG_RAW;
+
+		*mSRV = std::move(DirectX12API::CSUAllocate());
+		DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), &SRVDesc, mSRV->CPU());
+
+
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc = {};
+		UAVDesc.ViewDimension		= D3D12_UAV_DIMENSION_BUFFER;
+		UAVDesc.Format				= DXGI_FORMAT_R32_TYPELESS;
+		UAVDesc.Buffer.NumElements	= (UINT)bufferSize / 4;
+		UAVDesc.Buffer.Flags		= D3D12_BUFFER_UAV_FLAG_RAW;
+
+		*mUAV = std::move(DirectX12API::CSUAllocate());
+		DirectX12API::GetD3DDevice()->CreateUnorderedAccessView(Get(), nullptr, &UAVDesc, mUAV->CPU());
+	}
+
+	void DirectX12ByteAddressBuffer::Reset()
 	{
 		if (mD3DResource == nullptr)
 		{
@@ -290,6 +327,80 @@ namespace JG
 		DirectX12API::DestroyCommittedResource(mD3DResource);
 		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
+
+
+	bool DirectX12StructuredBuffer::IsValid() const
+	{
+		return mD3DResource != nullptr;
+	}
+	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, void* initDatas , u64 commandID)
+	{
+		u64 originBtSize = mElementSize * mElementCount;
+		mElementSize     = elementSize;
+		mElementCount    = elementCount;
+		u64 btSize		 = mElementSize * mElementCount;
+
+
+		if (mD3DResource && (originBtSize != btSize))
+		{
+			Reset();
+		}
+
+		if (mD3DResource == nullptr)
+		{
+			mD3DResource = DirectX12API::CreateCommittedResource(
+				GetName(),
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+				D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+				D3D12_RESOURCE_STATE_COMMON,
+				nullptr);
+		}
+
+		if (mD3DResource && initDatas)
+		{
+			auto commandList = DirectX12API::GetGraphicsCommandList();
+			commandList->CopyBuffer(mD3DResource.Get(), initDatas, elementSize, elementCount);
+		}
+		return IsValid();
+	}
+	u64 DirectX12StructuredBuffer::GetDataSize() const
+	{
+		return mElementCount * mElementSize;
+	}
+	u64 DirectX12StructuredBuffer::GetElementCount() const
+	{
+		return mElementCount;
+	}
+	u64 DirectX12StructuredBuffer::GetElementSize() const
+	{
+		return mElementSize;
+	}
+	BufferID DirectX12StructuredBuffer::GetBufferID() const
+	{
+		if (IsValid() == true)
+		{
+			return mD3DResource->GetGPUVirtualAddress();
+		}
+		return 0;
+	}
+
+	ID3D12Resource* DirectX12StructuredBuffer::Get() const
+	{
+		return mD3DResource.Get();
+	}
+
+	void DirectX12StructuredBuffer::Reset()
+	{
+		if (mD3DResource == nullptr)
+		{
+			return;
+		}
+		DirectX12API::DestroyCommittedResource(mD3DResource);
+		mD3DResource.Reset(); mD3DResource = nullptr;
+	}
+
+
 
 	DirectX12ReadBackBuffer::~DirectX12ReadBackBuffer()
 	{
@@ -301,9 +412,9 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::Read(SharedPtr<IReadWriteBuffer> readWriteBuffer, const std::function<void()>& onCompelete)
+	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer, u64 commandID , bool asCompute)
 	{
-		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false || mState == EReadBackBufferState::Reading)
+		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false)
 		{
 			return false;
 		}
@@ -329,46 +440,35 @@ namespace JG
 			}
 		}
 
-		auto dxRWBuffer = static_cast<DirectX12ReadWriteBuffer*>(readWriteBuffer.get());
-		auto commandList = DirectX12API::GetComputeCommandList(MAIN_GRAPHICS_COMMAND_ID);
-		commandList->CopyResource(Get(), dxRWBuffer->Get());
+		auto dxRWBuffer = static_cast<DirectX12StructuredBuffer*>(readWriteBuffer.get());
 
-		mState = EReadBackBufferState::Reading;
-		mOnCompelete = onCompelete;
-		mScheduleHandle = Scheduler::GetInstance().ScheduleOnceByFrame(DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem, [&]()->EScheduleResult
+		if (asCompute == true)
 		{
-			mState = EReadBackBufferState::ReadCompelete;
-			if (mOnCompelete != nullptr)
-			{
-				mOnCompelete();
-				mOnCompelete = nullptr;
-			}
-			return EScheduleResult::Break;
-		});
-
+			auto commandList = DirectX12API::GetComputeCommandList();
+			commandList->CopyResource(Get(), dxRWBuffer->Get());
+		}
+		else
+		{
+			auto commandList = DirectX12API::GetGraphicsCommandList();
+			commandList->CopyResource(Get(), dxRWBuffer->Get());
+		}
 		return IsValid();
 	}
 
 	bool DirectX12ReadBackBuffer::GetData(void* out_data,u64 out_data_size)
 	{
-		if (IsValid() == false || mState != EReadBackBufferState::ReadCompelete)
+		if (IsValid() == false)
 		{
 			return false;
 		}
 		out_data_size = Math::Min(out_data_size, mBufferSize);
 		memcpy(out_data, mCPU, out_data_size);
-		mState = EReadBackBufferState::Wait;
 		return true;
 	}
 
 	u64 DirectX12ReadBackBuffer::GetDataSize() const
 	{
 		return mBufferSize;
-	}
-
-	EReadBackBufferState DirectX12ReadBackBuffer::GetState() const
-	{
-		return mState;
 	}
 
 	void DirectX12ReadBackBuffer::Reset()
@@ -378,384 +478,11 @@ namespace JG
 			mD3DResource->Unmap(0, nullptr);
 			mCPU = nullptr;
 			mBufferSize = 0;
-			mState = EReadBackBufferState::Wait;
 			DirectX12API::DestroyCommittedResource(mD3DResource);
 			mD3DResource.Reset();
 			mD3DResource = nullptr;
 		}
-		if (mScheduleHandle)
-		{
-			mScheduleHandle->Reset();
-			mScheduleHandle = nullptr;
-		}
-		mOnCompelete = nullptr;
 	}
-	DirectX12Computer::~DirectX12Computer()
-	{
-		if (mScheduleHandle != nullptr)
-		{
-			mScheduleHandle->Reset();
-			mScheduleHandle = nullptr;
-		}
-		mOnCompelete = nullptr;
-	}
-	bool DirectX12Computer::SetFloat(const String& name, float value)
-	{
-		return mShaderData->SetFloat(name, value);
-	}
-	bool DirectX12Computer::SetFloat2(const String& name, const JVector2& value)
-	{
-		return  mShaderData->SetFloat2(name, value);
-	}
-	bool DirectX12Computer::SetFloat3(const String& name, const JVector3& value)
-	{
-		return  mShaderData->SetFloat3(name, value);
-	}
-	bool DirectX12Computer::SetFloat4(const String& name, const JVector4& value)
-	{
-		return  mShaderData->SetFloat4(name, value);
-	}
-	bool DirectX12Computer::SetInt(const String& name, i32 value)
-	{
-		return mShaderData->SetInt(name, value);
-	}
-	bool DirectX12Computer::SetInt2(const String& name, const JVector2Int& value)
-	{
-		return mShaderData->SetInt2(name, value);
-	}
-	bool DirectX12Computer::SetInt3(const String& name, const JVector3Int& value)
-	{
-		return mShaderData->SetInt3(name, value);
-	}
-	bool DirectX12Computer::SetInt4(const String& name, const JVector4Int& value)
-	{
-		return mShaderData->SetInt4(name, value);
-	}
-	bool DirectX12Computer::SetUint(const String& name, u32 value)
-	{
-		return mShaderData->SetUint(name, value);
-	}
-	bool DirectX12Computer::SetUint2(const String& name, const JVector2Uint& value)
-	{
-		return mShaderData->SetUint2(name, value);
-	}
-	bool DirectX12Computer::SetUint3(const String& name, const JVector3Uint& value)
-	{
-		return mShaderData->SetUint3(name, value);
-	}
-	bool DirectX12Computer::SetUint4(const String& name, const JVector4Uint& value)
-	{
-		return mShaderData->SetUint4(name, value);
-	}
-	bool DirectX12Computer::SetFloat4x4(const String& name, const JMatrix& value)
-	{
-		return mShaderData->SetFloat4x4(name, value);
-	}
-
-	bool DirectX12Computer::SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture)
-	{
-		return mShaderData->SetTexture(name, textureSlot, texture);
-	}
-
-	bool DirectX12Computer::SetFloatArray(const String& name, const List<float>& value)
-	{
-		return mShaderData->SetFloatArray(name, value);
-	}
-
-	bool DirectX12Computer::SetFloat2Array(const String& name, const List<JVector2>& value)
-	{
-		return mShaderData->SetFloat2Array(name, value);
-	}
-
-	bool DirectX12Computer::SetFloat3Array(const String& name, const List<JVector3>& value)
-	{
-		return mShaderData->SetFloat3Array(name, value);
-	}
-
-	bool DirectX12Computer::SetFloat4Array(const String& name, const List<JVector4>& value)
-	{
-		return mShaderData->SetFloat4Array(name, value);
-	}
-
-	bool DirectX12Computer::SetIntArray(const String& name, const List<i32>& value)
-	{
-		return mShaderData->SetIntArray(name, value);
-	}
-
-	bool DirectX12Computer::SetInt2Array(const String& name, const List<JVector2Int>& value)
-	{
-		return mShaderData->SetInt2Array(name, value);
-	}
-
-	bool DirectX12Computer::SetInt3Array(const String& name, const List<JVector3Int>& value)
-	{
-		return mShaderData->SetInt3Array(name, value);
-	}
-
-	bool DirectX12Computer::SetInt4Array(const String& name, const List<JVector4Int>& value)
-	{
-		return mShaderData->SetInt4Array(name, value);
-	}
-
-	bool DirectX12Computer::SetUintArray(const String& name, const List<u32>& value)
-	{
-		return mShaderData->SetUintArray(name, value);
-	}
-
-	bool DirectX12Computer::SetUint2Array(const String& name, const List<JVector2Uint>& value)
-	{
-		return mShaderData->SetUint2Array(name, value);
-	}
-
-	bool DirectX12Computer::SetUint3Array(const String& name, const List<JVector3Uint>& value)
-	{
-		return mShaderData->SetUint3Array(name, value);
-	}
-
-	bool DirectX12Computer::SetUint4Array(const String& name, const List<JVector4Uint>& value)
-	{
-		return mShaderData->SetUint4Array(name, value);
-	}
-
-	bool DirectX12Computer::SetFloat4x4Array(const String& name, const List<JMatrix>& value)
-	{
-		return mShaderData->SetFloat4x4Array(name, value);
-	}
-
-	bool DirectX12Computer::SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
-	{
-		return mShaderData->SetStructDataArray(name, datas, elementCount, elementSize);
-	}
-
-	bool DirectX12Computer::GetFloat(const String& name, float* out_value)
-	{
-		return mShaderData->GetFloat(name, out_value);
-	}
-
-	bool DirectX12Computer::GetFloat2(const String& name, JVector2* out_value)
-	{
-		return mShaderData->GetFloat2(name, out_value);
-	}
-
-	bool DirectX12Computer::GetFloat3(const String& name, JVector3* out_value)
-	{
-		return mShaderData->GetFloat3(name, out_value);
-	}
-
-	bool DirectX12Computer::GetFloat4(const String& name, JVector4* out_value)
-	{
-		return mShaderData->GetFloat4(name, out_value);
-	}
-
-	bool DirectX12Computer::GetInt(const String& name, i32* out_value)
-	{
-		return mShaderData->GetInt(name, out_value);
-	}
-
-	bool DirectX12Computer::GetInt2(const String& name, JVector2Int* out_value)
-	{
-		return mShaderData->GetInt2(name, out_value);
-	}
-
-	bool DirectX12Computer::GetInt3(const String& name, JVector3Int* out_value)
-	{
-		return mShaderData->GetInt3(name, out_value);
-	}
-
-	bool DirectX12Computer::GetInt4(const String& name, JVector4Int* out_value)
-	{
-		return mShaderData->GetInt4(name, out_value);
-	}
-
-	bool DirectX12Computer::GetUint(const String& name, u32* out_value)
-	{
-		return mShaderData->GetUint(name, out_value);
-	}
-
-	bool DirectX12Computer::GetUint2(const String& name, JVector2Uint* out_value)
-	{
-		return mShaderData->GetUint2(name, out_value);
-	}
-
-	bool DirectX12Computer::GetUint3(const String& name, JVector3Uint* out_value)
-	{
-		return mShaderData->GetUint3(name, out_value);
-	}
-
-	bool DirectX12Computer::GetUint4(const String& name, JVector4Uint* out_value)
-	{
-		return mShaderData->GetUint4(name, out_value);
-	}
-
-	bool DirectX12Computer::GetFloat4x4(const String& name, JMatrix* out_value)
-	{
-		return mShaderData->GetFloat4x4(name, out_value);
-	}
-
-	bool DirectX12Computer::GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value)
-	{
-		return mShaderData->GetTexture(name, textureSlot, out_value);
-	}
-
-	SharedPtr<IReadWriteBuffer> DirectX12Computer::GetRWBuffer(const String& name)
-	{
-		return mShaderData->GetRWData(name);
-	}
-
-	void DirectX12Computer::SetComputeShader(SharedPtr<IComputeShader> shader)
-	{
-		if (shader == nullptr || shader->IsSuccessed() == false)
-		{
-			return;
-		}
-
-		mOwnerShader = shader;
-		auto dx12Shader = static_cast<DirectX12ComputeShader*>(shader.get());
-		mShaderData = CreateUniquePtr<ShaderData>(dx12Shader->GetShaderDataForm());
-	}
-	const String& DirectX12Computer::GetName() const
-	{
-		return mName;
-	}
-	void DirectX12Computer::SetName(const String& name)
-	{
-		mName = name;
-	}
-
-	EComputerState DirectX12Computer::GetState() const
-	{
-		return mState;
-	}
-
-	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, const std::function<void()>& onCompelete, bool asComputeCommand)
-	{
-		if (mOwnerShader == nullptr || mOwnerShader->IsSuccessed() == false)
-		{
-			return false;
-		}
-		//if (mState == EComputerState::Run)
-		//{
-		//	return false;
-		//}
-		mState = EComputerState::Run;
-
-
-		if (asComputeCommand)
-		{
-			ComputeCommandList* commandList = DirectX12API::GetComputeCommandList(commandID);
-			DispatchInternal(commandID, commandList, groupX, groupY, groupZ);
-		}
-		else
-		{
-			auto graphicsCmdList = DirectX12API::GetGraphicsCommandList(commandID);
-			graphicsCmdList->AsCompute([&](SharedPtr<ComputeCommandList> commandList)
-			{
-				DispatchInternal(commandID, commandList.get(), groupX, groupY, groupZ);
-			});
-		}
-
-
-		if (mScheduleHandle && mScheduleHandle->IsValid())
-		{
-			mScheduleHandle->Reset();
-		}
-		mOnCompelete = onCompelete;
-		mScheduleHandle = Scheduler::GetInstance().ScheduleOnceByFrame(
-			DirectX12API::GetFrameBufferCount(), SchedulePriority::EndSystem,
-			[&]() -> EScheduleResult
-		{
-			mState = EComputerState::Compelete;
-			if (mOnCompelete != nullptr)
-			{
-				mOnCompelete();
-				mOnCompelete = nullptr;
-			}
-			return EScheduleResult::Break;
-		});
-
-		return true;
-	}
-
-	bool  DirectX12Computer::DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ)
-	{
-		auto RootSig = DirectX12API::GetComputeRootSignature(commandID); //mShaderData->GetRootSignature();
-		commandList->BindRootSignature(RootSig);
-
-
-		// Data Bind
-		mShaderData->ForEach_CB([&](const ShaderDataForm::CBufferData* data, const List<jbyte>& btData)
-		{
-			commandList->BindConstantBuffer(data->RootParm, btData.data(), btData.size());
-		});
-		mShaderData->ForEach_SB([&](const ShaderDataForm::StructuredBufferData* data, const List<jbyte>& btData)
-		{
-			u64 elementSize = data->ElementDataSize;
-			u64 elementCount = btData.size() / elementSize;
-			commandList->BindStructuredBuffer(data->RootParm, btData.data(), elementCount, elementSize);
-		});
-		mShaderData->ForEach_RWSB([&](const ShaderDataForm::StructuredBufferData* data, SharedPtr<IReadWriteBuffer> rwBuffer)
-		{
-			auto dx12RWBuffer = static_cast<DirectX12ReadWriteBuffer*>(rwBuffer.get());
-			commandList->BindStructuredBuffer(data->RootParm, dx12RWBuffer->GetBufferID(), dx12RWBuffer->Get());
-		});
-
-
-
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-		mShaderData->ForEach_Tex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
-		{
-			u64 textureCount = textureList.size();
-			for (u64 i = 0; i < textureCount; ++i)
-			{
-				if (textureList[i] != nullptr && textureList[i]->IsValid())
-				{
-					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetSRV());
-				}
-			}
-		});
-		if (handles.empty() == false)
-		{
-			commandList->BindTextures((u32)ShaderDefine::EComputeRootParam::TEXTURE2D, handles);
-		}
-		handles.clear();
-
-
-
-		mShaderData->ForEach_RWTex([&](const ShaderDataForm::TextureData* data, const List<SharedPtr<ITexture>>& textureList)
-		{
-			u64 textureCount = textureList.size();
-			for (u64 i = 0; i < textureCount; ++i)
-			{
-				if (textureList[i] != nullptr && textureList[i]->IsValid())
-				{
-					handles.push_back(static_cast<DirectX12Texture*>(textureList[i].get())->GetUAV());
-				}
-			}
-		});
-
-		if (handles.empty() == false)
-		{
-			commandList->BindTextures((u32)ShaderDefine::EComputeRootParam::RWTEXTURE2D, handles);
-		}
-
-
-
-
-		auto PSO = DirectX12API::GetComputePipelineState(commandID);
-		PSO->BindRootSignature(*RootSig);
-		PSO->BindShader(*(static_cast<DirectX12ComputeShader*>(mOwnerShader.get())));
-		if (PSO->Finalize() == false)
-		{
-			return false;
-		}
-		commandList->BindPipelineState(PSO);
-		commandList->Dispatch(groupX, groupY, groupZ);
-		return true;
-	}
-
-
-
-
 
 	DirectX12Texture::~DirectX12Texture()
 	{
@@ -767,7 +494,7 @@ namespace JG
 		ITexture::SetName(name);
 		if (mD3DResource != nullptr)
 		{
-			mD3DResource->SetName(StringExtend::s2ws(name).c_str());
+			mD3DResource->SetName(StringHelper::s2ws(name).c_str());
 			ResourceStateTracker::SetResourceName(mD3DResource.Get(), name);
 		}
 	}
@@ -837,7 +564,7 @@ namespace JG
 
 		if (mD3DResource)
 		{
-			mD3DResource->SetName(StringExtend::s2ws(GetName()).c_str());
+			mD3DResource->SetName(StringHelper::s2ws(GetName()).c_str());
 		}
 	}
 	void DirectX12Texture::SetTextureMemory(
@@ -852,7 +579,7 @@ namespace JG
 		info.Format = format;
 		info.PixelPerUnit = pixelPerUnit;
 		SetTextureInfo(info);
-		auto commandList = DirectX12API::GetGraphicsCommandList(MAIN_GRAPHICS_COMMAND_ID);
+		auto commandList = DirectX12API::GetGraphicsCommandList();
 		commandList->CopyTextrueFromMemory(Get(), pixels, width, height, channels, info.ArraySize);
 	}
 
@@ -1072,16 +799,5 @@ namespace JG
 	{
 		return nullptr;
 	}
-	
-
-
-
-
-
-
-
-
-
-
 
 }

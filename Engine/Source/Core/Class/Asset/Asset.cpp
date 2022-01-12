@@ -221,7 +221,7 @@ namespace JG
 
 	bool MaterialAssetStock::Write(const String& path, const MaterialAssetStock& stock)
 	{
-		auto filePath = PathExtend::CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
+		auto filePath = PathHelper::CombinePath(path, stock.Name) + JG_ASSET_FORMAT;
 
 		auto json = CreateSharedPtr<Json>();
 		json->AddMember(JG_ASSET_KEY, stock);
@@ -940,10 +940,10 @@ namespace JG
 		auto absoluteAssetPath = fs::absolute(Application::GetAssetPath()).string();
 		auto homePath = fs::current_path().string();
 
-		originPath        = StringExtend::ReplaceAll(originPath, "\\", "/");
-		absolutePath      = StringExtend::ReplaceAll(absolutePath, "\\", "/");
-		absoluteAssetPath = StringExtend::ReplaceAll(absoluteAssetPath, "\\", "/");
-		homePath		  = StringExtend::ReplaceAll(homePath, "\\", "/");
+		originPath        = StringHelper::ReplaceAll(originPath, "\\", "/");
+		absolutePath      = StringHelper::ReplaceAll(absolutePath, "\\", "/");
+		absoluteAssetPath = StringHelper::ReplaceAll(absoluteAssetPath, "\\", "/");
+		homePath		  = StringHelper::ReplaceAll(homePath, "\\", "/");
 
 
 		String resourcePath;
@@ -953,10 +953,10 @@ namespace JG
 		{
 			if (path.find_first_of("Asset/") != String::npos) {
 
-				resourcePath = StringExtend::ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = StringExtend::ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = StringExtend::ReplaceAll(absolutePath, "Asset/", "");
-				absolutePath = PathExtend::CombinePath(absoluteAssetPath, absolutePath);
+				resourcePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
+				absolutePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
+				absolutePath = StringHelper::ReplaceAll(absolutePath, "Asset/", "");
+				absolutePath = PathHelper::CombinePath(absoluteAssetPath, absolutePath);
 				out_absolutePath = absolutePath;
 				out_resourcePath = resourcePath;
 				return true;
@@ -965,7 +965,7 @@ namespace JG
 		// in AssetPath
 		else
 		{
-			resourcePath = StringExtend::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
+			resourcePath = StringHelper::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
 			out_absolutePath = absolutePath;
 			out_resourcePath = resourcePath;
 			return true;

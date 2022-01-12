@@ -37,7 +37,17 @@ namespace JG
 		{
 			pos = AnalysisRWStructuredBuffer(code, pos, &result);
 		}
-
+		pos = 0;
+		while (pos != String::npos)
+		{
+			pos = AnalysisByteAddressBuffer(code, pos, &result);
+		}
+		// RWStructuredBuffer
+		pos = 0;
+		while (pos != String::npos)
+		{
+			pos = AnalysisRWByteAddressBuffer(code, pos, &result);
+		}
 		// Texture
 		pos = 0;
 		while (pos != String::npos)
@@ -203,12 +213,119 @@ namespace JG
 		}
 
 		cBuffer->DataSize    = uploadDataSize;
-		cBuffer->ElementType = HLSL::EHLSLElement::CBuffer;
 		cBuffer->RootParm    = (u64)ShaderDefine::EComputeRootParam::CB_0 + CBOffset;
 		cBuffer->RegisterNum = CBOffset;
 
 		code.insert(endPos, " : register(b" + std::to_string(cBuffer->RegisterNum) + ")");
 		CBOffset += 1;
+		return startPos;
+	}
+	u64 ShaderDataForm::AnalysisByteAddressBuffer(String& code, u64 startPos, bool* result)
+	{
+		u64 dataTokenStartPos = code.find(HLSL::Token::ByteAddressBuffer, startPos);
+		if (dataTokenStartPos != String::npos && dataTokenStartPos >= 2)
+		{
+			String token = code.substr(dataTokenStartPos - 2, strlen(HLSL::Token::RWByteAddressBuffer));
+			if (token == HLSL::Token::RWByteAddressBuffer)
+			{
+				return code.find(";", dataTokenStartPos) + 1;
+			}
+		}
+		if (dataTokenStartPos != String::npos)
+		{
+			u64 endPos = code.find(";", dataTokenStartPos);
+
+
+
+			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
+
+			String nameCode = StringHelper::ReplaceAll(dataCode, HLSL::Token::ByteAddressBuffer, "");
+			u64 labPos = nameCode.find("<"); u64 rabPos = nameCode.find(">");
+			if (labPos != String::npos && rabPos != String::npos)
+			{
+				String dataType = nameCode.substr(labPos, rabPos - labPos + 1);
+				nameCode = StringHelper::ReplaceAll(nameCode, dataType, "");
+			}
+
+			nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
+
+			if (RegisterByteAddrBuffer(nameCode) == false)
+			{
+				if (result != nullptr)
+				{
+					*result = false;
+				}
+				return String::npos;
+			}
+
+			auto byteAddrData = ByteAddrDataMap[nameCode].get();
+			byteAddrData->Name = nameCode;
+			byteAddrData->RootParm = (u64)ShaderDefine::EComputeRootParam::BYTEADDRESSBUFFER;
+			byteAddrData->RegisterNum = ByteAddrRegisterNumOffset;
+			byteAddrData->RegisterSpace = HLSL::RegisterSpace::ByteAddressBufferRegisterSpace;
+
+
+			code.insert(endPos,
+				" : register(t" + std::to_string(ByteAddrDataMap[nameCode]->RegisterNum) +
+				", space" + std::to_string(ByteAddrDataMap[nameCode]->RegisterSpace) + ")");
+			startPos = endPos + 1;
+
+			SortedByteAddrDataMap[byteAddrData->RegisterNum] = byteAddrData;
+			ByteAddrRegisterNumOffset += 1;
+		}
+		else
+		{
+			return String::npos;
+		}
+		return startPos;
+	}
+	u64 ShaderDataForm::AnalysisRWByteAddressBuffer(String& code, u64 startPos, bool* result)
+	{
+		u64 dataTokenStartPos = code.find(HLSL::Token::RWByteAddressBuffer, startPos);
+		if (dataTokenStartPos != String::npos)
+		{
+			u64 endPos = code.find(";", dataTokenStartPos);
+
+			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
+
+			String nameCode = StringHelper::ReplaceAll(dataCode, HLSL::Token::RWByteAddressBuffer, "");
+			u64 labPos = nameCode.find("<"); u64 rabPos = nameCode.find(">");
+			if (labPos != String::npos && rabPos != String::npos)
+			{
+				String dataType = nameCode.substr(labPos, rabPos - labPos + 1);
+				nameCode = StringHelper::ReplaceAll(nameCode, dataType, "");
+			}
+
+			nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
+
+			if (RegisterRWByteAddrBuffer(nameCode) == false)
+			{
+				if (result != nullptr)
+				{
+					*result = false;
+				}
+				return String::npos;
+			}
+
+			auto byteAddrData = RWByteAddrDataMap[nameCode].get();
+			byteAddrData->Name = nameCode;
+			byteAddrData->RootParm = (u64)ShaderDefine::EComputeRootParam::RWBYTEADDRESSBUFFER;
+			byteAddrData->RegisterNum = RWByteAddrRegisterNumOffset;
+			byteAddrData->RegisterSpace = HLSL::RegisterSpace::RWByteAddressBufferRegisterSpace;
+
+
+			code.insert(endPos,
+				" : register(u" + std::to_string(RWByteAddrDataMap[nameCode]->RegisterNum) +
+				", space" + std::to_string(RWByteAddrDataMap[nameCode]->RegisterSpace) + ")");
+			startPos = endPos + 1;
+
+			SortedRWByteAddrDataMap[byteAddrData->RegisterNum] = byteAddrData;
+			RWByteAddrRegisterNumOffset += 1;
+		}
+		else
+		{
+			return String::npos;
+		}
 		return startPos;
 	}
 	u64 ShaderDataForm::AnalysisStructuredBuffer(String& code, u64 startPos, bool* result)
@@ -246,7 +363,7 @@ namespace JG
 
 
 			String typeCode = dataCode.substr(dataTypeStartPos, dataTypeEndPos - dataTypeStartPos);
-			typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
+			typeCode = StringHelper::ReplaceAll(typeCode, " ", "");
 
 		
 			String typeName;
@@ -265,7 +382,7 @@ namespace JG
 
 
 			String nameCode = dataCode.substr(dataTypeEndPos + 1, dataCode.length() - dataTypeEndPos - 1);
-			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+			nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
 
 			if (RegisterStructuredBuffer(nameCode) == false)
 			{
@@ -282,7 +399,6 @@ namespace JG
 			structuredBufferData->RootParm    = (u64)ShaderDefine::EComputeRootParam::STRUCTUREDBUFFER_0 + SBOffset;
 			structuredBufferData->RegisterNum = 0;
 			structuredBufferData->RegisterSpace = HLSL::RegisterSpace::StructuredBufferRegisterSpace + SBOffset;
-			structuredBufferData->ElementType = HLSL::EHLSLElement::StructuredBuffer;
 			structuredBufferData->ElementDataSize = typeSize;
 	
 
@@ -316,37 +432,28 @@ namespace JG
 
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
 
-			String nameCode = StringExtend::ReplaceAll(dataCode, HLSL::Token::Texture2D, "");
+			String nameCode = StringHelper::ReplaceAll(dataCode, HLSL::Token::Texture2D, "");
 			u64 labPos = nameCode.find("<"); u64 rabPos = nameCode.find(">");
 			if (labPos != String::npos && rabPos != String::npos)
 			{
 				String dataType = nameCode.substr(labPos, rabPos - labPos + 1);
-				nameCode = StringExtend::ReplaceAll(nameCode, dataType, "");
+				nameCode = StringHelper::ReplaceAll(nameCode, dataType, "");
 			}
 
-			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
-			
-
-
-
-
-
+			nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
+		
 			u64 arraySize = 1;
-
 			u64 arrayStartPos = dataCode.find("[");
 			if (arrayStartPos != String::npos)
 			{
 
 				nameCode = nameCode.substr(0, nameCode.find("["));
-
-
-
 				arrayStartPos += 1;
 				u64 arrayEndPos = dataCode.find("]", arrayStartPos);
 
 
 				String arraySizeCode = dataCode.substr(arrayStartPos, arrayEndPos - arrayStartPos);
-				arraySizeCode = StringExtend::ReplaceAll(arraySizeCode, " ", "");
+				arraySizeCode = StringHelper::ReplaceAll(arraySizeCode, " ", "");
 
 				arraySize = atol(arraySizeCode.c_str());
 			}
@@ -365,8 +472,6 @@ namespace JG
 			textureData->RootParm = (u64)ShaderDefine::EComputeRootParam::TEXTURE2D;
 			textureData->RegisterNum   = TexRegisterNumOffset;
 			textureData->RegisterSpace = HLSL::RegisterSpace::Texture2DRegisterSpace;
-			textureData->ElementType   = HLSL::EHLSLElement::Texture;
-			textureData->Type	       = HLSL::EHLSLTextureType::_2D;
 			textureData->TextureCount  = arraySize;
 			code.insert(endPos,
 				" : register(t" + std::to_string(TextureDataMap[nameCode]->RegisterNum) +
@@ -384,7 +489,7 @@ namespace JG
 	}
 	u64 ShaderDataForm::AnalysisRWStructuredBuffer(String& code, u64 startPos, bool* result)
 	{
-		if (MAS_RWSB_COUNT <= RWSBOffset)
+		if (MAX_RWSB_COUNT <= RWSBOffset)
 		{
 			if (result)
 			{
@@ -409,7 +514,7 @@ namespace JG
 
 
 			String typeCode = dataCode.substr(dataTypeStartPos, dataTypeEndPos - dataTypeStartPos);
-			typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
+			typeCode = StringHelper::ReplaceAll(typeCode, " ", "");
 
 			String typeName;
 			u64 typeSize = 0;
@@ -423,7 +528,7 @@ namespace JG
 			}
 
 			String nameCode = dataCode.substr(dataTypeEndPos + 1, dataCode.length() - dataTypeEndPos - 1);
-			nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
+			nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
 
 			if (RegisterRWStructuredBuffer(nameCode) == false)
 			{
@@ -440,7 +545,6 @@ namespace JG
 			structuredBufferData->RootParm = (u64)ShaderDefine::EComputeRootParam::RWSTRUCTUREDBUFFER_0 + RWSBOffset;
 			structuredBufferData->RegisterNum = 0;
 			structuredBufferData->RegisterSpace = HLSL::RegisterSpace::RWStructuredBufferRegisterSpace + RWSBOffset;
-			structuredBufferData->ElementType   = HLSL::EHLSLElement::RWStructuredBuffer;
 			structuredBufferData->ElementDataSize = typeSize;
 
 			code.insert(endPos, " : register(u0, space" + std::to_string(structuredBufferData->RegisterSpace) + ")");
@@ -464,7 +568,7 @@ namespace JG
 			dataTokenStartPos = code.find(">", dataTokenStartPos) + 1;
 
 			String dataCode = code.substr(dataTokenStartPos, endPos - dataTokenStartPos);
-			String nameCode = StringExtend::ReplaceAll(dataCode, " ", "");
+			String nameCode = StringHelper::ReplaceAll(dataCode, " ", "");
 
 			u64 arraySize = 1;
 
@@ -481,7 +585,7 @@ namespace JG
 
 
 				String arraySizeCode = dataCode.substr(arrayStartPos, arrayEndPos - arrayStartPos);
-				arraySizeCode = StringExtend::ReplaceAll(arraySizeCode, " ", "");
+				arraySizeCode = StringHelper::ReplaceAll(arraySizeCode, " ", "");
 
 				arraySize = atol(arraySizeCode.c_str());
 			}
@@ -500,8 +604,6 @@ namespace JG
 			textureData->RootParm      = (u64)ShaderDefine::EComputeRootParam::RWTEXTURE2D;
 			textureData->RegisterNum   = RWTexRegisterNumOffset;
 			textureData->RegisterSpace = HLSL::RegisterSpace::RWTexture2DRegisterSpace;
-			textureData->ElementType   = HLSL::EHLSLElement::RWTexture;
-			textureData->Type = HLSL::EHLSLTextureType::_2D;
 			textureData->TextureCount = arraySize;
 
 			code.insert(endPos,
@@ -558,9 +660,9 @@ namespace JG
 		u64 startPos = pos + strlen(HLSL::Token::Struct);
 		u64 endPos = code.find_first_of("{", startPos);
 		String structName = code.substr(startPos, endPos - startPos);
-		structName = StringExtend::ReplaceAll(structName, "\n", "");
-		structName = StringExtend::ReplaceAll(structName, "\t", "");
-		structName = StringExtend::ReplaceAll(structName, " ", "");
+		structName = StringHelper::ReplaceAll(structName, "\n", "");
+		structName = StringHelper::ReplaceAll(structName, "\t", "");
+		structName = StringHelper::ReplaceAll(structName, " ", "");
 
 		if (out_value != nullptr)
 		{
@@ -572,9 +674,9 @@ namespace JG
 		u64 startPos = pos + strlen(HLSL::Token::CBuffer);
 		u64 endPos = code.find_first_of("{", startPos);
 		String cbName = code.substr(startPos, endPos - startPos);
-		cbName = StringExtend::ReplaceAll(cbName, "\n", "");
-		cbName = StringExtend::ReplaceAll(cbName, "\t", "");
-		cbName = StringExtend::ReplaceAll(cbName, " ", "");
+		cbName = StringHelper::ReplaceAll(cbName, "\n", "");
+		cbName = StringHelper::ReplaceAll(cbName, "\t", "");
+		cbName = StringHelper::ReplaceAll(cbName, " ", "");
 
 		if (out_value != nullptr)
 		{
@@ -591,8 +693,8 @@ namespace JG
 			if (endPos != String::npos)
 			{
 				String varCode = code.substr(startPos, endPos - startPos + 1);
-				varCode = StringExtend::ReplaceAll(varCode, "\n", "");
-				varCode = StringExtend::ReplaceAll(varCode, "\t", "");
+				varCode = StringHelper::ReplaceAll(varCode, "\n", "");
+				varCode = StringHelper::ReplaceAll(varCode, "\t", "");
 
 				if (out_value)
 				{
@@ -619,8 +721,8 @@ namespace JG
 		u64 result = endPos + 1;
 
 		String dataCode = samplerStateDataCode.substr(startPos, endPos - startPos);
-		dataCode = StringExtend::ReplaceAll(dataCode, "\t", "");
-		dataCode = StringExtend::ReplaceAll(dataCode, "\n", "");
+		dataCode = StringHelper::ReplaceAll(dataCode, "\t", "");
+		dataCode = StringHelper::ReplaceAll(dataCode, "\n", "");
 
 
 		startPos = 0;
@@ -630,13 +732,13 @@ namespace JG
 		if (out_key != nullptr)
 		{
 			*out_key = dataCode.substr(startPos, midPos - startPos);
-			*out_key = StringExtend::ReplaceAll(*out_key, " ", "");
+			*out_key = StringHelper::ReplaceAll(*out_key, " ", "");
 		}
 
 		if (out_value != nullptr)
 		{
 			*out_value = dataCode.substr(midPos + 1, endPos - midPos - 1);
-			*out_value = StringExtend::ReplaceAll(*out_value, " ", "");
+			*out_value = StringHelper::ReplaceAll(*out_value, " ", "");
 		}
 
 
@@ -663,10 +765,10 @@ namespace JG
 
 
 		String typeCode = varCode.substr(varStartPos, varMidPos - varStartPos);
-		typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
+		typeCode = StringHelper::ReplaceAll(typeCode, " ", "");
 		String nameCode = varCode.substr(varMidPos + 1, varEndPos - varMidPos);
-		nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
-		nameCode = StringExtend::ReplaceAll(nameCode, ";", "");
+		nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
+		nameCode = StringHelper::ReplaceAll(nameCode, ";", "");
 
 		u64 varSize = 0;
 		if (FindTypeInfo(typeCode, nullptr, &varSize) == false)
@@ -677,6 +779,32 @@ namespace JG
 		structData->DataNameList.push_back(nameCode);
 		structData->DataTypeList.push_back(typeCode);
 		structData->DataSize += varSize;
+		return true;
+	}
+
+	bool ShaderDataForm::RegisterByteAddrBuffer(const String& name)
+	{
+		if (ByteAddrDataMap.find(name) != ByteAddrDataMap.end())
+		{
+			JG_CORE_ERROR("{0} ByteAddrData Already Exists.", name);
+			return false;
+		}
+
+		ByteAddrDataMap[name] = CreateUniquePtr<ByteAddressData>();
+
+		return true;
+	}
+
+	bool ShaderDataForm::RegisterRWByteAddrBuffer(const String& name)
+	{
+		if (RWByteAddrDataMap.find(name) != RWByteAddrDataMap.end())
+		{
+			JG_CORE_ERROR("{0} ByteAddrData Already Exists.", name);
+			return false;
+		}
+
+		RWByteAddrDataMap[name] = CreateUniquePtr<ByteAddressData>();
+
 		return true;
 	}
 
@@ -752,10 +880,10 @@ namespace JG
 
 
 		String typeCode = varCode.substr(varStartPos, varMidPos - varStartPos);
-		typeCode = StringExtend::ReplaceAll(typeCode, " ", "");
+		typeCode = StringHelper::ReplaceAll(typeCode, " ", "");
 		String nameCode = varCode.substr(varMidPos + 1, varEndPos - varMidPos);
-		nameCode = StringExtend::ReplaceAll(nameCode, " ", "");
-		nameCode = StringExtend::ReplaceAll(nameCode, ";", "");
+		nameCode = StringHelper::ReplaceAll(nameCode, " ", "");
+		nameCode = StringHelper::ReplaceAll(nameCode, ";", "");
 
 
 
@@ -786,17 +914,23 @@ namespace JG
 		{
 			mReadDatas[_pair.first].resize(_pair.second->DataSize);
 		}
-
 		for (auto& _pair : shaderDataForm->StructuredBufferDataMap)
 		{
-			mReadDatas[_pair.first].resize(_pair.second->ElementDataSize);
+			mSBDatas[_pair.first] = nullptr;
 		}
 		for (auto& _pair : shaderDataForm->RWStructuredBufferDataMap)
 		{
-			u64 alignment = _pair.second->ElementDataSize;
-			u64 alignDataSize = (MaxDataSize + (alignment - 1)) & ~(alignment - 1);
-			mReadWriteDatas[_pair.first] = IReadWriteBuffer::Create(_pair.first, alignDataSize);
+			mRWSBDatas[_pair.first] = nullptr;
 		}
+		for (auto& _pair : shaderDataForm->ByteAddrDataMap)
+		{
+			mByteAddrDatas[_pair.first] = nullptr;
+		}
+		for (auto& _pair : shaderDataForm->RWByteAddrDataMap)
+		{
+			mRWByteAddrDatas[_pair.first] = nullptr;
+		}
+
 
 		for (auto& _pair : shaderDataForm->TextureDataMap)
 		{
@@ -817,24 +951,24 @@ namespace JG
 			action(cBufferData, mReadDatas[cBufferName]);
 		}
 	}
-	void ShaderData::ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action)
+	void ShaderData::ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IStructuredBuffer>)>& action)
 	{
 		if (action == nullptr) return;
 		for (auto& _pair : mShaderDataForm->StructuredBufferDataMap)
 		{
 			auto structuredBufferName = _pair.first;
 			auto structuredBufferData = _pair.second.get();
-			action(structuredBufferData, mReadDatas[structuredBufferName]);
+			action(structuredBufferData, mSBDatas[structuredBufferName]);
 		}
 	}
-	void ShaderData::ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action)
+	void ShaderData::ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IStructuredBuffer>)>& action)
 	{
 		if (action == nullptr) return;
 		for (auto& _pair : mShaderDataForm->RWStructuredBufferDataMap)
 		{
 			auto structuredBufferName = _pair.first;
 			auto structuredBufferData = _pair.second.get();
-			action(structuredBufferData, mReadWriteDatas[structuredBufferName]);
+			action(structuredBufferData, mRWSBDatas[structuredBufferName]);
 		}
 	}
 	void ShaderData::ForEach_Tex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action)
@@ -859,11 +993,28 @@ namespace JG
 			action(textureData, mRWTextureDatas[textureData->Name]);
 		}
 	}
+	void ShaderData::ForEach_BAB(const std::function<void(const ShaderDataForm::ByteAddressData*, SharedPtr<IByteAddressBuffer>)>& action)
+	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->SortedByteAddrDataMap)
+		{
+			auto  byteAddrData = _pair.second;
+			action(byteAddrData, mByteAddrDatas[byteAddrData->Name]);
+		}
+	}
+	void ShaderData::ForEach_RWBAB(const std::function<void(const ShaderDataForm::ByteAddressData*, SharedPtr<IByteAddressBuffer>)>& action)
+	{
+		if (action == nullptr) return;
+		for (auto& _pair : mShaderDataForm->SortedRWByteAddrDataMap)
+		{
+			auto  byteAddrData = _pair.second;
+			action(byteAddrData, mRWByteAddrDatas[byteAddrData->Name]);
+		}
+	}
 	void ShaderData::Reset()
 	{
 		mUploadAllocator->Reset();
 		mReadDatas.clear();
-		mReadWriteDatas.clear();
 		mTextureDatas.clear();
 		mRWTextureDatas.clear();
 	}
@@ -953,79 +1104,35 @@ namespace JG
 		return false;
 	}
 
-
-
-	bool ShaderData::SetFloatArray(const String& name, const List<float>& value)
+	bool ShaderData::SetByteAddressBuffer(const String& name, SharedPtr<IByteAddressBuffer> bab)
 	{
-		return SetDataArray<float, EShaderDataType::_float>(name, value);
+		if (mByteAddrDatas.find(name) != mByteAddrDatas.end())
+		{
+			mByteAddrDatas[name] = bab;
+			return true;
+		}
+		if (mRWByteAddrDatas.find(name) != mRWByteAddrDatas.end())
+		{
+			mRWByteAddrDatas[name] = bab;
+			return true;
+		}
+		return false;
 	}
 
-	bool ShaderData::SetFloat2Array(const String& name, const List<JVector2>& value)
+	bool ShaderData::SetStructuredBuffer(const String& name, SharedPtr<IStructuredBuffer> sb)
 	{
-		return SetDataArray<JVector2, EShaderDataType::_float2>(name, value);
+		if (mSBDatas.find(name) != mSBDatas.end())
+		{
+			mSBDatas[name] = sb;
+			return true;
+		}
+		if (mRWSBDatas.find(name) != mRWSBDatas.end())
+		{
+			mRWSBDatas[name] = sb;
+			return true;
+		}
+		return false;
 	}
-
-	bool ShaderData::SetFloat3Array(const String& name, const List<JVector3>& value)
-	{
-		return SetDataArray<JVector3, EShaderDataType::_float3>(name, value);
-	}
-
-	bool ShaderData::SetFloat4Array(const String& name, const List<JVector4>& value)
-	{
-		return SetDataArray<JVector4, EShaderDataType::_float4>(name, value);
-	}
-
-	bool ShaderData::SetIntArray(const String& name, const List<i32>& value)
-	{
-		return SetDataArray<i32, EShaderDataType::_int>(name, value);
-	}
-
-	bool ShaderData::SetInt2Array(const String& name, const List<JVector2Int>& value)
-	{
-		return SetDataArray<JVector2Int, EShaderDataType::_int2>(name, value);
-	}
-
-	bool ShaderData::SetInt3Array(const String& name, const List<JVector3Int>& value)
-	{
-		return SetDataArray<JVector3Int, EShaderDataType::_int3>(name, value);
-	}
-
-	bool ShaderData::SetInt4Array(const String& name, const List<JVector4Int>& value)
-	{
-		return SetDataArray<JVector4Int, EShaderDataType::_int4>(name, value);
-	}
-
-	bool ShaderData::SetUintArray(const String& name, const List<u32>& value)
-	{
-		return SetDataArray<u32, EShaderDataType::_uint>(name, value);
-	}
-
-	bool ShaderData::SetUint2Array(const String& name, const List<JVector2Uint>& value)
-	{
-		return SetDataArray<JVector2Uint, EShaderDataType::_uint2>(name, value);
-	}
-
-	bool ShaderData::SetUint3Array(const String& name, const List<JVector3Uint>& value)
-	{
-		return SetDataArray<JVector3Uint, EShaderDataType::_uint3>(name, value);
-	}
-
-	bool ShaderData::SetUint4Array(const String& name, const List<JVector4Uint>& value)
-	{
-		return SetDataArray<JVector4Uint, EShaderDataType::_uint4>(name, value);
-	}
-
-	bool ShaderData::SetFloat4x4Array(const String& name, const List<JMatrix>& value)
-	{
-		return SetDataArray<JMatrix, EShaderDataType::_float4x4>(name, value);
-	}
-
-	bool ShaderData::SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
-	{
-		return SetDataArray(name, datas, elementCount, elementSize);
-	}
-
-
 
 	bool ShaderData::GetFloat(const String& name, float* out_value)
 	{
@@ -1108,11 +1215,27 @@ namespace JG
 		*out_value = textureList[textureSlot];
 		return true;
 	}
-	SharedPtr<IReadWriteBuffer> ShaderData::GetRWData(const String& name)
+	SharedPtr<IByteAddressBuffer> ShaderData::GetByteAddressBuffer(const String& name)
 	{
-		if (mReadWriteDatas.find(name) != mReadWriteDatas.end())
+		if (mByteAddrDatas.find(name) != mByteAddrDatas.end())
 		{
-			return mReadWriteDatas[name];
+			return mByteAddrDatas[name];
+		}
+		if (mRWByteAddrDatas.find(name) != mRWByteAddrDatas.end())
+		{
+			return mRWByteAddrDatas[name];
+		}
+		return nullptr;
+	}
+	SharedPtr<IStructuredBuffer> ShaderData::GetStructuredBuffer(const String& name)
+	{
+		if (mSBDatas.find(name) != mSBDatas.end())
+		{
+			return mSBDatas[name];
+		}
+		if (mRWSBDatas.find(name) != mRWSBDatas.end())
+		{
+			return mRWSBDatas[name];
 		}
 		return nullptr;
 	}
@@ -1131,41 +1254,5 @@ namespace JG
 			return nullptr;
 		}
 		return data;
-	}
-	bool ShaderData::CheckDataArray(const String& name, EShaderDataType checkType)
-	{
-		auto iter = mShaderDataForm->StructuredBufferDataMap.find(name);
-		if (iter == mShaderDataForm->StructuredBufferDataMap.end())
-		{
-			return false;
-		}
-
-		auto data = iter->second.get();
-		if (data->Type != ShaderDataTypeToString(checkType))
-		{
-			return false;
-		}
-
-		return true;
-	}
-	bool ShaderData::CheckDataArray(const String& name, u64 elementSize)
-	{
-		auto iter = mShaderDataForm->StructuredBufferDataMap.find(name);
-		if (iter == mShaderDataForm->StructuredBufferDataMap.end())
-		{
-			return false;
-		}
-		u64 typeSize = 0;
-		auto data = iter->second.get();
-		if (mShaderDataForm->FindTypeInfo(data->Type, nullptr, &typeSize) == false)
-		{
-			return false;
-		}
-		if (elementSize != typeSize)
-		{
-			return false;
-		}
-
-		return true;
 	}
 }

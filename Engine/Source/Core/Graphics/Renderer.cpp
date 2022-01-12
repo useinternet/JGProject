@@ -9,6 +9,10 @@ namespace JG
 {
 	RenderStatistics Renderer::Statistics;
 	RenderDebugger   Renderer::Debugger;
+	Renderer::Renderer()
+	{
+		mRenderParamManager = CreateUniquePtr<RenderParamManager>();
+	}
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
@@ -187,6 +191,11 @@ namespace JG
 
 
 
+	RenderParamManager* Renderer::GetRenderParamManager() const
+	{
+		return mRenderParamManager.get();
+	}
+
 	const RenderInfo& Renderer::GetRenderInfo() const
 	{
 		return mCurrentRenderInfo;
@@ -230,108 +239,5 @@ namespace JG
 		{
 			action(_pair.first, _pair.second);
 		}
-	}
-	bool Renderer::RegisterGlobalRenderParamTex(const String& name, SharedPtr<ITexture> initTexture, bool isPrivate)
-	{
-		if (mGlobalParamTexDic.find(name) != mGlobalParamTexDic.end())
-		{
-			return false;
-		}
-
-		auto& _pair = mGlobalParamTexDic[name];
-		_pair.first  = initTexture;
-		_pair.second = isPrivate;
-
-
-		return true;
-	}
-	bool Renderer::SetGlobalRenderParamTex(const String& name, SharedPtr<ITexture> tex)
-	{
-		if (mGlobalParamTexDic.find(name) == mGlobalParamTexDic.end())
-		{
-			return false;
-		}
-
-		auto& _pair = mGlobalParamTexDic[name];
-		if (_pair.second)
-		{
-			return false;
-		}
-
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
-		_pair.first = tex;
-		return true;
-	}
-	SharedPtr<ITexture> Renderer::GetGlobalRenderParamTex(const String& name)
-	{
-		if (mGlobalParamTexDic.find(name) == mGlobalParamTexDic.end())
-		{
-			return nullptr;
-		}
-
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
-		auto& _pair = mGlobalParamTexDic[name];
-		return _pair.first;
-	}
-	bool Renderer::RegisterGlobalRenderParam(const String& name, u64 dataSize)
-	{
-		if (mGlobalParamDic.find(name) != mGlobalParamDic.end())
-		{
-			return false;
-		}
-
-		mGlobalParamDic[name].resize(dataSize);
-		return true;
-	}
-	bool Renderer::RegisterLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> initTexture, bool isPrivate)
-	{
-		if (mLocalParamTexDic[type].find(name) != mLocalParamTexDic[type].end())
-		{
-			return false;
-		}
-
-		auto& _pair = mLocalParamTexDic[type][name];
-
-		_pair.first = initTexture;
-		_pair.second = isPrivate;
-
-		return true;
-	}
-	bool Renderer::SetLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> tex)
-	{
-		if (mLocalParamTexDic[type].find(name) != mLocalParamTexDic[type].end())
-		{
-			return false;
-		}
-		auto& _pair = mLocalParamTexDic[type][name];
-
-		if (_pair.second)
-		{
-			return false;
-		}
-
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
-		_pair.first = tex;
-		return true;
-	}
-	SharedPtr<ITexture> Renderer::GetLocalRenderParamTex(const Type& type, const String& name)
-	{
-		if (mLocalParamTexDic[type].find(name) != mLocalParamTexDic[type].end())
-		{
-			return nullptr;
-		}
-
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
-		auto& _pair = mLocalParamTexDic[type][name];
-		return _pair.first;
-	}
-	bool Renderer::RegisterLocalRenderParam(const Type& type, const String& name, u64 dataSize)
-	{
-		if (mLocalParamDic[type].find(name) != mLocalParamDic[type].end())
-		{
-			return false;
-		}
-		mLocalParamDic[type][name].resize(dataSize);
-		return true;
 	}
 }

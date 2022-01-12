@@ -31,7 +31,10 @@ namespace JG
 		String mFullSourceCode;
 		bool mIsCompileSuccess = false;
 		List<std::pair<EShaderDataType, String>> mPropertyList;
-		List<SharedPtr<IShaderScript>> mShaderScriptList;
+		List<SharedPtr<IShaderScript>>			 mShaderScriptList;
+
+		SortedDictionary<u64, String> mSortedTextureMap;
+		SortedDictionary<u64, String> mSortedTextureCubeMap;
 	public:
 		const String& GetName() const override;
 		void SetName(const String& name);
@@ -44,6 +47,9 @@ namespace JG
 		virtual bool IsSuccessed() const override;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
+	public:
+		void ForEach_TextureSlot(const std::function<void(const String&)>& action);
+		void ForEach_TextureCubeSlot(const std::function<void(const String&)>& action);
 	public:
 		ID3DBlob* GetVSData() const {
 			return mVSData.Get();

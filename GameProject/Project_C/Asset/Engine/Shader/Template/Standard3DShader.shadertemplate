@@ -112,7 +112,11 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 			Lo += CalcPointLight(N, V, material, pl);
 		}
 	}
-
+	for(int i = 0; i<_PointLightCount; ++i)
+	{
+		PointLight pl = _PointLightList[i];
+		Lo += CalcPointLight(N, V, material, pl);
+	}
 
 
 

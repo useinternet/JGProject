@@ -36,19 +36,12 @@ namespace JG
 			i32			 PointLightCount = 0;
 		};
 		CB CB;
-
-		List<Graphics::LightGrid> LightGrids;
-		List<u32> VisibleLightIndices;
 	private:
-		JMatrix mPrevViewMatrix;
-		SharedPtr<IComputer>       mComputer;
-		SharedPtr<IReadBackBuffer> mVisibleLightIndicesRBB;
-		SharedPtr<IReadBackBuffer> mLightGridRBB;
+		List<SharedPtr<IComputer>>         mLightCullingComputers;
+		List<SharedPtr<IStructuredBuffer>> mLightSB;
 
-		bool mEnableDispatch    = true;
-		i32  mCompeleteRBBCount = 0;
-		Renderer* mRenderer = nullptr;
-		PreRenderProcess_ComputeCluster* mComputeClusterProcess  = nullptr;
+		List<SharedPtr<IStructuredBuffer>> mLightGridSB;
+		List<SharedPtr<IStructuredBuffer>> mVisibleLightIndiciesSB;
 	public:
 		PreRenderProcess_LightCulling();
 	public:
@@ -58,6 +51,7 @@ namespace JG
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	public:
-		void SetClusters(const void* data, u64 dataCount, u64 dataSize);
+		bool InitComputers();
+		void SetClusters(SharedPtr<IStructuredBuffer> sb);
 	};
 }

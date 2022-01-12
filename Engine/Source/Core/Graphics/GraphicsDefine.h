@@ -10,7 +10,7 @@ namespace JG
 {
 #define MAX_RENDERTARGET 8
 #define TEXTURE_ID_NULL  0
-#define MAIN_GRAPHICS_COMMAND_ID 1
+#define MAIN_GRAPHICS_COMMAND_ID 0
 
 	using TextureID  = u64;
 	using BufferID   = u64;
@@ -53,7 +53,7 @@ namespace JG
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
-		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT; 
 		case ETextureFormat::R8_Uint:			 return DXGI_FORMAT_R8_UINT;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
@@ -200,59 +200,6 @@ namespace JG
 		}
 	}
 
-	enum class ESamplerStateTemplate
-	{
-		Unknown,
-		Point_Wrap,
-		Point_Clamp,
-		Point_Border,
-		Point_Border_TransparentBlack,
-		Point_Border_OpaqueBlack,
-		Point_Mirror,
-		Point_MirrorOnce,
-		Linear_Wrap,
-		Linear_Clamp,
-		Linear_Border,
-		Linear_Border_TransparentBlack,
-		Linear_Border_OpaqueBlack,
-		Linear_Mirror,
-		Linear_MirrorOnce,
-		Anisotropic_Wrap,
-		Anisotropic_Clamp,
-		Anisotropic_Border,
-		Anisotropic_Border_TransparentBlack,
-		Anisotropic_Border_OpaqueBlack,
-		Anisotropic_Mirror,
-		Anisotropic_MirrorOnce,
-	};
-
-	inline ESamplerStateTemplate StringToSamplerStateTemplate(const String& _template)
-	{
-		if (_template == "Point_Wrap") return ESamplerStateTemplate::Point_Wrap;
-		else if (_template == "Point_Clamp") return ESamplerStateTemplate::Point_Clamp;
-		else if (_template == "Point_Border") return ESamplerStateTemplate::Point_Border;
-		else if (_template == "Point_Border_TransparentBlack") return ESamplerStateTemplate::Point_Border_TransparentBlack;
-		else if (_template == "Point_Border_OpaqueBlack") return ESamplerStateTemplate::Point_Border_OpaqueBlack;
-		else if (_template == "Point_Mirror") return ESamplerStateTemplate::Point_Mirror;
-		else if (_template == "Point_MirrorOnce") return ESamplerStateTemplate::Point_MirrorOnce;
-		else if (_template == "Linear_Wrap") return ESamplerStateTemplate::Linear_Wrap;
-		else if (_template == "Linear_Clamp") return ESamplerStateTemplate::Linear_Clamp;
-		else if (_template == "Linear_Border") return ESamplerStateTemplate::Linear_Border;
-		else if (_template == "Linear_Border_TransparentBlack") return ESamplerStateTemplate::Linear_Border_TransparentBlack;
-		else if (_template == "Linear_Border_OpaqueBlack") return ESamplerStateTemplate::Linear_Border_OpaqueBlack;
-		else if (_template == "Linear_Mirror") return ESamplerStateTemplate::Linear_Mirror;
-		else if (_template == "Linear_MirrorOnce") return ESamplerStateTemplate::Linear_MirrorOnce;
-		else if (_template == "Anisotropic_Wrap") return ESamplerStateTemplate::Anisotropic_Wrap;
-		else if (_template == "Anisotropic_Clamp") return ESamplerStateTemplate::Anisotropic_Clamp;
-		else if (_template == "Anisotropic_Border") return ESamplerStateTemplate::Anisotropic_Border;
-		else if (_template == "Anisotropic_Border_TransparentBlack") return ESamplerStateTemplate::Anisotropic_Border_TransparentBlack;
-		else if (_template == "Anisotropic_Border_OpaqueBlack") return ESamplerStateTemplate::Anisotropic_Border_OpaqueBlack;
-		else if (_template == "Anisotropic_Mirror") return ESamplerStateTemplate::Anisotropic_Mirror;
-		else if (_template == "Anisotropic_MirrorOnce") return ESamplerStateTemplate::Anisotropic_MirrorOnce;
-		else return ESamplerStateTemplate::Unknown;
-	}
-
-
 	enum class EDepthStencilStateTemplate
 	{
 		Default = 0,
@@ -290,18 +237,6 @@ namespace JG
 	{
 		GPULoad,
 		CPULoad,
-	};
-	enum class EComputerState
-	{
-		Wait,
-		Run,
-		Compelete,
-	};
-	enum class EReadBackBufferState
-	{
-		Wait,
-		Reading,
-		ReadCompelete,
 	};
 	enum class EGeometryType
 	{
@@ -366,6 +301,8 @@ namespace JG
 			TEXTURE2D,
 			TEXTURECUBE,
 			RWTEXTURE2D,
+			BYTEADDRESSBUFFER,
+			RWBYTEADDRESSBUFFER,
 			STRUCTUREDBUFFER_0,
 			STRUCTUREDBUFFER_1,
 			STRUCTUREDBUFFER_2,
@@ -429,13 +366,15 @@ namespace JG
 		using token = char;
 		namespace Token
 		{
-			constexpr token* Struct = "struct ";
+			constexpr token* Struct  = "struct ";
 			constexpr token* CBuffer = "cbuffer ";
 			constexpr token* StructuredBuffer = "StructuredBuffer";
-			constexpr token* Texture2D = "Texture2D";
+			constexpr token* Texture2D   = "Texture2D";
 			constexpr token* TextureCube = "TextureCube";
 			constexpr token* RWStructuredBuffer = "RWStructuredBuffer";
-			constexpr token* RWTexture2D = "RWTexture2D<";
+			constexpr token* RWTexture2D  = "RWTexture2D<";
+			constexpr token* ByteAddressBuffer = "ByteAddressBuffer";
+			constexpr token* RWByteAddressBuffer = "RWByteAddressBuffer";
 			constexpr token* SamplerState = "SamplerState";
 			constexpr token* SamplerComparisonState = "SamplerComparisonState";
 		}
@@ -450,13 +389,20 @@ namespace JG
 			constexpr int Texture2DRegisterSpace   = 0;
 			constexpr int TextureCubeRegisterSpace = 1;
 			constexpr int RWTexture2DRegisterSpace = 2;
-			constexpr int PointLightRegisterSpace = 3;
+			constexpr int ByteAddressBufferRegisterSpace = 3;
+			constexpr int RWByteAddressBufferRegisterSpace = 4;
+
+
+
+
+			constexpr int PointLightRegisterSpace  = 3;
 			constexpr int LightGridRegisterSpace		   = 11;
 			constexpr int VisibleLightIndicesRegisterSpace = 12;
 
 
 			constexpr int StructuredBufferRegisterSpace   = 10;
 			constexpr int RWStructuredBufferRegisterSpace = 20;
+
 		}
 
 		constexpr char* VSEntry = "vs_main";
@@ -472,28 +418,6 @@ namespace JG
 		constexpr char* PSTarget = "ps_5_1";
 		constexpr char* CSTarget = "cs_5_1";
 
-		enum class EHLSLElement
-		{
-			None,
-			CBuffer,
-			StructuredBuffer,
-			RWStructuredBuffer,
-			Texture,
-			RWTexture,
-			SamplerState,
-		};
-
-		enum class EHLSLTextureType
-		{
-			_1D,
-			_2D,
-			_3D,
-			Cube,
-		};
-		inline String GetHLSLElementToken(EHLSLElement)
-		{
-			return "";
-		}
 
 		inline String ShaderDataTypeToHLSLCode(EShaderDataType type)
 		{

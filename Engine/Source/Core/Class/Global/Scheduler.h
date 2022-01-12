@@ -15,11 +15,12 @@ namespace JG
 		{
 			// System 
 			BeginSystem = -2000000,
-			Graphics_BeginFrame = BeginSystem + 1,
+			Graphics_BeginFrame		  = BeginSystem + 1,
+
 			Graphics_PushSceneObject  = BeginSystem + 2,
 			Graphics_Rendering        = BeginSystem + 3,
 
-	   
+			AssetDataBase_Update      = BeginSystem + 4,
 			// Layer
 			ImGuiSystemLayer		 = -900000,
 			GameLayer				 = -800000,
@@ -37,7 +38,6 @@ namespace JG
 			Graphics_EndFrame	   = 2000001,
 			DestroyObject          = 2000002,
 			Graphics_DestroyObject = 2000003,
-			AssetDataBase_Update   = 3000000,
 			EndSystem = 10000000,
 		};
 	};

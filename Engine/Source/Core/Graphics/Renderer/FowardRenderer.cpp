@@ -7,7 +7,7 @@
 
 #include "Graphics/PostRenderProcess/PostProcess_Bloom.h"
 #include "Graphics/PostRenderProcess/PostProcess_ToneMapping.h"
-
+#include "Graphics/PostRenderProcess/PostProcess_UpdateExposure.h"
 #include "Graphics/Batch/Render2DBatch.h"
 namespace JG
 {
@@ -21,18 +21,36 @@ namespace JG
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+		if (mExposureSB.empty())
+		{
+			GraphicsHelper::InitStrucutredBuffer("Exposure", 8, sizeof(8), &mExposureSB);
+			RP_Global_SB::Create("Renderer/Exposure", mExposureSB[info.CurrentBufferIndex], GetRenderParamManager());
+		}
+		f32 exposure = mExposure.GetValue();
+		f32 initialMinLog = mInitialMinLog.GetValue();
+		f32 initialMaxLog = mInitialMaxLog.GetValue();
+		List<f32> val; val.resize(8);
+		val[0] = exposure;
+		val[1] = 1.0f / exposure;
+		val[2] = exposure;
+		val[3] = 0.0f;
+		val[4] = initialMinLog;
+		val[5] = initialMaxLog;
+		val[6] = initialMaxLog - initialMinLog;
+		val[7] = 1.0f / (initialMaxLog - initialMinLog);
 
+		mExposureSB[info.CurrentBufferIndex]->SetData(sizeof(f32), 8, val.data(), commandID);
+		RP_Global_SB::Load("Renderer/Exposure", GetRenderParamManager()).SetValue(mExposureSB[info.CurrentBufferIndex]);
 
 		if (mPrevResolution != info.Resolution ||
-			mPrevClearColor != info.ClearColor ||
-			mPrevIsHDR != info.IsHDR)
+			mPrevClearColor != info.ClearColor)
 		{
-
-			mPrevIsHDR = info.IsHDR;
 			mPrevResolution = info.Resolution;
 			mPrevClearColor = info.ClearColor;
-			InitTextures(info.Resolution, info.ClearColor, info.IsHDR);
+			InitTextures(info.Resolution, info.ClearColor);
 		}
+
+	
 	}
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
@@ -112,13 +130,13 @@ namespace JG
 		return 0;
 	}
 
-	void FowardRenderer::InitTextures(const JVector2& size, const Color& clearColor, bool ishdr)
+	void FowardRenderer::InitTextures(const JVector2& size, const Color& clearColor)
 	{
 		TextureInfo mainTexInfo;
 		mainTexInfo.Width  = std::max<u32>(1, size.x);
 		mainTexInfo.Height = std::max<u32>(1, size.y);
 		mainTexInfo.ArraySize = 1;
-		mainTexInfo.Format = (ishdr) ? ETextureFormat::R16G16B16A16_Float : ETextureFormat::R8G8B8A8_Unorm;
+		mainTexInfo.Format = ETextureFormat::R32G32B32A32_Float;
 		mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
 		mainTexInfo.MipLevel = 1;
 		mainTexInfo.ClearColor = clearColor;
@@ -142,29 +160,9 @@ namespace JG
 
 	void FowardRenderer::InitGlobalRenderParams()
 	{
-
-
-//    Exposure, 1.0f / Exposure, Exposure, 0.0f,
-//    kInitialMinLog, kInitialMaxLog, kInitialMaxLog - kInitialMinLog, 1.0f / (kInitialMaxLog - kInitialMinLog)
-
-
-		// 2.0f, -8.0f, 8.0f, 0.25f
-		RP_Global_Float::Create("Renderer/Exposure", 2.0f, this);
-		RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, this);
-		RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, this);
-		RP_Global_Float::Create("Renderer/HDRPaperWhite", 3.0f, this);
-		RP_Global_Float::Create("Renderer/MaxDisplayLuminance", 500.0f, this);
-
-		//200.0f, 100.0f, 500.0f, 50.0f
-// MaxDisplayLuminance = 1000.0f, 500.0f, 10000.0f, 100.0f
-		// RenderParam
-		// Bloom »ý¼º
-
-		// ToneMapHDRCS
-
-		// UpdateExposure
-
-
+		mExposure = RP_Global_Float::Create("Renderer/Exposure", 2.0f, GetRenderParamManager());
+		mInitialMinLog = RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, GetRenderParamManager());
+		mInitialMaxLog = RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, GetRenderParamManager());
 	}
 
 

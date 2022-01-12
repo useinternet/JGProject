@@ -27,7 +27,7 @@ namespace JG
 		ComPtr<ID3D12DescriptorHeap> mBindedDescriptorHeap = nullptr;
 
 		D3D12_COMMAND_LIST_TYPE           mD3DType;            // 공용
-		ComPtr<ID3D12GraphicsCommandList> mD3DCommandList;     // 공용
+		ComPtr<ID3D12GraphicsCommandList4> mD3DCommandList;     // 공용
 		ComPtr<ID3D12CommandAllocator>    mD3DAllocator;       // 공용
 
 		SharedPtr<List<ComPtr<ID3D12Object>>>      mTempObjectList;       // 공용
@@ -42,7 +42,7 @@ namespace JG
 		CommandList(D3D12_COMMAND_LIST_TYPE d3dType);
 		virtual ~CommandList() = default;
 	public:
-		ID3D12GraphicsCommandList* Get() const {
+		ID3D12GraphicsCommandList4* Get() const {
 			return mD3DCommandList.Get();
 		}
 		void BackupResource(ID3D12Object* d3dObj);
@@ -79,13 +79,15 @@ namespace JG
 		void ClearRenderTargetTexture(ID3D12Resource* resource, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const Color& clearColor);
 		void ClearDepthTexture(ID3D12Resource* resource, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, 
 			f32 clearDepth = 1.0f, u8 clearStencil = 0, D3D12_CLEAR_FLAGS clearFlags = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL);
-
+		void ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource);
+		void ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource);
 		void SetRenderTarget(
 			ID3D12Resource** rtTextures, D3D12_CPU_DESCRIPTOR_HANDLE* rtvHandles, u64 rtTextureCount,
 			ID3D12Resource* depthTexture, D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle);
 		void BindRootSignature(SharedPtr<RootSignature> rootSig);
 		void BindPipelineState(SharedPtr<GraphicsPipelineState> pso);
 
+		
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
 		void BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
 		void BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize);
@@ -115,6 +117,8 @@ namespace JG
 		ComputeCommandList(D3D12_COMMAND_LIST_TYPE d3dType) : CommandList(d3dType) {};
 		virtual ~ComputeCommandList() = default;
 	public:
+		void ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource);
+		void ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource);
 		void BindRootSignature(SharedPtr<RootSignature> rootSig);
 		void BindPipelineState(SharedPtr<ComputePipelineState> pso);
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
@@ -126,6 +130,7 @@ namespace JG
 		void BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
 		void BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset = 0);
 		void Dispatch(u32 groupX, u32 groupY, u32 groupZ);
+		void DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc);
 	};
 
 

@@ -14,7 +14,7 @@ namespace JG
 		String name = shader->GetName();
 
 
-		List<String> splitedName = StringExtend::Split(name, '/');
+		List<String> splitedName = StringHelper::Split(name, '/');
 
 		if (splitedName.empty() == true)
 		{
@@ -31,7 +31,7 @@ namespace JG
 		}
 
 
-		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount() + 1;
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
 
 		List<SharedPtr<ITexture>>& t_list = *out_t_list;
 		t_list.resize(bufferCnt);
@@ -42,6 +42,46 @@ namespace JG
 			if (t == nullptr) t = ITexture::Create(name + "_" + std::to_string(index), info);
 			else t->SetTextureInfo(info);
 
+			++index;
+		}
+	}
+
+	void GraphicsHelper::InitByteAddressBuffer(const String& name, u64 elementCount, List<SharedPtr<IByteAddressBuffer>>* out_b_list)
+	{
+		if (out_b_list == nullptr)
+		{
+			return;
+		}
+
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+
+		List<SharedPtr<IByteAddressBuffer>>& b_list = *out_b_list;
+		b_list.resize(bufferCnt);
+
+		i32 index = 0;
+		for (auto& b : b_list)
+		{
+			b = IByteAddressBuffer::Create(name + "_" + std::to_string(index), elementCount);
+			++index;
+		}
+	}
+
+	void GraphicsHelper::InitStrucutredBuffer(const String& name, u64 elementCount, u64 elementSize, List<SharedPtr<IStructuredBuffer>>* out_sb_list)
+	{
+		if (out_sb_list == nullptr)
+		{
+			return;
+		}
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+
+		List<SharedPtr<IStructuredBuffer>>& sb_list = *out_sb_list;
+		sb_list.resize(bufferCnt);
+
+
+		i32 index = 0;
+		for (auto& sb : sb_list)
+		{
+			sb = IStructuredBuffer::Create(name + "_" + std::to_string(index), elementSize, elementCount);
 			++index;
 		}
 	}
@@ -58,7 +98,7 @@ namespace JG
 		}
 
 
-		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount() + 1;
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
 		
 
 		List<SharedPtr<IComputer>>& c_list = *out_c_list;
@@ -72,11 +112,4 @@ namespace JG
 			++index;
 		}
 	}
-
-	u32 GraphicsHelper::GetCompeleteBufferIndex(u32 bufferIndex)
-	{
-		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		return (bufferIndex + bufferCnt) % (bufferCnt + 1);
-	}
-
 }

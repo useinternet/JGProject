@@ -13,20 +13,20 @@ namespace JG
 		if (shader != nullptr)
 		{
 			mComputer =  IComputer::Create("ClusterComputer", shader);
-			mClusterRBB = IReadBackBuffer::Create("ClusterRBB");
+			mClusterSB = IStructuredBuffer::Create("ClusterSB", sizeof(Cluster), NUM_CLUSTER);
+			mComputer->SetStructuredBuffer(SHADERPARAM_CLUSTERS, mClusterSB);
+			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, NUM_X_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, NUM_Y_SLICE);
+			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, NUM_Z_SLICE);
 		}
-		Clusters.resize(NUM_CLUSTER);
 	}
 	void PreRenderProcess_ComputeCluster::Awake(Renderer* renderer)
 	{
+		
+
 	}
 	void PreRenderProcess_ComputeCluster::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
 	{
-		if (mLightCullingProcess == nullptr)
-		{
-			mLightCullingProcess = renderer->FindProcess<PreRenderProcess_LightCulling>();
-		}
-
 		rednerPassData->NumClusterSlice.x = NUM_X_SLICE;
 		rednerPassData->NumClusterSlice.y = NUM_Y_SLICE;
 		rednerPassData->NumClusterSlice.z = NUM_Z_SLICE;
@@ -37,11 +37,12 @@ namespace JG
 
 
 
-		mIsDirty = CheckDirty(info);
-		if (mIsDirty == false)
+		if (CheckDirty(info) == false)
 		{
 			return;
 		}
+		mIsDirty = true;
+	
 
 		CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
 		CB.Resolution    = info.Resolution;
@@ -52,54 +53,38 @@ namespace JG
 			info.Resolution.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
 
 
+		mComputer->SetFloat4x4(SHADERPARAM_INVPROJMATRIX, CB.InvProjMatrix);
+		mComputer->SetFloat2(SHADERPARAM_RESOLUTION, CB.Resolution);
+		mComputer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
+		mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
+		mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
 	}
 	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		if (mComputer == nullptr || mClusterRBB == nullptr)
+		if (mLightCullingProcess == nullptr)
+		{
+			mLightCullingProcess = renderer->FindProcess<PreRenderProcess_LightCulling>();
+			if (mLightCullingProcess)
+			{
+				mLightCullingProcess->SetClusters(mClusterSB);
+			}
+		}
+
+
+		if (mComputer == nullptr || mIsDirty == false)
 		{
 			return;
 		}
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 
-		if (mEnableDispatch == true)
+
+		mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, false);
+		Scheduler::GetInstance().ScheduleOnceByFrame(JGGraphics::GetInstance().GetBufferCount() + 1, 0,
+			[&]()->EScheduleResult
 		{
-			auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-			mComputer->SetFloat4x4(SHADERPARAM_INVPROJMATRIX, CB.InvProjMatrix);
-			mComputer->SetFloat2(SHADERPARAM_RESOLUTION, CB.Resolution);
-			mComputer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
-			mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
-			mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
-			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, NUM_X_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, NUM_Y_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, NUM_Z_SLICE);
-			mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, nullptr, false);
-			mIsDirty		= false;
-			mEnableDispatch = false;
-		}
-		else
-		{
-			if (mComputer->GetState() == EComputerState::Compelete)
-			{
-				auto rwBuffer = mComputer->GetRWBuffer(SHADERPARAM_CLUSTERS);
-
-				if (rwBuffer != nullptr && rwBuffer->IsValid())
-				{
-					mClusterRBB->Read(rwBuffer, [&]()
-					{
-						mClusterRBB->GetData(Clusters.data(), sizeof(Cluster) * NUM_CLUSTER);
-						if (mLightCullingProcess)
-						{
-							mLightCullingProcess->SetClusters(Clusters.data(), Clusters.size(), sizeof(Cluster));
-						}
-						mEnableDispatch = true;
-					});
-				}
-				else
-				{
-					mEnableDispatch = true;
-				}
-			}
-		}
+			mIsDirty = false;
+			return EScheduleResult::Break;
+		});
 	}
 
 	bool PreRenderProcess_ComputeCluster::IsCompelete()

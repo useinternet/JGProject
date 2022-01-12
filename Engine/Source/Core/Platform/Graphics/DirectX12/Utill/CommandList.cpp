@@ -1,4 +1,5 @@
-﻿#include "pch.h"
+﻿#include "CommandList.h"
+#include "pch.h"
 #include "CommandList.h"
 
 #include "DescriptorAllocator.h"
@@ -294,6 +295,19 @@ namespace JG
 		mD3DCommandList->ClearDepthStencilView(dsvHandle, clearFlags, clearDepth, clearStencil, 0, nullptr);
 	}
 
+	void GraphicsCommandList::ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource)
+	{
+		auto gpu = mDynamicDescriptorAllocator->UploadDirect(handle, mD3DCommandList, &mBindedDescriptorHeap);
+		const u32 ClearColor[4] = {};
+		mD3DCommandList->ClearUnorderedAccessViewUint(gpu, handle, resource, ClearColor, 0, nullptr);
+	}
+
+	void GraphicsCommandList::ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource)
+	{
+		auto gpu = mDynamicDescriptorAllocator->UploadDirect(handle, mD3DCommandList, &mBindedDescriptorHeap);
+		const f32 ClearColor[4] = {};
+		mD3DCommandList->ClearUnorderedAccessViewFloat(gpu, handle, resource, ClearColor, 0, nullptr);
+	}
 	void GraphicsCommandList::SetRenderTarget(
 		ID3D12Resource** rtTextures, D3D12_CPU_DESCRIPTOR_HANDLE* rtvHandles, u64 rtTextureCount,
 		ID3D12Resource* depthTexture, D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle)
@@ -473,12 +487,12 @@ namespace JG
 	void GraphicsCommandList::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation,
 		u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
 	void GraphicsCommandList::Draw(u32 vertexPerInstance, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 	void GraphicsCommandList::AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action)
@@ -515,6 +529,20 @@ namespace JG
 
 
 
+
+	void ComputeCommandList::ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource)
+	{
+		auto gpu = mDynamicDescriptorAllocator->UploadDirect(handle, mD3DCommandList, &mBindedDescriptorHeap);
+		const u32 ClearColor[4] = {};
+		mD3DCommandList->ClearUnorderedAccessViewUint(gpu, handle, resource, ClearColor, 0, nullptr);
+	}
+
+	void ComputeCommandList::ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource)
+	{
+		auto gpu = mDynamicDescriptorAllocator->UploadDirect(handle, mD3DCommandList, &mBindedDescriptorHeap);
+		const f32 ClearColor[4] = {};
+		mD3DCommandList->ClearUnorderedAccessViewFloat(gpu, handle, resource, ClearColor, 0, nullptr);
+	}
 
 	void ComputeCommandList::BindRootSignature(SharedPtr<RootSignature> rootSig)
 	{
@@ -639,8 +667,15 @@ namespace JG
 	}
 	void ComputeCommandList::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
+	}
+
+	void ComputeCommandList::DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc)
+	{
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
+		mD3DCommandList->DispatchRays(&desc);
+
 	}
 
 }

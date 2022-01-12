@@ -49,7 +49,7 @@ namespace JG
 			return false;
 		}
 		// vertexBuffer, IndexBuffer ¹ÙÀÎµù
-		auto commandList = DirectX12API::GetGraphicsCommandList(commandID);
+		auto commandList = DirectX12API::GetGraphicsCommandList();
 		commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
@@ -125,7 +125,7 @@ namespace JG
 		{
 			return false;
 		}
-		auto pso = DirectX12API::GetGraphicsPipelineState(commandID);
+		auto pso = DirectX12API::GetGraphicsPipelineState();
 		pso->BindInputLayout(*mInputLayout);
 		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		return true;

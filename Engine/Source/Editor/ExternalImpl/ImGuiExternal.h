@@ -3,7 +3,7 @@
 #include "JGCore.h"
 #include "Graphics/GraphicsDefine.h"
 #include "Imgui/imgui.h"
-
+#include "Imgui/imgui_internal.h"
 namespace JG
 {
 	enum class EAssetFormat;
@@ -27,10 +27,10 @@ namespace ImGui
 	bool Vector2Uint_OnGUI(const std::string& label, JG::JVector2Uint& v, float label_space = 0.0f);
 	void Color4_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
 	void Color3_OnGUI(const std::string& label, JG::Color& c, float label_space = 0.0f);
-	bool Float_OnGUI(const std::string& label, float& f, float label_space = 0.0f);
+	bool Float_OnGUI(const std::string& label, float& f, float label_space = 0.0f, float min = -FLT_MAX, float max = FLT_MAX, float speed = 1.0f);
 	void Float_Slider_OnGUI(const std::string& label, float& f,float min, float max, float label_space = 0.0f);
-	bool Int_OnGUI(const std::string& label, int& i, float label_space = 0.0f);
-	bool Uint_OnGUI(const std::string& label, JG::u32& i, float label_space = 0.0f);
+	bool Int_OnGUI(const std::string& label, int& i, float label_space = 0.0f, int min = JG::JG_I32_Min, int maxfloat = JG::JG_I32_MAX, float speed = 1.0f);
+	bool Uint_OnGUI(const std::string& label, JG::u32& i, float label_space = 0.0f, JG::u32 min = 0, JG::u32 max = JG::JG_U32_MAX, float speed = 1.0f);
 	bool String_OnGUI(const std::string& label, std::string& str, float label_space = 0.0f);
 	void Bool_OnGUI(const std::string& label, bool& b, float label_space = 0.0f);
 	void AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, const std::function<void(const std::string&)>& action, float label_space = 0.0f);

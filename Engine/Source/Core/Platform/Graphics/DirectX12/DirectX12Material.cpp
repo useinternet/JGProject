@@ -234,8 +234,8 @@ namespace JG
 		{
 			return false;
 		}
-		auto cmdList = DirectX12API::GetGraphicsCommandList(commandID);
-		auto pso = DirectX12API::GetGraphicsPipelineState(commandID);
+		auto cmdList = DirectX12API::GetGraphicsCommandList();
+		auto pso = DirectX12API::GetGraphicsPipelineState();
 		pso->SetDepthStencilState(mDepthStencilDesc);
 		pso->SetBlendState(mBlendDesc);
 		pso->SetRasterizerState(mRasterzerDesc);
@@ -247,26 +247,52 @@ namespace JG
 			memcpy(mUploadBtData.data(), mBtData.data(), mBtData.size());
 		}
 
+		D3D12_CPU_DESCRIPTOR_HANDLE nullTexHandle = { ITexture::NullTexture()->GetTextureID() };
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> t_handles;
-		for (auto _pair : mTextures)
+		pDX12Shader->ForEach_TextureSlot([&](const String& name)
 		{
-			auto tex = _pair.second;
+			if (mTextures.find(name) == mTextures.end())
+			{
+				t_handles.push_back(nullTexHandle);
+			}
+			else
+			{
+				SharedPtr<ITexture> tex = mTextures[name];
+				if (tex == nullptr || tex->IsValid() == false)
+				{
+					t_handles.push_back(nullTexHandle);
+				}
+				else
+				{
+					auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+					t_handles.push_back(dx12Tex->GetSRV());
+				}
+			}
 
-			if (tex == nullptr || tex->IsValid() == false)continue;
 
-			auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-			t_handles.push_back(dx12Tex->GetSRV());
-		}
+		});
+
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> tc_handles;
-		for (auto _pair : mTextureCubes)
+		pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
 		{
-			auto tex = _pair.second;
-
-			if (tex == nullptr || tex->IsValid() == false)continue;
-
-			auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-			tc_handles.push_back(dx12Tex->GetSRV());
-		}
+			if (mTextureCubes.find(name) == mTextureCubes.end())
+			{
+				tc_handles.push_back(nullTexHandle);
+			}
+			else
+			{
+				SharedPtr<ITexture> tex = mTextureCubes[name];
+				if (tex == nullptr || tex->IsValid() == false)
+				{
+					tc_handles.push_back(nullTexHandle);
+				}
+				else
+				{
+					auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+					tc_handles.push_back(dx12Tex->GetSRV());
+				}
+			}
+		});
 
 		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, t_handles);
 		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURECUBE, tc_handles);

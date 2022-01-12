@@ -6,7 +6,7 @@
 
 namespace JG
 {
-	namespace StringExtend
+	namespace StringHelper
 	{
 		inline std::wstring s2ws(const std::string& str)
 		{
@@ -53,7 +53,7 @@ namespace JG
 	}
 
 
-	namespace PathExtend
+	namespace PathHelper
 	{
 		inline String CombinePath(const String& dest, const String& src)
 		{
@@ -77,7 +77,7 @@ namespace JG
 		{
 			auto p = fs::path(filePath);
 			String extension = p.extension().string();
-			String originFileName = StringExtend::ReplaceAll(p.filename().string(), extension, "");
+			String originFileName = StringHelper::ReplaceAll(p.filename().string(), extension, "");
 			String fileName = originFileName;
 
 			String targetDir = p.parent_path().string();
@@ -102,7 +102,7 @@ namespace JG
 	
 
 
-	namespace FileExtend
+	namespace FileHelper
 	{
 		inline bool ReadAllText(const String& path, String* out_str)
 		{
@@ -136,6 +136,41 @@ namespace JG
 			if (fout.is_open() == true)
 			{
 				fout << txt;
+				fout.close();
+				return true;
+			}
+			else
+			{
+				fout.close();
+				return false;
+			}
+		}
+
+
+		inline bool ReadAllByte(const String& path, void* data, u64 dataSize)
+		{
+			std::ifstream fin;
+			fin.open(path, std::ios::binary);
+			if (fin.is_open() == true)
+			{
+				fin.read(reinterpret_cast<char*>(data), dataSize);
+				fin.close();
+				return true;
+			}
+			else
+			{
+				fin.close();
+				return false;
+			}
+		}
+		inline bool WriteAllByte(const String& path, void* data, u64 dataSize)
+		{
+			std::ofstream fout;
+			fout.open(path, std::ios::binary);
+
+			if (fout.is_open() == true)
+			{
+				fout.write(reinterpret_cast<const char*>(data), dataSize);
 				fout.close();
 				return true;
 			}

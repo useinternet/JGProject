@@ -243,7 +243,7 @@ namespace JG
 						stock.ShaderScript = scriptList[0]->GetName();
 					}
 
-					auto outputPath = StringExtend::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
+					auto outputPath = StringHelper::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
 					MaterialAssetStock::Write(outputPath, stock);
 					AssetDataBase::GetInstance().RefreshAsset(obj->GetAssetID());
 				}

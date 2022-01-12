@@ -144,6 +144,7 @@ workspace "JGEngine"
                     "Imgui",
                     "stb",
                     "zlib",
+                    "Publish/%{cfg.buildcfg}/dxcompiler",
                     "Publish/%{cfg.buildcfg}/assimp-vc142-mt",
                     "Publish/%{cfg.buildcfg}/PhysX_64",
                     "Publish/%{cfg.buildcfg}/PhysXCommon_64",
@@ -194,6 +195,18 @@ workspace "JGEngine"
                     "Core"
                 }
                 SetStaticLibConfig("Source/Game/", "JG_EDITOR")
+        group "Engine/Develop"
+            project "Develop"
+                includedirs{
+                    "Source/Core/",
+                    "ThirdParty",
+                }
+                pchheader (PCH_HEADER)
+                pchsource (PCH_CPP_PATH)
+                links {
+                    "Core"
+                }
+                SetConsoleAppConfig("Source/Develop/", "JG_Develop")
         group "User/SandBox"
             project "SandBox_Game"
                 includedirs{
@@ -222,6 +235,7 @@ workspace "JGEngine"
                     "Core", "Game", "Editor"
                 }
                 SetSharedLibConfig("../GameProject/Project_C/Asset/Cpp/Editor/", "Source/Bridge/Editor/", "EDITOR_DLL_EXPORT")
+            
             
             
     group "ThirdParty"

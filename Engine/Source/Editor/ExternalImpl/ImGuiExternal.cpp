@@ -51,20 +51,20 @@ namespace ImGui
 			switch (vector_element_enum)
 			{
 			case Vector_Element_Int:
-				ImGui::InputInt(("##" + btText + label).c_str(), &((int*)data)[i]);
+				isDeactive = ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i]);
 				break;
 			case Vector_Element_Uint:
-				ImGui::InputInt(("##" + btText + label).c_str(), &((int*)data)[i], ImGuiInputTextFlags_CharsDecimal);
+				isDeactive = ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i], 1.0f, 0, JG::JG_I32_MAX);
 				break;
 			case Vector_Element_Float:
-				ImGui::InputFloat(("##" + btText + label).c_str(), &((float*)data)[i]);
+				isDeactive = ImGui::DragFloat(("##" + btText + label).c_str(), &((float*)data)[i]);
 				break;
 			}
 
-			if (ImGui::IsItemDeactivatedAfterEdit() == true)
-			{
-				isDeactive = true;
-			}
+			//if (ImGui::IsItemDeactivatedAfterEdit() == true)
+			//{
+			//	
+			//}
 			ImGui::NextColumn();
 		}
 
@@ -305,12 +305,11 @@ namespace ImGui
 		ImGui::ColorEdit3(("##" + label).c_str(), (float*)&c);
 		ImGui::Columns(1);
 	}
-	bool Float_OnGUI(const std::string& label, float& f, float label_space)
+	bool Float_OnGUI(const std::string& label, float& f, float label_space, float min , float max, float speed )
 	{
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
-		ImGui::InputFloat(("##" + label).c_str(), &f);
-
+		ImGui::DragFloat(("##" + label).c_str(), &f, speed, min, max);
 		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
 		return result;
@@ -322,20 +321,20 @@ namespace ImGui
 		ImGui::SliderFloat(("##" + label).c_str(), &f, min, max);
 		ImGui::Columns(1);
 	}
-	bool Int_OnGUI(const std::string& label, int& i, float label_space)
+	bool Int_OnGUI(const std::string& label, int& i, float label_space, int min, int max, float speed)
 	{
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
-		ImGui::InputInt(("##" + label).c_str(), &i);
+		ImGui::DragInt(("##" + label).c_str(), &i, speed, min, max);
 		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
 		return result;
 	}
-	bool Uint_OnGUI(const std::string& label, JG::u32& i, float label_space)
+	bool Uint_OnGUI(const std::string& label, JG::u32& i, float label_space, JG::u32 min, JG::u32 max, float speed)
 	{
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 		ImGui::SetNextItemWidth(150.0F);
-		ImGui::InputInt(("##" + label).c_str(), (int*)&i, ImGuiInputTextFlags_CharsDecimal);
+		ImGui::DragInt(("##" + label).c_str(), (int*)&i, speed, min, max);
 		bool result = ImGui::IsItemDeactivatedAfterEdit();
 		ImGui::Columns(1);
 		return result;

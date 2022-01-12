@@ -9,7 +9,7 @@
 
 namespace JG
 {
-	SharedPtr<IVertexBuffer> IVertexBuffer::Create(String name, EBufferLoadMethod method)
+	SharedPtr<IVertexBuffer> IVertexBuffer::Create(const String& name, EBufferLoadMethod method)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
@@ -17,26 +17,27 @@ namespace JG
 		return api->CreateVertexBuffer(name, method);
 	}
 
-	SharedPtr<IIndexBuffer> IIndexBuffer::Create(String name, EBufferLoadMethod method)
+	SharedPtr<IIndexBuffer> IIndexBuffer::Create(const String& name, EBufferLoadMethod method)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateIndexBuffer(name, method);
 	}
-	SharedPtr<IComputer> IComputer::Create(const String& name, SharedPtr<IComputeShader> shader)
+	SharedPtr<IByteAddressBuffer> IByteAddressBuffer::Create(const String& name, u64 elementCount)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateComputer(name, shader);
+		return api->CreateByteAddressBuffer(name, elementCount);
 	}
-	SharedPtr<IReadWriteBuffer> IReadWriteBuffer::Create(String name, u64 btSize)
+
+	SharedPtr<IStructuredBuffer> IStructuredBuffer::Create(const String& name, u64 elementSize, u64 elementCount)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateReadWriteBuffer(name, btSize);
+		return api->CreateStrucuredBuffer(name, elementSize, elementCount);
 	}
 	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name)
 	{
@@ -44,13 +45,6 @@ namespace JG
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateReadBackBuffer(name);
-	}
-	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer)
-	{
-		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
-		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-
-		return api->CreateReadBackBuffer(name, readWriteBuffer);
 	}
 	SharedPtr<ITexture> ITexture::Create(const String& name)
 	{
@@ -79,7 +73,7 @@ namespace JG
 	void ITexture::CreateNullTexture()
 	{
 		bool isLoadWhiteTexture = false;
-		auto nullTexturePath = PathExtend::CombinePath(Application::GetTexturePath(), "NullTexture.jgasset");
+		auto nullTexturePath = PathHelper::CombinePath(Application::GetTexturePath(), "NullTexture.jgasset");
 		if (fs::exists(nullTexturePath) == true)
 		{
 			auto json = CreateSharedPtr<Json>();
@@ -142,6 +136,9 @@ namespace JG
 		gNullTexture.reset();
 		gNullTexture = nullptr;
 	}
+
+
+
 
 
 

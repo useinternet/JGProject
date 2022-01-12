@@ -29,10 +29,13 @@ namespace JG
 		DirectX12VertexBuffer() = default;
 		virtual ~DirectX12VertexBuffer();
 	public:
-		virtual bool  SetData(const void* datas, u64 elementSize, u64 elementCount) override;
+		virtual bool  SetData(const void* datas, u64 elementSize, u64 elementCount, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) override;
 		virtual bool  IsValid() const override;
 		virtual void SetBufferLoadMethod(EBufferLoadMethod type) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
+		ID3D12Resource* Get() const {
+			return mD3DResource.Get();
+		}
 	protected:
 		virtual void Bind(u64 commandID) override;
 		void Reset();
@@ -63,11 +66,14 @@ namespace JG
 		DirectX12IndexBuffer() = default;
 		virtual ~DirectX12IndexBuffer();
 	public:
-		virtual bool SetData(const u32* datas, u64 count) override;
+		virtual bool SetData(const u32* datas, u64 count, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) override;
 		virtual bool IsValid() const override;
 
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
+		ID3D12Resource* Get() const {
+			return mD3DResource.Get();
+		}
 	protected:
 		virtual void Bind(u64 commandID) override;
 		void Reset();
@@ -81,42 +87,64 @@ namespace JG
 			return mIndexCount;
 		}
 	};
-	class DirectX12ReadWriteBuffer : public IReadWriteBuffer
-	{
-		u64 mDataSize  = 0;
-		ComPtr<ID3D12Resource>  mD3DResource;
-	public:
-		virtual ~DirectX12ReadWriteBuffer();
 
+	class DirectX12ByteAddressBuffer : public IByteAddressBuffer
+	{
+		const u64 mElementSize = 4;
+		u64   mElementCount = 0;
+
+		ComPtr<ID3D12Resource>  mD3DResource;
+
+		UniquePtr<DescriptorAllocation> mUAV;
+		UniquePtr<DescriptorAllocation> mSRV;
+	public:
+		DirectX12ByteAddressBuffer() = default;
+		virtual ~DirectX12ByteAddressBuffer() = default;
 	public:
 		virtual bool IsValid() const override;
-		virtual bool SetData(u64 btSize) override;
-		virtual u64  GetDataSize() const override;
-		virtual BufferID GetBufferID() const override;
+		virtual bool SetData(u64 elementCount, const void* initDatas = nullptr, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) override;
 	public:
-		ID3D12Resource* Get() const {
-			return mD3DResource.Get();
-		}
+		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
+		D3D12_CPU_DESCRIPTOR_HANDLE GetUAV() const;
+		ID3D12Resource* Get() const;
+	private:
+		void CreateViews();
+		void Reset();
+	};
+
+
+	class DirectX12StructuredBuffer : public IStructuredBuffer
+	{
+		void* mCPUData = nullptr;
+		u64 mElementSize  = 0;
+		u64 mElementCount = 0;
+		ComPtr<ID3D12Resource>  mD3DResource;
+	public:
+		virtual bool IsValid() const override;
+		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) override;
+		virtual u64 GetDataSize() const override;
+		virtual u64 GetElementCount() const override;
+		virtual u64 GetElementSize() const override;
+		virtual BufferID GetBufferID() const override;
+
+		ID3D12Resource* Get() const;
 	private:
 		void Reset();
 	};
+
 
 	class DirectX12ReadBackBuffer : public IReadBackBuffer
 	{
 		ComPtr<ID3D12Resource>  mD3DResource;
-		EReadBackBufferState    mState = EReadBackBufferState::Wait;
 		void* mCPU        = nullptr;
 		u64   mBufferSize = 0;
-		SharedPtr<ScheduleHandle> mScheduleHandle;
-		std::function<void()> mOnCompelete;
 	public:
 		virtual ~DirectX12ReadBackBuffer();
 	public:
 		virtual bool IsValid() const override;
-		virtual bool Read(SharedPtr<IReadWriteBuffer> readWriteBuffer, const std::function<void()>& onCompelete) override;
+		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer, u64 commandID, bool asCompute) override;
 		virtual bool GetData(void* out_data, u64 out_data_size) override;
 		virtual u64 GetDataSize() const override;
-		virtual EReadBackBufferState GetState() const override;
 	public:
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
@@ -124,82 +152,6 @@ namespace JG
 	private:
 		void Reset();
 	};
-
-
-	class DirectX12Computer : public IComputer
-	{
-	private:
-		String         mName;
-		EComputerState mState = EComputerState::Wait;
-		SharedPtr<IComputeShader> mOwnerShader;
-		UniquePtr<ShaderData>     mShaderData;
-
-		SharedPtr<ScheduleHandle> mScheduleHandle;
-		std::function<void()> mOnCompelete;
-	public:
-		virtual ~DirectX12Computer();
-	public:
-		virtual bool SetFloat(const String& name, float value) override;
-		virtual bool SetFloat2(const String& name, const JVector2& value) override;
-		virtual bool SetFloat3(const String& name, const JVector3& value) override;
-		virtual bool SetFloat4(const String& name, const JVector4& value) override;
-		virtual bool SetInt(const String& name, i32 value) override;
-		virtual bool SetInt2(const String& name, const JVector2Int& value) override;
-		virtual bool SetInt3(const String& name, const JVector3Int& value) override;
-		virtual bool SetInt4(const String& name, const JVector4Int& value) override;
-		virtual bool SetUint(const String& name, u32 value) override;
-		virtual bool SetUint2(const String& name, const JVector2Uint& value) override;
-		virtual bool SetUint3(const String& name, const JVector3Uint& value) override;
-		virtual bool SetUint4(const String& name, const JVector4Uint& value) override;
-		virtual bool SetFloat4x4(const String& name, const JMatrix& value) override;
-		virtual bool SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture) override;
-
-		virtual bool SetFloatArray(const String& name, const List<float>& value) override;
-		virtual bool SetFloat2Array(const String& name, const List<JVector2>& value) override;
-		virtual bool SetFloat3Array(const String& name, const List<JVector3>& value) override;
-		virtual bool SetFloat4Array(const String& name, const List<JVector4>& value) override;
-		virtual bool SetIntArray(const String& name, const List<i32>& value) override;
-		virtual bool SetInt2Array(const String& name, const List<JVector2Int>& value) override;
-		virtual bool SetInt3Array(const String& name, const List<JVector3Int>& value) override;
-		virtual bool SetInt4Array(const String& name, const List<JVector4Int>& value) override;
-		virtual bool SetUintArray(const String& name, const List<u32>& value) override;
-		virtual bool SetUint2Array(const String& name, const List<JVector2Uint>& value) override;
-		virtual bool SetUint3Array(const String& name, const List<JVector3Uint>& value) override;
-		virtual bool SetUint4Array(const String& name, const List<JVector4Uint>& value) override;
-		virtual bool SetFloat4x4Array(const String& name, const List<JMatrix>& value) override;
-		virtual bool SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize) override;
-
-		virtual bool GetFloat(const String& name, float* out_value) override;
-		virtual bool GetFloat2(const String& name, JVector2* out_value) override;
-		virtual bool GetFloat3(const String& name, JVector3* out_value) override;
-		virtual bool GetFloat4(const String& name, JVector4* out_value) override;
-		virtual bool GetInt(const String& name, i32* out_value) override;
-		virtual bool GetInt2(const String& name, JVector2Int* value) override;
-		virtual bool GetInt3(const String& name, JVector3Int* value) override;
-		virtual bool GetInt4(const String& name, JVector4Int* value) override;
-		virtual bool GetUint(const String& name, u32* value) override;
-		virtual bool GetUint2(const String& name, JVector2Uint* value) override;
-		virtual bool GetUint3(const String& name, JVector3Uint* value) override;
-		virtual bool GetUint4(const String& name, JVector4Uint* value) override;
-		virtual bool GetFloat4x4(const String& name, JMatrix* out_value) override;
-		virtual bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value) override;
-		virtual SharedPtr<IReadWriteBuffer> GetRWBuffer(const String& name) override;
-	public:
-		void SetComputeShader(SharedPtr<IComputeShader> shader);
-		virtual const String& GetName() const override;
-		virtual void  SetName(const String& name) override;
-		virtual EComputerState GetState() const override;
-		virtual bool Dispatch(
-			u64 commandID, u32 groupX, u32 groupY, u32 groupZ,
-			const std::function<void()>& onCompelete, bool asComputeCommand) override;
-	private:
-		bool DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ);
-	};
-
-
-
-
-
 
 	class DirectX12Texture : public ITexture
 	{

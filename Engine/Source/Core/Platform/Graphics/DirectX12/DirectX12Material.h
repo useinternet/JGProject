@@ -23,8 +23,12 @@ namespace JG
 
 
 		Dictionary<String, CBPair> mCBDatas;
-		Dictionary<String, SharedPtr<ITexture>> mTextures;
+		Dictionary<String, SharedPtr<ITexture>>    mTextures;
+		SortedDictionary<u64, SharedPtr<ITexture>> mSortedTextures;
+
+
 		Dictionary<String, SharedPtr<ITexture>> mTextureCubes;
+		SortedDictionary<u64, SharedPtr<ITexture>> mSortedTextureCubes;
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;

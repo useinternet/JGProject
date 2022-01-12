@@ -28,6 +28,7 @@ namespace JG
 		static const String& GetComputeShaderScriptPath();
 		static const String& GetShaderTemplatePath();
 		static const String& GetConfigPath();
+		static const String& GetCachePath();
 	private:
 		static Application* smInstance;
 	private:

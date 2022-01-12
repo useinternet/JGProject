@@ -281,7 +281,7 @@ namespace JG
 		}
 
 		ImGui::TableNextColumn();
-		ImGui::Text(StringExtend::ReplaceAll(gameNode->GetType().GetName(), "JG::", "").c_str());
+		ImGui::Text(StringHelper::ReplaceAll(gameNode->GetType().GetName(), "JG::", "").c_str());
 		ImGui::TableNextColumn();
 
 		if (ImGui::Checkbox(("##Active_CheckBox" + gameNode->GetName()).c_str(), &isActive) && gameNode->GetParent() != nullptr)

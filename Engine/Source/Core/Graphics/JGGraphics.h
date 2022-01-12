@@ -7,7 +7,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Renderer.h"
-
+#include "Computer.h"
 
 
 
@@ -142,8 +142,6 @@ namespace JG
 			f32 FarZ  = 0.0f;
 			f32 NearZ = 0.0f;
 			Color    ClearColor;
-
-			bool IsHDR = true;
 		};
 
 		class SceneResultInfo
@@ -361,7 +359,6 @@ namespace JG
 			virtual u64 GetBtSize() const override {
 				return 48;
 			}
-
 		};
 
 

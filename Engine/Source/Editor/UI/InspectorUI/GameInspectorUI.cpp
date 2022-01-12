@@ -185,9 +185,9 @@ namespace JG
 
 		f32 label_width = ImGui::CalcTextSize("Intensity").x;
 		ImGui::Color3_OnGUI("Color", color, label_width);
-		ImGui::Float_OnGUI("Intensity", intensity, label_width);
-		ImGui::Float_OnGUI("Range", range, label_width);
-		ImGui::Float_OnGUI("AttRange", attRange, label_width);
+		ImGui::Float_OnGUI("Intensity", intensity, label_width, 0.0f);
+		ImGui::Float_OnGUI("Range", range, label_width, 0.0f);
+		ImGui::Float_OnGUI("AttRange", attRange, label_width, 0.0f);
 
 		obj->SetColor(Color(color.R, color.G, color.B, 1.0f));
 		obj->SetIntensity(intensity);

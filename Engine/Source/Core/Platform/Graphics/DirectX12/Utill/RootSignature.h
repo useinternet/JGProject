@@ -55,6 +55,9 @@ namespace JG
 		ID3D12RootSignature* Get() const {
 			return mD3DRootSig.Get();
 		}
+		ID3D12RootSignature** GetAddressOf() {
+			return mD3DRootSig.GetAddressOf();
+		}
 	private:
 		friend class DirectX12API;
 		static void ClearCache();

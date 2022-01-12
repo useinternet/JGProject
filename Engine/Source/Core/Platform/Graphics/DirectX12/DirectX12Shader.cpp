@@ -71,6 +71,29 @@ namespace JG
 	{
 		return mShaderScriptList;
 	}
+	void DirectX12GraphicsShader::ForEach_TextureSlot(const std::function<void(const String&)>& action)
+	{
+		if (action == nullptr)
+		{
+			return;
+		}
+		for (auto& _pair : mSortedTextureMap)
+		{
+			action(_pair.second);
+		}
+
+	}
+	void DirectX12GraphicsShader::ForEach_TextureCubeSlot(const std::function<void(const String&)>& action)
+	{
+		if (action == nullptr)
+		{
+			return;
+		}
+		for (auto& _pair : mSortedTextureCubeMap)
+		{
+			action(_pair.second);
+		}
+	}
 	bool DirectX12GraphicsShader::Compile(const String& code, String* error)
 	{
 		if (mFlags & EShaderFlags::Allow_VertexShader)
@@ -138,15 +161,15 @@ namespace JG
 	{
 		if (script == nullptr)
 		{
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
 
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneResources, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneVariables, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneFunction, "");
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneContents, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, "");
 		}
 		else
 		{
@@ -173,25 +196,29 @@ namespace JG
 				if (lineEnd == String::npos) break;
 				auto line = resourcesCode.substr(lineStart, lineEnd - lineStart);
 				auto mid  = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = StringExtend::ReplaceAll(type, "\n", "");  type = StringExtend::ReplaceAll(type, "\t", ""); type = StringExtend::ReplaceAll(type, " ", "");
+				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
 				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = StringExtend::ReplaceAll(name, "\n", "");  name = StringExtend::ReplaceAll(name, "\t", "");
+				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
 				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
 				if (type == HLSL::Token::Texture2D)
 				{
+					u64 resNum = texture2dCnt;
 					String registerSpace = std::to_string(HLSL::RegisterSpace::Texture2DRegisterSpace);
 					String registerNum   = std::to_string(texture2dCnt++);
 					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
 					resourcesCode.insert(lineEnd, registerStr);
 					lineEnd += registerStr.length();
+					mSortedTextureMap[resNum] = name;
 				}
 				else if (type == HLSL::Token::TextureCube)
 				{
+					u64 resNum = textureCubeCnt;
 					String registerSpace = std::to_string(HLSL::RegisterSpace::TextureCubeRegisterSpace);
 					String registerNum = std::to_string(textureCubeCnt++);
 					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
 					resourcesCode.insert(lineEnd, registerStr);
 					lineEnd += registerStr.length();
+					mSortedTextureCubeMap[resNum] = name;
 				}
 				lineStart = lineEnd + 1;
 			}
@@ -209,9 +236,9 @@ namespace JG
 				auto line = variablesCode.substr(lineStart, lineEnd - lineStart);
 
 				auto mid = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = StringExtend::ReplaceAll(type, "\n", "");  type = StringExtend::ReplaceAll(type, "\t", ""); type = StringExtend::ReplaceAll(type, " ", "");
+				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
 				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = StringExtend::ReplaceAll(name, "\n", "");  name = StringExtend::ReplaceAll(name, "\t", "");
+				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
 				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
 				lineStart = lineEnd + 1;
 			}
@@ -244,16 +271,16 @@ namespace JG
 		switch (type)
 		{
 		case EShaderScriptType::Surface:
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, functionCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, contentsCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, functionCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, contentsCode);
 			break;
 		case EShaderScriptType::Scene:
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneResources, resourcesCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneVariables, variablesCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneFunction, functionCode);
-			code = StringExtend::ReplaceAll(code, ShaderDefine::Location::SceneContents, contentsCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, resourcesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, variablesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, functionCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, contentsCode);
 			break;
 		default:
 			return false;

@@ -70,7 +70,7 @@ namespace JG
 				{
 					mFilteredTypeList.insert(type.GetName());
 				}
-				auto originName = StringExtend::ReplaceAll(type.GetName(), "JG::", "");
+				auto originName = StringHelper::ReplaceAll(type.GetName(), "JG::", "");
 				auto filterName = filter;
 
 				u64 pos = originName.find(filterName);

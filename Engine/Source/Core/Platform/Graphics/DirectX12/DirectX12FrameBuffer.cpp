@@ -44,7 +44,7 @@ namespace JG
 
 
 		auto commandQueue = DirectX12API::GetGraphicsCommandQueue();
-		auto commandList = commandQueue->RequestCommandList(JG_U64_MAX);
+		auto commandList = commandQueue->RequestCommandList();
 
 		commandList->Get()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
 			backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));

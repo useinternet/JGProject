@@ -55,13 +55,13 @@ namespace JG
 	}
 
 
-	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics)
+	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics)
 	{
-		if (d3dDescriptorHeap.Get() != mD3DHeap.Get())
+		if (d3dDescriptorHeap->Get() != mD3DHeap.Get())
 		{
 			RequestDescriptorHeap();
-			d3dDescriptorHeap = mD3DHeap;
-			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap.GetAddressOf());
+			*d3dDescriptorHeap = mD3DHeap;
+			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap->GetAddressOf());
 		}
 		if (!mCPUCache.empty())
 		{
@@ -129,6 +129,28 @@ namespace JG
 		JGASSERT_IF(mDescriptorTableType.find(rootParam) != mDescriptorTableType.end(),
 			"DynamicDescriptorAllocator::GetDescriptorTableType  :  NonExistent rootParam");
 		return mDescriptorTableType.at(rootParam);
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorAllocator::UploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle, ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap)
+	{
+		if (d3dDescriptorHeap->Get() != mD3DHeap.Get())
+		{
+			RequestDescriptorHeap();
+			*d3dDescriptorHeap = mD3DHeap;
+			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap->GetAddressOf());
+		}
+		CD3DX12_CPU_DESCRIPTOR_HANDLE startCPU(mD3DHeap->GetCPUDescriptorHandleForHeapStart());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE startGPU(mD3DHeap->GetGPUDescriptorHandleForHeapStart());
+
+		auto gpu = startGPU.Offset(mPushedHandleOffset, mIncreaseSize);
+		auto cpu = startCPU.Offset(mPushedHandleOffset, mIncreaseSize);
+
+		DirectX12API::GetD3DDevice()->CopyDescriptorsSimple(1, cpu, handle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+
+		mPushedHandleOffset += 1;
+
+		return gpu;
 	}
 
 	void DynamicDescriptorAllocator::RequestDescriptorHeap()

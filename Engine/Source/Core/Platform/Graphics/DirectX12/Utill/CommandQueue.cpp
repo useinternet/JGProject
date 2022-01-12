@@ -18,33 +18,35 @@ namespace JG
 		auto bufferCnt = DirectX12API::GetFrameBufferCount();
 		for (u64 i = 0; i < bufferCnt; ++i)
 		{
-			mExcuteCmdLists[i] = SortedDictionary<u64, SharedPtr<CommandList>>();
-			mExcutePendingCmdLists[i] = SortedDictionary<u64, SharedPtr<CommandList>>();
+			mExcuteCmdLists[i]		  = SortedDictionary<std::thread::id, SharedPtr<CommandList>>();
+			mExcutePendingCmdLists[i] = SortedDictionary<std::thread::id, SharedPtr<CommandList>>();
 		}
 	}
 
 	CommandQueue::~CommandQueue() = default;
 
-	CommandList* CommandQueue::RequestCommandList(u64 ID)
+	CommandList* CommandQueue::RequestCommandList()
 	{
 		while (mIsCommandListExcute == true) {}
-	
+		
 
 		std::lock_guard<std::mutex> lock(mMutex);
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+
 		auto& CmdLists = mExcuteCmdLists[DirectX12API::GetFrameBufferIndex()];
 		auto& PendingCmdLists = mExcutePendingCmdLists[DirectX12API::GetFrameBufferIndex()];
 
-		if (CmdLists.find(ID) == CmdLists.end())
+		if (CmdLists.find(curr_thread_id) == CmdLists.end())
 		{
 			auto pCmdList = CreateCommandList();
-			CmdLists[ID] = pCmdList;
-			PendingCmdLists[ID] = CreateCommandList();
-			return CmdLists[ID].get();
+			CmdLists[curr_thread_id] = pCmdList;
+			PendingCmdLists[curr_thread_id] = CreateCommandList();
+			return CmdLists[curr_thread_id].get();
 		}
 		else
 		{
-			auto pCmdList = CmdLists[ID].get();
-			auto pPendingCmdList = PendingCmdLists[ID].get();
+			auto pCmdList = CmdLists[curr_thread_id].get();
+			auto pPendingCmdList = PendingCmdLists[curr_thread_id].get();
 			if (pCmdList->IsClosing())
 			{
 				pCmdList->Reset();

@@ -3,7 +3,7 @@
 #include "Event/EditorEvent.h"
 #include "Event/GameEvent.h"
 #include "ExternalImpl/ImGuiExternal.h"
-
+#include "Class/Data/StorableVar.h"
 namespace JG
 {
 	class IUIError

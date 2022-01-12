@@ -6,21 +6,12 @@ namespace JG
 	class IMaterial;
 	class PostProcess_ToneMapping : public IRenderProcess
 	{
-	public:
-		const static constexpr char* SCRIPT_NAME = "Scene/ToneMapping";
-		const static constexpr char* MATERIAL_PARAM_SCENETEXTURE = "SceneTexture";
-		const static constexpr char* MATERIAL_PARAM_EXPOSURE     = "Exposure";
-
 	private:
 		// 그릴 텍스쳐
 		List<SharedPtr<ITexture>>  mToneMappingTextures;
 		List<SharedPtr<ITexture>>  mOutLumaTextures;
 		// Dispatch 할 Computer
 		List<SharedPtr<IComputer>> mToneMappingComputers;
-
-
-		RP_Local_Bool mEnable;
-		
 
 		JVector2 mPrevResolution;
 	public:

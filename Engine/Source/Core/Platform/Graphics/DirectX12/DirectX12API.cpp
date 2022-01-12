@@ -1,3 +1,4 @@
+#include "DirectX12API.h"
 #include "pch.h"
 
 #include "DirectX12API.h"
@@ -6,6 +7,7 @@
 #include "DirectX12Shader.h"
 #include "DirectX12Material.h"
 #include "DirectX12Mesh.h"
+#include "Directx12Computer.h"
 #include "Utill/DirectX12Helper.h"
 #include "Utill/DescriptorAllocator.h"
 #include "Utill/CommandQueue.h"
@@ -17,36 +19,7 @@
 #include "Graphics/JGGraphics.h"
 namespace JG
 {
-
-	static ComPtr<IDXGIFactory4> gFactory;
-	static ComPtr<ID3D12Device>  gDevice;
-	static UniquePtr<DescriptorAllocator> gCSUAllocator;
-	static UniquePtr<DescriptorAllocator> gRTVAllocator;
-	static UniquePtr<DescriptorAllocator> gDSVAllocator;
-
-	static UniquePtr<CommandQueue> gGraphicsCommandQueue;
-	static UniquePtr<CommandQueue> gComputeCommandQueue;
-	static UniquePtr<CommandQueue> gCopyCommandQueue;
-
-
-
-	static Dictionary<handle, SharedPtr<DirectX12FrameBuffer>> gFrameBuffers;
-	static const u64 gFrameBufferCount = 3;
-	static u64       gFrameBufferIndex = 0;
-
-	std::mutex gGraphicsPSOMutex;
-	std::mutex gComputePSOMutex;
-	std::mutex gRootSigMutex;
-
-
-	static Dictionary<u64, SharedPtr<GraphicsPipelineState>> gGraphicsPSOs;
-	static Dictionary<u64, SharedPtr<ComputePipelineState>>  gComputePSOs;
-	static Dictionary<u64, SharedPtr<RootSignature>> gGraphicsRootSignatures;
-	static Dictionary<u64, SharedPtr<RootSignature>> gComputeRootSignatures;
-
-
-	static std::mutex gDeviceMutex;
-
+	DirectX12API* DirectX12API::sm_DirectX12API = nullptr;
 	EGraphicsAPI DirectX12API::GetAPI() const
 	{
 		return EGraphicsAPI::DirectX12;
@@ -59,100 +32,116 @@ namespace JG
 	{
 		return GetFrameBufferIndex();
 	}
+	DirectX12API* DirectX12API::GetInstance()
+	{
+		return sm_DirectX12API;
+	}
 	IDXGIFactory4* DirectX12API::GetDXGIFactory()
 	{
-		return gFactory.Get();
+		return GetInstance()->mFactory.Get();
 	}
 
-	ID3D12Device* DirectX12API::GetD3DDevice()
+	ID3D12Device5* DirectX12API::GetD3DDevice()
 	{
-		return gDevice.Get();
+		return GetInstance()->mDevice.Get();
 	}
 	CommandQueue* DirectX12API::GetGraphicsCommandQueue()
 	{
-		return gGraphicsCommandQueue.get();
+		return GetInstance()->mGraphicsCommandQueue.get();
 	}
 	CommandQueue* DirectX12API::GetComputeCommandQueue()
 	{
-		return gComputeCommandQueue.get();
+		return GetInstance()->mComputeCommandQueue.get();
 	}
 	CommandQueue* DirectX12API::GetCopyCommandQueue()
 	{
-		return gCopyCommandQueue.get();
+		return GetInstance()->mCopyCommandQueue.get();
 	}
 	u64	DirectX12API::GetFrameBufferCount()
 	{
-		return gFrameBufferCount;
+		return GetInstance()->mFrameBufferCount;
 	}
 	u64 DirectX12API::GetFrameBufferIndex()
 	{
-		return gFrameBufferIndex;
+		return GetInstance()->mFrameBufferIndex;
 	}
 
 	DescriptorAllocation DirectX12API::RTVAllocate()
 	{
-		return gRTVAllocator->Allocate();
+		return GetInstance()->mRTVAllocator->Allocate();
 	}
 	DescriptorAllocation DirectX12API::DSVAllocate()
 	{
-		return gDSVAllocator->Allocate();
+		return GetInstance()->mDSVAllocator->Allocate();
 	}
 	DescriptorAllocation DirectX12API::CSUAllocate()
 	{
-		return gCSUAllocator->Allocate();
+		return GetInstance()->mCSUAllocator->Allocate();
 	}
 
-	GraphicsCommandList* DirectX12API::GetGraphicsCommandList(u64 ID)
+	GraphicsCommandList* DirectX12API::GetGraphicsCommandList()
 	{
-		return static_cast<GraphicsCommandList*>(gGraphicsCommandQueue->RequestCommandList(ID));
+		return static_cast<GraphicsCommandList*>(GetGraphicsCommandQueue()->RequestCommandList());
 	}
-	ComputeCommandList* DirectX12API::GetComputeCommandList(u64 ID)
+	ComputeCommandList* DirectX12API::GetComputeCommandList()
 	{
-		return static_cast<ComputeCommandList*>(gComputeCommandQueue->RequestCommandList(ID));
+		return static_cast<ComputeCommandList*>(GetComputeCommandQueue()->RequestCommandList());
 	}
-	CopyCommandList* DirectX12API::GetCopyCommandList(u64 ID)
+	CopyCommandList* DirectX12API::GetCopyCommandList()
 	{
-		return static_cast<CopyCommandList*>(gCopyCommandQueue->RequestCommandList(ID));
+		return static_cast<CopyCommandList*>(GetCopyCommandQueue()->RequestCommandList());
 	}
 
-	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState(u64 ID)
+	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState()
 	{
-		std::lock_guard<std::mutex> lock(gGraphicsPSOMutex);
-		if (gGraphicsPSOs[ID] == nullptr)
+		DirectX12API* instance = GetInstance();
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+		std::lock_guard<std::mutex> lock(instance->mGraphicsPSOMutex);
+
+
+		if (instance->mGraphicsPSOs[curr_thread_id] == nullptr)
 		{
-			gGraphicsPSOs[ID] = CreateSharedPtr<GraphicsPipelineState>();
+			instance->mGraphicsPSOs[curr_thread_id] = CreateSharedPtr<GraphicsPipelineState>();
 		}
-		return gGraphicsPSOs[ID];
+		return instance->mGraphicsPSOs[curr_thread_id];
 	}
 
-	SharedPtr<ComputePipelineState> DirectX12API::GetComputePipelineState(u64 ID)
+	SharedPtr<ComputePipelineState> DirectX12API::GetComputePipelineState()
 	{
-		std::lock_guard<std::mutex> lock(gComputePSOMutex);
-		if (gComputePSOs[ID] == nullptr)
+		DirectX12API* instance = GetInstance();
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+		std::lock_guard<std::mutex> lock(instance->mComputePSOMutex);
+
+		if (instance->mComputePSOs[curr_thread_id] == nullptr)
 		{
-			gComputePSOs[ID] = CreateSharedPtr<ComputePipelineState>();
+			instance->mComputePSOs[curr_thread_id] = CreateSharedPtr<ComputePipelineState>();
 		}
-		return gComputePSOs[ID];
+		return instance->mComputePSOs[curr_thread_id];
 	}
 
-	SharedPtr<RootSignature> DirectX12API::GetGraphicsRootSignature(u64 ID)
+	SharedPtr<RootSignature> DirectX12API::GetGraphicsRootSignature()
 	{
-		std::lock_guard<std::mutex> lock(gRootSigMutex);
-		if (gGraphicsRootSignatures[ID] == nullptr)
+		DirectX12API* instance = GetInstance();
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+		std::lock_guard<std::mutex> lock(instance->mRootSigMutex);
+
+		if (instance->mGraphicsRootSignatures[curr_thread_id] == nullptr)
 		{
-			gGraphicsRootSignatures[ID] = CreateGraphicsRootSignature();
+			instance->mGraphicsRootSignatures[curr_thread_id] = CreateGraphicsRootSignature();
 		}
-		return gGraphicsRootSignatures[ID];
+		return instance->mGraphicsRootSignatures[curr_thread_id];
 	}
 
-	SharedPtr<RootSignature> DirectX12API::GetComputeRootSignature(u64 ID)
+	SharedPtr<RootSignature> DirectX12API::GetComputeRootSignature()
 	{
-		std::lock_guard<std::mutex> lock(gRootSigMutex);
-		if (gComputeRootSignatures[ID] == nullptr)
+		DirectX12API* instance = GetInstance();
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+		std::lock_guard<std::mutex> lock(instance->mRootSigMutex);
+		if (instance->mComputeRootSignatures[curr_thread_id] == nullptr)
 		{
-			gComputeRootSignatures[ID] = CreateComputeRootSignature();
+			instance->mComputeRootSignatures[curr_thread_id] = CreateComputeRootSignature();
 		}
-		return gComputeRootSignatures[ID];
+		return instance->mComputeRootSignatures[curr_thread_id];
 	}
 	void DirectX12API::GetDepthStencilDesc(EDepthStencilStateTemplate _template, D3D12_DEPTH_STENCIL_DESC* out)
 	{
@@ -233,11 +222,12 @@ namespace JG
 		D3D12_RESOURCE_STATES InitialResourceState, 
 		const D3D12_CLEAR_VALUE* pOptimizedClearValue)
 	{
+		DirectX12API* instance = GetInstance();
 		Microsoft::WRL::ComPtr<ID3D12Resource> resultResource;
 		HRESULT hResult = S_OK;
 		{
-			std::lock_guard<std::mutex> lock(gDeviceMutex);
-			hResult = gDevice->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, IID_PPV_ARGS(resultResource.GetAddressOf()));
+			std::lock_guard<std::mutex> lock(instance->mDeviceMutex);
+			hResult = instance->mDevice->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, IID_PPV_ARGS(resultResource.GetAddressOf()));
 		}
 		if (SUCCEEDED(hResult))
 		{
@@ -298,7 +288,8 @@ namespace JG
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::Texture2DRegisterSpace);
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::TextureCubeRegisterSpace);
 		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, HLSL::RegisterSpace::RWTexture2DRegisterSpace);
-
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1024, 0, HLSL::RegisterSpace::ByteAddressBufferRegisterSpace);
+		rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, HLSL::RegisterSpace::RWByteAddressBufferRegisterSpace);
 
 		for (i32 i = 0; i < 10; ++i)
 		{
@@ -386,11 +377,16 @@ namespace JG
 	}
 	bool DirectX12API::Create()
 	{
+		if (sm_DirectX12API != nullptr)
+		{
+			return false;
+		}
+		sm_DirectX12API = this;
 		JG_CORE_INFO("DirectX12 Init Start");
 
 		//
-		gFactory = CreateDXGIFactory();
-		if (gFactory)
+		mFactory = CreateDXGIFactory();
+		if (mFactory)
 		{
 			JG_CORE_INFO("Success Create DXGIFactroy");
 		}
@@ -400,12 +396,12 @@ namespace JG
 			return false;
 		}
 		DXGI_ADAPTER_DESC1 adapterDesc = {};
-		gDevice = CreateD3DDevice(gFactory, false, &adapterDesc);
+		mDevice = CreateD3DDevice(mFactory, false, &adapterDesc);
 
-		if (gDevice)
+		if (mDevice)
 		{
 			JG_CORE_INFO("Success Create D3D12Device");
-			JG_CORE_TRACE("Description : " + StringExtend::ws2s(adapterDesc.Description));
+			JG_CORE_TRACE("Description : " + StringHelper::ws2s(adapterDesc.Description));
 			JG_CORE_TRACE("VideoMemory : {0}  MB", adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 		}
 		else
@@ -417,15 +413,15 @@ namespace JG
 		// NOTE
 		// DescriptiorAllcator »ý¼º
 		JG_CORE_INFO("Create DescriptorAllocator...");
-		gCSUAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		gRTVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		gDSVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		mCSUAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		mRTVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		mDSVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
 		JG_CORE_INFO("Create CommandQueue...");
-		gGraphicsCommandQueue = CreateUniquePtr<CommandQueue>(gFrameBufferCount, D3D12_COMMAND_LIST_TYPE_DIRECT);
-		gComputeCommandQueue  = CreateUniquePtr<CommandQueue>(gFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-		gCopyCommandQueue     = CreateUniquePtr<CommandQueue>(gFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
+		mGraphicsCommandQueue = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_DIRECT);
+		mComputeCommandQueue  = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+		mCopyCommandQueue     = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
 
 
 		JG_CORE_INFO("DirectX12 Init End");
@@ -437,78 +433,78 @@ namespace JG
 	{
 		Flush();
 
-		gGraphicsPSOs.clear();
-		gComputePSOs.clear();
-		gGraphicsRootSignatures.clear();
-		gComputeRootSignatures.clear();
-		for (auto& _pair : gFrameBuffers)
+		mGraphicsPSOs.clear();
+		mComputePSOs.clear();
+		mGraphicsRootSignatures.clear();
+		mComputeRootSignatures.clear();
+		for (auto& _pair : mFrameBuffers)
 		{
 			_pair.second->Reset();
 		}
-		gFrameBuffers.clear();
+		mFrameBuffers.clear();
 
-		gCSUAllocator.reset();
-		gRTVAllocator.reset();
-		gDSVAllocator.reset();
-
-		gGraphicsCommandQueue.reset();
-		gComputeCommandQueue.reset();
-		gCopyCommandQueue.reset();
+		mCSUAllocator.reset();
+		mRTVAllocator.reset();
+		mDSVAllocator.reset();
+		
+		mGraphicsCommandQueue.reset();
+		mComputeCommandQueue.reset();
+		mCopyCommandQueue.reset();
 
 
 		PipelineState::ClearCache();
 		RootSignature::ClearCache();
 		ResourceStateTracker::ClearCache();
 
-		gDevice.Reset();
-		gFactory.Reset();
+		mDevice.Reset();
+		mFactory.Reset();
 	}
 
 	void DirectX12API::BeginFrame()
 	{
-		gGraphicsCommandQueue->Begin();
-		gComputeCommandQueue->Begin();
-		gCopyCommandQueue->Begin();
+		mGraphicsCommandQueue->Begin();
+		mComputeCommandQueue->Begin();
+		mCopyCommandQueue->Begin();
 	}
 	void DirectX12API::EndFrame()
 	{
 		// TODO
 		// FrameBuffer Update
-		for (auto& iter : gFrameBuffers)
+		for (auto& iter : mFrameBuffers)
 		{
 			iter.second->Update();
 		}
 
-		gGraphicsCommandQueue->End();
-		gComputeCommandQueue->End();
-		gCopyCommandQueue->End();
+		mGraphicsCommandQueue->End();
+		mComputeCommandQueue->End();
+		mCopyCommandQueue->End();
 
 
 		// TODO
 		// SwapBuffer
-		for (auto& iter : gFrameBuffers)
+		for (auto& iter : mFrameBuffers)
 		{
 			iter.second->Present();
 		}
 
 
-		gFrameBufferIndex = (gFrameBufferIndex + 1) % gFrameBufferCount;
-		gCSUAllocator->UpdatePage();
-		gRTVAllocator->UpdatePage();
-		gRTVAllocator->UpdatePage();
+		mFrameBufferIndex = (mFrameBufferIndex + 1) % mFrameBufferCount;
+		mCSUAllocator->UpdatePage();
+		mRTVAllocator->UpdatePage();
+		mRTVAllocator->UpdatePage();
 	}
 	void DirectX12API::Flush()
 	{
-		gGraphicsCommandQueue->Flush();
-		gComputeCommandQueue->Flush();
-		gCopyCommandQueue->Flush();
+		mGraphicsCommandQueue->Flush();
+		mComputeCommandQueue->Flush();
+		mCopyCommandQueue->Flush();
 	}
 
 	void DirectX12API::BeginDraw(u64 commandID)
 	{
-		auto rootSig = GetGraphicsRootSignature(commandID);
-		auto pso     = GetGraphicsPipelineState(commandID);
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto rootSig = GetGraphicsRootSignature();
+		auto pso     = GetGraphicsPipelineState();
+		auto cmdList = GetGraphicsCommandList();
 		
 
 
@@ -524,20 +520,34 @@ namespace JG
 
 	void DirectX12API::SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)
 	{
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
+	}
+
+	void DirectX12API::SetLightGrids(u64 commandID, SharedPtr<IStructuredBuffer> rwBuffer)
+	{
+		auto cmdList = GetGraphicsCommandList();
+		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
+		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, rwBuffer->GetBufferID(), dx12buffer->Get());
 	}
 
 	void DirectX12API::SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids)
 	{
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
 	}
 
 	void DirectX12API::SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies)
 	{
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
+	}
+
+	void DirectX12API::SetVisibleLightIndicies(u64 commandID, const SharedPtr<IStructuredBuffer> rwBuffer)
+	{
+		auto cmdList = GetGraphicsCommandList();
+		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
+		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, rwBuffer->GetBufferID(), dx12buffer->Get());
 	}
 
 	void DirectX12API::SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights)
@@ -556,7 +566,7 @@ namespace JG
 		}
 
 
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 
 		if (lightDic.find(Graphics::ELightType::PointLight) != lightDic.end())
 		{
@@ -573,7 +583,7 @@ namespace JG
 	{
 		if (textures.empty()) return;
 
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 		auto texCnt  = textures.size();
 
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
@@ -597,25 +607,25 @@ namespace JG
 
 	void DirectX12API::SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount)
 	{
-		auto cmdList = GetGraphicsCommandList(commandID);
+		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
 	}
 
 	void DirectX12API::SetViewports(u64 commandID, const List<Viewport>& viewPorts)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
+		auto commandList = GetGraphicsCommandList();
 		commandList->SetViewports(viewPorts);
 	}
 
 	void DirectX12API::SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
+		auto commandList = GetGraphicsCommandList();
 		commandList->SetScissorRects(scissorRects);
 	}
 
 	void DirectX12API::ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
+		auto commandList = GetGraphicsCommandList();
 
 		for (auto& texture : rtTextures)
 		{
@@ -642,10 +652,19 @@ namespace JG
 		}
 	}
 
+	void DirectX12API::ClearUAVUint(u64 commandID, SharedPtr<IByteAddressBuffer> buffer)
+	{
+		auto commandList = GetGraphicsCommandList();
+
+		auto dx12ByteAddrBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+		commandList->ClearUAVUint(dx12ByteAddrBuffer->GetUAV(), dx12ByteAddrBuffer->Get());
+
+	}
+
 	void DirectX12API::SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto commandList = GetGraphicsCommandList();
+		auto pso = GetGraphicsPipelineState();
 		List<DXGI_FORMAT> rtFormats;
 		DXGI_FORMAT dsFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
 
@@ -689,8 +708,8 @@ namespace JG
 
 	void DirectX12API::DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto commandList = GetGraphicsCommandList();
+		auto pso = GetGraphicsPipelineState();
 		if (pso->Finalize() == false)
 		{
 			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
@@ -702,8 +721,8 @@ namespace JG
 
 	void DirectX12API::Draw(u64 commandID, u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		auto commandList = GetGraphicsCommandList(commandID);
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto commandList = GetGraphicsCommandList();
+		auto pso = GetGraphicsPipelineState();
 		if (pso->Finalize() == false)
 		{
 			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
@@ -716,7 +735,7 @@ namespace JG
 
 	void DirectX12API::SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template)
 	{
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto pso = GetGraphicsPipelineState();
 		D3D12_DEPTH_STENCIL_DESC desc = {};
 		GetDepthStencilDesc(_template, &desc);
 		pso->SetDepthStencilState(desc);
@@ -728,7 +747,7 @@ namespace JG
 		{
 			return;
 		}
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto pso = GetGraphicsPipelineState();
 		auto blendDesc = pso->GetBlendDesc();
 		D3D12_RENDER_TARGET_BLEND_DESC desc = {};
 
@@ -739,7 +758,7 @@ namespace JG
 
 	void DirectX12API::SetRasterizerState(u64 commandID, ERasterizerStateTemplate _template)
 	{
-		auto pso = GetGraphicsPipelineState(commandID);
+		auto pso = GetGraphicsPipelineState();
 
 		D3D12_RASTERIZER_DESC desc = {};
 		GetRasterizerDesc(_template, &desc);
@@ -749,10 +768,10 @@ namespace JG
 	SharedPtr<IFrameBuffer> DirectX12API::CreateFrameBuffer(const FrameBufferInfo& info)
 	{
 		if (info.Handle == 0) return nullptr;
-		auto iter = gFrameBuffers.find(info.Handle);
-		if (iter != gFrameBuffers.end())
+		auto iter = mFrameBuffers.find(info.Handle);
+		if (iter != mFrameBuffers.end())
 		{
-			return gFrameBuffers[info.Handle];
+			return mFrameBuffers[info.Handle];
 		}
 
 		auto buffer = CreateSharedPtr<DirectX12FrameBuffer>();
@@ -761,7 +780,7 @@ namespace JG
 			JG_CORE_ERROR("Failed Create DirectX12RenderContext");
 			return nullptr;
 		}
-		gFrameBuffers.emplace(info.Handle, buffer);
+		mFrameBuffers.emplace(info.Handle, buffer);
 		return buffer;
 	}
 	SharedPtr<IVertexBuffer> DirectX12API::CreateVertexBuffer(const String& name, EBufferLoadMethod method)
@@ -778,26 +797,25 @@ namespace JG
 		iBuffer->SetBufferLoadMethod(method);
 		return iBuffer;
 	}
-	SharedPtr<IReadWriteBuffer> DirectX12API::CreateReadWriteBuffer(const String& name, u64 btSize)
+	SharedPtr<IStructuredBuffer> DirectX12API::CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount)
 	{
-		auto rwBuffer = CreateSharedPtr<DirectX12ReadWriteBuffer>();
-		rwBuffer->SetName(name);
-		rwBuffer->SetData(btSize);
-
-		return rwBuffer;
+		auto sBuffer = CreateSharedPtr<DirectX12StructuredBuffer>();
+		sBuffer->SetName(name);
+		sBuffer->SetData(elementSize, elementCount);
+		return sBuffer;
+	}
+	SharedPtr<IByteAddressBuffer> DirectX12API::CreateByteAddressBuffer(const String& name, u64 elementCount)
+	{
+		auto btAddrBuffer = CreateSharedPtr<DirectX12ByteAddressBuffer>();
+		btAddrBuffer->SetName(name);
+		btAddrBuffer->SetData(elementCount);
+		return btAddrBuffer;
 	}
 	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name)
 	{
 		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
 		rbBuffer->SetName(name);
 	
-		return rbBuffer;
-	}
-	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer)
-	{
-		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
-		rbBuffer->SetName(name);
-		rbBuffer->Read(readWriteBuffer, nullptr);
 		return rbBuffer;
 	}
 	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)

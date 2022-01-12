@@ -14,13 +14,17 @@ namespace JG
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
+	class IByteAddressBuffer;
+	class IStructuredBuffer;
+
 	class IGraphicsShader;
 	class IComputeShader;
 	class IShaderScript;
 	class IFrameBuffer;
 	class IMaterial;
 	class IMesh;
-	class IReadWriteBuffer;
+
+
 	class IReadBackBuffer;
 	class IComputer;
 	class ISubMesh;
@@ -36,7 +40,7 @@ namespace JG
 		class Light;
 		class LightGrid;
 	}
-	class IGraphicsAPI 
+	class IGraphicsAPI
 	{
 	public:
 		virtual EGraphicsAPI GetAPI() const = 0;
@@ -58,12 +62,15 @@ namespace JG
 		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData) = 0;
 		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) = 0;
 		virtual void SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids) = 0;
+		virtual void SetLightGrids(u64 commandID, SharedPtr<IStructuredBuffer> rwBuffer) = 0;
 		virtual void SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies) = 0;
+		virtual void SetVisibleLightIndicies(u64 commandID, const SharedPtr<IStructuredBuffer> rwBuffer) = 0;
 		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) = 0;
 		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) = 0;
 		virtual void SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects) = 0;
 		virtual void ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
+		virtual void ClearUAVUint(u64 commandID, SharedPtr<IByteAddressBuffer> buffer) = 0;
 		virtual void SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)   = 0;
 		virtual void DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 		virtual void Draw(u64 commandID, u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
@@ -79,9 +86,10 @@ namespace JG
 		virtual SharedPtr<IIndexBuffer>   CreateIndexBuffer(const String& name, EBufferLoadMethod method) = 0;
 		
 
-		virtual SharedPtr<IReadWriteBuffer> CreateReadWriteBuffer(const String& name, u64 btSize) = 0;
+
+		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount)   = 0;
+		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
-		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, SharedPtr<IReadWriteBuffer> readWriteBuffer) = 0;
 		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
@@ -91,7 +99,6 @@ namespace JG
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
-		//virtual SharedPtr<ITexture>       CreateTexture(const TextureAssetStock& stock) = 0;
 		virtual void ClearTexture(u64 commandID, SharedPtr<ITexture> texture);
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);

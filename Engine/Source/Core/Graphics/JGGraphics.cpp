@@ -194,12 +194,12 @@ namespace JG
 			{
 				continue;
 			}
-			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
+			auto fileName = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
 			EShaderFlags shaderFlags = EShaderFlags::None;
 
 			std::ifstream fin(p.string());
 			String sourceCode;
-			FileExtend::ReadAllText(p.string(), &sourceCode);
+			FileHelper::ReadAllText(p.string(), &sourceCode);
 			if (sourceCode.empty() == false)
 			{
 				if (sourceCode.find(HLSL::VSEntry) != String::npos)
@@ -240,12 +240,12 @@ namespace JG
 			{
 				continue;
 			}
-			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
+			auto fileName = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
 
 			SharedPtr<IShaderScript> script;
 			String scriptCode;
 
-			FileExtend::ReadAllText(p.string(), &scriptCode);
+			FileHelper::ReadAllText(p.string(), &scriptCode);
 			if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
 			{
 				script = IShaderScript::CreateSurfaceScript("Surface/" + fileName, scriptCode);
@@ -269,9 +269,9 @@ namespace JG
 			{
 				continue;
 			}
-			auto fileName = StringExtend::ReplaceAll(p.filename().string(), p.extension().string(), "");
+			auto fileName = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
 			String sourceCode;
-			FileExtend::ReadAllText(p.string(), &sourceCode);
+			FileHelper::ReadAllText(p.string(), &sourceCode);
 			if (sourceCode.empty() == false)
 			{
 				if (sourceCode.find(HLSL::CSEntry) != String::npos)
@@ -421,11 +421,8 @@ namespace JG
 				info.ProjMatrix = mSceneInfo.ProjMatrix;
 				info.FarZ  = mSceneInfo.FarZ;
 				info.NearZ = mSceneInfo.NearZ;
-				info.EyePosition		= mSceneInfo.EyePos;
-				info.CurrentBufferIndex = mCurrentIndex;
-				info.CompeleteBufferIndex = GraphicsHelper::GetCompeleteBufferIndex(mCurrentIndex);
-				info.IsHDR = mSceneInfo.IsHDR;
-				info.ClearColor = mSceneInfo.ClearColor;
+				info.EyePosition = mSceneInfo.EyePos;
+				info.ClearColor  = mSceneInfo.ClearColor;
 
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
@@ -507,7 +504,7 @@ namespace JG
 			// Rendering 이 끝났으니. 다시 정보수정 Ok
 			UnLock();
 
-			u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount() + 1;
+			u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 			mCurrentIndex = (mCurrentIndex + 1) % bufferCnt;
 
 

@@ -15,7 +15,6 @@ namespace JG
 
 	void PostProcess_ToneMapping::Awake(Renderer* renderer)
 	{
-		mEnable = RP_Local_Bool::Create("Enable", true, GetType(), renderer);
 	}
 
 	void PostProcess_ToneMapping::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
@@ -24,7 +23,7 @@ namespace JG
 		{
 			if (InitComputers() == false)
 			{
-				mEnable.SetValue(false);
+
 			}
 		}
 		if (mPrevResolution != info.Resolution)
@@ -36,44 +35,26 @@ namespace JG
 			mToneMappingTextures.resize(bufferCnt);
 			if (InitTextures(info.Resolution) == false)
 			{
-				mEnable.SetValue(false);
+
 			}
 		}
 	}
 
 	void PostProcess_ToneMapping::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		if (mEnable.GetValue() == false)
-		{
-			return;
-		}
 		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 
 
 		SharedPtr<IComputer> targetComputer = mToneMappingComputers[info.CurrentBufferIndex];
 		SharedPtr<ITexture>  targetTexture   = mToneMappingTextures[info.CurrentBufferIndex];
+		SharedPtr<IStructuredBuffer> exposureSB = RP_Global_SB::Load("Renderer/Exposure", renderer->GetRenderParamManager()).GetValue();
 
-		f32 exposureVal      = RP_Global_Float::Load("Renderer/Exposure", renderer).GetValue();
-		f32 initialMinLogVal = RP_Global_Float::Load("Renderer/InitialMinLog", renderer).GetValue();
-		f32 initialMaxLogVal = RP_Global_Float::Load("Renderer/InitialMaxLog", renderer).GetValue();
-		f32 bloomStrength    = RP_Local_Float::Load(JGTYPE(PostProcess_Bloom), "BloomStrength", renderer).GetValue();
-		f32 paperWhite = RP_Global_Float::Load("Renderer/HDRPaperWhite", renderer).GetValue();
-		f32 maxDisplayLuminance = RP_Global_Float::Load("Renderer/MaxDisplayLuminance", renderer).GetValue();
 
-		SharedPtr<ITexture> bloomTex = RP_Global_Tex::Load("PostProcess/Bloom/BloomResult", renderer).GetValue();
+		f32 bloomStrength			 = RP_Global_Float::Load("PostProcess/Bloom/BloomStrength", renderer->GetRenderParamManager()).GetValue();
+		SharedPtr<ITexture> bloomTex = RP_Global_Tex::Load("PostProcess/Bloom/BloomResult", renderer->GetRenderParamManager()).GetValue();
 
-		List<f32> exposure; exposure.resize(8);
 
-		exposure[0] = exposureVal;
-		exposure[1] = 1.0f / exposureVal;
-		exposure[2] = exposureVal;
-		exposure[3] = 0.0f;
-		exposure[4] = initialMinLogVal;
-		exposure[5] = initialMaxLogVal;
-		exposure[6] = initialMaxLogVal - initialMinLogVal;
-		exposure[7] = 1.0f / (initialMaxLogVal - initialMinLogVal);
-
-		if (targetComputer->SetStructDataArray("Exposure", exposure.data(), exposure.size(), sizeof(f32)) == false)
+		if (targetComputer->SetStructuredBuffer("Exposure", exposureSB) == false)
 		{
 			return;
 		}
@@ -89,22 +70,11 @@ namespace JG
 		{
 			return;
 		}
-		if (targetComputer->SetFloat("PaperWhiteRatio", paperWhite / maxDisplayLuminance) == false)
-		{
-			return;
-		}
-		if (targetComputer->SetFloat("MaxBrightness", maxDisplayLuminance) == false)
-		{
-			return;
-		}
-
-
-		
 		u32 groupX = Math::DivideByMultiple(info.Resolution.x, 8);
 		u32 groupY = Math::DivideByMultiple(info.Resolution.y, 8);
 
-		targetComputer->Dispatch(commandID, groupX, groupY, 1, nullptr, false);
-		result->SceneTexture = mToneMappingTextures[info.CompeleteBufferIndex];
+		targetComputer->Dispatch(commandID, groupX, groupY, 1, false);
+		result->SceneTexture = mToneMappingTextures[info.CurrentBufferIndex];
 	}
 
 	bool PostProcess_ToneMapping::IsCompelete()
@@ -161,6 +131,7 @@ namespace JG
 			{
 				return false;
 			}
+
 			++index;
 		}
 		return true;

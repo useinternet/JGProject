@@ -151,14 +151,14 @@ namespace JG
 
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
 	{
-		auto globalLibPath = PathExtend::CombinePath(path, "GlobalShaderLibrary.shaderLib");
-		FileExtend::ReadAllText(globalLibPath, &mGlobalShaderLibCode);
+		auto globalLibPath = PathHelper::CombinePath(path, "GlobalShaderLibrary.shaderLib");
+		FileHelper::ReadAllText(globalLibPath, &mGlobalShaderLibCode);
 
-		auto globalGraphicsLibPath = PathExtend::CombinePath(path, "GlobalGraphicsLibrary.shaderLib");
-		FileExtend::ReadAllText(globalGraphicsLibPath, &mGlobalGraphicsLibCode);
+		auto globalGraphicsLibPath = PathHelper::CombinePath(path, "GlobalGraphicsLibrary.shaderLib");
+		FileHelper::ReadAllText(globalGraphicsLibPath, &mGlobalGraphicsLibCode);
 
-		auto globalComputeLibPath = PathExtend::CombinePath(path, "GlobalComputeLibrary.shaderLib");
-		FileExtend::ReadAllText(globalComputeLibPath, &mGlobalComputeLibCode);
+		auto globalComputeLibPath = PathHelper::CombinePath(path, "GlobalComputeLibrary.shaderLib");
+		FileHelper::ReadAllText(globalComputeLibPath, &mGlobalComputeLibCode);
 		return true;
 	}
 

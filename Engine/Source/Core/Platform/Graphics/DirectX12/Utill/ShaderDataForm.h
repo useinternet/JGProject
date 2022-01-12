@@ -12,20 +12,10 @@ namespace JG
 	private:
 		static const u64 MAX_CB_COUNT = 5;
 		static const u64 MAX_SB_COUNT   = 10;
-		static const u64 MAS_RWSB_COUNT = 10;
+		static const u64 MAX_RWSB_COUNT = 10;
 	public:
 		class CBufferData;
-		class ShaderElement
-		{
-		public:
-			String Name;
-			u32 RootParm = 0;
-			u32 RegisterNum = 0;
-			u32 RegisterSpace = 0;
-			HLSL::EHLSLElement ElementType = HLSL::EHLSLElement::None;
-		public:
-			virtual ~ShaderElement() = default;
-		};
+
 		class Data
 		{
 		public:
@@ -33,28 +23,6 @@ namespace JG
 			u64 DataSize = 0;
 			u64 DataPos = 0;
 			CBufferData* Owner = nullptr;
-		};
-		class TextureData : public ShaderElement
-		{
-		public:
-			HLSL::EHLSLTextureType Type = HLSL::EHLSLTextureType::_2D;
-			u64 TextureCount = 0;
-		public:
-			virtual ~TextureData() = default;
-		};
-		class CBufferData : public ShaderElement
-		{
-		public:
-			Dictionary<String, UniquePtr<Data>> DataMap;
-			u64 DataSize = 0;
-		public:
-			virtual ~CBufferData() = default;
-		};
-		class StructuredBufferData : public ShaderElement
-		{
-		public:
-			String Type;
-			u64 ElementDataSize = 0;
 		};
 		class StructData
 		{
@@ -64,15 +32,65 @@ namespace JG
 			List<String> DataNameList;
 			u64 DataSize = 0;
 		};
+
+
+		class ShaderElement
+		{
+		public:
+			String Name;
+			u32 RootParm = 0;
+			u32 RegisterNum = 0;
+			u32 RegisterSpace = 0;
+		public:
+			virtual ~ShaderElement() = default;
+		};
+
+
+
+		class ByteAddressData : public ShaderElement {};
+		class TextureData : public ShaderElement
+		{
+		public:
+			u64 TextureCount = 0;
+		public:
+			virtual ~TextureData() = default;
+		};
+
+
+		class CBufferData : public ShaderElement
+		{
+		public:
+			Dictionary<String, UniquePtr<Data>> DataMap;
+			u64 DataSize = 0;
+		public:
+			virtual ~CBufferData() = default;
+		};
+
+
+		class StructuredBufferData : public ShaderElement
+		{
+		public:
+			String Type;
+			u64 ElementDataSize = 0;
+		};
+
 	public:
 		Dictionary<String, UniquePtr<CBufferData>>		CBufferDataMap;
 		Dictionary<String, UniquePtr<StructuredBufferData>> StructuredBufferDataMap;
 		Dictionary<String, UniquePtr<StructuredBufferData>> RWStructuredBufferDataMap;
+
+
+		Dictionary<String, UniquePtr<ByteAddressData>> ByteAddrDataMap;
+		SortedDictionary<u64, ByteAddressData*>        SortedByteAddrDataMap;
+		Dictionary<String, UniquePtr<ByteAddressData>> RWByteAddrDataMap;
+		SortedDictionary<u64, ByteAddressData*>        SortedRWByteAddrDataMap;
+
+
 		Dictionary<String, UniquePtr<TextureData>>		TextureDataMap;
-		SortedDictionary<u64, TextureData*> SortedTextureDataMap;
+		SortedDictionary<u64, TextureData*>             SortedTextureDataMap;
 
 		Dictionary<String, UniquePtr<TextureData>>		RWTextureDataMap;
-		SortedDictionary<u64, TextureData*> SortedRWTextureDataMap;
+		SortedDictionary<u64, TextureData*>             SortedRWTextureDataMap;
 
 		Dictionary<String, Data*>		                CBufferVarMap;
 		Dictionary<String, UniquePtr<StructData>>       StructDataMap;
@@ -81,6 +99,9 @@ namespace JG
 		u64 SBOffset = 0;
 		u64 RWSBOffset = 0;
 
+
+		u64 ByteAddrRegisterNumOffset   = 0;
+		u64 RWByteAddrRegisterNumOffset = 0;
 		u64 TexRegisterNumOffset   = 0;
 		u64 RWTexRegisterNumOffset = 0;;
 	public:
@@ -89,6 +110,8 @@ namespace JG
 	private:
 		u64 AnalysisStruct(const String& code, u64 startPos, bool* result);
 		u64 AnalysisCBuffer(String& code, u64 startPos, bool* result);
+		u64 AnalysisByteAddressBuffer(String& code, u64 startPos, bool* result);
+		u64 AnalysisRWByteAddressBuffer(String& code, u64 startPos, bool* result);
 		u64 AnalysisStructuredBuffer(String& code, u64 startPos, bool* result);
 		u64 AnalysisTexture2D(String& code, u64 startPos, bool* result);
 		u64 AnalysisRWStructuredBuffer(String& code, u64 startPos, bool* result);
@@ -103,6 +126,8 @@ namespace JG
 	private:
 		bool RegisterStruct(const String& name);
 		bool RegisterStructVar(StructData* structData, const String& varCode);
+		bool RegisterByteAddrBuffer(const String& name);
+		bool RegisterRWByteAddrBuffer(const String& name);
 		bool RegisterStructuredBuffer(const String& name);
 		bool RegisterRWStructuredBuffer(const String& name);
 		bool RegisterCBuffer(const String& name);
@@ -113,7 +138,8 @@ namespace JG
 
 	class IShader;
 	class ITexture;
-	class IReadWriteBuffer;
+	class IStructuredBuffer;
+	class IByteAddressBuffer;
 	class RootSignature;
 	class ShaderData
 	{
@@ -122,7 +148,10 @@ namespace JG
 	private:
 		UniquePtr<UploadAllocator>      mUploadAllocator;
 		Dictionary<String, List<jbyte>> mReadDatas;
-		Dictionary<String, SharedPtr<IReadWriteBuffer>> mReadWriteDatas;
+		Dictionary<String, SharedPtr<IStructuredBuffer>> mSBDatas;
+		Dictionary<String, SharedPtr<IStructuredBuffer>> mRWSBDatas;
+		Dictionary<String, SharedPtr<IByteAddressBuffer>> mByteAddrDatas;
+		Dictionary<String, SharedPtr<IByteAddressBuffer>> mRWByteAddrDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>>   mTextureDatas;
 		Dictionary<String, List<SharedPtr<ITexture>>>   mRWTextureDatas;
 		SharedPtr<ShaderDataForm> mShaderDataForm = nullptr;
@@ -132,11 +161,12 @@ namespace JG
 		ShaderData(SharedPtr<ShaderDataForm> shaderDataForm);
 	public:
 		void ForEach_CB(const std::function<void(const ShaderDataForm::CBufferData*, const List<jbyte>&)>& action);
-		void ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, const List<jbyte>&)>& action);
-		void ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IReadWriteBuffer>)>& action);
+		void ForEach_SB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IStructuredBuffer>)>& action);
+		void ForEach_RWSB(const std::function<void(const ShaderDataForm::StructuredBufferData*, SharedPtr<IStructuredBuffer>)>& action);
 		void ForEach_Tex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action);
 		void ForEach_RWTex(const std::function<void(const ShaderDataForm::TextureData*, const List<SharedPtr<ITexture>>&)>& action);
-
+		void ForEach_BAB(const std::function<void(const ShaderDataForm::ByteAddressData*, SharedPtr<IByteAddressBuffer>)>& action);
+		void ForEach_RWBAB(const std::function<void(const ShaderDataForm::ByteAddressData*, SharedPtr<IByteAddressBuffer>)>& action);
 		void Reset();
 	public:
 		bool SetFloat(const String& name, float value);
@@ -153,22 +183,8 @@ namespace JG
 		bool SetUint4(const String& name, const JVector4Uint& value);
 		bool SetFloat4x4(const String& name, const JMatrix& value);
 		bool SetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture> texture);
-
-		bool SetFloatArray(const String& name, const List<float>& value);
-		bool SetFloat2Array(const String& name, const List<JVector2>& value);
-		bool SetFloat3Array(const String& name, const List<JVector3>& value);
-		bool SetFloat4Array(const String& name, const List<JVector4>& value);
-		bool SetIntArray(const String& name, const List<i32>& value);
-		bool SetInt2Array(const String& name, const List<JVector2Int>& value);
-		bool SetInt3Array(const String& name, const List<JVector3Int>& value);
-		bool SetInt4Array(const String& name, const List<JVector4Int>& value);
-		bool SetUintArray(const String& name, const List<u32>& value);
-		bool SetUint2Array(const String& name, const List<JVector2Uint>& value);
-		bool SetUint3Array(const String& name, const List<JVector3Uint>& value);
-		bool SetUint4Array(const String& name, const List<JVector4Uint>& value);
-		bool SetFloat4x4Array(const String& name, const List<JMatrix>& value);
-		bool SetStructDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize);
-
+		bool SetByteAddressBuffer(const String& name, SharedPtr<IByteAddressBuffer> bab);
+		bool SetStructuredBuffer(const String& name, SharedPtr<IStructuredBuffer> sb);
 
 		bool GetFloat(const String& name, float* out_value);
 		bool GetFloat2(const String& name, JVector2* out_value);
@@ -184,8 +200,9 @@ namespace JG
 		bool GetUint4(const String& name, JVector4Uint* out_value);
 		bool GetFloat4x4(const String& name, JMatrix* outValue);
 		bool GetTexture(const String& name, u32 textureSlot, SharedPtr<ITexture>* out_value);
-	public:
-		SharedPtr<IReadWriteBuffer> GetRWData(const String& name);
+
+		SharedPtr<IByteAddressBuffer> GetByteAddressBuffer(const String& name);
+		SharedPtr<IStructuredBuffer> GetStructuredBuffer(const String& name);
 	public:
 		template<class T, EShaderDataType type>
 		bool SetData(const String& name, const T* value)
@@ -206,50 +223,6 @@ namespace JG
 			memcpy(dest, value, dataSize);
 			return true;
 		}
-
-
-
-		template<class T, EShaderDataType type>
-		bool SetDataArray(const String& name, const List<T>& dataArray)
-		{
-			std::lock_guard<std::shared_mutex> lock(mMutex);
-			if (CheckDataArray(name, type) == false)
-			{
-				return false;
-			}
-			u64 btSize = sizeof(T) * dataArray.size();
-			if (MaxDataSize <= btSize)
-			{
-				btSize = MaxDataSize;
-				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
-			}
-	
-			auto& btList = mReadDatas[name]; btList.resize(btSize);
-
-			memcpy(btList.data(), dataArray.data(), btSize);
-			return true;
-		}
-
-		bool SetDataArray(const String& name, const void* datas, u64 elementCount, u64 elementSize)
-		{
-			std::lock_guard<std::shared_mutex> lock(mMutex);
-			if (CheckDataArray(name, elementSize) == false)
-			{
-				return false;
-			}
-			u64 btSize = elementCount * elementSize;
-			if (MaxDataSize <= btSize)
-			{
-				btSize = MaxDataSize;
-				JG_CORE_WARN("ShaderData have exceeded the StructuredBuffer's Maximum Range.");
-			}
-
-			auto& btList = mReadDatas[name]; btList.resize(btSize);
-			memcpy(btList.data(), datas, btSize);
-			return true;
-		}
-
-
 		template<class T, EShaderDataType type>
 		bool GetData(const String& name, T* value)
 		{
@@ -272,7 +245,5 @@ namespace JG
 			return true;
 		}
 		ShaderDataForm::Data* GetAndCheckData(const String& name, EShaderDataType checkType);
-		bool CheckDataArray(const String& name, EShaderDataType checkType);
-		bool CheckDataArray(const String& name, u64 elementSize);
 	};
 }

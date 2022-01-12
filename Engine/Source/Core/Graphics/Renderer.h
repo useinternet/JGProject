@@ -35,6 +35,8 @@ namespace JG
 	class FowardRenderer;
 	class DeferredRenderer;
 	class IRenderProcess;
+	class IStructuredBuffer;
+	class IByteAddressBuffer;
 
 	class RenderStatistics
 	{
@@ -66,11 +68,9 @@ namespace JG
 		JVector3 EyePosition;
 		f32 FarZ;
 		f32 NearZ;
-		u64 CurrentBufferIndex   = 0;
-		u64 CompeleteBufferIndex = 0;
+		u64 CurrentBufferIndex = 0;
 
 		Color ClearColor;
-		bool IsHDR;
 	};
 
 	class RenderResult
@@ -104,27 +104,14 @@ namespace JG
 		List<SharedPtr<IRenderProcess>> mPreProcessList;
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
-
-
-
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
 		RenderInfo mCurrentRenderInfo;
 
 
-
-
-
-
-		// Renderer Param
-		Dictionary<Type, Dictionary<String, List<jbyte>>> mLocalParamDic;
-		Dictionary<Type, Dictionary<String, std::pair<SharedPtr<ITexture>, bool>>> mLocalParamTexDic;
-
-		Dictionary<String, List<jbyte>>		    mGlobalParamDic;
-		Dictionary<String, std::pair<SharedPtr<ITexture>, bool>> mGlobalParamTexDic;
-		std::mutex mRenderParamMutex;
+		UniquePtr<RenderParamManager> mRenderParamManager;
 	public:
-		Renderer() = default;
+		Renderer();
 		virtual ~Renderer() = default;
 	public:
 		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
@@ -135,7 +122,8 @@ namespace JG
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
 		void EndBatch();
 	public:
-		const RenderInfo& GetRenderInfo() const;
+		RenderParamManager* GetRenderParamManager() const;
+		const RenderInfo&   GetRenderInfo() const;
 		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
 		const LightInfo& GetLightInfo(Graphics::ELightType type);
 		const SortedDictionary<int, List<Renderer::ObjectInfo>>& GetObjectInfoLists() const;
@@ -188,133 +176,6 @@ namespace JG
 				return nullptr;
 			}
 		}
-
-
-
-
-
-		bool RegisterGlobalRenderParamTex(const String& name,  SharedPtr<ITexture> initTexture = nullptr, bool isPrivate = false);
-		bool SetGlobalRenderParamTex(const String& name, SharedPtr<ITexture> tex);
-		SharedPtr<ITexture> GetGlobalRenderParamTex(const String& name);
-
-
-
-		bool RegisterGlobalRenderParam(const String& name, u64 dataSize);
-		template<class T>
-		bool SetGlobalRenderParam(const String& name, const T& data)
-		{
-			if (mGlobalParamDic.find(name) == mGlobalParamDic.end())
-			{
-				return false;
-			}
-
-			auto& btData = mGlobalParamDic[name];
-			u64 dataSize = btData.size();
-			if (dataSize != sizeof(T))
-			{
-				return false;
-			}
-
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
-			memcpy(btData.data(), (const void*)& data, dataSize);
-
-			return true;
-		}
-		template<class T>
-		bool GetGlobalRenderParam(const String& name, T* out_data)
-		{
-			if (out_data == nullptr)
-			{
-				return false;
-			}
-
-			if (mGlobalParamDic.find(name) == mGlobalParamDic.end())
-			{
-				return false;
-			}
-			auto& btData = mGlobalParamDic[name];
-			u64 dataSize = btData.size();
-			if (dataSize != sizeof(T))
-			{
-				return false;
-			}
-
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
-			memcpy((void*)out_data, btData.data(), dataSize);
-			return true;
-		}
-
-
-
-
-
-
-		bool RegisterLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> initTexture = nullptr, bool isPrivate = false);
-		bool SetLocalRenderParamTex(const Type& type, const String& name, SharedPtr<ITexture> tex);
-		SharedPtr<ITexture> GetLocalRenderParamTex(const Type& type, const String& name);
-
-
-		bool RegisterLocalRenderParam(const Type& type, const String& name, u64 dataSize);
-
-		template<class DataType>
-		bool SetLocalRenderParam(const Type& type, const String& name, const DataType& data)
-		{
-			if (mLocalParamDic.find(type) == mLocalParamDic.end())
-			{
-				return false;
-			}
-
-			auto& renderParamDic = mLocalParamDic[type];
-			if (renderParamDic.find(name) == renderParamDic.end())
-			{
-				return false;
-			}
-			List<jbyte>& btData = renderParamDic[name];
-
-			u64 dataSize = sizeof(DataType);
-			if (dataSize != btData.size())
-			{
-				return false;
-			}
-
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
-			memcpy((void*)btData.data(), (const void*) & data, dataSize);
-
-			return true;
-		}
-
-		template<class DataType>
-		bool GetLocalRenderParam(const Type& type, const String& name, DataType* out_data)
-		{
-			if (out_data == nullptr)
-			{
-				return false;
-			}
-
-			if (mLocalParamDic.find(type) == mLocalParamDic.end())
-			{
-				return false;
-			}
-
-			auto& renderParamDic = mLocalParamDic[type];
-			if (renderParamDic.find(name) == renderParamDic.end())
-			{
-				return false;
-			}
-			List<jbyte>& btData = renderParamDic[name];
-			u64 dataSize = sizeof(DataType);
-			if (dataSize != btData.size())
-			{
-				return false;
-			}
-
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
-			memcpy((void*)out_data, btData.data(), dataSize);
-
-			return true;
-		}
-
-
 	protected:
 		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
 		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;

@@ -1,100 +1,46 @@
 #include "pch.h"
 #include "PreRenderProcess_LightCulling.h"
 #include "PreRenderProcess_ComputeCluster.h"
+
+#include "Graphics/GraphicsHelper.h"
 namespace JG
 {
 	PreRenderProcess_LightCulling::PreRenderProcess_LightCulling()
 	{
-		auto shader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
-		if (shader != nullptr)
-		{
-			mComputer = IComputer::Create("LightCullingComputer", shader);
-			mLightGridRBB = IReadBackBuffer::Create("LightGridRBB");
-			mVisibleLightIndicesRBB = IReadBackBuffer::Create("VisibleLightIndicesRBB ");
-		}
 
-		LightGrids.resize(PreRenderProcess_ComputeCluster::NUM_CLUSTER);
-		VisibleLightIndices.resize(MAX_VISIBLE_LIGHTINDEX_COUNT, 0);
 	}
 	void PreRenderProcess_LightCulling::Awake(Renderer* renderer)
 	{
+
 	}
 	void PreRenderProcess_LightCulling::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
-		if (mComputeClusterProcess == nullptr)
-		{
-			mComputeClusterProcess = renderer->FindProcess<PreRenderProcess_ComputeCluster>();
-		}
-		if (mRenderer == nullptr)
-		{
-			mRenderer = renderer;
-		}
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		api->SetLightGrids(commandID, LightGrids);
-		api->SetVisibleLightIndicies(commandID, VisibleLightIndices);
-
-
-		CB.ViewMatirx = JMatrix::Transpose(info.ViewMatrix);
+		InitComputers();
+		CB.ViewMatirx      = JMatrix::Transpose(info.ViewMatrix);
 		CB.PointLightCount = renderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
-
 	}
 	void PreRenderProcess_LightCulling::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		if (mComputer == nullptr || mVisibleLightIndicesRBB == nullptr || mLightGridRBB == nullptr)
-		{
-			return;
-		}
+		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+		auto pointLightsInfo = renderer->GetLightInfo(Graphics::ELightType::PointLight);
+
+
+
+		SharedPtr<IComputer>         targetComputer = mLightCullingComputers[info.CurrentBufferIndex];
+		SharedPtr<IStructuredBuffer> targetLightSB = mLightSB[info.CurrentBufferIndex];
+		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[info.CurrentBufferIndex];
+		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[info.CurrentBufferIndex];
 
 
 
 
-		if (mEnableDispatch == true)
-		{
-			auto commandID = JGGraphics::GetInstance().RequestCommandID();
-			auto pointLightsInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
-			mComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
-			mComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
-			mComputer->SetStructDataArray(SHADERPARAM_POINTLIGHTS, pointLightsInfo.ByteData.data(), pointLightsInfo.Count, pointLightsInfo.Size);
-			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_X_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
-			mComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, nullptr, false);
-			mEnableDispatch = false;
-		}
-		else
-		{
-			if (mComputer->GetState() == EComputerState::Compelete)
-			{
-				auto lightGridRWB		    = mComputer->GetRWBuffer(SHADERPARAM_LIGHTGRIDS);
-				auto visibleLightIndicesRWB = mComputer->GetRWBuffer(SHADERPARAM_VISIBLE_LIGHTINDICES);
+		targetLightSB->SetData(pointLightsInfo.Size, pointLightsInfo.Count, pointLightsInfo.ByteData.data(), commandID);
+		api->SetLightGrids(commandID, targetLightGridSB);
+		api->SetVisibleLightIndicies(commandID, targetVisibleLightIndiciesSB);
 
-
-				if (lightGridRWB != nullptr && lightGridRWB->IsValid() &&
-					visibleLightIndicesRWB != nullptr && visibleLightIndicesRWB->IsValid())
-				{
-					mLightGridRBB->Read(lightGridRWB, [&]()
-					{
-						mLightGridRBB->GetData(LightGrids.data(), sizeof(Graphics::LightGrid) * PreRenderProcess_ComputeCluster::NUM_CLUSTER);
-						++mCompeleteRBBCount;
-					});
-					mVisibleLightIndicesRBB->Read(visibleLightIndicesRWB, [&]()
-					{
-						mVisibleLightIndicesRBB->GetData(VisibleLightIndices.data(), MAX_VISIBLE_LIGHTINDEX_COUNT * sizeof(u32));
-						++mCompeleteRBBCount;
-					});
-				}
-				else
-				{
-					mEnableDispatch = false;
-				}
-			}
-		}
-
-		if (mCompeleteRBBCount == NUM_RBB_COUNT)
-		{
-			mEnableDispatch = true;
-			mCompeleteRBBCount = 0;
-		}
+		targetComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
+		targetComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
+		targetComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, false);
 	}
 	bool PreRenderProcess_LightCulling::IsCompelete()
 	{
@@ -104,10 +50,44 @@ namespace JG
 	{
 		return JGTYPE(PreRenderProcess_LightCulling);
 	}
-	void PreRenderProcess_LightCulling::SetClusters(const void* data, u64 dataCount, u64 dataSize)
+	bool PreRenderProcess_LightCulling::InitComputers()
 	{
-		if (mComputer == nullptr) return;
+		if (mLightCullingComputers.empty() == false)
+		{
+			return true;
+		}
+	
+		auto shader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
+		if (shader == nullptr)
+		{
+			return false;
+		}
 
-		mComputer->SetStructDataArray(SHADERPARAM_CLUSTERS, data, dataCount, dataSize);
+
+		GraphicsHelper::InitComputer("LightCulling_Computer", shader, &mLightCullingComputers);
+		GraphicsHelper::InitStrucutredBuffer("LightSB", 1024, 48, &mLightSB);
+		GraphicsHelper::InitStrucutredBuffer("LightGridSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER, sizeof(Graphics::LightGrid), &mLightGridSB);
+		GraphicsHelper::InitStrucutredBuffer("VisibleLightIndiciesSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER * 64, sizeof(u32), &mVisibleLightIndiciesSB);
+
+
+		i32 index = 0;
+		for (auto& computer : mLightCullingComputers)
+		{
+			computer->SetUint(SHADERPARAM_NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_X_SLICE);
+			computer->SetUint(SHADERPARAM_NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
+			computer->SetUint(SHADERPARAM_NUM_Z_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
+			computer->SetStructuredBuffer(SHADERPARAM_POINTLIGHTS, mLightSB[index]);
+			computer->SetStructuredBuffer(SHADERPARAM_LIGHTGRIDS,  mLightGridSB[index]);
+			computer->SetStructuredBuffer(SHADERPARAM_VISIBLE_LIGHTINDICES, mVisibleLightIndiciesSB[index]);
+			index++;
+		}
+		return true;
+	}
+	void PreRenderProcess_LightCulling::SetClusters(SharedPtr<IStructuredBuffer> sb)
+	{
+		for (auto& computer : mLightCullingComputers)
+		{
+			computer->SetStructuredBuffer(SHADERPARAM_CLUSTERS, sb);
+		}
 	}
 }
