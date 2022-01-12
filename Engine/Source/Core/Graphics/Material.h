@@ -57,7 +57,7 @@ namespace JG
 
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
-		virtual bool Bind(u64 commandID) = 0;
+		virtual bool Bind() = 0;
 		virtual bool IsValid() const = 0;
 	public:
 		virtual ~IMaterial() = default;

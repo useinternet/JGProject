@@ -34,7 +34,6 @@ namespace JG
 
 	void PostProcess_Bloom::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		u64 commandID = JGGraphics::GetInstance().RequestCommandID();
 		// Extract Brightness
 		{
 			SharedPtr<IComputer>& targetComputer    = mExtractBrightnessComputers[info.CurrentBufferIndex];
@@ -70,7 +69,7 @@ namespace JG
 			u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y, 8);
 			u32 groupZ = 1;
 
-			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, false);
+			targetComputer->Dispatch(groupX, groupY, groupZ, false);
 		}
 
 		// Bloom Downsample
@@ -81,7 +80,7 @@ namespace JG
 			u32 groupY = Math::DivideByMultiple(mBloomResolutoin.y * 0.5f, 8);
 			u32 groupZ = 1;
 
-			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, false);
+			targetComputer->Dispatch(groupX, groupY, groupZ, false);
 		}
 
 
@@ -98,35 +97,35 @@ namespace JG
 			texes[0] = mBloomTextures[4][0][info.CurrentBufferIndex];
 			texes[1] = mBloomTextures[4][1][info.CurrentBufferIndex];
 			lowerTex = mBloomTextures[4][0][info.CurrentBufferIndex];
-			Blur(commandID, targetComputer, texes, lowerTex, 1.0f);
+			Blur(targetComputer, texes, lowerTex, 1.0f);
 
 
 			// 3 - 4,1
 			texes[0] = mBloomTextures[3][0][info.CurrentBufferIndex];
 			texes[1] = mBloomTextures[3][1][info.CurrentBufferIndex];
 			lowerTex = mBloomTextures[4][1][info.CurrentBufferIndex];
-			Blur(commandID, targetComputer, texes, lowerTex, upSamplingFactor);
+			Blur(targetComputer, texes, lowerTex, upSamplingFactor);
 
 
 			// 2 - 3,1
 			texes[0] = mBloomTextures[2][0][info.CurrentBufferIndex];
 			texes[1] = mBloomTextures[2][1][info.CurrentBufferIndex];
 			lowerTex = mBloomTextures[3][1][info.CurrentBufferIndex];
-			Blur(commandID, targetComputer, texes, lowerTex, upSamplingFactor);
+			Blur(targetComputer, texes, lowerTex, upSamplingFactor);
 
 
 			// 1 - 2,1
 			texes[0] = mBloomTextures[1][0][info.CurrentBufferIndex];
 			texes[1] = mBloomTextures[1][1][info.CurrentBufferIndex];
 			lowerTex = mBloomTextures[2][1][info.CurrentBufferIndex];
-			Blur(commandID, targetComputer, texes, lowerTex, upSamplingFactor);
+			Blur(targetComputer, texes, lowerTex, upSamplingFactor);
 
 
 			// 0 - 1,1
 			texes[0] = mBloomTextures[0][0][info.CurrentBufferIndex];
 			texes[1] = mBloomTextures[0][1][info.CurrentBufferIndex];
 			lowerTex = mBloomTextures[1][1][info.CurrentBufferIndex];
-			Blur(commandID, targetComputer, texes, lowerTex, upSamplingFactor);
+			Blur(targetComputer, texes, lowerTex, upSamplingFactor);
 		}
 
 		mLumaResult.SetValue(mLumaTextures[info.CurrentBufferIndex]);
@@ -143,7 +142,7 @@ namespace JG
 		return JGTYPE(PostProcess_Bloom);
 	}
 
-	bool PostProcess_Bloom::Blur(u64 commandID, SharedPtr<IComputer> targetComputer, List<SharedPtr<ITexture>> texes, SharedPtr<ITexture> lowerTex, f32 upSamplingFactor)
+	bool PostProcess_Bloom::Blur(SharedPtr<IComputer> targetComputer, List<SharedPtr<ITexture>> texes, SharedPtr<ITexture> lowerTex, f32 upSamplingFactor)
 	{
 		TextureInfo texInfo = texes[0]->GetTextureInfo();
 
@@ -172,7 +171,7 @@ namespace JG
 		u32 groupY = Math::DivideByMultiple(texInfo.Height, 8);
 		u32 groupZ = 1;
 
-		targetComputer->Dispatch(commandID, groupX, groupY, 1, false);
+		targetComputer->Dispatch(groupX, groupY, 1, false);
 
 
 		return true;

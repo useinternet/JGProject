@@ -49,7 +49,7 @@ namespace JG
 	public:
 		virtual const String& GetName() const = 0;
 		virtual void SetName(const String& name) = 0;
-		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, bool asComputeCommand = true) = 0;
+		virtual bool Dispatch(u32 groupX, u32 groupY, u32 groupZ, bool asComputeCommand = true) = 0;
 	public:
 		static SharedPtr<IComputer> Create(const String& name, SharedPtr<IComputeShader> shader);
 	};

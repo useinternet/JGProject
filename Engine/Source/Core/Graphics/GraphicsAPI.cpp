@@ -6,9 +6,9 @@
 
 namespace JG
 {
-	void IGraphicsAPI::ClearTexture(u64 commandID, SharedPtr<ITexture> texture)
+	void IGraphicsAPI::ClearTexture(SharedPtr<ITexture> texture)
 	{
-		ClearRenderTarget(commandID, { texture }, nullptr);
+		ClearRenderTarget({ texture }, nullptr);
 	}
 	UniquePtr<IGraphicsAPI> IGraphicsAPI::Create(EGraphicsAPI api)
 	{

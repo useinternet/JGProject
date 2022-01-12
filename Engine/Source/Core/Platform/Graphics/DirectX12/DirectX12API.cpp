@@ -500,7 +500,7 @@ namespace JG
 		mCopyCommandQueue->Flush();
 	}
 
-	void DirectX12API::BeginDraw(u64 commandID)
+	void DirectX12API::BeginDraw()
 	{
 		auto rootSig = GetGraphicsRootSignature();
 		auto pso     = GetGraphicsPipelineState();
@@ -513,44 +513,44 @@ namespace JG
 		cmdList->BindRootSignature(rootSig);
 	}
 
-	void DirectX12API::EndDraw(u64 commandID)
+	void DirectX12API::EndDraw()
 	{
 		//
 	}
 
-	void DirectX12API::SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData)
+	void DirectX12API::SetRenderPassData( const Graphics::RenderPassData& passData)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
 	}
 
-	void DirectX12API::SetLightGrids(u64 commandID, SharedPtr<IStructuredBuffer> rwBuffer)
+	void DirectX12API::SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, rwBuffer->GetBufferID(), dx12buffer->Get());
 	}
 
-	void DirectX12API::SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids)
+	void DirectX12API::SetLightGrids( const List<Graphics::LightGrid>& lightGrids)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
 	}
 
-	void DirectX12API::SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies)
+	void DirectX12API::SetVisibleLightIndicies( const List<u32>& visibleLightIndicies)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
 	}
 
-	void DirectX12API::SetVisibleLightIndicies(u64 commandID, const SharedPtr<IStructuredBuffer> rwBuffer)
+	void DirectX12API::SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
 		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, rwBuffer->GetBufferID(), dx12buffer->Get());
 	}
 
-	void DirectX12API::SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights)
+	void DirectX12API::SetLights( const List<SharedPtr<Graphics::Light>>& lights)
 	{
 		Dictionary<Graphics::ELightType, List<jbyte>> lightDic;
 		Dictionary<Graphics::ELightType, u64> lightSizeDic;
@@ -579,7 +579,7 @@ namespace JG
 
 	}
 
-	void DirectX12API::SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures)
+	void DirectX12API::SetTextures( const List<SharedPtr<ITexture>>& textures)
 	{
 		if (textures.empty()) return;
 
@@ -605,25 +605,25 @@ namespace JG
 		}
 	}
 
-	void DirectX12API::SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount)
+	void DirectX12API::SetTransform( const JMatrix* worldmats, u64 instanceCount)
 	{
 		auto cmdList = GetGraphicsCommandList();
 		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
 	}
 
-	void DirectX12API::SetViewports(u64 commandID, const List<Viewport>& viewPorts)
+	void DirectX12API::SetViewports( const List<Viewport>& viewPorts)
 	{
 		auto commandList = GetGraphicsCommandList();
 		commandList->SetViewports(viewPorts);
 	}
 
-	void DirectX12API::SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects)
+	void DirectX12API::SetScissorRects( const List<ScissorRect>& scissorRects)
 	{
 		auto commandList = GetGraphicsCommandList();
 		commandList->SetScissorRects(scissorRects);
 	}
 
-	void DirectX12API::ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	void DirectX12API::ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
 	{
 		auto commandList = GetGraphicsCommandList();
 
@@ -652,7 +652,7 @@ namespace JG
 		}
 	}
 
-	void DirectX12API::ClearUAVUint(u64 commandID, SharedPtr<IByteAddressBuffer> buffer)
+	void DirectX12API::ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer)
 	{
 		auto commandList = GetGraphicsCommandList();
 
@@ -661,7 +661,7 @@ namespace JG
 
 	}
 
-	void DirectX12API::SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	void DirectX12API::SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
 	{
 		auto commandList = GetGraphicsCommandList();
 		auto pso = GetGraphicsPipelineState();
@@ -706,7 +706,7 @@ namespace JG
 		commandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
 	}
 
-	void DirectX12API::DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
+	void DirectX12API::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
 	{
 		auto commandList = GetGraphicsCommandList();
 		auto pso = GetGraphicsPipelineState();
@@ -719,7 +719,7 @@ namespace JG
 		commandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
 	}
 
-	void DirectX12API::Draw(u64 commandID, u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
+	void DirectX12API::Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
 		auto commandList = GetGraphicsCommandList();
 		auto pso = GetGraphicsPipelineState();
@@ -733,7 +733,7 @@ namespace JG
 		commandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
-	void DirectX12API::SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template)
+	void DirectX12API::SetDepthStencilState( EDepthStencilStateTemplate _template)
 	{
 		auto pso = GetGraphicsPipelineState();
 		D3D12_DEPTH_STENCIL_DESC desc = {};
@@ -741,7 +741,7 @@ namespace JG
 		pso->SetDepthStencilState(desc);
 	}
 
-	void DirectX12API::SetBlendState(u64 commandID, u32 renderTargetSlot, EBlendStateTemplate _template)
+	void DirectX12API::SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template)
 	{
 		if (renderTargetSlot >= MAX_RENDERTARGET)
 		{
@@ -756,7 +756,7 @@ namespace JG
 		pso->SetBlendState(blendDesc);
 	}
 
-	void DirectX12API::SetRasterizerState(u64 commandID, ERasterizerStateTemplate _template)
+	void DirectX12API::SetRasterizerState( ERasterizerStateTemplate _template)
 	{
 		auto pso = GetGraphicsPipelineState();
 
@@ -900,5 +900,13 @@ namespace JG
 		texture->Create(name, info);
 
 		return texture;
+	}
+	SharedPtr<IComputeContext> DirectX12API::GetComputeContext() const
+	{
+		return SharedPtr<IComputeContext>();
+	}
+	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext() const
+	{
+		return SharedPtr<IGraphicsContext>();
 	}
 }

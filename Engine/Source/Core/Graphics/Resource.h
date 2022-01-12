@@ -28,59 +28,54 @@ namespace JG
 		const IResource& operator=(const IResource&) = delete;
 	};
 
-	class IBuffer : public IResource {};
-
-
-
-
-	class IVertexBuffer : public IBuffer
+	class IVertexBuffer : public IResource
 	{
 	public:
 		virtual ~IVertexBuffer() = default;
 	protected:
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) = 0;
 	public:
-		virtual bool SetData(const void* datas, u64 elementSize, u64 elementCount, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) = 0;
+		virtual bool SetData(const void* datas, u64 elementSize, u64 elementCount) = 0;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 	protected:
-		virtual void Bind(u64 commandID) = 0;
+		virtual void Bind() = 0;
 	public:
 		static SharedPtr<IVertexBuffer> Create(const String& name, EBufferLoadMethod method);
 	};
 
-	class IIndexBuffer : public IBuffer
+	class IIndexBuffer : public IResource
 	{
 	public:
 		virtual ~IIndexBuffer() = default;
 	protected:
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) = 0;
 	public:
-		virtual bool SetData(const u32* datas, u64 count, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) = 0;
+		virtual bool SetData(const u32* datas, u64 count) = 0;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 		virtual u32 GetIndexCount() const = 0;
 	protected:
-		virtual void Bind(u64 commandID) = 0;
+		virtual void Bind() = 0;
 	public:
 		static SharedPtr<IIndexBuffer> Create(const String& name, EBufferLoadMethod method);
 	};
 
-	class IByteAddressBuffer : public IBuffer
+	class IByteAddressBuffer : public IResource
 	{
 	public:
 		virtual ~IByteAddressBuffer() = default;
 	public:
-		virtual bool SetData(u64 elementCount, const void* initDatas = nullptr, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) = 0;
+		virtual bool SetData(u64 elementCount, const void* initDatas = nullptr) = 0;
 	public:
 		static SharedPtr<IByteAddressBuffer> Create(const String& name, u64 elementCount);
 	};
 
 
-	class IStructuredBuffer : public IBuffer
+	class IStructuredBuffer : public IResource
 	{
 	public:
 		virtual ~IStructuredBuffer() = default;
 	public:
-		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr, u64 commandID = MAIN_GRAPHICS_COMMAND_ID) = 0;
+		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr) = 0;
 	public:
 		virtual u64      GetDataSize()     const = 0;
 		virtual u64      GetElementCount() const = 0;
@@ -91,12 +86,12 @@ namespace JG
 	};
 
 
-	class IReadBackBuffer : public IBuffer
+	class IReadBackBuffer : public IResource
 	{
 	public:
 		virtual ~IReadBackBuffer() = default;
 	public:
-		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer, u64 commandID = MAIN_GRAPHICS_COMMAND_ID, bool asCompute = false) = 0;
+		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer, bool asCompute = false) = 0;
 		virtual bool GetData(void* out_data, u64 out_data_size) = 0;
 		virtual u64  GetDataSize() const = 0;
 	public:
@@ -114,7 +109,7 @@ namespace JG
 		virtual const TextureInfo& GetTextureInfo() const = 0;
 		virtual void  SetTextureInfo(const TextureInfo& info) = 0;
 		virtual void  SetTextureMemory(
-			const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit = 1,
+			const jbyte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit = 1,
 			u32 arraySize = 1, u32 mipLevel = 1, ETextureFlags flags = ETextureFlags::None, ETextureFormat format = ETextureFormat::R8G8B8A8_Unorm) = 0;
 		virtual void  SetClearColor(const Color& clearColor) = 0;
 	private:

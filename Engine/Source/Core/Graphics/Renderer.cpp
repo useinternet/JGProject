@@ -39,8 +39,7 @@ namespace JG
 			}
 		}
 
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		api->BeginDraw(commandID);
+		api->BeginDraw();
 
 		// PassData  바인딩
 		// Light 정보 바인딩
@@ -71,8 +70,8 @@ namespace JG
 		}
 
 
-		api->SetRenderPassData(commandID, passData);
-		api->SetLights(commandID, lightList);
+		api->SetRenderPassData(passData);
+		api->SetLights(lightList);
 		return BeginBatch(info, batchList);
 	}
 	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
@@ -156,8 +155,7 @@ namespace JG
 
 		CompeleteImpl(api, mCurrentRenderInfo, result);
 
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-		api->EndDraw(commandID);
+		api->EndDraw();
 
 		return result;
 	}

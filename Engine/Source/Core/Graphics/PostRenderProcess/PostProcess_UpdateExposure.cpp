@@ -26,8 +26,6 @@ namespace JG
 
 	void PostProcess_UpdateExposure::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		u64 commandID = JGGraphics::GetInstance().RequestCommandID();
-
 		RP_Global_Tex lumaResultVal  = RP_Global_Tex::Load("PostProcess/Bloom/LumaResult", renderer->GetRenderParamManager());
 		RP_Global_SB  exposureSBVal = RP_Global_SB::Load("Renderer/Exposure", renderer->GetRenderParamManager());
 
@@ -51,8 +49,8 @@ namespace JG
 			u32 groupY = Math::DivideByMultiple(texInfo.Height, texInfo.Height);
 			u32 groupZ = 1;
 
-			api->ClearUAVUint(commandID, targetHistogram);
-			targetComputer->Dispatch(commandID, groupX, groupY, groupZ, false);
+			api->ClearUAVUint( targetHistogram);
+			targetComputer->Dispatch(groupX, groupY, groupZ, false);
 
 		}
 		{
@@ -68,7 +66,7 @@ namespace JG
 			targetComputer->SetUint("PixelCount", pixelCount);
 			targetComputer->SetStructuredBuffer("Exposure", exposureSBVal.GetValue());
 
-			targetComputer->Dispatch(commandID, 1, 1, 1, false);
+			targetComputer->Dispatch(1, 1, 1, false);
 		}
 
 

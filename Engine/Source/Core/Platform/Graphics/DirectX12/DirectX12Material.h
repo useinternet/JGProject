@@ -75,7 +75,7 @@ namespace JG
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
 		virtual bool IsValid() const override;
-		virtual bool Bind(u64 commandID) override;
+		virtual bool Bind() override;
 		void Init(SharedPtr<IGraphicsShader> shader);
 	private:
 		template<class T>

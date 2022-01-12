@@ -24,7 +24,7 @@ namespace JG
 		virtual u32 GetIndexCount() const = 0;
 		virtual void SetInstanceCount(u32 cnt) = 0;
 		virtual u32 GetInstanceCount() const = 0;
-		virtual bool Bind(u64 commandID) = 0;
+		virtual bool Bind() = 0;
 		virtual bool IsValid() const = 0;
 
 	public:
@@ -47,7 +47,7 @@ namespace JG
 	public:
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName()   = 0;
-		virtual bool Bind(u64 commandID) = 0;
+		virtual bool Bind() = 0;
 		virtual bool IsValid() const = 0;
 	public:
 		static SharedPtr<IMesh> Create(const String& name);

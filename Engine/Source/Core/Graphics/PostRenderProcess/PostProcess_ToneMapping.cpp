@@ -42,9 +42,6 @@ namespace JG
 
 	void PostProcess_ToneMapping::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-
 		SharedPtr<IComputer> targetComputer = mToneMappingComputers[info.CurrentBufferIndex];
 		SharedPtr<ITexture>  targetTexture   = mToneMappingTextures[info.CurrentBufferIndex];
 		SharedPtr<IStructuredBuffer> exposureSB = RP_Global_SB::Load("Renderer/Exposure", renderer->GetRenderParamManager()).GetValue();
@@ -73,7 +70,7 @@ namespace JG
 		u32 groupX = Math::DivideByMultiple(info.Resolution.x, 8);
 		u32 groupY = Math::DivideByMultiple(info.Resolution.y, 8);
 
-		targetComputer->Dispatch(commandID, groupX, groupY, 1, false);
+		targetComputer->Dispatch(groupX, groupY, 1, false);
 		result->SceneTexture = mToneMappingTextures[info.CurrentBufferIndex];
 	}
 

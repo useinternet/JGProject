@@ -36,7 +36,7 @@ namespace JG
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	private:
-		bool Blur(u64 commandID, SharedPtr<IComputer> targetComputer, List<SharedPtr<ITexture>> texes, SharedPtr<ITexture> lowerTex, f32 upSamplingFactor);
+		bool Blur(SharedPtr<IComputer> targetComputer, List<SharedPtr<ITexture>> texes, SharedPtr<ITexture> lowerTex, f32 upSamplingFactor);
 		bool InitComputers();
 		bool InitTextures(const JVector2& resolution);
 	};

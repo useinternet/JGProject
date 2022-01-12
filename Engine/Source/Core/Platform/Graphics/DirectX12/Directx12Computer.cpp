@@ -177,7 +177,7 @@ namespace JG
 		mName = name;
 	}
 
-	bool DirectX12Computer::Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ , bool asComputeCommand)
+	bool DirectX12Computer::Dispatch(u32 groupX, u32 groupY, u32 groupZ , bool asComputeCommand)
 	{
 		if (mOwnerShader == nullptr || mOwnerShader->IsSuccessed() == false)
 		{
@@ -186,21 +186,21 @@ namespace JG
 		if (asComputeCommand)
 		{
 			ComputeCommandList* commandList = DirectX12API::GetComputeCommandList();
-			DispatchInternal(commandID, commandList, groupX, groupY, groupZ);
+			DispatchInternal(commandList, groupX, groupY, groupZ);
 		}
 		else
 		{
 			auto graphicsCmdList = DirectX12API::GetGraphicsCommandList();
 			graphicsCmdList->AsCompute([&](SharedPtr<ComputeCommandList> commandList)
 			{
-				DispatchInternal(commandID, commandList.get(), groupX, groupY, groupZ);
+				DispatchInternal(commandList.get(), groupX, groupY, groupZ);
 			});
 		}
 
 		return true;
 	}
 
-	bool  DirectX12Computer::DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ)
+	bool  DirectX12Computer::DispatchInternal(ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ)
 	{
 		auto RootSig = DirectX12API::GetComputeRootSignature();
 		commandList->BindRootSignature(RootSig);

@@ -13,7 +13,6 @@ namespace JG
 	JGGraphics::JGGraphics(const JGGraphicsDesc& desc)
 	{
 		mDesc = desc;
-		mMainThreadID = std::this_thread::get_id();
 		Init();
 	}
 
@@ -91,25 +90,6 @@ namespace JG
 		}
 		return mGraphcisAPI->GetBufferCount();
 	}
-	u64 JGGraphics::RequestCommandID() 
-	{
-		if (mMainThreadID == std::this_thread::get_id())
-		{
-			return 0;
-		}
-		else
-		{
-			auto threadID = std::this_thread::get_id();
-			std::lock_guard<std::mutex> lock(mCommandIDMutex);
-			if (mCommandIDPool.find(threadID) == mCommandIDPool.end())
-			{
-				mCommandIDPool[threadID] = mCommandIDIndex;
-				++mCommandIDIndex;
-			}
-			return mCommandIDPool[threadID];
-		}
-	}
-
 	const JGGraphicsDesc& JGGraphics::GetDesc() const
 	{
 		return mDesc;
@@ -168,13 +148,6 @@ namespace JG
 		Renderer::Statistics.TotalObjectCount = 0;
 		Renderer::Statistics.CullingObjectCount = 0;
 		Renderer::Statistics.VisibleObjectCount = 0;
-
-
-		mCommandIDIndex = 1;
-		mCommandIDPool.clear();
-
-		// Scene Reset
-		
 	}
 	void JGGraphics::LoadShader()
 	{

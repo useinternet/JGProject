@@ -21,7 +21,7 @@ namespace JG
 	}
 	void PreRenderProcess_LightCulling::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
+
 		auto pointLightsInfo = renderer->GetLightInfo(Graphics::ELightType::PointLight);
 
 
@@ -34,13 +34,13 @@ namespace JG
 
 
 
-		targetLightSB->SetData(pointLightsInfo.Size, pointLightsInfo.Count, pointLightsInfo.ByteData.data(), commandID);
-		api->SetLightGrids(commandID, targetLightGridSB);
-		api->SetVisibleLightIndicies(commandID, targetVisibleLightIndiciesSB);
+		targetLightSB->SetData(pointLightsInfo.Size, pointLightsInfo.Count, pointLightsInfo.ByteData.data());
+		api->SetLightGrids(targetLightGridSB);
+		api->SetVisibleLightIndicies(targetVisibleLightIndiciesSB);
 
 		targetComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
 		targetComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
-		targetComputer->Dispatch(commandID, PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, false);
+		targetComputer->Dispatch(PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, false);
 	}
 	bool PreRenderProcess_LightCulling::IsCompelete()
 	{

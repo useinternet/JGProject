@@ -17,7 +17,7 @@ namespace JG
 	}
 
 
-	bool DirectX12VertexBuffer::SetData(const void* datas, u64 elementSize, u64 elementCount, u64 commandID)
+	bool DirectX12VertexBuffer::SetData(const void* datas, u64 elementSize, u64 elementCount)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
 		mElementSize = elementSize; mElementCount = elementCount;
@@ -91,7 +91,7 @@ namespace JG
 	{
 		mLoadMethod = method;
 	}
-	void DirectX12VertexBuffer::Bind(u64 commandID)
+	void DirectX12VertexBuffer::Bind()
 	{
 		if (IsValid() == false)
 		{
@@ -130,7 +130,7 @@ namespace JG
 		Reset();
 	}
 
-	bool DirectX12IndexBuffer::SetData(const u32* datas, u64 count, u64 commandID)
+	bool DirectX12IndexBuffer::SetData(const u32* datas, u64 count)
 	{
 		u64 originBtSize = sizeof(u32) * mIndexCount;
 		mIndexCount = count;
@@ -208,7 +208,7 @@ namespace JG
 		mLoadMethod = method;
 	}
 
-	void DirectX12IndexBuffer::Bind(u64 commandID)
+	void DirectX12IndexBuffer::Bind()
 	{
 		if (IsValid() == false)
 		{
@@ -243,7 +243,7 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ByteAddressBuffer::SetData(u64 elementCount, const void* initDatas, u64 commandID)
+	bool DirectX12ByteAddressBuffer::SetData(u64 elementCount, const void* initDatas)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
 		mElementCount    = elementCount;
@@ -333,7 +333,7 @@ namespace JG
 	{
 		return mD3DResource != nullptr;
 	}
-	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, void* initDatas , u64 commandID)
+	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, void* initDatas)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
 		mElementSize     = elementSize;
@@ -412,7 +412,7 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer, u64 commandID , bool asCompute)
+	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer , bool asCompute)
 	{
 		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false)
 		{
@@ -568,7 +568,7 @@ namespace JG
 		}
 	}
 	void DirectX12Texture::SetTextureMemory(
-		const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit, u32 arraySize, u32 mipLevel, ETextureFlags flags, ETextureFormat format)
+		const jbyte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit, u32 arraySize, u32 mipLevel, ETextureFlags flags, ETextureFormat format)
 	{
 		TextureInfo info;
 		info.ArraySize = arraySize;
@@ -599,7 +599,7 @@ namespace JG
 		SetTextureInfo(info);
 	}
 
-	void DirectX12Texture::CreateFromMemory(const String& name, const byte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
+	void DirectX12Texture::CreateFromMemory(const String& name, const jbyte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit)
 	{
 
 		SetName(name);

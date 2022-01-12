@@ -52,12 +52,7 @@ namespace JG
 		JGGraphicsDesc mDesc;
 
 
-		
-
-		std::thread::id                  mMainThreadID;
-		Dictionary<std::thread::id, u64> mCommandIDPool;
-		std::mutex       mCommandIDMutex;
-		u64				 mCommandIDIndex = 1;
+	
 	public:
 		JGGraphics(const JGGraphicsDesc& desc);
 		~JGGraphics();
@@ -73,9 +68,6 @@ namespace JG
 		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
 		u64           GetBufferCount() const;
-
-		u64           RequestCommandID();
-
 		const JGGraphicsDesc& GetDesc() const;
 		void  Flush();
 	private:

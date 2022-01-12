@@ -38,7 +38,7 @@ namespace JG
 	{
 		return mInstanceCount;
 	}
-	bool DirectX12SubMesh::Bind(u64 commandID)
+	bool DirectX12SubMesh::Bind()
 	{
 		if (mVertexBuffer == nullptr)
 		{
@@ -54,13 +54,13 @@ namespace JG
 
 
 		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
-		dx12VBuffer->Bind(commandID);
+		dx12VBuffer->Bind();
 		commandList->FlushVertexBuffer();
 
 
 
 		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
-		dx12IBuffer->Bind(commandID);
+		dx12IBuffer->Bind();
 
 		return true;
 	}
@@ -119,7 +119,7 @@ namespace JG
 	{
 		return mName;
 	}
-	bool DirectX12Mesh::Bind(u64 commandID)
+	bool DirectX12Mesh::Bind()
 	{
 		if (mInputLayout == nullptr)
 		{

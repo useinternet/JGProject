@@ -87,13 +87,11 @@ namespace JG
 		{
 			return false;
 		}
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
 		if (mIsClearWhiteTexture == false)
 		{
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget(commandID, { mWhiteTexture }, nullptr);
+			api->ClearRenderTarget({ mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
@@ -174,18 +172,17 @@ namespace JG
 	{
 
 		if (mQuadCount == 0) return;
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		auto api       = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		if (mCurrFrameResource->Standard2DMaterial->Bind(commandID) == false)
+		if (mCurrFrameResource->Standard2DMaterial->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind StandardMaterial");
 			StartBatch();
 			return;
 		}
 
-		api->SetTextures(commandID, mTextureArray);
+		api->SetTextures(mTextureArray);
 
 
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;
@@ -194,19 +191,19 @@ namespace JG
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		if (mCurrFrameResource->QuadMesh->Bind(commandID) == false)
+		if (mCurrFrameResource->QuadMesh->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind(commandID) == false)
+		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		api->DrawIndexed(commandID, quadIndexCount);
+		api->DrawIndexed(quadIndexCount);
 		StartBatch();
 	}
 

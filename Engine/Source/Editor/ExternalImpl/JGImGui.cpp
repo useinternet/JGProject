@@ -144,7 +144,7 @@ namespace JG
 		ImGui::FileDialog::Instance().CreateTexture = [&](uint8_t* data, int w, int h, char fmt) -> void*
 		{
 			gFileDialogTexture = ITexture::Create("DialogFileFonts");
-			gFileDialogTexture->SetTextureMemory(data, w, h, 4);
+			gFileDialogTexture->SetTextureMemory((const jbyte*)data, w, h, 4);
 
 			return (void*)ConvertImGuiTextureID(gFileDialogTexture->GetTextureID());
 		};

@@ -34,14 +34,20 @@ namespace JG
 
 	class TextureAssetStock;
 
+
 	namespace Graphics
 	{
 		class RenderPassData;
 		class Light;
 		class LightGrid;
 	}
+
+	class IGraphicsContext;
+	class IComputeContext;
 	class IGraphicsAPI
 	{
+	public:
+		virtual ~IGraphicsAPI() = default;
 	public:
 		virtual EGraphicsAPI GetAPI() const = 0;
 		virtual u64 GetBufferCount() const = 0;
@@ -57,28 +63,28 @@ namespace JG
 		virtual void EndFrame()	 = 0;
 		virtual void Flush() = 0;
 		//
-		virtual void BeginDraw(u64 commandID) = 0;
-		virtual void EndDraw(u64 commandID)   = 0;
-		virtual void SetRenderPassData(u64 commandID, const Graphics::RenderPassData& passData) = 0;
-		virtual void SetLights(u64 commandID, const List<SharedPtr<Graphics::Light>>& lights) = 0;
-		virtual void SetLightGrids(u64 commandID, const List<Graphics::LightGrid>& lightGrids) = 0;
-		virtual void SetLightGrids(u64 commandID, SharedPtr<IStructuredBuffer> rwBuffer) = 0;
-		virtual void SetVisibleLightIndicies(u64 commandID, const List<u32>& visibleLightIndicies) = 0;
-		virtual void SetVisibleLightIndicies(u64 commandID, const SharedPtr<IStructuredBuffer> rwBuffer) = 0;
-		virtual void SetTextures(u64 commandID, const List<SharedPtr<ITexture>>& textures) = 0;
-		virtual void SetTransform(u64 commandID, const JMatrix* worldmats, u64 instanceCount = 1) = 0;
-		virtual void SetViewports(u64 commandID, const List<Viewport>& viewPorts) = 0;
-		virtual void SetScissorRects(u64 commandID, const List<ScissorRect>& scissorRects) = 0;
-		virtual void ClearRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
-		virtual void ClearUAVUint(u64 commandID, SharedPtr<IByteAddressBuffer> buffer) = 0;
-		virtual void SetRenderTarget(u64 commandID, const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)   = 0;
-		virtual void DrawIndexed(u64 commandID, u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
-		virtual void Draw(u64 commandID, u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
+		virtual void BeginDraw() = 0;
+		virtual void EndDraw()   = 0;
+		virtual void SetRenderPassData( const Graphics::RenderPassData& passData) = 0;
+		virtual void SetLights( const List<SharedPtr<Graphics::Light>>& lights) = 0;
+		virtual void SetLightGrids( const List<Graphics::LightGrid>& lightGrids) = 0;
+		virtual void SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer) = 0;
+		virtual void SetVisibleLightIndicies( const List<u32>& visibleLightIndicies) = 0;
+		virtual void SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer) = 0;
+		virtual void SetTextures( const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void SetTransform( const JMatrix* worldmats, u64 instanceCount = 1) = 0;
+		virtual void SetViewports( const List<Viewport>& viewPorts) = 0;
+		virtual void SetScissorRects( const List<ScissorRect>& scissorRects) = 0;
+		virtual void ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
+		virtual void ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer) = 0;
+		virtual void SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)   = 0;
+		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
+		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 		// State
 
-		virtual void SetDepthStencilState(u64 commandID, EDepthStencilStateTemplate _template) = 0;
-		virtual void SetBlendState(u64 commandID, u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
-		virtual void SetRasterizerState(u64 commandID, ERasterizerStateTemplate _template) = 0;
+		virtual void SetDepthStencilState( EDepthStencilStateTemplate _template) = 0;
+		virtual void SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
+		virtual void SetRasterizerState( ERasterizerStateTemplate _template) = 0;
 
 		// Create Resource
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;
@@ -99,11 +105,77 @@ namespace JG
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
-		virtual void ClearTexture(u64 commandID, SharedPtr<ITexture> texture);
+		virtual void ClearTexture( SharedPtr<ITexture> texture);
+
+
+
+		virtual SharedPtr<IComputeContext> GetComputeContext()   const = 0;
+		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() const = 0;
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);
 		
 	};
+
+
+	/*
+RootSignature 은 수동
+PipelineState 은 자동 생성으로
+*/
+	class IGraphicsContext
+	{
+	public:
+		virtual ~IGraphicsContext() = default;
+	public:
+		// 초기 셋팅 함수
+		virtual void ClearRenderTarget(const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
+		virtual void SetRenderTarget(const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
+		virtual void SetViewports(const List<Viewport>& viewPorts) = 0;
+		virtual void SetScissorRects(const List<ScissorRect>& scissorRects) = 0;
+
+		// Bind 함수
+		virtual void BindRootSignature() = 0;
+		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) = 0;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
+		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) = 0;
+
+		// 셋팅 함수
+		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
+		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
+		virtual void SetRasterizerState(ERasterizerStateTemplate _template) = 0;
+
+
+		// 그리기 함수
+		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
+		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
+
+		// 인터페이스 변경 함수
+		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() = 0;
+	};
+
+	class IComputeContext
+	{
+	public:
+		virtual ~IComputeContext() = default;
+	public:
+		virtual void BindRootSignature() = 0;
+		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) = 0;
+		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) = 0;
+
+		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) = 0;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
+		virtual void Dispatch2D(u32 groupX, u32 groupY) = 0;
+		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
+	};
+
+
+
+
 
 
 }

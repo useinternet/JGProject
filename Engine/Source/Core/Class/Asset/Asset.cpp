@@ -768,11 +768,11 @@ namespace JG
 		switch (textureAsset->GetAssetFormat())
 		{
 		case EAssetFormat::Texture:
-			textureAsset->mData->SetTextureMemory((const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
+			textureAsset->mData->SetTextureMemory((const jbyte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit);
 			break;
 		case EAssetFormat::CubeMap:
 			textureAsset->mData->SetTextureMemory(
-				(const byte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit, 
+				(const jbyte*)textureStock->Pixels.data(), textureStock->Width, textureStock->Height, textureStock->Channels, textureStock->PixelPerUnit, 
 				6, 1, ETextureFlags::SRV_TextureCube);
 			break;
 		}

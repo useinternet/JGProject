@@ -20,7 +20,6 @@ namespace JG
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		if (mExposureSB.empty())
 		{
 			GraphicsHelper::InitStrucutredBuffer("Exposure", 8, sizeof(8), &mExposureSB);
@@ -39,7 +38,7 @@ namespace JG
 		val[6] = initialMaxLog - initialMinLog;
 		val[7] = 1.0f / (initialMaxLog - initialMinLog);
 
-		mExposureSB[info.CurrentBufferIndex]->SetData(sizeof(f32), 8, val.data(), commandID);
+		mExposureSB[info.CurrentBufferIndex]->SetData(sizeof(f32), 8, val.data());
 		RP_Global_SB::Load("Renderer/Exposure", GetRenderParamManager()).SetValue(mExposureSB[info.CurrentBufferIndex]);
 
 		if (mPrevResolution != info.Resolution ||
@@ -55,9 +54,6 @@ namespace JG
 
 	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
 
@@ -67,10 +63,10 @@ namespace JG
 		}
 
 
-		api->SetViewports(commandID, { Viewport(info.Resolution.x, info.Resolution.y) });
-		api->SetScissorRects(commandID, { ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
-		api->ClearRenderTarget(commandID, { targetTexture }, targetDepthTexture);
-		api->SetRenderTarget(commandID, { targetTexture }, targetDepthTexture);
+		api->SetViewports({ Viewport(info.Resolution.x, info.Resolution.y) });
+		api->SetScissorRects({ ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
+		api->ClearRenderTarget({ targetTexture }, targetDepthTexture);
+		api->SetRenderTarget({ targetTexture }, targetDepthTexture);
 		
 		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
 		{
@@ -79,15 +75,15 @@ namespace JG
 				auto mesh = info.Mesh;
 				auto& materialList = info.MaterialList;
 				auto& worldMatrix  = JMatrix::Transpose(info.WorldMatrix);
-				api->SetTransform(commandID, &worldMatrix);
+				api->SetTransform(&worldMatrix);
 
-				if (mesh->Bind(commandID) == false)
+				if (mesh->Bind() == false)
 				{
 					JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
 				}
 				for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
 				{
-					if (mesh->GetSubMesh(i)->Bind(commandID) == false)
+					if (mesh->GetSubMesh(i)->Bind() == false)
 					{
 						JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(i)->GetName());
 						continue;
@@ -102,11 +98,11 @@ namespace JG
 						material = materialList[i];
 					}
 
-					if (material == nullptr || material->Bind(commandID) == false)
+					if (material == nullptr || material->Bind() == false)
 					{
 						continue;
 					}
-					api->DrawIndexed(commandID, mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
+					api->DrawIndexed(mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
 				}
 			}
 		});

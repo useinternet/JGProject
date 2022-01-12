@@ -96,7 +96,7 @@ namespace JG
 					}
 
 					gNullTexture = ITexture::Create(nullTexturePath);
-					gNullTexture->SetTextureMemory((const byte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
+					gNullTexture->SetTextureMemory((const jbyte*)stock.Pixels.data(), stock.Width, stock.Height, stock.Channels, stock.PixelPerUnit);
 				}
 				else
 				{
@@ -127,7 +127,7 @@ namespace JG
 
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget(MAIN_GRAPHICS_COMMAND_ID, { gNullTexture }, nullptr);
+			api->ClearRenderTarget({ gNullTexture }, nullptr);
 		}
 	}
 

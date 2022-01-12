@@ -54,8 +54,8 @@ namespace JG
 		void SetComputeShader(SharedPtr<IComputeShader> shader);
 		virtual const String& GetName() const override;
 		virtual void  SetName(const String& name) override;
-		virtual bool Dispatch(u64 commandID, u32 groupX, u32 groupY, u32 groupZ, bool asComputeCommand) override;
+		virtual bool Dispatch(u32 groupX, u32 groupY, u32 groupZ, bool asComputeCommand) override;
 	private:
-		bool DispatchInternal(u64 commandID, ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ);
+		bool DispatchInternal(ComputeCommandList* commandList, u32 groupX, u32 groupY, u32 groupZ);
 	};
 }

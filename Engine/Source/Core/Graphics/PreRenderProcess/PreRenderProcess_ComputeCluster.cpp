@@ -75,10 +75,7 @@ namespace JG
 		{
 			return;
 		}
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
-
-
-		mComputer->Dispatch(commandID, NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, false);
+		mComputer->Dispatch(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, false);
 		Scheduler::GetInstance().ScheduleOnceByFrame(JGGraphics::GetInstance().GetBufferCount() + 1, 0,
 			[&]()->EScheduleResult
 		{

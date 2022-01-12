@@ -16,7 +16,6 @@ namespace JG
 		{
 			return false;
 		}
-		auto commandID    = JGGraphics::GetInstance().RequestCommandID();
 		IGraphicsAPI* api = JGGraphics::GetInstance().GetGraphicsAPI();
 		i32 index = api->GetBufferIndex();
 		TextureInfo texInfo = targetTexture->GetTextureInfo();
@@ -26,7 +25,7 @@ namespace JG
 		{
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget(commandID, { mWhiteTexture }, nullptr);
+			api->ClearRenderTarget({ mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
@@ -37,9 +36,9 @@ namespace JG
 
 
 
-		api->SetViewports(commandID, { Viewport(texInfo.Width, texInfo.Height) });
-		api->SetScissorRects(commandID, { ScissorRect(0,0, texInfo.Width,texInfo.Height) });
-		api->SetRenderTarget(commandID, { targetTexture }, nullptr);
+		api->SetViewports({ Viewport(texInfo.Width, texInfo.Height) });
+		api->SetScissorRects({ ScissorRect(0,0, texInfo.Width,texInfo.Height) });
+		api->SetRenderTarget({ targetTexture }, nullptr);
 
 		StartBatch();
 		return true;
@@ -155,18 +154,17 @@ namespace JG
 	void EditorUIRenderer::NextBatch()
 	{
 		if (mQuadCount == 0) return;
-		auto commandID = JGGraphics::GetInstance().RequestCommandID();
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		if (mEditorUIMaterial->Bind(commandID) == false)
+		if (mEditorUIMaterial->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind StandardMaterial");
 			StartBatch();
 			return;
 		}
 
-		api->SetTextures(commandID, mTextureArray);
+		api->SetTextures(mTextureArray);
 
 
 
@@ -176,19 +174,19 @@ namespace JG
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		if (mCurrFrameResource->QuadMesh->Bind(commandID) == false)
+		if (mCurrFrameResource->QuadMesh->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind(commandID) == false)
+		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind() == false)
 		{
 			JG_CORE_ERROR("Failed Bind QuadMesh");
 			StartBatch();
 			return;
 		}
-		api->DrawIndexed(commandID, quadIndexCount);
+		api->DrawIndexed(quadIndexCount);
 		StartBatch();
 	}
 }
