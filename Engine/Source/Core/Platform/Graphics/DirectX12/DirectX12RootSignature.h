@@ -11,9 +11,11 @@ namespace JG
 	{
 		friend class DirectX12RootSignatureCreater;
 		SharedPtr<RootSignature> mRootSig;
+		Dictionary<u32, EDescriptorTableRangeType> mDescriptorTableRangeTypeDic;
 	public:
-		RootSignature* Get() const {
-			return mRootSig.get();
+		EDescriptorTableRangeType GetDescriptorRangeType(u32 rootParam) const;
+		SharedPtr<RootSignature> Get() const {
+			return mRootSig;
 		}
 	};
 	class DirectX12RootSignatureCreater : public IRootSignatureCreater
@@ -53,8 +55,8 @@ namespace JG
 		virtual void Reset() override;
 		virtual SharedPtr<IRootSignature> Generate() override;
 	private:
-		D3D12_FILTER ToD3DFilter(ESamplerFilter filter);
-		D3D12_TEXTURE_ADDRESS_MODE ToD3DTextureAddressMode(ETextureAddressMode addressMode);
+		D3D12_FILTER ToD3D(ESamplerFilter filter);
+		D3D12_TEXTURE_ADDRESS_MODE ToD3D(ETextureAddressMode addressMode);
 	};
 
 }

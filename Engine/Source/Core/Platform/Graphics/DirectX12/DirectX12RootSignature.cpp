@@ -3,6 +3,15 @@
 #include "Utill/RootSignature.h"
 namespace JG
 {
+	EDescriptorTableRangeType DirectX12RootSignature::GetDescriptorRangeType(u32 rootParam) const
+	{
+		if (mDescriptorTableRangeTypeDic.find(rootParam) == mDescriptorTableRangeTypeDic.end())
+		{
+			return EDescriptorTableRangeType::NONE;
+		}
+		return mDescriptorTableRangeTypeDic.at(rootParam);
+	}
+
 	void DirectX12RootSignatureCreater::AddDescriptorTable(u32 rootParam, EDescriptorTableRangeType rangeType, u32 numDescriptor, u32 numRegister, u32 numRegisterSpace)
 	{
 		Data data;
@@ -76,10 +85,11 @@ namespace JG
 		{
 			return nullptr;
 		}
-
+		SharedPtr<DirectX12RootSignature> result = CreateSharedPtr< DirectX12RootSignature>();
 		auto rootSig = CreateSharedPtr<RootSignature>();
 		for (auto& _pair : mRootSignatureDataDic)
 		{
+			u32 rootParam = _pair.first;
 			Data data = _pair.second;
 
 
@@ -87,21 +97,27 @@ namespace JG
 			{
 			case SRV:
 				rootSig->InitAsSRV(data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::NONE;
 				break;
 			case UAV:
 				rootSig->InitAsUAV(data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::NONE;
 				break;
 			case CBV:
 				rootSig->InitAsCBV(data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::NONE;
 				break;
 			case DT_SRV:
 				rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, data.numDescriptor, data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::SRV;
 				break;
 			case DT_UAV:
 				rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, data.numDescriptor, data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::UAV;
 				break;
 			case DT_CBV:
 				rootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, data.numDescriptor, data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::CBV;
 				break;
 			}
 		}
@@ -115,10 +131,10 @@ namespace JG
 
 			const CD3DX12_STATIC_SAMPLER_DESC sampler(
 				numRegister, // shaderRegister
-				ToD3DFilter(data.Filter), // filter
-				ToD3DTextureAddressMode(data.AddressMode),  // addressU
-				ToD3DTextureAddressMode(data.AddressMode),  // addressV
-				ToD3DTextureAddressMode(data.AddressMode),
+				ToD3D(data.Filter), // filter
+				ToD3D(data.AddressMode),  // addressU
+				ToD3D(data.AddressMode),  // addressV
+				ToD3D(data.AddressMode),
 				0.0f, 16, D3D12_COMPARISON_FUNC_EQUAL,
 				D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK); // addressW
 			rootSig->AddStaticSamplerState(sampler);
@@ -126,7 +142,6 @@ namespace JG
 
 		if (rootSig->Finalize())
 		{
-			SharedPtr<DirectX12RootSignature> result = CreateSharedPtr< DirectX12RootSignature>();
 			result->mRootSig = rootSig;
 			return result;
 
@@ -134,7 +149,7 @@ namespace JG
 		return nullptr;
 	}
 
-	D3D12_FILTER DirectX12RootSignatureCreater::ToD3DFilter(ESamplerFilter filter)
+	D3D12_FILTER DirectX12RootSignatureCreater::ToD3D(ESamplerFilter filter)
 	{
 		switch (filter)
 		{
@@ -145,7 +160,7 @@ namespace JG
 		return D3D12_FILTER_MIN_MAG_MIP_POINT;
 	}
 
-	D3D12_TEXTURE_ADDRESS_MODE DirectX12RootSignatureCreater::ToD3DTextureAddressMode(ETextureAddressMode addressMode)
+	D3D12_TEXTURE_ADDRESS_MODE DirectX12RootSignatureCreater::ToD3D(ETextureAddressMode addressMode)
 	{
 		switch (addressMode)
 		{
@@ -157,6 +172,8 @@ namespace JG
 		}
 		return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	}
+
+
 
 
 

@@ -495,37 +495,59 @@ namespace JG
 		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
-	void GraphicsCommandList::AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action)
+
+	SharedPtr<ComputeCommandList> GraphicsCommandList::QueryInterfaceAsComputeCommandList()
 	{
-		if (action == nullptr)
-		{
-			return;
-		}
 		SharedPtr<ComputeCommandList> result = CreateSharedPtr<ComputeCommandList>();
 
 		// 공유할건 공유하고 따로 만들건 따로 만들기
-		result->mD3DType		= mD3DType;
+		result->mD3DType = mD3DType;
 		result->mD3DCommandList = mD3DCommandList;
-		result->mD3DAllocator	= mD3DAllocator;
+		result->mD3DAllocator = mD3DAllocator;
 
-		result->mTempObjectList			= mTempObjectList;
-		result->mResourceStateTracker	= mResourceStateTracker;
-		result->mUploadAllocator		= mUploadAllocator;
+		result->mTempObjectList = mTempObjectList;
+		result->mResourceStateTracker = mResourceStateTracker;
+		result->mUploadAllocator = mUploadAllocator;
 		result->mDynamicDescriptorAllocator = mComputeDynamicDescriptorAllocator;
-
-
 
 		result->mBindedDescriptorHeap = mBindedDescriptorHeap;
 		result->mBindedComputeRootSig = mBindedComputeRootSig;
 		result->mBindedPipelineState = mBindedPipelineState;
 
-		action(result);
-
-		mBindedComputeRootSig = result->mBindedComputeRootSig;
-		mBindedPipelineState = result->mBindedPipelineState;
-		mBindedDescriptorHeap = result->mBindedDescriptorHeap;
-
+		return result;
 	}
+
+	//void GraphicsCommandList::AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action)
+	//{
+	//	if (action == nullptr)
+	//	{
+	//		return;
+	//	}
+	//	SharedPtr<ComputeCommandList> result = CreateSharedPtr<ComputeCommandList>();
+
+	//	// 공유할건 공유하고 따로 만들건 따로 만들기
+	//	result->mD3DType		= mD3DType;
+	//	result->mD3DCommandList = mD3DCommandList;
+	//	result->mD3DAllocator	= mD3DAllocator;
+
+	//	result->mTempObjectList			= mTempObjectList;
+	//	result->mResourceStateTracker	= mResourceStateTracker;
+	//	result->mUploadAllocator		= mUploadAllocator;
+	//	result->mDynamicDescriptorAllocator = mComputeDynamicDescriptorAllocator;
+
+
+
+	//	result->mBindedDescriptorHeap = mBindedDescriptorHeap;
+	//	result->mBindedComputeRootSig = mBindedComputeRootSig;
+	//	result->mBindedPipelineState = mBindedPipelineState;
+
+	//	action(result);
+
+	//	mBindedComputeRootSig = result->mBindedComputeRootSig;
+	//	mBindedPipelineState  = result->mBindedPipelineState;
+	//	mBindedDescriptorHeap = result->mBindedDescriptorHeap;
+
+	//}
 
 
 

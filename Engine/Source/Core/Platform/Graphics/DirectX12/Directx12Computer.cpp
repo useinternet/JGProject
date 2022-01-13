@@ -191,10 +191,12 @@ namespace JG
 		else
 		{
 			auto graphicsCmdList = DirectX12API::GetGraphicsCommandList();
-			graphicsCmdList->AsCompute([&](SharedPtr<ComputeCommandList> commandList)
-			{
-				DispatchInternal(commandList.get(), groupX, groupY, groupZ);
-			});
+			SharedPtr<ComputeCommandList> computeCommandList = graphicsCmdList->QueryInterfaceAsComputeCommandList();
+			DispatchInternal(computeCommandList.get(), groupX, groupY, groupZ);
+			//graphicsCmdList->AsCompute([&](SharedPtr<ComputeCommandList> commandList)
+			//{
+			//	
+			//});
 		}
 
 		return true;

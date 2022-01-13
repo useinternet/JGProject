@@ -11,6 +11,10 @@ namespace JG
 	*/
 
 	enum class EShaderFlags;
+	enum class EDepthStencilStateTemplate;
+	enum class EBlendStateTemplate;
+	enum class ERasterizerStateTemplate;
+	class InputLayout;
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
@@ -23,7 +27,7 @@ namespace JG
 	class IFrameBuffer;
 	class IMaterial;
 	class IMesh;
-
+	class IRootSignature;
 
 	class IReadBackBuffer;
 	class IComputer;
@@ -109,18 +113,14 @@ namespace JG
 
 
 
-		virtual SharedPtr<IComputeContext> GetComputeContext()   const = 0;
-		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() const = 0;
+		virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
+		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);
 		
 	};
 
 
-	/*
-RootSignature 은 수동
-PipelineState 은 자동 생성으로
-*/
 	class IGraphicsContext
 	{
 	public:
@@ -133,11 +133,11 @@ PipelineState 은 자동 생성으로
 		virtual void SetScissorRects(const List<ScissorRect>& scissorRects) = 0;
 
 		// Bind 함수
-		virtual void BindRootSignature() = 0;
+		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
-		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) = 0;
+		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
-		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) = 0;
 
@@ -145,7 +145,7 @@ PipelineState 은 자동 생성으로
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
 		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
 		virtual void SetRasterizerState(ERasterizerStateTemplate _template) = 0;
-
+		virtual void SetInputLayout(SharedPtr<InputLayout> inputLayout) = 0;
 
 		// 그리기 함수
 		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
@@ -153,6 +153,7 @@ PipelineState 은 자동 생성으로
 
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() = 0;
+		virtual void Reset() = 0;
 	};
 
 	class IComputeContext
@@ -160,7 +161,7 @@ PipelineState 은 자동 생성으로
 	public:
 		virtual ~IComputeContext() = default;
 	public:
-		virtual void BindRootSignature() = 0;
+		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) = 0;
 		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) = 0;
@@ -169,8 +170,11 @@ PipelineState 은 자동 생성으로
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) = 0;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
-		virtual void Dispatch2D(u32 groupX, u32 groupY) = 0;
+		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) = 0;
+		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) = 0;
+		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) = 0;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
+		virtual void Reset() = 0;
 	};
 
 

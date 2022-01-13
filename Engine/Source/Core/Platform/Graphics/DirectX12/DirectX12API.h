@@ -127,9 +127,8 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
 
-
-		virtual SharedPtr<IComputeContext> GetComputeContext()   const override;
-		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() const override;
+		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
+		virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
 	private:
 		// 임시 
 	
@@ -154,6 +153,8 @@ namespace JG
 		std::mutex mGraphicsPSOMutex;
 		std::mutex mComputePSOMutex;
 		std::mutex mRootSigMutex;
+		std::mutex mGraphicsContextMutex;
+		std::mutex mComputeContextMutex;
 
 
 		Dictionary<std::thread::id, SharedPtr<GraphicsPipelineState>> mGraphicsPSOs;
@@ -161,22 +162,77 @@ namespace JG
 		Dictionary<std::thread::id, SharedPtr<RootSignature>> mGraphicsRootSignatures;
 		Dictionary<std::thread::id, SharedPtr<RootSignature>> mComputeRootSignatures;
 
+		Dictionary<std::thread::id, SharedPtr<IGraphicsContext>> mGraphicsContextDic;
+		Dictionary<std::thread::id, SharedPtr<IComputeContext>> mComputeContextDic;
+
 		std::mutex mDeviceMutex;
 
+
+		
 	};
 
 
 	class DirectX12GraphicsContext : public IGraphicsContext
 	{
+		GraphicsCommandList*      mCommandList         = nullptr;
+		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 
+		SharedPtr<ComputeCommandList> mCacheComputeCommandList = nullptr;
+	public:
+		// 초기 셋팅 함수
+		virtual void ClearRenderTarget(const List<SharedPtr<ITexture>>&rtTextures, SharedPtr<ITexture> depthTexture) override;
+		virtual void SetRenderTarget(const List<SharedPtr<ITexture>>&rtTextures, SharedPtr<ITexture> depthTexture) override;
+		virtual void SetViewports(const List<Viewport>&viewPorts) override;
+		virtual void SetScissorRects(const List<ScissorRect>&scissorRects) override;
 
+		// Bind 함수
+		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>&textures) override;
+		virtual void BindConstantBuffer(u32 rootParam, const void*, u32 dataSize) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
+		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) override;
 
+		// 셋팅 함수
+		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) override;
+		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) override;
+		virtual void SetRasterizerState(ERasterizerStateTemplate _template) override;
+		virtual void SetInputLayout(SharedPtr<InputLayout> inputLayout) override;
+
+		// 그리기 함수
+		virtual void DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation) override;
+		virtual void Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation) override;
+
+		// 인터페이스 변경 함수
+		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() override;
+	public:
+		virtual void Reset() override;
 	};
 
 
 	class DirectX12ComputeContext : public IComputeContext
 	{
+		friend DirectX12GraphicsContext;
 
+		ComputeCommandList*       mCommandList = nullptr;
+		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
+	public:
+		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) override;
+		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
+		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
+
+		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) override;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
+		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) override;
+		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) override;
+		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) override;
+		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
+	public:
+		virtual void Reset() override;
 	};
 
 

@@ -8,6 +8,10 @@
 #include "DirectX12Material.h"
 #include "DirectX12Mesh.h"
 #include "Directx12Computer.h"
+#include "DirectX12RootSignature.h"
+
+
+
 #include "Utill/DirectX12Helper.h"
 #include "Utill/DescriptorAllocator.h"
 #include "Utill/CommandQueue.h"
@@ -465,6 +469,15 @@ namespace JG
 		mGraphicsCommandQueue->Begin();
 		mComputeCommandQueue->Begin();
 		mCopyCommandQueue->Begin();
+
+		for (auto& _pair : mGraphicsContextDic)
+		{
+			_pair.second->Reset();
+		}
+		for (auto& _pair : mComputeContextDic)
+		{
+			_pair.second->Reset();
+		}
 	}
 	void DirectX12API::EndFrame()
 	{
@@ -502,6 +515,7 @@ namespace JG
 
 	void DirectX12API::BeginDraw()
 	{
+
 		auto rootSig = GetGraphicsRootSignature();
 		auto pso     = GetGraphicsPipelineState();
 		auto cmdList = GetGraphicsCommandList();
@@ -901,12 +915,533 @@ namespace JG
 
 		return texture;
 	}
-	SharedPtr<IComputeContext> DirectX12API::GetComputeContext() const
+	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext()
 	{
-		return SharedPtr<IComputeContext>();
+		std::lock_guard<std::mutex> lock(mGraphicsContextMutex);
+
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+
+		if (mGraphicsContextDic.find(curr_thread_id) == mGraphicsContextDic.end())
+		{
+			SharedPtr<DirectX12GraphicsContext> graphicsContext = CreateSharedPtr<DirectX12GraphicsContext>();
+			graphicsContext->Reset();
+			mGraphicsContextDic[curr_thread_id] = graphicsContext;
+			return graphicsContext;
+		}
+
+		return mGraphicsContextDic[curr_thread_id];
 	}
-	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext() const
+	SharedPtr<IComputeContext> DirectX12API::GetComputeContext()
 	{
-		return SharedPtr<IGraphicsContext>();
+		std::lock_guard<std::mutex> lock(mComputeContextMutex);
+
+		std::thread::id curr_thread_id = std::this_thread::get_id();
+
+		if (mComputeContextDic.find(curr_thread_id) == mComputeContextDic.end())
+		{
+			SharedPtr<DirectX12ComputeContext> computeContext = CreateSharedPtr<DirectX12ComputeContext>();
+			computeContext->Reset();
+			mComputeContextDic[curr_thread_id] = computeContext;
+			return computeContext;
+		}
+
+		return mComputeContextDic[curr_thread_id];
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// 초기 셋팅 함수
+	void DirectX12GraphicsContext::ClearRenderTarget(const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		for (auto& texture : rtTextures)
+		{
+			if (texture == nullptr || texture->IsValid() == false) continue;
+			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+			if (handle.ptr == 0) continue;
+
+
+			TextureInfo info = texture->GetTextureInfo();
+
+			mCommandList->ClearRenderTargetTexture(static_cast<DirectX12Texture*>(texture.get())->Get(), handle, info.ClearColor);
+		}
+		if (depthTexture && depthTexture->IsValid())
+		{
+			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+
+			if (handle.ptr != 0)
+			{
+				TextureInfo info = depthTexture->GetTextureInfo();
+
+				mCommandList->ClearDepthTexture(static_cast<DirectX12Texture*>(depthTexture.get())->Get(),
+					handle, info.ClearDepth, info.ClearStencil);
+			}
+		}
+	}
+	void DirectX12GraphicsContext::SetRenderTarget(const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		List<DXGI_FORMAT> rtFormats;
+		DXGI_FORMAT dsFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
+
+
+		List<ID3D12Resource*> d3dRTResources;
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+
+		ID3D12Resource* d3dDSResource = nullptr;
+		UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandle = nullptr;
+
+		for (auto& texture : rtTextures)
+		{
+			if (texture == nullptr || texture->IsValid() == false) continue;
+			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+			if (handle.ptr == 0) continue;
+
+
+			rtFormats.push_back(ConvertDXGIFormat(texture->GetTextureInfo().Format));
+
+			d3dRTResources.push_back(static_cast<DirectX12Texture*>(texture.get())->Get());
+			rtvHandles.push_back(handle);
+
+
+		}
+		if (depthTexture && depthTexture->IsValid())
+		{
+			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+			if (handle.ptr != 0)
+			{
+				dsFormat = ConvertDXGIFormat(depthTexture->GetTextureInfo().Format);
+				d3dDSResource = static_cast<DirectX12Texture*>(depthTexture.get())->Get();
+				dsvHandle = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
+				*dsvHandle = handle;
+			}
+		}
+
+		pso->BindRenderTarget(rtFormats, dsFormat);
+
+		mCommandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
+	}
+
+
+	void DirectX12GraphicsContext::SetViewports(const List<Viewport>& viewPorts)
+	{
+		mCommandList->SetViewports(viewPorts);
+	}
+	void DirectX12GraphicsContext::SetScissorRects(const List<ScissorRect>& scissorRects)
+	{
+		mCommandList->SetScissorRects(scissorRects);
+	}
+	void DirectX12GraphicsContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
+	{
+		if (rootSig == nullptr)
+		{
+			return;
+		}
+
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(rootSig.get());
+
+		mCommandList->BindRootSignature(dx12RootSig->Get());
+		mBindedRootSignature = rootSig;
+
+
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->BindRootSignature(*(dx12RootSig->Get()));
+
+
+	}
+	// Bind 함수
+	void DirectX12GraphicsContext::BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures)
+	{
+		if (textures.empty() || mCommandList == nullptr)
+		{
+			return;
+		}
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(mBindedRootSignature.get());
+		
+		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+		for (auto& tex : textures)
+		{
+			DirectX12Texture* dx12Tex = nullptr;
+			if (tex == nullptr || tex->IsValid() == false)
+			{
+				dx12Tex = static_cast<DirectX12Texture*>(ITexture::NullTexture().get());
+			}
+			else
+			{
+				dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+			}
+			switch (type)
+			{
+			case EDescriptorTableRangeType::SRV:
+				handles.push_back(dx12Tex->GetSRV());
+				break;
+			case EDescriptorTableRangeType::UAV:
+				handles.push_back(dx12Tex->GetUAV());
+				break;
+			}
+
+		}
+		mCommandList->BindTextures(rootParam, handles);
+	}
+	void DirectX12GraphicsContext::BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		mCommandList->BindConstantBuffer(rootParam, data, dataSize);
+	}
+	void DirectX12GraphicsContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb)
+	{
+		if (mCommandList == nullptr || sb == nullptr)
+		{
+			return;
+		}
+		mCommandList->BindStructuredBuffer(rootParam, sb->GetBufferID(), static_cast<DirectX12StructuredBuffer*>(sb.get())->Get());
+	}
+	void DirectX12GraphicsContext::BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount)
+	{
+		if (mCommandList == nullptr || data == nullptr)
+		{
+			return;
+		}
+		mCommandList->BindStructuredBuffer(rootParam, data, elementCount, elementSize);
+
+	}
+	void DirectX12GraphicsContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab)
+	{
+		if (bab == nullptr || bab->IsValid() || mCommandList == nullptr)
+		{
+			return;
+		}
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(mBindedRootSignature.get());
+
+		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(bab.get());;
+		switch (type)
+		{
+		case EDescriptorTableRangeType::SRV:
+			handles.push_back(dx12byteAddressBuffer->GetSRV());
+			break;
+		case EDescriptorTableRangeType::UAV:
+			handles.push_back(dx12byteAddressBuffer->GetUAV());
+			break;
+		}
+		mCommandList->BindTextures(rootParam, handles);
+	}
+	void DirectX12GraphicsContext::BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer)
+	{
+		if (mCommandList == nullptr || vertexBuffer == nullptr || indexBuffer == nullptr)
+		{
+			return;
+		}
+		if (vertexBuffer->IsValid() == false || indexBuffer->IsValid() == false)
+		{
+			return;
+		}
+
+		mCommandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		{
+			auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(vertexBuffer.get());
+			D3D12_VERTEX_BUFFER_VIEW View = {};
+			View.BufferLocation = dx12VBuffer->Get()->GetGPUVirtualAddress();
+			View.SizeInBytes = (u32)dx12VBuffer->GetElementSize() * (u32)dx12VBuffer->GetElementCount();
+			View.StrideInBytes = (u32)dx12VBuffer->GetElementSize();
+			mCommandList->BindVertexBuffer(View);
+
+		}
+		{
+			auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(indexBuffer.get());
+			D3D12_INDEX_BUFFER_VIEW View;
+			View.BufferLocation = dx12IBuffer->Get()->GetGPUVirtualAddress();
+			View.Format = DXGI_FORMAT_R32_UINT;
+			View.SizeInBytes = sizeof(u32) * dx12IBuffer->GetIndexCount();
+
+			mCommandList->BindIndexBuffer(View);
+		}
+
+
+	}
+
+	// 셋팅 함수
+	void DirectX12GraphicsContext::SetDepthStencilState(EDepthStencilStateTemplate _template)
+	{
+	
+		D3D12_DEPTH_STENCIL_DESC desc;
+		DirectX12API::GetDepthStencilDesc(_template, &desc);
+
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->SetDepthStencilState(desc);
+
+	}
+	void DirectX12GraphicsContext::SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template)
+	{
+
+		D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		DirectX12API::GetBlendDesc(_template, &blendDesc.RenderTarget[renderTargetSlot]);
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->SetBlendState(blendDesc);
+	}
+	void DirectX12GraphicsContext::SetRasterizerState(ERasterizerStateTemplate _template)
+	{
+		D3D12_RASTERIZER_DESC      desc;
+		DirectX12API::GetRasterizerDesc(_template, &desc);
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->SetRasterizerState(desc);
+
+
+	}
+	void DirectX12GraphicsContext::SetInputLayout(SharedPtr<InputLayout> inputLayout)
+	{
+		if (inputLayout == nullptr)
+		{
+			return;
+		}
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->BindInputLayout(*inputLayout);
+		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+	}
+
+	// 그리기 함수
+	void DirectX12GraphicsContext::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		if (pso->Finalize() == false)
+		{
+			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+			return;
+		}
+		mCommandList->BindPipelineState(pso);
+		mCommandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
+	}
+	void DirectX12GraphicsContext::Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		if (pso->Finalize() == false)
+		{
+			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+			return;
+		}
+		mCommandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mCommandList->BindPipelineState(pso);
+		mCommandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
+	}
+
+	// 인터페이스 변경 함수
+	SharedPtr<IComputeContext> DirectX12GraphicsContext::QueryInterfaceAsComputeContext()
+	{
+		if (mCacheComputeCommandList == nullptr)
+		{
+			mCacheComputeCommandList = mCommandList->QueryInterfaceAsComputeCommandList();
+		}
+		
+
+		SharedPtr<DirectX12ComputeContext> computeContex = CreateSharedPtr<DirectX12ComputeContext>();
+		computeContex->mCommandList = mCacheComputeCommandList.get();
+
+
+		return nullptr;
+	}
+	void DirectX12GraphicsContext::Reset()
+	{
+		mCommandList			 = nullptr;
+		mBindedRootSignature	 = nullptr;
+		mCacheComputeCommandList = nullptr;
+
+		mCommandList = DirectX12API::GetGraphicsCommandList();
+	}
+
+
+	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
+	{
+		if (rootSig == nullptr)
+		{
+			return;
+		}
+
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(rootSig.get());
+
+		mCommandList->BindRootSignature(dx12RootSig->Get());
+		mBindedRootSignature = rootSig;
+
+
+		auto pso = DirectX12API::GetComputePipelineState();
+		pso->BindRootSignature(*(dx12RootSig->Get()));
+	}
+	void DirectX12ComputeContext::BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures)
+	{
+		if (textures.empty() || mCommandList == nullptr)
+		{
+			return;
+		}
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(mBindedRootSignature.get());
+
+		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+		for (auto& tex : textures)
+		{
+			DirectX12Texture* dx12Tex = nullptr;
+			if (tex == nullptr || tex->IsValid() == false)
+			{
+				dx12Tex = static_cast<DirectX12Texture*>(ITexture::NullTexture().get());
+			}
+			else
+			{
+				dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+			}
+			switch (type)
+			{
+			case EDescriptorTableRangeType::SRV:
+				handles.push_back(dx12Tex->GetSRV());
+				break;
+			case EDescriptorTableRangeType::UAV:
+				handles.push_back(dx12Tex->GetUAV());
+				break;
+			}
+		}
+
+		mCommandList->BindTextures(rootParam, handles);
+	}
+	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
+
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+
+		mCommandList->ClearUAVUint(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
+
+
+
+	}
+	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
+
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+
+		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
+	}
+
+	void DirectX12ComputeContext::BindConstantBuffer(u32 rootParam, void* data, u32 dataSize)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		mCommandList->BindConstantBuffer(rootParam, data, dataSize);
+	}
+	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb)
+	{
+		if (mCommandList == nullptr || sb == nullptr)
+		{
+			return;
+		}
+		mCommandList->BindStructuredBuffer(rootParam, sb->GetBufferID(), static_cast<DirectX12StructuredBuffer*>(sb.get())->Get());
+	}
+	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount)
+	{
+		if (mCommandList == nullptr || data == nullptr)
+		{
+			return;
+		}
+		mCommandList->BindStructuredBuffer(rootParam, data, elementCount, elementSize);
+	}
+	void DirectX12ComputeContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab)
+	{
+		if (bab == nullptr || bab->IsValid() || mCommandList == nullptr)
+		{
+			return;
+		}
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(mBindedRootSignature.get());
+
+		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
+		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(bab.get());
+		switch (type)
+		{
+		case EDescriptorTableRangeType::SRV:
+			handles.push_back(dx12byteAddressBuffer->GetSRV());
+			break;
+		case EDescriptorTableRangeType::UAV:
+			handles.push_back(dx12byteAddressBuffer->GetUAV());
+			break;
+		}
+		mCommandList->BindTextures(rootParam, handles);
+	}
+	void DirectX12ComputeContext::Dispatch1D(u32 ThreadCountX, u32 GroupSizeX)
+	{
+
+		Dispatch(Math::DivideByMultiple(ThreadCountX, GroupSizeX), 1, 1);
+	}
+	void DirectX12ComputeContext::Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX,  u32 GroupSizeY)
+	{
+		Dispatch(Math::DivideByMultiple(ThreadCountX, GroupSizeX), Math::DivideByMultiple(ThreadCountY, GroupSizeY), 1);
+	}
+	void DirectX12ComputeContext::Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ)
+	{
+		Dispatch(Math::DivideByMultiple(ThreadCountX, GroupSizeX), Math::DivideByMultiple(ThreadCountY, GroupSizeY), Math::DivideByMultiple(ThreadCountZ, GroupSizeZ));
+	}
+	void DirectX12ComputeContext::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+		auto pso = DirectX12API::GetComputePipelineState();
+		mCommandList->BindPipelineState(pso);
+		mCommandList->Dispatch(groupX, groupY, groupZ);
+	}
+	void DirectX12ComputeContext::Reset()
+	{
+		mCommandList = nullptr;
+		mBindedRootSignature = nullptr;
+		mCommandList = DirectX12API::GetComputeCommandList();
 	}
 }

@@ -14,10 +14,12 @@ namespace JG
 {
 	enum class EDescriptorTableRangeType
 	{
+		NONE,
 		SRV,
 		CBV,
 		UAV
 	};
+
 	enum class ESamplerFilter
 	{
 		Point,
