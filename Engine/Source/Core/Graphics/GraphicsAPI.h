@@ -28,9 +28,8 @@ namespace JG
 	class IMaterial;
 	class IMesh;
 	class IRootSignature;
-
+	class IRootSignatureCreater;
 	class IReadBackBuffer;
-	class IComputer;
 	class ISubMesh;
 	
 	struct TextureInfo;
@@ -66,29 +65,6 @@ namespace JG
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame()	 = 0;
 		virtual void Flush() = 0;
-		//
-		virtual void BeginDraw() = 0;
-		virtual void EndDraw()   = 0;
-		virtual void SetRenderPassData( const Graphics::RenderPassData& passData) = 0;
-		virtual void SetLights( const List<SharedPtr<Graphics::Light>>& lights) = 0;
-		virtual void SetLightGrids( const List<Graphics::LightGrid>& lightGrids) = 0;
-		virtual void SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer) = 0;
-		virtual void SetVisibleLightIndicies( const List<u32>& visibleLightIndicies) = 0;
-		virtual void SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer) = 0;
-		virtual void SetTextures( const List<SharedPtr<ITexture>>& textures) = 0;
-		virtual void SetTransform( const JMatrix* worldmats, u64 instanceCount = 1) = 0;
-		virtual void SetViewports( const List<Viewport>& viewPorts) = 0;
-		virtual void SetScissorRects( const List<ScissorRect>& scissorRects) = 0;
-		virtual void ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) = 0;
-		virtual void ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer) = 0;
-		virtual void SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)   = 0;
-		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
-		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
-		// State
-
-		virtual void SetDepthStencilState( EDepthStencilStateTemplate _template) = 0;
-		virtual void SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
-		virtual void SetRasterizerState( ERasterizerStateTemplate _template) = 0;
 
 		// Create Resource
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;
@@ -100,7 +76,6 @@ namespace JG
 		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount)   = 0;
 		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
-		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
@@ -109,10 +84,7 @@ namespace JG
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
-		virtual void ClearTexture( SharedPtr<ITexture> texture);
-
-
-
+		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() = 0;
 		virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 	public:
@@ -134,12 +106,32 @@ namespace JG
 
 		// Bind 함수
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) = 0;
+		virtual void BindShader(SharedPtr<IGraphicsShader> shader) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) = 0;
+		virtual void DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList) = 0;
+
+
+
+		template<class T>
+		void BindConstantBuffer(u32 rootParam, const T& data)
+		{
+			BindConstantBuffer(rootParam, &data, sizeof(T));
+		}
+		template<>
+		void BindConstantBuffer(u32 rootParam, const List<jbyte>& data)
+		{
+			BindConstantBuffer(rootParam, data.data(), data.size());
+		}
+		template<class T>
+		void BindSturcturedBuffer(u32 rootParam, const List<T>& datas)
+		{
+			BindSturcturedBuffer(rootParam, datas.data(), sizeof(T), datas.size());
+		}
 
 		// 셋팅 함수
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
@@ -162,14 +154,33 @@ namespace JG
 		virtual ~IComputeContext() = default;
 	public:
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) = 0;
+		virtual void BindShader(SharedPtr<IComputeShader> shader) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) = 0;
 		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) = 0;
 
-		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) = 0;
+		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
-		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
+
+		template<class T>
+		void BindConstantBuffer(u32 rootParam, const T& data)
+		{
+			BindConstantBuffer(rootParam, &data, sizeof(T));
+		}
+		template<>
+		void BindConstantBuffer(u32 rootParam, const List<jbyte>& data)
+		{
+			BindConstantBuffer(rootParam, (void*)data.data(), data.size());
+		}
+		template<class T>
+		void BindSturcturedBuffer(u32 rootParam, const List<T>& datas)
+		{
+			BindSturcturedBuffer(rootParam, datas.data(), sizeof(T), datas.size());
+		}
+
+
 		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) = 0;
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) = 0;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) = 0;

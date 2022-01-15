@@ -54,5 +54,7 @@ namespace JG
 		virtual void AddSampler(u32 numRegister, ESamplerFilter filter, ETextureAddressMode addressMode) = 0;
 		virtual void Reset() = 0;
 		virtual SharedPtr<IRootSignature> Generate() = 0;
+	public:
+		static SharedPtr<IRootSignatureCreater> Create();
 	};
 }

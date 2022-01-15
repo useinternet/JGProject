@@ -22,6 +22,8 @@ namespace JG
 namespace JG
 {
 	class IGraphicsAPI;
+	class IGraphicsContext;
+	class IComputeContext;
 	class InputLayout;
 	class IShader;
 	class ITexture;
@@ -84,7 +86,19 @@ namespace JG
 	public:
 		static RenderStatistics Statistics;
 		static RenderDebugger   Debugger;
+		enum
+		{
+			RootParam_PointLight,
+			RootParam_PassCB,
+			RootParam_ObjectCB,
+			RootParam_MaterialCB,
+			RootParam_Texture2D,
+			RootParam_TextureCube,
+			RootParam_LightGrid,
+			RootParam_VisibleLightIndicies,
+		};
 	protected:
+
 		struct LightInfo
 		{
 			i32 Count = 0;
@@ -108,7 +122,8 @@ namespace JG
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
 		RenderInfo mCurrentRenderInfo;
 
-
+		SharedPtr<IGraphicsContext> mGraphicsContext;
+		SharedPtr<IComputeContext>  mComputeContext;
 		UniquePtr<RenderParamManager> mRenderParamManager;
 	public:
 		Renderer();
@@ -144,7 +159,10 @@ namespace JG
 			mPreProcessList.push_back(preProcess);
 
 			mProcessPool[type] = preProcess.get();
-			preProcess->Awake(this);
+
+			IRenderProcess::AwakeData awakeData;
+			awakeData.pRenderer = this;
+			preProcess->Awake(awakeData);
 			return preProcess.get();
 		}
 		template<class T>
@@ -160,7 +178,10 @@ namespace JG
 			mPostProcessList.push_back(postProcess);
 
 			mProcessPool[type] = postProcess.get();
-			postProcess->Awake(this);
+
+			IRenderProcess::AwakeData awakeData;
+			awakeData.pRenderer = this;
+			postProcess->Awake(awakeData);
 			return postProcess.get();
 		}
 		template<class T>

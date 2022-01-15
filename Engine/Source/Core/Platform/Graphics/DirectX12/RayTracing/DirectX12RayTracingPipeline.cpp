@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "DirectX12RayTracingPipeline.h"
 #include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
+#include "Platform/Graphics/DirectX12/DirectX12RootSignature.h"
+#include "Platform/Graphics/DirectX12/DirectX12API.h"
 namespace JG
 {
-
-    DirectX12RayTracingPipeline::DirectX12RayTracingPipeline()
+    DirectX12RayTracingPipeline::~DirectX12RayTracingPipeline()
     {
-        mRaytracingRootSig = CreateSharedPtr<RootSignature>();
+        Reset();
     }
+
 
     void DirectX12RayTracingPipeline::AddLibrary(const String& shaderPath, const List<String>& symbolExports)
     {
@@ -20,6 +22,7 @@ namespace JG
         {
             return;
         }
+
         mShaderDic[shaderPath] = blob;
         mPipelineGen.AddLibrary(blob.Get(), symbolExports);
     }
@@ -55,19 +58,109 @@ namespace JG
     }
 
 
-    bool DirectX12RayTracingPipeline::Finalize()
+
+    void DirectX12RayTracingPipeline::SetGlobalRootSignature(SharedPtr<IRootSignature> rootSig)
     {
-        //mSBTGen.AddRayGenerationProgram();
-        //mSBTGen.AddHitGroup()
-        return false;
+        if (rootSig == nullptr)
+        {
+            return;
+        }
+        mRaytracingRootSig = static_cast<DirectX12RootSignature*>(rootSig.get())->Get();
     }
     bool DirectX12RayTracingPipeline::IsValid()
     {
-        //D3D12_SHADER_VARIABLE_DESC desc;
-        //desc.
-        return false;
+        return Generate();
     }
 
+    u64 DirectX12RayTracingPipeline::GetRayGenStartAddr() const
+    {
+        return mRayGenStartAddr;
+    }
+    u64 DirectX12RayTracingPipeline::GetRayGenSectionSize() const
+    {
+        return mRayGenSectionSize;
+    }
+
+    u64 DirectX12RayTracingPipeline::GetMissStartAddr() const
+    {
+        return mMissStartAddr;
+    }
+    u64 DirectX12RayTracingPipeline::GetMissSectionSize() const
+    {
+        return mMissSectionSize;
+    }
+    u64 DirectX12RayTracingPipeline::GetMissEntrySize() const
+    {
+        return mMissEntrySize;
+    }
+
+    u64 DirectX12RayTracingPipeline::GetHitGroupStartAddr() const
+    {
+        return mHitGroupStartAddr;
+    }
+    u64 DirectX12RayTracingPipeline::GetHitGroupSectionSize() const
+    {
+        return mHitGroupSectionSize;
+    }
+    u64 DirectX12RayTracingPipeline::GetHitGroupEntrySize() const
+    {
+        return mHitGroupEntrySize;
+    }
+    bool DirectX12RayTracingPipeline::Generate()
+    {
+        if (mRaytracingPipelineState == nullptr)
+        {
+            mRaytracingPipelineState = mPipelineGen.Generate();
+            mRaytracingPipelineState->QueryInterface(mRaytracingPipelineStateProperties.GetAddressOf());
+        }
+
+        if (mShaderBindingTableBuffer == nullptr)
+        {
+            mShaderBindingTableBuffer = DirectX12API::CreateCommittedResource(
+                "SBT_Buffer",
+                &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+                D3D12_HEAP_FLAG_NONE,
+                &CD3DX12_RESOURCE_DESC::Buffer(mSBTGen.ComputeSBTSize()),
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr);
+            mSBTGen.Generate(mShaderBindingTableBuffer.Get(), mRaytracingPipelineStateProperties.Get());
+        }
+
+
+        if (mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr)
+        {
+            u64 startAddr = mShaderBindingTableBuffer->GetGPUVirtualAddress();
+
+            mRayGenStartAddr = startAddr;
+            mRayGenSectionSize = mSBTGen.GetRayGenSectionSize();
+
+            mMissStartAddr = startAddr + mRayGenSectionSize;
+            mMissSectionSize = mSBTGen.GetMissSectionSize();
+            mMissEntrySize = mSBTGen.GetMissEntrySize();
+
+            mHitGroupStartAddr = startAddr + mRayGenSectionSize + mMissSectionSize;
+            mHitGroupSectionSize = mSBTGen.GetHitGroupSectionSize();
+            mHitGroupEntrySize = mSBTGen.GetHitGroupEntrySize();
+        }
+
+
+
+        return mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr;
+    }
+    void DirectX12RayTracingPipeline::Reset()
+    {
+        DirectX12API::DestroyCommittedResource(mShaderBindingTableBuffer);
+
+
+
+        mShaderDic.clear();
+        mRaytracingRootSig = nullptr;
+        mRaytracingPipelineState = nullptr;
+        mRaytracingPipelineStateProperties = nullptr;
+        mShaderBindingTableBuffer = nullptr;
+        mSBTGen.Reset();
+        mPipelineGen = RayTracingPipelineGenerator();
+    }
     IDxcBlob* DirectX12RayTracingPipeline::CompileShaderLibrary(const String& filePath)
 	{
         static IDxcCompiler*       pCompiler = nullptr;

@@ -21,11 +21,12 @@ namespace JG
 		TextureInfo texInfo = targetTexture->GetTextureInfo();
 
 
+		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
 		if (mIsClearWhiteTexture == false)
 		{
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget({ mWhiteTexture }, nullptr);
+			context->ClearRenderTarget({ mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
@@ -36,9 +37,9 @@ namespace JG
 
 
 
-		api->SetViewports({ Viewport(texInfo.Width, texInfo.Height) });
-		api->SetScissorRects({ ScissorRect(0,0, texInfo.Width,texInfo.Height) });
-		api->SetRenderTarget({ targetTexture }, nullptr);
+		context->SetViewports({ Viewport(texInfo.Width, texInfo.Height) });
+		context->SetScissorRects({ ScissorRect(0,0, texInfo.Width,texInfo.Height) });
+		context->SetRenderTarget({ targetTexture }, nullptr);
 
 		StartBatch();
 		return true;
@@ -90,7 +91,7 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
-		auto _editorUiShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardEditorUIShader);
+		mEditorUIShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardEditorUIShader);
 
 		TextureInfo textureInfo;
 		textureInfo.Width = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
@@ -114,9 +115,6 @@ namespace JG
 			rsc.QuadMesh->GetSubMesh(0)->SetIndexBuffer(rsc.QuadIBuffer);
 			mFrameResources[i] = rsc;
 		} 
-
-		mEditorUIMaterial = IMaterial::Create("EditorUIMaterial", _editorUiShader);
-		mEditorUIMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
 	
 		mStandardQuadPosition[0] = JVector3(-0.5f, -0.5f, 0.0f);
 		mStandardQuadPosition[1] = JVector3(-0.5f, +0.5f, 0.0f);
@@ -157,36 +155,25 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		if (mEditorUIMaterial->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind StandardMaterial");
-			StartBatch();
-			return;
-		}
 
-		api->SetTextures(mTextureArray);
-
-
+		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+	
 
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;
 		u32 quadIndexCount = mQuadCount * QuadIndexCount;
-
-
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		if (mCurrFrameResource->QuadMesh->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind QuadMesh");
-			StartBatch();
-			return;
-		}
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind QuadMesh");
-			StartBatch();
-			return;
-		}
-		api->DrawIndexed(quadIndexCount);
+
+
+		context->SetInputLayout(mCurrFrameResource->QuadMesh->GetInputLayout());
+		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
+
+
+		context->BindShader(mEditorUIShader);
+		context->BindTextures(Renderer::RootParam_Texture2D, mTextureArray);
+		context->BindVertexAndIndexBuffer(mCurrFrameResource->QuadVBuffer, mCurrFrameResource->QuadIBuffer);
+		context->DrawIndexed(quadIndexCount);
+
 		StartBatch();
 	}
 }

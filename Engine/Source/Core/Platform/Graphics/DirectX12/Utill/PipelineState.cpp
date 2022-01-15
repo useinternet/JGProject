@@ -104,59 +104,6 @@ namespace JG
 		mDesc.InputLayout.pInputElementDescs = mD3DInputLayoutDescs.data();
 
 	}
-
-	void GraphicsPipelineState::BindShader(const DirectX12Shader& shader)
-	{
-		//if ((shader.GetFlags() & EShaderFlags::Allow_ComputeShader) == true)
-		//{
-		//	return;
-		//}
-
-		//mIsDirty = true;
-		//auto flags = shader.GetFlags();
-
-
-		//if (shader.GetVSData() != nullptr)
-		//{
-		//	mDesc.VS = {
-		//		reinterpret_cast<byte*>(shader.GetVSData()->GetBufferPointer()),
-		//		shader.GetVSData()->GetBufferSize()
-		//	};
-		//}
-
-		//if (shader.GetDSData() != nullptr)
-		//{
-		//	mDesc.DS = {
-		//		reinterpret_cast<byte*>(shader.GetDSData()->GetBufferPointer()),
-		//		shader.GetDSData()->GetBufferSize()
-		//	};
-		//}
-
-		//if (shader.GetHSData() != nullptr)
-		//{
-		//	mDesc.HS = {
-		//		reinterpret_cast<byte*>(shader.GetHSData()->GetBufferPointer()),
-		//		shader.GetHSData()->GetBufferSize()
-		//	};
-		//}
-
-		//if (shader.GetGSData() != nullptr)
-		//{
-		//	mDesc.GS = {
-		//		reinterpret_cast<byte*>(shader.GetGSData()->GetBufferPointer()),
-		//		shader.GetGSData()->GetBufferSize()
-		//	};
-		//}
-
-		//if (shader.GetPSData() != nullptr)
-		//{
-		//	mDesc.PS = {
-		//		reinterpret_cast<byte*>(shader.GetPSData()->GetBufferPointer()),
-		//		shader.GetPSData()->GetBufferSize()
-		//	};
-		//}
-
-	}
 	void GraphicsPipelineState::BindShader(const DirectX12GraphicsShader& shader)
 	{
 		mIsDirty = true;

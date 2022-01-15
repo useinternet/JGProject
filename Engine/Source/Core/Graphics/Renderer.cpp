@@ -21,6 +21,9 @@ namespace JG
 		mCurrentRenderInfo = info;
 		mLightInfos.clear();
 
+		// Context 초기화
+		mGraphicsContext = api->GetGraphicsContext();
+		mComputeContext  = mGraphicsContext->QueryInterfaceAsComputeContext();
 
 		// Light Info 정보 수집
 		u64 pl_count = 0;
@@ -38,8 +41,6 @@ namespace JG
 				break;
 			}
 		}
-
-		api->BeginDraw();
 
 		// PassData  바인딩
 		// Light 정보 바인딩
@@ -60,18 +61,31 @@ namespace JG
 
 
 		ReadyImpl(api, &passData, info);
+
+		IRenderProcess::ReadyData readyData;
+		readyData.pRenderer = this;
+		readyData.GraphicsContext = mGraphicsContext;
+		readyData.ComputeContext = mComputeContext;
+		readyData.pRenderPassData = &passData;
+		readyData.Info = mCurrentRenderInfo;
 		for (auto& preProcess : mPreProcessList)
 		{
-			preProcess->Ready(this, api, &passData, mCurrentRenderInfo);
+			preProcess->Ready(readyData);
 		}
 		for (auto& postProcess : mPostProcessList)
 		{
-			postProcess->Ready(this, api, &passData, mCurrentRenderInfo);
+			postProcess->Ready(readyData);
 		}
 
 
-		api->SetRenderPassData(passData);
-		api->SetLights(lightList);
+
+
+		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+		context->BindConstantBuffer(RootParam_PassCB, passData);
+
+		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
+		context->BindSturcturedBuffer(RootParam_PointLight, lInfo.ByteData.data(), lInfo.Size, lInfo.Count);
+
 		return BeginBatch(info, batchList);
 	}
 	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
@@ -81,8 +95,6 @@ namespace JG
 			return;
 		}
 		Statistics.TotalObjectCount += 1;
-		// Culling
-
 
 		ObjectInfo info;
 		info.WorldMatrix = worldMatrix;
@@ -101,9 +113,17 @@ namespace JG
 
 
 		// PreProcess Run
+		IRenderProcess::RunData runData;
+		runData.pRenderer = this;
+		runData.GraphicsContext = mGraphicsContext;
+		runData.ComputeContext	= mComputeContext;
+		runData.Info			= mCurrentRenderInfo;
+		runData.Result			= result;
+
+
 		for (auto& preProcess : mPreProcessList)
 		{
-			preProcess->Run(this, api, mCurrentRenderInfo, result);
+			preProcess->Run(runData);
 		}
 
 	
@@ -128,7 +148,7 @@ namespace JG
 		// PostProcess
 		for (auto& postProcess : mPostProcessList)
 		{
-			postProcess->Run(this, api, mCurrentRenderInfo, result);
+			postProcess->Run(runData);
 		}
 
 
@@ -154,9 +174,6 @@ namespace JG
 		EndBatch();
 
 		CompeleteImpl(api, mCurrentRenderInfo, result);
-
-		api->EndDraw();
-
 		return result;
 	}
 

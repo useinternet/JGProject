@@ -87,26 +87,18 @@ namespace JG
 	{
 		return mLoadMethod;
 	}
+	u64 DirectX12VertexBuffer::GetVertexCount() const
+	{
+		return mElementCount;
+	}
+	u64 DirectX12VertexBuffer::GetVertexSize() const
+	{
+		return mElementSize;
+	}
 	void DirectX12VertexBuffer::SetBufferLoadMethod(EBufferLoadMethod method)
 	{
 		mLoadMethod = method;
 	}
-	void DirectX12VertexBuffer::Bind()
-	{
-		if (IsValid() == false)
-		{
-			return;
-		}
-		auto commandList = DirectX12API::GetGraphicsCommandList();
-
-
-		D3D12_VERTEX_BUFFER_VIEW View = {};
-		View.BufferLocation = mD3DResource->GetGPUVirtualAddress();
-		View.SizeInBytes = (u32)mElementSize * (u32)mElementCount;
-		View.StrideInBytes = (u32)mElementSize;
-		commandList->BindVertexBuffer(View, false);
-	}
-
 	void DirectX12VertexBuffer::Reset()
 	{
 		if (mD3DResource == nullptr)
@@ -207,22 +199,6 @@ namespace JG
 	{
 		mLoadMethod = method;
 	}
-
-	void DirectX12IndexBuffer::Bind()
-	{
-		if (IsValid() == false)
-		{
-			return;
-		}
-		auto commandList = DirectX12API::GetGraphicsCommandList();
-		D3D12_INDEX_BUFFER_VIEW View;
-		View.BufferLocation = mD3DResource->GetGPUVirtualAddress();
-		View.Format = DXGI_FORMAT_R32_UINT;
-		View.SizeInBytes = sizeof(u32) * mIndexCount;
-
-		commandList->BindIndexBuffer(View);
-	}
-
 	void DirectX12IndexBuffer::Reset()
 	{
 		if (mD3DResource == nullptr)

@@ -18,6 +18,16 @@ namespace JG
 		mIndexBuffer = indexBuffer;
 	}
 
+	SharedPtr<IVertexBuffer> DirectX12SubMesh::GetVertexBuffer() const
+	{
+		return mVertexBuffer;
+	}
+
+	SharedPtr<IIndexBuffer> DirectX12SubMesh::GetIndexBuffer() const
+	{
+		return mIndexBuffer;
+	}
+
 	void DirectX12SubMesh::SetName(const String& name)
 	{
 		mName = name;
@@ -37,32 +47,6 @@ namespace JG
 	u32 DirectX12SubMesh::GetInstanceCount() const
 	{
 		return mInstanceCount;
-	}
-	bool DirectX12SubMesh::Bind()
-	{
-		if (mVertexBuffer == nullptr)
-		{
-			return false;
-		}
-		if (mIndexBuffer == nullptr)
-		{
-			return false;
-		}
-		// vertexBuffer, IndexBuffer ¹ÙÀÎµù
-		auto commandList = DirectX12API::GetGraphicsCommandList();
-		commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
-		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
-		dx12VBuffer->Bind();
-		commandList->FlushVertexBuffer();
-
-
-
-		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
-		dx12IBuffer->Bind();
-
-		return true;
 	}
 
 	bool DirectX12SubMesh::IsValid() const
@@ -92,6 +76,11 @@ namespace JG
 		mInputLayout = inputLayout;
 	}
 
+	SharedPtr<InputLayout> DirectX12Mesh::GetInputLayout() const
+	{
+		return mInputLayout;
+	}
+
 	SharedPtr<ISubMesh> DirectX12Mesh::GetSubMesh(i32 index)
 	{
 		if (mSubMeshList.size() <= index) return nullptr;
@@ -119,18 +108,6 @@ namespace JG
 	{
 		return mName;
 	}
-	bool DirectX12Mesh::Bind()
-	{
-		if (mInputLayout == nullptr)
-		{
-			return false;
-		}
-		auto pso = DirectX12API::GetGraphicsPipelineState();
-		pso->BindInputLayout(*mInputLayout);
-		pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-		return true;
-	}
-
 	bool DirectX12Mesh::IsValid() const
 	{
 		bool result = true;

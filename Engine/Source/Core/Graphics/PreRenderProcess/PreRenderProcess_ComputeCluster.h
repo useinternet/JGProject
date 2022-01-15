@@ -8,7 +8,8 @@
 
 namespace JG
 {
-	class IComputer;
+	class IRootSignature;
+	class IComputeShader;
 	class PreRenderProcess_LightCulling;
 	class PreRenderProcess_ComputeCluster : public IRenderProcess
 	{
@@ -37,6 +38,9 @@ namespace JG
 			JVector2 TileSize;
 			f32 FarZ = 0.0f;
 			f32 NearZ = 0.0f;
+			u32	NumXSlice = 0;
+			u32	NumYSlice = 0;
+			u32	NumZSlice = 0;
 		};
 		CB CB;
 		struct Cluster
@@ -46,17 +50,17 @@ namespace JG
 		};
 	private:
 		JMatrix mPrevProjMatrix;
-		SharedPtr<IComputer>         mComputer;
+		SharedPtr<IRootSignature> mRootSignature;
+		SharedPtr<IComputeShader> mShader;
+
 		SharedPtr<IStructuredBuffer> mClusterSB;
 		bool mIsDirty        = true;
 
 		PreRenderProcess_LightCulling* mLightCullingProcess = nullptr;
 	public:
-		PreRenderProcess_ComputeCluster();
-	public:
-		virtual void Awake(Renderer* renderer) override;
-		virtual void Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info) override;
-		virtual void Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) override;
+		virtual void Awake(const AwakeData& data) override;
+		virtual void Ready(const ReadyData& data) override;
+		virtual void Run(const RunData& data) override;
 		virtual bool IsCompelete() override;
 		virtual Type GetType() const override;
 	private:

@@ -10,6 +10,7 @@ namespace JG
 	class ITexture;
 	class IVertexBuffer;
 	class IIndexBuffer;
+	class IGraphicsShader;
 	class IMaterial;
 	class EditorUIRenderer
 	{
@@ -44,7 +45,7 @@ namespace JG
 		JVector3 mStandardQuadPosition[4];
 		JVector2 mStandardQuadTexcoord[4];
 		List<FrameResource> mFrameResources;
-		SharedPtr<IMaterial> mEditorUIMaterial;
+		SharedPtr<IGraphicsShader> mEditorUIShader;
 		List<QuadVertex>    mVertices;
 		List<u32>           mIndices;
 		List<SharedPtr<ITexture>> mTextureArray;

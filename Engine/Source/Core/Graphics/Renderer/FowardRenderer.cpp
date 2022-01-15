@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "FowardRenderer.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_LightCulling.h"
 
 #include "Graphics/PostRenderProcess/PostProcess_Bloom.h"
 #include "Graphics/PostRenderProcess/PostProcess_ToneMapping.h"
-#include "Graphics/PostRenderProcess/PostProcess_UpdateExposure.h"
 #include "Graphics/Batch/Render2DBatch.h"
 namespace JG
 {
@@ -20,6 +20,32 @@ namespace JG
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
+		if (mRootSignature == nullptr)
+		{
+			auto creater = api->CreateRootSignatureCreater();
+			creater->AddSRV(RootParam_PointLight, 0, 3);
+			creater->AddCBV(RootParam_PassCB, 0, 0);
+			creater->AddCBV(RootParam_ObjectCB, 1, 0);
+			creater->AddCBV(RootParam_MaterialCB, 2, 0);
+			creater->AddDescriptorTable(RootParam_Texture2D, EDescriptorTableRangeType::SRV, 1024, 0, 0);
+			creater->AddDescriptorTable(RootParam_TextureCube, EDescriptorTableRangeType::SRV, 1024, 0, 1);
+			creater->AddSRV(RootParam_LightGrid, 0, 11);
+			creater->AddSRV(RootParam_VisibleLightIndicies, 0, 12);
+			creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
+			creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
+			creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);
+			creater->AddSampler(3, ESamplerFilter::Point, ETextureAddressMode::Clamp);
+			creater->AddSampler(4, ESamplerFilter::Linear, ETextureAddressMode::Clamp);
+			creater->AddSampler(5, ESamplerFilter::Anisotropic, ETextureAddressMode::Clamp);
+			creater->AddSampler(6, ESamplerFilter::Linear, ETextureAddressMode::Border);
+			mRootSignature = creater->Generate();
+		}
+		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+
+		context->BindRootSignature(mRootSignature);
+
+
+
 		if (mExposureSB.empty())
 		{
 			GraphicsHelper::InitStrucutredBuffer("Exposure", 8, sizeof(8), &mExposureSB);
@@ -61,13 +87,12 @@ namespace JG
 		{
 			return;
 		}
+		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+		context->SetViewports({ Viewport(info.Resolution.x, info.Resolution.y) });
+		context->SetScissorRects({ ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
+		context->ClearRenderTarget({ targetTexture }, targetDepthTexture);
+		context->SetRenderTarget({ targetTexture }, targetDepthTexture);
 
-
-		api->SetViewports({ Viewport(info.Resolution.x, info.Resolution.y) });
-		api->SetScissorRects({ ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
-		api->ClearRenderTarget({ targetTexture }, targetDepthTexture);
-		api->SetRenderTarget({ targetTexture }, targetDepthTexture);
-		
 		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
 		{
 			for (auto& info : objectList)
@@ -75,44 +100,16 @@ namespace JG
 				auto mesh = info.Mesh;
 				auto& materialList = info.MaterialList;
 				auto& worldMatrix  = JMatrix::Transpose(info.WorldMatrix);
-				api->SetTransform(&worldMatrix);
 
-				if (mesh->Bind() == false)
-				{
-					JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetName());
-				}
-				for (u64 i = 0; i < mesh->GetSubMeshCount(); ++i)
-				{
-					if (mesh->GetSubMesh(i)->Bind() == false)
-					{
-						JG_CORE_ERROR("{0} : Fail Mesh Bind", mesh->GetSubMesh(i)->GetName());
-						continue;
-					}
-					SharedPtr<IMaterial> material = nullptr;
-					if (materialList.size() <= i)
-					{
-						material = materialList[0];
-					}
-					else
-					{
-						material = materialList[i];
-					}
-
-					if (material == nullptr || material->Bind() == false)
-					{
-						continue;
-					}
-					api->DrawIndexed(mesh->GetSubMesh(i)->GetIndexCount(), mesh->GetSubMesh(i)->GetInstanceCount());
-				}
+				context->BindConstantBuffer(RootParam_ObjectCB, worldMatrix);
+				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
 			}
 		});
-
-		
-
 		if (result != nullptr)
 		{
 			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
 		}
+
 	}
 
 	void FowardRenderer::CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)

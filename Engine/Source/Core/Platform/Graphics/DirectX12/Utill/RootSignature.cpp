@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "RootSignature.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
+#include "..\..\..\..\Graphics\RootSignature.h"
 
 
 
@@ -155,4 +156,5 @@ namespace JG
 	{
 		gRootSigCahce.clear();
 	}
+
 }

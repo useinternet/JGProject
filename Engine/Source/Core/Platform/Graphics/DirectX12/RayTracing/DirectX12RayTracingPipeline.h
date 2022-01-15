@@ -1,22 +1,18 @@
 #pragma once
-#include "JGCore.h"
+#include "Graphics/Raytracing/RayTracingPipeline.h"
 #include "Platform/Graphics/DirectX12/Utill/RayTracingHelper.h"
 
 
 
 namespace JG
 {
+	class IRootSignature;
 	class RootSignature;
-	class DirectX12RayTracingPipeline
+	class IComputeContext;
+	class DirectX12RayTracingPipeline : public IRayTracingPipeline
 	{
 	private:
-		//Dictionary<String, ShaderParam>		 mShaderParamDic;
 		Dictionary<String, ComPtr<IDxcBlob>> mShaderDic;
-
-
-		i32 mRootParam = 0;
-
-
 		SharedPtr<RootSignature>			 mRaytracingRootSig;
 		ComPtr<ID3D12StateObject>			 mRaytracingPipelineState;
 		ComPtr<ID3D12StateObjectProperties>  mRaytracingPipelineStateProperties;
@@ -24,24 +20,44 @@ namespace JG
 
 		RayTracingShaderBindingTableGenerator mSBTGen;
 		RayTracingPipelineGenerator			  mPipelineGen;
+
+
+		
+		u64 mRayGenStartAddr   = 0;
+		u64 mRayGenSectionSize = 0;
+
+		u64 mMissStartAddr	 = 0;
+		u64 mMissSectionSize = 0;
+		u64 mMissEntrySize	 = 0;
+
+		u64 mHitGroupStartAddr	 = 0;
+		u64 mHitGroupSectionSize = 0;
+		u64 mHitGroupEntrySize	 = 0;
+
 	public:
-		DirectX12RayTracingPipeline();
-	public:
+		virtual ~DirectX12RayTracingPipeline();
 		// Pipeline
-		void AddLibrary(const String& shaderPath, const List<String>& symbolExports);
-		void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol);
-
-
-		void AddRayGenerationProgram(const String& entryPoint);
-		void AddHitProgram(const String& entryPoint);
-		void AddMissProgram(const String& entryPoint);
-		void SetMaxPayloadSize(u32 byteSize);
-		void SetMaxAttributeSize(u32 byteSize);
-		void SetMaxRecursionDepth(u32 maxDepth);
-
-		bool Finalize();
-		bool IsValid();
+		virtual void AddLibrary(const String& shaderPath, const List<String>& symbolExports) override;
+		virtual void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol)  override;
+		virtual void AddRayGenerationProgram(const String& entryPoint) override;
+		virtual void AddHitProgram(const String& entryPoint) override;
+		virtual void AddMissProgram(const String& entryPoint) override;
+		virtual void SetMaxPayloadSize(u32 byteSize) override;
+		virtual void SetMaxAttributeSize(u32 byteSize) override;
+		virtual void SetMaxRecursionDepth(u32 maxDepth) override;
+		virtual void SetGlobalRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual bool IsValid() override;
+		virtual u64 GetRayGenStartAddr() const override;
+		virtual u64 GetRayGenSectionSize()const override;
+		virtual u64 GetMissStartAddr() const override;
+		virtual u64 GetMissSectionSize() const override;
+		virtual u64 GetMissEntrySize() const override;
+		virtual u64 GetHitGroupStartAddr() const override;
+		virtual u64 GetHitGroupSectionSize() const override;
+		virtual u64 GetHitGroupEntrySize() const override;
+		virtual void Reset() override;
 	private:
+		bool Generate();
 		IDxcBlob* CompileShaderLibrary(const String& filePath);
 	};
 

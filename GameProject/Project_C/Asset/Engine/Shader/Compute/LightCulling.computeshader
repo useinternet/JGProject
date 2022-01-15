@@ -1,7 +1,7 @@
 
 
 
-cbuffer ConstantData
+cbuffer CB : register(b0)
 {
     float4x4 _ViewMatrix;
     int      _PointLightCount;
@@ -12,11 +12,11 @@ cbuffer ConstantData
 
 
 // output
-RWStructuredBuffer<uint>      _VisibleLightIndices;
-RWStructuredBuffer<LightGrid> _LightGrids;
+RWStructuredBuffer<uint>      _VisibleLightIndices : register(u0, space0);
+RWStructuredBuffer<LightGrid> _LightGrids : register(u0, space1);
 // input
-StructuredBuffer<PointLight> _PointLights;
-StructuredBuffer<Cluster>    _Clusters;
+StructuredBuffer<PointLight> _PointLights : register(t0, space2);
+StructuredBuffer<Cluster>    _Clusters : register(t0, space3);
 
 
 
@@ -60,8 +60,8 @@ void cs_main(uint3 groupId : SV_GroupID,
     float zIndex = dispatchThreadId.z;
     int index = zIndex * _NUM_X_SLICE * _NUM_Y_SLICE + yIndex * _NUM_X_SLICE + xIndex;
 
-    _LightGrids[index].PL_Count  = 5;
-    _LightGrids[index].PL_Offset = 5;
+    _LightGrids[index].PL_Count  = 0;
+    _LightGrids[index].PL_Offset = 0;
 
 
     GroupMemoryBarrierWithGroupSync();

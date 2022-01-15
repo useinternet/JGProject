@@ -17,8 +17,6 @@ namespace JG
 	class IComputeShader;
 	class DirectX12VertexBuffer : public IVertexBuffer
 	{
-		friend class DirectX12Mesh;
-		friend class DirectX12SubMesh;
 	private:
 		u64   mElementSize  = 0;
 		u64   mElementCount = 0;
@@ -33,11 +31,12 @@ namespace JG
 		virtual bool  IsValid() const override;
 		virtual void SetBufferLoadMethod(EBufferLoadMethod type) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
+		virtual u64 GetVertexCount() const override;
+		virtual u64 GetVertexSize() const override;
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
 	protected:
-		virtual void Bind() override;
 		void Reset();
 	public:
 		void* GetData() const
@@ -75,7 +74,7 @@ namespace JG
 			return mD3DResource.Get();
 		}
 	protected:
-		virtual void Bind() override;
+		//virtual void Bind() override;
 		void Reset();
 	public:
 		u32* GetData() const

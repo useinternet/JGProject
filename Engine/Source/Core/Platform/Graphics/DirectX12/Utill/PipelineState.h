@@ -6,7 +6,6 @@
 namespace JG
 {
 	class RootSignature;
-	class DirectX12Shader;
 	class DirectX12GraphicsShader;
 	class DirectX12ComputeShader;
 	//class 
@@ -39,7 +38,6 @@ namespace JG
 		void BindRootSignature(const RootSignature& rootSig);
 		void BindRenderTarget(const List< DXGI_FORMAT>& rtFormats, DXGI_FORMAT dvFormat = DXGI_FORMAT_UNKNOWN);
 		void BindInputLayout(const InputLayout& inputLayout);
-		void BindShader(const DirectX12Shader& shader);
 		void BindShader(const DirectX12GraphicsShader& shader);
 		void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE type);
 		void SetSampleMask(uint32_t sampleMask);

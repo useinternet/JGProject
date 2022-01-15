@@ -40,7 +40,32 @@
       "ProjectGuid": "e087650d-4c9c-8dbe-151e-311e81f189ef",
       "DisplayName": "Imgui",
       "ColorIndex": 6
+    },
+    "2d301565-1993-a409-c218-ddbfae5a708c": {
+      "ProjectGuid": "2d301565-1993-a409-c218-ddbfae5a708c",
+      "DisplayName": "SandBox_Game",
+      "ColorIndex": 7
+    },
+    "7fce9cfc-eb59-0ac1-f46a-8db5607566c1": {
+      "ProjectGuid": "7fce9cfc-eb59-0ac1-f46a-8db5607566c1",
+      "DisplayName": "Graphics_Devlop",
+      "ColorIndex": 8
+    },
+    "4f09e4ad-3bab-0e84-2466-22d810a795d4": {
+      "ProjectGuid": "4f09e4ad-3bab-0e84-2466-22d810a795d4",
+      "DisplayName": "Devlop",
+      "ColorIndex": 9
+    },
+    "1450616a-802f-e005-8947-6bdcf5a54667": {
+      "ProjectGuid": "1450616a-802f-e005-8947-6bdcf5a54667",
+      "DisplayName": "Develop",
+      "ColorIndex": 10
+    },
+    "02806a06-6e0b-d8ca-771c-5bbfe32634cb": {
+      "ProjectGuid": "02806a06-6e0b-d8ca-771c-5bbfe32634cb",
+      "DisplayName": "SandBox_Develop",
+      "ColorIndex": 11
     }
   },
-  "NextColorIndex": 7
+  "NextColorIndex": 12
 }

@@ -1,6 +1,6 @@
 
 
-cbuffer ConstantData
+cbuffer ConstantData : register(b0)
 {
     float4x4 __InvProjMatrix__;
     float2   __Resolution__;
@@ -12,10 +12,8 @@ cbuffer ConstantData
     uint _NUM_Z_SLICE;
 };
 
+RWStructuredBuffer<Cluster> _Clusters  : register(u0, space0);
 
-// output
-RWStructuredBuffer<Cluster> _Clusters;
-RWStructuredBuffer<uint4> _IndexTest;
 
 float3 ScreenToView(float4 screen)
 {

@@ -13,36 +13,36 @@ namespace JG
 
 	}
 
-	void PostProcess_ToneMapping::Awake(Renderer* renderer)
+	void PostProcess_ToneMapping::Awake(const AwakeData& data)
 	{
 	}
 
-	void PostProcess_ToneMapping::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
+	void PostProcess_ToneMapping::Ready(const ReadyData& data)
 	{
-		if (mToneMappingComputers.empty())
-		{
-			if (InitComputers() == false)
-			{
+		//if (mToneMappingComputers.empty())
+		//{
+		//	if (InitComputers() == false)
+		//	{
 
-			}
-		}
-		if (mPrevResolution != info.Resolution)
-		{
-			mPrevResolution = info.Resolution;
-			u64 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		
+		//	}
+		//}
+		//if (mPrevResolution != info.Resolution)
+		//{
+		//	mPrevResolution = info.Resolution;
+		//	u64 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+		//
 
-			mToneMappingTextures.resize(bufferCnt);
-			if (InitTextures(info.Resolution) == false)
-			{
+		//	mToneMappingTextures.resize(bufferCnt);
+		//	if (InitTextures(info.Resolution) == false)
+		//	{
 
-			}
-		}
+		//	}
+		//}
 	}
 
-	void PostProcess_ToneMapping::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
+	void PostProcess_ToneMapping::Run(const RunData& data)
 	{
-		SharedPtr<IComputer> targetComputer = mToneMappingComputers[info.CurrentBufferIndex];
+		/*SharedPtr<IComputer> targetComputer = mToneMappingComputers[info.CurrentBufferIndex];
 		SharedPtr<ITexture>  targetTexture   = mToneMappingTextures[info.CurrentBufferIndex];
 		SharedPtr<IStructuredBuffer> exposureSB = RP_Global_SB::Load("Renderer/Exposure", renderer->GetRenderParamManager()).GetValue();
 
@@ -71,7 +71,7 @@ namespace JG
 		u32 groupY = Math::DivideByMultiple(info.Resolution.y, 8);
 
 		targetComputer->Dispatch(groupX, groupY, 1, false);
-		result->SceneTexture = mToneMappingTextures[info.CurrentBufferIndex];
+		result->SceneTexture = mToneMappingTextures[info.CurrentBufferIndex];*/
 	}
 
 	bool PostProcess_ToneMapping::IsCompelete()
@@ -85,17 +85,17 @@ namespace JG
 	}
 	bool PostProcess_ToneMapping::InitComputers()
 	{
-		SharedPtr<IComputeShader> shader = ShaderLibrary::GetInstance().FindComputeShader("Tonemapping");
-		if (shader == nullptr)
-		{
-			return false;
-		}
-		GraphicsHelper::InitComputer("ToneMapping_Computer", shader, &mToneMappingComputers);
+		//SharedPtr<IComputeShader> shader = ShaderLibrary::GetInstance().FindComputeShader("Tonemapping");
+		//if (shader == nullptr)
+		//{
+		//	return false;
+		//}
+		//GraphicsHelper::InitComputer("ToneMapping_Computer", shader, &mToneMappingComputers);
 		return true;
 	}
 	bool PostProcess_ToneMapping::InitTextures(const JVector2& size)
 	{
-		TextureInfo mainTexInfo;
+	/*	TextureInfo mainTexInfo;
 		mainTexInfo.Width = std::max<u32>(1, size.x);
 		mainTexInfo.Height = std::max<u32>(1, size.y);
 		mainTexInfo.ArraySize = 1;
@@ -130,7 +130,7 @@ namespace JG
 			}
 
 			++index;
-		}
+		}*/
 		return true;
 	}
 }

@@ -7,7 +7,6 @@
 #include "DirectX12Shader.h"
 #include "DirectX12Material.h"
 #include "DirectX12Mesh.h"
-#include "Directx12Computer.h"
 #include "DirectX12RootSignature.h"
 
 
@@ -513,272 +512,272 @@ namespace JG
 		mCopyCommandQueue->Flush();
 	}
 
-	void DirectX12API::BeginDraw()
-	{
+	//void DirectX12API::BeginDraw()
+	//{
 
-		auto rootSig = GetGraphicsRootSignature();
-		auto pso     = GetGraphicsPipelineState();
-		auto cmdList = GetGraphicsCommandList();
-		
-
-
-
-		pso->BindRootSignature(*rootSig);
-		cmdList->BindRootSignature(rootSig);
-	}
-
-	void DirectX12API::EndDraw()
-	{
-		//
-	}
-
-	void DirectX12API::SetRenderPassData( const Graphics::RenderPassData& passData)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
-	}
-
-	void DirectX12API::SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, rwBuffer->GetBufferID(), dx12buffer->Get());
-	}
-
-	void DirectX12API::SetLightGrids( const List<Graphics::LightGrid>& lightGrids)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
-	}
-
-	void DirectX12API::SetVisibleLightIndicies( const List<u32>& visibleLightIndicies)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
-	}
-
-	void DirectX12API::SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
-		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, rwBuffer->GetBufferID(), dx12buffer->Get());
-	}
-
-	void DirectX12API::SetLights( const List<SharedPtr<Graphics::Light>>& lights)
-	{
-		Dictionary<Graphics::ELightType, List<jbyte>> lightDic;
-		Dictionary<Graphics::ELightType, u64> lightSizeDic;
-		for (auto& l : lights)
-		{
-			auto type = l->GetLightType();
-			l->PushBtData(lightDic[type]);
-
-			if (lightSizeDic.find(type) == lightSizeDic.end())
-			{
-				lightSizeDic.emplace(type, l->GetBtSize());
-			}
-		}
+	//	auto rootSig = GetGraphicsRootSignature();
+	//	auto pso     = GetGraphicsPipelineState();
+	//	auto cmdList = GetGraphicsCommandList();
+	//	
 
 
-		auto cmdList = GetGraphicsCommandList();
 
-		if (lightDic.find(Graphics::ELightType::PointLight) != lightDic.end())
-		{
-			void* pl_ptr = lightDic[Graphics::ELightType::PointLight].data();
-			u64 pl_size = lightSizeDic[Graphics::ELightType::PointLight];
-			u64 pl_count = lightDic[Graphics::ELightType::PointLight].size() / pl_size;
-			cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_POINT_LIGHTS, pl_ptr, pl_count, pl_size);
-		}
+	//	pso->BindRootSignature(*rootSig);
+	//	cmdList->BindRootSignature(rootSig);
+	//}
 
+	//void DirectX12API::EndDraw()
+	//{
+	//	//
+	//}
 
-	}
+	//void DirectX12API::SetRenderPassData( const Graphics::RenderPassData& passData)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_RENDER_PASS_DATA, (void*)&passData, sizeof(Graphics::RenderPassData));
+	//}
 
-	void DirectX12API::SetTextures( const List<SharedPtr<ITexture>>& textures)
-	{
-		if (textures.empty()) return;
+	//void DirectX12API::SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
+	//	cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, rwBuffer->GetBufferID(), dx12buffer->Get());
+	//}
 
-		auto cmdList = GetGraphicsCommandList();
-		auto texCnt  = textures.size();
+	//void DirectX12API::SetLightGrids( const List<Graphics::LightGrid>& lightGrids)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_LIGHTGRID, lightGrids.data(), lightGrids.size(), sizeof(Graphics::LightGrid));
+	//}
 
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+	//void DirectX12API::SetVisibleLightIndicies( const List<u32>& visibleLightIndicies)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, visibleLightIndicies.data(), visibleLightIndicies.size(), sizeof(u32));
+	//}
 
-		for (u64 i = 0; i < texCnt; ++i)
-		{
-			auto& tex = textures[i];
-			if (tex == nullptr || tex->IsValid() == false)
-			{
-				continue;
-			}
-			auto handle = static_cast<DirectX12Texture*>(tex.get())->GetSRV();
-			handles.push_back(handle);
-		}
+	//void DirectX12API::SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	auto dx12buffer = static_cast<DirectX12StructuredBuffer*>(rwBuffer.get());
+	//	cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_VISIBLE_LIGHT_INDICIES, rwBuffer->GetBufferID(), dx12buffer->Get());
+	//}
 
-		if (handles.empty() == false)
-		{
-			cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, handles);
-		}
-	}
+	//void DirectX12API::SetLights( const List<SharedPtr<Graphics::Light>>& lights)
+	//{
+	//	Dictionary<Graphics::ELightType, List<jbyte>> lightDic;
+	//	Dictionary<Graphics::ELightType, u64> lightSizeDic;
+	//	for (auto& l : lights)
+	//	{
+	//		auto type = l->GetLightType();
+	//		l->PushBtData(lightDic[type]);
 
-	void DirectX12API::SetTransform( const JMatrix* worldmats, u64 instanceCount)
-	{
-		auto cmdList = GetGraphicsCommandList();
-		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
-	}
-
-	void DirectX12API::SetViewports( const List<Viewport>& viewPorts)
-	{
-		auto commandList = GetGraphicsCommandList();
-		commandList->SetViewports(viewPorts);
-	}
-
-	void DirectX12API::SetScissorRects( const List<ScissorRect>& scissorRects)
-	{
-		auto commandList = GetGraphicsCommandList();
-		commandList->SetScissorRects(scissorRects);
-	}
-
-	void DirectX12API::ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
-	{
-		auto commandList = GetGraphicsCommandList();
-
-		for (auto& texture : rtTextures)
-		{
-			if (texture == nullptr || texture->IsValid() == false) continue;
-			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
-			if (handle.ptr == 0) continue;
+	//		if (lightSizeDic.find(type) == lightSizeDic.end())
+	//		{
+	//			lightSizeDic.emplace(type, l->GetBtSize());
+	//		}
+	//	}
 
 
-			TextureInfo info = texture->GetTextureInfo();
+	//	auto cmdList = GetGraphicsCommandList();
 
-			commandList->ClearRenderTargetTexture(static_cast<DirectX12Texture*>(texture.get())->Get(), handle, info.ClearColor);
-		}
-		if (depthTexture && depthTexture->IsValid())
-		{
-			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
-
-			if (handle.ptr != 0)
-			{
-				TextureInfo info = depthTexture->GetTextureInfo();
-
-				commandList->ClearDepthTexture(static_cast<DirectX12Texture*>(depthTexture.get())->Get(),
-					handle, info.ClearDepth, info.ClearStencil);
-			}
-		}
-	}
-
-	void DirectX12API::ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer)
-	{
-		auto commandList = GetGraphicsCommandList();
-
-		auto dx12ByteAddrBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
-		commandList->ClearUAVUint(dx12ByteAddrBuffer->GetUAV(), dx12ByteAddrBuffer->Get());
-
-	}
-
-	void DirectX12API::SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
-	{
-		auto commandList = GetGraphicsCommandList();
-		auto pso = GetGraphicsPipelineState();
-		List<DXGI_FORMAT> rtFormats;
-		DXGI_FORMAT dsFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
+	//	if (lightDic.find(Graphics::ELightType::PointLight) != lightDic.end())
+	//	{
+	//		void* pl_ptr = lightDic[Graphics::ELightType::PointLight].data();
+	//		u64 pl_size = lightSizeDic[Graphics::ELightType::PointLight];
+	//		u64 pl_count = lightDic[Graphics::ELightType::PointLight].size() / pl_size;
+	//		cmdList->BindStructuredBuffer((u32)ShaderDefine::EGraphcisRootParam::SB_POINT_LIGHTS, pl_ptr, pl_count, pl_size);
+	//	}
 
 
-		List<ID3D12Resource*> d3dRTResources;
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+	//}
 
-		ID3D12Resource* d3dDSResource = nullptr;
-		UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandle = nullptr;
+	//void DirectX12API::SetTextures( const List<SharedPtr<ITexture>>& textures)
+	//{
+	//	if (textures.empty()) return;
 
-		for (auto& texture : rtTextures)
-		{
-			if (texture == nullptr || texture->IsValid() == false) continue;
-			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
-			if (handle.ptr == 0) continue;
+	//	auto cmdList = GetGraphicsCommandList();
+	//	auto texCnt  = textures.size();
+
+	//	List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
+
+	//	for (u64 i = 0; i < texCnt; ++i)
+	//	{
+	//		auto& tex = textures[i];
+	//		if (tex == nullptr || tex->IsValid() == false)
+	//		{
+	//			continue;
+	//		}
+	//		auto handle = static_cast<DirectX12Texture*>(tex.get())->GetSRV();
+	//		handles.push_back(handle);
+	//	}
+
+	//	if (handles.empty() == false)
+	//	{
+	//		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, handles);
+	//	}
+	//}
+
+	//void DirectX12API::SetTransform( const JMatrix* worldmats, u64 instanceCount)
+	//{
+	//	auto cmdList = GetGraphicsCommandList();
+	//	cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_OBJECTDATA, (void*)worldmats, sizeof(JMatrix));
+	//}
+
+	//void DirectX12API::SetViewports( const List<Viewport>& viewPorts)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+	//	commandList->SetViewports(viewPorts);
+	//}
+
+	//void DirectX12API::SetScissorRects( const List<ScissorRect>& scissorRects)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+	//	commandList->SetScissorRects(scissorRects);
+	//}
+
+	//void DirectX12API::ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+
+	//	for (auto& texture : rtTextures)
+	//	{
+	//		if (texture == nullptr || texture->IsValid() == false) continue;
+	//		auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+	//		if (handle.ptr == 0) continue;
 
 
-			rtFormats.push_back(ConvertDXGIFormat(texture->GetTextureInfo().Format));
+	//		TextureInfo info = texture->GetTextureInfo();
 
-			d3dRTResources.push_back(static_cast<DirectX12Texture*>(texture.get())->Get());
-			rtvHandles.push_back(handle);
+	//		commandList->ClearRenderTargetTexture(static_cast<DirectX12Texture*>(texture.get())->Get(), handle, info.ClearColor);
+	//	}
+	//	if (depthTexture && depthTexture->IsValid())
+	//	{
+	//		auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+
+	//		if (handle.ptr != 0)
+	//		{
+	//			TextureInfo info = depthTexture->GetTextureInfo();
+
+	//			commandList->ClearDepthTexture(static_cast<DirectX12Texture*>(depthTexture.get())->Get(),
+	//				handle, info.ClearDepth, info.ClearStencil);
+	//		}
+	//	}
+	//}
+
+	//void DirectX12API::ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+
+	//	auto dx12ByteAddrBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+	//	commandList->ClearUAVUint(dx12ByteAddrBuffer->GetUAV(), dx12ByteAddrBuffer->Get());
+
+	//}
+
+	//void DirectX12API::SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+	//	auto pso = GetGraphicsPipelineState();
+	//	List<DXGI_FORMAT> rtFormats;
+	//	DXGI_FORMAT dsFormat = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
 
 
-		}
-		if (depthTexture && depthTexture->IsValid())
-		{
-			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
-			if (handle.ptr != 0)
-			{
-				dsFormat = ConvertDXGIFormat(depthTexture->GetTextureInfo().Format);
-				d3dDSResource = static_cast<DirectX12Texture*>(depthTexture.get())->Get();
-				dsvHandle = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
-				*dsvHandle = handle;
-			}
-		}
+	//	List<ID3D12Resource*> d3dRTResources;
+	//	List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
-		pso->BindRenderTarget(rtFormats, dsFormat);
+	//	ID3D12Resource* d3dDSResource = nullptr;
+	//	UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandle = nullptr;
 
-		commandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
-	}
+	//	for (auto& texture : rtTextures)
+	//	{
+	//		if (texture == nullptr || texture->IsValid() == false) continue;
+	//		auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+	//		if (handle.ptr == 0) continue;
 
-	void DirectX12API::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
-	{
-		auto commandList = GetGraphicsCommandList();
-		auto pso = GetGraphicsPipelineState();
-		if (pso->Finalize() == false)
-		{
-			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
-			return;
-		}
-		commandList->BindPipelineState(pso);
-		commandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
-	}
 
-	void DirectX12API::Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
-	{
-		auto commandList = GetGraphicsCommandList();
-		auto pso = GetGraphicsPipelineState();
-		if (pso->Finalize() == false)
-		{
-			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
-			return;
-		}
-		commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->BindPipelineState(pso);
-		commandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
-	}
+	//		rtFormats.push_back(ConvertDXGIFormat(texture->GetTextureInfo().Format));
 
-	void DirectX12API::SetDepthStencilState( EDepthStencilStateTemplate _template)
-	{
-		auto pso = GetGraphicsPipelineState();
-		D3D12_DEPTH_STENCIL_DESC desc = {};
-		GetDepthStencilDesc(_template, &desc);
-		pso->SetDepthStencilState(desc);
-	}
+	//		d3dRTResources.push_back(static_cast<DirectX12Texture*>(texture.get())->Get());
+	//		rtvHandles.push_back(handle);
 
-	void DirectX12API::SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template)
-	{
-		if (renderTargetSlot >= MAX_RENDERTARGET)
-		{
-			return;
-		}
-		auto pso = GetGraphicsPipelineState();
-		auto blendDesc = pso->GetBlendDesc();
-		D3D12_RENDER_TARGET_BLEND_DESC desc = {};
 
-		GetBlendDesc(_template, &desc);
-		blendDesc.RenderTarget[renderTargetSlot] = desc;
-		pso->SetBlendState(blendDesc);
-	}
+	//	}
+	//	if (depthTexture && depthTexture->IsValid())
+	//	{
+	//		auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+	//		if (handle.ptr != 0)
+	//		{
+	//			dsFormat = ConvertDXGIFormat(depthTexture->GetTextureInfo().Format);
+	//			d3dDSResource = static_cast<DirectX12Texture*>(depthTexture.get())->Get();
+	//			dsvHandle = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
+	//			*dsvHandle = handle;
+	//		}
+	//	}
 
-	void DirectX12API::SetRasterizerState( ERasterizerStateTemplate _template)
-	{
-		auto pso = GetGraphicsPipelineState();
+	//	pso->BindRenderTarget(rtFormats, dsFormat);
 
-		D3D12_RASTERIZER_DESC desc = {};
-		GetRasterizerDesc(_template, &desc);
+	//	commandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
+	//}
 
-		pso->SetRasterizerState(desc);
-	}
+	//void DirectX12API::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+	//	auto pso = GetGraphicsPipelineState();
+	//	if (pso->Finalize() == false)
+	//	{
+	//		JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+	//		return;
+	//	}
+	//	commandList->BindPipelineState(pso);
+	//	commandList->DrawIndexed(indexCount, instancedCount, startIndexLocation, startVertexLocation, startIndexLocation);
+	//}
+
+	//void DirectX12API::Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
+	//{
+	//	auto commandList = GetGraphicsCommandList();
+	//	auto pso = GetGraphicsPipelineState();
+	//	if (pso->Finalize() == false)
+	//	{
+	//		JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+	//		return;
+	//	}
+	//	commandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//	commandList->BindPipelineState(pso);
+	//	commandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
+	//}
+
+	//void DirectX12API::SetDepthStencilState( EDepthStencilStateTemplate _template)
+	//{
+	//	auto pso = GetGraphicsPipelineState();
+	//	D3D12_DEPTH_STENCIL_DESC desc = {};
+	//	GetDepthStencilDesc(_template, &desc);
+	//	pso->SetDepthStencilState(desc);
+	//}
+
+	//void DirectX12API::SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template)
+	//{
+	//	if (renderTargetSlot >= MAX_RENDERTARGET)
+	//	{
+	//		return;
+	//	}
+	//	auto pso = GetGraphicsPipelineState();
+	//	auto blendDesc = pso->GetBlendDesc();
+	//	D3D12_RENDER_TARGET_BLEND_DESC desc = {};
+
+	//	GetBlendDesc(_template, &desc);
+	//	blendDesc.RenderTarget[renderTargetSlot] = desc;
+	//	pso->SetBlendState(blendDesc);
+	//}
+
+	//void DirectX12API::SetRasterizerState( ERasterizerStateTemplate _template)
+	//{
+	//	auto pso = GetGraphicsPipelineState();
+
+	//	D3D12_RASTERIZER_DESC desc = {};
+	//	GetRasterizerDesc(_template, &desc);
+
+	//	pso->SetRasterizerState(desc);
+	//}
 	SharedPtr<IFrameBuffer> DirectX12API::CreateFrameBuffer(const FrameBufferInfo& info)
 	{
 		if (info.Handle == 0) return nullptr;
@@ -832,17 +831,17 @@ namespace JG
 	
 		return rbBuffer;
 	}
-	SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)
-	{
-		if (shader == nullptr)
-		{
-			return nullptr;
-		}
-		auto computer = CreateSharedPtr<DirectX12Computer>();
-		computer->SetName(name);
-		computer->SetComputeShader(shader);
-		return computer;
-	}
+	//SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)
+	//{
+	//	if (shader == nullptr)
+	//	{
+	//		return nullptr;
+	//	}
+	//	auto computer = CreateSharedPtr<DirectX12Computer>();
+	//	computer->SetName(name);
+	//	computer->SetComputeShader(shader);
+	//	return computer;
+	//}
 	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
 		String errorCode;
@@ -914,6 +913,10 @@ namespace JG
 		texture->Create(name, info);
 
 		return texture;
+	}
+	SharedPtr<IRootSignatureCreater> DirectX12API::CreateRootSignatureCreater()
+	{
+		return CreateSharedPtr<DirectX12RootSignatureCreater>();
 	}
 	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext()
 	{
@@ -1072,6 +1075,12 @@ namespace JG
 
 
 	}
+	void DirectX12GraphicsContext::BindShader(SharedPtr<IGraphicsShader> shader)
+	{
+		DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(shader.get());
+		auto pso = DirectX12API::GetGraphicsPipelineState();
+		pso->BindShader(*pDX12Shader);
+	}
 	// Bind 함수
 	void DirectX12GraphicsContext::BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures)
 	{
@@ -1191,7 +1200,49 @@ namespace JG
 
 
 	}
+	void DirectX12GraphicsContext::DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList)
+	{
 
+		if (mCommandList == nullptr || mesh == nullptr || materialList.empty())
+		{
+			return;
+		}
+
+
+		// InputLayout
+		SetInputLayout(mesh->GetInputLayout());
+
+		u32 subMeshCount = mesh->GetSubMeshCount();
+		for (i32 i = 0; i < subMeshCount; ++i)
+		{
+			SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
+			BindVertexAndIndexBuffer(subMesh->GetVertexBuffer(), subMesh->GetIndexBuffer());
+
+			SharedPtr<IMaterial> material = nullptr;
+			if (materialList.size() <= i)
+			{
+				material = materialList[0];
+			}
+			else
+			{
+				material = materialList[i];
+			}
+			if (material == nullptr || material->Bind() == false)
+			{
+				continue;
+			}
+
+			material->Bind();
+
+			List<jbyte> materialCB = material->GetMaterialPropertyByteData();
+
+			BindShader(material->GetShader());
+			BindTextures(Renderer::RootParam_Texture2D, material->GetTextureList());
+			BindTextures(Renderer::RootParam_TextureCube, material->GetCubeTextureList());
+			BindConstantBuffer(Renderer::RootParam_MaterialCB, materialCB.data(), materialCB.size());
+			DrawIndexed(subMesh->GetIndexCount(), subMesh->GetInstanceCount(), 0, 0, 0);
+		}
+	}
 	// 셋팅 함수
 	void DirectX12GraphicsContext::SetDepthStencilState(EDepthStencilStateTemplate _template)
 	{
@@ -1278,7 +1329,7 @@ namespace JG
 		computeContex->mCommandList = mCacheComputeCommandList.get();
 
 
-		return nullptr;
+		return computeContex;
 	}
 	void DirectX12GraphicsContext::Reset()
 	{
@@ -1288,6 +1339,8 @@ namespace JG
 
 		mCommandList = DirectX12API::GetGraphicsCommandList();
 	}
+
+
 
 
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
@@ -1367,7 +1420,7 @@ namespace JG
 		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
 	}
 
-	void DirectX12ComputeContext::BindConstantBuffer(u32 rootParam, void* data, u32 dataSize)
+	void DirectX12ComputeContext::BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize)
 	{
 		if (mCommandList == nullptr)
 		{
@@ -1384,7 +1437,7 @@ namespace JG
 		}
 		mCommandList->BindStructuredBuffer(rootParam, sb->GetBufferID(), static_cast<DirectX12StructuredBuffer*>(sb.get())->Get());
 	}
-	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount)
+	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount)
 	{
 		if (mCommandList == nullptr || data == nullptr)
 		{
@@ -1415,6 +1468,7 @@ namespace JG
 		}
 		mCommandList->BindTextures(rootParam, handles);
 	}
+
 	void DirectX12ComputeContext::Dispatch1D(u32 ThreadCountX, u32 GroupSizeX)
 	{
 
@@ -1428,6 +1482,12 @@ namespace JG
 	{
 		Dispatch(Math::DivideByMultiple(ThreadCountX, GroupSizeX), Math::DivideByMultiple(ThreadCountY, GroupSizeY), Math::DivideByMultiple(ThreadCountZ, GroupSizeZ));
 	}
+	void DirectX12ComputeContext::BindShader(SharedPtr<IComputeShader> shader)
+	{
+		auto dx12Shader = static_cast<DirectX12ComputeShader*>(shader.get());
+		auto PSO = DirectX12API::GetComputePipelineState();
+		PSO->BindShader(*dx12Shader);
+	}
 	void DirectX12ComputeContext::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
 		if (mCommandList == nullptr)
@@ -1435,6 +1495,11 @@ namespace JG
 			return;
 		}
 		auto pso = DirectX12API::GetComputePipelineState();
+		if (pso->Finalize() == false)
+		{
+			JG_CORE_ERROR("Failed Create Compute PipelineState");
+			return;
+		}
 		mCommandList->BindPipelineState(pso);
 		mCommandList->Dispatch(groupX, groupY, groupZ);
 	}

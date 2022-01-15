@@ -11,8 +11,6 @@ namespace JG
 	class GlobalGameSystem;
 	class GameWorld;
 	class IGameObject;
-	class IComputer;
-	class IReadBackBuffer;
 
 
 	class GameLogicSystemLayer : public ISystemLayer

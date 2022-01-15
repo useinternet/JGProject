@@ -87,29 +87,6 @@ namespace JG
 	public:
 		virtual void Flush() override;
 	protected:
-		virtual void BeginDraw() override;
-		virtual void EndDraw()   override;
-
-		virtual void SetRenderPassData( const Graphics::RenderPassData& passData)   override;
-		virtual void SetLightGrids( SharedPtr<IStructuredBuffer> rwBuffer) override;
-		virtual void SetLightGrids( const List<Graphics::LightGrid>& lightGrids) override;
-		virtual void SetVisibleLightIndicies( const List<u32>& visibleLightIndicies) override;
-		virtual void SetVisibleLightIndicies( const SharedPtr<IStructuredBuffer> rwBuffer) override;
-		virtual void SetLights( const List<SharedPtr<Graphics::Light>>& lights) override;
-		virtual void SetTextures( const List<SharedPtr<ITexture>>& textures) override;
-		virtual void SetTransform( const JMatrix* worldmats, u64 instanceCount = 1) override;
-		virtual void SetViewports( const List<Viewport>& viewPorts) override;
-		virtual void SetScissorRects( const List<ScissorRect>& scissorRects) override;
-		virtual void ClearRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) override;
-		virtual void ClearUAVUint( SharedPtr<IByteAddressBuffer> buffer) override;
-		virtual void SetRenderTarget( const List<SharedPtr<ITexture>>& rtTextures, SharedPtr<ITexture> depthTexture) override;
-		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) override;
-		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) override;
-	protected:
-		virtual void SetDepthStencilState( EDepthStencilStateTemplate _template) override;
-		virtual void SetBlendState( u32 renderTargetSlot, EBlendStateTemplate _template) override;
-		virtual void SetRasterizerState( ERasterizerStateTemplate _template) override;
-	protected:
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& info) override;
 		virtual SharedPtr<IVertexBuffer>  CreateVertexBuffer(const String& name, EBufferLoadMethod method) override;
 		virtual SharedPtr<IIndexBuffer>   CreateIndexBuffer(const String& name, EBufferLoadMethod method) override;
@@ -117,7 +94,6 @@ namespace JG
 		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount) override;
 		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) override;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
-		virtual SharedPtr<IComputer>      CreateComputer(const String& name, SharedPtr<IComputeShader> shader) override;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
@@ -126,7 +102,7 @@ namespace JG
 		virtual SharedPtr<ISubMesh>       CreateSubMesh(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
-
+		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() override;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
 		virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
 	private:
@@ -187,13 +163,14 @@ namespace JG
 
 		// Bind 함수
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual void BindShader(SharedPtr<IGraphicsShader> shader) override;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>&textures) override;
 		virtual void BindConstantBuffer(u32 rootParam, const void*, u32 dataSize) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) override;
-
+		virtual void DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList) override;
 		// 셋팅 함수
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) override;
 		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) override;
@@ -219,20 +196,24 @@ namespace JG
 		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 	public:
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual void BindShader(SharedPtr<IComputeShader> shader) override;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) override;
 		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
 		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
 
-		virtual void BindConstantBuffer(u32 rootParam, void* data, u32 dataSize) override;
+		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
-		virtual void BindSturcturedBuffer(u32 rootParam, void* data, u32 elementSize, u32 elementCount) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
 		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) override;
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) override;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) override;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
-	public:
 		virtual void Reset() override;
+	public:
+		ComputeCommandList* Get() const {
+			return mCommandList;
+		}
 	};
 
 

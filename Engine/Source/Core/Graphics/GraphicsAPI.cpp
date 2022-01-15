@@ -3,13 +3,10 @@
 #include "Application.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 #include "Renderer.h"
-
+#include "Mesh.h"
+#include "Material.h"
 namespace JG
 {
-	void IGraphicsAPI::ClearTexture(SharedPtr<ITexture> texture)
-	{
-		ClearRenderTarget({ texture }, nullptr);
-	}
 	UniquePtr<IGraphicsAPI> IGraphicsAPI::Create(EGraphicsAPI api)
 	{
 		switch(api)
@@ -22,6 +19,7 @@ namespace JG
 		}
 		
 	}
+
 }
 
 

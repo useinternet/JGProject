@@ -1,46 +1,62 @@
 #include "pch.h"
 #include "PreRenderProcess_LightCulling.h"
 #include "PreRenderProcess_ComputeCluster.h"
-
+#include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
 namespace JG
 {
-	PreRenderProcess_LightCulling::PreRenderProcess_LightCulling()
+	void PreRenderProcess_LightCulling::Awake(const AwakeData& data)
 	{
+		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
 
+		creater->AddCBV(0, 0, 0);
+		creater->AddUAV(1, 0, 0);
+		creater->AddUAV(2, 0, 1);
+		creater->AddSRV(3, 0, 2);
+		creater->AddSRV(4, 0, 3);
+
+		mRootSignature = creater->Generate();
+		mShader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
+
+		GraphicsHelper::InitStrucutredBuffer("LightGridSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER, sizeof(Graphics::LightGrid), &mLightGridSB);
+		GraphicsHelper::InitStrucutredBuffer("VisibleLightIndiciesSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER * 64, sizeof(u32), &mVisibleLightIndiciesSB);
 	}
-	void PreRenderProcess_LightCulling::Awake(Renderer* renderer)
+	void PreRenderProcess_LightCulling::Ready(const ReadyData& data)
 	{
+		CB.ViewMatirx      = JMatrix::Transpose(data.Info.ViewMatrix);
+		CB.PointLightCount = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
+		CB.NumXSlice = PreRenderProcess_ComputeCluster::NUM_X_SLICE;
+		CB.NumYSlice = PreRenderProcess_ComputeCluster::NUM_Y_SLICE;
+		CB.NumZSlice = PreRenderProcess_ComputeCluster::NUM_Z_SLICE;
 
+
+		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
+		context->BindSturcturedBuffer(Renderer::RootParam_LightGrid, mLightGridSB[data.Info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer(Renderer::RootParam_VisibleLightIndicies, mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex]);
 	}
-	void PreRenderProcess_LightCulling::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
+	void PreRenderProcess_LightCulling::Run(const RunData& data)
 	{
-		InitComputers();
-		CB.ViewMatirx      = JMatrix::Transpose(info.ViewMatrix);
-		CB.PointLightCount = renderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
-	}
-	void PreRenderProcess_LightCulling::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
-	{
+		auto pointLightsInfo = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 
-		auto pointLightsInfo = renderer->GetLightInfo(Graphics::ELightType::PointLight);
+
+		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[data.Info.CurrentBufferIndex];
+		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex];
 
 
 
-		SharedPtr<IComputer>         targetComputer = mLightCullingComputers[info.CurrentBufferIndex];
-		SharedPtr<IStructuredBuffer> targetLightSB = mLightSB[info.CurrentBufferIndex];
-		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[info.CurrentBufferIndex];
-		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[info.CurrentBufferIndex];
+		SharedPtr<IComputeContext> context = data.ComputeContext;
 
-
-
-
-		targetLightSB->SetData(pointLightsInfo.Size, pointLightsInfo.Count, pointLightsInfo.ByteData.data());
-		api->SetLightGrids(targetLightGridSB);
-		api->SetVisibleLightIndicies(targetVisibleLightIndiciesSB);
-
-		targetComputer->SetFloat4x4(SHADERPARAM_VIEWMATRIX, CB.ViewMatirx);
-		targetComputer->SetInt(SHADERPARAM_POINTLIGHTCOUNT, CB.PointLightCount);
-		targetComputer->Dispatch(PreRenderProcess_ComputeCluster::NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE, false);
+		context->BindRootSignature(mRootSignature);
+		context->BindShader(mShader);
+		context->BindConstantBuffer(0, CB); 
+		context->BindSturcturedBuffer(1, targetVisibleLightIndiciesSB);
+		context->BindSturcturedBuffer(2, targetLightGridSB);
+		context->BindSturcturedBuffer(3, pointLightsInfo.ByteData.data(), pointLightsInfo.Size, pointLightsInfo.Count);
+		context->BindSturcturedBuffer(4, mClusterSB);
+		context->Dispatch(
+			PreRenderProcess_ComputeCluster::NUM_X_SLICE, 
+			PreRenderProcess_ComputeCluster::NUM_Y_SLICE, 
+			PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
 	}
 	bool PreRenderProcess_LightCulling::IsCompelete()
 	{
@@ -50,44 +66,8 @@ namespace JG
 	{
 		return JGTYPE(PreRenderProcess_LightCulling);
 	}
-	bool PreRenderProcess_LightCulling::InitComputers()
-	{
-		if (mLightCullingComputers.empty() == false)
-		{
-			return true;
-		}
-	
-		auto shader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
-		if (shader == nullptr)
-		{
-			return false;
-		}
-
-
-		GraphicsHelper::InitComputer("LightCulling_Computer", shader, &mLightCullingComputers);
-		GraphicsHelper::InitStrucutredBuffer("LightSB", 1024, 48, &mLightSB);
-		GraphicsHelper::InitStrucutredBuffer("LightGridSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER, sizeof(Graphics::LightGrid), &mLightGridSB);
-		GraphicsHelper::InitStrucutredBuffer("VisibleLightIndiciesSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER * 64, sizeof(u32), &mVisibleLightIndiciesSB);
-
-
-		i32 index = 0;
-		for (auto& computer : mLightCullingComputers)
-		{
-			computer->SetUint(SHADERPARAM_NUM_X_SLICE, PreRenderProcess_ComputeCluster::NUM_X_SLICE);
-			computer->SetUint(SHADERPARAM_NUM_Y_SLICE, PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
-			computer->SetUint(SHADERPARAM_NUM_Z_SLICE, PreRenderProcess_ComputeCluster::NUM_Z_SLICE);
-			computer->SetStructuredBuffer(SHADERPARAM_POINTLIGHTS, mLightSB[index]);
-			computer->SetStructuredBuffer(SHADERPARAM_LIGHTGRIDS,  mLightGridSB[index]);
-			computer->SetStructuredBuffer(SHADERPARAM_VISIBLE_LIGHTINDICES, mVisibleLightIndiciesSB[index]);
-			index++;
-		}
-		return true;
-	}
 	void PreRenderProcess_LightCulling::SetClusters(SharedPtr<IStructuredBuffer> sb)
 	{
-		for (auto& computer : mLightCullingComputers)
-		{
-			computer->SetStructuredBuffer(SHADERPARAM_CLUSTERS, sb);
-		}
+		mClusterSB = sb;
 	}
 }

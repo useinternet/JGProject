@@ -12,10 +12,11 @@ namespace JG
 	private:
 		String mName;
 		SharedPtr<IGraphicsShader> mGraphicsShader;
+		
+
 		D3D12_BLEND_DESC           mBlendDesc;
 		D3D12_DEPTH_STENCIL_DESC   mDepthStencilDesc;
 		D3D12_RASTERIZER_DESC      mRasterzerDesc;
-
 
 		List<jbyte> mBtData;
 		List<jbyte> mUploadBtData;
@@ -23,12 +24,8 @@ namespace JG
 
 
 		Dictionary<String, CBPair> mCBDatas;
-		Dictionary<String, SharedPtr<ITexture>>    mTextures;
-		SortedDictionary<u64, SharedPtr<ITexture>> mSortedTextures;
-
-
+		Dictionary<String, SharedPtr<ITexture>> mTextures;
 		Dictionary<String, SharedPtr<ITexture>> mTextureCubes;
-		SortedDictionary<u64, SharedPtr<ITexture>> mSortedTextureCubes;
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
@@ -75,6 +72,14 @@ namespace JG
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
 		virtual bool IsValid() const override;
+		virtual List<SharedPtr<ITexture>> GetTextureList()	  const override;
+		virtual List<SharedPtr<ITexture>> GetCubeTextureList() const override;
+		virtual const List<jbyte>& GetMaterialPropertyByteData() override;
+
+
+
+
+		// 나중에 공용 Desc 로 변경 일단 Bind로 하자..(나중에 변경)
 		virtual bool Bind() override;
 		void Init(SharedPtr<IGraphicsShader> shader);
 	private:

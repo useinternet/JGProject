@@ -25,7 +25,7 @@ namespace JG
 			data.Type = DT_CBV;
 			break;
 		case EDescriptorTableRangeType::SRV:
-			data.Type = DT_UAV;
+			data.Type = DT_SRV;
 			break;
 		case EDescriptorTableRangeType::UAV:
 			data.Type = DT_UAV;

@@ -81,6 +81,7 @@ VS_OUT vs_main(VS_IN vin)
 
 float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 {
+
 	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
 	float alpha = output.albedo.a;
 
@@ -112,11 +113,12 @@ float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
 			Lo += CalcPointLight(N, V, material, pl);
 		}
 	}
-	for(int i = 0; i<_PointLightCount; ++i)
-	{
-		PointLight pl = _PointLightList[i];
-		Lo += CalcPointLight(N, V, material, pl);
-	}
+	
+	//for(int i = 0; i<_PointLightCount; ++i)
+	//{
+	//	PointLight pl = _PointLightList[i];
+	//	Lo += CalcPointLight(N, V, material, pl);
+	//}
 
 
 

@@ -2,68 +2,57 @@
 #include "PreRenderProcess_ComputeCluster.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/Renderer.h"
-
+#include "Graphics/RootSignature.h"
 #include "PreRenderProcess_LightCulling.h"
 
 namespace JG
 {
-	PreRenderProcess_ComputeCluster::PreRenderProcess_ComputeCluster()
+	void PreRenderProcess_ComputeCluster::Awake(const AwakeData& data)
 	{
-		auto shader   = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
-		if (shader != nullptr)
-		{
-			mComputer =  IComputer::Create("ClusterComputer", shader);
-			mClusterSB = IStructuredBuffer::Create("ClusterSB", sizeof(Cluster), NUM_CLUSTER);
-			mComputer->SetStructuredBuffer(SHADERPARAM_CLUSTERS, mClusterSB);
-			mComputer->SetUint(SHADERPARAM_NUM_X_SLICE, NUM_X_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Y_SLICE, NUM_Y_SLICE);
-			mComputer->SetUint(SHADERPARAM_NUM_Z_SLICE, NUM_Z_SLICE);
-		}
+		mShader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
+		SharedPtr<IRootSignatureCreater> rootSigCreater = IRootSignatureCreater::Create();
+
+		rootSigCreater->AddCBV(0, 0, 0);
+		rootSigCreater->AddUAV(1, 0, 0);
+
+		mRootSignature = rootSigCreater->Generate();
+		mClusterSB = IStructuredBuffer::Create("ClusterSB", sizeof(Cluster), NUM_CLUSTER);
 	}
-	void PreRenderProcess_ComputeCluster::Awake(Renderer* renderer)
+	void PreRenderProcess_ComputeCluster::Ready(const ReadyData& data)
 	{
-		
-
-	}
-	void PreRenderProcess_ComputeCluster::Ready(Renderer* renderer, IGraphicsAPI* api, Graphics::RenderPassData* rednerPassData, const RenderInfo& info)
-	{
-		rednerPassData->NumClusterSlice.x = NUM_X_SLICE;
-		rednerPassData->NumClusterSlice.y = NUM_Y_SLICE;
-		rednerPassData->NumClusterSlice.z = NUM_Z_SLICE;
-		rednerPassData->ClusterSize.x = (u32)std::ceilf(info.Resolution.x / (float)NUM_X_SLICE);
-		rednerPassData->ClusterSize.y = (u32)std::ceilf(info.Resolution.y / (float)NUM_Y_SLICE);
-		rednerPassData->ClusterScale  = (f32)NUM_Z_SLICE / std::log2f(info.FarZ / info.NearZ);
-		rednerPassData->ClusterBias   = -((f32)NUM_Z_SLICE * std::log2f(info.NearZ) / std::log2f(info.FarZ / info.NearZ));
+		data.pRenderPassData->NumClusterSlice.x = NUM_X_SLICE;
+		data.pRenderPassData->NumClusterSlice.y = NUM_Y_SLICE;
+		data.pRenderPassData->NumClusterSlice.z = NUM_Z_SLICE;
+		data.pRenderPassData->ClusterSize.x = (u32)std::ceilf(data.Info.Resolution.x / (float)NUM_X_SLICE);
+		data.pRenderPassData->ClusterSize.y = (u32)std::ceilf(data.Info.Resolution.y / (float)NUM_Y_SLICE);
+		data.pRenderPassData->ClusterScale  = (f32)NUM_Z_SLICE / std::log2f(data.Info.FarZ / data.Info.NearZ);
+		data.pRenderPassData->ClusterBias   = -((f32)NUM_Z_SLICE * std::log2f(data.Info.NearZ) / std::log2f(data.Info.FarZ / data.Info.NearZ));
 
 
 
-		if (CheckDirty(info) == false)
+		if (CheckDirty(data.Info) == false)
 		{
 			return;
 		}
 		mIsDirty = true;
 	
 
-		CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
-		CB.Resolution    = info.Resolution;
-		CB.FarZ			 = info.FarZ;
-		CB.NearZ		 = info.NearZ;
+		CB.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(data.Info.ProjMatrix));
+		CB.Resolution    = data.Info.Resolution;
+		CB.FarZ			 = data.Info.FarZ;
+		CB.NearZ		 = data.Info.NearZ;
 		CB.TileSize = JVector2(
-			info.Resolution.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
-			info.Resolution.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
-
-
-		mComputer->SetFloat4x4(SHADERPARAM_INVPROJMATRIX, CB.InvProjMatrix);
-		mComputer->SetFloat2(SHADERPARAM_RESOLUTION, CB.Resolution);
-		mComputer->SetFloat2(SHADERPARAM_TILESIZE, CB.TileSize);
-		mComputer->SetFloat(SHADERPARAM_NEARZ, CB.NearZ);
-		mComputer->SetFloat(SHADERPARAM_FARZ, CB.FarZ);
+			data.Info.Resolution.x / (f32)PreRenderProcess_ComputeCluster::NUM_X_SLICE,
+			data.Info.Resolution.y / (f32)PreRenderProcess_ComputeCluster::NUM_Y_SLICE);
+		CB.NumXSlice = NUM_X_SLICE;
+		CB.NumYSlice = NUM_Y_SLICE;
+		CB.NumZSlice = NUM_Z_SLICE;
 	}
-	void PreRenderProcess_ComputeCluster::Run(Renderer* renderer, IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
+	void PreRenderProcess_ComputeCluster::Run(const RunData& data)
 	{
 		if (mLightCullingProcess == nullptr)
 		{
-			mLightCullingProcess = renderer->FindProcess<PreRenderProcess_LightCulling>();
+			mLightCullingProcess = data.pRenderer->FindProcess<PreRenderProcess_LightCulling>();
 			if (mLightCullingProcess)
 			{
 				mLightCullingProcess->SetClusters(mClusterSB);
@@ -71,17 +60,20 @@ namespace JG
 		}
 
 
-		if (mComputer == nullptr || mIsDirty == false)
+		if (mIsDirty == false)
 		{
 			return;
 		}
-		mComputer->Dispatch(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE, false);
-		Scheduler::GetInstance().ScheduleOnceByFrame(JGGraphics::GetInstance().GetBufferCount() + 1, 0,
-			[&]()->EScheduleResult
-		{
-			mIsDirty = false;
-			return EScheduleResult::Break;
-		});
+		mIsDirty = false;
+
+
+		SharedPtr<IComputeContext> context = data.ComputeContext;
+		context->BindShader(mShader);
+		context->BindRootSignature(mRootSignature);
+		context->BindConstantBuffer(0, CB);
+		context->BindSturcturedBuffer(1, mClusterSB);
+		context->Dispatch(NUM_X_SLICE, NUM_Y_SLICE, NUM_Z_SLICE);
+
 	}
 
 	bool PreRenderProcess_ComputeCluster::IsCompelete()

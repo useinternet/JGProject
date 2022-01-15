@@ -9,6 +9,7 @@ namespace JG
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class IMaterial;
+	class IGraphicsShader;
 	class Render2DBatch : public RenderBatch
 	{
 	public:
@@ -29,7 +30,6 @@ namespace JG
 			SharedPtr<IMesh>         QuadMesh;
 			SharedPtr<IVertexBuffer> QuadVBuffer;
 			SharedPtr<IIndexBuffer>  QuadIBuffer;
-			SharedPtr<IMaterial> Standard2DMaterial;
 		};
 	private:
 		static const u32 MaxQuadCount = 1200;
@@ -47,7 +47,7 @@ namespace JG
 		List<u32>           mIndices;
 		List<SharedPtr<ITexture>> mTextureArray;
 		SharedPtr<ITexture>       mWhiteTexture;
-
+		SharedPtr<IGraphicsShader> m2DShader;
 		u64 mQuadCount = 0;
 		u64 mTextureCount = 0;
 

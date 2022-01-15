@@ -228,75 +228,71 @@ namespace JG
 		return mGraphicsShader != nullptr && mGraphicsShader->IsSuccessed();
 	}
 
+	List<SharedPtr<ITexture>> DirectX12Material::GetTextureList() const
+	{
+		if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
+		{
+			return List<SharedPtr<ITexture>>();
+		}
+		List<SharedPtr<ITexture>> texList;
+		DirectX12GraphicsShader*  pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
+		pDX12Shader->ForEach_TextureSlot([&](const String& name)
+		{
+			if (mTextures.find(name) == mTextures.end())
+			{
+				texList.push_back(nullptr);
+			}
+			else
+			{
+				texList.push_back(mTextures.at(name));
+			}
+
+
+		});
+		return texList;
+	}
+
+	List<SharedPtr<ITexture>> DirectX12Material::GetCubeTextureList() const
+	{
+		if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
+		{
+			return List<SharedPtr<ITexture>>();;
+		}
+		List<SharedPtr<ITexture>> texList;
+		DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
+		pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
+		{
+			if (mTextureCubes.find(name) == mTextureCubes.end())
+			{
+				texList.push_back(nullptr);
+			}
+			else
+			{
+				texList.push_back(mTextureCubes.at(name));
+			}
+		});
+		return texList;
+	}
+
+	const List<jbyte>& DirectX12Material::GetMaterialPropertyByteData()
+	{
+		{
+			std::lock_guard<std::mutex> lock(mMutex);
+			memcpy(mUploadBtData.data(), mBtData.data(), mBtData.size());
+		}
+		return mUploadBtData;
+	}
+
 	bool DirectX12Material::Bind()
 	{
 		if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
 		{
 			return false;
 		}
-		auto cmdList = DirectX12API::GetGraphicsCommandList();
 		auto pso = DirectX12API::GetGraphicsPipelineState();
 		pso->SetDepthStencilState(mDepthStencilDesc);
 		pso->SetBlendState(mBlendDesc);
 		pso->SetRasterizerState(mRasterzerDesc);
-
-		DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
-		pso->BindShader(*pDX12Shader);
-		{
-			std::lock_guard<std::mutex> lock(mMutex);
-			memcpy(mUploadBtData.data(), mBtData.data(), mBtData.size());
-		}
-
-		D3D12_CPU_DESCRIPTOR_HANDLE nullTexHandle = { ITexture::NullTexture()->GetTextureID() };
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> t_handles;
-		pDX12Shader->ForEach_TextureSlot([&](const String& name)
-		{
-			if (mTextures.find(name) == mTextures.end())
-			{
-				t_handles.push_back(nullTexHandle);
-			}
-			else
-			{
-				SharedPtr<ITexture> tex = mTextures[name];
-				if (tex == nullptr || tex->IsValid() == false)
-				{
-					t_handles.push_back(nullTexHandle);
-				}
-				else
-				{
-					auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-					t_handles.push_back(dx12Tex->GetSRV());
-				}
-			}
-
-
-		});
-
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> tc_handles;
-		pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
-		{
-			if (mTextureCubes.find(name) == mTextureCubes.end())
-			{
-				tc_handles.push_back(nullTexHandle);
-			}
-			else
-			{
-				SharedPtr<ITexture> tex = mTextureCubes[name];
-				if (tex == nullptr || tex->IsValid() == false)
-				{
-					tc_handles.push_back(nullTexHandle);
-				}
-				else
-				{
-					auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-					tc_handles.push_back(dx12Tex->GetSRV());
-				}
-			}
-		});
-
-		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURE2D, t_handles);
-		cmdList->BindTextures((u32)ShaderDefine::EGraphcisRootParam::TEXTURECUBE, tc_handles);
-		cmdList->BindConstantBuffer((u32)ShaderDefine::EGraphcisRootParam::CB_MATERIAL, mUploadBtData.data(), mUploadBtData.size());
 		return true;
 	}
 

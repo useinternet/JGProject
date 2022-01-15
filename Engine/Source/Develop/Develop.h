@@ -2,12 +2,13 @@
 #include "JGCore.h"
 #include "Application.h"
 #include "Class/Asset/Asset.h"
+#include "Graphics/GraphicsDefine.h"
+#include "Graphics/FrameBuffer.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 #include "Platform/Graphics/DirectX12/Utill/CommandList.h"
 #include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
 #include "Platform/Graphics/DirectX12/Utill/RayTracingHelper.h"
-#include "Graphics/GraphicsDefine.h"
-#include "Graphics/FrameBuffer.h"
+
 namespace JG
 {
 	/*
@@ -54,7 +55,7 @@ namespace JG
 	
 	
 	*/
-	class IFrameBuffer;
+	//class IFrameBuffer;
 	class Develop : public Application
 	{
 		List<SharedPtr<IFrameBuffer>> mFrameBuffers;

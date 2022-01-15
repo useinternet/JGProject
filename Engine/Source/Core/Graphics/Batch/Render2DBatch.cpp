@@ -38,10 +38,6 @@ namespace JG
 			rsc.QuadMesh->GetSubMesh(0)->SetVertexBuffer(rsc.QuadVBuffer);
 			rsc.QuadMesh->GetSubMesh(0)->SetIndexBuffer(rsc.QuadIBuffer);
 
-			rsc.Standard2DMaterial = IMaterial::Create("Standard2DMaterial", _2dShader);
-			rsc.Standard2DMaterial->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
-			rsc.Standard2DMaterial->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
-
 			mFrameResources[i] = rsc;
 		}
 
@@ -91,7 +87,10 @@ namespace JG
 		{
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->ClearRenderTarget({ mWhiteTexture }, nullptr);
+
+			SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+
+			context->ClearRenderTarget({ mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
@@ -175,35 +174,29 @@ namespace JG
 		auto api       = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		if (mCurrFrameResource->Standard2DMaterial->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind StandardMaterial");
-			StartBatch();
-			return;
-		}
+		SharedPtr<IGraphicsContext> context;
+		
 
-		api->SetTextures(mTextureArray);
-
-
+	
+	
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;
 		u32 quadIndexCount = mQuadCount * QuadIndexCount;
 
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
-		if (mCurrFrameResource->QuadMesh->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind QuadMesh");
-			StartBatch();
-			return;
-		}
-		if (mCurrFrameResource->QuadMesh->GetSubMesh(0)->Bind() == false)
-		{
-			JG_CORE_ERROR("Failed Bind QuadMesh");
-			StartBatch();
-			return;
-		}
-		api->DrawIndexed(quadIndexCount);
+
+
+	
+		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
+		context->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
+		context->SetInputLayout(mCurrFrameResource->QuadMesh->GetInputLayout());
+
+		context->BindShader(m2DShader);
+		context->BindTextures(Renderer::RootParam_Texture2D, mTextureArray);
+		context->BindVertexAndIndexBuffer(mCurrFrameResource->QuadVBuffer, mCurrFrameResource->QuadIBuffer);
+		context->DrawIndexed(quadIndexCount);
+
 		StartBatch();
 	}
 

@@ -37,8 +37,8 @@ namespace JG
 	public:
 		virtual bool SetData(const void* datas, u64 elementSize, u64 elementCount) = 0;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
-	protected:
-		virtual void Bind() = 0;
+		virtual u64 GetVertexCount() const = 0;
+		virtual u64 GetVertexSize() const = 0;
 	public:
 		static SharedPtr<IVertexBuffer> Create(const String& name, EBufferLoadMethod method);
 	};
@@ -54,7 +54,7 @@ namespace JG
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 		virtual u32 GetIndexCount() const = 0;
 	protected:
-		virtual void Bind() = 0;
+		//virtual void Bind() = 0;
 	public:
 		static SharedPtr<IIndexBuffer> Create(const String& name, EBufferLoadMethod method);
 	};

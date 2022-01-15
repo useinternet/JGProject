@@ -12,7 +12,6 @@ namespace JG
 	class IStructuredBuffer;
 	class IByteAddressBuffer;
 	class ITexture;
-	class IComputer;
 	class GraphicsHelper
 	{
 	public:
@@ -24,6 +23,5 @@ namespace JG
 		static void InitRenderTextures(const TextureInfo& info, const String& name, List<SharedPtr<ITexture>>* out_t_list);
 		static void InitByteAddressBuffer(const String& name, u64 elementCount, List<SharedPtr<IByteAddressBuffer>>* out_b_list);
 		static void InitStrucutredBuffer(const String& name, u64 elementCount, u64 elementSize, List<SharedPtr<IStructuredBuffer>>* out_sb_list);
-		static void InitComputer(const String& name, SharedPtr<IComputeShader> computeShader, List<SharedPtr<IComputer>>* out_c_list);
 	};
 }

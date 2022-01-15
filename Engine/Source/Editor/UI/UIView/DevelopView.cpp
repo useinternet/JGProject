@@ -39,46 +39,20 @@ namespace JG
 	void DevelopView::OnGUI()
 	{
 		ImGui::Begin("Develop", &mOpenGUI);
-		auto texID = (ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(ITexture::NullTexture()->GetTextureID());
-
-		ImGui::Columns(2, (const char*)this, true);
 
 
-		ImGui::SetColumnWidth(0, 975.0f);
-		ImGui::BeginChild("Devlop Image");
 
-		auto tex = RP_Global_Tex::Load(mSelectedTextureParamKey, mRenderParamManager).GetValue();
-		if (tex && tex->IsValid())
+
+
+
+
+		if (ImGui::CollapsingHeader("Statistics", ImGuiTreeNodeFlags_DefaultOpen) == true)
 		{
-			(ImTextureID)JGImGui::GetInstance().ConvertImGuiTextureID(tex->GetTextureID());
+			Statistics_OnGUI();
 		}
-
-		ImGui::Image(texID, ImVec2(960, 540));
-		ImGui::EndChild();
-
-
-
-
-
-		ImGui::NextColumn();
-
-
-
-
-
-		ImGui::BeginChild("Devlop Controll");
-		//if (ImGui::CollapsingHeader("Statistics", ImGuiTreeNodeFlags_DefaultOpen) == true)
-		//{
-		//	Statistics_OnGUI();
-		//}
 		Dev_OnGUI();
-		ImGui::EndChild();
-
-		
 
 
-
-		ImGui::Columns();
 		ImGui::End();
 		if (mOpenGUI == false)
 		{

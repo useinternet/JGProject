@@ -85,31 +85,4 @@ namespace JG
 			++index;
 		}
 	}
-
-	void GraphicsHelper::InitComputer(const String& name, SharedPtr<IComputeShader> computeShader, List<SharedPtr<IComputer>>* out_c_list)
-	{
-		if (out_c_list == nullptr)
-		{
-			return;
-		}
-		if (computeShader == nullptr || computeShader->IsSuccessed() == false)
-		{
-			return;
-		}
-
-
-		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		
-
-		List<SharedPtr<IComputer>>& c_list = *out_c_list;
-		c_list.resize(bufferCnt);
-
-
-		i32 index = 0;
-		for (auto& c : c_list)
-		{
-			c = IComputer::Create(name + "_" + std::to_string(index), computeShader);
-			++index;
-		}
-	}
 }

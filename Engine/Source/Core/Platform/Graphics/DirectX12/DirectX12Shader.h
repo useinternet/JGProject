@@ -82,7 +82,7 @@ namespace JG
 		String mName;
 		String			 mSourceCode;
 		bool			 mIsCompileSuccess = false;
-		SharedPtr<ShaderDataForm> mShaderDataForm;
+		//SharedPtr<ShaderDataForm> mShaderDataForm;
 	public:
 		const String& GetName() const override;
 		void SetName(const String& name);
@@ -90,9 +90,9 @@ namespace JG
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;
 	public:
-		SharedPtr<ShaderDataForm> GetShaderDataForm() const {
-			return mShaderDataForm;
-		}
+		//SharedPtr<ShaderDataForm> GetShaderDataForm() const {
+		//	return mShaderDataForm;
+		//}
 		ID3DBlob* GetCSData() const {
 			return mCSData.Get();
 		}

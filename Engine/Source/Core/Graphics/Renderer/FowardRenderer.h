@@ -6,11 +6,16 @@
 namespace JG
 {
 	class IReadBackBuffer;
+	class IRootSignature;
+	class IRootSignatureCreater;
 	class FowardRenderer : public Renderer
 	{
 		List<SharedPtr<ITexture>> mTargetTextures;
 		List<SharedPtr<ITexture>> mTargetDepthTextures;
 		List<SharedPtr<IStructuredBuffer>> mExposureSB;
+		SharedPtr<IRootSignature> mRootSignature;
+
+
 		JVector2 mPrevResolution;
 		Color    mPrevClearColor;
 

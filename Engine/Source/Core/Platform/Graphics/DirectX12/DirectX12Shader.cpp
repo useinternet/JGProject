@@ -324,12 +324,6 @@ namespace JG
 		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + "\n";
 		mSourceCode     = libCode + sourceCode;
 
-		mShaderDataForm = CreateSharedPtr<ShaderDataForm>();
-		if (mShaderDataForm->Set(mSourceCode) == false)
-		{
-			return false;
-		}
-
 		if (Compile(mCSData, mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), error) == true)
 		{
 			return true;
