@@ -19,6 +19,7 @@ namespace JG
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer) override;
 		virtual SharedPtr<IVertexBuffer> GetVertexBuffer() const override;
 		virtual SharedPtr<IIndexBuffer>  GetIndexBuffer() const override;
+		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() override;
 	public:
 		virtual void SetName(const String& name) override;
 		virtual const String& GetName() const override;

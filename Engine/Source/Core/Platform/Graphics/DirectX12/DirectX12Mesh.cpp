@@ -28,6 +28,11 @@ namespace JG
 		return mIndexBuffer;
 	}
 
+	SharedPtr<IBottomLevelAccelerationStructure> DirectX12SubMesh::GetBottomLevelAS()
+	{
+		return SharedPtr<IBottomLevelAccelerationStructure>();
+	}
+
 	void DirectX12SubMesh::SetName(const String& name)
 	{
 		mName = name;

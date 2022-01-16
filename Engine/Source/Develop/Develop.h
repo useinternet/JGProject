@@ -8,7 +8,10 @@
 #include "Platform/Graphics/DirectX12/Utill/CommandList.h"
 #include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
 #include "Platform/Graphics/DirectX12/Utill/RayTracingHelper.h"
-
+#include "Platform/Graphics/DirectX12/RayTracing/DirectX12RayTracingPipeline.h"
+#include "Platform/Graphics/DirectX12/DirectX12RootSignature.h"
+#include "Platform/Graphics/DirectX12/RayTracing/DirectX12BottomLevelAccelerationStructure.h"
+#include "Platform/Graphics/DirectX12/RayTracing/DirectX12TopLevelAccelerationStructure.h"
 namespace JG
 {
 	/*
@@ -87,24 +90,17 @@ namespace JG
 			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT3 color;
 		};
-		// DescriptorHeap Copy 해서
-		// UploadDirect 해서 STB 만들기
-		// 
 
-
-		SharedPtr<RootSignature>			mRaytracingRootSig;
-		ComPtr<ID3D12StateObject>			mRaytracingPipelineState;
-		ComPtr<ID3D12StateObjectProperties> mRaytracingPipelineStateProperties;
-		ComPtr<ID3D12Resource>              mRayGenerationSBT;
-		ComPtr<ID3D12Resource>              mHitSBT;
-		ComPtr<ID3D12Resource>              mMissSBT;
-		ComPtr<ID3D12Resource> mSBTBuffer;
-		AccelerationStructureBuffers mTriAS;
-		AccelerationStructureBuffers mSceneAS;
-		RayTracingShaderBindingTableGenerator mSBTGen;
+		//AccelerationStructureBuffers mTriAS;
+		//AccelerationStructureBuffers mSceneAS;
 		SharedPtr<IVertexBuffer> mVertexBuffer;
 		SharedPtr<IIndexBuffer>  mIndexBuffer;
 
+
+		SharedPtr<IRayTracingPipeline> mRaytracingPipeline;
+		SharedPtr<IRootSignature>      mGlobalRootSignature;
+		SharedPtr<ITopLevelAccelerationStructure> mSceneAS;
+		SharedPtr<IBottomLevelAccelerationStructure> mTriBLAS;
 	protected:
 		virtual void OpenImpl() override;
 		virtual void CloseImpl() override;

@@ -67,6 +67,7 @@ namespace JG
 		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
 		u64           GetBufferCount() const;
+		bool          IsSupportedRayTracing() const;
 		const JGGraphicsDesc& GetDesc() const;
 		void  Flush();
 	private:

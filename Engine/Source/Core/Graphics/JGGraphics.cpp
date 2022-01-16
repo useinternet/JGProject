@@ -90,6 +90,10 @@ namespace JG
 		}
 		return mGraphcisAPI->GetBufferCount();
 	}
+	bool JGGraphics::IsSupportedRayTracing() const
+	{
+		return mGraphcisAPI->IsSupportedRayTracing();
+	}
 	const JGGraphicsDesc& JGGraphics::GetDesc() const
 	{
 		return mDesc;

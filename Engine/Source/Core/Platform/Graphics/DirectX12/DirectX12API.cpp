@@ -8,7 +8,9 @@
 #include "DirectX12Material.h"
 #include "DirectX12Mesh.h"
 #include "DirectX12RootSignature.h"
-
+#include "RayTracing/DirectX12RayTracingPipeline.h"
+#include "RayTracing/DirectX12BottomLevelAccelerationStructure.h"
+#include "RayTracing/DirectX12TopLevelAccelerationStructure.h"
 
 
 #include "Utill/DirectX12Helper.h"
@@ -29,11 +31,11 @@ namespace JG
 	}
 	u64 DirectX12API::GetBufferCount() const
 	{
-		return GetFrameBufferCount();
+		return mFrameBufferCount;
 	}
 	u64 DirectX12API::GetBufferIndex() const 
 	{
-		return GetFrameBufferIndex();
+		return mFrameBufferIndex;
 	}
 	DirectX12API* DirectX12API::GetInstance()
 	{
@@ -60,14 +62,14 @@ namespace JG
 	{
 		return GetInstance()->mCopyCommandQueue.get();
 	}
-	u64	DirectX12API::GetFrameBufferCount()
-	{
-		return GetInstance()->mFrameBufferCount;
-	}
-	u64 DirectX12API::GetFrameBufferIndex()
-	{
-		return GetInstance()->mFrameBufferIndex;
-	}
+	//u64	DirectX12API::GetFrameBufferCount()
+	//{
+	//	return GetInstance()->mFrameBufferCount;
+	//}
+	//u64 DirectX12API::GetFrameBufferIndex()
+	//{
+	//	return GetInstance()->mFrameBufferIndex;
+	//}
 
 	DescriptorAllocation DirectX12API::RTVAllocate()
 	{
@@ -399,7 +401,7 @@ namespace JG
 			return false;
 		}
 		DXGI_ADAPTER_DESC1 adapterDesc = {};
-		mDevice = CreateD3DDevice(mFactory, false, &adapterDesc);
+		mDevice = CreateD3DDevice(mFactory, false, &adapterDesc, &mIsSupportedRayTracing);
 
 		if (mDevice)
 		{
@@ -461,6 +463,11 @@ namespace JG
 
 		mDevice.Reset();
 		mFactory.Reset();
+	}
+
+	bool DirectX12API::IsSupportedRayTracing() const
+	{
+		return mIsSupportedRayTracing;
 	}
 
 	void DirectX12API::BeginFrame()
@@ -917,6 +924,18 @@ namespace JG
 	SharedPtr<IRootSignatureCreater> DirectX12API::CreateRootSignatureCreater()
 	{
 		return CreateSharedPtr<DirectX12RootSignatureCreater>();
+	}
+	SharedPtr<IRayTracingPipeline> DirectX12API::CreateRayTracingPipeline()
+	{
+		return CreateSharedPtr<DirectX12RayTracingPipeline>();
+	}
+	SharedPtr<ITopLevelAccelerationStructure> DirectX12API::CreateTopLevelAccelerationStructure()
+	{
+		return CreateSharedPtr<DirectX12TopLevelAccelerationStructure>();
+	}
+	SharedPtr<IBottomLevelAccelerationStructure> DirectX12API::CreateBottomLevelAccelerationStructure()
+	{
+		return CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
 	}
 	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext()
 	{

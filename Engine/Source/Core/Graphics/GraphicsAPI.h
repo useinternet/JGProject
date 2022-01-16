@@ -20,7 +20,6 @@ namespace JG
 	class IIndexBuffer;
 	class IByteAddressBuffer;
 	class IStructuredBuffer;
-
 	class IGraphicsShader;
 	class IComputeShader;
 	class IShaderScript;
@@ -31,7 +30,11 @@ namespace JG
 	class IRootSignatureCreater;
 	class IReadBackBuffer;
 	class ISubMesh;
-	
+	class IRayTracingPipeline;
+	class IBottomLevelAccelerationStructure;
+	class ITopLevelAccelerationStructure;
+
+
 	struct TextureInfo;
 	struct FrameBufferInfo;
 
@@ -60,19 +63,15 @@ namespace JG
 		friend class JGGraphics;
 		virtual bool Create() = 0;
 		virtual void Destroy() = 0;
-
+		virtual bool IsSupportedRayTracing() const = 0;
 	public:
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame()	 = 0;
 		virtual void Flush() = 0;
 
-		// Create Resource
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;
 		virtual SharedPtr<IVertexBuffer>  CreateVertexBuffer(const String& name, EBufferLoadMethod method) = 0;
 		virtual SharedPtr<IIndexBuffer>   CreateIndexBuffer(const String& name, EBufferLoadMethod method) = 0;
-		
-
-
 		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount)   = 0;
 		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) = 0;
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
@@ -87,6 +86,12 @@ namespace JG
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() = 0;
 		virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
+
+
+		// RayTracing
+		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
+		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() = 0;
+		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() = 0;
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);
 		

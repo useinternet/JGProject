@@ -55,9 +55,14 @@ namespace JG
 		virtual u64 GetHitGroupStartAddr() const override;
 		virtual u64 GetHitGroupSectionSize() const override;
 		virtual u64 GetHitGroupEntrySize() const override;
+		virtual bool Generate() override;
 		virtual void Reset() override;
+	public:
+		ID3D12StateObject* GetPipelineState() const {
+			return mRaytracingPipelineState.Get();
+		}
 	private:
-		bool Generate();
+
 		IDxcBlob* CompileShaderLibrary(const String& filePath);
 	};
 

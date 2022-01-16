@@ -69,7 +69,7 @@ namespace JG
     }
     bool DirectX12RayTracingPipeline::IsValid()
     {
-        return Generate();
+        return mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr;
     }
 
     u64 DirectX12RayTracingPipeline::GetRayGenStartAddr() const
@@ -110,6 +110,7 @@ namespace JG
     {
         if (mRaytracingPipelineState == nullptr)
         {
+            mPipelineGen.SetRootSignature(mRaytracingRootSig->Get());
             mRaytracingPipelineState = mPipelineGen.Generate();
             mRaytracingPipelineState->QueryInterface(mRaytracingPipelineStateProperties.GetAddressOf());
         }
@@ -145,7 +146,7 @@ namespace JG
 
 
 
-        return mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr;
+        return IsValid();
     }
     void DirectX12RayTracingPipeline::Reset()
     {

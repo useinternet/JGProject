@@ -29,8 +29,9 @@ namespace JG
 		virtual u64 GetHitGroupStartAddr() const = 0;
 		virtual u64 GetHitGroupSectionSize() const = 0;
 		virtual u64 GetHitGroupEntrySize() const = 0;
+		virtual bool Generate() = 0;
 		virtual void Reset() = 0;
 	public:
-
+		static SharedPtr<IRayTracingPipeline> Create();
 	};
 }

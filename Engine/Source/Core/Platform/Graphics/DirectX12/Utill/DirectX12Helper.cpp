@@ -40,7 +40,8 @@ namespace JG
 	Microsoft::WRL::ComPtr<ID3D12Device5>  CreateD3DDevice(
 		Microsoft::WRL::ComPtr<IDXGIFactory4> factory,
 		bool is_UseWrapDevice,
-		DXGI_ADAPTER_DESC1* OutadapterDesc)
+		DXGI_ADAPTER_DESC1* OutadapterDesc,
+		bool* IsSupportedRayTracing)
 	{
 		HRESULT hr = S_OK;
 		if (is_UseWrapDevice)
@@ -63,7 +64,7 @@ namespace JG
 
 			DXGI_ADAPTER_DESC1 adapterDesc = {};
 			SIZE_T maxSize = 0;
-
+			
 			for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(Idx, &pAdapter); ++Idx)
 			{
 				DXGI_ADAPTER_DESC1 desc;
@@ -76,6 +77,10 @@ namespace JG
 					pAdapter->GetDesc1(&desc);
 					maxSize = desc.DedicatedVideoMemory;
 					adapterDesc = desc;
+					if (IsSupportedRayTracing)
+					{
+						*IsSupportedRayTracing = IsDirectXRaytracingSupported(pAdapter.Get());
+					}
 				}
 			}
 

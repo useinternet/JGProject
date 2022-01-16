@@ -10,6 +10,8 @@ namespace JG
 
 	bool DirectX12FrameBuffer::Init(const FrameBufferInfo& info)
 	{
+		u64 buffCount = DirectX12API::GetInstance()->GetBufferCount();
+		
 		mInfo = info;
 		mSwapChain = CreateDXGISwapChain(
 			(HWND)mInfo.Handle,
@@ -17,7 +19,7 @@ namespace JG
 			DirectX12API::GetGraphicsCommandQueue()->Get(),
 			ConvertDXGIFormat(mInfo.Format),
 			mInfo.Width, mInfo.Height,
-			(u32)DirectX12API::GetFrameBufferCount());
+			(u32)buffCount);
 
 
 		if (mSwapChain == nullptr)
@@ -25,9 +27,9 @@ namespace JG
 			JG_CORE_CRITICAL("Failed Create SwapChain in DirectX12RenderContext");
 			return false;
 		}
-		mBackBuffers.resize(DirectX12API::GetFrameBufferCount());
-		mRTVs.resize(DirectX12API::GetFrameBufferCount());
-		for (u64 i = 0; i < DirectX12API::GetFrameBufferCount(); ++i)
+		mBackBuffers.resize(buffCount);
+		mRTVs.resize(buffCount);
+		for (u64 i = 0; i < buffCount; ++i)
 		{
 			mRTVs[i] = DirectX12API::RTVAllocate();
 			mSwapChain->GetBuffer((u32)i, IID_PPV_ARGS(mBackBuffers[i].GetAddressOf()));
@@ -101,12 +103,12 @@ namespace JG
 
 	void DirectX12FrameBuffer::Resize(u32 width, u32 height)
 	{
-		
+		u64 buffCount = DirectX12API::GetInstance()->GetBufferCount();
 
 		if (mInfo.Width == width && mInfo.Height == height) return;
 		DirectX12API::GetGraphicsCommandQueue()->Flush();
 
-		for (u64 i = 0; i < DirectX12API::GetFrameBufferCount(); ++i)
+		for (u64 i = 0; i < buffCount; ++i)
 		{
 			mBackBuffers[i].Reset();
 		}
@@ -118,9 +120,9 @@ namespace JG
 
 		mInfo.Width  = desc.Width;
 		mInfo.Height = desc.Height;
-		mSwapChain->ResizeBuffers((u32)DirectX12API::GetFrameBufferCount(), desc.Width, desc.Height, desc.Format, desc.Flags);
+		mSwapChain->ResizeBuffers((u32)buffCount, desc.Width, desc.Height, desc.Format, desc.Flags);
 
-		for (u64 i = 0; i < DirectX12API::GetFrameBufferCount(); ++i)
+		for (u64 i = 0; i < buffCount; ++i)
 		{
 			mSwapChain->GetBuffer((u32)i, IID_PPV_ARGS(mBackBuffers[i].GetAddressOf()));
 			DirectX12API::GetD3DDevice()->CreateRenderTargetView(mBackBuffers[i].Get(), nullptr, mRTVs[i].CPU());

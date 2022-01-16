@@ -44,7 +44,7 @@ namespace JG
 {
 	ComPtr<IDXGIFactory4>   CreateDXGIFactory();
 	
-	ComPtr<ID3D12Device5>    CreateD3DDevice(ComPtr<IDXGIFactory4> factory, bool is_UseWrapDevice, DXGI_ADAPTER_DESC1* OutadapterDesc);
+	ComPtr<ID3D12Device5>    CreateD3DDevice(ComPtr<IDXGIFactory4> factory, bool is_UseWrapDevice, DXGI_ADAPTER_DESC1* OutadapterDesc, bool* IsSupportedRayTracing);
 	
 	ComPtr<IDXGISwapChain4> CreateDXGISwapChain(
 		HWND hWnd, ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12CommandQueue> cmdQue,
@@ -62,7 +62,15 @@ namespace JG
 	ComPtr<ID3D12RootSignature>  CreateD3DRootSignature(ComPtr<ID3D12Device> device,  CD3DX12_ROOT_SIGNATURE_DESC* DESC);
 
 
+	inline bool IsDirectXRaytracingSupported(IDXGIAdapter1* adapter)
+	{
+		ComPtr<ID3D12Device> testDevice;
+		D3D12_FEATURE_DATA_D3D12_OPTIONS5 featureSupportData = {};
 
+		return SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&testDevice)))
+			&& SUCCEEDED(testDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &featureSupportData, sizeof(featureSupportData)))
+			&& featureSupportData.RaytracingTier != D3D12_RAYTRACING_TIER_NOT_SUPPORTED;
+	}
 
 #ifdef _M_X64
 #define ENABLE_SSE_CRC32 1

@@ -15,7 +15,7 @@ namespace JG
 		mD3DCmdQueue = CreateD3DCommandQueue(DirectX12API::GetD3DDevice(), mD3DType);
 		mFenceValue.resize(bufferCount, 0);
 
-		auto bufferCnt = DirectX12API::GetFrameBufferCount();
+		auto bufferCnt = DirectX12API::GetInstance()->GetBufferCount();
 		for (u64 i = 0; i < bufferCnt; ++i)
 		{
 			mExcuteCmdLists[i]		  = SortedDictionary<std::thread::id, SharedPtr<CommandList>>();
@@ -33,8 +33,10 @@ namespace JG
 		std::lock_guard<std::mutex> lock(mMutex);
 		std::thread::id curr_thread_id = std::this_thread::get_id();
 
-		auto& CmdLists = mExcuteCmdLists[DirectX12API::GetFrameBufferIndex()];
-		auto& PendingCmdLists = mExcutePendingCmdLists[DirectX12API::GetFrameBufferIndex()];
+		u64 buffIndex = DirectX12API::GetInstance()->GetBufferIndex();
+
+		auto& CmdLists = mExcuteCmdLists[buffIndex];
+		auto& PendingCmdLists = mExcutePendingCmdLists[buffIndex];
 
 		if (CmdLists.find(curr_thread_id) == CmdLists.end())
 		{
@@ -58,7 +60,8 @@ namespace JG
 
 	void CommandQueue::Begin()
 	{
-		uint64_t value = mFenceValue[DirectX12API::GetFrameBufferIndex()];
+		u64 buffIndex = DirectX12API::GetInstance()->GetBufferIndex();
+		uint64_t value = mFenceValue[buffIndex];
 		mFence->WaitForFenceValue(value);
 	}
 
@@ -67,9 +70,9 @@ namespace JG
 		mIsCommandListExcute = true;
 		List<ID3D12CommandList*>   d3dCmdLists;
 		ResourceStateTracker::Lock();
-
-		auto& PendingCmdLists = mExcutePendingCmdLists[DirectX12API::GetFrameBufferIndex()];
-		for (auto cmdList : mExcuteCmdLists[DirectX12API::GetFrameBufferIndex()])
+		u64 buffIndex = DirectX12API::GetInstance()->GetBufferIndex();
+		auto& PendingCmdLists = mExcutePendingCmdLists[buffIndex];
+		for (auto cmdList : mExcuteCmdLists[buffIndex])
 		{
 			if (cmdList.second->IsClosing() == true) continue;
 			auto pendCmdList = PendingCmdLists[cmdList.first];
@@ -87,7 +90,7 @@ namespace JG
 
 		mFence->IncreaseValue();
 		mD3DCmdQueue->Signal(mFence->Get(), mFence->GetValue());
-		mFenceValue[DirectX12API::GetFrameBufferIndex()] = mFence->GetValue();
+		mFenceValue[buffIndex] = mFence->GetValue();
 		mIsCommandListExcute = false;
 	}
 

@@ -70,7 +70,7 @@ namespace JG
 
 	void DescriptorAllocator::CPUDescriptorPage::UpdatePage()
 	{
-		u64 frameBufferIndex = DirectX12API::GetFrameBufferIndex();
+		u64 frameBufferIndex = DirectX12API::GetInstance()->GetBufferIndex();
 		while (!PendingHandles[frameBufferIndex].empty())
 		{
 			AbandonedHandles.push(PendingHandles[frameBufferIndex].front());
@@ -81,7 +81,7 @@ namespace JG
 	void DescriptorAllocator::CPUDescriptorPage::Free(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 	{
 		lock_guard<mutex> lock(FreeMutex);
-		u64 frameBufferIndex = DirectX12API::GetFrameBufferIndex();
+		u64 frameBufferIndex = DirectX12API::GetInstance()->GetBufferIndex();
 
 		PendingHandles[frameBufferIndex].push(handle);
 	}

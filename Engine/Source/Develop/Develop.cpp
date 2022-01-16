@@ -1,17 +1,12 @@
 #include "pch.h"
 #include "Develop.h"
 #include "DevShader.h"
-#include "Platform/Graphics/DirectX12/Utill/DXRHelper.h"
-#include "Platform/Graphics/DirectX12/Utill/nv_helpers_dx12/BottomLevelASGenerator.h"
-#include "Platform/Graphics/DirectX12/Utill/nv_helpers_dx12/RaytracingPipelineGenerator.h"
-#include "Platform/Graphics/DirectX12/Utill/nv_helpers_dx12/RootSignatureGenerator.h"
-#include "Platform/Graphics/DirectX12/Utill/nv_helpers_dx12/ShaderBindingTableGenerator.h"
-#include "Platform/Graphics/DirectX12/Utill/nv_helpers_dx12/TopLevelASGenerator.h"
 #define SHADER_PATH(x) PathHelper::CombinePath(PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing"),x)
 namespace JG
 {
 	void Develop::OpenImpl()
 	{
+		mRaytracingPipeline = CreateSharedPtr<DirectX12RayTracingPipeline>();
 		Scheduler::GetInstance().Schedule(1.5f, 0.0f, -1, 0, [&]() -> EScheduleResult
 		{
 			try {
@@ -41,7 +36,7 @@ namespace JG
 		Init();
 		Load();
 
-		u32 index = DirectX12API::GetFrameBufferIndex();
+		u32 index = DirectX12API::GetInstance()->GetBufferIndex(); 
 		DirectX12Texture* targetTexture      = static_cast<DirectX12Texture*>(mRenderTextures[index].get());
 		DirectX12Texture* targetDepthTexture = static_cast<DirectX12Texture*>(mDepthTextures[index].get());
 
@@ -65,33 +60,30 @@ namespace JG
 		*dsvHandle = targetDepthTexture->GetDSV();
 
 
-		cmdList->BindRootSignature(mRaytracingRootSig);
+		cmdList->BindRootSignature(static_cast<DirectX12RootSignature*>(mGlobalRootSignature.get())->Get());
 		cmdList->BindTextures(0, { targetTexture->GetUAV() });
-		cmdList->BindStructuredBuffer(1, mSceneAS.pResult->GetGPUVirtualAddress());
-		cmdList->Get()->SetPipelineState1(mRaytracingPipelineState.Get());
+		cmdList->BindStructuredBuffer(1, static_cast<DirectX12TopLevelAccelerationStructure*>(mSceneAS.get())->GetResult()->GetGPUVirtualAddress());
+		cmdList->Get()->SetPipelineState1(static_cast<DirectX12RayTracingPipeline*>(mRaytracingPipeline.get())->GetPipelineState());
 
 
 		D3D12_DISPATCH_RAYS_DESC dispatchRays{};
-		dispatchRays.RayGenerationShaderRecord.StartAddress = mSBTBuffer->GetGPUVirtualAddress();
-		dispatchRays.RayGenerationShaderRecord.SizeInBytes  = mSBTGen.GetRayGenSectionSize();
+		dispatchRays.RayGenerationShaderRecord.StartAddress = mRaytracingPipeline->GetRayGenStartAddr();
+		dispatchRays.RayGenerationShaderRecord.SizeInBytes = mRaytracingPipeline->GetRayGenSectionSize();
 
-		dispatchRays.MissShaderTable.StartAddress = mSBTBuffer->GetGPUVirtualAddress() + mSBTGen.GetRayGenSectionSize();
-		dispatchRays.MissShaderTable.SizeInBytes = mSBTGen.GetMissSectionSize();
-		dispatchRays.MissShaderTable.StrideInBytes = mSBTGen.GetMissEntrySize();
+		dispatchRays.MissShaderTable.StartAddress = mRaytracingPipeline->GetMissStartAddr();
+		dispatchRays.MissShaderTable.SizeInBytes = mRaytracingPipeline->GetMissSectionSize();
+		dispatchRays.MissShaderTable.StrideInBytes = mRaytracingPipeline->GetMissEntrySize();
 
 
-		dispatchRays.HitGroupTable.StartAddress  = mSBTBuffer->GetGPUVirtualAddress() + mSBTGen.GetRayGenSectionSize() + mSBTGen.GetMissSectionSize();
-		dispatchRays.HitGroupTable.SizeInBytes   = mSBTGen.GetHitGroupSectionSize();
-		dispatchRays.HitGroupTable.StrideInBytes = mSBTGen.GetHitGroupEntrySize();
+		dispatchRays.HitGroupTable.StartAddress = mRaytracingPipeline->GetHitGroupStartAddr();
+		dispatchRays.HitGroupTable.SizeInBytes = mRaytracingPipeline->GetHitGroupSectionSize();
+		dispatchRays.HitGroupTable.StrideInBytes = mRaytracingPipeline->GetHitGroupEntrySize();
 
 		dispatchRays.Width = 1920;
 		dispatchRays.Height = 1080;
 		dispatchRays.Depth = 1;
 
 		cmdList->DispatchRays(dispatchRays);
-
-
-
 		mFrameBuffers[index]->SubmitTexture(mRenderTextures[index]);
 
 	}
@@ -113,7 +105,7 @@ namespace JG
 		JVector2Uint size = JVector2Uint(1920, 1080);
 
 
-		u32 buffCnt = DirectX12API::GetFrameBufferCount();
+		u32 buffCnt = DirectX12API::GetInstance()->GetBufferCount();
 		mFrameBuffers.resize(buffCnt);
 		mRenderTextures.resize(buffCnt);
 		mDepthTextures.resize(buffCnt);
@@ -186,77 +178,87 @@ namespace JG
 	void Develop::CreateBottomLevelAS()
 	{
 		ComputeCommandList* cmdList = DirectX12API::GetComputeCommandList();
+		SharedPtr<DirectX12ComputeContext> context = CreateSharedPtr<DirectX12ComputeContext>();
+		context->mCommandList = cmdList;
+		mTriBLAS = CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
+		mTriBLAS->Generate(context, mVertexBuffer, mIndexBuffer);
+
+		//auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
+		//auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
+
+		//u64 scratchSize = 0;
+		//u64 resultSize  = 0;
+
+		//BottomLevelASGenerator btASGen;
+		//btASGen.AddVertexBuffer(
+		//	dx12VBuffer->Get(), 0, 3, sizeof(Vertex),
+		//	dx12IBuffer->Get(), 0, 3, nullptr, 0);
+		//btASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize);
+
+		//HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&CD3DX12_RESOURCE_DESC::Buffer(scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+		//	D3D12_RESOURCE_STATE_COMMON,
+		//	nullptr,
+		//	IID_PPV_ARGS(mTriAS.pScratch.GetAddressOf()));
+
+		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&CD3DX12_RESOURCE_DESC::Buffer(resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+		//	D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
+		//	nullptr,
+		//	IID_PPV_ARGS(mTriAS.pResult.GetAddressOf()));
 
 
-		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
-		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
-
-		u64 scratchSize = 0;
-		u64 resultSize  = 0;
-
-		BottomLevelASGenerator btASGen;
-		btASGen.AddVertexBuffer(
-			dx12VBuffer->Get(), 0, 3, sizeof(Vertex),
-			dx12IBuffer->Get(), 0, 3, nullptr, 0);
-		btASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize);
-
-		HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-			D3D12_RESOURCE_STATE_COMMON,
-			nullptr,
-			IID_PPV_ARGS(mTriAS.pScratch.GetAddressOf()));
-
-		hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-			D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-			nullptr,
-			IID_PPV_ARGS(mTriAS.pResult.GetAddressOf()));
-
-
-		btASGen.Generate(cmdList, mTriAS.pScratch.Get(), mTriAS.pResult.Get());
+		//btASGen.Generate(cmdList, mTriAS.pScratch.Get(), mTriAS.pResult.Get());
 	}
 
 	void Develop::CreateTopLevelAS()
 	{
 		ComputeCommandList* cmdList = DirectX12API::GetComputeCommandList();
-
-		u64 scratchSize = 0;
-		u64 resultSize = 0;
-		u64 instanceSize = 0;
-		TopLevelASGenerator topASGen;
-		topASGen.AddInstance(mTriAS.pResult.Get(), JMatrix::Identity(), 0, 0);
-		topASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize, &instanceSize);
+		SharedPtr<DirectX12ComputeContext> context = CreateSharedPtr<DirectX12ComputeContext>();
+		context->mCommandList = cmdList;
 
 
-		HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(instanceSize + 1000, D3D12_RESOURCE_FLAG_NONE),
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(mSceneAS.pInstanceDesc.GetAddressOf()));
+		mSceneAS = CreateSharedPtr<DirectX12TopLevelAccelerationStructure>();
+		mSceneAS->AddInstance(mTriBLAS, JMatrix::Identity(), 0, 0);
+		mSceneAS->Generate(context);
+
+		//u64 scratchSize = 0;
+		//u64 resultSize = 0;
+		//u64 instanceSize = 0;
+		//TopLevelASGenerator topASGen;
+		//topASGen.AddInstance(mTriAS.pResult.Get(), JMatrix::Identity(), 0, 0);
+		//topASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize, &instanceSize);
 
 
-		hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(scratchSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-			D3D12_RESOURCE_STATE_COMMON,
-			nullptr,
-			IID_PPV_ARGS(mSceneAS.pScratch.GetAddressOf()));
+		//HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&CD3DX12_RESOURCE_DESC::Buffer(instanceSize + 1000, D3D12_RESOURCE_FLAG_NONE),
+		//	D3D12_RESOURCE_STATE_GENERIC_READ,
+		//	nullptr,
+		//	IID_PPV_ARGS(mSceneAS.pInstanceDesc.GetAddressOf()));
 
-		hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(resultSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-			D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-			nullptr,
-			IID_PPV_ARGS(mSceneAS.pResult.GetAddressOf()));
-		topASGen.Generate(cmdList, mSceneAS.pScratch.Get(), mSceneAS.pResult.Get(), mSceneAS.pInstanceDesc.Get());
+
+		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&CD3DX12_RESOURCE_DESC::Buffer(scratchSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+		//	D3D12_RESOURCE_STATE_COMMON,
+		//	nullptr,
+		//	IID_PPV_ARGS(mSceneAS.pScratch.GetAddressOf()));
+
+		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&CD3DX12_RESOURCE_DESC::Buffer(resultSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+		//	D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
+		//	nullptr,
+		//	IID_PPV_ARGS(mSceneAS.pResult.GetAddressOf()));
+		//topASGen.Generate(cmdList, mSceneAS.pScratch.Get(), mSceneAS.pResult.Get(), mSceneAS.pInstanceDesc.Get());
 	}
 
 
@@ -271,51 +273,25 @@ namespace JG
 		}
 		isInit = true;
 
-		// 루트 서명
-		mRaytracingRootSig = CreateSharedPtr<RootSignature>();
-		mRaytracingRootSig->InitAsDescriptorTable(D3D12_DESCRIPTOR_RANGE_TYPE::D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1024, 0, 0);
-		mRaytracingRootSig->InitAsSRV(0, 0);
-		mRaytracingRootSig->Finalize();
-
-
-
-		// 셰이더 컴파일
-		String shaderPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing");
-		auto pRayGeneration = nv_helpers_dx12::CompileShaderLibrary(StringHelper::s2ws(SHADER_PATH("RayGeneration.hlsli")).c_str());
-		auto pHitMiss		= nv_helpers_dx12::CompileShaderLibrary(StringHelper::s2ws(SHADER_PATH("HitMiss.hlsli")).c_str());
-
-
-
-		RayTracingPipelineGenerator pipelineGen;
-		pipelineGen.AddLibrary(pRayGeneration, { "RayGeneration" });
-		pipelineGen.AddLibrary(pHitMiss, { "Hit", "Miss" });
-		pipelineGen.AddHitGroup("HitGroup0", "Hit");
-		pipelineGen.SetRootSignature(mRaytracingRootSig->Get());
-		pipelineGen.SetMaxPayloadSize(sizeof(float[4]));
-		pipelineGen.SetMaxRecursionDepth(1);
-		mRaytracingPipelineState = pipelineGen.Generate();
-		mRaytracingPipelineState->QueryInterface(mRaytracingPipelineStateProperties.GetAddressOf());
-
-
-		mSBTGen.AddRayGenerationProgram(L"RayGeneration", {});
-		mSBTGen.AddMissProgram(L"Miss", {});
-		mSBTGen.AddHitGroup(L"HitGroup0", {});
+		SharedPtr<IRootSignatureCreater> creater = CreateSharedPtr<DirectX12RootSignatureCreater>();
+		creater->AddDescriptorTable(0, EDescriptorTableRangeType::UAV, 1024, 0, 0);
+		creater->AddSRV(1, 0, 0);
+		mGlobalRootSignature = creater->Generate();
 
 
 
 
-
-		HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(mSBTGen.ComputeSBTSize()),
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(mSBTBuffer.GetAddressOf()));
-
-
-		mSBTGen.Generate(mSBTBuffer.Get(), mRaytracingPipelineStateProperties.Get());
-
+		mRaytracingPipeline->AddLibrary(SHADER_PATH("RayGeneration.hlsli"), {"RayGeneration"});
+		mRaytracingPipeline->AddLibrary(SHADER_PATH("HitMiss.hlsli"), { "Hit", "Miss" });
+		mRaytracingPipeline->AddHitGroup("HitGroup0", "Hit", "", "");
+		mRaytracingPipeline->SetGlobalRootSignature(mGlobalRootSignature);
+		mRaytracingPipeline->SetMaxPayloadSize(sizeof(float[4]));
+		mRaytracingPipeline->SetMaxRecursionDepth(1);
+		mRaytracingPipeline->SetMaxAttributeSize(sizeof(float[2]));
+		mRaytracingPipeline->AddRayGenerationProgram("RayGeneration");
+		mRaytracingPipeline->AddMissProgram("Miss");
+		mRaytracingPipeline->AddHitProgram("HitGroup0");
+		mRaytracingPipeline->Generate();
 	}
 
 }

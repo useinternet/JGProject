@@ -47,7 +47,7 @@ namespace JG
 		auto platform    = window->GetPlatform();
 		auto handle      = window->GetHandle();
 		auto api = JGGraphics::GetInstance().GetDesc().GraphicsAPI;
-		auto bufferCount = DirectX12API::GetFrameBufferCount();
+		auto bufferCount = DirectX12API::GetInstance()->GetBufferCount();
 
 
 
@@ -96,12 +96,12 @@ namespace JG
 			DirectX12::gCommandAlloc = CreateD3DCommandAllocator(DirectX12API::GetD3DDevice(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 			DirectX12::gCommandList  = CreateD3DCommandList(DirectX12API::GetD3DDevice(), DirectX12::gCommandAlloc, D3D12_COMMAND_LIST_TYPE_DIRECT);
 			DirectX12::gCommandList->Close();
-			ImGui_ImplDX12_Init(DirectX12API::GetD3DDevice(), (i32)DirectX12API::GetFrameBufferCount(),
+			ImGui_ImplDX12_Init(DirectX12API::GetD3DDevice(), (i32)DirectX12API::GetInstance()->GetBufferCount(),
 				DXGI_FORMAT_R8G8B8A8_UNORM, DirectX12::gSrvDescriptorHeap.Get(),
 				DirectX12::gSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 				DirectX12::gSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-			DirectX12::gCurrentSrvIndex = (DirectX12::gMaxSrvCount * DirectX12API::GetFrameBufferIndex()) + DirectX12::gSrvStartIndex;
+			DirectX12::gCurrentSrvIndex = (DirectX12::gMaxSrvCount * DirectX12API::GetInstance()->GetBufferIndex()) + DirectX12::gSrvStartIndex;
 			DirectX12::gIncreaseSize    = DirectX12API::GetD3DDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
@@ -121,7 +121,7 @@ namespace JG
 				ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
 
 
-				DirectX12::gCurrentSrvIndex = (DirectX12::gMaxSrvCount * DirectX12API::GetFrameBufferIndex()) + DirectX12::gSrvStartIndex;
+				DirectX12::gCurrentSrvIndex = (DirectX12::gMaxSrvCount * DirectX12API::GetInstance()->GetBufferIndex()) + DirectX12::gSrvStartIndex;
 				return state;
 			});
 

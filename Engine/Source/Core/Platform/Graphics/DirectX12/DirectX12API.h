@@ -41,8 +41,8 @@ namespace JG
 		static CommandQueue*  GetGraphicsCommandQueue();
 		static CommandQueue*  GetComputeCommandQueue();
 		static CommandQueue*  GetCopyCommandQueue();
-		static u64			  GetFrameBufferCount();
-		static u64			  GetFrameBufferIndex();
+		//static u64			  GetFrameBufferCount();
+		//static u64			  GetFrameBufferIndex();
 
 
 		static DescriptorAllocation RTVAllocate();
@@ -81,6 +81,7 @@ namespace JG
 		// Application
 		virtual bool Create() override;
 		virtual void Destroy() override;
+		virtual bool IsSupportedRayTracing() const override;
 		// API
 		virtual void BeginFrame() override;
 		virtual void EndFrame()   override;
@@ -103,6 +104,11 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) override;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() override;
+		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() override;
+		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() override;
+		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() override;
+
+
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
 		virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
 	private:
@@ -110,7 +116,6 @@ namespace JG
 	
 		static DirectX12API* sm_DirectX12API;
 		
-
 		ComPtr<IDXGIFactory4> mFactory;
 		ComPtr<ID3D12Device5>  mDevice;
 		SharedPtr<DescriptorAllocator> mCSUAllocator;
@@ -144,6 +149,7 @@ namespace JG
 		std::mutex mDeviceMutex;
 
 
+		bool mIsSupportedRayTracing = false;
 		
 	};
 
@@ -191,7 +197,7 @@ namespace JG
 	class DirectX12ComputeContext : public IComputeContext
 	{
 		friend DirectX12GraphicsContext;
-
+	public:
 		ComputeCommandList*       mCommandList = nullptr;
 		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 	public:
