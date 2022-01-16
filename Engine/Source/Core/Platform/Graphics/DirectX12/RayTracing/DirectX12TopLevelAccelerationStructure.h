@@ -21,8 +21,10 @@ namespace JG
 		virtual ~DirectX12TopLevelAccelerationStructure();
 		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex) override;
 		virtual void Generate(SharedPtr<IComputeContext> context, bool onlyUpdate = false,  bool allowUpdate = false) override;
+		
 		virtual void Reset() override;
 	public:
+		void Clear();
 		ID3D12Resource* GetResult() const {
 			return mResult.Get();
 		}

@@ -22,6 +22,7 @@
 #include "Utill/ResourceStateTracker.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/RayTracing/Raytracer.h"
 namespace JG
 {
 	DirectX12API* DirectX12API::sm_DirectX12API = nullptr;
@@ -465,10 +466,6 @@ namespace JG
 		mFactory.Reset();
 	}
 
-	bool DirectX12API::IsSupportedRayTracing() const
-	{
-		return mIsSupportedRayTracing;
-	}
 
 	void DirectX12API::BeginFrame()
 	{
@@ -511,6 +508,10 @@ namespace JG
 		mCSUAllocator->UpdatePage();
 		mRTVAllocator->UpdatePage();
 		mRTVAllocator->UpdatePage();
+	}
+	bool DirectX12API::IsSupportedRayTracing() const
+	{
+		return mIsSupportedRayTracing;
 	}
 	void DirectX12API::Flush()
 	{
@@ -1336,7 +1337,7 @@ namespace JG
 	}
 
 	// 인터페이스 변경 함수
-	SharedPtr<IComputeContext> DirectX12GraphicsContext::QueryInterfaceAsComputeContext()
+	SharedPtr<IComputeContext> DirectX12GraphicsContext::QueryInterfaceAsComputeContext() const
 	{
 		if (mCacheComputeCommandList == nullptr)
 		{
@@ -1350,6 +1351,15 @@ namespace JG
 
 		return computeContex;
 	}
+	SharedPtr<ICopyContext>	   DirectX12GraphicsContext::QueryInterfaceAsCopyContext() const
+	{
+		SharedPtr<DirectX12CopyContext> copyContext = CreateSharedPtr<DirectX12CopyContext>();
+		copyContext->mCommandList = mCommandList;
+
+		return copyContext;
+	}
+
+
 	void DirectX12GraphicsContext::Reset()
 	{
 		mCommandList			 = nullptr;
@@ -1361,7 +1371,31 @@ namespace JG
 
 
 
+	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
 
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+
+		mCommandList->ClearUAVUint(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
+
+
+
+	}
+	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
+
+		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
+
+		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
+	}
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
 	{
 		if (rootSig == nullptr)
@@ -1413,31 +1447,7 @@ namespace JG
 
 		mCommandList->BindTextures(rootParam, handles);
 	}
-	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer)
-	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
-		{
-			return;
-		}
 
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
-
-		mCommandList->ClearUAVUint(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
-
-
-
-	}
-	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer)
-	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
-		{
-			return;
-		}
-
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
-
-		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
-	}
 
 	void DirectX12ComputeContext::BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize)
 	{
@@ -1487,7 +1497,15 @@ namespace JG
 		}
 		mCommandList->BindTextures(rootParam, handles);
 	}
-
+	void DirectX12ComputeContext::BindAccelerationStructure(u32 rootParam, SharedPtr<ITopLevelAccelerationStructure> as)
+	{
+		if (mCommandList == nullptr || as == nullptr)
+		{
+			return;
+		}
+		auto dx12AS = static_cast<DirectX12TopLevelAccelerationStructure*>(as.get());
+		mCommandList->BindStructuredBuffer(rootParam, dx12AS->GetResult()->GetGPUVirtualAddress());
+	}
 	void DirectX12ComputeContext::Dispatch1D(u32 ThreadCountX, u32 GroupSizeX)
 	{
 
@@ -1522,10 +1540,71 @@ namespace JG
 		mCommandList->BindPipelineState(pso);
 		mCommandList->Dispatch(groupX, groupY, groupZ);
 	}
+	void DirectX12ComputeContext::DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline)
+	{
+		if (DirectX12API::GetInstance()->IsSupportedRayTracing() == false)
+		{
+			return;
+		}
+		if (pipeline == nullptr || mCommandList == nullptr)
+		{
+			return;
+		}
+
+		DirectX12RayTracingPipeline* dx12Pipeline = static_cast<DirectX12RayTracingPipeline*>(pipeline.get());
+		mCommandList->BindPipelineState(dx12Pipeline->GetPipelineState());
+
+
+
+
+		D3D12_DISPATCH_RAYS_DESC dispatchRays{};
+
+		dispatchRays.RayGenerationShaderRecord.StartAddress = pipeline->GetRayGenStartAddr();
+		dispatchRays.RayGenerationShaderRecord.SizeInBytes = pipeline->GetRayGenSectionSize();
+
+		dispatchRays.MissShaderTable.StartAddress = pipeline->GetMissStartAddr();
+		dispatchRays.MissShaderTable.SizeInBytes = pipeline->GetMissSectionSize();
+		dispatchRays.MissShaderTable.StrideInBytes = pipeline->GetMissEntrySize();
+
+
+		dispatchRays.HitGroupTable.StartAddress = pipeline->GetHitGroupStartAddr();
+		dispatchRays.HitGroupTable.SizeInBytes = pipeline->GetHitGroupSectionSize();
+		dispatchRays.HitGroupTable.StrideInBytes = pipeline->GetHitGroupEntrySize();
+		dispatchRays.Width = width;
+		dispatchRays.Height = height;
+		dispatchRays.Depth = 1;
+
+		mCommandList->DispatchRays(dispatchRays);
+	}
 	void DirectX12ComputeContext::Reset()
 	{
 		mCommandList = nullptr;
 		mBindedRootSignature = nullptr;
 		mCommandList = DirectX12API::GetComputeCommandList();
+	}
+	SharedPtr<ICopyContext>	   DirectX12ComputeContext::QueryInterfaceAsCopyContext() const
+	{
+		SharedPtr<DirectX12CopyContext> copyContext = SharedPtr<DirectX12CopyContext>();
+		copyContext->mCommandList = mCommandList;
+
+		return copyContext;
+	}
+
+
+
+
+
+
+	void DirectX12CopyContext::CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount)
+	{
+		if (mCommandList == nullptr || datas == nullptr)
+		{
+			return;
+		}
+
+		DirectX12StructuredBuffer* dx12SB = static_cast<DirectX12StructuredBuffer*>(sb.get());
+
+		mCommandList->CopyBuffer(dx12SB->Get(), datas, elementSize, elementCount);
+
 	}
 }

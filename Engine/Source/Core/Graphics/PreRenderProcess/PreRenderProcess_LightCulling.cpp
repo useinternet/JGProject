@@ -51,7 +51,7 @@ namespace JG
 		context->BindConstantBuffer(0, CB); 
 		context->BindSturcturedBuffer(1, targetVisibleLightIndiciesSB);
 		context->BindSturcturedBuffer(2, targetLightGridSB);
-		context->BindSturcturedBuffer(3, pointLightsInfo.ByteData.data(), pointLightsInfo.Size, pointLightsInfo.Count);
+		context->BindSturcturedBuffer(3, pointLightsInfo.SB[data.Info.CurrentBufferIndex]);
 		context->BindSturcturedBuffer(4, mClusterSB);
 		context->Dispatch(
 			PreRenderProcess_ComputeCluster::NUM_X_SLICE, 

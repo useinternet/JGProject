@@ -32,7 +32,7 @@ StructuredBuffer<PointLight> _PointLightList : register(t0, space3);
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList : register(t0, space11);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t0, space12);
- 
+
 
 
 

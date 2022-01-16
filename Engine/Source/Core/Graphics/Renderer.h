@@ -24,6 +24,7 @@ namespace JG
 	class IGraphicsAPI;
 	class IGraphicsContext;
 	class IComputeContext;
+	class ICopyContext;
 	class InputLayout;
 	class IShader;
 	class ITexture;
@@ -102,8 +103,10 @@ namespace JG
 		struct LightInfo
 		{
 			i32 Count = 0;
-			u64 Size = 0;
-			List<jbyte> ByteData;
+			u64 Size  = 0;
+			List<i32> OriginCount;
+			List<SharedPtr<IStructuredBuffer>> SB;
+			//List<jbyte> ByteData;
 		};
 		struct ObjectInfo
 		{
@@ -119,11 +122,20 @@ namespace JG
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
-		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
-		RenderInfo mCurrentRenderInfo;
 
+
+		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
+
+
+
+		// RenderInfo
+		RenderInfo mRenderInfo;
+
+
+		// Context, ParamManager
 		SharedPtr<IGraphicsContext> mGraphicsContext;
 		SharedPtr<IComputeContext>  mComputeContext;
+		SharedPtr<ICopyContext> mCopyContext;
 		UniquePtr<RenderParamManager> mRenderParamManager;
 	public:
 		Renderer();

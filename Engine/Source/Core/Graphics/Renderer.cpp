@@ -4,6 +4,7 @@
 #include "JGGraphics.h"
 #include "Graphics/RenderBatch.h"
 #include "Graphics/RenderProcess.h"
+#include "Graphics/GraphicsHelper.h"
 #include "PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 namespace JG
 {
@@ -17,30 +18,57 @@ namespace JG
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-
-		mCurrentRenderInfo = info;
-		mLightInfos.clear();
-
+		u64 buffCount = api->GetBufferCount();
+		mRenderInfo = info;
 		// Context 초기화
 		mGraphicsContext = api->GetGraphicsContext();
 		mComputeContext  = mGraphicsContext->QueryInterfaceAsComputeContext();
+		mCopyContext	 = mGraphicsContext->QueryInterfaceAsCopyContext();
 
-		// Light Info 정보 수집
-		u64 pl_count = 0;
+
+		for (auto& _pair : mLightInfos)
+		{
+			_pair.second.Count = 0;
+		}
+
+
+
+		// Light Info 정보 수집 <- 나중에 라이트 매니저로 빼기
+		// Structured Buffer 사이즈 조절 고민
+		Dictionary<Graphics::ELightType, List<jbyte>> lightBtDic;
 		for (auto item : lightList)
 		{
+			Graphics::ELightType lightType = item->GetLightType();
+
+			if (mLightInfos.find(lightType) == mLightInfos.end())
+			{
+				mLightInfos[lightType].OriginCount.resize(buffCount);
+				mLightInfos[lightType].SB.resize(buffCount);
+			}
+
 			auto& info = mLightInfos[item->GetLightType()];
 			info.Count++;
 			info.Size = item->GetBtSize();
-			item->PushBtData(info.ByteData);
 
-			switch (item->GetLightType())
-			{
-			case Graphics::ELightType::PointLight:
-				++pl_count;
-				break;
-			}
+			auto& byteData = lightBtDic[item->GetLightType()];
+			item->PushBtData(byteData);
 		}
+		for (auto& _pair : lightBtDic)
+		{
+			Graphics::ELightType lightType = _pair.first;
+			void* lightData = _pair.second.data();
+			auto& lightInfo = mLightInfos[lightType];
+			if (lightInfo.OriginCount[info.CurrentBufferIndex] != lightInfo.Count)
+			{
+				lightInfo.OriginCount[info.CurrentBufferIndex] = lightInfo.Count;
+				mLightInfos[lightType].SB[info.CurrentBufferIndex] = IStructuredBuffer::Create("Light_SB", lightInfo.Size, lightInfo.Count);
+			}
+
+
+			mCopyContext->CopyBuffer(lightInfo.SB[info.CurrentBufferIndex], lightData, lightInfo.Size, lightInfo.Count);
+		}
+
+
 
 		// PassData  바인딩
 		// Light 정보 바인딩
@@ -52,7 +80,7 @@ namespace JG
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolution;
-		passData.PointLightCount = pl_count;
+		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].Count;
 
 		if (Debugger.Mode == ERenderDebugMode::Visible_ActiveCluster)
 		{
@@ -67,7 +95,7 @@ namespace JG
 		readyData.GraphicsContext = mGraphicsContext;
 		readyData.ComputeContext = mComputeContext;
 		readyData.pRenderPassData = &passData;
-		readyData.Info = mCurrentRenderInfo;
+		readyData.Info = mRenderInfo;
 		for (auto& preProcess : mPreProcessList)
 		{
 			preProcess->Ready(readyData);
@@ -84,7 +112,7 @@ namespace JG
 		context->BindConstantBuffer(RootParam_PassCB, passData);
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
-		context->BindSturcturedBuffer(RootParam_PointLight, lInfo.ByteData.data(), lInfo.Size, lInfo.Count);
+		context->BindSturcturedBuffer(RootParam_PointLight, lInfo.SB[info.CurrentBufferIndex]);
 
 		return BeginBatch(info, batchList);
 	}
@@ -117,7 +145,7 @@ namespace JG
 		runData.pRenderer = this;
 		runData.GraphicsContext = mGraphicsContext;
 		runData.ComputeContext	= mComputeContext;
-		runData.Info			= mCurrentRenderInfo;
+		runData.Info			= mRenderInfo;
 		runData.Result			= result;
 
 
@@ -141,7 +169,7 @@ namespace JG
 		}
 
 		// Render
-		RenderImpl(api, mCurrentRenderInfo, result);
+		RenderImpl(api, mRenderInfo, result);
 
 
 
@@ -173,7 +201,7 @@ namespace JG
 		mObjectInfoListDic.clear();
 		EndBatch();
 
-		CompeleteImpl(api, mCurrentRenderInfo, result);
+		CompeleteImpl(api, mRenderInfo, result);
 		return result;
 	}
 
@@ -213,7 +241,7 @@ namespace JG
 
 	const RenderInfo& Renderer::GetRenderInfo() const
 	{
-		return mCurrentRenderInfo;
+		return mRenderInfo;
 	}
 
 	const Dictionary<Graphics::ELightType, Renderer::LightInfo>& Renderer::GetLightInfos() const

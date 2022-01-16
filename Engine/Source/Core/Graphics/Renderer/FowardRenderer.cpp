@@ -3,6 +3,9 @@
 #include "Graphics/JGGraphics.h"
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
+#include "Graphics/RayTracing/RayTracingPipeline.h"
+#include "Graphics/RayTracing/TopLevelAccelerationStructure.h"
+#include "Graphics/RayTracing/BottomLevelAccelerationStructure.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 #include "Graphics/PreRenderProcess/PreRenderProcess_LightCulling.h"
 
@@ -16,6 +19,7 @@ namespace JG
 	{
 		InitProcesses();
 		InitGlobalRenderParams();
+		InitRayTracing();
 	}
 
 	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
@@ -149,6 +153,12 @@ namespace JG
 
 		AddPostProcess<PostProcess_Bloom>();
 		AddPostProcess<PostProcess_ToneMapping>();
+	}
+
+	void FowardRenderer::InitRayTracing()
+	{
+
+
 	}
 
 	void FowardRenderer::InitGlobalRenderParams()

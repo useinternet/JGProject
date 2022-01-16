@@ -107,7 +107,6 @@ namespace JG
 		void Draw(u32 vertexPerInstance, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0);
 
 		SharedPtr<ComputeCommandList> QueryInterfaceAsComputeCommandList();
-		//void AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action);
 	};
 
 	class ComputeCommandList : public CommandList
@@ -122,6 +121,7 @@ namespace JG
 		void ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource);
 		void BindRootSignature(SharedPtr<RootSignature> rootSig);
 		void BindPipelineState(SharedPtr<ComputePipelineState> pso);
+		void BindPipelineState(ID3D12StateObject* pso);
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
 		void BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
 		void BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize);

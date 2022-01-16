@@ -585,6 +585,10 @@ namespace JG
 		mBindedPipelineState = pso->Get();
 		mD3DCommandList->SetPipelineState(mBindedPipelineState.Get());
 	}
+	void ComputeCommandList::BindPipelineState(ID3D12StateObject* pso)
+	{
+		mD3DCommandList->SetPipelineState1(pso);
+	}
 	void ComputeCommandList::BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles)
 	{
 		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);

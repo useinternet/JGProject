@@ -10,6 +10,7 @@ namespace JG
 	class IIndexBuffer;
 	class StaticMeshAssetStock;
 	class IBottomLevelAccelerationStructure;
+	class IComputeContext;
 	class ISubMesh 
 	{
 	public:
@@ -29,7 +30,8 @@ namespace JG
 		virtual u32 GetInstanceCount() const	 = 0;
 
 		virtual bool IsValid() const			 = 0;
-		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() = 0;
+		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() const = 0;
+		virtual void SetBottomLevelAccelerationStructure(SharedPtr<IBottomLevelAccelerationStructure> bottomAS) = 0;
 	public:
 		static SharedPtr<ISubMesh> Create(const String& name);
 	};

@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "DirectX12Mesh.h"
-
-
 #include "DirectX12API.h"
+#include "RayTracing/DirectX12BottomLevelAccelerationStructure.h"
 #include "Utill/PipelineState.h"
 #include "Utill/CommandList.h"
 
@@ -28,9 +27,14 @@ namespace JG
 		return mIndexBuffer;
 	}
 
-	SharedPtr<IBottomLevelAccelerationStructure> DirectX12SubMesh::GetBottomLevelAS()
+	SharedPtr<IBottomLevelAccelerationStructure> DirectX12SubMesh::GetBottomLevelAS() const
 	{
-		return SharedPtr<IBottomLevelAccelerationStructure>();
+		return mBottomAS;
+	}
+
+	void DirectX12SubMesh::SetBottomLevelAccelerationStructure(SharedPtr<IBottomLevelAccelerationStructure> bottomAS)
+	{
+		mBottomAS = bottomAS;
 	}
 
 	void DirectX12SubMesh::SetName(const String& name)
@@ -58,9 +62,6 @@ namespace JG
 	{
 		return mVertexBuffer && mVertexBuffer->IsValid() && mIndexBuffer && mIndexBuffer->IsValid();
 	}
-
-
-
 
 	void DirectX12Mesh::AddMesh(SharedPtr<ISubMesh> subMesh)
 	{

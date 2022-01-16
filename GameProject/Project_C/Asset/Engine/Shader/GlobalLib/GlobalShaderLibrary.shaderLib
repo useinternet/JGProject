@@ -43,18 +43,15 @@ struct Cluster
 };
 
 
+
+
 SamplerState _PointWrap  : register(s0);
 SamplerState _LinearWrap : register(s1);
 SamplerState _AnisotropicWrap : register(s2);
-
 SamplerState _PointClamp  : register(s3);
 SamplerState _LinearClamp : register(s4);
 SamplerState _AnisotropicClamp : register(s5);
-
-
 SamplerState _LinearBorder_TB : register(s6);
-
-
 
 
 

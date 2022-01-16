@@ -117,6 +117,7 @@ namespace JG
 		void* mCPUData = nullptr;
 		u64 mElementSize  = 0;
 		u64 mElementCount = 0;
+		EBufferLoadMethod		mLoadMethod;
 		ComPtr<ID3D12Resource>  mD3DResource;
 	public:
 		virtual bool IsValid() const override;

@@ -21,6 +21,7 @@ namespace JG
 	class CommandQueue;
 	class DescriptorAllocation;
 	class DescriptorAllocator;
+	class CommandList;
 	class GraphicsCommandList;
 	class ComputeCommandList;
 	class CopyCommandList;
@@ -41,10 +42,6 @@ namespace JG
 		static CommandQueue*  GetGraphicsCommandQueue();
 		static CommandQueue*  GetComputeCommandQueue();
 		static CommandQueue*  GetCopyCommandQueue();
-		//static u64			  GetFrameBufferCount();
-		//static u64			  GetFrameBufferIndex();
-
-
 		static DescriptorAllocation RTVAllocate();
 		static DescriptorAllocation DSVAllocate();
 		static DescriptorAllocation CSUAllocate();
@@ -81,11 +78,12 @@ namespace JG
 		// Application
 		virtual bool Create() override;
 		virtual void Destroy() override;
-		virtual bool IsSupportedRayTracing() const override;
+
 		// API
 		virtual void BeginFrame() override;
 		virtual void EndFrame()   override;
 	public:
+		virtual bool IsSupportedRayTracing() const override;
 		virtual void Flush() override;
 	protected:
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& info) override;
@@ -159,7 +157,7 @@ namespace JG
 		GraphicsCommandList*      mCommandList         = nullptr;
 		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 
-		SharedPtr<ComputeCommandList> mCacheComputeCommandList = nullptr;
+		mutable SharedPtr<ComputeCommandList> mCacheComputeCommandList = nullptr;
 	public:
 		// 초기 셋팅 함수
 		virtual void ClearRenderTarget(const List<SharedPtr<ITexture>>&rtTextures, SharedPtr<ITexture> depthTexture) override;
@@ -188,7 +186,8 @@ namespace JG
 		virtual void Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation) override;
 
 		// 인터페이스 변경 함수
-		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() override;
+		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() const override;
+		virtual SharedPtr<ICopyContext>	   QueryInterfaceAsCopyContext() const override;
 	public:
 		virtual void Reset() override;
 	};
@@ -201,21 +200,32 @@ namespace JG
 		ComputeCommandList*       mCommandList = nullptr;
 		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 	public:
+		// Clear 함수
+		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
+		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
+
+
+		// Bind 함수
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
 		virtual void BindShader(SharedPtr<IComputeShader> shader) override;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) override;
-		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
-		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
+
 
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
+		virtual void BindAccelerationStructure(u32 rootParam, SharedPtr<ITopLevelAccelerationStructure> as) override;
+		// Dispatch 함수
 		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) override;
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) override;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) override;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
+		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline) override;
 		virtual void Reset() override;
+
+
+		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const override;
 	public:
 		ComputeCommandList* Get() const {
 			return mCommandList;
@@ -224,7 +234,14 @@ namespace JG
 
 
 
-
+	class DirectX12CopyContext : public ICopyContext
+	{
+		friend DirectX12GraphicsContext;
+		friend DirectX12ComputeContext;
+		CommandList* mCommandList = nullptr;
+	public:
+		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) override;
+	};
 
 
 

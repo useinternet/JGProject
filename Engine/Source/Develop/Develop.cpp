@@ -182,37 +182,6 @@ namespace JG
 		context->mCommandList = cmdList;
 		mTriBLAS = CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
 		mTriBLAS->Generate(context, mVertexBuffer, mIndexBuffer);
-
-		//auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(mVertexBuffer.get());
-		//auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(mIndexBuffer.get());
-
-		//u64 scratchSize = 0;
-		//u64 resultSize  = 0;
-
-		//BottomLevelASGenerator btASGen;
-		//btASGen.AddVertexBuffer(
-		//	dx12VBuffer->Get(), 0, 3, sizeof(Vertex),
-		//	dx12IBuffer->Get(), 0, 3, nullptr, 0);
-		//btASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize);
-
-		//HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&CD3DX12_RESOURCE_DESC::Buffer(scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-		//	D3D12_RESOURCE_STATE_COMMON,
-		//	nullptr,
-		//	IID_PPV_ARGS(mTriAS.pScratch.GetAddressOf()));
-
-		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&CD3DX12_RESOURCE_DESC::Buffer(resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-		//	D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-		//	nullptr,
-		//	IID_PPV_ARGS(mTriAS.pResult.GetAddressOf()));
-
-
-		//btASGen.Generate(cmdList, mTriAS.pScratch.Get(), mTriAS.pResult.Get());
 	}
 
 	void Develop::CreateTopLevelAS()
@@ -225,40 +194,6 @@ namespace JG
 		mSceneAS = CreateSharedPtr<DirectX12TopLevelAccelerationStructure>();
 		mSceneAS->AddInstance(mTriBLAS, JMatrix::Identity(), 0, 0);
 		mSceneAS->Generate(context);
-
-		//u64 scratchSize = 0;
-		//u64 resultSize = 0;
-		//u64 instanceSize = 0;
-		//TopLevelASGenerator topASGen;
-		//topASGen.AddInstance(mTriAS.pResult.Get(), JMatrix::Identity(), 0, 0);
-		//topASGen.ComputeASBufferSizes(false, &scratchSize, &resultSize, &instanceSize);
-
-
-		//HRESULT hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&CD3DX12_RESOURCE_DESC::Buffer(instanceSize + 1000, D3D12_RESOURCE_FLAG_NONE),
-		//	D3D12_RESOURCE_STATE_GENERIC_READ,
-		//	nullptr,
-		//	IID_PPV_ARGS(mSceneAS.pInstanceDesc.GetAddressOf()));
-
-
-		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&CD3DX12_RESOURCE_DESC::Buffer(scratchSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-		//	D3D12_RESOURCE_STATE_COMMON,
-		//	nullptr,
-		//	IID_PPV_ARGS(mSceneAS.pScratch.GetAddressOf()));
-
-		//hResult = DirectX12API::GetD3DDevice()->CreateCommittedResource(
-		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&CD3DX12_RESOURCE_DESC::Buffer(resultSize + 1000, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-		//	D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
-		//	nullptr,
-		//	IID_PPV_ARGS(mSceneAS.pResult.GetAddressOf()));
-		//topASGen.Generate(cmdList, mSceneAS.pScratch.Get(), mSceneAS.pResult.Get(), mSceneAS.pInstanceDesc.Get());
 	}
 
 

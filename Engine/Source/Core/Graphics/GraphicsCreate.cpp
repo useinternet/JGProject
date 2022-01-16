@@ -176,11 +176,6 @@ namespace JG
 	}
 
 
-
-
-
-
-
 	// ********************   Mesh.h   ******************** //
 	SharedPtr<ISubMesh> ISubMesh::Create(const String& name)
 	{

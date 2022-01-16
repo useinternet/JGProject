@@ -7,7 +7,7 @@ namespace JG
 {
 	DirectX12TopLevelAccelerationStructure::~DirectX12TopLevelAccelerationStructure()
 	{
-		Reset();
+		Clear();
 	}
 
 	void DirectX12TopLevelAccelerationStructure::AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex)
@@ -69,12 +69,17 @@ namespace JG
 
 	void DirectX12TopLevelAccelerationStructure::Reset()
 	{
+		mTopASGen = TopLevelASGenerator();
+	}
+
+	void DirectX12TopLevelAccelerationStructure::Clear()
+	{
 		DirectX12API::DestroyCommittedResource(mScratch);
 		DirectX12API::DestroyCommittedResource(mInstance);
 		DirectX12API::DestroyCommittedResource(mResult);
 
-		mScratchSize = 0;
-		mResultSize = 0;
+		mScratchSize  = 0;
+		mResultSize   = 0;
 		mInstanceSize = 0;
 		mTopASGen = TopLevelASGenerator();
 	}

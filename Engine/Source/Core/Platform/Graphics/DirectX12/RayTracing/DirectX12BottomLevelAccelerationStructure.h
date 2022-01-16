@@ -18,9 +18,8 @@ namespace JG
 		virtual ~DirectX12BottomLevelAccelerationsStructure();
 		virtual void Generate(
 			SharedPtr<IComputeContext> context, SharedPtr<IVertexBuffer> vBuffer, SharedPtr<IIndexBuffer> iBuffer, bool onlyUpdate = false, bool allowUpdate = false, bool isOpaque = true) override;
-		virtual void Reset() override;
-
 	public:
+		void Clear();
 		ID3D12Resource* GetResult() const {
 			return mResult.Get();
 		}

@@ -12,7 +12,7 @@ namespace JG
 
 	DirectX12BottomLevelAccelerationsStructure::~DirectX12BottomLevelAccelerationsStructure()
 	{
-		Reset();
+		Clear();
 	}
 
 	void DirectX12BottomLevelAccelerationsStructure::Generate(
@@ -68,8 +68,7 @@ namespace JG
 
 		btASGen.Generate(dx12Context->Get(), mScratch.Get(), mResult.Get(), onlyUpdate, (onlyUpdate == false) ? nullptr : mResult.Get());
 	}
-
-	void DirectX12BottomLevelAccelerationsStructure::Reset()
+	void DirectX12BottomLevelAccelerationsStructure::Clear()
 	{
 		DirectX12API::DestroyCommittedResource(mResult);
 		DirectX12API::DestroyCommittedResource(mScratch);

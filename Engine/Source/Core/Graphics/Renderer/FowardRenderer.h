@@ -8,6 +8,11 @@ namespace JG
 	class IReadBackBuffer;
 	class IRootSignature;
 	class IRootSignatureCreater;
+	class ITopLevelAccelerationStructure;
+	class IRayTracingPipeline;
+	class IBottomLevelAccelerationStructure;
+
+
 	class FowardRenderer : public Renderer
 	{
 		List<SharedPtr<ITexture>> mTargetTextures;
@@ -26,6 +31,9 @@ namespace JG
 		RP_Global_Float mExposure;
 		RP_Global_Float mInitialMinLog;
 		RP_Global_Float mInitialMaxLog;
+
+
+
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;
@@ -38,6 +46,8 @@ namespace JG
 	private:
 		void InitTextures(const JVector2& size, const Color& clearColor);
 		void InitProcesses();
+		void InitRayTracing();
 		void InitGlobalRenderParams();
+
 	};
 }

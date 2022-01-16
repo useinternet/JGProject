@@ -33,7 +33,7 @@ namespace JG
 	class IRayTracingPipeline;
 	class IBottomLevelAccelerationStructure;
 	class ITopLevelAccelerationStructure;
-
+	class RayTracer;
 
 	struct TextureInfo;
 	struct FrameBufferInfo;
@@ -50,6 +50,7 @@ namespace JG
 
 	class IGraphicsContext;
 	class IComputeContext;
+	class ICopyContext;
 	class IGraphicsAPI
 	{
 	public:
@@ -63,10 +64,11 @@ namespace JG
 		friend class JGGraphics;
 		virtual bool Create() = 0;
 		virtual void Destroy() = 0;
-		virtual bool IsSupportedRayTracing() const = 0;
+	
 	public:
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame()	 = 0;
+		virtual bool IsSupportedRayTracing() const = 0;
 		virtual void Flush() = 0;
 
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;
@@ -138,6 +140,8 @@ namespace JG
 			BindSturcturedBuffer(rootParam, datas.data(), sizeof(T), datas.size());
 		}
 
+
+
 		// 셋팅 함수
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
 		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) = 0;
@@ -149,7 +153,8 @@ namespace JG
 		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 
 		// 인터페이스 변경 함수
-		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() = 0;
+		virtual SharedPtr<IComputeContext>  QueryInterfaceAsComputeContext() const  = 0;
+		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const = 0;
 		virtual void Reset() = 0;
 	};
 
@@ -168,7 +173,7 @@ namespace JG
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
-
+		virtual void BindAccelerationStructure(u32 rootParam, SharedPtr<ITopLevelAccelerationStructure> as) = 0;
 		template<class T>
 		void BindConstantBuffer(u32 rootParam, const T& data)
 		{
@@ -190,10 +195,21 @@ namespace JG
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) = 0;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) = 0;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
+		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline) = 0;
 		virtual void Reset() = 0;
+
+		// 인터페이스 변경 함수
+		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const  = 0;
 	};
 
 
+	class ICopyContext
+	{
+	public:
+		virtual ~ICopyContext() = default;
+	public:
+		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) = 0;
+	};
 
 
 
