@@ -64,6 +64,10 @@ namespace JG
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 		}
+		if (mInstance == nullptr || mResult == nullptr || mScratch == nullptr)
+		{
+			return;
+		}
 		mTopASGen.Generate(dx12Context->Get(), mScratch.Get(), mResult.Get(), mInstance.Get(), onlyUpdate, (onlyUpdate == false) ? nullptr : mResult.Get());
 	}
 

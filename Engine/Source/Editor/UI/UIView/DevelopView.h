@@ -49,7 +49,7 @@ namespace JG
 		RenderParamManager* mRenderParamManager = nullptr;
 
 		// External,
-		String mSelectedTextureParamKey;
+		StorableString mSelectedTextureParamKey = StorableString("DevelopView/SelectedTextureParamKey", "Final");
 
 		Dictionary<String, RendererParamInfo>			    mRendererParmDic;
 		Dictionary<String, Dictionary<String, Param2Info>>	mParam2Dic;

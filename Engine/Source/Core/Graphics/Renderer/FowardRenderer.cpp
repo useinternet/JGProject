@@ -12,6 +12,7 @@
 #include "Graphics/PostRenderProcess/PostProcess_Bloom.h"
 #include "Graphics/PostRenderProcess/PostProcess_ToneMapping.h"
 #include "Graphics/Batch/Render2DBatch.h"
+#include "Graphics/RayTracing/Raytracer.h"
 namespace JG
 {
 
@@ -22,11 +23,15 @@ namespace JG
 		InitRayTracing();
 	}
 
-	void FowardRenderer::ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info)
+	void FowardRenderer::ReadyImpl(Graphics::RenderPassData* renderPassData, const RenderInfo& info)
 	{
+		if (mRayTracer != nullptr)
+		{
+			mRayTracer->Reset();
+		}
 		if (mRootSignature == nullptr)
 		{
-			auto creater = api->CreateRootSignatureCreater();
+			auto creater = IRootSignatureCreater::Create();
 			creater->AddSRV(RootParam_PointLight, 0, 3);
 			creater->AddCBV(RootParam_PassCB, 0, 0);
 			creater->AddCBV(RootParam_ObjectCB, 1, 0);
@@ -44,7 +49,7 @@ namespace JG
 			creater->AddSampler(6, ESamplerFilter::Linear, ETextureAddressMode::Border);
 			mRootSignature = creater->Generate();
 		}
-		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
 
 		context->BindRootSignature(mRootSignature);
 
@@ -82,7 +87,7 @@ namespace JG
 	
 	}
 
-	void FowardRenderer::RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
+	void FowardRenderer::RenderImpl(const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
@@ -91,7 +96,7 @@ namespace JG
 		{
 			return;
 		}
-		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
 		context->SetViewports({ Viewport(info.Resolution.x, info.Resolution.y) });
 		context->SetScissorRects({ ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
 		context->ClearRenderTarget({ targetTexture }, targetDepthTexture);
@@ -107,6 +112,39 @@ namespace JG
 
 				context->BindConstantBuffer(RootParam_ObjectCB, worldMatrix);
 				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
+
+
+
+				// RayTracing AS »ý¼º
+				if (mesh != nullptr && JGGraphics::GetInstance().IsSupportedRayTracing() && (info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
+				{
+					u32 subMeshCount = mesh->GetSubMeshCount();
+					for (i32 i = 0; i < subMeshCount; ++i)
+					{
+						SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
+
+						if (subMesh == nullptr)
+						{
+							continue;
+						}
+						SharedPtr<IBottomLevelAccelerationStructure> blas = subMesh->GetBottomLevelAS();
+
+						if (blas == nullptr)
+						{
+							blas = IBottomLevelAccelerationStructure::Create();
+							blas->Generate(GetComputeContext(),subMesh->GetVertexBuffer(), subMesh->GetIndexBuffer());
+							subMesh->SetBottomLevelAS(blas);
+						}
+						u64 instanceCount = subMesh->GetInstanceCount();
+						for (u64 insID = 0; insID < instanceCount; ++insID)
+						{
+							mRayTracer->AddInstance(blas, worldMatrix, insID, 0);
+						}
+
+					}
+				}
+	
+
 			}
 		});
 		if (result != nullptr)
@@ -114,9 +152,15 @@ namespace JG
 			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
 		}
 
+
+		if (mRayTracer)
+		{
+			mRayTracer->Execute(GetComputeContext());
+		}
+
 	}
 
-	void FowardRenderer::CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result)
+	void FowardRenderer::CompeleteImpl(const RenderInfo& info, SharedPtr<RenderResult> result)
 	{
 
 
@@ -144,6 +188,11 @@ namespace JG
 		mainTexInfo.Format = ETextureFormat::D24_Unorm_S8_Uint;
 		mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Foward_TargetDepthTexture", &mTargetDepthTextures);
+
+		if (mRayTracer != nullptr)
+		{
+			mRayTracer->SetResolution(size);
+		}
 	}
 
 	void FowardRenderer::InitProcesses()
@@ -157,6 +206,11 @@ namespace JG
 
 	void FowardRenderer::InitRayTracing()
 	{
+		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false)
+		{
+			return;
+		}
+		mRayTracer = CreateSharedPtr<RayTracer>(this);
 
 
 	}

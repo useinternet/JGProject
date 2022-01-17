@@ -20,6 +20,10 @@ namespace JG
 		bool onlyUpdate, bool allowUpdate, bool isOpaque)
 	{
 
+		if (context == nullptr || vBuffer == nullptr || iBuffer == nullptr)
+		{
+			return;
+		}
 		auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(vBuffer.get());
 		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(iBuffer.get());
 		auto dx12Context = static_cast<DirectX12ComputeContext*>(context.get());
@@ -28,7 +32,9 @@ namespace JG
 
 
 		BottomLevelASGenerator btASGen;
-		btASGen.AddVertexBuffer(dx12VBuffer->Get(), 0, dx12VBuffer->GetVertexCount(), dx12VBuffer->GetVertexSize(), nullptr, 0, isOpaque);
+		btASGen.AddVertexBuffer(
+			dx12VBuffer->Get(), 0, dx12VBuffer->GetVertexCount(), dx12VBuffer->GetVertexSize(), 
+			dx12IBuffer->Get(), 0, dx12IBuffer->GetIndexCount(), nullptr, 0, isOpaque);
 
 
 		u64 scratchSize = 0;

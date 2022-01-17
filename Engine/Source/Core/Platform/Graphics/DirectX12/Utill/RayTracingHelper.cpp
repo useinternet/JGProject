@@ -206,8 +206,6 @@ namespace JG
 		ID3D12Resource* indexBuffer, u64 indexOffsetInBytes, u32 indexCount,
 		ID3D12Resource* transformBuffer, u64 transformOffsetInBytes, bool isOpaque)
 	{
-		// Create the DX12 descriptor representing the input data, assumed to be
- // opaque triangles, with 3xf32 vertex coordinates and 32-bit indices
 		D3D12_RAYTRACING_GEOMETRY_DESC descriptor = {};
 		descriptor.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
 		descriptor.Triangles.VertexBuffer.StartAddress  = vertexBuffer->GetGPUVirtualAddress() + vertexOffsetInBytes;
@@ -352,8 +350,8 @@ namespace JG
 			instanceDescs[i].InstanceContributionToHitGroupIndex = mInstances[i].HitGroupIndex;
 			instanceDescs[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 
-			JMatrix m = JMatrix::Transpose(mInstances[i].Transform);
-			memcpy(instanceDescs[i].Transform, &m, sizeof(instanceDescs[i].Transform));
+			//JMatrix m = JMatrix::Transpose(mInstances[i].Transform);
+			memcpy(instanceDescs[i].Transform, &(mInstances[i].Transform), sizeof(instanceDescs[i].Transform));
 			instanceDescs[i].AccelerationStructure = mInstances[i].BottomLevelAS->GetGPUVirtualAddress();
 			instanceDescs[i].InstanceMask = 0xFF;
 		}

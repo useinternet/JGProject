@@ -31,7 +31,7 @@ namespace JG
 
 		virtual bool IsValid() const			 = 0;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() const = 0;
-		virtual void SetBottomLevelAccelerationStructure(SharedPtr<IBottomLevelAccelerationStructure> bottomAS) = 0;
+		virtual void SetBottomLevelAS(SharedPtr<IBottomLevelAccelerationStructure> bottomAS) = 0;
 	public:
 		static SharedPtr<ISubMesh> Create(const String& name);
 	};

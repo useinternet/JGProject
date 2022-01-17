@@ -95,6 +95,7 @@ namespace JG
 			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		}
 		sceneObject->WorldMatrix = JMatrix::Scaling(radius) * JMatrix::Translation(location);
+		sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
 		sceneObject->MaterialList.push_back(mMaterial);
 		sceneObject->Mesh = mMesh;
 		GetGameWorld()->PushRenderSceneObject(sceneObject);

@@ -2,6 +2,7 @@
 #include "DevelopView.h"
 #include "Application.h"
 #include "UI/UIManager.h"
+#include "UI/UIView/SceneView.h"
 #include "ExternalImpl/JGImGui.h"
 #include "Components/Camera.h"
 
@@ -54,6 +55,11 @@ namespace JG
 
 
 		ImGui::End();
+
+
+
+
+
 		if (mOpenGUI == false)
 		{
 			mOpenGUI = true;
@@ -106,23 +112,28 @@ namespace JG
 		{
 			if (ImGui::CollapsingHeader("[Render Texture]", ImGuiTreeNodeFlags_DefaultOpen) == true)
 			{
-				ImGui::Text("Current Texture : %s", mSelectedTextureParamKey.c_str());
-				if (ImGui::BeginCombo("##RenderTextureParamCombo", mSelectedTextureParamKey.c_str()) == true)
+				ImGui::Text("Current Texture : %s", mSelectedTextureParamKey.GetValue().c_str());
+				if (ImGui::BeginCombo("##RenderTextureParamCombo", mSelectedTextureParamKey.GetValue().c_str()) == true)
 				{
 					String selectedTextureParamKey;
 
+					if (ImGui::Selectable("Final",  "Final" == mSelectedTextureParamKey.GetValue()) == true)
+					{
+						selectedTextureParamKey = "Final";
+					}
+
 					mRenderParamManager->ForEach([&](const String& key, SharedPtr<ITexture> tex)
 					{
-						if (ImGui::Selectable(key.c_str(), key == mSelectedTextureParamKey) == true)
+						if (ImGui::Selectable(key.c_str(), key == mSelectedTextureParamKey.GetValue()) == true)
 						{
 							selectedTextureParamKey = key;
 						}
 					});
 					ImGui::EndCombo();
 
-					if (mSelectedTextureParamKey != selectedTextureParamKey)
+					if (mSelectedTextureParamKey.GetValue() != selectedTextureParamKey)
 					{
-						mSelectedTextureParamKey = selectedTextureParamKey;
+						mSelectedTextureParamKey.SetValue(selectedTextureParamKey);
 					}
 
 				}
@@ -131,7 +142,24 @@ namespace JG
 			{
 				RendererParams_OnGUI();
 			}
+
+			SceneView* sceneView = UIManager::GetInstance().GetUIView<SceneView>();
+			if (sceneView != nullptr)
+			{
+				if (mSelectedTextureParamKey.GetValue() == "Final")
+				{
+					sceneView->SetSceneTexture(nullptr);
+				}
+				else
+				{
+					sceneView->SetSceneTexture(RP_Global_Tex::Load(mSelectedTextureParamKey.GetValue(), mRenderParamManager).GetValue());
+				}
+			}
 		}
+
+
+
+
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();
 	}

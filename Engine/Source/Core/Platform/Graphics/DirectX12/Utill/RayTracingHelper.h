@@ -90,7 +90,7 @@ namespace JG
 				BottomLevelAS(blAS), Transform(tr), InstanceID(iID), HitGroupIndex(hgId) {}
 
 			ID3D12Resource* BottomLevelAS;
-			const JMatrix& Transform;
+			JMatrix Transform;
 			u32 InstanceID;
 			u32 HitGroupIndex;
 		};

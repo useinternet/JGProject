@@ -94,6 +94,9 @@ namespace JG
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 
 		virtual void OnEvent(IEvent& e) override;
+	public:
+		void                SetSceneTexture(SharedPtr<ITexture> sceneTexture);
+		SharedPtr<ITexture> GetSceneTexture() const;
 	private:
 		void OnGUI_Top();
 		void OnGUI_Bottom();
@@ -109,9 +112,6 @@ namespace JG
 	private:
 		void      SetSelectedGameNode(GameNode* gameNode);
 		GameNode* GetSelectedGameNode() const;
-
-		void                SetSceneTexture(SharedPtr<ITexture> sceneTexture);
-		SharedPtr<ITexture> GetSceneTexture() const;
 		TextureID GetIconTextureID(i32 iconEnum) const;
 		JVector2  GetFitSize(JVector2 originSize, f32 wratio, f32 hratio);
 	private:

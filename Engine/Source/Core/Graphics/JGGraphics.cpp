@@ -90,6 +90,14 @@ namespace JG
 		}
 		return mGraphcisAPI->GetBufferCount();
 	}
+	u64 JGGraphics::GetBufferIndex() const
+	{
+		if (mGraphcisAPI == nullptr)
+		{
+			return 0;
+		}
+		return mGraphcisAPI->GetBufferIndex();
+	}
 	bool JGGraphics::IsSupportedRayTracing() const
 	{
 		return mGraphcisAPI->IsSupportedRayTracing();
@@ -423,7 +431,7 @@ namespace JG
 							break;
 						case ESceneObjectType::Static:
 							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
-							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList);
+							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList, staticObj->Flags);
 							break;
 						// Skeletal
 						}

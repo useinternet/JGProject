@@ -32,7 +32,7 @@ namespace JG
 		return mBottomAS;
 	}
 
-	void DirectX12SubMesh::SetBottomLevelAccelerationStructure(SharedPtr<IBottomLevelAccelerationStructure> bottomAS)
+	void DirectX12SubMesh::SetBottomLevelAS(SharedPtr<IBottomLevelAccelerationStructure> bottomAS)
 	{
 		mBottomAS = bottomAS;
 	}

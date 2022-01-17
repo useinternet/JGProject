@@ -1,9 +1,28 @@
+struct PointLight
+{
+    float3 Position;
+    float  Range;
+    float3 Color;
+    float  AttRange;
+    float  Intensity;
+    float  Att0;
+    float  Att1;
+    float  Att2;
+};
 
 
 
 
-RaytracingAccelerationStructure gSceneAS : register(t0, space0);
 RWTexture2D<float4> gOutput : register(u0, space0);
+RaytracingAccelerationStructure gSceneAS : register(t0, space0);
+StructuredBuffer<PointLight> _PointLightList : register(t0, space1);
+
+
+float3 HitWorldPosition()
+{
+    return WorldRayOrigin() + RayTCurrent() * WorldRayDirection();
+}
+
 
 cbuffer CB : register(b0)
 {
@@ -14,6 +33,7 @@ cbuffer CB : register(b0)
 	float3 _EyePosition;
     float  _NearZ;
     float  _FarZ;
+    int    _PointLightCount;
 }
 
 
@@ -22,31 +42,27 @@ struct Payload
     float4 Color;
 };
 
-struct Built_in_attribute
+struct ShadowPayload
 {
-    float BaryX;
-    float BaryY;
+    bool Hit;
 };
 
 
 [shader("raygeneration")]
 void RayGeneration()
 {
-
     uint2 launchIndex = DispatchRaysIndex().xy;
-    uint2 dimensions = DispatchRaysDimensions().xy;
+    float2 dims = float2(DispatchRaysDimensions().xy);
+    float2 d = (((launchIndex.xy + 0.5f) / dims.xy) * 2.f - 1.f);
 
-    float2 ndc = ((((float2)launchIndex + 0.5f) / (float)dimensions) * 2.f - 1.f);
-
-
-    Payload payLoad;
+    Payload payload;
 
 
     RayDesc ray;
     ray.Origin = _EyePosition;
-    float4 target = mul(_InverseProjMatrix, float4(ndc.x, -ndc.y, 1, 1));
-    ray.Direction = mul(_InverseViewMatrix, float4(target.xyz, 0));
-    ray.TMin = _NearZ;
+    float4 target = mul(float4(d.x, -d.y, 1, 1), _InverseProjMatrix);
+    ray.Direction = mul(float4(target.xyz, 0), _InverseViewMatrix);
+    ray.TMin = 0;
     ray.TMax = _FarZ;
 
 
@@ -60,16 +76,45 @@ void RayGeneration()
         ray,
         payload);
 
-    gOutput[launchIndex] = payLoad.Color;
+    gOutput[launchIndex.xy] = payload.Color;
 
 }
 [shader("closesthit")]
-void ClosestHit(inout Payload hit, Built_in_attribute attribute)
+void ClosestHit(inout Payload payload, BuiltInTriangleIntersectionAttributes attribute)
 {
-    payLoad = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float3 worldPos = HitWorldPosition();
+
+
+    for(int i = 0; i<_PointLightCount; ++i)
+    {
+        PointLight pl = _PointLightList[i];
+        
+        float distance  = length(pl.Position - worldPos);
+        float direction = normalize(pl.Position - worldPos);
+
+        if(distance <= pl.Range)
+        {
+            ShadowPayload shadowPayload;
+            shadowPayload.Hit = true;
+            RayDesc shadowRay;
+            shadowRay.Origin = worldPos;
+            shadowRay.Direction = direction;
+            shadowRay.TMin = 0.01;
+            shadowRay.TMax = _FarZ;
+        }
+    }
+
+    payload.Color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 [shader("miss")]
-void Miss(inout Payload hit : SV_RayPayload)
+void Miss(inout Payload payload : SV_RayPayload)
 {
-    payLoad = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    payload.Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 }
+
+[shader("miss")]
+void ShadowMiss(inout ShadowPayload payload : SV_RayPayload)
+{
+    payload.Hit = false;
+}
+

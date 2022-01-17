@@ -218,6 +218,14 @@ namespace JG
 		dispatcher.Dispatch<NotifyDestroyJGObjectEvent>(EVENT_BIND_FN(&SceneView::ResponseDestroyGameObject));
 		dispatcher.Dispatch<NotifyChangeGameWorldEvent>(EVENT_BIND_FN(&SceneView::ResponseChangeGameWorld));
 	}
+	void SceneView::SetSceneTexture(SharedPtr<ITexture> sceneTexture)
+	{
+		mSceneTexture = sceneTexture;
+	}
+	SharedPtr<ITexture> SceneView::GetSceneTexture() const
+	{
+		return mSceneTexture;
+	}
 	void SceneView::OnGUI_Top()
 	{
 		ImGui::BeginChild("SceneView_Top",ImVec2(0, 43.0f), true);
@@ -235,9 +243,13 @@ namespace JG
 		winSize.y -= 18.0f;
 		SharedPtr<ITexture> sceneTexture = nullptr;
 		auto mainCam = Camera::GetMainCamera();
-		if (mainCam)
+		if (mainCam && (GetSceneTexture() == nullptr || GetSceneTexture()->IsValid() == false))
 		{
 			sceneTexture = mainCam->GetTexture();
+		}
+		else
+		{
+			sceneTexture = GetSceneTexture();
 		}
 		if (mainCam && sceneTexture && sceneTexture->IsValid())
 		{
@@ -575,14 +587,7 @@ namespace JG
 	{
 		return mSelectedGameNode;
 	}
-	void SceneView::SetSceneTexture(SharedPtr<ITexture> sceneTexture)
-	{
-		mSceneTexture = sceneTexture;
-	}
-	SharedPtr<ITexture> SceneView::GetSceneTexture() const
-	{
-		return mSceneTexture;
-	}
+
 	TextureID SceneView::GetIconTextureID(i32 iconEnum) const
 	{
 		if (mIcons[iconEnum] && mIcons[iconEnum]->Get() && mIcons[iconEnum]->Get()->IsValid())

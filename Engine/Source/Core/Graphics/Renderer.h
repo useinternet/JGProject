@@ -16,6 +16,7 @@ namespace JG
 		class Light;
 		class PointLight;
 		enum class ELightType;
+		enum class ESceneObjectFlags;
 	}
 }
 
@@ -113,6 +114,7 @@ namespace JG
 			JMatrix WorldMatrix;
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;
+			Graphics::ESceneObjectFlags Flags;
 		};
 
 	private:
@@ -142,15 +144,20 @@ namespace JG
 		virtual ~Renderer() = default;
 	public:
 		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
-		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList);
+		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList, Graphics::ESceneObjectFlags flags);
 		SharedPtr<RenderResult> End();
 		virtual ERendererPath GetRendererPath() const = 0;
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
 		void EndBatch();
+
+		SharedPtr<IGraphicsContext> GetGraphicsContext() const;
+		SharedPtr<IComputeContext>  GetComputeContext() const;
+		SharedPtr<ICopyContext>		GetCopyContext() const;
 	public:
 		RenderParamManager* GetRenderParamManager() const;
 		const RenderInfo&   GetRenderInfo() const;
+
 		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
 		const LightInfo& GetLightInfo(Graphics::ELightType type);
 		const SortedDictionary<int, List<Renderer::ObjectInfo>>& GetObjectInfoLists() const;
@@ -210,9 +217,9 @@ namespace JG
 			}
 		}
 	protected:
-		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
-		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
-		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
+		virtual void ReadyImpl(Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
+		virtual void RenderImpl(const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
+		virtual void CompeleteImpl(const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};
 }

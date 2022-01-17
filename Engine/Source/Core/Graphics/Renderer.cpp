@@ -88,7 +88,7 @@ namespace JG
 		}
 
 
-		ReadyImpl(api, &passData, info);
+		ReadyImpl( &passData, info);
 
 		IRenderProcess::ReadyData readyData;
 		readyData.pRenderer = this;
@@ -116,7 +116,7 @@ namespace JG
 
 		return BeginBatch(info, batchList);
 	}
-	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList)
+	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList, Graphics::ESceneObjectFlags flags)
 	{
 		if (mesh == nullptr || materialList.empty())
 		{
@@ -128,6 +128,7 @@ namespace JG
 		info.WorldMatrix = worldMatrix;
 		info.Mesh = mesh;
 		info.MaterialList = materialList;
+		info.Flags = flags;
 		i32 type = ArrangeObject(info);
 		mObjectInfoListDic[type].push_back(info);
 		
@@ -169,7 +170,7 @@ namespace JG
 		}
 
 		// Render
-		RenderImpl(api, mRenderInfo, result);
+		RenderImpl(mRenderInfo, result);
 
 
 
@@ -201,7 +202,7 @@ namespace JG
 		mObjectInfoListDic.clear();
 		EndBatch();
 
-		CompeleteImpl(api, mRenderInfo, result);
+		CompeleteImpl(mRenderInfo, result);
 		return result;
 	}
 
@@ -232,7 +233,18 @@ namespace JG
 		mBatchList.clear();
 	}
 
-
+	SharedPtr<IGraphicsContext> Renderer::GetGraphicsContext() const
+	{
+		return mGraphicsContext;
+	}
+	SharedPtr<IComputeContext> Renderer::GetComputeContext() const
+	{
+		return mComputeContext;
+	}
+	SharedPtr<ICopyContext> Renderer::GetCopyContext() const
+	{
+		return mCopyContext;
+	}
 
 	RenderParamManager* Renderer::GetRenderParamManager() const
 	{
@@ -249,15 +261,20 @@ namespace JG
 		return mLightInfos;
 	}
 
+
+
 	const Renderer::LightInfo& Renderer::GetLightInfo(Graphics::ELightType type)
 	{
 		return mLightInfos[type];
 	}
 
+
+
 	const SortedDictionary<int, List<Renderer::ObjectInfo>>& Renderer::GetObjectInfoLists() const
 	{
 		return mObjectInfoListDic;
 	}
+
 
 	void Renderer::ForEach(const std::function<void(Graphics::ELightType, const LightInfo&)>& action)
 	{

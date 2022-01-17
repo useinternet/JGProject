@@ -67,6 +67,7 @@ namespace JG
 		DebugGeometryDrawer* GetDebugGeometryDrawer() const;
 		IGraphicsAPI* GetGraphicsAPI() const;
 		u64           GetBufferCount() const;
+		u64			  GetBufferIndex() const;
 		bool          IsSupportedRayTracing() const;
 		const JGGraphicsDesc& GetDesc() const;
 		void  Flush();
@@ -117,6 +118,13 @@ namespace JG
 			Static,
 			Paper,
 			Debug,
+		};
+
+		ENUM_FLAG(ESceneObjectFlags)
+		enum class ESceneObjectFlags
+		{
+			None = 0,
+			Ignore_RayTracing_Bottom_Level_AS = 0x00001,
 		};
 
 
@@ -207,7 +215,9 @@ namespace JG
 		{
 		public:
 			JMatrix	WorldMatrix = JMatrix::Identity();
+			ESceneObjectFlags Flags = ESceneObjectFlags::None;
 			u64     Layer = 0;
+		
 		public:
 			virtual ~SceneObject() = default;
 		public:

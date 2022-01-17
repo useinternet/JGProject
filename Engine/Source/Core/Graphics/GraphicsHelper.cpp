@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GraphicsHelper.h"
 #include "JGGraphics.h"
+#include "RayTracing/TopLevelAccelerationStructure.h"
 #include "Shader.h"
 
 
@@ -22,6 +23,25 @@ namespace JG
 		}
 
 		return splitedName[0];
+	}
+	void GraphicsHelper::InitTopLevelAccelerationStructure(List<SharedPtr<ITopLevelAccelerationStructure>>* out_as_list)
+	{
+		if (out_as_list == nullptr)
+		{
+			return;
+		}
+
+
+		u32 bufferCnt = JGGraphics::GetInstance().GetBufferCount();
+
+		List<SharedPtr<ITopLevelAccelerationStructure>>& as_list = *out_as_list;
+		as_list.resize(bufferCnt);
+
+		i32 index = 0;
+		for (auto& as : as_list)
+		{
+			as = ITopLevelAccelerationStructure::Create();
+		}
 	}
 	void GraphicsHelper::InitRenderTextures(const TextureInfo& info, const String& name,  List<SharedPtr<ITexture>>* out_t_list)
 	{

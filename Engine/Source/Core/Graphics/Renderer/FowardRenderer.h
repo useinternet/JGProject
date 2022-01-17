@@ -5,14 +5,11 @@
 
 namespace JG
 {
-	class IReadBackBuffer;
 	class IRootSignature;
-	class IRootSignatureCreater;
-	class ITopLevelAccelerationStructure;
-	class IRayTracingPipeline;
-	class IBottomLevelAccelerationStructure;
+	class IReadBackBuffer;
+	class RayTracer;
 
-
+	
 	class FowardRenderer : public Renderer
 	{
 		List<SharedPtr<ITexture>> mTargetTextures;
@@ -33,15 +30,15 @@ namespace JG
 		RP_Global_Float mInitialMaxLog;
 
 
-
+		SharedPtr<RayTracer> mRayTracer;
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;
 	public:
 		virtual ERendererPath GetRendererPath() const override { return ERendererPath::Foward; }
-		virtual void ReadyImpl(IGraphicsAPI* api, Graphics::RenderPassData* renderPassData, const RenderInfo& info) override;
-		virtual void RenderImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) override;
-		virtual void CompeleteImpl(IGraphicsAPI* api, const RenderInfo& info, SharedPtr<RenderResult> result) override;
+		virtual void ReadyImpl(Graphics::RenderPassData* renderPassData, const RenderInfo& info) override;
+		virtual void RenderImpl(const RenderInfo& info, SharedPtr<RenderResult> result) override;
+		virtual void CompeleteImpl(const RenderInfo& info, SharedPtr<RenderResult> result) override;
 		virtual int ArrangeObject(const ObjectInfo& info) override;
 	private:
 		void InitTextures(const JVector2& size, const Color& clearColor);
