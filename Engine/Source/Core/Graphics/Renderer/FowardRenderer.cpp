@@ -3,6 +3,7 @@
 #include "Graphics/JGGraphics.h"
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
+#include "Graphics/Manager/LightManager.h"
 #include "Graphics/RayTracing/RayTracingPipeline.h"
 #include "Graphics/RayTracing/TopLevelAccelerationStructure.h"
 #include "Graphics/RayTracing/BottomLevelAccelerationStructure.h"
@@ -23,12 +24,13 @@ namespace JG
 		InitRayTracing();
 	}
 
-	void FowardRenderer::ReadyImpl(Graphics::RenderPassData* renderPassData, const RenderInfo& info)
+	void FowardRenderer::ReadyImpl(Graphics::RenderPassData* renderPassData)
 	{
 		if (mRayTracer != nullptr)
 		{
 			mRayTracer->Reset();
 		}
+		const RenderInfo& info = GetRenderInfo();
 		if (mRootSignature == nullptr)
 		{
 			auto creater = IRootSignatureCreater::Create();
@@ -87,8 +89,9 @@ namespace JG
 	
 	}
 
-	void FowardRenderer::RenderImpl(const RenderInfo& info, SharedPtr<RenderResult> result)
+	void FowardRenderer::RenderImpl(SharedPtr<RenderResult> result)
 	{
+		const RenderInfo& info = GetRenderInfo();
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
 
@@ -114,37 +117,10 @@ namespace JG
 				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
 
 
-
-				// RayTracing AS 持失
-				if (mesh != nullptr && JGGraphics::GetInstance().IsSupportedRayTracing() && (info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
+				if ((info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
 				{
-					u32 subMeshCount = mesh->GetSubMeshCount();
-					for (i32 i = 0; i < subMeshCount; ++i)
-					{
-						SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
-
-						if (subMesh == nullptr)
-						{
-							continue;
-						}
-						SharedPtr<IBottomLevelAccelerationStructure> blas = subMesh->GetBottomLevelAS();
-
-						if (blas == nullptr)
-						{
-							blas = IBottomLevelAccelerationStructure::Create();
-							blas->Generate(GetComputeContext(),subMesh->GetVertexBuffer(), subMesh->GetIndexBuffer());
-							subMesh->SetBottomLevelAS(blas);
-						}
-						u64 instanceCount = subMesh->GetInstanceCount();
-						for (u64 insID = 0; insID < instanceCount; ++insID)
-						{
-							mRayTracer->AddInstance(blas, worldMatrix, insID, 0);
-						}
-
-					}
+					UpdateBottomLevelAS(mesh, worldMatrix);
 				}
-	
-
 			}
 		});
 		if (result != nullptr)
@@ -153,14 +129,11 @@ namespace JG
 		}
 
 
-		if (mRayTracer)
-		{
-			mRayTracer->Execute(GetComputeContext());
-		}
+		UpdateRayTacing();
 
 	}
 
-	void FowardRenderer::CompeleteImpl(const RenderInfo& info, SharedPtr<RenderResult> result)
+	void FowardRenderer::CompeleteImpl(SharedPtr<RenderResult> result)
 	{
 
 
@@ -189,7 +162,7 @@ namespace JG
 		mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Foward_TargetDepthTexture", &mTargetDepthTextures);
 
-		if (mRayTracer != nullptr)
+		if (mRayTracer != nullptr && JGGraphics::GetInstance().IsSupportedRayTracing())
 		{
 			mRayTracer->SetResolution(size);
 		}
@@ -211,9 +184,9 @@ namespace JG
 			return;
 		}
 		mRayTracer = CreateSharedPtr<RayTracer>(this);
-
-
 	}
+
+
 
 	void FowardRenderer::InitGlobalRenderParams()
 	{
@@ -222,5 +195,51 @@ namespace JG
 		mInitialMaxLog = RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, GetRenderParamManager());
 	}
 
+	void FowardRenderer::UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix)
+	{
+		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false)
+		{
+			return;
+		}
+		if (mesh == nullptr)
+		{
+			return;
+		}
+		// RayTracing AS 持失
+		u32 subMeshCount = mesh->GetSubMeshCount();
+		for (i32 i = 0; i < subMeshCount; ++i)
+		{
+			SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
 
+			if (subMesh == nullptr)
+			{
+				continue;
+			}
+			SharedPtr<IBottomLevelAccelerationStructure> blas = subMesh->GetBottomLevelAS();
+
+			if (blas == nullptr)
+			{
+				blas = IBottomLevelAccelerationStructure::Create();
+				blas->Generate(GetComputeContext(), subMesh->GetVertexBuffer(), subMesh->GetIndexBuffer());
+				subMesh->SetBottomLevelAS(blas);
+			}
+			u64 instanceCount = subMesh->GetInstanceCount();
+			for (u64 insID = 0; insID < instanceCount; ++insID)
+			{
+				mRayTracer->AddInstance(blas, worldMatrix, insID, 0);
+			}
+
+		}
+
+
+	}
+	void FowardRenderer::UpdateRayTacing()
+	{
+		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false || mRayTracer ==nullptr)
+		{
+			return;
+		}
+
+		mRayTracer->Execute(GetComputeContext());
+	}
 }

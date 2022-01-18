@@ -4,8 +4,8 @@
 #include "Graphics/DebugGeometryDrawer.h"
 #include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/Renderer/FowardRenderer.h"
-#include "Graphics/Renderer/DeferredRenderer.h"
 #include "GraphicsHelper.h"
+#include "Graphics/Develop/RenderStatistics.h"
 #include "Application.h"
 
 namespace JG
@@ -157,7 +157,7 @@ namespace JG
 	void JGGraphics::Reset()
 	{
 		// Statics Reset
-		Renderer::Statistics.TotalObjectCount = 0;
+		Renderer::Statistics.TotalObjectCount   = 0;
 		Renderer::Statistics.CullingObjectCount = 0;
 		Renderer::Statistics.VisibleObjectCount = 0;
 	}
@@ -504,9 +504,6 @@ namespace JG
 			{
 			case ERendererPath::Foward:
 				mRenderer = CreateSharedPtr<FowardRenderer>();
-				break;
-			case ERendererPath::Deferred:
-				mRenderer = CreateSharedPtr<DeferredRenderer>();
 				break;
 			}
 		}

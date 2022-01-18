@@ -2,6 +2,7 @@
 #include "JGCore.h"
 #include "GraphicsDefine.h"
 #include "RenderParam.h"
+#include "Develop/RenderStatistics.h"
 namespace JG
 {
 	namespace Graphics
@@ -41,27 +42,8 @@ namespace JG
 	class IRenderProcess;
 	class IStructuredBuffer;
 	class IByteAddressBuffer;
-
-	class RenderStatistics
-	{
-	public:
-		i32 TotalObjectCount   = 0;
-		i32 VisibleObjectCount = 0;
-		i32 CullingObjectCount = 0;
-	};
-
-	enum class ERenderDebugMode
-	{
-		None,
-		Visible_ActiveCluster,
-	};
-	class RenderDebugger
-	{
-	public:
-		ERenderDebugMode Mode;
-	};
-
-
+	class LightManager;
+	class RenderStatistics;
 	class RenderInfo
 	{
 	public:
@@ -87,7 +69,6 @@ namespace JG
 	{
 	public:
 		static RenderStatistics Statistics;
-		static RenderDebugger   Debugger;
 		enum
 		{
 			RootParam_PointLight,
@@ -107,7 +88,6 @@ namespace JG
 			u64 Size  = 0;
 			List<i32> OriginCount;
 			List<SharedPtr<IStructuredBuffer>> SB;
-			//List<jbyte> ByteData;
 		};
 		struct ObjectInfo
 		{
@@ -118,14 +98,16 @@ namespace JG
 		};
 
 	private:
-		List<SharedPtr<RenderBatch>>	mBatchList;
+		// Batch , Process
+		List<SharedPtr<RenderBatch>>	  mBatchList;
 		Dictionary<Type, IRenderProcess*> mProcessPool;
 		List<SharedPtr<IRenderProcess>> mPreProcessList;
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
 
+
+
+		// Infos
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
-
-
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
 
 
@@ -134,11 +116,12 @@ namespace JG
 		RenderInfo mRenderInfo;
 
 
-		// Context, ParamManager
+		// Context, Managers
 		SharedPtr<IGraphicsContext> mGraphicsContext;
 		SharedPtr<IComputeContext>  mComputeContext;
-		SharedPtr<ICopyContext> mCopyContext;
+		SharedPtr<ICopyContext>		mCopyContext;
 		UniquePtr<RenderParamManager> mRenderParamManager;
+		UniquePtr<LightManager>		  mLightManager;
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
@@ -217,9 +200,9 @@ namespace JG
 			}
 		}
 	protected:
-		virtual void ReadyImpl(Graphics::RenderPassData* renderPassData, const RenderInfo& info) = 0;
-		virtual void RenderImpl(const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
-		virtual void CompeleteImpl(const RenderInfo& info, SharedPtr<RenderResult> result) = 0;
+		virtual void ReadyImpl(Graphics::RenderPassData* renderPassData) = 0;
+		virtual void RenderImpl(SharedPtr<RenderResult> result) = 0;
+		virtual void CompeleteImpl(SharedPtr<RenderResult> result) = 0;
 		virtual int  ArrangeObject(const ObjectInfo& info) = 0;
 	};
 }

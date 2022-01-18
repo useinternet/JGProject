@@ -131,7 +131,7 @@ namespace JG
 		class SceneInfo
 		{
 		public:
-			ERendererPath RenderPath = ERendererPath::Deferred;
+			ERendererPath RenderPath = ERendererPath::Foward;
 			JVector2 Resolution;
 
 			

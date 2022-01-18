@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Application.h"
 #include "JGGraphics.h"
+#include "Graphics/Manager/LightManager.h"
 #include "Graphics/RenderBatch.h"
 #include "Graphics/RenderProcess.h"
 #include "Graphics/GraphicsHelper.h"
@@ -9,22 +10,26 @@
 namespace JG
 {
 	RenderStatistics Renderer::Statistics;
-	RenderDebugger   Renderer::Debugger;
 	Renderer::Renderer()
 	{
 		mRenderParamManager = CreateUniquePtr<RenderParamManager>();
+		mLightManager		= CreateUniquePtr<LightManager>();
 	}
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+
 		u64 buffCount = api->GetBufferCount();
-		mRenderInfo = info;
+		
+
+
 		// Context 초기화
 		mGraphicsContext = api->GetGraphicsContext();
 		mComputeContext  = mGraphicsContext->QueryInterfaceAsComputeContext();
 		mCopyContext	 = mGraphicsContext->QueryInterfaceAsCopyContext();
-
+		mRenderInfo		 = info;
 
 		for (auto& _pair : mLightInfos)
 		{
@@ -82,13 +87,8 @@ namespace JG
 		passData.Resolution		= info.Resolution;
 		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].Count;
 
-		if (Debugger.Mode == ERenderDebugMode::Visible_ActiveCluster)
-		{
-			passData.DebugMode = (u32)ERenderDebugMode::Visible_ActiveCluster;
-		}
 
-
-		ReadyImpl( &passData, info);
+		ReadyImpl( &passData);
 
 		IRenderProcess::ReadyData readyData;
 		readyData.pRenderer = this;
@@ -170,7 +170,7 @@ namespace JG
 		}
 
 		// Render
-		RenderImpl(mRenderInfo, result);
+		RenderImpl(result);
 
 
 
@@ -202,7 +202,7 @@ namespace JG
 		mObjectInfoListDic.clear();
 		EndBatch();
 
-		CompeleteImpl(mRenderInfo, result);
+		CompeleteImpl(result);
 		return result;
 	}
 
