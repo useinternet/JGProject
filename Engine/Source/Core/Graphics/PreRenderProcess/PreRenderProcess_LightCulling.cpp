@@ -31,8 +31,8 @@ namespace JG
 
 
 		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
-		context->BindSturcturedBuffer(Renderer::RootParam_LightGrid, mLightGridSB[data.Info.CurrentBufferIndex]);
-		context->BindSturcturedBuffer(Renderer::RootParam_VisibleLightIndicies, mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[data.Info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex]);
 	}
 	void PreRenderProcess_LightCulling::Run(const RunData& data)
 	{

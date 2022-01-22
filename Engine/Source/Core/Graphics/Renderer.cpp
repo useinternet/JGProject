@@ -5,6 +5,7 @@
 #include "Graphics/Manager/LightManager.h"
 #include "Graphics/RenderBatch.h"
 #include "Graphics/RenderProcess.h"
+#include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
 #include "PreRenderProcess/PreRenderProcess_ComputeCluster.h"
 namespace JG
@@ -14,6 +15,7 @@ namespace JG
 	{
 		mRenderParamManager = CreateUniquePtr<RenderParamManager>();
 		mLightManager		= CreateUniquePtr<LightManager>();
+		InitRootSignature();
 	}
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
 	{
@@ -85,7 +87,7 @@ namespace JG
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolution;
-		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].Count;
+		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].OriginCount[info.CurrentBufferIndex];
 
 
 		ReadyImpl( &passData);
@@ -109,10 +111,10 @@ namespace JG
 
 
 		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
-		context->BindConstantBuffer(RootParam_PassCB, passData);
+		context->BindConstantBuffer((u32)ERootParam::PassCB, passData);
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
-		context->BindSturcturedBuffer(RootParam_PointLight, lInfo.SB[info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.SB[info.CurrentBufferIndex]);
 
 		return BeginBatch(info, batchList);
 	}
@@ -246,6 +248,16 @@ namespace JG
 		return mCopyContext;
 	}
 
+	SharedPtr<IRootSignature> Renderer::GetGraphicsRootSignature() const
+	{
+		return mGraphicsRootSignature;
+	}
+
+	SharedPtr<IRootSignature> Renderer::GetComputeRootSignature() const
+	{
+		return mComputeRootSignature;
+	}
+
 	RenderParamManager* Renderer::GetRenderParamManager() const
 	{
 		return mRenderParamManager.get();
@@ -299,5 +311,38 @@ namespace JG
 		{
 			action(_pair.first, _pair.second);
 		}
+	}
+	void Renderer::InitRootSignature()
+	{
+		//Graphics
+		{
+			auto creater = IRootSignatureCreater::Create();
+			creater->AddSRV((u32)ERootParam::PointLight, 0, 3);
+			creater->AddCBV((u32)ERootParam::PassCB, 0, 0);
+			creater->AddCBV((u32)ERootParam::ObjectCB, 1, 0);
+			creater->AddCBV((u32)ERootParam::MaterialCB, 2, 0);
+			creater->AddDescriptorTable((u32)ERootParam::Texture2D, EDescriptorTableRangeType::SRV, 1024, 0, 0);
+			creater->AddDescriptorTable((u32)ERootParam::TextureCube, EDescriptorTableRangeType::SRV, 1024, 0, 1);
+			creater->AddSRV((u32)ERootParam::LightGrid, 0, 11);
+			creater->AddSRV((u32)ERootParam::VisibleLightIndicies, 0, 12);
+			creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
+			creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
+			creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);
+			creater->AddSampler(3, ESamplerFilter::Point, ETextureAddressMode::Clamp);
+			creater->AddSampler(4, ESamplerFilter::Linear, ETextureAddressMode::Clamp);
+			creater->AddSampler(5, ESamplerFilter::Anisotropic, ETextureAddressMode::Clamp);
+			creater->AddSampler(6, ESamplerFilter::Linear, ETextureAddressMode::Border);
+			mGraphicsRootSignature = creater->Generate();
+		}
+		// Compute
+		{
+			auto creater = IRootSignatureCreater::Create();
+			creater->AddDescriptorTable((u32)EComputeRootParam::UAV, EDescriptorTableRangeType::UAV, 1024, 0, 0);
+			creater->AddDescriptorTable((u32)EComputeRootParam::SRV, EDescriptorTableRangeType::SRV, 1024, 0, 0);
+			creater->AddCBV((u32)EComputeRootParam::CB0, 0, 0);
+			mComputeRootSignature = creater->Generate();
+		}
+
+
 	}
 }

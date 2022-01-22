@@ -31,6 +31,7 @@ namespace JG
 	class IShader;
 	class ITexture;
 	class IMaterial;
+	class IRootSignature;
 	class IMesh;
 	class Application;
 	class Camera;
@@ -69,16 +70,24 @@ namespace JG
 	{
 	public:
 		static RenderStatistics Statistics;
-		enum
+		enum class ERootParam : u32
 		{
-			RootParam_PointLight,
-			RootParam_PassCB,
-			RootParam_ObjectCB,
-			RootParam_MaterialCB,
-			RootParam_Texture2D,
-			RootParam_TextureCube,
-			RootParam_LightGrid,
-			RootParam_VisibleLightIndicies,
+			PointLight,
+			PassCB,
+			ObjectCB,
+			MaterialCB,
+			Texture2D,
+			TextureCube,
+			LightGrid,
+			VisibleLightIndicies,
+		};
+
+
+		enum class EComputeRootParam : u32
+		{
+			UAV,
+			SRV,
+			CB0
 		};
 	protected:
 
@@ -122,6 +131,9 @@ namespace JG
 		SharedPtr<ICopyContext>		mCopyContext;
 		UniquePtr<RenderParamManager> mRenderParamManager;
 		UniquePtr<LightManager>		  mLightManager;
+
+		SharedPtr<IRootSignature> mGraphicsRootSignature;
+		SharedPtr<IRootSignature> mComputeRootSignature;
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
@@ -137,6 +149,9 @@ namespace JG
 		SharedPtr<IGraphicsContext> GetGraphicsContext() const;
 		SharedPtr<IComputeContext>  GetComputeContext() const;
 		SharedPtr<ICopyContext>		GetCopyContext() const;
+	public:
+		SharedPtr<IRootSignature> GetGraphicsRootSignature() const;
+		SharedPtr<IRootSignature> GetComputeRootSignature() const;
 	public:
 		RenderParamManager* GetRenderParamManager() const;
 		const RenderInfo&   GetRenderInfo() const;
@@ -199,6 +214,8 @@ namespace JG
 				return nullptr;
 			}
 		}
+	private:
+		void InitRootSignature();
 	protected:
 		virtual void ReadyImpl(Graphics::RenderPassData* renderPassData) = 0;
 		virtual void RenderImpl(SharedPtr<RenderResult> result) = 0;

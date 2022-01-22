@@ -408,7 +408,7 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition = mSceneInfo.EyePos;
 				info.ClearColor  = mSceneInfo.ClearColor;
-
+				info.CurrentBufferIndex = mCurrentIndex;
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
 

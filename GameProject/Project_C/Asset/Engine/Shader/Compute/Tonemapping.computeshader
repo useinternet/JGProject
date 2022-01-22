@@ -2,7 +2,7 @@
 // Bloom
 StructuredBuffer<float> Exposure;
 Texture2D Bloom;
-Texture2D SrcColor;
+
 RWTexture2D<float3> DestColor;
 RWTexture2D<float>  OutLuma;
 

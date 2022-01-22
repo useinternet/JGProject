@@ -31,29 +31,10 @@ namespace JG
 			mRayTracer->Reset();
 		}
 		const RenderInfo& info = GetRenderInfo();
-		if (mRootSignature == nullptr)
-		{
-			auto creater = IRootSignatureCreater::Create();
-			creater->AddSRV(RootParam_PointLight, 0, 3);
-			creater->AddCBV(RootParam_PassCB, 0, 0);
-			creater->AddCBV(RootParam_ObjectCB, 1, 0);
-			creater->AddCBV(RootParam_MaterialCB, 2, 0);
-			creater->AddDescriptorTable(RootParam_Texture2D, EDescriptorTableRangeType::SRV, 1024, 0, 0);
-			creater->AddDescriptorTable(RootParam_TextureCube, EDescriptorTableRangeType::SRV, 1024, 0, 1);
-			creater->AddSRV(RootParam_LightGrid, 0, 11);
-			creater->AddSRV(RootParam_VisibleLightIndicies, 0, 12);
-			creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
-			creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
-			creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);
-			creater->AddSampler(3, ESamplerFilter::Point, ETextureAddressMode::Clamp);
-			creater->AddSampler(4, ESamplerFilter::Linear, ETextureAddressMode::Clamp);
-			creater->AddSampler(5, ESamplerFilter::Anisotropic, ETextureAddressMode::Clamp);
-			creater->AddSampler(6, ESamplerFilter::Linear, ETextureAddressMode::Border);
-			mRootSignature = creater->Generate();
-		}
+
 		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
 
-		context->BindRootSignature(mRootSignature);
+		context->BindRootSignature(GetGraphicsRootSignature());
 
 
 
@@ -91,6 +72,9 @@ namespace JG
 
 	void FowardRenderer::RenderImpl(SharedPtr<RenderResult> result)
 	{
+
+		UpdateRayTacing();
+
 		const RenderInfo& info = GetRenderInfo();
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
@@ -113,24 +97,14 @@ namespace JG
 				auto& materialList = info.MaterialList;
 				auto& worldMatrix  = JMatrix::Transpose(info.WorldMatrix);
 
-				context->BindConstantBuffer(RootParam_ObjectCB, worldMatrix);
+				context->BindConstantBuffer((u32)ERootParam::ObjectCB, worldMatrix);
 				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
-
-
-				if ((info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
-				{
-					UpdateBottomLevelAS(mesh, worldMatrix);
-				}
 			}
 		});
 		if (result != nullptr)
 		{
 			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
 		}
-
-
-		UpdateRayTacing();
-
 	}
 
 	void FowardRenderer::CompeleteImpl(SharedPtr<RenderResult> result)
@@ -240,6 +214,19 @@ namespace JG
 			return;
 		}
 
+		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
+		{
+			for (auto& info : objectList)
+			{
+				auto mesh = info.Mesh;
+				auto& worldMatrix = JMatrix::Transpose(info.WorldMatrix);
+
+				if ((info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
+				{
+					UpdateBottomLevelAS(mesh, worldMatrix);
+				}
+			}
+		});
 		mRayTracer->Execute(GetComputeContext());
 	}
 }

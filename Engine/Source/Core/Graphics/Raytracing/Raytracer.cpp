@@ -9,6 +9,8 @@
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/Compute/FloatAccumulater.h"
+#include "Graphics/Compute/Blur.h"
 
 #define SHADER_PATH(x) PathHelper::CombinePath(PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing"),x)
 
@@ -61,14 +63,43 @@ namespace JG
 		mSceneAS[currentIndex]->Generate(context);
 
 
+		auto lInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
+
+
+
 		context->BindRootSignature(mGlobalRootSignature);
 		// Output Texture 바인딩
-		context->BindTextures(0, { mOutputTextures[currentIndex] });
+		context->BindTextures(RootParam_Output, { mOutputTextures[currentIndex] });
 		// Top - Level AS 바인딩
-		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
-		context->BindConstantBuffer(2, _CB);
+		context->BindAccelerationStructure(RootParam_SceneAS, mSceneAS[currentIndex]);
+		context->BindConstantBuffer(RootParam_CB, _CB);
+		context->BindSturcturedBuffer(RootParam_PointLightSB, lInfo.SB[currentIndex]);
+
 		context->DispatchRay(mResolution.x, mResolution.y, 1, mPipeline);
+
 		mShadowTex.SetValue(mOutputTextures[currentIndex]);
+		{
+			//Compute::Blur_Float::Input input;
+			//input.Resolution = mResolution;
+			//input.TextureFormat = ETextureFormat::R32_Float;
+			//input.Src = mShadowTex.GetValue();
+			//Compute::Blur_Float::Output output = mShaowBlur->Execute(context, input);
+			//mShadowTex.SetValue(output.Result);
+		}
+		{
+			Compute::FloatAccumulater::Input input;
+			input.CurrFrame = mShadowTex.GetValue();
+			input.IsResetAccumCount = mIsResetAccumCount;
+			input.Resolution = mResolution;
+			Compute::FloatAccumulater::Output output = mShadowAccumulater->Execute(context, input);
+			mShadowTex.SetValue(output.Result);
+
+			if (mIsResetAccumCount)
+			{
+				mIsResetAccumCount = false;
+			}
+		}
+
 	}
 
 	void RayTracer::Reset()
@@ -89,51 +120,46 @@ namespace JG
 
 	void RayTracer::UpdateCB()
 	{
+		u32 currentIndex = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferIndex();
 		if (mRenderer == nullptr)
 		{
 			return;
 		}
+		auto plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 		const RenderInfo& info = mRenderer->GetRenderInfo();
-		_CB._ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
-		_CB._ProjMatrix = JMatrix::Transpose(info.ProjMatrix);
-		_CB._InverseViewMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ViewMatrix));
-		_CB._InverseProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
-		_CB._EyePosition = info.EyePosition;
-		_CB._FarZ = info.FarZ;
-		_CB._NearZ = info.NearZ;
-		_CB._PointLightCount = 0;
 
 
-		//mRenderer->GetLightInfo(Graphics::ELightType)
+		{
+			JMatrix viewMatrix = JMatrix::Transpose(info.ViewMatrix);
+			for (i32 i = 0; i < 4; ++i)
+			{
+				for (i32 j = 0; j < 4; ++j)
+				{
+					if (_CB.ViewMatrix.Get_C(i, j) != viewMatrix.Get_C(i, j))
+					{
+						mIsResetAccumCount = true;
+					}
+				}
+			}
+		}
+
+		_CB.ViewMatrix = JMatrix::Transpose(info.ViewMatrix);
+		_CB.ProjMatrix = JMatrix::Transpose(info.ProjMatrix);
+		_CB.InverseViewMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ViewMatrix));
+		_CB.InverseProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
+		_CB.EyePosition = info.EyePosition;
+		_CB.FarZ = info.FarZ;
+		_CB.NearZ = info.NearZ;
+		_CB.PointLightCount = plInfo.OriginCount[currentIndex];
 
 
-
-		//for (int x = 0; x < 1920; ++x)
-		//{
-		//	for (int y = 0; y < 1080; ++y)
-		//	{
-		//		JVector2 launchIndex = JVector2(x, y);
-		//		JVector2 dimensions = JVector2(1920, 1080);
-
-		//		f32 ndcX = ((launchIndex.x + 0.5f) / dimensions.x) * 2.0f - 1.0f;
-		//		f32 ndcY = ((launchIndex.y + 0.5f) / dimensions.y) * 2.0f - 1.0f;
-
-
-		//		JVector4 target = _CB._InverseProjMatrix.Transform(JVector4(ndcX, -ndcY, 1, 1));//mul(_InverseProjMatrix, float4(ndc.x, -ndc.y, 100, 1));
-		//		JVector3 direciton = _CB._InverseViewMatrix.TransformVector(JVector3(target.x, target.y, target.z)); 
-
-
-		//		int n = 0;
-		//	}
-		//}
-		
-
+		static u32 seedFrameCount = 0;
+		_CB.FrameCount = seedFrameCount++;
 	}
 
 	void RayTracer::Init()
 	{
 		InitRootSignature();
-
 		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
 
 		mPipeline = IRayTracingPipeline::Create();
@@ -142,24 +168,29 @@ namespace JG
 
 
 		mPipeline->AddLibrary(SHADER_PATH("StandardRayTracingShader.hlsli"), 
-			{"RayGeneration", "ClosestHit", "Miss"});
-		mPipeline->AddHitGroup("HitGroup0", "ClosestHit", "", "");
-
-
+			{"RayGeneration", "ClosestHit", "ShadowHit","Miss", "ShadowMiss"});
+		mPipeline->AddHitGroup("FirstHitGroup", "ClosestHit", "", "");
+		mPipeline->AddHitGroup("ShadowHitGroup", "ShadowHit", "", "");
 
 		mPipeline->AddRayGenerationProgram("RayGeneration");
-		mPipeline->AddHitProgram("HitGroup0");
+		mPipeline->AddHitProgram("FirstHitGroup");
+		mPipeline->AddHitProgram("ShadowHitGroup");
 		mPipeline->AddMissProgram("Miss");
+		mPipeline->AddMissProgram("ShadowMiss");
 		mPipeline->SetGlobalRootSignature(mGlobalRootSignature);
-		mPipeline->SetMaxPayloadSize(sizeof(Color));
+		mPipeline->SetMaxPayloadSize(sizeof(float[5]));
 		mPipeline->SetMaxAttributeSize(sizeof(float[2]));
-		mPipeline->SetMaxRecursionDepth(1);
+		mPipeline->SetMaxRecursionDepth(2);
 		if (mPipeline->Generate() == false)
 		{
 			JG_CORE_ERROR("Failed RayTracing Pipline");
 		}
 
 		mShadowTex = RP_Global_Tex::Create("RayTracing/Shadow", nullptr, mRenderer->GetRenderParamManager());
+
+
+		mShadowAccumulater = CreateUniquePtr<Compute::FloatAccumulater>(mRenderer);
+		mShaowBlur = CreateUniquePtr<Compute::Blur_Float>(mRenderer);
 	}
 
 	void RayTracer::InitTextures()
@@ -168,7 +199,7 @@ namespace JG
 		texInfo.Width	  = std::max<u32>(1, mResolution.x);
 		texInfo.Height	  = std::max<u32>(1, mResolution.y);
 		texInfo.ArraySize = 1;
-		texInfo.Format	  = ETextureFormat::R8G8B8A8_Unorm;
+		texInfo.Format	  = ETextureFormat::R32_Float;
 		texInfo.Flags	  = ETextureFlags::Allow_UnorderedAccessView;
 		texInfo.MipLevel  = 1;
 		texInfo.ClearColor = Color();
@@ -183,9 +214,11 @@ namespace JG
 	void RayTracer::InitRootSignature()
 	{
 		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
-		creater->AddDescriptorTable(0, EDescriptorTableRangeType::UAV, 1024, 0, 0);
-		creater->AddSRV(1, 0, 0);
-		creater->AddCBV(2, 0, 0);
+		creater->AddDescriptorTable(RootParam_Output, EDescriptorTableRangeType::UAV, 1024, 0, 0);
+		creater->AddSRV(RootParam_SceneAS, 0, 0);
+		creater->AddCBV(RootParam_CB, 0, 0);
+		creater->AddSRV(RootParam_PointLightSB, 0, 1);
+
 		mGlobalRootSignature = creater->Generate();
 	}
 }

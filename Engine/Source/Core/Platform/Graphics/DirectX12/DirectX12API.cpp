@@ -1257,9 +1257,9 @@ namespace JG
 			List<jbyte> materialCB = material->GetMaterialPropertyByteData();
 
 			BindShader(material->GetShader());
-			BindTextures(Renderer::RootParam_Texture2D, material->GetTextureList());
-			BindTextures(Renderer::RootParam_TextureCube, material->GetCubeTextureList());
-			BindConstantBuffer(Renderer::RootParam_MaterialCB, materialCB.data(), materialCB.size());
+			BindTextures((u32)Renderer::ERootParam::Texture2D, material->GetTextureList());
+			BindTextures((u32)Renderer::ERootParam::TextureCube, material->GetCubeTextureList());
+			BindConstantBuffer((u32)Renderer::ERootParam::MaterialCB, materialCB.data(), materialCB.size());
 			DrawIndexed(subMesh->GetIndexCount(), subMesh->GetInstanceCount(), 0, 0, 0);
 		}
 	}

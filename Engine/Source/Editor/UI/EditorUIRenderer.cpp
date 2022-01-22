@@ -170,7 +170,7 @@ namespace JG
 
 
 		context->BindShader(mEditorUIShader);
-		context->BindTextures(Renderer::RootParam_Texture2D, mTextureArray);
+		context->BindTextures((u32)Renderer::ERootParam::Texture2D, mTextureArray);
 		context->BindVertexAndIndexBuffer(mCurrFrameResource->QuadVBuffer, mCurrFrameResource->QuadIBuffer);
 		context->DrawIndexed(quadIndexCount);
 

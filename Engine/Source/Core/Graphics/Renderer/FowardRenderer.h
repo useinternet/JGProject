@@ -5,7 +5,7 @@
 
 namespace JG
 {
-	class IRootSignature;
+
 	class IReadBackBuffer;
 	class IMesh;
 	class RayTracer;
@@ -16,8 +16,6 @@ namespace JG
 		List<SharedPtr<ITexture>> mTargetTextures;
 		List<SharedPtr<ITexture>> mTargetDepthTextures;
 	
-
-		SharedPtr<IRootSignature> mRootSignature;
 		SharedPtr<RayTracer> mRayTracer;
 
 		JVector2 mPrevResolution;
