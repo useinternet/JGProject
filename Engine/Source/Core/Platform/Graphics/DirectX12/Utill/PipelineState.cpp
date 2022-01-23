@@ -74,9 +74,16 @@ namespace JG
 
 
 		mDesc.NumRenderTargets = (u32)cnt;
-		for (u64 i = 0; i < cnt; ++i)
+		for (u64 i = 0; i < MAX_RENDERTARGET; ++i)
 		{
-			mDesc.RTVFormats[i] = rtFormats[i];
+			if (i < cnt)
+			{
+				mDesc.RTVFormats[i] = rtFormats[i];
+			}
+			else
+			{
+				mDesc.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
+			}
 		}
 		mDesc.DSVFormat = dvFormat;
 	}

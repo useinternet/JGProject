@@ -16,6 +16,7 @@ struct VS_OUT
 	float3 tanW	   : TANGENT;
 	float3 bitW    : BITANGENT;
 	float2 tex     : TEXCOORD;
+	float2 depth	: DEPTH;
 };
 
 __PS_SURFACE_VARIABLES_SCRIPT__
@@ -75,65 +76,22 @@ VS_OUT vs_main(VS_IN vin)
 	vout.tanW = normalize(tanW);
 	vout.bitW = normalize(bitW);
 	vout.tex   = vin.tex;
+	vout.depth = float2(vout.posH.z, vout.posH.w);
 	return vout;
 }
 
-
-float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
+struct PS_OUT
 {
-
-	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
-	float alpha = output.albedo.a;
-
-	float3 N = normalize(pin.normalW);
-	float3 V = normalize(_EyePosition - pin.posW);
-
-
-    float3 Lo = float3(0.0f,0.0f,0.0f);
-
-	Material material;
-	material.WorldPosition = pin.posW;
-	material.Albedo    = output.albedo.rgb;
-	material.Roughness = output.roughness;
-	material.Metallic  = output.metallic;
-	material.Emissive = output.emissive;
-	
-	int   clusterIndex = GetClusterIndex(pin.posH.xyz);
-	LightGrid lgrid  = _LightGridList[clusterIndex];
-
-	// Calc PointLight
-	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
-	{
-		int pl_start  = lgrid.PL_Offset;
-		int pl_end    = pl_start + lgrid.PL_Count;
-		for(int i = pl_start; i<pl_end; i++)
-		{
-			int lightIndex = _VisibleLightIndices[i];
-			PointLight pl = _PointLightList[lightIndex];
-			Lo += CalcPointLight(N, V, material, pl);
-		}
-	}
-	
-	float3 final = Lo + material.Emissive;
-	return float4(final, alpha);
-}
-float4 Debug_Visible_Cluster(VS_OUT pin, PS_SURFACE_OUTPUT output)
-{
-	int   clusterIndex = GetClusterIndex(pin.posH.xyz);
-	LightGrid lgrid  = _LightGridList[clusterIndex];
-
-	// Calc PointLight
-	if(lgrid.PL_Count > 0)
-	{
-		float att = (float)lgrid.PL_Count / (float)_PointLightCount;
-		return output.albedo * att;
-	}
-	return float4(0.0f,0.0f,0.0f,0.0f);
-}
+	float4 Albedo : SV_TARGET0;
+	float4 Normal : SV_TARGET1;
+	float4 Specular : SV_TARGET2;
+	float3 Emissive : SV_TARGET3;
+	float4 Material_0 : SV_TARGET4;
+	float  Depth : SV_TARGET5;
+};
 
 
-
-float4 ps_main(VS_OUT pin) : SV_TARGET
+PS_OUT ps_main(VS_OUT pin) : SV_TARGET
 {
 	PS_SURFACE_INPUT input;
 	input.position = pin.posW;
@@ -144,28 +102,18 @@ float4 ps_main(VS_OUT pin) : SV_TARGET
 	input.tex       = pin.tex;
 	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
 
-	if(_DebugMode == DEBUG_MODE_NONE)
-	{
-		if(output.flags & SCRIPT_FLAG_IGNORE_LIGHTPASS)
-		{
-			return output.albedo;
-		}
-		else
-		{
-			return Lo(pin, output);
-		}
-	}
-	else
-	{
-		if(_DebugMode == DEBUG_MODE_VISIBLE_ACTIVE_CLUSTER)
-		{
-			return Debug_Visible_Cluster(pin, output);
-		}
-		else
-		{
-			return float4(0.0f,0.0f,0.0f,1.0f);
-		}
-	}
+
+	PS_OUT ps_out;
+	ps_out.Albedo   = output.albedo;
+	ps_out.Normal   = float4(output.normal.rgb, 1.0f);
+	ps_out.Specular = float4(output.specular, 1.0f);
+	ps_out.Emissive = pin.posH.xyz; //output.emissive;
+	
+	ps_out.Material_0 = float4(output.roughness, output.metallic, 1.0f, 1.0f);
+	ps_out.Depth 	  = saturate(pin.depth.x / pin.depth.y);
+
+	
+	return ps_out;
 }
 
 

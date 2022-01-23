@@ -83,6 +83,7 @@ namespace JG
 		passData.ViewMatrix		= JMatrix::Transpose(info.ViewMatrix);
 		passData.ProjMatrix     = JMatrix::Transpose(info.ProjMatrix);
 		passData.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
+		passData.InvViewProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ViewProjMatrix));
 		passData.EyePosition	= info.EyePosition;
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;

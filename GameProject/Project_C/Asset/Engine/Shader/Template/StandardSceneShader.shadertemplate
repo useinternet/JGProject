@@ -23,6 +23,7 @@ struct PS_SCENE_OUTPUT
 
 struct PS_SCENE_INPUT
 {
+    float4 posH;
     float2 tex;
 };
 
@@ -56,7 +57,7 @@ float4 ps_main(VS_OUT pin) : SV_TARGET
 {
     PS_SCENE_INPUT input;
     input.tex = pin.TexC;
-
+    input.posH = pin.PosH;
 
     PS_SCENE_OUTPUT output;
     output =  PS_SCENE_FUNCTION(input);

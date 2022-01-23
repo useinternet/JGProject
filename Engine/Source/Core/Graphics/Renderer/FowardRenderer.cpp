@@ -31,39 +31,15 @@ namespace JG
 			mRayTracer->Reset();
 		}
 		const RenderInfo& info = GetRenderInfo();
-
 		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
-
 		context->BindRootSignature(GetGraphicsRootSignature());
 
 
-
-		if (mExposureSB.empty())
+		if (mResolution != info.Resolution ||
+			mClearColor != info.ClearColor)
 		{
-			GraphicsHelper::InitStrucutredBuffer("Exposure", 8, sizeof(8), &mExposureSB);
-			RP_Global_SB::Create("Renderer/Exposure", mExposureSB[info.CurrentBufferIndex], GetRenderParamManager());
-		}
-		f32 exposure = mExposure.GetValue();
-		f32 initialMinLog = mInitialMinLog.GetValue();
-		f32 initialMaxLog = mInitialMaxLog.GetValue();
-		List<f32> val; val.resize(8);
-		val[0] = exposure;
-		val[1] = 1.0f / exposure;
-		val[2] = exposure;
-		val[3] = 0.0f;
-		val[4] = initialMinLog;
-		val[5] = initialMaxLog;
-		val[6] = initialMaxLog - initialMinLog;
-		val[7] = 1.0f / (initialMaxLog - initialMinLog);
-
-		mExposureSB[info.CurrentBufferIndex]->SetData(sizeof(f32), 8, val.data());
-		RP_Global_SB::Load("Renderer/Exposure", GetRenderParamManager()).SetValue(mExposureSB[info.CurrentBufferIndex]);
-
-		if (mPrevResolution != info.Resolution ||
-			mPrevClearColor != info.ClearColor)
-		{
-			mPrevResolution = info.Resolution;
-			mPrevClearColor = info.ClearColor;
+			mResolution = info.Resolution;
+			mClearColor = info.ClearColor;
 			InitTextures(info.Resolution, info.ClearColor);
 		}
 
@@ -74,8 +50,9 @@ namespace JG
 	{
 
 		UpdateRayTacing();
-
-		const RenderInfo& info = GetRenderInfo();
+		UpdateGBufferPass();
+		UpdateLightPass();
+		/*const RenderInfo& info = GetRenderInfo();
 		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
 		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
 
@@ -100,10 +77,14 @@ namespace JG
 				context->BindConstantBuffer((u32)ERootParam::ObjectCB, worldMatrix);
 				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
 			}
-		});
+		});*/
+		//if (result != nullptr)
+		//{
+		//	result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
+		//}
 		if (result != nullptr)
 		{
-			result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
+			//result->SceneTexture = mGBu
 		}
 	}
 
@@ -136,6 +117,33 @@ namespace JG
 		mainTexInfo.Flags = ETextureFlags::Allow_DepthStencil;
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Foward_TargetDepthTexture", &mTargetDepthTextures);
 
+
+
+
+
+		mainTexInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
+		mainTexInfo.Flags  = ETextureFlags::Allow_RenderTarget;
+		mainTexInfo.ClearColor = Color();
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Albedo", &mGBufferDic[EGBuffer::Albedo]);
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Normal", &mGBufferDic[EGBuffer::Normal]);
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Specular", &mGBufferDic[EGBuffer::Specular]);
+		mainTexInfo.Format = ETextureFormat::R11G11B10_Float;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Emissive", &mGBufferDic[EGBuffer::Emissive]);
+
+
+		mainTexInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Material", &mGBufferDic[EGBuffer::Material_0]);
+
+		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Results", &mResults);
+
+		mainTexInfo.Format     = ETextureFormat::R32_Float;
+		mainTexInfo.ClearColor = Color::White();
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Depth", &mGBufferDic[EGBuffer::Depth]);
+
+
+		mLightShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/LightPass" });
+
 		if (mRayTracer != nullptr && JGGraphics::GetInstance().IsSupportedRayTracing())
 		{
 			mRayTracer->SetResolution(size);
@@ -161,12 +169,83 @@ namespace JG
 	}
 
 
-
 	void FowardRenderer::InitGlobalRenderParams()
 	{
-		mExposure = RP_Global_Float::Create("Renderer/Exposure", 2.0f, GetRenderParamManager());
-		mInitialMinLog = RP_Global_Float::Create("Renderer/InitialMinLog", -12.0f, GetRenderParamManager());
-		mInitialMaxLog = RP_Global_Float::Create("Renderer/InitialMaxLog", 4.0f, GetRenderParamManager());
+		mGBufferTexDic[EGBuffer::Albedo] = RP_Global_Tex::Create("Renderer/GBuffer/Albedo", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::Normal] = RP_Global_Tex::Create("Renderer/GBuffer/Normal", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::Specular] = RP_Global_Tex::Create("Renderer/GBuffer/Specular", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::Emissive] = RP_Global_Tex::Create("Renderer/GBuffer/Emissive", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::Material_0] = RP_Global_Tex::Create("Renderer/GBuffer/Material_0", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::Depth] = RP_Global_Tex::Create("Renderer/GBuffer/Depth", nullptr, GetRenderParamManager(), false);
+
+		mResultTex = RP_Global_Tex::Create("Renderer/Result", nullptr, GetRenderParamManager(), false);
+	}
+
+	void FowardRenderer::UpdateGBufferPass()
+	{
+		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
+		List<SharedPtr<ITexture>> targetTextures = {
+			GetTargetTexture(EGBuffer::Albedo),
+			GetTargetTexture(EGBuffer::Normal),
+			GetTargetTexture(EGBuffer::Specular),
+			GetTargetTexture(EGBuffer::Emissive),
+			GetTargetTexture(EGBuffer::Material_0),
+			GetTargetTexture(EGBuffer::Depth)
+		};
+		SharedPtr<ITexture> targetDepthTexture = mTargetDepthTextures[buffIndex];
+		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
+		context->SetViewports({ Viewport(mResolution.x, mResolution.y) });
+		context->SetScissorRects({ ScissorRect(0,0, mResolution.x,mResolution.y) });
+		context->ClearRenderTarget(targetTextures, targetDepthTexture);
+		context->SetRenderTarget(targetTextures, targetDepthTexture);
+
+		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
+		{
+			for (auto& info : objectList)
+			{
+				auto mesh = info.Mesh;
+				auto& materialList = info.MaterialList;
+				auto& worldMatrix = JMatrix::Transpose(info.WorldMatrix);
+
+				context->BindConstantBuffer((u32)ERootParam::ObjectCB, worldMatrix);
+				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
+			}
+		});
+
+		mGBufferTexDic[EGBuffer::Albedo].SetValue(targetTextures[0]);
+		mGBufferTexDic[EGBuffer::Normal].SetValue(targetTextures[1]);
+		mGBufferTexDic[EGBuffer::Specular].SetValue(targetTextures[2]);
+		mGBufferTexDic[EGBuffer::Emissive].SetValue(targetTextures[3]);
+		mGBufferTexDic[EGBuffer::Material_0].SetValue(targetTextures[4]);
+		mGBufferTexDic[EGBuffer::Depth].SetValue(targetTextures[5]);
+	}
+
+	void FowardRenderer::UpdateLightPass()
+	{
+		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
+		List<SharedPtr<ITexture>> bindTextures = {
+			GetTargetTexture(EGBuffer::Albedo),
+			GetTargetTexture(EGBuffer::Normal),
+			GetTargetTexture(EGBuffer::Specular),
+			GetTargetTexture(EGBuffer::Emissive),
+			GetTargetTexture(EGBuffer::Material_0),
+			GetTargetTexture(EGBuffer::Depth)
+		};
+		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
+		SharedPtr<ITexture> targetTex = mResults[buffIndex];
+		
+		context->SetViewports({ Viewport(mResolution.x, mResolution.y) });
+		context->SetScissorRects({ ScissorRect(0,0, mResolution.x,mResolution.y) });
+		context->ClearRenderTarget({ targetTex }, nullptr);
+		context->SetRenderTarget({ targetTex }, nullptr);
+		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
+
+		context->BindShader(mLightShader);
+		context->BindTextures((u32)ERootParam::Texture2D, bindTextures);
+		context->Draw(6);
+
+
+		mResultTex.SetValue(targetTex);
 	}
 
 	void FowardRenderer::UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix)
@@ -228,5 +307,10 @@ namespace JG
 			}
 		});
 		mRayTracer->Execute(GetComputeContext());
+	}
+	SharedPtr<ITexture> FowardRenderer::GetTargetTexture(EGBuffer buffer)
+	{
+		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
+		return mGBufferDic[buffer][buffIndex];
 	}
 }

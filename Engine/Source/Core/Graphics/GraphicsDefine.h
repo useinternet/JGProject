@@ -25,6 +25,7 @@ namespace JG
 		R16G16B16A16_Float,
 		R32G32B32A32_Float,
 		R8_Uint,
+		R24G8_TYPELESS,
 		D24_Unorm_S8_Uint
 	};
 	inline String TextureFormatToString(ETextureFormat format)
@@ -38,8 +39,9 @@ namespace JG
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
 		case ETextureFormat::R32G32B32A32_Float: return "R32G32B32A32_Float";
 		case ETextureFormat::R8_Uint:			 return "R8_Uint";
+		case ETextureFormat::R24G8_TYPELESS:	 return "R24G8_Typeless";
 		case ETextureFormat::D24_Unorm_S8_Uint:  return "D24_Unorm_S8_Uint";
-
+			
 		default: return "None";
 		}
 	}
@@ -58,6 +60,7 @@ namespace JG
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT; 
 		case ETextureFormat::R8_Uint:			 return DXGI_FORMAT_R8_UINT;
+		case ETextureFormat::R24G8_TYPELESS:	 return DXGI_FORMAT_R24G8_TYPELESS;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			JG_CORE_ERROR("This {0} DirectX12 TextureFormat is not supported convert ETextureFormat", TextureFormatToString(format));
@@ -281,53 +284,6 @@ namespace JG
 
 	namespace ShaderDefine
 	{
-		enum class EGraphcisRootParam
-		{
-			SB_POINT_LIGHTS,
-			CB_RENDER_PASS_DATA,
-			CB_OBJECTDATA,
-			CB_MATERIAL,
-			TEXTURE2D,
-			TEXTURECUBE,
-			RWTEXTURE2D,
-			SB_LIGHTGRID,
-			SB_VISIBLE_LIGHT_INDICIES,
-		};
-
-		enum class EComputeRootParam
-		{
-			CB_0,
-			CB_1,
-			CB_2,
-			CB_3,
-			CB_4,
-			TEXTURE2D,
-			TEXTURECUBE,
-			RWTEXTURE2D,
-			BYTEADDRESSBUFFER,
-			RWBYTEADDRESSBUFFER,
-			STRUCTUREDBUFFER_0,
-			STRUCTUREDBUFFER_1,
-			STRUCTUREDBUFFER_2,
-			STRUCTUREDBUFFER_3,
-			STRUCTUREDBUFFER_4,
-			STRUCTUREDBUFFER_5,
-			STRUCTUREDBUFFER_6,
-			STRUCTUREDBUFFER_7,
-			STRUCTUREDBUFFER_8,
-			STRUCTUREDBUFFER_9,
-			RWSTRUCTUREDBUFFER_0,
-			RWSTRUCTUREDBUFFER_1,
-			RWSTRUCTUREDBUFFER_2,
-			RWSTRUCTUREDBUFFER_3,
-			RWSTRUCTUREDBUFFER_4,
-			RWSTRUCTUREDBUFFER_5,
-			RWSTRUCTUREDBUFFER_6,
-			RWSTRUCTUREDBUFFER_7,
-			RWSTRUCTUREDBUFFER_8,
-			RWSTRUCTUREDBUFFER_9,
-		};
-
 		namespace Template
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
@@ -391,21 +347,6 @@ namespace JG
 		{
 			constexpr int Texture2DRegisterSpace   = 0;
 			constexpr int TextureCubeRegisterSpace = 1;
-			constexpr int RWTexture2DRegisterSpace = 2;
-			constexpr int ByteAddressBufferRegisterSpace = 3;
-			constexpr int RWByteAddressBufferRegisterSpace = 4;
-
-
-
-
-			constexpr int PointLightRegisterSpace  = 3;
-			constexpr int LightGridRegisterSpace		   = 11;
-			constexpr int VisibleLightIndicesRegisterSpace = 12;
-
-
-			constexpr int StructuredBufferRegisterSpace   = 10;
-			constexpr int RWStructuredBufferRegisterSpace = 20;
-
 		}
 
 		constexpr char* VSEntry = "vs_main";

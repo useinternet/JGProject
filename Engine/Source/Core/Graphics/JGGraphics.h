@@ -370,6 +370,7 @@ namespace JG
 			JMatrix ProjMatrix;
 			JMatrix ViewMatrix;
 			JMatrix ViewProjMatrix;
+			JMatrix InvViewProjMatrix;
 			JVector2 Resolution;
 			f32 NearZ = 0.0f;
 			f32 FarZ  = 0.0f;

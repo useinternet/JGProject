@@ -90,7 +90,7 @@ namespace JG
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam)
 		{
-			f32 farZ = mainCam->GetFarZ() * 0.4f;
+			f32 farZ = mainCam->GetFarZ() * 0.9f;
 			radius = JVector3(farZ, farZ, farZ);
 			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		}
@@ -98,7 +98,7 @@ namespace JG
 		sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
 		sceneObject->MaterialList.push_back(mMaterial);
 		sceneObject->Mesh = mMesh;
-		GetGameWorld()->PushRenderSceneObject(sceneObject);
+		//GetGameWorld()->PushRenderSceneObject(sceneObject);
 		return EScheduleResult::Continue;
 	}
 

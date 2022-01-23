@@ -1,0 +1,38 @@
+float4 Lo(VS_OUT pin, PS_SURFACE_OUTPUT output)
+{
+
+	float4 ambientLight = output.albedo * float4(0.03f, 0.03f, 0.03f, 1.0f);
+	float alpha = output.albedo.a;
+
+	float3 N = normalize(pin.normalW);
+	float3 V = normalize(_EyePosition - pin.posW);
+
+
+    float3 Lo = float3(0.0f,0.0f,0.0f);
+
+	Material material;
+	material.WorldPosition = pin.posW;
+	material.Albedo    = output.albedo.rgb;
+	material.Roughness = output.roughness;
+	material.Metallic  = output.metallic;
+	material.Emissive = output.emissive;
+	
+	int   clusterIndex = GetClusterIndex(pin.posH.xyz);
+	LightGrid lgrid  = _LightGridList[clusterIndex];
+
+	// Calc PointLight
+	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
+	{
+		int pl_start  = lgrid.PL_Offset;
+		int pl_end    = pl_start + lgrid.PL_Count;
+		for(int i = pl_start; i<pl_end; i++)
+		{
+			int lightIndex = _VisibleLightIndices[i];
+			PointLight pl = _PointLightList[lightIndex];
+			Lo += CalcPointLight(N, V, material, pl);
+		}
+	}
+	
+	float3 final = Lo + material.Emissive;
+	return float4(final, alpha);
+}

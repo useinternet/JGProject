@@ -70,10 +70,6 @@ namespace JG
 			D3D12_RESOURCE_STATES InitialResourceState,
 			const D3D12_CLEAR_VALUE* pOptimizedClearValue);
 		static void DestroyCommittedResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource);
-	private:
-		static SharedPtr<RootSignature> CreateGraphicsRootSignature();
-		static SharedPtr<RootSignature> CreateComputeRootSignature();
-		static void AddStaticSamplerState(SharedPtr<RootSignature> rootSig);
 	protected:
 		// Application
 		virtual bool Create() override;
@@ -138,9 +134,6 @@ namespace JG
 
 		Dictionary<std::thread::id, SharedPtr<GraphicsPipelineState>> mGraphicsPSOs;
 		Dictionary<std::thread::id, SharedPtr<ComputePipelineState>>  mComputePSOs;
-		Dictionary<std::thread::id, SharedPtr<RootSignature>> mGraphicsRootSignatures;
-		Dictionary<std::thread::id, SharedPtr<RootSignature>> mComputeRootSignatures;
-
 		Dictionary<std::thread::id, SharedPtr<IGraphicsContext>> mGraphicsContextDic;
 		Dictionary<std::thread::id, SharedPtr<IComputeContext>> mComputeContextDic;
 
