@@ -157,6 +157,7 @@ namespace JG
 	}
 	bool RenderParamManager::SetGlobalRenderParamTex(const String& name, SharedPtr<ITexture> tex)
 	{
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamTexDic.find(name) == mGlobalParamTexDic.end())
 		{
 			return false;
@@ -168,18 +169,19 @@ namespace JG
 			return false;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
+
 		_pair.first = tex;
 		return true;
 	}
 	SharedPtr<ITexture> RenderParamManager::GetGlobalRenderParamTex(const String& name)
 	{
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamTexDic.find(name) == mGlobalParamTexDic.end())
 		{
 			return nullptr;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
+		
 		auto& _pair = mGlobalParamTexDic[name];
 		return _pair.first;
 	}
@@ -201,6 +203,7 @@ namespace JG
 
 	bool RenderParamManager::SetGlobalRenderParamSB(const String& name, SharedPtr<IStructuredBuffer> sb)
 	{
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamSBDic.find(name) == mGlobalParamSBDic.end())
 		{
 			return false;
@@ -212,19 +215,20 @@ namespace JG
 			return false;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
+
 		_pair.first = sb;
 		return true;
 	}
 
 	SharedPtr<IStructuredBuffer> RenderParamManager::GetGlobalRenderParamSB(const String& name)
 	{
+
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamSBDic.find(name) == mGlobalParamSBDic.end())
 		{
 			return nullptr;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		auto& _pair = mGlobalParamSBDic[name];
 		return _pair.first;
 	}
@@ -246,6 +250,7 @@ namespace JG
 
 	bool RenderParamManager::SetGlobalRenderParamBAB(const String& name, SharedPtr<IByteAddressBuffer> bab)
 	{
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamBABDic.find(name) == mGlobalParamBABDic.end())
 		{
 			return false;
@@ -257,19 +262,20 @@ namespace JG
 			return false;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
+
 		_pair.first = bab;
 		return true;
 	}
 
 	SharedPtr<IByteAddressBuffer> RenderParamManager::GetGlobalRenderParamBAB(const String& name)
 	{
+		std::lock_guard<std::mutex> lock(mRenderParamMutex);
 		if (mGlobalParamBABDic.find(name) == mGlobalParamBABDic.end())
 		{
 			return nullptr;
 		}
 
-		std::lock_guard<std::mutex> lock(mRenderParamMutex);
+
 		auto& _pair = mGlobalParamBABDic[name];
 		return _pair.first;
 	}

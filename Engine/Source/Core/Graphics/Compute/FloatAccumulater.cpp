@@ -42,15 +42,13 @@ namespace JG
 			}
 
 			context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, mCB);
-			context->BindTextures((u32)Renderer::EComputeRootParam::SRV, { mPrevs[currIndex], input.CurrFrame });
+			context->BindTextures((u32)Renderer::EComputeRootParam::SRV, { mResults[currIndex], input.CurrFrame });
 			context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { mResults[currIndex] });
 			context->Dispatch2D(mResolution.x, mResolution.y);
 
 			FloatAccumulater::Output output;
 			output.Result = mResults[currIndex];
 
-
-			Swap(mResults[currIndex], mPrevs[currIndex]);
 			mCB.AccumCount++;
 			return output;
 		}
@@ -74,8 +72,6 @@ namespace JG
 			texInfo.Flags = ETextureFlags::Allow_UnorderedAccessView;
 			texInfo.MipLevel = 1;
 			texInfo.ClearColor = Color();
-
-			GraphicsHelper::InitRenderTextures(texInfo, "PrevAccumTexture", &mPrevs);
 			GraphicsHelper::InitRenderTextures(texInfo, "ResultAccumTexture", &mResults);
 
 

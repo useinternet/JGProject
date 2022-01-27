@@ -26,9 +26,6 @@ namespace JG
 			{
 				return Blur_Float::Output();
 			}
-			InitTextures(input.Resolution, input.TextureFormat);
-
-
 			u32 currIndex = JGGraphics::GetInstance().GetBufferIndex();
 
 			context->BindShader(mShader);
@@ -36,32 +33,12 @@ namespace JG
 
 
 			context->BindTextures((u32)Renderer::EComputeRootParam::SRV, { input.Src });
-			context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { mResults[currIndex] });
-			context->Dispatch2D(mResolution.x, mResolution.y);
+			context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { input.Src });
+			context->Dispatch2D(input.Resolution.x, input.Resolution.y);
 
 			Blur_Float::Output output;
-			output.Result = mResults[currIndex];
+			output.Result = input.Src;
 			return output;
-		}
-		void Blur_Float::InitTextures(const JVector2& resolution, ETextureFormat format)
-		{
-
-			if (mResolution == resolution && mTextureFormat == format)
-			{
-				return;
-			}
-			mResolution = resolution;
-			mTextureFormat = format;
-			TextureInfo texInfo;
-			texInfo.Width = std::max<u32>(1, mResolution.x);
-			texInfo.Height = std::max<u32>(1, mResolution.y);
-			texInfo.ArraySize = 1;
-			texInfo.Format = mTextureFormat;
-			texInfo.Flags = ETextureFlags::Allow_UnorderedAccessView;
-			texInfo.MipLevel = 1;
-			texInfo.ClearColor = Color();
-
-			GraphicsHelper::InitRenderTextures(texInfo, "BlurResult", &mResults);
 		}
 	}
 

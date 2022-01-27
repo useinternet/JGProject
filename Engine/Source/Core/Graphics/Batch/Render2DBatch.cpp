@@ -95,8 +95,8 @@ namespace JG
 		}
 
 
-
-		mCurrFrameResource = &mFrameResources[info.CurrentBufferIndex];
+		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
+		mCurrFrameResource = &mFrameResources[bufferIndex];
 		return true;
 	}
 

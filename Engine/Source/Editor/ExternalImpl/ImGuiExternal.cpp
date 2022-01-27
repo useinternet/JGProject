@@ -51,20 +51,16 @@ namespace ImGui
 			switch (vector_element_enum)
 			{
 			case Vector_Element_Int:
-				isDeactive = ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i]);
+				isDeactive |= ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i]);
 				break;
 			case Vector_Element_Uint:
-				isDeactive = ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i], 1.0f, 0, JG::JG_I32_MAX);
+				isDeactive |= ImGui::DragInt(("##" + btText + label).c_str(), &((int*)data)[i], 1.0f, 0, JG::JG_I32_MAX);
 				break;
 			case Vector_Element_Float:
-				isDeactive = ImGui::DragFloat(("##" + btText + label).c_str(), &((float*)data)[i]);
+				isDeactive |= ImGui::DragFloat(("##" + btText + label).c_str(), &((float*)data)[i]);
 				break;
 			}
 
-			//if (ImGui::IsItemDeactivatedAfterEdit() == true)
-			//{
-			//	
-			//}
 			ImGui::NextColumn();
 		}
 

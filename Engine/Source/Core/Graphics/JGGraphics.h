@@ -178,9 +178,6 @@ namespace JG
 			Queue<SharedPtr<SceneObject>> mSceneObjectQueue;
 			List<SharedPtr<Light>>        mLightList;
 
-
-			u64 mCurrentIndex = 0;
-
 			SharedPtr<Renderer>       mRenderer;
 			SharedPtr<Render2DBatch>  m2DBatch;
 			SharedPtr<ScheduleHandle> mRenderScheduleHandle;

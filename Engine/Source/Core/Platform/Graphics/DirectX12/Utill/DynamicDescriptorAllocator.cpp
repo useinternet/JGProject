@@ -12,6 +12,9 @@ namespace JG
 		);
 		mD3DHeap = CreateD3DDescriptorHeap(DirectX12API::GetD3DDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
 			D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, mNumDescriptor);
+
+
+	
 	}
 
 	void DynamicDescriptorAllocator::CommitRootSignature(RootSignature& rootSig)
@@ -46,7 +49,7 @@ namespace JG
 	{
 		if (clearHandleOffset)
 		{
-			mPushedHandleOffset = 0;
+			mPushedHandleOffset = 1;
 		}
 		mDescriptorCache.clear();
 		mRootParamInitTypeMap.clear();
@@ -55,18 +58,18 @@ namespace JG
 	}
 
 
-	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics)
+	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics)
 	{
-		if (d3dDescriptorHeap->Get() != mD3DHeap.Get())
+		if (d3dDescriptorHeap.Get() != mD3DHeap.Get())
 		{
 			RequestDescriptorHeap();
-			*d3dDescriptorHeap = mD3DHeap;
-			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap->GetAddressOf());
+			d3dDescriptorHeap = mD3DHeap;
+			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap.GetAddressOf());
 		}
+		
 		if (!mCPUCache.empty())
 		{
 			List<D3D12_CPU_DESCRIPTOR_HANDLE> cpu_Handles;
-
 			for (auto& cache_pair : mCPUCache)
 			{
 				i32  rootParam = cache_pair.first;

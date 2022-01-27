@@ -31,16 +31,17 @@ namespace JG
 
 
 		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
-		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[data.Info.CurrentBufferIndex]);
-		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex]);
+		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[bufferIndex]);
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[bufferIndex]);
 	}
 	void PreRenderProcess_LightCulling::Run(const RunData& data)
 	{
 		auto pointLightsInfo = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 
-
-		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[data.Info.CurrentBufferIndex];
-		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[data.Info.CurrentBufferIndex];
+		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
+		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[bufferIndex];
+		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[bufferIndex];
 
 
 
@@ -51,7 +52,7 @@ namespace JG
 		context->BindConstantBuffer(0, CB); 
 		context->BindSturcturedBuffer(1, targetVisibleLightIndiciesSB);
 		context->BindSturcturedBuffer(2, targetLightGridSB);
-		context->BindSturcturedBuffer(3, pointLightsInfo.SB[data.Info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer(3, pointLightsInfo.SB[bufferIndex]);
 		context->BindSturcturedBuffer(4, mClusterSB);
 		context->Dispatch(
 			PreRenderProcess_ComputeCluster::NUM_X_SLICE, 

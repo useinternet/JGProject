@@ -29,17 +29,10 @@ namespace JG
 	
 			Renderer* mRenderer = nullptr;
 			SharedPtr<IComputeShader> mShader;
-			List<SharedPtr<ITexture>> mResults;
-			JVector2 mResolution;
-			ETextureFormat mTextureFormat;
 		public:
 			Blur_Float(Renderer* renderer);
 
 			Output Execute(SharedPtr<IComputeContext> context, const Input& input);
-		private:
-			void InitTextures(const JVector2& resolution, ETextureFormat format);
-
-
 
 		};
 	}

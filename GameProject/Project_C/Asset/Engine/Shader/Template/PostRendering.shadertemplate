@@ -16,7 +16,6 @@ struct VS_OUT
 	float3 tanW	   : TANGENT;
 	float3 bitW    : BITANGENT;
 	float2 tex     : TEXCOORD;
-	float2 depth	: DEPTH;
 };
 
 __PS_SURFACE_VARIABLES_SCRIPT__
@@ -31,7 +30,6 @@ struct PS_SURFACE_OUTPUT
 	float roughness;
 	float metallic;
 	float3 emissive;
-	int shadingmodel;
 };
 
 
@@ -55,7 +53,6 @@ PS_SURFACE_OUTPUT PS_SURFACE_FUNCTION(PS_SURFACE_INPUT _input)
     _output.roughness = 0.0f;
 	_output.metallic  = 0.0f;
 	_output.emissive = float3(0.0f,0.0f,0.0f);
-	_output.shadingmodel = 0;
 
 	__PS_SURFACE_CONTENTS_SCRIPT__
 	return _output;
@@ -76,23 +73,10 @@ VS_OUT vs_main(VS_IN vin)
 	vout.tanW = normalize(tanW);
 	vout.bitW = normalize(bitW);
 	vout.tex   = vin.tex;
-	vout.depth = float2(vout.posH.z, vout.posH.w);
 	return vout;
 }
 
-struct PS_OUT
-{
-	float4 Albedo : SV_TARGET0;
-	float4 Normal : SV_TARGET1;
-	float4 WorldPos : SV_TARGET2;
-	float4 Specular : SV_TARGET3;
-	float3 Emissive : SV_TARGET4;
-	float4 Material_0 : SV_TARGET5;
-	float  Depth : SV_TARGET6;
-};
-
-
-PS_OUT ps_main(VS_OUT pin) : SV_TARGET
+float4 ps_main(VS_OUT pin) : SV_TARGET
 {
 	PS_SURFACE_INPUT input;
 	input.position = pin.posW;
@@ -103,26 +87,7 @@ PS_OUT ps_main(VS_OUT pin) : SV_TARGET
 	input.tex       = pin.tex;
 	PS_SURFACE_OUTPUT output = PS_SURFACE_FUNCTION(input);
 
-
-	PS_OUT ps_out;
-	ps_out.Albedo   = output.albedo;
-	ps_out.Normal   = float4(output.normal.rgb, 1.0f);
-	ps_out.Specular = float4(output.specular, 1.0f);
-	ps_out.Emissive = output.emissive;
-	ps_out.WorldPos = float4(pin.posW, 1.0f);
-	ps_out.Material_0 = float4(output.roughness, output.metallic, 1.0f, 1.0f);
-	if(output.shadingmodel == SHADING_MODEL_SKYBOX)
-	{
-		ps_out.Depth = 1.0f;
-	}
-	else
-	{
-		ps_out.Depth 	  = saturate(pin.depth.x / pin.depth.y);
-	}
-	
-
-	
-	return ps_out;
+	return output.albedo;
 }
 
 

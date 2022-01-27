@@ -642,7 +642,7 @@ namespace JG
 		}
 
 		pso->BindRenderTarget(rtFormats, dsFormat);
-
+		mCommandList->SetRenderTarget(nullptr, nullptr, 0, nullptr, nullptr);
 		mCommandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
 	}
 
@@ -702,17 +702,21 @@ namespace JG
 			{
 				dx12Tex = static_cast<DirectX12Texture*>(tex.get());
 			}
+		
 			switch (type)
 			{
 			case EDescriptorTableRangeType::SRV:
+				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 				handles.push_back(dx12Tex->GetSRV());
 				break;
 			case EDescriptorTableRangeType::UAV:
+				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 				handles.push_back(dx12Tex->GetUAV());
 				break;
 			}
 
 		}
+		mCommandList->FlushResourceBarrier();
 		mCommandList->BindTextures(rootParam, handles);
 	}
 	void DirectX12GraphicsContext::BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize)
@@ -974,6 +978,15 @@ namespace JG
 
 		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
 	}
+	void DirectX12ComputeContext::UAVBarrier(SharedPtr<ITexture> tex) 
+	{
+		if (mCommandList == nullptr || tex == nullptr || tex->IsValid() == false)
+		{
+			return;
+		}
+		auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
+		mCommandList->UAVBarrier(dx12Tex->Get());
+	}
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
 	{
 		if (rootSig == nullptr)
@@ -1015,14 +1028,16 @@ namespace JG
 			switch (type)
 			{
 			case EDescriptorTableRangeType::SRV:
+				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 				handles.push_back(dx12Tex->GetSRV());
 				break;
 			case EDescriptorTableRangeType::UAV:
+				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 				handles.push_back(dx12Tex->GetUAV());
 				break;
 			}
 		}
-
+		mCommandList->FlushResourceBarrier();
 		mCommandList->BindTextures(rootParam, handles);
 	}
 

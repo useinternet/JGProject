@@ -52,39 +52,12 @@ namespace JG
 		UpdateRayTacing();
 		UpdateGBufferPass();
 		UpdateLightPass();
-		/*const RenderInfo& info = GetRenderInfo();
-		auto targetTexture = mTargetTextures[info.CurrentBufferIndex];
-		auto targetDepthTexture = mTargetDepthTextures[info.CurrentBufferIndex];
 
-		if (targetTexture == nullptr || targetDepthTexture == nullptr)
-		{
-			return;
-		}
-		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
-		context->SetViewports({ Viewport(info.Resolution.x, info.Resolution.y) });
-		context->SetScissorRects({ ScissorRect(0,0, info.Resolution.x,info.Resolution.y) });
-		context->ClearRenderTarget({ targetTexture }, targetDepthTexture);
-		context->SetRenderTarget({ targetTexture }, targetDepthTexture);
-
-		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
-		{
-			for (auto& info : objectList)
-			{
-				auto mesh = info.Mesh;
-				auto& materialList = info.MaterialList;
-				auto& worldMatrix  = JMatrix::Transpose(info.WorldMatrix);
-
-				context->BindConstantBuffer((u32)ERootParam::ObjectCB, worldMatrix);
-				context->DrawIndexedAfterBindMeshAndMaterial(mesh, materialList);
-			}
-		});*/
-		//if (result != nullptr)
-		//{
-		//	result->SceneTexture = mTargetTextures[info.CurrentBufferIndex];
-		//}
+		UpdateFinalPass();
+		
 		if (result != nullptr)
 		{
-			//result->SceneTexture = mGBu
+			result->SceneTexture = mFinalResultTex.GetValue();
 		}
 	}
 
@@ -135,15 +108,21 @@ namespace JG
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Material", &mGBufferDic[EGBuffer::Material_0]);
 
 		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
-		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Results", &mResults);
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_LightResult", &mLightResult);
 
-		mainTexInfo.Format     = ETextureFormat::R32_Float;
+		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_FinalResult", &mFinalResult);
+
+		mainTexInfo.Format     = ETextureFormat::R16G16B16A16_Float;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Depth", &mGBufferDic[EGBuffer::WorldPos]);
+
+		mainTexInfo.Format = ETextureFormat::R32_Float;
 		mainTexInfo.ClearColor = Color::White();
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Depth", &mGBufferDic[EGBuffer::Depth]);
 
 
 		mLightShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/LightPass" });
-
+		mFinalShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/FinalPass" });
 		if (mRayTracer != nullptr && JGGraphics::GetInstance().IsSupportedRayTracing())
 		{
 			mRayTracer->SetResolution(size);
@@ -177,8 +156,11 @@ namespace JG
 		mGBufferTexDic[EGBuffer::Emissive] = RP_Global_Tex::Create("Renderer/GBuffer/Emissive", nullptr, GetRenderParamManager(), false);
 		mGBufferTexDic[EGBuffer::Material_0] = RP_Global_Tex::Create("Renderer/GBuffer/Material_0", nullptr, GetRenderParamManager(), false);
 		mGBufferTexDic[EGBuffer::Depth] = RP_Global_Tex::Create("Renderer/GBuffer/Depth", nullptr, GetRenderParamManager(), false);
+		mGBufferTexDic[EGBuffer::WorldPos] = RP_Global_Tex::Create("Renderer/GBuffer/WorldPos", nullptr, GetRenderParamManager(), false);
 
-		mResultTex = RP_Global_Tex::Create("Renderer/Result", nullptr, GetRenderParamManager(), false);
+
+		mLightResultTex = RP_Global_Tex::Create("Renderer/LightResult", nullptr, GetRenderParamManager(), false);
+		mFinalResultTex = RP_Global_Tex::Create("Renderer/FinalResult", nullptr, GetRenderParamManager(), false);
 	}
 
 	void FowardRenderer::UpdateGBufferPass()
@@ -187,6 +169,7 @@ namespace JG
 		List<SharedPtr<ITexture>> targetTextures = {
 			GetTargetTexture(EGBuffer::Albedo),
 			GetTargetTexture(EGBuffer::Normal),
+			GetTargetTexture(EGBuffer::WorldPos),
 			GetTargetTexture(EGBuffer::Specular),
 			GetTargetTexture(EGBuffer::Emissive),
 			GetTargetTexture(EGBuffer::Material_0),
@@ -214,6 +197,7 @@ namespace JG
 
 		mGBufferTexDic[EGBuffer::Albedo].SetValue(targetTextures[0]);
 		mGBufferTexDic[EGBuffer::Normal].SetValue(targetTextures[1]);
+		mGBufferTexDic[EGBuffer::WorldPos].SetValue(targetTextures[2]);
 		mGBufferTexDic[EGBuffer::Specular].SetValue(targetTextures[2]);
 		mGBufferTexDic[EGBuffer::Emissive].SetValue(targetTextures[3]);
 		mGBufferTexDic[EGBuffer::Material_0].SetValue(targetTextures[4]);
@@ -226,14 +210,17 @@ namespace JG
 		List<SharedPtr<ITexture>> bindTextures = {
 			GetTargetTexture(EGBuffer::Albedo),
 			GetTargetTexture(EGBuffer::Normal),
+			GetTargetTexture(EGBuffer::WorldPos),
 			GetTargetTexture(EGBuffer::Specular),
 			GetTargetTexture(EGBuffer::Emissive),
 			GetTargetTexture(EGBuffer::Material_0),
-			GetTargetTexture(EGBuffer::Depth)
+			GetTargetTexture(EGBuffer::Depth),
 		};
 		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
-		SharedPtr<ITexture> targetTex = mResults[buffIndex];
+		SharedPtr<ITexture> targetTex = mLightResult[buffIndex];
 		
+		
+
 		context->SetViewports({ Viewport(mResolution.x, mResolution.y) });
 		context->SetScissorRects({ ScissorRect(0,0, mResolution.x,mResolution.y) });
 		context->ClearRenderTarget({ targetTex }, nullptr);
@@ -245,8 +232,34 @@ namespace JG
 		context->Draw(6);
 
 
-		mResultTex.SetValue(targetTex);
+		mLightResultTex.SetValue(targetTex);
 	}
+
+	void FowardRenderer::UpdateFinalPass()
+	{
+		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
+		List<SharedPtr<ITexture>> bindTextures = {
+			RP_Global_Tex::Load("Renderer/LightResult", GetRenderParamManager()).GetValue(),
+			RP_Global_Tex::Load("Renderer/Raytracing/Shadow", GetRenderParamManager()).GetValue(),
+			GetTargetTexture(EGBuffer::Depth),
+		};
+		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
+		SharedPtr<ITexture> targetTex = mFinalResult[buffIndex];
+
+		context->SetViewports({ Viewport(mResolution.x, mResolution.y) });
+		context->SetScissorRects({ ScissorRect(0,0, mResolution.x,mResolution.y) });
+		context->ClearRenderTarget({ targetTex }, nullptr);
+		context->SetRenderTarget({ targetTex }, nullptr);
+		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
+
+		context->BindShader(mFinalShader);
+		context->BindTextures((u32)ERootParam::Texture2D, bindTextures);
+		context->Draw(6);
+
+
+		mFinalResultTex.SetValue(targetTex);
+	}
+
 
 	void FowardRenderer::UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix)
 	{

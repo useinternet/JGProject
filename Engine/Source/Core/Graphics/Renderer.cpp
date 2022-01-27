@@ -24,9 +24,6 @@ namespace JG
 
 
 		u64 buffCount = api->GetBufferCount();
-		
-
-
 		// Context 초기화
 		mGraphicsContext = api->GetGraphicsContext();
 		mComputeContext  = mGraphicsContext->QueryInterfaceAsComputeContext();
@@ -60,19 +57,25 @@ namespace JG
 			auto& byteData = lightBtDic[item->GetLightType()];
 			item->PushBtData(byteData);
 		}
+
+
+
+		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
+
+
 		for (auto& _pair : lightBtDic)
 		{
 			Graphics::ELightType lightType = _pair.first;
 			void* lightData = _pair.second.data();
 			auto& lightInfo = mLightInfos[lightType];
-			if (lightInfo.OriginCount[info.CurrentBufferIndex] != lightInfo.Count)
+			if (lightInfo.OriginCount[bufferIndex] != lightInfo.Count)
 			{
-				lightInfo.OriginCount[info.CurrentBufferIndex] = lightInfo.Count;
-				mLightInfos[lightType].SB[info.CurrentBufferIndex] = IStructuredBuffer::Create("Light_SB", lightInfo.Size, lightInfo.Count);
+				lightInfo.OriginCount[bufferIndex] = lightInfo.Count;
+				mLightInfos[lightType].SB[bufferIndex] = IStructuredBuffer::Create("Light_SB", lightInfo.Size, lightInfo.Count);
 			}
 
 
-			mCopyContext->CopyBuffer(lightInfo.SB[info.CurrentBufferIndex], lightData, lightInfo.Size, lightInfo.Count);
+			mCopyContext->CopyBuffer(lightInfo.SB[bufferIndex], lightData, lightInfo.Size, lightInfo.Count);
 		}
 
 
@@ -88,7 +91,7 @@ namespace JG
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolution;
-		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].OriginCount[info.CurrentBufferIndex];
+		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].OriginCount[bufferIndex];
 
 
 		ReadyImpl( &passData);
@@ -115,7 +118,7 @@ namespace JG
 		context->BindConstantBuffer((u32)ERootParam::PassCB, passData);
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
-		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.SB[info.CurrentBufferIndex]);
+		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.SB[bufferIndex]);
 
 		return BeginBatch(info, batchList);
 	}

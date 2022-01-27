@@ -55,8 +55,6 @@ namespace JG
 		JVector3 EyePosition;
 		f32 FarZ;
 		f32 NearZ;
-		u64 CurrentBufferIndex = 0;
-
 		Color ClearColor;
 	};
 

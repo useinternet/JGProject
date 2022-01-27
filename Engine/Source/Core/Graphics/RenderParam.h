@@ -318,6 +318,7 @@ namespace JG
 		template<class T>
 		bool SetGlobalRenderParam(const String& name, const T& data)
 		{
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
 			if (mGlobalParamDic.find(name) == mGlobalParamDic.end())
 			{
 				return false;
@@ -330,13 +331,14 @@ namespace JG
 				return false;
 			}
 
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+
 			rpInfo.Set(&data);
 			return true;
 		}
 		template<class T>
 		bool GetGlobalRenderParam(const String& name, T* out_data)
 		{
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
 			if (out_data == nullptr)
 			{
 				return false;
@@ -353,7 +355,7 @@ namespace JG
 				return false;
 			}
 
-			std::lock_guard<std::mutex> lock(mRenderParamMutex);
+	
 			return rpInfo.GetValue(out_data);
 		}
 

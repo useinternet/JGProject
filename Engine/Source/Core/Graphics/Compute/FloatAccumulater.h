@@ -31,7 +31,6 @@ namespace JG
 
 			Renderer* mRenderer = nullptr;
 			SharedPtr<IComputeShader> mShader;
-			List<SharedPtr<ITexture>> mPrevs;
 			List<SharedPtr<ITexture>> mResults;
 			CB mCB;
 			JVector2 mResolution;

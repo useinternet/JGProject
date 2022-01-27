@@ -302,7 +302,6 @@ namespace JG
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
-			mCurrentIndex = 0;
 			m2DBatch = CreateSharedPtr<Render2DBatch>();
 			SetSceneInfo(info);
 
@@ -408,7 +407,6 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition = mSceneInfo.EyePos;
 				info.ClearColor  = mSceneInfo.ClearColor;
-				info.CurrentBufferIndex = mCurrentIndex;
 				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
 				{
 
@@ -488,11 +486,6 @@ namespace JG
 			mRenderScheduleHandle = nullptr;
 			// Rendering 이 끝났으니. 다시 정보수정 Ok
 			UnLock();
-
-			u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
-			mCurrentIndex = (mCurrentIndex + 1) % bufferCnt;
-
-
 			return mSceneResult;
 		}
 

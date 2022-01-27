@@ -27,8 +27,9 @@ namespace JG
 
 		bool mResizeDirty        = false;
 		u32 mNumDescriptor		 = 0;
-		u32 mPushedHandleOffset  = 0;
+		u32 mPushedHandleOffset  = 1;
 		u32 mIncreaseSize		 = 0;
+
 	public:
 		DynamicDescriptorAllocator(u32 numDescriptor = 1024);
 	public:
@@ -36,7 +37,7 @@ namespace JG
 		void CommitDescriptorTable(u32 rootParam, const List<D3D12_CPU_DESCRIPTOR_HANDLE>& handles);
 
 		void Reset(bool clearHandleOffset = false);
-		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>* d3dDescriptorHeap, bool is_graphics);
+		void PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics);
 
 
 		i32  GetDescriptorInitAsType(u32 rootParam) const;

@@ -22,17 +22,11 @@ namespace JG
 		Color    mClearColor;
 
 
-
-
-		/*float3 WorldPosition;
-		float3 Albedo;
-		float Roughness;
-		float Metallic;
-		float3 Emissive; */
 		enum EGBuffer
 		{
 			Albedo,
 			Normal,
+			WorldPos,
 			Specular,
 			Emissive,
 			Material_0, // Rough, Metallic, µîµî
@@ -40,9 +34,13 @@ namespace JG
 		};
 		Dictionary<EGBuffer, List<SharedPtr<ITexture>>> mGBufferDic;
 		Dictionary<EGBuffer, RP_Global_Tex> mGBufferTexDic;
-		RP_Global_Tex mResultTex;
-		List<SharedPtr<ITexture>>  mResults;
+		RP_Global_Tex mLightResultTex;
+		RP_Global_Tex mFinalResultTex;
+		List<SharedPtr<ITexture>>  mLightResult;
 		SharedPtr<IGraphicsShader> mLightShader;
+
+		SharedPtr<IGraphicsShader> mFinalShader;
+		List<SharedPtr<ITexture>>  mFinalResult;
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;
@@ -60,7 +58,7 @@ namespace JG
 
 		void UpdateGBufferPass();
 		void UpdateLightPass();
-
+		void UpdateFinalPass();
 		void UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix);
 		void UpdateRayTacing();
 		

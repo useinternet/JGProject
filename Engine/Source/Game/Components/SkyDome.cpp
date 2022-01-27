@@ -64,12 +64,6 @@ namespace JG
 
 	}
 
-	//void SkyDome::OnInspectorGUI()
-	//{
-	//	GameComponent::OnInspectorGUI();
-
-	//}
-
 	EScheduleResult SkyDome::PushRenderSceneObject()
 	{
 		if (mMaterial == nullptr || (mMesh == nullptr || mMesh->IsValid() == false))
@@ -90,7 +84,7 @@ namespace JG
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam)
 		{
-			f32 farZ = mainCam->GetFarZ() * 0.9f;
+			f32 farZ = mainCam->GetFarZ() * 0.5f;
 			radius = JVector3(farZ, farZ, farZ);
 			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		}
@@ -98,7 +92,7 @@ namespace JG
 		sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
 		sceneObject->MaterialList.push_back(mMaterial);
 		sceneObject->Mesh = mMesh;
-		//GetGameWorld()->PushRenderSceneObject(sceneObject);
+		GetGameWorld()->PushRenderSceneObject(sceneObject);
 		return EScheduleResult::Continue;
 	}
 

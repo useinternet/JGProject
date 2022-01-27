@@ -1,7 +1,7 @@
 
 
-#define DEBUG_MODE_NONE 0
-#define DEBUG_MODE_VISIBLE_ACTIVE_CLUSTER 1
+#define SHADING_MODEL_DEFAULT_LIT 0
+#define SHADING_MODEL_SKYBOX      1
 
 cbuffer __RenderPassDataCB__ : register(b0)
 {
@@ -199,28 +199,37 @@ float3 CalcWorldPosition(float2 tex, float depth)
     PosInWorld.xyz /= PosInWorld.w;
     return PosInWorld.xyz;
 }
-uint GetClusterIndex(float3 posH)
+uint GetClusterIndex(float2 tex, float depth)
 {
-    float linearZ  = LinearDepth(posH.z);
+    float z = depth;
+    float x = tex.x * _Resolution.x;
+    float y = tex.y * _Resolution.y;
+    float linearZ  = LinearDepth(z);
     uint zIndex    = max(log2(linearZ) * _ClusterScale + _ClusterBias, 0.0);
 
+    uint3 clusterIndexs = uint3(x / _ClusterSize.x, y / _ClusterSize.y, zIndex);
 
-    uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
+
     uint  tileIndex = clusterIndexs.x +
                      _NumClusterSlice.x * clusterIndexs.y +
                      (_NumClusterSlice.x * _NumClusterSlice.y) * clusterIndexs.z;
 
     return tileIndex;
 }
-uint3 GetClusterIndex3(float3 posH)
+float3 GetClusterIndex3(float2 tex, float depth)
 {
-    float linearZ  = LinearDepth(posH.z);
+    //float x = 2.0f * tex.x - 1.0f;
+    //float y = 1.0f - 2.0f * tex.y;
+    float z = depth;
+    float x = tex.x * _Resolution.x;
+    float y = tex.y * _Resolution.y;
+    float linearZ  = LinearDepth(z);
     uint zIndex    = max(log2(linearZ) * _ClusterScale + _ClusterBias, 0.0);
 
-
-    uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
-    return clusterIndexs;
+    uint3 clusterIndexs = uint3(x / _ClusterSize.x, y / _ClusterSize.y, zIndex);
+    return float3((float)clusterIndexs.x / _NumClusterSlice.x, (float)clusterIndexs.y / _NumClusterSlice.y , (float)zIndex / 24);
 }
+
 
 
 

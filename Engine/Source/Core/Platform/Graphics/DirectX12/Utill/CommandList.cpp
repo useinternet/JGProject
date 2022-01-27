@@ -191,6 +191,7 @@ namespace JG
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(uploadBuffer.GetAddressOf()));
+
 		uploadBuffer->SetName(TT("UploadBuffer"));
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
@@ -487,12 +488,12 @@ namespace JG
 	void GraphicsCommandList::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation,
 		u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
 	void GraphicsCommandList::Draw(u32 vertexPerInstance, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, true);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
@@ -516,41 +517,6 @@ namespace JG
 
 		return result;
 	}
-
-	//void GraphicsCommandList::AsCompute(const std::function<void(SharedPtr<ComputeCommandList>)>& action)
-	//{
-	//	if (action == nullptr)
-	//	{
-	//		return;
-	//	}
-	//	SharedPtr<ComputeCommandList> result = CreateSharedPtr<ComputeCommandList>();
-
-	//	// 공유할건 공유하고 따로 만들건 따로 만들기
-	//	result->mD3DType		= mD3DType;
-	//	result->mD3DCommandList = mD3DCommandList;
-	//	result->mD3DAllocator	= mD3DAllocator;
-
-	//	result->mTempObjectList			= mTempObjectList;
-	//	result->mResourceStateTracker	= mResourceStateTracker;
-	//	result->mUploadAllocator		= mUploadAllocator;
-	//	result->mDynamicDescriptorAllocator = mComputeDynamicDescriptorAllocator;
-
-
-
-	//	result->mBindedDescriptorHeap = mBindedDescriptorHeap;
-	//	result->mBindedComputeRootSig = mBindedComputeRootSig;
-	//	result->mBindedPipelineState = mBindedPipelineState;
-
-	//	action(result);
-
-	//	mBindedComputeRootSig = result->mBindedComputeRootSig;
-	//	mBindedPipelineState  = result->mBindedPipelineState;
-	//	mBindedDescriptorHeap = result->mBindedDescriptorHeap;
-
-	//}
-
-
-
 
 	void ComputeCommandList::ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, ID3D12Resource* resource)
 	{
@@ -693,13 +659,13 @@ namespace JG
 	}
 	void ComputeCommandList::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
 	}
 
 	void ComputeCommandList::DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, &mBindedDescriptorHeap, false);
+		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
 		mD3DCommandList->DispatchRays(&desc);
 
 	}

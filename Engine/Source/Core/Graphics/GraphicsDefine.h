@@ -288,6 +288,7 @@ namespace JG
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
 			constexpr char* Standard3DShader = "Standard3DShader";
+			constexpr char* StandardPostRenderingShader = "PostRendering";
 			constexpr char* StandardSceneShader = "StandardSceneShader";
 			constexpr char* StandardEditorUIShader = "StandardEditorUIShader";
 			constexpr char* DebugShader = "DebugShader";

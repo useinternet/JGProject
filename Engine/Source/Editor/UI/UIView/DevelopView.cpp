@@ -143,18 +143,30 @@ namespace JG
 				RendererParams_OnGUI();
 			}
 
-			SceneView* sceneView = UIManager::GetInstance().GetUIView<SceneView>();
-			if (sceneView != nullptr)
+
+			if (mSelectedTextureParamKey.GetValue().length() > 0)
 			{
-				if (mSelectedTextureParamKey.GetValue() == "Final")
+				Scheduler::GetInstance().ScheduleOnce(0, SchedulePriority::BeginSystem,
+					[&]() -> EScheduleResult
 				{
-					sceneView->SetSceneTexture(nullptr);
-				}
-				else
-				{
-					sceneView->SetSceneTexture(RP_Global_Tex::Load(mSelectedTextureParamKey.GetValue(), mRenderParamManager).GetValue());
-				}
+
+					SceneView* sceneView = UIManager::GetInstance().GetUIView<SceneView>();
+					if (sceneView != nullptr)
+					{
+						if (mSelectedTextureParamKey.GetValue() == "Final")
+						{
+							sceneView->SetSceneTexture(nullptr);
+						}
+						else
+						{
+							sceneView->SetSceneTexture(RP_Global_Tex::Load(mSelectedTextureParamKey.GetValue(), mRenderParamManager).GetValue());
+						}
+					}
+					return EScheduleResult::Break;
+				});
 			}
+
+
 		}
 
 
