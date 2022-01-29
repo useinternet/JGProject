@@ -23,15 +23,14 @@ namespace JG
 	}
 	void PreRenderProcess_LightCulling::Ready(const ReadyData& data)
 	{
+		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		CB.ViewMatirx      = JMatrix::Transpose(data.Info.ViewMatrix);
 		CB.PointLightCount = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
 		CB.NumXSlice = PreRenderProcess_ComputeCluster::NUM_X_SLICE;
 		CB.NumYSlice = PreRenderProcess_ComputeCluster::NUM_Y_SLICE;
 		CB.NumZSlice = PreRenderProcess_ComputeCluster::NUM_Z_SLICE;
 
-
 		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
-		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[bufferIndex]);
 		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[bufferIndex]);
 	}
@@ -43,16 +42,13 @@ namespace JG
 		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[bufferIndex];
 		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[bufferIndex];
 
-
-
 		SharedPtr<IComputeContext> context = data.ComputeContext;
-
 		context->BindRootSignature(mRootSignature);
 		context->BindShader(mShader);
 		context->BindConstantBuffer(0, CB); 
 		context->BindSturcturedBuffer(1, targetVisibleLightIndiciesSB);
 		context->BindSturcturedBuffer(2, targetLightGridSB);
-		context->BindSturcturedBuffer(3, pointLightsInfo.SB[bufferIndex]);
+		context->BindSturcturedBuffer(3, pointLightsInfo.Data.data(), pointLightsInfo.Size, pointLightsInfo.Count);
 		context->BindSturcturedBuffer(4, mClusterSB);
 		context->Dispatch(
 			PreRenderProcess_ComputeCluster::NUM_X_SLICE, 

@@ -39,47 +39,18 @@ namespace JG
 
 		// Light Info 정보 수집 <- 나중에 라이트 매니저로 빼기
 		// Structured Buffer 사이즈 조절 고민
-		Dictionary<Graphics::ELightType, List<jbyte>> lightBtDic;
 		for (auto item : lightList)
 		{
 			Graphics::ELightType lightType = item->GetLightType();
-
-			if (mLightInfos.find(lightType) == mLightInfos.end())
-			{
-				mLightInfos[lightType].OriginCount.resize(buffCount);
-				mLightInfos[lightType].SB.resize(buffCount);
-			}
-
 			auto& info = mLightInfos[item->GetLightType()];
 			info.Count++;
 			info.Size = item->GetBtSize();
-
-			auto& byteData = lightBtDic[item->GetLightType()];
-			item->PushBtData(byteData);
+			item->PushBtData(info.Data);
 		}
 
 
 
 		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-
-
-		for (auto& _pair : lightBtDic)
-		{
-			Graphics::ELightType lightType = _pair.first;
-			void* lightData = _pair.second.data();
-			auto& lightInfo = mLightInfos[lightType];
-			if (lightInfo.OriginCount[bufferIndex] != lightInfo.Count)
-			{
-				lightInfo.OriginCount[bufferIndex] = lightInfo.Count;
-				mLightInfos[lightType].SB[bufferIndex] = IStructuredBuffer::Create("Light_SB", lightInfo.Size, lightInfo.Count);
-			}
-
-
-			mCopyContext->CopyBuffer(lightInfo.SB[bufferIndex], lightData, lightInfo.Size, lightInfo.Count);
-		}
-
-
-
 		// PassData  바인딩
 		// Light 정보 바인딩
 		Graphics::RenderPassData passData;
@@ -91,7 +62,7 @@ namespace JG
 		passData.FarZ			= info.FarZ;
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolution;
-		passData.PointLightCount =  mLightInfos[Graphics::ELightType::PointLight].OriginCount[bufferIndex];
+		passData.PointLightCount = mLightInfos[Graphics::ELightType::PointLight].Count;
 
 
 		ReadyImpl( &passData);
@@ -118,7 +89,7 @@ namespace JG
 		context->BindConstantBuffer((u32)ERootParam::PassCB, passData);
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
-		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.SB[bufferIndex]);
+		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.Data.data(), lInfo.Size, lInfo.Count);
 
 		return BeginBatch(info, batchList);
 	}
@@ -175,7 +146,6 @@ namespace JG
 			if (isCompelete) break;
 		}
 
-		// Render
 		RenderImpl(result);
 
 
@@ -199,13 +169,8 @@ namespace JG
 			}
 			if (isCompelete) break;
 		}
-
-
-
-
-
-
 		mObjectInfoListDic.clear();
+		mLightInfos.clear();
 		EndBatch();
 
 		CompeleteImpl(result);

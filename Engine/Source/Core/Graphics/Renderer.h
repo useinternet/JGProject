@@ -93,8 +93,7 @@ namespace JG
 		{
 			i32 Count = 0;
 			u64 Size  = 0;
-			List<i32> OriginCount;
-			List<SharedPtr<IStructuredBuffer>> SB;
+			List<jbyte> Data;
 		};
 		struct ObjectInfo
 		{
@@ -132,6 +131,8 @@ namespace JG
 
 		SharedPtr<IRootSignature> mGraphicsRootSignature;
 		SharedPtr<IRootSignature> mComputeRootSignature;
+
+		u64 mReadyFrame = 0;
 	public:
 		Renderer();
 		virtual ~Renderer() = default;

@@ -978,15 +978,6 @@ namespace JG
 
 		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
 	}
-	void DirectX12ComputeContext::UAVBarrier(SharedPtr<ITexture> tex) 
-	{
-		if (mCommandList == nullptr || tex == nullptr || tex->IsValid() == false)
-		{
-			return;
-		}
-		auto dx12Tex = static_cast<DirectX12Texture*>(tex.get());
-		mCommandList->UAVBarrier(dx12Tex->Get());
-	}
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
 	{
 		if (rootSig == nullptr)

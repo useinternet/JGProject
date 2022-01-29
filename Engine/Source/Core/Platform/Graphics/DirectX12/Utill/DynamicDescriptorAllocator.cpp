@@ -49,7 +49,7 @@ namespace JG
 	{
 		if (clearHandleOffset)
 		{
-			mPushedHandleOffset = 1;
+			mPushedHandleOffset = 0;
 		}
 		mDescriptorCache.clear();
 		mRootParamInitTypeMap.clear();

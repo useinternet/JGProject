@@ -165,7 +165,7 @@ namespace JG
 		auto lInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 
 
-		CB.PointLightCount = lInfo.OriginCount[currentIndex];
+		CB.PointLightCount = lInfo.Count;
 
 
 
@@ -178,7 +178,7 @@ namespace JG
 		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
 
 		// PointLight
-		context->BindSturcturedBuffer(2, lInfo.SB[currentIndex]);
+		context->BindSturcturedBuffer(2, lInfo.Data.data(), lInfo.Size, lInfo.Count);
 
 		// WorldPos
 		context->BindTextures(3, { worldPosTex } );

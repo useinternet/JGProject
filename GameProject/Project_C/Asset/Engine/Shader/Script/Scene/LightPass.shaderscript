@@ -37,7 +37,10 @@ _Scene {
 	float3 V = normalize(_EyePosition - material.WorldPosition);
 
 
-	int   clusterIndex = GetClusterIndex(_input.tex, depth);
+
+
+
+	uint   clusterIndex = GetClusterIndex(_input.tex, depth);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
 
 	// Calc PointLight
@@ -48,6 +51,7 @@ _Scene {
 		for(int i = pl_start; i<pl_end; i++)
 		{
 			int lightIndex = _VisibleLightIndices[i];
+
 			PointLight pl = _PointLightList[lightIndex];
 			Lo += CalcPointLight(N, V, material, pl);
 		}

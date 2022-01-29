@@ -93,6 +93,7 @@ float3 F_Schlick(float cosTheta, float3 F0)
 float3 CalcDirLight(float3 N, float3 V, Material material, DirectionalLight light)
 {
     float3 L = normalize(light.Direction);
+    
 	float3 H = normalize(L + V);
 
 
@@ -213,8 +214,8 @@ uint GetClusterIndex(float2 tex, float depth)
     uint  tileIndex = clusterIndexs.x +
                      _NumClusterSlice.x * clusterIndexs.y +
                      (_NumClusterSlice.x * _NumClusterSlice.y) * clusterIndexs.z;
-
-    return tileIndex;
+    uint tileTotalCount = _NumClusterSlice.x * _NumClusterSlice.y * _NumClusterSlice.z;
+    return min(tileTotalCount, max(tileIndex, 0));
 }
 float3 GetClusterIndex3(float2 tex, float depth)
 {

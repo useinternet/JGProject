@@ -27,7 +27,7 @@ namespace JG
 
 		bool mResizeDirty        = false;
 		u32 mNumDescriptor		 = 0;
-		u32 mPushedHandleOffset  = 1;
+		u32 mPushedHandleOffset  = 0;
 		u32 mIncreaseSize		 = 0;
 
 	public:

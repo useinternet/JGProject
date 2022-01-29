@@ -42,13 +42,10 @@ namespace JG
 			mClearColor = info.ClearColor;
 			InitTextures(info.Resolution, info.ClearColor);
 		}
-
-	
 	}
 
 	void FowardRenderer::RenderImpl(SharedPtr<RenderResult> result)
 	{
-
 		UpdateRayTacing();
 		UpdateGBufferPass();
 		UpdateLightPass();
