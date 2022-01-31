@@ -119,13 +119,13 @@ namespace JG
 		bool isGameSystem = GameObjectFactory::GetInstance().IsGameSystem(type);
 		if (isGameSystem == false)
 		{
-			JG_CORE_ERROR("This Type({0}) is not GameSystem Category.", type.GetName());
+			JG_LOG_ERROR("This Type({0}) is not GameSystem Category.", type.GetName());
 			return;
 		}
 		auto obj = GameObjectFactory::GetInstance().CreateObjectByType(type);
 		if (obj == nullptr)
 		{
-			JG_CORE_ERROR("This Type({0}) is not registered.", type.GetName());
+			JG_LOG_ERROR("This Type({0}) is not registered.", type.GetName());
 			return;
 		}
 		auto sys = static_cast<GameSystem*>(obj);

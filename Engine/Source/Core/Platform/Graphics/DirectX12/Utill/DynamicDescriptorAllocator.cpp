@@ -90,7 +90,7 @@ namespace JG
 					if (mPushedHandleOffset >= mNumDescriptor)
 					{
 						mPushedHandleOffset = mNumDescriptor;
-						JG_CORE_CRITICAL("Need Add DynamicDescriptorAllocator Size  {0} => {1} ", mNumDescriptor, mNumDescriptor * 2);
+						JG_LOG_ERROR("Need Add DynamicDescriptorAllocator Size  {0} => {1} ", mNumDescriptor, mNumDescriptor * 2);
 					}
 
 					List<u32> srcDescriptorRangeSize(handleCount, 1);
@@ -162,7 +162,7 @@ namespace JG
 		{
 			return;
 		}
-		JG_CORE_ERROR("Resize DynamicDescriptorHeap Size {0} => {1}", mNumDescriptor, mNumDescriptor * 2);
+		JG_LOG_ERROR("Resize DynamicDescriptorHeap Size {0} => {1}", mNumDescriptor, mNumDescriptor * 2);
 		mNumDescriptor *= 2;
 
 		mD3DHeap = CreateD3DDescriptorHeap(DirectX12API::GetD3DDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,

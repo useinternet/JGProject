@@ -29,7 +29,7 @@ namespace JG
         mMainThreadID = std::this_thread::get_id();
         mMaxThreadCount = std::thread::hardware_concurrency();
 
-        JG_CORE_INFO("Scheduler Prepared Thread Count :  {0} ", mMaxThreadCount);
+        JG_LOG_INFO("Scheduler Prepared Thread Count :  {0} ", mMaxThreadCount);
 
         mThreads.resize(mMaxThreadCount);
         for (i32 i = 0; i < mMaxThreadCount; ++i)

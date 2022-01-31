@@ -24,7 +24,7 @@ namespace JG
 
 		if (mSwapChain == nullptr)
 		{
-			JG_CORE_CRITICAL("Failed Create SwapChain in DirectX12RenderContext");
+			JG_LOG_ERROR("Failed Create SwapChain in DirectX12RenderContext");
 			return false;
 		}
 		mBackBuffers.resize(buffCount);

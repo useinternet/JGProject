@@ -164,13 +164,13 @@ namespace JG
 		bool isComponent = GameObjectFactory::GetInstance().IsGameComponent(type);
 		if (isComponent == false)
 		{
-			JG_CORE_ERROR("This Type({0}) is not Component Category.", type.GetName());
+			JG_LOG_ERROR("This Type({0}) is not Component Category.", type.GetName());
 			return nullptr;
 		}
 		auto obj = GameObjectFactory::GetInstance().CreateObjectByType(type);
 		if (obj == nullptr)
 		{
-			JG_CORE_ERROR("This Type({0}) is not registered.", type.GetName());
+			JG_LOG_ERROR("This Type({0}) is not registered.", type.GetName());
 			return nullptr;
 		}
 		auto com = static_cast<GameComponent*>(obj);

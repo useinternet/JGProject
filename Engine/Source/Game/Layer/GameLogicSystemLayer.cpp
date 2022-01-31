@@ -43,7 +43,7 @@ namespace JG
 		mGamePlugin->Link(CreateSharedPtr<GamePluginLinker>());
 		if (mGamePlugin->IsVaild())
 		{
-			JG_INFO("Successed Connect Game Plugin");
+			JG_LOG_INFO("Successed Connect Game Plugin");
 			auto func = mGamePlugin->LoadFunction<void>("TestFunction");
 			if (func.IsVaild())
 			{

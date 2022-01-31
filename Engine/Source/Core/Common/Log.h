@@ -6,30 +6,30 @@
 //#define SPDLOG_WCHAR_FILENAMES 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
 namespace JG
 {
 	class Log : public GlobalSingleton<Log>
 	{
 		friend class Application;
 	private:
-		SharedPtr<spdlog::logger> smCoreLogger;
-		SharedPtr<spdlog::logger> smClientLogger;
+		SharedPtr<spdlog::logger> smLogger;
 	public:
-		inline static SharedPtr<spdlog::logger>& GetCoreLogger()  { return GetInstance().smCoreLogger; }
-		inline static SharedPtr<spdlog::logger>& GetClientLogger() { return GetInstance().smClientLogger; }
+		inline static SharedPtr<spdlog::logger>& GetLogger()  { return GetInstance().smLogger; }
+		inline static String GetLogFile() { return "jg_log.txt"; }
 	public:
 		Log()
 		{
-			spdlog::set_pattern("%^[%T] %n: %v%$");
-			smCoreLogger = spdlog::stdout_color_mt("Core");
-			smCoreLogger->set_level(spdlog::level::trace);
-			smClientLogger = spdlog::stdout_color_mt("App");
-			smClientLogger->set_level(spdlog::level::trace);
+			FileHelper::WriteAllText(GetLogFile(), "");
+			spdlog::set_pattern("[_]%^[:%t:][%l]%v%$[_]");
+			smLogger = spdlog::basic_logger_mt("JGLog", GetLogFile());
+			smLogger->set_level(spdlog::level::trace);
+			smLogger->flush_on(spdlog::level::trace);
+
 		}
 		~Log()
 		{
-			smCoreLogger.reset();
-			smClientLogger.reset();
+			smLogger.reset();
 			spdlog::shutdown();
 		}
 	public:
@@ -64,46 +64,19 @@ namespace JG
 		{
 			return std::forward<T>(arg);
 		}
-		//static auto Convert(const wchar_t* arg)
-		//{
-		//	return ws2s(arg);
-		//}
-		//static auto Convert(String& arg)
-		//{
-		//	return ws2s(arg);
-		//}
-		//static auto Convert(const String& arg)
-		//{
-		//	return ws2s(arg);
-		//}
 	};
 }
 
 
-//#if   _DEBUG
-#define JG_CORE_TRACE(...)    ::JG::Log::TraceLog(::JG::Log::GetCoreLogger(), __VA_ARGS__);
-#define JG_CORE_INFO(...)     ::JG::Log::InfoLog(::JG::Log::GetCoreLogger(), __VA_ARGS__);
-#define JG_CORE_WARN(...)     ::JG::Log::WarnLog(::JG::Log::GetCoreLogger(), __VA_ARGS__);
-#define JG_CORE_ERROR(...)    ::JG::Log::ErrorLog(::JG::Log::GetCoreLogger(), __VA_ARGS__);
-#define JG_CORE_CRITICAL(...) ::JG::Log::CriticalLog(::JG::Log::GetCoreLogger(), __VA_ARGS__);
-//#elif _RELEASE
-//#define JG_CORE_TRACE(...)   
-//#define JG_CORE_INFO(...)     
-//#define JG_CORE_WARN(...)     
-//#define JG_CORE_ERROR(...)    
-//#define JG_CORE_CRITICAL(...) 
-//#endif //  
-
 #if   _DEBUG
-#define JG_TRACE(...)   ::JG::Log::TraceLog(::JG::Log::GetClientLogger(), __VA_ARGS__);
-#define JG_INFO(...)    ::JG::Log::InfoLog(::JG::Log::GetClientLogger(), __VA_ARGS__);
-#define JG_WARN(...)    ::JG::Log::WarnLog(::JG::Log::GetClientLogger(), __VA_ARGS__);
-#define JG_ERROR(...)   ::JG::Log::ErrorLog(::JG::Log::GetClientLogger(), __VA_ARGS__);
-#define JG_CRITICAL(...)::JG::Log::CriticalLog(::JG::Log::GetClientLogger(), __VA_ARGS__);
+#define JG_LOG_TRACE(...)    ::JG::Log::TraceLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_INFO(...)     ::JG::Log::InfoLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_WARN(...)     ::JG::Log::WarnLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_ERROR(...)    ::JG::Log::ErrorLog(::JG::Log::GetLogger(), __VA_ARGS__);
 #elif _RELEASE
-#define JG_TRACE(...)   
-#define JG_INFO(...)     
-#define JG_WARN(...)     
-#define JG_ERROR(...)    
-#define JG_CRITICAL(...) 
+#define JG_LOG_TRACE(...)   
+#define JG_LOG_INFO(...)     
+#define JG_LOG_WARN(...)     
+#define JG_LOG_ERROR(...)    
 #endif //  
+ 

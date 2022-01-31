@@ -65,7 +65,7 @@ namespace JG
 		}
 		else
 		{
-			JG_CORE_ERROR("Assimp Importer ReadFiles Error : {0}", importer.GetErrorString());
+			JG_LOG_ERROR("Assimp Importer ReadFiles Error : {0}", importer.GetErrorString());
 			return EAssetImportResult::Fail;
 		}
 
@@ -205,7 +205,7 @@ namespace JG
 			}
 			if (multipleTex >= 2)
 			{
-				JG_CORE_ERROR("This Mesh is multiple texcoord : {0}", output->Name);
+				JG_LOG_ERROR("This Mesh is multiple texcoord : {0}", output->Name);
 			}
 
 
@@ -278,7 +278,7 @@ namespace JG
 
 		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Mesh, json) == false)
 		{
-			JG_CORE_ERROR("Fail Write Mesh : {0} ", outputPath);
+			JG_LOG_ERROR("Fail Write Mesh : {0} ", outputPath);
 		}
 	}
 
@@ -290,7 +290,7 @@ namespace JG
 		json->AddMember(JG_ASSET_KEY, stock);
 		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Texture, json) == false)
 		{
-			JG_CORE_ERROR("Fail Write Texture : {0} ", outputPath);
+			JG_LOG_ERROR("Fail Write Texture : {0} ", outputPath);
 		}
 	}
 
@@ -303,7 +303,7 @@ namespace JG
 		json->AddMember(JG_ASSET_KEY, stock);
 		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::CubeMap, json) == false)
 		{
-			JG_CORE_ERROR("Fail Write CubeMap : {0} ", outputPath);
+			JG_LOG_ERROR("Fail Write CubeMap : {0} ", outputPath);
 		}
 	}
 
@@ -311,7 +311,7 @@ namespace JG
 	{
 		if (MaterialAssetStock::Write(outputPath, stock) == false)
 		{
-			JG_CORE_ERROR("Fail Write Material : {0} ", outputPath);
+			JG_LOG_ERROR("Fail Write Material : {0} ", outputPath);
 		}
 	}
 

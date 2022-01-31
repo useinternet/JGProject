@@ -98,7 +98,7 @@ namespace JG
 	{
 		for (auto& obj : mReservedDestroyObjects)
 		{
-			JG_INFO("GameNode : {0}  Destroy", obj->GetName());
+			JG_LOG_INFO("GameNode : {0}  Destroy", obj->GetName());
 			obj->Destory();
 		}
 		mReservedDestroyObjects.clear();

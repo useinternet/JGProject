@@ -63,7 +63,7 @@ namespace JG
 		case ETextureFormat::R24G8_TYPELESS:	 return DXGI_FORMAT_R24G8_TYPELESS;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
-			JG_CORE_ERROR("This {0} DirectX12 TextureFormat is not supported convert ETextureFormat", TextureFormatToString(format));
+			JG_LOG_ERROR("This {0} DirectX12 TextureFormat is not supported convert ETextureFormat", TextureFormatToString(format));
 			return DXGI_FORMAT_UNKNOWN;
 		}
 	}
@@ -149,7 +149,7 @@ namespace JG
 		case EShaderDataType::_float3x3: return 36;
 		case EShaderDataType::_float4x4: return 64;
 		default:
-			JG_CORE_CRITICAL("not supported ShaderDataType");
+			JG_LOG_ERROR("not supported ShaderDataType");
 			return 0;
 		}
 	}
@@ -176,7 +176,7 @@ namespace JG
 		case EShaderDataType::textureCube: return"TextureCube";
 		case EShaderDataType::rwtexture2D: return "RWTexture2D";
 		default:
-			JG_CORE_CRITICAL("not supported ShaderDataType");
+			JG_LOG_ERROR("not supported ShaderDataType");
 			return "unknown";
 		}
 	}
@@ -384,7 +384,7 @@ namespace JG
 			case EShaderDataType::_float3x3: return "float3x3";
 			case EShaderDataType::_float4x4: return "float4x4";
 			default:
-				JG_CORE_CRITICAL("not supported ShaderDataType");
+				JG_LOG_ERROR("not supported ShaderDataType");
 				return "unknown";
 			}
 		}

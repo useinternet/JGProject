@@ -175,7 +175,7 @@ namespace JG
 		{
 			if (InsertScriptInternal(code, script) == false)
 			{
-				JG_CORE_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
+				JG_LOG_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
 			}
 		}
 	}

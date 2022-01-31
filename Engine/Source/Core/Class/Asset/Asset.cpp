@@ -616,7 +616,7 @@ namespace JG
 		}
 		case EAssetFormat::GameWorld:
 		default:
-			JG_CORE_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
+			JG_LOG_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
 			break;
 		}
 		return true;
@@ -642,7 +642,7 @@ namespace JG
 				auto iter = mAssetDataPool.find(compeleteData.ID);
 				if (iter != mAssetDataPool.end())
 				{
-					JG_CORE_ERROR("Asset Load Fail  : {0}", iter->second->Path);
+					JG_LOG_ERROR("Asset Load Fail  : {0}", iter->second->Path);
 					if (compeleteData.ID.IsOrigin())
 					{
 						mOriginAssetDataPool.erase(compeleteData.ID.ResourcePath);
@@ -663,7 +663,7 @@ namespace JG
 				{
 					iter->second->Asset = compeleteData.Asset;
 					iter->second->State = EAssetDataState::None;
-					JG_CORE_INFO("Asset Load Success : {0}", iter->second->Path);
+					JG_LOG_INFO("Asset Load Success : {0}", iter->second->Path);
 				}
 			}
 
@@ -677,7 +677,7 @@ namespace JG
 			if (mAyncLoadAssetHandleList[loopCnt] == nullptr)
 			{
 				auto loadData = mLoadAssetDataQueue.front(); mLoadAssetDataQueue.pop();
-				JG_CORE_INFO("Asset Loading... : {0}", loadData->Path);
+				JG_LOG_INFO("Asset Loading... : {0}", loadData->Path);
 				mAyncLoadAssetHandleList[loopCnt] = Scheduler::GetInstance().ScheduleAsync(
 					[&](SharedPtr<IJGObject> userData)
 				{
@@ -729,12 +729,12 @@ namespace JG
 			{
 				if (unLoadData.Asset->GetAssetID().IsOrigin())
 				{
-					JG_CORE_INFO("UnLoad Asset : {0}", unLoadData.Asset->GetAssetPath());
+					JG_LOG_INFO("UnLoad Asset : {0}", unLoadData.Asset->GetAssetPath());
 
 				}
 				else
 				{
-					JG_CORE_INFO("UnLoad ReadWrite Asset : {0}", unLoadData.Asset->GetAssetPath());
+					JG_LOG_INFO("UnLoad ReadWrite Asset : {0}", unLoadData.Asset->GetAssetPath());
 				}
 				unLoadData.Asset.reset();
 				unLoadData.Asset = nullptr;
@@ -806,7 +806,7 @@ namespace JG
 					i32 int_value = value->GetInt32();
 					if (materialAsset->mData->SetInt(name, int_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Int", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Int", materialStock->Name, name);
 					}
 				}
 				break;
@@ -815,7 +815,7 @@ namespace JG
 					JVector2Int int2_value = value->GetVector2Int();
 					if (materialAsset->mData->SetInt2(name, int2_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Int2", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Int2", materialStock->Name, name);
 					}
 				}
 				break;
@@ -824,7 +824,7 @@ namespace JG
 					JVector3Int int3_value = value->GetVector3Int();
 					if (materialAsset->mData->SetInt3(name, int3_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Int3", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Int3", materialStock->Name, name);
 					}
 				}
 				break;
@@ -833,7 +833,7 @@ namespace JG
 					JVector4Int int4_value = value->GetVector4Int();
 					if (materialAsset->mData->SetInt4(name, int4_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Int4", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Int4", materialStock->Name, name);
 					}
 				}
 				break;
@@ -842,7 +842,7 @@ namespace JG
 					u32 uint_value = value->GetUint32();
 					if (materialAsset->mData->SetUint(name, uint_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Uint", materialStock->Name, name);
 					}
 				}
 				break;
@@ -851,7 +851,7 @@ namespace JG
 					JVector2Uint uint2_value = value->GetVector2Uint();
 					if (materialAsset->mData->SetUint2(name, uint2_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint2", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Uint2", materialStock->Name, name);
 					}
 				}
 				break;
@@ -860,7 +860,7 @@ namespace JG
 					JVector3Uint uint3_value = value->GetVector3Uint();
 					if (materialAsset->mData->SetUint3(name, uint3_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint3", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Uint3", materialStock->Name, name);
 					}
 				}
 				break;
@@ -869,7 +869,7 @@ namespace JG
 					JVector4Uint uint4_value = value->GetVector4Uint();
 					if (materialAsset->mData->SetUint4(name, uint4_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Uint4", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Uint4", materialStock->Name, name);
 					}
 				}
 				break;
@@ -878,7 +878,7 @@ namespace JG
 					f32 f32_value = value->GetFloat();
 					if (materialAsset->mData->SetFloat(name, f32_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Float", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Float", materialStock->Name, name);
 					}
 				}
 				break;
@@ -887,7 +887,7 @@ namespace JG
 					JVector2 float2_value = value->GetVector2();
 					if (materialAsset->mData->SetFloat2(name, float2_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Float2", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Float2", materialStock->Name, name);
 					}
 				}
 				break;
@@ -896,7 +896,7 @@ namespace JG
 					JVector3 float3_value = value->GetVector3();
 					if (materialAsset->mData->SetFloat3(name, float3_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Float3", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Float3", materialStock->Name, name);
 					}
 				}
 				break;
@@ -905,7 +905,7 @@ namespace JG
 					JVector4 float4_value = value->GetVector4();
 					if (materialAsset->mData->SetFloat4(name, float4_value) == false)
 					{
-						JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+						JG_LOG_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
 					}
 				}
 				break;
@@ -920,7 +920,7 @@ namespace JG
 							auto t = static_cast<Asset<ITexture>*>(textureAsset.get())->Get();
 							if (materialAsset->mData->SetTexture(name, t) == false)
 							{
-								JG_CORE_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
+								JG_LOG_WARN("Failed {0} 's Param {1} Set Float4", materialStock->Name, name);
 							}
 						}
 					}

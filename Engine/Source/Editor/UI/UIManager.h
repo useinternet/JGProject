@@ -124,7 +124,7 @@ namespace JG
 			auto iter = mUIViewPool.find(type);
 			if (iter == mUIViewPool.end())
 			{
-				JG_CORE_ERROR("Not Find UIViewType : {0}", type.GetName());
+				JG_LOG_ERROR("Not Find UIViewType : {0}", type.GetName());
 				return nullptr;
 			}
 			return static_cast<UIViewType*>(iter->second.get());
@@ -166,7 +166,7 @@ namespace JG
 			auto iter = mPopupUIViewPool.find(type);
 			if (iter == mPopupUIViewPool.end())
 			{
-				JG_CORE_ERROR("Not Find UIModalViewType : {0}", type.GetName());
+				JG_LOG_ERROR("Not Find UIModalViewType : {0}", type.GetName());
 				return nullptr;
 			}
 			return static_cast<UIPopupViewType*>(iter->second.get());

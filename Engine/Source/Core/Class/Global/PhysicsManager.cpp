@@ -184,7 +184,7 @@ namespace JG
 					Command_Remove(command);
 					break;
 				default:
-					JG_CORE_ERROR("is not supported physics command type");
+					JG_LOG_ERROR("is not supported physics command type");
 					break;
 				}
 			}
@@ -211,7 +211,7 @@ namespace JG
 			return EScheduleResult::Continue;
 		});
 
-		JG_CORE_INFO("Create PhysXAPI : {0}", PX_PHYSICS_VERSION);
+		JG_LOG_INFO("Create PhysXAPI : {0}", PX_PHYSICS_VERSION);
 	}
 
 	void PhysicsManager::Command_Remove(SharedPtr<HandleCommand> command)
@@ -278,7 +278,7 @@ namespace JG
 		}
 		else
 		{
-			JG_CORE_ERROR("is not supported  PhysicsType in Command_Remove : {0}", (i32)data->Type);
+			JG_LOG_ERROR("is not supported  PhysicsType in Command_Remove : {0}", (i32)data->Type);
 		}
 
 
@@ -331,7 +331,7 @@ namespace JG
 		}
 		else
 		{
-			JG_CORE_ERROR("is not supported  PhysicsType in Command_Attach : Dest : {0}  Src : {1}", (i32)destData->Type, (i32)srcData->Type);
+			JG_LOG_ERROR("is not supported  PhysicsType in Command_Attach : Dest : {0}  Src : {1}", (i32)destData->Type, (i32)srcData->Type);
 		}
 	}
 
@@ -367,7 +367,7 @@ namespace JG
 		}
 		else
 		{
-			JG_CORE_ERROR("is not supported  PhysicsType in Command_Attach : Dest : {0}  Src : {1}", (i32)destData->Type, (i32)srcData->Type);
+			JG_LOG_ERROR("is not supported  PhysicsType in Command_Attach : Dest : {0}  Src : {1}", (i32)destData->Type, (i32)srcData->Type);
 		}
 	}
 

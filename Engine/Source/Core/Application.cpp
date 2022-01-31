@@ -129,12 +129,12 @@ namespace JG
 		
 		if(!mWindow->Create(prop.WindowProps))
 		{
-			JG_CORE_CRITICAL("Failed Create Window");
+			JG_LOG_ERROR("Failed Create Window");
 			return false;
 		}
 		else
 		{
-			JG_CORE_INFO("Successed Create Window");
+			JG_LOG_INFO("Successed Create Window");
 			JGGraphicsDesc desc;
 			desc.GraphicsAPI = EGraphicsAPI::DirectX12;
 			desc.GlobalShaderLibPath = Application::GetShaderGlobalLibPath();
@@ -234,7 +234,7 @@ namespace JG
 	}
 	bool Application::Open(AppOpenEvent& e)
 	{
-		JG_CORE_INFO(e.ToString());
+		JG_LOG_INFO(e.ToString());
 		OpenImpl();
 		return true;
 	}
@@ -244,7 +244,7 @@ namespace JG
 		{
 			mMinimized = true;
 			JGGraphics::GetInstance().Flush();
-			JG_CORE_INFO("최소화 상태");
+			JG_LOG_INFO("최소화 상태");
 		}
 		else
 		{
@@ -258,7 +258,7 @@ namespace JG
 	}
 	bool Application::Close(AppCloseEvent& e)
 	{
-		JG_CORE_INFO(e.ToString());
+		JG_LOG_INFO(e.ToString());
 		CloseImpl();
 		mIsRunning = false;
 		return true;

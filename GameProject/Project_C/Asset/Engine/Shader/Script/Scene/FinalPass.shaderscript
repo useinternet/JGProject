@@ -21,7 +21,7 @@ _Scene {
 	}
 	else
 	{
-		_output.final = float4(Lo * Shadow, 1.0f);
+		_output.final = float4(Lo , 1.0f);
 	}
 
 };

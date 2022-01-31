@@ -388,7 +388,7 @@ namespace JG
 			}
 			if (mRenderScheduleHandle != nullptr || IsLock())
 			{
-				JG_CORE_ERROR("It's still being rendered.");
+				JG_LOG_ERROR("It's still being rendered.");
 				return;
 			}
 			// Scene 정보 수정을 할수 없게 Lock

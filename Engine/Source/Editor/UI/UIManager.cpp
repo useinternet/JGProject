@@ -154,7 +154,7 @@ namespace JG
 			if (t != nullptr)
 			{
 				mIcons.emplace(t->GetAssetName(), t);
-				JG_CORE_INFO("Load Success Icon : {0} ", t->GetAssetName());
+				JG_LOG_INFO("Load Success Icon : {0} ", t->GetAssetName());
 			}
 		}
 		mIsLoadIcons = true;

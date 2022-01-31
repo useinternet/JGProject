@@ -89,7 +89,7 @@ namespace JG
 	}
 	void Develop::OnError()
 	{
-		JG_CORE_ERROR("Exception");
+		JG_LOG_ERROR("Exception");
 	}
 	void Develop::Init()
 	{

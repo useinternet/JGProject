@@ -323,7 +323,7 @@ namespace JG
 						e.ExceptObjectList.push_back(inspectorView->GetTargetObject());
 					}
 					SendEvent(e);
-					JG_CORE_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
+					JG_LOG_INFO("Scene View MousePos : {0}, {1}", standardPos.x, standardPos.y);
 				}
 				if (ImGui::IsWindowHovered() &&
 					ImGui::IsWindowFocused() == true &&

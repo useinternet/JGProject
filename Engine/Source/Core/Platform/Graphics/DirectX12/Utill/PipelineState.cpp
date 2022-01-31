@@ -31,7 +31,7 @@ namespace JG
 		case EShaderDataType::_uint4: return DXGI_FORMAT_R32G32B32A32_UINT;
 
 		default:
-			JG_CORE_ERROR("ConvertShaderDataType :: not supported ShaderDataType");
+			JG_LOG_ERROR("ConvertShaderDataType :: not supported ShaderDataType");
 			return DXGI_FORMAT_UNKNOWN;
 		}
 		
@@ -68,7 +68,7 @@ namespace JG
 		u64 cnt = rtFormats.size();
 		if (cnt >= MAX_RENDERTARGET)
 		{
-			JG_CORE_ERROR("RenderTarget Num can not exceed 8");
+			JG_LOG_ERROR("RenderTarget Num can not exceed 8");
 			cnt = MAX_RENDERTARGET;
 		}
 

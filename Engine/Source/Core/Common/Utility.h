@@ -50,6 +50,55 @@ namespace JG
 			}
 			return result;
 		}
+
+		inline u64 Find(const String& message, const String& pattern, u64 offset, u64 order = 1)
+		{
+			u64 cnt = 0;
+			u64 result = String::npos;
+			while (cnt < order )
+			{
+				u64 pos = message.find(pattern, offset);
+				if (pos == String::npos)
+				{
+					break;
+				}
+				offset = pos + pattern.length();
+				result = pos;
+				cnt += 1;
+			}
+			
+			return result;
+		}
+		inline bool StartWidth(const String& message, const String& pattern)
+		{
+			if (message.length() < pattern.length())
+			{
+				return false;
+			}
+			return std::strncmp(message.c_str(), pattern.c_str(), pattern.length()) == 0;
+		}
+		inline bool EndWidth(const String& message, const String& pattern)
+		{
+			if (message.length() < pattern.length())
+			{
+				return false;
+			}
+
+			String endStr = message.substr(message.length() - pattern.length(), pattern.length());
+			return std::strncmp(endStr.c_str(), pattern.c_str(), pattern.length()) == 0;
+		}
+
+		inline String ToString(std::thread::id id)
+		{
+			std::stringstream ss;
+			ss << id;
+			return ss.str();
+		}
+
+		inline i32 ToInt(const String& str, i32 default = 0)
+		{
+			return std::stoi(str, nullptr, default);
+		}
 	}
 
 

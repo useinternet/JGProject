@@ -234,17 +234,17 @@ namespace JG
 			return false;
 		}
 		sm_DirectX12API = this;
-		JG_CORE_INFO("DirectX12 Init Start");
+		JG_LOG_INFO("DirectX12 Init Start");
 
 		//
 		mFactory = CreateDXGIFactory();
 		if (mFactory)
 		{
-			JG_CORE_INFO("Success Create DXGIFactroy");
+			JG_LOG_INFO("Success Create DXGIFactroy");
 		}
 		else
 		{
-			JG_CORE_CRITICAL("Failed Create DXGIFactory");
+			JG_LOG_ERROR("Failed Create DXGIFactory");
 			return false;
 		}
 		DXGI_ADAPTER_DESC1 adapterDesc = {};
@@ -252,31 +252,31 @@ namespace JG
 
 		if (mDevice)
 		{
-			JG_CORE_INFO("Success Create D3D12Device");
-			JG_CORE_TRACE("Description : " + StringHelper::ws2s(adapterDesc.Description));
-			JG_CORE_TRACE("VideoMemory : {0}  MB", adapterDesc.DedicatedVideoMemory / 1024 / 1024);
+			JG_LOG_INFO("Success Create D3D12Device");
+			JG_LOG_TRACE("Description : " + StringHelper::ws2s(adapterDesc.Description));
+			JG_LOG_TRACE("VideoMemory : {0}  MB", adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 		}
 		else
 		{
-			JG_CORE_CRITICAL("Failed Create D3D12Device");
+			JG_LOG_ERROR("Failed Create D3D12Device");
 			return false;
 		}
 
 		// NOTE
 		// DescriptiorAllcator »ý¼º
-		JG_CORE_INFO("Create DescriptorAllocator...");
+		JG_LOG_INFO("Create DescriptorAllocator...");
 		mCSUAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		mRTVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		mDSVAllocator = CreateUniquePtr<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
-		JG_CORE_INFO("Create CommandQueue...");
+		JG_LOG_INFO("Create CommandQueue...");
 		mGraphicsCommandQueue = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_DIRECT);
 		mComputeCommandQueue  = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE);
 		mCopyCommandQueue     = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
 
 
-		JG_CORE_INFO("DirectX12 Init End");
+		JG_LOG_INFO("DirectX12 Init End");
 		return true;
 	}
 
@@ -376,7 +376,7 @@ namespace JG
 		auto buffer = CreateSharedPtr<DirectX12FrameBuffer>();
 		if (!buffer->Init(info))
 		{
-			JG_CORE_ERROR("Failed Create DirectX12RenderContext");
+			JG_LOG_ERROR("Failed Create DirectX12RenderContext");
 			return nullptr;
 		}
 		mFrameBuffers.emplace(info.Handle, buffer);
@@ -435,7 +435,7 @@ namespace JG
 		shader->SetName(name);
 		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader : {0} \n Error : {1} ", name, errorCode);
+			JG_LOG_ERROR("Failed Compile Shader : {0}  Error : {1} ", name, errorCode);
 			return nullptr;
 		}
 
@@ -449,7 +449,8 @@ namespace JG
 		shader->SetName(name);
 		if (shader->Compile(sourceCode, &errorCode) == false)
 		{
-			JG_CORE_ERROR("Failed Compile Shader : {0} \n Error : {1}", name, errorCode);
+			errorCode = StringHelper::ReplaceAll(errorCode,"\n", "");
+			JG_LOG_ERROR("Failed Compile Shader : {0} Error : {1}", name, errorCode);
 			return nullptr;
 		}
 
@@ -642,7 +643,6 @@ namespace JG
 		}
 
 		pso->BindRenderTarget(rtFormats, dsFormat);
-		mCommandList->SetRenderTarget(nullptr, nullptr, 0, nullptr, nullptr);
 		mCommandList->SetRenderTarget(d3dRTResources.data(), rtvHandles.data(), d3dRTResources.size(), d3dDSResource, dsvHandle.get());
 	}
 
@@ -895,7 +895,7 @@ namespace JG
 		auto pso = DirectX12API::GetGraphicsPipelineState();
 		if (pso->Finalize() == false)
 		{
-			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+			JG_LOG_ERROR("Failed Create Graphcis PipelineState");
 			return;
 		}
 		mCommandList->BindPipelineState(pso);
@@ -910,7 +910,7 @@ namespace JG
 		auto pso = DirectX12API::GetGraphicsPipelineState();
 		if (pso->Finalize() == false)
 		{
-			JG_CORE_ERROR("Failed Create Graphcis PipelineState");
+			JG_LOG_ERROR("Failed Create Graphcis PipelineState");
 			return;
 		}
 		mCommandList->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1118,7 +1118,7 @@ namespace JG
 		auto pso = DirectX12API::GetComputePipelineState();
 		if (pso->Finalize() == false)
 		{
-			JG_CORE_ERROR("Failed Create Compute PipelineState");
+			JG_LOG_ERROR("Failed Create Compute PipelineState");
 			return;
 		}
 		mCommandList->BindPipelineState(pso);

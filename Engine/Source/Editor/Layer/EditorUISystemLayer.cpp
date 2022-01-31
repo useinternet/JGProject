@@ -9,7 +9,7 @@
 #include "UI/UIView/ContentsView.h"
 #include "UI/UIView/ProjectSettingView.h"
 #include "UI/UIView/DevelopView.h"
-
+#include "UI/UIView/DevConsoleView.h"
 // PopupUI
 #include "UI/ContextUI/ComponentFinderContextView.h"
 #include "UI/ContextUI/AssetFinderContextView.h"
@@ -202,6 +202,7 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<ContentsView>();
 		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
 		UIManager::GetInstance().RegisterUIView<DevelopView>();
+		UIManager::GetInstance().RegisterUIView<DevConsoleView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()

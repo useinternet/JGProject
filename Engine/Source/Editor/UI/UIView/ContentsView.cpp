@@ -703,7 +703,7 @@ namespace JG
 								to = PathHelper::CombinePath(to, fileName);
 								if (fs::create_directory(to) == false)
 								{
-									JG_CORE_ERROR("Fail Create Directory");
+									JG_LOG_ERROR("Fail Create Directory");
 									continue;
 								}
 							}
@@ -719,7 +719,7 @@ namespace JG
 						progressBar->Display(file, ratio);
 						if (err.message().length() > 0)
 						{
-							JG_CORE_ERROR("Error : {0}", err.message());
+							JG_LOG_ERROR("Error : {0}", err.message());
 						}
 				
 					}
@@ -761,7 +761,7 @@ namespace JG
 				{
 					if (Import(importFile) == false)
 					{
-						JG_CORE_INFO("Fail Import File : {0}", importFile);
+						JG_LOG_INFO("Fail Import File : {0}", importFile);
 					}
 					ratio += oneUnit;
 					progressBar->Display(importFile, ratio);
@@ -793,7 +793,7 @@ namespace JG
 		}
 
 
-		JG_CORE_INFO("Double Click : {0}", path);
+		JG_LOG_INFO("Double Click : {0}", path);
 	}
 	void ContentsView::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -912,7 +912,7 @@ namespace JG
 		}
 		else
 		{
-			JG_CORE_ERROR("not supported import format : {0}", p.string());
+			JG_LOG_ERROR("not supported import format : {0}", p.string());
 			return false;
 		}
 	
@@ -1118,7 +1118,7 @@ namespace JG
 
 		if (err.message().length() > 0)
 		{
-			JG_CORE_ERROR("ReName Error : {0}", err.message());
+			JG_LOG_ERROR("ReName Error : {0}", err.message());
 		}
 
 		auto assetID = AssetDataBase::GetInstance().GetAssetOriginID(dest);

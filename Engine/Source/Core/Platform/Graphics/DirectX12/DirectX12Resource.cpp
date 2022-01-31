@@ -70,7 +70,7 @@ namespace JG
 			}
 			else
 			{
-				JG_CORE_WARN("{0} Buffer CPU Data is nullptr", GetName());
+				JG_LOG_WARN("{0} Buffer CPU Data is nullptr", GetName());
 
 			}
 	
@@ -170,7 +170,7 @@ namespace JG
 					auto hResult = mD3DResource->Map(0, nullptr, (void**)&mCPUData);
 					if (FAILED(hResult))
 					{
-						JG_CORE_WARN("{0} Buffer Fail Map", GetName());
+						JG_LOG_WARN("{0} Buffer Fail Map", GetName());
 					}
 				}
 			}
@@ -180,7 +180,7 @@ namespace JG
 			}
 			else
 			{
-				JG_CORE_WARN("{0} Buffer CPU Data is nullptr", GetName());
+				JG_LOG_WARN("{0} Buffer CPU Data is nullptr", GetName());
 			}
 			break;
 		}
@@ -603,7 +603,7 @@ namespace JG
 		// 렌더 타겟 텍스쳐가 아니라면 0을 뿜어냄
 		if ((mTextureInfo.Flags & ETextureFlags::Allow_RenderTarget) == false)
 		{
-			JG_CORE_ERROR("{0} not supported RenderTarget because does not include  ETextureFlags::Allow_RenderTarget Flag", GetName());
+			JG_LOG_ERROR("{0} not supported RenderTarget because does not include  ETextureFlags::Allow_RenderTarget Flag", GetName());
 			return { 0 };
 		}
 
@@ -642,7 +642,7 @@ namespace JG
 		if (IsValid() == false) return { 0 };
 		if ((mTextureInfo.Flags & ETextureFlags::Allow_DepthStencil) == false)
 		{
-			JG_CORE_ERROR("{0} not supported DepthStencil because does not include  ETextureFlags::Allow_DepthStencil Flag", GetName());
+			JG_LOG_ERROR("{0} not supported DepthStencil because does not include  ETextureFlags::Allow_DepthStencil Flag", GetName());
 			return { 0 };
 		}
 
