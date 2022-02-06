@@ -8,6 +8,11 @@
 
 namespace JG
 {
+	
+
+
+
+
 	const String& DirectX12GraphicsShader::GetName() const
 	{
 		return mName;
@@ -18,8 +23,12 @@ namespace JG
 	}
 	bool DirectX12GraphicsShader::Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error)
 	{
+
 		mFlags = flags;
 		mShaderScriptList = scriptList;
+		mScriptCodeAnalyzer = CreateUniquePtr<ShaderScriptCodeAnalyzer>(
+			HLSL::RegisterNumber::MaterialRegisterNumber, 0,
+			0, HLSL::RegisterSpace::Texture2DRegisterSpace);
 		// SourceCode
 		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode()   + "\n";
 		libCode       += ShaderLibrary::GetInstance().GetGlobalGraphicsLibCode() + "\n";
@@ -29,13 +38,13 @@ namespace JG
 
 		if (scriptList.empty())
 		{
-			InsertScript(code, nullptr);
+			mScriptCodeAnalyzer->InsertScript(code, nullptr);
 		}
 		else
 		{
 			for (auto& script : scriptList)
 			{
-				InsertScript(code, script);
+				mScriptCodeAnalyzer->InsertScript(code, script);
 			}
 		}
 
@@ -65,7 +74,7 @@ namespace JG
 	}
 	const List<std::pair<EShaderDataType, String>>& DirectX12GraphicsShader::GetPropertyList() const
 	{
-		return mPropertyList;
+		return mScriptCodeAnalyzer->GetPropertyList();
 	}
 	const List<SharedPtr<IShaderScript>>& DirectX12GraphicsShader::GetScriptList() const
 	{
@@ -77,22 +86,11 @@ namespace JG
 		{
 			return;
 		}
-		for (auto& _pair : mSortedTextureMap)
+		for (auto& _pair : mScriptCodeAnalyzer->GetSortedTextureMap())
 		{
 			action(_pair.second);
 		}
 
-	}
-	void DirectX12GraphicsShader::ForEach_TextureCubeSlot(const std::function<void(const String&)>& action)
-	{
-		if (action == nullptr)
-		{
-			return;
-		}
-		for (auto& _pair : mSortedTextureCubeMap)
-		{
-			action(_pair.second);
-		}
 	}
 	bool DirectX12GraphicsShader::Compile(const String& code, String* error)
 	{
@@ -157,160 +155,7 @@ namespace JG
 		mIsCompileSuccess = true;
 		return true;
 	}
-	void DirectX12GraphicsShader::InsertScript(String& code, SharedPtr<IShaderScript> script)
-	{
-		if (script == nullptr)
-		{
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
 
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, "");
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, "");
-		}
-		else
-		{
-			if (InsertScriptInternal(code, script) == false)
-			{
-				JG_LOG_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
-			}
-		}
-	}
-	bool DirectX12GraphicsShader::InsertScriptInternal(String& code, SharedPtr<IShaderScript> script)
-	{
-		String scriptCode = script->GetCode();
-		String resourcesCode;
-		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Resources, resourcesCode) == true)
-		{
-			//
-			u64 lineStart    = 0;
-			u64 lineEnd      = 0;
-			u32 texture2dCnt = 0;
-			u32 textureCubeCnt = 0;
-			while (true)
-			{
-				lineEnd = resourcesCode.find(";", lineStart);
-				if (lineEnd == String::npos) break;
-				auto line = resourcesCode.substr(lineStart, lineEnd - lineStart);
-				auto mid  = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
-				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
-				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
-				if (type == HLSL::Token::Texture2D)
-				{
-					u64 resNum = texture2dCnt;
-					String registerSpace = std::to_string(HLSL::RegisterSpace::Texture2DRegisterSpace);
-					String registerNum   = std::to_string(texture2dCnt++);
-					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
-					resourcesCode.insert(lineEnd, registerStr);
-					lineEnd += registerStr.length();
-					mSortedTextureMap[resNum] = name;
-				}
-				else if (type == HLSL::Token::TextureCube)
-				{
-					u64 resNum = textureCubeCnt;
-					String registerSpace = std::to_string(HLSL::RegisterSpace::TextureCubeRegisterSpace);
-					String registerNum = std::to_string(textureCubeCnt++);
-					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
-					resourcesCode.insert(lineEnd, registerStr);
-					lineEnd += registerStr.length();
-					mSortedTextureCubeMap[resNum] = name;
-				}
-				lineStart = lineEnd + 1;
-			}
-		}
-
-		String variablesCode;
-		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Variables, variablesCode) == true)
-		{
-			u64 lineStart = 0;
-			u64 lineEnd = 0;
-			while (true)
-			{
-				lineEnd = variablesCode.find(";", lineStart);
-				if (lineEnd == String::npos) break;
-				auto line = variablesCode.substr(lineStart, lineEnd - lineStart);
-
-				auto mid = line.find_last_of(" ");
-				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
-				auto name = line.substr(mid + 1, line.length() - mid - 1);
-				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
-				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
-				lineStart = lineEnd + 1;
-			}
-			String registerStr = " : register(b" + std::to_string(HLSL::RegisterNumber::MaterialRegisterNumber) + ")";
-			variablesCode = String(HLSL::Token::CBuffer) + "__ScriptConstantBuffer__" + registerStr + "\n { \n" + variablesCode;
-			variablesCode += "\n};";
-		}
-
-		// Function 코드를 마지막에
-		String functionCode;
-		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Function, functionCode) == true)
-		{
-
-		}
-
-
-		String contentsCode;
-		EShaderScriptType type = EShaderScriptType::Surface;
-		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Surface, contentsCode) == true)
-		{
-			type = EShaderScriptType::Surface;
-		}
-		else if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Scene, contentsCode) == true)
-		{
-			type = EShaderScriptType::Scene;
-		}
-
-
-
-		switch (type)
-		{
-		case EShaderScriptType::Surface:
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, functionCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, contentsCode);
-			break;
-		case EShaderScriptType::Scene:
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, resourcesCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, variablesCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, functionCode);
-			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, contentsCode);
-			break;
-		default:
-			return false;
-		}
-		return true;
-	}
-	bool DirectX12GraphicsShader::ExtractScriptContents(const String& code, const String& key, String& out_code)
-	{
-		u64 start = code.find(key);
-		if (start == String::npos)
-		{
-			return false;
-		}
-
-
-		u64 end = code.find("};", start);
-		if (start == String::npos)
-		{
-			return false;
-		}
-
-		start = code.find("{", start);
-		if (start == String::npos)
-		{
-			return false;
-		}
-
-		out_code = code.substr(start + 1, end - start - 1);
-		return true;
-	}
 	const String& DirectX12ComputeShader::GetName() const
 	{
 		return mName;
@@ -359,6 +204,266 @@ namespace JG
 			return false;
 		}
 		mIsCompileSuccess = true;
+		return true;
+	}
+	bool DirectX12ClosestHitShader::Init(SharedPtr<IShaderScript> script)
+	{
+		mScriptCodeAnalyzer = CreateUniquePtr< ShaderScriptCodeAnalyzer>(
+			0, 1,
+			2, 1);
+		String Name = StringHelper::ReplaceAll(GetName(), "Surface/", "");
+		mHitGroupName = Name + "_HitGroup";
+		mEntryPoint = Name + "_ClosestHit";
+		mSourceCode = R"(
+
+StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
+StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
+
+
+__PS_SURFACE_RESOURCES_SCRIPT__
+__PS_SURFACE_VARIABLES_SCRIPT__
+__PS_SURFACE_FUNCTION_SCRIPT__
+
+
+SURFACE_OUTPUT SURFACE_FUNCTION(SURFACE_INPUT _input)
+{
+	SURFACE_OUTPUT _output;
+	_output.albedo    = float4(1.0f,1.0f,1.0f,1.0f);
+	_output.specular  = float3(0.5f, 0.5f, 0.5f);
+	_output.normal    = _input.normal;
+    _output.roughness = 0.0f;
+	_output.metallic  = 0.0f;
+	_output.emissive = float3(0.0f,0.0f,0.0f);
+	_output.shadingmodel = 0;
+
+	__PS_SURFACE_CONTENTS_SCRIPT__
+
+
+	return _output;
+};
+
+[shader("closesthit")]
+void __ClosestHit_EntryPoint__(inout Payload payload, BuiltInTriangleIntersectionAttributes attribute)
+{
+	uint startIndex = PrimitiveIndex() * 3;
+    const uint3 indices = { Local_IndexBuffer[startIndex], Local_IndexBuffer[startIndex + 1], Local_IndexBuffer[startIndex + 2] };
+    Vertex vertices[3] = {
+        Local_VertexBuffer[indices[0]],
+        Local_VertexBuffer[indices[1]],
+        Local_VertexBuffer[indices[2]] };
+
+    Vertex v = HitAttribute(vertices, attribute);
+
+
+	SURFACE_INPUT input;
+	input.position       = HitWorldPosition();
+	input.local_position = HitObjectPosition();
+	input.normal         = normalize(v.Normal);
+	input.tangent        = normalize(v.Tangent);
+	input.bitangent      = normalize(v.Bitangent);
+	input.tex            = v.Texcoord;
+	SURFACE_OUTPUT output = SURFACE_FUNCTION(input);
+	
+	if(output.shadingmodel == SHADING_MODEL_DEFAULT_LIT)
+	{
+		payload.Color = float4(Lo(output), 1.0f);
+	}
+	else
+	{
+		payload.Color = float4(output.emissive, 1.0f);
+	}
+
+
+
+}
+)";
+		mSourceCode = StringHelper::ReplaceAll(mSourceCode, "__ClosestHit_EntryPoint__", mEntryPoint);
+		mScriptCodeAnalyzer->InsertScript(mSourceCode, script);
+
+		return true;
+	}
+	const String& DirectX12ClosestHitShader::GetName() const
+	{
+		return mName;
+	}
+	const String& DirectX12ClosestHitShader::GetEntryPoint() const
+	{
+		return mEntryPoint;
+	}
+	const String& DirectX12ClosestHitShader::GetHitGroupName() const
+	{
+		return mHitGroupName;
+	}
+	const String& DirectX12ClosestHitShader::GetShaderCode() const
+	{
+		return mSourceCode;
+	}
+	void DirectX12ClosestHitShader::SetName(const String& name)
+	{
+		mName = name;
+	}
+
+
+
+
+
+
+
+
+	void ShaderScriptCodeAnalyzer::InsertScript(String& code, SharedPtr<IShaderScript> script)
+	{
+		if (script == nullptr)
+		{
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, "");
+
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, "");
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, "");
+		}
+		else
+		{
+			if (InsertScriptInternal(code, script) == false)
+			{
+				JG_LOG_ERROR("Fail Insert ShaderScript : {0}", script->GetName());
+			}
+		}
+	}
+	const List<std::pair<EShaderDataType, String>>& ShaderScriptCodeAnalyzer::GetPropertyList() const
+	{
+		return mPropertyList;
+	}
+	const SortedDictionary<u64, String>& ShaderScriptCodeAnalyzer::GetSortedTextureMap() const
+	{
+		return mSortedTextureMap;
+	}
+	//const SortedDictionary<u64, String>& ShaderScriptCodeAnalyzer::GetSortedTextureCubeMap() const
+	//{
+	//	return mSortedTextureCubeMap;
+	//}
+	bool ShaderScriptCodeAnalyzer::InsertScriptInternal(String& code, SharedPtr<IShaderScript> script)
+	{
+		String scriptCode = script->GetCode();
+		String resourcesCode;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Resources, resourcesCode) == true)
+		{
+			//
+			u64 lineStart = 0;
+			u64 lineEnd = 0;
+			u32 texture2dCnt = mStartTexRegisterNum;
+			//u32 textureCubeCnt = mStartTexCubeReigsterNum;
+			while (true)
+			{
+				lineEnd = resourcesCode.find(";", lineStart);
+				if (lineEnd == String::npos) break;
+				auto line = resourcesCode.substr(lineStart, lineEnd - lineStart);
+				auto mid = line.find_last_of(" ");
+				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
+				auto name = line.substr(mid + 1, line.length() - mid - 1);
+				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
+				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
+				if (type == HLSL::Token::Texture2D || type == HLSL::Token::TextureCube)
+				{
+					u64 resNum = texture2dCnt;
+					String registerSpace = std::to_string(mStartTexRegisterSpace);
+					String registerNum = std::to_string(texture2dCnt++);
+					String registerStr = " : register(t" + registerNum + ", space" + registerSpace + ")";
+					resourcesCode.insert(lineEnd, registerStr);
+					lineEnd += registerStr.length();
+					mSortedTextureMap[resNum] = name;
+				}
+				lineStart = lineEnd + 1;
+			}
+		}
+
+		String variablesCode;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Variables, variablesCode) == true)
+		{
+			u64 lineStart = 0;
+			u64 lineEnd = 0;
+			while (true)
+			{
+				lineEnd = variablesCode.find(";", lineStart);
+				if (lineEnd == String::npos) break;
+				auto line = variablesCode.substr(lineStart, lineEnd - lineStart);
+
+				auto mid = line.find_last_of(" ");
+				auto type = line.substr(0, mid); type = StringHelper::ReplaceAll(type, "\n", "");  type = StringHelper::ReplaceAll(type, "\t", ""); type = StringHelper::ReplaceAll(type, " ", "");
+				auto name = line.substr(mid + 1, line.length() - mid - 1);
+				name = StringHelper::ReplaceAll(name, "\n", "");  name = StringHelper::ReplaceAll(name, "\t", "");
+				mPropertyList.push_back(std::pair<EShaderDataType, String>(StringToShaderDataType(type), name));
+				lineStart = lineEnd + 1;
+			}
+			String registerStr = " : register(b" + std::to_string(mStartCBReigsterNum) + ", space" + std::to_string(mStartCBRegisterSpace) + ")";
+			variablesCode = String(HLSL::Token::CBuffer) + "__ScriptConstantBuffer__" + registerStr + "\n { \n" + variablesCode;
+			variablesCode += "\n};";
+		}
+
+		// Function 코드를 마지막에
+		String functionCode;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Function, functionCode) == true)
+		{
+
+		}
+
+
+		String contentsCode;
+		EShaderScriptType type = EShaderScriptType::Surface;
+		if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Surface, contentsCode) == true)
+		{
+			type = EShaderScriptType::Surface;
+		}
+		else if (ExtractScriptContents(scriptCode, ShaderDefine::Type::Scene, contentsCode) == true)
+		{
+			type = EShaderScriptType::Scene;
+		}
+
+
+
+		switch (type)
+		{
+		case EShaderScriptType::Surface:
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceResources, resourcesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceVariables, variablesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceFunction, functionCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SurfaceContents, contentsCode);
+			break;
+		case EShaderScriptType::Scene:
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneResources, resourcesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneVariables, variablesCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneFunction, functionCode);
+			code = StringHelper::ReplaceAll(code, ShaderDefine::Location::SceneContents, contentsCode);
+			break;
+		default:
+			return false;
+		}
+		return true;
+	}
+	bool ShaderScriptCodeAnalyzer::ExtractScriptContents(const String& code, const String& key, String& out_code)
+	{
+		u64 start = code.find(key);
+		if (start == String::npos)
+		{
+			return false;
+		}
+
+
+		u64 end = code.find("};", start);
+		if (start == String::npos)
+		{
+			return false;
+		}
+
+		start = code.find("{", start);
+		if (start == String::npos)
+		{
+			return false;
+		}
+
+		out_code = code.substr(start + 1, end - start - 1);
 		return true;
 	}
 }

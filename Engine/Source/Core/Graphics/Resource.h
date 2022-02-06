@@ -85,7 +85,6 @@ namespace JG
 		static SharedPtr<IStructuredBuffer> Create(const String& name, u64 elementSize, u64 elementCount);
 	};
 
-
 	class IReadBackBuffer : public IResource
 	{
 	public:

@@ -324,8 +324,12 @@ namespace JG
 		if (type == JGTYPE(bool))
 		{
 			RP_Global_Bool val = RP_Global_Bool::Load(key, mRenderParamManager);
-			bool valResult = ImGui::CheckBox((void*)(("##" + key).c_str()), val.GetValue());
-			val.SetValue(valResult);
+			bool check = val.GetValue();
+			if (ImGui::Checkbox(("##" + key).c_str(), &check) == true)
+			{
+				val.SetValue(!val.GetValue());
+			}
+	
 		}
 		else if (type == JGTYPE(f32))
 		{

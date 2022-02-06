@@ -2,6 +2,22 @@
 
 
 
+
+struct Material
+{
+    float3 WorldPosition;
+    float3 Albedo;
+    float  Roughness;
+    float  Metallic;
+    float3 Emissive;
+};
+
+struct DirectionalLight
+{
+    float3 Direction;
+    float3 LightColor;
+};
+
 struct PointLight
 {
     float3 Position;
@@ -13,6 +29,112 @@ struct PointLight
     float  Att1;
     float  Att2;
 };
+
+
+
+
+
+struct LightGrid
+{
+    int PL_Count;
+    int PL_Offset;
+};
+
+struct Cluster
+{
+    float4 Min;
+    float4 Max;
+};
+
+struct Vertex
+{
+	float3 Position;
+	float2 Texcoord;
+	float3 Normal;
+	float3 Tangent;
+	float3 Bitangent;
+};
+
+struct SURFACE_OUTPUT
+{
+	float4 albedo;
+	float3 normal;
+	float3 specular;
+	float roughness;
+	float metallic;
+	float3 emissive;
+    int shadingmodel;
+};
+struct SURFACE_INPUT
+{
+	float3 position;
+	float3 local_position;
+	float3 normal;
+	float3 tangent;
+	float3 bitangent;
+	float2 tex;
+};
+
+
+float3 HitWorldPosition()
+{
+    return WorldRayOrigin() + RayTCurrent() * WorldRayDirection();
+}
+
+// Retrieve hit object space position.
+float3 HitObjectPosition()
+{
+    return ObjectRayOrigin() + RayTCurrent() * ObjectRayDirection();
+}
+float3 HitAttribute(float3 vertexAttribute[3], BuiltInTriangleIntersectionAttributes attr)
+{
+    return vertexAttribute[0] +
+        attr.barycentrics.x * (vertexAttribute[1] - vertexAttribute[0]) +
+        attr.barycentrics.y * (vertexAttribute[2] - vertexAttribute[0]);
+}
+float2 HitAttribute(float2 vertexAttribute[3], BuiltInTriangleIntersectionAttributes attr)
+{
+    return vertexAttribute[0] +
+        attr.barycentrics.x * (vertexAttribute[1] - vertexAttribute[0]) +
+        attr.barycentrics.y * (vertexAttribute[2] - vertexAttribute[0]);
+}
+Vertex HitAttribute(Vertex vertices[3], BuiltInTriangleIntersectionAttributes attr)
+{
+    float2 vertexTexcoords[3] = { vertices[0].Texcoord, vertices[1].Texcoord, vertices[2].Texcoord };
+    float2 texCoord = HitAttribute(vertexTexcoords, attr);
+    float orientation = HitKind() == HIT_KIND_TRIANGLE_FRONT_FACE ? 1 : -1;
+
+    float3 vertexNormals[3] = { vertices[0].Normal, vertices[1].Normal, vertices[2].Normal };
+    float3 normal = normalize(HitAttribute(vertexNormals, attr));
+
+    normal *= orientation;
+    normal = normalize(mul((float3x3)ObjectToWorld3x4(), normal));
+
+
+    float3 vertexTangents[3] = { vertices[0].Tangent, vertices[1].Tangent, vertices[2].Tangent };
+    float3 tangent = normalize(HitAttribute(vertexTangents, attr));
+    tangent *= orientation;
+    tangent = normalize(mul((float3x3)ObjectToWorld3x4(), tangent));
+
+    float3 vertexBitangents[3] = { vertices[0].Bitangent, vertices[1].Bitangent, vertices[2].Bitangent };
+    float3 bitangent = normalize(HitAttribute(vertexBitangents, attr));
+    bitangent *= orientation;
+    bitangent = normalize(mul((float3x3)ObjectToWorld3x4(), bitangent));
+
+
+
+    Vertex result;
+    result.Position  = HitWorldPosition();
+    result.Texcoord  = texCoord;
+    result.Tangent   = tangent;
+    result.Bitangent = bitangent;
+    result.Normal    = normal;
+    return result;
+}
+
+
+
+
 
 
 uint initRand(uint val0, uint val1, uint backoff = 16)
@@ -59,17 +181,17 @@ float3 getConeSample(inout uint randSeed, float3 hitNorm, float cosThetaMax)
 	return tangent * (r * cos(phi)) + bitangent * (r * sin(phi)) + hitNorm.xyz * cosTheta;
 }
 
-float3 HitWorldPosition()
-{
-    return WorldRayOrigin() + RayTCurrent() * WorldRayDirection();
-}
-
 
 struct HaltonState
 {
     uint dimension;
     uint sequenceIndex;
 };
+float haltonSample(uint dimension, uint sampleIndex);
+float haltonNext(inout HaltonState state);
+uint haltonIndex(uint x, uint y, uint i);
+uint halton2Inverse(uint index, uint digits);
+uint halton3Inverse(uint index, uint digits);
 
 void haltonInit(inout HaltonState hState,
     int x, int y,
@@ -171,3 +293,13 @@ uint halton3Inverse(uint index, uint digits)
     }
     return result;
 }
+
+
+
+
+
+
+
+
+
+

@@ -61,7 +61,15 @@ namespace JG
 		data.numRegisterSpace = numRegisterSpace;
 		mRootSignatureDataDic[rootParam] = data;
 	}
-
+	 void DirectX12RootSignatureCreater::AddConstant(u32 rootParam, u32 btSize, u32 numRegister, u32 numRegisterSpace)
+	{
+		 Data data;
+		 data.Type = Constant;
+		 data.constantSize = btSize;
+		 data.numRegister = numRegister;
+		 data.numRegisterSpace = numRegisterSpace;
+		 mRootSignatureDataDic[rootParam] = data;
+	}
 	void DirectX12RootSignatureCreater::AddSampler(u32 numRegister, ESamplerFilter filter, ETextureAddressMode addressMode)
 	{
 		SamplerData data;
@@ -78,7 +86,7 @@ namespace JG
 		mRootSignatureSamplerDataDic.clear();
 	}
 
-	SharedPtr<IRootSignature> DirectX12RootSignatureCreater::Generate()
+	SharedPtr<IRootSignature> DirectX12RootSignatureCreater::Generate(bool isLocal)
 	{
 
 		if (mRootSignatureDataDic.empty())
@@ -105,6 +113,10 @@ namespace JG
 				break;
 			case CBV:
 				rootSig->InitAsCBV(data.numRegister, data.numRegisterSpace);
+				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::NONE;
+				break;
+			case Constant:
+				rootSig->InitAsConstant(data.constantSize, data.numRegister, data.numRegisterSpace);
 				result->mDescriptorTableRangeTypeDic[rootParam] = EDescriptorTableRangeType::NONE;
 				break;
 			case DT_SRV:
@@ -140,7 +152,8 @@ namespace JG
 			rootSig->AddStaticSamplerState(sampler);
 		}
 
-		if (rootSig->Finalize())
+		if (rootSig->Finalize(
+			(isLocal) ? D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE : D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT))
 		{
 			result->mRootSig = rootSig;
 			return result;

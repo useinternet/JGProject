@@ -2,6 +2,8 @@
 #include "Shader.h"
 #include "Application.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/RayTracing/RayTracingPipeline.h"
+#include "Graphics/RayTracing/Raytracer.h"
 #include "GraphicsAPI.h"
 
 namespace JG
@@ -20,6 +22,13 @@ namespace JG
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		return api->CreateComputeShader(name, sourceCode);
+	}
+	SharedPtr<IClosestHitShader> IClosestHitShader::Create(const String& name, SharedPtr<IShaderScript> script)
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
+
+		return api->CreateClosestHitShader(name, script);
 	}
 
 
@@ -80,6 +89,38 @@ namespace JG
 		}
 	}
 
+	void ShaderLibrary::RegisterClosestHitShader(const String& name, SharedPtr<IClosestHitShader> shader)
+	{
+		if (shader == nullptr)
+		{
+			return;
+		}
+
+		std::lock_guard<std::shared_mutex> lock(mClosestHitMutex);
+
+		auto iter = mClosestHitShaderDic.find(name);
+		if (iter == mClosestHitShaderDic.end())
+		{
+			mClosestHitShaderDic.emplace(name, shader);
+		}
+	}
+
+	void ShaderLibrary::RegisterRayTracingPipeline(const String& name, SharedPtr<IRayTracingPipeline> pipeline)
+	{
+		if (pipeline == nullptr)
+		{
+			return;
+		}
+		std::lock_guard<std::shared_mutex> lock(mRayTracingPipelineMutex);
+
+		auto iter = mRayTracingPipelineDic.find(name);
+		if (iter == mRayTracingPipelineDic.end())
+		{
+			mRayTracingPipelineDic.emplace(name, pipeline);
+		}
+		
+	}
+
 	SharedPtr<IGraphicsShader> ShaderLibrary::FindGraphicsShader(const String& name)
 	{
 		std::shared_lock<std::shared_mutex> lock(mGraphicsMutex);
@@ -137,9 +178,19 @@ namespace JG
 		return nullptr;
 	}
 
+	SharedPtr<IClosestHitShader> ShaderLibrary::FindClosestHitShader(const String& name)
+	{
+		std::shared_lock<std::shared_mutex> lock(mClosestHitMutex);
+		auto iter = mClosestHitShaderDic.find(name);
+		if (iter != mClosestHitShaderDic.end())
+		{
+			return iter->second;
+		}
+		return nullptr;
+	}
+
 	SharedPtr<IShaderScript> ShaderLibrary::FindScript(const String& name)
 	{
-
 		std::shared_lock<std::shared_mutex> lock(mScriptMutex);
 		auto iter = mShaderScriptDic.find(name);
 		if (iter != mShaderScriptDic.end())
@@ -147,6 +198,31 @@ namespace JG
 			return iter->second;
 		}
 		return nullptr;
+	}
+
+	SharedPtr<IRayTracingPipeline> ShaderLibrary::FindRayTracingPipeline(const String& name)
+	{
+		std::shared_lock<std::shared_mutex> lock(mRayTracingPipelineMutex);
+		auto iter = mRayTracingPipelineDic.find(name);
+		if (iter != mRayTracingPipelineDic.end())
+		{
+			return iter->second;
+		}
+		return nullptr;
+	}
+
+	void ShaderLibrary::AddRayTracingLibrary(const String& name, SharedPtr<IClosestHitShader> shader)
+	{
+		SharedPtr<IRayTracingPipeline> pipeline = FindRayTracingPipeline(name);
+		if (pipeline == nullptr)
+		{
+			JG_LOG_ERROR("Fail Add RayTracing Library : {0} -> {1}", name, shader->GetName());
+			return;
+		}
+
+		pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetShaderCode(), { shader->GetEntryPoint() });
+		pipeline->AddHitGroup(shader->GetHitGroupName(), shader->GetEntryPoint(), "", "");
+		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { shader->GetEntryPoint() });
 	}
 
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)
@@ -159,6 +235,10 @@ namespace JG
 
 		auto globalComputeLibPath = PathHelper::CombinePath(path, "GlobalComputeLibrary.shaderLib");
 		FileHelper::ReadAllText(globalComputeLibPath, &mGlobalComputeLibCode);
+
+
+		auto globalRayTracingLibPath = PathHelper::CombinePath(path, "GlobalRayTracingLibrary.shaderLib");
+		FileHelper::ReadAllText(globalRayTracingLibPath, &mGlobalRayTracingLibCode);
 		return true;
 	}
 
@@ -174,6 +254,11 @@ namespace JG
 	const String& ShaderLibrary::GetGlobalComputeLibCode() const
 	{
 		return mGlobalComputeLibCode;
+	}
+
+	const String& ShaderLibrary::GetGlobalRayTracingLibCode() const
+	{
+		return mGlobalRayTracingLibCode;
 	}
 
 	void ShaderLibrary::ForEach(EShaderScriptType scriptType, const std::function<void(SharedPtr<IShaderScript>)>& action)

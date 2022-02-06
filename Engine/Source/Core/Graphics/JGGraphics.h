@@ -94,6 +94,7 @@ namespace JG
 		void LoadShaderTemplate();
 		void LoadShaderScript();
 		void LoadComputeShader();
+		void LoadRayTracingPipeline();
 	private:
 		class RemoveObjectData : public IJGObject
 		{
@@ -367,6 +368,8 @@ namespace JG
 			JMatrix ProjMatrix;
 			JMatrix ViewMatrix;
 			JMatrix ViewProjMatrix;
+			JMatrix InvViewMatrix;
+			JMatrix InvProjMatrix;
 			JMatrix InvViewProjMatrix;
 			JVector2 Resolution;
 			f32 NearZ = 0.0f;

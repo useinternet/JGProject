@@ -1,15 +1,13 @@
 ﻿#pragma once
 #include "Graphics/Shader.h"
 #include "Utill/DirectX12Helper.h"
-#include "Utill/ShaderDataForm.h"
 namespace JG
 {
 	class IComputeBuffer;
 	class GraphicsPipelineState;
 	class RootSignature;
 	class ITexture;
-	class ShaderDataForm;
-
+	class ShaderScriptCodeAnalyzer;
 
 	struct CompileConfig
 	{
@@ -26,19 +24,17 @@ namespace JG
 		ComPtr<ID3DBlob> mGSData;
 		ComPtr<ID3DBlob> mPSData;
 		EShaderFlags     mFlags;
+		List<SharedPtr<IShaderScript>>	mShaderScriptList;
+
+		UniquePtr<ShaderScriptCodeAnalyzer> mScriptCodeAnalyzer;
 		String mName;
 		String mSourceCode;
 		String mFullSourceCode;
 		bool mIsCompileSuccess = false;
-		List<std::pair<EShaderDataType, String>> mPropertyList;
-		List<SharedPtr<IShaderScript>>			 mShaderScriptList;
 
-		SortedDictionary<u64, String> mSortedTextureMap;
-		SortedDictionary<u64, String> mSortedTextureCubeMap;
 	public:
 		const String& GetName() const override;
 		void SetName(const String& name);
-
 
 		virtual bool  Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
 		virtual const String& GetShaderCode() const override;
@@ -49,7 +45,11 @@ namespace JG
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
 		void ForEach_TextureSlot(const std::function<void(const String&)>& action);
-		void ForEach_TextureCubeSlot(const std::function<void(const String&)>& action);
+
+		//void ForEach_TextureCubeSlot(const std::function<void(const String&)>& action);
+
+
+
 	public:
 		ID3DBlob* GetVSData() const {
 			return mVSData.Get();
@@ -69,12 +69,7 @@ namespace JG
 	private:
 		bool Compile(const String& code, String* error);
 		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
-		void InsertScript(String& code, SharedPtr<IShaderScript> script);
-		bool InsertScriptInternal(String& code, SharedPtr<IShaderScript> script);
-		bool ExtractScriptContents(const String& code, const String& key, String& out_code);
 	};
-
-
 	class DirectX12ComputeShader : public IComputeShader
 	{
 	private:
@@ -82,7 +77,6 @@ namespace JG
 		String mName;
 		String			 mSourceCode;
 		bool			 mIsCompileSuccess = false;
-		//SharedPtr<ShaderDataForm> mShaderDataForm;
 	public:
 		const String& GetName() const override;
 		void SetName(const String& name);
@@ -90,9 +84,6 @@ namespace JG
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;
 	public:
-		//SharedPtr<ShaderDataForm> GetShaderDataForm() const {
-		//	return mShaderDataForm;
-		//}
 		ID3DBlob* GetCSData() const {
 			return mCSData.Get();
 		}
@@ -100,5 +91,48 @@ namespace JG
 		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
 	};
 
+
+
+	class DirectX12ClosestHitShader : public IClosestHitShader
+	{
+		String mName;
+		String mSourceCode;
+		String mHitGroupName;
+		String mEntryPoint;
+		UniquePtr<ShaderScriptCodeAnalyzer> mScriptCodeAnalyzer;
+	public:
+		virtual bool Init(SharedPtr<IShaderScript> script) override;
+		virtual const String& GetName() const override;
+		virtual const String& GetEntryPoint()   const override;
+		virtual const String& GetHitGroupName() const override;
+		virtual const String& GetShaderCode() const override;
+	public:
+		void SetName(const String& name);
+	};
+
+
+
+	class ShaderScriptCodeAnalyzer
+	{
+		List<std::pair<EShaderDataType, String>> mPropertyList;
+		u64 mStartCBReigsterNum = 0;
+		u64 mStartCBRegisterSpace = 0;
+		u64 mStartTexRegisterNum = 0;
+		u64 mStartTexRegisterSpace = 0;
+
+		SortedDictionary<u64, String> mSortedTextureMap;
+	public:
+		ShaderScriptCodeAnalyzer(
+			u64 start_cb_register_num, u64 start_cb_register_space,
+			u64 start_tex_register_num, u64 start_tex_register_space) :
+			mStartCBReigsterNum(start_cb_register_num), mStartCBRegisterSpace(start_cb_register_space),
+			mStartTexRegisterNum(start_tex_register_num), mStartTexRegisterSpace(start_cb_register_space) {}
+		void InsertScript(String& code, SharedPtr<IShaderScript> script);
+		const List<std::pair<EShaderDataType, String>>& GetPropertyList() const;
+		const SortedDictionary<u64, String>& GetSortedTextureMap() const;
+	private:
+		bool InsertScriptInternal(String& code, SharedPtr<IShaderScript> script);
+		bool ExtractScriptContents(const String& code, const String& key, String& out_code);
+	};
 }
 

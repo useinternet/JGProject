@@ -8,10 +8,13 @@
 namespace JG
 {
 	class IShaderScript;
+	class IRayTracingPipeline;
 	class IGraphicsShader
 	{
 	protected:
 		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
+	public:
+		virtual ~IGraphicsShader() = default;
 	public:
 		virtual const String& GetName()			  const = 0;
 		virtual const String& GetShaderCode()     const = 0;
@@ -29,11 +32,28 @@ namespace JG
 	protected:
 		virtual bool Compile(const String& sourceCode, String* error) = 0;
 	public:
+		virtual ~IComputeShader() = default;
+	public:
 		virtual const String& GetName()		  const = 0;
 		virtual const String& GetShaderCode() const = 0;
 		virtual bool IsSuccessed() const = 0;
 	public:
 		static SharedPtr<IComputeShader> Create(const String& name, const String& sourceCode);
+	};
+
+	class IClosestHitShader
+	{
+	protected:
+		virtual bool Init(SharedPtr<IShaderScript> script) = 0;
+	public:
+		virtual ~IClosestHitShader() = default;
+	public:
+		virtual const String& GetName()		    const = 0;
+		virtual const String& GetEntryPoint()   const = 0;
+		virtual const String& GetHitGroupName() const = 0;
+		virtual const String& GetShaderCode()   const = 0;
+	public:
+		static SharedPtr<IClosestHitShader> Create(const String& name, SharedPtr<IShaderScript> script);
 	};
 
 
@@ -88,30 +108,37 @@ namespace JG
 		Dictionary<String, SharedPtr<IGraphicsShader>> mGraphicsShaderDic;
 		Dictionary<String, SharedPtr<IComputeShader>>  mComputeShaderDic;
 		Dictionary<String, SharedPtr<IShaderScript>>   mShaderScriptDic;
+		Dictionary<String, SharedPtr<IClosestHitShader>> mClosestHitShaderDic;
+		Dictionary<String, SharedPtr<IRayTracingPipeline>> mRayTracingPipelineDic;
 		Dictionary<EShaderScriptType, List<SharedPtr<IShaderScript>>> mShaderScriptDicByType;
 		String mGlobalShaderLibCode;
 		String mGlobalGraphicsLibCode;
 		String mGlobalComputeLibCode;
-
-		// Script 를 합쳐서 키값으로 사용
-		// 현재 머터리얼의 Template Name과 Sript Name들 가져올려면
-
-
+		String mGlobalRayTracingLibCode;
 
 		std::shared_mutex mGraphicsMutex;
 		std::shared_mutex mComputeMutex;
 		std::shared_mutex mScriptMutex;
+		std::shared_mutex mClosestHitMutex;
+		std::shared_mutex mRayTracingPipelineMutex;
 	public:
 		void RegisterGraphicsShader(const String& name, SharedPtr<IGraphicsShader> shader);
 		void RegisterComputeShader(const String& name, SharedPtr<IComputeShader> shader);
 		void RegisterShaderScript(const String& name, SharedPtr<IShaderScript> script);
+		void RegisterClosestHitShader(const String& name, SharedPtr<IClosestHitShader> shader);
+		void RegisterRayTracingPipeline(const String& name, SharedPtr<IRayTracingPipeline> pipeline);
+
+
 
 
 		SharedPtr<IGraphicsShader> FindGraphicsShader(const String& name);
 		SharedPtr<IGraphicsShader> FindGraphicsShader(const String& name, const List<String>& scriptNameList);
 		SharedPtr<IComputeShader>  FindComputeShader(const String& name);
+		SharedPtr<IClosestHitShader> FindClosestHitShader(const String& name);
 		SharedPtr<IShaderScript>   FindScript(const String& name);
+		SharedPtr< IRayTracingPipeline> FindRayTracingPipeline(const String& name);
 
+		void AddRayTracingLibrary(const String& name, SharedPtr<IClosestHitShader> shader);
 
 
 
@@ -119,6 +146,7 @@ namespace JG
 		const String& GetGlobalShaderLibCode()   const;
 		const String& GetGlobalGraphicsLibCode() const;
 		const String& GetGlobalComputeLibCode() const;
+		const String& GetGlobalRayTracingLibCode() const;
 	public:
 		void ForEach(EShaderScriptType scriptType, const std::function<void(SharedPtr<IShaderScript>)>& action);
 	};

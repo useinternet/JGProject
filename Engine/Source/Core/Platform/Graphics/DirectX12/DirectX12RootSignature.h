@@ -25,6 +25,7 @@ namespace JG
 			SRV,
 			UAV,
 			CBV,
+			Constant,
 			DT_SRV,
 			DT_UAV,
 			DT_CBV
@@ -32,6 +33,7 @@ namespace JG
 		struct Data
 		{
 			EType Type;
+			u32 constantSize = 0;
 			u32 numDescriptor	 = 0;
 			u32 numRegister		 = 0;
 			u32 numRegisterSpace = 0;
@@ -50,10 +52,11 @@ namespace JG
 		virtual void AddDescriptorTable(u32 rootParam, EDescriptorTableRangeType rangeType, u32 numDescriptor, u32 numRegister, u32 numRegisterSpace) override;
 		virtual void AddSRV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) override;
 		virtual void AddCBV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) override;
+		virtual void AddConstant(u32 rootParam, u32 btSize, u32 numRegister, u32 numRegisterSpace) override;
 		virtual void AddUAV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) override;
 		virtual void AddSampler(u32 numRegister, ESamplerFilter filter, ETextureAddressMode addressMode) override;
 		virtual void Reset() override;
-		virtual SharedPtr<IRootSignature> Generate() override;
+		virtual SharedPtr<IRootSignature> Generate(bool isLocal = false) override;
 	private:
 		D3D12_FILTER ToD3D(ESamplerFilter filter);
 		D3D12_TEXTURE_ADDRESS_MODE ToD3D(ETextureAddressMode addressMode);

@@ -1,13 +1,14 @@
 
 
-#define SHADING_MODEL_DEFAULT_LIT 0
-#define SHADING_MODEL_SKYBOX      1
+
 
 cbuffer __RenderPassDataCB__ : register(b0)
 {
     float4x4 _ProjMatrix;
     float4x4 _ViewMatrix;
     float4x4 _ViewProjMatrix;
+    float4x4 _InvViewMatrix;
+    float4x4 _InvProjMatrix;
     float4x4 _InvViewProjMatrix;
     float2   _Resolution;
     float    _NearZ;

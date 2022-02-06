@@ -237,7 +237,12 @@ namespace JG
 			D3D_ROOT_SIGNATURE_VERSION_1,
 			serializedRootSig.GetAddressOf(),
 			errorBlob.GetAddressOf());
-
+		String errstr;
+		if (errorBlob != nullptr)
+		{
+			errstr = (const char*)errorBlob->GetBufferPointer();
+		}
+		
 
 		hr = device->CreateRootSignature(
 			0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(),

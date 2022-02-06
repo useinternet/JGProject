@@ -53,6 +53,7 @@ namespace JG
 		void TransitionBarrier(ID3D12Resource* d3dResource, D3D12_RESOURCE_STATES state, u32 subResource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, bool flush = false);
 		void UAVBarrier(ID3D12Resource* d3dResource, bool flush = false);
 		void AliasBarrier(ID3D12Resource* beforeResource, ID3D12Resource* afterResource, bool flush = false);
+		D3D12_GPU_DESCRIPTOR_HANDLE UploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle);
 		void FlushResourceBarrier();
 
 		void CopyResource(ID3D12Resource* dest, ID3D12Resource* src);

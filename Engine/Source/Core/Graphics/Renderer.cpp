@@ -15,6 +15,7 @@ namespace JG
 	{
 		mRenderParamManager = CreateUniquePtr<RenderParamManager>();
 		mLightManager		= CreateUniquePtr<LightManager>();
+		mPassData = CreateSharedPtr< Graphics::RenderPassData>();
 		InitRootSignature();
 	}
 	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
@@ -56,6 +57,8 @@ namespace JG
 		Graphics::RenderPassData passData;
 		passData.ViewMatrix		= JMatrix::Transpose(info.ViewMatrix);
 		passData.ProjMatrix     = JMatrix::Transpose(info.ProjMatrix);
+		passData.InvViewMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ViewMatrix));
+		passData.InvProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ProjMatrix));
 		passData.ViewProjMatrix = JMatrix::Transpose(info.ViewProjMatrix);
 		passData.InvViewProjMatrix = JMatrix::Transpose(JMatrix::Inverse(info.ViewProjMatrix));
 		passData.EyePosition	= info.EyePosition;
@@ -87,6 +90,8 @@ namespace JG
 
 		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
 		context->BindConstantBuffer((u32)ERootParam::PassCB, passData);
+
+		(*mPassData) = passData;
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
 		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.Data.data(), lInfo.Size, lInfo.Count);
@@ -235,6 +240,11 @@ namespace JG
 	const RenderInfo& Renderer::GetRenderInfo() const
 	{
 		return mRenderInfo;
+	}
+
+	const Graphics::RenderPassData& Renderer::GetPassData() const
+	{
+		return *mPassData;
 	}
 
 	const Dictionary<Graphics::ELightType, Renderer::LightInfo>& Renderer::GetLightInfos() const

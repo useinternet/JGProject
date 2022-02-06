@@ -69,16 +69,16 @@ namespace JG
 		mTextures[name] = texture;
 		return true;
 	}
-	bool DirectX12Material::SetTextureCube(const String& name, SharedPtr<ITexture> texture)
-	{
-		if (mTextureCubes.find(name) == mTextureCubes.end())
-		{
-			return false;
-		}
+	//bool DirectX12Material::SetTextureCube(const String& name, SharedPtr<ITexture> texture)
+	//{
+	//	if (mTextureCubes.find(name) == mTextureCubes.end())
+	//	{
+	//		return false;
+	//	}
 
-		mTextureCubes[name] = texture;
-		return true;
-	}
+	//	mTextureCubes[name] = texture;
+	//	return true;
+	//}
 	bool DirectX12Material::GetFloat(const String& name, float* out_value)
 	{
 		return GetData(name, out_value);
@@ -158,10 +158,10 @@ namespace JG
 		return true;
 	}
 
-	bool DirectX12Material::GetTextureCube(const String& name, SharedPtr<ITexture>* out_value)
-	{
-		return false;
-	}
+	//bool DirectX12Material::GetTextureCube(const String& name, SharedPtr<ITexture>* out_value)
+	//{
+	//	return false;
+	//}
 
 	void DirectX12Material::SetDepthStencilState(EDepthStencilStateTemplate _template)
 	{
@@ -198,6 +198,7 @@ namespace JG
 		return mGraphicsShader;
 	}
 
+
 	void DirectX12Material::SetShader(SharedPtr<IGraphicsShader> shader)
 	{
 		Init(shader);
@@ -213,14 +214,13 @@ namespace JG
 		return mGraphicsShader->GetPropertyList();
 	}
 
-	const List<SharedPtr<IShaderScript>>& DirectX12Material::GetScriptList() const
+	SharedPtr<IShaderScript> DirectX12Material::GetScript() const
 	{
 		if (mGraphicsShader == nullptr)
 		{
-			static List<SharedPtr<IShaderScript>> tmp;
-			return tmp;
+			return nullptr;
 		}
-		return mGraphicsShader->GetScriptList();
+		return mGraphicsShader->GetScriptList()[0];
 	}
 
 	bool DirectX12Material::IsValid() const
@@ -252,27 +252,27 @@ namespace JG
 		return texList;
 	}
 
-	List<SharedPtr<ITexture>> DirectX12Material::GetCubeTextureList() const
-	{
-		if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
-		{
-			return List<SharedPtr<ITexture>>();;
-		}
-		List<SharedPtr<ITexture>> texList;
-		DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
-		pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
-		{
-			if (mTextureCubes.find(name) == mTextureCubes.end())
-			{
-				texList.push_back(nullptr);
-			}
-			else
-			{
-				texList.push_back(mTextureCubes.at(name));
-			}
-		});
-		return texList;
-	}
+	//List<SharedPtr<ITexture>> DirectX12Material::GetCubeTextureList() const
+	//{
+	//	if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
+	//	{
+	//		return List<SharedPtr<ITexture>>();;
+	//	}
+	//	List<SharedPtr<ITexture>> texList;
+	//	DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
+	//	pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
+	//	{
+	//		if (mTextureCubes.find(name) == mTextureCubes.end())
+	//		{
+	//			texList.push_back(nullptr);
+	//		}
+	//		else
+	//		{
+	//			texList.push_back(mTextureCubes.at(name));
+	//		}
+	//	});
+	//	return texList;
+	//}
 
 	const List<jbyte>& DirectX12Material::GetMaterialPropertyByteData()
 	{
@@ -307,6 +307,9 @@ namespace JG
 
 
 		mGraphicsShader = shader;
+
+
+
 		auto propertyList = mGraphicsShader->GetPropertyList();
 
 		u64 btPos = 0;
@@ -318,8 +321,6 @@ namespace JG
 			switch (type)
 			{
 			case EShaderDataType::textureCube:
-				mTextureCubes[name] = nullptr;
-				break;
 			case EShaderDataType::texture2D:
 				mTextures[name] = nullptr;
 				break;

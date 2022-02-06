@@ -72,11 +72,28 @@ namespace JG
 		Desc.AnyHitShaderImport = AnyHitSymbol.empty() ? nullptr : AnyHitSymbol.c_str();
 		Desc.IntersectionShaderImport =
 			IntersectionSymbol.empty() ? nullptr : IntersectionSymbol.c_str();
+		Desc.Type = D3D12_HIT_GROUP_TYPE_TRIANGLES;
 	}
 	RayTracingPipelineGenerator::HitGroup::HitGroup(const HitGroup& source)
 		: HitGroup(source.HitGroupName, source.ClosestHitSymbol, source.AnyHitSymbol,source.IntersectionSymbol)
 	{}
 
+	RayTracingPipelineGenerator::RootSignatureAssociation::RootSignatureAssociation(
+		ID3D12RootSignature* rootSignature, const std::vector<std::wstring>& symbols)
+		: mRootSignature(rootSignature), mSymbols(symbols), mSymbolPointers(symbols.size())
+	{
+		for (size_t i = 0; i < mSymbols.size(); i++)
+		{
+			mSymbolPointers[i] = mSymbols[i].c_str();
+		}
+		mRootSignaturePointer = mRootSignature;
+	}
+
+	RayTracingPipelineGenerator::RootSignatureAssociation::RootSignatureAssociation(
+		const RootSignatureAssociation& source)
+		: RootSignatureAssociation(source.mRootSignature, source.mSymbols)
+	{
+	}
 
 	void RayTracingPipelineGenerator::AddLibrary(IDxcBlob* dxilLib, const List<String>& symbolExports)
 	{
@@ -95,6 +112,11 @@ namespace JG
 	void RayTracingPipelineGenerator::SetRootSignature(ID3D12RootSignature* rootSig)
 	{
 		mGlobalRootSignature = rootSig;
+	}
+
+	void RayTracingPipelineGenerator::AddLocalRootSignature(ID3D12RootSignature* rootSig, const List<String>& symbols)
+	{
+		mRootSignatureAssociations.push_back(RootSignatureAssociation(rootSig, StringHelper::s2ws(symbols)));
 	}
 
 	void RayTracingPipelineGenerator::SetMaxPayloadSize(u32 btSize)
@@ -117,6 +139,7 @@ namespace JG
 		u64 subObjectCount =
 			mLibraries.size() + mHitGroups.size() 
 			+ 1 // GlobalShaderRootSignature
+			+ (2 * mRootSignatureAssociations.size())
 			+ 1 // ShaderConfig
 			+ 1; // PipelineConfig
 
@@ -149,6 +172,25 @@ namespace JG
 		globalRootSig.pDesc = mGlobalRootSignature.GetAddressOf();
 		subObjects[currIndex++] = globalRootSig;
 
+		// Local RootSig
+		for (RootSignatureAssociation& assoc : mRootSignatureAssociations)
+		{
+			D3D12_STATE_SUBOBJECT rootSigObject = {};
+			rootSigObject.Type = D3D12_STATE_SUBOBJECT_TYPE_LOCAL_ROOT_SIGNATURE;
+			rootSigObject.pDesc = &assoc.mRootSignature;
+			subObjects[currIndex++] = rootSigObject;
+
+
+			assoc.mAssociation.NumExports = static_cast<UINT>(assoc.mSymbolPointers.size());
+			assoc.mAssociation.pExports = assoc.mSymbolPointers.data();
+			assoc.mAssociation.pSubobjectToAssociate = &subObjects[(currIndex - 1)];
+
+			D3D12_STATE_SUBOBJECT rootSigAssociationObject = {};
+			rootSigAssociationObject.Type = D3D12_STATE_SUBOBJECT_TYPE_SUBOBJECT_TO_EXPORTS_ASSOCIATION;
+			rootSigAssociationObject.pDesc = &assoc.mAssociation;
+
+			subObjects[currIndex++] = rootSigAssociationObject;
+		}
 
 		// Shader Config 
 		D3D12_RAYTRACING_SHADER_CONFIG shaderConfigDesc = {};
@@ -398,7 +440,6 @@ namespace JG
 		u8* pData = outputData;
 		for (const auto& shader : shaders)
 		{
-			// Get the shader identifier, and check whether that identifier is known
 			void* id = raytracingPipeline->GetShaderIdentifier(shader.EntryPoint.c_str());
 			if (!id)
 			{
@@ -407,7 +448,7 @@ namespace JG
 				throw std::logic_error(std::string(errMsg.begin(), errMsg.end()));
 			}
 			memcpy(pData, id, mProgIdSize);
-			memcpy(pData + mProgIdSize, shader.InputData.data(), shader.InputData.size() * 8);
+			memcpy(pData + mProgIdSize, shader.InputData, shader.InputDataSize);
 
 			pData += entrySize;
 		}
@@ -416,32 +457,32 @@ namespace JG
 
 	u32 RayTracingShaderBindingTableGenerator::GetEntrySize(const std::vector<SBTEntry>& entries)
 	{
-		u64 maxArgs = 0;
+		u64 maxArgSize = 0;
 		for (const auto& shader : entries)
 		{
-			maxArgs = Math::Max(maxArgs, shader.InputData.size());
+			maxArgSize = Math::Max(maxArgSize, shader.InputDataSize);
 		}
-		uint32_t entrySize = mProgIdSize + 8 * static_cast<u32>(maxArgs);
-		entrySize = ROUND_UP(entrySize, D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT);
+		u32 entrySize = mProgIdSize + static_cast<u32>(maxArgSize);
+		entrySize = ROUND_UP(entrySize, D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT);
 
 		return entrySize;
 	}
 
-	void RayTracingShaderBindingTableGenerator::AddRayGenerationProgram(const std::wstring& entryPoint, const std::vector<void*>& inputData)
+	void RayTracingShaderBindingTableGenerator::AddRayGenerationProgram(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize)
 	{
-		mRayGen.emplace_back(SBTEntry(entryPoint, inputData));
+		mRayGen.emplace_back(SBTEntry(entryPoint, inputData, inputDataSize));
 	}
-	void RayTracingShaderBindingTableGenerator::AddMissProgram(const std::wstring& entryPoint, const std::vector<void*>& inputData)
+	void RayTracingShaderBindingTableGenerator::AddMissProgram(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize)
 	{
-		mMiss.emplace_back(SBTEntry(entryPoint, inputData));
+		mMiss.emplace_back(SBTEntry(entryPoint, inputData, inputDataSize));
 	}
-	void RayTracingShaderBindingTableGenerator::AddHitGroup(const std::wstring& entryPoint, const std::vector<void*>& inputData)
+	void RayTracingShaderBindingTableGenerator::AddHitGroup(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize)
 	{
-		mHitGroup.emplace_back(SBTEntry(entryPoint, inputData));
+		mHitGroup.emplace_back(SBTEntry(entryPoint, inputData, inputDataSize));
 	}
 	u32  RayTracingShaderBindingTableGenerator::ComputeSBTSize()
 	{
-		mProgIdSize		   = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
+		mProgIdSize = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 		mRayGenEntrySize   = GetEntrySize(mRayGen);
 		mMissEntrySize     = GetEntrySize(mMiss);
 		mHitGroupEntrySize = GetEntrySize(mHitGroup);

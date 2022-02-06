@@ -86,7 +86,7 @@ namespace JG
 		mDescriptorTableInfoByRootParam.clear();
 		mDescriptorRanges.clear();
 	}
-	bool RootSignature::Finalize()
+	bool RootSignature::Finalize(D3D12_ROOT_SIGNATURE_FLAGS flags)
 	{
 		if (mD3DRootSig != nullptr)
 		{
@@ -96,7 +96,9 @@ namespace JG
 
 		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc((u32)mRootParams.size(),
 			mRootParams.data(), (u32)mSamplerState.size(), mSamplerState.data(),
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+			flags);
+
+
 
 		u64 HashCode = HashState(&rootSigDesc.Flags);
 

@@ -11,6 +11,7 @@
 #include "RayTracing/DirectX12RayTracingPipeline.h"
 #include "RayTracing/DirectX12BottomLevelAccelerationStructure.h"
 #include "RayTracing/DirectX12TopLevelAccelerationStructure.h"
+#include "RayTracing/DirectX12RaytracingShaderResourceTable.h"
 
 
 #include "Utill/DirectX12Helper.h"
@@ -317,14 +318,9 @@ namespace JG
 		mComputeCommandQueue->Begin();
 		mCopyCommandQueue->Begin();
 
-		for (auto& _pair : mGraphicsContextDic)
-		{
-			_pair.second->Reset();
-		}
-		for (auto& _pair : mComputeContextDic)
-		{
-			_pair.second->Reset();
-		}
+		mGraphicsContextDic.clear();
+		mComputeContextDic.clear();
+		
 	}
 	void DirectX12API::EndFrame()
 	{
@@ -457,6 +453,14 @@ namespace JG
 
 		return shader;
 	}
+
+	SharedPtr<IClosestHitShader> DirectX12API::CreateClosestHitShader(const String& name, const SharedPtr<IShaderScript> script)
+	{
+		auto shader = CreateSharedPtr<DirectX12ClosestHitShader>();
+		shader->SetName(name);
+		shader->Init(script);
+		return shader;
+	}
 	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name)
 	{
 		auto material = CreateSharedPtr<DirectX12Material>();
@@ -508,6 +512,10 @@ namespace JG
 	SharedPtr<IRayTracingPipeline> DirectX12API::CreateRayTracingPipeline()
 	{
 		return CreateSharedPtr<DirectX12RayTracingPipeline>();
+	}
+	SharedPtr<IRayTracingShaderResourceTable> DirectX12API::CreateRayTracingShaderResourceTable()
+	{
+		return CreateSharedPtr<DirectX12RayTracingShaderResourceTable>();
 	}
 	SharedPtr<ITopLevelAccelerationStructure> DirectX12API::CreateTopLevelAccelerationStructure()
 	{
@@ -840,7 +848,7 @@ namespace JG
 
 			BindShader(material->GetShader());
 			BindTextures((u32)Renderer::ERootParam::Texture2D, material->GetTextureList());
-			BindTextures((u32)Renderer::ERootParam::TextureCube, material->GetCubeTextureList());
+			//BindTextures((u32)Renderer::ERootParam::TextureCube, material->GetCubeTextureList());
 			BindConstantBuffer((u32)Renderer::ERootParam::MaterialCB, materialCB.data(), materialCB.size());
 			DrawIndexed(subMesh->GetIndexCount(), subMesh->GetInstanceCount(), 0, 0, 0);
 		}
@@ -1124,7 +1132,7 @@ namespace JG
 		mCommandList->BindPipelineState(pso);
 		mCommandList->Dispatch(groupX, groupY, groupZ);
 	}
-	void DirectX12ComputeContext::DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline)
+	void DirectX12ComputeContext::DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt)
 	{
 		if (DirectX12API::GetInstance()->IsSupportedRayTracing() == false)
 		{
@@ -1139,25 +1147,31 @@ namespace JG
 		mCommandList->BindPipelineState(dx12Pipeline->GetPipelineState());
 
 
+		DirectX12RayTracingShaderResourceTable* dx12SRT = static_cast<DirectX12RayTracingShaderResourceTable*>(srt.get());
+		dx12SRT->Generate(mCommandList, dx12Pipeline->GetPipelineProperties());
 
+		//mCommandList->get
 
 		D3D12_DISPATCH_RAYS_DESC dispatchRays{};
 
-		dispatchRays.RayGenerationShaderRecord.StartAddress = pipeline->GetRayGenStartAddr();
-		dispatchRays.RayGenerationShaderRecord.SizeInBytes = pipeline->GetRayGenSectionSize();
+		dispatchRays.RayGenerationShaderRecord.StartAddress = dx12SRT->GetRayGenStartAddr();
+		dispatchRays.RayGenerationShaderRecord.SizeInBytes = dx12SRT->GetRayGenSectionSize();
 
-		dispatchRays.MissShaderTable.StartAddress = pipeline->GetMissStartAddr();
-		dispatchRays.MissShaderTable.SizeInBytes = pipeline->GetMissSectionSize();
-		dispatchRays.MissShaderTable.StrideInBytes = pipeline->GetMissEntrySize();
+		dispatchRays.MissShaderTable.StartAddress = dx12SRT->GetMissStartAddr();
+		dispatchRays.MissShaderTable.SizeInBytes = dx12SRT->GetMissSectionSize();
+		dispatchRays.MissShaderTable.StrideInBytes = dx12SRT->GetMissEntrySize();
 
 
-		dispatchRays.HitGroupTable.StartAddress = pipeline->GetHitGroupStartAddr();
-		dispatchRays.HitGroupTable.SizeInBytes = pipeline->GetHitGroupSectionSize();
-		dispatchRays.HitGroupTable.StrideInBytes = pipeline->GetHitGroupEntrySize();
+		dispatchRays.HitGroupTable.StartAddress = dx12SRT->GetHitGroupStartAddr();
+		dispatchRays.HitGroupTable.SizeInBytes = dx12SRT->GetHitGroupSectionSize();
+		dispatchRays.HitGroupTable.StrideInBytes = dx12SRT->GetHitGroupEntrySize();
 		dispatchRays.Width = width;
 		dispatchRays.Height = height;
 		dispatchRays.Depth = 1;
 
+		mCommandList->BackupResource(dx12SRT->GetRayGenSRT());
+		mCommandList->BackupResource(dx12SRT->GetMissSRT());
+		mCommandList->BackupResource(dx12SRT->GetHitSRT());
 		mCommandList->DispatchRays(dispatchRays);
 	}
 	void DirectX12ComputeContext::Reset()

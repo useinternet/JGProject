@@ -46,16 +46,29 @@ namespace JG
 
 	void FowardRenderer::RenderImpl(SharedPtr<RenderResult> result)
 	{
-		UpdateRayTacing();
-		UpdateGBufferPass();
-		UpdateLightPass();
-
-		UpdateFinalPass();
-		
-		if (result != nullptr)
+		if (mIsRayTracing.GetValue() == true)
 		{
-			result->SceneTexture = mFinalResultTex.GetValue();
+			UpdateRayTacing();
+			if (result != nullptr)
+			{
+				result->SceneTexture = RP_Global_Tex::Load("Renderer/Raytracing/Result", GetRenderParamManager()).GetValue();
+			}
 		}
+		else
+		{
+			UpdateGBufferPass();
+			UpdateLightPass();
+
+			UpdateFinalPass();
+			if (result != nullptr)
+			{
+				result->SceneTexture = mFinalResultTex.GetValue();
+			}
+		}
+
+
+		
+
 	}
 
 	void FowardRenderer::CompeleteImpl(SharedPtr<RenderResult> result)
@@ -155,7 +168,7 @@ namespace JG
 		mGBufferTexDic[EGBuffer::Depth] = RP_Global_Tex::Create("Renderer/GBuffer/Depth", nullptr, GetRenderParamManager(), false);
 		mGBufferTexDic[EGBuffer::WorldPos] = RP_Global_Tex::Create("Renderer/GBuffer/WorldPos", nullptr, GetRenderParamManager(), false);
 
-
+		mIsRayTracing = RP_Global_Bool::Create("Renderer/IsRayTracing", true, GetRenderParamManager());
 		mLightResultTex = RP_Global_Tex::Create("Renderer/LightResult", nullptr, GetRenderParamManager(), false);
 		mFinalResultTex = RP_Global_Tex::Create("Renderer/FinalResult", nullptr, GetRenderParamManager(), false);
 	}
@@ -237,7 +250,6 @@ namespace JG
 		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
 		List<SharedPtr<ITexture>> bindTextures = {
 			RP_Global_Tex::Load("Renderer/LightResult", GetRenderParamManager()).GetValue(),
-			RP_Global_Tex::Load("Renderer/Raytracing/Shadow", GetRenderParamManager()).GetValue(),
 			GetTargetTexture(EGBuffer::Depth),
 		};
 		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
@@ -256,46 +268,6 @@ namespace JG
 
 		mFinalResultTex.SetValue(targetTex);
 	}
-
-
-	void FowardRenderer::UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix)
-	{
-		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false)
-		{
-			return;
-		}
-		if (mesh == nullptr)
-		{
-			return;
-		}
-		// RayTracing AS »ý¼º
-		u32 subMeshCount = mesh->GetSubMeshCount();
-		for (i32 i = 0; i < subMeshCount; ++i)
-		{
-			SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
-
-			if (subMesh == nullptr)
-			{
-				continue;
-			}
-			SharedPtr<IBottomLevelAccelerationStructure> blas = subMesh->GetBottomLevelAS();
-
-			if (blas == nullptr)
-			{
-				blas = IBottomLevelAccelerationStructure::Create();
-				blas->Generate(GetComputeContext(), subMesh->GetVertexBuffer(), subMesh->GetIndexBuffer());
-				subMesh->SetBottomLevelAS(blas);
-			}
-			u64 instanceCount = subMesh->GetInstanceCount();
-			for (u64 insID = 0; insID < instanceCount; ++insID)
-			{
-				mRayTracer->AddInstance(blas, worldMatrix, insID, 0);
-			}
-
-		}
-
-
-	}
 	void FowardRenderer::UpdateRayTacing()
 	{
 		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false || mRayTracer ==nullptr)
@@ -308,11 +280,32 @@ namespace JG
 			for (auto& info : objectList)
 			{
 				auto mesh = info.Mesh;
+				auto materialList = info.MaterialList;
 				auto& worldMatrix = JMatrix::Transpose(info.WorldMatrix);
+
+
 
 				if ((info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
 				{
-					UpdateBottomLevelAS(mesh, worldMatrix);
+					u64 subMeshCount = mesh->GetSubMeshCount();
+					for (u64 i = 0; i < subMeshCount; ++i)
+					{
+						SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
+						SharedPtr<IMaterial> material = nullptr;
+						if (subMesh == nullptr)
+						{
+							continue;
+						}
+						if (i >= materialList.size())
+						{
+							material = materialList[0];
+						}
+						else
+						{
+							material = materialList[i];
+						}
+						mRayTracer->AddInstance(subMesh, material, { worldMatrix });
+					}
 				}
 			}
 		});

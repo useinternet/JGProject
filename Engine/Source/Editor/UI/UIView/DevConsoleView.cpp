@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DevConsoleView.h"
+#include "ExternalImpl/CommandPrompt.h"
 #include "UI/UIManager.h"
 
 namespace JG
@@ -10,7 +11,7 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
-
+		mCommandPrompt = CreateUniquePtr<CommandPrompt>();
 		mMainThreadID = StringHelper::ToInt(StringHelper::ToString(std::this_thread::get_id()));
 	}
 	DevConsoleView::~DevConsoleView()
@@ -26,22 +27,22 @@ namespace JG
 	{
 		LogFilterInfo info;
 		info.IsActive = true;
-		info.Filter = ELogFilter::Info;
+		info.LogLevel = ELogLevel::Info;
 		info.ShowName = "Info";
-		mLogFilterInfoDic[ELogFilter::Info] = info;
+		mLogFilterInfoDic[ELogLevel::Info] = info;
 
 
-		info.Filter = ELogFilter::Trace;
+		info.LogLevel = ELogLevel::Trace;
 		info.ShowName = "Trace";
-		mLogFilterInfoDic[ELogFilter::Trace] = info;
+		mLogFilterInfoDic[ELogLevel::Trace] = info;
 
-		info.Filter = ELogFilter::Warn;
+		info.LogLevel = ELogLevel::Warn;
 		info.ShowName = "Warn";
-		mLogFilterInfoDic[ELogFilter::Warn] = info;
+		mLogFilterInfoDic[ELogLevel::Warn] = info;
 
-		info.Filter = ELogFilter::Error;
+		info.LogLevel = ELogLevel::Error;
 		info.ShowName = "Error";
-		mLogFilterInfoDic[ELogFilter::Error] = info;
+		mLogFilterInfoDic[ELogLevel::Error] = info;
 	}
 	void DevConsoleView::Initialize()
 	{
@@ -53,14 +54,6 @@ namespace JG
 		OnGUI_Top();
 		OnGUI_Log();
 		OnGUI_Bottom();
-
-		static int s = 0;
-		if (ImGui::IsKeyPressed((int)EKeyCode::E))
-		{
-			JG_LOG_TRACE("{0} TEST", s);
-			s++;
-
-		}
 		ImGui::End();
 		if (mOpenGUI == false)
 		{
@@ -129,13 +122,14 @@ namespace JG
 			ImGui::EndCombo();
 		}
 		ImGui::SameLine();
+		ImGui::Text("Auto Scroll"); ImGui::SameLine();
 		mAutoScroll = ImGui::CheckBox(&mAutoScroll, mAutoScroll);
 		ImGui::AlignTextToFramePadding();
 
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - 60.0f);
 		if (ImGui::Button("Clear"))
 		{
-			// Clear
+			mLogs.clear();
 		}
 
 		ImGui::EndChild();
@@ -143,7 +137,7 @@ namespace JG
 	}
 	void DevConsoleView::OnGUI_Log()
 	{
-		float height = ImGui::GetContentRegionAvail().y - (smBottomHeight + smTopHeight) - ImGui::GetStyle().ItemSpacing.y * 4;
+		float height = ImGui::GetContentRegionAvail().y - (smBottomHeight) - ImGui::GetStyle().ItemSpacing.y * 2;
 		ImGui::BeginChild("DevConsoleView/Log", ImVec2(0, height), true);
 
 		u64 logCnt = mLogs.size();
@@ -152,15 +146,14 @@ namespace JG
 			for (u64 i = 0; i < mMaxLogCount; ++i)
 			{
 				u64 line = (mCurrentLogLine + i) % mMaxLogCount;
-				ImGui::TextWrapped((mLogs[line].Message).c_str());
+				OnGUI_LogText(mLogs[line]);
 			}
 		}
 		else
 		{
 			for (auto& loginfo : mLogs)
 			{
-				
-				ImGui::TextWrapped((loginfo.Message).c_str());
+				OnGUI_LogText(loginfo);
 	
 			}
 		}
@@ -169,16 +162,66 @@ namespace JG
 			ImGui::SetScrollHereY(1.0f);
 		}
 		ImGui::EndChild();
-		ImGui::Separator();
+
+	}
+	void DevConsoleView::OnGUI_LogText(const LogInfo& info)
+	{
+		bool isShow = mLogFilterInfoDic[info.LogLevel].IsActive;
+		if (isShow == true && mSearchStr.length() > 0)
+		{
+			isShow = info.Message.find(mSearchStr) != String::npos;
+		}
+		if (isShow == false)
+		{
+			return;
+		}
+		
+		ImVec4 texColor = ImVec4(1, 1, 1, 1);
+		switch (info.LogLevel)
+		{
+		case ELogLevel::Info:
+			texColor = ImVec4(0, 1, 0, 1);
+			break;
+		case ELogLevel::Warn:
+			texColor = ImVec4(1, 1, 0, 1);
+			break;
+		case ELogLevel::Error:
+			texColor = ImVec4(1, 0, 0, 1);
+			break;
+		}
+		ImGui::PushStyleColor(ImGuiCol_Text, texColor);
+
+
+		ImGui::TextWrapped(info.Message.c_str());
+
+		ImGui::PopStyleColor();
 	}
 	void DevConsoleView::OnGUI_Bottom()
 	{
-		String out;
 		ImGui::BeginChild("DevConsoleView/Bottom", ImVec2(0, smBottomHeight));
-		ImGui::Spacing();
-		ImGui::InputText(this, "(null)", out);
-		ImGui::EndChild();
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Filter"); ImGui::SameLine();
+		ImGui::InputText("DevConsoleView/SearchInputText", mSearchStr, mSearchStr);
 		ImGui::Separator();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Cmd   "); ImGui::SameLine();
+
+
+		if (ImGui::InputText("DevConsoleView/Cmd", mCmdStr, mCmdStr) == true)
+		{
+			if (ImGui::IsKeyPressed((i32)EKeyCode::Enter) == true)
+			{
+			
+				CommandExecution(mCmdStr);
+				mCmdStr.clear();
+				
+				ImGui::SetKeyboardFocusHere(1);
+					
+			}
+
+		}
+		ImGui::EndChild();
 	}
 	void DevConsoleView::UpdateLog()
 	{
@@ -225,6 +268,7 @@ namespace JG
 			});
 		}
 	}
+
 	void DevConsoleView::ReadLog_Async()
 	{
 		if (mLogFileStream.is_open())
@@ -238,7 +282,7 @@ namespace JG
 
 				String token = "[_]";
 
-				if (StringHelper::StartWidth(log, token) == false || StringHelper::EndWidth(log, token) == false)
+				if (StringHelper::EndWidth(log, token) == false)
 				{
 					break;
 				}
@@ -253,8 +297,6 @@ namespace JG
 					break;
 				}
 			}
-		
-
 		}
 	}
 	void DevConsoleView::PushLogInfo_Async(const String& msg)
@@ -267,25 +309,21 @@ namespace JG
 		info.Message = msg;
 		if (msg.find("[trace]") != String::npos)
 		{
-			info.Filter = (ELogFilter)((i32)info.Filter | (i32)ELogFilter::Trace);
 			info.LogLevel = ELogLevel::Trace;
 			info.Message = StringHelper::ReplaceAll(info.Message, "[trace]", "");
 		}
 		else if (msg.find("[info]") != String::npos)
 		{
-			info.Filter = (ELogFilter)((i32)info.Filter | (i32)ELogFilter::Info);
 			info.LogLevel = ELogLevel::Info;
 			info.Message = StringHelper::ReplaceAll(info.Message, "[info]", "");
 		}
 		else if (msg.find("[warning]") != String::npos)
 		{
-			info.Filter = (ELogFilter)((i32)info.Filter | (i32)ELogFilter::Warn);
 			info.LogLevel = ELogLevel::Warn;
 			info.Message = StringHelper::ReplaceAll(info.Message, "[warning]", "");
 		}
 		else if (msg.find("[error]") != String::npos)
 		{
-			info.Filter = (ELogFilter)((i32)info.Filter | (i32)ELogFilter::Error);
 			info.LogLevel = ELogLevel::Error;
 			info.Message = StringHelper::ReplaceAll(info.Message, "[error]", "");
 		}
@@ -311,5 +349,10 @@ namespace JG
 			}
 		}
 		mPendingLogs.push_back(info);
+	}
+	void DevConsoleView::CommandExecution(const String& command)
+	{
+
+		mCommandPrompt->Execute(command);
 	}
 }

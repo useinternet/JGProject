@@ -10,6 +10,7 @@
 
 #include "stb/stb_image.h"
 #include "Graphics/RayTracing/RayTracingPipeline.h"
+#include "Graphics/RayTracing/RayTracingShaderResourceTable.h"
 #include "Graphics/RayTracing/BottomLevelAccelerationStructure.h"
 #include "Graphics/RayTracing/TopLevelAccelerationStructure.h"
 
@@ -236,6 +237,14 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		return api->CreateRayTracingPipeline();
 	}
+
+	SharedPtr<IRayTracingShaderResourceTable> IRayTracingShaderResourceTable::Create()
+	{
+		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
+		return api->CreateRayTracingShaderResourceTable();
+	}
+
+
 	SharedPtr<IBottomLevelAccelerationStructure> IBottomLevelAccelerationStructure::Create()
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();

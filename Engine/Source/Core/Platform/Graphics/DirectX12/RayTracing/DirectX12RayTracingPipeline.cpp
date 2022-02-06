@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DirectX12RayTracingPipeline.h"
+#include "Graphics/Shader.h"
 #include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
 #include "Platform/Graphics/DirectX12/DirectX12RootSignature.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
@@ -17,47 +18,76 @@ namespace JG
         {
             return;
         }
-        ComPtr<IDxcBlob> blob = CompileShaderLibrary(shaderPath);
+        auto w_filepath = StringHelper::s2ws(shaderPath);
+        // Open and read the file
+        std::ifstream shaderFile(w_filepath);
+        if (shaderFile.good() == false)
+        {
+            throw std::logic_error("Cannot find shader file");
+        }
+        std::stringstream strStream;
+        strStream << shaderFile.rdbuf();
+        std::string sShader = strStream.str();
+
+        String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
+        sShader = libCode + sShader;
+
+        ComPtr<IDxcBlob> blob = CompileShaderLibrary(shaderPath, sShader);
         if (blob == nullptr)
         {
             return;
         }
 
+
+
         mShaderDic[shaderPath] = blob;
         mPipelineGen.AddLibrary(blob.Get(), symbolExports);
+        mIsDirty = true;
     }
+    void DirectX12RayTracingPipeline::AddLibraryAsSourceCode(const String& name, const String& sourceCode, const List<String>& symbolExports)
+    {
+        if (mShaderDic.find(name) != mShaderDic.end())
+        {
+            return;
+        }
+ 
+        String sshader = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
+        sshader = sshader + sourceCode;
+
+
+        ComPtr<IDxcBlob> blob = CompileShaderLibrary(name, sshader);
+        if (blob == nullptr)
+        {
+            return;
+        }
+
+
+
+        mShaderDic[name] = blob;
+        mPipelineGen.AddLibrary(blob.Get(), symbolExports);
+        mIsDirty = true;
+    }
+
     void DirectX12RayTracingPipeline::AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol)
     {
         mPipelineGen.AddHitGroup(hitGroupName, closestHitSymbol, anyHitSymbol, intersectionSymbol);
+        mIsDirty = true;
     }
-    void DirectX12RayTracingPipeline::AddRayGenerationProgram(const String& entryPoint)
-    {
-        mSBTGen.AddRayGenerationProgram(StringHelper::s2ws(entryPoint), {});
-    }
-    void DirectX12RayTracingPipeline::AddHitProgram(const String& entryPoint)
-    {
-        mSBTGen.AddHitGroup(StringHelper::s2ws(entryPoint), {});
-    }
-    void DirectX12RayTracingPipeline::AddMissProgram(const String& entryPoint)
-    {
-        mSBTGen.AddMissProgram(StringHelper::s2ws(entryPoint), {});
-    }
-
-
     void DirectX12RayTracingPipeline::SetMaxPayloadSize(u32 byteSize)
     {
         mPipelineGen.SetMaxPayloadSize(byteSize);
+        mIsDirty = true;
     }
     void DirectX12RayTracingPipeline::SetMaxAttributeSize(u32 byteSize)
     {
         mPipelineGen.SetMaxAttributeSize(byteSize);
+        mIsDirty = true;
     }
     void DirectX12RayTracingPipeline::SetMaxRecursionDepth(u32 maxDepth)
     {
         mPipelineGen.SetMaxRecursionDepth(maxDepth);
+        mIsDirty = true;
     }
-
-
 
     void DirectX12RayTracingPipeline::SetGlobalRootSignature(SharedPtr<IRootSignature> rootSig)
     {
@@ -65,104 +95,48 @@ namespace JG
         {
             return;
         }
-        mRaytracingRootSig = static_cast<DirectX12RootSignature*>(rootSig.get())->Get();
+        if (mRaytracingRootSig != rootSig)
+        {
+            mIsDirty = true;
+        }
+        mRaytracingRootSig = rootSig;
+    }
+
+    void DirectX12RayTracingPipeline::AddLocalRootSignature(SharedPtr<IRootSignature> rootSig, const List<String>& symbols)
+    {
+        auto dx12RootSig = static_cast<DirectX12RootSignature*>(rootSig.get())->Get();
+        mPipelineGen.AddLocalRootSignature(dx12RootSig->Get(), symbols);
+        mIsDirty = true;
     }
     bool DirectX12RayTracingPipeline::IsValid()
     {
-        return mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr;
-    }
-
-    u64 DirectX12RayTracingPipeline::GetRayGenStartAddr() const
-    {
-        return mRayGenStartAddr;
-    }
-    u64 DirectX12RayTracingPipeline::GetRayGenSectionSize() const
-    {
-        return mRayGenSectionSize;
-    }
-
-    u64 DirectX12RayTracingPipeline::GetMissStartAddr() const
-    {
-        return mMissStartAddr;
-    }
-    u64 DirectX12RayTracingPipeline::GetMissSectionSize() const
-    {
-        return mMissSectionSize;
-    }
-    u64 DirectX12RayTracingPipeline::GetMissEntrySize() const
-    {
-        return mMissEntrySize;
-    }
-
-    u64 DirectX12RayTracingPipeline::GetHitGroupStartAddr() const
-    {
-        return mHitGroupStartAddr;
-    }
-    u64 DirectX12RayTracingPipeline::GetHitGroupSectionSize() const
-    {
-        return mHitGroupSectionSize;
-    }
-    u64 DirectX12RayTracingPipeline::GetHitGroupEntrySize() const
-    {
-        return mHitGroupEntrySize;
+        return mRaytracingPipelineState != nullptr;
     }
     bool DirectX12RayTracingPipeline::Generate()
     {
-        if (mRaytracingPipelineState == nullptr)
+        if (mRaytracingPipelineState == nullptr || mIsDirty ==  true)
         {
-            mPipelineGen.SetRootSignature(mRaytracingRootSig->Get());
+            mIsDirty = false;
+            auto dx12RootSig = static_cast<DirectX12RootSignature*>(mRaytracingRootSig.get())->Get();
+            mPipelineGen.SetRootSignature(dx12RootSig->Get());
             mRaytracingPipelineState = mPipelineGen.Generate();
             mRaytracingPipelineState->QueryInterface(mRaytracingPipelineStateProperties.GetAddressOf());
         }
-
-        if (mShaderBindingTableBuffer == nullptr)
-        {
-            mShaderBindingTableBuffer = DirectX12API::CreateCommittedResource(
-                "SBT_Buffer",
-                &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-                D3D12_HEAP_FLAG_NONE,
-                &CD3DX12_RESOURCE_DESC::Buffer(mSBTGen.ComputeSBTSize()),
-                D3D12_RESOURCE_STATE_GENERIC_READ,
-                nullptr);
-            mSBTGen.Generate(mShaderBindingTableBuffer.Get(), mRaytracingPipelineStateProperties.Get());
-        }
-
-
-        if (mRaytracingPipelineState != nullptr && mShaderBindingTableBuffer != nullptr)
-        {
-            u64 startAddr = mShaderBindingTableBuffer->GetGPUVirtualAddress();
-
-            mRayGenStartAddr = startAddr;
-            mRayGenSectionSize = mSBTGen.GetRayGenSectionSize();
-
-            mMissStartAddr = startAddr + mRayGenSectionSize;
-            mMissSectionSize = mSBTGen.GetMissSectionSize();
-            mMissEntrySize = mSBTGen.GetMissEntrySize();
-
-            mHitGroupStartAddr = startAddr + mRayGenSectionSize + mMissSectionSize;
-            mHitGroupSectionSize = mSBTGen.GetHitGroupSectionSize();
-            mHitGroupEntrySize = mSBTGen.GetHitGroupEntrySize();
-        }
-
-
-
         return IsValid();
     }
     void DirectX12RayTracingPipeline::Reset()
     {
-        DirectX12API::DestroyCommittedResource(mShaderBindingTableBuffer);
-
-
-
         mShaderDic.clear();
         mRaytracingRootSig = nullptr;
         mRaytracingPipelineState = nullptr;
         mRaytracingPipelineStateProperties = nullptr;
-        mShaderBindingTableBuffer = nullptr;
-        mSBTGen.Reset();
         mPipelineGen = RayTracingPipelineGenerator();
     }
-    IDxcBlob* DirectX12RayTracingPipeline::CompileShaderLibrary(const String& filePath)
+    SharedPtr<IRootSignature> DirectX12RayTracingPipeline::GetGlobalRootSignature() const
+    {
+        return mRaytracingRootSig;
+    }
+    IDxcBlob* DirectX12RayTracingPipeline::CompileShaderLibrary(const String& filePath, const String& sourceCode)
 	{
         static IDxcCompiler*       pCompiler = nullptr;
         static IDxcLibrary*        pLibrary = nullptr;
@@ -177,25 +151,16 @@ namespace JG
             (DxcCreateInstance(CLSID_DxcLibrary, __uuidof(IDxcLibrary), (void**)&pLibrary));
             (pLibrary->CreateIncludeHandler(&dxcIncludeHandler));
         }
-        auto w_filepath = StringHelper::s2ws(filePath);
-        // Open and read the file
-        std::ifstream shaderFile(w_filepath);
-        if (shaderFile.good() == false)
-        {
-            throw std::logic_error("Cannot find shader file");
-        }
-        std::stringstream strStream;
-        strStream << shaderFile.rdbuf();
-        std::string sShader = strStream.str();
+
 
         // Create blob from the string
         IDxcBlobEncoding* pTextBlob;
         (pLibrary->CreateBlobWithEncodingFromPinned(
-            (LPBYTE)sShader.c_str(), (uint32_t)sShader.size(), 0, &pTextBlob));
+            (LPBYTE)sourceCode.c_str(), (uint32_t)sourceCode.size(), 0, &pTextBlob));
 
         // Compile
         IDxcOperationResult* pResult;
-        (pCompiler->Compile(pTextBlob, w_filepath.c_str(), L"", L"lib_6_3", nullptr, 0, nullptr, 0,
+        (pCompiler->Compile(pTextBlob, StringHelper::s2ws(filePath).c_str(), L"", L"lib_6_3", nullptr, 0, nullptr, 0,
             dxcIncludeHandler, &pResult));
 
         // Verify the result

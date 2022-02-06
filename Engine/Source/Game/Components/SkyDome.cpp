@@ -72,7 +72,7 @@ namespace JG
 
 		if (mCubeMap != nullptr && mCubeMap->IsValid())
 		{
-			mMaterial->SetTextureCube("Tex1", mCubeMap->Get());
+			mMaterial->SetTexture("Tex1", mCubeMap->Get());
 		}
 	
 
@@ -89,7 +89,7 @@ namespace JG
 			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		}
 		sceneObject->WorldMatrix = JMatrix::Scaling(radius) * JMatrix::Translation(location);
-		sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
+		//sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
 		sceneObject->MaterialList.push_back(mMaterial);
 		sceneObject->Mesh = mMesh;
 		GetGameWorld()->PushRenderSceneObject(sceneObject);

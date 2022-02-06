@@ -16,7 +16,7 @@ namespace JG
 		}
 
 		// Material 정보를 가져온다.
-		auto scriptList = obj->Get()->GetScriptList();
+		auto script = obj->Get()->GetScript();
 
 
 		SharedPtr<IMaterial> material = obj->Get();
@@ -36,9 +36,9 @@ namespace JG
 		// Surface Script
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Shader Script "); ImGui::SameLine();
-		if (scriptList.empty() == false)
+		if (script != nullptr)
 		{
-			if (ImGui::BeginCombo("##Script Combo Box", scriptList[0]->GetName().c_str()))
+			if (ImGui::BeginCombo("##Script Combo Box", script->GetName().c_str()))
 			{
 				ShaderLibrary::GetInstance().ForEach(EShaderScriptType::Surface, [&](SharedPtr<IShaderScript> script)
 				{
@@ -237,11 +237,8 @@ namespace JG
 					stock.MaterialDatas = materialDatas;
 					stock.ShaderTemplate = GraphicsHelper::GetShaderTemplateName(material->GetShader());
 					
-					auto scriptList = material->GetScriptList();
-					for (auto& script : scriptList)
-					{
-						stock.ShaderScript = scriptList[0]->GetName();
-					}
+					auto script = material->GetScript();
+					stock.ShaderScript = script->GetName();
 
 					auto outputPath = StringHelper::ReplaceAll(obj->GetAssetFullPath(), obj->GetAssetName() + obj->GetExtension(), "");
 					MaterialAssetStock::Write(outputPath, stock);

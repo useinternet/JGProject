@@ -50,10 +50,11 @@ namespace JG
 		virtual void AddDescriptorTable(u32 rootParam, EDescriptorTableRangeType rangeType, u32 numDescriptor, u32 numRegister, u32 numRegisterSpace) = 0;
 		virtual void AddSRV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) = 0;
 		virtual void AddCBV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) = 0;
+		virtual void AddConstant(u32 rootParam, u32 btSize, u32 numRegister, u32 numRegisterSpace) = 0;
 		virtual void AddUAV(u32 rootParam, u32 numRegister, u32 numRegisterSpace) = 0;
 		virtual void AddSampler(u32 numRegister, ESamplerFilter filter, ETextureAddressMode addressMode) = 0;
 		virtual void Reset() = 0;
-		virtual SharedPtr<IRootSignature> Generate() = 0;
+		virtual SharedPtr<IRootSignature> Generate(bool isLocal = false) = 0;
 	public:
 		static SharedPtr<IRootSignatureCreater> Create();
 	};

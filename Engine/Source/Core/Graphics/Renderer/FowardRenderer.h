@@ -36,11 +36,13 @@ namespace JG
 		Dictionary<EGBuffer, RP_Global_Tex> mGBufferTexDic;
 		RP_Global_Tex mLightResultTex;
 		RP_Global_Tex mFinalResultTex;
+		RP_Global_Bool mIsRayTracing;
 		List<SharedPtr<ITexture>>  mLightResult;
 		SharedPtr<IGraphicsShader> mLightShader;
 
 		SharedPtr<IGraphicsShader> mFinalShader;
 		List<SharedPtr<ITexture>>  mFinalResult;
+
 	public:
 		FowardRenderer();
 		virtual ~FowardRenderer() = default;
@@ -59,7 +61,6 @@ namespace JG
 		void UpdateGBufferPass();
 		void UpdateLightPass();
 		void UpdateFinalPass();
-		void UpdateBottomLevelAS(SharedPtr<IMesh> mesh, const JMatrix& worldMatrix);
 		void UpdateRayTacing();
 		
 		SharedPtr<ITexture> GetTargetTexture(EGBuffer buffer);

@@ -1,6 +1,9 @@
 #include "JGGraphics.h"
 #include "pch.h"
 #include "JGGraphics.h"
+#include "RayTracing/RayTracingPipeline.h"
+#include "RayTracing/Raytracer.h"
+#include "Graphics/RootSignature.h"
 #include "Graphics/DebugGeometryDrawer.h"
 #include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/Renderer/FowardRenderer.h"
@@ -164,6 +167,7 @@ namespace JG
 	void JGGraphics::LoadShader()
 	{
 		ShaderLibrary::GetInstance().LoadGlobalShaderLib(mDesc.GlobalShaderLibPath);
+		LoadRayTracingPipeline();
 		LoadShaderTemplate();
 		LoadShaderScript();
 		LoadComputeShader();
@@ -234,6 +238,14 @@ namespace JG
 			if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
 			{
 				script = IShaderScript::CreateSurfaceScript("Surface/" + fileName, scriptCode);
+
+				if (IsSupportedRayTracing())
+				{
+					SharedPtr<IClosestHitShader> closestHitShader = IClosestHitShader::Create("Surface/" + fileName, script);
+					ShaderLibrary::GetInstance().RegisterClosestHitShader("Surface/" + fileName, closestHitShader);
+					ShaderLibrary::GetInstance().AddRayTracingLibrary(RayTracer::GetDefaultRayTracingPipelineName(), closestHitShader);
+				}
+
 			}
 			else if (scriptCode.find(ShaderDefine::Type::Scene) != String::npos)
 			{
@@ -266,6 +278,22 @@ namespace JG
 				}
 			}
 		}
+	}
+	void JGGraphics::LoadRayTracingPipeline()
+	{
+		SharedPtr<IRayTracingPipeline> pipeline = IRayTracingPipeline::Create();
+		//Pipeline
+		String shaderPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing");
+		pipeline = IRayTracingPipeline::Create();
+		pipeline->AddLibrary(PathHelper::CombinePath(shaderPath, "Reflect.hlsli"), { "RayGeneration", "ClosestHit", "Miss" });
+		pipeline->AddHitGroup("HitGroup0", "ClosestHit", "", "");
+		pipeline->SetGlobalRootSignature(RayTracer::CreateGlobalRootSignature());
+		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), {"ClosestHit"});
+		pipeline->SetMaxPayloadSize(sizeof(Color));
+		pipeline->SetMaxRecursionDepth(1);
+		pipeline->Generate();
+
+		ShaderLibrary::GetInstance().RegisterRayTracingPipeline(RayTracer::GetDefaultRayTracingPipelineName(), pipeline);
 	}
 }
 

@@ -35,9 +35,23 @@ namespace JG
 			std::wstring IntersectionSymbol;
 			D3D12_HIT_GROUP_DESC Desc = {};
 		};
+		struct RootSignatureAssociation
+		{
+			RootSignatureAssociation(ID3D12RootSignature* rootSignature,
+				const std::vector<std::wstring>& symbols);
+
+			RootSignatureAssociation(const RootSignatureAssociation& source);
+
+			ID3D12RootSignature* mRootSignature;
+			ID3D12RootSignature* mRootSignaturePointer;
+			std::vector<std::wstring> mSymbols;
+			std::vector<LPCWSTR> mSymbolPointers;
+			D3D12_SUBOBJECT_TO_EXPORTS_ASSOCIATION mAssociation = {};
+		};
 
 		List<Library>  mLibraries = {};
 		List<HitGroup> mHitGroups = {};
+		List<RootSignatureAssociation> mRootSignatureAssociations;
 		ComPtr<ID3D12RootSignature> mGlobalRootSignature;
 
 
@@ -50,6 +64,7 @@ namespace JG
 		void AddLibrary(IDxcBlob* dxilLib, const List<String>& symbolExports);
 		void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol = "", const String& intersectionSymbol = "");
 		void SetRootSignature(ID3D12RootSignature* rootSig);
+		void AddLocalRootSignature(ID3D12RootSignature* rootSig, const List<String>& symbols);
 		void SetMaxPayloadSize(u32 btSize);
 		void SetMaxAttributeSize(u32 btSize);
 		void SetMaxRecursionDepth(u32 maxDepth);
@@ -113,11 +128,12 @@ namespace JG
 	private:
 		struct SBTEntry
 		{
-			SBTEntry(std::wstring entryPoint, std::vector<void*> inputData) :
-				EntryPoint(entryPoint), InputData(inputData) {}
+			SBTEntry(std::wstring entryPoint, const void* inputData, u64 inputDataSize) :
+				EntryPoint(entryPoint), InputData(inputData), InputDataSize(inputDataSize) {}
 
 			const std::wstring		 EntryPoint;
-			const std::vector<void*> InputData;
+			const void* InputData	  = nullptr;
+			const u64	InputDataSize = 0;
 		};
 		u32 CopyShaderData(ID3D12StateObjectProperties* raytracingPipeline,
 			u8* outputData, const std::vector<SBTEntry>& shaders,
@@ -135,12 +151,11 @@ namespace JG
 
 		u32 mProgIdSize;
 	public:
-		void AddRayGenerationProgram(const std::wstring& entryPoint, const std::vector<void*>& inputData);
-		void AddMissProgram(const std::wstring& entryPoint, const std::vector<void*>& inputData);
-		void AddHitGroup(const std::wstring& entryPoint, const std::vector<void*>& inputData);
+		void AddRayGenerationProgram(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize);
+		void AddMissProgram(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize);
+		void AddHitGroup(const std::wstring& entryPoint, const void* inputData, u64 inputDataSize);
 		u32  ComputeSBTSize();
-		void Generate(ID3D12Resource* sbtBuffer,
-			ID3D12StateObjectProperties* raytracingPipeline);
+		void Generate(ID3D12Resource* rayGenBuffer, ID3D12StateObjectProperties* raytracingPipeline);
 		void Reset();
 		u32 GetRayGenSectionSize() const;
 		u32 GetRayGenEntrySize() const;

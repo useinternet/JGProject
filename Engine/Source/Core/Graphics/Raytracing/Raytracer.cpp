@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "TopLevelAccelerationStructure.h"
 #include "BottomLevelAccelerationStructure.h"
+#include "RayTracingShaderResourceTable.h"
 #include "RayTracingPipeline.h"
 #include "Graphics/Resource.h"
 #include "Graphics/Mesh.h"
@@ -28,19 +29,24 @@ namespace JG
 
 	}
 
-	void RayTracer::AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btas, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex)
+	void RayTracer::AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform)
 	{
-		if (mSceneAS.empty() == true)
+		u64 instanceCount = subMesh->GetInstanceCount();
+		JMatrix defaultTransform = transform[0];
+		for (u64 i = 0; i < instanceCount; ++i)
 		{
-			return;
+			JMatrix m;
+			if (transform.size() <= i)
+			{
+				m = defaultTransform;
+			}
+			else
+			{
+				m = transform[i];
+			}
+			mInstances.push_back(InstanceData(subMesh, material, m, i, mHitGroupOffset));
 		}
-
-		u32 currentIndex = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferIndex();
-		if (mSceneAS[currentIndex] == nullptr)
-		{
-			return;
-		}
-		mSceneAS[currentIndex]->AddInstance(btas, transform, instanceID, hitGroupIndex);
+		mHitGroupOffset += mHitGroupStride;
 	}
 	void RayTracer::SetResolution(const JVector2& resolutoin)
 	{
@@ -52,13 +58,13 @@ namespace JG
 	}
 	void RayTracer::Execute(SharedPtr<IComputeContext> context)
 	{
-		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false)
+		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false || mInstances.empty() == true)
 		{
 			return;
 		}
 
 		UpdateAccelerationStructure(context);
-		UpdateShadow(context);
+		Update(context);
 	}
 
 	void RayTracer::Reset()
@@ -73,8 +79,9 @@ namespace JG
 		{
 			return;
 		}
-
+		mInstances.clear();
 		mSceneAS[currentIndex]->Reset();
+		mHitGroupOffset = 0;
 	}
 
 
@@ -82,7 +89,8 @@ namespace JG
 	void RayTracer::Init()
 	{
 		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
-		BuildShadow();
+
+		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
 	}
 
 	void RayTracer::InitTextures()
@@ -91,115 +99,135 @@ namespace JG
 		texInfo.Width	  = std::max<u32>(1, mResolution.x);
 		texInfo.Height	  = std::max<u32>(1, mResolution.y);
 		texInfo.ArraySize = 1;
-		texInfo.Format	  = ETextureFormat::R32_Float;
+		texInfo.Format	  = ETextureFormat::R16G16B16A16_Float;
 		texInfo.Flags	  = ETextureFlags::Allow_UnorderedAccessView;
 		texInfo.MipLevel  = 1;
 		texInfo.ClearColor = Color();
 
-		texInfo.Format = ETextureFormat::R32_Float;
-		GraphicsHelper::InitRenderTextures(texInfo, "ShadowOutput", &mShadow.Results);
-
-
 		texInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
-		GraphicsHelper::InitRenderTextures(texInfo, "ReflectOutput", &mReflection.Results);
+		GraphicsHelper::InitRenderTextures(texInfo, "ReflectOutput", &mResults);
 
 	}
-	void RayTracer::BuildShadow()
-	{
-		mShadow.Result = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr, mRenderer->GetRenderParamManager());
 
-		// RootSignature
-		auto rootSigCreater = IRootSignatureCreater::Create();
-		rootSigCreater->AddCBV(0, 0, 0);
-		rootSigCreater->AddSRV(1, 0, 1);
-		rootSigCreater->AddSRV(2, 0, 2);
-		rootSigCreater->AddDescriptorTable(3, EDescriptorTableRangeType::SRV, 1, 0, 0);
-		rootSigCreater->AddDescriptorTable(4, EDescriptorTableRangeType::UAV, 1, 0, 0);
-		mShadow.RootSignature = rootSigCreater->Generate();
-
-
-
-		// Pipeline
-		mShadow.Pipeline = IRayTracingPipeline::Create();
-		mShadow.Pipeline->AddLibrary(SHADER_PATH("Shadow.hlsli"), { "RayGeneration", "ClosestHit", "Miss" });
-		mShadow.Pipeline->AddHitGroup("ShadowHitGroup", "ClosestHit", "", "");
-
-		mShadow.Pipeline->AddRayGenerationProgram("RayGeneration");
-		mShadow.Pipeline->AddHitProgram("ShadowHitGroup");
-		mShadow.Pipeline->AddMissProgram("Miss");
-		mShadow.Pipeline->SetGlobalRootSignature(mShadow.RootSignature);
-		mShadow.Pipeline->SetMaxPayloadSize(sizeof(float));
-		mShadow.Pipeline->SetMaxAttributeSize(sizeof(float[2]));
-		mShadow.Pipeline->SetMaxRecursionDepth(1);
-		mShadow.Pipeline->Generate();
-	}
-	void RayTracer::BuildReflection()
-	{
-		mReflection.Result = RP_Global_Tex::Create("Renderer/Raytracing/Reflect", nullptr, mRenderer->GetRenderParamManager());
-		
-
-
-	}
-	void RayTracer::BuildGlobalIllumination()
-	{
-	}
 	void RayTracer::UpdateAccelerationStructure(SharedPtr<IComputeContext> context)
 	{
 		u32 currentIndex = JGGraphics::GetInstance().GetBufferIndex();
-		mSceneAS[currentIndex]->Generate(context);
-
-
-	}
-	void RayTracer::UpdateShadow(SharedPtr<IComputeContext> context)
-	{
-		struct CB
+		for (InstanceData& instance : mInstances)
 		{
-			int PointLightCount = 0;
-		};
-		static CB CB;
+			SharedPtr<IBottomLevelAccelerationStructure> blas = instance.SubMesh->GetBottomLevelAS();
 
+			if (blas == nullptr)
+			{
+				blas = IBottomLevelAccelerationStructure::Create();
+				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer());
+				instance.SubMesh->SetBottomLevelAS(blas);
+			}
+
+			mSceneAS[currentIndex]->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex);
+		}
+		mSceneAS[currentIndex]->Generate(context);
+	}
+	void RayTracer::Update(SharedPtr<IComputeContext> context)
+	{
+		if (mSRT == nullptr)
+		{
+			mSRT = IRayTracingShaderResourceTable::Create();
+		}
+		mSRT->Reset();
+		mSRT->AddRayGeneration("RayGeneration");
+		mSRT->AddMiss("Miss");
+		for (int i = 0; i < mInstances.size(); ++i)
+		{
+			InstanceData& instance = mInstances[i];
+			LocalRootArgument arg;
+			arg.SetIndexBuffer(instance.SubMesh->GetIndexBuffer());
+			arg.SetVertexBuffer(instance.SubMesh->GetVertexBuffer());
+			if (instance.Material == nullptr || instance.Material->IsValid() == false)
+			{
+				mSRT->AddHitGroupAndBindLocalRootArgument("HitGroup0", arg);
+			}
+			else
+			{
+				const List<jbyte>& cbData = instance.Material->GetMaterialPropertyByteData();
+				arg.SetConstant(cbData.data(), cbData.size());
+
+				const List<SharedPtr<ITexture>>& texes = instance.Material->GetTextureList();
+				arg.SetTextures(texes);
+
+				auto closetShader = ShaderLibrary::GetInstance().FindClosestHitShader(instance.Material->GetScript()->GetName());
+
+				mSRT->AddHitGroupAndBindLocalRootArgument(closetShader->GetHitGroupName(), arg);
+			}
+
+
+		}
 		u32 currentIndex = JGGraphics::GetInstance().GetBufferIndex();
+		SharedPtr<IRayTracingPipeline> pipeline = ShaderLibrary::GetInstance().FindRayTracingPipeline(GetDefaultRayTracingPipelineName());
+		pipeline->Generate();
 
-		SharedPtr<ITexture> worldPosTex = RP_Global_Tex::Load("Renderer/GBuffer/WorldPos", mRenderer->GetRenderParamManager()).GetValue();
-
-		auto lInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
-
-
-		CB.PointLightCount = lInfo.Count;
-
-
-
-		context->BindRootSignature(mShadow.RootSignature);
+		context->BindRootSignature(pipeline->GetGlobalRootSignature());
 
 		// CB Bind
-		context->BindConstantBuffer(0, CB);
+		context->BindConstantBuffer(0, mRenderer->GetPassData());
 
 		// SceneAS
 		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
 
-		// PointLight
-		context->BindSturcturedBuffer(2, lInfo.Data.data(), lInfo.Size, lInfo.Count);
-
-		// WorldPos
-		context->BindTextures(3, { worldPosTex } );
-
 		// Result
-		context->BindTextures(4, { mShadow.Results[currentIndex] });
+		context->BindTextures(2, { mResults[currentIndex] });
+		
+		// PointLight
+		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
+		context->BindSturcturedBuffer(3, plInfo.Data.data(), plInfo.Size, plInfo.Count);
 
 
+		context->DispatchRay(mResolution.x, mResolution.y, 1, pipeline, mSRT);
 
-		context->DispatchRay(mResolution.x, mResolution.y, 1, mShadow.Pipeline);
-
-		mShadow.Result.SetValue(mShadow.Results[currentIndex]);
+		mResultTex.SetValue(mResults[currentIndex]);
 
 
 
 	}
-	void RayTracer::UpdateReflection(SharedPtr<IComputeContext> context)
+
+	const String& RayTracer::GetDefaultRayTracingPipelineName()
 	{
+		static String result = "DefaultRayTracingPipeline";
+		return result;
 	}
-	void RayTracer::UpdateGlobalIllumination(SharedPtr<IComputeContext> context)
+
+	u64 RayTracer::GetMaxConstantBufferSize()
 	{
+		return 256;
 	}
+
+	SharedPtr<IRootSignature> RayTracer::CreateGlobalRootSignature()
+	{
+		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
+		creater->AddCBV(0, 0, 0);
+		creater->AddSRV(1, 0, 0);
+		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 1, 0, 0);
+		creater->AddSRV(3, 1, 0);
+		creater->AddSRV(4, 2, 0);
+		creater->AddSRV(5, 3, 0);
+
+
+		creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
+		creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
+		creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);
+		creater->AddSampler(3, ESamplerFilter::Point, ETextureAddressMode::Clamp);
+		creater->AddSampler(4, ESamplerFilter::Linear, ETextureAddressMode::Clamp);
+		creater->AddSampler(5, ESamplerFilter::Anisotropic, ETextureAddressMode::Clamp);
+		creater->AddSampler(6, ESamplerFilter::Linear, ETextureAddressMode::Border);
+		return creater->Generate();
+	}
+
+	SharedPtr<IRootSignature> RayTracer::CreateLocalRootSignature()
+	{
+		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
+		creater->AddConstant(0, GetMaxConstantBufferSize(), 0, 1);
+		creater->AddDescriptorTable(1, EDescriptorTableRangeType::SRV, 1024, 0, 1);
+		return creater->Generate(true);
+	}
+
 }
 

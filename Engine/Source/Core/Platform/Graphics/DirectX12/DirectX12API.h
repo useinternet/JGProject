@@ -52,10 +52,6 @@ namespace JG
 
 		static SharedPtr<GraphicsPipelineState> GetGraphicsPipelineState();
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState();
-		static SharedPtr<RootSignature>         GetGraphicsRootSignature();
-		static SharedPtr<RootSignature>         GetComputeRootSignature();
-
-
 
 		static void GetDepthStencilDesc(EDepthStencilStateTemplate _template,  D3D12_DEPTH_STENCIL_DESC* out);
 		static void GetBlendDesc(EBlendStateTemplate _template,  D3D12_RENDER_TARGET_BLEND_DESC* out);
@@ -91,6 +87,7 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) override;
+		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const SharedPtr<IShaderScript> script) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) override;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) override;
 		virtual SharedPtr<IMesh>		  CreateMesh(const String& name) override;
@@ -99,6 +96,7 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) override;
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() override;
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() override;
+		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() override;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() override;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() override;
 
@@ -213,7 +211,7 @@ namespace JG
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) override;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) override;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
-		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline) override;
+		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) override;
 		virtual void Reset() override;
 
 

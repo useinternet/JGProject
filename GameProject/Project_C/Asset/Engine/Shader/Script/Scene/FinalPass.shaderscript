@@ -1,9 +1,7 @@
 
 _Resources{
 	Texture2D LightTex;
-	Texture2D ShadowTex;
 	Texture2D Depth;
-
 };
 
 _Variables {
@@ -12,7 +10,6 @@ _Variables {
 
 _Scene {
 	float3 Lo     	 = LightTex.Sample(_LinearWrap, _input.tex).rgb;
-	float Shadow     = ShadowTex.Sample(_LinearWrap, _input.tex).r;
 	float depth 	 = Depth.Sample(_LinearWrap, _input.tex).r;
 
 	if(depth >= 1.0f)

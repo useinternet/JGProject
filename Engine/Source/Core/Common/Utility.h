@@ -15,6 +15,15 @@ namespace JG
 
 			return converterX.from_bytes(str);
 		}
+		inline List<std::wstring> s2ws(const List<std::string>& str_list)
+		{
+			List<std::wstring> result;
+			for (auto& str : str_list)
+			{
+				result.push_back(s2ws(str));
+			}
+			return result;
+		}
 
 		inline std::string ws2s(const std::wstring& wstr)
 		{
@@ -23,7 +32,15 @@ namespace JG
 
 			return converterX.to_bytes(wstr);
 		}
-
+		inline List<std::string> ws2s(const List<std::wstring>& str_list)
+		{
+			List<std::string> result;
+			for (auto& str : str_list)
+			{
+				result.push_back(ws2s(str));
+			}
+			return result;
+		}
 		inline String ReplaceAll(const String& message, const String& pattern, const String& replace)
 		{
 			if (pattern.empty() == true) return message;

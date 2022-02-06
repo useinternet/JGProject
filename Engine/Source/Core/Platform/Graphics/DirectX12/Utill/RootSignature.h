@@ -49,7 +49,7 @@ namespace JG
 		void AddStaticSamplerState(const D3D12_STATIC_SAMPLER_DESC& desc);
 		DescriptorTableInfo GetDescriptorTableRangeType(u32 rootparam) const;
 		void Reset();
-		bool Finalize();
+		bool Finalize(D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	public:
 		ID3D12RootSignature* Get() const {

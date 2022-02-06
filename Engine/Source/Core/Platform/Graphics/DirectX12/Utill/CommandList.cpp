@@ -105,6 +105,15 @@ namespace JG
 		BackupResource(afterResource);
 	}
 
+	D3D12_GPU_DESCRIPTOR_HANDLE CommandList::UploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	{
+		if (mDynamicDescriptorAllocator == nullptr || handle.ptr == 0)
+		{
+			return { 0 };
+		}
+		return mDynamicDescriptorAllocator->UploadDirect(handle, mD3DCommandList, &mBindedDescriptorHeap);
+	}
+
 	void CommandList::FlushResourceBarrier()
 	{
 		mResourceStateTracker->FlushResourceBarrier(Get());
@@ -554,6 +563,7 @@ namespace JG
 	void ComputeCommandList::BindPipelineState(ID3D12StateObject* pso)
 	{
 		mD3DCommandList->SetPipelineState1(pso);
+		BackupResource(pso);
 	}
 	void ComputeCommandList::BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles)
 	{

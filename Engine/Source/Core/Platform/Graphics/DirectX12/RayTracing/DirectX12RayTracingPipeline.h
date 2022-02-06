@@ -6,65 +6,43 @@
 
 namespace JG
 {
-	class IRootSignature;
+
 	class RootSignature;
 	class IComputeContext;
 	class DirectX12RayTracingPipeline : public IRayTracingPipeline
 	{
 	private:
 		Dictionary<String, ComPtr<IDxcBlob>> mShaderDic;
-		SharedPtr<RootSignature>			 mRaytracingRootSig;
+		SharedPtr<IRootSignature>			 mRaytracingRootSig;
 		ComPtr<ID3D12StateObject>			 mRaytracingPipelineState;
 		ComPtr<ID3D12StateObjectProperties>  mRaytracingPipelineStateProperties;
-		ComPtr<ID3D12Resource>				 mShaderBindingTableBuffer;
-
-		RayTracingShaderBindingTableGenerator mSBTGen;
 		RayTracingPipelineGenerator			  mPipelineGen;
 
-
-		
-		u64 mRayGenStartAddr   = 0;
-		u64 mRayGenSectionSize = 0;
-
-		u64 mMissStartAddr	 = 0;
-		u64 mMissSectionSize = 0;
-		u64 mMissEntrySize	 = 0;
-
-		u64 mHitGroupStartAddr	 = 0;
-		u64 mHitGroupSectionSize = 0;
-		u64 mHitGroupEntrySize	 = 0;
-
+		bool mIsDirty = true;
 	public:
 		virtual ~DirectX12RayTracingPipeline();
 		// Pipeline
 		virtual void AddLibrary(const String& shaderPath, const List<String>& symbolExports) override;
+		virtual void AddLibraryAsSourceCode(const String& name, const String& sourceCode, const List<String>& symbolExports) override;
 		virtual void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol)  override;
-		virtual void AddRayGenerationProgram(const String& entryPoint) override;
-		virtual void AddHitProgram(const String& entryPoint) override;
-		virtual void AddMissProgram(const String& entryPoint) override;
 		virtual void SetMaxPayloadSize(u32 byteSize) override;
 		virtual void SetMaxAttributeSize(u32 byteSize) override;
 		virtual void SetMaxRecursionDepth(u32 maxDepth) override;
 		virtual void SetGlobalRootSignature(SharedPtr<IRootSignature> rootSig) override;
+		virtual void AddLocalRootSignature(SharedPtr<IRootSignature> rootSig, const List<String>& symbols) override;
 		virtual bool IsValid() override;
-		virtual u64 GetRayGenStartAddr() const override;
-		virtual u64 GetRayGenSectionSize()const override;
-		virtual u64 GetMissStartAddr() const override;
-		virtual u64 GetMissSectionSize() const override;
-		virtual u64 GetMissEntrySize() const override;
-		virtual u64 GetHitGroupStartAddr() const override;
-		virtual u64 GetHitGroupSectionSize() const override;
-		virtual u64 GetHitGroupEntrySize() const override;
 		virtual bool Generate() override;
 		virtual void Reset() override;
+
+		virtual SharedPtr<IRootSignature> GetGlobalRootSignature() const override;
 	public:
+		ID3D12StateObjectProperties* GetPipelineProperties() const {
+			return mRaytracingPipelineStateProperties.Get();
+		}
 		ID3D12StateObject* GetPipelineState() const {
 			return mRaytracingPipelineState.Get();
 		}
 	private:
-
-		IDxcBlob* CompileShaderLibrary(const String& filePath);
+		IDxcBlob* CompileShaderLibrary(const String& filePath, const String& sourceCode);
 	};
-
-
 }

@@ -6,6 +6,7 @@
 #include "JGCore.h"
 #include "Utill/DirectX12Helper.h"
 #include "Utill/ShaderDataForm.h"
+#include "Utill/DescriptorAllocator.h"
 #include "Graphics/Resource.h"
 
 
@@ -13,7 +14,6 @@
 namespace JG
 {
 	class ComputeCommandList;
-	class DescriptorAllocation;
 	class IComputeShader;
 	class DirectX12VertexBuffer : public IVertexBuffer
 	{
@@ -23,6 +23,11 @@ namespace JG
 		void* mCPUData  = nullptr;
 		EBufferLoadMethod mLoadMethod;
 		ComPtr<ID3D12Resource>  mD3DResource;
+
+
+		mutable bool mSRVDirty = true;
+		mutable DescriptorAllocation mSRV;
+		mutable std::mutex mSRVMutex;
 	public:
 		DirectX12VertexBuffer() = default;
 		virtual ~DirectX12VertexBuffer();
@@ -51,6 +56,7 @@ namespace JG
 		{
 			return mElementCount;
 		}
+		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
 	};
 	class DirectX12IndexBuffer : public IIndexBuffer
 	{
@@ -61,6 +67,10 @@ namespace JG
 		u32  mIndexCount = 0;
 		EBufferLoadMethod mLoadMethod;
 		ComPtr<ID3D12Resource>  mD3DResource;
+
+		mutable bool mSRVDirty = true;
+		mutable DescriptorAllocation mSRV;
+		mutable std::mutex mSRVMutex;
 	public:
 		DirectX12IndexBuffer() = default;
 		virtual ~DirectX12IndexBuffer();
@@ -85,6 +95,7 @@ namespace JG
 		{
 			return mIndexCount;
 		}
+		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
 	};
 
 	class DirectX12ByteAddressBuffer : public IByteAddressBuffer

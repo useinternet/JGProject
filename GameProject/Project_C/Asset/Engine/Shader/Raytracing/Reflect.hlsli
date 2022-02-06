@@ -1,37 +1,5 @@
 
-#include "Common.hlsli"
-
-
-RaytracingAccelerationStructure _SceneAS : register(t0, space0);
-RWTexture2D<float4> _Output : register(u0, space0);
-
-
-Texture2D _WorldPos    : register(t0);
-Texture2D _Albedo   : register(t1);
-Texture2D _Normal   : register(t2);
-Texture2D _Specular   : register(t3);
-Texture2D _Material : register(t4);
-
-
-Texture2D _Shadow : register(t3);
-
-
-
-cbuffer CB : register(b0)
-{
-    float3 _EyePosition;
-    uint _FrameCount;
-}
-
-
-// Normal을알아야한다.
-struct Payload
-{
-    float4 IndirectColor;
-    uint rayDepth;
-
-    
-};
+//#include "Common.hlsli"
 
 
 
@@ -42,47 +10,60 @@ void RayGeneration()
     float2 dims = float2(DispatchRaysDimensions().xy);
     float2 d = (((launchIndex.xy + 0.5f) / dims.xy) * 2.f - 1.f);
 
+    RayDesc ray;
+    ray.Origin = _EyePosition;
+    float4 target = mul(float4(d.x, -d.y, 1, 1), _InvProjMatrix);
+    ray.Direction = mul(float4(target.xyz, 0), _InvViewMatrix);
+    ray.TMin = 0;
+    ray.TMax = _FarZ;
+
+    Payload payload;
+    payload.Color = float4(0.0f,0.0f,0.0f,0.0f);
 
 
-    uint randSeed = initRand(launchIndex.x + launchIndex.y * launchDim.x, _FrameCount, 16);
+    TraceRay(
+        _SceneAS,
+        RAY_FLAG_NONE,
+        0xFF,
+        0,
+        1,
+        0,
+        ray,
+        payload);
 
 
-    float4 WorldPos  = _WorldPos[launchIndex];
-	float3 WorldNormal = _Normal[launchIndex].xyz;
-	float3 Albedo   = _Albedo[launchIndex].xyz;
-	float3 Specular  = _Specular[launchIndex].xyz;
-	float  Roughness  = _Material[launchIndex].x;
-	float  Shadow    = _Shadow[launchIndex];
-
-    
-
-    float3 V = normalize(_EyePosition - WorldPos.xyz);
-    float3 N = normalize(WorldNormal);
-    if (dot(N, V) <= 0.0f) 
-    {
-        N = -N;
-    }
-    float NdotV = dot(N, V);
-
-    bool isGeometryValid = (WorldPos.w >= 0.0f);
-	float3 shadeColor;
-	float3 bounceColor;
-    if(isGeometryValid)
-    {
-
-    }
-
-
+    _Output[launchIndex] = payload.Color;
 }
+
+
+// Local //
+cbuffer _DefaultCB__ : register(b0, space1)
+{ }
+//ConstantBuffer<MaterialCB> Test : register(b0, space1);
+StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
+StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
+Texture2D Null_Texture : register(t2, space1);
+// Default Hit Shader
 [shader("closesthit")]
 void ClosestHit(inout Payload payload, BuiltInTriangleIntersectionAttributes attribute)
 {
+    uint startIndex = PrimitiveIndex() * 3;
+    const uint3 indices = { Local_IndexBuffer[startIndex], Local_IndexBuffer[startIndex + 1], Local_IndexBuffer[startIndex + 2] };
+    Vertex vertices[3] = {
+        Local_VertexBuffer[indices[0]],
+        Local_VertexBuffer[indices[1]],
+        Local_VertexBuffer[indices[2]] };
 
+    Vertex v = HitAttribute(vertices, attribute);
+
+    float4 textureColor = Null_Texture.SampleLevel(_PointWrap, v.Texcoord, 0);
+    payload.Color = textureColor;
 }
+
+// Default Miss Shader
 [shader("miss")]
 void Miss(inout Payload payload : SV_RayPayload)
 {
-
+    payload.Color = float4(0.0f,0.0f,0.0f,0.0f);
 }
-
 

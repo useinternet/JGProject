@@ -66,24 +66,24 @@ namespace JG
 		cmdList->Get()->SetPipelineState1(static_cast<DirectX12RayTracingPipeline*>(mRaytracingPipeline.get())->GetPipelineState());
 
 
-		D3D12_DISPATCH_RAYS_DESC dispatchRays{};
-		dispatchRays.RayGenerationShaderRecord.StartAddress = mRaytracingPipeline->GetRayGenStartAddr();
-		dispatchRays.RayGenerationShaderRecord.SizeInBytes = mRaytracingPipeline->GetRayGenSectionSize();
+		//D3D12_DISPATCH_RAYS_DESC dispatchRays{};
+		//dispatchRays.RayGenerationShaderRecord.StartAddress = mRaytracingPipeline->GetRayGenStartAddr();
+		//dispatchRays.RayGenerationShaderRecord.SizeInBytes = mRaytracingPipeline->GetRayGenSectionSize();
 
-		dispatchRays.MissShaderTable.StartAddress = mRaytracingPipeline->GetMissStartAddr();
-		dispatchRays.MissShaderTable.SizeInBytes = mRaytracingPipeline->GetMissSectionSize();
-		dispatchRays.MissShaderTable.StrideInBytes = mRaytracingPipeline->GetMissEntrySize();
+		//dispatchRays.MissShaderTable.StartAddress = mRaytracingPipeline->GetMissStartAddr();
+		//dispatchRays.MissShaderTable.SizeInBytes = mRaytracingPipeline->GetMissSectionSize();
+		//dispatchRays.MissShaderTable.StrideInBytes = mRaytracingPipeline->GetMissEntrySize();
 
 
-		dispatchRays.HitGroupTable.StartAddress = mRaytracingPipeline->GetHitGroupStartAddr();
-		dispatchRays.HitGroupTable.SizeInBytes = mRaytracingPipeline->GetHitGroupSectionSize();
-		dispatchRays.HitGroupTable.StrideInBytes = mRaytracingPipeline->GetHitGroupEntrySize();
+		//dispatchRays.HitGroupTable.StartAddress = mRaytracingPipeline->GetHitGroupStartAddr();
+		//dispatchRays.HitGroupTable.SizeInBytes = mRaytracingPipeline->GetHitGroupSectionSize();
+		//dispatchRays.HitGroupTable.StrideInBytes = mRaytracingPipeline->GetHitGroupEntrySize();
 
-		dispatchRays.Width = 1920;
-		dispatchRays.Height = 1080;
-		dispatchRays.Depth = 1;
+		//dispatchRays.Width = 1920;
+		//dispatchRays.Height = 1080;
+		//dispatchRays.Depth = 1;
 
-		cmdList->DispatchRays(dispatchRays);
+		//cmdList->DispatchRays(dispatchRays);
 		mFrameBuffers[index]->SubmitTexture(mRenderTextures[index]);
 
 	}
@@ -223,9 +223,9 @@ namespace JG
 		mRaytracingPipeline->SetMaxPayloadSize(sizeof(float[4]));
 		mRaytracingPipeline->SetMaxRecursionDepth(1);
 		mRaytracingPipeline->SetMaxAttributeSize(sizeof(float[2]));
-		mRaytracingPipeline->AddRayGenerationProgram("RayGeneration");
-		mRaytracingPipeline->AddMissProgram("Miss");
-		mRaytracingPipeline->AddHitProgram("HitGroup0");
+		//mRaytracingPipeline->AddRayGenerationProgram("RayGeneration");
+		//mRaytracingPipeline->AddMissProgram("Miss");
+		//mRaytracingPipeline->AddHitProgram("HitGroup0");
 		mRaytracingPipeline->Generate();
 	}
 

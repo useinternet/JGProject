@@ -44,16 +44,16 @@ namespace JG
 				return false;
 			}
 			Value = value;
-			mRenderParamManager->SetGlobalRenderParam(GetName(), Value);
+			mRenderParamManager->SetGlobalRenderParam<T>(GetName(), Value);
 			return true;
 		}
-		const T& GetValue() const
+		const T& GetValue()
 		{
 			if (IsVaild() == false)
 			{
 				return Value;
 			}
-			mRenderParamManager->GetGlobalRenderParam(GetName(), &Value);
+			mRenderParamManager->GetGlobalRenderParam<T>(GetName(), &Value);
 			return Value;
 		}
 	public:
@@ -243,7 +243,6 @@ namespace JG
 				}
 				memcpy((void*)Value.data(), (void*)&src, Value.size());
 			}
-
 		};
 	private:
 		template<class T>
@@ -330,9 +329,9 @@ namespace JG
 			{
 				return false;
 			}
+			rpInfo.Set<T>(data);
 
-
-			rpInfo.Set(&data);
+			
 			return true;
 		}
 		template<class T>

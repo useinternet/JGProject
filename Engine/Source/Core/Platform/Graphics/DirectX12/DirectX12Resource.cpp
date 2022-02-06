@@ -5,7 +5,7 @@
 #include "DirectX12Shader.h"
 #include "Utill/ResourceStateTracker.h"
 #include "Utill/CommandQueue.h"
-#include "Utill/DescriptorAllocator.h"
+
 #include "Utill/CommandList.h"
 #include "Utill/PipelineState.h"
 #include "Class/Asset/Asset.h"
@@ -24,6 +24,7 @@ namespace JG
 		u64 btSize = mElementSize * mElementCount;
 
 		// Create
+		mSRVDirty = originBtSize != btSize;
 		switch (mLoadMethod)
 		{
 		case EBufferLoadMethod::GPULoad:
@@ -112,6 +113,30 @@ namespace JG
 		}
 		DirectX12API::DestroyCommittedResource(mD3DResource);
 		mD3DResource.Reset(); mD3DResource = nullptr;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12VertexBuffer::GetSRV() const
+	{
+		if (IsValid() == false) return { 0 };
+		if (mSRVDirty == false) return { mSRV.CPU()};
+
+		mSRVDirty = false;
+
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+		desc.ViewDimension			 = D3D12_SRV_DIMENSION_BUFFER;
+		desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		desc.Buffer.NumElements		 = mElementCount;
+		desc.Format = DXGI_FORMAT_UNKNOWN;
+		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		desc.Buffer.StructureByteStride = mElementSize;
+
+		std::lock_guard<std::mutex> lock(mSRVMutex);
+		auto alloc = DirectX12API::CSUAllocate();
+		DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), &desc, alloc.CPU());
+
+		mSRV = std::move(alloc);
+		return mSRV.CPU();
 	}
 
 
@@ -212,6 +237,30 @@ namespace JG
 		}
 		DirectX12API::DestroyCommittedResource(mD3DResource);
 		mD3DResource.Reset(); mD3DResource = nullptr;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12IndexBuffer::GetSRV() const
+	{
+		if (IsValid() == false) return { 0 };
+		if (mSRVDirty == false) return { mSRV.CPU() };
+		
+		mSRVDirty = false;
+
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+		desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		desc.Buffer.NumElements = mIndexCount;
+		desc.Format = DXGI_FORMAT_R32_TYPELESS;
+		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+		desc.Buffer.StructureByteStride = 0;
+
+		std::lock_guard<std::mutex> lock(mSRVMutex);
+		auto alloc = DirectX12API::CSUAllocate();
+		DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), &desc, alloc.CPU());
+
+		mSRV = std::move(alloc);
+		return mSRV.CPU();
 	}
 
 	bool DirectX12ByteAddressBuffer::IsValid() const
@@ -679,10 +728,6 @@ namespace JG
 	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetSRV() const
 	{
 		if (IsValid() == false) return { 0 };
-
-		D3D12_SHADER_RESOURCE_VIEW_DESC desc;
-
-
 		SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> srvDesc = CreateSRVDesc(mTextureInfo.Flags);
 
 		u64 hash = 0;

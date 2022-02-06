@@ -22,6 +22,7 @@ namespace JG
 	class IStructuredBuffer;
 	class IGraphicsShader;
 	class IComputeShader;
+	class IClosestHitShader;
 	class IShaderScript;
 	class IFrameBuffer;
 	class IMaterial;
@@ -33,6 +34,7 @@ namespace JG
 	class IRayTracingPipeline;
 	class IBottomLevelAccelerationStructure;
 	class ITopLevelAccelerationStructure;
+	class IRayTracingShaderResourceTable;
 	class RayTracer;
 
 	struct TextureInfo;
@@ -79,6 +81,7 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
+		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const SharedPtr<IShaderScript> script) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) = 0;
 		virtual SharedPtr<IMesh>          CreateMesh(const String& name) = 0;
@@ -92,6 +95,7 @@ namespace JG
 
 		// RayTracing
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
+		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() = 0;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() = 0;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() = 0;
 	public:
@@ -194,7 +198,7 @@ namespace JG
 		virtual void Dispatch2D(u32 ThreadCountX, u32 ThreadCountY, u32 GroupSizeX = 8, u32 GroupSizeY = 8) = 0;
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) = 0;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
-		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline) = 0;
+		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) = 0;
 		virtual void Reset() = 0;
 
 		// 인터페이스 변경 함수

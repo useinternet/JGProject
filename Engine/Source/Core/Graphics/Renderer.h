@@ -133,6 +133,8 @@ namespace JG
 		SharedPtr<IRootSignature> mComputeRootSignature;
 
 		u64 mReadyFrame = 0;
+
+		SharedPtr<Graphics::RenderPassData> mPassData;
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
@@ -154,7 +156,7 @@ namespace JG
 	public:
 		RenderParamManager* GetRenderParamManager() const;
 		const RenderInfo&   GetRenderInfo() const;
-
+		const Graphics::RenderPassData& GetPassData() const;
 		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
 		const LightInfo& GetLightInfo(Graphics::ELightType type);
 		const SortedDictionary<int, List<Renderer::ObjectInfo>>& GetObjectInfoLists() const;

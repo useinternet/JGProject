@@ -13,18 +13,12 @@ namespace JG
 	/// 2. 치트 기능,
 	/// 
 	/// </summary>
+	
+	class CommandPrompt;
 	class DevConsoleView : public UIView
 	{
 		JGCLASS
 	private:
-		enum class ELogFilter
-		{
-			None = 0,
-			Info  = 0x001,
-			Trace = 0x002,
-			Warn  = 0x004,
-			Error = 0x008,
-		};
 		enum class ELogLevel
 		{
 			Info,
@@ -34,25 +28,24 @@ namespace JG
 		};
 		struct LogFilterInfo
 		{
-			ELogFilter Filter;
+			ELogLevel  LogLevel;
 			String	   ShowName;
 			bool       IsActive;
 		};
 		struct LogInfo
 		{
-			ELogFilter Filter = ELogFilter::None;
 			ELogLevel  LogLevel;
 			String Message;
 			u64  ThreadID;
 		};
 	private:
 		static constexpr  f32 smTopHeight = 32.0f;
-		static constexpr  f32 smBottomHeight = 32.0f;
+		static constexpr  f32 smBottomHeight = 52.0f;
 		bool mOpenGUI = true;
 		bool mAutoScroll = true;
 
 		SharedPtr<ScheduleHandle> mReadScheduleHandle;
-		Dictionary<ELogFilter, LogFilterInfo> mLogFilterInfoDic;
+		Dictionary<ELogLevel, LogFilterInfo> mLogFilterInfoDic;
 
 		u32 mStartLogFileOffset = 0;
 		u32 mCurrentLogLine = 0;
@@ -65,6 +58,10 @@ namespace JG
 		List<LogInfo> mPendingLogs;
 		std::ifstream mLogFileStream;
 
+		String mSearchStr;
+		String mCmdStr;
+
+		UniquePtr<CommandPrompt> mCommandPrompt;
 	public:
 		DevConsoleView();
 		virtual ~DevConsoleView();
@@ -83,10 +80,12 @@ namespace JG
 		void CloseLogFile();
 		void OnGUI_Top();
 		void OnGUI_Log();
+		void OnGUI_LogText(const LogInfo& info);
 		void OnGUI_Bottom();
 		void UpdateLog();
 		void ReadLog_Async();
 		void PushLogInfo_Async(const String& msg);
+		void CommandExecution(const String& command);
 	};
 }
 
