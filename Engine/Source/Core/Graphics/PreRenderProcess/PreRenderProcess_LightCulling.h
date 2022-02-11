@@ -31,6 +31,7 @@ namespace JG
 		SharedPtr<IStructuredBuffer> mClusterSB;
 		SharedPtr<IComputeShader> mShader;
 		SharedPtr<IRootSignature> mRootSignature;
+
 	public:
 		virtual void Awake(const AwakeData& data) override;
 		virtual void Ready(const ReadyData& data) override;

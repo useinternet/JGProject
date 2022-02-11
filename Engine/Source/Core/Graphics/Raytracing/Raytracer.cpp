@@ -13,8 +13,6 @@
 #include "Graphics/Compute/FloatAccumulater.h"
 #include "Graphics/Compute/Blur.h"
 
-#define SHADER_PATH(x) PathHelper::CombinePath(PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing"),x)
-
 namespace JG
 {
 	RayTracer::RayTracer(Renderer* renderer) : mRenderer(renderer)
@@ -25,8 +23,6 @@ namespace JG
 		}
 
 		Init();
-
-
 	}
 
 	void RayTracer::AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform)
@@ -89,8 +85,10 @@ namespace JG
 	void RayTracer::Init()
 	{
 		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
-
-		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
+		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 10, mRenderer->GetRenderParamManager());		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
+		mDirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr, mRenderer->GetRenderParamManager());
+		mIndirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Indirect", nullptr, mRenderer->GetRenderParamManager());
+		mShadowTex = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr, mRenderer->GetRenderParamManager());
 	}
 
 	void RayTracer::InitTextures()
@@ -100,13 +98,14 @@ namespace JG
 		texInfo.Height	  = std::max<u32>(1, mResolution.y);
 		texInfo.ArraySize = 1;
 		texInfo.Format	  = ETextureFormat::R16G16B16A16_Float;
-		texInfo.Flags	  = ETextureFlags::Allow_UnorderedAccessView;
+		texInfo.Flags	  = ETextureFlags::Allow_UnorderedAccessView | ETextureFlags::Allow_RenderTarget;
 		texInfo.MipLevel  = 1;
 		texInfo.ClearColor = Color();
 
-		texInfo.Format = ETextureFormat::R8G8B8A8_Unorm;
-		GraphicsHelper::InitRenderTextures(texInfo, "ReflectOutput", &mResults);
 
+		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
+		GraphicsHelper::InitRenderTextures(texInfo, "IndirectOutput", &mResources[EResource::Indirect]);
+		GraphicsHelper::InitRenderTextures(texInfo, "ResultOutput", &mResources[EResource::Result]);
 	}
 
 	void RayTracer::UpdateAccelerationStructure(SharedPtr<IComputeContext> context)
@@ -134,8 +133,10 @@ namespace JG
 			mSRT = IRayTracingShaderResourceTable::Create();
 		}
 		mSRT->Reset();
-		mSRT->AddRayGeneration("RayGeneration");
-		mSRT->AddMiss("Miss");
+		mSRT->AddRayGeneration(ShaderDefine::RayTracing::RayGen);
+		mSRT->AddMiss(ShaderDefine::RayTracing::DirectMiss);
+		mSRT->AddMiss(ShaderDefine::RayTracing::IndirectMiss);
+		mSRT->AddMiss(ShaderDefine::RayTracing::ShadowMiss);
 		for (int i = 0; i < mInstances.size(); ++i)
 		{
 			InstanceData& instance = mInstances[i];
@@ -144,7 +145,9 @@ namespace JG
 			arg.SetVertexBuffer(instance.SubMesh->GetVertexBuffer());
 			if (instance.Material == nullptr || instance.Material->IsValid() == false)
 			{
-				mSRT->AddHitGroupAndBindLocalRootArgument("HitGroup0", arg);
+				mSRT->AddHitGroupAndBindLocalRootArgument(ShaderDefine::RayTracing::DirectNullHitGroup, arg);
+				mSRT->AddHitGroupAndBindLocalRootArgument(ShaderDefine::RayTracing::IndirectNullHitGroup, arg);
+				mSRT->AddHitGroupAndBindLocalRootArgument(ShaderDefine::RayTracing::ShadowHitGroup);
 			}
 			else
 			{
@@ -154,9 +157,13 @@ namespace JG
 				const List<SharedPtr<ITexture>>& texes = instance.Material->GetTextureList();
 				arg.SetTextures(texes);
 
-				auto closetShader = ShaderLibrary::GetInstance().FindClosestHitShader(instance.Material->GetScript()->GetName());
 
-				mSRT->AddHitGroupAndBindLocalRootArgument(closetShader->GetHitGroupName(), arg);
+				String scriptName = instance.Material->GetScript()->GetName();
+				auto directHitShader   = ShaderLibrary::GetInstance().FindClosestHitShader(ShaderDefine::Template::DirectClosestHitShader, scriptName);
+				auto indirectHitShader = ShaderLibrary::GetInstance().FindClosestHitShader(ShaderDefine::Template::IndirectClosestHitShader, scriptName);
+				mSRT->AddHitGroupAndBindLocalRootArgument(directHitShader->GetHitGroupName(), arg);
+				mSRT->AddHitGroupAndBindLocalRootArgument(indirectHitShader->GetHitGroupName(), arg);
+				mSRT->AddHitGroupAndBindLocalRootArgument(ShaderDefine::RayTracing::ShadowHitGroup);
 			}
 
 
@@ -167,26 +174,46 @@ namespace JG
 
 		context->BindRootSignature(pipeline->GetGlobalRootSignature());
 
+
+		struct CB
+		{
+			Graphics::RenderPassData PassData;
+			u32 MaxRayDepth;
+		};
+		CB CB;
+		CB.PassData    = mRenderer->GetPassData();
+		CB.MaxRayDepth = mRayBounds.GetValue();
 		// CB Bind
-		context->BindConstantBuffer(0, mRenderer->GetPassData());
+		context->BindConstantBuffer(0, CB);
 
 		// SceneAS
 		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
 
 		// Result
-		context->BindTextures(2, { mResults[currentIndex] });
+		context->BindTextures(2, {
+			GetResource(EResource::Direct), 
+			GetResource(EResource::Indirect),
+			GetResource(EResource::Result) });
 		
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 		context->BindSturcturedBuffer(3, plInfo.Data.data(), plInfo.Size, plInfo.Count);
 
+		// LightGrid
+		context->BindSturcturedBuffer(4, mRenderer->GetLightGrid());
+		// VisibleLightIndicies
+		context->BindSturcturedBuffer(5, mRenderer->GetVisibleLightIndicies());
 
 		context->DispatchRay(mResolution.x, mResolution.y, 1, pipeline, mSRT);
 
-		mResultTex.SetValue(mResults[currentIndex]);
+		mResultTex.SetValue(GetResource(EResource::Result));
+		mDirectTex.SetValue(GetResource(EResource::Direct));
+		mIndirectTex.SetValue(GetResource(EResource::Indirect));
+	}
 
-
-
+	SharedPtr<ITexture> RayTracer::GetResource(EResource type)
+	{
+		return mResources[type][JGGraphics::GetInstance().GetBufferIndex()];
 	}
 
 	const String& RayTracer::GetDefaultRayTracingPipelineName()
@@ -205,7 +232,7 @@ namespace JG
 		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
 		creater->AddCBV(0, 0, 0);
 		creater->AddSRV(1, 0, 0);
-		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 1, 0, 0);
+		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 3, 0, 0);
 		creater->AddSRV(3, 1, 0);
 		creater->AddSRV(4, 2, 0);
 		creater->AddSRV(5, 3, 0);

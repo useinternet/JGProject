@@ -1,6 +1,10 @@
 
 //#include "Common.hlsli"
 
+// Direct Lighting   -> Lighting / 
+// Indirect Lighting -> Denosing
+// Shadow            -> Denosing
+// A0                -> Denosing
 
 
 [shader("raygeneration")]
@@ -9,43 +13,44 @@ void RayGeneration()
     uint2  launchIndex = DispatchRaysIndex().xy;
     float2 dims = float2(DispatchRaysDimensions().xy);
     float2 d = (((launchIndex.xy + 0.5f) / dims.xy) * 2.f - 1.f);
-
-    RayDesc ray;
-    ray.Origin = _EyePosition;
     float4 target = mul(float4(d.x, -d.y, 1, 1), _InvProjMatrix);
-    ray.Direction = mul(float4(target.xyz, 0), _InvViewMatrix);
-    ray.TMin = 0;
-    ray.TMax = _FarZ;
-
-    Payload payload;
-    payload.Color = float4(0.0f,0.0f,0.0f,0.0f);
 
 
-    TraceRay(
-        _SceneAS,
-        RAY_FLAG_NONE,
-        0xFF,
-        0,
-        1,
-        0,
-        ray,
-        payload);
+    float3 rayOrigin = _EyePosition;
+    float3 rayDir    = mul(float4(target.xyz, 0), _InvViewMatrix);
 
 
-    _Output[launchIndex] = payload.Color;
+
+
+    // Direct Ray
+    float3 directColor = ShootDirectRay(rayOrigin, rayDir);
+
+
+    HaltonState hState;
+	haltonInit(hState, launchIndex.x + 10, launchIndex.y + 10, 1, 1, _FrameCount, 1);
+    float seed = initRand(launchIndex.x + launchIndex.y * dims.x, _FrameCount, 16);
+    float3 indirectColor = ShootIndirectRay(rayOrigin, rayDir, seed, hState, -1);
+
+
+
+    _DirectOutput[launchIndex] = float4(directColor, 1.0f);
+    _IndirectOutput[launchIndex] = float4(indirectColor, 1.0f);
+
+
+    indirectColor = float3(0.15f, 0.15f, 0.2f) * indirectColor;
+    _ResultOutput[launchIndex] = float4(directColor + indirectColor, 1.0f);
 }
 
 
 // Local //
 cbuffer _DefaultCB__ : register(b0, space1)
 { }
-//ConstantBuffer<MaterialCB> Test : register(b0, space1);
 StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
 StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
 Texture2D Null_Texture : register(t2, space1);
 // Default Hit Shader
 [shader("closesthit")]
-void ClosestHit(inout Payload payload, BuiltInTriangleIntersectionAttributes attribute)
+void DirectClosestHit(inout DirectRayPayload payload, BuiltInTriangleIntersectionAttributes attribute)
 {
     uint startIndex = PrimitiveIndex() * 3;
     const uint3 indices = { Local_IndexBuffer[startIndex], Local_IndexBuffer[startIndex + 1], Local_IndexBuffer[startIndex + 2] };
@@ -57,13 +62,25 @@ void ClosestHit(inout Payload payload, BuiltInTriangleIntersectionAttributes att
     Vertex v = HitAttribute(vertices, attribute);
 
     float4 textureColor = Null_Texture.SampleLevel(_PointWrap, v.Texcoord, 0);
-    payload.Color = textureColor;
+    payload.Color = textureColor.xyz;
 }
-
+[shader("closesthit")]
+void IndirectClosestHit(inout IndirectRayPayload payload, BuiltInTriangleIntersectionAttributes attribute)
+{
+    payload.Color = float3(0.0f,0.0f,0.0f);
+}
 // Default Miss Shader
 [shader("miss")]
-void Miss(inout Payload payload : SV_RayPayload)
+void DirectMiss(inout DirectRayPayload payload : SV_RayPayload)
 {
-    payload.Color = float4(0.0f,0.0f,0.0f,0.0f);
+    payload.Color = float3(0.0f,0.0f,0.0f);
 }
+
+
+[shader("miss")]
+void IndirectMiss(inout IndirectRayPayload payload : SV_RayPayload)
+{
+    payload.Color = float3(0.0f, 0.0f, 0.0f);
+}
+
 

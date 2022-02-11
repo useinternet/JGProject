@@ -5,6 +5,66 @@
 
 namespace JG
 {
+	bool RP_Global_Bool::SetValue(bool value)
+	{
+		if (IsVaild() == false)
+		{
+			return false;
+		}
+		Value = value;
+		mRenderParamManager->SetGlobalRenderParam(GetName(), (i32)Value);
+		return true;
+	}
+
+	bool RP_Global_Bool::GetValue()
+	{
+		if (IsVaild() == false)
+		{
+			return Value;
+		}
+		i32 value;
+		mRenderParamManager->GetGlobalRenderParam(GetName(), &value);
+		Value = value;
+		return Value;
+	}
+
+	RP_Global_Bool RP_Global_Bool::Create(const String& name, bool initValue, RenderParamManager* rpManger)
+	{
+		RP_Global_Bool val;
+		val.mRenderParamManager = rpManger;
+		val.mName = name;
+		val.Value = initValue;
+
+		if (rpManger->RegisterGlobalRenderParam(name, (i32)initValue, JGTYPE(bool)) == false)
+		{
+			return RP_Global_Bool();
+		}
+		val.mIsValid = true;
+		return val;
+	}
+
+	RP_Global_Bool RP_Global_Bool::Load(const String& name, RenderParamManager* rpManger)
+	{
+		if (rpManger == nullptr)
+		{
+			return RP_Global_Bool();
+		}
+		i32 value;
+		if (rpManger->GetGlobalRenderParam(name, &value) == false)
+		{
+			return RP_Global_Bool();
+		}
+		RP_Global_Bool val;
+		val.mRenderParamManager = rpManger;
+		val.mName = name;
+		val.Value = value;
+		val.mIsValid = true;
+		return val;
+	}
+
+
+
+
 
 	bool RP_Global_Tex::SetValue(SharedPtr<ITexture> value)
 	{
@@ -279,4 +339,5 @@ namespace JG
 		auto& _pair = mGlobalParamBABDic[name];
 		return _pair.first;
 	}
+
 }

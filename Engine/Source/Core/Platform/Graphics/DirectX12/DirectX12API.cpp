@@ -413,17 +413,6 @@ namespace JG
 	
 		return rbBuffer;
 	}
-	//SharedPtr<IComputer> DirectX12API::CreateComputer(const String& name, SharedPtr<IComputeShader> shader)
-	//{
-	//	if (shader == nullptr)
-	//	{
-	//		return nullptr;
-	//	}
-	//	auto computer = CreateSharedPtr<DirectX12Computer>();
-	//	computer->SetName(name);
-	//	computer->SetComputeShader(shader);
-	//	return computer;
-	//}
 	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
 		String errorCode;
@@ -454,11 +443,11 @@ namespace JG
 		return shader;
 	}
 
-	SharedPtr<IClosestHitShader> DirectX12API::CreateClosestHitShader(const String& name, const SharedPtr<IShaderScript> script)
+	SharedPtr<IClosestHitShader> DirectX12API::CreateClosestHitShader(const String& name, const String& sourceCode, const SharedPtr<IShaderScript> script)
 	{
 		auto shader = CreateSharedPtr<DirectX12ClosestHitShader>();
 		shader->SetName(name);
-		shader->Init(script);
+		shader->Init(sourceCode, script);
 		return shader;
 	}
 	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name)

@@ -44,7 +44,7 @@ namespace JG
 	class IClosestHitShader
 	{
 	protected:
-		virtual bool Init(SharedPtr<IShaderScript> script) = 0;
+		virtual bool Init(const String& sourceCode, SharedPtr<IShaderScript> script) = 0;
 	public:
 		virtual ~IClosestHitShader() = default;
 	public:
@@ -52,8 +52,9 @@ namespace JG
 		virtual const String& GetEntryPoint()   const = 0;
 		virtual const String& GetHitGroupName() const = 0;
 		virtual const String& GetShaderCode()   const = 0;
+		virtual const String& GetFullShaderCode() const = 0;
 	public:
-		static SharedPtr<IClosestHitShader> Create(const String& name, SharedPtr<IShaderScript> script);
+		static SharedPtr<IClosestHitShader> Create(const String& name, const String& sourceCode, SharedPtr<IShaderScript> script);
 	};
 
 
@@ -135,6 +136,7 @@ namespace JG
 		SharedPtr<IGraphicsShader> FindGraphicsShader(const String& name, const List<String>& scriptNameList);
 		SharedPtr<IComputeShader>  FindComputeShader(const String& name);
 		SharedPtr<IClosestHitShader> FindClosestHitShader(const String& name);
+		SharedPtr<IClosestHitShader> FindClosestHitShader(const String& name, const String& scriptName);
 		SharedPtr<IShaderScript>   FindScript(const String& name);
 		SharedPtr< IRayTracingPipeline> FindRayTracingPipeline(const String& name);
 

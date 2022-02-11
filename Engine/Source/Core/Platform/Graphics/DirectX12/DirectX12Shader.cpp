@@ -8,11 +8,6 @@
 
 namespace JG
 {
-	
-
-
-
-
 	const String& DirectX12GraphicsShader::GetName() const
 	{
 		return mName;
@@ -23,7 +18,6 @@ namespace JG
 	}
 	bool DirectX12GraphicsShader::Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error)
 	{
-
 		mFlags = flags;
 		mShaderScriptList = scriptList;
 		mScriptCodeAnalyzer = CreateUniquePtr<ShaderScriptCodeAnalyzer>(
@@ -206,79 +200,17 @@ namespace JG
 		mIsCompileSuccess = true;
 		return true;
 	}
-	bool DirectX12ClosestHitShader::Init(SharedPtr<IShaderScript> script)
+	bool DirectX12ClosestHitShader::Init(const String& sourceCode, SharedPtr<IShaderScript> script)
 	{
 		mScriptCodeAnalyzer = CreateUniquePtr< ShaderScriptCodeAnalyzer>(
 			0, 1,
 			2, 1);
-		String Name = StringHelper::ReplaceAll(GetName(), "Surface/", "");
+		String Name   = StringHelper::ReplaceAll(GetName(), "/", "_");
 		mHitGroupName = Name + "_HitGroup";
-		mEntryPoint = Name + "_ClosestHit";
-		mSourceCode = R"(
-
-StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
-StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
-
-
-__PS_SURFACE_RESOURCES_SCRIPT__
-__PS_SURFACE_VARIABLES_SCRIPT__
-__PS_SURFACE_FUNCTION_SCRIPT__
-
-
-SURFACE_OUTPUT SURFACE_FUNCTION(SURFACE_INPUT _input)
-{
-	SURFACE_OUTPUT _output;
-	_output.albedo    = float4(1.0f,1.0f,1.0f,1.0f);
-	_output.specular  = float3(0.5f, 0.5f, 0.5f);
-	_output.normal    = _input.normal;
-    _output.roughness = 0.0f;
-	_output.metallic  = 0.0f;
-	_output.emissive = float3(0.0f,0.0f,0.0f);
-	_output.shadingmodel = 0;
-
-	__PS_SURFACE_CONTENTS_SCRIPT__
-
-
-	return _output;
-};
-
-[shader("closesthit")]
-void __ClosestHit_EntryPoint__(inout Payload payload, BuiltInTriangleIntersectionAttributes attribute)
-{
-	uint startIndex = PrimitiveIndex() * 3;
-    const uint3 indices = { Local_IndexBuffer[startIndex], Local_IndexBuffer[startIndex + 1], Local_IndexBuffer[startIndex + 2] };
-    Vertex vertices[3] = {
-        Local_VertexBuffer[indices[0]],
-        Local_VertexBuffer[indices[1]],
-        Local_VertexBuffer[indices[2]] };
-
-    Vertex v = HitAttribute(vertices, attribute);
-
-
-	SURFACE_INPUT input;
-	input.position       = HitWorldPosition();
-	input.local_position = HitObjectPosition();
-	input.normal         = normalize(v.Normal);
-	input.tangent        = normalize(v.Tangent);
-	input.bitangent      = normalize(v.Bitangent);
-	input.tex            = v.Texcoord;
-	SURFACE_OUTPUT output = SURFACE_FUNCTION(input);
-	
-	if(output.shadingmodel == SHADING_MODEL_DEFAULT_LIT)
-	{
-		payload.Color = float4(Lo(output), 1.0f);
-	}
-	else
-	{
-		payload.Color = float4(output.emissive, 1.0f);
-	}
-
-
-
-}
-)";
-		mSourceCode = StringHelper::ReplaceAll(mSourceCode, "__ClosestHit_EntryPoint__", mEntryPoint);
-		mScriptCodeAnalyzer->InsertScript(mSourceCode, script);
+		mEntryPoint   = Name + "_ClosestHit";
+		mSourceCode = sourceCode;
+		mFullSourceCode = StringHelper::ReplaceAll(mSourceCode, HLSL::ClosestHitEntry, mEntryPoint);
+		mScriptCodeAnalyzer->InsertScript(mFullSourceCode, script);
 
 		return true;
 	}
@@ -298,18 +230,14 @@ void __ClosestHit_EntryPoint__(inout Payload payload, BuiltInTriangleIntersectio
 	{
 		return mSourceCode;
 	}
+	const String& DirectX12ClosestHitShader::GetFullShaderCode() const
+	{
+		return mFullSourceCode;
+	}
 	void DirectX12ClosestHitShader::SetName(const String& name)
 	{
 		mName = name;
 	}
-
-
-
-
-
-
-
-
 	void ShaderScriptCodeAnalyzer::InsertScript(String& code, SharedPtr<IShaderScript> script)
 	{
 		if (script == nullptr)
@@ -340,10 +268,6 @@ void __ClosestHit_EntryPoint__(inout Payload payload, BuiltInTriangleIntersectio
 	{
 		return mSortedTextureMap;
 	}
-	//const SortedDictionary<u64, String>& ShaderScriptCodeAnalyzer::GetSortedTextureCubeMap() const
-	//{
-	//	return mSortedTextureCubeMap;
-	//}
 	bool ShaderScriptCodeAnalyzer::InsertScriptInternal(String& code, SharedPtr<IShaderScript> script)
 	{
 		String scriptCode = script->GetCode();

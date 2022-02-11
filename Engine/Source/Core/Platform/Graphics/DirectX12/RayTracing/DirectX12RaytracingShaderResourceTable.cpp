@@ -93,7 +93,7 @@ namespace JG
 		mRayEntrySize = GetEntrySize(mRayGenLocalRootArgInfos);
 
 
-		mRayGenSectionSize = mRayEntrySize * mRayGenLocalRootArgInfos.size();
+		mRayGenSectionSize = mRayEntrySize * (mRayGenLocalRootArgInfos.size() + 1);
 		if (mRayGenSRT == nullptr || mRayGenSectionSize >= mRayGenSRTSize)
 		{
 			if (mRayGenSRT != nullptr)
@@ -140,7 +140,7 @@ namespace JG
 	{
 		// Create SRT Resource
 		mMissEntrySize = GetEntrySize(mMissLocalRootArgInfos);
-		mMissSectionSize = mMissEntrySize * mMissLocalRootArgInfos.size();
+		mMissSectionSize = mMissEntrySize * (mMissLocalRootArgInfos.size() + 1);
 		if (mMissSRT == nullptr || mMissSectionSize >= mMissSRTSize)
 		{
 			if (mMissSRT != nullptr)

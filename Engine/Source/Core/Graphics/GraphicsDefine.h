@@ -288,10 +288,13 @@ namespace JG
 		{
 			constexpr char* Standard2DShader = "Standard2DShader";
 			constexpr char* Standard3DShader = "Standard3DShader";
-			constexpr char* StandardPostRenderingShader = "PostRendering";
 			constexpr char* StandardSceneShader = "StandardSceneShader";
 			constexpr char* StandardEditorUIShader = "StandardEditorUIShader";
 			constexpr char* DebugShader = "DebugShader";
+
+
+			constexpr char* DirectClosestHitShader   = "DirectClosestHitShader";
+			constexpr char* IndirectClosestHitShader = "IndirectClosestHitShader";
 		}
 		namespace Type
 		{
@@ -316,9 +319,22 @@ namespace JG
 			constexpr char* SceneContents  = "__PS_SCENE_CONTENTS_SCRIPT__";
 		}
 
-		namespace Token
+		namespace RayTracing
 		{
-			constexpr char* PassData = "__PASS_DATA__";
+			constexpr char* RayGen = "RayGeneration";
+			constexpr char* DirectNullHit = "DirectClosestHit";
+			constexpr char* DirectMiss = "DirectMiss";
+
+
+			constexpr char* IndirectNullHit = "IndirectClosestHit";
+			constexpr char* IndirectMiss = "IndirectMiss";
+
+			constexpr char* ShadowHit = "ShadowHit";
+			constexpr char* ShadowMiss = "ShadowMiss";
+
+			constexpr char* DirectNullHitGroup   = "DirectNullHitGroup";
+			constexpr char* IndirectNullHitGroup = "IndirectNullHitGroup";
+			constexpr char* ShadowHitGroup       = "ShadowHitGroup";
 		}
 	}
 	namespace HLSL
@@ -362,6 +378,9 @@ namespace JG
 		constexpr char* GSTarget = "gs_5_1";
 		constexpr char* PSTarget = "ps_5_1";
 		constexpr char* CSTarget = "cs_5_1";
+
+		constexpr char* ClosestHitEntry = "__ClosestHit_EntryPoint__";
+		constexpr char* MissEntry       = "__Miss_EntryPoint__";
 
 
 		inline String ShaderDataTypeToHLSLCode(EShaderDataType type)

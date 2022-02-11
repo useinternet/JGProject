@@ -133,8 +133,10 @@ namespace JG
 		SharedPtr<IRootSignature> mComputeRootSignature;
 
 		u64 mReadyFrame = 0;
-
+		u64 mFrameCount = 0;
 		SharedPtr<Graphics::RenderPassData> mPassData;
+		SharedPtr<IStructuredBuffer> mLightGrid;
+		SharedPtr<IStructuredBuffer> mVisibleLightIndicies;
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
@@ -143,6 +145,12 @@ namespace JG
 		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList, Graphics::ESceneObjectFlags flags);
 		SharedPtr<RenderResult> End();
 		virtual ERendererPath GetRendererPath() const = 0;
+
+		void SetLightGrid(SharedPtr<IStructuredBuffer> sb);
+		void SetVisibleLightIndicies(SharedPtr<IStructuredBuffer> sb);
+
+		SharedPtr<IStructuredBuffer> GetLightGrid() const;
+		SharedPtr<IStructuredBuffer> GetVisibleLightIndicies() const;
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
 		void EndBatch();

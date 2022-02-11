@@ -66,7 +66,7 @@ namespace JG
 		passData.NearZ			= info.NearZ;
 		passData.Resolution		= info.Resolution;
 		passData.PointLightCount = mLightInfos[Graphics::ELightType::PointLight].Count;
-
+		passData.FrameCount = mFrameCount++;
 
 		ReadyImpl( &passData);
 
@@ -180,6 +180,26 @@ namespace JG
 
 		CompeleteImpl(result);
 		return result;
+	}
+
+	void Renderer::SetLightGrid(SharedPtr<IStructuredBuffer> sb)
+	{
+		mLightGrid = sb;
+	}
+
+	void Renderer::SetVisibleLightIndicies(SharedPtr<IStructuredBuffer> sb)
+	{
+		mVisibleLightIndicies = sb;
+	}
+
+	SharedPtr<IStructuredBuffer> Renderer::GetLightGrid() const
+	{
+		return mLightGrid;
+	}
+
+	SharedPtr<IStructuredBuffer> Renderer::GetVisibleLightIndicies() const
+	{
+		return mVisibleLightIndicies;
 	}
 
 	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)

@@ -340,33 +340,33 @@ namespace JG
 				val.SetValue(valResult);
 			}
 		}
-		else if (type == JGTYPE(JVector2))
-		{
-			RP_Global_Float2 val = RP_Global_Float2::Load(key, mRenderParamManager);
-			JVector2 valResult = val.GetValue();
-			if (ImGui::DragFloat2(("##" + key).c_str(), (float*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
-		else if (type == JGTYPE(JVector3))
-		{
-			RP_Global_Float3 val = RP_Global_Float3::Load(key, mRenderParamManager);
-			JVector3 valResult = val.GetValue();
-			if (ImGui::DragFloat3(("##" + key).c_str(), (float*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
-		else if (type == JGTYPE(JVector4))
-		{
-			RP_Global_Float4 val = RP_Global_Float4::Load(key, mRenderParamManager);
-			JVector4 valResult = val.GetValue();
-			if (ImGui::DragFloat4(("##" + key).c_str(), (float*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
+		//else if (type == JGTYPE(JVector2))
+		//{
+		//	RP_Global_Float2 val = RP_Global_Float2::Load(key, mRenderParamManager);
+		//	JVector2 valResult = val.GetValue();
+		//	if (ImGui::DragFloat2(("##" + key).c_str(), (float*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
+		//else if (type == JGTYPE(JVector3))
+		//{
+		//	RP_Global_Float3 val = RP_Global_Float3::Load(key, mRenderParamManager);
+		//	JVector3 valResult = val.GetValue();
+		//	if (ImGui::DragFloat3(("##" + key).c_str(), (float*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
+		//else if (type == JGTYPE(JVector4))
+		//{
+		//	RP_Global_Float4 val = RP_Global_Float4::Load(key, mRenderParamManager);
+		//	JVector4 valResult = val.GetValue();
+		//	if (ImGui::DragFloat4(("##" + key).c_str(), (float*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
 		else if (type == JGTYPE(i32))
 		{
 			RP_Global_Int val = RP_Global_Int::Load(key, mRenderParamManager);
@@ -376,33 +376,33 @@ namespace JG
 				val.SetValue(valResult);
 			}
 		}
-		else if (type == JGTYPE(JVector2Int))
-		{
-			RP_Global_Int2 val = RP_Global_Int2::Load(key, mRenderParamManager);
-			JVector2Int valResult = val.GetValue();
-			if (ImGui::DragInt2(("##" + key).c_str(), (int*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
-		else if (type == JGTYPE(JVector3Int))
-		{
-			RP_Global_Int3 val = RP_Global_Int3::Load(key, mRenderParamManager);
-			JVector3Int valResult = val.GetValue();
-			if (ImGui::DragInt3(("##" + key).c_str(), (int*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
-		else if (type == JGTYPE(JVector4Int))
-		{
-			RP_Global_Int4 val = RP_Global_Int4::Load(key, mRenderParamManager);
-			JVector4Int valResult = val.GetValue();
-			if (ImGui::DragInt4(("##" + key).c_str(), (int*)&valResult) == true)
-			{
-				val.SetValue(valResult);
-			}
-		}
+		//else if (type == JGTYPE(JVector2Int))
+		//{
+		//	RP_Global_Int2 val = RP_Global_Int2::Load(key, mRenderParamManager);
+		//	JVector2Int valResult = val.GetValue();
+		//	if (ImGui::DragInt2(("##" + key).c_str(), (int*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
+		//else if (type == JGTYPE(JVector3Int))
+		//{
+		//	RP_Global_Int3 val = RP_Global_Int3::Load(key, mRenderParamManager);
+		//	JVector3Int valResult = val.GetValue();
+		//	if (ImGui::DragInt3(("##" + key).c_str(), (int*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
+		//else if (type == JGTYPE(JVector4Int))
+		//{
+		//	RP_Global_Int4 val = RP_Global_Int4::Load(key, mRenderParamManager);
+		//	JVector4Int valResult = val.GetValue();
+		//	if (ImGui::DragInt4(("##" + key).c_str(), (int*)&valResult) == true)
+		//	{
+		//		val.SetValue(valResult);
+		//	}
+		//}
 		else
 		{
 			ImGui::Text("None");

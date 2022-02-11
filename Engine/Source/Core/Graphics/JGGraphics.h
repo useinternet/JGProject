@@ -380,7 +380,7 @@ namespace JG
 			f32 ClusterScale = 0.0f;
 			f32 ClusterBias = 0.0f;
 			JVector3Uint NumClusterSlice;
-			u32 DebugMode = 0;
+			u32 FrameCount = 0;
 		};
 
 		class LightGrid

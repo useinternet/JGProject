@@ -174,7 +174,6 @@ namespace JG
 	}
 	void JGGraphics::LoadShaderTemplate()
 	{
-		// Shader Template
 		auto templatePath = Application::GetShaderTemplatePath();
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
 		{
@@ -211,8 +210,26 @@ namespace JG
 				{
 					shaderFlags = shaderFlags | EShaderFlags::Allow_PixelShader;
 				}
-				auto shader = IGraphicsShader::Create(fileName, sourceCode, shaderFlags);
-				ShaderLibrary::GetInstance().RegisterGraphicsShader(fileName, shader);
+
+				if (shaderFlags != EShaderFlags::None)
+				{
+					auto shader = IGraphicsShader::Create(fileName, sourceCode, shaderFlags);
+					ShaderLibrary::GetInstance().RegisterGraphicsShader(fileName, shader);
+				}
+				else
+				{
+					if (sourceCode.find(HLSL::ClosestHitEntry) != String::npos)
+					{
+						auto shader = IClosestHitShader::Create(fileName, sourceCode, nullptr);
+						ShaderLibrary::GetInstance().RegisterClosestHitShader(fileName, shader);
+					}
+					else if (sourceCode.find(HLSL::MissEntry) != String::npos)
+					{
+						auto shader = IClosestHitShader::Create(fileName, sourceCode, nullptr);
+						ShaderLibrary::GetInstance().RegisterClosestHitShader(fileName, shader);
+					}
+				}
+
 			}
 
 		}
@@ -238,13 +255,6 @@ namespace JG
 			if (scriptCode.find(ShaderDefine::Type::Surface) != String::npos)
 			{
 				script = IShaderScript::CreateSurfaceScript("Surface/" + fileName, scriptCode);
-
-				if (IsSupportedRayTracing())
-				{
-					SharedPtr<IClosestHitShader> closestHitShader = IClosestHitShader::Create("Surface/" + fileName, script);
-					ShaderLibrary::GetInstance().RegisterClosestHitShader("Surface/" + fileName, closestHitShader);
-					ShaderLibrary::GetInstance().AddRayTracingLibrary(RayTracer::GetDefaultRayTracingPipelineName(), closestHitShader);
-				}
 
 			}
 			else if (scriptCode.find(ShaderDefine::Type::Scene) != String::npos)
@@ -285,12 +295,32 @@ namespace JG
 		//Pipeline
 		String shaderPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing");
 		pipeline = IRayTracingPipeline::Create();
-		pipeline->AddLibrary(PathHelper::CombinePath(shaderPath, "Reflect.hlsli"), { "RayGeneration", "ClosestHit", "Miss" });
-		pipeline->AddHitGroup("HitGroup0", "ClosestHit", "", "");
+		pipeline->AddLibrary(PathHelper::CombinePath(shaderPath, "Reflect.hlsli"), 
+			{ ShaderDefine::RayTracing::RayGen, 
+			  ShaderDefine::RayTracing::DirectNullHit,
+			  ShaderDefine::RayTracing::DirectMiss,
+			  ShaderDefine::RayTracing::IndirectNullHit,
+			  ShaderDefine::RayTracing::IndirectMiss,
+			  ShaderDefine::RayTracing::ShadowHit,
+			  ShaderDefine::RayTracing::ShadowMiss});
+
+		pipeline->AddHitGroup(
+			ShaderDefine::RayTracing::DirectNullHitGroup,
+			ShaderDefine::RayTracing::DirectNullHit,
+			"", "");
+		pipeline->AddHitGroup(
+			ShaderDefine::RayTracing::IndirectNullHitGroup,
+			ShaderDefine::RayTracing::IndirectNullHit,
+			"", "");
+		pipeline->AddHitGroup(
+			ShaderDefine::RayTracing::ShadowHitGroup,
+			ShaderDefine::RayTracing::ShadowHit,
+			"","");
 		pipeline->SetGlobalRootSignature(RayTracer::CreateGlobalRootSignature());
-		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), {"ClosestHit"});
-		pipeline->SetMaxPayloadSize(sizeof(Color));
-		pipeline->SetMaxRecursionDepth(1);
+		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { ShaderDefine::RayTracing::DirectNullHit });
+		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { ShaderDefine::RayTracing::IndirectNullHit });
+		pipeline->SetMaxPayloadSize(sizeof(float[64]));
+		pipeline->SetMaxRecursionDepth(10);
 		pipeline->Generate();
 
 		ShaderLibrary::GetInstance().RegisterRayTracingPipeline(RayTracer::GetDefaultRayTracingPipelineName(), pipeline);

@@ -23,6 +23,8 @@ namespace JG
 	}
 	void PreRenderProcess_LightCulling::Ready(const ReadyData& data)
 	{
+
+
 		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		CB.ViewMatirx      = JMatrix::Transpose(data.Info.ViewMatrix);
 		CB.PointLightCount = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
@@ -30,6 +32,8 @@ namespace JG
 		CB.NumYSlice = PreRenderProcess_ComputeCluster::NUM_Y_SLICE;
 		CB.NumZSlice = PreRenderProcess_ComputeCluster::NUM_Z_SLICE;
 
+		data.pRenderer->SetLightGrid(mLightGridSB[bufferIndex]);
+		data.pRenderer->SetVisibleLightIndicies(mVisibleLightIndiciesSB[bufferIndex]);
 		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
 		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[bufferIndex]);
 		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[bufferIndex]);

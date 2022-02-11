@@ -97,15 +97,17 @@ namespace JG
 	{
 		String mName;
 		String mSourceCode;
+		String mFullSourceCode;
 		String mHitGroupName;
 		String mEntryPoint;
 		UniquePtr<ShaderScriptCodeAnalyzer> mScriptCodeAnalyzer;
 	public:
-		virtual bool Init(SharedPtr<IShaderScript> script) override;
+		virtual bool Init(const String& sourceCode, SharedPtr<IShaderScript> script) override;
 		virtual const String& GetName() const override;
 		virtual const String& GetEntryPoint()   const override;
 		virtual const String& GetHitGroupName() const override;
 		virtual const String& GetShaderCode() const override;
+		virtual const String& GetFullShaderCode() const override;
 	public:
 		void SetName(const String& name);
 	};

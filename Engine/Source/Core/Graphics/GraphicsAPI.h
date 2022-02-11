@@ -81,7 +81,7 @@ namespace JG
 		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
-		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const SharedPtr<IShaderScript> script) = 0;
+		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const String& sourceCode, const SharedPtr<IShaderScript> script) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name) = 0;
 		virtual SharedPtr<IMaterial>	  CreateMaterial(const String& name, SharedPtr<IGraphicsShader> shader) = 0;
 		virtual SharedPtr<IMesh>          CreateMesh(const String& name) = 0;

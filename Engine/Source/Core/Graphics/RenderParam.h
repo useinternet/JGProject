@@ -105,6 +105,21 @@ namespace JG
 		}
 	};
 
+
+	class RP_Global_Bool : public RenderParam
+	{
+		bool Value;
+	public:
+		virtual ~RP_Global_Bool() = default;
+	public:
+		bool SetValue(bool value);
+		bool GetValue();
+	public:
+		static RP_Global_Bool Create(const String& name, bool initValue, RenderParamManager* rpManger);
+		static RP_Global_Bool Load(const String& name, RenderParamManager* rpManger);
+	};
+
+
 	class RP_Global_Tex : public RenderParam
 	{
 	public:
@@ -141,15 +156,14 @@ namespace JG
 		static RP_Global_BAB Load(const String& name, RenderParamManager* rpManger);
 	};
 
-	using RP_Global_Bool   = RP_GlobalVar<bool>;
 	using RP_Global_Float  = RP_GlobalVar<float>;
-	using RP_Global_Float2 = RP_GlobalVar<JVector2>;
-	using RP_Global_Float3 = RP_GlobalVar<JVector3>;
-	using RP_Global_Float4 = RP_GlobalVar<JVector4>;
+	//using RP_Global_Float2 = RP_GlobalVar<JVector2>;
+	//using RP_Global_Float3 = RP_GlobalVar<JVector3>;
+	//using RP_Global_Float4 = RP_GlobalVar<JVector4>;
 	using RP_Global_Int    = RP_GlobalVar<i32>;
-	using RP_Global_Int2   = RP_GlobalVar<JVector2Int>;
-	using RP_Global_Int3   = RP_GlobalVar<JVector3Int>;
-	using RP_Global_Int4   = RP_GlobalVar<JVector4Int>;
+	//using RP_Global_Int2   = RP_GlobalVar<JVector2Int>;
+	//using RP_Global_Int3   = RP_GlobalVar<JVector3Int>;
+	//using RP_Global_Int4   = RP_GlobalVar<JVector4Int>;
 
 
 
@@ -295,13 +309,13 @@ namespace JG
 		SharedPtr<IByteAddressBuffer> GetGlobalRenderParamBAB(const String& name);
 
 		template<class T>
-		bool RegisterGlobalRenderParam(const String& name, const T& value)
+		bool RegisterGlobalRenderParam(const String& name, const T& value, Type type = JGTYPE(T))
 		{
 			if (mGlobalParamDic.find(name) != mGlobalParamDic.end())
 			{
 				return false;
 			}
-			mGlobalParamDic[name].Init((void*)&value, nullptr, nullptr, sizeof(T), JGTYPE(T));
+			mGlobalParamDic[name].Init((void*)&value, nullptr, nullptr, sizeof(T), type);
 			return true;
 		}
 		template<class T>
@@ -330,8 +344,6 @@ namespace JG
 				return false;
 			}
 			rpInfo.Set<T>(data);
-
-			
 			return true;
 		}
 		template<class T>

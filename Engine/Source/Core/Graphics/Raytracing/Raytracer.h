@@ -40,6 +40,19 @@ namespace JG
 				const JMatrix& transform, u64 insID, u64 hitGroupIndex)
 				: SubMesh(subMesh), Material(m), Transform(transform), InstanceID(insID), HitGroupIndex(hitGroupIndex) {}
 		};
+		enum EResource
+		{
+			Direct,
+			Indirect,
+			Result,
+			Shadow,
+			MotionVector,
+			ReprojectedNormalDepth,
+			NormalDepth,
+			Depth,
+			AoSurfaceAlbedo,
+			Count,
+		};
 	private:
 		List<SharedPtr<ITopLevelAccelerationStructure>> mSceneAS;
 		List<InstanceData> mInstances;
@@ -51,21 +64,22 @@ namespace JG
 		Renderer* mRenderer = nullptr;
 		JVector2 mResolution;
 
-		List<SharedPtr<ITexture>>  mResults;
 		RP_Global_Tex mResultTex;
+		RP_Global_Tex mShadowTex;
+		RP_Global_Tex mIndirectTex;
+		RP_Global_Tex mDirectTex;
 
-		u64 mHitGroupOffset = 0;
-		u64 mHitGroupStride  = 1;
+		RP_Global_Int mRayBounds;
 
-	/// <summary>
-	/// 1. Gen 수정 ( 상수 버퍼도 들어가게끔 )
-	/// 2. GPU 리소스들 CPU에서도 수정할수있겠금 수정
-	/// 3. RaytracingContext 따로 생성 
-	/// RaytracingContext
-	/// BindShaderTable을 조작할 수 있는 Context
-	/// 이걸로 조작 가능
-	/// </summary>
-		List<Color> testColor;
+		u64 mHitGroupOffset  = 0;
+		u64 mHitGroupStride  = 3;
+
+
+
+
+
+
+		List<SharedPtr<ITexture>> mResources[EResource::Count];
 	public:
 		RayTracer(Renderer* renderer);
 		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform);
@@ -77,6 +91,7 @@ namespace JG
 		void InitTextures();
 		void UpdateAccelerationStructure(SharedPtr<IComputeContext> context);
 		void Update(SharedPtr<IComputeContext> context);
+		SharedPtr<ITexture> GetResource(EResource type);
 	public:
 		static const String& GetDefaultRayTracingPipelineName();
 		static u64 GetMaxConstantBufferSize();

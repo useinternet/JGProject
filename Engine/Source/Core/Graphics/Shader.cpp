@@ -23,12 +23,12 @@ namespace JG
 
 		return api->CreateComputeShader(name, sourceCode);
 	}
-	SharedPtr<IClosestHitShader> IClosestHitShader::Create(const String& name, SharedPtr<IShaderScript> script)
+	SharedPtr<IClosestHitShader> IClosestHitShader::Create(const String& name, const String& sourceCode, SharedPtr<IShaderScript> script)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateClosestHitShader(name, script);
+		return api->CreateClosestHitShader(name, sourceCode, script);
 	}
 
 
@@ -177,7 +177,6 @@ namespace JG
 		}
 		return nullptr;
 	}
-
 	SharedPtr<IClosestHitShader> ShaderLibrary::FindClosestHitShader(const String& name)
 	{
 		std::shared_lock<std::shared_mutex> lock(mClosestHitMutex);
@@ -188,6 +187,34 @@ namespace JG
 		}
 		return nullptr;
 	}
+	SharedPtr<IClosestHitShader> ShaderLibrary::FindClosestHitShader(const String& name, const String& scriptName)
+	{
+		String code = "";
+		auto originShader = FindClosestHitShader(name);
+		if (originShader == nullptr)
+		{
+			return nullptr;
+		}
+		code += name;
+
+		auto script = FindScript(scriptName);
+		code += "/" + script->GetName();
+
+		auto result = FindClosestHitShader(code);
+		if (result == nullptr)
+		{
+			result = IClosestHitShader::Create(code, originShader->GetShaderCode(), script);
+			if (result == nullptr)
+			{
+				return nullptr;
+			}
+			RegisterClosestHitShader(code, result);
+			AddRayTracingLibrary(RayTracer::GetDefaultRayTracingPipelineName(), result);
+		}
+		return result;
+	}
+
+
 
 	SharedPtr<IShaderScript> ShaderLibrary::FindScript(const String& name)
 	{
@@ -220,7 +247,7 @@ namespace JG
 			return;
 		}
 
-		pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetShaderCode(), { shader->GetEntryPoint() });
+		pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetFullShaderCode(), { shader->GetEntryPoint() });
 		pipeline->AddHitGroup(shader->GetHitGroupName(), shader->GetEntryPoint(), "", "");
 		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { shader->GetEntryPoint() });
 	}

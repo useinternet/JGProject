@@ -25,7 +25,6 @@ namespace JG
 
 		Dictionary<String, CBPair> mCBDatas;
 		Dictionary<String, SharedPtr<ITexture>> mTextures;
-		//Dictionary<String, SharedPtr<ITexture>> mTextureCubes;
 	public:
 		virtual bool SetFloat(const String& name, float value) override;
 		virtual bool SetFloat2(const String& name, const JVector2& value) override;
@@ -71,7 +70,6 @@ namespace JG
 	public:
 		virtual bool IsValid() const override;
 		virtual List<SharedPtr<ITexture>> GetTextureList()	  const override;
-		//virtual List<SharedPtr<ITexture>> GetCubeTextureList() const override;
 		virtual const List<jbyte>& GetMaterialPropertyByteData() override;
 
 

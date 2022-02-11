@@ -251,29 +251,6 @@ namespace JG
 		});
 		return texList;
 	}
-
-	//List<SharedPtr<ITexture>> DirectX12Material::GetCubeTextureList() const
-	//{
-	//	if (mGraphicsShader == nullptr || mGraphicsShader->IsSuccessed() == false)
-	//	{
-	//		return List<SharedPtr<ITexture>>();;
-	//	}
-	//	List<SharedPtr<ITexture>> texList;
-	//	DirectX12GraphicsShader* pDX12Shader = static_cast<DirectX12GraphicsShader*>(mGraphicsShader.get());
-	//	pDX12Shader->ForEach_TextureCubeSlot([&](const String& name)
-	//	{
-	//		if (mTextureCubes.find(name) == mTextureCubes.end())
-	//		{
-	//			texList.push_back(nullptr);
-	//		}
-	//		else
-	//		{
-	//			texList.push_back(mTextureCubes.at(name));
-	//		}
-	//	});
-	//	return texList;
-	//}
-
 	const List<jbyte>& DirectX12Material::GetMaterialPropertyByteData()
 	{
 		{
