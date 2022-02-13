@@ -17,7 +17,7 @@ namespace JG
 	{
 		JG_LOG_TRACE(">> {0}", command);
 
-		List<String> commandAndArgs = StringHelper::Split(StringHelper::ToLower(command), ' ');
+		List<String> commandAndArgs = StringHelper::Split(command, ' ');
 		if (commandAndArgs.empty())
 		{
 			return;
@@ -39,13 +39,12 @@ namespace JG
 	}
 	void CommandPrompt::Execute(const String& command, const List<String>& args)
 	{
-		String lower_str = StringHelper::ToLower(command);
-		mRegisteredCommand[lower_str](lower_str, args);
+		mRegisteredCommand[command](command, args);
 	}
 	void CommandPrompt::LoadCommand()
 	{
-		RegisterCommand("SaveGameWorld", COMMAND_BIND_FUNC(Command_SaveGameWorld));
-		RegisterCommand("AssetImport", COMMAND_BIND_FUNC(Command_AssetImport));
+		RegisterCommand("savegameworld", COMMAND_BIND_FUNC(Command_SaveGameWorld));
+		RegisterCommand("assetimport", COMMAND_BIND_FUNC(Command_AssetImport));
 	}
 	void CommandPrompt::RegisterCommand(const String& command, const std::function<void(const String&, const List<String>&)>& func)
 	{
