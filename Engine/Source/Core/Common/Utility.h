@@ -1,11 +1,19 @@
 #pragma once
 #include <string>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
 #include <codecvt>
 
 
 
 namespace JG
 {
+	enum class EStringComparsion
+	{
+		None,
+		IgnoreCase,
+	};
 	namespace StringHelper
 	{
 		inline std::wstring s2ws(const std::string& str)
@@ -115,6 +123,21 @@ namespace JG
 		inline i32 ToInt(const String& str, i32 default = 0)
 		{
 			return std::stoi(str, nullptr, default);
+		}
+
+		inline String ToLower(const String& str)
+		{
+			String result = str;
+			std::transform(result.begin(), result.end(), result.begin(), 
+				[](unsigned char c) -> unsigned char { return std::tolower(c); });
+			return result;
+		}
+		inline String ToUpper(const String& str)
+		{
+			String result = str;
+			std::transform(result.begin(), result.end(), result.begin(),
+				[](unsigned char c) -> unsigned char { return std::toupper(c); });
+			return result;
 		}
 	}
 

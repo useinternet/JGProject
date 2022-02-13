@@ -32,8 +32,6 @@ namespace JG
 	{
 		None,
 	};
-
-
 	struct FBXAssetImportSettings
 	{
 		String AssetPath;

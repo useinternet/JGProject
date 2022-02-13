@@ -40,14 +40,15 @@ namespace JG
 	}
 	enum class EAssetFormat
 	{
-		None,
-		Mesh,
-		Skeletal,
-		Material,
-		Texture,
-		Directory,
-		GameWorld,
-		CubeMap,
+		None = 0,
+		Mesh      = 1,
+		Skeletal  = 2,
+		Material  = 3,
+		Texture   = 4,
+		Directory = 5,
+		GameWorld = 6,
+		CubeMap   = 7,
+		Prefab    = 8,
 	};
 
 	enum class ERendererPath

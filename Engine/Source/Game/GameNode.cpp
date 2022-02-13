@@ -102,7 +102,6 @@ namespace JG
 			}
 
 			jsonData->AddMember("Childs", childListJson);
-
 		}
 	}
 	void GameNode::LoadJson(SharedPtr<JsonData> jsonData)

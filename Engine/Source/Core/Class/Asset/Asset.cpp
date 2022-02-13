@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Asset.h"
 #include "AssetManager.h"
+#include "AssetHelper.h"
 #include "Application.h"
 #include "Graphics/JGGraphics.h"
 #include "AssetImporter.h"
@@ -283,7 +284,7 @@ namespace JG
 	{
 		String resourcePath;
 		String absolutePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
 		{
 			return AssetID();
 		}
@@ -299,7 +300,7 @@ namespace JG
 	{
 		String resourcePath;
 		String absolutePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
 		{
 			return nullptr;
 		}
@@ -367,7 +368,7 @@ namespace JG
 
 		String resourcePath;
 		String absolutePath;
-		if (GetResourcePath(originAssetData->Path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(originAssetData->Path, &absolutePath, &resourcePath) == false)
 		{
 			return nullptr;
 		}
@@ -486,7 +487,7 @@ namespace JG
 		EAssetFormat assetFormat = originData->Asset->GetAssetFormat();
 		String absolutePath;
 		String resourcePath;
-		if (GetResourcePath(reName, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(reName, &absolutePath, &resourcePath) == false)
 		{
 			return;
 		}
@@ -933,45 +934,45 @@ namespace JG
 		}
 	}
 
-	bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const
-	{
-		auto originPath = path;
-		auto absolutePath      = fs::absolute(path).string();
-		auto absoluteAssetPath = fs::absolute(Application::GetAssetPath()).string();
-		auto homePath = fs::current_path().string();
+	//bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const
+	//{
+	//	auto originPath = path;
+	//	auto absolutePath      = fs::absolute(path).string();
+	//	auto absoluteAssetPath = fs::absolute(Application::GetAssetPath()).string();
+	//	auto homePath = fs::current_path().string();
 
-		originPath        = StringHelper::ReplaceAll(originPath, "\\", "/");
-		absolutePath      = StringHelper::ReplaceAll(absolutePath, "\\", "/");
-		absoluteAssetPath = StringHelper::ReplaceAll(absoluteAssetPath, "\\", "/");
-		homePath		  = StringHelper::ReplaceAll(homePath, "\\", "/");
+	//	originPath        = StringHelper::ReplaceAll(originPath, "\\", "/");
+	//	absolutePath      = StringHelper::ReplaceAll(absolutePath, "\\", "/");
+	//	absoluteAssetPath = StringHelper::ReplaceAll(absoluteAssetPath, "\\", "/");
+	//	homePath		  = StringHelper::ReplaceAll(homePath, "\\", "/");
 
 
-		String resourcePath;
+	//	String resourcePath;
 
-		// 
-		if (absolutePath.find(absoluteAssetPath) == String::npos )
-		{
-			if (path.find_first_of("Asset/") != String::npos) {
+	//	// 
+	//	if (absolutePath.find(absoluteAssetPath) == String::npos )
+	//	{
+	//		if (path.find_first_of("Asset/") != String::npos) {
 
-				resourcePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
-				absolutePath = StringHelper::ReplaceAll(absolutePath, "Asset/", "");
-				absolutePath = PathHelper::CombinePath(absoluteAssetPath, absolutePath);
-				out_absolutePath = absolutePath;
-				out_resourcePath = resourcePath;
-				return true;
-			}
-		}
-		// in AssetPath
-		else
-		{
-			resourcePath = StringHelper::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
-			out_absolutePath = absolutePath;
-			out_resourcePath = resourcePath;
-			return true;
-		}
-		return false;
-	}
+	//			resourcePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
+	//			absolutePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
+	//			absolutePath = StringHelper::ReplaceAll(absolutePath, "Asset/", "");
+	//			absolutePath = PathHelper::CombinePath(absoluteAssetPath, absolutePath);
+	//			out_absolutePath = absolutePath;
+	//			out_resourcePath = resourcePath;
+	//			return true;
+	//		}
+	//	}
+	//	// in AssetPath
+	//	else
+	//	{
+	//		resourcePath = StringHelper::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
+	//		out_absolutePath = absolutePath;
+	//		out_resourcePath = resourcePath;
+	//		return true;
+	//	}
+	//	return false;
+	//}
 
 	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
 	{
@@ -996,8 +997,9 @@ namespace JG
 	{
 		String absolutePath;
 		String resourcePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
 		{
+			JG_LOG_ERROR("Resource must exist in AssetPath : {0}", path);
 			return false;
 		}
 		String assetJsonText = Json::ToString(json);
@@ -1017,6 +1019,7 @@ namespace JG
 
 		if (fout.is_open() == false)
 		{
+			JG_LOG_ERROR("Fail Write Asset : {0}", path);
 			return false;
 		}
 		fout.write((const char*)(&headerJsonLen), sizeof(u64));
@@ -1032,8 +1035,9 @@ namespace JG
 	{
 		String absolutePath;
 		String resourcePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
 		{
+			JG_LOG_ERROR("Resource must exist in AssetPath : {0}", path);
 			return false;
 		}
 		std::lock_guard<std::mutex> lock(mAssetRWMutex);
@@ -1041,6 +1045,7 @@ namespace JG
 		fin.open(absolutePath);
 		if (fin.is_open() == false)
 		{
+			JG_LOG_ERROR("Failed Read Asset : {0}", path);
 			return false;
 		}
 
@@ -1094,7 +1099,7 @@ namespace JG
 	{
 		String absolutePath;
 		String resourcePath;
-		if (GetResourcePath(path, absolutePath, resourcePath) == false)
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
 		{
 			return EAssetFormat::None;
 		}

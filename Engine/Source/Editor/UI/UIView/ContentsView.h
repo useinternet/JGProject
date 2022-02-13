@@ -19,6 +19,7 @@ namespace JG
 			ICON_TEXTURE,
 			ICON_MESH,
 			ICON_IMPORT,
+			ICON_PREFAB,
 			MAX_ICON
 		};
 		enum
@@ -111,7 +112,6 @@ namespace JG
 	private:
 		void OnGUI_Top();
 		void OnGUI_Bottom();
-	private:
 		void OnGUI_DirectoryPanel();
 		void OnGUI_Directory(DirectoryNode* dirNode);
 		void OnGUI_FilePanel_TopBar();
@@ -136,7 +136,7 @@ namespace JG
 		void NextTargetDirectory();
 		void SetTargetFile(const String& path);
 
-
+	public:
 		const String& GetTargetDirectory() const;
 		const String& GetTargetFile() const;
 	private:
@@ -146,6 +146,7 @@ namespace JG
 		void CreateSurfaceMaterial(const String& targetDir);
 
 		void Rename(const String& path, const String& name);
+		void CopyToPath();
 		void Copy();
 		void Paste();
 		void Move();

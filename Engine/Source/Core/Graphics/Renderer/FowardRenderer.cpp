@@ -46,7 +46,7 @@ namespace JG
 
 	void FowardRenderer::RenderImpl(SharedPtr<RenderResult> result)
 	{
-		if (mIsRayTracing.GetValue() == true)
+		if (mIsRayTracing.GetValue() == true && JGGraphics::GetInstance().IsSupportedRayTracing() == true)
 		{
 			UpdateRayTacing();
 			if (result != nullptr)

@@ -17,6 +17,7 @@ namespace JG
 		void LoadCommand();
 		void RegisterCommand(const String& command, const std::function<void(const String&, const List<String>&)>& func);
 	private:
-		void TestCommand(const String& command, const List<String>& args);
+		void Command_SaveGameWorld(const String& command, const List<String>& args);
+		void Command_AssetImport(const String& command, const List<String>& args);
 	};
 }

@@ -21,11 +21,16 @@ namespace JG
 		Log()
 		{
 			FileHelper::WriteAllText(GetLogFile(), "");
-			spdlog::set_pattern("[_]%^[:%t:][%l]%v%$[_]");
+			spdlog::set_pattern("%^[:%t:][%l]%v%$");
 			smLogger = spdlog::basic_logger_mt("JGLog", GetLogFile());
+
+
 			smLogger->set_level(spdlog::level::trace);
 			smLogger->flush_on(spdlog::level::trace);
 
+			auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+			consoleSink->set_pattern("%^[:%t:][%l]%v%$");
+			smLogger->sinks().push_back(consoleSink);
 		}
 		~Log()
 		{

@@ -61,20 +61,6 @@ namespace JG
 			e.AssetPath = gameWorldAssetPath;
 			Application::GetInstance().SendEvent(e);
 		}
-
-		//CubeMapAssetImportSettings settings;
-
-		//settings.AssetPath[0] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/right.jpg";
-		//settings.AssetPath[1] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/left.jpg";
-		//settings.AssetPath[2] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/top.jpg";
-		//settings.AssetPath[3] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/bottom.jpg";
-		//settings.AssetPath[4] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/front.jpg";
-		//settings.AssetPath[5] = "../../../GameProject/Project_C/RawResources/CubeMap/Default/back.jpg";
-
-		//settings.OutputPath = PathExtend::CombinePath(Application::GetEnginePath(), "CubeMap");
-		//settings.Name = "DefaultSky";
-		//AssetImporter::Import(settings);
-
 	}
 	void GameLogicSystemLayer::Destroy()
 	{
@@ -124,7 +110,7 @@ namespace JG
 
 
 			bool result = AssetDataBase::GetInstance().WriteAsset(mGameWorldAssetPath, EAssetFormat::GameWorld, json);
-
+			JG_LOG_INFO("Compelete Save GameWorld : {0} ", mGameWorldAssetPath);
 			if (result == false)
 			{
 				{

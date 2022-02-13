@@ -7,6 +7,9 @@ namespace JG
 {
 	DevConsoleView::DevConsoleView()
 	{
+		mSink = CreateUniquePtr<DevConsoleSink>();
+		mSink->set_pattern("%^[:%t:][%l]%v%$");
+		Log::GetLogger()->sinks().push_back(mSink);
 		UIManager::GetInstance().RegisterMainMenuItem("Windows/DevlopConsole", 0, [&]()
 		{
 			Open();
@@ -46,6 +49,7 @@ namespace JG
 	}
 	void DevConsoleView::Initialize()
 	{
+
 	}
 	void DevConsoleView::OnGUI()
 	{
@@ -72,26 +76,6 @@ namespace JG
 	void DevConsoleView::LoadJson(SharedPtr<JsonData> jsonData)
 	{
 		UIView::LoadJson(jsonData);
-	}
-	void DevConsoleView::OpenLogFile()
-	{
-		if (mLogFileStream.is_open() == false)
-		{
-			if (fs::exists(Log::GetLogFile()) == false)
-			{
-				FileHelper::WriteAllText(Log::GetLogFile(), "");
-			}
-			mLogFileStream.open(Log::GetLogFile());
-			mLogFileStream.seekg(mStartLogFileOffset, std::ios::beg);
-		}
-	}
-	void DevConsoleView::CloseLogFile()
-	{
-		if (mLogFileStream.is_open())
-		{
-			mLogFileStream.close();
-		}
-
 	}
 	void DevConsoleView::OnGUI_Top()
 	{
@@ -131,7 +115,11 @@ namespace JG
 		{
 			mLogs.clear();
 		}
-
+		ImGui::Separator();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Filter"); ImGui::SameLine();
+		ImGui::InputText("DevConsoleView/SearchInputText", mSearchStr, mSearchStr);
+	
 		ImGui::EndChild();
 		ImGui::Separator();
 	}
@@ -200,10 +188,7 @@ namespace JG
 	{
 		ImGui::BeginChild("DevConsoleView/Bottom", ImVec2(0, smBottomHeight));
 
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Filter"); ImGui::SameLine();
-		ImGui::InputText("DevConsoleView/SearchInputText", mSearchStr, mSearchStr);
-		ImGui::Separator();
+
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Cmd   "); ImGui::SameLine();
 
@@ -262,40 +247,24 @@ namespace JG
 			mPendingLogs.clear();
 			mReadScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
-				OpenLogFile();
 				ReadLog_Async();
-				CloseLogFile();
 			});
 		}
 	}
 
 	void DevConsoleView::ReadLog_Async()
 	{
-		if (mLogFileStream.is_open())
+		u32 readLineCount = 0;
+		Queue<String>& messageQueue = mSink->GetLogMessageQueue();
+		std::lock_guard<std::mutex> lock(mSink->GetMutex());
+		while (messageQueue.empty() == false)
 		{
-			u32 readLineCount = 0;
-			while (mLogFileStream.eof() == false)
+			String log = messageQueue.front(); messageQueue.pop();
+			PushLogInfo_Async(log);
+			++readLineCount;
+			if (readLineCount > mReadMaxLogLine)
 			{
-			
-				String log;
-				std::getline(mLogFileStream, log);
-
-				String token = "[_]";
-
-				if (StringHelper::EndWidth(log, token) == false)
-				{
-					break;
-				}
-				mStartLogFileOffset = mLogFileStream.tellg();
-
-
-				log = StringHelper::ReplaceAll(log, "[_]", "");
-				PushLogInfo_Async(log);
-				++readLineCount;
-				if (readLineCount > mReadMaxLogLine)
-				{
-					break;
-				}
+				break;
 			}
 		}
 	}
@@ -327,9 +296,6 @@ namespace JG
 			info.LogLevel = ELogLevel::Error;
 			info.Message = StringHelper::ReplaceAll(info.Message, "[error]", "");
 		}
-	
-
-
 		String threadStr;
 		u64 startPos = msg.find("[:");
 		if (startPos != String::npos)
@@ -340,8 +306,6 @@ namespace JG
 			threadStr = msg.substr(startPos, endPos - startPos);
 
 			info.Message = StringHelper::ReplaceAll(info.Message, "[:" + threadStr + ":]", "");
-
-
 			u64 threadID = StringHelper::ToInt(threadStr);
 			if (threadID != mMainThreadID)
 			{

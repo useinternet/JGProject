@@ -81,6 +81,7 @@ namespace JG
 					{
 						*IsSupportedRayTracing = IsDirectXRaytracingSupported(pAdapter.Get());
 					}
+					break;
 				}
 			}
 

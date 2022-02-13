@@ -4,6 +4,7 @@
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/ImFileDialog.h"
 #include "Class/Asset/AssetImporter.h"
+#include "Class/Asset/AssetHelper.h"
 #include "GameObjectFactory.h"
 #include "Components/Camera.h"
 #include "GameNode.h"
@@ -35,16 +36,21 @@ namespace JG
 			CreateSurfaceMaterial(GetTargetDirectory());
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Material/Lighting", 0, [&]() {}, nullptr);
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Copy", 20, [&]() {
+
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "CopyToPath", 20, [&]() {
+			CopyToPath();
+		}, nullptr);
+
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Copy", 40, [&]() {
 			Copy();
 		}, nullptr);
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Paste", 20, [&]() {
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Paste", 40, [&]() {
 			Paste();
 		}, nullptr);
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Move", 20, [&]() {
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Move", 40, [&]() {
 			Move();
 		}, nullptr);
-		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Delete", 20, [&]() {
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Delete", 40, [&]() {
 			Delete();
 		}, nullptr);
 		LoadIcons();
@@ -941,19 +947,14 @@ namespace JG
 			gameWorld = GameObjectFactory::GetInstance().CreateObject<GameWorld>();
 			gameWorld->AddNode("MainCamera")->AddComponent<EditorCamera>();
 
-			auto json = CreateSharedPtr<Json>();
-			auto assetJson = json->CreateJsonData();
-
-			gameWorld->MakeJson(assetJson);
-			json->AddMember(JG_ASSET_KEY, assetJson);
-
-			auto path = PathHelper::CombinePath(targetDir, std::string("NewGameWorld") + JG_ASSET_FORMAT);
+			auto path = PathHelper::CombinePath(targetDir, std::string("NewGameWorld"));
 			path = PathHelper::GetUniqueFileName(path);
 
-			
-
 			std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
-			AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::GameWorld, json);
+			AssetHelper::WriteAsset(EAssetFormat::GameWorld, path, [&](SharedPtr<JsonData> jsonData)
+			{
+				gameWorld->MakeJson(jsonData);
+			});
 
 			Scheduler::GetInstance().ScheduleOnceByFrame(10, SchedulePriority::EndSystem, [&]()->EScheduleResult
 			{
@@ -1125,6 +1126,31 @@ namespace JG
 		AssetDataBase::GetInstance().RefreshAssetName(assetID, src);
 		RequestSaveGameWorldEvent e;
 		SendEvent(e);
+	}
+
+	void ContentsView::CopyToPath()
+	{
+		String copyStr;
+		if (mSelectedFilesInDirPanel.empty() == false)
+		{
+			for (auto& dir : mSelectedFilesInDirPanel)
+			{
+				String resourcePath;
+				AssetHelper::GetResourcePath(dir, &resourcePath, nullptr);
+				copyStr += resourcePath + " ";
+			}
+		}
+		else if (mSelectedFilesInFilePanel.empty() == false)
+		{
+			for (auto& file : mSelectedFilesInFilePanel)
+			{
+				String resourcePath;
+				AssetHelper::GetResourcePath(file, &resourcePath, nullptr);
+				copyStr += resourcePath + " ";
+			}
+		}
+		ImGui::SetClipboardText(copyStr.c_str());
+;		JG_LOG_TRACE("Copy To Path : {0}", copyStr);
 	}
 
 	void ContentsView::Copy()
@@ -1316,8 +1342,9 @@ namespace JG
 		mIcons[ICON_DIRECTORY] = UIManager::GetInstance().GetIcon("Icon_Directory");
 		mIcons[ICON_MATERIAL]  = UIManager::GetInstance().GetIcon("Icon_Material");
 		mIcons[ICON_GAMEWORLD] = UIManager::GetInstance().GetIcon("Icon_GameWorld");
-		mIcons[ICON_TEXTURE] = UIManager::GetInstance().GetIcon("Icon_Texture");
+		mIcons[ICON_TEXTURE]   = UIManager::GetInstance().GetIcon("Icon_Texture");
 		mIcons[ICON_MESH]      = UIManager::GetInstance().GetIcon("Icon_Mesh");
+		mIcons[ICON_PREFAB]    = UIManager::GetInstance().GetIcon("Icon_Prefab");
 	}
 	i32 ContentsView::GetIconID(EAssetFormat format)
 	{
@@ -1328,6 +1355,7 @@ namespace JG
 		case JG::EAssetFormat::Texture:   return ICON_TEXTURE;
 		case JG::EAssetFormat::GameWorld: return ICON_GAMEWORLD;
 		case JG::EAssetFormat::Mesh:   return ICON_MESH;
+		case JG::EAssetFormat::Prefab: return ICON_PREFAB;
 		case JG::EAssetFormat::Skeletal:
 		default:
 			return ICON_NONE;

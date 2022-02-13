@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "WorldHierarchyView.h"
 #include "Imgui/imgui.h"
+#include "Class/Asset/AssetHelper.h"
 #include "GameNode.h"
 #include "GameWorld.h"
 #include "UI/UIView/InspectorView.h"
+#include "UI/UIView/ContentsView.h"
 #include "UI/UIManager.h"
 #include "Components/SpriteRenderer.h"
 #include "Components/StaticMeshRenderer.h"
@@ -24,8 +26,6 @@ namespace JG
 	}
 	void WorldHierarchyView::Load()
 	{
-
-
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/EmptyObject", 0, [&]()
 		{
 			CreateEmptyObject();
@@ -50,6 +50,12 @@ namespace JG
 		{
 			CreatePointLight();
 		}, nullptr);
+
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Make Prefab", 0, [&]()
+		{
+			MakePrefab();
+		}, nullptr);
+
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Copy %_C", 0,
 			[&]()
@@ -255,7 +261,28 @@ namespace JG
 			e.SelectedGameNode = gameNode;
 			SendEvent(e);
 		}
-	
+		DragAndDropTarget<DDDContentsFile>([&](DDDContentsFile* contentsFile)
+		{
+			if (contentsFile == nullptr)
+			{
+				return;
+			}
+			JG_LOG_TRACE("TargetNode : {0} , SourceFile : {1}", gameNode->GetName(), contentsFile->FilePath);
+			EAssetFormat assetFormat = AssetHelper::GetAssetFormat(contentsFile->FilePath);
+			bool result = false;
+			switch (assetFormat)
+			{
+			case EAssetFormat::Prefab:
+				result = AssetHelper::ReadAsset(assetFormat, contentsFile->FilePath, [&](SharedPtr<JsonData> jsonData)
+				{
+					GameNode* node = gameNode->AddNode(fs::path(contentsFile->FilePath).filename().string());
+					node->LoadJson(jsonData);
+					JG_LOG_TRACE("Scuccess Load Prefab : {0}", contentsFile->FilePath);
+				});
+				break;
+			}
+			
+		});
 		ImGui::TableNextColumn();
 		if (ImGui::ArrowButton(("##UpButton" + gameNode->GetName()).c_str(), ImGuiDir_Up) || (mTargetGameNode == gameNode && ImGui::IsKeyPressed((i32)EKeyCode::NumPadSubtract)))
 		{
@@ -389,6 +416,26 @@ namespace JG
 		if (mTargetGameNode == nullptr) return;
 		auto node = mTargetGameNode->AddNode("Camera");
 		auto camera = node->AddComponent<Camera>();
+	}
+	void WorldHierarchyView::MakePrefab()
+	{
+		if (mTargetGameNode == nullptr) return;
+
+		String targetPath = "Asset/";
+
+		ContentsView* contentView = UIManager::GetInstance().GetUIView<ContentsView>();
+		if (contentView != nullptr)
+		{
+			targetPath = contentView->GetTargetDirectory();
+		}
+		targetPath = PathHelper::CombinePath(targetPath, mTargetGameNode->GetName());
+		AssetHelper::WriteAsset(EAssetFormat::Prefab, targetPath, 
+			[&](SharedPtr<JsonData> jsonData)
+			{
+				mTargetGameNode->MakeJson(jsonData);
+			});
+
+
 	}
 	void WorldHierarchyView::Copy(bool is_remove_gamenode_after_copy)
 	{

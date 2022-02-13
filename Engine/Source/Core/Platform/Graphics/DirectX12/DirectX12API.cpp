@@ -64,15 +64,6 @@ namespace JG
 	{
 		return GetInstance()->mCopyCommandQueue.get();
 	}
-	//u64	DirectX12API::GetFrameBufferCount()
-	//{
-	//	return GetInstance()->mFrameBufferCount;
-	//}
-	//u64 DirectX12API::GetFrameBufferIndex()
-	//{
-	//	return GetInstance()->mFrameBufferIndex;
-	//}
-
 	DescriptorAllocation DirectX12API::RTVAllocate()
 	{
 		return GetInstance()->mRTVAllocator->Allocate();

@@ -456,7 +456,7 @@ namespace JG
 		void LoadAssetData_Update();
 
 		EScheduleResult UnLoadAsset_Update();
-		bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
+		//bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
 		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);

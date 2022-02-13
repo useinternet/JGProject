@@ -39,15 +39,14 @@ namespace JG
 			u64  ThreadID;
 		};
 	private:
-		static constexpr  f32 smTopHeight = 32.0f;
-		static constexpr  f32 smBottomHeight = 52.0f;
+		static constexpr  f32 smTopHeight = 60.0f;
+		static constexpr  f32 smBottomHeight = 25.0f;
 		bool mOpenGUI = true;
 		bool mAutoScroll = true;
 
 		SharedPtr<ScheduleHandle> mReadScheduleHandle;
 		Dictionary<ELogLevel, LogFilterInfo> mLogFilterInfoDic;
 
-		u32 mStartLogFileOffset = 0;
 		u32 mCurrentLogLine = 0;
 		u32 mReadMaxLogLine = 10;
 		u32 mMaxLogCount	= 9999;
@@ -56,12 +55,14 @@ namespace JG
 
 		List<LogInfo> mLogs;
 		List<LogInfo> mPendingLogs;
-		std::ifstream mLogFileStream;
 
 		String mSearchStr;
 		String mCmdStr;
 
 		UniquePtr<CommandPrompt> mCommandPrompt;
+
+		class DevConsoleSink;
+		SharedPtr<DevConsoleSink> mSink;
 	public:
 		DevConsoleView();
 		virtual ~DevConsoleView();
@@ -76,8 +77,6 @@ namespace JG
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	private:
-		void OpenLogFile();
-		void CloseLogFile();
 		void OnGUI_Top();
 		void OnGUI_Log();
 		void OnGUI_LogText(const LogInfo& info);
@@ -86,6 +85,27 @@ namespace JG
 		void ReadLog_Async();
 		void PushLogInfo_Async(const String& msg);
 		void CommandExecution(const String& command);
+	private:
+		class DevConsoleSink : public spdlog::sinks::base_sink<std::mutex>
+		{
+			Queue<String> mLogMessageQueue;
+		protected:
+			void sink_it_(const spdlog::details::log_msg& msg) override
+			{
+				spdlog::memory_buf_t formatted;
+				spdlog::sinks::base_sink<std::mutex>::formatter_->format(msg, formatted);
+				mLogMessageQueue.push(fmt::to_string(formatted));
+			}
+
+			void flush_() override {}
+		public:
+			std::mutex& GetMutex() {
+				return mutex_;
+			}
+			Queue<String>& GetLogMessageQueue() {
+				return mLogMessageQueue;
+			}
+		};
 	};
 }
 

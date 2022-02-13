@@ -291,6 +291,10 @@ namespace JG
 	}
 	void JGGraphics::LoadRayTracingPipeline()
 	{
+		if (IsSupportedRayTracing() == false)
+		{
+			return;
+		}
 		SharedPtr<IRayTracingPipeline> pipeline = IRayTracingPipeline::Create();
 		//Pipeline
 		String shaderPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing");

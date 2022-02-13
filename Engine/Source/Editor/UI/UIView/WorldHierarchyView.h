@@ -93,6 +93,7 @@ namespace JG
 		void CreateSphere();
 		void CreatePointLight();
 		void CreateCamera();
+		void MakePrefab();
 		void Copy(bool is_remove_gamenode_after_copy = false);
 		void Paste();
 		bool IsCanAbleToCopy();
