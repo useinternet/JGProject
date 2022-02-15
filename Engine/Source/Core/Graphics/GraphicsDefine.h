@@ -18,7 +18,9 @@ namespace JG
 	{
 		None,
 		R8_Unorm,
+		R16_Float,
 		R32_Float,
+		R16G16_Float,
 		R8G8B8A8_Unorm,
 		R16G16B16A16_Unorm,
 		R11G11B10_Float,
@@ -35,6 +37,8 @@ namespace JG
 		case ETextureFormat::R11G11B10_Float:    return "R11G11B10_Float";
 		case ETextureFormat::R8_Unorm:			 return "R8_Unrom";
 		case ETextureFormat::R32_Float:			 return "R32_Float";
+		case ETextureFormat::R16_Float:			 return "R16_Float";
+		case ETextureFormat::R16G16_Float:		 return "R16G16_Float";
 		case ETextureFormat::R8G8B8A8_Unorm:     return "R8G8B8A8_Unorm";
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
 		case ETextureFormat::R32G32B32A32_Float: return "R32G32B32A32_Float";
@@ -54,7 +58,9 @@ namespace JG
 		{
 		case ETextureFormat::R11G11B10_Float:    return DXGI_FORMAT_R11G11B10_FLOAT;
 		case ETextureFormat::R8_Unorm:			 return DXGI_FORMAT_R8_UNORM;
+		case ETextureFormat::R16_Float:			 return DXGI_FORMAT_R16_FLOAT;
 		case ETextureFormat::R32_Float:			 return DXGI_FORMAT_R32_FLOAT;
+		case ETextureFormat::R16G16_Float:		 return DXGI_FORMAT_R16G16_FLOAT;
 		case ETextureFormat::R8G8B8A8_Unorm:     return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;

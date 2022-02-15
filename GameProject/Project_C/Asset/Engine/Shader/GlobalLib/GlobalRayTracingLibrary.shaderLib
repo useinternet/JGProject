@@ -1,3 +1,9 @@
+#define FLT_EPSILON     1.192092896e-07 
+#define FLT_MIN         1.175494351e-38 
+#define FLT_MAX         3.402823466e+38 
+#define FLT_10BIT_MIN   6.1e-5
+#define FLT_10BIT_MAX   6.5e4
+
 struct Vertex
 {
 	float3 Position;
@@ -34,6 +40,8 @@ struct HaltonState
 
 
 
+
+
 float haltonSample(uint dimension, uint sampleIndex);
 float haltonNext(inout HaltonState state);
 uint haltonIndex(uint x, uint y, uint i);
@@ -57,10 +65,14 @@ struct IndirectRayPayload
     uint RayDepth;
     HaltonState HaltonState;
 };
-
 struct DirectRayPayload
 {
     float3 Color;
+    float  Hit;
+    float3 HitPosition;
+    float2 Normal;
+    float3 PrevHitPosition;
+    float2 PrevNormal;
 };
 
 struct ShadowRayPayload
@@ -72,9 +84,16 @@ struct ShadowRayPayload
 
 
 RaytracingAccelerationStructure _SceneAS : register(t0, space0);
+
+
 RWTexture2D<float4> _DirectOutput   : register(u0, space0);
 RWTexture2D<float4> _IndirectOutput : register(u1, space0);
 RWTexture2D<float4> _ResultOutput : register(u2, space0);
+
+RWTexture2D<float2> _MotionVectorOutput : register(u3, space0);
+RWTexture2D<float4> _ReprojectedNormalDepthOutput : register(u4, space0);
+RWTexture2D<float4> _NormalDepthOutput : register(u5, space0);
+RWTexture2D<float4> _DepthOutput : register(u6, space0);
 
 // Lights
 StructuredBuffer<PointLight> _PointLightList     : register(t1, space0);
@@ -82,7 +101,7 @@ StructuredBuffer<PointLight> _PointLightList     : register(t1, space0);
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList       : register(t2, space0);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t3, space0);
-
+StructuredBuffer<float3x4> _PrevFrameBottomLevelASInstanceTransform : register(t4, space0);
 
 
 cbuffer CB : register(b0)
@@ -93,17 +112,26 @@ cbuffer CB : register(b0)
     float4x4 _InvViewMatrix;
     float4x4 _InvProjMatrix;
     float4x4 _InvViewProjMatrix;
+    float4x4 _PrevFrameViewProjMatrix;
+    float4x4 _PrevFrameInvViewProjMatrix;
+
+
     float2   _Resolution;
     float    _NearZ;
     float    _FarZ;
+
     float3   _EyePosition;
     uint     _PointLightCount;
+
     float2   _ClusterSize;
     float    _ClusterScale;
     float    _ClusterBias;
+
     uint3    _NumClusterSlice;
     uint     _FrameCount;
     uint     _MaxRayDepth;
+
+    float3 _PrevFrameEyePosition;
 }
 
 SamplerState _PointWrap  : register(s0);
@@ -176,8 +204,28 @@ Vertex HitAttribute(Vertex vertices[3], BuiltInTriangleIntersectionAttributes at
     return result;
 }
 
+float2 OctWrap(float2 v)
+{
+    return (1.0 - abs(v.yx)) * (v.xy >= 0.0 ? 1.0 : -1.0);
+}
+float2 EncodeNormal(float3 n)
+{
+    n /= (abs(n.x) + abs(n.y) + abs(n.z));
+    n.xy = n.z >= 0.0 ? n.xy : OctWrap(n.xy);
+    n.xy = n.xy * 0.5 + 0.5;
+    return n.xy;
+}
 
+float3 DecodeNormal(float2 f)
+{
+    f = f * 2.0 - 1.0;
 
+    // https://twitter.com/Stubbesaurus/status/937994790553227264
+    float3 n = float3(f.x, f.y, 1.0 - abs(f.x) - abs(f.y));
+    float t = saturate(-n.z);
+    n.xy += n.xy >= 0.0 ? -t : t;
+    return normalize(n);
+}
 
 /// Rand Function
 uint initRand(uint val0, uint val1, uint backoff = 16)
@@ -316,6 +364,105 @@ uint halton3Inverse(uint index, uint digits)
         index /= 3;
     }
     return result;
+}
+float2 ClipSpaceToTexturePosition(in float4 clipSpacePosition)
+{
+    float3 NDCposition = clipSpacePosition.xyz / clipSpacePosition.w;   // Perspective divide to get Normal Device Coordinates: {[-1,1], [-1,1], (0, 1]}
+    NDCposition.y = -NDCposition.y;                                     // Invert Y for DirectX-style coordinates.
+    float2 texturePosition = (NDCposition.xy + 1) * 0.5f;               // [-1,1] -> [0, 1]
+    return texturePosition;
+}
+float3 GenerateForwardCameraRayDirection(in float4x4 invViewProjMatrix)
+{
+	float2 screenPos = float2(0, 0);
+	
+	// Unproject the pixel coordinate into a world positon.
+	float4 world = mul(float4(screenPos, 0, 1), invViewProjMatrix);
+	return normalize(world.xyz);
+}
+
+float GetPlaneConstant(in float3 planeNormal, in float3 pointOnThePlane)
+{
+    // Given a plane equation N * P + d = 0
+    // d = - N * P
+    return -dot(planeNormal, pointOnThePlane);
+}
+
+bool IsPointOnTheNormalSideOfPlane(in float3 P, in float3 planeNormal, in float3 pointOnThePlane)
+{
+    float d = GetPlaneConstant(planeNormal, pointOnThePlane);
+    return dot(P, planeNormal) + d > 0;
+}
+float3 ReflectPointThroughPlane(in float3 P, in float3 planeNormal, in float3 pointOnThePlane)
+{
+    //           |
+    //           |
+    //  P ------ C ------ R
+    //           |
+    //           |
+    // Given a point P, plane with normal N and constant d, the projection point C of P onto plane is:
+    // C = P + t*N
+    //
+    // Then the reflected point R of P through the plane can be computed using t as:
+    // R = P + 2*t*N
+
+    // Given C = P + t*N, and C lying on the plane,
+    // C*N + d = 0
+    // then
+    // C = - d/N
+    // -d/N = P + t*N
+    // 0 = d + P*N + t*N*N
+    // t = -(d + P*N) / N*N
+
+    float d = GetPlaneConstant(planeNormal, pointOnThePlane);
+    float3 N = planeNormal;
+    float t = -(d + dot(P, N)) / dot(N, N);
+
+    return P + 2 * t * N;
+}
+
+float3 ReflectFrontPointThroughPlane(
+    in float3 p,
+    in float3 mirrorSurfacePoint,
+    in float3 mirrorNormal)
+{
+    if (!IsPointOnTheNormalSideOfPlane(p, mirrorNormal, mirrorSurfacePoint))
+    {
+        return FLT_MAX;
+    }
+
+    return ReflectPointThroughPlane(p, mirrorNormal, mirrorSurfacePoint);
+}
+
+float3 GetWorldHitPositionInPreviousFrame(
+    in float3 prevHitWorldPosition, // PrevFrameHitPosition,
+    in uint BLASInstanceIndex,      // blas Instance Index
+    in BuiltInTriangleIntersectionAttributes attr,
+    out float3x4 _BLASTransform)
+{
+    // Transform the hit object position to world space.
+    _BLASTransform = _PrevFrameBottomLevelASInstanceTransform[BLASInstanceIndex];
+    return mul(float4(prevHitWorldPosition, 1), _BLASTransform);
+}
+
+float2 CalculateMotionVector(
+    in float3 hitPosition,
+    out float _depth,
+    in uint2 DTid)
+{
+    // Variables prefixed with underscore _ denote values in the previous frame.
+    float3 hitViewPosition = hitPosition - _PrevFrameEyePosition;
+    float3 cameraDirection = GenerateForwardCameraRayDirection(_PrevFrameInvViewProjMatrix);
+    _depth = dot(hitViewPosition, cameraDirection);
+
+    // Calculate screen space position of the hit in the previous frame.
+    float4 _clipSpacePosition = mul(float4(hitViewPosition, 1),_PrevFrameViewProjMatrix);
+    float2 _texturePosition = ClipSpaceToTexturePosition(_clipSpacePosition);
+
+    float2 xy = DispatchRaysIndex().xy + 0.5f;   // Center in the middle of the pixel.
+    float2 texturePosition = xy / DispatchRaysDimensions().xy;
+
+    return texturePosition - _texturePosition;
 }
 
 // Light Func
@@ -555,6 +702,13 @@ float3 ShootDirectRay(
 
     DirectRayPayload payload;
     payload.Color = float3(0.0f,0.0f,0.0f);
+    payload.Hit = 0.0f;
+    payload.HitPosition = float3(0,0,0);
+    payload.Normal = float2(0,0);
+    payload.PrevHitPosition = float3(0,0,0);
+    payload.PrevNormal = float2(0,0);
+
+
     TraceRay(
         _SceneAS,
         RAY_FLAG_NONE,
@@ -564,6 +718,7 @@ float3 ShootDirectRay(
         RAY_TYPE_DIRECT,
         ray,
         payload);
+        
     return payload.Color;
 }
 
@@ -717,48 +872,6 @@ float3 GGXDirect(SURFACE_OUTPUT input)
     float shadow = ShootShadowRay();
     return Lo * shadow + material.Emissive;
 };
-float3 LambertDirect(SURFACE_OUTPUT input)
-{
-    float3 posW = HitWorldPosition();
-    float3 Lo = float3(0.0f,0.0f,0.0f);
-	float3 N = normalize(input.normal);
-	float3 V = normalize(_EyePosition - posW);
-
-
-    Material material;
-    material.Albedo = input.albedo;
-    material.Roughness = input.roughness;
-    material.Metallic = input.metallic;
-    material.Emissive = input.emissive;
-    material.WorldPosition = posW;
-
-    float4 posH = mul(_InvViewProjMatrix, float4(posW, 1.0f));
-
-	uint   clusterIndex = GetClusterIndex(posH.xyz);
-	LightGrid lgrid  = _LightGridList[clusterIndex];
-
-	// Calc PointLight
-	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
-	{
-		int pl_start  = lgrid.PL_Offset;
-		int pl_end    = pl_start + lgrid.PL_Count;
-		for(int i = pl_start; i<pl_end; i++)
-		{
-			int lightIndex = _VisibleLightIndices[i];
-    
-			PointLight pl = _PointLightList[lightIndex];
-			Lo += CalcPointLight_Lambert(N, V, material, pl);
-		}
-	}
-
-    float shadow = ShootShadowRay();
-    return Lo * shadow + material.Emissive;
-}
-
-
-
-
-
 
 
 [shader("closesthit")]
@@ -771,3 +884,4 @@ void ShadowMiss(inout ShadowRayPayload payload : SV_RayPayload)
 {
     payload.Factor = 1.0f;
 }
+

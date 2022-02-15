@@ -95,11 +95,16 @@ ImportAssetType
 				String outputPath = args[2];
 
 				TextureAssetImportSettings importSettings;
-
+				AssetHelper::GetResourcePath(srcPath, &srcPath, nullptr);
 				AssetHelper::GetResourcePath(outputPath, &outputPath, nullptr);
 				importSettings.AssetPath  = srcPath;
 				importSettings.OutputPath = outputPath;
 				importSettings.Flags = ETextureAssetImportFlags::None;
+
+				if (fs::exists(srcPath) == false)
+				{
+					JG_LOG_ERROR(">> not exist file : {0}", srcPath);
+				}
 
 				
 				JG_LOG_TRACE(">> Import Texture {0} -> {1}", srcPath, outputPath);

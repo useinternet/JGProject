@@ -1,5 +1,6 @@
 StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
-StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
+StructuredBuffer<Vertex> Prev_Local_VertexBuffer   : register(t1, space1);
+StructuredBuffer<uint>   Local_IndexBuffer    : register(t2, space1);
 
 
 __PS_SURFACE_RESOURCES_SCRIPT__
@@ -29,6 +30,12 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 {
 	uint startIndex = PrimitiveIndex() * 3;
     const uint3 indices = { Local_IndexBuffer[startIndex], Local_IndexBuffer[startIndex + 1], Local_IndexBuffer[startIndex + 2] };
+
+    float3 prev_vertices[3] = {
+        Prev_Local_VertexBuffer[indices[0]].Position,
+        Prev_Local_VertexBuffer[indices[1]].Position,
+        Prev_Local_VertexBuffer[indices[2]].Position };
+   float3 prevHitPosition = HitAttribute(prev_vertices, attribute);
     Vertex vertices[3] = {
         Local_VertexBuffer[indices[0]],
         Local_VertexBuffer[indices[1]],
@@ -36,6 +43,7 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 
     Vertex v = HitAttribute(vertices, attribute);
 
+  
 
 	SURFACE_INPUT input;
 	input.position       = HitWorldPosition();
@@ -49,6 +57,17 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 
 	if(output.shadingmodel == SHADING_MODEL_DEFAULT_LIT)
 	{
+    	payload.Hit           = RayTCurrent();
+    	payload.HitPosition   = HitWorldPosition();;
+    	payload.Normal 		  = normalize(output.normal);
+
+    	//float3x4 _blasTransform;
+    	//payload.PrevHitPosition = GetWorldHitPositionInPreviousFrame(
+        //	prevHitPosition, 
+        //	InstanceIndex(), 
+        //	attr, 
+        //	_blasTransform);
+		//payload.PrevNormal = normalize(mul((float3x3)_blasTransform, objectNormal));
 		payload.Color = GGXDirect(output);
 	}
 	else

@@ -4,6 +4,10 @@
 
 namespace JG
 {
+	namespace Graphics
+	{
+		class RenderPassData;
+	}
 	class ITopLevelAccelerationStructure;
 	class IRayTracingShaderResourceTable;
 	class IBottomLevelAccelerationStructure;
@@ -40,17 +44,48 @@ namespace JG
 				const JMatrix& transform, u64 insID, u64 hitGroupIndex)
 				: SubMesh(subMesh), Material(m), Transform(transform), InstanceID(insID), HitGroupIndex(hitGroupIndex) {}
 		};
+		struct CB
+		{
+			JMatrix ProjMatrix;
+			JMatrix ViewMatrix;
+			JMatrix ViewProjMatrix;
+			JMatrix InvViewMatrix;
+			JMatrix InvProjMatrix;
+			JMatrix InvViewProjMatrix;
+			JMatrix PrevFrameViewProjMatrix;
+			JMatrix PrevFrameInvViewProjMatrix;
+
+
+			JVector2 Resolution;
+			f32 NearZ;
+			f32 FarZ;
+
+			JVector3 EyePosition;
+			u32 PointLightCount;
+
+			JVector2 ClusterSize;
+			f32 ClusterScale;
+			f32 ClusterBias;
+
+			JVector3Uint NumClusterSlice;
+			u32 FrameCount;
+			u32 MaxRayDepth;
+
+			JVector3 PrevFrameEyePosition;
+
+			void Begin(const Graphics::RenderPassData& passData);
+			void End();
+		};
+
 		enum EResource
 		{
 			Direct,
 			Indirect,
 			Result,
-			Shadow,
 			MotionVector,
 			ReprojectedNormalDepth,
 			NormalDepth,
 			Depth,
-			AoSurfaceAlbedo,
 			Count,
 		};
 	private:
@@ -75,11 +110,8 @@ namespace JG
 		u64 mHitGroupStride  = 3;
 
 
-
-
-
-
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
+		CB mCB;
 	public:
 		RayTracer(Renderer* renderer);
 		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform);

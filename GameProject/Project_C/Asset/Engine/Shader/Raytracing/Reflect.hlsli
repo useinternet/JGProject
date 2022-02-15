@@ -46,8 +46,10 @@ void RayGeneration()
 cbuffer _DefaultCB__ : register(b0, space1)
 { }
 StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
-StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
-Texture2D Null_Texture : register(t2, space1);
+StructuredBuffer<Vertex> Prev_Local_VertexBuffer   : register(t1, space1);
+StructuredBuffer<uint>   Local_IndexBuffer    : register(t2, space1);
+Texture2D Null_Texture : register(t3, space1);
+
 // Default Hit Shader
 [shader("closesthit")]
 void DirectClosestHit(inout DirectRayPayload payload, BuiltInTriangleIntersectionAttributes attribute)
@@ -69,6 +71,8 @@ void IndirectClosestHit(inout IndirectRayPayload payload, BuiltInTriangleInterse
 {
     payload.Color = float3(0.0f,0.0f,0.0f);
 }
+
+
 // Default Miss Shader
 [shader("miss")]
 void DirectMiss(inout DirectRayPayload payload : SV_RayPayload)

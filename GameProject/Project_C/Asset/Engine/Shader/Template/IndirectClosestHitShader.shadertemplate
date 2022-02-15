@@ -1,6 +1,6 @@
 StructuredBuffer<Vertex> Local_VertexBuffer   : register(t0, space1);
-StructuredBuffer<uint>   Local_IndexBuffer    : register(t1, space1);
-
+StructuredBuffer<Vertex> Prev_Local_VertexBuffer   : register(t1, space1);
+StructuredBuffer<uint>   Local_IndexBuffer    : register(t2, space1);
 
 __PS_SURFACE_RESOURCES_SCRIPT__
 __PS_SURFACE_VARIABLES_SCRIPT__
@@ -35,11 +35,13 @@ void __ClosestHit_EntryPoint__(inout IndirectRayPayload payload, BuiltInTriangle
         Local_VertexBuffer[indices[2]] };
 
     Vertex v = HitAttribute(vertices, attribute);	
+
+
 	SURFACE_INPUT input;
 	input.position       = HitWorldPosition();
 	input.local_position = HitObjectPosition();
-	input.normal         = normalize(v.Normal);
-	input.tangent        = normalize(v.Tangent);
+	input.normal         = normalize(v.Normal); 
+	input.tangent        = normalize(v.Tangent); 
 	input.bitangent      = normalize(v.Bitangent);
 	input.tex            = v.Texcoord;
 	SURFACE_OUTPUT output = SURFACE_FUNCTION(input);
@@ -48,7 +50,7 @@ void __ClosestHit_EntryPoint__(inout IndirectRayPayload payload, BuiltInTriangle
 	{
 		if(payload.RayDepth < _MaxRayDepth)
 		{
-			float3 N = normalize(v.Normal);
+			float3 N = normalize(output.normal);
 			float3 V = normalize(_EyePosition - input.position);
 			payload.Color += GGXIndirect(
 				payload.RndSeed, 
@@ -58,7 +60,7 @@ void __ClosestHit_EntryPoint__(inout IndirectRayPayload payload, BuiltInTriangle
 		}
 		else
 		{
-			payload.Color += LambertDirect(output);
+			payload.Color += GGXDirect(output);
 		}
 	}
 	else

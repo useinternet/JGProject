@@ -22,6 +22,7 @@ namespace JG
 		u64 scratchSize  = 0;
 		u64 resultSize   = 0;
 		u64 instanceSize = 0;
+		
 		auto dx12Context = static_cast<DirectX12ComputeContext*>(context.get());
 
 
@@ -69,6 +70,18 @@ namespace JG
 			return;
 		}
 		mTopASGen.Generate(dx12Context->Get(), mScratch.Get(), mResult.Get(), mInstance.Get(), onlyUpdate, (onlyUpdate == false) ? nullptr : mResult.Get());
+
+
+		const auto& instances = mTopASGen.GetInstances();
+		u64 prevInstanceSize = instances.size() * sizeof(f32[3][4]);
+		// mPrevInstance -> StructuredBuffer cpu에서도 수정할수있도록 수정
+		for (auto& instance : instances)
+		{
+
+		}
+
+
+
 	}
 
 	void DirectX12TopLevelAccelerationStructure::Reset()

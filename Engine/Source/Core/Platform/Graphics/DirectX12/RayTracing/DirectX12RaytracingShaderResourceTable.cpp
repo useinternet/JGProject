@@ -248,6 +248,13 @@ namespace JG
 				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect(dx12VBuffer->GetSRV());
 				gpuHandles.push_back(gpuHandle);
 			}
+			// Prev VertexBuffer
+			if (info.Argument.GetVertexBuffer() != nullptr)
+			{
+				DirectX12VertexBuffer* dx12VBuffer = static_cast<DirectX12VertexBuffer*>(info.Argument.GetVertexBuffer().get());
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect(dx12VBuffer->GetSRV());
+				gpuHandles.push_back(gpuHandle);
+			}
 			if (info.Argument.GetIndexBuffer() != nullptr)
 			{
 				DirectX12IndexBuffer* dx12IBuffer = static_cast<DirectX12IndexBuffer*>(info.Argument.GetIndexBuffer().get());

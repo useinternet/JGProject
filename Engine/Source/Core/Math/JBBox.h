@@ -20,8 +20,6 @@ namespace JG
 			float MinT = FLT_MAX;
 			float MaxS = -FLT_MAX;
 			JVector3 center = Center();
-			// ray dir;
-
 			for (int i = 0; i < 3; ++i)
 			{
 				if (std::abs(ray.dir.At(i)) <= ERROR_RANGE)
@@ -46,8 +44,6 @@ namespace JG
 						return false;
 				}
 			}
-
-
 			return true;
 		}
 		JVector3 Center() const {

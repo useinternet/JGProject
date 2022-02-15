@@ -15,6 +15,38 @@
 
 namespace JG
 {
+	void RayTracer::CB::Begin(const Graphics::RenderPassData& passData)
+	{
+		ProjMatrix = passData.ProjMatrix;
+		ViewMatrix = passData.ViewMatrix;
+		ViewProjMatrix = passData.ViewProjMatrix;
+		InvViewMatrix = passData.InvViewMatrix;
+		InvProjMatrix = passData.InvProjMatrix;
+		InvViewProjMatrix = passData.InvViewProjMatrix;
+		Resolution = passData.Resolution;
+		NearZ = passData.NearZ;
+		FarZ = passData.FarZ;
+
+		EyePosition = passData.EyePosition;
+		PointLightCount = passData.PointLightCount;
+
+		ClusterSize = passData.ClusterSize;
+		ClusterScale = passData.ClusterScale;
+		ClusterBias = passData.ClusterBias;
+
+		NumClusterSlice = passData.NumClusterSlice;
+		FrameCount = passData.FrameCount;
+
+
+	}
+
+	void RayTracer::CB::End()
+	{
+		PrevFrameEyePosition	   = EyePosition;
+		PrevFrameViewProjMatrix    = ViewProjMatrix;
+		PrevFrameInvViewProjMatrix = InvViewProjMatrix;
+	}
+
 	RayTracer::RayTracer(Renderer* renderer) : mRenderer(renderer)
 	{
 		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false)
@@ -85,7 +117,7 @@ namespace JG
 	void RayTracer::Init()
 	{
 		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
-		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 10, mRenderer->GetRenderParamManager());		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
+		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 5, mRenderer->GetRenderParamManager());		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
 		mDirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr, mRenderer->GetRenderParamManager());
 		mIndirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Indirect", nullptr, mRenderer->GetRenderParamManager());
 		mShadowTex = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr, mRenderer->GetRenderParamManager());
@@ -106,6 +138,16 @@ namespace JG
 		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
 		GraphicsHelper::InitRenderTextures(texInfo, "IndirectOutput", &mResources[EResource::Indirect]);
 		GraphicsHelper::InitRenderTextures(texInfo, "ResultOutput", &mResources[EResource::Result]);
+		GraphicsHelper::InitRenderTextures(texInfo, "NormalDepthOutput", &mResources[EResource::NormalDepth]);
+		GraphicsHelper::InitRenderTextures(texInfo, "ReprojectedNormalDepth", &mResources[EResource::ReprojectedNormalDepth]);
+
+		texInfo.Format = ETextureFormat::R16G16_Float;
+		GraphicsHelper::InitRenderTextures(texInfo, "MotionVectorOutput", &mResources[EResource::MotionVector]);
+
+
+		texInfo.Format = ETextureFormat::R16_Float;
+		GraphicsHelper::InitRenderTextures(texInfo, "DepthOutput", &mResources[EResource::Depth]);
+
 	}
 
 	void RayTracer::UpdateAccelerationStructure(SharedPtr<IComputeContext> context)
@@ -175,16 +217,10 @@ namespace JG
 		context->BindRootSignature(pipeline->GetGlobalRootSignature());
 
 
-		struct CB
-		{
-			Graphics::RenderPassData PassData;
-			u32 MaxRayDepth;
-		};
-		CB CB;
-		CB.PassData    = mRenderer->GetPassData();
-		CB.MaxRayDepth = mRayBounds.GetValue();
+		mCB.Begin(mRenderer->GetPassData());
+		mCB.MaxRayDepth = mRayBounds.GetValue();
 		// CB Bind
-		context->BindConstantBuffer(0, CB);
+		context->BindConstantBuffer(0, mCB);
 
 		// SceneAS
 		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
@@ -193,7 +229,11 @@ namespace JG
 		context->BindTextures(2, {
 			GetResource(EResource::Direct), 
 			GetResource(EResource::Indirect),
-			GetResource(EResource::Result) });
+			GetResource(EResource::Result),
+			GetResource(EResource::MotionVector),
+			GetResource(EResource::ReprojectedNormalDepth),
+			GetResource(EResource::NormalDepth),
+			GetResource(EResource::Depth)});
 		
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
@@ -209,6 +249,8 @@ namespace JG
 		mResultTex.SetValue(GetResource(EResource::Result));
 		mDirectTex.SetValue(GetResource(EResource::Direct));
 		mIndirectTex.SetValue(GetResource(EResource::Indirect));
+
+		mCB.End();
 	}
 
 	SharedPtr<ITexture> RayTracer::GetResource(EResource type)
@@ -232,11 +274,11 @@ namespace JG
 		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
 		creater->AddCBV(0, 0, 0);
 		creater->AddSRV(1, 0, 0);
-		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 3, 0, 0);
+		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 6, 0, 0);
 		creater->AddSRV(3, 1, 0);
 		creater->AddSRV(4, 2, 0);
 		creater->AddSRV(5, 3, 0);
-
+		creater->AddSRV(6, 4, 0);
 
 		creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
 		creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
@@ -255,6 +297,8 @@ namespace JG
 		creater->AddDescriptorTable(1, EDescriptorTableRangeType::SRV, 1024, 0, 1);
 		return creater->Generate(true);
 	}
+
+
 
 }
 

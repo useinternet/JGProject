@@ -433,6 +433,11 @@ namespace JG
 		commandList->UAVBarrier(resultBuffer, true);
 	}
 
+	const List<TopLevelASGenerator::Instance>& TopLevelASGenerator::GetInstances() const
+	{
+		return mInstances;
+	}
+
 
 
 	u32 RayTracingShaderBindingTableGenerator::CopyShaderData(ID3D12StateObjectProperties* raytracingPipeline, u8* outputData, const std::vector<SBTEntry>& shaders, u32 entrySize)

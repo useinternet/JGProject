@@ -98,7 +98,7 @@ namespace JG
 
 	class TopLevelASGenerator
 	{
-	private:
+	public:
 		struct Instance
 		{
 			Instance(ID3D12Resource* blAS, const JMatrix& tr, u32 iID, u32 hgId) :
@@ -109,6 +109,7 @@ namespace JG
 			u32 InstanceID;
 			u32 HitGroupIndex;
 		};
+	private:
 		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS mFlags;
 		List<Instance> mInstances;
 
@@ -121,6 +122,7 @@ namespace JG
 		void Generate(
 			CommandList* commandList, ID3D12Resource* scratchBuffer, ID3D12Resource* resultBuffer,  ID3D12Resource* descriptorsBuffer,					  
 			bool updateOnly = false, ID3D12Resource* previousResult = nullptr);
+		const List<TopLevelASGenerator::Instance>& GetInstances() const;
 	};
 
 	class RayTracingShaderBindingTableGenerator

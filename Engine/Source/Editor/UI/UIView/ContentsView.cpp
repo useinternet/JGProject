@@ -1136,7 +1136,7 @@ namespace JG
 			for (auto& dir : mSelectedFilesInDirPanel)
 			{
 				String resourcePath;
-				AssetHelper::GetResourcePath(dir, &resourcePath, nullptr);
+				AssetHelper::GetResourcePath(dir, nullptr, &resourcePath);
 				copyStr += resourcePath + " ";
 			}
 		}
@@ -1145,7 +1145,7 @@ namespace JG
 			for (auto& file : mSelectedFilesInFilePanel)
 			{
 				String resourcePath;
-				AssetHelper::GetResourcePath(file, &resourcePath, nullptr);
+				AssetHelper::GetResourcePath(file, nullptr, &resourcePath);
 				copyStr += resourcePath + " ";
 			}
 		}

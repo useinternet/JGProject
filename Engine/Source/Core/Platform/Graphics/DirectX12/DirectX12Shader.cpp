@@ -204,7 +204,7 @@ namespace JG
 	{
 		mScriptCodeAnalyzer = CreateUniquePtr< ShaderScriptCodeAnalyzer>(
 			0, 1,
-			2, 1);
+			3, 1);
 		String Name   = StringHelper::ReplaceAll(GetName(), "/", "_");
 		mHitGroupName = Name + "_HitGroup";
 		mEntryPoint   = Name + "_ClosestHit";
