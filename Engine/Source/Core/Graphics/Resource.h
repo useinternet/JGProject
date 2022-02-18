@@ -76,13 +76,19 @@ namespace JG
 		virtual ~IStructuredBuffer() = default;
 	public:
 		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr) = 0;
+		virtual void SetDataByIndex(u64 index, void* data) const = 0;
 	public:
 		virtual u64      GetDataSize()     const = 0;
 		virtual u64      GetElementCount() const = 0;
 		virtual u64		 GetElementSize()  const = 0;
 		virtual BufferID GetBufferID()     const = 0;
+		virtual void*    GetDataPtr() const = 0;
+
+	protected:
+		virtual void SetBufferLoadMethod(EBufferLoadMethod type) = 0;
+		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 	public:
-		static SharedPtr<IStructuredBuffer> Create(const String& name, u64 elementSize, u64 elementCount);
+		static SharedPtr<IStructuredBuffer> Create(const String& name, u64 elementSize, u64 elementCount, EBufferLoadMethod method);
 	};
 
 	class IReadBackBuffer : public IResource

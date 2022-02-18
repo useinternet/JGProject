@@ -11,6 +11,7 @@ namespace JG
 	class ITopLevelAccelerationStructure;
 	class IRayTracingShaderResourceTable;
 	class IBottomLevelAccelerationStructure;
+	class CalculatePartialDerivatives;
 	class IRayTracingPipeline;
 	class IComputeContext;
 	class ISubMesh;
@@ -20,7 +21,7 @@ namespace JG
 	class ITexture;
 	class IRootSignature;
 	class Renderer;
-
+	class RTAO;
 	
 	
 
@@ -82,10 +83,12 @@ namespace JG
 			Direct,
 			Indirect,
 			Result,
+			HitPosition,
 			MotionVector,
 			ReprojectedNormalDepth,
 			NormalDepth,
 			Depth,
+			PartialDepthDerivatives,
 			Count,
 		};
 	private:
@@ -99,17 +102,16 @@ namespace JG
 		Renderer* mRenderer = nullptr;
 		JVector2 mResolution;
 
-		RP_Global_Tex mResultTex;
-		RP_Global_Tex mShadowTex;
-		RP_Global_Tex mIndirectTex;
-		RP_Global_Tex mDirectTex;
 
+		RP_Global_Tex mTex[EResource::Count];
 		RP_Global_Int mRayBounds;
 
 		u64 mHitGroupOffset  = 0;
 		u64 mHitGroupStride  = 3;
 
 
+		SharedPtr<CalculatePartialDerivatives> mCalculatePartialDerivatives;
+		SharedPtr<RTAO> mRTAO;
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
 		CB mCB;
 	public:
@@ -123,6 +125,7 @@ namespace JG
 		void InitTextures();
 		void UpdateAccelerationStructure(SharedPtr<IComputeContext> context);
 		void Update(SharedPtr<IComputeContext> context);
+	
 		SharedPtr<ITexture> GetResource(EResource type);
 	public:
 		static const String& GetDefaultRayTracingPipelineName();

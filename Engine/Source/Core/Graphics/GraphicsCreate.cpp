@@ -54,12 +54,12 @@ namespace JG
 		return api->CreateByteAddressBuffer(name, elementCount);
 	}
 
-	SharedPtr<IStructuredBuffer> IStructuredBuffer::Create(const String& name, u64 elementSize, u64 elementCount)
+	SharedPtr<IStructuredBuffer> IStructuredBuffer::Create(const String& name, u64 elementSize, u64 elementCount, EBufferLoadMethod method)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateStrucuredBuffer(name, elementSize, elementCount);
+		return api->CreateStrucuredBuffer(name, elementSize, elementCount, method);
 	}
 	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name)
 	{

@@ -1,5 +1,11 @@
 
 #define JG_PI 3.141592
+#define FLT_EPSILON     1.192092896e-07 
+#define FLT_MIN         1.175494351e-38 
+#define FLT_MAX         3.402823466e+38 
+#define FLT_10BIT_MIN   6.1e-5
+#define FLT_10BIT_MAX   6.5e4
+
 
 #define SHADING_MODEL_DEFAULT_LIT 0
 #define SHADING_MODEL_SKYBOX      1
@@ -137,3 +143,26 @@ float3 RGBLimitedToFull10bit( float3 x )
 {
     return saturate((x - 64.0 / 1023.0) * 1023.0 / 876.0);
 }
+
+
+uint GetIndexOfValueClosestToTheReference(in float refValue, in float2 vValues)
+{
+    float2 delta = abs(refValue - vValues);
+
+    uint outIndex = delta[1] < delta[0] ? 1 : 0;
+
+    return outIndex;
+}
+
+uint GetIndexOfValueClosestToTheReference(in float refValue, in float4 vValues)
+{
+    float4 delta = abs(refValue - vValues);
+
+    uint outIndex = delta[1] < delta[0] ? 1 : 0;
+    outIndex = delta[2] < delta[outIndex] ? 2 : outIndex;
+    outIndex = delta[3] < delta[outIndex] ? 3 : outIndex;
+
+    return outIndex;
+}
+
+

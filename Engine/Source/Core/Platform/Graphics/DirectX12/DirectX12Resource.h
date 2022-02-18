@@ -133,11 +133,15 @@ namespace JG
 	public:
 		virtual bool IsValid() const override;
 		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr) override;
+		virtual void SetDataByIndex(u64 index, void* data) const override;
 		virtual u64 GetDataSize() const override;
 		virtual u64 GetElementCount() const override;
 		virtual u64 GetElementSize() const override;
-		virtual BufferID GetBufferID() const override;
+		virtual void* GetDataPtr() const override;
 
+		virtual BufferID GetBufferID() const override;
+		virtual void SetBufferLoadMethod(EBufferLoadMethod method) override;
+		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
 		ID3D12Resource* Get() const;
 	private:
 		void Reset();

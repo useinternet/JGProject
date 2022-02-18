@@ -16,7 +16,7 @@ namespace JG
 		rootSigCreater->AddUAV(1, 0, 0);
 
 		mRootSignature = rootSigCreater->Generate();
-		mClusterSB = IStructuredBuffer::Create("ClusterSB", sizeof(Cluster), NUM_CLUSTER);
+		mClusterSB = IStructuredBuffer::Create("ClusterSB", sizeof(Cluster), NUM_CLUSTER, EBufferLoadMethod::GPULoad);
 	}
 	void PreRenderProcess_ComputeCluster::Ready(const ReadyData& data)
 	{

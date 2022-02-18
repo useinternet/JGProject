@@ -93,7 +93,7 @@ namespace JG
 		mRayEntrySize = GetEntrySize(mRayGenLocalRootArgInfos);
 
 
-		mRayGenSectionSize = mRayEntrySize * (mRayGenLocalRootArgInfos.size() + 1);
+		mRayGenSectionSize = mRayEntrySize * (mRayGenLocalRootArgInfos.size());
 		if (mRayGenSRT == nullptr || mRayGenSectionSize >= mRayGenSRTSize)
 		{
 			if (mRayGenSRT != nullptr)
@@ -107,7 +107,7 @@ namespace JG
 				"RayGenSRT_Buffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(mRayGenSRTSize),
+				&CD3DX12_RESOURCE_DESC::Buffer(mRayGenSRTSize * 2),
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 
@@ -140,7 +140,7 @@ namespace JG
 	{
 		// Create SRT Resource
 		mMissEntrySize = GetEntrySize(mMissLocalRootArgInfos);
-		mMissSectionSize = mMissEntrySize * (mMissLocalRootArgInfos.size() + 1);
+		mMissSectionSize = mMissEntrySize * (mMissLocalRootArgInfos.size());
 		if (mMissSRT == nullptr || mMissSectionSize >= mMissSRTSize)
 		{
 			if (mMissSRT != nullptr)
@@ -154,7 +154,7 @@ namespace JG
 				"MissSRT_Buffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(mMissSRTSize),
+				&CD3DX12_RESOURCE_DESC::Buffer(mMissSRTSize * 2),
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 

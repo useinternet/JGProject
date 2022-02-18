@@ -35,7 +35,15 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
         Prev_Local_VertexBuffer[indices[0]].Position,
         Prev_Local_VertexBuffer[indices[1]].Position,
         Prev_Local_VertexBuffer[indices[2]].Position };
-   float3 prevHitPosition = HitAttribute(prev_vertices, attribute);
+
+    float3 normals[3] = {
+        Local_VertexBuffer[indices[0]].Normal,
+        Local_VertexBuffer[indices[1]].Normal,
+        Local_VertexBuffer[indices[2]].Normal };
+		
+    float3 prevHitPosition = HitAttribute(prev_vertices, attribute);
+	float3 objectNormal = HitAttribute(normals, attribute);
+
     Vertex vertices[3] = {
         Local_VertexBuffer[indices[0]],
         Local_VertexBuffer[indices[1]],
@@ -61,13 +69,9 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
     	payload.HitPosition   = HitWorldPosition();;
     	payload.Normal 		  = normalize(output.normal);
 
-    	//float3x4 _blasTransform;
-    	//payload.PrevHitPosition = GetWorldHitPositionInPreviousFrame(
-        //	prevHitPosition, 
-        //	InstanceIndex(), 
-        //	attr, 
-        //	_blasTransform);
-		//payload.PrevNormal = normalize(mul((float3x3)_blasTransform, objectNormal));
+		float4x4  _blasTransform = _PrevFrameBottomLevelASInstanceTransform[InstanceIndex()];
+		payload.PrevHitPosition = mul(float4(prevHitPosition, 1.0f), _blasTransform);
+		payload.PrevNormal = normalize(mul(objectNormal, (float3x3)_blasTransform));
 		payload.Color = GGXDirect(output);
 	}
 	else

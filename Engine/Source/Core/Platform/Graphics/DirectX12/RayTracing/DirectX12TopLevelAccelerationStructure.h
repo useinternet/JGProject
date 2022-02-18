@@ -5,6 +5,7 @@
 namespace JG
 {
 	class IBottomLevelAccelerationStructure;
+
 	class DirectX12TopLevelAccelerationStructure : public ITopLevelAccelerationStructure
 	{
 
@@ -21,8 +22,10 @@ namespace JG
 		u64 mScratchSize  = 0;
 		u64 mResultSize   = 0;
 		u64 mInstanceSize = 0;
+		u64 mPrevInstanceSize = 0;
 	public:
 		virtual ~DirectX12TopLevelAccelerationStructure();
+		virtual SharedPtr<IStructuredBuffer> GetPrevFrameTransformBuffer() const override;
 		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex) override;
 		virtual void Generate(SharedPtr<IComputeContext> context, bool onlyUpdate = false,  bool allowUpdate = false) override;
 		virtual void Reset() override;

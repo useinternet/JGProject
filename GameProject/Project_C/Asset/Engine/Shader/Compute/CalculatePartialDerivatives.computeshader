@@ -1,0 +1,49 @@
+Texture2D<float> _Input : register(t0);
+RWTexture2D<float2> _Output : register(u0);
+
+
+cbuffer CB : register(b0)
+{
+    uint2 _Resolution;
+};
+
+
+[numthreads(8, 8, 1)]
+void cs_main(uint2 DTid : SV_DispatchThreadID)
+{
+    //                x
+    //        ----------------->
+    //    |    x     [top]     x
+    // y  |  [left]   DTiD   [right]
+    //    v    x    [bottom]   x
+    //
+    uint2 top = clamp(DTid.xy + uint2(0, -1), 0, _Resolution - 1);
+    uint2 bottom = clamp(DTid.xy + uint2(0, 1), 0, _Resolution - 1);
+    uint2 left = clamp(DTid.xy + uint2(-1, 0), 0, _Resolution - 1);
+    uint2 right = clamp(DTid.xy + uint2(1, 0), 0, _Resolution - 1);
+
+    float centerValue = _Input[DTid.xy];
+    float2 backwardDifferences = centerValue - float2(_Input[left], _Input[top]);
+    float2 forwardDifferences = float2(_Input[right], _Input[bottom]) - centerValue;
+
+    // Calculates partial derivatives as the min of absolute backward and forward differences. 
+
+    // Find the absolute minimum of the backward and foward differences in each axis
+    // while preserving the sign of the difference.
+    float2 ddx = float2(backwardDifferences.x, forwardDifferences.x);
+    float2 ddy = float2(backwardDifferences.y, forwardDifferences.y);
+
+    uint2 minIndex = {
+        GetIndexOfValueClosestToTheReference(0, ddx),
+        GetIndexOfValueClosestToTheReference(0, ddy)
+    };
+    float2 ddxy = float2(ddx[minIndex.x], ddy[minIndex.y]);
+
+    // Clamp ddxy to a reasonable value to avoid ddxy going over surface boundaries
+    // on thin geometry and getting background/foreground blended together on blur.
+    float maxDdxy = 1;
+    float2 _sign = sign(ddxy);
+    ddxy = _sign * min(abs(ddxy), maxDdxy);
+
+    _Output[DTid] = ddxy;
+}

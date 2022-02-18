@@ -277,6 +277,7 @@ namespace JG
 			{
 				return;
 			}
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
 			for (auto& _pair : mGlobalParamDic)
 			{
 				action(_pair.first, _pair.second);
@@ -284,10 +285,12 @@ namespace JG
 		}
 		void ForEach(const std::function<void(const String&, SharedPtr<ITexture>)>& action)
 		{
+			
 			if (action == nullptr)
 			{
 				return;
 			}
+			std::lock_guard<std::mutex> lock(mRenderParamMutex);
 			for (auto& _pair : mGlobalParamTexDic)
 			{
 				action(_pair.first, _pair.second.first);

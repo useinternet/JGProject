@@ -86,7 +86,7 @@ namespace JG
 		}
 	}
 
-	void GraphicsHelper::InitStrucutredBuffer(const String& name, u64 elementCount, u64 elementSize, List<SharedPtr<IStructuredBuffer>>* out_sb_list)
+	void GraphicsHelper::InitStrucutredBuffer(const String& name, u64 elementCount, u64 elementSize, List<SharedPtr<IStructuredBuffer>>* out_sb_list, EBufferLoadMethod method)
 	{
 		if (out_sb_list == nullptr)
 		{
@@ -101,7 +101,7 @@ namespace JG
 		i32 index = 0;
 		for (auto& sb : sb_list)
 		{
-			sb = IStructuredBuffer::Create(name + "_" + std::to_string(index), elementSize, elementCount);
+			sb = IStructuredBuffer::Create(name + "_" + std::to_string(index), elementSize, elementCount, method);
 			++index;
 		}
 	}

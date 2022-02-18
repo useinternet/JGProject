@@ -4,12 +4,15 @@
 #include "TopLevelAccelerationStructure.h"
 #include "BottomLevelAccelerationStructure.h"
 #include "RayTracingShaderResourceTable.h"
+
 #include "RayTracingPipeline.h"
+#include "RTAO.h"
 #include "Graphics/Resource.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/Compute/CalculatePartialDerivatives.h"
 #include "Graphics/Compute/FloatAccumulater.h"
 #include "Graphics/Compute/Blur.h"
 
@@ -92,7 +95,24 @@ namespace JG
 		}
 
 		UpdateAccelerationStructure(context);
-		Update(context);
+
+		static i32 testFrame = 0;
+		testFrame++;
+		if (testFrame >= 20)
+		{
+			Update(context);
+
+			for (int i = 0; i < EResource::Count; ++i)
+			{
+				mTex[i].SetValue(GetResource((EResource)i));
+			}
+
+		}
+		else
+		{
+			testFrame++;
+		}
+		
 	}
 
 	void RayTracer::Reset()
@@ -117,10 +137,25 @@ namespace JG
 	void RayTracer::Init()
 	{
 		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
-		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 5, mRenderer->GetRenderParamManager());		mResultTex = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
-		mDirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr, mRenderer->GetRenderParamManager());
-		mIndirectTex = RP_Global_Tex::Create("Renderer/Raytracing/Indirect", nullptr, mRenderer->GetRenderParamManager());
-		mShadowTex = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr, mRenderer->GetRenderParamManager());
+		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 5, mRenderer->GetRenderParamManager());	
+
+
+		mTex[EResource::Result] = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Direct] = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Indirect] = RP_Global_Tex::Create("Renderer/Raytracing/Indirect", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::MotionVector] = RP_Global_Tex::Create("Renderer/Raytracing/MotionVector", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::ReprojectedNormalDepth] = RP_Global_Tex::Create("Renderer/Raytracing/ReprojectedNormalDepth", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::NormalDepth] = RP_Global_Tex::Create("Renderer/Raytracing/NormalDepth", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Depth] = RP_Global_Tex::Create("Renderer/Raytracing/Depth", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::PartialDepthDerivatives] = RP_Global_Tex::Create("Renderer/Raytracing/PartialDepthDerivatives", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::HitPosition] = RP_Global_Tex::Create("Renderer/Raytracing/HitPosition", nullptr, mRenderer->GetRenderParamManager());
+
+
+
+		mCalculatePartialDerivatives = CreateUniquePtr<CalculatePartialDerivatives>(mRenderer);
+		mRTAO = CreateSharedPtr<RTAO>(mRenderer);
+
+
 	}
 
 	void RayTracer::InitTextures()
@@ -141,13 +176,17 @@ namespace JG
 		GraphicsHelper::InitRenderTextures(texInfo, "NormalDepthOutput", &mResources[EResource::NormalDepth]);
 		GraphicsHelper::InitRenderTextures(texInfo, "ReprojectedNormalDepth", &mResources[EResource::ReprojectedNormalDepth]);
 
+
+		texInfo.Format = ETextureFormat::R32G32B32A32_Float;
+		GraphicsHelper::InitRenderTextures(texInfo, "HitPosition", &mResources[EResource::HitPosition]);
+
 		texInfo.Format = ETextureFormat::R16G16_Float;
 		GraphicsHelper::InitRenderTextures(texInfo, "MotionVectorOutput", &mResources[EResource::MotionVector]);
-
+		GraphicsHelper::InitRenderTextures(texInfo, "PartialDepthDerivatives", &mResources[EResource::PartialDepthDerivatives]);
 
 		texInfo.Format = ETextureFormat::R16_Float;
 		GraphicsHelper::InitRenderTextures(texInfo, "DepthOutput", &mResources[EResource::Depth]);
-
+		
 	}
 
 	void RayTracer::UpdateAccelerationStructure(SharedPtr<IComputeContext> context)
@@ -233,7 +272,8 @@ namespace JG
 			GetResource(EResource::MotionVector),
 			GetResource(EResource::ReprojectedNormalDepth),
 			GetResource(EResource::NormalDepth),
-			GetResource(EResource::Depth)});
+			GetResource(EResource::Depth),
+			GetResource(EResource::HitPosition)});
 		
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
@@ -243,14 +283,39 @@ namespace JG
 		context->BindSturcturedBuffer(4, mRenderer->GetLightGrid());
 		// VisibleLightIndicies
 		context->BindSturcturedBuffer(5, mRenderer->GetVisibleLightIndicies());
+		// PrevFrameTransform
+		context->BindSturcturedBuffer(6, mSceneAS[currentIndex]->GetPrevFrameTransformBuffer());
+
+
 
 		context->DispatchRay(mResolution.x, mResolution.y, 1, pipeline, mSRT);
 
-		mResultTex.SetValue(GetResource(EResource::Result));
-		mDirectTex.SetValue(GetResource(EResource::Direct));
-		mIndirectTex.SetValue(GetResource(EResource::Indirect));
-
 		mCB.End();
+
+
+		if (mCalculatePartialDerivatives != nullptr)
+		{
+			CalculatePartialDerivatives::Input input;
+			input.Resolution = mCB.Resolution;
+			input.Input = GetResource(EResource::Depth);
+			input.Output = GetResource(EResource::PartialDepthDerivatives);
+			mCalculatePartialDerivatives->Execute(context, input);
+		}
+
+
+
+		// RTAO
+
+		RTAO::Input input;
+		input.Resolution = mResolution;
+		input.NormalDepth = GetResource(EResource::NormalDepth);
+		input.HitPosition = GetResource(EResource::HitPosition);
+		input.SceneAS = mSceneAS[currentIndex];
+		mRTAO->Execute(context, input);
+
+
+
+
 	}
 
 	SharedPtr<ITexture> RayTracer::GetResource(EResource type)
@@ -274,7 +339,7 @@ namespace JG
 		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
 		creater->AddCBV(0, 0, 0);
 		creater->AddSRV(1, 0, 0);
-		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, 6, 0, 0);
+		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, EResource::Count, 0, 0);
 		creater->AddSRV(3, 1, 0);
 		creater->AddSRV(4, 2, 0);
 		creater->AddSRV(5, 3, 0);

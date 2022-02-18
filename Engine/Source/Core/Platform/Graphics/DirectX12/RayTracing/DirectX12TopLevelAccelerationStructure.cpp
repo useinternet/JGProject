@@ -10,6 +10,11 @@ namespace JG
 		Clear();
 	}
 
+	SharedPtr<IStructuredBuffer> DirectX12TopLevelAccelerationStructure::GetPrevFrameTransformBuffer() const
+	{
+		return mPrevInstance;
+	}
+
 	void DirectX12TopLevelAccelerationStructure::AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex)
 	{
 		auto dx12BLAS = static_cast<DirectX12BottomLevelAccelerationsStructure*>(btAS.get());
@@ -73,15 +78,22 @@ namespace JG
 
 
 		const auto& instances = mTopASGen.GetInstances();
-		u64 prevInstanceSize = instances.size() * sizeof(f32[3][4]);
-		// mPrevInstance -> StructuredBuffer cpu에서도 수정할수있도록 수정
-		for (auto& instance : instances)
+		u64 prevInstanceSize = instances.size() * sizeof(JMatrix);
+
+		if (prevInstanceSize > mPrevInstanceSize)
 		{
-
+			mPrevInstanceSize = prevInstanceSize;
+			mPrevInstance = IStructuredBuffer::Create("PrevInstanceTransformStructuredBuffer", sizeof(JMatrix), instances.size(), EBufferLoadMethod::CPULoad);
 		}
-
-
-
+		if (mPrevInstance != nullptr)
+		{
+			u32 index = 0;
+			for (auto& instance : instances)
+			{
+				mPrevInstance->SetDataByIndex(index, (void*)&(instance.Transform));
+				++index;
+			}
+		}
 	}
 
 	void DirectX12TopLevelAccelerationStructure::Reset()

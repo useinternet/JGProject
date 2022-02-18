@@ -383,10 +383,11 @@ namespace JG
 		iBuffer->SetBufferLoadMethod(method);
 		return iBuffer;
 	}
-	SharedPtr<IStructuredBuffer> DirectX12API::CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount)
+	SharedPtr<IStructuredBuffer> DirectX12API::CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount, EBufferLoadMethod method)
 	{
 		auto sBuffer = CreateSharedPtr<DirectX12StructuredBuffer>();
 		sBuffer->SetName(name);
+		sBuffer->SetBufferLoadMethod(method);
 		sBuffer->SetData(elementSize, elementCount);
 		return sBuffer;
 	}

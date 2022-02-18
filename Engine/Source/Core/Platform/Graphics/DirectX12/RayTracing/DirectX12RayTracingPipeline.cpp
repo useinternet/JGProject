@@ -12,7 +12,7 @@ namespace JG
     }
 
 
-    void DirectX12RayTracingPipeline::AddLibrary(const String& shaderPath, const List<String>& symbolExports)
+    void DirectX12RayTracingPipeline::AddLibrary(const String& shaderPath, const List<String>& symbolExports, bool isIncludeGlobalLib)
     {
         if (mShaderDic.find(shaderPath) != mShaderDic.end())
         {
@@ -29,8 +29,13 @@ namespace JG
         strStream << shaderFile.rdbuf();
         std::string sShader = strStream.str();
 
-        String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
-        sShader = libCode + sShader;
+
+        if (isIncludeGlobalLib)
+        {
+            String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
+            sShader = libCode + sShader;
+        }
+
 
         ComPtr<IDxcBlob> blob = CompileShaderLibrary(shaderPath, sShader);
         if (blob == nullptr)

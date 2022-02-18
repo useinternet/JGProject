@@ -17,7 +17,7 @@ void RayGeneration()
 
 
     float3 rayOrigin = _EyePosition;
-    float3 rayDir    = mul(float4(target.xyz, 0), _InvViewMatrix);
+    float3 rayDir    = normalize(mul(float4(target.xyz, 0), _InvViewMatrix));
 
 
 
@@ -39,6 +39,8 @@ void RayGeneration()
 
     indirectColor = float3(0.15f, 0.15f, 0.2f) * indirectColor;
     _ResultOutput[launchIndex] = float4(directColor + indirectColor, 1.0f);
+
+
 }
 
 

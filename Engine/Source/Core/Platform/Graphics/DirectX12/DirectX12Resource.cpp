@@ -370,6 +370,57 @@ namespace JG
 		{
 			Reset();
 		}
+		switch (mLoadMethod)
+		{
+		case EBufferLoadMethod::GPULoad:
+		{
+			if (mD3DResource == nullptr)
+			{
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
+					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+					D3D12_RESOURCE_STATE_COMMON,
+					nullptr);
+			}
+			if (mD3DResource && initDatas)
+			{
+				auto commandList = DirectX12API::GetGraphicsCommandList();
+				commandList->CopyBuffer(mD3DResource.Get(), initDatas, elementSize, elementCount);
+			}
+		}
+		break;
+		case EBufferLoadMethod::CPULoad:
+			if (mD3DResource == nullptr)
+			{
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
+					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Buffer(btSize),
+					D3D12_RESOURCE_STATE_GENERIC_READ,
+					nullptr
+				);
+				if (mD3DResource)
+				{
+					mD3DResource->Map(0, nullptr, &mCPUData);
+				}
+			}
+			if (mCPUData != nullptr && initDatas != nullptr)
+			{
+				memcpy(mCPUData, initDatas, btSize);
+			}
+			else
+			{
+				JG_LOG_WARN("{0} Buffer CPU Data is nullptr", GetName());
+
+			}
+
+			break;
+		}
+		return true;
+
 
 		if (mD3DResource == nullptr)
 		{
@@ -382,12 +433,20 @@ namespace JG
 				nullptr);
 		}
 
-		if (mD3DResource && initDatas)
-		{
-			auto commandList = DirectX12API::GetGraphicsCommandList();
-			commandList->CopyBuffer(mD3DResource.Get(), initDatas, elementSize, elementCount);
-		}
+	
 		return IsValid();
+	}
+	void DirectX12StructuredBuffer::SetDataByIndex(u64 index, void* data) const
+	{
+		u64 dataPos = index * GetElementSize();
+		u64 dataSize = GetElementCount() * GetElementSize();
+		if (IsValid() == false || dataPos >= dataSize || GetDataPtr() == nullptr)
+		{
+			return;
+		}
+
+		u8* dataPtr = (u8*)GetDataPtr();
+		memcpy(dataPtr + dataPos, data, GetElementSize());
 	}
 	u64 DirectX12StructuredBuffer::GetDataSize() const
 	{
@@ -401,6 +460,10 @@ namespace JG
 	{
 		return mElementSize;
 	}
+	void* DirectX12StructuredBuffer::GetDataPtr() const
+	{
+		return mCPUData;
+	}
 	BufferID DirectX12StructuredBuffer::GetBufferID() const
 	{
 		if (IsValid() == true)
@@ -408,6 +471,16 @@ namespace JG
 			return mD3DResource->GetGPUVirtualAddress();
 		}
 		return 0;
+	}
+
+	void DirectX12StructuredBuffer::SetBufferLoadMethod(EBufferLoadMethod method)
+	{
+		mLoadMethod = method;
+	}
+
+	EBufferLoadMethod DirectX12StructuredBuffer::GetBufferLoadMethod() const
+	{
+		return mLoadMethod;
 	}
 
 	ID3D12Resource* DirectX12StructuredBuffer::Get() const
@@ -423,6 +496,7 @@ namespace JG
 		}
 		DirectX12API::DestroyCommittedResource(mD3DResource);
 		mD3DResource.Reset(); mD3DResource = nullptr;
+		mCPUData = nullptr;
 	}
 
 
