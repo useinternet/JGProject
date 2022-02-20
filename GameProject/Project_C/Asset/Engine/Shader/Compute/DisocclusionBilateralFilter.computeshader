@@ -1,0 +1,254 @@
+
+
+Texture2D<float> _Depth : register(t1);
+Texture2D<float> _BlurStrength: register(t2);
+RWTexture2D<float> _OutValue : register(u0);
+
+
+cbuffer CB : register(b0)
+{
+    uint2 _TextureDim;
+    uint _Step;
+};
+static const unsigned int _Radius = 1;
+static const unsigned int _Width = 1 + 2 * _Radius;
+static const float _Kernel1D[_Width] = { 0.27901, 0.44198, 0.27901 };
+static const float _Kernel[_Width][_Width] =
+{
+    { _Kernel1D[0] * _Kernel1D[0], _Kernel1D[0] * _Kernel1D[1], _Kernel1D[0] * _Kernel1D[2] },
+    { _Kernel1D[1] * _Kernel1D[0], _Kernel1D[1] * _Kernel1D[1], _Kernel1D[1] * _Kernel1D[2] },
+    { _Kernel1D[2] * _Kernel1D[0], _Kernel1D[2] * _Kernel1D[1], _Kernel1D[2] * _Kernel1D[2] },
+};
+// Group shared memory cache for the row aggregated results.
+static const uint NumValuesToLoadPerRowOrColumn =
+    8
+    + (_Width - 1);
+groupshared uint PackedValueDepthCache[NumValuesToLoadPerRowOrColumn][8];   // 16bit float value, depth.
+groupshared float FilteredResultCache[NumValuesToLoadPerRowOrColumn][8];    // 32 bit float filteredValue.
+
+
+// Find a DTID with steps in between the group threads and groups interleaved to cover all pixels.
+uint2 GetPixelIndex(in uint2 Gid, in uint2 GTid)
+{
+    uint2 GroupDim = uint2(8, 8);
+    uint2 groupBase = (Gid / _Step) * GroupDim * _Step + Gid % _Step;
+    uint2 groupThreadOffset = GTid * _Step;
+    uint2 sDTid = groupBase + groupThreadOffset;
+
+    return sDTid;
+}
+
+// Load up to 16x16 pixels and filter them horizontally.
+// The output is cached in Shared Memory and contains NumRows x 8 results.
+void FilterHorizontally(in uint2 Gid, in uint GI)
+{
+    const uint2 GroupDim = uint2(8, 8);
+
+    // Processes the thread group as row-major 4x16, where each sub group of 16 threads processes one row.
+    // Each thread loads up to 4 values, with the sub groups loading rows interleaved.
+    // Loads up to 4x16x4 == 256 input values.
+    uint2 GTid4x16_row0 = uint2(GI % 16, GI / 16);
+    int2 GroupKernelBasePixel = GetPixelIndex(Gid, 0) - int(_Radius * _Step);
+    const uint NumRowsToLoadPerThread = 4;
+    const uint Row_BaseWaveLaneIndex = (WaveGetLaneIndex() / 16) * 16;
+
+    [unroll]
+    for (uint i = 0; i < NumRowsToLoadPerThread; i++)
+    {
+        uint2 GTid4x16 = GTid4x16_row0 + uint2(0, i * 4);
+        if (GTid4x16.y >= NumValuesToLoadPerRowOrColumn)
+        {
+            break;
+        }
+
+        // Load all the contributing columns for each row.
+        int2 pixel = GroupKernelBasePixel + GTid4x16 * _Step;
+        float value = -1;
+        float depth = 0;
+
+        // The lane is out of bounds of the GroupDim + kernel, 
+        // but could be within bounds of the input texture,
+        // so don't read it from the texture.
+        // However, we need to keep it as an active lane for a below split sum.
+        if (GTid4x16.x < NumValuesToLoadPerRowOrColumn && IsWithinBounds(pixel, _TextureDim))
+        {
+            value = _OutValue[pixel];
+            depth = _Depth[pixel];
+        }
+
+        // Cache the kernel center values.
+        if (IsInRange(GTid4x16.x, _Radius, _Radius + GroupDim.x - 1))
+        {
+            PackedValueDepthCache[GTid4x16.y][GTid4x16.x - _Radius] = Float2ToHalf(float2(value, depth));
+        }
+
+        // Filter the values for the first GroupDim columns.
+        {
+            // Accumulate for the whole kernel width.
+            float weightedValueSum = 0;
+            float weightSum = 0;
+            float gaussianWeightedValueSum = 0;
+            float gaussianWeightedSum = 0;
+
+            // Since a row uses 16 lanes, but we only need to calculate the aggregate for the first half (8) lanes,
+            // split the kernel wide aggregation among the first 8 and the second 8 lanes, and then combine them.
+
+
+            // Get the lane index that has the first value for a kernel in this lane.
+            uint Row_KernelStartLaneIndex =
+                (Row_BaseWaveLaneIndex + GTid4x16.x)
+                - (GTid4x16.x < GroupDim.x
+                    ? 0
+                    : GroupDim.x);
+
+            // Get values for the kernel center.
+            uint kcLaneIndex = Row_KernelStartLaneIndex + _Radius;
+            float kcValue = WaveReadLaneAt(value, kcLaneIndex);
+            float kcDepth = WaveReadLaneAt(depth, kcLaneIndex);
+
+            // Initialize the first 8 lanes to the center cell contribution of the kernel. 
+            // This covers the remainder of 1 in FilterKernel::Width / 2 used in the loop below. 
+            if (GTid4x16.x < GroupDim.x && kcValue != -1 && kcDepth != 0)
+            {
+                float w_h = _Kernel1D[_Radius];
+                gaussianWeightedValueSum = w_h * kcValue;
+                gaussianWeightedSum = w_h;
+                weightedValueSum = gaussianWeightedValueSum;
+                weightSum = w_h;
+            }
+
+            // Second 8 lanes start just past the kernel center.
+            uint KernelCellIndexOffset =
+                GTid4x16.x < GroupDim.x
+                ? 0
+                : (_Radius + 1); // Skip over the already accumulated center cell of the kernel.
+
+
+            // For all columns in the kernel.
+            for (uint c = 0; c < _Radius; c++)
+            {
+                uint kernelCellIndex = KernelCellIndexOffset + c;
+
+                uint laneToReadFrom = Row_KernelStartLaneIndex + kernelCellIndex;
+                float cValue = WaveReadLaneAt(value, laneToReadFrom);
+                float cDepth = WaveReadLaneAt(depth, laneToReadFrom);
+
+                if (cValue != -1 && kcDepth != 0 && cDepth != 0)
+                {
+                    float w_h = _Kernel1D[kernelCellIndex];
+
+                    // Simple depth test with tolerance growing as the kernel radius increases.
+                    // Goal is to prevent values too far apart to blend together, while having 
+                    // the test being relaxed enough to get a strong blurring result.
+                    float depthThreshold = 0.05 + _Step * 0.001 * abs(int(_Radius) - c);
+                    float w_d = abs(kcDepth - cDepth) <= depthThreshold * kcDepth;
+                    float w = w_h * w_d;
+
+                    weightedValueSum += w * cValue;
+                    weightSum += w;
+                    gaussianWeightedValueSum += w_h * cValue;
+                    gaussianWeightedSum += w_h;
+                }
+            }
+
+            // Combine the sub-results.
+            uint laneToReadFrom = min(WaveGetLaneCount() - 1, Row_BaseWaveLaneIndex + GTid4x16.x + GroupDim.x);
+            weightedValueSum += WaveReadLaneAt(weightedValueSum, laneToReadFrom);
+            weightSum += WaveReadLaneAt(weightSum, laneToReadFrom);
+            gaussianWeightedValueSum += WaveReadLaneAt(gaussianWeightedValueSum, laneToReadFrom);
+            gaussianWeightedSum += WaveReadLaneAt(gaussianWeightedSum, laneToReadFrom);
+
+            // Store only the valid results, i.e. first GroupDim columns.
+            if (GTid4x16.x < GroupDim.x)
+            {
+                float gaussianFilteredValue = gaussianWeightedSum > 1e-6 ? gaussianWeightedValueSum / gaussianWeightedSum : -1;
+                float filteredValue = weightSum > 1e-6 ? weightedValueSum / weightSum : gaussianFilteredValue;
+
+                FilteredResultCache[GTid4x16.y][GTid4x16.x] = filteredValue;
+            }
+        }
+    }
+}
+
+void FilterVertically(uint2 DTid, in uint2 GTid, in float blurStrength)
+{
+    // Kernel center values.
+    float2 kcValueDepth = HalfToFloat2(PackedValueDepthCache[GTid.y + _Radius][GTid.x]);
+    float kcValue = kcValueDepth.x;
+    float kcDepth = kcValueDepth.y;
+
+    float filteredValue = kcValue;
+    if (blurStrength >= 0.01 && kcDepth != 0)
+    {
+        float weightedValueSum = 0;
+        float weightSum = 0;
+        float gaussianWeightedValueSum = 0;
+        float gaussianWeightSum = 0;
+
+        // For all rows in the kernel.
+        [unroll]
+        for (uint r = 0; r < _Width; r++)
+        {
+            uint rowID = GTid.y + r;
+
+            float2 rUnpackedValueDepth = HalfToFloat2(PackedValueDepthCache[rowID][GTid.x]);
+            float rDepth = rUnpackedValueDepth.y;
+            float rFilteredValue = FilteredResultCache[rowID][GTid.x];
+
+            if (rDepth != 0 && rFilteredValue != -1)
+            {
+                float w_h = _Kernel1D[r];
+
+                // Simple depth test with tolerance growing as the kernel radius increases.
+                // Goal is to prevent values too far apart to blend together, while having 
+                // the test being relaxed enough to get a strong blurring result.
+                float depthThreshold = 0.05 + _Step * 0.001 * abs(int(_Radius) - int(r));
+                float w_d = abs(kcDepth - rDepth) <= depthThreshold * kcDepth;
+                float w = w_h * w_d;
+
+                weightedValueSum += w * rFilteredValue;
+                weightSum += w;
+                gaussianWeightedValueSum += w_h * rFilteredValue;
+                gaussianWeightSum += w_h;
+            }
+        }
+        float gaussianFilteredValue = gaussianWeightSum > 1e-6 ? gaussianWeightedValueSum / gaussianWeightSum : -1;
+        filteredValue = weightSum > 1e-6 ? weightedValueSum / weightSum : gaussianFilteredValue;
+        filteredValue = filteredValue != -1 ? lerp(kcValue, filteredValue, blurStrength) : filteredValue;
+    }
+    _OutValue[DTid] = filteredValue;
+}
+
+
+[numthreads(8,8, 1)]
+void cs_main(uint2 Gid : SV_GroupID, uint2 GTid : SV_GroupThreadID, uint GI : SV_GroupIndex)
+{
+    uint2 sDTid = GetPixelIndex(Gid, GTid);
+    // Pass through if all pixels have 0 blur strength set.
+    float blurStrength;
+    {
+        if (GI == 0)
+            FilteredResultCache[0][0] = 0;
+        GroupMemoryBarrierWithGroupSync();
+
+        blurStrength = _BlurStrength[sDTid];
+
+        float MinBlurStrength = 0.01;
+        bool valueNeedsFiltering = blurStrength >= MinBlurStrength;
+        if (valueNeedsFiltering)
+            FilteredResultCache[0][0] = 1;
+
+        GroupMemoryBarrierWithGroupSync();
+
+        if (FilteredResultCache[0][0] == 0)
+        {
+            return;
+        }
+    }
+
+
+    FilterHorizontally(Gid, GI);
+    GroupMemoryBarrierWithGroupSync();
+
+    FilterVertically(sDTid, GTid, blurStrength);
+}

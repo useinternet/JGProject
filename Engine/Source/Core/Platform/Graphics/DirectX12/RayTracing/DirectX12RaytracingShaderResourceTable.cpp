@@ -96,18 +96,19 @@ namespace JG
 		mRayGenSectionSize = mRayEntrySize * (mRayGenLocalRootArgInfos.size());
 		if (mRayGenSRT == nullptr || mRayGenSectionSize >= mRayGenSRTSize)
 		{
+			mRayGenSRTSize = mRayGenSectionSize;
 			if (mRayGenSRT != nullptr)
 			{
 				mRayGenSRT->Unmap(0, nullptr);
 				DirectX12API::DestroyCommittedResource(mRayGenSRT);
 				mRayGenSRTSize *= 2;
 			}
-
+			
 			mRayGenSRT = DirectX12API::CreateCommittedResource(
 				"RayGenSRT_Buffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(mRayGenSRTSize * 2),
+				&CD3DX12_RESOURCE_DESC::Buffer(mRayGenSRTSize),
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 
@@ -143,6 +144,7 @@ namespace JG
 		mMissSectionSize = mMissEntrySize * (mMissLocalRootArgInfos.size());
 		if (mMissSRT == nullptr || mMissSectionSize >= mMissSRTSize)
 		{
+			mMissSRTSize = mMissSectionSize;
 			if (mMissSRT != nullptr)
 			{
 				mMissSRT->Unmap(0, nullptr);
@@ -154,7 +156,7 @@ namespace JG
 				"MissSRT_Buffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(mMissSRTSize * 2),
+				&CD3DX12_RESOURCE_DESC::Buffer(mMissSRTSize),
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 

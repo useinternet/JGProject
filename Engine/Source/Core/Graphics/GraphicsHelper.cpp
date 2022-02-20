@@ -105,4 +105,16 @@ namespace JG
 			++index;
 		}
 	}
+	u32 GraphicsHelper::NumMantissaBitsInFloatFormat(u32 FloatFormatBitLength)
+	{
+		switch (FloatFormatBitLength)
+		{
+		case 32: return 23;
+		case 16: return 10;
+		case 11: return 6;
+		case 10: return 5;
+		}
+
+		return 0;
+	}
 }

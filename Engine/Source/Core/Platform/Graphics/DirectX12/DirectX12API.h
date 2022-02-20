@@ -176,6 +176,9 @@ namespace JG
 		virtual void DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation, u32 startVertexLocation, u32 startInstanceLocation) override;
 		virtual void Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation) override;
 
+		// 상태 변경 함수
+		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
+		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) override;
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() const override;
 		virtual SharedPtr<ICopyContext>	   QueryInterfaceAsCopyContext() const override;
@@ -214,7 +217,9 @@ namespace JG
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) override;
 		virtual void Reset() override;
 
-
+		// 상태 변경 함수
+		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
+		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) override;
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const override;
 	public:
 		ComputeCommandList* Get() const {
@@ -230,6 +235,7 @@ namespace JG
 		friend DirectX12ComputeContext;
 		CommandList* mCommandList = nullptr;
 	public:
+		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) override;
 		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) override;
 	};
 

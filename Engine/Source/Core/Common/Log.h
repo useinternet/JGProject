@@ -79,9 +79,9 @@ namespace JG
 #define JG_LOG_WARN(...)     ::JG::Log::WarnLog(::JG::Log::GetLogger(), __VA_ARGS__);
 #define JG_LOG_ERROR(...)    ::JG::Log::ErrorLog(::JG::Log::GetLogger(), __VA_ARGS__);
 #elif _RELEASE
-#define JG_LOG_TRACE(...)   
-#define JG_LOG_INFO(...)     
-#define JG_LOG_WARN(...)     
-#define JG_LOG_ERROR(...)    
+#define JG_LOG_TRACE(...)    ::JG::Log::TraceLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_INFO(...)     ::JG::Log::InfoLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_WARN(...)     ::JG::Log::WarnLog(::JG::Log::GetLogger(), __VA_ARGS__);
+#define JG_LOG_ERROR(...)    ::JG::Log::ErrorLog(::JG::Log::GetLogger(), __VA_ARGS__); 
 #endif //  
  

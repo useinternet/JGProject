@@ -14,6 +14,7 @@ namespace JG
 	enum class EDepthStencilStateTemplate;
 	enum class EBlendStateTemplate;
 	enum class ERasterizerStateTemplate;
+	enum class EResourceState;
 	class InputLayout;
 	class ITexture;
 	class IVertexBuffer;
@@ -92,15 +93,12 @@ namespace JG
 		virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 
-
-		// RayTracing
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() = 0;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() = 0;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() = 0;
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);
-		
 	};
 
 
@@ -156,6 +154,10 @@ namespace JG
 		virtual void DrawIndexed(u32 indexCount, u32 instancedCount = 1, u32 startIndexLocation = 0, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 
+		// 상태 변경 함수
+		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
+		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;
+
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext>  QueryInterfaceAsComputeContext() const  = 0;
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const = 0;
@@ -201,6 +203,11 @@ namespace JG
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) = 0;
 		virtual void Reset() = 0;
 
+
+		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
+		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;
+
+
 		// 인터페이스 변경 함수
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const  = 0;
 	};
@@ -211,6 +218,7 @@ namespace JG
 	public:
 		virtual ~ICopyContext() = default;
 	public:
+		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) = 0;
 		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) = 0;
 	};
 

@@ -1,0 +1,113 @@
+
+
+Texture2D<float> _CurrentFrameValue : register(t0);
+Texture2D<float2> _CurrentFrameLocalMeanVariance : register(t1);
+Texture2D<float> _CurrentFrameRayHitDistance : register(t2);
+Texture2D<uint4> _Reprojected_Tspp_Value_SquaredMeanValue_RayHitDistance : register(t3);
+
+RWTexture2D<float> _OutValue : register(u0);
+RWTexture2D<uint> _OutTspp : register(u1);
+RWTexture2D<float> _OutSquaredMeanValue : register(u2);
+RWTexture2D<float> _OutRayHitDistance : register(u3);
+RWTexture2D<float> _OutVariance : register(u4);
+RWTexture2D<float> _OutBlurStrength: register(u5);
+
+
+cbuffer CB : register(b0)
+{
+    float _StdDevGamma; // 0.6f, 0.1f, 10.f
+    float _Clamping_minStdDevTolerance; // 0.05f, 0.f, 1.f
+    float _ClampDifferenceToTsppScale; // 4.f, 0.f, 10.f
+    float _MinSmoothingFactor;
+
+    uint _MinTsppToUseTemporalVariance; // 4, 1, 40
+    uint _BlurStrength_MaxTspp; // 12, 0, 100
+    float _BlurDecayStrength; // 1.0f, 0.1f, 32.f
+};
+
+
+[numthreads(8,8, 1)]
+void cs_main(uint2 DTid : SV_DispatchThreadID)
+{
+    uint4 encodedCachedValues = _Reprojected_Tspp_Value_SquaredMeanValue_RayHitDistance[DTid];
+    uint Tspp = encodedCachedValues.x;
+    float4 cachedValues = float4(Tspp, f16tof32(encodedCachedValues.yzw));
+
+    float value = _CurrentFrameValue[DTid];
+
+    bool isValidValue = value != -1;
+
+    float valueSquaredMean = isValidValue ? value * value : -1;
+    float rayHitDistance = -1;
+    float variance = -1;
+    
+    if (Tspp > 0)
+    {     
+        uint maxTspp = 1 / _MinSmoothingFactor;
+        Tspp = isValidValue ? min(Tspp + 1, maxTspp) : Tspp;
+
+        float cachedValue = cachedValues.y;
+
+        float2 localMeanVariance = _CurrentFrameLocalMeanVariance[DTid];
+        float localMean = localMeanVariance.x;
+        float localVariance = localMeanVariance.y;
+
+
+        float localStdDev = max(_StdDevGamma * sqrt(localVariance), _Clamping_minStdDevTolerance);
+        float nonClampedCachedValue = cachedValue;
+
+        // Clamp value to mean +/- std.dev of local neighborhood to surpress ghosting on value changing due to other occluder movements.
+        // Ref: Salvi2016, Temporal Super-Sampling
+        cachedValue = clamp(cachedValue, localMean - localStdDev, localMean + localStdDev);
+
+        // Scale down the tspp based on how strongly the cached value got clamped to give more weight to new samples.
+        float TsppScale = saturate(_ClampDifferenceToTsppScale * abs(cachedValue - nonClampedCachedValue));
+        Tspp = lerp(Tspp, 0, TsppScale);
+
+        float invTspp = 1.f / Tspp;
+        float a = max(invTspp, _MinSmoothingFactor);
+        float MaxSmoothingFactor = 1;
+        a = min(a, MaxSmoothingFactor);
+
+        // TODO: use average weighting instead of exponential for the first few samples 
+        //  to even out the weights for the noisy start instead of giving first samples much more weight than the rest.
+        //  Ref: Koskela2019, Blockwise Multi-Order Feature Regression for Real-Time Path-Tracing Reconstruction
+
+        // Value.
+        value = isValidValue ? lerp(cachedValue, value, a) : cachedValue;
+
+        // Value Squared Mean.
+        float cachedSquaredMeanValue = cachedValues.z; 
+        valueSquaredMean = isValidValue ? lerp(cachedSquaredMeanValue, valueSquaredMean, a) : cachedSquaredMeanValue;
+
+        // Variance.
+        float temporalVariance = valueSquaredMean - value * value;
+        temporalVariance = max(0, temporalVariance);    // Ensure variance doesn't go negative due to imprecision.
+        variance = Tspp >= _MinTsppToUseTemporalVariance ? temporalVariance : localVariance;
+        variance = max(0.1, variance);
+
+        // RayHitDistance.
+        rayHitDistance = isValidValue ? _CurrentFrameRayHitDistance[DTid] : 0;
+        float cachedRayHitDistance = cachedValues.w;
+        rayHitDistance = isValidValue ? lerp(cachedRayHitDistance, rayHitDistance, a) : cachedRayHitDistance;
+    }
+    else if (isValidValue)
+    {
+        Tspp = 1;
+        value = value;
+
+        rayHitDistance = _CurrentFrameRayHitDistance[DTid];
+        variance = _CurrentFrameLocalMeanVariance[DTid].y;
+        valueSquaredMean = valueSquaredMean;
+    }
+
+    float TsppRatio = min(Tspp, _BlurStrength_MaxTspp) / float(_BlurStrength_MaxTspp);
+    float blurStrength = pow(1 - TsppRatio, _BlurDecayStrength);
+
+    _OutTspp[DTid] = Tspp;
+    _OutValue[DTid] = value;
+    _OutSquaredMeanValue[DTid] = valueSquaredMean;
+    _OutRayHitDistance[DTid] = rayHitDistance;
+    _OutVariance[DTid] = variance; 
+    _OutBlurStrength[DTid] = blurStrength;
+}

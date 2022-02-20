@@ -228,6 +228,31 @@ namespace JG
 		BackupResource(src);
 	}
 
+	void CommandList::CopyTextureRegion(ID3D12Resource* dest, ID3D12Resource* src, const JRect& srcBox, D3D12_RESOURCE_STATES inDestState, D3D12_RESOURCE_STATES inSrcState)
+	{
+		TransitionBarrier(dest, D3D12_RESOURCE_STATE_COPY_DEST);
+		TransitionBarrier(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
+		FlushResourceBarrier();
+
+
+		CD3DX12_TEXTURE_COPY_LOCATION copyDest(dest, 0);
+		CD3DX12_TEXTURE_COPY_LOCATION copySrc(src, 0);
+	
+		
+
+		mD3DCommandList->CopyTextureRegion(
+			&copyDest, 0, 0, 0, &copySrc, 
+			&CD3DX12_BOX(0, 0, srcBox.Width(), srcBox.Height()));
+
+		TransitionBarrier(dest, inDestState);
+		TransitionBarrier(src, inSrcState);
+		FlushResourceBarrier();
+
+		BackupResource(dest);
+		BackupResource(src);
+
+	}
+
 
 
 	GraphicsCommandList::GraphicsCommandList(D3D12_COMMAND_LIST_TYPE d3dType) : CommandList(d3dType) 

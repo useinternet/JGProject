@@ -1,6 +1,6 @@
 
 
-Texture2D<float4>  _NormalDepthInput : register(t0, space0);
+Texture2D<uint>  _NormalDepthInput : register(t0, space0);
 Texture2D<float4> _HitPositionInput : register(t1, space0);
 StructuredBuffer<float4> _SampleSets : register(t2, space0);
 RaytracingAccelerationStructure _SceneAS : register(t3, space0);
@@ -14,7 +14,6 @@ cbuffer CB : register(b0)
     uint _NumSamplesPerSet;
     uint _NumSampleSets;
     uint _NumPixelsPerDimPerSet;
-
 
     uint2 _Resolution;
     float _SPP;  //1, 1, 1024, 1
@@ -38,12 +37,10 @@ void RayGeneration()
     float2 dims = float2(DispatchRaysDimensions().xy);
     float2 d = (((launchIndex.xy + 0.5f) / dims.xy) * 2.f - 1.f);
 
-    float4 normalDepth = _NormalDepthInput[launchIndex];
+    float3 normal;
+    float  depth;
 
-    float3 normal = normalize(normalDepth.xyz);
-    float  depth   = normalDepth.w;
-
-
+    DecodeNormalDepth( _NormalDepthInput[launchIndex], normal, depth);
 
     float ambientCoef = -1;
     float tHit = 0.0f;

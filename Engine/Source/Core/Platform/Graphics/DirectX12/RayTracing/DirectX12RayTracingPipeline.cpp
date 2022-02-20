@@ -30,11 +30,13 @@ namespace JG
         std::string sShader = strStream.str();
 
 
+        String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode();
+
         if (isIncludeGlobalLib)
         {
-            String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
-            sShader = libCode + sShader;
+            libCode += ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();
         }
+        sShader = libCode + sShader;
 
 
         ComPtr<IDxcBlob> blob = CompileShaderLibrary(shaderPath, sShader);

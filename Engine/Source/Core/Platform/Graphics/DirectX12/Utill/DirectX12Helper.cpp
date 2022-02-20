@@ -252,6 +252,70 @@ namespace JG
 		return rootSig;
 	}
 	
+
+	IDxcBlob* CompileShader(const String& filePath, const String& sourceCode, const String& entry, const String& target)
+	{
+		static IDxcCompiler* pCompiler = nullptr;
+		static IDxcLibrary* pLibrary = nullptr;
+		static IDxcIncludeHandler* dxcIncludeHandler;
+
+		HRESULT hr;
+
+		// Initialize the DXC compiler and compiler helper
+		if (!pCompiler)
+		{
+			(DxcCreateInstance(CLSID_DxcCompiler, __uuidof(IDxcCompiler), (void**)&pCompiler));
+			(DxcCreateInstance(CLSID_DxcLibrary, __uuidof(IDxcLibrary), (void**)&pLibrary));
+			(pLibrary->CreateIncludeHandler(&dxcIncludeHandler));
+		}
+
+
+		// Create blob from the string
+		IDxcBlobEncoding* pTextBlob;
+		(pLibrary->CreateBlobWithEncodingFromPinned(
+			(LPBYTE)sourceCode.c_str(), (uint32_t)sourceCode.size(), 0, &pTextBlob));
+
+		// Compile
+		IDxcOperationResult* pResult;
+		HRESULT hResult = pCompiler->Compile(pTextBlob, StringHelper::s2ws(filePath).c_str(), StringHelper::s2ws(entry).c_str(), StringHelper::s2ws(target).c_str(), nullptr, 0, nullptr, 0,
+			dxcIncludeHandler, &pResult);
+		if (pResult == nullptr)
+		{
+			JG_LOG_ERROR("{0} : Failed to get shader compiler error", filePath);
+			return nullptr;
+		}
+		else
+		{
+			// Verify the result
+			HRESULT resultCode;
+			(pResult->GetStatus(&resultCode));
+			if (FAILED(resultCode))
+			{
+				IDxcBlobEncoding* pError;
+				hr = pResult->GetErrorBuffer(&pError);
+				if (FAILED(hr))
+				{
+					JG_LOG_ERROR("{0} : Failed to get shader compiler error", filePath);
+				}
+
+				// Convert error blob to a string
+				std::vector<char> infoLog(pError->GetBufferSize() + 1);
+				memcpy(infoLog.data(), pError->GetBufferPointer(), pError->GetBufferSize());
+				infoLog[pError->GetBufferSize()] = 0;
+
+				std::string errorMsg = "Shader Compiler Error:\n";
+				errorMsg.append(infoLog.data());
+
+
+				JG_LOG_ERROR("{0} : Failed compile shader \n Error : {1}", filePath, errorMsg);
+			}
+
+			IDxcBlob* pBlob;
+			(pResult->GetResult(&pBlob));
+			return pBlob;
+		}
+		
+	}
 }
 
 

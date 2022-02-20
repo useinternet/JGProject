@@ -37,7 +37,7 @@ void RayGeneration()
     _IndirectOutput[launchIndex] = float4(indirectColor, 1.0f);
 
 
-    indirectColor = float3(0.15f, 0.15f, 0.2f) * indirectColor;
+    indirectColor = indirectColor;
     _ResultOutput[launchIndex] = float4(directColor + indirectColor, 1.0f);
 
 

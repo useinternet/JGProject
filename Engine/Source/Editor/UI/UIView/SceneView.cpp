@@ -303,7 +303,7 @@ namespace JG
 					auto imageCenter = JRect(imageMin.x, imageMin.y, imageMax.x, imageMax.y).Center();
 					InputManager::GetInstance().SetCenterPointWhenHideCursor(imageCenter);
 				}
-
+				
 				if (ImGui::IsMouseClicked(0) == true &&
 					ImGui::IsItemHovered() &&
 					ImGuizmo::IsUsing() == false)

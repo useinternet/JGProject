@@ -143,8 +143,206 @@ float3 RGBLimitedToFull10bit( float3 x )
 {
     return saturate((x - 64.0 / 1023.0) * 1023.0 / 876.0);
 }
+float length_toPow2(float2 p)
+{
+    return dot(p, p);
+}
+
+float length_toPow2(float3 p)
+{
+    return dot(p, p);
+}
+
+uint Float2ToHalf(in float2 val)
+{
+    uint result = 0;
+    result = f32tof16(val.x);
+    result |= f32tof16(val.y) << 16;
+    return result;
+}
+
+float2 HalfToFloat2(in uint val)
+{
+    float2 result;
+    result.x = f16tof32(val);
+    result.y = f16tof32(val >> 16);
+    return result;
+}
+
+uint2 EncodeMaterial16b(uint materialID, float3 diffuse)
+{
+    uint2 result;
+    result.x = materialID;
+    result.x |= f32tof16(diffuse.r) << 16;
+    result.y = Float2ToHalf(diffuse.gb);
+
+    return result;
+}
+
+bool IsWithinBounds(in int2 index, in int2 dimensions)
+{
+    return index.x >= 0 && index.y >= 0 && index.x < dimensions.x && index.y < dimensions.y;
+}
+float3 RemoveSRGB(float3 x)
+{
+	return x < 0.04045 ? x / 12.92 : pow((x + 0.055) / 1.055, 2.4);
+}
+
+float3 ApplySRGB(float3 x)
+{
+	return x < 0.0031308 ? 12.92 * x : 1.055 * pow(abs(x), 1.0 / 2.4) - 0.055;
+}
+
+uint SmallestPowerOf2GreaterThan(in uint x)
+{
+    // Set all the bits behind the most significant non-zero bit in x to 1.
+    // Essentially giving us the largest value that is smaller than the
+    // next power of 2 we're looking for.
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+
+    // Return the next power of two value.
+    return x + 1;
+}
+float FloatPrecision(in float x, in uint NumMantissaBits)
+{
+    // Find the exponent range the value is in.
+    uint nextPowerOfTwo = SmallestPowerOf2GreaterThan(x);
+    float exponentRange = nextPowerOfTwo - (nextPowerOfTwo >> 1);
+
+    float MaxMantissaValue = 1 << NumMantissaBits;
+
+    return exponentRange / MaxMantissaValue;
+}
+
+float FloatPrecisionR10(in float x)
+{
+    return FloatPrecision(x, 5);
+}
+
+float FloatPrecisionR16(in float x)
+{
+    return FloatPrecision(x, 10);
+}
+
+float FloatPrecisionR32(in float x)
+{
+    return FloatPrecision(x, 23);
+}
+float2 OctWrap(float2 v)
+{
+    return (1.0 - abs(v.yx)) * (v.xy >= 0.0 ? 1.0 : -1.0);
+}
+uint Pack_R8_FLOAT(float r)
+{
+    return clamp(round(r * 255), 0, 255);
+}
+
+float Unpack_R8_FLOAT(uint r)
+{
+    return (r & 0xFF) / 255.0;
+}
+
+// pack two 8 bit uint2 into a 16 bit uint.
+uint Pack_R8G8_to_R16_UINT(in uint r, in uint g)
+{
+    return (r & 0xff) | ((g & 0xff) << 8);
+}
+
+void Unpack_R16_to_R8G8_UINT(in uint v, out uint r, out uint g)
+{
+    r = v & 0xFF;
+    g = (v >> 8) & 0xFF;
+}
+uint Pack_R8G8B16_FLOAT(float3 rgb)
+{
+    uint r = Pack_R8_FLOAT(rgb.r);
+    uint g = Pack_R8_FLOAT(rgb.g) << 8;
+    uint b = f32tof16(rgb.b) << 16;
+    return r | g | b;
+}
+
+float3 Unpack_R8G8B16_FLOAT(uint rgb)
+{
+    float r = Unpack_R8_FLOAT(rgb);
+    float g = Unpack_R8_FLOAT(rgb >> 8);
+    float b = f16tof32(rgb >> 16);
+    return float3(r, g, b);
+}
+
+uint NormalizedFloat3ToByte3(float3 v)
+{
+    return
+        (uint(v.x * 255) << 16) +
+        (uint(v.y * 255) << 8) +
+        uint(v.z * 255);
+}
+
+float3 Byte3ToNormalizedFloat3(uint v)
+{
+    return float3(
+        (v >> 16) & 0xff,
+        (v >> 8) & 0xff,
+        v & 0xff) / 255;
+}
+float2 EncodeNormal(float3 n)
+{
+    n /= (abs(n.x) + abs(n.y) + abs(n.z));
+    n.xy = n.z >= 0.0 ? n.xy : OctWrap(n.xy);
+    n.xy = n.xy * 0.5 + 0.5;
+    return n.xy;
+}
+
+float3 DecodeNormal(float2 f)
+{
+    f = f * 2.0 - 1.0;
+
+    // https://twitter.com/Stubbesaurus/status/937994790553227264
+    float3 n = float3(f.x, f.y, 1.0 - abs(f.x) - abs(f.y));
+    float t = saturate(-n.z);
+    n.xy += n.xy >= 0.0 ? -t : t;
+    return normalize(n);
+}
+uint EncodeNormalDepth_N16D16(in float3 normal, in float depth)
+{
+    float3 encodedNormalDepth = float3(EncodeNormal(normal), depth);
+    return Pack_R8G8B16_FLOAT(encodedNormalDepth);
+}
 
 
+// Decoded 16 bit normal and 16bit depth.
+void DecodeNormalDepth_N16D16(in uint packedEncodedNormalAndDepth, out float3 normal, out float depth)
+{
+    float3 encodedNormalDepth = Unpack_R8G8B16_FLOAT(packedEncodedNormalAndDepth);
+    normal = DecodeNormal(encodedNormalDepth.xy);
+    depth = encodedNormalDepth.z;
+}
+
+uint EncodeNormalDepth(in float3 normal, in float depth)
+{
+    return EncodeNormalDepth_N16D16(normal, depth);
+}
+
+void DecodeNormalDepth(in uint encodedNormalDepth, out float3 normal, out float depth)
+{
+    DecodeNormalDepth_N16D16(encodedNormalDepth, normal, depth);
+}
+
+void DecodeNormal(in uint encodedNormalDepth, out float3 normal)
+{
+    float depthDummy;
+    DecodeNormalDepth_N16D16(encodedNormalDepth, normal, depthDummy);
+}
+
+void UnpackEncodedNormalDepth(in uint packedEncodedNormalDepth, out float2 encodedNormal, out float depth)
+{
+    float3 encodedNormalDepth = Unpack_R8G8B16_FLOAT(packedEncodedNormalDepth);
+    encodedNormal = encodedNormalDepth.xy;
+    depth = encodedNormalDepth.z;
+}
 uint GetIndexOfValueClosestToTheReference(in float refValue, in float2 vValues)
 {
     float2 delta = abs(refValue - vValues);
@@ -165,4 +363,166 @@ uint GetIndexOfValueClosestToTheReference(in float refValue, in float4 vValues)
     return outIndex;
 }
 
+// Remap partial depth derivatives at z0 from [1,1] pixel offset to a new pixel offset.
+float2 RemapDdxy(in float z0, in float2 ddxy, in float2 pixelOffset)
+{    
+    // Perspective correction for non-linear depth interpolation.
+    // Ref: https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation
+    // Given a linear depth interpolation for finding z at offset q along z0 to z1
+    //      z =  1 / (1 / z0 * (1 - q) + 1 / z1 * q)
+    // and z1 = z0 + ddxy, where z1 is at a unit pixel offset [1, 1]
+    // z can be calculated via ddxy as
+    //
+    //      z = (z0 + ddxy) / (1 + (1-q) / z0 * ddxy) 
+    float2 z = (z0 + ddxy) / (1 + ((1 - pixelOffset) / z0) * ddxy);
+    return sign(pixelOffset) * (z - z0);
+}
+float2 ApproximateProjectedSurfaceDimensionsPerPixel(in float z, in float2 ddxy, in float tan_a)
+{
+    // Surface dimensions for a surface parallel at z.
+    float2 dx = tan_a * z;
+    
+    // Using Pythagorean theorem approximate the surface dimensions given the ddxy.
+    float2 w = sqrt(dx * dx + ddxy * ddxy);
 
+    return w;
+}
+bool IsInRange(in uint val, in uint min, in float max)
+{
+    return (val >= min && val <= max);
+}
+
+bool IsInRange(in float val, in float min, in float max)
+{
+    return (val >= min && val <= max);
+}
+namespace CrossBilateral
+{
+    namespace Normal
+    {
+        struct Parameters
+        {
+            float Sigma;
+            float SigmaExponent;
+        };
+
+        // Get cross bilateral normal based weights.
+        float4 GetWeights(
+            in float3 TargetNormal,
+            in float3 SampleNormals[4],
+            in Parameters Params)
+        {
+            float4 NdotSampleN = float4(
+                dot(TargetNormal, SampleNormals[0]),
+                dot(TargetNormal, SampleNormals[1]),
+                dot(TargetNormal, SampleNormals[2]),
+                dot(TargetNormal, SampleNormals[3]));
+
+            // Apply adjustment scale to the dot product. 
+            // Values greater than 1 increase tolerance scale 
+            // for unwanted inflated normal differences,
+            // such as due to low-precision normal quantization.
+            NdotSampleN *= Params.Sigma;
+
+            float4 normalWeights = pow(saturate(NdotSampleN), Params.SigmaExponent);
+
+            return normalWeights;
+        }
+    }
+
+    // Linear depth.
+    namespace Depth
+    {
+        struct Parameters
+        {
+            float Sigma;
+            float WeightCutoff;
+            uint NumMantissaBits;
+        };
+               
+        float4 GetWeights(
+            in float TargetDepth,
+            in float2 Ddxy,
+            in float4 SampleDepths,
+            in Parameters Params)
+        {
+            float depthThreshold = dot(1, abs(Ddxy));
+            float depthFloatPrecision = FloatPrecision(TargetDepth, Params.NumMantissaBits);
+
+            float depthTolerance = Params.Sigma * depthThreshold + depthFloatPrecision;
+            float4 depthWeights = min(depthTolerance / (abs(SampleDepths - TargetDepth) + depthFloatPrecision), 1);
+            depthWeights *= depthWeights >= Params.WeightCutoff;
+
+            return depthWeights;
+        }
+
+        float4 GetWeights(
+            in float TargetDepth,
+            in float2 Ddxy,
+            in float4 SampleDepths,
+            in float2 SampleOffset, // offset in-between the samples to remap ddxy for.
+            in Parameters Params)
+        {
+            float2 remappedDdxy = RemapDdxy(TargetDepth, Ddxy, SampleOffset);
+            return GetWeights(TargetDepth, remappedDdxy, SampleDepths, Params);
+        }
+    }
+
+    namespace Bilinear
+    {
+        // TargetOffset - offset from the top left ([0,0]) sample of the quad samples.
+        float4 GetWeights(in float2 TargetOffset)
+        {
+            float4 bilinearWeights =
+                float4(
+                    (1 - TargetOffset.x) * (1 - TargetOffset.y),
+                    TargetOffset.x * (1 - TargetOffset.y),
+                    (1 - TargetOffset.x) * TargetOffset.y,
+                    TargetOffset.x * TargetOffset.y);
+
+            return bilinearWeights;
+        }
+    }
+
+    namespace BilinearDepthNormal
+    {
+        struct Parameters
+        {
+            Normal::Parameters Normal;
+            Depth::Parameters Depth;
+        };
+
+        float4 GetWeights(
+            in float TargetDepth,
+            in float3 TargetNormal,
+            in float2 TargetOffset,
+            in float2 Ddxy,
+            in float4 SampleDepths,
+            in float3 SampleNormals[4],
+            in float2 SamplesOffset,
+            Parameters Params)
+        {
+            float4 bilinearWeights = Bilinear::GetWeights(TargetOffset);
+            float4 depthWeights = Depth::GetWeights(TargetDepth, Ddxy, SampleDepths, SamplesOffset, Params.Depth);
+            float4 normalWeights = Normal::GetWeights(TargetNormal, SampleNormals, Params.Normal);
+
+            return bilinearWeights * depthWeights * normalWeights;
+        }
+
+        float4 GetWeights(
+            in float TargetDepth,
+            in float3 TargetNormal,
+            in float2 TargetOffset,
+            in float2 Ddxy,
+            in float4 SampleDepths,
+            in float3 SampleNormals[4],
+            Parameters Params)
+        {
+            float4 bilinearWeights = Bilinear::GetWeights(TargetOffset);
+            float4 depthWeights = Depth::GetWeights(TargetDepth, Ddxy, SampleDepths, Params.Depth);
+            float4 normalWeights = Normal::GetWeights(TargetNormal, SampleNormals, Params.Normal);
+
+            return bilinearWeights * depthWeights * normalWeights;
+        }
+    }
+}

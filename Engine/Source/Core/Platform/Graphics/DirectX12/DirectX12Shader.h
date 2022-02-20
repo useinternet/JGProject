@@ -73,7 +73,7 @@ namespace JG
 	class DirectX12ComputeShader : public IComputeShader
 	{
 	private:
-		ComPtr<ID3DBlob> mCSData;
+		ComPtr<IDxcBlob> mCSData;
 		String mName;
 		String			 mSourceCode;
 		bool			 mIsCompileSuccess = false;
@@ -84,11 +84,11 @@ namespace JG
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;
 	public:
-		ID3DBlob* GetCSData() const {
+		IDxcBlob* GetCSData() const {
 			return mCSData.Get();
 		}
 	private:
-		bool Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
+		bool Compile(ComPtr<IDxcBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
 	};
 
 

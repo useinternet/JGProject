@@ -60,6 +60,7 @@ namespace JG
 		void CopyTextrueFromMemory(ID3D12Resource* resource, const void* pixels, i32 width, i32 height, i32 channels, u64 arraySize);
 		void CopyBuffer(ID3D12Resource* buffer, const void* data, u64 elementSize, u64 elementCount);
 		void CopyBufferRegion(ID3D12Resource* dest, u64 destOffset,  ID3D12Resource* src, u64 srcOffset, u64 byteSize);
+		void CopyTextureRegion(ID3D12Resource* dest, ID3D12Resource* src, const JRect& srcBox, D3D12_RESOURCE_STATES inDestState, D3D12_RESOURCE_STATES inSrcState);
 	};
 
 	class GraphicsCommandList : public CommandList

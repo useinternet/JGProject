@@ -637,7 +637,6 @@ namespace JG
 			d3dRscFlags, D3D12_TEXTURE_LAYOUT_UNKNOWN, 0);
 
 
-
 		SharedPtr<D3D12_CLEAR_VALUE> clearValue = nullptr;
 		if (flags & ETextureFlags::Allow_RenderTarget)
 		{

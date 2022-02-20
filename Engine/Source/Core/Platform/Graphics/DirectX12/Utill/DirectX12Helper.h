@@ -61,7 +61,7 @@ namespace JG
 	ComPtr<ID3D12DescriptorHeap> CreateD3DDescriptorHeap(ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flag, u32 numDescriptor);
 	ComPtr<ID3D12RootSignature>  CreateD3DRootSignature(ComPtr<ID3D12Device> device,  CD3DX12_ROOT_SIGNATURE_DESC* DESC);
 
-
+	IDxcBlob* CompileShader(const String& filePath, const String& sourceCode, const String& entry, const String& target);
 	inline bool IsDirectXRaytracingSupported(IDXGIAdapter1* adapter)
 	{
 		ComPtr<ID3D12Device> testDevice;

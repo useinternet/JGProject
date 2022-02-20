@@ -22,14 +22,7 @@ namespace JG
 	class IRootSignature;
 	class Renderer;
 	class RTAO;
-	
-	
-
-	/// <summary>
-	/// Ray Offset
-	/// 0 : Radiance Ray
-	/// 1 : Shadow   Ray
-	/// </summary>
+	class Denoiser;
 	class RayTracer
 	{
 	private:
@@ -104,6 +97,9 @@ namespace JG
 
 
 		RP_Global_Tex mTex[EResource::Count];
+		RP_Global_Tex mAOTex;
+
+
 		RP_Global_Int mRayBounds;
 
 		u64 mHitGroupOffset  = 0;
@@ -111,7 +107,8 @@ namespace JG
 
 
 		SharedPtr<CalculatePartialDerivatives> mCalculatePartialDerivatives;
-		SharedPtr<RTAO> mRTAO;
+		SharedPtr<RTAO>     mRTAO;
+		SharedPtr<Denoiser> mAODesnoiser;
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
 		CB mCB;
 	public:

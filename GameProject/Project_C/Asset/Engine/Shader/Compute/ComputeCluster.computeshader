@@ -34,10 +34,6 @@ float3 LineIntersectionToZPlane(float3 A, float3 B, float zDistance)
     return A + T * AB;
 }
 
-// SV_GroupID : dispatch 호출의 스레드 그룹들 중 현재 스레드가 속한 그룹의 3차원 식별자
-// SV_GroupThreadID : 그 스레드 그룹 안에서의 현재 스레드의 3차원 식별자
-// SV_DispatchThreadID : 전체 dispatch 안에서의 현재 스레드 식별자
-// SV_GroupIndex : 현재 스레드가 속한 스레드 그룹의 3차원 식별자를 1차원으로 직렬화한 인덱스
 [numthreads(1, 1, 1)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,

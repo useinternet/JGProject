@@ -13,6 +13,7 @@ namespace JG
     class IRayTracingPipeline;
     class IRayTracingShaderResourceTable;
     class ITopLevelAccelerationStructure;
+
 	class RTAO
 	{
     private:
@@ -128,6 +129,7 @@ namespace JG
         {
             SharedPtr<ITexture> AO;
             SharedPtr<ITexture> AORayDistance;
+            f32 MaxRayDistance;
         };
     private:
         enum EResource
@@ -158,6 +160,12 @@ namespace JG
         SharedPtr<IRootSignature> mRootSignature;
         SharedPtr<IRayTracingShaderResourceTable> mSRT;
         SharedPtr<IRayTracingPipeline> mPipeline;
+
+
+
+
+        SharedPtr<ScheduleHandle> mSamplerUpdateSH;
+        SharedPtr<ScheduleHandle> mSamplerUpdateAyncSH;
     public:
         RTAO(Renderer* renderer);
         Output Execute(SharedPtr<IComputeContext> context, const Input& input);

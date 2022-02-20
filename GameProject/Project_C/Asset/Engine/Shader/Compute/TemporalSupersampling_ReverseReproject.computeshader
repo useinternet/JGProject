@@ -1,0 +1,167 @@
+
+
+Texture2D<uint> _CurrentFrameNormalDepth : register(t0);
+Texture2D<float2> _CurrentFrameLinearDepthDerivative : register(t1);
+Texture2D<uint> _ReprojectedNormalDepth : register(t2); 
+Texture2D<float2> _TextureSpaceMotionVector : register(t3);
+Texture2D<uint> _CachedNormalDepth : register(t4);
+Texture2D<float> _CachedValue : register(t5);
+Texture2D<uint2> _CachedTspp : register(t6);
+Texture2D<float> _CachedValueSquaredMean : register(t7);
+Texture2D<float> _CachedRayHitDepth : register(t8);
+
+
+RWTexture2D<uint> _OutCachedTspp : register(u0);
+RWTexture2D<uint4> _OutReprojectedCachedValues : register(u1);
+RWTexture2D<float4> _Debug1 : register(u2);
+cbuffer CB : register(b0)
+{
+    uint2  _TextureDim;
+    float2 _InvTextureDim;
+
+    float _DepthSigma; //1.0f, 0.0f, 10.f
+    uint  _DepthNumMantissaBits;      // Number of Mantissa Bits in the floating format of the input depth resources format.
+};
+
+SamplerState ClampSampler : register(s0);
+
+float4 BilateralResampleWeights(in float TargetDepth, in float3 TargetNormal, in float4 SampleDepths, in float3 SampleNormals[4], in float2 TargetOffset, in uint2 TargetIndex, in int2 sampleIndices[4], in float2 Ddxy)
+{
+    
+    bool4 isWithinBounds = bool4(
+        IsWithinBounds(sampleIndices[0], _TextureDim),
+        IsWithinBounds(sampleIndices[1], _TextureDim),
+        IsWithinBounds(sampleIndices[2], _TextureDim),
+        IsWithinBounds(sampleIndices[3], _TextureDim));
+ 
+    CrossBilateral::BilinearDepthNormal::Parameters params;
+    params.Depth.Sigma = _DepthSigma;
+    params.Depth.WeightCutoff = 0.5;
+    params.Depth.NumMantissaBits = _DepthNumMantissaBits;
+    params.Normal.Sigma = 1.1;      // Bump the sigma a bit to add tolerance for slight geometry misalignments and/or format precision limitations.
+    params.Normal.SigmaExponent = 32; 
+
+    float4 bilinearDepthNormalWeights = CrossBilateral::BilinearDepthNormal::GetWeights(
+            TargetDepth,
+            TargetNormal,
+            TargetOffset,
+            Ddxy,
+            SampleDepths,
+            SampleNormals,
+            params);
+
+    float4 weights = isWithinBounds * bilinearDepthNormalWeights;
+
+    return weights;
+}
+
+
+[numthreads(8,8, 1)]
+void cs_main(uint2 DTid : SV_DispatchThreadID)
+{
+    float3 _normal;
+    float _depth;
+    DecodeNormalDepth(_ReprojectedNormalDepth[DTid], _normal, _depth);
+    float2 textureSpaceMotionVector = _TextureSpaceMotionVector[DTid];
+
+    if (_depth == 0 || textureSpaceMotionVector.x > 1e2f)
+    {
+        _OutCachedTspp[DTid] = 0;
+        return;
+    }
+
+    float2 texturePos = (DTid.xy + 0.5f) * _InvTextureDim;
+    float2 cacheFrameTexturePos = texturePos - textureSpaceMotionVector;
+
+    // Find the nearest integer index smaller than the texture position.
+    // The floor() ensures the that value sign is taken into consideration.
+    int2 topLeftCacheFrameIndex = floor(cacheFrameTexturePos * _TextureDim - 0.5);
+    float2 adjustedCacheFrameTexturePos = (topLeftCacheFrameIndex + 0.5) * _InvTextureDim;
+
+    float2 cachePixelOffset = cacheFrameTexturePos * _TextureDim - 0.5 - topLeftCacheFrameIndex;
+
+    const int2 srcIndexOffsets[4] = { {0, 0}, {1, 0}, {0, 1}, {1, 1} };
+
+    int2 cacheIndices[4] = {
+        topLeftCacheFrameIndex + srcIndexOffsets[0],
+        topLeftCacheFrameIndex + srcIndexOffsets[1],
+        topLeftCacheFrameIndex + srcIndexOffsets[2],
+        topLeftCacheFrameIndex + srcIndexOffsets[3] };
+
+    float3 cacheNormals[4];
+    float4 vCacheDepths = 0;
+    {
+        uint4 packedEncodedNormalDepths = _CachedNormalDepth.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+        [unroll]
+        for (int i = 0; i < 4; i++)
+        {
+            DecodeNormalDepth(packedEncodedNormalDepths[i], cacheNormals[i], vCacheDepths[i]);
+        }
+    }
+    float2 ddxy = _CurrentFrameLinearDepthDerivative[DTid];
+        
+    float4 weights;
+    weights = BilateralResampleWeights(_depth, _normal, vCacheDepths, cacheNormals, cachePixelOffset, DTid, cacheIndices, ddxy);
+    
+    // Invalidate weights for invalid values in the cache.
+    float4 vCacheValues = _CachedValue.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+    weights = vCacheValues != -1 ? weights : 0;
+    float weightSum = dot(1, weights);
+    
+    float cachedValue = -1;
+    float cachedValueSquaredMean = 0;
+    float cachedRayHitDepth = 0;
+
+    uint tspp;
+    bool areCacheValuesValid = weightSum > 1e-3f;
+    
+    if (areCacheValuesValid)
+    {
+        uint4 vCachedTspp = _CachedTspp.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+        // Enforce tspp of at least 1 for reprojection for valid values.
+        // This is because the denoiser will fill in invalid values with filtered 
+        // ones if it can. But it doesn't increase tspp.
+        vCachedTspp = max(1, vCachedTspp);
+
+
+        float4 nWeights = weights / weightSum;   // Normalize the weights.
+
+        
+        // Scale the tspp by the total weight. This is to keep the tspp low for 
+        // total contributions that have very low reprojection weight. While its preferred to get 
+        // a weighted value even for reprojections that have low weights but still
+        // satisfy consistency tests, the tspp needs to be kept small so that the Target calculated values
+        // are quickly filled in over a few frames. Otherwise, bad estimates from reprojections,
+        // such as on disocclussions of surfaces on rotation, are kept around long enough to create 
+        // visible streaks that fade away very slow.
+        // Example: rotating camera around dragon's nose up close. 
+        float TsppScale = 1; // TODO saturate(weightSum); 
+
+        float cachedTspp = TsppScale * dot(nWeights, vCachedTspp);
+        tspp = round(cachedTspp);
+        
+        if (tspp > 0)
+        {
+            float4 vCacheValues = _CachedValue.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+            cachedValue = dot(nWeights, vCacheValues);
+
+            float4 vCachedValueSquaredMean = _CachedValueSquaredMean.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+            cachedValueSquaredMean = dot(nWeights, vCachedValueSquaredMean);
+
+            float4 vCachedRayHitDepths = _CachedRayHitDepth.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
+            cachedRayHitDepth = dot(nWeights, vCachedRayHitDepths);
+        }
+   
+    }
+    else
+    {
+        // No valid values can be retrieved from the cache.
+        // TODO: try a greater cache footprint to find useful samples,
+        //   For example a 3x3 pixel cache footprint or use lower mip cache input.
+        tspp = 0;
+
+    }
+    
+    _OutCachedTspp[DTid] = tspp;
+    _OutReprojectedCachedValues[DTid] = uint4(tspp, f32tof16(float3(cachedValue, cachedValueSquaredMean, cachedRayHitDepth)));
+}

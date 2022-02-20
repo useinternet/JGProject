@@ -7,6 +7,7 @@
 
 #include "RayTracingPipeline.h"
 #include "RTAO.h"
+#include "Denoiser.h"
 #include "Graphics/Resource.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/RootSignature.h"
@@ -149,12 +150,12 @@ namespace JG
 		mTex[EResource::Depth] = RP_Global_Tex::Create("Renderer/Raytracing/Depth", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::PartialDepthDerivatives] = RP_Global_Tex::Create("Renderer/Raytracing/PartialDepthDerivatives", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::HitPosition] = RP_Global_Tex::Create("Renderer/Raytracing/HitPosition", nullptr, mRenderer->GetRenderParamManager());
-
+		mAOTex = RP_Global_Tex::Create("Renderer/Raytracing/AO", nullptr, mRenderer->GetRenderParamManager());
 
 
 		mCalculatePartialDerivatives = CreateUniquePtr<CalculatePartialDerivatives>(mRenderer);
 		mRTAO = CreateSharedPtr<RTAO>(mRenderer);
-
+		mAODesnoiser = CreateSharedPtr<Denoiser>(mRenderer);
 
 	}
 
@@ -173,6 +174,9 @@ namespace JG
 		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
 		GraphicsHelper::InitRenderTextures(texInfo, "IndirectOutput", &mResources[EResource::Indirect]);
 		GraphicsHelper::InitRenderTextures(texInfo, "ResultOutput", &mResources[EResource::Result]);
+
+		
+		texInfo.Format = ETextureFormat::R32_Uint;
 		GraphicsHelper::InitRenderTextures(texInfo, "NormalDepthOutput", &mResources[EResource::NormalDepth]);
 		GraphicsHelper::InitRenderTextures(texInfo, "ReprojectedNormalDepth", &mResources[EResource::ReprojectedNormalDepth]);
 
@@ -305,15 +309,39 @@ namespace JG
 
 
 		// RTAO
+		SharedPtr<ITexture> AOResult;
+		SharedPtr<ITexture> AOHitDistance;
+		f32 MaxAORayHitDistance = 0.0f;
+		{
+			RTAO::Input input;
+			input.Resolution = mResolution;
+			input.NormalDepth = GetResource(EResource::NormalDepth);
+			input.HitPosition = GetResource(EResource::HitPosition);
+			input.SceneAS = mSceneAS[currentIndex];
+			RTAO::Output output = mRTAO->Execute(context, input);
 
-		RTAO::Input input;
-		input.Resolution = mResolution;
-		input.NormalDepth = GetResource(EResource::NormalDepth);
-		input.HitPosition = GetResource(EResource::HitPosition);
-		input.SceneAS = mSceneAS[currentIndex];
-		mRTAO->Execute(context, input);
+			AOResult = output.AO;
+			AOHitDistance = output.AORayDistance;
+			MaxAORayHitDistance = output.MaxRayDistance;
+		}
 
 
+		// Denoise(±¸Çö Áß)
+		{
+			Denoiser::Input input;
+			input.Resolution = mResolution;
+			input.NormalDepth = GetResource(EResource::NormalDepth);
+			input.DepthDerivatives = GetResource(EResource::PartialDepthDerivatives);
+			input.ReprojectedNormalDepth = GetResource(EResource::ReprojectedNormalDepth);
+			input.MotionVector		= GetResource(EResource::MotionVector);
+			input.Value = AOResult;
+			input.RayHitDistance = AOHitDistance;
+			input.MaxRayDistance = MaxAORayHitDistance;
+			input.Depth = GetResource(EResource::Depth);
+			Denoiser::Output output = mAODesnoiser->Execute(context, input);
+			mAOTex.SetValue(output.OutValue);
+			
+		}
 
 
 	}

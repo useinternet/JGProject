@@ -64,9 +64,9 @@ struct DirectRayPayload
     float3 Color;
     float  Hit;
     float3 HitPosition;
-    float3 Normal;
+    float2 Normal;
     float3 PrevHitPosition;
-    float3 PrevNormal;
+    float2 PrevNormal;
 };
 
 struct ShadowRayPayload
@@ -85,8 +85,8 @@ RWTexture2D<float4> _IndirectOutput : register(u1, space0);
 RWTexture2D<float4> _ResultOutput : register(u2, space0);
 
 RWTexture2D<float2> _MotionVectorOutput : register(u3, space0);
-RWTexture2D<float4> _ReprojectedNormalDepthOutput : register(u4, space0);
-RWTexture2D<float4> _NormalDepthOutput : register(u5, space0);
+RWTexture2D<uint> _ReprojectedNormalDepthOutput : register(u4, space0);
+RWTexture2D<uint> _NormalDepthOutput : register(u5, space0);
 RWTexture2D<float> _DepthOutput : register(u6, space0);
 RWTexture2D<float4> _HitPositionOutput : register(u7, space0); 
 
@@ -199,28 +199,6 @@ Vertex HitAttribute(Vertex vertices[3], BuiltInTriangleIntersectionAttributes at
     return result;
 }
 
-float2 OctWrap(float2 v)
-{
-    return (1.0 - abs(v.yx)) * (v.xy >= 0.0 ? 1.0 : -1.0);
-}
-float2 EncodeNormal(float3 n)
-{
-    n /= (abs(n.x) + abs(n.y) + abs(n.z));
-    n.xy = n.z >= 0.0 ? n.xy : OctWrap(n.xy);
-    n.xy = n.xy * 0.5 + 0.5;
-    return n.xy;
-}
-
-float3 DecodeNormal(float2 f)
-{
-    f = f * 2.0 - 1.0;
-
-    // https://twitter.com/Stubbesaurus/status/937994790553227264
-    float3 n = float3(f.x, f.y, 1.0 - abs(f.x) - abs(f.y));
-    float t = saturate(-n.z);
-    n.xy += n.xy >= 0.0 ? -t : t;
-    return normalize(n);
-}
 
 /// Rand Function
 uint initRand(uint val0, uint val1, uint backoff = 16)
@@ -693,9 +671,9 @@ float3 ShootDirectRay(
     payload.Color = float3(0.0f,0.0f,0.0f);
     payload.Hit = 0.0f;
     payload.HitPosition = float3(0,0,0);
-    payload.Normal = float3(0,0, 0);
+    payload.Normal = float2(0,0);
     payload.PrevHitPosition = float3(0,0,0);
-    payload.PrevNormal = float3(0,0,0);
+    payload.PrevNormal = float2(0,0);
 
 
     TraceRay(
@@ -715,24 +693,23 @@ float3 ShootDirectRay(
     if(payload.Hit == 0.0f)
     {
         _MotionVectorOutput[launchIndex] = float2(1e3f,1e3f);
-        _ReprojectedNormalDepthOutput[launchIndex] = float4(0,0,0,0);
-        _NormalDepthOutput[launchIndex] = float4(0,0,0,0);
+        _ReprojectedNormalDepthOutput[launchIndex] = 0;
+        _NormalDepthOutput[launchIndex] = 0;
         _DepthOutput[launchIndex] = 0;
     }
     else
     {
         _MotionVectorOutput[launchIndex] = motionVector;
-        _ReprojectedNormalDepthOutput[launchIndex] = float4(payload.PrevNormal, _depth);
+        _ReprojectedNormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.PrevNormal), _depth);
 
     // Calculate linear z-depth
         float rayLength = payload.Hit;
         float3 eyeDir   = GenerateForwardCameraRayDirection(_InvViewProjMatrix);
         float linearDepth = rayLength * dot(rayDir, eyeDir);
-        _NormalDepthOutput[launchIndex] = float4(payload.Normal, linearDepth);
+
+        
+        _NormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.Normal), linearDepth);
         _DepthOutput[launchIndex] = linearDepth;
-
-
-
     }
 
 

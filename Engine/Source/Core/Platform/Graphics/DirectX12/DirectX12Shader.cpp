@@ -177,28 +177,36 @@ namespace JG
 	{
 		return mIsCompileSuccess;
 	}
-	bool DirectX12ComputeShader::Compile(ComPtr<ID3DBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error)
+	bool DirectX12ComputeShader::Compile(ComPtr<IDxcBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error)
 	{
-		ComPtr<ID3DBlob> errorData;
-		HRESULT hr = D3DCompile2(
-			sourceCode.data(),
-			sourceCode.size(),
-			nullptr,
-			nullptr,
-			nullptr,
-			config.Entry.c_str(),
-			config.Target.c_str(),
-			0, 0, 0, nullptr, 0,
-			blob.GetAddressOf(),
-			errorData.GetAddressOf());
+		blob = CompileShader(GetName(), sourceCode, config.Entry, config.Target);
 
-		if (FAILED(hr) && error != nullptr)
+		if (blob != nullptr)
 		{
-			*error = (char*)errorData->GetBufferPointer();
-			return false;
+			mIsCompileSuccess = true;
 		}
-		mIsCompileSuccess = true;
-		return true;
+		return mIsCompileSuccess;
+
+		//ComPtr<ID3DBlob> errorData;
+		//HRESULT hr = D3DCompile2(
+		//	sourceCode.data(),
+		//	sourceCode.size(),
+		//	nullptr,
+		//	nullptr,
+		//	nullptr,
+		//	config.Entry.c_str(),
+		//	config.Target.c_str(),
+		//	0, 0, 0, nullptr, 0,
+		//	blob.GetAddressOf(),
+		//	errorData.GetAddressOf());
+
+		//if (FAILED(hr) && error != nullptr)
+		//{
+		//	*error = (char*)errorData->GetBufferPointer();
+		//	return false;
+		//}
+		//mIsCompileSuccess = true;
+		//return true;
 	}
 	bool DirectX12ClosestHitShader::Init(const String& sourceCode, SharedPtr<IShaderScript> script)
 	{

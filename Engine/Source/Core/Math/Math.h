@@ -57,6 +57,26 @@ namespace JG
         {
             return A * (1 - Alpha) + B * Alpha;
         }
+        template<class T>
+        inline static T Clamp(T a, T _min, T _max)
+        {
+            return Max<T>(_min, Min<T>(_max, a));
+        }
+
+        template<class T>
+        inline static T Saturate(T a)
+        {
+            return Clamp(a, 0, 1);
+        }
+
+        template<typename T>
+        inline static T RelativeCoef(T a, T _min, T _max)
+        {
+            float _a = Clamp(a, _min, _max);
+            return (_a - _min) / (_max - _min);
+        }
+
+
 
 
         template <typename T> 
@@ -123,6 +143,9 @@ namespace JG
         {
             return value == 0 ? 0 : 1 << Log2(value);
         }
+
+
+
 	};
 
 

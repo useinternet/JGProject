@@ -211,7 +211,6 @@ namespace JG
     {
         mRenderer = renderer;
         Init();
-
     }
 
     RTAO::Output RTAO::Execute(SharedPtr<IComputeContext> context, const Input& input)
@@ -221,7 +220,9 @@ namespace JG
             mResolution = input.Resolution;
             InitTexture();
         }
-        UpdateSampler();
+
+        // Sample Update 가 끝날때까지 대기
+        while (mSamplerUpdateAyncSH->GetState() != EScheduleState::Compelete) {}
         struct CB
         {
             u32 Seed;
@@ -247,10 +248,6 @@ namespace JG
         CB.MinimumAmbientIllumination = mMinimumAmbientIllunmination.GetValue();
 
 
-
-
-
-
         context->BindRootSignature(mRootSignature);
         context->BindConstantBuffer(0, CB);
         context->BindTextures(1,
@@ -268,7 +265,6 @@ namespace JG
         context->BindSturcturedBuffer(3, mHemisphereSamples[bufferIndex]);
         context->BindAccelerationStructure(4, input.SceneAS);
         
-
         context->DispatchRay(input.Resolution.x, input.Resolution.y, 1.0F, mPipeline, mSRT);
 
         for (i32 i = 0; i < EResource::Count; ++i)
@@ -280,6 +276,7 @@ namespace JG
         RTAO::Output output;
         output.AO = GetResource(EResource::AO);
         output.AORayDistance = GetResource(EResource::AoRayDistance);
+        output.MaxRayDistance = mMaxAoRayHitTime.GetValue();
         return output;
 
     }
@@ -296,6 +293,16 @@ namespace JG
         mTex[EResource::AoRayDistance] = RP_Global_Tex::Create("Renderer/RTAO/AoRayDistance", nullptr, mRenderer->GetRenderParamManager());
         GraphicsHelper::InitStrucutredBuffer("HemisphereSamples", 1024 * 8 * 8 * mNumSampleSets, sizeof(JVector4), &mHemisphereSamples, EBufferLoadMethod::CPULoad);
 
+
+        mSamplerUpdateSH = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1,
+            SchedulePriority::BeginSystem, [&]() -> EScheduleResult
+        {
+            mSamplerUpdateAyncSH = Scheduler::GetInstance().ScheduleAsync([&]()
+            {
+                UpdateSampler();
+            });
+            return EScheduleResult::Continue;
+        });
         InitLibrary();
     }
 

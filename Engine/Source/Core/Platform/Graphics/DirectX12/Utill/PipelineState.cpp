@@ -253,7 +253,11 @@ namespace JG
 
 	void ComputePipelineState::BindRootSignature(const RootSignature& rootSig)
 	{
-		mIsDirty = mDesc.pRootSignature != rootSig.Get();
+		if (mDesc.pRootSignature != rootSig.Get())
+		{
+			mIsDirty = true;
+		}
+
 		mDesc.pRootSignature = rootSig.Get();
 	}
 

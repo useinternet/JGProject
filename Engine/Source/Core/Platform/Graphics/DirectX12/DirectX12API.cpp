@@ -93,10 +93,10 @@ namespace JG
 	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState()
 	{
 		DirectX12API* instance = GetInstance();
-		std::thread::id curr_thread_id = std::this_thread::get_id();
+
 		std::lock_guard<std::mutex> lock(instance->mGraphicsPSOMutex);
 
-
+		std::thread::id curr_thread_id = std::this_thread::get_id();
 		if (instance->mGraphicsPSOs[curr_thread_id] == nullptr)
 		{
 			instance->mGraphicsPSOs[curr_thread_id] = CreateSharedPtr<GraphicsPipelineState>();
@@ -107,9 +107,9 @@ namespace JG
 	SharedPtr<ComputePipelineState> DirectX12API::GetComputePipelineState()
 	{
 		DirectX12API* instance = GetInstance();
-		std::thread::id curr_thread_id = std::this_thread::get_id();
 		std::lock_guard<std::mutex> lock(instance->mComputePSOMutex);
 
+		std::thread::id curr_thread_id = std::this_thread::get_id();
 		if (instance->mComputePSOs[curr_thread_id] == nullptr)
 		{
 			instance->mComputePSOs[curr_thread_id] = CreateSharedPtr<ComputePipelineState>();
@@ -829,7 +829,7 @@ namespace JG
 
 			BindShader(material->GetShader());
 			BindTextures((u32)Renderer::ERootParam::Texture2D, material->GetTextureList());
-			//BindTextures((u32)Renderer::ERootParam::TextureCube, material->GetCubeTextureList());
+	
 			BindConstantBuffer((u32)Renderer::ERootParam::MaterialCB, materialCB.data(), materialCB.size());
 			DrawIndexed(subMesh->GetIndexCount(), subMesh->GetInstanceCount(), 0, 0, 0);
 		}
@@ -906,7 +906,45 @@ namespace JG
 		mCommandList->BindPipelineState(pso);
 		mCommandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}
+	void DirectX12GraphicsContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
 
+		if (textures.size() != states.size())
+		{
+			JG_LOG_ERROR("Not Match TextureCount And ResourceStateCount");
+			return;
+		}
+		u32 count = textures.size();
+
+		for (u32 i = 0; i < count; ++i)
+		{
+			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			D3D12_RESOURCE_STATES dx12State = ConvertDX12ResourceState(states[i]);
+			mCommandList->TransitionBarrier(dx12Tex->Get(), dx12State);
+		}
+
+		mCommandList->FlushResourceBarrier();
+	}
+	void DirectX12GraphicsContext::UAVBarrier(const List<SharedPtr<ITexture>>& textures)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		u32 count = textures.size();
+
+		for (u32 i = 0; i < count; ++i)
+		{
+			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			mCommandList->UAVBarrier(dx12Tex->Get());
+		}
+		mCommandList->FlushResourceBarrier();
+	}
 	// 인터페이스 변경 함수
 	SharedPtr<IComputeContext> DirectX12GraphicsContext::QueryInterfaceAsComputeContext() const
 	{
@@ -1161,9 +1199,48 @@ namespace JG
 		mBindedRootSignature = nullptr;
 		mCommandList = DirectX12API::GetComputeCommandList();
 	}
+	void DirectX12ComputeContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		if (textures.size() != states.size())
+		{
+			JG_LOG_ERROR("Not Match TextureCount And ResourceStateCount");
+			return;
+		}
+		u32 count = textures.size();
+
+		for (u32 i = 0; i < count; ++i)
+		{
+			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			D3D12_RESOURCE_STATES dx12State = ConvertDX12ResourceState(states[i]);
+			mCommandList->TransitionBarrier(dx12Tex->Get(), dx12State);
+		}
+
+		mCommandList->FlushResourceBarrier();
+	}
+	void DirectX12ComputeContext::UAVBarrier(const List<SharedPtr<ITexture>>& textures)
+	{
+		if (mCommandList == nullptr)
+		{
+			return;
+		}
+
+		u32 count = textures.size();
+
+		for (u32 i = 0; i < count; ++i)
+		{
+			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			mCommandList->UAVBarrier(dx12Tex->Get());
+		}
+		mCommandList->FlushResourceBarrier();
+	}
 	SharedPtr<ICopyContext>	   DirectX12ComputeContext::QueryInterfaceAsCopyContext() const
 	{
-		SharedPtr<DirectX12CopyContext> copyContext = SharedPtr<DirectX12CopyContext>();
+		SharedPtr<DirectX12CopyContext> copyContext = CreateSharedPtr<DirectX12CopyContext>();
 		copyContext->mCommandList = mCommandList;
 
 		return copyContext;
@@ -1173,7 +1250,21 @@ namespace JG
 
 
 
+	void DirectX12CopyContext::CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState)
+	{
+		if (mCommandList == nullptr || dest == nullptr || src == nullptr)
+		{
+			return;
+		}
 
+		DirectX12Texture* destDx12Tex = static_cast<DirectX12Texture*>(dest.get());
+		DirectX12Texture* srcDx12Tex = static_cast<DirectX12Texture*>(src.get());
+		D3D12_RESOURCE_STATES destState = ConvertDX12ResourceState(inDestState);
+		D3D12_RESOURCE_STATES srcState = ConvertDX12ResourceState(inSrcState);
+
+		mCommandList->CopyTextureRegion(destDx12Tex->Get(), srcDx12Tex->Get(), srcRect, destState, srcState);
+
+	}
 	void DirectX12CopyContext::CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount)
 	{
 		if (mCommandList == nullptr || datas == nullptr)

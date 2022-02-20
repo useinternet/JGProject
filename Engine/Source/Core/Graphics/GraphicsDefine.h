@@ -1,7 +1,7 @@
 #pragma once
 #include "JGCore.h"
 #include <dxgi1_6.h>
-
+#include <d3d12.h>
 
 
 
@@ -26,7 +26,10 @@ namespace JG
 		R11G11B10_Float,
 		R16G16B16A16_Float,
 		R32G32B32A32_Float,
+		R16G16B16A16_Uint,
 		R8_Uint,
+		R16_Uint,
+		R32_Uint,
 		R24G8_TYPELESS,
 		D24_Unorm_S8_Uint
 	};
@@ -42,10 +45,12 @@ namespace JG
 		case ETextureFormat::R8G8B8A8_Unorm:     return "R8G8B8A8_Unorm";
 		case ETextureFormat::R16G16B16A16_Unorm: return "R16G16B16A16_Unorm";
 		case ETextureFormat::R32G32B32A32_Float: return "R32G32B32A32_Float";
+		case ETextureFormat::R16G16B16A16_Uint:  return "R16G16B16A16_Uint";
 		case ETextureFormat::R8_Uint:			 return "R8_Uint";
+		case ETextureFormat::R16_Uint:			 return "R16_Uint";
+		case ETextureFormat::R32_Uint:			 return "R32_Uint";
 		case ETextureFormat::R24G8_TYPELESS:	 return "R24G8_Typeless";
 		case ETextureFormat::D24_Unorm_S8_Uint:  return "D24_Unorm_S8_Uint";
-			
 		default: return "None";
 		}
 	}
@@ -65,7 +70,10 @@ namespace JG
 		case ETextureFormat::R16G16B16A16_Unorm: return DXGI_FORMAT_R16G16B16A16_UNORM;
 		case ETextureFormat::R16G16B16A16_Float: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 		case ETextureFormat::R32G32B32A32_Float: return DXGI_FORMAT_R32G32B32A32_FLOAT; 
+		case ETextureFormat::R16G16B16A16_Uint:  return DXGI_FORMAT_R16G16B16A16_UINT;
 		case ETextureFormat::R8_Uint:			 return DXGI_FORMAT_R8_UINT;
+		case ETextureFormat::R16_Uint:			 return DXGI_FORMAT_R16_UINT;
+		case ETextureFormat::R32_Uint:			 return DXGI_FORMAT_R32_UINT;
 		case ETextureFormat::R24G8_TYPELESS:	 return DXGI_FORMAT_R24G8_TYPELESS;
 		case ETextureFormat::D24_Unorm_S8_Uint:  return	DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
@@ -74,9 +82,46 @@ namespace JG
 		}
 	}
 
+	enum class EResourceState
+	{
+		Common,
+		VertexAndConstantBuffer,
+		IndexBuffer,
+		RenderTarget,
+		UnorderedAccess,
+		DepthWrite,
+		DepthRead,
+		NonePixelShaderResource,
+		PixelShaderResource,
+		CopyDest,
+		CopySource,
+		RayTracingAccelerationStructure,
+		GenericRead,
+	};
 
+	inline D3D12_RESOURCE_STATES ConvertDX12ResourceState(EResourceState state)
+	{
+		switch (state)
+		{
+		case EResourceState::Common:					return D3D12_RESOURCE_STATE_COMMON;
+		case EResourceState::VertexAndConstantBuffer:	return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		case EResourceState::IndexBuffer:				return D3D12_RESOURCE_STATE_INDEX_BUFFER;
+		case EResourceState::RenderTarget:				return D3D12_RESOURCE_STATE_RENDER_TARGET;
+		case EResourceState::UnorderedAccess:			return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		case EResourceState::DepthWrite:				return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		case EResourceState::DepthRead:					return D3D12_RESOURCE_STATE_DEPTH_READ;
+		case EResourceState::NonePixelShaderResource:	return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		case EResourceState::PixelShaderResource:		return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		case EResourceState::CopyDest:					return D3D12_RESOURCE_STATE_COPY_DEST;
+		case EResourceState::CopySource:				return D3D12_RESOURCE_STATE_COPY_SOURCE;
+		case EResourceState::RayTracingAccelerationStructure: return D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
+		case EResourceState::GenericRead:				return D3D12_RESOURCE_STATE_GENERIC_READ;
+		default:
+			return D3D12_RESOURCE_STATE_COMMON;
 
-
+		}
+		return D3D12_RESOURCE_STATE_COMMON;
+	}
 
 
 	ENUM_FLAG(ETextureFlags)
@@ -383,7 +428,7 @@ namespace JG
 		constexpr char* HSTarget = "hs_5_1";
 		constexpr char* GSTarget = "gs_5_1";
 		constexpr char* PSTarget = "ps_5_1";
-		constexpr char* CSTarget = "cs_5_1";
+		constexpr char* CSTarget = "cs_6_0";
 
 		constexpr char* ClosestHitEntry = "__ClosestHit_EntryPoint__";
 		constexpr char* MissEntry       = "__Miss_EntryPoint__";
