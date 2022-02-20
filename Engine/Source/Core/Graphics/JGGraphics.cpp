@@ -299,7 +299,7 @@ namespace JG
 		//Pipeline
 		String shaderPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Raytracing");
 		pipeline = IRayTracingPipeline::Create();
-		pipeline->AddLibrary(PathHelper::CombinePath(shaderPath, "Reflect.hlsli"), 
+		pipeline->AddLibrary(PathHelper::CombinePath(shaderPath, "RayTracer.hlsli"), 
 			{ ShaderDefine::RayTracing::RayGen, 
 			  ShaderDefine::RayTracing::DirectNullHit,
 			  ShaderDefine::RayTracing::DirectMiss,
