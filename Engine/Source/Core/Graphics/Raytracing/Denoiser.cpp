@@ -22,7 +22,7 @@ namespace JG
 			mResolution = input.Resolution;
 			InitTexture();
 		}
-		
+
 		u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		
 		u32 temporalCachePreviousFrameResourceIndex = mTemporalCacheCurrentFrameResourceIndex;
@@ -31,6 +31,7 @@ namespace JG
 		u32 temporalCachePreviousFrameTemporalValueResourceIndex = mTemporalCacheCurrentFrameTemporalValueResourceIndex;
 		mTemporalCacheCurrentFrameTemporalValueResourceIndex = (mTemporalCacheCurrentFrameTemporalValueResourceIndex + 1) % 2;
 
+		context->ClearUAVFloat(mDebugTextures[bufferIndex]);
 		// TemporalSupersampling_ReverseReproject
 		{
 			TemporalSupersampling_ReverseReproject::Input _input;
@@ -39,7 +40,7 @@ namespace JG
 			_input.CurrentFrameDepthDerivative = input.DepthDerivatives;
 			_input.ReprojectedNormalDepth = input.ReprojectedNormalDepth;
 			_input.MotionVector = input.MotionVector;
-			_input.CachedValue = mTemporalValue[temporalCachePreviousFrameTemporalValueResourceIndex];
+			_input.CachedValue  = mTemporalValue[temporalCachePreviousFrameTemporalValueResourceIndex];
 			_input.CachedNormalDepth = mPrevFrameGBufferNormalDepth;
 			_input.CachedTspp = mTemporalCache[temporalCachePreviousFrameResourceIndex][ETemporalSuperSampling::Tspp];
 			_input.CachedValueSquareMean = mTemporalCache[temporalCachePreviousFrameResourceIndex][ETemporalSuperSampling::CoefficientSquaredMean];

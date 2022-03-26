@@ -25,7 +25,7 @@ namespace JG
 	}
 	void ContentsView::Load()
 	{
-		// Copy Paste Delete Move ÀÌÁ¤µµ¸¸ ÀÏ´Ü »ý¼º
+		// Copy Paste Delete Move ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Folder", 0, [&]() {
 			CreateFolder(GetTargetDirectory());
 		}, nullptr);
@@ -644,7 +644,7 @@ namespace JG
 			}
 			mTaskFlags &= ~Task_CloseProgressBar;
 		}
-		// º¹»ç 
+		// ï¿½ï¿½ï¿½ï¿½ 
 		if (mAsyncUpdatePaste.ThreadTaskHandle == nullptr && mTaskFlags & Task_Paste)
 		{
 			mAsyncUpdatePaste.ThreadData = CreateUniquePtr<ThreadData_UpdatePaste>();
@@ -657,7 +657,7 @@ namespace JG
 			mCopyOrMoveFileList.clear();
 			mAsyncUpdatePaste.ThreadTaskHandle = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
-				// Copy ³ª Move ½ÃÀÛ
+				// Copy ï¿½ï¿½ Move ï¿½ï¿½ï¿½ï¿½
 				std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
 				i32 taskFlags = mAsyncUpdatePaste.ThreadData->TaskFlags;
 				u64 totalCnt = mAsyncUpdatePaste.ThreadData->FileList.size();
@@ -665,7 +665,7 @@ namespace JG
 				f32 ratio    = 0.0f;
 				auto progressBar = UIManager::GetInstance().GetPopupUIView<ProgressBarModalView>();
 			
-				// ÆÄÀÏ Áßº¹ °Ë»ç
+				// ï¿½ï¿½ï¿½ï¿½ ï¿½ßºï¿½ ï¿½Ë»ï¿½
 		
 				bool isDuplicate = false;
 				HashSet<String> fileNameSet;
@@ -853,9 +853,9 @@ namespace JG
 
 
 		i32 historyCnt = (i32)mDirectoryHistory.size();
-		// ÃÖ½Å »óÅÂÀÌ¸é ±×³É
+		// ï¿½Ö½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½×³ï¿½
 		bool isLatest = (historyCnt - 1 == mHistroyIndex);
-		// ÃÖ½Å »óÅÂ°¡ ¾Æ´Ï¶ó¸é
+		// ï¿½Ö½ï¿½ ï¿½ï¿½ï¿½Â°ï¿½ ï¿½Æ´Ï¶ï¿½ï¿½
 		if (isLatest == false)
 		{
 			i32 removeIndex = mHistroyIndex + 1;
@@ -1155,7 +1155,7 @@ namespace JG
 
 	void ContentsView::Copy()
 	{
-		// CopyÀÇ °æ¿ì
+		// Copyï¿½ï¿½ ï¿½ï¿½ï¿½
 		mCopyOrMoveFileList.clear();
 		if (mSelectedFilesInDirPanel.empty() == false)
 		{

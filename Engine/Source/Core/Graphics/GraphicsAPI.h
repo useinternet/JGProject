@@ -174,6 +174,8 @@ namespace JG
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) = 0;
 		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) = 0;
+		virtual void ClearUAVUint(SharedPtr<ITexture> buffer) = 0;
+		virtual void ClearUAVFloat(SharedPtr<ITexture> buffer) = 0;
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;

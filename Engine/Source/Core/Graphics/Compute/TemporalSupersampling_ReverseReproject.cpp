@@ -57,7 +57,6 @@ namespace JG
 			{ input.OutCachedTspp, input.OutReprojectedCachedValues, input.OutDebug });
 
 		context->Dispatch2D(input.Resolution.x, input.Resolution.y);
-
 	}
 
 }

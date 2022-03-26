@@ -339,7 +339,7 @@ namespace JG
 			creater->AddDescriptorTable((u32)EComputeRootParam::UAV, EDescriptorTableRangeType::UAV, 1024, 0, 0);
 			creater->AddDescriptorTable((u32)EComputeRootParam::SRV, EDescriptorTableRangeType::SRV, 1024, 0, 0);
 			creater->AddCBV((u32)EComputeRootParam::CB0, 0, 0);
-			creater->AddSampler(0, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);
+			creater->AddSampler(0, ESamplerFilter::Linear, ETextureAddressMode::Clamp);
 			mComputeRootSignature = creater->Generate();
 		}
 

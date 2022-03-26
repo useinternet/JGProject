@@ -197,7 +197,8 @@ namespace JG
 		// Clear 함수
 		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
 		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
-
+		virtual void ClearUAVUint(SharedPtr<ITexture> buffer) override;
+		virtual void ClearUAVFloat(SharedPtr<ITexture> buffer) override;
 		// Bind 함수
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
 		virtual void BindShader(SharedPtr<IComputeShader> shader) override;

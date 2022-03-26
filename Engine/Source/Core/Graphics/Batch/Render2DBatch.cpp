@@ -15,7 +15,7 @@ namespace JG
 		inputLayout->Add(EShaderDataType::_float4, "COLOR", 0);
 		inputLayout->Add(EShaderDataType::_int, "TEXTUREINDEX", 0);
 
-		auto _2dShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::Standard2DShader); 
+		m2DShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::Standard2DShader);
 
 		TextureInfo textureInfo;
 		textureInfo.Width      = 1; textureInfo.Height = 1; 	textureInfo.MipLevel = 1; 	textureInfo.ArraySize = 1;
@@ -174,7 +174,7 @@ namespace JG
 		auto api       = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		SharedPtr<IGraphicsContext> context;
+		SharedPtr<IGraphicsContext> context = GetConnectedRenderer()->GetGraphicsContext();
 		
 
 	

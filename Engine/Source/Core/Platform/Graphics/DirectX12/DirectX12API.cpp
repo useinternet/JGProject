@@ -1005,6 +1005,28 @@ namespace JG
 
 		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
 	}
+
+	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<ITexture> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
+
+		DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(buffer.get());
+
+		mCommandList->ClearUAVFloat(dx12Tex->GetUAV(), dx12Tex->Get());
+	}
+	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<ITexture> buffer)
+	{
+		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		{
+			return;
+		}
+		DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(buffer.get());
+
+		mCommandList->ClearUAVUint(dx12Tex->GetUAV(), dx12Tex->Get());
+	}
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
 	{
 		if (rootSig == nullptr)

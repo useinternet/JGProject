@@ -59,11 +59,12 @@ float4 BilateralResampleWeights(in float TargetDepth, in float3 TargetNormal, in
 [numthreads(8,8, 1)]
 void cs_main(uint2 DTid : SV_DispatchThreadID)
 {
+     _Debug1[DTid] = float4(0.0f,0.0f, 0.0f,1.0f);
     float3 _normal;
     float _depth;
     DecodeNormalDepth(_ReprojectedNormalDepth[DTid], _normal, _depth);
     float2 textureSpaceMotionVector = _TextureSpaceMotionVector[DTid];
-
+   
     if (_depth == 0 || textureSpaceMotionVector.x > 1e2f)
     {
         _OutCachedTspp[DTid] = 0;
@@ -75,10 +76,10 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
 
     // Find the nearest integer index smaller than the texture position.
     // The floor() ensures the that value sign is taken into consideration.
-    int2 topLeftCacheFrameIndex = floor(cacheFrameTexturePos * _TextureDim - 0.5);
+    int2 topLeftCacheFrameIndex = floor(cacheFrameTexturePos * (_TextureDim - 0.5));
     float2 adjustedCacheFrameTexturePos = (topLeftCacheFrameIndex + 0.5) * _InvTextureDim;
-
-    float2 cachePixelOffset = cacheFrameTexturePos * _TextureDim - 0.5 - topLeftCacheFrameIndex;
+ 
+    float2 cachePixelOffset = cacheFrameTexturePos * (_TextureDim - 0.5) - topLeftCacheFrameIndex;
 
     const int2 srcIndexOffsets[4] = { {0, 0}, {1, 0}, {0, 1}, {1, 1} };
 
@@ -99,10 +100,10 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
         }
     }
     float2 ddxy = _CurrentFrameLinearDepthDerivative[DTid];
-        
+            
     float4 weights;
     weights = BilateralResampleWeights(_depth, _normal, vCacheDepths, cacheNormals, cachePixelOffset, DTid, cacheIndices, ddxy);
-    
+ _Debug1[DTid] = float4(cachePixelOffset, 0.0f,1.0f);
     // Invalidate weights for invalid values in the cache.
     float4 vCacheValues = _CachedValue.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
     weights = vCacheValues != -1 ? weights : 0;
@@ -114,7 +115,7 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
 
     uint tspp;
     bool areCacheValuesValid = weightSum > 1e-3f;
-    
+
     if (areCacheValuesValid)
     {
         uint4 vCachedTspp = _CachedTspp.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
@@ -161,7 +162,7 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
         tspp = 0;
 
     }
-    
+   
     _OutCachedTspp[DTid] = tspp;
     _OutReprojectedCachedValues[DTid] = uint4(tspp, f32tof16(float3(cachedValue, cachedValueSquaredMean, cachedRayHitDepth)));
 }

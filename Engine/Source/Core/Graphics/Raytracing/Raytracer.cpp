@@ -301,7 +301,7 @@ namespace JG
 		{
 			CalculatePartialDerivatives::Input input;
 			input.Resolution = mCB.Resolution;
-			input.Input = GetResource(EResource::Depth);
+			input.Input  = GetResource(EResource::Depth);
 			input.Output = GetResource(EResource::PartialDepthDerivatives);
 			mCalculatePartialDerivatives->Execute(context, input);
 		}

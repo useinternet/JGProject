@@ -413,23 +413,31 @@ float3 ReflectFrontPointThroughPlane(
 
 
 float2 CalculateMotionVector(
+    in float3 prevhitPosition,
     in float3 hitPosition,
     out float _depth,
     in uint2 DTid)
 {
     // Variables prefixed with underscore _ denote values in the previous frame.
-    float3 hitViewPosition = hitPosition - _PrevFrameEyePosition;
+    float3 hitViewPosition = prevhitPosition - _PrevFrameEyePosition;
     float3 cameraDirection = GenerateForwardCameraRayDirection(_PrevFrameInvViewProjMatrix);
     _depth = dot(hitViewPosition, cameraDirection);
 
     // Calculate screen space position of the hit in the previous frame.
-    float4 _clipSpacePosition = mul(float4(hitPosition, 1), _PrevFrameViewProjMatrix);
+    float4 _clipSpacePosition = mul(float4(prevhitPosition, 1), _PrevFrameViewProjMatrix);
     float2 _texturePosition = ClipSpaceToTexturePosition(_clipSpacePosition);
 
-    float2 xy = DispatchRaysIndex().xy + 0.5f;   // Center in the middle of the pixel.
-    float2 texturePosition = xy / DispatchRaysDimensions().xy;
 
-    return texturePosition - _texturePosition;
+    float4 clipSpacePosition = mul(float4(hitPosition, 1), _ViewProjMatrix);
+    float2 texturePosition = ClipSpaceToTexturePosition(clipSpacePosition);
+    //float2 xy = DispatchRaysIndex().xy + 0.5f;   // Center in the middle of the pixel.
+    //float2 texturePosition = xy / DispatchRaysDimensions().xy;
+
+
+    float2 motionVector = (texturePosition - _texturePosition);
+    //motionVector.x = max(motionVector.x, -0);
+    //motionVector.y = max(motionVector.y , 0);
+    return motionVector;
 }
 
 // Light Func
@@ -688,8 +696,8 @@ float3 ShootDirectRay(
 
     uint2  launchIndex = DispatchRaysIndex().xy;
     float _depth;
-    float2 motionVector = CalculateMotionVector(payload.PrevHitPosition, _depth, launchIndex);
-    _HitPositionOutput[launchIndex] = float4(payload.HitPosition,1.0f);
+
+    _HitPositionOutput[launchIndex] =float4(payload.HitPosition,1.0f);
     if(payload.Hit == 0.0f)
     {
         _MotionVectorOutput[launchIndex] = float2(1e3f,1e3f);
@@ -699,6 +707,7 @@ float3 ShootDirectRay(
     }
     else
     {
+        float2 motionVector = CalculateMotionVector(payload.PrevHitPosition,payload.HitPosition, _depth, launchIndex);
         _MotionVectorOutput[launchIndex] = motionVector;
         _ReprojectedNormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.PrevNormal), _depth);
 

@@ -154,11 +154,11 @@ namespace JG
 	protected:
 		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
 		void EndBatch();
-
+	public:
 		SharedPtr<IGraphicsContext> GetGraphicsContext() const;
 		SharedPtr<IComputeContext>  GetComputeContext() const;
 		SharedPtr<ICopyContext>		GetCopyContext() const;
-	public:
+
 		SharedPtr<IRootSignature> GetGraphicsRootSignature() const;
 		SharedPtr<IRootSignature> GetComputeRootSignature() const;
 	public:

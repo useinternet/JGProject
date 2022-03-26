@@ -134,7 +134,7 @@ namespace JG
 			}
 			mGraphcisAPI->BeginFrame();
 			Reset();
-
+				
 			// Scene Reset
 			//for (auto& _pair : mSceneDic)
 			//{
