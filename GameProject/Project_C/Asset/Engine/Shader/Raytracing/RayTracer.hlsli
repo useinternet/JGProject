@@ -18,29 +18,30 @@ void RayGeneration()
 
     float3 rayOrigin = _EyePosition;
     float3 rayDir    = normalize(mul(float4(target.xyz, 0), _InvViewMatrix));
-
-
-
-
-    // Direct Ray
-    float3 directColor = ShootDirectRay(rayOrigin, rayDir);
-
+    float3 hitPosition;
 
     HaltonState hState;
 	haltonInit(hState, launchIndex.x + 10, launchIndex.y + 10, 1, 1, _FrameCount, 1);
-    float seed = initRand(launchIndex.x + launchIndex.y * dims.x, _FrameCount, 16);
-    float3 indirectColor = ShootIndirectRay(rayOrigin, rayDir, seed, hState, -1);
+    uint indirctSeed = initRand(launchIndex.x + launchIndex.y * dims.x, _FrameCount, 16);
+    uint shadowSeed  = initRand(launchIndex.x + launchIndex.y * dims.x, _FrameCount * 2, 16);
+
+    // Direct Ray
 
 
 
-    _DirectOutput[launchIndex] = float4(directColor, 1.0f);
-    _IndirectOutput[launchIndex] = float4(indirectColor, 1.0f);
+    float3 directColor = ShootDirectRay(rayOrigin, rayDir, hitPosition);
+    float  shadow      = ShootShadowRay(shadowSeed, hitPosition);
 
 
-    indirectColor = float3(0.15f, 0.15f, 0.2f) * indirectColor;
-    _ResultOutput[launchIndex] = float4(directColor + indirectColor, 1.0f);
+
+    float3 indirectColor = ShootIndirectRay(rayOrigin, rayDir, indirctSeed, hState, -1);
 
 
+    _DirectOutput[launchIndex]        = float4(directColor, 1.0f);
+    _IndirectRedOutput[launchIndex]   = indirectColor.x;
+    _IndirectGreenOutput[launchIndex] = indirectColor.y;
+    _IndirectBlueOutput[launchIndex]  = indirectColor.z;
+    _ShadowOutput[launchIndex]        = saturate(shadow);
 }
 
 

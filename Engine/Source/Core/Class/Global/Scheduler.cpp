@@ -333,15 +333,15 @@ namespace JG
     {
         mIsRunSyncTaskAll = true;
 
+
+        u32 removeTaskCount = 0;
         for (auto& _pair : mSortedSyncTasks)
         {
             auto& taskList = _pair.second;
-            u64 cnt = _pair.second.size();
-
-            for (u64 i = 0; i < cnt; ++i)
+            auto& iter = taskList.begin();
+            for (; iter != taskList.end();)
             {
-                auto task = taskList[i].lock();
-
+                auto task = iter->lock();
                 if (task)
                 {
                     switch (task->GetScheduleType())
@@ -359,8 +359,26 @@ namespace JG
                     }
                     break;
                     }
+                    ++iter;
+                }
+                else if(removeTaskCount <= mMaxRemoveWeakPtrCount)
+                {
+                    ++removeTaskCount;
+                    iter = taskList.erase(iter);
+                }
+                else
+                {
+                    ++iter;
                 }
             }
+
+            //u64 cnt = _pair.second.size();
+            //for (u64 i = 0; i < cnt; ++i)
+            //{
+            //    auto task = taskList[i].lock();
+
+  
+            //}
         }
 
 

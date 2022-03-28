@@ -132,7 +132,6 @@ namespace JG
 		SharedPtr<IRootSignature> mGraphicsRootSignature;
 		SharedPtr<IRootSignature> mComputeRootSignature;
 
-		u64 mReadyFrame = 0;
 		u64 mFrameCount = 0;
 		SharedPtr<Graphics::RenderPassData> mPassData;
 		SharedPtr<IStructuredBuffer> mLightGrid;

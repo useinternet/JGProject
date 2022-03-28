@@ -374,8 +374,10 @@ namespace JG
 		descriptorsBuffer->Map(0, nullptr, reinterpret_cast<void**>(&instanceDescs));
 		if (!instanceDescs)
 		{
-			throw std::logic_error("Cannot map the instance descriptor buffer - is it "
+			JG_LOG_ERROR("Cannot map the instance descriptor buffer - is it "
 				"in the upload heap?");
+			descriptorsBuffer->Unmap(0, nullptr);
+			return;
 		}
 
 		auto instanceCount = static_cast<UINT>(mInstances.size());

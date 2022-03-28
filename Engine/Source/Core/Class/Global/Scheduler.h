@@ -170,6 +170,8 @@ namespace JG
 			}
 		};
 	private:
+
+
 		u64 mIDOffset = 1;
 		Queue<u64> mIDQueue;
 		std::thread::id mMainThreadID;
@@ -178,10 +180,12 @@ namespace JG
 		Dictionary<u64, SharedPtr<SyncTask>>  mSyncTaskPool;
 		SortedDictionary<i32, List<WeakPtr<SyncTask>>>  mSortedSyncTasks;
 		Queue<WeakPtr<SyncTask>> mReservedSyncTasks;
+		
 		// Thread ฐüทร
 		Queue<SharedPtr<AsyncTask>> mAsyncTaskQueue;
 		List<std::thread>			mThreads;
-		i32		   mMaxThreadCount = 0;
+		i32		   mMaxThreadCount		  = 0;
+		const u64  mMaxRemoveWeakPtrCount = 100;
 		std::mutex mMutex;
 		std::mutex mTaskMutex;
 

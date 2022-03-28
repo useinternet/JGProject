@@ -16,6 +16,7 @@
 #include "Graphics/Compute/CalculatePartialDerivatives.h"
 #include "Graphics/Compute/FloatAccumulater.h"
 #include "Graphics/Compute/Blur.h"
+#include "Graphics/Compute/RT_Composite.h"
 
 namespace JG
 {
@@ -88,7 +89,7 @@ namespace JG
 			InitTextures();
 		}
 	}
-	void RayTracer::Execute(SharedPtr<IComputeContext> context)
+	void RayTracer::Execute(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture)
 	{
 		if (JGGraphics::GetInstance().IsSupportedRayTracing() == false || mInstances.empty() == true)
 		{
@@ -96,24 +97,11 @@ namespace JG
 		}
 
 		UpdateAccelerationStructure(context);
-
-		static i32 testFrame = 0;
-		testFrame++;
-		if (testFrame >= 20)
+		Update(context, targetTexture);
+		for (int i = 0; i < EResource::Count; ++i)
 		{
-			Update(context);
-
-			for (int i = 0; i < EResource::Count; ++i)
-			{
-				mTex[i].SetValue(GetResource((EResource)i));
-			}
-
+			mTex[i].SetValue(GetResource((EResource)i));
 		}
-		else
-		{
-			testFrame++;
-		}
-		
 	}
 
 	void RayTracer::Reset()
@@ -141,21 +129,36 @@ namespace JG
 		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 5, mRenderer->GetRenderParamManager());	
 
 
-		mTex[EResource::Result] = RP_Global_Tex::Create("Renderer/Raytracing/Result", nullptr, mRenderer->GetRenderParamManager());
-		mTex[EResource::Direct] = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr, mRenderer->GetRenderParamManager());
-		mTex[EResource::Indirect] = RP_Global_Tex::Create("Renderer/Raytracing/Indirect", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Direct] = RP_Global_Tex::Create("Renderer/Raytracing/Direct", nullptr,     mRenderer->GetRenderParamManager());
+		mTex[EResource::IndirectR] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectR", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::IndirectG] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectG", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::IndirectB] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectB", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Shadow] = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr,     mRenderer->GetRenderParamManager());
 		mTex[EResource::MotionVector] = RP_Global_Tex::Create("Renderer/Raytracing/MotionVector", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::ReprojectedNormalDepth] = RP_Global_Tex::Create("Renderer/Raytracing/ReprojectedNormalDepth", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::NormalDepth] = RP_Global_Tex::Create("Renderer/Raytracing/NormalDepth", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::Depth] = RP_Global_Tex::Create("Renderer/Raytracing/Depth", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::PartialDepthDerivatives] = RP_Global_Tex::Create("Renderer/Raytracing/PartialDepthDerivatives", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::HitPosition] = RP_Global_Tex::Create("Renderer/Raytracing/HitPosition", nullptr, mRenderer->GetRenderParamManager());
-		mAOTex = RP_Global_Tex::Create("Renderer/Raytracing/AO", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::RayDistance] = RP_Global_Tex::Create("Renderer/Raytracing/RayDistance", nullptr, mRenderer->GetRenderParamManager());
+
+		mDenoisedTex[EDenoiser::Denoise_Ao] = RP_Global_Tex::Create("Renderer/Raytracing/DenoisedAO", nullptr, mRenderer->GetRenderParamManager());
+		mDenoisedTex[EDenoiser::Denoise_Shadow] = RP_Global_Tex::Create("Renderer/Raytracing/DenoisedShadow", nullptr, mRenderer->GetRenderParamManager());
+		mDenoisedTex[EDenoiser::Denoise_IndirectR] = RP_Global_Tex::Create("Renderer/Raytracing/DenoisedIndirectR", nullptr, mRenderer->GetRenderParamManager());
+		mDenoisedTex[EDenoiser::Denoise_IndirectG] = RP_Global_Tex::Create("Renderer/Raytracing/DenoisedIndirectG", nullptr, mRenderer->GetRenderParamManager());
+		mDenoisedTex[EDenoiser::Denoise_IndirectB] = RP_Global_Tex::Create("Renderer/Raytracing/DenoisedIndirectB", nullptr, mRenderer->GetRenderParamManager());
+
+
+		mDenoiser[EDenoiser::Denoise_Ao] = CreateSharedPtr<Denoiser>("AO", mRenderer);
+		mDenoiser[EDenoiser::Denoise_Shadow] = CreateSharedPtr<Denoiser>("Shadow", mRenderer);
+		mDenoiser[EDenoiser::Denoise_IndirectR] = CreateSharedPtr<Denoiser>("IndirectR", mRenderer);
+		mDenoiser[EDenoiser::Denoise_IndirectG] = CreateSharedPtr<Denoiser>("IndirectG", mRenderer);
+		mDenoiser[EDenoiser::Denoise_IndirectB] = CreateSharedPtr<Denoiser>("IndirectB", mRenderer);
 
 
 		mCalculatePartialDerivatives = CreateUniquePtr<CalculatePartialDerivatives>(mRenderer);
 		mRTAO = CreateSharedPtr<RTAO>(mRenderer);
-		mAODesnoiser = CreateSharedPtr<Denoiser>(mRenderer);
+		mComposite = CreateSharedPtr<RT_Composite>(mRenderer);
 
 	}
 
@@ -170,11 +173,15 @@ namespace JG
 		texInfo.MipLevel  = 1;
 		texInfo.ClearColor = Color();
 
-
 		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
-		GraphicsHelper::InitRenderTextures(texInfo, "IndirectOutput", &mResources[EResource::Indirect]);
-		GraphicsHelper::InitRenderTextures(texInfo, "ResultOutput", &mResources[EResource::Result]);
 
+
+		texInfo.Format = ETextureFormat::R16_Float;
+		GraphicsHelper::InitRenderTextures(texInfo, "IndirectROutput", &mResources[EResource::IndirectR]);
+		GraphicsHelper::InitRenderTextures(texInfo, "IndirectGOutput", &mResources[EResource::IndirectG]);
+		GraphicsHelper::InitRenderTextures(texInfo, "IndirectBOutput", &mResources[EResource::IndirectB]);
+		GraphicsHelper::InitRenderTextures(texInfo, "ShadowOutput", &mResources[EResource::Shadow]);
+		GraphicsHelper::InitRenderTextures(texInfo, "RayDistance", &mResources[EResource::RayDistance]);
 		
 		texInfo.Format = ETextureFormat::R32_Uint;
 		GraphicsHelper::InitRenderTextures(texInfo, "NormalDepthOutput", &mResources[EResource::NormalDepth]);
@@ -211,7 +218,7 @@ namespace JG
 		}
 		mSceneAS[currentIndex]->Generate(context);
 	}
-	void RayTracer::Update(SharedPtr<IComputeContext> context)
+	void RayTracer::Update(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture)
 	{
 		if (mSRT == nullptr)
 		{
@@ -271,13 +278,16 @@ namespace JG
 		// Result
 		context->BindTextures(2, {
 			GetResource(EResource::Direct), 
-			GetResource(EResource::Indirect),
-			GetResource(EResource::Result),
+			GetResource(EResource::IndirectR),
+			GetResource(EResource::IndirectG),
+			GetResource(EResource::IndirectB),
+			GetResource(EResource::Shadow),
 			GetResource(EResource::MotionVector),
 			GetResource(EResource::ReprojectedNormalDepth),
 			GetResource(EResource::NormalDepth),
 			GetResource(EResource::Depth),
-			GetResource(EResource::HitPosition)});
+			GetResource(EResource::HitPosition),
+			GetResource(EResource::RayDistance)});
 		
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
@@ -326,24 +336,65 @@ namespace JG
 		}
 
 
-		// Denoise(±¸Çö Áß)
+		for (EDenoiser denoiser = (EDenoiser)0; denoiser < EDenoiser::Denoise_Count;)
 		{
 			Denoiser::Input input;
 			input.Resolution = mResolution;
 			input.NormalDepth = GetResource(EResource::NormalDepth);
 			input.DepthDerivatives = GetResource(EResource::PartialDepthDerivatives);
 			input.ReprojectedNormalDepth = GetResource(EResource::ReprojectedNormalDepth);
-			input.MotionVector		= GetResource(EResource::MotionVector);
-			input.Value = AOResult;
-			input.RayHitDistance = AOHitDistance;
-			input.MaxRayDistance = MaxAORayHitDistance;
+			input.MotionVector = GetResource(EResource::MotionVector);
 			input.Depth = GetResource(EResource::Depth);
-			Denoiser::Output output = mAODesnoiser->Execute(context, input);
-			mAOTex.SetValue(output.OutValue);
-			
+
+			switch (denoiser)
+			{
+			case EDenoiser::Denoise_Ao:
+				input.Value = AOResult;
+				input.RayHitDistance = AOHitDistance;
+				input.MaxRayDistance = MaxAORayHitDistance;
+				break;
+			case EDenoiser::Denoise_Shadow:
+				input.Value = GetResource(EResource::Shadow);
+				input.RayHitDistance = GetResource(EResource::RayDistance);
+				input.MaxRayDistance = mCB.FarZ;
+				break;
+			case EDenoiser::Denoise_IndirectR:
+				input.Value = GetResource(EResource::IndirectR);
+				input.RayHitDistance = GetResource(EResource::RayDistance);
+				input.MaxRayDistance = mCB.FarZ;
+				break;
+			case EDenoiser::Denoise_IndirectG:
+				input.Value = GetResource(EResource::IndirectG);
+				input.RayHitDistance = GetResource(EResource::RayDistance);
+				input.MaxRayDistance = mCB.FarZ;
+				break;
+			case EDenoiser::Denoise_IndirectB:
+				input.Value = GetResource(EResource::IndirectB);
+				input.RayHitDistance = GetResource(EResource::RayDistance);
+				input.MaxRayDistance = mCB.FarZ;
+				break;
+			}
+			Denoiser::Output output = mDenoiser[denoiser]->Execute(context, input);
+			mDenoisedTex[denoiser].SetValue(output.OutValue);
+
+			denoiser = (EDenoiser)((int)denoiser + 1);
 		}
 
 
+		// Composite
+		{
+			RT_Composite::Input input;
+			input.Resolution = mCB.Resolution;
+			input.Direct    = GetResource(EResource::Direct);
+			input.IndirectR = mDenoisedTex[EDenoiser::Denoise_IndirectR].GetValue();
+			input.IndirectG = mDenoisedTex[EDenoiser::Denoise_IndirectG].GetValue();
+			input.IndirectB = mDenoisedTex[EDenoiser::Denoise_IndirectB].GetValue();
+			input.Shadow    = mDenoisedTex[EDenoiser::Denoise_Shadow].GetValue();
+			input.AO        = mDenoisedTex[EDenoiser::Denoise_Ao].GetValue();
+
+			input.Output = targetTexture;
+			mComposite->Execute(context, input);
+		}
 	}
 
 	SharedPtr<ITexture> RayTracer::GetResource(EResource type)

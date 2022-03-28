@@ -12,6 +12,7 @@ namespace JG
 	class IRayTracingShaderResourceTable;
 	class IBottomLevelAccelerationStructure;
 	class CalculatePartialDerivatives;
+	class RT_Composite;
 	class IRayTracingPipeline;
 	class IComputeContext;
 	class ISubMesh;
@@ -74,15 +75,28 @@ namespace JG
 		enum EResource
 		{
 			Direct,
-			Indirect,
-			Result,
+			IndirectR,
+			IndirectG,
+			IndirectB,
+			Shadow,
 			HitPosition,
+			RayDistance,
 			MotionVector,
 			ReprojectedNormalDepth,
 			NormalDepth,
 			Depth,
 			PartialDepthDerivatives,
 			Count,
+		};
+
+		enum EDenoiser
+		{
+			Denoise_IndirectR,
+			Denoise_IndirectG,
+			Denoise_IndirectB,
+			Denoise_Ao,
+			Denoise_Shadow,
+			Denoise_Count
 		};
 	private:
 		List<SharedPtr<ITopLevelAccelerationStructure>> mSceneAS;
@@ -97,9 +111,7 @@ namespace JG
 
 
 		RP_Global_Tex mTex[EResource::Count];
-		RP_Global_Tex mAOTex;
-
-
+		RP_Global_Tex mDenoisedTex[EDenoiser::Denoise_Count];
 		RP_Global_Int mRayBounds;
 
 		u64 mHitGroupOffset  = 0;
@@ -107,21 +119,23 @@ namespace JG
 
 
 		SharedPtr<CalculatePartialDerivatives> mCalculatePartialDerivatives;
+		SharedPtr<RT_Composite> mComposite;
 		SharedPtr<RTAO>     mRTAO;
-		SharedPtr<Denoiser> mAODesnoiser;
+
+		SharedPtr<Denoiser> mDenoiser[EDenoiser::Denoise_Count];
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
 		CB mCB;
 	public:
 		RayTracer(Renderer* renderer);
 		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform);
 		void SetResolution(const JVector2& resolutoin);
-		void Execute(SharedPtr<IComputeContext> context);
+		void Execute(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture);
 		void Reset();
 	private:
 		void Init();
 		void InitTextures();
 		void UpdateAccelerationStructure(SharedPtr<IComputeContext> context);
-		void Update(SharedPtr<IComputeContext> context);
+		void Update(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture);
 	
 		SharedPtr<ITexture> GetResource(EResource type);
 	public:

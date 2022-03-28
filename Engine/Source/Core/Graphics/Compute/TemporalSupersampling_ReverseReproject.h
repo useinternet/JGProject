@@ -29,7 +29,6 @@ namespace JG
 
 			SharedPtr<ITexture> OutCachedTspp;
 			SharedPtr<ITexture> OutReprojectedCachedValues;
-			SharedPtr<ITexture> OutDebug;
 		};
 	private:
 		Renderer* mRenderer;

@@ -1,26 +1,26 @@
 
 
-Texture2D<uint> _CurrentFrameNormalDepth : register(t0);
+Texture2D<uint>   _CurrentFrameNormalDepth : register(t0);
 Texture2D<float2> _CurrentFrameLinearDepthDerivative : register(t1);
-Texture2D<uint> _ReprojectedNormalDepth : register(t2); 
+Texture2D<uint>   _ReprojectedNormalDepth   : register(t2); 
 Texture2D<float2> _TextureSpaceMotionVector : register(t3);
-Texture2D<uint> _CachedNormalDepth : register(t4);
-Texture2D<float> _CachedValue : register(t5);
-Texture2D<uint2> _CachedTspp : register(t6);
-Texture2D<float> _CachedValueSquaredMean : register(t7);
-Texture2D<float> _CachedRayHitDepth : register(t8);
+Texture2D<uint>   _CachedNormalDepth : register(t4);
+Texture2D<float>  _CachedValue : register(t5);            // -> ChangeFormat
+Texture2D<uint>   _CachedTspp  : register(t6);            
+Texture2D<float>  _CachedValueSquaredMean : register(t7); // -> ChangeFormat
+Texture2D<float>  _CachedRayHitDepth : register(t8);
 
 
-RWTexture2D<uint> _OutCachedTspp : register(u0);
-RWTexture2D<uint4> _OutReprojectedCachedValues : register(u1);
-RWTexture2D<float4> _Debug1 : register(u2);
+RWTexture2D<uint>  _OutCachedTspp : register(u0);          // -> Change Format
+RWTexture2D<uint4> _OutReprojectedCachedValues : register(u1); // -> Change Format
+
 cbuffer CB : register(b0)
 {
     uint2  _TextureDim;
     float2 _InvTextureDim;
 
-    float _DepthSigma; //1.0f, 0.0f, 10.f
-    uint  _DepthNumMantissaBits;      // Number of Mantissa Bits in the floating format of the input depth resources format.
+    float _DepthSigma; 
+    uint  _DepthNumMantissaBits;
 };
 
 SamplerState ClampSampler : register(s0);
@@ -59,9 +59,8 @@ float4 BilateralResampleWeights(in float TargetDepth, in float3 TargetNormal, in
 [numthreads(8,8, 1)]
 void cs_main(uint2 DTid : SV_DispatchThreadID)
 {
-     _Debug1[DTid] = float4(0.0f,0.0f, 0.0f,1.0f);
     float3 _normal;
-    float _depth;
+    float  _depth;
     DecodeNormalDepth(_ReprojectedNormalDepth[DTid], _normal, _depth);
     float2 textureSpaceMotionVector = _TextureSpaceMotionVector[DTid];
    
@@ -103,7 +102,6 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
             
     float4 weights;
     weights = BilateralResampleWeights(_depth, _normal, vCacheDepths, cacheNormals, cachePixelOffset, DTid, cacheIndices, ddxy);
- _Debug1[DTid] = float4(cachePixelOffset, 0.0f,1.0f);
     // Invalidate weights for invalid values in the cache.
     float4 vCacheValues = _CachedValue.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
     weights = vCacheValues != -1 ? weights : 0;
@@ -152,7 +150,6 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
             float4 vCachedRayHitDepths = _CachedRayHitDepth.GatherRed(ClampSampler, adjustedCacheFrameTexturePos).wzxy;
             cachedRayHitDepth = dot(nWeights, vCachedRayHitDepths);
         }
-   
     }
     else
     {

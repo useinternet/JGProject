@@ -54,7 +54,7 @@ namespace JG
 			input.CachedRayHitDepth});
 
 		context->BindTextures((u32)Renderer::EComputeRootParam::UAV, 
-			{ input.OutCachedTspp, input.OutReprojectedCachedValues, input.OutDebug });
+			{ input.OutCachedTspp, input.OutReprojectedCachedValues });
 
 		context->Dispatch2D(input.Resolution.x, input.Resolution.y);
 	}

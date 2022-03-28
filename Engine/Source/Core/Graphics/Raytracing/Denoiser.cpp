@@ -10,9 +10,10 @@
 #include "Graphics/Compute/CalculateMeanVariance.h"
 namespace JG
 {
-	Denoiser::Denoiser(Renderer* renderer)
+	Denoiser::Denoiser(const String& name, Renderer* renderer)
 	{
 		mRenderer = renderer;
+		mName	  = name;
 		Init();
 	}
 	Denoiser::Output Denoiser::Execute(SharedPtr<IComputeContext> context, const Input& input)
@@ -24,14 +25,12 @@ namespace JG
 		}
 
 		u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-		
 		u32 temporalCachePreviousFrameResourceIndex = mTemporalCacheCurrentFrameResourceIndex;
 		mTemporalCacheCurrentFrameResourceIndex = (mTemporalCacheCurrentFrameResourceIndex + 1) % 2;
 
 		u32 temporalCachePreviousFrameTemporalValueResourceIndex = mTemporalCacheCurrentFrameTemporalValueResourceIndex;
 		mTemporalCacheCurrentFrameTemporalValueResourceIndex = (mTemporalCacheCurrentFrameTemporalValueResourceIndex + 1) % 2;
 
-		context->ClearUAVFloat(mDebugTextures[bufferIndex]);
 		// TemporalSupersampling_ReverseReproject
 		{
 			TemporalSupersampling_ReverseReproject::Input _input;
@@ -47,7 +46,6 @@ namespace JG
 			_input.CachedRayHitDepth = mTemporalCache[temporalCachePreviousFrameResourceIndex][ETemporalSuperSampling::RayHitDistance];
 			_input.OutCachedTspp = mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::Tspp];
 			_input.OutReprojectedCachedValues = mCachedTsppValueSquaredValueRayHitDistance;
-			_input.OutDebug = mDebugTextures[bufferIndex];
 			_input.DepthSigma = mDepthSigma.GetValue();
 			mTemporalSupersamplingReverseReproject->Execute(context, _input);
 
@@ -74,7 +72,6 @@ namespace JG
 				EResourceState::Common, EResourceState::Common);
 
 		}
-		mDebug.SetValue(mDebugTextures[bufferIndex]);
 		//CalculateMeanVariance
 		{
 			context->TransitionBarrier({ input.Value }, { EResourceState::NonePixelShaderResource });
@@ -85,14 +82,14 @@ namespace JG
 			_input.Resolution = mResolution;
 			_input.KernelWidth = mVariance_BilateralFilterKernelWidth.GetValue();
 			_input.Value = input.Value;
-			_input.OutMeanVariance = mLocalMeanVarianceResources[EVarianceResource::Raw];
+			_input.OutMeanVariance = mLocalMeanVarianceResources;
 			
 			mCalculateMeanVariance->Execute(context, _input);
 
 
 			context->TransitionBarrier(
-				{ mLocalMeanVarianceResources[EVarianceResource::Raw] }, { EResourceState::NonePixelShaderResource });
-			context->UAVBarrier({ mLocalMeanVarianceResources[EVarianceResource::Raw] });
+				{ mLocalMeanVarianceResources }, { EResourceState::NonePixelShaderResource });
+			context->UAVBarrier({ mLocalMeanVarianceResources });
 		
 		}
 		// TemporalSupersampling_BlendWithCurrentFrame
@@ -102,7 +99,7 @@ namespace JG
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::Tspp],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::CoefficientSquaredMean],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::RayHitDistance],
-				mVarianceResources[EVarianceResource::Raw],
+				mVarianceResources,
 				mDisocclusionBlurStrength
 				}, {
 				EResourceState::UnorderedAccess,
@@ -117,14 +114,14 @@ namespace JG
 			TemporalSupersampling_BlendWithCurrentFrame::Input _input;
 			_input.Resolution = mResolution;
 			_input.Value = input.Value;
-			_input.LocalMeanVariance = mLocalMeanVarianceResources[EVarianceResource::Raw];
+			_input.LocalMeanVariance = mLocalMeanVarianceResources;
 			_input.RayHitDistance = input.RayHitDistance;
 			_input.Reprojected_Tspp_Value_SquaredMeanValue_RayHitDistance = mCachedTsppValueSquaredValueRayHitDistance;
 			_input.OutValue = mTemporalValue[mTemporalCacheCurrentFrameTemporalValueResourceIndex];
 			_input.OutTspp = mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::Tspp];
 			_input.OutSquaredMeanValue = mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::CoefficientSquaredMean];
 			_input.OutRayHitDistance = mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::RayHitDistance];
-			_input.OutVariance = mVarianceResources[EVarianceResource::Raw];
+			_input.OutVariance = mVarianceResources;
 			_input.OutBlurStrength = mDisocclusionBlurStrength;
 			
 			_input.StdDevGamma = mStdDevGamma.GetValue();
@@ -141,7 +138,7 @@ namespace JG
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::Tspp],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::CoefficientSquaredMean],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::RayHitDistance],
-				mVarianceResources[EVarianceResource::Raw],
+				mVarianceResources,
 				mDisocclusionBlurStrength,
 				mTemporalValue[mTemporalCacheCurrentFrameTemporalValueResourceIndex]
 				}, {
@@ -157,17 +154,15 @@ namespace JG
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::Tspp],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::CoefficientSquaredMean],
 				mTemporalCache[mTemporalCacheCurrentFrameResourceIndex][ETemporalSuperSampling::RayHitDistance],
-				mVarianceResources[EVarianceResource::Raw],
+				mVarianceResources,
 				mDisocclusionBlurStrength,
 				mTemporalValue[mTemporalCacheCurrentFrameTemporalValueResourceIndex] });
 		}
 
 
-
+		// AtrousWaveletTransformCrossBilateralFilter
 		{
-			SharedPtr<ITexture> Variance = mVarianceResources[EVarianceResource::Raw];
-
-			// Adaptive kernel radius rotation.
+			SharedPtr<ITexture> Variance = mVarianceResources;
 			float kernelRadiusLerfCoef = 0;
 			if (mKernelRadiusRotateKernelEnable.GetValue())
 			{
@@ -240,41 +235,43 @@ namespace JG
 	}
 	void Denoiser::Init()
 	{
-		mTemporalSupersamplingReverseReproject = CreateSharedPtr<TemporalSupersampling_ReverseReproject>(mRenderer);
+		mTemporalSupersamplingReverseReproject		 = CreateSharedPtr<TemporalSupersampling_ReverseReproject>(mRenderer);
 		mTemporalSupersampling_BlendWithCurrentFrame = CreateSharedPtr<TemporalSupersampling_BlendWithCurrentFrame>(mRenderer);
-		mAtrousWaveletTransformCrossBilateralFilter = CreateSharedPtr<AtrousWaveletTransformCrossBilateralFilter>(mRenderer);
-		mCalculateMeanVariance = CreateSharedPtr<CalculateMeanVariance>(mRenderer);
+		mAtrousWaveletTransformCrossBilateralFilter  = CreateSharedPtr<AtrousWaveletTransformCrossBilateralFilter>(mRenderer);
+		mCalculateMeanVariance		 = CreateSharedPtr<CalculateMeanVariance>(mRenderer);
 		mDisocclusionBilateralFilter = CreateSharedPtr<DisocclusionBilateralFilter>(mRenderer);
-		mDepthSigma = RP_Global_Float::Create("Renderer/Denoiser/DepthSigma", 1.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
-		mVariance_BilateralFilterKernelWidth = RP_Global_Int::Create("Renderer/Denoiser/Variance_KernelWidth", 9, 3, 9, mRenderer->GetRenderParamManager());
-		mMaxTspp = RP_Global_Int::Create("Renderer/Denoiser/MaxTspp", 33, 1, 100, mRenderer->GetRenderParamManager());
-
-
-		mStdDevGamma = RP_Global_Float::Create("Renderer/Denoiser/StdDevGamma", 0.6f, 0.1f, 10.0f, mRenderer->GetRenderParamManager());
-		mClampingMinStdDevTolerance = RP_Global_Float::Create("Renderer/Denoiser/ClampingMinStdDevTolerance", 0.05f, 0.0f, 1.0f, mRenderer->GetRenderParamManager());
-		mClampDifferenceToTsppScale = RP_Global_Float::Create("Renderer/Denoiser/ClampDifferenceToTsppScale", 4.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
-
-		mMinTsppToUseTemporalVariance = RP_Global_Int::Create("Renderer/Denoiser/MinTsppToUseTemporalVariance", 4, 1, 40, mRenderer->GetRenderParamManager());
-		mBlurStrengthMaxTspp = RP_Global_Int::Create("Renderer/Denoiser/BlurStrengthMaxTspp", 12, 0, 100, mRenderer->GetRenderParamManager());
-		mBlurDecayStrength = RP_Global_Float::Create("Renderer/Denoiser/BlurDecayStrength", 1.0f, 0.1f, 32.0f, mRenderer->GetRenderParamManager());
 
 
 
-		mKernelRadiusRotateKernelEnable = RP_Global_Bool::Create("Renderer/Denosier/KernelRadiusRotateKernelEnable", true, mRenderer->GetRenderParamManager());
-		mKernelRadiusRotateKernelNumCycles = RP_Global_Int::Create("Renderer/Denoiser/KernelRadiusRotateKernelNumCycles", 3, 1, 10, mRenderer->GetRenderParamManager());
-		mAdaptiveKernelSizeRayHitDistanceScaleFactor = RP_Global_Float::Create("Renderer/Denoiser/AdaptiveKernelSizeRayHitDistanceScaleFactor", 0.02f, 0.001f, 0.1f, mRenderer->GetRenderParamManager());
-		mAdaptiveKernelSizeRayHitDistanceScaleExponent = RP_Global_Float::Create("Renderer/Denoiser/AdaptiveKernelSizeRayHitDistanceScaleExponent", 2.0f, 1.0f, 5.0f, mRenderer->GetRenderParamManager());
+		mDepthSigma							 = RP_Global_Float::Create(GetRenderParamName("DepthSigma"), 1.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
+		mVariance_BilateralFilterKernelWidth = RP_Global_Int::Create(GetRenderParamName("Variance_KernelWidth"), 9, 3, 9, mRenderer->GetRenderParamManager());
+		mMaxTspp							 = RP_Global_Int::Create(GetRenderParamName("MaxTspp"), 33, 1, 100, mRenderer->GetRenderParamManager());
 
 
-		mValueSigma = RP_Global_Float::Create("Renderer/Denoiser/ValueSigma", 1.0f, 0.0f, 30.0f, mRenderer->GetRenderParamManager());
-		mNormalSigma = RP_Global_Float::Create("Renderer/Denoiser/NormalSigma", 64, 0, 256, mRenderer->GetRenderParamManager());
-		mMinKernelWidth = RP_Global_Int::Create("Renderer/Denoiser/MinKernelWidth", 3, 3, 101, mRenderer->GetRenderParamManager());
-		mKernelWidthPercentage = RP_Global_Float::Create("Renderer/Denoiser/KernelWidthPercentage", 1.5f, 0, 100, mRenderer->GetRenderParamManager());
-		mMinVarianceToDenoise = RP_Global_Float::Create("Renderer/Denoiser/MinVarianceToDenoise", 0.0F, 0.0F, 1.0F, mRenderer->GetRenderParamManager());
-		mDepthWeightCufoff = RP_Global_Float::Create("Renderer/Denoiser/DepthWeightCufoff", 0.2F, 0.0F, 2.0F, mRenderer->GetRenderParamManager());
+		mStdDevGamma				= RP_Global_Float::Create(GetRenderParamName("StdDevGamma"), 0.6f, 0.1f, 10.0f, mRenderer->GetRenderParamManager());
+		mClampingMinStdDevTolerance = RP_Global_Float::Create(GetRenderParamName("ClampingMinStdDevTolerance"), 0.05f, 0.0f, 1.0f, mRenderer->GetRenderParamManager());
+		mClampDifferenceToTsppScale = RP_Global_Float::Create(GetRenderParamName("ClampDifferenceToTsppScale"), 4.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
 
-		mDebug = RP_Global_Tex::Create("Debug", nullptr, mRenderer->GetRenderParamManager());
-		mTspBlurPasses = RP_Global_Int::Create("Renderer/Denoiser/TspBlurPasses ", 3, 0, 6, mRenderer->GetRenderParamManager());
+		mMinTsppToUseTemporalVariance = RP_Global_Int::Create(GetRenderParamName("MinTsppToUseTemporalVariance"), 4, 1, 40, mRenderer->GetRenderParamManager());
+		mBlurStrengthMaxTspp		  = RP_Global_Int::Create(GetRenderParamName("BlurStrengthMaxTspp"), 12, 0, 100, mRenderer->GetRenderParamManager());
+		mBlurDecayStrength			  = RP_Global_Float::Create(GetRenderParamName("BlurDecayStrength"), 1.0f, 0.1f, 32.0f, mRenderer->GetRenderParamManager());
+
+
+
+		mKernelRadiusRotateKernelEnable					= RP_Global_Bool::Create(GetRenderParamName("KernelRadiusRotateKernelEnable"), true, mRenderer->GetRenderParamManager());
+		mKernelRadiusRotateKernelNumCycles				= RP_Global_Int::Create(GetRenderParamName("KernelRadiusRotateKernelNumCycles"), 3, 1, 10, mRenderer->GetRenderParamManager());
+		mAdaptiveKernelSizeRayHitDistanceScaleFactor	= RP_Global_Float::Create(GetRenderParamName("AdaptiveKernelSizeRayHitDistanceScaleFactor"), 0.02f, 0.001f, 0.1f, mRenderer->GetRenderParamManager());
+		mAdaptiveKernelSizeRayHitDistanceScaleExponent	= RP_Global_Float::Create(GetRenderParamName("AdaptiveKernelSizeRayHitDistanceScaleExponent"), 2.0f, 1.0f, 5.0f, mRenderer->GetRenderParamManager());
+
+
+		mValueSigma				= RP_Global_Float::Create(GetRenderParamName("ValueSigma"), 1.0f, 0.0f, 30.0f, mRenderer->GetRenderParamManager());
+		mNormalSigma			= RP_Global_Float::Create(GetRenderParamName("NormalSigma"), 64, 0, 256, mRenderer->GetRenderParamManager());
+		mMinKernelWidth			= RP_Global_Int::Create(GetRenderParamName("MinKernelWidth"), 3, 3, 101, mRenderer->GetRenderParamManager());
+		mKernelWidthPercentage	= RP_Global_Float::Create(GetRenderParamName("KernelWidthPercentage"), 1.5f, 0, 100, mRenderer->GetRenderParamManager());
+		mMinVarianceToDenoise	= RP_Global_Float::Create(GetRenderParamName("MinVarianceToDenoise"), 0.0F, 0.0F, 1.0F, mRenderer->GetRenderParamManager());
+		mDepthWeightCufoff		= RP_Global_Float::Create(GetRenderParamName("DepthWeightCufoff"), 0.2F, 0.0F, 2.0F, mRenderer->GetRenderParamManager());
+
+		mTspBlurPasses = RP_Global_Int::Create(GetRenderParamName("TspBlurPasses"), 3, 0, 6, mRenderer->GetRenderParamManager());
 	}
 	void Denoiser::InitTexture()
 	{
@@ -286,7 +283,6 @@ namespace JG
 		texInfo.Flags = ETextureFlags::Allow_UnorderedAccessView | ETextureFlags::Allow_RenderTarget;
 		texInfo.MipLevel = 1;
 		texInfo.ClearColor = Color();
-		GraphicsHelper::InitRenderTextures(texInfo, "Debug", &mDebugTextures);
 		for (i32 i = 0; i < 2; ++i)
 		{
 			texInfo.Format = ETextureFormat::R8_Uint;
@@ -301,19 +297,20 @@ namespace JG
 		mCachedTsppValueSquaredValueRayHitDistance = ITexture::Create("CachedTsppValueSquaredValueRayHitDistance", texInfo);
 
 		texInfo.Format = ETextureFormat::R16_Float;
-		mVarianceResources[EVarianceResource::Raw] = ITexture::Create("Variance_Raw", texInfo);
-		mVarianceResources[EVarianceResource::Smoothed] = ITexture::Create("Variance_Smoothed", texInfo);
+		mVarianceResources = ITexture::Create("Variance_Raw", texInfo);
 
 		texInfo.Format = ETextureFormat::R16G16_Float;
-		mLocalMeanVarianceResources[EVarianceResource::Raw] = ITexture::Create("LocalMeanVariance_Raw", texInfo);
-		mLocalMeanVarianceResources[EVarianceResource::Smoothed] = ITexture::Create("LocalMeanVariance_Smoothed", texInfo);
-
-
+		mLocalMeanVarianceResources = ITexture::Create("LocalMeanVariance_Raw", texInfo);
+		
 		texInfo.Format = ETextureFormat::R8_Unorm;
 		mDisocclusionBlurStrength = ITexture::Create("DisocclustionStrength", texInfo);
 
 		texInfo.Format = ETextureFormat::R32_Uint;
 		mPrevFrameGBufferNormalDepth = ITexture::Create("PrevFrameNormalDepth", texInfo);
 
+	}
+	String Denoiser::GetRenderParamName(const String& name)
+	{
+		return "Denoiser/" + mName + "/" + name;
 	}
 }

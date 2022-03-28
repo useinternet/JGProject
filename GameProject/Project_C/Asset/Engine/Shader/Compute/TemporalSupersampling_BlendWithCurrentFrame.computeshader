@@ -1,16 +1,16 @@
 
 
-Texture2D<float> _CurrentFrameValue : register(t0);
+Texture2D<float>  _CurrentFrameValue : register(t0);
 Texture2D<float2> _CurrentFrameLocalMeanVariance : register(t1);
-Texture2D<float> _CurrentFrameRayHitDistance : register(t2);
-Texture2D<uint4> _Reprojected_Tspp_Value_SquaredMeanValue_RayHitDistance : register(t3);
+Texture2D<float>  _CurrentFrameRayHitDistance : register(t2);
+Texture2D<uint4>  _Reprojected_Tspp_Value_SquaredMeanValue_RayHitDistance : register(t3);
 
-RWTexture2D<float> _OutValue : register(u0);
-RWTexture2D<uint> _OutTspp : register(u1);
-RWTexture2D<float> _OutSquaredMeanValue : register(u2);
-RWTexture2D<float> _OutRayHitDistance : register(u3);
-RWTexture2D<float> _OutVariance : register(u4);
-RWTexture2D<float> _OutBlurStrength: register(u5);
+RWTexture2D<float> _OutValue            : register(u0); // -> Change Format
+RWTexture2D<uint>  _OutTspp             : register(u1);
+RWTexture2D<float> _OutSquaredMeanValue : register(u2); // -> Change Format
+RWTexture2D<float> _OutRayHitDistance   : register(u3); 
+RWTexture2D<float> _OutVariance         : register(u4); // -> Change Format
+RWTexture2D<float> _OutBlurStrength     : register(u5);
 
 
 cbuffer CB : register(b0)
@@ -49,7 +49,7 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
         float cachedValue = cachedValues.y;
 
         float2 localMeanVariance = _CurrentFrameLocalMeanVariance[DTid];
-        float localMean = localMeanVariance.x;
+        float localMean     = localMeanVariance.x;
         float localVariance = localMeanVariance.y;
 
 
@@ -97,17 +97,17 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
         value = value;
 
         rayHitDistance = _CurrentFrameRayHitDistance[DTid];
-        variance = _CurrentFrameLocalMeanVariance[DTid].y;
+        variance       = _CurrentFrameLocalMeanVariance[DTid].y;
         valueSquaredMean = valueSquaredMean;
     }
 
-    float TsppRatio = min(Tspp, _BlurStrength_MaxTspp) / float(_BlurStrength_MaxTspp);
+    float TsppRatio    = min(Tspp, _BlurStrength_MaxTspp) / float(_BlurStrength_MaxTspp);
     float blurStrength = pow(1 - TsppRatio, _BlurDecayStrength);
 
-    _OutTspp[DTid] = Tspp;
+    _OutTspp[DTid]  = Tspp;
     _OutValue[DTid] = value;
     _OutSquaredMeanValue[DTid] = valueSquaredMean;
     _OutRayHitDistance[DTid] = rayHitDistance;
-    _OutVariance[DTid] = variance; 
-    _OutBlurStrength[DTid] = blurStrength;
+    _OutVariance[DTid]       = variance; 
+    _OutBlurStrength[DTid]   = blurStrength;
 }

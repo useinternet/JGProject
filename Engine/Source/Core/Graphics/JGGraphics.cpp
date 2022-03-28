@@ -134,13 +134,7 @@ namespace JG
 			}
 			mGraphcisAPI->BeginFrame();
 			Reset();
-				
-			// Scene Reset
-			//for (auto& _pair : mSceneDic)
-			//{
-			//	_pair.second->Reset();
-			//}
-
+			
 			return EScheduleResult::Continue;
 		});
 

@@ -33,40 +33,50 @@ namespace JG
 
 		mTopASGen.ComputeASBufferSizes(allowUpdate, &scratchSize, &resultSize, &instanceSize);
 
-		if (scratchSize > mScratchSize)
+		if (scratchSize > mScratchSize || mScratch == nullptr)
 		{
-			mScratchSize = scratchSize;
+			if (mScratch != nullptr)
+			{
+				mScratchSize *= 2;
+			}
+
 			DirectX12API::DestroyCommittedResource(mScratch);
 			mScratch = DirectX12API::CreateCommittedResource(
 				"TopLevel_ScratchBuffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(scratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+				&CD3DX12_RESOURCE_DESC::Buffer(mScratchSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
 				D3D12_RESOURCE_STATE_COMMON,
 				nullptr);
 		}
-		if (resultSize > mResultSize)
+		if (resultSize > mResultSize || mResult == nullptr)
 		{
-			mResultSize = resultSize;
+			if (mResult != nullptr)
+			{
+				mResultSize *= 2;
+			}
 			DirectX12API::DestroyCommittedResource(mResult);
 			mResult = DirectX12API::CreateCommittedResource(
 				"TopLevel_ResultBuffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(resultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+				&CD3DX12_RESOURCE_DESC::Buffer(mResultSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
 				D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
 				nullptr);
 
 		}
-		if (instanceSize > mInstanceSize)
+		if (instanceSize > mInstanceSize || mInstance == nullptr)
 		{
-			mInstanceSize = instanceSize;
+			if (mInstance != nullptr)
+			{
+				mInstanceSize *= 2;
+			}
 			DirectX12API::DestroyCommittedResource(mInstance);
 			mInstance = DirectX12API::CreateCommittedResource(
 				"TopLevel_InstanceBuffer",
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(instanceSize, D3D12_RESOURCE_FLAG_NONE),
+				&CD3DX12_RESOURCE_DESC::Buffer(mInstanceSize, D3D12_RESOURCE_FLAG_NONE),
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 		}
@@ -79,11 +89,13 @@ namespace JG
 
 		const auto& instances = mTopASGen.GetInstances();
 		u64 prevInstanceSize = instances.size() * sizeof(JMatrix);
-
-		if (prevInstanceSize > mPrevInstanceSize)
+		if (prevInstanceSize > mPrevInstanceSize || mPrevInstance == nullptr)
 		{
-			mPrevInstanceSize = prevInstanceSize;
-			mPrevInstance = IStructuredBuffer::Create("PrevInstanceTransformStructuredBuffer", sizeof(JMatrix), instances.size(), EBufferLoadMethod::CPULoad);
+			if (mPrevInstance != nullptr)
+			{
+				mPrevInstanceSize *= 2;
+			}
+			mPrevInstance = IStructuredBuffer::Create("PrevInstanceTransformStructuredBuffer", sizeof(JMatrix), mPrevInstanceSize / sizeof(JMatrix), EBufferLoadMethod::CPULoad);
 		}
 		if (mPrevInstance != nullptr)
 		{
@@ -107,9 +119,9 @@ namespace JG
 		DirectX12API::DestroyCommittedResource(mInstance);
 		DirectX12API::DestroyCommittedResource(mResult);
 
-		mScratchSize  = 0;
-		mResultSize   = 0;
-		mInstanceSize = 0;
+		mScratchSize  = _2MB;
+		mResultSize   = _2MB;
+		mInstanceSize = _2MB;
 		mTopASGen = TopLevelASGenerator();
 	}
 

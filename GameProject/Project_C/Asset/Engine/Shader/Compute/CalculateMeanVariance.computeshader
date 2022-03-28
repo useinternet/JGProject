@@ -9,10 +9,7 @@ cbuffer CB : register(b0)
     uint2 _TextureDim;
     uint _KernelWidth;
     uint _KernelRadius;
-
     uint _PixelStepY;
-    bool _DoCheckerboardSampling;
-    bool _AreEvenPixelsActive;
 };
 // Group shared memory cache for the row aggregated results.
 groupshared uint PackedRowResultCache[16][8];            // 16bit float valueSum, squaredValueSum.

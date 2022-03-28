@@ -4,6 +4,7 @@
 
 namespace JG
 {
+	enum class ETextureFormat;
 	class IComputeContext;
 	class Renderer;
 	class ITexture;
@@ -23,16 +24,6 @@ namespace JG
 				RayHitDistance,
 				CoefficientSquaredMean,
 				Count,
-			};
-		};
-		class EVarianceResource
-		{
-		public:
-			enum
-			{
-				Raw = 0,
-				Smoothed,
-				Count
 			};
 		};
 	public:
@@ -55,7 +46,9 @@ namespace JG
 		};
 		
 	private:
-		Renderer* mRenderer;
+		Renderer*		mRenderer;
+		String			mName;
+
 		JVector2  mResolution;
 		RP_Global_Float mDepthSigma;
 		RP_Global_Int mVariance_BilateralFilterKernelWidth;
@@ -70,10 +63,10 @@ namespace JG
 		RP_Global_Float mBlurDecayStrength;
 
 
-		RP_Global_Bool mKernelRadiusRotateKernelEnable; // true
-		RP_Global_Int  mKernelRadiusRotateKernelNumCycles; //3, 1, 10,
-		RP_Global_Float mAdaptiveKernelSizeRayHitDistanceScaleFactor; //0.02f, 0.001f, 0.1f
-		RP_Global_Float mAdaptiveKernelSizeRayHitDistanceScaleExponent; //2.0f, 1.0f, 5.0f
+		RP_Global_Bool mKernelRadiusRotateKernelEnable; 
+		RP_Global_Int  mKernelRadiusRotateKernelNumCycles; 
+		RP_Global_Float mAdaptiveKernelSizeRayHitDistanceScaleFactor; 
+		RP_Global_Float mAdaptiveKernelSizeRayHitDistanceScaleExponent; 
 	
 
 		RP_Global_Float mValueSigma;
@@ -86,30 +79,30 @@ namespace JG
 
 		RP_Global_Int mTspBlurPasses;
 
-		List<SharedPtr<ITexture>> mDebugTextures;
-		RP_Global_Tex  mDebug;
 
-		SharedPtr<TemporalSupersampling_ReverseReproject> mTemporalSupersamplingReverseReproject;
+		SharedPtr<TemporalSupersampling_ReverseReproject>	   mTemporalSupersamplingReverseReproject;
 		SharedPtr<TemporalSupersampling_BlendWithCurrentFrame> mTemporalSupersampling_BlendWithCurrentFrame;
-		SharedPtr< AtrousWaveletTransformCrossBilateralFilter> mAtrousWaveletTransformCrossBilateralFilter;
-		SharedPtr< DisocclusionBilateralFilter> mDisocclusionBilateralFilter;
-		SharedPtr<CalculateMeanVariance> mCalculateMeanVariance;
+		SharedPtr<AtrousWaveletTransformCrossBilateralFilter>  mAtrousWaveletTransformCrossBilateralFilter;
+		SharedPtr<DisocclusionBilateralFilter>	mDisocclusionBilateralFilter;
+		SharedPtr<CalculateMeanVariance>		mCalculateMeanVariance;
 		SharedPtr<ITexture> mTemporalCache[2][ETemporalSuperSampling::Count];
 		SharedPtr<ITexture> mTemporalValue[2];
 		SharedPtr<ITexture> mCachedTsppValueSquaredValueRayHitDistance;
-		SharedPtr<ITexture> mVarianceResources[EVarianceResource::Count];
-		SharedPtr<ITexture> mLocalMeanVarianceResources[EVarianceResource::Count];
+		SharedPtr<ITexture> mVarianceResources;
+		SharedPtr<ITexture> mLocalMeanVarianceResources;
 		SharedPtr<ITexture> mDisocclusionBlurStrength;
 		SharedPtr<ITexture> mPrevFrameGBufferNormalDepth;
 
 		u32 mTemporalCacheCurrentFrameResourceIndex = 0;
 		u32 mTemporalCacheCurrentFrameTemporalValueResourceIndex = 0;
 	public:
-		Denoiser(Renderer* renderer);
+		Denoiser(const String& name, Renderer* renderer);
 		Output Execute(SharedPtr<IComputeContext> context, const Input& input);
 	private:
 		void Init();
 		void InitTexture();
+	private:
+		String GetRenderParamName(const String& name);
 	};
 
 }

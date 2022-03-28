@@ -80,16 +80,17 @@ struct ShadowRayPayload
 RaytracingAccelerationStructure _SceneAS : register(t0, space0);
 
 
-RWTexture2D<float4> _DirectOutput   : register(u0, space0);
-RWTexture2D<float4> _IndirectOutput : register(u1, space0);
-RWTexture2D<float4> _ResultOutput : register(u2, space0);
-
-RWTexture2D<float2> _MotionVectorOutput : register(u3, space0);
-RWTexture2D<uint> _ReprojectedNormalDepthOutput : register(u4, space0);
-RWTexture2D<uint> _NormalDepthOutput : register(u5, space0);
-RWTexture2D<float> _DepthOutput : register(u6, space0);
-RWTexture2D<float4> _HitPositionOutput : register(u7, space0); 
-
+RWTexture2D<float4> _DirectOutput        : register(u0, space0);
+RWTexture2D<float>  _IndirectRedOutput   : register(u1, space0);
+RWTexture2D<float>  _IndirectGreenOutput : register(u2, space0);
+RWTexture2D<float>  _IndirectBlueOutput  : register(u3, space0);
+RWTexture2D<float>  _ShadowOutput        : register(u4, space0);
+RWTexture2D<float2> _MotionVectorOutput           : register(u5, space0);
+RWTexture2D<uint>   _ReprojectedNormalDepthOutput : register(u6, space0);
+RWTexture2D<uint>   _NormalDepthOutput            : register(u7, space0);
+RWTexture2D<float>  _DepthOutput                  : register(u8, space0);
+RWTexture2D<float4> _HitPositionOutput            : register(u9, space0); 
+RWTexture2D<float4> _RayDistanceOutput            : register(u10, space0); 
 // Lights
 StructuredBuffer<PointLight> _PointLightList     : register(t1, space0);
 
@@ -136,10 +137,6 @@ SamplerState _PointClamp  : register(s3);
 SamplerState _LinearClamp : register(s4);
 SamplerState _AnisotropicClamp : register(s5);
 SamplerState _LinearBorder_TB : register(s6);
-
-
-
-
 
 ///
 //HitAttribute Func
@@ -245,7 +242,22 @@ float3 getCosHemisphereSample(inout uint randSeed, float3 hitNorm)
 	// Get our cosine-weighted hemisphere lobe sample direction
 	return tangent * (r * cos(phi).x) + bitangent * (r * sin(phi)) + hitNorm.xyz * sqrt(1 - randVal.x);
 }
+float3 getConeSample(inout uint randSeed, float3 hitNorm, float cosThetaMax)
+{
+	// Get 2 random numbers to select our sample with
+	float2 randVal = float2(nextRand(randSeed), nextRand(randSeed));
 
+	// Cosine weighted hemisphere sample from RNG
+	float3 bitangent = getPerpendicularVector(hitNorm);
+	float3 tangent = cross(bitangent, hitNorm);
+
+	float cosTheta = (1.0 - randVal.x) + randVal.x * cosThetaMax;
+	float r = sqrt(1.0 - cosTheta * cosTheta);
+	float phi = randVal.y * 2.0 * 3.14159265f;
+
+	// Get our cosine-weighted hemisphere lobe sample direction
+	return tangent * (r * cos(phi)) + bitangent * (r * sin(phi)) + hitNorm.xyz * cosTheta;
+}
 // Halton Func
 void haltonInit(inout HaltonState hState,
     int x, int y,
@@ -667,7 +679,8 @@ float3 ShootIndirectRay(
 
 float3 ShootDirectRay(
     float3 rayOrigin, 
-    float3 rayDir)
+    float3 rayDir,
+    out float3 hitPosition)
 {
     RayDesc ray;
     ray.Origin = rayOrigin;  
@@ -704,6 +717,7 @@ float3 ShootDirectRay(
         _ReprojectedNormalDepthOutput[launchIndex] = 0;
         _NormalDepthOutput[launchIndex] = 0;
         _DepthOutput[launchIndex] = 0;
+        _RayDistanceOutput[launchIndex] = _FarZ;
     }
     else
     {
@@ -718,28 +732,29 @@ float3 ShootDirectRay(
 
         
         _NormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.Normal), linearDepth);
-        _DepthOutput[launchIndex] = linearDepth;
+        _DepthOutput[launchIndex]       = linearDepth;
+        _RayDistanceOutput[launchIndex] = payload.Hit;
     }
 
 
 
-
+    hitPosition = payload.HitPosition;
     return payload.Color;
 }
 
-float ShootShadowRay_PL(PointLight pl, float3 worldPos)
+float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
 {
     float  distance  = length(pl.Position - worldPos);
    	float3 direction = normalize(pl.Position - worldPos);
 
     ShadowRayPayload payload;
-    payload.Factor = 0.0f;
+    payload.Factor = 0.1f;
 
     if(distance <= pl.Range)
     {
         RayDesc ray;
         ray.Origin    = worldPos;
-        ray.Direction = direction; //normalize(getConeSample(randSeed,direction , 0.999));;
+        ray.Direction = normalize(getConeSample(randSeed,direction , 0.9999));;
         ray.TMin = 0.01;
         ray.TMax = distance;
         TraceRay(
@@ -760,11 +775,22 @@ float ShootShadowRay_PL(PointLight pl, float3 worldPos)
     return payload.Factor;
 }
 
-float ShootShadowRay()
+float ShootShadowRay(int randSeed, in float3 posW)
 {
     int totalLightCount = _PointLightCount;
-    int visibleTotalLightCount = 0;
-    float3 posW  = HitWorldPosition();
+    int lightIndex = min(int(nextRand(randSeed) * totalLightCount), totalLightCount - 1);
+
+
+
+
+    int PL_Index = lightIndex;
+    PointLight pl = _PointLightList[lightIndex];
+    float shadow = ShootShadowRay_PL(pl, randSeed, posW);
+    
+    return shadow;
+
+    /*int visibleTotalLightCount = 0;
+
     float4 posH = mul(_InvViewProjMatrix, float4(posW, 1.0f));
 
     uint   clusterIndex = GetClusterIndex(posH.xyz);
@@ -790,8 +816,8 @@ float ShootShadowRay()
     {
         return 1.0f;
     }
-    shadowFactor /= visibleTotalLightCount;
-    return shadowFactor;
+    shadowFactor /= visibleTotalLightCount; */
+    //return shadowFactor;
 }
 
 
@@ -874,15 +900,15 @@ float3 GGXDirect(SURFACE_OUTPUT input)
 		}
 	}
 
-    float shadow = ShootShadowRay();
-    return Lo * shadow + material.Emissive;
+    //float shadow = ShootShadowRay();
+    return Lo + material.Emissive;
 };
 
 
 [shader("closesthit")]
 void ShadowHit(inout ShadowRayPayload payload, BuiltInTriangleIntersectionAttributes attribute)
 {
-    payload.Factor = 0.5f;
+    payload.Factor = 0.1f;
 }
 [shader("miss")]
 void ShadowMiss(inout ShadowRayPayload payload : SV_RayPayload)

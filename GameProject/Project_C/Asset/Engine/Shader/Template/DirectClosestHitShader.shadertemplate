@@ -77,6 +77,7 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 	}
 	else
 	{
+		payload.Hit           = RayTCurrent();
 		payload.Color = output.emissive;
 	}
 }

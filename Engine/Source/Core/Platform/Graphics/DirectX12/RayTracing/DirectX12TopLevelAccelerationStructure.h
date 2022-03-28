@@ -19,10 +19,10 @@ namespace JG
 		
 
 
-		u64 mScratchSize  = 0;
-		u64 mResultSize   = 0;
-		u64 mInstanceSize = 0;
-		u64 mPrevInstanceSize = 0;
+		u64 mScratchSize  = _2MB;
+		u64 mResultSize   = _2MB;
+		u64 mInstanceSize = _2MB;
+		u64 mPrevInstanceSize = _2MB;
 	public:
 		virtual ~DirectX12TopLevelAccelerationStructure();
 		virtual SharedPtr<IStructuredBuffer> GetPrevFrameTransformBuffer() const override;

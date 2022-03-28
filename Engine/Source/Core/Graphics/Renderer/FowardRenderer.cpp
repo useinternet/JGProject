@@ -49,10 +49,6 @@ namespace JG
 		if (mIsRayTracing.GetValue() == true && JGGraphics::GetInstance().IsSupportedRayTracing() == true)
 		{
 			UpdateRayTacing();
-			if (result != nullptr)
-			{
-				result->SceneTexture = RP_Global_Tex::Load("Renderer/Raytracing/Result", GetRenderParamManager()).GetValue();
-			}
 		}
 		else
 		{
@@ -60,14 +56,14 @@ namespace JG
 			UpdateLightPass();
 
 			UpdateFinalPass();
-			if (result != nullptr)
-			{
-				result->SceneTexture = mFinalResultTex.GetValue();
-			}
+
 		}
 
 
-		
+		if (result != nullptr)
+		{
+			result->SceneTexture = mFinalResultTex.GetValue();
+		}
 
 	}
 
@@ -89,7 +85,7 @@ namespace JG
 		mainTexInfo.Height = std::max<u32>(1, size.y);
 		mainTexInfo.ArraySize = 1;
 		mainTexInfo.Format = ETextureFormat::R32G32B32A32_Float;
-		mainTexInfo.Flags = ETextureFlags::Allow_RenderTarget;
+		mainTexInfo.Flags  = ETextureFlags::Allow_RenderTarget;
 		mainTexInfo.MipLevel = 1;
 		mainTexInfo.ClearColor = clearColor;
 
@@ -120,15 +116,16 @@ namespace JG
 		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_LightResult", &mLightResult);
 
-		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
-		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_FinalResult", &mFinalResult);
-
 		mainTexInfo.Format     = ETextureFormat::R16G16B16A16_Float;
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Depth", &mGBufferDic[EGBuffer::WorldPos]);
 
 		mainTexInfo.Format = ETextureFormat::R32_Float;
 		mainTexInfo.ClearColor = Color::White();
 		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_Depth", &mGBufferDic[EGBuffer::Depth]);
+
+		mainTexInfo.Format = ETextureFormat::R16G16B16A16_Float;
+		mainTexInfo.Flags = mainTexInfo.Flags | ETextureFlags::Allow_UnorderedAccessView;
+		GraphicsHelper::InitRenderTextures(mainTexInfo, "Defferred_FinalResult", &mFinalResult);
 
 
 		mLightShader = ShaderLibrary::GetInstance().FindGraphicsShader(ShaderDefine::Template::StandardSceneShader, { "Scene/LightPass" });
@@ -274,7 +271,7 @@ namespace JG
 		{
 			return;
 		}
-
+		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
 		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
 		{
 			for (auto& info : objectList)
@@ -309,7 +306,8 @@ namespace JG
 				}
 			}
 		});
-		mRayTracer->Execute(GetComputeContext());
+		mRayTracer->Execute(GetComputeContext(), mFinalResult[buffIndex]);
+		mFinalResultTex.SetValue(mFinalResult[buffIndex]);
 	}
 	SharedPtr<ITexture> FowardRenderer::GetTargetTexture(EGBuffer buffer)
 	{
