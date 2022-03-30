@@ -97,6 +97,10 @@ namespace JG
 
 		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		mCurrFrameResource = &mFrameResources[bufferIndex];
+
+		JMatrix V = JMatrix::LookAtLH(JVector3(0.0f, 0.0f, -10.0f), JVector3(0.0f, 0.0f, 1.0f), JVector3(0.0f, 1.0f, 0.0f));
+		JMatrix P = JMatrix::OrthographicLH(info.Resolution.x, info.Resolution.y, info.NearZ, info.FarZ);
+		mQuadViewProj = JMatrix::Transpose(V * P);
 		return true;
 	}
 
@@ -175,24 +179,31 @@ namespace JG
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
 		SharedPtr<IGraphicsContext> context = GetConnectedRenderer()->GetGraphicsContext();
-		
+		RenderResult* renderResult = GetConnectedRenderer()->GetRenderResult();
+		const RenderInfo& renderInfo = GetConnectedRenderer()->GetRenderInfo();
+		const Graphics::RenderPassData& passData = GetConnectedRenderer()->GetPassData();
 
-	
-	
 		u32 quadVertexCount = mQuadCount * QuadVertexCount;
-		u32 quadIndexCount = mQuadCount * QuadIndexCount;
+		u32 quadIndexCount  = mQuadCount * QuadIndexCount;
 
 
 		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
 		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
 
+		context->SetViewports({ Viewport(renderInfo.Resolution.x, renderInfo.Resolution.y) });
+		context->SetScissorRects({ ScissorRect(0,0, renderInfo.Resolution.x, renderInfo.Resolution.y) });
+		context->SetRenderTarget({ renderResult->SceneTexture }, nullptr);
 
-	
 		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
 		context->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
 		context->SetInputLayout(mCurrFrameResource->QuadMesh->GetInputLayout());
 
 		context->BindShader(m2DShader);
+		context->BindRootSignature(GetConnectedRenderer()->GetGraphicsRootSignature());
+
+
+		context->BindConstantBuffer((u32)Renderer::ERootParam::ObjectCB, passData.ViewProjMatrix);
+	
 		context->BindTextures((u32)Renderer::ERootParam::Texture2D, mTextureArray);
 		context->BindVertexAndIndexBuffer(mCurrFrameResource->QuadVBuffer, mCurrFrameResource->QuadIBuffer);
 		context->DrawIndexed(quadIndexCount);

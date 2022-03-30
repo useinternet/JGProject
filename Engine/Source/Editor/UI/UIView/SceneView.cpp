@@ -242,17 +242,6 @@ namespace JG
 		winSize.x -= 16.0f;
 		winSize.y -= 18.0f;
 		SharedPtr<ITexture> sceneTexture = nullptr;
-
-		static u32 tmpFrame = 0;
-		if (tmpFrame < 200)
-		{
-			tmpFrame++;
-			ImGui::EndChild();
-			return;
-		}
-
-
-
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam && (GetSceneTexture() == nullptr || GetSceneTexture()->IsValid() == false))
 		{

@@ -51,6 +51,8 @@ uint halton3Inverse(uint index, uint digits);
 #define RAY_TYPE_SHADOW   2
 #define RAY_TYPE_COUNT    3
 
+#define PAYLOAD_FLAG_NONE 0
+#define PAYLOAD_FLAG_ZERO_DEPTH 1
 
 struct IndirectRayPayload
 {
@@ -67,6 +69,7 @@ struct DirectRayPayload
     float2 Normal;
     float3 PrevHitPosition;
     float2 PrevNormal;
+    uint Flags;
 };
 
 struct ShadowRayPayload
@@ -137,6 +140,12 @@ SamplerState _PointClamp  : register(s3);
 SamplerState _LinearClamp : register(s4);
 SamplerState _AnisotropicClamp : register(s5);
 SamplerState _LinearBorder_TB : register(s6);
+
+
+int GetTotalLightCount()
+{
+    return _PointLightCount;
+}
 
 ///
 //HitAttribute Func
@@ -695,7 +704,7 @@ float3 ShootDirectRay(
     payload.Normal = float2(0,0);
     payload.PrevHitPosition = float3(0,0,0);
     payload.PrevNormal = float2(0,0);
-
+    payload.Flags = PAYLOAD_FLAG_NONE;
 
     TraceRay(
         _SceneAS,
@@ -716,7 +725,7 @@ float3 ShootDirectRay(
         _MotionVectorOutput[launchIndex] = float2(1e3f,1e3f);
         _ReprojectedNormalDepthOutput[launchIndex] = 0;
         _NormalDepthOutput[launchIndex] = 0;
-        _DepthOutput[launchIndex] = 0;
+        _DepthOutput[launchIndex]       = 0;
         _RayDistanceOutput[launchIndex] = _FarZ;
     }
     else
@@ -726,9 +735,9 @@ float3 ShootDirectRay(
         _ReprojectedNormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.PrevNormal), _depth);
 
     // Calculate linear z-depth
-        float rayLength = payload.Hit;
-        float3 eyeDir   = GenerateForwardCameraRayDirection(_InvViewProjMatrix);
-        float linearDepth = rayLength * dot(rayDir, eyeDir);
+        float  rayLength   = payload.Hit;
+        float3 eyeDir      = GenerateForwardCameraRayDirection(_InvViewProjMatrix);
+        float  linearDepth = rayLength * dot(rayDir, eyeDir);
 
         
         _NormalDepthOutput[launchIndex] = EncodeNormalDepth(DecodeNormal(payload.Normal), linearDepth);
@@ -736,6 +745,10 @@ float3 ShootDirectRay(
         _RayDistanceOutput[launchIndex] = payload.Hit;
     }
 
+    if(payload.Flags == PAYLOAD_FLAG_ZERO_DEPTH)
+    {
+        _DepthOutput[launchIndex] = 0.0f;
+    }
 
 
     hitPosition = payload.HitPosition;
@@ -775,49 +788,25 @@ float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
     return payload.Factor;
 }
 
+
+
 float ShootShadowRay(int randSeed, in float3 posW)
 {
-    int totalLightCount = _PointLightCount;
+    int totalLightCount = GetTotalLightCount();
+    if(totalLightCount == 0)
+    {
+        return 0.0f;
+    }
     int lightIndex = min(int(nextRand(randSeed) * totalLightCount), totalLightCount - 1);
 
 
 
 
-    int PL_Index = lightIndex;
+    int PL_Index  = lightIndex;
     PointLight pl = _PointLightList[lightIndex];
     float shadow = ShootShadowRay_PL(pl, randSeed, posW);
     
     return shadow;
-
-    /*int visibleTotalLightCount = 0;
-
-    float4 posH = mul(_InvViewProjMatrix, float4(posW, 1.0f));
-
-    uint   clusterIndex = GetClusterIndex(posH.xyz);
-	LightGrid lgrid  = _LightGridList[clusterIndex];
-
-    float shadowFactor = 0.0f;
-
-    if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
-	{
-		int pl_start  = lgrid.PL_Offset;
-		int pl_end    = pl_start + lgrid.PL_Count;
-		for(int i = pl_start; i<pl_end; i++)
-		{
-			int lightIndex = _VisibleLightIndices[i];
-            
-			PointLight pl = _PointLightList[lightIndex];
-            shadowFactor += ShootShadowRay_PL(pl, posW);
-            visibleTotalLightCount += 1;
-		}
-	}
-
-    if(visibleTotalLightCount == 0)
-    {
-        return 1.0f;
-    }
-    shadowFactor /= visibleTotalLightCount; */
-    //return shadowFactor;
 }
 
 
@@ -865,7 +854,6 @@ float3 GGXIndirect(
 		return bounceColor;
 	}
 }
-
 float3 GGXDirect(SURFACE_OUTPUT input)
 {
     float3 posW = HitWorldPosition();

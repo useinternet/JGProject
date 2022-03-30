@@ -38,12 +38,12 @@ namespace JG
 	class IVertexBuffer;
 	class IIndexBuffer;
 	class RenderBatch;
+	class Render2DBatch;
 	class FowardRenderer;
 	class DeferredRenderer;
 	class IRenderProcess;
 	class IStructuredBuffer;
 	class IByteAddressBuffer;
-	class LightManager;
 	class RenderStatistics;
 	class RenderInfo
 	{
@@ -102,10 +102,19 @@ namespace JG
 			List<SharedPtr<IMaterial>> MaterialList;
 			Graphics::ESceneObjectFlags Flags;
 		};
-
+		struct PaperInfo
+		{
+			JMatrix WorldMatrix;
+			Color  Color = Color::White();
+			SharedPtr<ITexture> Texture = nullptr;
+		};
 	private:
 		// Batch , Process
-		List<SharedPtr<RenderBatch>>	  mBatchList;
+		List<SharedPtr<RenderBatch>> mBatchList;
+		Render2DBatch*     mRender2DBatch;
+
+
+
 		Dictionary<Type, IRenderProcess*> mProcessPool;
 		List<SharedPtr<IRenderProcess>> mPreProcessList;
 		List<SharedPtr<IRenderProcess>> mPostProcessList;
@@ -115,24 +124,27 @@ namespace JG
 		// Infos
 		Dictionary<Graphics::ELightType, LightInfo>   mLightInfos;
 		SortedDictionary<int ,List<ObjectInfo>> mObjectInfoListDic;
-
+		List<PaperInfo> mPaperInfoList;
 
 
 		// RenderInfo
 		RenderInfo mRenderInfo;
-
+		SharedPtr<RenderResult> mRenderResult;
 
 		// Context, Managers
 		SharedPtr<IGraphicsContext> mGraphicsContext;
 		SharedPtr<IComputeContext>  mComputeContext;
 		SharedPtr<ICopyContext>		mCopyContext;
 		UniquePtr<RenderParamManager> mRenderParamManager;
-		UniquePtr<LightManager>		  mLightManager;
 
 		SharedPtr<IRootSignature> mGraphicsRootSignature;
 		SharedPtr<IRootSignature> mComputeRootSignature;
 
-		u64 mFrameCount = 0;
+
+
+
+		u64		  mFrameCount = 0;
+		const u64 mResultDelayFrameCount = 240;
 		SharedPtr<Graphics::RenderPassData> mPassData;
 		SharedPtr<IStructuredBuffer> mLightGrid;
 		SharedPtr<IStructuredBuffer> mVisibleLightIndicies;
@@ -140,8 +152,8 @@ namespace JG
 		Renderer();
 		virtual ~Renderer() = default;
 	public:
-		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList);
-		void DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList, Graphics::ESceneObjectFlags flags);
+		bool Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList);
+		void DrawCall(SharedPtr<Graphics::SceneObject> sceneObject);
 		SharedPtr<RenderResult> End();
 		virtual ERendererPath GetRendererPath() const = 0;
 
@@ -151,7 +163,16 @@ namespace JG
 		SharedPtr<IStructuredBuffer> GetLightGrid() const;
 		SharedPtr<IStructuredBuffer> GetVisibleLightIndicies() const;
 	protected:
-		bool BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList);
+		template<class BatchType>
+		BatchType* CreateBatch()
+		{
+			SharedPtr<BatchType> batch = CreateSharedPtr<BatchType>();
+			batch->ConnectRenderer(this);
+
+			mBatchList.push_back(batch);
+			return batch.get();
+		}
+		bool BeginBatch(const RenderInfo& info);
 		void EndBatch();
 	public:
 		SharedPtr<IGraphicsContext> GetGraphicsContext() const;
@@ -163,6 +184,7 @@ namespace JG
 	public:
 		RenderParamManager* GetRenderParamManager() const;
 		const RenderInfo&   GetRenderInfo() const;
+		RenderResult* GetRenderResult() const;
 		const Graphics::RenderPassData& GetPassData() const;
 		const Dictionary<Graphics::ELightType, LightInfo>&       GetLightInfos() const;
 		const LightInfo& GetLightInfo(Graphics::ELightType type);

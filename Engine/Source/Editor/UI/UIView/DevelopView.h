@@ -13,9 +13,6 @@ namespace JG
 
 	private:
 		bool	 mOpenGUI = true;
-
-		
-
 		struct RendererParamInfo
 		{
 			String Key;

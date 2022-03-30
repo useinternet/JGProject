@@ -11,6 +11,8 @@
 #define SHADING_MODEL_SKYBOX      1
 
 
+
+
 struct Material
 {
     float3 WorldPosition;

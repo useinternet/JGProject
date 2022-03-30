@@ -25,14 +25,15 @@ namespace JG
 
 		context->BindShader(mShader);
 		context->BindRootSignature(mRenderer->GetComputeRootSignature());
-
+		context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, input.FarZ);
 		context->BindTextures((u32)Renderer::EComputeRootParam::SRV, {
 			input.Direct,
 			input.IndirectR,
 			input.IndirectG,
 			input.IndirectB,
 			input.Shadow,
-			input.AO
+			input.AO,
+			input.Depth
 			});
 		context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { input.Output });
 		context->Dispatch2D(input.Resolution.x, input.Resolution.y);

@@ -419,7 +419,7 @@ namespace JG
 		{
 			sceneInfo = mScene->GetSceneInfo();
 		}
-		sceneInfo.RenderPath = ERendererPath::Foward;
+		sceneInfo.RenderPath = ERendererPath::RayTracing;
 		sceneInfo.EyePos = GetOwner()->GetTransform()->GetWorldLocation();
 		sceneInfo.Resolution = GetResolution();
 		sceneInfo.ClearColor = GetClearColor();

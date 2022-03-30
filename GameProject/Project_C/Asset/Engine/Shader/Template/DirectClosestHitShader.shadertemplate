@@ -51,8 +51,6 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 
     Vertex v = HitAttribute(vertices, attribute);
 
-  
-
 	SURFACE_INPUT input;
 	input.position       = HitWorldPosition();
 	input.local_position = HitObjectPosition();
@@ -62,7 +60,6 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 	input.tex            = v.Texcoord;
 	SURFACE_OUTPUT output = SURFACE_FUNCTION(input);
 	
-
 	if(output.shadingmodel == SHADING_MODEL_DEFAULT_LIT)
 	{
     	payload.Hit           = RayTCurrent();
@@ -75,9 +72,10 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 		payload.PrevNormal = EncodeNormal(normalize(mul(objectNormal, (float3x3)_blasTransform)));
 		payload.Color = GGXDirect(output);
 	}
-	else
+	else if(output.shadingmodel == SHADING_MODEL_SKYBOX)
 	{
-		payload.Hit           = RayTCurrent();
+		payload.Hit   = RayTCurrent();
 		payload.Color = output.emissive;
+		payload.Flags = PAYLOAD_FLAG_ZERO_DEPTH;
 	}
 }

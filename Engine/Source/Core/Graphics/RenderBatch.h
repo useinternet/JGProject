@@ -7,7 +7,6 @@ namespace JG
 	class RenderInfo;
 	class RenderBatch
 	{
-	
 		Renderer* mConnectedRenderer = nullptr;
 	public:
 		RenderBatch() = default;

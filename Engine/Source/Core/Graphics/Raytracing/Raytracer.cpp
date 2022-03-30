@@ -385,14 +385,15 @@ namespace JG
 		{
 			RT_Composite::Input input;
 			input.Resolution = mCB.Resolution;
+			input.FarZ = mCB.FarZ;
 			input.Direct    = GetResource(EResource::Direct);
 			input.IndirectR = mDenoisedTex[EDenoiser::Denoise_IndirectR].GetValue();
 			input.IndirectG = mDenoisedTex[EDenoiser::Denoise_IndirectG].GetValue();
 			input.IndirectB = mDenoisedTex[EDenoiser::Denoise_IndirectB].GetValue();
 			input.Shadow    = mDenoisedTex[EDenoiser::Denoise_Shadow].GetValue();
 			input.AO        = mDenoisedTex[EDenoiser::Denoise_Ao].GetValue();
-
-			input.Output = targetTexture;
+			input.Depth     = GetResource(EResource::Depth);
+			input.Output    = targetTexture;
 			mComposite->Execute(context, input);
 		}
 	}

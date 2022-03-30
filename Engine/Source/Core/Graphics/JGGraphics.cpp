@@ -7,6 +7,9 @@
 #include "Graphics/DebugGeometryDrawer.h"
 #include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/Renderer/FowardRenderer.h"
+#include "Graphics/Renderer/DeferredRenderer.h"
+#include "Graphics/Renderer/RayTracingRenderer.h"
+
 #include "GraphicsHelper.h"
 #include "Graphics/Develop/RenderStatistics.h"
 #include "Application.h"
@@ -358,7 +361,7 @@ namespace JG
 		Scene::Scene(const SceneInfo& info)
 		{
 			static u64 s_CommandIDOffset = 0;
-			m2DBatch = CreateSharedPtr<Render2DBatch>();
+			//m2DBatch = CreateSharedPtr<Render2DBatch>();
 			SetSceneInfo(info);
 
 		}
@@ -392,7 +395,7 @@ namespace JG
 
 		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)
 		{
-			if (mRenderer == nullptr || m2DBatch == nullptr)
+			if (mRenderer == nullptr)
 			{
 				return false;
 			}
@@ -407,7 +410,7 @@ namespace JG
 
 		bool Scene::PushLight(SharedPtr<Light> l)
 		{
-			if (mRenderer == nullptr || m2DBatch == nullptr)
+			if (mRenderer == nullptr)
 			{
 				return false;
 			}
@@ -438,7 +441,7 @@ namespace JG
 
 		void Scene::Rendering()
 		{
-			if (mRenderer == nullptr || m2DBatch == nullptr)
+			if (mRenderer == nullptr)
 			{
 				return;
 			}
@@ -463,33 +466,12 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition = mSceneInfo.EyePos;
 				info.ClearColor  = mSceneInfo.ClearColor;
-				if (mRenderer->Begin(info, mLightList, { m2DBatch }) == true)
+				if (mRenderer->Begin(info, mLightList) == true)
 				{
-
 					while (mSceneObjectQueue.empty() == false)
 					{
 						auto obj = mSceneObjectQueue.front(); mSceneObjectQueue.pop();
-						switch (obj->GetSceneObjectType())
-						{
-						case ESceneObjectType::Paper:
-						{
-							auto paperObj = static_cast<PaperObject*>(obj.get());
-							m2DBatch->DrawCall(paperObj->WorldMatrix, paperObj->Texture, paperObj->Color);
-						}
-							break;
-						case ESceneObjectType::Debug:
-						{
-							//auto debugObj = static_cast<DebugRenderObject*>(obj.get());
-							//mRenderer->DrawCall(debugObj->WorldMatrix, debugObj->Mesh, debugObj->MaterialList);
-						}
-							break;
-						case ESceneObjectType::Static:
-							auto staticObj = static_cast<StaticRenderObject*>(obj.get());
-							mRenderer->DrawCall(staticObj->WorldMatrix, staticObj->Mesh, staticObj->MaterialList, staticObj->Flags);
-							break;
-						// Skeletal
-						}
-
+						mRenderer->DrawCall(obj);
 					}
 
 					auto result = mRenderer->End();
@@ -551,8 +533,10 @@ namespace JG
 			auto bufferCount = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 			switch (path)
 			{
-			case ERendererPath::Foward:
-				mRenderer = CreateSharedPtr<FowardRenderer>();
+			case ERendererPath::Deferred:
+				mRenderer = CreateSharedPtr<DeferredRenderer>();
+			case ERendererPath::RayTracing:
+				mRenderer = CreateSharedPtr<RayTracingRenderer>();
 				break;
 			}
 		}

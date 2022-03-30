@@ -12,60 +12,54 @@
 namespace JG
 {
     RTAO::Sampler::Sampler() :
-        m_numSamples(0),
-        m_numSampleSets(0),
-        m_index(0)
+        mNumSamples(0),
+        mNumSampleSets(0),
+        mIndex(0)
     {
     }
 
-    // Get a valid index from <0, m_numSampleSets * m_numSamples>.
-    // The index increases by 1 on each call, but on a first 
-    // access of a next sample set, the:
-    // - sample set is randomly picked
-    // - sample set is indexed from a random starting index within a set.
-    // In addition the order of indices is retrieved from shuffledIndices.
-    UINT RTAO::Sampler::GetSampleIndex()
+    u32 RTAO::Sampler::GetSampleIndex()
     {
         // Initialize sample and set jumps.
-        if (m_index % m_numSamples == 0)
+        if (mIndex % mNumSamples == 0)
         {
             // Pick a random index jump within a set.
-            m_jump = GetRandomJump();
+            mJump = GetRandomJump();
 
             // Pick a random set index jump.
-            m_setJump = GetRandomSetJump() * m_numSamples;
+            mSetJump = GetRandomSetJump() * mNumSamples;
         }
-        return m_setJump + m_shuffledIndices[(m_index++ + m_jump) % m_numSamples];
+        return mSetJump + mShuffledIndices[(mIndex++ + mJump) % mNumSamples];
     }
 
     // Resets the sampler with newly randomly generated samples
-    void RTAO::Sampler::Reset(UINT numSamples, UINT numSampleSets, Enum hemisphereDistribution)
+    void RTAO::Sampler::Reset(u32 numSamples, u32 numSampleSets, Enum hemisphereDistribution)
     {
-        m_index = 0;
-        m_numSamples = numSamples;
-        m_numSampleSets = numSampleSets;
-        m_samples.resize(m_numSamples * m_numSampleSets, UnitSquareSample2D(FLT_MAX, FLT_MAX));
-        m_shuffledIndices.resize(m_numSamples * m_numSampleSets);
-        m_hemisphereSamples.resize(m_numSamples * m_numSampleSets, HemisphereSample3D(FLT_MAX, FLT_MAX, FLT_MAX));
+        mIndex = 0;
+        mNumSamples = numSamples;
+        mNumSampleSets = numSampleSets;
+        mSamples.resize(mNumSamples * mNumSampleSets, UnitSquareSample2D(FLT_MAX, FLT_MAX));
+        mShuffledIndices.resize(mNumSamples * mNumSampleSets);
+        mHemisphereSamples.resize(mNumSamples * mNumSampleSets, HemisphereSample3D(FLT_MAX, FLT_MAX, FLT_MAX));
 
         // Reset generator and initialize distributions.
         {
             // Initialize to the same seed for determinism.
-            m_generatorURNG.seed(s_seed);
+            mGeneratorURNG.seed(s_seed);
 
-            std::uniform_int_distribution<UINT> jumpDistribution(0, m_numSamples - 1);
-            std::uniform_int_distribution<UINT> jumpSetDistribution(0, m_numSampleSets - 1);
+            std::uniform_int_distribution<u32> jumpDistribution(0, mNumSamples - 1);
+            std::uniform_int_distribution<u32> jumpSetDistribution(0, mNumSampleSets - 1);
 
-            std::uniform_real_distribution<float> unitSquareDistribution(0.f, 1.f);
+            std::uniform_real_distribution<f32> unitSquareDistribution(0.f, 1.f);
 
             // Specify the next representable value for the end range, since
             // uniform_real_distribution constructs excluding the end value [being, end).
-            std::uniform_real_distribution<float> unitSquareDistributionInclusive(0.f, nextafter(1.f, FLT_MAX));
+            std::uniform_real_distribution<f32> unitSquareDistributionInclusive(0.f, nextafter(1.f, FLT_MAX));
 
-            GetRandomJump = bind(jumpDistribution, ref(m_generatorURNG));
-            GetRandomSetJump = bind(jumpSetDistribution, ref(m_generatorURNG));
-            GetRandomFloat01 = bind(unitSquareDistribution, ref(m_generatorURNG));
-            GetRandomFloat01inclusive = bind(unitSquareDistributionInclusive, ref(m_generatorURNG));
+            GetRandomJump = bind(jumpDistribution, ref(mGeneratorURNG));
+            GetRandomSetJump = bind(jumpSetDistribution, ref(mGeneratorURNG));
+            GetRandomFloat01 = bind(unitSquareDistribution, ref(mGeneratorURNG));
+            GetRandomFloat01inclusive = bind(unitSquareDistributionInclusive, ref(mGeneratorURNG));
         }
 
         // Generate random samples.
@@ -78,13 +72,13 @@ namespace JG
             case Cosine: InitializeHemisphereSamples(1.f); break;
             }
 
-            for (UINT i = 0; i < m_numSampleSets; i++)
+            for (UINT i = 0; i < mNumSampleSets; i++)
             {
-                auto first = begin(m_shuffledIndices) + i * m_numSamples;
-                auto last = first + m_numSamples;
+                auto first = begin(mShuffledIndices) + i * mNumSamples;
+                auto last = first + mNumSamples;
 
                 std::iota(first, last, 0u); // Fill with 0, 1, ..., m_numSamples - 1 
-                shuffle(first, last, m_generatorURNG);
+                shuffle(first, last, mGeneratorURNG);
             }
         }
     };
@@ -94,26 +88,23 @@ namespace JG
         return JVector2(GetRandomFloat01(), GetRandomFloat01());
     }
 
-    UINT RTAO::Sampler::GetRandomNumber(UINT min, UINT max)
+    UINT RTAO::Sampler::GetRandomNumber(u32 min, u32 max)
     {
-        std::uniform_int_distribution<UINT> distribution(min, max);
-        return distribution(m_generatorURNG);
+        std::uniform_int_distribution<u32> distribution(min, max);
+        return distribution(mGeneratorURNG);
     }
     RTAO::UnitSquareSample2D RTAO::Sampler::GetSample2D()
     {
-        return m_samples[GetSampleIndex()];
+        return mSamples[GetSampleIndex()];
     }
 
     RTAO::HemisphereSample3D RTAO::Sampler::GetHemisphereSample3D()
     {
-        return m_hemisphereSamples[GetSampleIndex()];
+        return mHemisphereSamples[GetSampleIndex()];
     }
-
-    // Initialize samples on a 3D hemisphere from 2D unit square samples
-    // cosDensityPower - cosine density power {0, 1, ...}. 0:uniform, 1:cosine,...
     void RTAO::Sampler::InitializeHemisphereSamples(float cosDensityPower)
     {
-        for (UINT i = 0; i < m_samples.size(); i++)
+        for (UINT i = 0; i < mSamples.size(); i++)
         {
             // Compute azimuth (phi) and polar angle (theta)
             /*
@@ -127,26 +118,14 @@ namespace JG
             m_hemisphereSamples[i].z = cosf(theta);
             */
             // Optimized version using trigonometry equations.
-            float cosTheta = powf((1.f - m_samples[i].y), 1.f / (cosDensityPower + 1));
+            float cosTheta = powf((1.f - mSamples[i].y), 1.f / (cosDensityPower + 1));
             float sinTheta = sqrtf(1.f - cosTheta * cosTheta);
-            m_hemisphereSamples[i].x = sinTheta * cosf(JG_2PI * m_samples[i].x);
-            m_hemisphereSamples[i].y = sinTheta * sinf(JG_2PI * m_samples[i].x);
-            m_hemisphereSamples[i].z = cosTheta;
+            mHemisphereSamples[i].x = sinTheta * cosf(JG_2PI * mSamples[i].x);
+            mHemisphereSamples[i].y = sinTheta * sinf(JG_2PI * mSamples[i].x);
+            mHemisphereSamples[i].z = cosTheta;
 
         }
     }
-
-    // Generate multi-jittered sample patterns on a unit square [0,1].
-    // Ref: Section 5.3.4 in Ray Tracing from the Ground Up.
-    // The distribution has good random sampling distributions
-    // with somewhat uniform distributions in both:
-    // - 2D
-    // - 1D projections of each axes.
-    // Multi-jittered is a combination of two sample distributions:
-    // - Jittered: samples are distributed on a NxN grid, 
-    //             with each sample being random within its cell.
-    // - N-rooks/Linear hypercube sampling: samples have uniform
-    //             distribution in 1D projections of each axes.
     void RTAO::MultiJittered::GenerateSamples2D()
     {
         for (UINT s = 0; s < NumSampleSets(); s++)
@@ -157,7 +136,7 @@ namespace JG
             const UINT T = NumSamples();
             const UINT N = static_cast<UINT>(sqrt(T));
 
-#define SAMPLE(i) m_samples[sampleSetStartID + i]
+#define SAMPLE(i) mSamples[sampleSetStartID + i]
 
             // Generate random samples
             for (UINT col = 0, i = 0; col < N; col++)
@@ -196,7 +175,7 @@ namespace JG
     // Generate random sample patterns on unit square.
     void RTAO::Random::GenerateSamples2D()
     {
-        for (auto& sample : m_samples)
+        for (auto& sample : mSamples)
         {
             sample = RandomFloat01_2D();
         }
@@ -212,6 +191,19 @@ namespace JG
         mRenderer = renderer;
         Init();
     }
+
+    RTAO::~RTAO()
+    {
+        if (mSamplerUpdateSH != nullptr)
+        {
+            mSamplerUpdateSH->Reset();
+        }
+        if (mSamplerUpdateAyncSH != nullptr)
+        {
+            mSamplerUpdateAyncSH->Reset();
+        }
+    }
+
 
     RTAO::Output RTAO::Execute(SharedPtr<IComputeContext> context, const Input& input)
     {
@@ -356,12 +348,12 @@ namespace JG
     {
         u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
         SharedPtr<IStructuredBuffer> sb = mHemisphereSamples[bufferIndex];
-        UINT pixelsInSampleSet1D = mAOSampleSetDistributedAcrossPixels.GetValue();
-        UINT samplesPerSet = mSPP.GetValue() * pixelsInSampleSet1D * pixelsInSampleSet1D;
+        u32 pixelsInSampleSet1D = mAOSampleSetDistributedAcrossPixels.GetValue();
+        u32 samplesPerSet = mSPP.GetValue() * pixelsInSampleSet1D * pixelsInSampleSet1D;
         mRandomSampler.Reset(samplesPerSet, mNumSampleSets, Cosine);
 
-        UINT numSamples = mRandomSampler.NumSamples() * mRandomSampler.NumSampleSets();
-        for (UINT i = 0; i < numSamples; i++)
+        u32 numSamples = mRandomSampler.NumSamples() * mRandomSampler.NumSampleSets();
+        for (u32 i = 0; i < numSamples; i++)
         {
             JVector3 p = mRandomSampler.GetHemisphereSample3D();
     

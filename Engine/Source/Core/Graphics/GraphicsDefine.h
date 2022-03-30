@@ -337,13 +337,11 @@ namespace JG
 	{
 		namespace Template
 		{
-			constexpr char* Standard2DShader = "Standard2DShader";
-			constexpr char* Standard3DShader = "Standard3DShader";
-			constexpr char* StandardSceneShader = "StandardSceneShader";
-			constexpr char* StandardEditorUIShader = "StandardEditorUIShader";
-			constexpr char* DebugShader = "DebugShader";
-
-
+			constexpr char* Standard2DShader		= "Standard2DShader";
+			constexpr char* Standard3DShader		= "Standard3DShader";
+			constexpr char* StandardSceneShader		= "StandardSceneShader";
+			constexpr char* StandardEditorUIShader  = "StandardEditorUIShader";
+			constexpr char* DebugShader				= "DebugShader";
 			constexpr char* DirectClosestHitShader   = "DirectClosestHitShader";
 			constexpr char* IndirectClosestHitShader = "IndirectClosestHitShader";
 		}

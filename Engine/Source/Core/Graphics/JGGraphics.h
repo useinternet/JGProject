@@ -7,11 +7,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Renderer.h"
-
-
-
-
-
+#include "SceneObject.h"
+#include "SceneLight.h"
 namespace JG
 {
 	namespace Graphics
@@ -27,9 +24,6 @@ namespace JG
 	}
 	class Render2DBatch;
 	class DebugGeometryDrawer;
-
-
-
 	struct JGGraphicsDesc
 	{
 		EGraphicsAPI GraphicsAPI;
@@ -37,6 +31,9 @@ namespace JG
 		String ShaderTemplatePath;
 		String ShaderScriptPath;
 	};
+
+
+
 	class JGGraphics : public GlobalSingleton<JGGraphics, JGGraphicsDesc>
 	{
 		friend class Application;
@@ -110,32 +107,12 @@ namespace JG
 {
 	namespace Graphics
 	{
-		enum class ELightType
-		{
-			PointLight,
-		};
-		enum class ESceneObjectType
-		{
-			Static,
-			Paper,
-			Debug,
-		};
-
-		ENUM_FLAG(ESceneObjectFlags)
-		enum class ESceneObjectFlags
-		{
-			None = 0,
-			Ignore_RayTracing_Bottom_Level_AS = 0x00001,
-		};
-
 
 		class SceneInfo
 		{
 		public:
-			ERendererPath RenderPath = ERendererPath::Foward;
+			ERendererPath RenderPath = ERendererPath::Deferred;
 			JVector2 Resolution;
-
-			
 			JVector3 EyePos;
 			JMatrix  ViewMatrix = JMatrix::Identity();
 			JMatrix  ProjMatrix = JMatrix::Identity();
@@ -168,8 +145,6 @@ namespace JG
 			bool IsLock();
 		};
 
-
-		//
 		class Scene : public GObject
 		{
 			using PostRenderingEvent = std::function<void(SharedPtr<SceneResultInfo>)>;
@@ -180,7 +155,7 @@ namespace JG
 			List<SharedPtr<Light>>        mLightList;
 
 			SharedPtr<Renderer>       mRenderer;
-			SharedPtr<Render2DBatch>  m2DBatch;
+			//SharedPtr<Render2DBatch>  m2DBatch;
 			SharedPtr<ScheduleHandle> mRenderScheduleHandle;
 
 
@@ -201,166 +176,9 @@ namespace JG
 			void Reset();
 			void Rendering();
 			SharedPtr<SceneResultInfo> FetchResultFinish();
-
-
 		private:
 			void InitRenderer(ERendererPath path);
 		};
-
-
-		// SceneObject //
-		class SceneObject
-		{
-		public:
-			JMatrix	WorldMatrix = JMatrix::Identity();
-			ESceneObjectFlags Flags = ESceneObjectFlags::None;
-			u64     Layer = 0;
-		
-		public:
-			virtual ~SceneObject() = default;
-		public:
-			virtual ESceneObjectType GetSceneObjectType() const = 0;
-			virtual bool IsValid() const = 0;
-		};
-
-		class PaperObject : public SceneObject
-		{
-		public:
-			Color  Color = Color::White();
-			SharedPtr<ITexture> Texture = nullptr;
-		public:
-			virtual ~PaperObject() = default;
-		public:
-			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Paper; }
-			virtual bool IsValid() const override { return true; }
-		};
-
-		class DebugRenderObject : public SceneObject
-		{
-		public:
-			SharedPtr<IMesh> Mesh;
-			List<SharedPtr<IMaterial>> MaterialList;
-		public:
-			virtual ~DebugRenderObject() = default;
-		public:
-			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Debug; }
-			virtual bool IsValid() const override {
-				bool result = true;
-
-				if (Mesh == nullptr || Mesh->IsValid() == false)
-				{
-					result = false;
-				}
-				if (MaterialList.empty())
-				{
-					result = false;
-				}
-				else
-				{
-					for (auto& m : MaterialList)
-					{
-						if (m == nullptr)
-						{
-							result = false;
-							break;
-						}
-					}
-				}
-
-				return result;
-			}
-		};
-
-		class StaticRenderObject : public SceneObject
-		{
-		public:
-			SharedPtr<IMesh> Mesh;
-			List<SharedPtr<IMaterial>> MaterialList;
-		public:
-			virtual ~StaticRenderObject() = default;
-		public:
-			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Static; }
-			virtual bool IsValid() const override { 
-				bool result = true;
-
-				if (Mesh == nullptr || Mesh->IsValid() == false)
-				{
-					result = false;
-				}
-				if (MaterialList.empty())
-				{
-					result = false;
-				}
-				else
-				{
-					for (auto& m : MaterialList)
-					{
-						if (m == nullptr)
-						{
-							result = false;
-							break;
-						}
-					}
-				}
-
-				return result;
-			}
-		};
-
-
-
-
-		/// Light ///
-		class Light 
-		{
-		public:
-			virtual ~Light() = default;
-		protected:
-			void PushData(List<jbyte>& btData, void* data, u64 size) {
-				u64 offset = btData.size();
-
-				btData.resize(offset + size);
-				memcpy(&btData[offset], data, size);
-			}
-		public:
-			virtual ELightType GetLightType() const = 0;
-			virtual void PushBtData(List<jbyte>& btData) = 0;
-			virtual u64  GetBtSize() const = 0;
-		};
-
-
-		//
-		class PointLight : public Light
-		{
-		public:
-			virtual ~PointLight() = default;
-		public:
-			JVector3 Color;
-			JVector3 Position;
-			f32 Intensity = 1.0f;
-			f32 Range    = 0.0f;
-			f32 AttRange = 0.0f;
-			f32 Att0 = 0.0f;
-			f32 Att1 = 0.0f;
-			f32 Att2 = 0.0f;
-		public:
-			virtual ELightType GetLightType() const override { return ELightType::PointLight; }
-			virtual void PushBtData(List<jbyte>& btData)  override
-			{
-				PushData(btData, &Position, sizeof(JVector3));
-				PushData(btData, &Range, sizeof(float));
-				PushData(btData, &Color, sizeof(JVector3));
-				PushData(btData, &AttRange, sizeof(float));
-				PushData(btData, &Intensity, sizeof(float));
-				PushData(btData, &Att0, sizeof(float));
-				PushData(btData, &Att1, sizeof(float));
-				PushData(btData, &Att2, sizeof(float));
-			}
-			virtual u64 GetBtSize() const override {
-				return 48;
-			}
-		};
-
 
 		class RenderPassData
 		{

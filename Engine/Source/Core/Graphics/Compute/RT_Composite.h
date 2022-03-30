@@ -15,13 +15,14 @@ namespace JG
 		struct Input
 		{
 			JVector2 Resolution;
+			f32 FarZ;
 			SharedPtr<ITexture> Direct;
 			SharedPtr<ITexture> IndirectR;
 			SharedPtr<ITexture> IndirectG;
 			SharedPtr<ITexture> IndirectB;
 			SharedPtr<ITexture> Shadow;
 			SharedPtr<ITexture> AO;
-
+			SharedPtr<ITexture> Depth;
 			SharedPtr<ITexture> Output;
 		};
 		

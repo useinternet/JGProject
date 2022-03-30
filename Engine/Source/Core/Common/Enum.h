@@ -55,6 +55,8 @@ namespace JG
 	{
 		Foward,
 		Deferred,
+		RayTracing,
+		Simple,
 	};
 
 	enum class EKeyCode

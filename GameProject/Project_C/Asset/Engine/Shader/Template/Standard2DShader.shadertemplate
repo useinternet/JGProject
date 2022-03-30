@@ -19,9 +19,9 @@ VS_OUT vs_main(VS_IN vin)
 {
 	VS_OUT vout;
 		    
-	vout.posH  = mul(float4(vin.posL, 1.0f), _ViewProjMatrix);
-	vout.tex   = vin.tex;
-	vout.color = vin.color;
+	vout.posH   = mul(float4(vin.posL, 1.0f), _WorldMatrix);
+	vout.tex     = vin.tex;
+	vout.color  = vin.color;
 	vout.textureIndex = vin.textureIndex;
 	return vout;
 }

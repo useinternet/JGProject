@@ -50,7 +50,7 @@ namespace JG
 		SharedPtr<IGraphicsShader> m2DShader;
 		u64 mQuadCount = 0;
 		u64 mTextureCount = 0;
-
+		JMatrix mQuadViewProj;
 		FrameResource* mCurrFrameResource = nullptr;
 		List<SharedPtr<ITexture>> mRenderTarges;
 

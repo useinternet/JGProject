@@ -2,8 +2,8 @@
 #include "Renderer.h"
 #include "Application.h"
 #include "JGGraphics.h"
-#include "Graphics/Manager/LightManager.h"
 #include "Graphics/RenderBatch.h"
+#include "Graphics/Batch/Render2DBatch.h"
 #include "Graphics/RenderProcess.h"
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
@@ -14,11 +14,12 @@ namespace JG
 	Renderer::Renderer()
 	{
 		mRenderParamManager = CreateUniquePtr<RenderParamManager>();
-		mLightManager		= CreateUniquePtr<LightManager>();
-		mPassData = CreateSharedPtr< Graphics::RenderPassData>();
+		mPassData		    = CreateSharedPtr< Graphics::RenderPassData>();
 		InitRootSignature();
+
+		mRender2DBatch = CreateBatch<Render2DBatch>();
 	}
-	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList, List<SharedPtr<RenderBatch>> batchList)
+	bool Renderer::Begin(const RenderInfo& info, List<SharedPtr<Graphics::Light>> lightList)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
@@ -36,8 +37,6 @@ namespace JG
 			_pair.second.Count = 0;
 		}
 
-
-
 		// Light Info 정보 수집 <- 나중에 라이트 매니저로 빼기
 		// Structured Buffer 사이즈 조절 고민
 		for (auto item : lightList)
@@ -48,8 +47,6 @@ namespace JG
 			info.Size = item->GetBtSize();
 			item->PushBtData(info.Data);
 		}
-
-
 
 		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		// PassData  바인딩
@@ -96,32 +93,65 @@ namespace JG
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
 		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.Data.data(), lInfo.Size, lInfo.Count);
 
-		return BeginBatch(info, batchList);
+		return BeginBatch(info);
 	}
-	void Renderer::DrawCall(const JMatrix& worldMatrix, SharedPtr<IMesh> mesh, List<SharedPtr<IMaterial>> materialList, Graphics::ESceneObjectFlags flags)
+	void Renderer::DrawCall(SharedPtr<Graphics::SceneObject> sceneObject)
 	{
-		if (mesh == nullptr || materialList.empty())
+		if (sceneObject == nullptr)
 		{
 			return;
 		}
 		Statistics.TotalObjectCount += 1;
 
-		ObjectInfo info;
-		info.WorldMatrix = worldMatrix;
-		info.Mesh = mesh;
-		info.MaterialList = materialList;
-		info.Flags = flags;
-		i32 type = ArrangeObject(info);
-		mObjectInfoListDic[type].push_back(info);
-		
-		Statistics.VisibleObjectCount += 1;
+
+		switch(sceneObject->GetSceneObjectType())
+		{
+		case Graphics::ESceneObjectType::Paper:
+		{
+			Graphics::PaperObject* paperObj = static_cast<Graphics::PaperObject*>(sceneObject.get());
+			PaperInfo info;
+			info.WorldMatrix = paperObj->WorldMatrix;
+			info.Color = paperObj->Color;
+			if (paperObj->Texture == nullptr || paperObj->Texture->IsValid() == false)
+			{
+				info.Texture = ITexture::NullTexture();
+			}
+			else
+			{
+				info.Texture = paperObj->Texture;
+			}
+			mPaperInfoList.push_back(info);
+			Statistics.VisibleObjectCount += 1;
+		}
+
+			break;
+		case Graphics::ESceneObjectType::Static:
+		{
+			Graphics::StaticRenderObject* staticObj = static_cast<Graphics::StaticRenderObject*>(sceneObject.get());
+			if (staticObj->Mesh != nullptr && staticObj->MaterialList.empty() == false)
+			{
+				ObjectInfo info;
+				info.WorldMatrix = staticObj->WorldMatrix;
+				info.Mesh = staticObj->Mesh;
+				info.MaterialList = staticObj->MaterialList;
+				info.Flags = staticObj->Flags;
+				i32 type = ArrangeObject(info);
+				mObjectInfoListDic[type].push_back(info);
+				Statistics.VisibleObjectCount += 1;
+			}
+			
+
+
+
+		}
+			break;
+		}
+	
 	}
 	SharedPtr<RenderResult> Renderer::End()
 	{
 		auto api  = JGGraphics::GetInstance().GetGraphicsAPI();
 		SharedPtr<RenderResult> result = CreateSharedPtr<RenderResult>();
-	
-
 
 		// PreProcess Run
 		IRenderProcess::RunData runData;
@@ -174,11 +204,31 @@ namespace JG
 			}
 			if (isCompelete) break;
 		}
-		mObjectInfoListDic.clear();
-		mLightInfos.clear();
-		EndBatch();
+
+
 
 		CompeleteImpl(result);
+
+
+
+
+		mRenderResult = result;
+
+		// Paper 처리
+		if (mRender2DBatch != nullptr)
+		{
+			for (PaperInfo& info : mPaperInfoList)
+			{
+				mRender2DBatch->DrawCall(info.WorldMatrix, info.Texture, info.Color);
+			}
+		}
+		EndBatch();
+		
+
+
+		mPaperInfoList.clear();
+		mObjectInfoListDic.clear();
+		mLightInfos.clear();
 		return result;
 	}
 
@@ -202,19 +252,14 @@ namespace JG
 		return mVisibleLightIndicies;
 	}
 
-	bool Renderer::BeginBatch(const RenderInfo& info, List<SharedPtr<RenderBatch>> batchList)
+	bool Renderer::BeginBatch(const RenderInfo& info)
 	{
 		bool result = true;
-		mBatchList = batchList;
-		if (mBatchList.empty() == false)
+		for (auto& batch : mBatchList)
 		{
-			for (auto& batch : mBatchList)
+			if (batch->Begin(info) == false)
 			{
-				batch->ConnectRenderer(this);
-				if (batch->Begin(info) == false)
-				{
-					result = false;
-				}
+				result = false;
 			}
 		}
 		return result;
@@ -226,7 +271,6 @@ namespace JG
 		{
 			batch->End();
 		}
-		mBatchList.clear();
 	}
 
 	SharedPtr<IGraphicsContext> Renderer::GetGraphicsContext() const
@@ -260,6 +304,11 @@ namespace JG
 	const RenderInfo& Renderer::GetRenderInfo() const
 	{
 		return mRenderInfo;
+	}
+
+	RenderResult* Renderer::GetRenderResult() const
+	{
+		return mRenderResult.get();
 	}
 
 	const Graphics::RenderPassData& Renderer::GetPassData() const
