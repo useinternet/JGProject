@@ -73,7 +73,6 @@ namespace JG
 	private:
 		List<Asset<ITexture>*> mIcons;
 	private:
-		bool mOpenGUI = true;
 		bool mIsCtrl = false;
 
 		f32      mFileCellScale = 1.0f;
@@ -108,6 +107,8 @@ namespace JG
 		virtual void Load() override;
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
+		virtual void PreOnGUI() override;
+		virtual void LateOnGUI() override;
 		virtual void Destroy() override;
 	private:
 		void OnGUI_Top();

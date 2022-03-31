@@ -34,7 +34,7 @@ namespace JG
 
 
 
-	class JGGraphics : public GlobalSingleton<JGGraphics, JGGraphicsDesc>
+	class JGGraphics : public IGlobalSingleton<JGGraphics>
 	{
 		friend class Application;
 	private:

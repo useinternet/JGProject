@@ -25,4 +25,14 @@ namespace JG
 		return mDll != nullptr;;
 	}
 
+	PluginLinker::PluginLinker()
+	{
+		pGlobalSingletoneManager = GlobalSingletonManager::GetInstancePtr();
+	}
+
+	void PluginLinker::Apply()
+	{
+		GlobalSingletonManager::SetInstancePtr(pGlobalSingletoneManager);
+	}
+
 }

@@ -27,9 +27,15 @@ namespace JG
 		virtual void Load()        = 0;
 		virtual void Initialize()  = 0;
 		virtual void OnGUI()       = 0;
+		virtual void BeginOnGUI()  = 0;
+		virtual void EndOnGUI()    = 0;
 		virtual void Destroy()     = 0;
+		
 	protected:
 		virtual void OnEvent(IEvent& e) = 0;
+		virtual u64  GetViewID() const = 0;
+		virtual void SetViewID(u64 id) = 0;
+		virtual bool IsUniqueView() const = 0;
 	public:
 		virtual void Open()  = 0;
 		virtual void Close() = 0;
@@ -43,15 +49,72 @@ namespace JG
 	{
 		JGCLASS
 	private:
-		bool mIsOpen = false;
-		bool mIsLoad = false;
+		String mTitleName;
+
+		bool mIsOpen     = false;
+		bool mIsLoad     = false;
+
+		
+		// GUI x 버튼 클릭 여부
+		u64  mViewID    = 0;
+		bool mIsUniqueView = true;
+		bool mIsShowGUI    = true;
+	private:
+		virtual u64 GetViewID() const override
+		{
+			return mViewID;
+		}
+		virtual void SetViewID(u64 id) override
+		{
+			mViewID = id;
+		}
+		virtual bool IsUniqueView() const override
+		{
+			return mIsUniqueView;
+		}
 	protected:
 		virtual void OnEvent(IEvent& e) override { }
-	protected:
 		virtual void Load()		  override {}
 		virtual void Initialize() override {}
+
 		virtual void OnGUI()	  override {}
+		virtual void PreOnGUI()   {}
+		virtual void LateOnGUI()  {}
 		virtual void Destroy()	  override {}
+		virtual void ReceiveError(SharedPtr<IUIError> error) override {}
+
+		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override {
+			jsonData->AddMember("IsOpen", IsOpen());
+		}
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override {
+			auto val = jsonData->GetMember("IsOpen");
+			bool open = false;
+			if (val)
+			{
+				open = val->GetBool();
+			}
+			if (open) Open();
+			else Close();
+
+		}
+
+
+		const String& GetTitleName()
+		{
+			if (mTitleName.empty() == true)
+			{
+				mTitleName = StringHelper::ReplaceAll(GetType().GetName(), "JG::", "");
+			}
+			return mTitleName;
+		}
+		void SetTitleName(const String& name)
+		{
+			mTitleName = name;
+		}
+		void DisableUniqueView()
+		{
+			mIsUniqueView = false;
+		}
 	public:
 		virtual bool IsOpen() const override {
 			return mIsOpen;
@@ -77,25 +140,24 @@ namespace JG
 				Destroy();
 			}
 		}
-
-
-		// IUIErrorReceiver
-		virtual void ReceiveError(SharedPtr<IUIError> error) override {}
-	public:
-		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override {
-			jsonData->AddMember("IsOpen", IsOpen());
+	private:
+		virtual void BeginOnGUI() override
+		{
+			PreOnGUI();
+			ImGui::Begin(GetTitleName().c_str(), &mIsShowGUI);
 		}
-		virtual void LoadJson(SharedPtr<JsonData> jsonData) override {
-			auto val = jsonData->GetMember("IsOpen");
-			bool open = false;
-			if (val)
+		virtual void EndOnGUI() override
+		{
+			ImGui::End();
+			if (mIsShowGUI == false)
 			{
-				open = val->GetBool();
+				mIsShowGUI = true;
+				Close();
 			}
-			if (open) Open();
-			else Close();
-
+			LateOnGUI();
 		}
+
+
 
 	public:
 		virtual ~UIView() = default;

@@ -50,7 +50,6 @@ namespace JG
 			}
 		};
 
-		bool mOpenGUI = true;
 		bool mIsCtrl = false;
 
 

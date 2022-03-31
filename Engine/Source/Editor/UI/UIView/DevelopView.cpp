@@ -39,32 +39,11 @@ namespace JG
 
 	void DevelopView::OnGUI()
 	{
-		ImGui::Begin("Develop", &mOpenGUI);
-
-
-
-
-
-
-
 		if (ImGui::CollapsingHeader("Statistics", ImGuiTreeNodeFlags_DefaultOpen) == true)
 		{
 			Statistics_OnGUI();
 		}
 		Dev_OnGUI();
-
-
-		ImGui::End();
-
-
-
-
-
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
 	}
 
 	void DevelopView::Destroy()

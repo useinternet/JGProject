@@ -10,10 +10,9 @@
 #endif 
 
 #include "JGCore.h"
-#include "Linker/GamePluginLinker.h"
 #include "GameObjectFactory.h"
-
-GAME_API void Start_Plugin(JG::SharedPtr<JG::GamePluginLinker> linker);
+#include "Class/Plugin.h"
+GAME_API void Start_Plugin(JG::SharedPtr<JG::PluginLinker> linker);
 
 // 게임 컴포넌트 
 //x##

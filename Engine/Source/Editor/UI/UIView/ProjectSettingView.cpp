@@ -12,6 +12,8 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
+
+		SetTitleName("ProjectSetting");
 	}
 	void ProjectSettingView::Load()
 	{
@@ -24,9 +26,6 @@ namespace JG
 		mCategoryList[Category_Input] = Category("Input");
 
 		LoadIcons();
-
-
-
 		for (int i = 0; i < 512; ++i)
 		{
 			auto str = KeyCodeToString((EKeyCode)i);
@@ -38,10 +37,6 @@ namespace JG
 	}
 	void ProjectSettingView::OnGUI()
 	{
-
-		ImGui::Begin("ProjectSetting", &mOpenGUI);
-		
-
 		f32 winWidth = ImGui::GetWindowWidth();
 		f32 categoryWidth = std::min<f32>(200.0f, winWidth * 0.2f);
 		if (ImGui::BeginTable("WorldHierarchy_Table", 2, ImGuiTableFlags_BordersInnerV) == true)
@@ -55,20 +50,6 @@ namespace JG
 			Contents_OnGUI();
 			ImGui::EndTable();
 		}
-
-
-
-
-
-
-		
-		ImGui::End();
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
-
 	}
 	void ProjectSettingView::Destroy()
 	{

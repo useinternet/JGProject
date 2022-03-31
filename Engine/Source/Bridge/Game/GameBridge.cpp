@@ -2,7 +2,7 @@
 #include "GameBridge.h"
 
 
-void Start_Plugin(JG::SharedPtr<JG::GamePluginLinker> linker)
+void Start_Plugin(JG::SharedPtr<JG::PluginLinker> linker)
 {
 	if (linker == nullptr)
 	{

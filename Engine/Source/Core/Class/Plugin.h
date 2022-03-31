@@ -60,8 +60,11 @@ namespace JG
 		}
 	};
 
-
-
-
-
+	class PluginLinker
+	{
+		GlobalSingletonManager* pGlobalSingletoneManager = nullptr;
+	public:
+		PluginLinker();
+		void Apply();
+	};
 }

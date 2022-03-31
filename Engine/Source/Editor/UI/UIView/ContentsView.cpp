@@ -13,6 +13,8 @@
 #include "Graphics/Shader.h"
 #include "UI/ModalUI/ProgressBarModalView.h"
 #include "UI/ModalUI/MessageBoxModalView.h"
+
+#include "UI/UIView/ModelView.h"
 #include "UI/UIManager.h"
 namespace JG
 {
@@ -22,6 +24,7 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
+		SetTitleName("Contents");
 	}
 	void ContentsView::Load()
 	{
@@ -69,23 +72,19 @@ namespace JG
 	}
 	void ContentsView::OnGUI()
 	{
-		mIsCtrl = ImGui::IsKeyDown((i32)EKeyCode::Ctrl);
-		UpdateNode();
-
-		ImGui::Begin("ContentsView", &mOpenGUI);
 		OnGUI_Top();
 		ImGui::Separator();
 		OnGUI_Bottom();
-		ImGui::End();
-
-
+	}
+	void ContentsView::PreOnGUI()
+	{
+		mIsCtrl = ImGui::IsKeyDown((i32)EKeyCode::Ctrl);
+		UpdateNode();
+	}
+	void ContentsView::LateOnGUI()
+	{
 		UpdateGUI();
 		UpdateTask();
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
 	}
 	void ContentsView::Destroy()
 	{
@@ -795,6 +794,9 @@ namespace JG
 			e.AssetPath = path;
 			SendEvent(e);
 		}
+			break;
+		case EAssetFormat::Mesh:
+			UIManager::GetInstance().GetUIView<ModelView>()->Open();
 			break;
 		}
 

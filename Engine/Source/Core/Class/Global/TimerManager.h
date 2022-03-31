@@ -17,7 +17,7 @@ namespace JG
 
 	class Timer;
 	class TimerHandle;
-	class TimerManager : public GlobalSingleton<TimerManager>
+	class TimerManager : public IGlobalSingleton<TimerManager>
 	{
 		friend class Application;
 		static const u64 TIMER_NULL_ID = -1;

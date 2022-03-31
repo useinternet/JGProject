@@ -1,6 +1,6 @@
-#include "JGGraphics.h"
 #include "pch.h"
 #include "JGGraphics.h"
+#include "Class/Global/GlobalSingletonManager.h"
 #include "RayTracing/RayTracingPipeline.h"
 #include "RayTracing/Raytracer.h"
 #include "Graphics/RootSignature.h"
@@ -27,7 +27,8 @@ namespace JG
 		Flush();
 		Reset();
 		mObjectPool.clear();
-		ShaderLibrary::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<ShaderLibrary>();
+
 		mGraphcisAPI->Destroy();
 		mGraphcisAPI.reset();
 	}
@@ -152,7 +153,8 @@ namespace JG
 
 			return EScheduleResult::Continue;
 		});
-		ShaderLibrary::Create();
+
+		GlobalSingletonManager::GetInstance().RegisterSingleton<ShaderLibrary>();
 	}
 	void JGGraphics::Reset()
 	{

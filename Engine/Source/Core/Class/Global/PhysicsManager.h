@@ -15,7 +15,7 @@ namespace JG
 		SharedPtr<physx::PxGeometry> Geometry = nullptr;
 		PhysicsHandle MaterialHandle = 0;
 	};
-	class PhysicsManager : public GlobalSingleton<PhysicsManager>
+	class PhysicsManager : public IGlobalSingleton<PhysicsManager>
 	{
 	private:
 		friend class Application;

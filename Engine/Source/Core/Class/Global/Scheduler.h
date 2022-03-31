@@ -113,7 +113,7 @@ namespace JG
 	using AsyncTaskFunction = std::function<void()>;
 	using AsyncTaskUserDataFunction = std::function<void(SharedPtr<IJGObject> userData)>;
 	// Worker 를 생성하여 스케쥴 작성
-	class Scheduler : public GlobalSingleton<Scheduler>
+	class Scheduler : public IGlobalSingleton<Scheduler>
 	{
 		friend class Application;
 		friend ScheduleHandle;

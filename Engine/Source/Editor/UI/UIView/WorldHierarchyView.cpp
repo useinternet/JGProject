@@ -23,6 +23,7 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
+		SetTitleName("WorldHierarchy");
 	}
 	void WorldHierarchyView::Load()
 	{
@@ -131,7 +132,6 @@ namespace JG
 	{
 		mIsCtrl = ImGui::IsKeyDown((i32)EKeyCode::Ctrl);
 
-		ImGui::Begin("WorldHierarchy", &mOpenGUI);
 		UpdateNode();
 		if (ImGui::BeginTable("WorldHierarchy_Table", 4) == true)
 		{
@@ -168,13 +168,6 @@ namespace JG
 			{
 				Paste();
 			}
-		}
-
-		ImGui::End();
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
 		}
 	}
 

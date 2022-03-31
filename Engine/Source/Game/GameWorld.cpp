@@ -80,7 +80,6 @@ namespace JG
 	}
 	AssetManager* GameWorld::GetAssetManager() const
 	{
-
 		return mAssetManager.get();
 	}
 	void GameWorld::PushRenderSceneObject(SharedPtr<Graphics::SceneObject> sceneObject)

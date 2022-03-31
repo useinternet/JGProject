@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>
 #include <codecvt>
+#include <xhash>
 
 
 
@@ -273,4 +274,14 @@ namespace JG
 
 	}
 
+
+
+	namespace HashHelper
+	{
+		template <class T>
+		inline void Combine(u64& seed, const T& v)
+		{
+			seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	}
 }

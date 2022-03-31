@@ -36,6 +36,7 @@
 #include "Class/Command.h"
 #include "Class/FileIO.h"
 #include "Class/TaskController.h"
+#include "Class/Global/GlobalSingletonManager.h"
 #include "Class/Global/TimerManager.h"
 #include "Class/Global/Scheduler.h"
 #include "Class/Global/PhysicsManager.h"

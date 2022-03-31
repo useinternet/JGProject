@@ -16,6 +16,8 @@ namespace JG
 		}, nullptr);
 		mCommandPrompt = CreateUniquePtr<CommandPrompt>();
 		mMainThreadID = StringHelper::ToInt(StringHelper::ToString(std::this_thread::get_id()));
+
+		SetTitleName("DevConsole");
 	}
 	DevConsoleView::~DevConsoleView()
 	{
@@ -53,17 +55,10 @@ namespace JG
 	}
 	void DevConsoleView::OnGUI()
 	{
-		ImGui::Begin("DevConsole", &mOpenGUI, ImGuiWindowFlags_NoScrollbar);
 		UpdateLog();
 		OnGUI_Top();
 		OnGUI_Log();
 		OnGUI_Bottom();
-		ImGui::End();
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
 	}
 	void DevConsoleView::Destroy()
 	{

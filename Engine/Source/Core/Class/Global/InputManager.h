@@ -36,7 +36,7 @@ namespace JG
 		AxisMappingData(const String & name) : Name(name) {}
 	};
 
-	class InputManager : public GlobalSingleton<InputManager>
+	class InputManager : public IGlobalSingleton<InputManager>
 	{
 		friend class Application;
 

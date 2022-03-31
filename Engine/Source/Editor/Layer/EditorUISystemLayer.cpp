@@ -10,6 +10,10 @@
 #include "UI/UIView/ProjectSettingView.h"
 #include "UI/UIView/DevelopView.h"
 #include "UI/UIView/DevConsoleView.h"
+#include "UI/UIView/ModelView.h"
+#include "UI/UIView/MaterialView.h"
+
+
 // PopupUI
 #include "UI/ContextUI/ComponentFinderContextView.h"
 #include "UI/ContextUI/AssetFinderContextView.h"
@@ -26,34 +30,28 @@ namespace JG
 {
 	void EditorUISystemLayer::OnAttach()
 	{
-		UIManager::Create();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<UIManager>();
 	}
 	void EditorUISystemLayer::OnDetach()
 	{
-		UIManager::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<UIManager>();
 	}
 
 
 	void EditorUISystemLayer::Begin()
 	{
+		GlobalSingletonManager::GetInstance().RegisterSingleton<JGImGui>();
 		Init();
 		SetMainMenu();
 		RegisterUIView();
 		RegisterPopupUIView();
 		RegisterInspectorUI();
 		LoadUISettings("JGUI.jgconfig");
-
-		//UIManager::GetInstance().RegisterMainMenuItem("File/Save GameWorld %_S", 0, [&]() {
-
-		//	RequestSaveGameWorldEvent e;
-		//	Application::GetInstance().SendEvent(e);
-
-		//}, nullptr);
 	}
 	void EditorUISystemLayer::Destroy()
 	{
 		SaveUISettings("JGUI.jgconfig");
-		JGImGui::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGImGui>();
 	}
 	void EditorUISystemLayer::OnEvent(IEvent& e)
 	{
@@ -117,7 +115,6 @@ namespace JG
 
 	void EditorUISystemLayer::Init()
 	{
-		JGImGui::Create();
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::ImGuiSystemLayer, SCHEDULE_BIND_FN(&EditorUISystemLayer::Update));
 		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::UISystemLayer, SCHEDULE_BIND_FN(&EditorUISystemLayer::MenuUpdate));
 		UIManager::GetInstance().BindShowContextMenuFunc([&](Type type, bool isWhenItemHovered) -> bool {
@@ -203,6 +200,8 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<ProjectSettingView>();
 		UIManager::GetInstance().RegisterUIView<DevelopView>();
 		UIManager::GetInstance().RegisterUIView<DevConsoleView>();
+		UIManager::GetInstance().RegisterUIView<ModelView>();
+		UIManager::GetInstance().RegisterUIView<MaterialView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()

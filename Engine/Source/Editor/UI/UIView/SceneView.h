@@ -45,9 +45,6 @@ namespace JG
 			Game_Pause,
 		};
 	private:
-		bool mOpenGUI = true;
-
-
 		GameNode*           mSelectedGameNode = nullptr;
 		SharedPtr<ITexture> mSceneTexture;
 
@@ -87,6 +84,7 @@ namespace JG
 		virtual void Load() override;
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
+		virtual void PreOnGUI() override;
 		virtual void Destroy() override;
 
 

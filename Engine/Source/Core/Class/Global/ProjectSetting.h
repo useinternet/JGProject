@@ -3,14 +3,8 @@
 
 namespace JG
 {
-	class ProjectSetting : public GlobalSingleton<ProjectSetting>
+	class ProjectSetting : public IGlobalSingleton<ProjectSetting>
 	{
-		friend class Application;
-
-
-
-
-
 		String mStartGameWorldPath;
 		
 		// Json Key

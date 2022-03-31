@@ -224,7 +224,6 @@ namespace JG
 
 
 		return descriptorHeap;
-
 	}
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateD3DRootSignature(Microsoft::WRL::ComPtr<ID3D12Device> device, CD3DX12_ROOT_SIGNATURE_DESC* DESC)
 	{

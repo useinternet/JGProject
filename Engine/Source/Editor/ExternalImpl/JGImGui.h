@@ -6,7 +6,7 @@
 namespace JG
 {
 	class IFrameBuffer;
-	class JGImGui : public GlobalSingleton<JGImGui>
+	class JGImGui : public IGlobalSingleton<JGImGui>
 	{
 		friend class EditorUISystemLayer;
 	private:

@@ -30,7 +30,6 @@ namespace JG
 			Category(const String& label) : Label(label) {}
 		};
 	private:
-		bool	 mOpenGUI = true;
 		Category mCategoryList[Category_Count];
 		Asset<ITexture>* mIcons[Icon_Count];
 		SortedSet<String> mKeyNames;

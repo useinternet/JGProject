@@ -21,6 +21,7 @@ namespace JG
 		{
 			Open();
 		}, nullptr);
+		SetTitleName("Scene");
 	}
 	void SceneView::Load()
 	{
@@ -119,9 +120,6 @@ namespace JG
 	}
 	void SceneView::OnGUI()
 	{
-		ImGuizmo::BeginFrame();
-
-		ImGui::Begin("SceneView", &mOpenGUI);
 
 		auto mainCam = Camera::GetMainCamera();
 		
@@ -183,14 +181,11 @@ namespace JG
 
 		OnGUI_Top();
 		OnGUI_Bottom();
+	}
 
-		ImGui::End();
-
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
+	void SceneView::PreOnGUI()
+	{
+		ImGuizmo::BeginFrame();
 	}
 
 	void SceneView::Destroy()

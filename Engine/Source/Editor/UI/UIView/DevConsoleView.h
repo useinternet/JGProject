@@ -41,7 +41,6 @@ namespace JG
 	private:
 		static constexpr  f32 smTopHeight = 60.0f;
 		static constexpr  f32 smBottomHeight = 25.0f;
-		bool mOpenGUI = true;
 		bool mAutoScroll = true;
 
 		SharedPtr<ScheduleHandle> mReadScheduleHandle;

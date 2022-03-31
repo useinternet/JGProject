@@ -102,9 +102,8 @@ namespace JG
 	};
 
 
-	class ShaderLibrary : public GlobalSingleton<ShaderLibrary>
+	class ShaderLibrary : public IGlobalSingleton<ShaderLibrary>
 	{
-		friend class JGGraphics;
 	private:
 		Dictionary<String, SharedPtr<IGraphicsShader>> mGraphicsShaderDic;
 		Dictionary<String, SharedPtr<IComputeShader>>  mComputeShaderDic;

@@ -8,8 +8,6 @@ namespace JG
 	class InspectorView : public UIView
 	{
 		JGCLASS
-
-		bool mOpenGUI = true;
 		bool mIsOpenPopup = false;
 		char mFindFilterStr[256];
 

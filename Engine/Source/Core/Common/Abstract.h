@@ -1,69 +1,13 @@
 #pragma once
 #include "Define.h"
 #include "Type.h"
+#include "Class/Global/GlobalSingletonManager.h"
+
+
 namespace JG
 {
-	class IGlobalSingletonLinker
-	{
-	public:
-		virtual void Set() = 0;
-		virtual void Apply() = 0;
-	protected:
-		template<class T>
-		T* GetInstance() const 
-		{
-			return T::GetInstancePtr();
-		}
-		template<class T>
-		void SetInstance(T* instance)
-		{
-			T::smInstance = instance;
-		}
-	};
-
-
-	template<class T, class ...Args>
-	class GlobalSingleton
-	{
-	private:
-		friend class IGlobalSingletonLinker;
-		static T* smInstance;
-	protected:
-		static void Create(Args... args)
-		{
-			if (smInstance != nullptr) return;
-
-			smInstance = new T(args...);
-		}
-		static void Destroy()
-		{
-			if (smInstance == nullptr) return;
-			delete smInstance;
-			smInstance = nullptr;
-		}
-
-	public:
-		virtual ~GlobalSingleton() = default;
-	public:
-		static bool IsValid()
-		{
-			return smInstance != nullptr;
-		}
-		static T& GetInstance() {
-			return *smInstance;
-		}
-		static T* GetInstancePtr() {
-			return smInstance;
-		}
-	};
-
-
-	template<class T, class ...Args>
-	T* GlobalSingleton<T, Args...>::smInstance = nullptr;
-
-
 	template<class FactoryClass, class InterfaceClass, i32 BufferCount>
-	class ObjectFactory : public GlobalSingleton<FactoryClass>
+	class ObjectFactory : public IGlobalSingleton<FactoryClass>
 	{
 	protected:
 		Dictionary<InterfaceClass*, SharedPtr<InterfaceClass>> mObjectPool;

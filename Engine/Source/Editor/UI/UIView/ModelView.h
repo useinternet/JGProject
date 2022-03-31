@@ -5,12 +5,12 @@
 
 namespace JG
 {
-	class MaterialView : public UIView
+	class ModelView : public UIView
 	{
 		JGCLASS
 	public:
-		MaterialView();
-		virtual ~MaterialView() = default;
+		ModelView();
+		virtual ~ModelView() = default;
 	protected:
 		virtual void Load() override;
 		virtual void Initialize() override;
@@ -18,5 +18,7 @@ namespace JG
 		virtual void Destroy() override;
 		virtual void OnEvent(IEvent& e) override;
 	};
+
+
 
 }

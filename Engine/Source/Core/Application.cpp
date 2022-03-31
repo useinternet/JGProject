@@ -1,9 +1,11 @@
 ﻿#include "pch.h"
 #include "Application.h"
+
+
 #include "Common/Assert.h"
 #include "Class/Asset/Asset.h"
 
-
+#include "Class/Global/GlobalSingletonManager.h"
 #include "Platform/Window/WindowsWindow.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/Renderer.h"
@@ -101,13 +103,13 @@ namespace JG
 		
 		// TODO
 		// 필요한 전역 클래스 생성
-		Log::Create();
-		TimerManager::Create();
-		Scheduler::Create();
-
-		AssetDataBase::Create();
-		InputManager::Create();
-		ProjectSetting::Create();
+		GlobalSingletonManager::Create();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<Log>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<TimerManager>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<Scheduler>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<AssetDataBase>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<InputManager>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<ProjectSetting>();
 
 		// TODO
 		// 필요한 멤버 클래스 생성
@@ -140,11 +142,11 @@ namespace JG
 			desc.GlobalShaderLibPath = Application::GetShaderGlobalLibPath();
 			desc.ShaderScriptPath    = Application::GetShaderScriptPath();
 			desc.ShaderTemplatePath  = Application::GetShaderTemplatePath();
-			JGGraphics::Create(desc);
+			GlobalSingletonManager::GetInstance().RegisterSingleton<JGGraphics, JGGraphicsDesc>(desc);
 			JGGraphics::GetInstance().LoadShader();
 			mIsRunning = true;
 		}
-		PhysicsManager::Create();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<PhysicsManager>();
 
 
 
@@ -200,21 +202,24 @@ namespace JG
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
 		ITexture::DestroyNullTexture();
-		PhysicsManager::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<PhysicsManager>();
 		JGGraphics::GetInstance().Flush();
 		mLayerStack.reset();
-		AssetDataBase::Destroy();
-		JGGraphics::Destroy();
-		ProjectSetting::Destroy();
-		InputManager::Destroy();
+
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<AssetDataBase>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGGraphics>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<ProjectSetting>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<InputManager>();
+
 
 
 		mWindow->Destroy();
 		mWindow.reset();
-	
-		Scheduler::Destroy();
-		TimerManager::Destroy();
-		Log::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<Scheduler>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<TimerManager>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<Log>();
+		GlobalSingletonManager::Destroy();
+		
 	}
 
 	void Application::OnEvent(IEvent& e)

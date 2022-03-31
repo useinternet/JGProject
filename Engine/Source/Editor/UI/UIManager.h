@@ -43,7 +43,7 @@ namespace JG
 		List<jbyte> Data;
 	};
 
-	class UIManager : public GlobalSingleton<UIManager>
+	class UIManager : public IGlobalSingleton<UIManager>
 	{
 		friend class EditorUISystemLayer;
 	public:
@@ -53,7 +53,7 @@ namespace JG
 		static const char SHIFT_SHORTCUT_TOKEN = '#';
 		static const char ALT_SHORTCUT_TOKEN   = '&';
 	private:
-		Dictionary<JG::Type, UniquePtr<IUIView>>      mUIViewPool;
+		Dictionary<u64, UniquePtr<IUIView>>      mUIViewPool;
 		Dictionary<JG::Type, UniquePtr<IPopupUIView>> mPopupUIViewPool;
 		Dictionary<JG::Type, UniquePtr<IInspectorUI>> mInspectorUIPool;
 		Dictionary<JG::Type, UniquePtr<MenuItemNode>> mUIViewContextMenu;
@@ -79,17 +79,24 @@ namespace JG
 	public:
 		// µî·Ï
 		template<class UIViewType>
-		void RegisterUIView()
+		void RegisterUIView(u64 viewID = 0)
 		{
 			Type type = Type(TypeID<UIViewType>());
+			u64 typeID = type.GetID();
 
+			if (viewID != 0)
+			{
+				HashHelper::Combine(typeID, viewID);
+			}
+			
 
 			std::lock_guard<std::shared_mutex> lock(mMutex);
-			if (mUIViewPool.find(type) != mUIViewPool.end())
+			if (mUIViewPool.find(typeID) != mUIViewPool.end())
 			{
 				return;
 			}
-			mUIViewPool[type]        = CreateUniquePtr<UIViewType>();
+			mUIViewPool[typeID] = CreateUniquePtr<UIViewType>();
+			mUIViewPool[typeID]->SetViewID(typeID);
 		}
 		template<class UIPopupViewType>
 		void RegisterPopupUIView()
@@ -116,18 +123,34 @@ namespace JG
 		}
 
 		template<class UIViewType>
-		UIViewType* GetUIView() const
+		UIViewType* GetUIView(u64 viewID = 0)
 		{
-			Type type = Type(TypeID<UIViewType>());
-
-			std::shared_lock<std::shared_mutex> lock(mMutex);
-			auto iter = mUIViewPool.find(type);
-			if (iter == mUIViewPool.end())
+		
+			Type type  = Type(TypeID<UIViewType>());
+			u64 typeID = type.GetID();
 			{
-				JG_LOG_ERROR("Not Find UIViewType : {0}", type.GetName());
-				return nullptr;
+				std::lock_guard<std::shared_mutex> lock(mMutex);
+				auto iter = mUIViewPool.find(typeID);
+				if (iter == mUIViewPool.end())
+				{
+					JG_LOG_ERROR("Not Find UIViewType : {0}", type.GetName());
+					return nullptr;
+				}
+				else if(iter->second->IsUniqueView() == false && viewID != 0)
+				{
+					HashHelper::Combine(typeID, viewID);
+				}
+				else
+				{
+					viewID = 0;
+				}
 			}
-			return static_cast<UIViewType*>(iter->second.get());
+			if (viewID != 0)
+			{
+				RegisterUIView<UIViewType>(viewID);
+			}
+
+			return static_cast<UIViewType*>(mUIViewPool[typeID].get());
 		}
 
 		template<class UIPopupViewType, class InitData>

@@ -15,7 +15,6 @@
 #include "Components/DevComponent.h"
 #include "Manager/GameLayerManager.h"
 #include "Class/Asset/Asset.h"
-#include "Linker/GamePluginLinker.h"
 
 
 #include "Graphics/DebugGeometryDrawer.h"
@@ -28,19 +27,18 @@ namespace JG
 {
 	void GameLogicSystemLayer::OnAttach()
 	{
-		GameLayerManager::Create();
-		GameObjectFactory::Create();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<GameLayerManager>();
+		GlobalSingletonManager::GetInstance().RegisterSingleton<GameObjectFactory>();
 	}
 	void GameLogicSystemLayer::OnDetach()
 	{
-
-		GameObjectFactory::Destroy();
-		GameLayerManager::Destroy();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<GameLayerManager>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<GameObjectFactory>();
 	}
 	void GameLogicSystemLayer::Begin()
 	{
 		mGamePlugin = CreateUniquePtr<Plugin>(GAME_DLL_NAME);
-		mGamePlugin->Link(CreateSharedPtr<GamePluginLinker>());
+		mGamePlugin->Link(CreateSharedPtr<PluginLinker>());
 		if (mGamePlugin->IsVaild())
 		{
 			JG_LOG_INFO("Successed Connect Game Plugin");

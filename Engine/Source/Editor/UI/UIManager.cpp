@@ -76,7 +76,8 @@ namespace JG
 	}
 	void UIManager::RegisterContextMenuItem(const Type& type, const String& menuPath, u64 priority, const std::function<void()>& action, const std::function<bool()> enableAction)
 	{
-		if (mUIViewPool.find(type) == mUIViewPool.end())
+		u64 typeID = type.GetID();
+		if (mUIViewPool.find(typeID) == mUIViewPool.end())
 		{
 			return;
 		}
@@ -165,13 +166,16 @@ namespace JG
 		{
 			if (_pair.second->IsOpen())
 			{
+				_pair.second->BeginOnGUI();
 				_pair.second->OnGUI();
+				_pair.second->EndOnGUI();
 			}
 		}
 		for (auto& _pair : mPopupUIViewPool)
 		{
 			if (_pair.second->GetPopupType() != EPopupType::Context && _pair.second->IsOpen())
 			{
+				
 				if (_pair.second->OnGUI() == false)
 				{
 					_pair.second->Close();

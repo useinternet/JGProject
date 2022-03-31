@@ -2,6 +2,7 @@
 #include "Define.h"
 #include "Abstract.h"
 #include "String.h"
+#include "Class/Global/GlobalSingletonManager.h"
 //#define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 //#define SPDLOG_WCHAR_FILENAMES 
 #include "spdlog/spdlog.h"
@@ -9,9 +10,8 @@
 #include "spdlog/sinks/basic_file_sink.h"
 namespace JG
 {
-	class Log : public GlobalSingleton<Log>
+	class Log : public IGlobalSingleton<Log>
 	{
-		friend class Application;
 	private:
 		SharedPtr<spdlog::logger> smLogger;
 	public:
@@ -32,7 +32,7 @@ namespace JG
 			consoleSink->set_pattern("%^[:%t:][%l]%v%$");
 			smLogger->sinks().push_back(consoleSink);
 		}
-		~Log()
+		virtual ~Log()
 		{
 			smLogger.reset();
 			spdlog::shutdown();

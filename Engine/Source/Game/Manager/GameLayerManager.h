@@ -16,7 +16,7 @@ namespace JG
 		String Name;
 	};
 
-	class GameLayerManager : public GlobalSingleton<GameLayerManager>
+	class GameLayerManager : public IGlobalSingleton<GameLayerManager>
 	{
 		friend class GameLogicSystemLayer;
 	private:

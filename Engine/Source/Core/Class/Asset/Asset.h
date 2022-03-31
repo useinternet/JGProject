@@ -350,9 +350,8 @@ namespace JG
 
 	class AssetManager;
 	class IMaterial;
-	class AssetDataBase : public GlobalSingleton<AssetDataBase>
+	class AssetDataBase : public IGlobalSingleton<AssetDataBase>
 	{
-		friend class Application;
 	private:
 		enum class EAssetDataState
 		{
@@ -442,7 +441,7 @@ namespace JG
 		AssetID GetAssetOriginID(const String& path);
 		SharedPtr<IAsset> LoadOriginAsset(const String& path);
 		SharedPtr<IAsset> LoadReadWriteAsset(AssetID originID);
-		void	UnLoadAsset(AssetID id);
+		void UnLoadAsset(AssetID id);
 		void RefreshAsset(AssetID originID, const String& reName = String());
 		void RefreshAssetName(AssetID originID, const String& reName);
 	private:
@@ -456,7 +455,6 @@ namespace JG
 		void LoadAssetData_Update();
 
 		EScheduleResult UnLoadAsset_Update();
-		//bool GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const;
 		SharedPtr<IAsset> CreateAsset(AssetID assetID, const String& path);
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);

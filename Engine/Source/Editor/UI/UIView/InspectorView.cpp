@@ -15,6 +15,7 @@ namespace JG
 			Open();
 		}, nullptr);
 		memset(mFindFilterStr, 0, 256);
+		SetTitleName("Inspector");
 	}
 
 	void InspectorView::Load()
@@ -27,14 +28,7 @@ namespace JG
 	}
 	void InspectorView::OnGUI()
 	{
-		ImGui::Begin("Inspector", &mOpenGUI);
 		UIManager::GetInstance().ShowInspectorUI(GetTargetObject());
-		ImGui::End();
-		if (mOpenGUI == false)
-		{
-			mOpenGUI = true;
-			Close();
-		}
 	}
 	void InspectorView::Destroy()
 	{
