@@ -10,7 +10,7 @@ namespace JG
 	void SpriteRenderer::Awake()
 	{
 		BaseRenderer::Awake();
-		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SpriteRenderer::PushRenderSceneObject));
+		//mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&SpriteRenderer::PushRenderSceneObject));
 	}
 	void SpriteRenderer::Start()
 	{
@@ -19,20 +19,29 @@ namespace JG
 	void SpriteRenderer::Destory()
 	{
 		BaseRenderer::Destory();
-		if (mPushRenderSceneObjectScheduleHandle != nullptr)
-		{
-			mPushRenderSceneObjectScheduleHandle->Reset();
-			mPushRenderSceneObjectScheduleHandle = nullptr;
-		}
+		//if (mPushRenderSceneObjectScheduleHandle != nullptr)
+		//{
+		//	mPushRenderSceneObjectScheduleHandle->Reset();
+		//	mPushRenderSceneObjectScheduleHandle = nullptr;
+		//}
 	}
 	void SpriteRenderer::Update()
 	{
 		BaseRenderer::Update();
+
 	}
 
 	void SpriteRenderer::LateUpdate()
 	{
 		BaseRenderer::LateUpdate();
+
+	}
+
+	void SpriteRenderer::FixedUpdate()
+	{
+		BaseRenderer::FixedUpdate();
+		PushRenderSceneObject();
+
 
 	}
 
@@ -95,12 +104,8 @@ namespace JG
 		BaseRenderer::OnChange(data);
 
 	}
-	EScheduleResult SpriteRenderer::PushRenderSceneObject()
+	void SpriteRenderer::PushRenderSceneObject()
 	{
-		if (IsActive() == false)
-		{
-			return EScheduleResult::Continue;
-		}
 		auto sceneObject = CreateSharedPtr<Graphics::PaperObject>();
 		auto transform   = GetOwner()->GetTransform();
 		sceneObject->WorldMatrix = transform->GetWorldMatrix();
@@ -130,8 +135,6 @@ namespace JG
 		}
 		sceneObject->WorldMatrix = JMatrix::Scaling(JVector3(spriteWidth, spriteHeight, 1)) * sceneObject->WorldMatrix;
 		GetGameWorld()->PushRenderSceneObject(sceneObject);
-		return EScheduleResult::Continue;
-
 	}
 
 }

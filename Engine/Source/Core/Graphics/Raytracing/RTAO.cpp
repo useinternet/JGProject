@@ -197,10 +197,12 @@ namespace JG
         if (mSamplerUpdateSH != nullptr)
         {
             mSamplerUpdateSH->Reset();
+            mSamplerUpdateSH = nullptr;
         }
         if (mSamplerUpdateAyncSH != nullptr)
         {
             mSamplerUpdateAyncSH->Reset();
+            mSamplerUpdateAyncSH = nullptr;
         }
     }
 
@@ -215,6 +217,9 @@ namespace JG
 
         // Sample Update 가 끝날때까지 대기
         while (mSamplerUpdateAyncSH->GetState() != EScheduleState::Compelete) {}
+        mSamplerUpdateAyncSH->Reset();
+        mSamplerUpdateAyncSH = nullptr;
+
         struct CB
         {
             u32 Seed;

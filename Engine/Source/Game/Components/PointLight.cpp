@@ -10,9 +10,7 @@ namespace JG
 	{
 #ifdef JG_EDITOR
 		mIcon = GetGameWorld()->GetAssetManager()->RequestOriginAsset<ITexture>("Asset/Engine/Icon/Icon_Light.jgasset");
-		mPushDebugHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&PointLight::PushDebugRenderItem));
 #endif
-		mPushLightScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&PointLight::PushLightItem));
 	}
 	void PointLight::Start()
 	{
@@ -25,21 +23,18 @@ namespace JG
 	{
 		Light::Update();
 	}
+	void PointLight::FixedUpdate()
+	{
+		Light::FixedUpdate();
+#ifdef JG_EDITOR
+		PushDebugRenderItem();
+#endif
+		PushLightItem();
+
+	}
 	void PointLight::Destory()
 	{
 		Light::Destory();
-		if (mPushLightScheduleHandle != nullptr)
-		{
-			mPushLightScheduleHandle->Reset();
-			mPushLightScheduleHandle = nullptr;
-		}
-#ifdef JG_EDITOR
-		if (mPushDebugHandle != nullptr)
-		{
-			mPushDebugHandle->Reset();
-			mPushDebugHandle = nullptr;
-		}
-#endif
 	}
 	void PointLight::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -209,17 +204,16 @@ namespace JG
 		}
 	}
 #ifdef JG_EDITOR
-	EScheduleResult PointLight::PushDebugRenderItem()
+	void PointLight::PushDebugRenderItem()
 	{
 		if (mIsEditorMode == false)
 		{
-			return EScheduleResult::Continue;
+			return;
 		}
-		//auto debugObject = CreateSharedPtr<Graphics::PaperObject>();
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam == nullptr)
 		{
-			return EScheduleResult::Continue;
+			return;
 		}
 
 
@@ -266,27 +260,23 @@ namespace JG
 
 
 		SharedPtr<ITexture> texture = nullptr;
-
-		//debugObject->WorldMatrix = billboardMatrix;
 		if (mIcon && mIcon->Get() && mIcon->Get()->IsValid())
 		{
 			texture = mIcon->Get();
-			//debugObject->Texture = mIcon->Get();
 		}
 
 		RequestDrawEditorUIInSceneView e;
 		e.Data.WorldMatrix = billboardMatrix;
 		e.Data.Texture = texture;
-		//GetGameWorld()->PushRenderSceneObject(debugObject);
+
 		SendEvent(e);
-		return EScheduleResult::Continue;
 	}
 #endif
-	EScheduleResult PointLight::PushLightItem()
+	void PointLight::PushLightItem()
 	{
 		if (IsActive() == false)
 		{
-			return EScheduleResult::Continue;
+			return;
 		}
 		auto lightObject = CreateSharedPtr<Graphics::PointLight>();
 		lightObject->Color = mColor;
@@ -298,7 +288,5 @@ namespace JG
 		lightObject->Att1 = mAtt1;
 		lightObject->Att2 = mAtt2;
 		GetGameWorld()->PushRenderLightObject(lightObject);
-
-		return EScheduleResult::Continue;
 	}
 }

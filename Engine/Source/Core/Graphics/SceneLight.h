@@ -9,6 +9,7 @@ namespace JG
 		enum class ELightType
 		{
 			PointLight,
+			DirectionalLight,
 		};
 
 
@@ -30,6 +31,25 @@ namespace JG
 			virtual u64  GetBtSize() const = 0;
 		};
 
+
+		class DirectionalLight : public Light
+		{
+		public:
+			virtual ~DirectionalLight() = default;
+		public:
+			JVector3 Direction;
+			JVector3 Color;
+		public:
+			virtual ELightType GetLightType() const override { return ELightType::DirectionalLight; }
+			virtual void PushBtData(List<jbyte>& btData)  override
+			{
+				PushData(btData, &Direction, sizeof(JVector3));
+				PushData(btData, &Color, sizeof(JVector3));
+			}
+			virtual u64 GetBtSize() const override {
+				return 24;
+			}
+		};
 
 		//
 		class PointLight : public Light

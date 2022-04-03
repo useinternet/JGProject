@@ -75,7 +75,7 @@ void __ClosestHit_EntryPoint__(inout DirectRayPayload payload, BuiltInTriangleIn
 	else if(output.shadingmodel == SHADING_MODEL_SKYBOX)
 	{
 		payload.Hit   = RayTCurrent();
-		payload.Color = output.emissive;
 		payload.Flags = PAYLOAD_FLAG_ZERO_DEPTH;
 	}
+	payload.Emissive = output.emissive;
 }

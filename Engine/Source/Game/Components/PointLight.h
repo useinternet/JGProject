@@ -22,8 +22,6 @@ namespace JG
 		f32 mAtt0 = 0.0f;
 		f32 mAtt1 = 0.0f;
 		f32 mAtt2 = 0.0f;
-
-		SharedPtr<ScheduleHandle> mPushLightScheduleHandle;
 #ifdef JG_EDITOR
 		SharedPtr<Graphics::PaperObject> mTargetObject;
 		SharedPtr<ScheduleHandle>	     mPushDebugHandle;
@@ -37,6 +35,7 @@ namespace JG
 		virtual void Awake() override;
 		virtual void Start() override;
 		virtual void Update() override;
+		virtual void FixedUpdate() override;
 		virtual void Destory() override;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
@@ -62,8 +61,8 @@ namespace JG
 	private:
 		void CalcAtt();
 #ifdef JG_EDITOR
-		EScheduleResult PushDebugRenderItem();
+		void PushDebugRenderItem();
 #endif
-		EScheduleResult PushLightItem();
+		void PushLightItem();
 	};
 }

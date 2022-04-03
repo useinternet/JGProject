@@ -25,7 +25,7 @@ struct Material
 struct DirectionalLight
 {
     float3 Direction;
-    float3 LightColor;
+    float3 Color;
 };
 
 struct PointLight

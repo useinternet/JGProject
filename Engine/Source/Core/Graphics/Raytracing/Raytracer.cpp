@@ -133,6 +133,7 @@ namespace JG
 		mTex[EResource::IndirectR] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectR", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::IndirectG] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectG", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::IndirectB] = RP_Global_Tex::Create("Renderer/Raytracing/IndirectB", nullptr, mRenderer->GetRenderParamManager());
+		mTex[EResource::Emissive] = RP_Global_Tex::Create("Renderer/Raytracing/Emissive", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::Shadow] = RP_Global_Tex::Create("Renderer/Raytracing/Shadow", nullptr,     mRenderer->GetRenderParamManager());
 		mTex[EResource::MotionVector] = RP_Global_Tex::Create("Renderer/Raytracing/MotionVector", nullptr, mRenderer->GetRenderParamManager());
 		mTex[EResource::ReprojectedNormalDepth] = RP_Global_Tex::Create("Renderer/Raytracing/ReprojectedNormalDepth", nullptr, mRenderer->GetRenderParamManager());
@@ -174,7 +175,7 @@ namespace JG
 		texInfo.ClearColor = Color();
 
 		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
-
+		GraphicsHelper::InitRenderTextures(texInfo, "EmissiveOutput", &mResources[EResource::Emissive]);
 
 		texInfo.Format = ETextureFormat::R16_Float;
 		GraphicsHelper::InitRenderTextures(texInfo, "IndirectROutput", &mResources[EResource::IndirectR]);
@@ -281,6 +282,7 @@ namespace JG
 			GetResource(EResource::IndirectR),
 			GetResource(EResource::IndirectG),
 			GetResource(EResource::IndirectB),
+			GetResource(EResource::Emissive),
 			GetResource(EResource::Shadow),
 			GetResource(EResource::MotionVector),
 			GetResource(EResource::ReprojectedNormalDepth),
@@ -390,6 +392,7 @@ namespace JG
 			input.IndirectR = mDenoisedTex[EDenoiser::Denoise_IndirectR].GetValue();
 			input.IndirectG = mDenoisedTex[EDenoiser::Denoise_IndirectG].GetValue();
 			input.IndirectB = mDenoisedTex[EDenoiser::Denoise_IndirectB].GetValue();
+			input.Emissive  = GetResource(EResource::Emissive);
 			input.Shadow    = mDenoisedTex[EDenoiser::Denoise_Shadow].GetValue();
 			input.AO        = mDenoisedTex[EDenoiser::Denoise_Ao].GetValue();
 			input.Depth     = GetResource(EResource::Depth);

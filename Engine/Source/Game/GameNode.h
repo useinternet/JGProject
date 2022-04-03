@@ -35,6 +35,7 @@ namespace JG
 	public: 
 		virtual void Update() override;
 		virtual void LateUpdate() override;
+		virtual void FixedUpdate() override;
 	public:
 		GameNode();
 		GameNode(GameWorld* gameWorld);

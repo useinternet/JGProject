@@ -78,6 +78,7 @@ namespace JG
 			IndirectR,
 			IndirectG,
 			IndirectB,
+			Emissive,
 			Shadow,
 			HitPosition,
 			RayDistance,

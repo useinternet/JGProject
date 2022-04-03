@@ -362,27 +362,44 @@ namespace JG
 
 		Scene::Scene(const SceneInfo& info)
 		{
-			static u64 s_CommandIDOffset = 0;
-			//m2DBatch = CreateSharedPtr<Render2DBatch>();
 			SetSceneInfo(info);
-
 		}
 		Scene::~Scene()
 		{
-
+			if (mRenderSH != nullptr)
+			{
+				mRenderSH->Reset();
+				mRenderSH = nullptr;
+			}
+			if (mPushSceneObjectSH != nullptr)
+			{
+				mPushSceneObjectSH->Reset();
+				mPushSceneObjectSH = nullptr;
+			}
+			if (mRenderFetchResultSH != nullptr)
+			{
+				mRenderFetchResultSH->Reset();
+				mRenderFetchResultSH = nullptr;
+			}
+			if (mRenderInternalSH != nullptr)
+			{
+				mRenderInternalSH->Reset();
+				mRenderInternalSH = nullptr;
+			}
 		}
-		bool Scene::SetSceneInfo(const SceneInfo& info)
+		void Scene::SetSceneInfo(const SceneInfo& info)
 		{
-			if (IsLock())
+			mPendingSceneInfo = info;
+			Scheduler::GetInstance().ScheduleOnceByFrame(0, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
 			{
-				return false;
-			}
-			if (mRenderer == nullptr || mSceneInfo.RenderPath != info.RenderPath)
-			{
-				InitRenderer(info.RenderPath);
-			}
-			mSceneInfo = info;
-			return true;
+				if (mRenderer == nullptr || mSceneInfo.RenderPath != mPendingSceneInfo.RenderPath)
+				{
+					InitRenderer(mPendingSceneInfo.RenderPath);
+				}
+				mSceneInfo = mPendingSceneInfo;
+				return EScheduleResult::Break;
+			});
+
 		}
 
 		const SceneInfo& Scene::GetSceneInfo() const
@@ -397,31 +414,21 @@ namespace JG
 
 		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)
 		{
-			if (mRenderer == nullptr)
+			if (mRenderer == nullptr || sceneObject == nullptr)
 			{
 				return false;
 			}
-			if (IsLock() || sceneObject == nullptr)
-			{
-				return false;
-			}
-			mSceneObjectQueue.push(sceneObject);
-
+			mPendingSceneObjectQueue.push(sceneObject);
 			return true;
 		}
 
 		bool Scene::PushLight(SharedPtr<Light> l)
 		{
-			if (mRenderer == nullptr)
+			if (mRenderer == nullptr || l == nullptr)
 			{
 				return false;
 			}
-			if (IsLock() || l == nullptr)
-			{
-				return false;
-			}
-			mLightList.push_back(l);
-
+			mPendingLightList.push_back(l);
 			return true;
 		}
 
@@ -443,90 +450,121 @@ namespace JG
 
 		void Scene::Rendering()
 		{
-			if (mRenderer == nullptr)
+			if (mRenderer == nullptr || mIsRendering == true)
 			{
 				return;
 			}
-			if (mRenderScheduleHandle != nullptr || IsLock())
+			if (mRenderSH != nullptr || mRenderInternalSH != nullptr || mRenderFetchResultSH != nullptr || IsLock())
 			{
 				JG_LOG_ERROR("It's still being rendered.");
 				return;
 			}
-			// Scene 정보 수정을 할수 없게 Lock
-			Lock();
-			// 비동기로 렌더링 시작
-			mRenderScheduleHandle = Scheduler::GetInstance().ScheduleAsync([&]()
+			mIsRendering = true;
+			mPushSceneObjectSH = Scheduler::GetInstance().ScheduleOnce(mSceneInfo.TickCycle, SchedulePriority::Graphics_PushSceneObject, [&]() -> EScheduleResult
 			{
-				u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
-
-				RenderInfo info;
-				info.Resolution = mSceneInfo.Resolution;
-				info.ViewProjMatrix	    = mSceneInfo.ViewProjMatrix;
-				info.ViewMatrix = mSceneInfo.ViewMatrix;
-				info.ProjMatrix = mSceneInfo.ProjMatrix;
-				info.FarZ  = mSceneInfo.FarZ;
-				info.NearZ = mSceneInfo.NearZ;
-				info.EyePosition = mSceneInfo.EyePos;
-				info.ClearColor  = mSceneInfo.ClearColor;
-				if (mRenderer->Begin(info, mLightList) == true)
+				mSceneObjectQueue = std::move(mPendingSceneObjectQueue);
+				mLightList        = std::move(mPendingLightList);
+		
+				return EScheduleResult::Break;
+			});
+			mRenderSH			 = Scheduler::GetInstance().ScheduleOnce(mSceneInfo.TickCycle, SchedulePriority::Graphics_Rendering, [&]() -> EScheduleResult
+			{
+				// Scene 정보 수정을 할수 없게 Lock
+				Lock();
+				// 비동기로 렌더링 시작
+				mRenderInternalSH = Scheduler::GetInstance().ScheduleAsync([&]()
 				{
-					while (mSceneObjectQueue.empty() == false)
-					{
-						auto obj = mSceneObjectQueue.front(); mSceneObjectQueue.pop();
-						mRenderer->DrawCall(obj);
-					}
+					u32 bufferCnt = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 
-					auto result = mRenderer->End();
-					if (result != nullptr)
+					RenderInfo info;
+					info.Resolution = mSceneInfo.Resolution;
+					info.ViewProjMatrix = mSceneInfo.ViewProjMatrix;
+					info.ViewMatrix = mSceneInfo.ViewMatrix;
+					info.ProjMatrix = mSceneInfo.ProjMatrix;
+					info.FarZ = mSceneInfo.FarZ;
+					info.NearZ = mSceneInfo.NearZ;
+					info.EyePosition = mSceneInfo.EyePos;
+					info.ClearColor = mSceneInfo.ClearColor;
+					if (mRenderer->Begin(info, mLightList) == true)
 					{
-						if (mSceneResult == nullptr)
+						while (mSceneObjectQueue.empty() == false)
+						{
+							auto obj = mSceneObjectQueue.front(); mSceneObjectQueue.pop();
+							mRenderer->DrawCall(obj);
+						}
+
+						auto result = mRenderer->End();
+						if (result != nullptr)
 						{
 							mSceneResult = CreateSharedPtr<SceneResultInfo>();
-						}
-						mSceneResult->Texture = result->SceneTexture;
+							mSceneResult->Texture = result->SceneTexture;
 
-						for (auto& _pair : mPostRenderingEventQueue)
-						{
-							while (_pair.second.empty() == false)
+							for (auto& _pair : mPostRenderingEventQueue)
 							{
-								auto func = _pair.second.front(); _pair.second.pop();
-								if (func != nullptr)
+								while (_pair.second.empty() == false)
 								{
-									func(mSceneResult);
+									auto func = _pair.second.front(); _pair.second.pop();
+									if (func != nullptr)
+									{
+										func(mSceneResult);
+									}
 								}
 							}
 						}
-					}
-					else {
-						mSceneResult = nullptr;
-					}
+						else {
+							mSceneResult = nullptr;
+						}
 
-					mPostRenderingEventQueue.clear();
-					mLightList.clear();
-				}
+						mPostRenderingEventQueue.clear();
+						mLightList.clear();
+						mIsRendering = false;
+					}
+				});
+
+				return EScheduleResult::Break;
 			});
+			mRenderFetchResultSH = Scheduler::GetInstance().ScheduleOnce(mSceneInfo.TickCycle, SchedulePriority::Graphics_RenderFinish, [&]() -> EScheduleResult
+			{
+				// Rendering이 끝날때까지 기다린다.
+				while (mRenderInternalSH->GetState() != EScheduleState::Compelete)
+				{
+					//
+				}
 
+				mRenderInternalSH->Reset();
+				mRenderInternalSH = nullptr;
+				// Rendering 이 끝났으니. 다시 정보수정 Ok
+				UnLock();
+
+			
+				mIsRendering = false;
+				return EScheduleResult::Break;
+			});
 		}
 
 		// 완료 될때까지 기다렷다가, SceneResultInfo 리턴
-		SharedPtr<SceneResultInfo> Scene::FetchResultFinish()
+		SharedPtr<SceneResultInfo> Scene::FetchResult()
 		{
 			//
-			if (mRenderScheduleHandle == nullptr)
+			if (mIsRendering == false)
+			{
+				if (mRenderSH != nullptr)
+				{
+					mRenderSH->Reset();
+					mRenderSH = nullptr;
+				}
+				if (mRenderFetchResultSH != nullptr)
+				{
+					mRenderFetchResultSH->Reset();
+					mRenderFetchResultSH = nullptr;
+				}
+
+				return mSceneResult;
+			}
+			else
 			{
 				return nullptr;
 			}
-			// Rendering이 끝날때까지 기다린다.
-			while (mRenderScheduleHandle->GetState() != EScheduleState::Compelete)
-			{
-				//
-			}
-
-			mRenderScheduleHandle->Reset();
-			mRenderScheduleHandle = nullptr;
-			// Rendering 이 끝났으니. 다시 정보수정 Ok
-			UnLock();
-			return mSceneResult;
 		}
 
 

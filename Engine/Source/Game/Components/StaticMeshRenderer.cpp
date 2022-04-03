@@ -11,7 +11,7 @@ namespace JG
 	void StaticMeshRenderer::Awake()
 	{
 		BaseRenderer::Awake();
-		mPushRenderSceneObjectScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_PushSceneObject, SCHEDULE_BIND_FN(&StaticMeshRenderer::PushRenderSceneObject));
+	
 	}
 	void StaticMeshRenderer::Start()
 	{
@@ -21,20 +21,22 @@ namespace JG
 	void StaticMeshRenderer::Destory()
 	{
 		BaseRenderer::Destory();
-		if (mPushRenderSceneObjectScheduleHandle != nullptr)
-		{
-			mPushRenderSceneObjectScheduleHandle->Reset();
-			mPushRenderSceneObjectScheduleHandle = nullptr;
-		}
+
 	}
 	void StaticMeshRenderer::Update()
 	{
 		BaseRenderer::Update();
+	
 	}
 	void StaticMeshRenderer::LateUpdate()
 	{
 		BaseRenderer::LateUpdate();
 
+	}
+	void StaticMeshRenderer::FixedUpdate()
+	{
+		BaseRenderer::FixedUpdate();
+		PushRenderSceneObject();
 	}
 	void StaticMeshRenderer::SetMesh(const String& path)
 	{
@@ -159,11 +161,11 @@ namespace JG
 	void StaticMeshRenderer::OnInspector_MaterialGUI()
 	{
 	}
-	EScheduleResult StaticMeshRenderer::PushRenderSceneObject()
+	void StaticMeshRenderer::PushRenderSceneObject()
 	{
 		if (mMesh == nullptr || mMesh->IsValid() == false)
 		{
-			return EScheduleResult::Continue;
+			return;
 		}
 
 
@@ -183,28 +185,11 @@ namespace JG
 		for (u64 i = 0; i < matAssetCnt; ++i)
 		{
 			auto material = mMaterialList[i];
-			if (material == nullptr)
-			{
-				//sceneObject->MaterialList[i] = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader));
-			}
-			else
+			if (material != nullptr)
 			{
 				sceneObject->MaterialList[i] = material->Get();
 			}
 		}
-
-
-		if (matAssetCnt == 0 && sceneObject->MaterialList.empty()) {
-			if (mNullMaterial == nullptr)
-			{
-				//mNullMaterial = IMaterial::Create("NullMaterial", ShaderLibrary::GetInstance().GetShader(ShaderDefine::Template::Standard3DShader));
-			}
-			sceneObject->MaterialList.push_back(mNullMaterial);
-		}
-
-
 		GetGameWorld()->PushRenderSceneObject(sceneObject);
-
-		return EScheduleResult::Continue;
 	}
 }

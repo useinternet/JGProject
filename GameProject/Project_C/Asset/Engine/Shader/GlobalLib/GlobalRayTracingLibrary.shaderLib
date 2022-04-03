@@ -69,6 +69,7 @@ struct DirectRayPayload
     float2 Normal;
     float3 PrevHitPosition;
     float2 PrevNormal;
+    float3 Emissive;
     uint Flags;
 };
 
@@ -87,14 +88,16 @@ RWTexture2D<float4> _DirectOutput        : register(u0, space0);
 RWTexture2D<float>  _IndirectRedOutput   : register(u1, space0);
 RWTexture2D<float>  _IndirectGreenOutput : register(u2, space0);
 RWTexture2D<float>  _IndirectBlueOutput  : register(u3, space0);
-RWTexture2D<float>  _ShadowOutput        : register(u4, space0);
-RWTexture2D<float2> _MotionVectorOutput           : register(u5, space0);
-RWTexture2D<uint>   _ReprojectedNormalDepthOutput : register(u6, space0);
-RWTexture2D<uint>   _NormalDepthOutput            : register(u7, space0);
-RWTexture2D<float>  _DepthOutput                  : register(u8, space0);
-RWTexture2D<float4> _HitPositionOutput            : register(u9, space0); 
-RWTexture2D<float4> _RayDistanceOutput            : register(u10, space0); 
+RWTexture2D<float4> _EmissiveOutput      : register(u4, space0);
+RWTexture2D<float>  _ShadowOutput        : register(u5, space0);
+RWTexture2D<float2> _MotionVectorOutput           : register(u6, space0);
+RWTexture2D<uint>   _ReprojectedNormalDepthOutput : register(u7, space0);
+RWTexture2D<uint>   _NormalDepthOutput            : register(u8, space0);
+RWTexture2D<float>  _DepthOutput                  : register(u9, space0);
+RWTexture2D<float4> _HitPositionOutput            : register(u10, space0); 
+RWTexture2D<float4> _RayDistanceOutput            : register(u11, space0); 
 // Lights
+
 StructuredBuffer<PointLight> _PointLightList     : register(t1, space0);
 
 // Clusters
@@ -573,7 +576,7 @@ float3 CalcPointLight_GGX(float3 N, float3 V, in Material material, PointLight l
         {
             att = 1.0f;
         }
-    
+        
     }
     else
     {
@@ -618,21 +621,30 @@ float LinearDepth(float z)
     float depthRange = 2.0 * z - 1.0;
     return 2.0 * _NearZ * _FarZ / (_FarZ + _NearZ - depthRange * (_FarZ - _NearZ));
 }
-uint GetClusterIndex(float3 posH)
+uint GetClusterIndex(float3 posW)
 {
-    float linearZ  = LinearDepth(posH.z);
+    float4 posH  = mul(float4(posW, 1.0f), _ViewProjMatrix);
+    float  depth = posH.z / posH.w;
+    float2 tex   = float2(DispatchRaysIndex().xy) / DispatchRaysDimensions().xy; 
+
+
+
+
+    float z = depth;
+    float x = tex.x * _Resolution.x;
+    float y = tex.y * _Resolution.y;
+    float linearZ  = LinearDepth(z);
     uint zIndex    = max(log2(linearZ) * _ClusterScale + _ClusterBias, 0.0);
 
+    uint3 clusterIndexs = uint3(x / _ClusterSize.x, y / _ClusterSize.y, zIndex);
 
-    uint3 clusterIndexs = uint3(posH.x / _ClusterSize.x, posH.y / _ClusterSize.y, zIndex);
+
     uint  tileIndex = clusterIndexs.x +
                      _NumClusterSlice.x * clusterIndexs.y +
                      (_NumClusterSlice.x * _NumClusterSlice.y) * clusterIndexs.z;
-
     uint tileTotalCount = _NumClusterSlice.x * _NumClusterSlice.y * _NumClusterSlice.z;
     return min(tileTotalCount, max(tileIndex, 0));
 }
-
 float3 ImportanceSampleGGX(float2 Xi, float3 N, float roughness)
 {
 	float a = roughness * roughness;
@@ -704,6 +716,7 @@ float3 ShootDirectRay(
     payload.Normal = float2(0,0);
     payload.PrevHitPosition = float3(0,0,0);
     payload.PrevNormal = float2(0,0);
+    payload.Emissive = float3(0,0,0);
     payload.Flags = PAYLOAD_FLAG_NONE;
 
     TraceRay(
@@ -719,6 +732,7 @@ float3 ShootDirectRay(
     uint2  launchIndex = DispatchRaysIndex().xy;
     float _depth;
 
+    _EmissiveOutput[launchIndex] = float4(payload.Emissive, 1.0f);
     _HitPositionOutput[launchIndex] =float4(payload.HitPosition,1.0f);
     if(payload.Hit == 0.0f)
     {
@@ -789,24 +803,37 @@ float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
 }
 
 
-
 float ShootShadowRay(int randSeed, in float3 posW)
 {
-    int totalLightCount = GetTotalLightCount();
+
+    uint   clusterIndex = GetClusterIndex(posW);
+	LightGrid lgrid  = _LightGridList[clusterIndex];
+
+
+    int totalLightCount = lgrid.PL_Count;
+    int activeLightCount = 0;
     if(totalLightCount == 0)
     {
         return 0.0f;
     }
-    int lightIndex = min(int(nextRand(randSeed) * totalLightCount), totalLightCount - 1);
 
 
-
-
-    int PL_Index  = lightIndex;
-    PointLight pl = _PointLightList[lightIndex];
-    float shadow = ShootShadowRay_PL(pl, randSeed, posW);
+    float shadow = 0.0f;
+	// Calc PointLight
+	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
+	{
+		int pl_start  = lgrid.PL_Offset;
+		int pl_end    = pl_start + lgrid.PL_Count;
+		for(int i = pl_start; i<pl_end; i++)
+		{
+			int lightIndex = _VisibleLightIndices[i];
     
-    return shadow;
+			PointLight pl = _PointLightList[lightIndex];
+            shadow += ShootShadowRay_PL(pl, randSeed, posW);
+            activeLightCount += 1;
+		}
+	}
+    return shadow / (float)activeLightCount;
 }
 
 
@@ -869,9 +896,8 @@ float3 GGXDirect(SURFACE_OUTPUT input)
     material.Emissive = input.emissive;
     material.WorldPosition = posW;
 
-    float4 posH = mul(_InvViewProjMatrix, float4(posW, 1.0f));
+    uint   clusterIndex = GetClusterIndex(posW);
 
-	uint   clusterIndex = GetClusterIndex(posH.xyz);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
 
 	// Calc PointLight
@@ -887,9 +913,7 @@ float3 GGXDirect(SURFACE_OUTPUT input)
 			Lo += CalcPointLight_GGX(N, V, material, pl);
 		}
 	}
-
-    //float shadow = ShootShadowRay();
-    return Lo + material.Emissive;
+    return Lo;
 };
 
 

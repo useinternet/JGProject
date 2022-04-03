@@ -144,7 +144,7 @@ namespace JG
 		virtual void BeginOnGUI() override
 		{
 			PreOnGUI();
-			ImGui::Begin(GetTitleName().c_str(), &mIsShowGUI);
+			ImGui::Begin((GetTitleName() + "##" + std::to_string(GetViewID())).c_str(), &mIsShowGUI);
 		}
 		virtual void EndOnGUI() override
 		{

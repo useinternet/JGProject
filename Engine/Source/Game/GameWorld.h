@@ -14,9 +14,6 @@ namespace JG
 		None,
 		Update_Lock = 0x00001,
 		LateUpdate_Lock = 0x00002,
-
-
-
 		All_Update_Lock = Update_Lock | LateUpdate_Lock
 	};
 
@@ -33,8 +30,9 @@ namespace JG
 
 
 
-		SharedPtr<ScheduleHandle> mUpdateScheduleHandle;
-		SharedPtr<ScheduleHandle> mLateUpdateScheduleHandle;
+		SharedPtr<ScheduleHandle> mUpdateSH;
+		SharedPtr<ScheduleHandle> mLateUpdateSH;
+		SharedPtr<ScheduleHandle> mFixedUpdateSH;
 		EGameWorldFlags mGameWorldFlags = EGameWorldFlags::None;
 
 

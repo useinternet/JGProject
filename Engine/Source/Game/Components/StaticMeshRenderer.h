@@ -8,10 +8,6 @@ namespace JG
 	private:
 		Asset<IMesh>* mMesh = nullptr;
 		List<Asset<IMaterial>*> mMaterialList;
-		SharedPtr<IMaterial>    mNullMaterial;
-
-
-		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle;
 	public:
 		virtual ~StaticMeshRenderer() = default;
 	protected:
@@ -21,6 +17,7 @@ namespace JG
 	protected:
 		virtual void Update() override;
 		virtual void LateUpdate() override;
+		virtual void FixedUpdate() override;
 	public:
 		void SetMesh(const String& path);
 		void SetMaterial(const String& path);
@@ -41,6 +38,6 @@ namespace JG
 	private:
 		void OnInspector_MeshGUI();
 		void OnInspector_MaterialGUI();
-		EScheduleResult PushRenderSceneObject();
+		void PushRenderSceneObject();
 	};
 }

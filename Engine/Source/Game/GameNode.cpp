@@ -64,6 +64,19 @@ namespace JG
 			}
 		}
 	}
+	void GameNode::FixedUpdate()
+	{
+		GameObject::LateUpdate();
+		if (IsAlive() == false) return;
+		for (auto& com : mComponents)
+		{
+			com->FixedUpdate();
+		}
+		for (auto& child : mChilds)
+		{
+			child->FixedUpdate();
+		}
+	}
 	GameNode::GameNode()
 	{
 		mTransform = AddComponent<Transform>();

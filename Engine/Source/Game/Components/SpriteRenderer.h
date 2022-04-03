@@ -10,7 +10,7 @@ namespace JG
 		Color mColor = Color::White();
 		JVector2 mSpriteSize;
 		Asset<ITexture>* mSprite = nullptr;
-		SharedPtr<ScheduleHandle> mPushRenderSceneObjectScheduleHandle = nullptr;
+		SharedPtr<ScheduleHandle> mRenderSH = nullptr;
 	public:
 		virtual ~SpriteRenderer() = default;
 	protected:
@@ -18,8 +18,10 @@ namespace JG
 		virtual void Start() override;
 		virtual void Destory() override;
 	protected:
+
 		virtual void Update() override;
 		virtual void LateUpdate() override;
+		virtual void FixedUpdate() override;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
@@ -32,7 +34,7 @@ namespace JG
 	public:
 		virtual void OnChange(const ChangeData& data) override;
 	private:
-		EScheduleResult PushRenderSceneObject();
+		void PushRenderSceneObject();
 	};
 
 }

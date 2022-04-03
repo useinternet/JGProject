@@ -31,6 +31,7 @@ namespace JG
 			input.IndirectR,
 			input.IndirectG,
 			input.IndirectB,
+			input.Emissive,
 			input.Shadow,
 			input.AO,
 			input.Depth

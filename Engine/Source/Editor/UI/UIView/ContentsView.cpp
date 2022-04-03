@@ -796,7 +796,15 @@ namespace JG
 		}
 			break;
 		case EAssetFormat::Mesh:
-			UIManager::GetInstance().GetUIView<ModelView>()->Open();
+		{
+			u64 pathHash = std::hash<String>()(path);
+			ModelView* modelView = UIManager::GetInstance().GetUIView<ModelView>(pathHash);
+			if (modelView != nullptr)
+			{
+				modelView->SetModel(path);
+				modelView->Open();
+			}
+		}
 			break;
 		}
 

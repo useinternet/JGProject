@@ -114,12 +114,15 @@ namespace JG
 			ERendererPath RenderPath = ERendererPath::Deferred;
 			JVector2 Resolution;
 			JVector3 EyePos;
-			JMatrix  ViewMatrix = JMatrix::Identity();
-			JMatrix  ProjMatrix = JMatrix::Identity();
+			JMatrix  ViewMatrix     = JMatrix::Identity();
+			JMatrix  ProjMatrix     = JMatrix::Identity();
 			JMatrix  ViewProjMatrix = JMatrix::Identity();
 			f32 FarZ  = 0.0f;
 			f32 NearZ = 0.0f;
 			Color    ClearColor;
+
+
+			f32 TickCycle = 0.00f;
 		};
 
 		class SceneResultInfo
@@ -150,21 +153,32 @@ namespace JG
 			using PostRenderingEvent = std::function<void(SharedPtr<SceneResultInfo>)>;
 		private:
 			SceneInfo mSceneInfo;
-			SharedPtr<SceneResultInfo>	  mSceneResult;
 			Queue<SharedPtr<SceneObject>> mSceneObjectQueue;
 			List<SharedPtr<Light>>        mLightList;
 
-			SharedPtr<Renderer>       mRenderer;
-			//SharedPtr<Render2DBatch>  m2DBatch;
-			SharedPtr<ScheduleHandle> mRenderScheduleHandle;
+			SceneInfo mPendingSceneInfo;
+			Queue<SharedPtr<SceneObject>> mPendingSceneObjectQueue;
+			List<SharedPtr<Light>>	      mPendingLightList;
 
+
+			SharedPtr<SceneResultInfo>	  mSceneResult;
+			SharedPtr<Renderer>       mRenderer;
+
+			// PushRenderObject
+			SharedPtr<ScheduleHandle> mSetSceneInfoSH;
+			SharedPtr<ScheduleHandle> mRenderSH;
+			SharedPtr<ScheduleHandle> mPushSceneObjectSH;
+			SharedPtr<ScheduleHandle> mRenderFetchResultSH;
+			SharedPtr<ScheduleHandle> mRenderInternalSH;
+
+			bool mIsRendering = false;
 
 			SortedDictionary<i32, Queue<PostRenderingEvent>> mPostRenderingEventQueue;
 		public:
 			Scene(const SceneInfo& info);
 			virtual ~Scene();
 		public:
-			bool SetSceneInfo(const SceneInfo& info);
+			void SetSceneInfo(const SceneInfo& info);
 			const SceneInfo& GetSceneInfo() const;
 			Renderer* GetRenderer() const;
 
@@ -175,9 +189,11 @@ namespace JG
 		public:
 			void Reset();
 			void Rendering();
-			SharedPtr<SceneResultInfo> FetchResultFinish();
+			SharedPtr<SceneResultInfo> FetchResult();
 		private:
 			void InitRenderer(ERendererPath path);
+
+			
 		};
 
 		class RenderPassData

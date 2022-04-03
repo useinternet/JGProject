@@ -441,6 +441,29 @@ namespace JG
 		AssetID GetAssetOriginID(const String& path);
 		SharedPtr<IAsset> LoadOriginAsset(const String& path);
 		SharedPtr<IAsset> LoadReadWriteAsset(AssetID originID);
+
+		template<class T>
+		SharedPtr<Asset<T>> LoadOriginAsset(const String& path)
+		{
+			SharedPtr<IAsset> originAsset = LoadOriginAsset(path);
+			if (originAsset == nullptr || originAsset->Is<Asset<T>>() == false)
+			{
+				return nullptr;
+			}
+			return std::static_pointer_cast<Asset<T>>(originAsset);
+		}
+
+		template<class T>
+		SharedPtr<Asset<T>> LoadReadWriteAsset(AssetID originID)
+		{
+			SharedPtr<IAsset> rwAsset = LoadReadWriteAsset(originID);
+			if (rwAsset == nullptr || rwAsset->Is<Asset<T>> == false)
+			{
+				return nullptr;
+			}
+			return std::static_pointer_cast<Asset<T>>(rwAsset);
+		}
+
 		void UnLoadAsset(AssetID id);
 		void RefreshAsset(AssetID originID, const String& reName = String());
 		void RefreshAssetName(AssetID originID, const String& reName);

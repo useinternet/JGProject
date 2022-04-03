@@ -20,6 +20,7 @@ namespace JG
 			SharedPtr<ITexture> IndirectR;
 			SharedPtr<ITexture> IndirectG;
 			SharedPtr<ITexture> IndirectB;
+			SharedPtr<ITexture> Emissive;
 			SharedPtr<ITexture> Shadow;
 			SharedPtr<ITexture> AO;
 			SharedPtr<ITexture> Depth;

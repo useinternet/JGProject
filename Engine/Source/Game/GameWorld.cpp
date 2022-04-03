@@ -8,7 +8,16 @@ namespace JG
 	GameWorld::GameWorld() : GameNode(this)
 	{
 		mAssetManager = AssetDataBase::GetInstance().RequestAssetManager();
-		mUpdateScheduleHandle = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mFixedUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		{
+			if (IsAlive() == false)
+			{
+				return EScheduleResult::Break;
+			}
+			FixedUpdate();
+			return EScheduleResult::Continue;
+		});
+		mUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -21,7 +30,7 @@ namespace JG
 			Update();
 			return EScheduleResult::Continue;
 		});
-		mLateUpdateScheduleHandle = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mLateUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -56,12 +65,13 @@ namespace JG
 		PhysicsManager::GetInstance().PushRemoveCommand(mPxSceneHandle);
 		AssetDataBase::GetInstance().ReturnAssetManager(mAssetManager);
 		mAssetManager = nullptr;
-
-		mUpdateScheduleHandle->Reset();
-		mLateUpdateScheduleHandle->Reset();
-
-		mUpdateScheduleHandle = nullptr;
-		mLateUpdateScheduleHandle = nullptr;
+		mFixedUpdateSH->Reset();
+		mUpdateSH->Reset();
+		mLateUpdateSH->Reset();
+	
+		mFixedUpdateSH = nullptr;
+		mUpdateSH = nullptr;
+		mLateUpdateSH = nullptr;
 	}
 
 	void GameWorld::MakeJson(SharedPtr<JsonData> jsonData) const

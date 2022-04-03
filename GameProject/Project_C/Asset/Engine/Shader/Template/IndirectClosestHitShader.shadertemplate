@@ -62,6 +62,7 @@ void __ClosestHit_EntryPoint__(inout IndirectRayPayload payload, BuiltInTriangle
 		{
 			payload.Color += GGXDirect(output);
 		}
+		payload.Color += output.emissive;
 	}
 	else
 	{

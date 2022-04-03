@@ -3,10 +3,11 @@
 Texture2D<float4>   _Direct     : register(t0);
 Texture2D<float>    _IndirectR  : register(t1);
 Texture2D<float>    _IndirectG  : register(t2); 
-Texture2D<float>    _IndirectB : register(t3);
-Texture2D<float>    _Shadow : register(t4);
-Texture2D<float>    _Ao : register(t5);
-Texture2D<float>    _Depth : register(t6);
+Texture2D<float>    _IndirectB  : register(t3);
+Texture2D<float4>    _Emissive   : register(t4);
+Texture2D<float>    _Shadow     : register(t5);
+Texture2D<float>    _Ao         : register(t6);
+Texture2D<float>    _Depth      : register(t7);
 
 RWTexture2D<float4>  _Result : register(u0);
 
@@ -22,15 +23,16 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
 {
     float3 direct   = _Direct[DTid].rgb;
     float3 indirect = float3(_IndirectR[DTid], _IndirectG[DTid], _IndirectB[DTid]);
+    float3 emissive = _Emissive[DTid].rgb;
     float shadow    = _Shadow[DTid];
     float ao        = _Ao[DTid];
-    float depth = _Depth[DTid];
+    float depth     = _Depth[DTid];
     if(depth <= 0.0f)
     {
-        _Result[DTid] = float4(direct, 1.0f);
+        _Result[DTid] = float4(direct + emissive, 1.0f);
     }
     else{
-        _Result[DTid] = float4(direct * shadow * ao + indirect * float3(0.25f, 0.25f, 0.25f), 1.0f);
+        _Result[DTid] = float4(direct * shadow * ao + emissive + indirect * float3(0.25f, 0.25f, 0.25f), 1.0f);
     }
    
 }

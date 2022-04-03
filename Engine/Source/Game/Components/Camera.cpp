@@ -38,15 +38,14 @@ namespace JG
 
 
 		UpdateGraphicsScene();
-
 		// 스케쥴러에 렌더링 로직 등록
-		mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
-		mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
-		mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
-		{
-			UpdateGraphicsScene();
-			return EScheduleResult::Continue;
-		});
+		//mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
+		//mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
+		//mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
+		//{
+		//	UpdateGraphicsScene();
+		//	return EScheduleResult::Continue;
+		//});
 	}
 
 	void Camera::Start()
@@ -58,9 +57,19 @@ namespace JG
 		}
 
 	}
+	void Camera::FixedUpdate()
+	{
+		GameComponent::FixedUpdate();
+		UpdateGraphicsScene();
+		Rendering();
+
+	}
 	void Camera::Update()
 	{
 		GameComponent::Update();
+
+
+
 		if (GetMainCamera() == nullptr)
 		{
 			SetMainCamera(this);
@@ -84,21 +93,21 @@ namespace JG
 			JGGraphics::GetInstance().DestroyObject(mScene);
 			mScene = nullptr;
 		}
-		if (mRenderingScheduleHandle != nullptr)
-		{
-			mRenderingScheduleHandle->Reset();
-			mRenderingScheduleHandle = nullptr;
-		}
-		if (mRenderFinishScheduleHandle != nullptr)
-		{
-			mRenderFinishScheduleHandle->Reset();
-			mRenderFinishScheduleHandle = nullptr;
-		}
-		if (mUpdateSceneInfoScheduleHandle != nullptr)
-		{
-			mUpdateSceneInfoScheduleHandle->Reset();
-			mUpdateSceneInfoScheduleHandle = nullptr;
-		}
+		//if (mRenderingScheduleHandle != nullptr)
+		//{
+		//	mRenderingScheduleHandle->Reset();
+		//	mRenderingScheduleHandle = nullptr;
+		//}
+		//if (mRenderFinishScheduleHandle != nullptr)
+		//{
+		//	mRenderFinishScheduleHandle->Reset();
+		//	mRenderFinishScheduleHandle = nullptr;
+		//}
+		//if (mUpdateSceneInfoScheduleHandle != nullptr)
+		//{
+		//	mUpdateSceneInfoScheduleHandle->Reset();
+		//	mUpdateSceneInfoScheduleHandle = nullptr;
+		//}
 	}
 	void Camera::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -436,32 +445,19 @@ namespace JG
 
 		mScene->SetSceneInfo(sceneInfo);
 	}
-	EScheduleResult Camera::Rendering()
+	void Camera::Rendering()
 	{
-		if (IsActive() == false)
-		{
-			return EScheduleResult::Continue;
-		}
 		if (mScene == nullptr)
 		{
-			return EScheduleResult::Continue;
-		
+			return;
 		}
-		mIsRendering = true;
-		mScene->Rendering();
-
-		return EScheduleResult::Continue;
-	}
-	EScheduleResult Camera::RenderFinish()
-	{
-		
-		if (mScene == nullptr || mIsRendering == false)
+		SharedPtr<Graphics::SceneResultInfo> resultInfo = mScene->FetchResult();
+		if (resultInfo != nullptr)
 		{
-			return EScheduleResult::Continue;
+			mSceneResultInfo = resultInfo;
 		}
-		mIsRendering = false;
-		mSceneResultInfo = mScene->FetchResultFinish();
-		return EScheduleResult::Continue;
+
+		mScene->Rendering();
 	}
 	f32 EditorCamera::GetZoom() const
 	{

@@ -42,22 +42,19 @@ namespace JG
 		bool mIsOrthographic  = false;
 		bool mIsMainCamera    = false;
 
-
-		bool mIsRendering = false;
-	
-
 		ERendererPath mRendererPath = ERendererPath::Foward;
 
 		Graphics::Scene* mScene = nullptr;
 		SharedPtr<Graphics::SceneResultInfo> mSceneResultInfo = nullptr;
-		SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
-		SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
-		SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
+		//SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
+		//SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
+		//SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
 	public:
 		virtual ~Camera() = default;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
+		virtual void FixedUpdate() override;
 		virtual void Update() override;
 		virtual void Destory() override;
 	public:
@@ -110,8 +107,7 @@ namespace JG
 		virtual void OnChange(const ChangeData& data) override;
 	private:
 		void UpdateGraphicsScene();
-		EScheduleResult Rendering();
-		EScheduleResult RenderFinish();
+		void Rendering();
 	};
 
 	class EditorCamera : public Camera
