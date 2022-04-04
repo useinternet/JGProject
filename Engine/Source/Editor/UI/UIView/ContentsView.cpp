@@ -15,6 +15,8 @@
 #include "UI/ModalUI/MessageBoxModalView.h"
 
 #include "UI/UIView/ModelView.h"
+#include "UI/UIView/MaterialView.h"
+#include "UI/UIView/PrefabView.h"
 #include "UI/UIManager.h"
 namespace JG
 {
@@ -803,6 +805,28 @@ namespace JG
 			{
 				modelView->SetModel(path);
 				modelView->Open();
+			}
+		}
+			break;
+		case EAssetFormat::Material:
+		{
+			u64 pathHash = std::hash<String>()(path);
+			MaterialView* materialView = UIManager::GetInstance().GetUIView<MaterialView>(pathHash);
+			if (materialView != nullptr)
+			{
+				materialView->SetMaterial(path);
+				materialView->Open();
+			}
+
+		}
+			break;
+		case EAssetFormat::Prefab:
+		{
+			u64 pathHash = std::hash<String>()(path);
+			PrefabView* prefabView = UIManager::GetInstance().GetUIView<PrefabView>(pathHash);
+			if (prefabView != nullptr)
+			{
+				prefabView->Open();
 			}
 		}
 			break;

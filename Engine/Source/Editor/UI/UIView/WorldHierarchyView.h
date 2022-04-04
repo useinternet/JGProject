@@ -91,6 +91,7 @@ namespace JG
 		void CreateCube();
 		void CreateSphere();
 		void CreatePointLight();
+		void CreateDirectionalLight();
 		void CreateCamera();
 		void MakePrefab();
 		void Copy(bool is_remove_gamenode_after_copy = false);

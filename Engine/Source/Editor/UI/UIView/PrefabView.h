@@ -1,19 +1,15 @@
 #pragma once
-#include "JGCore.h"
 #include "UI/UIView.h"
 
 
 namespace JG
 {
-	/* MaterialView 기능
-1. Material Script 편집기능 ( 오래걸리는것같으면 패스 )
-2. Material 컴파일, Mesh 테스트 적용, 뷰어 기능 추가
-*/
 	namespace Graphics
 	{
 		class Scene;
 	}
-	class MaterialView : public UIView
+
+	class PrefabView : public UIView
 	{
 		JGCLASS
 	private:
@@ -27,14 +23,14 @@ namespace JG
 
 		SharedPtr<ITexture>		 mSceneTexture;
 		SharedPtr<Asset<IMesh>>  mMeshAsset = nullptr;
-		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
+		List<SharedPtr<Asset<IMaterial>>> mMaterialAssetList;
 
 
 
 		Graphics::Scene* mScene = nullptr;
 	public:
-		MaterialView();
-		virtual ~MaterialView() = default;
+		PrefabView();
+		virtual ~PrefabView() = default;
 	protected:
 		virtual void Load() override;
 		virtual void Initialize() override;
@@ -42,7 +38,6 @@ namespace JG
 		virtual void Destroy() override;
 		virtual void OnEvent(IEvent& e) override;
 	public:
-		void UpdateScene();
 		void SetMaterial(const String& path);
 		void SetMesh(const String& path);
 	};

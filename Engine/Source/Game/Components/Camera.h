@@ -46,15 +46,12 @@ namespace JG
 
 		Graphics::Scene* mScene = nullptr;
 		SharedPtr<Graphics::SceneResultInfo> mSceneResultInfo = nullptr;
-		//SharedPtr<ScheduleHandle> mRenderingScheduleHandle;
-		//SharedPtr<ScheduleHandle> mRenderFinishScheduleHandle;
-		//SharedPtr<ScheduleHandle> mUpdateSceneInfoScheduleHandle;
 	public:
 		virtual ~Camera() = default;
 	protected:
 		virtual void Awake() override;
 		virtual void Start() override;
-		virtual void FixedUpdate() override;
+		virtual void FixedLateUpdate() override;
 		virtual void Update() override;
 		virtual void Destory() override;
 	public:

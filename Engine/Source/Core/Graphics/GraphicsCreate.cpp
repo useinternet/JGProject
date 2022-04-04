@@ -196,8 +196,18 @@ namespace JG
 	}
 	void IMesh::SetMeshStock(const StaticMeshAssetStock& stock)
 	{
+		MeshInfo meshInfo;
 		auto cnt = stock.SubMeshNames.size();
 		SetInputLayout(JGVertex::GetInputLayout());
+		meshInfo.InputLayout = GetInputLayout();
+		meshInfo.Name = stock.Name;
+		meshInfo.TotalSubMeshCount = cnt;
+
+		meshInfo.SubMeshIndexCounts.resize(cnt);
+		meshInfo.SubMeshVertexCounts.resize(cnt);
+		meshInfo.SubMeshNames.resize(cnt);
+
+
 		for (u64 i = 0; i < cnt; ++i)
 		{
 			auto vBuffer = IVertexBuffer::Create(stock.SubMeshNames[i] + "_VBuffer", EBufferLoadMethod::CPULoad);
@@ -209,8 +219,16 @@ namespace JG
 			subMesh->SetVertexBuffer(vBuffer);
 			subMesh->SetIndexBuffer(iBuffer);
 			AddMesh(subMesh);
+
+			meshInfo.SubMeshNames[i]        = stock.SubMeshNames[i];
+			meshInfo.SubMeshVertexCounts[i] = stock.Vertices[i].size();
+			meshInfo.SubMeshIndexCounts[i]  = stock.Indices[i].size();
+
+			meshInfo.TotalVertexCount += stock.Vertices[i].size();
+			meshInfo.TotalIndexCount += stock.Indices[i].size();
 		}
 		SetBoundingBox(stock.BoundingBox);
+		SetMeshInfo(meshInfo);
 	}
 	SharedPtr<IMesh> IMesh::Create(const StaticMeshAssetStock& stock)
 	{

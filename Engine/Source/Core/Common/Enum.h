@@ -49,6 +49,8 @@ namespace JG
 		GameWorld = 6,
 		CubeMap   = 7,
 		Prefab    = 8,
+		AnimationClip = 9,
+		ANimation = 10,
 	};
 
 	enum class ERendererPath

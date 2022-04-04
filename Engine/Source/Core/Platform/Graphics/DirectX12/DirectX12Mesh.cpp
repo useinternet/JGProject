@@ -103,6 +103,16 @@ namespace JG
 		return mBoundingBox;
 	}
 
+	void DirectX12Mesh::SetMeshInfo(const MeshInfo& meshInfo)
+	{
+		mMeshInfo = meshInfo;
+	}
+
+	const MeshInfo& DirectX12Mesh::GetMeshInfo() const
+	{
+		return mMeshInfo;
+	}
+
 
 
 	void DirectX12Mesh::SetName(const String& name)

@@ -10,9 +10,11 @@
 #include "Components/SpriteRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/PointLight.h"
+#include "Components/DirectionalLight.h"
 #include "Components/Camera.h"
 #include "Components/Collision.h"
 #include "Components/Transform.h"
+
 #include <random>
 namespace JG
 {
@@ -46,6 +48,10 @@ namespace JG
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/3D/Sphere", 0, [&]()
 		{
 			CreateSphere();
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Light/DirectionalLight", 0, [&]()
+		{
+			CreateDirectionalLight();
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Light/PointLight", 0, [&]()
 		{
@@ -403,6 +409,12 @@ namespace JG
 		if (mTargetGameNode == nullptr) return;
 		auto node = mTargetGameNode->AddNode("PointLight");
 		node->AddComponent<PointLight>();
+	}
+	void WorldHierarchyView::CreateDirectionalLight()
+	{
+		if (mTargetGameNode == nullptr) return;
+		auto node = mTargetGameNode->AddNode("DirectionalLight");
+		node->AddComponent<DirectionalLight>();
 	}
 	void WorldHierarchyView::CreateCamera()
 	{

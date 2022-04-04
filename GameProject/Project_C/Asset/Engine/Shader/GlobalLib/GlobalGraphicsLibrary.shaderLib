@@ -19,7 +19,7 @@ cbuffer __RenderPassDataCB__ : register(b0)
     float    _ClusterScale;
     float    _ClusterBias;
     uint3    _NumClusterSlice;
-    uint     _DebugMode;
+    uint     _DirectionalLightCount;
 };
 cbuffer __ObjectDataCB__ : register(b1)
 {

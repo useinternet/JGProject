@@ -137,15 +137,20 @@ namespace JG
 		private:
 			String mName;
 			bool   mLock = false;
+			bool   mUserLock = false;
 		public:
 			virtual ~GObject() = default;
 		public:
 			void SetName(const String& name);
 			const String& GetName();
+
+			bool IsUserLock() const;
+			void UserLock();
+			void UserUnLock();
 		protected:
 			void Lock();
 			void UnLock();
-			bool IsLock();
+			bool IsLock() const;
 		};
 
 		class Scene : public GObject
@@ -167,7 +172,6 @@ namespace JG
 			// PushRenderObject
 			SharedPtr<ScheduleHandle> mSetSceneInfoSH;
 			SharedPtr<ScheduleHandle> mRenderSH;
-			SharedPtr<ScheduleHandle> mPushSceneObjectSH;
 			SharedPtr<ScheduleHandle> mRenderFetchResultSH;
 			SharedPtr<ScheduleHandle> mRenderInternalSH;
 
@@ -178,8 +182,9 @@ namespace JG
 			Scene(const SceneInfo& info);
 			virtual ~Scene();
 		public:
-			void SetSceneInfo(const SceneInfo& info);
+			void  SetSceneInfo(const SceneInfo& info);
 			const SceneInfo& GetSceneInfo() const;
+
 			Renderer* GetRenderer() const;
 
 			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
@@ -189,8 +194,13 @@ namespace JG
 		public:
 			void Reset();
 			void Rendering();
+			bool IsEnableRendering() const;
 			SharedPtr<SceneResultInfo> FetchResult();
 		private:
+			EScheduleResult RenderScene();
+			EScheduleResult RenderFinish();
+
+
 			void InitRenderer(ERendererPath path);
 
 			

@@ -49,6 +49,9 @@ namespace JG
 		virtual SharedPtr<ISubMesh> GetSubMesh(i32 index) = 0;
 		virtual u64 GetSubMeshCount() const = 0;
 		virtual const JBBox& GetBoundingBox() const = 0;
+		virtual const MeshInfo& GetMeshInfo() const = 0;
+	private:
+		virtual void SetMeshInfo(const MeshInfo& meshInfo) = 0;
 	public:
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName()   = 0;

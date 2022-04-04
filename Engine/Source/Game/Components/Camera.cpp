@@ -34,18 +34,7 @@ namespace JG
 		{
 			smMainCamera = this;
 		}
-
-
-
 		UpdateGraphicsScene();
-		// 스케쥴러에 렌더링 로직 등록
-		//mRenderingScheduleHandle       = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Camera::Rendering));
-		//mRenderFinishScheduleHandle    = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Camera::RenderFinish));
-		//mUpdateSceneInfoScheduleHandle = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_BeginFrame, [&]() -> EScheduleResult
-		//{
-		//	UpdateGraphicsScene();
-		//	return EScheduleResult::Continue;
-		//});
 	}
 
 	void Camera::Start()
@@ -57,9 +46,9 @@ namespace JG
 		}
 
 	}
-	void Camera::FixedUpdate()
+	void Camera::FixedLateUpdate()
 	{
-		GameComponent::FixedUpdate();
+		GameComponent::FixedLateUpdate();
 		UpdateGraphicsScene();
 		Rendering();
 
@@ -93,21 +82,6 @@ namespace JG
 			JGGraphics::GetInstance().DestroyObject(mScene);
 			mScene = nullptr;
 		}
-		//if (mRenderingScheduleHandle != nullptr)
-		//{
-		//	mRenderingScheduleHandle->Reset();
-		//	mRenderingScheduleHandle = nullptr;
-		//}
-		//if (mRenderFinishScheduleHandle != nullptr)
-		//{
-		//	mRenderFinishScheduleHandle->Reset();
-		//	mRenderFinishScheduleHandle = nullptr;
-		//}
-		//if (mUpdateSceneInfoScheduleHandle != nullptr)
-		//{
-		//	mUpdateSceneInfoScheduleHandle->Reset();
-		//	mUpdateSceneInfoScheduleHandle = nullptr;
-		//}
 	}
 	void Camera::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
@@ -437,6 +411,7 @@ namespace JG
 		sceneInfo.FarZ = GetFarZ();
 		sceneInfo.NearZ = GetNearZ();
 		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
+		sceneInfo.TickCycle = GetGameWorld()->GetTickCycle();
 		if (mScene == nullptr)
 		{
 			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);
@@ -456,7 +431,6 @@ namespace JG
 		{
 			mSceneResultInfo = resultInfo;
 		}
-
 		mScene->Rendering();
 	}
 	f32 EditorCamera::GetZoom() const

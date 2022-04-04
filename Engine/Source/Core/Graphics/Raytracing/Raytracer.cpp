@@ -293,6 +293,8 @@ namespace JG
 		
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
+		const auto& dlInfo = mRenderer->GetLightInfo(Graphics::ELightType::DirectionalLight);
+
 		context->BindSturcturedBuffer(3, plInfo.Data.data(), plInfo.Size, plInfo.Count);
 
 		// LightGrid
@@ -301,7 +303,8 @@ namespace JG
 		context->BindSturcturedBuffer(5, mRenderer->GetVisibleLightIndicies());
 		// PrevFrameTransform
 		context->BindSturcturedBuffer(6, mSceneAS[currentIndex]->GetPrevFrameTransformBuffer());
-
+		// 
+		context->BindSturcturedBuffer(7, dlInfo.Data.data(), dlInfo.Size, dlInfo.Count);
 
 
 		context->DispatchRay(mResolution.x, mResolution.y, 1, pipeline, mSRT);
@@ -427,7 +430,7 @@ namespace JG
 		creater->AddSRV(4, 2, 0);
 		creater->AddSRV(5, 3, 0);
 		creater->AddSRV(6, 4, 0);
-
+		creater->AddSRV(7, 5, 0);
 		creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
 		creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
 		creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);

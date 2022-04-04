@@ -12,6 +12,7 @@
 #include "UI/UIView/DevConsoleView.h"
 #include "UI/UIView/ModelView.h"
 #include "UI/UIView/MaterialView.h"
+#include "UI/UIView/PrefabView.h"
 
 
 // PopupUI
@@ -202,6 +203,7 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<DevConsoleView>();
 		UIManager::GetInstance().RegisterUIView<ModelView>();
 		UIManager::GetInstance().RegisterUIView<MaterialView>();
+		UIManager::GetInstance().RegisterUIView<PrefabView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()

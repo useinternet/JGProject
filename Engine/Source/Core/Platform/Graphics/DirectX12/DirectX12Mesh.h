@@ -36,8 +36,9 @@ namespace JG
 	{
 		List<SharedPtr<ISubMesh>> mSubMeshList;
 		SharedPtr<InputLayout>    mInputLayout;
-		JBBox mBoundingBox;
+		JBBox  mBoundingBox;
 		String mName;
+		MeshInfo mMeshInfo;
 	public:
 		virtual ~DirectX12Mesh() = default;
 	public:
@@ -51,6 +52,8 @@ namespace JG
 		virtual u64					   GetSubMeshCount() const override;
 		virtual const JBBox&		   GetBoundingBox() const override;
 
+		virtual void SetMeshInfo(const MeshInfo& meshInfo) override;
+		virtual const MeshInfo& GetMeshInfo() const override;
 		virtual void	      SetName(const String& name) override;
 		virtual const String& GetName() override;
 		virtual bool IsValid() const override;

@@ -934,46 +934,6 @@ namespace JG
 		}
 	}
 
-	//bool AssetDataBase::GetResourcePath(const String& path, String& out_absolutePath, String& out_resourcePath) const
-	//{
-	//	auto originPath = path;
-	//	auto absolutePath      = fs::absolute(path).string();
-	//	auto absoluteAssetPath = fs::absolute(Application::GetAssetPath()).string();
-	//	auto homePath = fs::current_path().string();
-
-	//	originPath        = StringHelper::ReplaceAll(originPath, "\\", "/");
-	//	absolutePath      = StringHelper::ReplaceAll(absolutePath, "\\", "/");
-	//	absoluteAssetPath = StringHelper::ReplaceAll(absoluteAssetPath, "\\", "/");
-	//	homePath		  = StringHelper::ReplaceAll(homePath, "\\", "/");
-
-
-	//	String resourcePath;
-
-	//	// 
-	//	if (absolutePath.find(absoluteAssetPath) == String::npos )
-	//	{
-	//		if (path.find_first_of("Asset/") != String::npos) {
-
-	//			resourcePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
-	//			absolutePath = StringHelper::ReplaceAll(absolutePath, homePath + "/", "");
-	//			absolutePath = StringHelper::ReplaceAll(absolutePath, "Asset/", "");
-	//			absolutePath = PathHelper::CombinePath(absoluteAssetPath, absolutePath);
-	//			out_absolutePath = absolutePath;
-	//			out_resourcePath = resourcePath;
-	//			return true;
-	//		}
-	//	}
-	//	// in AssetPath
-	//	else
-	//	{
-	//		resourcePath = StringHelper::ReplaceAll(absolutePath, absoluteAssetPath, "Asset");
-	//		out_absolutePath = absolutePath;
-	//		out_resourcePath = resourcePath;
-	//		return true;
-	//	}
-	//	return false;
-	//}
-
 	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
 	{
 		// Mesh, Material, Texture

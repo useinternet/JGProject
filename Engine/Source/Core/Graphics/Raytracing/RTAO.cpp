@@ -294,10 +294,14 @@ namespace JG
         mSamplerUpdateSH = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1,
             SchedulePriority::BeginSystem, [&]() -> EScheduleResult
         {
-            mSamplerUpdateAyncSH = Scheduler::GetInstance().ScheduleAsync([&]()
+            if (mSamplerUpdateAyncSH == nullptr)
             {
-                UpdateSampler();
-            });
+                mSamplerUpdateAyncSH = Scheduler::GetInstance().ScheduleAsync([&]()
+                {
+                    UpdateSampler();
+                });
+            }
+
             return EScheduleResult::Continue;
         });
         InitLibrary();

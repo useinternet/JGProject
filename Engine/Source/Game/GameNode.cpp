@@ -66,7 +66,7 @@ namespace JG
 	}
 	void GameNode::FixedUpdate()
 	{
-		GameObject::LateUpdate();
+		GameObject::FixedUpdate();
 		if (IsAlive() == false) return;
 		for (auto& com : mComponents)
 		{
@@ -75,6 +75,19 @@ namespace JG
 		for (auto& child : mChilds)
 		{
 			child->FixedUpdate();
+		}
+	}
+	void GameNode::FixedLateUpdate()
+	{
+		GameObject::FixedLateUpdate();
+		if (IsAlive() == false) return;
+		for (auto& com : mComponents)
+		{
+			com->FixedLateUpdate();
+		}
+		for (auto& child : mChilds)
+		{
+			child->FixedLateUpdate();
 		}
 	}
 	GameNode::GameNode()

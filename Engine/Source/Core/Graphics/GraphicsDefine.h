@@ -152,6 +152,22 @@ namespace JG
 		f32   ClearDepth = 1.0f;
 		u8    ClearStencil = 0;
 	};
+
+
+	class InputLayout;
+	struct MeshInfo
+	{
+		String Name;
+		u32 TotalSubMeshCount = 0;
+		u32 TotalVertexCount  = 0;
+		u32 TotalIndexCount   = 0;
+
+		List<String> SubMeshNames;
+		List<u32>    SubMeshVertexCounts;
+		List<u32>    SubMeshIndexCounts;
+
+		SharedPtr<InputLayout> InputLayout;
+	};
 	
 
 	ENUM_FLAG(EShaderFlags)

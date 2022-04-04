@@ -49,7 +49,7 @@ namespace JG
 	{
 		JGCLASS
 	private:
-		String mTitleName;
+		String   mTitleName;
 
 		bool mIsOpen     = false;
 		bool mIsLoad     = false;

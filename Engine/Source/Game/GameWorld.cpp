@@ -8,7 +8,7 @@ namespace JG
 	GameWorld::GameWorld() : GameNode(this)
 	{
 		mAssetManager = AssetDataBase::GetInstance().RequestAssetManager();
-		mFixedUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mFixedUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -17,7 +17,16 @@ namespace JG
 			FixedUpdate();
 			return EScheduleResult::Continue;
 		});
-		mUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mFixedLateUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
+		{
+			if (IsAlive() == false)
+			{
+				return EScheduleResult::Break;
+			}
+			FixedLateUpdate();
+			return EScheduleResult::Continue;
+		});
+		mUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -30,7 +39,7 @@ namespace JG
 			Update();
 			return EScheduleResult::Continue;
 		});
-		mLateUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mLateUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -66,6 +75,7 @@ namespace JG
 		AssetDataBase::GetInstance().ReturnAssetManager(mAssetManager);
 		mAssetManager = nullptr;
 		mFixedUpdateSH->Reset();
+		mFixedLateUpdateSH->Reset();
 		mUpdateSH->Reset();
 		mLateUpdateSH->Reset();
 	
@@ -100,7 +110,11 @@ namespace JG
 			{
 				return;
 			}
-			scene_pair.second->PushSceneObject(sceneObject);
+			if (scene_pair.second->IsEnableRendering() == true)
+			{
+				scene_pair.second->PushSceneObject(sceneObject);
+			}
+	
 		}
 	}
 	void GameWorld::PushRenderLightObject(SharedPtr<Graphics::Light> lightObject)
@@ -111,7 +125,11 @@ namespace JG
 			{
 				return;
 			}
-			scene_pair.second->PushLight(lightObject);
+			if (scene_pair.second->IsEnableRendering() == true)
+			{
+				scene_pair.second->PushLight(lightObject);
+			}
+
 		}
 	}
 
@@ -177,6 +195,11 @@ namespace JG
 	const JVector3& GameWorld::GetGravity() const
 	{
 		return mGravity;
+	}
+
+	f32 GameWorld::GetTickCycle() const
+	{
+		return mTickCycle;
 	}
 
 	PhysicsHandle GameWorld::GetPxSceneHandle() const

@@ -98,8 +98,8 @@ RWTexture2D<float4> _HitPositionOutput            : register(u10, space0);
 RWTexture2D<float4> _RayDistanceOutput            : register(u11, space0); 
 // Lights
 
-StructuredBuffer<PointLight> _PointLightList     : register(t1, space0);
-
+StructuredBuffer<PointLight> _PointLightList            : register(t1, space0);
+StructuredBuffer<DirectionalLight> _DictionalLightList  : register(t5, space0);
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList       : register(t2, space0);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t3, space0);
