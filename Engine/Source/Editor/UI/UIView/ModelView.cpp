@@ -228,7 +228,6 @@ namespace JG
 		sceneInfo.ViewProjMatrix = sceneInfo.ViewMatrix * sceneInfo.ProjMatrix;
 		sceneInfo.NearZ = NearZ;
 		sceneInfo.FarZ  = FarZ;
-		sceneInfo.TickCycle = 0.0f;
 		sceneInfo.ClearColor = Color();
 
 		if (mScene == nullptr)

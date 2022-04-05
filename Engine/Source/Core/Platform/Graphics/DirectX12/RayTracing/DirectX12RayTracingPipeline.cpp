@@ -170,6 +170,8 @@ namespace JG
         (pCompiler->Compile(pTextBlob, StringHelper::s2ws(filePath).c_str(), L"", L"lib_6_3", nullptr, 0, nullptr, 0,
             dxcIncludeHandler, &pResult));
 
+
+
         // Verify the result
         HRESULT resultCode;
         (pResult->GetStatus(&resultCode));

@@ -28,12 +28,11 @@ namespace JG
 		SetOrthographic(true);
 		SetResolution(GameSettings::GetResolution());
 
-
-
 		if (GetType() == JGTYPE(EditorCamera) && smMainCamera == nullptr)
 		{
 			smMainCamera = this;
 		}
+
 		UpdateGraphicsScene();
 	}
 
@@ -98,6 +97,7 @@ namespace JG
 	}
 	void Camera::LoadJson(SharedPtr<JsonData> jsonData)
 	{
+
 		GameComponent::LoadJson(jsonData);
 		auto val = jsonData->GetMember("Resolution");
 		if (val)
@@ -411,7 +411,6 @@ namespace JG
 		sceneInfo.FarZ = GetFarZ();
 		sceneInfo.NearZ = GetNearZ();
 		sceneInfo.ViewProjMatrix = GetViewProjMatrix();
-		sceneInfo.TickCycle = GetGameWorld()->GetTickCycle();
 		if (mScene == nullptr)
 		{
 			mScene = JGGraphics::GetInstance().CreateScene(GetName() + "Scene", sceneInfo);

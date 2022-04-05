@@ -120,9 +120,6 @@ namespace JG
 			f32 FarZ  = 0.0f;
 			f32 NearZ = 0.0f;
 			Color    ClearColor;
-
-
-			f32 TickCycle = 0.00f;
 		};
 
 		class SceneResultInfo
@@ -137,16 +134,11 @@ namespace JG
 		private:
 			String mName;
 			bool   mLock = false;
-			bool   mUserLock = false;
 		public:
 			virtual ~GObject() = default;
 		public:
 			void SetName(const String& name);
 			const String& GetName();
-
-			bool IsUserLock() const;
-			void UserLock();
-			void UserUnLock();
 		protected:
 			void Lock();
 			void UnLock();
@@ -225,6 +217,7 @@ namespace JG
 			f32 ClusterBias = 0.0f;
 			JVector3Uint NumClusterSlice;
 			u32 FrameCount = 0;
+			u32 DirectionalLightCount = 0;
 		};
 
 		class LightGrid

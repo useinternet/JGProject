@@ -27,12 +27,14 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
     float shadow    = _Shadow[DTid];
     float ao        = _Ao[DTid];
     float depth     = _Depth[DTid];
+    float3 ambient  = indirect * float3(0.25f, 0.25f, 0.25f);
+
     if(depth <= 0.0f)
     {
         _Result[DTid] = float4(direct + emissive, 1.0f);
     }
     else{
-        _Result[DTid] = float4(direct * shadow * ao + emissive + indirect * float3(0.25f, 0.25f, 0.25f), 1.0f);
+        _Result[DTid] = float4(direct * shadow * ao + emissive + ambient , 1.0f);
     }
    
 }

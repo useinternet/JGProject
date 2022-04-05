@@ -22,27 +22,26 @@ namespace JG
 {
 	void RayTracer::CB::Begin(const Graphics::RenderPassData& passData)
 	{
-		ProjMatrix = passData.ProjMatrix;
-		ViewMatrix = passData.ViewMatrix;
-		ViewProjMatrix = passData.ViewProjMatrix;
-		InvViewMatrix = passData.InvViewMatrix;
-		InvProjMatrix = passData.InvProjMatrix;
+		ProjMatrix		= passData.ProjMatrix;
+		ViewMatrix		= passData.ViewMatrix;
+		ViewProjMatrix	= passData.ViewProjMatrix;
+		InvViewMatrix	= passData.InvViewMatrix;
+		InvProjMatrix	= passData.InvProjMatrix;
 		InvViewProjMatrix = passData.InvViewProjMatrix;
-		Resolution = passData.Resolution;
-		NearZ = passData.NearZ;
-		FarZ = passData.FarZ;
+		Resolution		= passData.Resolution;
+		NearZ			= passData.NearZ;
+		FarZ			= passData.FarZ;
 
-		EyePosition = passData.EyePosition;
+		EyePosition		= passData.EyePosition;
 		PointLightCount = passData.PointLightCount;
 
-		ClusterSize = passData.ClusterSize;
+		ClusterSize  = passData.ClusterSize;
 		ClusterScale = passData.ClusterScale;
-		ClusterBias = passData.ClusterBias;
+		ClusterBias  = passData.ClusterBias;
 
 		NumClusterSlice = passData.NumClusterSlice;
-		FrameCount = passData.FrameCount;
-
-
+		FrameCount      = passData.FrameCount;
+		DirectionalLightCount = passData.DirectionalLightCount;
 	}
 
 	void RayTracer::CB::End()
@@ -62,7 +61,7 @@ namespace JG
 		Init();
 	}
 
-	void RayTracer::AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform)
+	void RayTracer::AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform, Graphics::ESceneObjectFlags flags)
 	{
 		u64 instanceCount = subMesh->GetInstanceCount();
 		JMatrix defaultTransform = transform[0];
@@ -77,7 +76,13 @@ namespace JG
 			{
 				m = transform[i];
 			}
-			mInstances.push_back(InstanceData(subMesh, material, m, i, mHitGroupOffset));
+			InstanceData insData = InstanceData(subMesh, material, m, i, mHitGroupOffset);
+			if (flags & Graphics::ESceneObjectFlags::No_Shadow)
+			{
+				insData.InstanceMask = InstanceMask_NoShadow;
+			}
+			mInstances.push_back(insData);
+
 		}
 		mHitGroupOffset += mHitGroupStride;
 	}
@@ -215,7 +220,7 @@ namespace JG
 				instance.SubMesh->SetBottomLevelAS(blas);
 			}
 
-			mSceneAS[currentIndex]->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex);
+			mSceneAS[currentIndex]->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex, instance.InstanceMask);
 		}
 		mSceneAS[currentIndex]->Generate(context);
 	}
@@ -270,6 +275,7 @@ namespace JG
 
 		mCB.Begin(mRenderer->GetPassData());
 		mCB.MaxRayDepth = mRayBounds.GetValue();
+
 		// CB Bind
 		context->BindConstantBuffer(0, mCB);
 

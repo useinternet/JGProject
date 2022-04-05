@@ -194,6 +194,22 @@ namespace JG
 		obj->SetRange(range);
 		obj->SetAttRange(attRange);
 	}
+	void DirectionalLightInspectorUI::OnGUI_Impl(DirectionalLight* obj)
+	{
+		ImGui::Spacing();
+
+		Color color   = obj->GetColor();
+		f32 intensity = obj->GetIntensity();
+		f32 distance  = obj->GetDistance();
+		f32 label_width = ImGui::CalcTextSize("Intensity").x;
+		ImGui::Color3_OnGUI("Color", color, label_width);
+		ImGui::Float_OnGUI("Intensity", intensity, label_width, 0.0f);
+		ImGui::Float_OnGUI("Distance", distance, label_width, 0.0f);
+
+		obj->SetColor(Color(color.R, color.G, color.B, 1.0f));
+		obj->SetIntensity(intensity);
+		obj->SetDistance(distance);
+	}
 	void SkyDomeInspectorUI::OnGUI_Impl(SkyDome* obj)
 	{
 
@@ -267,5 +283,7 @@ namespace JG
 			obj->PopMaterial();
 		}, label_width);
 	}
+
+
 
 }

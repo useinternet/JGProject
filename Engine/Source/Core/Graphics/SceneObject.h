@@ -16,7 +16,7 @@ namespace JG
 		{
 			None = 0,
 			Ignore_RayTracing_Bottom_Level_AS = 0x00001,
-
+			No_Shadow = 0x00002,
 		};
 
 		enum class ESceneObjectType

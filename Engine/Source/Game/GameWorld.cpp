@@ -8,7 +8,7 @@ namespace JG
 	GameWorld::GameWorld() : GameNode(this)
 	{
 		mAssetManager = AssetDataBase::GetInstance().RequestAssetManager();
-		mFixedUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
+		mFixedUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -17,7 +17,7 @@ namespace JG
 			FixedUpdate();
 			return EScheduleResult::Continue;
 		});
-		mFixedLateUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
+		mFixedLateUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -26,7 +26,7 @@ namespace JG
 			FixedLateUpdate();
 			return EScheduleResult::Continue;
 		});
-		mUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
+		mUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -39,7 +39,7 @@ namespace JG
 			Update();
 			return EScheduleResult::Continue;
 		});
-		mLateUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
+		mLateUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{

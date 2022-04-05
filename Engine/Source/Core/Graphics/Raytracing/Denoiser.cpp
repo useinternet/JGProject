@@ -243,7 +243,7 @@ namespace JG
 
 
 
-		mDepthSigma							 = RP_Global_Float::Create(GetRenderParamName("DepthSigma"), 1.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
+		mDepthSigma							 = RP_Global_Float::Create(GetRenderParamName("DepthSigma"), 10.0f, 0.0f, 10.0f, mRenderer->GetRenderParamManager());
 		mVariance_BilateralFilterKernelWidth = RP_Global_Int::Create(GetRenderParamName("Variance_KernelWidth"), 9, 3, 9, mRenderer->GetRenderParamManager());
 		mMaxTspp							 = RP_Global_Int::Create(GetRenderParamName("MaxTspp"), 33, 1, 100, mRenderer->GetRenderParamManager());
 

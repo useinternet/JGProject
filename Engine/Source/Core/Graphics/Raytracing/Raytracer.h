@@ -7,6 +7,7 @@ namespace JG
 	namespace Graphics
 	{
 		class RenderPassData;
+		enum class ESceneObjectFlags;
 	}
 	class ITopLevelAccelerationStructure;
 	class IRayTracingShaderResourceTable;
@@ -24,21 +25,32 @@ namespace JG
 	class Renderer;
 	class RTAO;
 	class Denoiser;
+
 	class RayTracer
 	{
 	private:
+		enum EInstanceMask
+		{
+			InstanceMask_Direct = 0x01,
+			InstanceMask_InDirect = 0x02,
+			InstanceMask_Shadow = 0x04,
+			InstanceMask_All = 0xff,
+			InstanceMask_NoShadow = InstanceMask_All & (~(InstanceMask_Shadow)),
+		};
 		struct InstanceData
 		{
 			SharedPtr<ISubMesh>		 SubMesh;
 			SharedPtr<IMaterial>	 Material;
 			u64		InstanceID = 0;
 			u64     HitGroupIndex = 0;
+			u32     InstanceMask = EInstanceMask::InstanceMask_All;
 			JMatrix Transform;
 
 			InstanceData(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> m,
 				const JMatrix& transform, u64 insID, u64 hitGroupIndex)
 				: SubMesh(subMesh), Material(m), Transform(transform), InstanceID(insID), HitGroupIndex(hitGroupIndex) {}
 		};
+
 		struct CB
 		{
 			JMatrix ProjMatrix;
@@ -67,7 +79,12 @@ namespace JG
 			u32 MaxRayDepth;
 
 			JVector3 PrevFrameEyePosition;
+			u32 DirectionalLightCount;
 
+			JVector3 DL_Direction = JVector3(0.0f, -1.0f, 1.0f);
+			f32 DL_Distance = 5000.0F;
+			JVector3 DL_Color = JVector3(1.0f, 1.0f, 1.0f);
+			f32 DL_Intensity = 1.0f;
 			void Begin(const Graphics::RenderPassData& passData);
 			void End();
 		};
@@ -126,9 +143,10 @@ namespace JG
 		SharedPtr<Denoiser> mDenoiser[EDenoiser::Denoise_Count];
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
 		CB mCB;
+		CB mCB2;
 	public:
 		RayTracer(Renderer* renderer);
-		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform);
+		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform, Graphics::ESceneObjectFlags flags);
 		void SetResolution(const JVector2& resolutoin);
 		void Execute(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture);
 		void Reset();

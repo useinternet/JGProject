@@ -15,10 +15,10 @@ namespace JG
 		return mPrevInstance;
 	}
 
-	void DirectX12TopLevelAccelerationStructure::AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex)
+	void DirectX12TopLevelAccelerationStructure::AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 instanceMask)
 	{
 		auto dx12BLAS = static_cast<DirectX12BottomLevelAccelerationsStructure*>(btAS.get());
-		mTopASGen.AddInstance(dx12BLAS->GetResult(), transform, instanceID, hitGroupIndex);
+		mTopASGen.AddInstance(dx12BLAS->GetResult(), transform, instanceID, hitGroupIndex, instanceMask);
 	}
 
 	void DirectX12TopLevelAccelerationStructure::Generate(SharedPtr<IComputeContext> context, bool onlyUpdate , bool allowUpdate)

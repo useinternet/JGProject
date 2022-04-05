@@ -101,12 +101,13 @@ namespace JG
 	public:
 		struct Instance
 		{
-			Instance(ID3D12Resource* blAS, const JMatrix& tr, u32 iID, u32 hgId) :
-				BottomLevelAS(blAS), Transform(tr), InstanceID(iID), HitGroupIndex(hgId) {}
+			Instance(ID3D12Resource* blAS, const JMatrix& tr, u32 iID, u32 hgId, u32 instanceMask) :
+				BottomLevelAS(blAS), Transform(tr), InstanceID(iID), HitGroupIndex(hgId), InstanceMask(instanceMask) {}
 
 			ID3D12Resource* BottomLevelAS;
 			JMatrix Transform;
 			u32 InstanceID;
+			u32 InstanceMask = 0xff;
 			u32 HitGroupIndex;
 		};
 	private:
@@ -117,7 +118,7 @@ namespace JG
 		u64 mInstanceDescsSize;
 		u64 mResultSize;
 	public:
-		void AddInstance(ID3D12Resource* bottomLevelAS, const JMatrix& transform, u32 instanceID,   u32 hitGroupIndex);
+		void AddInstance(ID3D12Resource* bottomLevelAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 InstanceMask = 0xff);
 		void ComputeASBufferSizes(bool allowUpdate, u64* scratchSize,u64* resultSize, u64* descriptorsSize);
 		void Generate(
 			CommandList* commandList, ID3D12Resource* scratchBuffer, ID3D12Resource* resultBuffer,  ID3D12Resource* descriptorsBuffer,					  

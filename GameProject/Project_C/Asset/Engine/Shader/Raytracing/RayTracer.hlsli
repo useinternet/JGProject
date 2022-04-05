@@ -26,22 +26,14 @@ void RayGeneration()
     uint shadowSeed  = initRand(launchIndex.x + launchIndex.y * dims.x, _FrameCount * 2, 16);
 
     // Direct Ray
-
-
-
-    float3 directColor = ShootDirectRay(rayOrigin, rayDir, hitPosition);
-    float  shadow      = ShootShadowRay(shadowSeed, hitPosition);
-
-
-
-    float3 indirectColor = ShootIndirectRay(rayOrigin, rayDir, indirctSeed, hState, -1);
-
+    float3 directColor = ShootDirectRay(rayOrigin, rayDir, hitPosition, shadowSeed);
+    float3 indirectColor  = ShootIndirectRay(rayOrigin, rayDir, indirctSeed, hState, -1);
+    float3 indirectColor2 = ShootIndirectRay(rayOrigin, rayDir, indirctSeed, hState, -1);
 
     _DirectOutput[launchIndex]        = float4(directColor, 1.0f);
-    _IndirectRedOutput[launchIndex]   = indirectColor.x;
-    _IndirectGreenOutput[launchIndex] = indirectColor.y;
-    _IndirectBlueOutput[launchIndex]  = indirectColor.z;
-    _ShadowOutput[launchIndex]        = saturate(shadow);
+    _IndirectRedOutput[launchIndex]   = (indirectColor.x + indirectColor2.x) / 2;
+    _IndirectGreenOutput[launchIndex] = (indirectColor.y + indirectColor2.y) / 2;
+    _IndirectBlueOutput[launchIndex]  = (indirectColor.z + indirectColor2.z) / 2;
 }
 
 

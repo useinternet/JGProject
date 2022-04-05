@@ -333,9 +333,9 @@ namespace JG
 
 
 
-	void TopLevelASGenerator::AddInstance(ID3D12Resource* bottomLevelAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex)
+	void TopLevelASGenerator::AddInstance(ID3D12Resource* bottomLevelAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 instanceMask)
 	{
-		mInstances.emplace_back(Instance(bottomLevelAS, transform, instanceID, hitGroupIndex));
+		mInstances.emplace_back(Instance(bottomLevelAS, transform, instanceID, hitGroupIndex, instanceMask));
 	}
 	void TopLevelASGenerator::ComputeASBufferSizes(bool allowUpdate, u64* scratchSize, u64* resultSize, u64* descriptorsSize)
 	{
@@ -394,10 +394,10 @@ namespace JG
 			instanceDescs[i].InstanceContributionToHitGroupIndex = mInstances[i].HitGroupIndex;
 			instanceDescs[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 
-			//JMatrix m = JMatrix::Transpose(mInstances[i].Transform);
+		
 			memcpy(instanceDescs[i].Transform, &(mInstances[i].Transform), sizeof(instanceDescs[i].Transform));
 			instanceDescs[i].AccelerationStructure = mInstances[i].BottomLevelAS->GetGPUVirtualAddress();
-			instanceDescs[i].InstanceMask = 0xFF;
+			instanceDescs[i].InstanceMask = mInstances[i].InstanceMask;
 		}
 
 		descriptorsBuffer->Unmap(0, nullptr);

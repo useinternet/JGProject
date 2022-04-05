@@ -86,7 +86,7 @@ namespace JG
 						{
 							material = materialList[i];
 						}
-						mRayTracer->AddInstance(subMesh, material, { worldMatrix });
+						mRayTracer->AddInstance(subMesh, material, { worldMatrix }, info.Flags);
 					}
 				}
 			}

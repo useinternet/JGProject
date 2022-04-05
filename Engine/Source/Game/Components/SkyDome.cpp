@@ -84,12 +84,12 @@ namespace JG
 		auto mainCam = Camera::GetMainCamera();
 		if (mainCam)
 		{
-			f32 farZ = mainCam->GetFarZ() * 0.5f;
+			f32 farZ = mainCam->GetFarZ();
 			radius = JVector3(farZ, farZ, farZ);
 			location = mainCam->GetOwner()->GetTransform()->GetWorldLocation();
 		}
+		sceneObject->Flags = Graphics::ESceneObjectFlags::No_Shadow;
 		sceneObject->WorldMatrix = JMatrix::Scaling(radius) * JMatrix::Translation(location);
-		//sceneObject->Flags = Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS;
 		sceneObject->MaterialList.push_back(mMaterial);
 		sceneObject->Mesh = mMesh;
 		GetGameWorld()->PushRenderSceneObject(sceneObject);

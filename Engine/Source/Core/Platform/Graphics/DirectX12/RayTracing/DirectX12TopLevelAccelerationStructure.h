@@ -26,7 +26,7 @@ namespace JG
 	public:
 		virtual ~DirectX12TopLevelAccelerationStructure();
 		virtual SharedPtr<IStructuredBuffer> GetPrevFrameTransformBuffer() const override;
-		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex) override;
+		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 instanceMask) override;
 		virtual void Generate(SharedPtr<IComputeContext> context, bool onlyUpdate = false,  bool allowUpdate = false) override;
 		virtual void Reset() override;
 	public:

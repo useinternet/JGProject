@@ -345,21 +345,6 @@ namespace JG
 			return mName;
 		}
 
-		bool GObject::IsUserLock() const
-		{
-			return mUserLock;
-		}
-
-		void GObject::UserLock()
-		{
-			mUserLock = true;
-		}
-
-		void GObject::UserUnLock()
-		{
-			mUserLock = false;
-		}
-
 		void GObject::Lock()
 		{
 			mLock = true;
@@ -406,21 +391,18 @@ namespace JG
 				{
 					InitRenderer(mPendingSceneInfo.RenderPath);
 				}
-				if (mRenderSH == nullptr || mPendingSceneInfo.TickCycle != mSceneInfo.TickCycle)
+				if (mRenderSH == nullptr)
 				{
-					mRenderSH = Scheduler::GetInstance().Schedule(0.0f, mPendingSceneInfo.TickCycle, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Scene::RenderScene));
+					mRenderSH = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_Rendering, SCHEDULE_BIND_FN(&Scene::RenderScene));
 				}
-				if (mRenderFetchResultSH == nullptr || mPendingSceneInfo.TickCycle != mSceneInfo.TickCycle)
+				if (mRenderFetchResultSH == nullptr)
 				{
-					mRenderFetchResultSH = Scheduler::GetInstance().Schedule(0.0f, mPendingSceneInfo.TickCycle, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Scene::RenderFinish));
+					mRenderFetchResultSH = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Graphics_RenderFinish, SCHEDULE_BIND_FN(&Scene::RenderFinish));
 				}
 
 				mSceneInfo = mPendingSceneInfo;
 				return EScheduleResult::Break;
 			});
-
-	
-
 		}
 
 		const SceneInfo& Scene::GetSceneInfo() const
@@ -435,7 +417,7 @@ namespace JG
 
 		bool Scene::PushSceneObject(SharedPtr<SceneObject> sceneObject)
 		{
-			if (mRenderer == nullptr || sceneObject == nullptr || IsUserLock())
+			if (mRenderer == nullptr || sceneObject == nullptr)
 			{
 				return false;
 			}
@@ -445,7 +427,7 @@ namespace JG
 
 		bool Scene::PushLight(SharedPtr<Light> l)
 		{
-			if (mRenderer == nullptr || l == nullptr || IsUserLock())
+			if (mRenderer == nullptr || l == nullptr)
 			{
 				return false;
 			}
@@ -511,6 +493,8 @@ namespace JG
 			// Scene 정보 수정을 할수 없게 Lock
 			mSceneObjectQueue = std::move(mPendingSceneObjectQueue);
 			mLightList		  = std::move(mPendingLightList);
+
+
 			// 비동기로 렌더링 시작
 			mRenderInternalSH = Scheduler::GetInstance().ScheduleAsync([&]()
 			{
@@ -520,10 +504,10 @@ namespace JG
 				info.ViewProjMatrix = mSceneInfo.ViewProjMatrix;
 				info.ViewMatrix = mSceneInfo.ViewMatrix;
 				info.ProjMatrix = mSceneInfo.ProjMatrix;
-				info.FarZ = mSceneInfo.FarZ;
+				info.FarZ  = mSceneInfo.FarZ;
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition = mSceneInfo.EyePos;
-				info.ClearColor = mSceneInfo.ClearColor;
+				info.ClearColor  = mSceneInfo.ClearColor;
 				if (mRenderer->Begin(info, mLightList) == true)
 				{
 					while (mSceneObjectQueue.empty() == false)

@@ -17,6 +17,8 @@ namespace JG
 	private:
 		JVector3 mColor = Color::White();
 		JVector3 mDirection = JVector3(0, 0, 1);
+		f32 mIntensity = 1.0f;
+		f32 mDistance = 10000.0f;
 #ifdef JG_EDITOR
 		SharedPtr<Graphics::PaperObject> mTargetObject;
 		SharedPtr<ScheduleHandle>	     mPushDebugHandle;
@@ -35,6 +37,12 @@ namespace JG
 		virtual void MakeJson(SharedPtr<JsonData> jsonData)   const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
 	public:
+		void SetIntensity(f32 intensity);
+		f32  GetIntensity() const;
+
+		void SetDistance(f32 distance);
+		f32 GetDistance() const;
+
 		void SetColor(const Color& color);
 		const JVector3& GetDirection() const;
 		Color    GetColor() const;

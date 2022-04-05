@@ -192,7 +192,7 @@ namespace JG
 
 
 		mSceneAS = CreateSharedPtr<DirectX12TopLevelAccelerationStructure>();
-		mSceneAS->AddInstance(mTriBLAS, JMatrix::Identity(), 0, 0);
+		mSceneAS->AddInstance(mTriBLAS, JMatrix::Identity(), 0, 0, 0xff);
 		mSceneAS->Generate(context);
 	}
 

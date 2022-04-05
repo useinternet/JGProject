@@ -39,15 +39,19 @@ namespace JG
 		public:
 			JVector3 Direction;
 			JVector3 Color;
+			f32 Distance  = 10000.0f;
+			f32 Intensity = 1.0f;
 		public:
 			virtual ELightType GetLightType() const override { return ELightType::DirectionalLight; }
 			virtual void PushBtData(List<jbyte>& btData)  override
 			{
 				PushData(btData, &Direction, sizeof(JVector3));
 				PushData(btData, &Color, sizeof(JVector3));
+				PushData(btData, &Distance, sizeof(f32));
+				PushData(btData, &Intensity, sizeof(f32));
 			}
 			virtual u64 GetBtSize() const override {
-				return 24;
+				return 28;
 			}
 		};
 

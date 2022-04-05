@@ -50,6 +50,22 @@ namespace JG
 			mColor = val->GetVector3();
 		}
     }
+	void DirectionalLight::SetIntensity(f32 intensity)
+	{
+		mIntensity = intensity;
+	}
+	f32 DirectionalLight::GetIntensity() const
+	{
+		return mIntensity;
+	}
+	void DirectionalLight::SetDistance(f32 distance)
+	{
+		mDistance = distance;
+	}
+	f32 DirectionalLight::GetDistance() const
+	{
+		return mDistance;
+	}
 	void DirectionalLight::SetColor(const Color& color)
 	{
 		mColor = JVector3(color.R, color.G, color.B);
@@ -143,6 +159,8 @@ namespace JG
 
 		lightObject->Color		= mColor;
 		lightObject->Direction = mDirection;
+		lightObject->Distance  = mDistance;
+		lightObject->Intensity = mIntensity;
 		GetGameWorld()->PushRenderLightObject(lightObject);
     }
 }
