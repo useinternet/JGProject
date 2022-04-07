@@ -38,7 +38,7 @@ namespace JG
 			virtual ~DirectionalLight() = default;
 		public:
 			JVector3 Direction;
-			JVector3 Color;
+			JVector3 Color = Color::White();
 			f32 Distance  = 10000.0f;
 			f32 Intensity = 1.0f;
 		public:
@@ -51,7 +51,7 @@ namespace JG
 				PushData(btData, &Intensity, sizeof(f32));
 			}
 			virtual u64 GetBtSize() const override {
-				return 28;
+				return 32;
 			}
 		};
 

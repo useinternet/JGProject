@@ -7,6 +7,10 @@
 
 namespace JG
 {
+	namespace Graphics
+	{
+		class StaticRenderObject;
+	}
 	class IGraphicsShader;
 	class IComputeShader;
 	class IStructuredBuffer;
@@ -17,7 +21,7 @@ namespace JG
 	{
 	public:
 		static String GetShaderTemplateName(SharedPtr<IGraphicsShader> shader);
-
+		static SharedPtr<Graphics::StaticRenderObject> CreateSkyBox(const JVector3& eyePos, f32 farZ, const String& texturePath);
 
 
 		static void InitTopLevelAccelerationStructure(List<SharedPtr< ITopLevelAccelerationStructure>>* out_as_list);

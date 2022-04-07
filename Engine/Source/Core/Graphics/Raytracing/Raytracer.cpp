@@ -277,13 +277,13 @@ namespace JG
 		mCB.MaxRayDepth = mRayBounds.GetValue();
 
 		// CB Bind
-		context->BindConstantBuffer(0, mCB);
+		context->BindConstantBuffer(ERootParam::RootParam_CB, mCB);
 
 		// SceneAS
-		context->BindAccelerationStructure(1, mSceneAS[currentIndex]);
+		context->BindAccelerationStructure(ERootParam::RootParam_SceneAS, mSceneAS[currentIndex]);
 
 		// Result
-		context->BindTextures(2, {
+		context->BindTextures(ERootParam::RootParam_UAV, {
 			GetResource(EResource::Direct), 
 			GetResource(EResource::IndirectR),
 			GetResource(EResource::IndirectG),
@@ -301,16 +301,16 @@ namespace JG
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 		const auto& dlInfo = mRenderer->GetLightInfo(Graphics::ELightType::DirectionalLight);
 
-		context->BindSturcturedBuffer(3, plInfo.Data.data(), plInfo.Size, plInfo.Count);
-
+		context->BindSturcturedBuffer(ERootParam::RootParam_PointLightList, plInfo.Data.data(), plInfo.Size, plInfo.Count);
+		context->BindSturcturedBuffer(ERootParam::RootParam_DirectionalLightList, dlInfo.Data.data(), dlInfo.Size, dlInfo.Count);
 		// LightGrid
-		context->BindSturcturedBuffer(4, mRenderer->GetLightGrid());
+		context->BindSturcturedBuffer(ERootParam::RootParam_LightGridList, mRenderer->GetLightGrid());
 		// VisibleLightIndicies
-		context->BindSturcturedBuffer(5, mRenderer->GetVisibleLightIndicies());
+		context->BindSturcturedBuffer(ERootParam::RootParam_VisibleLightIndicies, mRenderer->GetVisibleLightIndicies());
 		// PrevFrameTransform
-		context->BindSturcturedBuffer(6, mSceneAS[currentIndex]->GetPrevFrameTransformBuffer());
+		context->BindSturcturedBuffer(ERootParam::RootParam_PrevFrameBLASTransform, mSceneAS[currentIndex]->GetPrevFrameTransformBuffer());
 		// 
-		context->BindSturcturedBuffer(7, dlInfo.Data.data(), dlInfo.Size, dlInfo.Count);
+
 
 
 		context->DispatchRay(mResolution.x, mResolution.y, 1, pipeline, mSRT);
@@ -394,8 +394,10 @@ namespace JG
 
 		// Composite
 		{
+			const RenderInfo& renderInfo = mRenderer->GetRenderInfo();
 			RT_Composite::Input input;
-			input.Resolution = mCB.Resolution;
+			input.Resolution   = mCB.Resolution;
+			input.AmbientColor = renderInfo.AmbientColor;
 			input.FarZ = mCB.FarZ;
 			input.Direct    = GetResource(EResource::Direct);
 			input.IndirectR = mDenoisedTex[EDenoiser::Denoise_IndirectR].GetValue();
@@ -429,14 +431,14 @@ namespace JG
 	SharedPtr<IRootSignature> RayTracer::CreateGlobalRootSignature()
 	{
 		SharedPtr<IRootSignatureCreater> creater = IRootSignatureCreater::Create();
-		creater->AddCBV(0, 0, 0);
-		creater->AddSRV(1, 0, 0);
-		creater->AddDescriptorTable(2, EDescriptorTableRangeType::UAV, EResource::Count, 0, 0);
-		creater->AddSRV(3, 1, 0);
-		creater->AddSRV(4, 2, 0);
-		creater->AddSRV(5, 3, 0);
-		creater->AddSRV(6, 4, 0);
-		creater->AddSRV(7, 5, 0);
+		creater->AddCBV(ERootParam::RootParam_CB, 0, 0);
+		creater->AddSRV(ERootParam::RootParam_SceneAS, 0, 0);
+		creater->AddDescriptorTable(ERootParam::RootParam_UAV, EDescriptorTableRangeType::UAV, EResource::Count, 0, 0);
+		creater->AddSRV(ERootParam::RootParam_PointLightList, 1, 0);
+		creater->AddSRV(ERootParam::RootParam_LightGridList, 2, 0);
+		creater->AddSRV(ERootParam::RootParam_VisibleLightIndicies, 3, 0);
+		creater->AddSRV(ERootParam::RootParam_PrevFrameBLASTransform, 4, 0);
+		creater->AddSRV(ERootParam::RootParam_DirectionalLightList, 5, 0);
 		creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
 		creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
 		creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);

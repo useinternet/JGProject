@@ -108,7 +108,8 @@ RWTexture2D<float4> _HitPositionOutput            : register(u10, space0);
 RWTexture2D<float4> _RayDistanceOutput            : register(u11, space0); 
 // Lights
 
-StructuredBuffer<PointLight> _PointLightList            : register(t1, space0);
+StructuredBuffer<PointLight>       _PointLightList       : register(t1, space0);
+StructuredBuffer<DirectionalLight> _DirectionalLightList : register(t5, space0);
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList       : register(t2, space0);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t3, space0);
@@ -144,11 +145,6 @@ cbuffer CB : register(b0)
 
     float3   _PrevFrameEyePosition;
     uint     _DirectionalLightCount;
-
-    float3   _DL_Direction;
-    float    _DL_Distance;
-    float3   _DL_Color;
-    float    _DL_Intensity;
 }
 
 SamplerState _PointWrap  : register(s0);
@@ -518,24 +514,14 @@ float3 F_Schlick(float cosTheta, float3 F0)
 
 
 
-float3 CalcDirectionalLight_GGX(float3 N, float V, in Material material)
+float3 CalcDirectionalLight_GGX(float3 N, float V, in Material material, DirectionalLight dl)
 {
-    if(_DirectionalLightCount == 0)
-    {
-        return float3(0.0f,0.0f,0.0f);
-    }
-    float3 L = normalize(_DL_Direction);
-    float3 lightPos = _EyePosition + -L * _DL_Distance;
+    float3 L = normalize(dl.Direction);
+    float3 lightPos = _EyePosition + -L * dl.Distance;
 
 
     float  distance  = length(lightPos - material.WorldPosition);
    	float3 direction = normalize(lightPos - material.WorldPosition);
-
-    if(distance > _DL_Distance * 2)
-    {
-        //return float3(0.0f, 0.0f,0.0f);
-    }
-
     L = direction;
 	float3 H = normalize(L + V);
     float NoL = max(dot(N,L), 0.0f);
@@ -554,8 +540,8 @@ float3 CalcDirectionalLight_GGX(float3 N, float V, in Material material)
 	float3 kS = F;
 	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
 	kD *= 1.0 - material.Metallic;
-	Lo += (material.Albedo / JG_PI + specular) * NoL;
-    return Lo * _DL_Intensity * _DL_Color;
+	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
+    return Lo * dl.Intensity * dl.Color;
 }
 float3 CalcPointLight_GGX(float3 N, float3 V, in Material material, PointLight light)
 {
@@ -761,20 +747,16 @@ float3 ShootDirectRay(
     hitPosition = payload.HitPosition;
     return payload.Color;
 }
-float ShootShadowRay_DL(inout uint randSeed, float3 worldPos)
+float ShootShadowRay_DL(DirectionalLight dl, inout uint randSeed, float3 worldPos)
 {
-    if(_DirectionalLightCount == 0)
-    {
-        return 0.0f;
-    }
     ShadowRayPayload payload;
     payload.Factor = 0.0F;
-    float3 L = normalize(_DL_Direction);
-    float3 lightPos = _EyePosition + -L * _DL_Distance;
+    float3 L = normalize(dl.Direction);
+    float3 lightPos = _EyePosition + -L * dl.Distance;
     
     float  distance  = length(lightPos - worldPos);
    	float3 direction = normalize(lightPos - worldPos);
-    if(distance <= _DL_Distance * 2)
+    if(distance <= dl.Distance * 2)
     {
         RayDesc ray;
         ray.Origin    = worldPos;
@@ -886,24 +868,33 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
     material.Emissive = input.emissive;
     material.WorldPosition = posW;
     
-    uint   clusterIndex = GetClusterIndex(posW);
 
-	LightGrid lgrid  = _LightGridList[clusterIndex];
 
     bool  isCalcShadow = output_shadow != -1.0f;
-    float accLuma = 0.000001f;
-    float accShadowLuma = 0.0f;
-    // Calc DirectionalLight
-    Lo += CalcDirectionalLight_GGX(N, V, material);
-    if(isCalcShadow == true)
+    float accIntensity = 0.000001f;
+    float accShadowIntensity = 0.0f;
+
+
+    //Calc DirectionalLight
+    for(int i = 0; i<_DirectionalLightCount; ++i)
     {
-        float luma = RGBToLogLuminance(Lo);
-        accLuma += luma;
+        DirectionalLight dl = _DirectionalLightList[i];
+        Lo += CalcDirectionalLight_GGX(N, V, material, dl);
+        if(isCalcShadow == true)
+        {
+            float intensity = max(max(Lo.x,Lo.y),Lo.z);
+            accIntensity += intensity;
 
-        float shadow = ShootShadowRay_DL(randSeed, posW);
-        accShadowLuma += (luma * shadow);
+            float shadow = ShootShadowRay_DL(dl, randSeed, posW);
+            accShadowIntensity += (intensity * shadow);
+        }
     }
+    
 
+
+
+    uint   clusterIndex = GetClusterIndex(posW);
+	LightGrid lgrid  = _LightGridList[clusterIndex];
 
 	// Calc PointLight
 	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
@@ -919,17 +910,16 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
 			Lo += plLo;
             if(isCalcShadow == true)
             {
-                float luma = RGBToLogLuminance(plLo);
-                accLuma += luma;
+                float intensity = max(max(Lo.x,Lo.y),Lo.z);
+                accIntensity += intensity;
                 float shadow = ShootShadowRay_PL(pl, randSeed, posW);
-                accShadowLuma += (luma * shadow);
+                accShadowIntensity += (intensity * shadow);
             }
-
 		}
 	}
     if(isCalcShadow == true)
     {
-        output_shadow = accShadowLuma / accLuma;
+        output_shadow = accShadowIntensity / accIntensity;
     }
 
     return Lo;

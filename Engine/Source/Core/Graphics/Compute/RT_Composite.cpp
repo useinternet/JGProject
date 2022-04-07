@@ -13,7 +13,6 @@ namespace JG
 	{
 		mRenderer = renderer;
 		mShader = ShaderLibrary::GetInstance().FindComputeShader("RT_Composite");
-
 	}
 
 	void RT_Composite::Execute(SharedPtr<IComputeContext> context, const Input& input)
@@ -22,10 +21,17 @@ namespace JG
 		{
 			return;
 		}
-
+		struct CB
+		{
+			JVector3 AmbientColor;
+			f32 FarZ;
+		};
+		CB cb;
+		cb.AmbientColor = input.AmbientColor;
+		cb.FarZ = input.FarZ;
 		context->BindShader(mShader);
 		context->BindRootSignature(mRenderer->GetComputeRootSignature());
-		context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, input.FarZ);
+		context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, cb);
 		context->BindTextures((u32)Renderer::EComputeRootParam::SRV, {
 			input.Direct,
 			input.IndirectR,

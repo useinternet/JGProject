@@ -10,6 +10,7 @@
 #include "Components/SpriteRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/PointLight.h"
+#include "Components/DirectionalLight.h"
 #include "Components/Collision.h"
 #include "Components/SkyDome.h"
 #include "Components/DevComponent.h"
@@ -304,6 +305,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<SpriteRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
+		GameObjectFactory::GetInstance().RegisterComponentType<DirectionalLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
 		GameObjectFactory::GetInstance().RegisterComponentType<DevComponent>();
 	}

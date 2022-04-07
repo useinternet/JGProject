@@ -15,6 +15,7 @@ namespace JG
 		struct Input
 		{
 			JVector2 Resolution;
+			JVector3 AmbientColor;
 			f32 FarZ;
 			SharedPtr<ITexture> Direct;
 			SharedPtr<ITexture> IndirectR;

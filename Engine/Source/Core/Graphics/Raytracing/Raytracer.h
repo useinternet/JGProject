@@ -37,6 +37,17 @@ namespace JG
 			InstanceMask_All = 0xff,
 			InstanceMask_NoShadow = InstanceMask_All & (~(InstanceMask_Shadow)),
 		};
+		enum ERootParam
+		{
+			RootParam_CB,
+			RootParam_SceneAS,
+			RootParam_UAV,
+			RootParam_PointLightList,
+			RootParam_LightGridList,
+			RootParam_VisibleLightIndicies,
+			RootParam_PrevFrameBLASTransform,
+			RootParam_DirectionalLightList,
+		};
 		struct InstanceData
 		{
 			SharedPtr<ISubMesh>		 SubMesh;
@@ -80,11 +91,6 @@ namespace JG
 
 			JVector3 PrevFrameEyePosition;
 			u32 DirectionalLightCount;
-
-			JVector3 DL_Direction = JVector3(0.0f, -1.0f, 1.0f);
-			f32 DL_Distance = 5000.0F;
-			JVector3 DL_Color = JVector3(1.0f, 1.0f, 1.0f);
-			f32 DL_Intensity = 1.0f;
 			void Begin(const Graphics::RenderPassData& passData);
 			void End();
 		};

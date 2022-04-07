@@ -457,7 +457,7 @@ namespace JG
 		SharedPtr<Asset<T>> LoadReadWriteAsset(AssetID originID)
 		{
 			SharedPtr<IAsset> rwAsset = LoadReadWriteAsset(originID);
-			if (rwAsset == nullptr || rwAsset->Is<Asset<T>> == false)
+			if (rwAsset == nullptr || rwAsset->Is<Asset<T>>() == false)
 			{
 				return nullptr;
 			}

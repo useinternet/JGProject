@@ -40,7 +40,7 @@ namespace JG
 	u64 LocalRootArgument::GetArgumentSize() const
 	{
 		u64 result = mConstant.size();
-		u64 handleCount = 2 + mTextures.size();
+		u64 handleCount = 3 + mTextures.size();
 		result += (sizeof(u64) * handleCount);
 		return result;
 	}

@@ -56,6 +56,7 @@ namespace JG
 		f32 FarZ;
 		f32 NearZ;
 		Color ClearColor;
+		Color AmbientColor;
 	};
 
 	class RenderResult

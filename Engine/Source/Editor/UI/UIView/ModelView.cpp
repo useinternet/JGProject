@@ -4,6 +4,7 @@
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/ImGuiExternal.h"
 #include "Graphics/JGGraphics.h"
+#include "Graphics/GraphicsHelper.h"
 namespace JG
 {
 	ModelView::ModelView()
@@ -20,10 +21,12 @@ namespace JG
 	}
 	void ModelView::OnGUI()
 	{
-		
-		Top_OnGUI();
-		Mid_OnGUI();
-		Bottom_OnGUI();
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, mImageSize.x + ImGui::GetStyle().FramePadding.x * 4);
+		Left_OnGUI();
+		ImGui::NextColumn();
+		Right_OnGUI();
+		ImGui::Columns(1);
 	}
 
 	void ModelView::PreOnGUI()
@@ -53,6 +56,10 @@ namespace JG
 	}
 	void ModelView::PushSceneObject()
 	{
+		if (mSkyBox == nullptr)
+		{
+			mSkyBox = GraphicsHelper::CreateSkyBox(mEyePos, mFarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
+		}
 		if (mScene != nullptr && mScene->IsEnableRendering())
 		{
 			if (mMeshAsset != nullptr && mMeshAsset->IsValid() == true && mMaterialAssetList.empty() == false)
@@ -69,16 +76,25 @@ namespace JG
 				}
 				mScene->PushSceneObject(sceneObject);
 			}
+			if (mSkyBox != nullptr)
+			{
+				mScene->PushSceneObject(mSkyBox);
+			}
+			// 
+			SharedPtr<Graphics::DirectionalLight> dl = CreateSharedPtr<Graphics::DirectionalLight>();
+			dl->Color	  = Color::White();
+			dl->Distance  = 10000.0f;
+			dl->Direction = JVector3(0.0f, -1.0f, 1.0f);
+			dl->Intensity = 1.0f;
+			mScene->PushLight(dl);
+
+
 		}
 	}
-	void ModelView::Bottom_OnGUI()
-	{
-
-	}
-	void ModelView::MidLeft_OnGUI()
+	void ModelView::Left_OnGUI()
 	{
 		u64 texID = 0;
-	
+		
 		PushSceneObject();
 		Rendering();
 	
@@ -122,7 +138,7 @@ namespace JG
 		}
 		ImGui::EndChild();
 	}
-	void ModelView::MidRight_OnGUI()
+	void ModelView::Right_OnGUI()
 	{
 		ImGui::BeginChild("MidRight_OnGUI");
 		if (ImGui::CollapsingHeader("Mesh Info", ImGuiTreeNodeFlags_DefaultOpen) == true && mMeshAsset->IsValid())
@@ -166,7 +182,7 @@ namespace JG
 		if (ImGui::CollapsingHeader("Materials", ImGuiTreeNodeFlags_DefaultOpen) == true)
 		{
 			String inputText = "";
-			if (mMaterialAssetList.empty() == false)
+			if (mMaterialAssetList.empty() == false && mMaterialAssetList[0] != nullptr)
 			{
 				inputText = mMaterialAssetList[0]->GetAssetName();
 			}
@@ -196,42 +212,25 @@ namespace JG
 			mScene->Rendering();
 		}
 	}
-	void ModelView::Mid_OnGUI()
-	{
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, mImageSize.x + ImGui::GetStyle().FramePadding.x * 4);
-		MidLeft_OnGUI();
-		ImGui::NextColumn();
-		MidRight_OnGUI();
-		ImGui::Columns(1);
-	}
-	void ModelView::Top_OnGUI()
-	{
-
-	}
-
+	
 	void ModelView::UpdateScene()
 	{
-		const JVector3 eyePos(0, 0, -300);
 		const JVector3 targetVec(0, 0, -1);
 		const JVector3 upVec(0, 1, 0);
-		const f32 NearZ = 1.0f;
-		const f32 FarZ = 1000.0f;
-
 
 		Graphics::SceneInfo sceneInfo;
 		sceneInfo.RenderPath = ERendererPath::RayTracing;
 		sceneInfo.Resolution = mResolution;
-		sceneInfo.EyePos     = eyePos;
-		sceneInfo.ViewMatrix = JMatrix::LookAtLH(eyePos, targetVec, upVec);
-		sceneInfo.ProjMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(90), mResolution.x / mResolution.y, NearZ, FarZ);
+		sceneInfo.EyePos = mEyePos;
+		sceneInfo.ViewMatrix = JMatrix::LookAtLH(mEyePos, targetVec, upVec);
+		sceneInfo.ProjMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(90), mResolution.x / mResolution.y, mNearZ, mFarZ);
 		sceneInfo.ViewProjMatrix = sceneInfo.ViewMatrix * sceneInfo.ProjMatrix;
-		sceneInfo.NearZ = NearZ;
-		sceneInfo.FarZ  = FarZ;
+		sceneInfo.NearZ = mNearZ;
+		sceneInfo.FarZ = mFarZ;
 		sceneInfo.ClearColor = Color();
-
 		if (mScene == nullptr)
 		{
+
 			mScene = JGGraphics::GetInstance().CreateScene("ModelView_Scene", sceneInfo);
 		}
 		else
@@ -266,7 +265,7 @@ namespace JG
 		{
 			mMaterialAssetList.resize(1);
 		}
-
-		mMaterialAssetList[0] = AssetDataBase::GetInstance().LoadOriginAsset<IMaterial>(path);
+		AssetID originMaterial = AssetDataBase::GetInstance().GetAssetOriginID(path);
+		mMaterialAssetList[0]  = AssetDataBase::GetInstance().LoadReadWriteAsset<IMaterial>(originMaterial);
 	}
 }

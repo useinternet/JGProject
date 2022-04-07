@@ -14,6 +14,10 @@ namespace JG
 	{
 		return v * k;
 	}
+	JVector3::JVector3(const Color& color) :
+		x(color.R), y(color.G), z(color.B) {}
+
+
 	JVector3 operator* (float k, const JVector3& v)
 	{
 		return v * k;

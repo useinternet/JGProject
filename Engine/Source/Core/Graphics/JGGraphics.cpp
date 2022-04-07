@@ -46,15 +46,13 @@ namespace JG
 			return;
 		}
 		mSceneDic.erase(gobject);
-
-
-
 		Scheduler::GetInstance().ScheduleOnceByFrame(mGraphcisAPI->GetBufferCount(), SchedulePriority::Graphics_DestroyObject,
 			[&](SharedPtr<IJGObject> userData) -> EScheduleResult
 		{
 
 			if (userData->Is<RemoveObjectData>())
 			{
+				Flush();
 				RemoveObject(userData->As<RemoveObjectData>()->GObject);
 			}
 			return EScheduleResult::Continue;
@@ -508,6 +506,8 @@ namespace JG
 				info.NearZ = mSceneInfo.NearZ;
 				info.EyePosition = mSceneInfo.EyePos;
 				info.ClearColor  = mSceneInfo.ClearColor;
+				info.AmbientColor = mSceneInfo.AmbientColor;
+
 				if (mRenderer->Begin(info, mLightList) == true)
 				{
 					while (mSceneObjectQueue.empty() == false)

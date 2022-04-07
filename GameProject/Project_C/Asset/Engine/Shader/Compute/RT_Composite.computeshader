@@ -14,6 +14,7 @@ RWTexture2D<float4>  _Result : register(u0);
 
 cbuffer CB : register(b0)
 {
+    float3 _AmbientColor;
     float _FarZ;
 }
 
@@ -27,7 +28,7 @@ void cs_main(uint2 DTid : SV_DispatchThreadID)
     float shadow    = _Shadow[DTid];
     float ao        = _Ao[DTid];
     float depth     = _Depth[DTid];
-    float3 ambient  = indirect * float3(0.25f, 0.25f, 0.25f);
+    float3 ambient  = indirect * _AmbientColor;
 
     if(depth <= 0.0f)
     {

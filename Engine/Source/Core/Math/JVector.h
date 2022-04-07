@@ -328,6 +328,7 @@ namespace JG
 		JVector3(float x, float y, float z) : x(x), y(y), z(z) {}
 		JVector3(const JVector4& v) : x(v.x), y(v.y), z(v.z) {}
 		JVector3(const JVector2& v, float z) : x(v.x), y(v.y), z(z) {}
+		JVector3(const Color& color);
 		JVector3(const JVector3& v) = default;
 		JVector3(JVector3&& v) = default;
 	public: // ¿¬»êÀÚ

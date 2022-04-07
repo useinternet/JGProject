@@ -119,7 +119,8 @@ namespace JG
 			JMatrix  ViewProjMatrix = JMatrix::Identity();
 			f32 FarZ  = 0.0f;
 			f32 NearZ = 0.0f;
-			Color    ClearColor;
+			Color  ClearColor;
+			Color  AmbientColor = Color(0.25f, 0.25f, 0.25f, 1.0f);
 		};
 
 		class SceneResultInfo
@@ -182,7 +183,6 @@ namespace JG
 			bool PushSceneObject(SharedPtr<SceneObject> sceneObject);
 			bool PushLight(SharedPtr<Light> l);
 			void PushPostRenderingEvent(i32 priority, const PostRenderingEvent& _e);
-
 		public:
 			void Reset();
 			void Rendering();
