@@ -41,7 +41,6 @@ namespace JG
 		Light::MakeJson(jsonData);
 		jsonData->AddMember("Color", mColor);
 		jsonData->AddMember("Intensity", mIntensity);
-		jsonData->AddMember("Distance", mDistance);
     }
     void DirectionalLight::LoadJson(SharedPtr<JsonData> jsonData)
     {
@@ -56,11 +55,6 @@ namespace JG
 		{
 			mIntensity = val->GetFloat();
 		}
-		val = jsonData->GetMember("Distance");
-		if (val)
-		{
-			mDistance = val->GetFloat();
-		}
     }
 	void DirectionalLight::SetIntensity(f32 intensity)
 	{
@@ -69,14 +63,6 @@ namespace JG
 	f32 DirectionalLight::GetIntensity() const
 	{
 		return mIntensity;
-	}
-	void DirectionalLight::SetDistance(f32 distance)
-	{
-		mDistance = distance;
-	}
-	f32 DirectionalLight::GetDistance() const
-	{
-		return mDistance;
 	}
 	void DirectionalLight::SetColor(const Color& color)
 	{
@@ -171,7 +157,6 @@ namespace JG
 
 		lightObject->Color = mColor;
 		lightObject->Direction = mDirection;
-		lightObject->Distance = mDistance;
 		lightObject->Intensity = mIntensity;
 		GetGameWorld()->PushRenderLightObject(lightObject);
     }

@@ -48,7 +48,18 @@ bool CheckPointLight(uint plIndex, uint tileIndex)
 
     return sqDist <= (r * r);
 }
-
+// bool CheckSpotLightVsAABB(Spotlight spotlight, AABB aabb)
+// {
+//     float sphereRadius = dot(aabb.extents, aabb.extents);
+//     float3 v = aabb.venter - spotlight.position;
+//     float lenSq = dot(v, v);
+//     float v1Len = dot(v, direction);
+//     float distanceClosestPoint = cos(spotlight.angle) * sqrt(lenSq - v1Len * v1Len) - v1Len * sin(spotlight.angle);
+//     bool angleCull = distanceClosestPoint > sphereRadius;
+//     bool frontCull = v1Len > sphereRadius + spotlight.range;
+//     bool backCull = v1Len < -sphereRadius;
+//     return !(angleCull || frontCull || backCull);
+// }
 [numthreads(1, 1, 1)]
 void cs_main(uint3 groupId : SV_GroupID,
              uint3 dispatchThreadId : SV_DispatchThreadID,

@@ -75,11 +75,11 @@ namespace JG
 
 
 			JVector2 Resolution;
-			f32 NearZ;
-			f32 FarZ;
+			f32 NearZ = 0.0f;
+			f32 FarZ  = 0.0f;
 
 			JVector3 EyePosition;
-			u32 PointLightCount;
+			u32 PointLightCount = 0;
 
 			JVector2 ClusterSize;
 			f32 ClusterScale;
@@ -90,7 +90,7 @@ namespace JG
 			u32 MaxRayDepth;
 
 			JVector3 PrevFrameEyePosition;
-			u32 DirectionalLightCount;
+			u32 DirectionalLightCount = 0;
 			void Begin(const Graphics::RenderPassData& passData);
 			void End();
 		};

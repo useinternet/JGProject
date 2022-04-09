@@ -511,83 +511,54 @@ float3 F_Schlick(float cosTheta, float3 F0)
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-
-
-
-float3 CalcDirectionalLight_GGX(float3 N, float V, in Material material, DirectionalLight dl)
+float CalcPointLightAtt(in PointLight pl, in float3 posW)
 {
-    float3 L = normalize(dl.Direction);
-    float3 lightPos = _EyePosition + -L * dl.Distance;
-
-
-    float  distance  = length(lightPos - material.WorldPosition);
-   	float3 direction = normalize(lightPos - material.WorldPosition);
-    L = direction;
-	float3 H = normalize(L + V);
-    float NoL = max(dot(N,L), 0.0f);
-	float NoH = max(dot(N,H),0.0f);
-	float NoV = max(dot(N,V), 0.0f);
-    
-	float VoH = saturate(dot(V,H));
-    float3 Lo = float3(0.0f,0.0f,0.0f);
-    float3 F0  = lerp(float3(0.04f,0.04f,0.04f), material.Albedo, material.Metallic);
-    float  D = DistributionGGX(NoH, material.Roughness);
-	float  G = GeometrySmith(NoV, NoL, material.Roughness);
-	float3 F = F_Schlick(max(VoH, 0.0f), F0);
-    float3 numerator  = D * G * F;
-	float  denom      = 4 * NoL * NoV;
-	float3 specular = numerator;// / (denom + 0.0001F);
-	float3 kS = F;
-	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
-	kD *= 1.0 - material.Metallic;
-	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
-    return Lo * dl.Intensity * dl.Color;
-}
-float3 CalcPointLight_GGX(float3 N, float3 V, in Material material, PointLight light)
-{
-    float3 L = normalize(light.Position - material.WorldPosition);
-	float3 H = normalize(L + V);
-    float NoL = max(dot(N,L), 0.0f);
-	float NoH = max(dot(N,H),0.0f);
-	float NoV = max(dot(N,V), 0.0f);
-    
-	float VoH = saturate(dot(V,H));
-    float3 Lo = float3(0.0f,0.0f,0.0f);
-    float3 F0  = lerp(float3(0.04f,0.04f,0.04f), material.Albedo, material.Metallic);
-    float  D = DistributionGGX(NoH, material.Roughness);
-	float  G = GeometrySmith(NoV, NoL, material.Roughness);
-	float3 F = F_Schlick(max(VoH, 0.0f), F0);
-    float3 numerator  = D * G * F;
-	float  denom      = 4 * NoL * NoV;
-	float3 specular = numerator;// / (denom + 0.0001F);
-	float3 kS = F;
-	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
-	kD *= 1.0 - material.Metallic;
-
-
     float att = 0.0f;
-    float d  = length(light.Position - material.WorldPosition);
-    if(d <= light.Range)
+    float d  = length(pl.Position - posW);
+    if(d <= pl.Range)
     {
-        if(d >= light.AttRange)
+        if(d >= pl.AttRange)
         {
-            d = max(d - light.AttRange, 0.0f);
-            att = light.Att0 + (light.Att1 * d) + (light.Att2 * d * d);
+            d = max(d - pl.AttRange, 0.0f);
+            att = pl.Att0 + (pl.Att1 * d) + (pl.Att2 * d * d);
             att = 1 / att;  
         }
         else
         {
             att = 1.0f;
         }
-        
     }
     else
     {
         att = 0.0f;
     }
+    return att;
+}
+float3 SurfaceShade_Default(float3 L, float3 N, float3 V, float Att, float3 Color, float Intensity, in Material material)
+{
+    Att = max(0, Att);
+	float3 H = normalize(L + V);
+    float NoL = max(dot(N,L), 0.0f);
+	float NoH = max(dot(N,H),0.0f);
+	float NoV = max(dot(N,V), 0.0f);
+    
+    float HoV = saturate(dot(H, V));
+    float3 Lo = float3(0.0f,0.0f,0.0f);
 
+    // specular default 0.5
+    float3 F0  = lerp(float3(0.08f,0.08f,0.08f) * material.Specular, material.Albedo, material.Metallic);
+    float  D = DistributionGGX(NoH, material.Roughness);
+	float  G = GeometrySmith(NoV, NoL, material.Roughness);
+	float3 F = F_Schlick(max(HoV, 0.0f), F0);
+
+    float3 numerator  = D * G * F;
+	//float  denom      = 4 * NoL * NoV;
+	float3 specular = numerator;// / max(denom, 0.0000001F);
+	float3 kS = F;
+	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
+	kD *= 1.0 - material.Metallic;
 	Lo += (kD * material.Albedo / JG_PI + specular) * NoL;
-    return Lo * att * light.Intensity * light.Color;
+    return Lo * Att * Intensity * Color;
 }
 
 
@@ -752,11 +723,10 @@ float ShootShadowRay_DL(DirectionalLight dl, inout uint randSeed, float3 worldPo
     ShadowRayPayload payload;
     payload.Factor = 0.0F;
     float3 L = normalize(dl.Direction);
-    float3 lightPos = _EyePosition + -L * dl.Distance;
-    
+    float3 lightPos  = _EyePosition + -L * _FarZ * 0.5f;
     float  distance  = length(lightPos - worldPos);
-   	float3 direction = normalize(lightPos - worldPos);
-    if(distance <= dl.Distance * 2)
+    float3 direction = normalize(lightPos - worldPos);
+    if(distance <= _FarZ)
     {
         RayDesc ray;
         ray.Origin    = worldPos;
@@ -805,6 +775,7 @@ float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
         	RAY_TYPE_SHADOW, 
         	ray,
         	payload);
+            // Shadow att apply
     }
     else
     {
@@ -859,16 +830,15 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
     float3 Lo = float3(0.0f,0.0f,0.0f);
 	float3 N = normalize(input.normal);
 	float3 V = normalize(_EyePosition - posW);
-
+    
 
     Material material;
     material.Albedo = input.albedo;
     material.Roughness = input.roughness;
     material.Metallic = input.metallic;
     material.Emissive = input.emissive;
+    material.Specular = input.specular;
     material.WorldPosition = posW;
-    
-
 
     bool  isCalcShadow = output_shadow != -1.0f;
     float accIntensity = 0.000001f;
@@ -876,22 +846,23 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
 
 
     //Calc DirectionalLight
-    for(int i = 0; i<_DirectionalLightCount; ++i)
+    // int i = 0;
+    int DL_Count = max(_DirectionalLightCount, 0);
+    if(DL_Count > 0)
     {
-        DirectionalLight dl = _DirectionalLightList[i];
-        Lo += CalcDirectionalLight_GGX(N, V, material, dl);
+        DirectionalLight dl = _DirectionalLightList[0];
+        float3 L    = normalize(-dl.Direction);
+        float3 dlLo = SurfaceShade_Default(L, N, V, 1.0f, dl.Color, dl.Intensity, material);
+        Lo += dlLo;
         if(isCalcShadow == true)
         {
-            float intensity = max(max(Lo.x,Lo.y),Lo.z);
+            float intensity = max(max(dlLo.x,dlLo.y),dlLo.z);
             accIntensity += intensity;
 
             float shadow = ShootShadowRay_DL(dl, randSeed, posW);
             accShadowIntensity += (intensity * shadow);
         }
     }
-    
-
-
 
     uint   clusterIndex = GetClusterIndex(posW);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
@@ -906,11 +877,13 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
 			int lightIndex = _VisibleLightIndices[i];
     
 			PointLight pl = _PointLightList[lightIndex];
-            float3 plLo = CalcPointLight_GGX(N, V, material, pl);
+            float3 L  = normalize(pl.Position - posW); 
+            float att = CalcPointLightAtt(pl, posW);
+            float3 plLo = SurfaceShade_Default(L, N, V, att, pl.Color, pl.Intensity, material);
 			Lo += plLo;
             if(isCalcShadow == true)
             {
-                float intensity = max(max(Lo.x,Lo.y),Lo.z);
+                float intensity = max(max(plLo.x,plLo.y),plLo.z);
                 accIntensity += intensity;
                 float shadow = ShootShadowRay_PL(pl, randSeed, posW);
                 accShadowIntensity += (intensity * shadow);

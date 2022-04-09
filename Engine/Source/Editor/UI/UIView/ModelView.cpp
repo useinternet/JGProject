@@ -83,7 +83,6 @@ namespace JG
 			// 
 			SharedPtr<Graphics::DirectionalLight> dl = CreateSharedPtr<Graphics::DirectionalLight>();
 			dl->Color	  = Color::White();
-			dl->Distance  = 10000.0f;
 			dl->Direction = JVector3(0.0f, -1.0f, 1.0f);
 			dl->Intensity = 1.0f;
 			mScene->PushLight(dl);

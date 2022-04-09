@@ -5,7 +5,7 @@
 #include "Class/Asset/Asset.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
-
+#include "Zep/zep.h"
 
 
 namespace JG
@@ -150,7 +150,6 @@ namespace JG
 			// 
 			SharedPtr<Graphics::DirectionalLight> dl = CreateSharedPtr<Graphics::DirectionalLight>();
 			dl->Color = Color::White();
-			dl->Distance = 10000.0f;
 			dl->Direction = JVector3(-0.2f, -0.8f, 1.0f);
 			dl->Intensity = 1.0f;
 			mScene->PushLight(dl);

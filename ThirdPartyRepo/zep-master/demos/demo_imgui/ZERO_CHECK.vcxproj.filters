@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\JGProject\ThirdPartyRepo\zep-master\demos\demo_imgui\CMakeFiles\6e96853e1513a5c368089838a5c3494c\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{1622442F-33C7-38F6-9F4F-6E280A7E2544}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

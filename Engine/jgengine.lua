@@ -165,8 +165,8 @@ workspace "JGEngine"
                 pchheader (PCH_HEADER)
                 pchsource (PCH_CPP_PATH)
 
-                postbuildcommands {"copy /b /y \"..\\Publish/Debug\\*.lib\" \"..\\Bin\\%{cfg.buildcfg}\""}
-                postbuildcommands {"copy /b /y \"..\\Publish/Debug\\*.dll\" \"..\\Bin\\%{cfg.buildcfg}\""}
+                postbuildcommands {"copy /b /y \"..\\Publish/%{cfg.buildcfg}\\*.lib\" \"..\\Bin\\%{cfg.buildcfg}\""}
+                postbuildcommands {"copy /b /y \"..\\Publish/%{cfg.buildcfg}\\*.dll\" \"..\\Bin\\%{cfg.buildcfg}\""}
                 SetStaticLibConfig("Source/Core/", "JG_EDITOR")
         group "Engine/Editor"
             project "Editor"
@@ -179,7 +179,9 @@ workspace "JGEngine"
                 pchheader (PCH_HEADER)
                 pchsource (PCH_CPP_PATH)
                 links {
-                    "Core", "Game",
+                    "Core", 
+                    "Game",
+                    "Publish/%{cfg.buildcfg}/Zep"
                 }
                 SetConsoleAppConfig("Source/Editor/", "JG_EDITOR")
         group "Engine/Game"
