@@ -227,6 +227,7 @@ namespace JG
 		UIManager::GetInstance().RegisterInspectorUI<SpriteRendererInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<StaticMeshRendererInspectorUI>();
 		UIManager::GetInstance().RegisterInspectorUI<DirectionalLightInspectorUI>();
+		UIManager::GetInstance().RegisterInspectorUI<SpotLightInspectorUI>();
 		//
 
 		UIManager::GetInstance().RegisterInspectorUI<MaterialAssetInspectorUI>();

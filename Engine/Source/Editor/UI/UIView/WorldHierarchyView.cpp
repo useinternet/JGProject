@@ -11,6 +11,7 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
+#include "Components/SpotLight.h"
 #include "Components/Camera.h"
 #include "Components/Collision.h"
 #include "Components/Transform.h"
@@ -56,6 +57,10 @@ namespace JG
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Light/PointLight", 0, [&]()
 		{
 			CreatePointLight();
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Light/SpotLight", 0, [&]()
+		{
+			CreateSpotLight();
 		}, nullptr);
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Make Prefab", 0, [&]()
@@ -409,6 +414,12 @@ namespace JG
 		if (mTargetGameNode == nullptr) return;
 		auto node = mTargetGameNode->AddNode("PointLight");
 		node->AddComponent<PointLight>();
+	}
+	void WorldHierarchyView::CreateSpotLight()
+	{
+		if (mTargetGameNode == nullptr) return;
+		auto node = mTargetGameNode->AddNode("SpotLight");
+		node->AddComponent<SpotLight>();
 	}
 	void WorldHierarchyView::CreateDirectionalLight()
 	{

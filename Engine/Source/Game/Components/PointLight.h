@@ -22,12 +22,6 @@ namespace JG
 		f32 mAtt0 = 0.0f;
 		f32 mAtt1 = 0.0f;
 		f32 mAtt2 = 0.0f;
-#ifdef JG_EDITOR
-		SharedPtr<Graphics::PaperObject> mTargetObject;
-		SharedPtr<ScheduleHandle>	     mPushDebugHandle;
-		Asset<ITexture>* mIcon = nullptr;
-		bool mIsEditorMode     = true;
-#endif // DEBUG
 	public:
 		virtual ~PointLight() = default;
 	
@@ -59,10 +53,7 @@ namespace JG
 		f32 GetAtt1() const;
 		f32 GetAtt2() const;
 	private:
-		void CalcAtt();
-#ifdef JG_EDITOR
-		void PushDebugRenderItem();
-#endif
-		void PushLightItem();
+		//void CalcAtt();
+		virtual void PushLightItem() override;
 	};
 }

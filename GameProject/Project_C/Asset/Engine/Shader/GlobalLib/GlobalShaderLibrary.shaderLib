@@ -16,11 +16,14 @@
 struct Material
 {
     float3 WorldPosition;
+    float Metallic;
     float3 Albedo;
     float Roughness;
-    float Metallic;
+
     float3 Emissive;
+    float  Padding0;
     float3 Specular;
+    float  Padding1;
 };
 
 struct DirectionalLight
@@ -28,6 +31,7 @@ struct DirectionalLight
     float3 Direction;
     float  Intensity;
     float3 Color;
+    float  Padding;
 };
 
 struct PointLight
@@ -45,15 +49,19 @@ struct PointLight
 struct SpotLight
 {
     float3 Position;
-    float3 Direction;
-    float3 Color;
     float  Range;
-    float  OutCone;
-    float  InnerCone;
+    float3 Direction;
+    float  OutFallOff;
+    float3 Color;
+    float  FallOff;
+
     float  Intensity;
+    float  AttRange;
     float  Att0;
     float  Att1;
+
     float  Att2;
+    float3 Padding;
 };
 
 struct LightGrid

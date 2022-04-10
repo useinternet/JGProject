@@ -91,6 +91,7 @@ namespace JG
 		void CreateCube();
 		void CreateSphere();
 		void CreatePointLight();
+		void CreateSpotLight();
 		void CreateDirectionalLight();
 		void CreateCamera();
 		void MakePrefab();

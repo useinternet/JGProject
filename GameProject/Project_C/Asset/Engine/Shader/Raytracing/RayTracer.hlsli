@@ -1,12 +1,4 @@
 
-//#include "Common.hlsli"
-
-// Direct Lighting   -> Lighting / 
-// Indirect Lighting -> Denosing
-// Shadow            -> Denosing
-// A0                -> Denosing
-
-
 [shader("raygeneration")]
 void RayGeneration()
 {

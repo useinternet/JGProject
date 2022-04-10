@@ -1,28 +1,29 @@
 #include "pch.h"
 #include "MaterialView.h"
 #include "UI/UIManager.h"
+#include "Application.h"
 #include "ExternalImpl/JGImGui.h"
+#include "ExternalImpl/JGScriptEditor.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
-#include "Zep/zep.h"
-
 
 namespace JG
 {
 	MaterialView::MaterialView()
 	{
 		DisableUniqueView();
-
+		
 
 	}
 	void MaterialView::Load()
 	{
-
+		
 	}
 	void MaterialView::Initialize()
 	{
 		UpdateScene();
+		mScriptEditor = CreateUniquePtr<JGScriptEditor>(JVector2(600, 600));
 	}
 	void MaterialView::OnGUI()
 	{
@@ -45,6 +46,11 @@ namespace JG
 
 		JGGraphics::GetInstance().DestroyObject(mScene);
 		mScene = nullptr;
+		if (mScriptEditor != nullptr)
+		{
+			mScriptEditor->Destroy();
+			mScriptEditor = nullptr;
+		}
 	}
 	void MaterialView::OnEvent(IEvent& e)
 	{
@@ -108,11 +114,12 @@ namespace JG
 	}
 	void MaterialView::RightTopOnGUI()
 	{
-		ImGui::BeginChild("RightTop_OnGUI", ImVec2(640, 640));
+		mScriptEditor->OnGUI();
+		//ImGui::BeginChild("RightTop_OnGUI", ImVec2(640, 640));
 
-		static char test[512] = {};
-		ImGui::InputTextMultiline("TextEditor", test, 512, ImVec2(600, 600));
-		ImGui::EndChild();
+		//static char test[512] = {};
+		//ImGui::InputTextMultiline("TextEditor", test, 512, ImVec2(600, 600));
+		//ImGui::EndChild();
 	}
 	void MaterialView::RightBottomOnGUI()
 	{
@@ -201,6 +208,16 @@ namespace JG
 	{
 		AssetID originMaterial = AssetDataBase::GetInstance().GetAssetOriginID(path);
 		mMaterialAsset = AssetDataBase::GetInstance().LoadReadWriteAsset<IMaterial>(originMaterial);
+
+		if (mScriptEditor != nullptr && mMaterialAsset != nullptr && mMaterialAsset->IsValid())
+		{
+			SharedPtr<IMaterial> m = mMaterialAsset->Get();
+			auto script = m->GetScript();
+			if (script != nullptr)
+			{
+				mScriptEditor->Load(mMaterialAsset->GetAssetName(), script->GetCode());
+			}
+		}
 	}
 	void MaterialView::SetMesh(const String& path)
 	{

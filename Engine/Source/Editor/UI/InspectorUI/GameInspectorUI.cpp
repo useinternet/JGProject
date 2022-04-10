@@ -194,6 +194,37 @@ namespace JG
 		obj->SetRange(range);
 		obj->SetAttRange(attRange);
 	}
+	void SpotLightInspectorUI::OnGUI_Impl(SpotLight* obj)
+	{
+		ImGui::Spacing();
+
+		Color color   = obj->GetColor();
+		f32 intensity = obj->GetIntensity();
+		f32 range	  = obj->GetRange();
+		f32 attRange = obj->GetAttRange();
+		f32 outFallOff  = obj->GetOutFallOff();
+		f32 fallOff   = obj->GetFallOff();
+
+
+		f32 label_width = ImGui::CalcTextSize("OutFallOff").x;
+
+
+		ImGui::Color3_OnGUI("Color", color, label_width);
+		ImGui::Float_OnGUI("Intensity", intensity, label_width, 0.0f);
+		ImGui::Float_OnGUI("Range", range, label_width, 0.0f);
+		ImGui::Float_OnGUI("AttRange", attRange, label_width, 0.0f);
+		ImGui::Float_OnGUI("OutFallOff", outFallOff, label_width, 0.0f);
+		ImGui::Float_OnGUI("FallOff", fallOff, label_width, 0.0f);
+
+
+		obj->SetColor(Color(color.R, color.G, color.B, 1.0f));
+		obj->SetIntensity(intensity);
+		obj->SetRange(range);
+		obj->SetOutFallOff(outFallOff);
+		obj->SetFallOff(fallOff);
+		obj->SetAttRange(attRange);
+
+	}
 	void DirectionalLightInspectorUI::OnGUI_Impl(DirectionalLight* obj)
 	{
 		ImGui::Spacing();
@@ -280,6 +311,8 @@ namespace JG
 			obj->PopMaterial();
 		}, label_width);
 	}
+
+
 
 
 

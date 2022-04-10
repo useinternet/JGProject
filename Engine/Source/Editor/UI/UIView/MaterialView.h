@@ -14,6 +14,7 @@ namespace JG
 		class Scene;
 		class StaticRenderObject;
 	}
+	class JGScriptEditor;
 	class MaterialView : public UIView
 	{
 		JGCLASS
@@ -33,7 +34,7 @@ namespace JG
 		SharedPtr<ITexture>		    mSceneTexture;
 		SharedPtr<Asset<IMesh>>     mMeshAsset = nullptr;
 		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
-
+		UniquePtr<JGScriptEditor>  mScriptEditor;
 
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
 		Graphics::Scene* mScene = nullptr;

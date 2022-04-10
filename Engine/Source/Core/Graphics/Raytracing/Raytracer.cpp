@@ -42,6 +42,7 @@ namespace JG
 		NumClusterSlice = passData.NumClusterSlice;
 		FrameCount      = passData.FrameCount;
 		DirectionalLightCount = passData.DirectionalLightCount;
+		SpotLightCount = passData.SpotLightCount;
 	}
 
 	void RayTracer::CB::End()
@@ -276,6 +277,9 @@ namespace JG
 		mCB.Begin(mRenderer->GetPassData());
 		mCB.MaxRayDepth = mRayBounds.GetValue();
 
+
+
+
 		// CB Bind
 		context->BindConstantBuffer(ERootParam::RootParam_CB, mCB);
 
@@ -300,9 +304,13 @@ namespace JG
 		// PointLight
 		const auto& plInfo = mRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 		const auto& dlInfo = mRenderer->GetLightInfo(Graphics::ELightType::DirectionalLight);
+		const auto& slInfo = mRenderer->GetLightInfo(Graphics::ELightType::SpotLight);
 
 		context->BindSturcturedBuffer(ERootParam::RootParam_PointLightList, plInfo.Data.data(), plInfo.Size, plInfo.Count);
 		context->BindSturcturedBuffer(ERootParam::RootParam_DirectionalLightList, dlInfo.Data.data(), dlInfo.Size, dlInfo.Count);
+		context->BindSturcturedBuffer(ERootParam::RootParam_SpotLightList, slInfo.Data.data(), slInfo.Size, slInfo.Count);
+
+
 		// LightGrid
 		context->BindSturcturedBuffer(ERootParam::RootParam_LightGridList, mRenderer->GetLightGrid());
 		// VisibleLightIndicies
@@ -439,6 +447,7 @@ namespace JG
 		creater->AddSRV(ERootParam::RootParam_VisibleLightIndicies, 3, 0);
 		creater->AddSRV(ERootParam::RootParam_PrevFrameBLASTransform, 4, 0);
 		creater->AddSRV(ERootParam::RootParam_DirectionalLightList, 5, 0);
+		creater->AddSRV(ERootParam::RootParam_SpotLightList, 6, 0);
 		creater->AddSampler(0, ESamplerFilter::Point, ETextureAddressMode::Wrap);
 		creater->AddSampler(1, ESamplerFilter::Linear, ETextureAddressMode::Wrap);
 		creater->AddSampler(2, ESamplerFilter::Anisotropic, ETextureAddressMode::Wrap);

@@ -109,7 +109,9 @@ RWTexture2D<float4> _RayDistanceOutput            : register(u11, space0);
 // Lights
 
 StructuredBuffer<PointLight>       _PointLightList       : register(t1, space0);
+StructuredBuffer<SpotLight> _SpotLightList : register(t6, space0);
 StructuredBuffer<DirectionalLight> _DirectionalLightList : register(t5, space0);
+
 // Clusters
 StructuredBuffer<LightGrid> _LightGridList       : register(t2, space0);
 StructuredBuffer<uint>      _VisibleLightIndices : register(t3, space0);
@@ -145,6 +147,7 @@ cbuffer CB : register(b0)
 
     float3   _PrevFrameEyePosition;
     uint     _DirectionalLightCount;
+    uint     _SpotLightCount;
 }
 
 SamplerState _PointWrap  : register(s0);
@@ -510,7 +513,37 @@ float3 F_Schlick(float cosTheta, float3 F0)
     }
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
+float CalcSpotLightAtt(in SpotLight sl, in float3 posW)
+{
+   
+    float d = length(sl.Position - posW);
+    float3 L1 = normalize(sl.Position - posW);
+    float3 L2 = normalize(-sl.Direction);
 
+    float theta = dot(L1, L2);
+    float epsilon = sl.FallOff - sl.OutFallOff;
+    float conatt = clamp(max(theta - sl.OutFallOff, 0) / epsilon, 0.0f, 1.0f);
+
+    float att;
+    if(d <= sl.Range)
+    {
+        if(d >= sl.AttRange)
+        {
+            d = max(d - sl.AttRange, 0.0f);
+            att = sl.Att0 + (sl.Att1 * d) + (sl.Att2 * d * d);
+            att = 1 / att;  
+        }
+        else
+        {
+            att = 1.0f;
+        }
+    }
+    else
+    {
+        att = 0.0f;
+    }
+    return max(0, att * conatt);
+}
 float CalcPointLightAtt(in PointLight pl, in float3 posW)
 {
     float att = 0.0f;
@@ -730,7 +763,7 @@ float ShootShadowRay_DL(DirectionalLight dl, inout uint randSeed, float3 worldPo
     {
         RayDesc ray;
         ray.Origin    = worldPos;
-        ray.Direction = normalize(getConeSample(randSeed, normalize(direction) , 0.9999));;
+        ray.Direction = normalize(getConeSample(randSeed, normalize(direction) , 0.9995));;
         ray.TMin = 0.01f;
         ray.TMax = distance;
             TraceRay(
@@ -763,7 +796,7 @@ float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
     {
         RayDesc ray;
         ray.Origin    = worldPos;
-        ray.Direction = normalize(getConeSample(randSeed,direction , 0.9999));;
+        ray.Direction = normalize(getConeSample(randSeed, direction , 0.9995));;
         ray.TMin = 0.01;
         ray.TMax = distance;
         TraceRay(
@@ -784,6 +817,35 @@ float ShootShadowRay_PL(PointLight pl, inout uint randSeed, float3 worldPos)
 
     return payload.Factor;
 }
+float ShootShadowRay(float3 direction, float range, float distance, float3 posW, inout uint randSeed)
+{
+    ShadowRayPayload payload;
+    payload.Factor = 0.0f;
+
+    if(distance <= range)
+    {
+        RayDesc ray;
+        ray.Origin    = posW;
+        ray.Direction = normalize(getConeSample(randSeed, direction , 0.9995));;
+        ray.TMin = 0.01;
+        ray.TMax = distance;
+        TraceRay(
+        	_SceneAS,
+        	RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH | RAY_FLAG_SKIP_CLOSEST_HIT_SHADER,
+        	INSTANCE_MASK_SHADOW,
+        	RAY_TYPE_SHADOW, 
+        	RAY_TYPE_COUNT,
+        	RAY_TYPE_SHADOW, 
+        	ray,
+        	payload);
+    }
+    else
+    {
+        return 1.0f;
+    }
+
+    return payload.Factor;
+} 
 
 float3 LambertianIndirect(
     inout uint seed, 
@@ -858,15 +920,13 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
         {
             float intensity = max(max(dlLo.x,dlLo.y),dlLo.z);
             accIntensity += intensity;
-
-            float shadow = ShootShadowRay_DL(dl, randSeed, posW);
+            float shadow = ShootShadowRay(L, _FarZ, _FarZ, posW, randSeed);
             accShadowIntensity += (intensity * shadow);
         }
     }
 
     uint   clusterIndex = GetClusterIndex(posW);
 	LightGrid lgrid  = _LightGridList[clusterIndex];
-
 	// Calc PointLight
 	if(lgrid.PL_Count > 0 && lgrid.PL_Offset >= 0)
 	{
@@ -883,13 +943,35 @@ float3 GGXDirect(SURFACE_OUTPUT input, inout float output_shadow, inout uint ran
 			Lo += plLo;
             if(isCalcShadow == true)
             {
+                float  distance  = length(pl.Position - posW);
                 float intensity = max(max(plLo.x,plLo.y),plLo.z);
                 accIntensity += intensity;
-                float shadow = ShootShadowRay_PL(pl, randSeed, posW);
+                float shadow = ShootShadowRay(L, pl.Range, distance, posW, randSeed);
                 accShadowIntensity += (intensity * shadow);
             }
 		}
 	}
+
+    // Calc SpotLight
+    for(int i = 0; i<_SpotLightCount; ++i)
+    {
+        SpotLight sl = _SpotLightList[i];
+        float3 L    = normalize(sl.Position - posW);
+        float  att  = CalcSpotLightAtt(sl, posW);
+        float3 slLo = SurfaceShade_Default(L, N, V, att, sl.Color, sl.Intensity, material);
+        Lo += slLo;
+        if(isCalcShadow == true)
+        {
+            float intensity = max(max(slLo.x,slLo.y),slLo.z);
+            accIntensity += intensity;
+            float shadow = 1.0f;
+            // float shadow = ShootShadowRay_PL(pl, randSeed, posW);
+            accShadowIntensity += (intensity * shadow);
+        }
+    }
+
+
+
     if(isCalcShadow == true)
     {
         output_shadow = accShadowIntensity / accIntensity;

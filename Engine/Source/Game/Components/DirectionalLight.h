@@ -18,12 +18,6 @@ namespace JG
 		JVector3 mColor = Color::White();
 		JVector3 mDirection = JVector3(0, 0, 1);
 		f32 mIntensity = 1.0f;
-#ifdef JG_EDITOR
-		SharedPtr<Graphics::PaperObject> mTargetObject;
-		SharedPtr<ScheduleHandle>	     mPushDebugHandle;
-		Asset<ITexture>* mIcon = nullptr;
-		bool mIsEditorMode = true;
-#endif // DEBUG
 	public:
 		virtual ~DirectionalLight() = default;
 	protected:
@@ -42,9 +36,6 @@ namespace JG
 		const JVector3& GetDirection() const;
 		Color    GetColor() const;
 	private:
-#ifdef JG_EDITOR
-		void PushDebugRenderItem();
-#endif
-		void PushLightItem();
+		virtual void PushLightItem() override;
 	};
 }

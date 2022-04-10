@@ -218,6 +218,7 @@ namespace JG
 			JVector3Uint NumClusterSlice;
 			u32 FrameCount = 0;
 			u32 DirectionalLightCount = 0;
+			u32 SpotLightCount = 0;
 		};
 
 		class LightGrid

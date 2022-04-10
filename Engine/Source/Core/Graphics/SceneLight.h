@@ -9,6 +9,7 @@ namespace JG
 		enum class ELightType
 		{
 			PointLight,
+			SpotLight,
 			DirectionalLight,
 		};
 
@@ -39,7 +40,7 @@ namespace JG
 		public:
 			JVector3 Direction;
 			JVector3 Color = Color::White();
-			f32 Intensity = 1.0f;
+			f32      Intensity = 1.0f;
 		public:
 			virtual ELightType GetLightType() const override { return ELightType::DirectionalLight; }
 			virtual void PushBtData(List<jbyte>& btData)  override
@@ -49,7 +50,7 @@ namespace JG
 				PushData(btData, &Color, sizeof(JVector3));
 			}
 			virtual u64 GetBtSize() const override {
-				return 28;
+				return 32;
 			}
 		};
 
@@ -72,16 +73,55 @@ namespace JG
 			virtual void PushBtData(List<jbyte>& btData)  override
 			{
 				PushData(btData, &Position, sizeof(JVector3));
-				PushData(btData, &Range, sizeof(float));
+				PushData(btData, &Range, sizeof(f32));
 				PushData(btData, &Color, sizeof(JVector3));
-				PushData(btData, &AttRange, sizeof(float));
-				PushData(btData, &Intensity, sizeof(float));
-				PushData(btData, &Att0, sizeof(float));
-				PushData(btData, &Att1, sizeof(float));
-				PushData(btData, &Att2, sizeof(float));
+				PushData(btData, &AttRange, sizeof(f32));
+				PushData(btData, &Intensity, sizeof(f32));
+				PushData(btData, &Att0, sizeof(f32));
+				PushData(btData, &Att1, sizeof(f32));
+				PushData(btData, &Att2, sizeof(f32));
 			}
 			virtual u64 GetBtSize() const override {
 				return 48;
+			}
+		};
+
+		class SpotLight : public Light
+		{
+		public:
+			virtual ~SpotLight() = default;
+		public:
+			JVector3 Color;
+			JVector3 Position;
+			JVector3 Direction;
+			f32 Intensity = 1.0f;
+			f32 Range = 0.0f;
+			f32 OutFallOff = 0.0f;
+			f32 FallOff = 0.0f;
+
+			f32 AttRnage = 0.0f;
+			f32 Att0 = 0.0f;
+			f32 Att1 = 0.0f;
+			f32 Att2 = 0.0f;
+		public:
+			virtual ELightType GetLightType() const override { return ELightType::SpotLight; }
+			virtual void PushBtData(List<jbyte>& btData)  override
+			{
+				PushData(btData, &Position, sizeof(JVector3));
+				PushData(btData, &Range, sizeof(f32));
+				PushData(btData, &Direction, sizeof(JVector3));
+				PushData(btData, &OutFallOff, sizeof(f32));
+				PushData(btData, &Color, sizeof(JVector3));
+				PushData(btData, &FallOff, sizeof(f32));
+				PushData(btData, &Intensity, sizeof(f32));
+
+				PushData(btData, &AttRnage, sizeof(f32));
+				PushData(btData, &Att0, sizeof(f32));
+				PushData(btData, &Att1, sizeof(f32));
+				PushData(btData, &Att2, sizeof(f32));
+			}
+			virtual u64 GetBtSize() const override {
+				return 80;
 			}
 		};
 	}

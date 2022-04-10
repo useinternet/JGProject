@@ -47,6 +47,7 @@ namespace JG
 			RootParam_VisibleLightIndicies,
 			RootParam_PrevFrameBLASTransform,
 			RootParam_DirectionalLightList,
+			RootParam_SpotLightList,
 		};
 		struct InstanceData
 		{
@@ -91,6 +92,7 @@ namespace JG
 
 			JVector3 PrevFrameEyePosition;
 			u32 DirectionalLightCount = 0;
+			u32 SpotLightCount = 0;
 			void Begin(const Graphics::RenderPassData& passData);
 			void End();
 		};
@@ -149,7 +151,6 @@ namespace JG
 		SharedPtr<Denoiser> mDenoiser[EDenoiser::Denoise_Count];
 		List<SharedPtr<ITexture>> mResources[EResource::Count];
 		CB mCB;
-		CB mCB2;
 	public:
 		RayTracer(Renderer* renderer);
 		void AddInstance(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> material, const List<JMatrix>& transform, Graphics::ESceneObjectFlags flags);

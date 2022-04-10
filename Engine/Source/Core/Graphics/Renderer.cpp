@@ -64,6 +64,7 @@ namespace JG
 		passData.Resolution		= info.Resolution;
 		passData.PointLightCount = mLightInfos[Graphics::ELightType::PointLight].Count;
 		passData.DirectionalLightCount = mLightInfos[Graphics::ELightType::DirectionalLight].Count;
+		passData.SpotLightCount = mLightInfos[Graphics::ELightType::SpotLight].Count;
 		passData.FrameCount = mFrameCount++;
 
 		ReadyImpl( &passData);
