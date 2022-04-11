@@ -14,13 +14,13 @@ namespace JG
 		class Scene;
 		class StaticRenderObject;
 	}
-	class JGScriptEditor;
+	class TextEditor;
 	class MaterialView : public UIView
 	{
 		JGCLASS
 	private:
 		const JVector2 mResolution = JVector2(450, 450);
-		const JVector2 mImageSize = mResolution;
+		const JVector2 mImageSize  = mResolution;
 		const f32 mFarZ = 1000000.0f;
 		const f32 mNearZ = 1.0f;
 		JVector3 mEyePos = JVector3(0, 0, -200.0f);
@@ -34,7 +34,7 @@ namespace JG
 		SharedPtr<ITexture>		    mSceneTexture;
 		SharedPtr<Asset<IMesh>>     mMeshAsset = nullptr;
 		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
-		UniquePtr<JGScriptEditor>  mScriptEditor;
+		UniquePtr<TextEditor>  mTextEditor;
 
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
 		Graphics::Scene* mScene = nullptr;
@@ -57,9 +57,13 @@ namespace JG
 		// 컴파일 및 에러 오류로그
 		void RightBottomOnGUI();
 	private:
+		void LoadTextEditor(const String& text);
 		void PushSceneObject();
 		void Rendering();
 		void UpdateScene();
+
+		void SaveMaterial();
+		void CompileShader();
 	public:
 		void SetMaterial(const String& path);
 		void SetMesh(const String& path);

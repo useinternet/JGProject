@@ -3,10 +3,11 @@
 #include "UI/UIManager.h"
 #include "Application.h"
 #include "ExternalImpl/JGImGui.h"
-#include "ExternalImpl/JGScriptEditor.h"
+#include "ExternalImpl/TextEditor.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
+#include "UI/UIManager.h"
 
 namespace JG
 {
@@ -23,11 +24,9 @@ namespace JG
 	void MaterialView::Initialize()
 	{
 		UpdateScene();
-		mScriptEditor = CreateUniquePtr<JGScriptEditor>(JVector2(600, 600));
 	}
 	void MaterialView::OnGUI()
 	{
-		ImGui::Text("This is Material View");
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, mImageSize.x + ImGui::GetStyle().FramePadding.x * 4);
 		LeftTopOnGUI();
@@ -43,14 +42,9 @@ namespace JG
 	{
 		mMeshAsset = nullptr;
 		mMaterialAsset = nullptr;
-
+		mTextEditor = nullptr;
 		JGGraphics::GetInstance().DestroyObject(mScene);
 		mScene = nullptr;
-		if (mScriptEditor != nullptr)
-		{
-			mScriptEditor->Destroy();
-			mScriptEditor = nullptr;
-		}
 	}
 	void MaterialView::OnEvent(IEvent& e)
 	{
@@ -109,25 +103,89 @@ namespace JG
 	void MaterialView::LeftBottomOnGUI()
 	{
 		ImGui::BeginChild("LeftBottom_OnGUI");
-		ImGui::Text("Property");
+
+		UIManager::GetInstance().ShowInspectorUI(mMaterialAsset.get());
+
 		ImGui::EndChild();
 	}
 	void MaterialView::RightTopOnGUI()
 	{
-		mScriptEditor->OnGUI();
-		//ImGui::BeginChild("RightTop_OnGUI", ImVec2(640, 640));
+		if (mTextEditor == nullptr && mMaterialAsset != nullptr && mMaterialAsset->IsValid())
+		{
+			auto script = mMaterialAsset->Get()->GetScript();
+			if (script != nullptr)
+			{
+				LoadTextEditor(script->GetCode());
+			}
+		}
+		ImGui::BeginChild("RightTopOnGUI", ImVec2(600, 600), true, ImGuiWindowFlags_HorizontalScrollbar);
+		if (mTextEditor != nullptr && mMaterialAsset != nullptr && mMaterialAsset->IsValid())
+		{
+			auto cpos = mTextEditor->GetCursorPosition();
+			if (ImGui::IsWindowFocused())
+			{
+				if (ImGui::IsKeyDown((i32)EKeyCode::Ctrl) && ImGui::IsKeyPressed((i32)EKeyCode::C))
+				{
+					mTextEditor->Copy();
+				}
+				if (ImGui::IsKeyDown((i32)EKeyCode::Ctrl) && ImGui::IsKeyPressed((i32)EKeyCode::X))
+				{
+					mTextEditor->Cut();
+				}
+				if (ImGui::IsKeyDown((i32)EKeyCode::Ctrl) && ImGui::IsKeyPressed((i32)EKeyCode::V))
+				{
+					mTextEditor->Paste();
+				}
+				if (ImGui::IsKeyDown((i32)EKeyCode::Ctrl) && ImGui::IsKeyPressed((i32)EKeyCode::A))
+				{
+					mTextEditor->SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(mTextEditor->GetTotalLines(), 0));
+				}
+			}
 
-		//static char test[512] = {};
-		//ImGui::InputTextMultiline("TextEditor", test, 512, ImVec2(600, 600));
-		//ImGui::EndChild();
+			ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, mTextEditor->GetTotalLines(),
+				mTextEditor->IsOverwrite() ? "Ovr" : "Ins",
+				mTextEditor->CanUndo() ? "*" : " ",
+				mTextEditor->GetLanguageDefinition().mName.c_str(), mMaterialAsset->GetAssetName().c_str());
+
+			mTextEditor->Render(mMaterialAsset->GetAssetPath().c_str());
+	
+		}
+		ImGui::EndChild();
+
 	}
 	void MaterialView::RightBottomOnGUI()
 	{
 		ImGui::BeginChild("RightBottom_OnGUI");
-		ImGui::Text("Compile");
-		ImGui::Button("Compile");
+		
+		if (ImGui::Button("Save") == true)
+		{
+			SaveMaterial();
+
+
+		} ImGui::SameLine();
+		if (ImGui::Button("Compile") == true)
+		{
+			SaveMaterial();
+			CompileShader();
+		}
+		ImGui::Separator();
+		ImGui::Text("ErrorLog1");
+		ImGui::Text("ErrorLog1");
+		ImGui::Text("ErrorLog1");
+		ImGui::Separator();
+		String out;
+		ImGui::InputText("##LogInputText", "test", out); ImGui::SameLine();
+		ImGui::Button("Clear");
 		ImGui::EndChild();
 	}
+	void MaterialView::LoadTextEditor(const String& text)
+	{
+		mTextEditor = CreateUniquePtr<TextEditor>();
+		mTextEditor->SetLanguageDefinition(TextEditor::LanguageDefinition::HLSL());
+		mTextEditor->SetText(text);
+		mTextEditor->SetPalette(TextEditor::GetDarkPalette());
+	}
+
 	void MaterialView::PushSceneObject()
 	{
 		if (mSkyBox == nullptr)
@@ -167,7 +225,6 @@ namespace JG
 	{
 		if (mScene != nullptr)
 		{
-
 			SharedPtr<Graphics::SceneResultInfo> resultInfo = mScene->FetchResult();
 			if (resultInfo != nullptr && resultInfo->Texture != nullptr && resultInfo->Texture->IsValid() == true)
 			{
@@ -194,31 +251,30 @@ namespace JG
 		sceneInfo.ClearColor = Color();
 		if (mScene == nullptr)
 		{
-
 			mScene = JGGraphics::GetInstance().CreateScene("ModelView_Scene", sceneInfo);
 		}
 		else
 		{
 			mScene->SetSceneInfo(sceneInfo);
 		}
-
 	}
 
+	void MaterialView::SaveMaterial()
+	{
+		JG_LOG_INFO("Save Material");
+
+	}
+	void MaterialView::CompileShader()
+	{
+		JG_LOG_INFO("Compile Shader");
+
+	}
 	void MaterialView::SetMaterial(const String& path)
 	{
-		AssetID originMaterial = AssetDataBase::GetInstance().GetAssetOriginID(path);
-		mMaterialAsset = AssetDataBase::GetInstance().LoadReadWriteAsset<IMaterial>(originMaterial);
-
-		if (mScriptEditor != nullptr && mMaterialAsset != nullptr && mMaterialAsset->IsValid())
-		{
-			SharedPtr<IMaterial> m = mMaterialAsset->Get();
-			auto script = m->GetScript();
-			if (script != nullptr)
-			{
-				mScriptEditor->Load(mMaterialAsset->GetAssetName(), script->GetCode());
-			}
-		}
+		//AssetID originMaterial = AssetDataBase::GetInstance().GetAssetOriginID(path);
+		mMaterialAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMaterial>(path);
 	}
+
 	void MaterialView::SetMesh(const String& path)
 	{
 		SharedPtr<Asset<IMesh>> asset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(path);
