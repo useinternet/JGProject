@@ -1,8 +1,8 @@
 #pragma once
 #include "JGCore.h"
-#include "physx/PxPhysXConfig.h"
-#include "physx/PxPhysicsAPI.h"
-#include "physx/PxPhysics.h"
+//#include "physx/PxPhysXConfig.h"
+//#include "physx/PxPhysicsAPI.h"
+//#include "physx/PxPhysics.h"
 
 namespace JG
 {
@@ -12,7 +12,7 @@ namespace JG
 	class PxShapeData
 	{
 	public:
-		SharedPtr<physx::PxGeometry> Geometry = nullptr;
+		//SharedPtr<physx::PxGeometry> Geometry = nullptr;
 		PhysicsHandle MaterialHandle = 0;
 	};
 	class PhysicsManager : public IGlobalSingleton<PhysicsManager>
@@ -116,115 +116,115 @@ namespace JG
 
 
 
-		physx::PxDefaultErrorCallback mDefaultErrorCallback;
-		physx::PxDefaultAllocator     mDefaultAllocatorCallback;
-		physx::PxFoundation*		  mFoundation = nullptr;
-		physx::PxPvd*				  mPvd = nullptr;
-		physx::PxPvdTransport*		  mPvdTransport = nullptr;
-		physx::PxPhysics*			  mPhysics = nullptr;
-		physx::PxDefaultCpuDispatcher* mCPUDispatcher = nullptr;
+		//physx::PxDefaultErrorCallback mDefaultErrorCallback;
+		//physx::PxDefaultAllocator     mDefaultAllocatorCallback;
+		//physx::PxFoundation*		  mFoundation = nullptr;
+		//physx::PxPvd*				  mPvd = nullptr;
+		//physx::PxPvdTransport*		  mPvdTransport = nullptr;
+		//physx::PxPhysics*			  mPhysics = nullptr;
+		//physx::PxDefaultCpuDispatcher* mCPUDispatcher = nullptr;
 
 
-		Dictionary<i32, u64> mPhysicsTypeHashCode;
-		Dictionary<PhysicsHandle, UniquePtr<HandleData>>  mHandleDataPool;
-		Dictionary<PhysicsHandle, physx::PxScene*>        mScenePool;
+		//Dictionary<i32, u64> mPhysicsTypeHashCode;
+		//Dictionary<PhysicsHandle, UniquePtr<HandleData>>  mHandleDataPool;
+		//Dictionary<PhysicsHandle, physx::PxScene*>        mScenePool;
 
 
-		Queue<SharedPtr<HandleCommand>> mCommandQueue;
+		//Queue<SharedPtr<HandleCommand>> mCommandQueue;
 
 	public:
 		PhysicsManager();
 		virtual ~PhysicsManager();
 	public:
-		physx::PxPhysics* GetPxPhysics() const;
+		//physx::PxPhysics* GetPxPhysics() const;
 	public:
-		PhysicsHandle CreatePxScene();
-		PhysicsHandle CreatePxRigidStatic(const JVector3& p, const JQuaternion& q);
-		PhysicsHandle CreatePxRigidDynamic(const JVector3& p, const JQuaternion& q);
-		PhysicsHandle CreatePxShape(const std::function<PxShapeData()>& returnAction);
-		PhysicsHandle CreatePxMaterial(f32 staticFriction, f32 dynamicFriction, f32 restitution);
+	//	PhysicsHandle CreatePxScene();
+	//	PhysicsHandle CreatePxRigidStatic(const JVector3& p, const JQuaternion& q);
+	//	PhysicsHandle CreatePxRigidDynamic(const JVector3& p, const JQuaternion& q);
+	//	PhysicsHandle CreatePxShape(const std::function<PxShapeData()>& returnAction);
+	//	PhysicsHandle CreatePxMaterial(f32 staticFriction, f32 dynamicFriction, f32 restitution);
 
 
 
 
 
-		void PushRemoveCommand(PhysicsHandle handle);
-		void PushAttachCommand(PhysicsHandle dest, PhysicsHandle src);
-		void PushDetachCommand(PhysicsHandle dest, PhysicsHandle src);
-		template<class PxClass>
-		bool PushWriteCommand(PhysicsHandle handle, const std::function<void(PxClass*)>& action)
-		{
-			if (Is<PxClass>(handle) == false)
-			{
-				return false;
-			}
-			auto command = CreateSharedPtr<WriteCommand<PxClass>>();
-			command->Handle = handle;
-			command->Action = action;
-			mCommandQueue.push(command);
+	//	void PushRemoveCommand(PhysicsHandle handle);
+	//	void PushAttachCommand(PhysicsHandle dest, PhysicsHandle src);
+	//	void PushDetachCommand(PhysicsHandle dest, PhysicsHandle src);
+	//	template<class PxClass>
+	//	bool PushWriteCommand(PhysicsHandle handle, const std::function<void(PxClass*)>& action)
+	//	{
+	//		if (Is<PxClass>(handle) == false)
+	//		{
+	//			return false;
+	//		}
+	//		auto command = CreateSharedPtr<WriteCommand<PxClass>>();
+	//		command->Handle = handle;
+	//		command->Action = action;
+	//		mCommandQueue.push(command);
 
-			return true;
-		}
-		template<class PxClass>
-		bool ExcuteReadCommand(PhysicsHandle handle, const std::function<void(const PxClass*)>& action)
-		{
-			if (Is<PxClass>(handle) == false)
-			{
-				return false;
-			}
-			if (action != nullptr)
-			{
-				action(As<PxClass>(handle));
-			}
-		}
+	//		return true;
+	//	}
+	//	template<class PxClass>
+	//	bool ExcuteReadCommand(PhysicsHandle handle, const std::function<void(const PxClass*)>& action)
+	//	{
+	//		if (Is<PxClass>(handle) == false)
+	//		{
+	//			return false;
+	//		}
+	//		if (action != nullptr)
+	//		{
+	//			action(As<PxClass>(handle));
+	//		}
+	//	}
 
-	private:
-		void Init();
-		void Command_Remove(SharedPtr<HandleCommand> command);
-		void Command_Attach(SharedPtr<HandleCommand> command);
-		void Command_Detach(SharedPtr<HandleCommand> command);
-		void Command_Write(SharedPtr<HandleCommand> command);
+	//private:
+	//	void Init();
+	//	void Command_Remove(SharedPtr<HandleCommand> command);
+	//	void Command_Attach(SharedPtr<HandleCommand> command);
+	//	void Command_Detach(SharedPtr<HandleCommand> command);
+	//	void Command_Write(SharedPtr<HandleCommand> command);
 
-		PhysicsHandle CreateHandle(void* ptr, i32 type);
-		HandleData*   GetHandleData(PhysicsHandle handle);
-	public:
-		template<class PxClass>
-		bool Is(PhysicsHandle handle)
-		{
-			auto data = GetHandleData(handle);
-			if (data == nullptr)
-			{
-				return false;
-			}
-			if (mPhysicsTypeHashCode.find(data->Type) == mPhysicsTypeHashCode.end())
-			{
-				return false;
-			}
-			bool isFind = false;
-			for (auto& _pair : mPhysicsTypeHashCode)
-			{
-				if (_pair.first & data->Type && _pair.second == typeid(PxClass).hash_code())
-				{
-					isFind = true;
-					break;
-				}
-			}
-			return isFind;
-		}
+	//	PhysicsHandle CreateHandle(void* ptr, i32 type);
+	//	HandleData*   GetHandleData(PhysicsHandle handle);
+	//public:
+	//	template<class PxClass>
+	//	bool Is(PhysicsHandle handle)
+	//	{
+	//		auto data = GetHandleData(handle);
+	//		if (data == nullptr)
+	//		{
+	//			return false;
+	//		}
+	//		if (mPhysicsTypeHashCode.find(data->Type) == mPhysicsTypeHashCode.end())
+	//		{
+	//			return false;
+	//		}
+	//		bool isFind = false;
+	//		for (auto& _pair : mPhysicsTypeHashCode)
+	//		{
+	//			if (_pair.first & data->Type && _pair.second == typeid(PxClass).hash_code())
+	//			{
+	//				isFind = true;
+	//				break;
+	//			}
+	//		}
+	//		return isFind;
+	//	}
 
-		template<class PxClass>
-		PxClass* As(PhysicsHandle handle)
-		{
-			if (Is<PxClass>(handle) == true)
-			{
-				auto data = GetHandleData(handle);
-				return (PxClass*)data->Ptr;
-			}
-			else
-			{
-				return nullptr;
-			}
-		}
+	//	template<class PxClass>
+	//	PxClass* As(PhysicsHandle handle)
+	//	{
+	//		if (Is<PxClass>(handle) == true)
+	//		{
+	//			auto data = GetHandleData(handle);
+	//			return (PxClass*)data->Ptr;
+	//		}
+	//		else
+	//		{
+	//			return nullptr;
+	//		}
+	//	}
 
 
 	};

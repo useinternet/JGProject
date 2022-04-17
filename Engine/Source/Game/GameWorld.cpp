@@ -26,7 +26,7 @@ namespace JG
 			FixedLateUpdate();
 			return EScheduleResult::Continue;
 		});
-		mUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -39,7 +39,7 @@ namespace JG
 			Update();
 			return EScheduleResult::Continue;
 		});
-		mLateUpdateSH = ScheduleByFrame(0, 0, -1, 0, [&]() -> EScheduleResult
+		mLateUpdateSH = Schedule(0, GetTickCycle(), -1, 0, [&]() -> EScheduleResult
 		{
 			if (IsAlive() == false)
 			{
@@ -52,7 +52,6 @@ namespace JG
 			LateUpdate();
 			return EScheduleResult::Continue;
 		});
-		mPxSceneHandle = PhysicsManager::GetInstance().CreatePxScene();
 	}
 	void GameWorld::Awake()
 	{
@@ -71,7 +70,7 @@ namespace JG
 		GameNode::Destory();
 
 
-		PhysicsManager::GetInstance().PushRemoveCommand(mPxSceneHandle);
+		//PhysicsManager::GetInstance().PushRemoveCommand(mPxSceneHandle);
 		AssetDataBase::GetInstance().ReturnAssetManager(mAssetManager);
 		mAssetManager = nullptr;
 		mFixedUpdateSH->Reset();
@@ -180,17 +179,6 @@ namespace JG
 	{
 		bool isDirty = mGravity != gravity;
 		mGravity = gravity;
-		if (isDirty)
-		{
-			PhysicsManager::GetInstance().PushWriteCommand<physx::PxScene>(
-				mPxSceneHandle, [&](physx::PxScene* scene)
-			{
-				auto _garvity = GetGravity();
-				scene->setGravity(physx::PxVec3(_garvity.x, _garvity.y, _garvity.z));
-			});
-
-
-		}
 	}
 	const JVector3& GameWorld::GetGravity() const
 	{
@@ -202,10 +190,6 @@ namespace JG
 		return mTickCycle;
 	}
 
-	PhysicsHandle GameWorld::GetPxSceneHandle() const
-	{
-		return mPxSceneHandle;
-	}
 
 	GameNode* GameWorld::Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList)
 	{

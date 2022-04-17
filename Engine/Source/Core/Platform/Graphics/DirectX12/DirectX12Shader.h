@@ -30,40 +30,58 @@ namespace JG
 		String mName;
 		String mSourceCode;
 		String mFullSourceCode;
+		String mErrorMessage;
 		bool mIsCompileSuccess = false;
 
 	public:
 		const String& GetName() const override;
-		void SetName(const String& name);
+	
 
-		virtual bool  Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) override;
 		virtual const String& GetShaderCode() const override;
 		virtual const String& GetFullShaderCode() const override;
+		virtual const String& GetErrorMessage()   const override;
 		virtual EShaderFlags  GetFlags() const override;
 		virtual bool IsSuccessed() const override;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const override;
 		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const override;
 	public:
+		void SetName(const String& name);
+		bool Init(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags);
 		void ForEach_TextureSlot(const std::function<void(const String&)>& action);
 
-		//void ForEach_TextureCubeSlot(const std::function<void(const String&)>& action);
-
-
-
-	public:
 		ID3DBlob* GetVSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mVSData.Get();
 		}
 		ID3DBlob* GetDSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mDSData.Get();
 		}
 		ID3DBlob* GetHSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mHSData.Get();
 		}
 		ID3DBlob* GetGSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mGSData.Get();
 		}
 		ID3DBlob* GetPSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mPSData.Get();
 		}
 	private:
@@ -75,16 +93,22 @@ namespace JG
 	private:
 		ComPtr<IDxcBlob> mCSData;
 		String mName;
-		String			 mSourceCode;
-		bool			 mIsCompileSuccess = false;
+		String mErrorMessage;
+		String mSourceCode;
+		bool   mIsCompileSuccess = false;
 	public:
-		const String& GetName() const override;
-		void SetName(const String& name);
-		virtual bool  Compile(const String& sourceCode, String* error) override;
+		virtual const String& GetName() const override;
+		virtual const String& GetErrorMessage() const override;
 		virtual const String& GetShaderCode() const override;
 		virtual bool  IsSuccessed() const override;
 	public:
+		void SetName(const String& name);
+		bool Init(const String& sourceCode);
 		IDxcBlob* GetCSData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
 			return mCSData.Get();
 		}
 	private:
@@ -95,20 +119,32 @@ namespace JG
 
 	class DirectX12ClosestHitShader : public IClosestHitShader
 	{
+		ComPtr<IDxcBlob> mBlobData;
 		String mName;
 		String mSourceCode;
 		String mFullSourceCode;
 		String mHitGroupName;
 		String mEntryPoint;
+		String mErrorMessage;
+		bool   mIsCompileSuccess = false;
 		UniquePtr<ShaderScriptCodeAnalyzer> mScriptCodeAnalyzer;
 	public:
-		virtual bool Init(const String& sourceCode, SharedPtr<IShaderScript> script) override;
 		virtual const String& GetName() const override;
 		virtual const String& GetEntryPoint()   const override;
 		virtual const String& GetHitGroupName() const override;
 		virtual const String& GetShaderCode() const override;
 		virtual const String& GetFullShaderCode() const override;
+		virtual const String& GetErrorMessage() const override;
+		virtual bool  IsSuccessed() const override;
 	public:
+		bool Init(const String& sourceCode, SharedPtr<IShaderScript> script);
+		IDxcBlob* GetData() const {
+			if (IsSuccessed() == false)
+			{
+				return nullptr;
+			}
+			return mBlobData.Get();
+		}
 		void SetName(const String& name);
 	};
 

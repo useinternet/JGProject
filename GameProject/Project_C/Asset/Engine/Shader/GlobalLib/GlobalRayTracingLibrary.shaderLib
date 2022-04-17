@@ -575,18 +575,19 @@ float3 SurfaceShade_Default(float3 L, float3 N, float3 V, float Att, float3 Colo
 	float NoH = max(dot(N,H),0.0f);
 	float NoV = max(dot(N,V), 0.0f);
     
-    float HoV = saturate(dot(H, V));
+    float HoL = max(dot(H,L), 0.0f);
     float3 Lo = float3(0.0f,0.0f,0.0f);
 
     // specular default 0.5
+    
     float3 F0  = lerp(float3(0.08f,0.08f,0.08f) * material.Specular, material.Albedo, material.Metallic);
     float  D = DistributionGGX(NoH, material.Roughness);
 	float  G = GeometrySmith(NoV, NoL, material.Roughness);
-	float3 F = F_Schlick(max(HoV, 0.0f), F0);
+	float3 F = F_Schlick(max(HoL, 0.0f), F0);
 
     float3 numerator  = D * G * F;
-	//float  denom      = 4 * NoL * NoV;
-	float3 specular = numerator;// / max(denom, 0.0000001F);
+	float  denom      = 4 * NoL * NoV;
+	float3 specular = numerator / max(denom, 0.1F);
 	float3 kS = F;
 	float3 kD = float3(1.0f, 1.0f,1.0f) - kS;
 	kD *= 1.0 - material.Metallic;

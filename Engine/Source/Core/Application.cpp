@@ -17,12 +17,13 @@ namespace JG
 	Application* Application::smInstance = nullptr;
 
 	static String gAssetPath   = "../../../GameProject/Project_C/Asset";
+	static String gCppPath	   = PathHelper::CombinePath(Application::GetAssetPath(), "Cpp");
 	static String gEnginePath  = PathHelper::CombinePath(Application::GetAssetPath(), "Engine");
 	static String gIconPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Icon");
 	static String gTexturePath = PathHelper::CombinePath(Application::GetEnginePath(), "Texture");
 	static String gMeshPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Mesh");
-	static String gConfigPath = PathHelper::CombinePath(Application::GetEnginePath(), "Config");
-	static String gCachePath = PathHelper::CombinePath(Application::GetEnginePath(), "Cache");
+	static String gConfigPath  = PathHelper::CombinePath(Application::GetEnginePath(), "Config");
+	static String gCachePath   = PathHelper::CombinePath(Application::GetEnginePath(), "Cache");
 	static String gShaderGlobalLibPath = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/GlobalLib");
 	static String gShaderScriptPath    = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Script");
 	static String gComputeShaderPath   = PathHelper::CombinePath(Application::GetEnginePath(), "Shader/Compute");
@@ -32,6 +33,11 @@ namespace JG
 	const String& Application::GetAssetPath()
 	{
 		return gAssetPath;
+	}
+
+	const String& Application::GetCppPath()
+	{
+		return gCppPath;
 	}
 
 	const String& Application::GetEnginePath()

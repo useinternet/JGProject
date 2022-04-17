@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "DirectX12RayTracingPipeline.h"
 #include "Graphics/Shader.h"
+#include "Graphics/Raytracing/Raytracer.h"
 #include "Platform/Graphics/DirectX12/Utill/RootSignature.h"
 #include "Platform/Graphics/DirectX12/DirectX12RootSignature.h"
+#include "Platform/Graphics/DirectX12/DirectX12Shader.h"
 #include "Platform/Graphics/DirectX12/DirectX12API.h"
 namespace JG
 {
@@ -50,6 +52,34 @@ namespace JG
         mShaderDic[shaderPath] = blob;
         mPipelineGen.AddLibrary(blob.Get(), symbolExports);
         mIsDirty = true;
+    }
+    void DirectX12RayTracingPipeline::AddLibrary(const SharedPtr<IShader> shader)
+    {
+        if (shader == nullptr || shader->IsSuccessed() == false)
+        {
+            return;
+        }
+        switch (shader->GetShaderType())
+        {
+        case EShaderType::ClosestHit:
+        {
+            DirectX12ClosestHitShader* closestHitShader = static_cast<DirectX12ClosestHitShader*>(shader.get());
+
+
+            ComPtr<IDxcBlob> blob = closestHitShader->GetData();
+			if (blob == nullptr)
+			{
+				return;
+			}
+			mShaderDic[closestHitShader->GetName()] = blob;
+			mPipelineGen.AddLibrary(blob.Get(), { closestHitShader->GetEntryPoint() });
+			AddHitGroup(closestHitShader->GetHitGroupName(), closestHitShader->GetEntryPoint(), "", "");
+			AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { closestHitShader->GetEntryPoint() });
+        }
+            break;
+        default:
+            return;
+        }
     }
     void DirectX12RayTracingPipeline::AddLibraryAsSourceCode(const String& name, const String& sourceCode, const List<String>& symbolExports)
     {

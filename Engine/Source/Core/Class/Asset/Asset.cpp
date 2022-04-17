@@ -58,88 +58,306 @@ namespace JG
 	}
 	void StaticMeshAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-		jsonData->AddMember("Name", Name);
-		jsonData->AddMember("IsSkinned", IsSkinned);
-		jsonData->AddMember("BoundingBox", BoundingBox);
+		jsonData->AddMember(NAME_KEY, Name);
+		jsonData->AddMember(BOUNDING_BOX_KEY, BoundingBox);
 
-		auto meshJson = jsonData->CreateJsonData();
-		auto cnt = SubMeshNames.size();
+		SharedPtr<JsonData> meshJson = jsonData->CreateJsonData();
+		u64 cnt = SubMeshNames.size();
 		for (auto i = 0; i < cnt; ++i)
 		{
 			auto viJson = meshJson->CreateJsonData();
-			viJson->AddMember("Name", SubMeshNames[i]);
+			viJson->AddMember(NAME_KEY, SubMeshNames[i]);
 
-
-
-			auto vArrayJson = viJson->CreateJsonData();
+			SharedPtr<JsonData> vArrayJson = viJson->CreateJsonData();
 			for (auto& v : Vertices[i])
 			{
-				auto vertexJson = viJson->CreateJsonData();
+				SharedPtr<JsonData> vertexJson = viJson->CreateJsonData();
 				v.MakeJson(vertexJson);
 				vArrayJson->AddMember(vertexJson);
 			}
+			SharedPtr<JsonData> bvArrayJson = viJson->CreateJsonData();
+			for (auto& bv : BoneVertices[i])
+			{
+				SharedPtr<JsonData> boneVertexJson = viJson->CreateJsonData();
+				bv.MakeJson(boneVertexJson);
+				bvArrayJson->AddMember(boneVertexJson);
+			}
 
-			viJson->AddMember("Vertices", vArrayJson);
-			viJson->AddMember("Indices", Indices[i]);
+
+			viJson->AddMember(VERTICES_KEY, vArrayJson);
+			viJson->AddMember(BONE_VERTICES_KEY, bvArrayJson);
+			viJson->AddMember(INDICES_KEY, Indices[i]);
 
 
 			meshJson->AddMember(viJson);
 		}
-		jsonData->AddMember("SubMeshs", meshJson);
+		jsonData->AddMember(SUBMESHS_KEY, meshJson);
 	}
 	void StaticMeshAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
 		SubMeshNames.clear();
 		Vertices.clear();
 		Indices.clear();
-		auto val = jsonData->GetMember("Name");
+		SharedPtr<JsonData> val = jsonData->GetMember(NAME_KEY);
 		if (val)
 		{
 			Name = val->GetString();
 		}
-		val = jsonData->GetMember("IsSkinned");
-		if (val)
-		{
-			IsSkinned = val->GetBool();
-		}
-		val = jsonData->GetMember("BoundingBox");
+		val = jsonData->GetMember(BOUNDING_BOX_KEY);
 		if (val)
 		{
 			BoundingBox = val->GetBoundingBox();
 		}
-		val = jsonData->GetMember("SubMeshs");
+		val = jsonData->GetMember(SUBMESHS_KEY);
 		if (val)
 		{
-			auto cnt = val->GetSize();
+			u64 cnt = val->GetSize();
 			Vertices.resize(cnt);
+			BoneVertices.resize(cnt);
 			Indices.resize(cnt);
+			
 			SubMeshNames.resize(cnt);
-			for (auto i = 0; i < cnt; ++i)
+			for (u64 i = 0; i < cnt; ++i)
 			{
-				auto meshJson = val->GetJsonDataFromIndex(i);
+				SharedPtr<JsonData> meshJson = val->GetJsonDataFromIndex(i);
 
-				auto verticesJson = meshJson->GetMember("Vertices");
-				auto indicesJson = meshJson->GetMember("Indices");
-				auto meshName = meshJson->GetMember("Name");
+				SharedPtr<JsonData> verticesJson	 = meshJson->GetMember(VERTICES_KEY);
+				SharedPtr<JsonData> boneVerticesJson = meshJson->GetMember(BONE_VERTICES_KEY);
+				SharedPtr<JsonData> indicesJson		 = meshJson->GetMember(INDICES_KEY);
+				SharedPtr<JsonData> meshNameJson	 = meshJson->GetMember(NAME_KEY);
 
-				SubMeshNames[i] = meshName->GetString();
-				Vertices[i].resize(verticesJson->GetSize());
-				Indices[i].resize(indicesJson->GetSize());
-				for (auto j = 0; j < verticesJson->GetSize(); ++j)
+				if (meshNameJson != nullptr)
 				{
-					auto vJson = verticesJson->GetJsonDataFromIndex(j);
-					JGVertex v;
-					v.LoadJson(vJson);
-					Vertices[i][j] = v;
+					SubMeshNames[i] = meshNameJson->GetString();
 				}
-				for (auto j = 0; j < indicesJson->GetSize(); ++j)
+				
+				if (verticesJson != nullptr)
 				{
-					auto iJson = indicesJson->GetJsonDataFromIndex(j);
-					u32 index;
-					index = iJson->GetUint32();
-					Indices[i][j] = index;
+					Vertices[i].resize(verticesJson->GetSize());
+					for (u64 j = 0; j < verticesJson->GetSize(); ++j)
+					{
+						SharedPtr<JsonData> vJson = verticesJson->GetJsonDataFromIndex(j);
+						JGVertex v;
+						v.LoadJson(vJson);
+						Vertices[i][j] = v;
+					}
+				}
+				if (boneVerticesJson != nullptr)
+				{
+					BoneVertices[i].resize(boneVerticesJson->GetSize());
+					for (u64 j = 0; j < boneVerticesJson->GetSize(); ++j)
+					{
+						SharedPtr<JsonData> vJson = boneVerticesJson->GetJsonDataFromIndex(j);
+						JGBoneVertex v;
+						v.LoadJson(vJson);
+						BoneVertices[i][j] = v;
+					}
+				}
+				if (indicesJson != nullptr)
+				{
+					Indices[i].resize(indicesJson->GetSize());
+					for (u64 j = 0; j < indicesJson->GetSize(); ++j)
+					{
+						auto iJson = indicesJson->GetJsonDataFromIndex(j);
+						u32 index;
+						index = iJson->GetUint32();
+						Indices[i][j] = index;
+					}
+				}
+			}
+		}
+	}
+	void SkeletalAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+		jsonData->AddMember(NAME_KEY, Name);
+		jsonData->AddMember(ROOT_BONE_NODE_KEY, RootBoneNode);
+
+
+		SharedPtr<JsonData> boneNodeArrayJson = jsonData->CreateJsonData();
+		for (u64 i = 0; i < BoneNodes.size(); ++i)
+		{
+			SharedPtr<JsonData> boneNodeJson = jsonData->CreateJsonData();
+
+			const BoneNode& boneNode = BoneNodes[i];
+
+			boneNodeJson->AddMember(BONE_NODE_ID_KEY, boneNode.ID);
+			boneNodeJson->AddMember(BONE_NODE_NAME_KEY, boneNode.Name);
+			boneNodeJson->AddMember(PARENT_BONDE_NODE_KEY, boneNode.ParentNode);
+			boneNodeJson->AddMember(CHILD_BONE_NODES_KEY, boneNode.ChildNodes);
+			boneNodeJson->AddMember(TRANSFORM_KEY, boneNode.Transform);
+			boneNodeJson->AddMember(BONE_OFFSET_KEY, boneNode.BoneOffset);
+
+
+			boneNodeArrayJson->AddMember(boneNodeJson);
+		}
+		jsonData->AddMember(BONE_NODES_KEY, boneNodeArrayJson);
+	}
+	void SkeletalAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+		SharedPtr<JsonData> val = jsonData->GetMember(NAME_KEY);
+		if (val != nullptr)
+		{
+			Name = val->GetString();
+		}
+
+		val = jsonData->GetMember(ROOT_BONE_NODE_KEY);
+		if (val != nullptr)
+		{
+			RootBoneNode = val->GetUint32();
+		}
+
+		SharedPtr<JsonData> boneNodeArrayJson = jsonData->GetMember(BONE_NODES_KEY);
+		if (boneNodeArrayJson != nullptr)
+		{
+			BoneNodes.resize(boneNodeArrayJson->GetSize());
+
+			for (u32 i = 0; i < boneNodeArrayJson->GetSize(); ++i)
+			{
+				SharedPtr<JsonData> boneNodeJson = boneNodeArrayJson->GetJsonDataFromIndex(i);
+
+				val = boneNodeJson->GetMember(BONE_NODE_ID_KEY);
+				if (val != nullptr)
+				{
+					BoneNodes[i].ID = val->GetUint32();
 				}
 
+				val = boneNodeJson->GetMember(BONE_NODE_NAME_KEY);
+				if (val != nullptr)
+				{
+					BoneNodes[i].Name = val->GetString();
+				}
+
+				val = boneNodeJson->GetMember(PARENT_BONDE_NODE_KEY);
+				if (val != nullptr)
+				{
+					BoneNodes[i].ParentNode = val->GetUint32();
+				}
+
+				val = boneNodeJson->GetMember(CHILD_BONE_NODES_KEY);
+				if (val != nullptr)
+				{
+					for (u32 j = 0; j < val->GetSize(); ++j)
+					{
+						BoneNodes[i].ChildNodes.push_back(val->GetJsonDataFromIndex(j)->GetUint32());
+					}
+				}
+
+				val = boneNodeJson->GetMember(TRANSFORM_KEY);
+				if (val != nullptr)
+				{
+					BoneNodes[i].Transform = val->GetMatrix();
+				}
+
+				val = boneNodeJson->GetMember(BONE_OFFSET_KEY);
+				if (val != nullptr)
+				{
+					BoneNodes[i].BoneOffset = val->GetMatrix();
+				}
+			}
+		}
+	}
+	void AnimationClipAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+		jsonData->AddMember(NAME_KEY, Name);
+		jsonData->AddMember(DURATION_KEY, Duration);
+		jsonData->AddMember(TICKS_PER_SECOND_KEY, TicksPerSecond);
+
+
+
+		SharedPtr<JsonData> animNodesJson = jsonData->CreateJsonData();
+
+		for (const auto& _pair : AnimationNodes)
+		{
+			SharedPtr<JsonData> animNodeJson = animNodesJson->CreateJsonData();
+
+			animNodeJson->AddMember(NODE_NAME_KEY, _pair.first);
+			animNodeJson->AddMember(LOCATION_VALUES_KEY, _pair.second.LocationValues);
+			animNodeJson->AddMember(ROTATION_VALUES_KEY, _pair.second.RotationValues);
+			animNodeJson->AddMember(SCALE_VALUES_KEY, _pair.second.ScaleValues);
+
+			animNodeJson->AddMember(LOCATION_TIMES_KEY, _pair.second.LocationTimes);
+			animNodeJson->AddMember(ROTATION_TIMES_KEY, _pair.second.RotationTimes);
+			animNodeJson->AddMember(SCALE_TIMES_KEY, _pair.second.ScaleTimes);
+
+			animNodesJson->AddMember(animNodeJson);
+		}
+		jsonData->AddMember(ANIMATION_NODES_KEY, animNodesJson);
+	}
+
+	void AnimationClipAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+		AnimationNodes.clear();
+		SharedPtr<JsonData> val = jsonData->GetMember(NAME_KEY);
+		if (val)
+		{
+			Name = val->GetString();
+		}
+		val = jsonData->GetMember(DURATION_KEY);
+		if (val)
+		{
+			Duration = val->GetFloat();
+		}
+		val = jsonData->GetMember(TICKS_PER_SECOND_KEY);
+		if (val)
+		{
+			TicksPerSecond = val->GetFloat();
+		}
+		val = jsonData->GetMember(ANIMATION_NODES_KEY);
+		if (val)
+		{
+			u32 elementCnt = val->GetSize();
+			for (u32 i = 0; i < elementCnt; ++i)
+			{
+				SharedPtr<JsonData> animVal = val->GetJsonDataFromIndex(i);
+				AnimationNode animNode;
+
+				animNode.NodeName = animVal->GetMember(NODE_NAME_KEY)->GetString();
+
+				// Location
+				{
+					SharedPtr<JsonData> locationValuesJson = animVal->GetMember(LOCATION_VALUES_KEY);
+					SharedPtr<JsonData> locationTimesJson  = animVal->GetMember(LOCATION_TIMES_KEY);
+					if (locationValuesJson != nullptr && locationTimesJson != nullptr)
+					{
+						animNode.LocationValues.resize(locationValuesJson->GetSize());
+						animNode.LocationTimes.resize(locationTimesJson->GetSize());
+						for (u32 i = 0; i < animNode.LocationValues.size(); ++i)
+						{
+							animNode.LocationValues[i] = locationValuesJson->GetJsonDataFromIndex(i)->GetVector3();
+							animNode.LocationTimes[i] = locationTimesJson->GetJsonDataFromIndex(i)->GetFloat();
+						}
+					}
+				}
+				// Rotation
+				{
+					SharedPtr<JsonData> rotationValuesJson = animVal->GetMember(ROTATION_VALUES_KEY);
+					SharedPtr<JsonData> rotationTimesJson  = animVal->GetMember(ROTATION_TIMES_KEY);
+					if (rotationValuesJson != nullptr && rotationTimesJson != nullptr)
+					{
+						animNode.RotationValues.resize(rotationValuesJson->GetSize());
+						animNode.RotationTimes.resize(rotationTimesJson->GetSize());
+						for (u32 i = 0; i < animNode.RotationValues.size(); ++i)
+						{
+							animNode.RotationValues[i] = rotationValuesJson->GetJsonDataFromIndex(i)->GetQuaternion();
+							animNode.RotationTimes[i] = rotationTimesJson->GetJsonDataFromIndex(i)->GetFloat();
+						}
+					}
+				}
+				// Scale
+				{
+					SharedPtr<JsonData> scaleValuesJson = animVal->GetMember(SCALE_VALUES_KEY);
+					SharedPtr<JsonData> scaleTimesJson = animVal->GetMember(SCALE_TIMES_KEY);
+					if (scaleValuesJson != nullptr && scaleTimesJson != nullptr)
+					{
+						animNode.ScaleValues.resize(scaleValuesJson->GetSize());
+						animNode.ScaleTimes.resize(scaleTimesJson->GetSize());
+						for (u32 i = 0; i < animNode.ScaleValues.size(); ++i)
+						{
+							animNode.ScaleValues[i] = scaleValuesJson->GetJsonDataFromIndex(i)->GetVector3();
+							animNode.ScaleTimes[i] = scaleTimesJson->GetJsonDataFromIndex(i)->GetFloat();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1083,6 +1301,8 @@ namespace JG
 		}
 		return assetFormat;
 	}
+
+
 
 
 

@@ -48,8 +48,6 @@ namespace JG
 						// 추후 변경 가능하도록 고민
 						auto shader = ShaderLibrary::GetInstance().FindGraphicsShader(templateName, {script->GetName()});
 						material->SetShader(shader);
-
-						
 					}
 				});
 				ImGui::EndCombo();

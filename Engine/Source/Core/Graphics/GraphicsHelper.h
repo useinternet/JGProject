@@ -17,6 +17,8 @@ namespace JG
 	class IByteAddressBuffer;
 	class ITexture;
 	class ITopLevelAccelerationStructure;
+	class IShaderScript;
+	class IShader;
 	class GraphicsHelper
 	{
 	public:

@@ -21,6 +21,7 @@ namespace JG
 	class IIndexBuffer;
 	class IByteAddressBuffer;
 	class IStructuredBuffer;
+	class IShader;
 	class IGraphicsShader;
 	class IComputeShader;
 	class IClosestHitShader;

@@ -175,7 +175,7 @@ namespace JG
 		for (auto& iter : fs::recursive_directory_iterator(templatePath))
 		{
 			auto p = iter.path();
-			if (p.extension() != ".shadertemplate")
+			if (p.extension() != SHADER_TEMPLATE_FORMAT)
 			{
 				continue;
 			}
@@ -239,7 +239,7 @@ namespace JG
 		{
 			auto p = iter.path();
 
-			if (p.extension() != ".shaderscript")
+			if (p.extension() != SHADER_SCRIPT_FORMAT)
 			{
 				continue;
 			}
@@ -269,7 +269,7 @@ namespace JG
 		{
 			auto p = iter.path();
 
-			if (p.extension() != ".computeshader")
+			if (p.extension() != COMPUTE_SHADER_FORMAT)
 			{
 				continue;
 			}

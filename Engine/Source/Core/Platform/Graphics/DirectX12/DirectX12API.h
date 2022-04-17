@@ -99,8 +99,6 @@ namespace JG
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() override;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() override;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() override;
-
-
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
 		virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
 	private:

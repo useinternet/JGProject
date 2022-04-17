@@ -50,7 +50,7 @@ namespace JG
 		CubeMap   = 7,
 		Prefab    = 8,
 		AnimationClip = 9,
-		ANimation = 10,
+		Animation = 10,
 	};
 
 	enum class ERendererPath

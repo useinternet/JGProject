@@ -10,7 +10,7 @@ function DebugConfig()
     optimize "Off"
     defines {"_DEBUG"}
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     runtime "Debug"
 end
 
@@ -19,7 +19,7 @@ function ReleaseConfig()
     optimize "Full" 
     defines {"_RELEASE", "NDEBUG"}
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     runtime "Release"
 end
 
@@ -146,21 +146,6 @@ workspace "JGEngine"
                     "zlib",
                     "Publish/%{cfg.buildcfg}/dxcompiler",
                     "Publish/%{cfg.buildcfg}/assimp-vc142-mt",
-                    "Publish/%{cfg.buildcfg}/PhysX_64",
-                    "Publish/%{cfg.buildcfg}/PhysXCommon_64",
-                    "Publish/%{cfg.buildcfg}/PhysXFoundation_64",
-                    "Publish/%{cfg.buildcfg}/PhysXCooking_64",
-                    "Publish/%{cfg.buildcfg}/LowLevel_static_64",
-                    "Publish/%{cfg.buildcfg}/LowLevelAABB_static_64",
-                    "Publish/%{cfg.buildcfg}/LowLevelDynamics_static_64",
-                    "Publish/%{cfg.buildcfg}/PhysXCharacterKinematic_static_64",
-                    "Publish/%{cfg.buildcfg}/PhysXExtensions_static_64",
-                    "Publish/%{cfg.buildcfg}/PhysXPvdSDK_static_64",
-                    "Publish/%{cfg.buildcfg}/PhysXTask_static_64",
-                    "Publish/%{cfg.buildcfg}/PhysXVehicle_static_64",
-                    "Publish/%{cfg.buildcfg}/SceneQuery_static_64",
-                    "Publish/%{cfg.buildcfg}/SimulationController_static_64",
-
                 }
                 pchheader (PCH_HEADER)
                 pchsource (PCH_CPP_PATH)
@@ -181,7 +166,6 @@ workspace "JGEngine"
                 links {
                     "Core", 
                     "Game",
-                    "Publish/%{cfg.buildcfg}/Zep"
                 }
                 SetConsoleAppConfig("Source/Editor/", "JG_EDITOR")
         group "Engine/Game"

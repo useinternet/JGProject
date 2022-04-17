@@ -443,7 +443,7 @@ namespace JG
 		constexpr char* GSTarget = "gs_5_1";
 		constexpr char* PSTarget = "ps_5_1";
 		constexpr char* CSTarget = "cs_6_0";
-
+		constexpr char* RTTarget = "lib_6_3";
 		constexpr char* ClosestHitEntry = "__ClosestHit_EntryPoint__";
 		constexpr char* MissEntry       = "__Miss_EntryPoint__";
 

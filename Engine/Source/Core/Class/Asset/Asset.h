@@ -78,6 +78,7 @@ namespace JG
 			}
 		}
 	};
+
 	struct JGQuadVertex
 	{
 		JVector3 Position;
@@ -125,9 +126,43 @@ namespace JG
 			return inputLayout;
 		}
 	};
-	struct JGBone
+	struct JGBoneVertex
 	{
-
+		JVector4Int BoneIDs;
+		JVector4	BoneWeights;
+	public:
+		void MakeJson(SharedPtr<JsonData> jsonData) const
+		{
+			auto& val = jsonData->GetValue();
+			val.SetArray();
+			val.PushBack(BoneIDs.x, jsonData->GetJsonAllocator());
+			val.PushBack(BoneIDs.y, jsonData->GetJsonAllocator());
+			val.PushBack(BoneIDs.z, jsonData->GetJsonAllocator());
+			val.PushBack(BoneIDs.w, jsonData->GetJsonAllocator());
+			val.PushBack(BoneWeights.x, jsonData->GetJsonAllocator());
+			val.PushBack(BoneWeights.y, jsonData->GetJsonAllocator());
+			val.PushBack(BoneWeights.z, jsonData->GetJsonAllocator());
+			val.PushBack(BoneWeights.w, jsonData->GetJsonAllocator());
+		}
+		void LoadJson(SharedPtr<JsonData> jsonData)
+		{
+			auto& val = jsonData->GetValue();
+			i32 index = 0;
+			for (const auto& value : val.GetArray())
+			{
+				if (index < 4)
+				{
+					i32 i = value.GetInt();
+					BoneIDs[index] = i;
+				}
+				else
+				{
+					f32 f = value.GetFloat();
+					BoneWeights[index] = f;
+				}
+				++index;
+			}
+		}
 	};
 
 
@@ -158,15 +193,20 @@ namespace JG
 			return EAssetFormat::Texture;
 		}
 	};
-
 	class StaticMeshAssetStock : public IAssetStock
 	{
+		static const constexpr char* NAME_KEY			= "Name";
+		static const constexpr char* BOUNDING_BOX_KEY	= "BoundingBox";
+		static const constexpr char* SUBMESHS_KEY		= "SubMeshs";
+		static const constexpr char* VERTICES_KEY		= "Vertices";
+		static const constexpr char* BONE_VERTICES_KEY	= "BoneVertices";
+		static const constexpr char* INDICES_KEY		= "Indices";
 	public:
 		String Name;
-		bool   IsSkinned = false;
-		List<String>           SubMeshNames;
-		List<List<JGVertex>>   Vertices;
-		List<List<u32>>		   Indices;
+		List<String>			 SubMeshNames;
+		List<List<JGVertex>>     Vertices;
+		List<List<JGBoneVertex>> BoneVertices;
+		List<List<u32>>			 Indices;
 		JBBox BoundingBox;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
@@ -178,6 +218,89 @@ namespace JG
 			return EAssetFormat::Mesh;
 		}
 	};
+	class SkeletalAssetStock : public IAssetStock
+	{
+		static const constexpr char* NAME_KEY				= "Name";
+		static const constexpr char* ROOT_BONE_NODE_KEY		= "RootBoneNode";
+		static const constexpr char* BONE_NODES_KEY			= "BoneNodes";
+		static const constexpr char* BONE_NODE_ID_KEY		= "BoneNodeID";
+		static const constexpr char* BONE_NODE_NAME_KEY		= "BoneNodeName";
+		static const constexpr char* PARENT_BONDE_NODE_KEY	= "ParentBoneNode";
+		static const constexpr char* CHILD_BONE_NODES_KEY	= "ChildNodes";
+		static const constexpr char* TRANSFORM_KEY			= "Transform";
+		static const constexpr char* BONE_OFFSET_KEY		= "BoneOffset";
+	public:
+		struct BoneNode
+		{
+			u32 ID;
+			String Name;
+
+			u32 ParentNode;
+			List<u32> ChildNodes;
+
+			JMatrix Transform;
+			JMatrix BoneOffset;
+		};
+	public:
+		String Name;
+		u32	   RootBoneNode;
+		List<BoneNode> BoneNodes;
+	public:
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	public:
+		virtual ~SkeletalAssetStock() = default;
+	public:
+		virtual EAssetFormat GetAssetFormat() const override {
+			return EAssetFormat::Skeletal;
+		}
+	};
+	class AnimationClipAssetStock : public IAssetStock
+	{
+		static const constexpr char* NAME_KEY	  = "Name";
+		static const constexpr char* DURATION_KEY = "Duration";
+		static const constexpr char* TICKS_PER_SECOND_KEY = "TicksPerSecond";
+		static const constexpr char* ANIMATION_NODES_KEY = "AnimationNodes";
+
+		static const constexpr char* NODE_NAME_KEY = "NodeName";
+		static const constexpr char* LOCATION_VALUES_KEY = "LocationValues";
+		static const constexpr char* ROTATION_VALUES_KEY = "RotationValues";
+		static const constexpr char* SCALE_VALUES_KEY = "ScaleValues";
+
+		static const constexpr char* LOCATION_TIMES_KEY = "LocationTimes";
+		static const constexpr char* ROTATION_TIMES_KEY = "RotationTimes";
+		static const constexpr char* SCALE_TIMES_KEY = "ScaleTimes";
+	public:
+		struct AnimationNode
+		{
+			String NodeName;
+
+			List<JVector3>	  LocationValues;
+			List<JQuaternion> RotationValues;
+			List<JVector3>    ScaleValues;
+
+			List<f32> LocationTimes;
+			List<f32> RotationTimes;
+			List<f32> ScaleTimes;
+		};
+	public:
+		String Name;
+		f32 Duration;
+		f32 TicksPerSecond;
+		Dictionary<String, AnimationNode> AnimationNodes;
+	public:
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	public:
+		virtual ~AnimationClipAssetStock() = default;
+	public:
+		virtual EAssetFormat GetAssetFormat() const override {
+			return EAssetFormat::AnimationClip;
+		}
+	};
+
+	
+
 
 
 	class MaterialAssetStock : public IAssetStock

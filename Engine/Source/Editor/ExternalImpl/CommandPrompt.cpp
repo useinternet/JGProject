@@ -99,6 +99,7 @@ ImportAssetType
 				AssetHelper::GetResourcePath(outputPath, &outputPath, nullptr);
 				importSettings.AssetPath  = srcPath;
 				importSettings.OutputPath = outputPath;
+
 				importSettings.Flags = ETextureAssetImportFlags::None;
 
 				if (fs::exists(srcPath) == false)
@@ -123,12 +124,63 @@ ImportAssetType
 			{
 
 			}
-			else if (importAssetType == "fbx")
+			else if (importAssetType == "fbx" && args.size() >= 3)
 			{
 				String srcPath    = args[1];
 				String outputPath = args[2];
 
+				FBXAssetImportSettings importSettings;
+				AssetHelper::GetResourcePath(srcPath, &srcPath, nullptr);
+				AssetHelper::GetResourcePath(outputPath, &outputPath, nullptr);
+				importSettings.AssetPath  = srcPath;
+				importSettings.OutputPath = outputPath;
+				if (fs::exists(srcPath) == false)
+				{
+					JG_LOG_ERROR(">> not exist file : {0}", srcPath);
+				}
+
+
+				if (args.size() >= 4)
+				{
+					for (JG::u32 i = 3; i < args.size(); ++i)
+					{
+						String flag = args[i];
+						if (flag == "Import_Mesh")
+						{
+							importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_Mesh;
+						}
+						else if (flag == "Import_AnimationClip")
+						{
+							importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_AnimationClip;
+						}
+						else if (flag == "Import_Skeletal")
+						{
+							importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_Skeletal;
+						}
+						else if (flag == "Import_Material")
+						{
+							importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_Material;
+						}
+						else if (flag == "Import_Texture")
+						{
+							importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_Texture;
+						}
+					}
+				}
+				else
+				{
+					importSettings.Flags = importSettings.Flags | EFBXAssetImportFlags::Import_All;
+				}
+
 				JG_LOG_TRACE(">> Import FBX {0} -> {1}", srcPath, outputPath);
+				if (AssetImporter::Import(importSettings) == EAssetImportResult::Fail)
+				{
+					JG_LOG_ERROR(">> Fail Import FBX");
+				}
+				else
+				{
+					JG_LOG_INFO(">> Scuccess Import FBX");
+				}
 			}
 			else
 			{

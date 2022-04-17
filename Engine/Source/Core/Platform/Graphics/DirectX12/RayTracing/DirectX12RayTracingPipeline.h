@@ -23,6 +23,7 @@ namespace JG
 		virtual ~DirectX12RayTracingPipeline();
 		// Pipeline
 		virtual void AddLibrary(const String& shaderPath, const List<String>& symbolExports, bool isIncludeGlobalLib = true) override;
+		virtual void AddLibrary(const SharedPtr<IShader> shader) override;
 		virtual void AddLibraryAsSourceCode(const String& name, const String& sourceCode, const List<String>& symbolExports) override;
 		virtual void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol)  override;
 		virtual void SetMaxPayloadSize(u32 byteSize) override;

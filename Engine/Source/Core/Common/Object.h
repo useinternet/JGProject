@@ -7,7 +7,7 @@ namespace JG
 
 #define JGCLASS \
 public: \
-	virtual Type GetType() const override { return Type(TypeID(this));} \
+	virtual JG::Type GetType() const override { return JG::Type(JG::TypeID(this));} \
 private: \
 
 

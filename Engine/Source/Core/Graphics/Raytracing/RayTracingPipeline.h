@@ -5,6 +5,7 @@
 namespace JG
 {
 	class IRootSignature;
+	class IShader;
 	class IRayTracingPipeline
 	{
 
@@ -12,6 +13,7 @@ namespace JG
 		virtual ~IRayTracingPipeline() = default;
 
 		virtual void AddLibrary(const String& shaderPath, const List<String>& symbolExports, bool isIncludeGlobalLib = true) = 0;
+		virtual void AddLibrary(const SharedPtr<IShader> shader) = 0;
 		virtual void AddLibraryAsSourceCode(const String& name, const String& sourceCode, const List<String>& symbolExports) = 0;
 		virtual void AddHitGroup(const String& hitGroupName, const String& closestHitSymbol, const String& anyHitSymbol, const String& intersectionSymbol) = 0;
 		virtual void SetMaxPayloadSize(u32 byteSize) = 0;

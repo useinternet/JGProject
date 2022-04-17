@@ -21,6 +21,11 @@ namespace JG
 	private:
 		const JVector2 mResolution = JVector2(450, 450);
 		const JVector2 mImageSize  = mResolution;
+		const f32 mRightBottomHeight = 230.0f;
+		f32 mWindowHeight			 = 0.0f;
+
+
+
 		const f32 mFarZ = 1000000.0f;
 		const f32 mNearZ = 1.0f;
 		JVector3 mEyePos = JVector3(0, 0, -200.0f);
@@ -34,10 +39,14 @@ namespace JG
 		SharedPtr<ITexture>		    mSceneTexture;
 		SharedPtr<Asset<IMesh>>     mMeshAsset = nullptr;
 		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
-		UniquePtr<TextEditor>  mTextEditor;
+		UniquePtr<TextEditor>		mTextEditor;
+
+		List<String> mMaterialLogs;
 
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
 		Graphics::Scene* mScene = nullptr;
+
+		StorableString mFailedCompileShaderCode;
 	public:
 		MaterialView();
 		virtual ~MaterialView() = default;
@@ -62,8 +71,11 @@ namespace JG
 		void Rendering();
 		void UpdateScene();
 
-		void SaveMaterial();
-		void CompileShader();
+		void SaveAndApplyScript();
+		bool CompileShader();
+
+		void AddLog(const String& log);
+		void ClearLogs();
 	public:
 		void SetMaterial(const String& path);
 		void SetMesh(const String& path);

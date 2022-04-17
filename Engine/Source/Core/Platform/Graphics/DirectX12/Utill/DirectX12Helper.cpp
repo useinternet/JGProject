@@ -252,7 +252,7 @@ namespace JG
 	}
 	
 
-	IDxcBlob* CompileShader(const String& filePath, const String& sourceCode, const String& entry, const String& target)
+	IDxcBlob* CompileShader(const String& filePath, const String& sourceCode, const String& entry, const String& target, String* out_errorMsg)
 	{
 		static IDxcCompiler* pCompiler = nullptr;
 		static IDxcLibrary* pLibrary = nullptr;
@@ -307,6 +307,10 @@ namespace JG
 
 
 				JG_LOG_ERROR("{0} : Failed compile shader \n Error : {1}", filePath, errorMsg);
+				if (out_errorMsg != nullptr)
+				{
+					*out_errorMsg = errorMsg;
+				}
 			}
 
 			IDxcBlob* pBlob;

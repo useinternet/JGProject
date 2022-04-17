@@ -15,15 +15,11 @@ namespace JG
 			return "";
 		}
 		String name = shader->GetName();
-
-
 		List<String> splitedName = StringHelper::Split(name, '/');
-
 		if (splitedName.empty() == true)
 		{
 			return "";
 		}
-
 		return splitedName[0];
 	}
 	SharedPtr<Graphics::StaticRenderObject> GraphicsHelper::CreateSkyBox(const JVector3& eyePos, f32 farZ, const String& texturePath)

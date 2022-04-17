@@ -13,7 +13,6 @@ namespace JG
 
 		EAssetFormat GetAssetFormat(const String& path);
 		bool GetResourcePath(const String& path, String* out_absolutePath, String* out_resourcePath);
-
 	}
 
 }

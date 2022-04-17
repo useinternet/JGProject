@@ -935,7 +935,7 @@ namespace JG
 		if (extension == ".fbx" || extension == ".FBX")
 		{
 			FBXAssetImportSettings settings;
-			settings.Flags = EFBXAssetImportFlags::None;
+			settings.Flags     = EFBXAssetImportFlags::Import_All;
 			settings.AssetPath = p.string();
 			settings.OutputPath = GetTargetDirectory();
 	

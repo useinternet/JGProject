@@ -37,10 +37,8 @@ namespace JG
 		EGameWorldFlags mGameWorldFlags = EGameWorldFlags::None;
 		
 
-
-		PhysicsHandle mPxSceneHandle = 0;
 		JVector3 mGravity;
-		const f32 mTickCycle = 0.0f;
+		const f32 mTickCycle = 0.0069f;
 	public:
 		GameWorld();
 		virtual ~GameWorld() = default;
@@ -78,12 +76,9 @@ namespace JG
 		void SetGravity(const JVector3& gravity);
 		const JVector3& GetGravity() const;
 		f32 GetTickCycle() const;
-		PhysicsHandle GetPxSceneHandle() const;
-		
 	public:
 		GameNode* Picking(const JVector2& screenPos, List<IJGObject*> exceptObjectList);
-		// 에디터 카메라 컬링
-		// 
+
 	private:
 		friend class GameLogicSystemLayer;
 		void SetGlobalGameSystemList(const List<GlobalGameSystem*>& systemList);

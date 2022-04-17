@@ -1,2 +1,2 @@
-call premake5.exe vs2019 --file=jgengine.lua
+call premake5.exe vs2022 --file=jgengine.lua
 PAUSE

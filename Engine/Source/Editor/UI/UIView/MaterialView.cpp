@@ -27,6 +27,8 @@ namespace JG
 	}
 	void MaterialView::OnGUI()
 	{
+		mWindowHeight = ImGui::GetWindowHeight();
+
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, mImageSize.x + ImGui::GetStyle().FramePadding.x * 4);
 		LeftTopOnGUI();
@@ -118,7 +120,8 @@ namespace JG
 				LoadTextEditor(script->GetCode());
 			}
 		}
-		ImGui::BeginChild("RightTopOnGUI", ImVec2(600, 600), true, ImGuiWindowFlags_HorizontalScrollbar);
+		f32 winHeight = std::max<f32>(300.0f, mWindowHeight - mRightBottomHeight);
+		ImGui::BeginChild("RightTopOnGUI", ImVec2(0, winHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
 		if (mTextEditor != nullptr && mMaterialAsset != nullptr && mMaterialAsset->IsValid())
 		{
 			auto cpos = mTextEditor->GetCursorPosition();
@@ -141,11 +144,17 @@ namespace JG
 					mTextEditor->SetSelection(TextEditor::Coordinates(), TextEditor::Coordinates(mTextEditor->GetTotalLines(), 0));
 				}
 			}
+			String scriptName;
+			SharedPtr<IShaderScript> script = mMaterialAsset->Get()->GetScript();
+			if (script != nullptr)
+			{
+				scriptName = script->GetName();
+			}
 
 			ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, mTextEditor->GetTotalLines(),
 				mTextEditor->IsOverwrite() ? "Ovr" : "Ins",
 				mTextEditor->CanUndo() ? "*" : " ",
-				mTextEditor->GetLanguageDefinition().mName.c_str(), mMaterialAsset->GetAssetName().c_str());
+				mTextEditor->GetLanguageDefinition().mName.c_str(), scriptName.c_str());
 
 			mTextEditor->Render(mMaterialAsset->GetAssetPath().c_str());
 	
@@ -159,23 +168,25 @@ namespace JG
 		
 		if (ImGui::Button("Save") == true)
 		{
-			SaveMaterial();
-
+			SaveAndApplyScript();
 
 		} ImGui::SameLine();
 		if (ImGui::Button("Compile") == true)
 		{
-			SaveMaterial();
 			CompileShader();
+		} ImGui::SameLine();
+		if (ImGui::Button("Clear") == true)
+		{
+			ClearLogs();
 		}
 		ImGui::Separator();
-		ImGui::Text("ErrorLog1");
-		ImGui::Text("ErrorLog1");
-		ImGui::Text("ErrorLog1");
-		ImGui::Separator();
-		String out;
-		ImGui::InputText("##LogInputText", "test", out); ImGui::SameLine();
-		ImGui::Button("Clear");
+		ImGui::BeginChild("ErrorLogChildWindow", ImVec2(0, 150.0f), true);
+		for (const String& log : mMaterialLogs)
+		{
+			ImGui::Text(log.c_str());
+		}
+
+		ImGui::EndChild();
 		ImGui::EndChild();
 	}
 	void MaterialView::LoadTextEditor(const String& text)
@@ -185,7 +196,6 @@ namespace JG
 		mTextEditor->SetText(text);
 		mTextEditor->SetPalette(TextEditor::GetDarkPalette());
 	}
-
 	void MaterialView::PushSceneObject()
 	{
 		if (mSkyBox == nullptr)
@@ -259,15 +269,70 @@ namespace JG
 		}
 	}
 
-	void MaterialView::SaveMaterial()
+	void MaterialView::SaveAndApplyScript()
 	{
-		JG_LOG_INFO("Save Material");
+		if (CompileShader() == false)
+		{
+			AddLog("Failed Save Material");
+			return;
+		}
 
+		SharedPtr<IShaderScript> script = mMaterialAsset->Get()->GetScript();
+		String scriptPath = PathHelper::CombinePath(Application::GetInstance().GetShaderScriptPath(), "Surface");
+		scriptPath = PathHelper::CombinePath(scriptPath, script->GetName() + SHADER_SCRIPT_FORMAT);
+	
+		if (FileHelper::WriteAllText(scriptPath, mTextEditor->GetText()) == false)
+		{
+			JG_LOG_ERROR("Failed Save Script : {0}", scriptPath);
+		}
 	}
-	void MaterialView::CompileShader()
+	bool MaterialView::CompileShader()
 	{
-		JG_LOG_INFO("Compile Shader");
-
+		ClearLogs();
+		if (mTextEditor == nullptr)
+		{
+			AddLog("TextEditor is null");
+			return false;
+		}
+		if (mMaterialAsset == nullptr || mMaterialAsset->IsValid() == false)
+		{
+			AddLog("Material Asset is null or InValid");
+			return false;
+		}
+		SharedPtr<IShaderScript> script = mMaterialAsset->Get()->GetScript();
+		if (script == nullptr)
+		{
+			AddLog("Material Script is null");
+			return false;
+		}
+		bool mIsCompileSuccess = false;
+		SharedPtr<IShaderScript> newScript = IShaderScript::CreateSurfaceScript(script->GetName(), mTextEditor->GetText());
+		switch (mScene->GetRenderer()->GetRendererPath())
+		{
+		case ERendererPath::RayTracing:
+		{
+			SharedPtr<IClosestHitShader> directShader = ShaderLibrary::GetInstance().FindClosestHitShader(ShaderDefine::Template::DirectClosestHitShader);
+			SharedPtr<IClosestHitShader> newShader	  = IClosestHitShader::Create("TempDirectShader", directShader->GetShaderCode(), newScript);
+			mIsCompileSuccess = newShader != nullptr && newShader->IsSuccessed();
+			if (mIsCompileSuccess == false)
+			{
+				AddLog(newShader->GetErrorMessage());
+			}
+		}
+			break;
+		default:
+			AddLog("Current Not Supported RendererPath");
+			return false;
+		}
+		return mIsCompileSuccess;
+	}
+	void MaterialView::AddLog(const String& log)
+	{
+		mMaterialLogs.push_back("Error : " + log);
+	}
+	void MaterialView::ClearLogs()
+	{
+		mMaterialLogs.clear();
 	}
 	void MaterialView::SetMaterial(const String& path)
 	{

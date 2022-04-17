@@ -3,18 +3,18 @@
 #include "Application.h"
 
 
-using namespace physx;
+//using namespace physx;
 
 namespace JG
 {
 	PhysicsManager::PhysicsManager()
 	{
-		Init();
+		//Init();
 	}
 	PhysicsManager::~PhysicsManager()
 	{
 
-		if (mCPUDispatcher != nullptr)
+		/*if (mCPUDispatcher != nullptr)
 		{
 			mCPUDispatcher->release();
 			mCPUDispatcher = nullptr;
@@ -38,9 +38,9 @@ namespace JG
 		{
 			mFoundation->release();
 			mFoundation = nullptr;
-		}
+		}*/
 	}
-	physx::PxPhysics* PhysicsManager::GetPxPhysics() const
+	/*physx::PxPhysics* PhysicsManager::GetPxPhysics() const
 	{
 		return mPhysics;
 	}
@@ -399,5 +399,5 @@ namespace JG
 		{
 			return mHandleDataPool[handle].get();
 		}
-	}
+	}*/
 }

@@ -12,44 +12,6 @@ namespace JG
 	{
 		return mName;
 	}
-	void DirectX12GraphicsShader::SetName(const String& name)
-	{
-		mName = name;
-	}
-	bool DirectX12GraphicsShader::Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error)
-	{
-		mFlags = flags;
-		mShaderScriptList = scriptList;
-		mScriptCodeAnalyzer = CreateUniquePtr<ShaderScriptCodeAnalyzer>(
-			HLSL::RegisterNumber::MaterialRegisterNumber, 0,
-			0, HLSL::RegisterSpace::Texture2DRegisterSpace);
-		// SourceCode
-		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode()   + "\n";
-		libCode       += ShaderLibrary::GetInstance().GetGlobalGraphicsLibCode() + "\n";
-		mSourceCode = sourceCode;
-
-		String code = libCode + sourceCode;
-
-		if (scriptList.empty())
-		{
-			mScriptCodeAnalyzer->InsertScript(code, nullptr);
-		}
-		else
-		{
-			for (auto& script : scriptList)
-			{
-				mScriptCodeAnalyzer->InsertScript(code, script);
-			}
-		}
-
-		
-		mFullSourceCode = code;
-		if (Compile(code, error) == true)
-		{
-			return true;
-		}
-		return false;
-	}
 	const String& DirectX12GraphicsShader::GetShaderCode() const
 	{
 		return mSourceCode;
@@ -58,6 +20,12 @@ namespace JG
 	{
 		return mFullSourceCode;
 	}
+
+	const JG::String& DirectX12GraphicsShader::GetErrorMessage() const
+	{
+		return mErrorMessage;
+	}
+
 	EShaderFlags DirectX12GraphicsShader::GetFlags() const
 	{
 		return mFlags;
@@ -74,6 +42,44 @@ namespace JG
 	{
 		return mShaderScriptList;
 	}
+
+
+	void DirectX12GraphicsShader::SetName(const String& name)
+	{
+		mName = name;
+	}
+	bool DirectX12GraphicsShader::Init(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags)
+	{
+		mFlags = flags;
+		mShaderScriptList = scriptList;
+		mScriptCodeAnalyzer = CreateUniquePtr<ShaderScriptCodeAnalyzer>(
+			HLSL::RegisterNumber::MaterialRegisterNumber, 0,
+			0, HLSL::RegisterSpace::Texture2DRegisterSpace);
+		// SourceCode
+		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + "\n";
+		libCode += ShaderLibrary::GetInstance().GetGlobalGraphicsLibCode() + "\n";
+		mSourceCode = sourceCode;
+
+		String code = libCode + sourceCode;
+
+		if (scriptList.empty())
+		{
+			mScriptCodeAnalyzer->InsertScript(code, nullptr);
+		}
+		else
+		{
+			for (auto& script : scriptList)
+			{
+				mScriptCodeAnalyzer->InsertScript(code, script);
+			}
+		}
+
+
+		mFullSourceCode = code;
+		mErrorMessage = "";
+		mIsCompileSuccess = Compile(code, &mErrorMessage);
+		return mIsCompileSuccess;
+	}
 	void DirectX12GraphicsShader::ForEach_TextureSlot(const std::function<void(const String&)>& action)
 	{
 		if (action == nullptr)
@@ -84,7 +90,6 @@ namespace JG
 		{
 			action(_pair.second);
 		}
-
 	}
 	bool DirectX12GraphicsShader::Compile(const String& code, String* error)
 	{
@@ -143,7 +148,8 @@ namespace JG
 
 		if (FAILED(hr) && error != nullptr)
 		{
-			*error = (char*)errorData->GetBufferPointer();
+			*error += (char*)errorData->GetBufferPointer();
+			*error += "\n";
 			return false;
 		}
 		mIsCompileSuccess = true;
@@ -154,21 +160,12 @@ namespace JG
 	{
 		return mName;
 	}
-	void DirectX12ComputeShader::SetName(const String& name)
-	{
-		mName = name;
-	}
-	bool DirectX12ComputeShader::Compile(const String& sourceCode, String* error)
-	{
-		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + "\n";
-		mSourceCode     = libCode + sourceCode;
 
-		if (Compile(mCSData, mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), error) == true)
-		{
-			return true;
-		}
-		return false;
+	const JG::String& DirectX12ComputeShader::GetErrorMessage() const
+	{
+		return mErrorMessage;
 	}
+
 	const String& DirectX12ComputeShader::GetShaderCode() const
 	{
 		return mSourceCode;
@@ -177,6 +174,20 @@ namespace JG
 	{
 		return mIsCompileSuccess;
 	}
+	void DirectX12ComputeShader::SetName(const String& name)
+	{
+		mName = name;
+	}
+	bool DirectX12ComputeShader::Init(const String& sourceCode)
+	{
+		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + "\n";
+		mSourceCode = libCode + sourceCode;
+		mErrorMessage = "";
+		mIsCompileSuccess = Compile(mCSData, mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), &mErrorMessage);
+		return mIsCompileSuccess;
+	}
+
+
 	bool DirectX12ComputeShader::Compile(ComPtr<IDxcBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error)
 	{
 		blob = CompileShader(GetName(), sourceCode, config.Entry, config.Target);
@@ -186,41 +197,6 @@ namespace JG
 			mIsCompileSuccess = true;
 		}
 		return mIsCompileSuccess;
-
-		//ComPtr<ID3DBlob> errorData;
-		//HRESULT hr = D3DCompile2(
-		//	sourceCode.data(),
-		//	sourceCode.size(),
-		//	nullptr,
-		//	nullptr,
-		//	nullptr,
-		//	config.Entry.c_str(),
-		//	config.Target.c_str(),
-		//	0, 0, 0, nullptr, 0,
-		//	blob.GetAddressOf(),
-		//	errorData.GetAddressOf());
-
-		//if (FAILED(hr) && error != nullptr)
-		//{
-		//	*error = (char*)errorData->GetBufferPointer();
-		//	return false;
-		//}
-		//mIsCompileSuccess = true;
-		//return true;
-	}
-	bool DirectX12ClosestHitShader::Init(const String& sourceCode, SharedPtr<IShaderScript> script)
-	{
-		mScriptCodeAnalyzer = CreateUniquePtr< ShaderScriptCodeAnalyzer>(
-			0, 1,
-			3, 1);
-		String Name   = StringHelper::ReplaceAll(GetName(), "/", "_");
-		mHitGroupName = Name + "_HitGroup";
-		mEntryPoint   = Name + "_ClosestHit";
-		mSourceCode = sourceCode;
-		mFullSourceCode = StringHelper::ReplaceAll(mSourceCode, HLSL::ClosestHitEntry, mEntryPoint);
-		mScriptCodeAnalyzer->InsertScript(mFullSourceCode, script);
-
-		return true;
 	}
 	const String& DirectX12ClosestHitShader::GetName() const
 	{
@@ -242,6 +218,36 @@ namespace JG
 	{
 		return mFullSourceCode;
 	}
+	const String& DirectX12ClosestHitShader::GetErrorMessage() const
+	{
+		return mErrorMessage;
+	}
+	bool DirectX12ClosestHitShader::IsSuccessed() const
+	{
+		return mIsCompileSuccess;
+	}
+
+	bool DirectX12ClosestHitShader::Init(const String& sourceCode, SharedPtr<IShaderScript> script)
+	{
+		mScriptCodeAnalyzer = CreateUniquePtr< ShaderScriptCodeAnalyzer>(
+			0, 1,
+			3, 1);
+		String Name = StringHelper::ReplaceAll(GetName(), "/", "_");
+		mHitGroupName = Name + "_HitGroup";
+		mEntryPoint   = Name + "_ClosestHit";
+		mSourceCode   = sourceCode;
+		mFullSourceCode = StringHelper::ReplaceAll(mSourceCode, HLSL::ClosestHitEntry, mEntryPoint);
+		mScriptCodeAnalyzer->InsertScript(mFullSourceCode, script);
+
+		String shaderLibCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + ShaderLibrary::GetInstance().GetGlobalRayTracingLibCode();;
+		mFullSourceCode = shaderLibCode + mFullSourceCode;
+		mErrorMessage.clear();
+
+		mBlobData = CompileShader(GetName(), mFullSourceCode, mEntryPoint, HLSL::RTTarget, &mErrorMessage);
+		mIsCompileSuccess = mErrorMessage.length() == 0;
+		return mIsCompileSuccess;
+	}
+
 	void DirectX12ClosestHitShader::SetName(const String& name)
 	{
 		mName = name;

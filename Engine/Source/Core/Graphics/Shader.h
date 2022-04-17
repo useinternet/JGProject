@@ -4,55 +4,66 @@
 #include "GraphicsDefine.h"
 #include <shared_mutex>
 
-
+#define SHADER_SCRIPT_FORMAT	".shaderscript"
+#define SHADER_TEMPLATE_FORMAT	".shadertemplate"
+#define COMPUTE_SHADER_FORMAT	".computeshader"
 namespace JG
 {
 	class IShaderScript;
 	class IRayTracingPipeline;
-	class IGraphicsShader
+
+	enum class EShaderType
 	{
-	protected:
-		virtual bool Compile(const String& sourceCode, const List<SharedPtr<IShaderScript>>& scriptList, EShaderFlags flags, String* error) = 0;
+		Graphics,
+		Compute,
+		ClosestHit
+	};
+
+	class IShader
+	{
+	public:
+		virtual const String& GetName()			  const = 0;
+		virtual const String& GetErrorMessage()   const = 0;
+		virtual const String& GetShaderCode()     const = 0;
+		virtual const String& GetFullShaderCode() const = 0;
+		virtual bool IsSuccessed()				  const = 0;
+		virtual const EShaderType GetShaderType() const = 0;
+	};
+
+	class IGraphicsShader : public IShader
+	{
 	public:
 		virtual ~IGraphicsShader() = default;
 	public:
-		virtual const String& GetName()			  const = 0;
-		virtual const String& GetShaderCode()     const = 0;
-		virtual const String& GetFullShaderCode() const = 0;
 		virtual EShaderFlags  GetFlags()          const = 0;
 		virtual const List<std::pair<EShaderDataType, String>>& GetPropertyList() const = 0;
-		virtual const List<SharedPtr<IShaderScript>>& GetScriptList() const = 0;
-		virtual bool IsSuccessed() const = 0;
+		virtual const List<SharedPtr<IShaderScript>>&			GetScriptList() const = 0;
+	
+		virtual const EShaderType GetShaderType() const override { return EShaderType::Graphics; };
 	public:
 		static SharedPtr<IGraphicsShader> Create(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList = List<SharedPtr<IShaderScript>>());
 	};
 
-	class IComputeShader
+	class IComputeShader : public IShader
 	{
-	protected:
-		virtual bool Compile(const String& sourceCode, String* error) = 0;
 	public:
 		virtual ~IComputeShader() = default;
 	public:
-		virtual const String& GetName()		  const = 0;
-		virtual const String& GetShaderCode() const = 0;
-		virtual bool IsSuccessed() const = 0;
+		virtual const String& GetFullShaderCode() const override { return GetShaderCode(); }
+		virtual const EShaderType GetShaderType() const override { return EShaderType::Compute; };
 	public:
 		static SharedPtr<IComputeShader> Create(const String& name, const String& sourceCode);
 	};
 
-	class IClosestHitShader
+	class IClosestHitShader :  public IShader
 	{
-	protected:
-		virtual bool Init(const String& sourceCode, SharedPtr<IShaderScript> script) = 0;
 	public:
 		virtual ~IClosestHitShader() = default;
 	public:
-		virtual const String& GetName()		    const = 0;
 		virtual const String& GetEntryPoint()   const = 0;
 		virtual const String& GetHitGroupName() const = 0;
-		virtual const String& GetShaderCode()   const = 0;
 		virtual const String& GetFullShaderCode() const = 0;
+		virtual const EShaderType GetShaderType() const  override  { return EShaderType::ClosestHit; };
 	public:
 		static SharedPtr<IClosestHitShader> Create(const String& name, const String& sourceCode, SharedPtr<IShaderScript> script);
 	};
@@ -127,7 +138,7 @@ namespace JG
 		void RegisterShaderScript(const String& name, SharedPtr<IShaderScript> script);
 		void RegisterClosestHitShader(const String& name, SharedPtr<IClosestHitShader> shader);
 		void RegisterRayTracingPipeline(const String& name, SharedPtr<IRayTracingPipeline> pipeline);
-
+		
 
 
 
@@ -144,6 +155,7 @@ namespace JG
 
 
 		bool   LoadGlobalShaderLib(const String& path);
+		
 		const String& GetGlobalShaderLibCode()   const;
 		const String& GetGlobalGraphicsLibCode() const;
 		const String& GetGlobalComputeLibCode() const;

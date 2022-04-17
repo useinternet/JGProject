@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GameLogicSystemLayer.h"
 #include "Application.h"
+#include "Class/Data/StorableVar.h"
 #include "GameObject.h"
 #include "GameNode.h"
 #include "GameWorld.h"
@@ -41,15 +42,7 @@ namespace JG
 	{
 		mGamePlugin = CreateUniquePtr<Plugin>(GAME_DLL_NAME);
 		mGamePlugin->Link(CreateSharedPtr<PluginLinker>());
-		if (mGamePlugin->IsVaild())
-		{
-			JG_LOG_INFO("Successed Connect Game Plugin");
-			auto func = mGamePlugin->LoadFunction<void>("TestFunction");
-			if (func.IsVaild())
-			{
-				func();
-			}
-		}
+
 
 		RegisterGameObjectType();
 		RegisterGlobalGameSystem();
@@ -145,7 +138,6 @@ namespace JG
 
 		return true;
 	}
-
 	bool GameLogicSystemLayer::ResponseLoadGameWorld(RequestLoadGameWorldEvent& e)
 	{
 		{
@@ -310,5 +302,49 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<SpotLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SkyDome>();
 		GameObjectFactory::GetInstance().RegisterComponentType<DevComponent>();
+
+		auto t = mGamePlugin->LoadFunction<void>("DevPlayer_Register_GameComponent");
+		// GamePlugin
+		//
+		StorableString  componentTypeCache	 = StorableString("GameLogicSystemLayer/GameComponentTypeCache", "");
+		HashSet<String> cachedComponentTypeSet;
+
+		std::stringstream ss(componentTypeCache.GetValue());
+		String tmp;
+		while (std::getline(ss, tmp, ',')) {
+			cachedComponentTypeSet.insert(tmp);
+		}
+		const String& cppPath = Application::GetCppPath();
+		fs::recursive_directory_iterator dirIter = fs::recursive_directory_iterator(cppPath);
+
+		for (auto iter : dirIter)
+		{
+			const fs::path& p = iter.path();
+			String extension = p.extension().string();
+			if (extension != ".h")
+			{
+				continue;
+			}
+			String comTypeName = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
+			if (cachedComponentTypeSet.find(comTypeName) != cachedComponentTypeSet.end())
+			{
+				continue;
+			}
+			cachedComponentTypeSet.insert(comTypeName);
+		}
+
+		String componentTypeCacheStr;
+		for (const String& typeName : cachedComponentTypeSet)
+		{
+			String gameComponentFuncName = typeName + "_Register_GameComponent";
+			PluginFunction<void> gameComponentFunc = mGamePlugin->LoadFunction<void>(gameComponentFuncName);
+
+			if (gameComponentFunc.IsVaild() == true)
+			{
+				gameComponentFunc();
+				componentTypeCacheStr += typeName + ",";
+			}
+		}
+		componentTypeCache.SetValue(componentTypeCacheStr);
 	}
 }

@@ -246,10 +246,10 @@ namespace JG
 			JG_LOG_ERROR("Fail Add RayTracing Library : {0} -> {1}", name, shader->GetName());
 			return;
 		}
-
-		pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetFullShaderCode(), { shader->GetEntryPoint() });
-		pipeline->AddHitGroup(shader->GetHitGroupName(), shader->GetEntryPoint(), "", "");
-		pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { shader->GetEntryPoint() });
+		pipeline->AddLibrary(shader);
+		//pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetFullShaderCode(), { shader->GetEntryPoint() });
+		//pipeline->AddHitGroup(shader->GetHitGroupName(), shader->GetEntryPoint(), "", "");
+		//pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { shader->GetEntryPoint() });
 	}
 
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)

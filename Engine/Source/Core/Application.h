@@ -9,6 +9,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 
 namespace JG
 {
+	class ISystemLayer;
 	class Timer;
 	struct ApplicaionProps
 	{
@@ -19,6 +20,7 @@ namespace JG
 	{
 	public:
 		static const String& GetAssetPath();
+		static const String& GetCppPath();
 		static const String& GetEnginePath();
 		static const String& GetIconPath();
 		static const String& GetTexturePath();

@@ -407,13 +407,11 @@ namespace JG
 	}
 	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
 	{
-		String errorCode;
-		auto shader = CreateSharedPtr<DirectX12GraphicsShader>();
+		SharedPtr<DirectX12GraphicsShader> shader = CreateSharedPtr<DirectX12GraphicsShader>();
 		shader->SetName(name);
-		if (shader->Compile(sourceCode, scriptList, flags, &errorCode) == false)
+		if (shader->Init(sourceCode, scriptList, flags) == false)
 		{
-			JG_LOG_ERROR("Failed Compile Shader : {0}  Error : {1} ", name, errorCode);
-			return nullptr;
+			JG_LOG_ERROR("Failed Compile Shader : {0}  Error : {1} ", name, shader->GetErrorMessage());
 		}
 
 
@@ -421,14 +419,11 @@ namespace JG
 	}
 	SharedPtr<IComputeShader> DirectX12API::CreateComputeShader(const String& name, const String& sourceCode)
 	{
-		String errorCode;
 		auto shader = CreateSharedPtr<DirectX12ComputeShader>();
 		shader->SetName(name);
-		if (shader->Compile(sourceCode, &errorCode) == false)
+		if (shader->Init(sourceCode) == false)
 		{
-			errorCode = StringHelper::ReplaceAll(errorCode,"\n", "");
-			JG_LOG_ERROR("Failed Compile Shader : {0} Error : {1}", name, errorCode);
-			return nullptr;
+			JG_LOG_ERROR("Failed Compile Shader : {0} Error : {1}", name, shader->GetErrorMessage());
 		}
 
 
@@ -439,7 +434,11 @@ namespace JG
 	{
 		auto shader = CreateSharedPtr<DirectX12ClosestHitShader>();
 		shader->SetName(name);
-		shader->Init(sourceCode, script);
+		if (shader->Init(sourceCode, script) == false)
+		{
+			JG_LOG_ERROR("Failed ClosestHitShader : {0} Error : {1}", name, shader->GetErrorMessage());
+		}
+
 		return shader;
 	}
 	SharedPtr<IMaterial> DirectX12API::CreateMaterial(const String& name)
@@ -506,6 +505,7 @@ namespace JG
 	{
 		return CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
 	}
+
 	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext()
 	{
 		std::lock_guard<std::mutex> lock(mGraphicsContextMutex);
