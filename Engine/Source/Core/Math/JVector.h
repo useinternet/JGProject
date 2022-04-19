@@ -446,6 +446,11 @@ namespace JG
 		{
 			return JVector3(Math::Min(v1.x, v2.x), Math::Min(v1.y, v2.y), Math::Min(v1.z, v2.z));
 		}
+		inline static JVector3 Lerp(const JVector3& v1, const JVector3& v2, f32 a)
+		{
+			auto sim = DirectX::XMVectorLerp(GetSIMD(v1), GetSIMD(v2), a);
+			return ConvertJVector3(sim).x;
+		}
 		inline static bool Equals(const JVector3& v1, const JVector3& v2, float error_range = ERROR_RANGE)
 		{
 			JVector3 delta_v = v1 - v2;

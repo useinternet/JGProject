@@ -22,6 +22,7 @@ namespace JG
 		enum class ESceneObjectType
 		{
 			Static,
+			Skeletal,
 			Paper,
 			Debug,
 		};
@@ -64,6 +65,19 @@ namespace JG
 			virtual ~StaticRenderObject() = default;
 		public:
 			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Static; }
+			virtual bool IsValid() const override;
+		};
+
+		class SkeletalRenderObject : public SceneObject
+		{
+
+		public:
+			SharedPtr<IMesh> Mesh;
+			List<SharedPtr<IMaterial>> MaterialList;
+		public:
+			virtual ~SkeletalRenderObject() = default;
+		public:
+			virtual ESceneObjectType GetSceneObjectType() const override { return ESceneObjectType::Skeletal; }
 			virtual bool IsValid() const override;
 		};
 

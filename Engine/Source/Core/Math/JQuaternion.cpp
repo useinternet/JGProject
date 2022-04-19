@@ -24,12 +24,14 @@ namespace JG
 		q.SetSIMD(DirectX::XMQuaternionRotationRollPitchYaw(euler.x, euler.y, euler.z));
 		return JQuaternion::Normalize(q);
 	}
+
 	JQuaternion JQuaternion::ToQuaternion(float pitch, float yaw, float roll)
 	{
 		return ToQuaternion({ pitch, yaw, roll });
 	}
 	JVector3 JQuaternion::ToEuler(const JQuaternion& q)
 	{
+
 		f32 sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
 		f32 cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
 		f32 roll = std::atan2(sinr_cosp, cosr_cosp);
@@ -52,7 +54,7 @@ namespace JG
 
 	JQuaternion JQuaternion::RotationRollPitchYawFromVector(const JVector3& angles)
 	{
-	
+		
 		JQuaternion result;
 		auto simQ = DirectX::XMQuaternionRotationRollPitchYawFromVector(JVector3::GetSIMD(angles));
 		result.SetSIMD(simQ);

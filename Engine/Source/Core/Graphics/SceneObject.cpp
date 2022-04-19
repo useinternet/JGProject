@@ -33,6 +33,10 @@ namespace JG
 
 			return result;
 		}
+		bool SkeletalRenderObject::IsValid() const
+		{
+			return false;
+		}
 		bool DebugRenderObject::IsValid() const
 		{
 			bool result = true;
@@ -59,5 +63,6 @@ namespace JG
 
 			return result;
 		}
+
 	}
 }

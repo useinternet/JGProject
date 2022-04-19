@@ -171,7 +171,7 @@ namespace JG
 	{
 		jsonData->AddMember(NAME_KEY, Name);
 		jsonData->AddMember(ROOT_BONE_NODE_KEY, RootBoneNode);
-
+		jsonData->AddMember(ROOT_OFFSET_KEY, RootOffset);
 
 		SharedPtr<JsonData> boneNodeArrayJson = jsonData->CreateJsonData();
 		for (u64 i = 0; i < BoneNodes.size(); ++i)
@@ -204,6 +204,12 @@ namespace JG
 		if (val != nullptr)
 		{
 			RootBoneNode = val->GetUint32();
+		}
+
+		val = jsonData->GetMember(ROOT_OFFSET_KEY);
+		if (val != nullptr)
+		{
+			RootOffset = val->GetMatrix();
 		}
 
 		SharedPtr<JsonData> boneNodeArrayJson = jsonData->GetMember(BONE_NODES_KEY);

@@ -158,7 +158,7 @@ namespace JG
 				else
 				{
 					f32 f = value.GetFloat();
-					BoneWeights[index] = f;
+					BoneWeights[index - 4] = f;
 				}
 				++index;
 			}
@@ -223,6 +223,7 @@ namespace JG
 		static const constexpr char* NAME_KEY				= "Name";
 		static const constexpr char* ROOT_BONE_NODE_KEY		= "RootBoneNode";
 		static const constexpr char* BONE_NODES_KEY			= "BoneNodes";
+		static const constexpr char* ROOT_OFFSET_KEY		= "RootOffset";
 		static const constexpr char* BONE_NODE_ID_KEY		= "BoneNodeID";
 		static const constexpr char* BONE_NODE_NAME_KEY		= "BoneNodeName";
 		static const constexpr char* PARENT_BONDE_NODE_KEY	= "ParentBoneNode";
@@ -245,6 +246,7 @@ namespace JG
 		String Name;
 		u32	   RootBoneNode;
 		List<BoneNode> BoneNodes;
+		JMatrix RootOffset;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;

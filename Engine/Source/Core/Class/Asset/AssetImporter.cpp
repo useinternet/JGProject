@@ -13,6 +13,17 @@
 
 namespace JG
 {
+	JMatrix ToJMatrix(const aiMatrix4x4& aiMatrix) 
+	{
+		return JMatrix(
+			aiMatrix.a1, aiMatrix.a2, aiMatrix.a3, aiMatrix.a4,
+			aiMatrix.b1, aiMatrix.b2, aiMatrix.b3, aiMatrix.b4,
+			aiMatrix.c1, aiMatrix.c2, aiMatrix.c3, aiMatrix.c4,
+			aiMatrix.d1, aiMatrix.d2, aiMatrix.d3, aiMatrix.d4);
+	};
+
+
+
 	EAssetImportResult AssetImporter::Import(const FBXAssetImportSettings& setting)
 	{
 		Assimp::Importer importer;
@@ -33,7 +44,13 @@ namespace JG
 			aiProcess_SortByPType |               // 단일타입의  프리미티브로 구성된 '깨끗한' 매쉬를 만듬
 			aiProcess_CalcTangentSpace            // 탄젠트 공간 계산 )
 		);
-		
+		// Skeletal
+
+		// Bone Data
+
+		// BoneTransform[64];
+
+		// 이걸로 vertex 
 		
 		if (scene != nullptr)
 		{
@@ -59,6 +76,7 @@ namespace JG
 					{
 						SkeletalAssetStock skeletalInfo;
 						skeletalInfo.Name = mesh->mName.C_Str() + String("_Skeletal");
+					
 						ReadSkeletal(scene, mesh, &skeletalInfo);
 						WriteSkeletal(setting.OutputPath, skeletalInfo);
 					}
@@ -312,7 +330,7 @@ namespace JG
 				for (u32 j = 0; j < weightCnt; ++j)
 				{
 					u32 vertexID	 = bone->mWeights[j].mVertexId;
-					u32 vertexWeight = bone->mWeights[j].mWeight;
+					f32 vertexWeight = bone->mWeights[j].mWeight;
 
 					for (u32 k = 0; k < 4; ++k)
 					{
@@ -333,6 +351,7 @@ namespace JG
 	}
 	void AssetImporter::ReadSkeletal(const aiScene* scene, const aiMesh* mesh, SkeletalAssetStock* output)
 	{
+		output->RootOffset = ToJMatrix(scene->mRootNode->mTransformation.Inverse());
 		Dictionary<String, u32> boneNodeDIc;
 
 		ReadSkeletalNode(mesh, boneNodeDIc, output);
@@ -344,16 +363,6 @@ namespace JG
 	void AssetImporter::ReadSkeletalNode(const aiMesh* mesh, Dictionary<String, u32>& boneNodeDIc,  SkeletalAssetStock* output)
 	{
 		u32 boneCount = mesh->mNumBones;
-
-		std::function<JMatrix(const aiMatrix4x4&)> toJMatrix = [](const aiMatrix4x4& aiMatrix) -> JMatrix
-		{
-			return JMatrix(
-				aiMatrix.a1, aiMatrix.a2, aiMatrix.a3, aiMatrix.a4,
-				aiMatrix.b1, aiMatrix.b2, aiMatrix.b3, aiMatrix.b4,
-				aiMatrix.c1, aiMatrix.c2, aiMatrix.c3, aiMatrix.c4,
-				aiMatrix.d1, aiMatrix.d2, aiMatrix.d3, aiMatrix.d4);
-		};
-
 		output->BoneNodes.resize(boneCount);
 
 		for (u32 i = 0; i < boneCount; ++i)
@@ -364,7 +373,7 @@ namespace JG
 			SkeletalAssetStock::BoneNode& boneNode = output->BoneNodes[i];
 			boneNode.ID = i;
 			boneNode.Name = bone->mName.C_Str();
-			boneNode.BoneOffset = toJMatrix(bone->mOffsetMatrix);
+			boneNode.BoneOffset = ToJMatrix(bone->mOffsetMatrix);
 			boneNodeDIc[boneNode.Name] = i;
 		}
 
@@ -373,14 +382,6 @@ namespace JG
 	}
 	void AssetImporter::ReadSkeletalHierarchy(const aiNode* node, const Dictionary<String, u32>& boneNodeDic, SkeletalAssetStock* output)
 	{
-		std::function<JMatrix(const aiMatrix4x4&)> toJMatrix = [](const aiMatrix4x4& aiMatrix) -> JMatrix
-		{
-			return JMatrix(
-				aiMatrix.a1, aiMatrix.a2, aiMatrix.a3, aiMatrix.a4,
-				aiMatrix.b1, aiMatrix.b2, aiMatrix.b3, aiMatrix.b4,
-				aiMatrix.c1, aiMatrix.c2, aiMatrix.c3, aiMatrix.c4,
-				aiMatrix.d1, aiMatrix.d2, aiMatrix.d3, aiMatrix.d4);
-		};
 		if (boneNodeDic.find(node->mName.C_Str()) != boneNodeDic.end())
 		{
 			u32 boneID = boneNodeDic.at(node->mName.C_Str());
@@ -400,7 +401,7 @@ namespace JG
 				boneNode.ParentNode = parentBoneID;
 				parentBoneNode.ChildNodes.push_back(boneID);
 			}
-			boneNode.Transform = toJMatrix(node->mTransformation);
+			boneNode.Transform = ToJMatrix(node->mTransformation);
 		}
 
 		for (u32 i = 0; i < node->mNumChildren; ++i)
