@@ -25,7 +25,7 @@ namespace JG
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
 
 
-
+		SharedPtr<AnimationParameters> GetAnimationParameters() const;
 		SharedPtr<AnimationSequence> GetRootAnimationSequence() const;
 	};
 }

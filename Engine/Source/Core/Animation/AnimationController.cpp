@@ -22,9 +22,14 @@ namespace JG
 		return SharedPtr<AnimationClipInfo>();
 	}
 
+	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters() const
+	{
+		return mAnimParams;
+	}
+
 	SharedPtr<AnimationSequence> AnimationController::GetRootAnimationSequence() const
 	{
-		return SharedPtr<AnimationSequence>();
+		return mRootSequence;
 	}
 
 

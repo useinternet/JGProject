@@ -12,17 +12,16 @@ namespace JG
 			String Name;
 			List<byte> Data;
 			EAnimationParameterType ParamType;
-			bool IsDirty = false;
 		};
 
 		Dictionary<String, ParamData> mParamDatas;
 	public:
-		void SetBool(const String& name, bool value);
-		void SetInt(const String& name, i32 value);
-		void SetFloat(const String& name, f32 value);
-		void SetVector2(const String& name, const JVector2& value);
-		void SetVector3(const String& name, const JVector3& value);
-		void SetVector4(const String& name, const JVector4& value);
+		bool SetBool(const String& name, bool value);
+		bool SetInt(const String& name, i32 value);
+		bool SetFloat(const String& name, f32 value);
+		bool SetVector2(const String& name, const JVector2& value);
+		bool SetVector3(const String& name, const JVector3& value);
+		bool SetVector4(const String& name, const JVector4& value);
 
 
 		bool GetBool(const String& name, bool* out_value);
@@ -35,11 +34,10 @@ namespace JG
 
 		// Copy
 		SharedPtr<AnimationParameters> Copy() const;
-		// Dirty한 부분 이나, 없는 부분만 채워 너음
-		void Overwrite(SharedPtr<AnimationParameters> params);
 	private:
-		void SetData(const String& name, void* data, u64 dataSize);
-		bool GetData(const String& name, void* out_data, u64 dataSize);
+		bool SetData(EAnimationParameterType type, const String& name, const void* data);
+		bool GetData(EAnimationParameterType type, const String& name, void* out_data);
 
+		u64 GetTypeDataSize(EAnimationParameterType type);
 	};
 }

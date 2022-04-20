@@ -11,6 +11,7 @@ enum class EAnimationParameterType
 	Vector3,
 	Vector4
 };
+
 enum class EAnimationCondition
 {
 	Equal,
@@ -19,3 +20,5 @@ enum class EAnimationCondition
 	Over,
 	Less,
 };
+
+

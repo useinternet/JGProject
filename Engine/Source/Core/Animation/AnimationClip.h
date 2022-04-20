@@ -16,6 +16,8 @@ namespace JG
 		String Name;
 		f32    AccTime;
 		SharedPtr<AnimationTransform> AnimTransform;
+		SharedPtr<AnimationClip> Clip;
+
 	};
 
 	class AnimationClip
