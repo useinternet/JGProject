@@ -22,6 +22,11 @@ namespace JG
 		return SharedPtr<AnimationClipInfo>();
 	}
 
+	SharedPtr<Skeletone> AnimationController::GetBindedSkeletone() const
+	{
+		return mSkeletone;
+	}
+
 	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters() const
 	{
 		return mAnimParams;

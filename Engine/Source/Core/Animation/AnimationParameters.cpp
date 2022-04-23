@@ -100,10 +100,8 @@ namespace JG
 			paramData.Data.resize(dataSize);
 			paramData.ParamType = type;
 			memcpy(paramData.Data.data(), data, dataSize);
-			mCacheParamNameSet.insert(name);
 		}
 		
-		mDirtyParamNameSet.insert(name);
 		return true;
 	}
 

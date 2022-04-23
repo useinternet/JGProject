@@ -1,6 +1,6 @@
 #pragma once
 #include "JGCore.h"
-
+#include "AnimationDefines.h"
 
 namespace JG
 {
@@ -19,6 +19,7 @@ namespace JG
 		SharedPtr<AnimationClip> Clip;
 
 	};
+
 
 	class AnimationClip
 	{
@@ -42,7 +43,7 @@ namespace JG
 		f32 mTickPerSecond = 0.0f;
 		Dictionary<String, AnimationNode> mAnimationNodes;
 	public:
-		bool Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone);
+		EAnimationClipState Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform);
 
 	private:
 		void UpdateInternal(u32 nodeID, f32 tick, SharedPtr<JG::Skeletone> skeletone, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);

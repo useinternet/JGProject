@@ -36,7 +36,7 @@ namespace JG
 	{
 		enum class ENodeType
 		{
-			Empty,
+			Begin,
 			AnimationClip,
 			AnimationSequence,
 		};
@@ -53,13 +53,13 @@ namespace JG
 		WeakPtr<AnimationController> mOwnerAnimController;
 
 		Dictionary<String, UniquePtr<Node>> mNodeDic;
-		List<UniquePtr<AnimationSequence>> mAnimSequenceList;
+		List<UniquePtr<AnimationSequence>>  mAnimSequenceList;
 		List<String> mAnimClipNameList;
 
-		String mStartNodeName;
-		String mEndNodeName;
+		String mBeginNodeName;
 
-		bool mIsMakingSequence = false;
+		Node* mCurrentNode = nullptr;
+		bool  mIsMakingSequence = false;
 	public:
 		AnimationSequence(SharedPtr<AnimationController> controller);
 
@@ -67,20 +67,22 @@ namespace JG
 		bool IsValid() const;
 		SharedPtr<AnimationController> GetOwnerAnimationController() const;
 
-		AnimationSequenceNexus Begin(const String& startNodeName, const String& endNodeName);
+		AnimationSequenceNexus Begin(const String& startNodeName);
 		AnimationSequenceNexus MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
 		AnimationSequenceNexus MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
 		AnimationSequenceNexus ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		
 		void End();
-		void Reset();
-
+		
 		SharedPtr<AnimationTransform> Execute();
 	private:
-	
 		bool CreateNode(ENodeType nodeType, const String& name);
 		bool IsExistNode(const String& name) const;
 		AnimationSequence::Node* FindNode(const String& name) const;
 
+		SharedPtr<AnimationTransform> ExecuteInternal(Node* node);
+
+
+		void Reset();
 	};
 }

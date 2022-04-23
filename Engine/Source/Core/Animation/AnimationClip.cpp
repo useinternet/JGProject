@@ -8,11 +8,11 @@
 
 namespace JG
 {
-	bool AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone)
+	EAnimationClipState AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform)
 	{
 		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr)
 		{
-			return false;
+			return EAnimationClipState::None;
 		}
 		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
 
@@ -20,13 +20,13 @@ namespace JG
 		if (clipInfo->AccTime >= mDuration)
 		{
 			clipInfo->AccTime = 0.0f;
-			return false;
+			return EAnimationClipState::Compelete;
 		}
-		SharedPtr<AnimationTransform> animTransform;
+		SharedPtr<AnimationTransform> animTransform = CreateSharedPtr<AnimationTransform>();
 
 		UpdateInternal(skeletone->GetRootNodeID(), tick, skeletone, JMatrix::Identity(), animTransform);
 
-		return true;
+		return EAnimationClipState::Running;
 	}
 	void AnimationClip::UpdateInternal(u32 nodeID, f32 tick, SharedPtr<JG::Skeletone> skeletone, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
 	{
