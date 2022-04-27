@@ -9,22 +9,6 @@ namespace JG
 	class AnimationClipInfo;
 	class AnimationSequence;
 
-	class AnimationSequenceNexus
-	{
-	private:
-		AnimationSequence* Pointer = nullptr;
-	public:
-		AnimationSequenceNexus(AnimationSequence* Pointer) : Pointer(Pointer) {}
-
-
-		/*AnimationSequenceNexus MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
-		AnimationSequenceNexus MakeAnimationClipNode(const String& clipName, const MakeAnimationClipAction& makeAction);
-		AnimationSequenceNexus ConnectSequence(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
-		AnimationSequenceNexus ConnectAnimationClip(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);*/
-		void End();
-	private:
-		bool IsValid() const;
-	};
 
 	template<class T>
 	using MakeAnimationAction = std::function<void(T* )>;
@@ -67,10 +51,10 @@ namespace JG
 		bool IsValid() const;
 		SharedPtr<AnimationController> GetOwnerAnimationController() const;
 
-		AnimationSequenceNexus Begin(const String& startNodeName);
-		AnimationSequenceNexus MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
-		AnimationSequenceNexus MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
-		AnimationSequenceNexus ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
+		AnimationSequence& Begin(const String& startNodeName);
+		AnimationSequence& MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
+		AnimationSequence& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
+		AnimationSequence& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		
 		void End();
 		

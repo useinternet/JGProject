@@ -6,61 +6,6 @@
 #include "AnimationClip.h"
 namespace JG
 {
-	//AnimationSequenceNexus AnimationSequenceNexus::MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction)
-	//{
-	//	if (IsValid() == false)
-	//	{
-	//		return AnimationSequenceNexus(nullptr);
-	//	}
-	//	return Pointer->MakeSequenceNode(name, makeAction);
-	//}
-
-	//AnimationSequenceNexus AnimationSequenceNexus::MakeAnimationClipNode(const String& clipName, const MakeAnimationClipAction& makeAction)
-	//{
-	//	if (IsValid() == false)
-	//	{
-	//		return AnimationSequenceNexus(nullptr);
-	//	}
-	//	return Pointer->MakeAnimationClipNode(clipName, makeAction);
-	//}
-
-	//AnimationSequenceNexus AnimationSequenceNexus::ConnectSequence(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
-	//{
-	//	if (IsValid() == false)
-	//	{
-	//		return AnimationSequenceNexus(nullptr);
-	//	}
-	//	return Pointer->ConnectSequence(prevName, nextName, makeAction);
-	//}
-
-	//AnimationSequenceNexus AnimationSequenceNexus::ConnectAnimationClip(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
-	//{
-	//	if (IsValid() == false)
-	//	{
-	//		return AnimationSequenceNexus(nullptr);
-	//	}
-	//	return Pointer->ConnectAnimationClip(prevName, nextName, makeAction);
-	//}
-
-	void AnimationSequenceNexus::End()
-	{
-		if (IsValid() == false)
-		{
-			return;
-		}
-		Pointer->End();
-	}
-
-	bool AnimationSequenceNexus::IsValid() const
-	{
-		return Pointer != nullptr;
-	}
-
-
-
-
-
-
 	AnimationSequence::AnimationSequence(SharedPtr<AnimationController> controller)
 	{
 		mOwnerAnimController = controller;
@@ -76,26 +21,26 @@ namespace JG
 		return mOwnerAnimController.lock();
 	}
 
-	AnimationSequenceNexus AnimationSequence::Begin(const String& startNodeName)
+	AnimationSequence& AnimationSequence::Begin(const String& startNodeName)
 	{
 		Reset();
 		mIsMakingSequence = true;
 		if (CreateNode(ENodeType::Begin, startNodeName) == false)
 		{
-			return AnimationSequenceNexus(nullptr);
+			return *this;
 		}
 		mBeginNodeName = startNodeName;
 
 
 
-		return AnimationSequenceNexus(this);
+		return *this;
 	}
 
-	AnimationSequenceNexus AnimationSequence::MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction)
+	AnimationSequence& AnimationSequence::MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction)
 	{
 		if (CreateNode(ENodeType::AnimationSequence, name) == false)
 		{
-			return AnimationSequenceNexus(nullptr);
+			return *this;
 		}
 
 		const Node* node = FindNode(name);
@@ -105,14 +50,14 @@ namespace JG
 			makeAction(pAnimSequence);
 		}
 
-		return AnimationSequenceNexus(this);
+		return *this;
 	}
 
-	AnimationSequenceNexus AnimationSequence::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
+	AnimationSequence& AnimationSequence::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
 	{
 		if (CreateNode(ENodeType::AnimationClip, name) == false)
 		{
-			return AnimationSequenceNexus(nullptr);
+			return *this;
 		}
 
 		const Node* node = FindNode(name);
@@ -121,14 +66,14 @@ namespace JG
 		{
 			makeAction(pClipInfo.get());
 		}
-		return AnimationSequenceNexus(this);
+		return *this;
 	}
 
-	AnimationSequenceNexus AnimationSequence::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
+	AnimationSequence& AnimationSequence::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
 		if (IsExistNode(prevName) == false || IsExistNode(nextName) == false)
 		{
-			return AnimationSequenceNexus(nullptr);
+			return *this;
 		}
 
 		AnimationTransitionData transitionData;
@@ -153,7 +98,7 @@ namespace JG
 		{
 			makeAction(transition.get());
 		}
-		return AnimationSequenceNexus(this);
+		return *this;
 	}
 
 
@@ -168,23 +113,10 @@ namespace JG
 		{
 			mCurrentNode = FindNode(mBeginNodeName);
 		}
-
-
-
 		if(mCurrentNode == nullptr)
 		{
 			return nullptr;
 		}
-
-		
-
-		// 시퀸스 
-
-		// 애니메이션 트랜스폼을 리턴
-
-
-
-
 		return nullptr;
 	}
 	bool AnimationSequence::CreateNode(ENodeType nodeType, const String& name)
@@ -270,6 +202,26 @@ namespace JG
 				}
 				result = CreateSharedPtr<AnimationTransform>();
 				EAnimationClipState clipState = animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
+				switch (clipState)
+				{
+				case EAnimationClipState::Running:
+				case EAnimationClipState::Compelete:
+					if (animClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
+					{
+						animClipInfo->Reset();
+						animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
+					}
+					break;
+				default:
+					result = nullptr;
+				break;
+				}
+
+				// clipState 에 따른 대처 고민 해보자
+				// Clip이면 애니메이션이 모두 완료될때까지 Clip에서 실행
+				// Clip이 완료되면 Transition 검사 이후 
+				// 트랜지션이  false 애니메이션 다시 시작 머물러서
+
 				// clipState 에 따른 대처 고민 해보자
 				// Clip이면 애니메이션이 모두 완료될때까지 Clip에서 실행
 				// Clip이 완료되면 Transition 검사 이후 

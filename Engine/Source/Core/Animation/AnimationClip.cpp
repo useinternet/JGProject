@@ -10,7 +10,7 @@ namespace JG
 {
 	EAnimationClipState AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform)
 	{
-		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr)
+		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr || animTransform == nullptr)
 		{
 			return EAnimationClipState::None;
 		}
@@ -22,7 +22,6 @@ namespace JG
 			clipInfo->AccTime = 0.0f;
 			return EAnimationClipState::Compelete;
 		}
-		SharedPtr<AnimationTransform> animTransform = CreateSharedPtr<AnimationTransform>();
 
 		UpdateInternal(skeletone->GetRootNodeID(), tick, skeletone, JMatrix::Identity(), animTransform);
 
@@ -181,10 +180,16 @@ namespace JG
 		
 		for (const auto& _pair : stock.AnimationNodes)
 		{
-			animClip->mAnimationNodes.emplace(_pair.first, _pair.second);
+			AnimationNode node;
+			node.NodeName = _pair.second.NodeName;
+			node.LocationValues = _pair.second.LocationValues;
+			node.LocationTimes  = _pair.second.LocationTimes;
+			node.RotationValues = _pair.second.RotationValues;
+			node.RotationTimes	= _pair.second.RotationTimes;
+			node.ScaleValues	= _pair.second.ScaleValues;
+			node.ScaleTimes		= _pair.second.ScaleTimes;
+			animClip->mAnimationNodes.emplace(_pair.first, node);
 		}
 		return animClip;
 	}
-
-
 }

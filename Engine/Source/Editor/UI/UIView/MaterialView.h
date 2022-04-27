@@ -5,10 +5,6 @@
 
 namespace JG
 {
-	/* MaterialView 기능
-1. Material Script 편집기능 ( 오래걸리는것같으면 패스 )
-2. Material 컴파일, Mesh 테스트 적용, 뷰어 기능 추가
-*/
 	namespace Graphics
 	{
 		class Scene;

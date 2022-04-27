@@ -17,14 +17,22 @@ namespace JG
 		f32    AccTime;
 		SharedPtr<AnimationTransform> AnimTransform;
 		SharedPtr<AnimationClip> Clip;
+		EAnimationClipFlags Flags = EAnimationClipFlags::None;
 
+	public:
+		void Reset()
+		{
+			AccTime = 0.0f;
+		}
+		EAnimationClipFlags GetFlags() const
+		{
+			return Flags;
+		}
 	};
 
 
 	class AnimationClip
 	{
-		// 애니메이션에 필요한 트랜스폼 계산 -> 컨트롤러에서
-		// 클립은 컨트롤러가 가지고있는다.
 		struct AnimationNode
 		{
 			String NodeName;

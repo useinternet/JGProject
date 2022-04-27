@@ -5,7 +5,7 @@
 
 namespace JG
 {
-	struct SkeletalAssetStock;
+	class SkeletalAssetStock;
 	class Skeletone
 	{
 	public:

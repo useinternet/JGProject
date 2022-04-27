@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "MaterialView.h"
-#include "UI/UIManager.h"
 #include "Application.h"
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/TextEditor.h"

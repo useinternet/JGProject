@@ -25,9 +25,16 @@ namespace JG
 	};
 
 	ENUM_FLAG(EAnimationTransitionFlags)
-		enum class EAnimationTransitionFlags
+	enum class EAnimationTransitionFlags
 	{
 		None,
+	};
+
+	ENUM_FLAG(EAnimationClipFlags)
+	enum class EAnimationClipFlags
+	{
+		None, 
+		Repeat,
 	};
 
 	enum class EAnimationClipState
