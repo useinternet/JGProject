@@ -11,6 +11,7 @@ namespace JG
 		class StaticRenderObject;
 	}
 	class TextEditor;
+	class EditorUIScene;
 	class MaterialView : public UIView
 	{
 		JGCLASS
@@ -33,14 +34,13 @@ namespace JG
 
 
 		SharedPtr<ITexture>		    mSceneTexture;
-		SharedPtr<Asset<IMesh>>     mMeshAsset = nullptr;
 		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
 		UniquePtr<TextEditor>		mTextEditor;
-
+		UniquePtr<EditorUIScene>	mEditorUIScene;
 		List<String> mMaterialLogs;
 
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
-		Graphics::Scene* mScene = nullptr;
+		SharedPtr<Graphics::StaticRenderObject> mModel;
 
 		StorableString mFailedCompileShaderCode;
 	public:
@@ -63,10 +63,7 @@ namespace JG
 		void RightBottomOnGUI();
 	private:
 		void LoadTextEditor(const String& text);
-		void PushSceneObject();
-		void Rendering();
 		void UpdateScene();
-
 		void SaveAndApplyScript();
 		bool CompileShader();
 

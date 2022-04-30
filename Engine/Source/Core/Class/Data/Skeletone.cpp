@@ -1,3 +1,5 @@
+#include "Skeletone.h"
+#include "Skeletone.h"
 #include "pch.h"
 #include "Skeletone.h"
 #include "Class/Asset/Asset.h"
@@ -28,13 +30,21 @@ namespace JG
 		return mRootBoneNode != -1;
 	}
 
-	SharedPtr<Skeletone> Skeletone::Create(const SkeletalAssetStock& stock)
+	void Skeletone::SetName(const String& name)
 	{
-		SharedPtr<Skeletone> skeletalone = CreateSharedPtr<Skeletone>();
+		mName = name;
+	}
 
-		skeletalone->mName = stock.Name;
-		skeletalone->mRootBoneNode = stock.RootBoneNode;
-		skeletalone->mRootOffsetTransform = stock.RootOffset;
+	const String& Skeletone::GetName() const
+	{
+		return mName;
+	}
+
+	void Skeletone::SetSkeletalStock(const SkeletalAssetStock& stock)
+	{
+		mSkeletoneName = stock.Name;
+		mRootBoneNode = stock.RootBoneNode;
+		mRootOffsetTransform = stock.RootOffset;
 		for (const SkeletalAssetStock::BoneNode& boneNode : stock.BoneNodes)
 		{
 			Node node;
@@ -47,9 +57,22 @@ namespace JG
 			node.Transform  = boneNode.Transform;
 			node.BoneOffset = boneNode.BoneOffset;
 
-			skeletalone->mBoneNodes.push_back(node);
+			mBoneNodes.push_back(node);
 		}
-		return skeletalone;
+	}
+
+	SharedPtr<Skeletone> Skeletone::Create(const String& name)
+	{
+		SharedPtr<Skeletone> skeletone = CreateSharedPtr<Skeletone>();
+		skeletone->mName = name;
+		return skeletone;
+	}
+
+	SharedPtr<Skeletone> Skeletone::Create(const SkeletalAssetStock& stock)
+	{
+		SharedPtr<Skeletone> skeletone = CreateSharedPtr<Skeletone>();
+		skeletone->SetSkeletalStock(stock);
+		return skeletone;
 	}
 
 

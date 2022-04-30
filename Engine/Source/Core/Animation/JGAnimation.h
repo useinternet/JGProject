@@ -24,10 +24,32 @@ namespace JG
 	완성된 Animation은 동기화 후 등록된 Scene에 Vertex 변경 요청 -> SkeletalRenderObject 넘길때 같이 넘김
 	
 	*/
+
+
+
+
+	/*
+	JGAnimation은 등록된 AnimationController 의 로직 관리를 한다.
+	*/
+	class AnimationController;
+	class AnimationClip;
 	class JGAnimation : public IGlobalSingleton<JGAnimation>
 	{
+		List<WeakPtr<AnimationController>> mRegisteredAnimationControllers;
+		Queue<WeakPtr<AnimationController>> mAddedRegisterAnimationControllers;
 
+		SharedPtr<ScheduleHandle> mAnimThreadSH;
+		SharedPtr<ScheduleHandle> mAnimBeginFrameSH;
+		SharedPtr<ScheduleHandle> mAnimEndFrameSH;
 	public:
+		JGAnimation();
+		virtual ~JGAnimation();
+
+		void RegisterAnimationController(SharedPtr<AnimationController> controller);
+	private:
+		EScheduleResult BeginFrame();
+		EScheduleResult EndFrame();
+		void Update_Thread();
 
 	};
 }

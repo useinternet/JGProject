@@ -17,6 +17,7 @@
 #include "UI/UIView/ModelView.h"
 #include "UI/UIView/MaterialView.h"
 #include "UI/UIView/PrefabView.h"
+#include "UI/UIView/AnimationClipView.h"
 #include "UI/UIManager.h"
 namespace JG
 {
@@ -829,6 +830,15 @@ namespace JG
 				prefabView->Open();
 			}
 		}
+			break;
+		case EAssetFormat::AnimationClip:
+			u64 pathHash = std::hash<String>()(path);
+			AnimationClipView* animClipView = UIManager::GetInstance().GetUIView<AnimationClipView>(pathHash);
+			if (animClipView != nullptr)
+			{
+				animClipView->SetAnimationClip(path);
+				animClipView->Open();
+			}
 			break;
 		}
 

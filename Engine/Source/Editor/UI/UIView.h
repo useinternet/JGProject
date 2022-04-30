@@ -59,11 +59,12 @@ namespace JG
 		u64  mViewID    = 0;
 		bool mIsUniqueView = true;
 		bool mIsShowGUI    = true;
-	private:
+	protected:
 		virtual u64 GetViewID() const override
 		{
 			return mViewID;
 		}
+	private:
 		virtual void SetViewID(u64 id) override
 		{
 			mViewID = id;

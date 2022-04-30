@@ -475,6 +475,7 @@ namespace JG
 
 	class AssetManager;
 	class IMaterial;
+	class Skeletone;
 	class AssetDataBase : public IGlobalSingleton<AssetDataBase>
 	{
 	private:

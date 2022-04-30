@@ -7,6 +7,7 @@
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
 #include "UI/UIManager.h"
+#include "UI/EditorUIScene.h"
 
 namespace JG
 {
@@ -27,7 +28,7 @@ namespace JG
 	void MaterialView::OnGUI()
 	{
 		mWindowHeight = ImGui::GetWindowHeight();
-
+		UpdateScene();
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, mImageSize.x + ImGui::GetStyle().FramePadding.x * 4);
 		LeftTopOnGUI();
@@ -41,11 +42,9 @@ namespace JG
 	}
 	void MaterialView::Destroy()
 	{
-		mMeshAsset = nullptr;
 		mMaterialAsset = nullptr;
 		mTextEditor = nullptr;
-		JGGraphics::GetInstance().DestroyObject(mScene);
-		mScene = nullptr;
+		mEditorUIScene = nullptr;
 	}
 	void MaterialView::OnEvent(IEvent& e)
 	{
@@ -56,48 +55,14 @@ namespace JG
 	{
 		u64 texID = 0;
 
-		PushSceneObject();
-		Rendering();
 
 		JVector2 padding = JVector2(ImGui::GetStyle().FramePadding.x * 2, ImGui::GetStyle().FramePadding.y * 2);
 		JVector2 winSize = mResolution + padding;
 
 		ImGui::BeginChild("LeftTop_OnGUI", ImVec2(winSize.x, winSize.y));
-		if (mSceneTexture == nullptr)
+		if (mEditorUIScene != nullptr)
 		{
-			texID = JGImGui::GetInstance().ConvertImGuiTextureID(ITexture::NullTexture()->GetTextureID());
-		}
-		else
-		{
-			texID = JGImGui::GetInstance().ConvertImGuiTextureID(mSceneTexture->GetTextureID());
-		}
-
-		ImGui::ImageButton((ImTextureID)texID, ImVec2(mImageSize.x, mImageSize.y), ImVec2(0, 0), ImVec2(1, 1), 0);
-
-		if (ImGui::IsItemHovered() == true && ImGui::IsMouseDown(ImGuiMouseButton_Left) == true)
-		{
-			static JVector2 NullMousePosition = JVector2(-1, -1);
-			ImVec2 imMousePos = ImGui::GetMousePos();
-			JVector2 delta = JVector2(0, 0);
-			if (mMousePosition == NullMousePosition)
-			{
-				mMousePosition = JVector2(imMousePos.x, imMousePos.y);
-				mPrevMousePosition = mMousePosition;
-			}
-			else
-			{
-				mMousePosition = JVector2(imMousePos.x, imMousePos.y);
-				delta = mMousePosition - mPrevMousePosition;
-				mPrevMousePosition = mMousePosition;
-			}
-			mModelRotation.x += Math::ConvertToRadians(delta.y);
-			mModelRotation.y += Math::ConvertToRadians(delta.x);
-			JG_LOG_INFO("Image Drag  {0} , {1} ", delta.x, delta.y);
-		}
-		else
-		{
-			mMousePosition = JVector2(-1, -1);
-			mPrevMousePosition = JVector2(-1, -1);
+			mEditorUIScene->OnGUI();
 		}
 		ImGui::EndChild();
 	}
@@ -195,77 +160,54 @@ namespace JG
 		mTextEditor->SetText(text);
 		mTextEditor->SetPalette(TextEditor::GetDarkPalette());
 	}
-	void MaterialView::PushSceneObject()
-	{
-		if (mSkyBox == nullptr)
-		{
-			mSkyBox = GraphicsHelper::CreateSkyBox(mEyePos, mFarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
-		}
-		if (mMeshAsset == nullptr)
-		{
-			String enginePath = Application::GetEnginePath();
-			mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
-		}
-		if (mScene != nullptr && mScene->IsEnableRendering())
-		{
-			if (mMeshAsset != nullptr && mMeshAsset->IsValid() == true && mMaterialAsset != nullptr && mMaterialAsset->IsValid() == true)
-			{
-				SharedPtr<Graphics::StaticRenderObject> sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
-				JQuaternion q = JQuaternion::RotationRollPitchYawFromVector(JVector3(mModelRotation.x, mModelRotation.y, 0.0f));
-				sceneObject->WorldMatrix = JMatrix::Rotation(q) * JMatrix::Scaling(1.5f);
-				sceneObject->Mesh = mMeshAsset->Get();
-				sceneObject->MaterialList.push_back(mMaterialAsset->Get());
-				mScene->PushSceneObject(sceneObject);
-			}
-			if (mSkyBox != nullptr)
-			{
-				mScene->PushSceneObject(mSkyBox);
-			}
-			// 
-			SharedPtr<Graphics::DirectionalLight> dl = CreateSharedPtr<Graphics::DirectionalLight>();
-			dl->Color = Color::White();
-			dl->Direction = JVector3(-0.2f, -0.8f, 1.0f);
-			dl->Intensity = 1.0f;
-			mScene->PushLight(dl);
 
-		}
-	}
-	void MaterialView::Rendering()
-	{
-		if (mScene != nullptr)
-		{
-			SharedPtr<Graphics::SceneResultInfo> resultInfo = mScene->FetchResult();
-			if (resultInfo != nullptr && resultInfo->Texture != nullptr && resultInfo->Texture->IsValid() == true)
-			{
-				mSceneTexture = resultInfo->Texture;
-			}
-			mScene->Rendering();
-		}
-	}
 	void MaterialView::UpdateScene()
 	{
 		const JVector3 targetVec(0, 0, -1);
 		const JVector3 upVec(0, 1, 0);
+		const JVector3 eyePos(0, 0, -200.0f);
+		const f32 farZ = 1000000.0f;
+		const f32 nearZ = 1.0f;
+
+		if (mSkyBox == nullptr)
+		{
+			mSkyBox = GraphicsHelper::CreateSkyBox(eyePos, farZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
+		}
+		if (mModel == nullptr)
+		{
+			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
+			if (mMaterialAsset != nullptr && mMaterialAsset->IsValid())
+			{
+				mModel->MaterialList.resize(1);
+				mModel->MaterialList[0] = mMaterialAsset->Get();
+			}
+		}
+		if (mModel->Mesh == nullptr)
+		{
+			String enginePath = Application::GetEnginePath();
+			auto   meshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
+			if (meshAsset != nullptr && meshAsset->IsValid())
+			{
+				mModel->Mesh = meshAsset->Get();
+			}
+		}
+		if (mEditorUIScene == nullptr)
+		{
+			EditorUISceneConfig config;
+			config.Resolution = mResolution;
+			config.ImageSize = mImageSize;
+			config.OffsetScale = JVector3(1.5f, 1.5f, 1.5f);
+			config.Model = mModel;
+			config.SkyBox = mSkyBox;
+			config.FarZ = farZ;
+			config.NearZ = nearZ;
+			config.EyePos = eyePos;
+
+			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
+		}
 
 
-		Graphics::SceneInfo sceneInfo;
-		sceneInfo.RenderPath = ERendererPath::RayTracing;
-		sceneInfo.Resolution = mResolution;
-		sceneInfo.EyePos = mEyePos;
-		sceneInfo.ViewMatrix = JMatrix::LookAtLH(mEyePos, targetVec, upVec);
-		sceneInfo.ProjMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(90), mResolution.x / mResolution.y, mNearZ, mFarZ);
-		sceneInfo.ViewProjMatrix = sceneInfo.ViewMatrix * sceneInfo.ProjMatrix;
-		sceneInfo.NearZ = mNearZ;
-		sceneInfo.FarZ = mFarZ;
-		sceneInfo.ClearColor = Color();
-		if (mScene == nullptr)
-		{
-			mScene = JGGraphics::GetInstance().CreateScene("ModelView_Scene", sceneInfo);
-		}
-		else
-		{
-			mScene->SetSceneInfo(sceneInfo);
-		}
+
 	}
 
 	void MaterialView::SaveAndApplyScript()
@@ -306,7 +248,7 @@ namespace JG
 		}
 		bool mIsCompileSuccess = false;
 		SharedPtr<IShaderScript> newScript = IShaderScript::CreateSurfaceScript(script->GetName(), mTextEditor->GetText());
-		switch (mScene->GetRenderer()->GetRendererPath())
+		switch (mEditorUIScene->GetScene()->GetRenderer()->GetRendererPath())
 		{
 		case ERendererPath::RayTracing:
 		{
@@ -335,7 +277,6 @@ namespace JG
 	}
 	void MaterialView::SetMaterial(const String& path)
 	{
-		//AssetID originMaterial = AssetDataBase::GetInstance().GetAssetOriginID(path);
 		mMaterialAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMaterial>(path);
 	}
 
@@ -344,7 +285,7 @@ namespace JG
 		SharedPtr<Asset<IMesh>> asset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(path);
 		if (asset != nullptr && asset->IsValid())
 		{
-			mMeshAsset = asset;
+			mModel->Mesh = asset->Get();
 		}
 	}
 }

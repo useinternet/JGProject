@@ -4,6 +4,9 @@
 #include "AssetHelper.h"
 #include "Application.h"
 #include "Graphics/JGGraphics.h"
+#include "Class/Data/Skeletone.h"
+#include "Animation/AnimationClip.h"
+#include "Animation/AnimationController.h"
 #include "AssetImporter.h"
 
 namespace JG
@@ -837,6 +840,30 @@ namespace JG
 			LoadData->Stock      = CreateSharedPtr<MaterialAssetStock>();
 			LoadData->OnComplete = std::bind(&AssetDataBase::MaterialAsset_OnCompelete, this, std::placeholders::_1);
 			LoadData->Stock->LoadJson(assetVal);
+			break;
+		}
+		case EAssetFormat::Skeletal:
+		{
+			SkeletalAssetStock stock;
+			stock.LoadJson(assetVal);
+			auto sAsset = LoadData->Asset->As<Asset<Skeletone>>();
+			if (sAsset != nullptr)
+			{
+				sAsset->mData->SetSkeletalStock(stock);
+			}
+			else return false;
+			break;
+		}
+		case EAssetFormat::AnimationClip:
+		{
+			AnimationClipAssetStock stock;
+			stock.LoadJson(assetVal);
+			auto aAsset = LoadData->Asset->As<Asset<AnimationClip>>();
+			if (aAsset != nullptr)
+			{
+				aAsset->mData->SetAnimationClipStock(stock);
+			}
+			else return false;
 			break;
 		}
 		case EAssetFormat::GameWorld:
