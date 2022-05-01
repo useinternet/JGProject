@@ -16,12 +16,9 @@ namespace JG
 	private:
 		String Name;
 		f32    AccTime;
-		SharedPtr<AnimationTransform> AnimTransform;
+
 		SharedPtr<AnimationClip> Clip;
 		EAnimationClipFlags Flags = EAnimationClipFlags::None;
-
-
-		
 	public:
 		AnimationClipInfo(const String& name, SharedPtr<AnimationClip> clip, EAnimationClipFlags flags);
 		void Reset()
@@ -56,7 +53,7 @@ namespace JG
 		f32 mTickPerSecond = 0.0f;
 		Dictionary<String, AnimationNode> mAnimationNodes;
 	public:
-		EAnimationClipState Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone);
+		EAnimationClipState Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform);
 
 
 		bool IsValid() const;

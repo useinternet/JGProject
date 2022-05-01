@@ -215,7 +215,8 @@ namespace JG
 					JG_LOG_ERROR("%s is not exist Animation Clip", name);
 					return nullptr;
 				}
-				EAnimationClipState clipState = animClip->Update(animClipInfo, animController->GetBindedSkeletone());
+				result = CreateSharedPtr<AnimationTransform>();
+				EAnimationClipState clipState = animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
 				switch (clipState)
 				{
 				case EAnimationClipState::Running:
@@ -223,9 +224,9 @@ namespace JG
 					if (animClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
 					{
 						animClipInfo->Reset();
-						animClip->Update(animClipInfo, animController->GetBindedSkeletone());
+						result->Reset();
+						animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
 					}
-					result = animClipInfo->AnimTransform;
 					break;
 				default:
 					result = nullptr;

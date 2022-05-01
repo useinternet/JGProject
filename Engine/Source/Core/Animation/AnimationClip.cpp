@@ -12,15 +12,14 @@ namespace JG
 	{
 		Name = name;
 		AccTime = 0.0f;
-		AnimTransform = CreateSharedPtr<AnimationTransform>();
 		Clip = clip;
 		Flags = flags;
 	}
 
 
-	EAnimationClipState AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone)
+	EAnimationClipState AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform)
 	{
-		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr)
+		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr || animTransform == nullptr)
 		{
 			return EAnimationClipState::None;
 		}
@@ -33,7 +32,7 @@ namespace JG
 			return EAnimationClipState::Compelete;
 		}
 
-		UpdateInternal(skeletone->GetRootNodeID(), tick, skeletone, JMatrix::Identity(), clipInfo->AnimTransform);
+		UpdateInternal(skeletone->GetRootNodeID(), tick, skeletone, JMatrix::Identity(), animTransform);
 
 		return EAnimationClipState::Running;
 	}

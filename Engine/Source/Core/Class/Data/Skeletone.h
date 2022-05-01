@@ -25,7 +25,7 @@ namespace JG
 		String mSkeletoneName;
 		u32	   mRootBoneNode = -1;
 		List<Node> mBoneNodes;
-		JMatrix mRootOffsetTransform;
+		JMatrix    mRootOffsetTransform;
 	public:
 		const JMatrix& GetRootOffsetTransform() const;
 		u32 GetRootNodeID() const;
