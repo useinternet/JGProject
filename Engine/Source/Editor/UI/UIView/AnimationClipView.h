@@ -22,11 +22,11 @@ namespace JG
 		static constexpr char* CLIP_NAME = "DefaultAnimationClip";
 	private:
 		const JVector2 mSceneResolution = JVector2(450.0f, 450.0f);
-		const f32 mInspectorWidth = 350.0f;
+		const f32 mInspectorWidth = 450.0f;
 
 
-		SharedPtr<Graphics::StaticRenderObject>   mSkyBox;
-		SharedPtr<Graphics::SkeletalRenderObject> mModel;
+		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
+		SharedPtr<Graphics::StaticRenderObject> mModel;
 
 		List<SharedPtr<Asset<IMaterial>>> mMaterialAssetList;
 		SharedPtr<Asset<Skeletone>> mSkeletoneAsset = nullptr;

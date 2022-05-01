@@ -2,6 +2,7 @@
 #include "AssetFinderContextView.h"
 #include "ExternalImpl/JGImGui.h"
 #include "Class/Asset/Asset.h"
+#include "Class/Asset/AssetHelper.h"
 #include "Application.h"
 namespace JG
 {
@@ -38,16 +39,23 @@ namespace JG
 			ImGui::InputText("##Finder Serach", buf, 256);
 			ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
-			ImGui::BeginChild("##AssetList", ImVec2(0, 300.0f), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoMove);
+			ImGui::BeginChild("##AssetList", ImVec2(0.0f, 300.0f), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoMove);
 			FindAsset();
 
 			bool _bool = false;
 			for (const PathData& p : mFilteredAssetList)
 			{
-				if (ImGui::Selectable(p.Name.c_str(), &_bool))
+		
+				if (ImGui::Selectable((p.Name + "##(" + p.Path + ")").c_str(), &_bool))
 				{
 					mSelectedAssetPath = p.Path;
 					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::IsItemHovered() == true)
+				{
+					ImGui::SetTooltip(p.Path.c_str());
+					ImGui::BeginTooltip();
+					ImGui::EndTooltip();
 				}
 			}
 
@@ -97,7 +105,7 @@ namespace JG
 				
 				continue;
 			}
-			EAssetFormat format = AssetDataBase::GetInstance().GetAssetFormat(p.string());
+			EAssetFormat format = AssetHelper::GetAssetFormat(p.string());
 			
 			if (mFilterFormat == format)
 			{
@@ -107,4 +115,10 @@ namespace JG
 			}
 		}
 	}
+	AssetFinderContextView::PathData::PathData(const fs::path& p)
+	{
+		Name = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
+		AssetHelper::GetResourcePath(p.string(), nullptr, &Path);
+	}
+
 }

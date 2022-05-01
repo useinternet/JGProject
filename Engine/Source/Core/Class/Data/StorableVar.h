@@ -110,6 +110,7 @@ namespace JG
 		}
 		void Init(const String& key, const String& initData)
 		{
+			Key = key;
 			String dataPath = GetDataPath();
 			// 존재하면 읽기, 없으면 초기화 데이터
 			if (fs::exists(dataPath) == true)

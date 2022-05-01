@@ -25,11 +25,7 @@ namespace JG
 			String Name;
 			String Path;
 
-			PathData(const fs::path& p)
-			{
-				Name = StringHelper::ReplaceAll(p.filename().string(), p.extension().string(), "");
-				Path = p.string();
-			}
+			PathData(const fs::path& p);
 		};
 		static const u32 mMaxReceivePathCount = 10;
 

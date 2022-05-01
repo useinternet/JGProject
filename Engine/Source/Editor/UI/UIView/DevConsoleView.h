@@ -48,7 +48,7 @@ namespace JG
 
 		u32 mCurrentLogLine = 0;
 		u32 mReadMaxLogLine = 10;
-		u32 mMaxLogCount	= 9999;
+		u32 mMaxLogCount	= 999;
 		u32 mMainThreadID   = 0;
 
 

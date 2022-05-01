@@ -27,10 +27,9 @@ namespace JG
 
 	void AnimationClipView::Initialize()
 	{
-		u64 viewID = GetViewID();
-		mModelAssetPath    = StorableString("AnimationClipView/ModelAssetPath" + std::to_string(viewID), "");
-		mMaterialAssetPath = StorableString("AnimationClipView/MaterialAssetPath" + std::to_string(viewID), "");
-
+		SetMesh(mModelAssetPath.GetValue());
+		SetSkeletal(mSkeletoneAssetPath.GetValue());
+		SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
 	}
 
 	void AnimationClipView::OnGUI()
@@ -72,13 +71,17 @@ namespace JG
 			mSkeletoneAssetPath.SetValue(mSkeletoneAsset->GetAssetPath());
 		}
 
+		String materialAssetPathStr;
 		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
 		{
 			if (material != nullptr && material->IsValid())
 			{
-				mMaterialAssetPath.SetValue(material->GetAssetPath());
+				materialAssetPathStr += material->GetAssetPath() + ",";
 			}
 		}
+		mMaterialAssetPath.SetValue(materialAssetPathStr);
+
+
 		mMaterialAssetList.clear();
 		mAnimClipAsset = nullptr;
 		mSkyBox = nullptr;
@@ -117,7 +120,7 @@ namespace JG
 			ImGui::AssetField_OnGUI("Mesh", (mMeshAsset != nullptr && mMeshAsset->IsValid()) ? mMeshAsset->GetAssetName() : "None",
 				EAssetFormat::Mesh, [&](const String& assetPath)
 			{
-				SetSkeletal(assetPath);
+				SetMesh(assetPath);
 			}, label_Space);
 		}
 
@@ -125,7 +128,7 @@ namespace JG
 			List<String> inputText;
 			for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
 			{
-				if (material == nullptr || material->IsValid())
+				if (material == nullptr)
 				{
 					inputText.push_back("None");
 				}
@@ -174,6 +177,13 @@ namespace JG
 	void AnimationClipView::SetAnimationClip(const String& animClipPath)
 	{
 		mAnimClipAsset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(animClipPath);
+		if (mAnimClipAsset)
+		{
+			mModelAssetPath     = StorableString("AnimationClipView/ModelAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
+			mSkeletoneAssetPath = StorableString("AnimationClipView/SkeletoneAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
+			mMaterialAssetPath  = StorableString("AnimationClipView/MaterialAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
+		}
+		
 	}
 	void AnimationClipView::SetMaterial(const List<String>& materialAssetPath)
 	{
@@ -193,24 +203,25 @@ namespace JG
 
 	void AnimationClipView::UpdateScene()
 	{
-		// 乞季 持失
-		if (mModel == nullptr && mMeshAsset != nullptr && mMeshAsset->IsValid())
+
+		if (mModel == nullptr)
 		{
-			mModel = CreateSharedPtr<Graphics::SkeletalRenderObject>();
-			mModel->Mesh = mMeshAsset->Get();
-
-			for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
-			{
-				if (material == nullptr || material->IsValid() == false)
-				{
-					continue;
-				}
-				mModel->MaterialList.push_back(material->Get());
-			}
-
-			mEditorUIScene->SetModel(mModel);
+			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
 		}
-
+		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
+		{
+			mModel->Mesh = mMeshAsset->Get();
+		}
+		mModel->MaterialList.clear();
+		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
+		{
+			if (material == nullptr || material->IsValid() == false)
+			{
+				continue;
+			}
+			mModel->MaterialList.push_back(material->Get());
+		}
+		
 		// Scene 持失
 		if (mEditorUIScene == nullptr)
 		{
@@ -222,6 +233,8 @@ namespace JG
 			config.SkyBox = GraphicsHelper::CreateSkyBox(config.EyePos, config.FarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
 			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
 		}
+		mEditorUIScene->SetModel(mModel);
+
 
 		// Animation 持失
 		if (mAnimClipAsset != nullptr && mAnimClipAsset->IsValid())

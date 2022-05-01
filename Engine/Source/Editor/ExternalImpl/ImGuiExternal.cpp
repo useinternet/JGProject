@@ -362,9 +362,12 @@ namespace ImGui
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 
 		auto inputT = inputText;
-		ImGui::InputText(("##InputText" + label).c_str(), &inputT[0], ImGuiInputTextFlags_ReadOnly);
-		ImGui::SameLine();
+
 		isOpenContext = ImGui::Button(("..##Button" + label).c_str());
+		ImGui::SameLine();
+		ImGui::InputText(("##InputText" + label).c_str(), &inputT[0], ImGuiInputTextFlags_ReadOnly);
+		
+	
 		JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
 		{
 			auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
@@ -382,8 +385,8 @@ namespace ImGui
 		}
 		if (JG::UIManager::GetInstance().OnContextUIView<JG::AssetFinderContextView>(hash))
 		{
-			JG::AssetFinderContextView* contextView = JG::UIManager::GetInstance().GetPopupUIView<JG::AssetFinderContextView>();
-			JG_LOG_INFO("Selected Asset : {0}", contextView->GetSelectedAssetPath());
+			JG::AssetFinderContextView* view = JG::UIManager::GetInstance().GetPopupUIView<JG::AssetFinderContextView>();
+			action(view->GetSelectedAssetPath());
 		}
 	}
 
@@ -423,9 +426,10 @@ namespace ImGui
 				auto inputID = GetUniqueID(label, idOffset++);
 				ImGui::AlignTextToFramePadding();
 				ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
+				isOpenContext = ImGui::Button(("..##Button" + label + std::to_string(i)).c_str()); ImGui::SameLine();
 				ImGui::InputText(inputID.c_str(), inputTextList[i].data(), ImGuiInputTextFlags_ReadOnly);
-				ImGui::SameLine();
-				isOpenContext = ImGui::Button(("..##Button" + label).c_str());
+				
+				
 				JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
 				{
 					auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
@@ -442,7 +446,8 @@ namespace ImGui
 				}
 				if (JG::UIManager::GetInstance().OnContextUIView<JG::AssetFinderContextView>(hash))
 				{
-
+					JG::AssetFinderContextView* view = JG::UIManager::GetInstance().GetPopupUIView<JG::AssetFinderContextView>();
+					action(i, view->GetSelectedAssetPath());
 				}
 			}
 			ImGui::TreePop();
