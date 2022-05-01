@@ -11,6 +11,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Shader.h"
 #include "Graphics/DebugGeometryDrawer.h"
+#include "Animation/JGAnimation.h"
 using namespace std;
 namespace JG
 {
@@ -153,7 +154,7 @@ namespace JG
 			mIsRunning = true;
 		}
 		GlobalSingletonManager::GetInstance().RegisterSingleton<PhysicsManager>();
-
+		GlobalSingletonManager::GetInstance().RegisterSingleton<JGAnimation>();
 
 
 		mAppTimer = Timer::Create();
@@ -208,6 +209,7 @@ namespace JG
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
 		ITexture::DestroyNullTexture();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGAnimation>();
 		GlobalSingletonManager::GetInstance().UnRegisterSingleton<PhysicsManager>();
 		JGGraphics::GetInstance().Flush();
 		mLayerStack.reset();

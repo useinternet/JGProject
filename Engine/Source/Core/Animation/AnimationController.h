@@ -1,7 +1,7 @@
 #pragma once
 
 #include "JGCore.h"
-
+#include "AnimationDefines.h"
 namespace JG
 {
 	class AnimationClip;
@@ -9,20 +9,23 @@ namespace JG
 	class AnimationSequence;
 	class AnimationTransition;
 	class AnimationParameters;
+	class AnimationTransform;
 	class Skeletone;
-	enum class EAnimationClipFlags;
-	class AnimationController
+	class AnimationController : public Enable_Shared_From_This<AnimationController>
 	{
+		friend class JGAnimation;
+
+
 		// 클립 이 추가되면 AnimationClipInfo 생성
 		SharedPtr<AnimationSequence>   mRootSequence;
 		SharedPtr<AnimationParameters> mAnimParams;
 		SharedPtr<Skeletone> mSkeletone;
-
+		SharedPtr<AnimationTransform> mFinalTransform;
 		Dictionary<String, SharedPtr<AnimationClip>>     mAnimClips;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> mAnimClipInfos;
 
 
-		struct CilpCommandData
+		struct ClipCommandData
 		{
 			enum 
 			{
@@ -35,9 +38,9 @@ namespace JG
 			SharedPtr<AnimationClipInfo> ClipInfo;
 		};
 
-		Queue<CilpCommandData> mClipCommandDataQueue;
+		Queue<ClipCommandData> mClipCommandDataQueue;
+		SharedPtr<AnimationTransform> mPendingTransform;
 	public:
-
 		// Clip 찾기
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags);
 		void RemoveAnimationClip(const String& name);
@@ -47,8 +50,13 @@ namespace JG
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
 
-		SharedPtr<Skeletone>		   GetBindedSkeletone() const;
-		SharedPtr<AnimationParameters> GetAnimationParameters() const;
+		SharedPtr<Skeletone>		   GetBindedSkeletone()       const;
+		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationSequence>   GetRootAnimationSequence() const;
+		SharedPtr<AnimationTransform>  GetFinalTransform() const;
+	private:
+		void Init();
+		void Update();
+		void Update_Thread();
 	};
 }

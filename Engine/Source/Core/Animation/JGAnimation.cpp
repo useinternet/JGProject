@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "JGAnimation.h"
-
+#include "AnimationController.h"
 
 namespace JG
 {
@@ -35,23 +35,34 @@ namespace JG
 
 	void JGAnimation::RegisterAnimationController(SharedPtr<AnimationController> controller)
 	{
-		mAddedRegisterAnimationControllers.push(controller);
+		controller->Init();
+		mAddedRegisterAnimationControllerQueue.push(controller);
 	}
 
 	EScheduleResult JGAnimation::BeginFrame()
 	{
 		// 애니메이션 데이터 갱신 루프 시작
 
-		while (mAddedRegisterAnimationControllers.empty() == false)
+		while (mAddedRegisterAnimationControllerQueue.empty() == false)
 		{
-			WeakPtr<AnimationController> controller = mAddedRegisterAnimationControllers.front();
-			mAddedRegisterAnimationControllers.pop();
+			WeakPtr<AnimationController> controller = mAddedRegisterAnimationControllerQueue.front();
+			mAddedRegisterAnimationControllerQueue.pop();
 			if (controller.lock() == nullptr)
 			{
 				continue;
 			}
 			mRegisteredAnimationControllers.push_back(controller);
 		}
+
+		for (WeakPtr<AnimationController> weak_controller : mRegisteredAnimationControllers)
+		{
+			SharedPtr<AnimationController> controller = weak_controller.lock();
+			if (controller == nullptr) continue;
+
+			controller->Update();
+		}
+
+
 
 		if (mRegisteredAnimationControllers.empty() == false)
 		{
@@ -92,7 +103,7 @@ namespace JG
 			}
 			else
 			{
-				// 컨트롤러 로직 수행
+				controller->Update_Thread();
 				++i;
 			}
 		}

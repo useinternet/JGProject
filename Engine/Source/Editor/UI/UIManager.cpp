@@ -175,7 +175,6 @@ namespace JG
 		{
 			if (_pair.second->GetPopupType() != EPopupType::Context && _pair.second->IsOpen())
 			{
-				
 				if (_pair.second->OnGUI() == false)
 				{
 					_pair.second->Close();

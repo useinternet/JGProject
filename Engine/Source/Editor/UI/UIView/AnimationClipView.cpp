@@ -10,6 +10,7 @@
 #include "UI/UIManager.h"
 #include "UI/EditorUIScene.h"
 
+#include "Animation/JGAnimation.h"
 #include "Animation/AnimationController.h"
 #include "Animation/AnimationClip.h"
 namespace JG
@@ -34,11 +35,20 @@ namespace JG
 
 	void AnimationClipView::OnGUI()
 	{
+		
+		JVector2 winSize;
+		f32 LeftWidth  = mSceneResolution.x + ImGui::GetStyle().FramePadding.x * 4;
+		f32 RightWidth = mInspectorWidth + ImGui::GetStyle().FramePadding.x * 4;
+		winSize.x = LeftWidth + RightWidth;
+		winSize.y = mSceneResolution.y + 65.0f + ImGui::GetStyle().FramePadding.y * 2;
+		ImGui::SetWindowSize(ImVec2(winSize.x, winSize.y));
 		// Image
 		UpdateScene();
 		ImGui::Columns(2);
+		ImGui::SetColumnWidth(-1, LeftWidth);
 		LeftOnGUI();
 		ImGui::NextColumn();
+		ImGui::SetColumnWidth(-1, RightWidth);
 		RightOnGUI();
 		ImGui::Columns(1);
 	}
@@ -93,6 +103,8 @@ namespace JG
 		{
 			mEditorUIScene->OnGUI();
 		}
+		ImGui::Separator();
+		ImGui::Button("TestButton");
 		ImGui::EndChild();
 	}
 	void AnimationClipView::RightOnGUI()
@@ -204,8 +216,8 @@ namespace JG
 		{
 			EditorUISceneConfig config;
 			config.EyePos = JVector3(0, 0, -200.0f);
-			config.Resolution = JVector2(450.0f, 450.0f);
-			config.ImageSize = config.Resolution;
+			config.Resolution = mSceneResolution;
+			config.ImageSize  = config.Resolution;
 			config.OffsetScale = JVector3(1, 1, 1);
 			config.SkyBox = GraphicsHelper::CreateSkyBox(config.EyePos, config.FarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
 			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
@@ -218,9 +230,7 @@ namespace JG
 			{
 				mAnimController = CreateUniquePtr<AnimationController>();
 				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
-
-				mAnimController->GetBindedSkeletone();
-
+				JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
 
 			}
 

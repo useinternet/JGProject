@@ -79,7 +79,7 @@ namespace JG
 		{
 			UIManager::GetInstance().OpenPopupUIView<ComponentFinderContextView>(ComponentFinderInitData());
 		}
-		if (UIManager::GetInstance().OnContextUIView<ComponentFinderContextView>())
+		if (UIManager::GetInstance().OnContextUIView<ComponentFinderContextView>(0))
 		{
 			auto comFinder     = UIManager::GetInstance().GetPopupUIView<ComponentFinderContextView>();
 			auto selectedType  = comFinder->GetSelectedComponent();

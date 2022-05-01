@@ -7,6 +7,8 @@
 #include "Common/DragAndDrop.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/Resource.h"
+#include "UI/UIManager.h"
+#include "UI/ContextUI/AssetFinderContextView.h"
 #include <Imgui/imgui_internal.h>
 
 namespace ImGui
@@ -356,10 +358,13 @@ namespace ImGui
 
 	void AssetField_OnGUI(const std::string& label, const std::string& inputText, JG::EAssetFormat format, const std::function<void(const std::string&)>& action, float label_space )
 	{
+		bool isOpenContext = false;
 		Label_OnGUI(2, label, label_space, nullptr, nullptr);
 
 		auto inputT = inputText;
-		ImGui::InputText(("##" + label).c_str(), &inputT[0], ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputText(("##InputText" + label).c_str(), &inputT[0], ImGuiInputTextFlags_ReadOnly);
+		ImGui::SameLine();
+		isOpenContext = ImGui::Button(("..##Button" + label).c_str());
 		JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
 		{
 			auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
@@ -370,6 +375,16 @@ namespace ImGui
 		});
 
 		ImGui::Columns(1);
+		JG::u64 hash = std::hash<JG::String>()(label);
+		if (isOpenContext)
+		{
+			JG::UIManager::GetInstance().OpenPopupUIView<JG::AssetFinderContextView>(JG::AssetFinderInitData(format), hash);
+		}
+		if (JG::UIManager::GetInstance().OnContextUIView<JG::AssetFinderContextView>(hash))
+		{
+			JG::AssetFinderContextView* contextView = JG::UIManager::GetInstance().GetPopupUIView<JG::AssetFinderContextView>();
+			JG_LOG_INFO("Selected Asset : {0}", contextView->GetSelectedAssetPath());
+		}
 	}
 
 	void AssetField_List_OnGUI(const std::string& label, JG::List<std::string>& inputTextList, JG::EAssetFormat format, 
@@ -404,10 +419,13 @@ namespace ImGui
 			cnt = inputTextList.size();
 			for (int i = 0; i < cnt; ++i)
 			{
+				bool isOpenContext = false;
 				auto inputID = GetUniqueID(label, idOffset++);
 				ImGui::AlignTextToFramePadding();
 				ImGui::Text(("Slot " + std::to_string(i) + " : ").c_str()); ImGui::SameLine();
 				ImGui::InputText(inputID.c_str(), inputTextList[i].data(), ImGuiInputTextFlags_ReadOnly);
+				ImGui::SameLine();
+				isOpenContext = ImGui::Button(("..##Button" + label).c_str());
 				JG::DragAndDropTarget<JG::DDDContentsFile>([&](JG::DDDContentsFile* ddd)
 				{
 					auto assetFormat = JG::AssetDataBase::GetInstance().GetAssetFormat(ddd->FilePath);
@@ -416,6 +434,16 @@ namespace ImGui
 						action(i, ddd->FilePath);
 					}
 				});
+
+				JG::u64 hash = std::hash<JG::String>()(label) + i;
+				if (isOpenContext)
+				{
+					JG::UIManager::GetInstance().OpenPopupUIView<JG::AssetFinderContextView>(JG::AssetFinderInitData(format), hash);
+				}
+				if (JG::UIManager::GetInstance().OnContextUIView<JG::AssetFinderContextView>(hash))
+				{
+
+				}
 			}
 			ImGui::TreePop();
 		}

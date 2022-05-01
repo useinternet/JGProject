@@ -36,7 +36,7 @@ namespace JG
 	class JGAnimation : public IGlobalSingleton<JGAnimation>
 	{
 		List<WeakPtr<AnimationController>> mRegisteredAnimationControllers;
-		Queue<WeakPtr<AnimationController>> mAddedRegisterAnimationControllers;
+		Queue<WeakPtr<AnimationController>> mAddedRegisterAnimationControllerQueue;
 
 		SharedPtr<ScheduleHandle> mAnimThreadSH;
 		SharedPtr<ScheduleHandle> mAnimBeginFrameSH;

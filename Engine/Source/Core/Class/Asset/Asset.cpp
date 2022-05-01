@@ -1196,6 +1196,8 @@ namespace JG
 		case EAssetFormat::CubeMap:
 		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path, assetFormat);
 		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path, assetFormat);
+		case EAssetFormat::AnimationClip: return CreateSharedPtr<Asset<AnimationClip>>(assetID, path, assetFormat);
+		case EAssetFormat::Skeletal: return CreateSharedPtr<Asset<Skeletone>>(assetID, path, assetFormat);
 		}
 
 

@@ -6,7 +6,7 @@ namespace JG
 
 	void ComponentFinderContextView::Initialize(const ComponentFinderInitData& data)
 	{
-		ImGui::OpenPopup(std::to_string(GetType().GetID()).c_str());
+		ImGui::OpenPopup(std::to_string(GetViewID()).c_str());
 		mSelectedComponentType.clear();
 	}
 	void ComponentFinderContextView::Destroy()
@@ -18,7 +18,7 @@ namespace JG
 	}
 	bool ComponentFinderContextView::OnGUI()
 	{
-		if (ImGui::BeginPopupContextWindow(std::to_string(GetType().GetID()).c_str()) == true)
+		if (ImGui::BeginPopupContextWindow(std::to_string(GetViewID()).c_str()) == true)
 		{
 			char buf[256] = { 0, };
 			ImGui::InputText("##Finder Serach", buf, 256);

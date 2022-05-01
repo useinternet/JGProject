@@ -226,28 +226,15 @@ namespace JG
 
 	SharedPtr<AnimationClip> AnimationClip::Create(const String& name)
 	{
-		return SharedPtr<AnimationClip>();
+		SharedPtr<AnimationClip> animClip = CreateSharedPtr<AnimationClip>();
+		animClip->SetName(name);
+		return animClip;
 	}
 
 	SharedPtr<AnimationClip> AnimationClip::Create(const AnimationClipAssetStock& stock)
 	{
 		SharedPtr<AnimationClip> animClip = CreateSharedPtr<AnimationClip>();
-		animClip->mName = stock.Name;
-		animClip->mDuration = stock.Duration;
-		animClip->mTickPerSecond = stock.TicksPerSecond;
-		
-		for (const auto& _pair : stock.AnimationNodes)
-		{
-			AnimationNode node;
-			node.NodeName = _pair.second.NodeName;
-			node.LocationValues = _pair.second.LocationValues;
-			node.LocationTimes  = _pair.second.LocationTimes;
-			node.RotationValues = _pair.second.RotationValues;
-			node.RotationTimes	= _pair.second.RotationTimes;
-			node.ScaleValues	= _pair.second.ScaleValues;
-			node.ScaleTimes		= _pair.second.ScaleTimes;
-			animClip->mAnimationNodes.emplace(_pair.first, node);
-		}
+		animClip->SetAnimationClipStock(stock);
 		return animClip;
 	}
 

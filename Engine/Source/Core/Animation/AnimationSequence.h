@@ -36,14 +36,15 @@ namespace JG
 
 		WeakPtr<AnimationController> mOwnerAnimController;
 
-		Dictionary<String, UniquePtr<Node>> mNodeDic;
-		List<UniquePtr<AnimationSequence>>  mAnimSequenceList;
+		Dictionary<String, SharedPtr<Node>> mNodeDic;
+		List<SharedPtr<AnimationSequence>>  mAnimSequenceList;
 		List<String> mAnimClipNameList;
 
 		String mBeginNodeName;
 
 		Node* mCurrentNode = nullptr;
 		bool  mIsMakingSequence = false;
+		bool  mIsRunning = false;
 	public:
 		AnimationSequence(SharedPtr<AnimationController> controller);
 
@@ -55,9 +56,8 @@ namespace JG
 		AnimationSequence& MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
 		AnimationSequence& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
 		AnimationSequence& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
-		
 		void End();
-		
+	
 		SharedPtr<AnimationTransform> Execute();
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);

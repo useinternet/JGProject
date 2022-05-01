@@ -120,6 +120,9 @@ namespace JG
 	template<class T>
 	using WeakPtr   = std::weak_ptr<T>;
 	
+	template<class T>
+	using Enable_Shared_From_This = std::enable_shared_from_this<T>;
+
 	template<class T, class ...Args>
 	UniquePtr<T> CreateUniquePtr(Args&& ... args)
 	{

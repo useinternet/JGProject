@@ -175,7 +175,6 @@ namespace JG
 		Context,
 		Modal,
 	};
-
 	class IPopupUIView : IJGObject
 	{
 		friend class UIManager;
@@ -186,6 +185,9 @@ namespace JG
 		virtual EPopupType GetPopupType() = 0;
 	protected:
 		virtual bool IsOpen() const = 0;
+
+		virtual void SetViewID(u64 viewID) = 0;
+		virtual u64  GetViewID() const = 0;
 	public:
 		virtual ~IPopupUIView() = default;
 	};
@@ -194,7 +196,9 @@ namespace JG
 	class PopupUIView : public IPopupUIView
 	{
 		friend class UIManager;
-		bool mIsOpen = false;
+		u64  mViewID = 0;
+		bool mIsOpen      = false;
+		bool mEnableOnGUI = true;
 	protected:
 		virtual bool OnGUI() override { return false; }
 		virtual void OnEvent(IEvent& e) override {}
@@ -210,7 +214,15 @@ namespace JG
 				Initialize(data);
 			}
 		}
+		virtual void SetViewID(u64 viewID) override
+		{
+			mViewID = viewID;
+		}
+	
 	public:
+		virtual u64  GetViewID() const override {
+			return mViewID;
+		}
 		virtual void Close() override
 		{
 			if (mIsOpen == true)

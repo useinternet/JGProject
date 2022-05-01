@@ -247,9 +247,6 @@ namespace JG
 			return;
 		}
 		pipeline->AddLibrary(shader);
-		//pipeline->AddLibraryAsSourceCode(shader->GetName(), shader->GetFullShaderCode(), { shader->GetEntryPoint() });
-		//pipeline->AddHitGroup(shader->GetHitGroupName(), shader->GetEntryPoint(), "", "");
-		//pipeline->AddLocalRootSignature(RayTracer::CreateLocalRootSignature(), { shader->GetEntryPoint() });
 	}
 
 	bool ShaderLibrary::LoadGlobalShaderLib(const String& path)

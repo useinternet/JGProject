@@ -57,7 +57,6 @@ namespace JG
 		Dictionary<JG::Type, UniquePtr<IPopupUIView>> mPopupUIViewPool;
 		Dictionary<JG::Type, UniquePtr<IInspectorUI>> mInspectorUIPool;
 		Dictionary<JG::Type, UniquePtr<MenuItemNode>> mUIViewContextMenu;
-
 		UniquePtr<MenuItemNode>  mMainMenuItemRootNode;
 		mutable std::shared_mutex   mMutex;
 
@@ -154,23 +153,44 @@ namespace JG
 		}
 
 		template<class UIPopupViewType, class InitData>
-		UIPopupViewType* OpenPopupUIView(const InitData& initData) const
+		UIPopupViewType* OpenPopupUIView(const InitData& initData, u32 viewID = 0) const
 		{
 			auto view = GetPopupUIView<UIPopupViewType>();
+	
 			if (view != nullptr)
 			{
+				Type type   = Type(TypeID<UIPopupViewType>());
+				u64  typeID = type.GetID();
+				if (viewID > 0)
+				{
+					HashHelper::Combine(typeID, viewID);
+				}
+				IPopupUIView* pInterfaceView = static_cast<IPopupUIView*>(view);
+				pInterfaceView->SetViewID(typeID);
 				view->Open(initData);
+				
 			}
 			return view;
 		}
 
 		template<class UIPopupViewType>
-		bool OnContextUIView() const 
+		bool OnContextUIView(u32 viewID) 
 		{
 			auto view = GetPopupUIView<UIPopupViewType>();
-			if (view != nullptr && view->IsOpen() && view->GetPopupType() == EPopupType::Context)
+			if (view == nullptr)
 			{
-				bool result = (static_cast<IPopupUIView*>(view))->OnGUI();
+				return false;
+			}
+			IPopupUIView* pInterfaceView = static_cast<IPopupUIView*>(view);
+			Type type   = Type(TypeID<UIPopupViewType>());
+			u64  typeID = type.GetID();
+			if (viewID > 0)
+			{
+				HashHelper::Combine(typeID, viewID);
+			}
+			if (view->GetViewID() == typeID && view->IsOpen() && view->GetPopupType() == EPopupType::Context)
+			{
+				bool result = pInterfaceView->OnGUI();
 				if (result == false)
 				{
 					view->Close();

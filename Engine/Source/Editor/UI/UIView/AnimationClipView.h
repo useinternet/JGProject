@@ -21,6 +21,10 @@ namespace JG
 
 		static constexpr char* CLIP_NAME = "DefaultAnimationClip";
 	private:
+		const JVector2 mSceneResolution = JVector2(450.0f, 450.0f);
+		const f32 mInspectorWidth = 350.0f;
+
+
 		SharedPtr<Graphics::StaticRenderObject>   mSkyBox;
 		SharedPtr<Graphics::SkeletalRenderObject> mModel;
 
@@ -36,7 +40,7 @@ namespace JG
 		StorableString mSkeletoneAssetPath;
 		StorableString mMaterialAssetPath;
 
-		UniquePtr<AnimationController> mAnimController;
+		SharedPtr<AnimationController> mAnimController;
 	public:
 		AnimationClipView();
 		virtual ~AnimationClipView() = default;

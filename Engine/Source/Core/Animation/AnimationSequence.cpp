@@ -23,6 +23,7 @@ namespace JG
 
 	AnimationSequence& AnimationSequence::Begin(const String& startNodeName)
 	{
+		if (mIsRunning) *this;
 		Reset();
 		mIsMakingSequence = true;
 		if (CreateNode(ENodeType::Begin, startNodeName) == false)
@@ -30,14 +31,16 @@ namespace JG
 			return *this;
 		}
 		mBeginNodeName = startNodeName;
-
-
-
 		return *this;
 	}
 
 	AnimationSequence& AnimationSequence::MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction)
 	{
+		if (mIsRunning) *this;
+		if (mIsMakingSequence == false)
+		{
+			return *this;
+		}
 		if (CreateNode(ENodeType::AnimationSequence, name) == false)
 		{
 			return *this;
@@ -55,6 +58,11 @@ namespace JG
 
 	AnimationSequence& AnimationSequence::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
 	{
+		if (mIsRunning) *this;
+		if (mIsMakingSequence == false)
+		{
+			return *this;
+		}
 		if (CreateNode(ENodeType::AnimationClip, name) == false)
 		{
 			return *this;
@@ -71,6 +79,11 @@ namespace JG
 
 	AnimationSequence& AnimationSequence::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
+		if (mIsRunning) *this;
+		if (mIsMakingSequence == false)
+		{
+			return *this;
+		}
 		if (IsExistNode(prevName) == false || IsExistNode(nextName) == false)
 		{
 			return *this;
@@ -104,6 +117,7 @@ namespace JG
 
 	void AnimationSequence::End()
 	{
+		if (mIsRunning) return;
 		mIsMakingSequence = false;
 	}
 
@@ -117,7 +131,8 @@ namespace JG
 		{
 			return nullptr;
 		}
-		return nullptr;
+		mIsRunning = true;
+		return ExecuteInternal(mCurrentNode);
 	}
 	bool AnimationSequence::CreateNode(ENodeType nodeType, const String& name)
 	{
