@@ -40,8 +40,7 @@ namespace JG
 		ImGui::ImageButton((ImTextureID)texID, ImVec2(mConfig.ImageSize.x, mConfig.ImageSize.y), ImVec2(0, 0), ImVec2(1, 1), 0);
 
 		if (ImGui::IsItemHovered() == true && 
-			ImGui::IsMouseDown(ImGuiMouseButton_Left) == true && 
-			(mConfig.Flags & EEditorUISceneFlags::No_MoveRotate) == false)
+			ImGui::IsMouseDown(ImGuiMouseButton_Left) == true)
 		{
 			static JVector2 NullMousePosition = JVector2(-1, -1);
 			ImVec2 imMousePos = ImGui::GetMousePos();
@@ -57,8 +56,15 @@ namespace JG
 				delta = mMousePosition - mPrevMousePosition;
 				mPrevMousePosition = mMousePosition;
 			}
-			mModelRotation.x += Math::ConvertToRadians(delta.y);
-			mModelRotation.y += Math::ConvertToRadians(delta.x);
+			if ((mConfig.Flags & EEditorUISceneFlags::Fix_RotatePitch) == false)
+			{
+				mModelRotation.x += Math::ConvertToRadians(delta.y);
+			}
+			if ((mConfig.Flags & EEditorUISceneFlags::Fix_RotateYaw) == false)
+			{
+				mModelRotation.y += Math::ConvertToRadians(delta.x);
+			}
+			
 			JG_LOG_INFO("Image Drag  {0} , {1} ", delta.x, delta.y);
 		}
 		else
@@ -66,7 +72,7 @@ namespace JG
 			mMousePosition = JVector2(-1, -1);
 			mPrevMousePosition = JVector2(-1, -1);
 		}
-
+		UpdateScene();
 		UpdateModel();
 		UpdateLight();
 		PushRenderObject();
@@ -78,6 +84,21 @@ namespace JG
 		mConfig.Model = model;
 	}
 
+	void EditorUIScene::SetLocation(const JVector3& location)
+	{
+		mConfig.OffsetLocation = location;
+	}
+
+	void EditorUIScene::SetScale(const JVector3& scale)
+	{
+		mConfig.OffsetScale = scale;
+	}
+
+	void EditorUIScene::SetTargetVector(const JVector3& targetVec)
+	{
+		mConfig.TargetVec = JVector3::Normalize(targetVec);
+	}
+
 	void EditorUIScene::Init()
 	{
 		UpdateScene();
@@ -87,7 +108,6 @@ namespace JG
 
 	void EditorUIScene::UpdateScene()
 	{
-		const JVector3 targetVec(0, 0, -1);
 		const JVector3 upVec(0, 1, 0);
 
 
@@ -95,11 +115,11 @@ namespace JG
 		sceneInfo.RenderPath = ERendererPath::RayTracing;
 		sceneInfo.Resolution = mConfig.Resolution;
 		sceneInfo.EyePos     = mConfig.EyePos;
-		sceneInfo.ViewMatrix = JMatrix::LookAtLH(mConfig.EyePos, targetVec, upVec);
+		sceneInfo.ViewMatrix = JMatrix::LookAtLH(mConfig.EyePos, mConfig.TargetVec, upVec);
 		sceneInfo.ProjMatrix = JMatrix::PerspectiveFovLH(Math::ConvertToRadians(90), mConfig.Resolution.x / mConfig.Resolution.y, mConfig.NearZ, mConfig.FarZ);
 		sceneInfo.ViewProjMatrix = sceneInfo.ViewMatrix * sceneInfo.ProjMatrix;
 		sceneInfo.NearZ = mConfig.NearZ;
-		sceneInfo.FarZ = mConfig.FarZ;
+		sceneInfo.FarZ  = mConfig.FarZ;
 		sceneInfo.ClearColor = Color();
 		if (mScene == nullptr)
 		{
@@ -113,7 +133,11 @@ namespace JG
 		if (mConfig.Model)
 		{
 			JQuaternion q = JQuaternion::RotationRollPitchYawFromVector(JVector3(mModelRotation.x, mModelRotation.y, 0.0f));
-			mConfig.Model->WorldMatrix = JMatrix::Rotation(q) * JMatrix::Scaling(mConfig.OffsetScale);
+			JMatrix S = JMatrix::Scaling(mConfig.OffsetScale);
+			JMatrix R = JMatrix::Rotation(q);
+			JMatrix T = JMatrix::Translation(mConfig.OffsetLocation);
+
+			mConfig.Model->WorldMatrix = S * R * T;
 		}
 	}
 

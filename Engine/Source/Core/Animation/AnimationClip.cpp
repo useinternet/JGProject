@@ -82,7 +82,6 @@ namespace JG
 		const Skeletone::Node* node = skeletone->GetNode(nodeID);
 		JMatrix nodeTransform = node->Transform;
 
-		const Skeletone::Node* parentNode = skeletone->GetNode(node->ParentNode);
 
 		const AnimationNode* animNode = FindAnimationNode(node->Name);
 
@@ -101,12 +100,10 @@ namespace JG
 		}
 
 
-		JMatrix globalTransform = parentTransform * nodeTransform;
+		JMatrix globalTransform =  nodeTransform * parentTransform;
+		JMatrix finalTransform = node->BoneOffset * globalTransform * skeletone->GetRootOffsetTransform();
 
-		JMatrix finalTransform = skeletone->GetRootOffsetTransform() * globalTransform * node->BoneOffset;
 		animTransform->Set(node->ID, finalTransform);
-
-
 		for (u32 nodeID : node->ChildNodes)
 		{
 			const Skeletone::Node* childNode = skeletone->GetNode(nodeID);

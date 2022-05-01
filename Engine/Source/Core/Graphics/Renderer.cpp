@@ -141,11 +141,10 @@ namespace JG
 				mObjectInfoListDic[type].push_back(info);
 				Statistics.VisibleObjectCount += 1;
 			}
-			
-
-
-
 		}
+			break;
+		case Graphics::ESceneObjectType::Skeletal:
+
 			break;
 		}
 	

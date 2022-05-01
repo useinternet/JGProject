@@ -15,11 +15,11 @@ namespace JG
 {
 	JMatrix ToJMatrix(const aiMatrix4x4& aiMatrix) 
 	{
-		return JMatrix(
+		return JMatrix::Transpose(JMatrix(
 			aiMatrix.a1, aiMatrix.a2, aiMatrix.a3, aiMatrix.a4,
 			aiMatrix.b1, aiMatrix.b2, aiMatrix.b3, aiMatrix.b4,
 			aiMatrix.c1, aiMatrix.c2, aiMatrix.c3, aiMatrix.c4,
-			aiMatrix.d1, aiMatrix.d2, aiMatrix.d3, aiMatrix.d4);
+			aiMatrix.d1, aiMatrix.d2, aiMatrix.d3, aiMatrix.d4));
 	};
 
 

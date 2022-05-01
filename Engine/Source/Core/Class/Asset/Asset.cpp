@@ -367,6 +367,8 @@ namespace JG
 						}
 					}
 				}
+
+				AnimationNodes.emplace(animNode.NodeName, animNode);
 			}
 		}
 	}

@@ -17,7 +17,9 @@ namespace JG
 	enum class EEditorUISceneFlags
 	{
 		None = 0,
-		No_MoveRotate = 0x001,
+		Fix_RotatePitch = 0x001,
+		Fix_RotateYaw   = 0x002,
+
 	};
 
 	struct EditorUISceneConfig
@@ -25,13 +27,15 @@ namespace JG
 		JVector2 Resolution;
 		JVector2 ImageSize;
 		JVector3 OffsetScale;
+		JVector3 OffsetLocation;
 
 		SharedPtr<Graphics::SceneObject> Model;
 		SharedPtr<Graphics::SceneObject> SkyBox;
 
 		f32 FarZ  = 1000000.0f;
 		f32 NearZ = 1.0f;
-		JVector3  EyePos = JVector3(0, 0, -200.0f);
+		JVector3  EyePos    = JVector3(0, 0, -200.0f);
+		JVector3  TargetVec = JVector3(0, 0, -1);
 		EEditorUISceneFlags Flags = EEditorUISceneFlags::None;
 	};
 
@@ -52,6 +56,9 @@ namespace JG
 		~EditorUIScene();
 		void OnGUI();
 		void SetModel(SharedPtr<Graphics::SceneObject> model);
+		void SetLocation(const JVector3& location);
+		void SetScale(const JVector3& scale);
+		void SetTargetVector(const JVector3& targetVec);
 		Graphics::Scene* GetScene() const {
 			return mScene;
 		}

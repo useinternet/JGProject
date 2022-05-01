@@ -12,6 +12,7 @@
 
 #include "Animation/JGAnimation.h"
 #include "Animation/AnimationController.h"
+#include "Animation/AnimationSequence.h"
 #include "Animation/AnimationClip.h"
 namespace JG
 {
@@ -182,6 +183,7 @@ namespace JG
 			mModelAssetPath     = StorableString("AnimationClipView/ModelAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
 			mSkeletoneAssetPath = StorableString("AnimationClipView/SkeletoneAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
 			mMaterialAssetPath  = StorableString("AnimationClipView/MaterialAssetPath/" + mAnimClipAsset->GetAssetPath(), "");
+			SetTitleName(mAnimClipAsset->GetAssetPath());
 		}
 		
 	}
@@ -203,14 +205,39 @@ namespace JG
 
 	void AnimationClipView::UpdateScene()
 	{
+		// Scene 持失
+		static const JVector3 EyePos = JVector3(0, 100.0f, -200.0f);
+		if (mEditorUIScene == nullptr)
+		{
+			EditorUISceneConfig config;
+			config.EyePos = EyePos;
+			config.Resolution = mSceneResolution;
+			config.ImageSize = config.Resolution;
+			config.OffsetScale = JVector3(1, 1, 1);
+			config.Flags = EEditorUISceneFlags::Fix_RotatePitch;
+			config.SkyBox = GraphicsHelper::CreateSkyBox(config.EyePos, config.FarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
+			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
+		}
+
 
 		if (mModel == nullptr)
 		{
 			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
 		}
+
+
+
+
 		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
 		{
 			mModel->Mesh = mMeshAsset->Get();
+			JBBox boundingBox = mModel->Mesh->GetBoundingBox();
+
+			JVector3 Center = boundingBox.Center();
+			mEditorUIScene->SetLocation(Center * -1);
+
+			JVector3 targetVec = EyePos * -1;
+			mEditorUIScene->SetTargetVector(targetVec);
 		}
 		mModel->MaterialList.clear();
 		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
@@ -222,17 +249,6 @@ namespace JG
 			mModel->MaterialList.push_back(material->Get());
 		}
 		
-		// Scene 持失
-		if (mEditorUIScene == nullptr)
-		{
-			EditorUISceneConfig config;
-			config.EyePos = JVector3(0, 0, -200.0f);
-			config.Resolution = mSceneResolution;
-			config.ImageSize  = config.Resolution;
-			config.OffsetScale = JVector3(1, 1, 1);
-			config.SkyBox = GraphicsHelper::CreateSkyBox(config.EyePos, config.FarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
-			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
-		}
 		mEditorUIScene->SetModel(mModel);
 
 
@@ -242,15 +258,27 @@ namespace JG
 			if (mAnimController == nullptr)
 			{
 				mAnimController = CreateUniquePtr<AnimationController>();
-				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
 				JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
 
+
+				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
+				mAnimController->GetRootAnimationSequence()->
+					 Begin("Start")
+					.MakeAnimationClipNode(CLIP_NAME, nullptr)
+					.ConnectNode("Start", CLIP_NAME, nullptr)
+					.End();
+
+				
 			}
 
 
+			if (mSkeletoneAsset != nullptr && mSkeletoneAsset->IsValid())
+			{
+				mAnimController->BindSkeletone(mSkeletoneAsset->Get());
+			}
 
+			SharedPtr<AnimationTransform> transform = mAnimController->GetFinalTransform();
 		}
-
 	}
 
 }
