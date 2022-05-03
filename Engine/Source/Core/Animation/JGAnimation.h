@@ -60,7 +60,7 @@ namespace JG
 		SharedPtr<ScheduleHandle> mAnimBeginFrameSH;
 		SharedPtr<ScheduleHandle> mAnimEndFrameSH;
 
-		SharedPtr<IComputeContext> mComputeContext;
+
 	public:
 		JGAnimation();
 		virtual ~JGAnimation();

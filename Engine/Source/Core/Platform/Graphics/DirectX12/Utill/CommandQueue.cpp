@@ -18,8 +18,8 @@ namespace JG
 		auto bufferCnt = DirectX12API::GetInstance()->GetBufferCount();
 		for (u64 i = 0; i < bufferCnt; ++i)
 		{
-			mExcuteCmdLists[i]		  = SortedDictionary<std::thread::id, SharedPtr<CommandList>>();
-			mExcutePendingCmdLists[i] = SortedDictionary<std::thread::id, SharedPtr<CommandList>>();
+			mExcuteCmdLists[i] = SortedDictionary<u64, SharedPtr<CommandList>>();
+			mExcutePendingCmdLists[i] = SortedDictionary<u64, SharedPtr<CommandList>>();
 		}
 	}
 
@@ -27,35 +27,54 @@ namespace JG
 
 	CommandList* CommandQueue::RequestCommandList()
 	{
-		while (mIsCommandListExcute == true) {}
-		
+		//Lock();
 
 		std::lock_guard<std::mutex> lock(mMutex);
+		mIsLock = true;
 		std::thread::id curr_thread_id = std::this_thread::get_id();
+		u64 hash = std::hash<std::thread::id>()(curr_thread_id);
+		return RequestCommandList(hash);
+	}
 
+	CommandList* CommandQueue::RequestCommandList(u64 commandID)
+	{
+		while (mIsCommandListExcute == true) {}		
 		u64 buffIndex = DirectX12API::GetInstance()->GetBufferIndex();
-
 		auto& CmdLists = mExcuteCmdLists[buffIndex];
 		auto& PendingCmdLists = mExcutePendingCmdLists[buffIndex];
 
-		if (CmdLists.find(curr_thread_id) == CmdLists.end())
+		if (mIsLock == false)
+		{
+			mMutex.lock();
+		}
+
+		CommandList* result = nullptr;
+		if (CmdLists.find(commandID) == CmdLists.end())
 		{
 			auto pCmdList = CreateCommandList();
-			CmdLists[curr_thread_id] = pCmdList;
-			PendingCmdLists[curr_thread_id] = CreateCommandList();
-			return CmdLists[curr_thread_id].get();
+			CmdLists[commandID] = pCmdList;
+			PendingCmdLists[commandID] = CreateCommandList();
+			result =  CmdLists[commandID].get();
 		}
 		else
 		{
-			auto pCmdList = CmdLists[curr_thread_id].get();
-			auto pPendingCmdList = PendingCmdLists[curr_thread_id].get();
+			auto pCmdList = CmdLists[commandID].get();
+			auto pPendingCmdList = PendingCmdLists[commandID].get();
 			if (pCmdList->IsClosing())
 			{
 				pCmdList->Reset();
 				pPendingCmdList->Reset();
 			}
-			return pCmdList;
+			result =  pCmdList;
 		}
+
+		if (mIsLock == false)
+		{
+			mMutex.unlock();
+		}
+		mIsLock = false;
+
+		return result;
 	}
 
 	void CommandQueue::Begin()

@@ -320,6 +320,7 @@ namespace JG
 	};
 	enum class ECommandQueueType
 	{
+		Unknown,
 		Graphics,
 		Compute
 	};

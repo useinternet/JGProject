@@ -74,6 +74,8 @@ namespace JG
 		virtual void EndFrame()	 = 0;
 		virtual bool IsSupportedRayTracing() const = 0;
 		virtual void Flush() = 0;
+		virtual void SubmitAndFlush(u64 queueID) = 0;
+		virtual void Flush(u64 queueID) = 0;
 
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& settings) = 0;
 		virtual SharedPtr<IVertexBuffer>  CreateVertexBuffer(const String& name, EBufferLoadMethod method) = 0;
@@ -168,7 +170,7 @@ namespace JG
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const = 0;
 	protected:
 		virtual void Reset() = 0;
-		virtual void Reset(u64 queueID) = 0;
+		virtual void Reset(u64 queueID, u64 cmdID) = 0;
 	};
 
 	class IComputeContext
@@ -220,7 +222,7 @@ namespace JG
 		// 인터페이스 변경 함수
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const  = 0;
 	protected:
-		virtual void Reset(u64 queueID) = 0;
+		virtual void Reset(u64 queueID, u64 cmdID) = 0;
 	};
 
 

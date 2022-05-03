@@ -56,6 +56,28 @@ namespace JG
 	{
 		return GetInstance()->mGraphicsCommandQueue.get();
 	}
+	CommandQueue* DirectX12API::GetCommandQueue(u64 queueID)
+	{
+		DirectX12API* api = GetInstance();
+		std::lock_guard<std::mutex> lock(api->mCommandQueueMutex);
+
+		if (api->mCommandQueueDic.find(queueID) == api->mCommandQueueDic.end())
+		{
+			return nullptr;
+		}
+		return api->mCommandQueueDic[queueID].second.get();
+	}
+	ECommandQueueType DirectX12API::GetCommandQueueType(u64 queueID)
+	{
+		DirectX12API* api = GetInstance();
+		std::lock_guard<std::mutex> lock(api->mCommandQueueMutex);
+
+		if (api->mCommandQueueDic.find(queueID) == api->mCommandQueueDic.end())
+		{
+			return ECommandQueueType::Unknown;
+		}
+		return api->mCommandQueueDic[queueID].first;
+	}
 	//CommandQueue* DirectX12API::GetComputeCommandQueue()
 	//{
 	//	return GetInstance()->mComputeCommandQueue.get();
@@ -80,6 +102,34 @@ namespace JG
 	GraphicsCommandList* DirectX12API::GetGraphicsCommandList()
 	{
 		return static_cast<GraphicsCommandList*>(GetGraphicsCommandQueue()->RequestCommandList());
+	}
+	GraphicsCommandList* DirectX12API::GetGraphicsCommandList(u64 queueID, u64 cmdID)
+	{
+		CommandQueue* queue = GetCommandQueue(queueID);
+		if (queue == nullptr)
+		{
+			return nullptr;
+		}
+		ECommandQueueType type = GetCommandQueueType(queueID);
+		if (type == ECommandQueueType::Graphics)
+		{
+			return static_cast<GraphicsCommandList*>(queue->RequestCommandList(cmdID));
+		}
+		return nullptr;
+	}
+	ComputeCommandList* DirectX12API::GetComputeCommandList(u64 queueID, u64 cmdID)
+	{
+		CommandQueue* queue = GetCommandQueue(queueID);
+		if (queue == nullptr)
+		{
+			return nullptr;
+		}
+		ECommandQueueType type = GetCommandQueueType(queueID);
+		if (type == ECommandQueueType::Graphics || type == ECommandQueueType::Compute)
+		{
+			return static_cast<ComputeCommandList*>(queue->RequestCommandList(cmdID));
+		}
+		return nullptr;
 	}
 	//ComputeCommandList* DirectX12API::GetComputeCommandList()
 	//{
@@ -307,12 +357,14 @@ namespace JG
 	void DirectX12API::BeginFrame()
 	{
 		mGraphicsCommandQueue->Begin();
-		//mComputeCommandQueue->Begin();
-		//mCopyCommandQueue->Begin();
-
 		mGraphicsContextDic.clear();
-		//mComputeContextDic.clear();
-		
+
+		//u64, std::pair<ECommandQueueType, SharedPtr<CommandQueue>>
+		for (const std::pair<u64, std::pair<ECommandQueueType, SharedPtr<CommandQueue>>>& _pair : mCommandQueueDic)
+		{
+			_pair.second.second->Begin();
+		}
+
 	}
 	void DirectX12API::EndFrame()
 	{
@@ -324,8 +376,10 @@ namespace JG
 		}
 
 		mGraphicsCommandQueue->End();
-		//mComputeCommandQueue->End();
-		//mCopyCommandQueue->End();
+		for (const std::pair<u64, std::pair<ECommandQueueType, SharedPtr<CommandQueue>>>& _pair : mCommandQueueDic)
+		{
+			_pair.second.second->End();
+		}
 
 
 		// TODO
@@ -348,8 +402,26 @@ namespace JG
 	void DirectX12API::Flush()
 	{
 		mGraphicsCommandQueue->Flush();
-		//mComputeCommandQueue->Flush();
-		//mCopyCommandQueue->Flush();
+	}
+
+	void DirectX12API::SubmitAndFlush(u64 queueID)
+	{
+		CommandQueue* queue = GetCommandQueue(queueID);
+		if (queue != nullptr)
+		{
+			queue->End();
+			queue->Flush();
+		}
+	}
+
+	void DirectX12API::Flush(u64 queueID)
+	{
+		CommandQueue* queue = GetCommandQueue(queueID);
+		if (queue != nullptr)
+		{
+			queue->Flush();
+		}
+
 	}
 
 	SharedPtr<IFrameBuffer> DirectX12API::CreateFrameBuffer(const FrameBufferInfo& info)
@@ -525,6 +597,8 @@ namespace JG
 	}
 	bool DirectX12API::AllocateCommandQueue(ECommandQueueType type, u64 queueID)
 	{
+
+		std::lock_guard<std::mutex> lock(mCommandQueueMutex);
 		if (mCommandQueueDic.find(queueID) != mCommandQueueDic.end())
 		{
 			return false;
@@ -542,11 +616,15 @@ namespace JG
 	}
 	SharedPtr<IComputeContext> DirectX12API::GetComputeContext(u64 queueID, u64 contextID)
 	{
-		return SharedPtr<IComputeContext>();
+		SharedPtr<DirectX12ComputeContext> computeContext = CreateSharedPtr<DirectX12ComputeContext>();
+		computeContext->Reset(queueID, contextID);
+		return computeContext;
 	}
 	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext(u64 queueID, u64 contextID)
 	{
-		return SharedPtr<IGraphicsContext>();
+		SharedPtr<DirectX12GraphicsContext> graphicsContext = CreateSharedPtr<DirectX12GraphicsContext>();
+		graphicsContext->Reset(queueID, contextID);
+		return graphicsContext;
 	}
 	//SharedPtr<IComputeContext> DirectX12API::GetComputeContext()
 	//{
@@ -1004,13 +1082,13 @@ namespace JG
 		mCommandList = DirectX12API::GetGraphicsCommandList();
 	}
 
-	void DirectX12GraphicsContext::Reset(u64 queueID)
+	void DirectX12GraphicsContext::Reset(u64 queueID, u64 cmdID)
 	{
 		mCommandList = nullptr;
 		mBindedRootSignature = nullptr;
 		mCacheComputeCommandList = nullptr;
 
-
+		mCommandList = DirectX12API::GetGraphicsCommandList(queueID, cmdID);
 	}
 
 
@@ -1297,11 +1375,11 @@ namespace JG
 
 		return copyContext;
 	}
-	void DirectX12ComputeContext::Reset(u64 queueID)
+	void DirectX12ComputeContext::Reset(u64 queueID, u64 cmdID)
 	{
 		mCommandList = nullptr;
 		mBindedRootSignature = nullptr;
-		//mCommandList = DirectX12API::GetComputeCommandList();
+		mCommandList = DirectX12API::GetComputeCommandList(queueID, cmdID);
 	}
 
 

@@ -5,6 +5,8 @@
 #include "Graphics/GraphicsAPI.h"
 namespace JG
 {
+#define ANIMATION_COMMAND_QUEUE_ID (u64)this
+#define ANIMATION_CONTEXT_ID 1
 	JGAnimation::JGAnimation()
 	{
 		mAnimBeginFrameSH = Scheduler::GetInstance().ScheduleByFrame(
@@ -13,6 +15,8 @@ namespace JG
 			0, 0, -1, SchedulePriority::Animation_EndFrame, SCHEDULE_BIND_FN(&JGAnimation::EndFrame));
 
 		mAnimThreadSH = nullptr;
+
+		JGGraphics::GetInstance().GetGraphicsAPI()->AllocateCommandQueue(ECommandQueueType::Compute, ANIMATION_COMMAND_QUEUE_ID);
 	}
 
 	JGAnimation::~JGAnimation()
@@ -42,7 +46,6 @@ namespace JG
 
 	void JGAnimation::UnRegisterAnimatioinController(SharedPtr<AnimationController> controller)
 	{
-
 		mCommandQueue.push(CommandData(controller, CommandData::Command_Remove));
 	}
 
@@ -70,9 +73,6 @@ namespace JG
 
 			controller->Update();
 		}
-
-		//mComputeContext = JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext();
-		
 		if (mRegisteredAnimationControllers.empty() == false)
 		{
 			mAnimThreadSH = Scheduler::GetInstance().ScheduleAsync([this]()
@@ -99,13 +99,15 @@ namespace JG
 
 	void JGAnimation::Update_Thread()
 	{
+
+		SharedPtr<IComputeContext> computeContext = JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext(ANIMATION_COMMAND_QUEUE_ID, ANIMATION_CONTEXT_ID);
 		u64 cnt = mRegisteredAnimationControllers.size();
 		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{
-			controller->Update_Thread(mComputeContext);
+			controller->Update_Thread(computeContext);
 		}
 
 		// 끝날때까지 기다리기
-		//JGGraphics::GetInstance().GetGraphicsAPI()->SubmitAndFlush_ComputeQueue();
+		JGGraphics::GetInstance().GetGraphicsAPI()->SubmitAndFlush(ANIMATION_COMMAND_QUEUE_ID);
 	}
 }

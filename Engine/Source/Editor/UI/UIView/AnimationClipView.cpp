@@ -90,8 +90,8 @@ namespace JG
 
 		if (mAnimController != nullptr)
 		{
-			mAnimController->RemoveAnimationClip(CLIP_NAME);
 			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimController);
+			mAnimController->RemoveAnimationClip(CLIP_NAME);
 			mAnimController = nullptr;
 		}
 		mEditorUIScene = nullptr;

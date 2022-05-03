@@ -40,16 +40,15 @@ namespace JG
 		static IDXGIFactory4* GetDXGIFactory();
 		static ID3D12Device5*  GetD3DDevice();
 		static CommandQueue*  GetGraphicsCommandQueue();
-		//static CommandQueue*  GetComputeCommandQueue();
-		//static CommandQueue*  GetCopyCommandQueue();
+		static CommandQueue*  GetCommandQueue(u64 queueID);
+		static ECommandQueueType GetCommandQueueType(u64 queueID);
 		static DescriptorAllocation RTVAllocate();
 		static DescriptorAllocation DSVAllocate();
 		static DescriptorAllocation CSUAllocate();
 
 		static GraphicsCommandList* GetGraphicsCommandList();
-		//static ComputeCommandList* GetComputeCommandList();
-		//static CopyCommandList* GetCopyCommandList();
-
+		static GraphicsCommandList* GetGraphicsCommandList(u64 queueID, u64 cmdID);
+		static ComputeCommandList*  GetComputeCommandList(u64 queueID, u64 cmdID);
 		static SharedPtr<GraphicsPipelineState> GetGraphicsPipelineState();
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState();
 
@@ -77,6 +76,9 @@ namespace JG
 	public:
 		virtual bool IsSupportedRayTracing() const override;
 		virtual void Flush() override;
+
+		virtual void SubmitAndFlush(u64 queueID) override;
+		virtual void Flush(u64 queueID) override;
 	protected:
 		virtual SharedPtr<IFrameBuffer>   CreateFrameBuffer(const FrameBufferInfo& info) override;
 		virtual SharedPtr<IVertexBuffer>  CreateVertexBuffer(const String& name, EBufferLoadMethod method) override;
@@ -131,6 +133,7 @@ namespace JG
 		std::mutex mComputePSOMutex;
 		std::mutex mRootSigMutex;
 		std::mutex mGraphicsContextMutex;
+		std::mutex mCommandQueueMutex;
 		//std::mutex mComputeContextMutex;
 
 
@@ -187,7 +190,7 @@ namespace JG
 		virtual SharedPtr<ICopyContext>	   QueryInterfaceAsCopyContext() const override;
 	public:
 		virtual void Reset() override;
-		virtual void Reset(u64 queueID) override;
+		virtual void Reset(u64 queueID, u64 cmdID) override;
 	};
 
 
@@ -230,7 +233,7 @@ namespace JG
 		ComputeCommandList* Get() const {
 			return mCommandList;
 		}
-		virtual void Reset(u64 queueID) override;
+		virtual void Reset(u64 queueID, u64 cmdID) override;
 	};
 
 
