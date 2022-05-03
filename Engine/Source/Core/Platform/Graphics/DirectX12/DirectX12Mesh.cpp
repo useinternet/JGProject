@@ -12,6 +12,11 @@ namespace JG
 		mVertexBuffer = vertexBuffer;
 	}
 
+	void DirectX12SubMesh::SetBoneBuffer(SharedPtr<IStructuredBuffer> boneBuffer)
+	{
+		mBoneBuffer = boneBuffer;
+	}
+
 	void DirectX12SubMesh::SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer)
 	{
 		mIndexBuffer = indexBuffer;
@@ -20,6 +25,11 @@ namespace JG
 	SharedPtr<IVertexBuffer> DirectX12SubMesh::GetVertexBuffer() const
 	{
 		return mVertexBuffer;
+	}
+
+	SharedPtr<IStructuredBuffer> DirectX12SubMesh::GetBoneBuffer() const
+	{
+		return mBoneBuffer;
 	}
 
 	SharedPtr<IIndexBuffer> DirectX12SubMesh::GetIndexBuffer() const

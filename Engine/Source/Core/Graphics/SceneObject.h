@@ -16,7 +16,8 @@ namespace JG
 		{
 			None = 0,
 			Ignore_RayTracing_Bottom_Level_AS = 0x00001,
-			No_Shadow = 0x00002,
+			Always_Update_Bottom_Level_AS = 0x00002,
+			No_Shadow = 0x00004,
 		};
 
 		enum class ESceneObjectType
@@ -70,7 +71,6 @@ namespace JG
 
 		class SkeletalRenderObject : public SceneObject
 		{
-
 		public:
 			SharedPtr<IMesh> Mesh;
 			List<SharedPtr<IMaterial>> MaterialList;

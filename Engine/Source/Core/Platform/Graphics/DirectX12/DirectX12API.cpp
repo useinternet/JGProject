@@ -56,14 +56,14 @@ namespace JG
 	{
 		return GetInstance()->mGraphicsCommandQueue.get();
 	}
-	CommandQueue* DirectX12API::GetComputeCommandQueue()
-	{
-		return GetInstance()->mComputeCommandQueue.get();
-	}
-	CommandQueue* DirectX12API::GetCopyCommandQueue()
-	{
-		return GetInstance()->mCopyCommandQueue.get();
-	}
+	//CommandQueue* DirectX12API::GetComputeCommandQueue()
+	//{
+	//	return GetInstance()->mComputeCommandQueue.get();
+	//}
+	//CommandQueue* DirectX12API::GetCopyCommandQueue()
+	//{
+	//	return GetInstance()->mCopyCommandQueue.get();
+	//}
 	DescriptorAllocation DirectX12API::RTVAllocate()
 	{
 		return GetInstance()->mRTVAllocator->Allocate();
@@ -81,14 +81,15 @@ namespace JG
 	{
 		return static_cast<GraphicsCommandList*>(GetGraphicsCommandQueue()->RequestCommandList());
 	}
-	ComputeCommandList* DirectX12API::GetComputeCommandList()
-	{
-		return static_cast<ComputeCommandList*>(GetComputeCommandQueue()->RequestCommandList());
-	}
-	CopyCommandList* DirectX12API::GetCopyCommandList()
-	{
-		return static_cast<CopyCommandList*>(GetCopyCommandQueue()->RequestCommandList());
-	}
+	//ComputeCommandList* DirectX12API::GetComputeCommandList()
+	//{
+	//	GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
+	//	return static_cast<ComputeCommandList*>(GetComputeCommandQueue()->RequestCommandList());
+	//}
+	//CopyCommandList* DirectX12API::GetCopyCommandList()
+	//{
+	//	return static_cast<CopyCommandList*>(GetCopyCommandQueue()->RequestCommandList());
+	//}
 
 	SharedPtr<GraphicsPipelineState> DirectX12API::GetGraphicsPipelineState()
 	{
@@ -264,8 +265,8 @@ namespace JG
 
 		JG_LOG_INFO("Create CommandQueue...");
 		mGraphicsCommandQueue = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_DIRECT);
-		mComputeCommandQueue  = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-		mCopyCommandQueue     = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
+		//mComputeCommandQueue  = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+		//mCopyCommandQueue     = CreateUniquePtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COPY);
 
 
 		JG_LOG_INFO("DirectX12 Init End");
@@ -290,8 +291,8 @@ namespace JG
 		mDSVAllocator.reset();
 		
 		mGraphicsCommandQueue.reset();
-		mComputeCommandQueue.reset();
-		mCopyCommandQueue.reset();
+		//mComputeCommandQueue.reset();
+		//mCopyCommandQueue.reset();
 
 
 		PipelineState::ClearCache();
@@ -306,11 +307,11 @@ namespace JG
 	void DirectX12API::BeginFrame()
 	{
 		mGraphicsCommandQueue->Begin();
-		mComputeCommandQueue->Begin();
-		mCopyCommandQueue->Begin();
+		//mComputeCommandQueue->Begin();
+		//mCopyCommandQueue->Begin();
 
 		mGraphicsContextDic.clear();
-		mComputeContextDic.clear();
+		//mComputeContextDic.clear();
 		
 	}
 	void DirectX12API::EndFrame()
@@ -323,8 +324,8 @@ namespace JG
 		}
 
 		mGraphicsCommandQueue->End();
-		mComputeCommandQueue->End();
-		mCopyCommandQueue->End();
+		//mComputeCommandQueue->End();
+		//mCopyCommandQueue->End();
 
 
 		// TODO
@@ -347,8 +348,8 @@ namespace JG
 	void DirectX12API::Flush()
 	{
 		mGraphicsCommandQueue->Flush();
-		mComputeCommandQueue->Flush();
-		mCopyCommandQueue->Flush();
+		//mComputeCommandQueue->Flush();
+		//mCopyCommandQueue->Flush();
 	}
 
 	SharedPtr<IFrameBuffer> DirectX12API::CreateFrameBuffer(const FrameBufferInfo& info)
@@ -522,22 +523,47 @@ namespace JG
 
 		return mGraphicsContextDic[curr_thread_id];
 	}
-	SharedPtr<IComputeContext> DirectX12API::GetComputeContext()
+	bool DirectX12API::AllocateCommandQueue(ECommandQueueType type, u64 queueID)
 	{
-		std::lock_guard<std::mutex> lock(mComputeContextMutex);
-
-		std::thread::id curr_thread_id = std::this_thread::get_id();
-
-		if (mComputeContextDic.find(curr_thread_id) == mComputeContextDic.end())
+		if (mCommandQueueDic.find(queueID) != mCommandQueueDic.end())
 		{
-			SharedPtr<DirectX12ComputeContext> computeContext = CreateSharedPtr<DirectX12ComputeContext>();
-			computeContext->Reset();
-			mComputeContextDic[curr_thread_id] = computeContext;
-			return computeContext;
+			return false;
 		}
-
-		return mComputeContextDic[curr_thread_id];
+		switch (type)
+		{
+		case ECommandQueueType::Graphics:
+			mCommandQueueDic[queueID] = std::pair<ECommandQueueType, SharedPtr<CommandQueue>>(type, CreateSharedPtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_DIRECT));
+			break;
+		case ECommandQueueType::Compute:
+			mCommandQueueDic[queueID] = std::pair<ECommandQueueType, SharedPtr<CommandQueue>>(type, CreateSharedPtr<CommandQueue>(mFrameBufferCount, D3D12_COMMAND_LIST_TYPE_COMPUTE));
+			break;
+		}
+		return true;
 	}
+	SharedPtr<IComputeContext> DirectX12API::GetComputeContext(u64 queueID, u64 contextID)
+	{
+		return SharedPtr<IComputeContext>();
+	}
+	SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext(u64 queueID, u64 contextID)
+	{
+		return SharedPtr<IGraphicsContext>();
+	}
+	//SharedPtr<IComputeContext> DirectX12API::GetComputeContext()
+	//{
+	//	std::lock_guard<std::mutex> lock(mComputeContextMutex);
+
+	//	std::thread::id curr_thread_id = std::this_thread::get_id();
+
+	//	if (mComputeContextDic.find(curr_thread_id) == mComputeContextDic.end())
+	//	{
+	//		SharedPtr<DirectX12ComputeContext> computeContext = CreateSharedPtr<DirectX12ComputeContext>();
+	//		computeContext->Reset();
+	//		mComputeContextDic[curr_thread_id] = computeContext;
+	//		return computeContext;
+	//	}
+
+	//	return mComputeContextDic[curr_thread_id];
+	//}
 
 
 
@@ -978,6 +1004,15 @@ namespace JG
 		mCommandList = DirectX12API::GetGraphicsCommandList();
 	}
 
+	void DirectX12GraphicsContext::Reset(u64 queueID)
+	{
+		mCommandList = nullptr;
+		mBindedRootSignature = nullptr;
+		mCacheComputeCommandList = nullptr;
+
+
+	}
+
 
 
 	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer)
@@ -1215,12 +1250,7 @@ namespace JG
 		mCommandList->BackupResource(dx12SRT->GetHitSRT());
 		mCommandList->DispatchRays(dispatchRays);
 	}
-	void DirectX12ComputeContext::Reset()
-	{
-		mCommandList = nullptr;
-		mBindedRootSignature = nullptr;
-		mCommandList = DirectX12API::GetComputeCommandList();
-	}
+
 	void DirectX12ComputeContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
 	{
 		if (mCommandList == nullptr)
@@ -1267,7 +1297,12 @@ namespace JG
 
 		return copyContext;
 	}
-
+	void DirectX12ComputeContext::Reset(u64 queueID)
+	{
+		mCommandList = nullptr;
+		mBindedRootSignature = nullptr;
+		//mCommandList = DirectX12API::GetComputeCommandList();
+	}
 
 
 
@@ -1298,5 +1333,69 @@ namespace JG
 
 		mCommandList->CopyBuffer(dx12SB->Get(), datas, elementSize, elementCount);
 
+	}
+	SharedPtr<IMesh> DirectX12CopyContext::CopyMesh(SharedPtr<IMesh> src)
+	{
+		if (src == nullptr)
+		{
+			return nullptr;
+		}
+		SharedPtr<IMesh> result = IMesh::Create(src->GetName());
+
+
+		result->SetInputLayout(src->GetInputLayout());
+		result->SetBoundingBox(src->GetBoundingBox());
+		
+		u32 subMeshCnt = src->GetSubMeshCount();
+		for (u32 i = 0; i < subMeshCnt; ++i)
+		{
+			SharedPtr<ISubMesh> src_subMesh = src->GetSubMesh(i);
+			
+			DirectX12VertexBuffer* src_dx12_vBuffer     = static_cast<DirectX12VertexBuffer*>(src_subMesh->GetVertexBuffer().get());
+			DirectX12IndexBuffer*  src_dx12_iBuffer      = static_cast<DirectX12IndexBuffer*>(src_subMesh->GetIndexBuffer().get());
+			DirectX12StructuredBuffer* src_dx12_bBuffer = nullptr;
+			if (src_subMesh->GetBoneBuffer() != nullptr)
+			{
+				src_dx12_bBuffer = static_cast<DirectX12StructuredBuffer*>(src_subMesh->GetBoneBuffer().get());
+			}
+			
+
+			SharedPtr<DirectX12VertexBuffer> dest_vBuffer = CreateSharedPtr<DirectX12VertexBuffer>();
+			dest_vBuffer->SetName(src->GetName() + "_VertexBuffer");
+			dest_vBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
+			dest_vBuffer->SetData(nullptr, src_dx12_vBuffer->GetElementSize(), src_dx12_vBuffer->GetElementCount());
+			mCommandList->CopyResource(dest_vBuffer->Get(), src_dx12_vBuffer->Get());
+
+			SharedPtr<DirectX12IndexBuffer> dest_iBuffer = CreateSharedPtr<DirectX12IndexBuffer>();
+			dest_iBuffer->SetName(src->GetName() + "_IndexBuffer");
+			dest_iBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
+			dest_iBuffer->SetData(nullptr, src_dx12_iBuffer->GetIndexCount());
+			mCommandList->CopyResource(dest_iBuffer->Get(), src_dx12_iBuffer->Get());
+
+
+			SharedPtr<ISubMesh> dest_subMesh = ISubMesh::Create(src_subMesh->GetName());
+			dest_subMesh->SetVertexBuffer(dest_vBuffer);
+			dest_subMesh->SetIndexBuffer(dest_iBuffer);
+
+
+			if (src_dx12_bBuffer != nullptr)
+			{
+				SharedPtr<DirectX12StructuredBuffer> dest_bBuffer = CreateSharedPtr<DirectX12StructuredBuffer>();
+				dest_bBuffer->SetName(src->GetName() + "_BoneBuffer");
+				dest_bBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
+				dest_bBuffer->SetData(src_dx12_bBuffer->GetElementSize(), src_dx12_bBuffer->GetElementCount(), nullptr);
+
+				mCommandList->CopyResource(dest_bBuffer->Get(), src_dx12_bBuffer->Get());
+				dest_subMesh->SetBoneBuffer(dest_bBuffer);
+			}
+			
+			result->AddMesh(dest_subMesh);
+		}
+
+
+
+
+
+		return result;
 	}
 }

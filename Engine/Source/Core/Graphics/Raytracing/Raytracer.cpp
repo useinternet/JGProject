@@ -77,7 +77,7 @@ namespace JG
 			{
 				m = transform[i];
 			}
-			InstanceData insData = InstanceData(subMesh, material, m, i, mHitGroupOffset);
+			InstanceData insData = InstanceData(subMesh, material, m, i, mHitGroupOffset, flags);
 			if (flags & Graphics::ESceneObjectFlags::No_Shadow)
 			{
 				insData.InstanceMask = InstanceMask_NoShadow;
@@ -219,6 +219,10 @@ namespace JG
 				blas = IBottomLevelAccelerationStructure::Create();
 				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer());
 				instance.SubMesh->SetBottomLevelAS(blas);
+			}
+			else if (instance.Flags & Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS)
+			{
+				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer());
 			}
 
 			mSceneAS[currentIndex]->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex, instance.InstanceMask);

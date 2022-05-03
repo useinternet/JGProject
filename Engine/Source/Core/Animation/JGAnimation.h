@@ -33,19 +33,39 @@ namespace JG
 	*/
 	class AnimationController;
 	class AnimationClip;
+	class IComputeContext;
 	class JGAnimation : public IGlobalSingleton<JGAnimation>
 	{
-		List<WeakPtr<AnimationController>> mRegisteredAnimationControllers;
-		Queue<WeakPtr<AnimationController>> mAddedRegisterAnimationControllerQueue;
+
+		struct CommandData
+		{
+			enum 
+			{
+				Command_Add,
+				Command_Remove,
+			};
+			SharedPtr<AnimationController> AnimController;
+			i32 Command = 0;
+
+			CommandData(SharedPtr<AnimationController> controller, i32 command) 
+				: AnimController(controller), Command(command) {}
+		};
+
+
+
+		HashSet<SharedPtr<AnimationController>> mRegisteredAnimationControllers;
+		Queue<CommandData> mCommandQueue;
 
 		SharedPtr<ScheduleHandle> mAnimThreadSH;
 		SharedPtr<ScheduleHandle> mAnimBeginFrameSH;
 		SharedPtr<ScheduleHandle> mAnimEndFrameSH;
+
+		SharedPtr<IComputeContext> mComputeContext;
 	public:
 		JGAnimation();
 		virtual ~JGAnimation();
-
 		void RegisterAnimationController(SharedPtr<AnimationController> controller);
+		void UnRegisterAnimatioinController(SharedPtr<AnimationController> controller);
 	private:
 		EScheduleResult BeginFrame();
 		EScheduleResult EndFrame();

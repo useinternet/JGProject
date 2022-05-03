@@ -11,6 +11,13 @@ namespace JG
 	class AnimationParameters;
 	class AnimationTransform;
 	class Skeletone;
+	class IMesh;
+	class IComputeContext;
+	namespace Compute
+	{
+		class AnimationSkinning;
+	}
+	
 	class AnimationController : public Enable_Shared_From_This<AnimationController>
 	{
 		friend class JGAnimation;
@@ -20,7 +27,10 @@ namespace JG
 		SharedPtr<AnimationSequence>   mRootSequence;
 		SharedPtr<AnimationParameters> mAnimParams;
 		SharedPtr<Skeletone> mSkeletone;
+		SharedPtr<IMesh> mSkinnedMesh;
+		SharedPtr<IMesh> mOriginMesh;
 		SharedPtr<AnimationTransform> mFinalTransform;
+		SharedPtr<Compute::AnimationSkinning> mAnimationSkinning;
 		Dictionary<String, SharedPtr<AnimationClip>>     mAnimClips;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> mAnimClipInfos;
 
@@ -38,25 +48,26 @@ namespace JG
 			SharedPtr<AnimationClipInfo> ClipInfo;
 		};
 
-		Queue<ClipCommandData> mClipCommandDataQueue;
+		Queue<ClipCommandData>        mClipCommandDataQueue;
 		SharedPtr<AnimationTransform> mPendingTransform;
 	public:
 		// Clip Ã£±â
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags);
 		void RemoveAnimationClip(const String& name);
 		void BindSkeletone(SharedPtr<Skeletone> skeletone);
-
+		void BindMesh(SharedPtr<IMesh> mesh);
 
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
 
 		SharedPtr<Skeletone>		   GetBindedSkeletone()       const;
+		SharedPtr<IMesh>			   GetBindedMesh() const;
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationSequence>   GetRootAnimationSequence() const;
 		SharedPtr<AnimationTransform>  GetFinalTransform() const;
 	private:
 		void Init();
 		void Update();
-		void Update_Thread();
+		void Update_Thread(SharedPtr<IComputeContext> computeContext);
 	};
 }

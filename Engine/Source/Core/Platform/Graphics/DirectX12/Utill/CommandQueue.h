@@ -29,6 +29,7 @@ namespace JG
 		CommandList* RequestCommandList();
 		void Begin();
 		void End();
+		void SubmitAndFlush();
 		void Flush();
 
 		ID3D12CommandQueue* Get() const {

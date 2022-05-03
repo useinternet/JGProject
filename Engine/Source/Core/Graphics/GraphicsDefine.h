@@ -318,6 +318,11 @@ namespace JG
 		Capsule,
 		Line,
 	};
+	enum class ECommandQueueType
+	{
+		Graphics,
+		Compute
+	};
 
 	class ScissorRect
 	{

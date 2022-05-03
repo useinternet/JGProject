@@ -91,13 +91,17 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() = 0;
-		virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
+		//virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() = 0;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() = 0;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() = 0;
+
+		virtual bool AllocateCommandQueue(ECommandQueueType type, u64 queueID) = 0;
+		virtual SharedPtr<IComputeContext>  GetComputeContext(u64 queueID, u64 contextID)  = 0;
+		virtual SharedPtr<IGraphicsContext> GetGraphicsContext(u64 queueID, u64 contextID) = 0;
 	public:
 		static UniquePtr<IGraphicsAPI> Create(EGraphicsAPI api);
 	};
@@ -162,7 +166,9 @@ namespace JG
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext>  QueryInterfaceAsComputeContext() const  = 0;
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const = 0;
+	protected:
 		virtual void Reset() = 0;
+		virtual void Reset(u64 queueID) = 0;
 	};
 
 	class IComputeContext
@@ -204,7 +210,7 @@ namespace JG
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) = 0;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) = 0;
-		virtual void Reset() = 0;
+	
 
 
 		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
@@ -213,6 +219,8 @@ namespace JG
 
 		// 인터페이스 변경 함수
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const  = 0;
+	protected:
+		virtual void Reset(u64 queueID) = 0;
 	};
 
 
@@ -223,6 +231,7 @@ namespace JG
 	public:
 		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) = 0;
 		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) = 0;
+		virtual SharedPtr<IMesh> CopyMesh(SharedPtr<IMesh> src) = 0;
 	};
 
 

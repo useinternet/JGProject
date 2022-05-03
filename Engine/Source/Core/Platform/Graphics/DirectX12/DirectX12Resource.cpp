@@ -38,7 +38,7 @@ namespace JG
 				D3D12_RESOURCE_STATE_COMMON,
 				nullptr);
 
-			if (mD3DResource)
+			if (mD3DResource && datas != nullptr)
 			{
 				auto commandList = DirectX12API::GetGraphicsCommandList();
 				commandList->CopyBuffer(mD3DResource.Get(), datas, elementSize, elementCount);
@@ -65,7 +65,7 @@ namespace JG
 					mD3DResource->Map(0, nullptr, &mCPUData);
 				}
 			}
-			if (mCPUData != nullptr)
+			if (mCPUData != nullptr && datas != nullptr)
 			{
 				memcpy(mCPUData, datas, btSize);
 			}
@@ -167,7 +167,7 @@ namespace JG
 				D3D12_RESOURCE_STATE_COMMON,
 				nullptr
 			);
-			if (mD3DResource != nullptr)
+			if (mD3DResource != nullptr && datas != nullptr)
 			{
 				auto commandList = DirectX12API::GetGraphicsCommandList();
 				commandList->CopyBuffer(mD3DResource.Get(), datas, sizeof(u32), mIndexCount);
@@ -199,7 +199,7 @@ namespace JG
 					}
 				}
 			}
-			if (mCPUData != nullptr)
+			if (mCPUData != nullptr && datas != nullptr)
 			{
 				memcpy(mCPUData, datas, btSize);
 			}
@@ -358,7 +358,7 @@ namespace JG
 	{
 		return mD3DResource != nullptr;
 	}
-	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, void* initDatas)
+	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, const void* initDatas)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
 		mElementSize     = elementSize;
@@ -511,7 +511,7 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer , bool asCompute)
+	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer)
 	{
 		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false)
 		{
@@ -541,16 +541,8 @@ namespace JG
 
 		auto dxRWBuffer = static_cast<DirectX12StructuredBuffer*>(readWriteBuffer.get());
 
-		if (asCompute == true)
-		{
-			auto commandList = DirectX12API::GetComputeCommandList();
-			commandList->CopyResource(Get(), dxRWBuffer->Get());
-		}
-		else
-		{
-			auto commandList = DirectX12API::GetGraphicsCommandList();
-			commandList->CopyResource(Get(), dxRWBuffer->Get());
-		}
+		auto commandList = DirectX12API::GetGraphicsCommandList();
+		commandList->CopyResource(Get(), dxRWBuffer->Get());
 		return IsValid();
 	}
 

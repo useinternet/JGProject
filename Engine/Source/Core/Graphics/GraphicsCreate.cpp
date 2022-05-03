@@ -210,14 +210,22 @@ namespace JG
 
 		for (u64 i = 0; i < cnt; ++i)
 		{
-			auto vBuffer = IVertexBuffer::Create(stock.SubMeshNames[i] + "_VBuffer", EBufferLoadMethod::CPULoad);
-			auto iBuffer = IIndexBuffer::Create(stock.SubMeshNames[i] + "_IBuffer", EBufferLoadMethod::CPULoad);
+			auto vBuffer = IVertexBuffer::Create(stock.SubMeshNames[i] + "_VBuffer", EBufferLoadMethod::GPULoad);
+			auto iBuffer = IIndexBuffer::Create(stock.SubMeshNames[i] + "_IBuffer", EBufferLoadMethod::GPULoad);
 			auto subMesh = ISubMesh::Create(stock.SubMeshNames[i]);
 
 			vBuffer->SetData(stock.Vertices[i].data(), sizeof(JGVertex), stock.Vertices[i].size());
 			iBuffer->SetData(stock.Indices[i].data(), stock.Indices[i].size());
 			subMesh->SetVertexBuffer(vBuffer);
 			subMesh->SetIndexBuffer(iBuffer);
+
+			if (stock.BoneVertices[i].empty() == false)
+			{
+				auto bBuffer = IStructuredBuffer::Create(stock.SubMeshNames[i] + "_BBuffer", sizeof(JGBoneVertex), stock.BoneVertices[i].size(), EBufferLoadMethod::GPULoad);
+				bBuffer->SetData(sizeof(JGBoneVertex), stock.BoneVertices[i].size(), stock.BoneVertices.data());
+				subMesh->SetBoneBuffer(bBuffer);
+			}
+
 			AddMesh(subMesh);
 
 			meshInfo.SubMeshNames[i]        = stock.SubMeshNames[i];

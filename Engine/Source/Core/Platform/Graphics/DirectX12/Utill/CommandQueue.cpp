@@ -94,6 +94,12 @@ namespace JG
 		mIsCommandListExcute = false;
 	}
 
+	void CommandQueue::SubmitAndFlush()
+	{
+		End();
+		Flush();
+	}
+
 	void CommandQueue::Flush()
 	{
 		mFence->IncreaseValue();

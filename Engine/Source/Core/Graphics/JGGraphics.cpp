@@ -571,8 +571,8 @@ namespace JG
 			auto bufferCount = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferCount();
 			switch (path)
 			{
-			case ERendererPath::Deferred:
-				mRenderer = CreateSharedPtr<DeferredRenderer>();
+			//case ERendererPath::Deferred:
+				//mRenderer = CreateSharedPtr<DeferredRenderer>();
 			case ERendererPath::RayTracing:
 				mRenderer = CreateSharedPtr<RayTracingRenderer>();
 				break;

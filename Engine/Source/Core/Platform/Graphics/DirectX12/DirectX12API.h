@@ -40,15 +40,15 @@ namespace JG
 		static IDXGIFactory4* GetDXGIFactory();
 		static ID3D12Device5*  GetD3DDevice();
 		static CommandQueue*  GetGraphicsCommandQueue();
-		static CommandQueue*  GetComputeCommandQueue();
-		static CommandQueue*  GetCopyCommandQueue();
+		//static CommandQueue*  GetComputeCommandQueue();
+		//static CommandQueue*  GetCopyCommandQueue();
 		static DescriptorAllocation RTVAllocate();
 		static DescriptorAllocation DSVAllocate();
 		static DescriptorAllocation CSUAllocate();
 
 		static GraphicsCommandList* GetGraphicsCommandList();
-		static ComputeCommandList*  GetComputeCommandList();
-		static CopyCommandList*     GetCopyCommandList();
+		//static ComputeCommandList* GetComputeCommandList();
+		//static CopyCommandList* GetCopyCommandList();
 
 		static SharedPtr<GraphicsPipelineState> GetGraphicsPipelineState();
 		static SharedPtr<ComputePipelineState>  GetComputePipelineState();
@@ -100,7 +100,11 @@ namespace JG
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() override;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() override;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
-		virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
+		//virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
+
+		virtual bool AllocateCommandQueue(ECommandQueueType type, u64 queueID) override;
+		virtual SharedPtr<IComputeContext>  GetComputeContext(u64 queueID, u64 contextID) override;
+		virtual SharedPtr<IGraphicsContext> GetGraphicsContext(u64 queueID, u64 contextID) override;
 	private:
 		// 임시 
 	
@@ -112,9 +116,11 @@ namespace JG
 		SharedPtr<DescriptorAllocator> mRTVAllocator;
 		SharedPtr<DescriptorAllocator> mDSVAllocator;
 
+
+		Dictionary<u64, std::pair<ECommandQueueType, SharedPtr<CommandQueue>>> mCommandQueueDic;
 		SharedPtr<CommandQueue> mGraphicsCommandQueue;
-		SharedPtr<CommandQueue> mComputeCommandQueue;
-		SharedPtr<CommandQueue> mCopyCommandQueue;
+		//SharedPtr<CommandQueue> mComputeCommandQueue;
+		//SharedPtr<CommandQueue> mCopyCommandQueue;
 
 
 		Dictionary<handle, SharedPtr<DirectX12FrameBuffer>> mFrameBuffers;
@@ -125,19 +131,18 @@ namespace JG
 		std::mutex mComputePSOMutex;
 		std::mutex mRootSigMutex;
 		std::mutex mGraphicsContextMutex;
-		std::mutex mComputeContextMutex;
+		//std::mutex mComputeContextMutex;
 
 
 		Dictionary<std::thread::id, SharedPtr<GraphicsPipelineState>> mGraphicsPSOs;
 		Dictionary<std::thread::id, SharedPtr<ComputePipelineState>>  mComputePSOs;
 		Dictionary<std::thread::id, SharedPtr<IGraphicsContext>> mGraphicsContextDic;
-		Dictionary<std::thread::id, SharedPtr<IComputeContext>> mComputeContextDic;
+		//Dictionary<std::thread::id, SharedPtr<IComputeContext>> mComputeContextDic;
 
 		std::mutex mDeviceMutex;
 
 
 		bool mIsSupportedRayTracing = false;
-		
 	};
 
 
@@ -182,6 +187,7 @@ namespace JG
 		virtual SharedPtr<ICopyContext>	   QueryInterfaceAsCopyContext() const override;
 	public:
 		virtual void Reset() override;
+		virtual void Reset(u64 queueID) override;
 	};
 
 
@@ -214,7 +220,7 @@ namespace JG
 		virtual void Dispatch3D(u32 ThreadCountX, u32 ThreadCountY, u32 ThreadCountZ, u32 GroupSizeX, u32 GroupSizeY, u32 GroupSizeZ) override;
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) override;
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) override;
-		virtual void Reset() override;
+	
 
 		// 상태 변경 함수
 		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
@@ -224,6 +230,7 @@ namespace JG
 		ComputeCommandList* Get() const {
 			return mCommandList;
 		}
+		virtual void Reset(u64 queueID) override;
 	};
 
 
@@ -236,6 +243,7 @@ namespace JG
 	public:
 		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) override;
 		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) override;
+		virtual SharedPtr<IMesh> CopyMesh(SharedPtr<IMesh> src) override;
 	};
 
 

@@ -91,6 +91,7 @@ namespace JG
 		if (mAnimController != nullptr)
 		{
 			mAnimController->RemoveAnimationClip(CLIP_NAME);
+			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimController);
 			mAnimController = nullptr;
 		}
 		mEditorUIScene = nullptr;
@@ -238,6 +239,11 @@ namespace JG
 
 			JVector3 targetVec = EyePos * -1;
 			mEditorUIScene->SetTargetVector(targetVec);
+
+			if (mAnimController != nullptr)
+			{
+				mAnimController->BindMesh(mMeshAsset->Get());
+			}
 		}
 		mModel->MaterialList.clear();
 		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
@@ -259,7 +265,6 @@ namespace JG
 			{
 				mAnimController = CreateUniquePtr<AnimationController>();
 				JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
-
 
 				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
 				mAnimController->GetRootAnimationSequence()->

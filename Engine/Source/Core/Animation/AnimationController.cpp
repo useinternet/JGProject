@@ -5,7 +5,10 @@
 #include "AnimationSequence.h"
 #include "AnimationTransform.h"
 #include "AnimationClip.h"
-
+#include "Graphics/Mesh.h"
+#include "Graphics/JGGraphics.h"
+#include "Graphics/GraphicsAPI.h"
+#include "Graphics/Compute/AnimationSkinning.h"
 #include "Class/Data/Skeletone.h"
 
 namespace JG
@@ -39,6 +42,29 @@ namespace JG
 		mSkeletone = skeletone;
 	}
 
+	void AnimationController::BindMesh(SharedPtr<IMesh> mesh)
+	{
+		if (mesh == nullptr)
+		{
+			return;
+		}
+		u32 subMeshCnt = mesh->GetSubMeshCount();
+		for (u32 i = 0; i < subMeshCnt; ++i)
+		{
+			SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
+			if (subMesh->GetBoneBuffer() == nullptr)
+			{
+				return;
+			}
+		}
+		if (mOriginMesh != mesh)
+		{
+			mSkinnedMesh = nullptr;
+		}
+
+		mOriginMesh = mesh;
+	}
+
 	SharedPtr<AnimationClip> AnimationController::FindAnimationClip(const String& name) const
 	{
 		if (mAnimClips.find(name) == mAnimClips.end())
@@ -60,6 +86,11 @@ namespace JG
 	SharedPtr<Skeletone> AnimationController::GetBindedSkeletone() const
 	{
 		return mSkeletone;
+	}
+
+	SharedPtr<IMesh> AnimationController::GetBindedMesh() const
+	{
+		return mSkinnedMesh;
 	}
 
 	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters() const
@@ -113,16 +144,34 @@ namespace JG
 
 	}
 
-	void AnimationController::Update_Thread()
+	void AnimationController::Update_Thread(SharedPtr<IComputeContext> computeContext)
 	{
 		if (mSkeletone == nullptr || mSkeletone->IsValid() == false)
 		{
 			return;
 		}
+		SharedPtr<AnimationTransform> animTransform = mRootSequence->Execute();
 
-		mPendingTransform = mRootSequence->Execute();
+		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
+		{
+			//SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
+			//if (mAnimationSkinning == nullptr)
+			//{
+			//	mAnimationSkinning = CreateUniquePtr<Compute::AnimationSkinning>();
+			//}
+			//// 스키닝 Mesh 생성
+			//if (mSkinnedMesh == nullptr)
+			//{
+			//	mSkinnedMesh = copyContext->CopyMesh(mOriginMesh);
+			//}
+
+			//// 애니메이션 스키닝
+			//Compute::AnimationSkinning::Input input;
+			//input.AnimTransform = animTransform;
+			//input.OriginMesh    = mOriginMesh;
+			//input.SkinnedMesh   = mSkinnedMesh;
+			//mAnimationSkinning->Execute(computeContext, input);
+		}
+		
 	}
-
-
-
 }

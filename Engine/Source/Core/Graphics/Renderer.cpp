@@ -144,10 +144,23 @@ namespace JG
 		}
 			break;
 		case Graphics::ESceneObjectType::Skeletal:
-
+		{
+			Graphics::SkeletalRenderObject* skeletalObj = static_cast<Graphics::SkeletalRenderObject*>(sceneObject.get());
+			if (skeletalObj->Mesh != nullptr && skeletalObj->MaterialList.empty() == false)
+			{
+				ObjectInfo info;
+				info.WorldMatrix = skeletalObj->WorldMatrix;
+				info.Mesh = skeletalObj->Mesh;
+				info.MaterialList = skeletalObj->MaterialList;
+				info.Flags = skeletalObj->Flags;
+				i32 type = ArrangeObject(info);
+				mObjectInfoListDic[type].push_back(info);
+				Statistics.VisibleObjectCount += 1;
+			}
+		}
+			
 			break;
 		}
-	
 	}
 	SharedPtr<RenderResult> Renderer::End()
 	{

@@ -75,7 +75,7 @@ namespace JG
 	public:
 		virtual ~IStructuredBuffer() = default;
 	public:
-		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr) = 0;
+		virtual bool SetData(u64 elementSize, u64 elementCount, const  void* initDatas = nullptr) = 0;
 		virtual void SetDataByIndex(u64 index, void* data) const = 0;
 	public:
 		virtual u64      GetDataSize()     const = 0;
@@ -96,7 +96,7 @@ namespace JG
 	public:
 		virtual ~IReadBackBuffer() = default;
 	public:
-		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer, bool asCompute = false) = 0;
+		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer) = 0;
 		virtual bool GetData(void* out_data, u64 out_data_size) = 0;
 		virtual u64  GetDataSize() const = 0;
 	public:

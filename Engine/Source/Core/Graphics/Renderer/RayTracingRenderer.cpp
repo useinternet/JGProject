@@ -65,8 +65,6 @@ namespace JG
 				auto materialList = info.MaterialList;
 				auto& worldMatrix = JMatrix::Transpose(info.WorldMatrix);
 
-
-
 				if ((info.Flags & Graphics::ESceneObjectFlags::Ignore_RayTracing_Bottom_Level_AS) == false)
 				{
 					u64 subMeshCount = mesh->GetSubMeshCount();

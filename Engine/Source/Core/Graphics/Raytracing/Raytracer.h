@@ -57,10 +57,11 @@ namespace JG
 			u64     HitGroupIndex = 0;
 			u32     InstanceMask = EInstanceMask::InstanceMask_All;
 			JMatrix Transform;
-
+			Graphics::ESceneObjectFlags Flags;
 			InstanceData(SharedPtr<ISubMesh> subMesh, SharedPtr<IMaterial> m,
-				const JMatrix& transform, u64 insID, u64 hitGroupIndex)
-				: SubMesh(subMesh), Material(m), Transform(transform), InstanceID(insID), HitGroupIndex(hitGroupIndex) {}
+				const JMatrix& transform, u64 insID, u64 hitGroupIndex, Graphics::ESceneObjectFlags flags)
+				: SubMesh(subMesh), Material(m), Transform(transform), InstanceID(insID), HitGroupIndex(hitGroupIndex),
+			Flags(flags) {}
 		};
 
 		struct CB

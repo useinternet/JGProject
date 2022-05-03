@@ -8,8 +8,9 @@ namespace JG
 	class IBottomLevelAccelerationStructure;
 	class DirectX12SubMesh : public ISubMesh
 	{
-		SharedPtr<IVertexBuffer> mVertexBuffer;
-		SharedPtr<IIndexBuffer>  mIndexBuffer;
+		SharedPtr<IVertexBuffer>     mVertexBuffer;
+		SharedPtr<IIndexBuffer>      mIndexBuffer;
+		SharedPtr<IStructuredBuffer> mBoneBuffer;
 		String mName;
 		u64	   mInstanceCount = 1;
 
@@ -19,9 +20,12 @@ namespace JG
 		virtual ~DirectX12SubMesh() = default;
 	public:
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) override;
+		virtual void SetBoneBuffer(SharedPtr<IStructuredBuffer> boneBuffer) override;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer) override;
 		virtual SharedPtr<IVertexBuffer> GetVertexBuffer() const override;
+		virtual SharedPtr<IStructuredBuffer> GetBoneBuffer() const override;
 		virtual SharedPtr<IIndexBuffer>  GetIndexBuffer() const override;
+
 		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() const override ;
 		virtual void SetBottomLevelAS(SharedPtr<IBottomLevelAccelerationStructure> bottomAS) override;
 	public:

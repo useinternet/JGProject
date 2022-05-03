@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "JGAnimation.h"
 #include "AnimationController.h"
-
+#include "Graphics/JGGraphics.h"
+#include "Graphics/GraphicsAPI.h"
 namespace JG
 {
 	JGAnimation::JGAnimation()
@@ -36,34 +37,42 @@ namespace JG
 	void JGAnimation::RegisterAnimationController(SharedPtr<AnimationController> controller)
 	{
 		controller->Init();
-		mAddedRegisterAnimationControllerQueue.push(controller);
+		mCommandQueue.push(CommandData(controller, CommandData::Command_Add));
+	}
+
+	void JGAnimation::UnRegisterAnimatioinController(SharedPtr<AnimationController> controller)
+	{
+
+		mCommandQueue.push(CommandData(controller, CommandData::Command_Remove));
 	}
 
 	EScheduleResult JGAnimation::BeginFrame()
 	{
 		// 애니메이션 데이터 갱신 루프 시작
 
-		while (mAddedRegisterAnimationControllerQueue.empty() == false)
+		while (mCommandQueue.empty() == false)
 		{
-			WeakPtr<AnimationController> controller = mAddedRegisterAnimationControllerQueue.front();
-			mAddedRegisterAnimationControllerQueue.pop();
-			if (controller.lock() == nullptr)
+			CommandData data = mCommandQueue.front(); mCommandQueue.pop();
+			switch (data.Command)
 			{
-				continue;
+			case CommandData::Command_Add:
+				mRegisteredAnimationControllers.insert(data.AnimController);
+				break;
+			case CommandData::Command_Remove:
+				mRegisteredAnimationControllers.erase(data.AnimController);
+				break;
 			}
-			mRegisteredAnimationControllers.push_back(controller);
 		}
 
-		for (WeakPtr<AnimationController> weak_controller : mRegisteredAnimationControllers)
+		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{
-			SharedPtr<AnimationController> controller = weak_controller.lock();
 			if (controller == nullptr) continue;
 
 			controller->Update();
 		}
 
-
-
+		//mComputeContext = JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext();
+		
 		if (mRegisteredAnimationControllers.empty() == false)
 		{
 			mAnimThreadSH = Scheduler::GetInstance().ScheduleAsync([this]()
@@ -91,24 +100,12 @@ namespace JG
 	void JGAnimation::Update_Thread()
 	{
 		u64 cnt = mRegisteredAnimationControllers.size();
-
-		for (u64 i = 0; i < cnt;)
+		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{
-			SharedPtr<AnimationController> controller = mRegisteredAnimationControllers[i].lock();
-			if (controller == nullptr)
-			{
-				std::swap(mRegisteredAnimationControllers.end() - 1, mRegisteredAnimationControllers.begin() + i);
-				mRegisteredAnimationControllers.pop_back();
-				--cnt;
-			}
-			else
-			{
-				controller->Update_Thread();
-				++i;
-			}
+			controller->Update_Thread(mComputeContext);
 		}
+
+		// 끝날때까지 기다리기
+		//JGGraphics::GetInstance().GetGraphicsAPI()->SubmitAndFlush_ComputeQueue();
 	}
-
-
-
 }

@@ -41,7 +41,7 @@ namespace JG
 		DirectX12Texture* targetDepthTexture = static_cast<DirectX12Texture*>(mDepthTextures[index].get());
 
 
-		ComputeCommandList* cmdList = DirectX12API::GetComputeCommandList();
+		SharedPtr<ComputeCommandList> cmdList = DirectX12API::GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
 		
 		List<ID3D12Resource*>             d3dRTResources;
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
@@ -177,18 +177,18 @@ namespace JG
 
 	void Develop::CreateBottomLevelAS()
 	{
-		ComputeCommandList* cmdList = DirectX12API::GetComputeCommandList();
+		SharedPtr<ComputeCommandList> cmdList = DirectX12API::GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
 		SharedPtr<DirectX12ComputeContext> context = CreateSharedPtr<DirectX12ComputeContext>();
-		context->mCommandList = cmdList;
+		context->mCommandList = cmdList.get();
 		mTriBLAS = CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
 		mTriBLAS->Generate(context, mVertexBuffer, mIndexBuffer);
 	}
 
 	void Develop::CreateTopLevelAS()
 	{
-		ComputeCommandList* cmdList = DirectX12API::GetComputeCommandList();
+		SharedPtr<ComputeCommandList> cmdList = DirectX12API::GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
 		SharedPtr<DirectX12ComputeContext> context = CreateSharedPtr<DirectX12ComputeContext>();
-		context->mCommandList = cmdList;
+		context->mCommandList = cmdList.get();
 
 
 		mSceneAS = CreateSharedPtr<DirectX12TopLevelAccelerationStructure>();

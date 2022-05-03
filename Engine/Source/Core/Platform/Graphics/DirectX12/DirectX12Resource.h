@@ -132,7 +132,7 @@ namespace JG
 		ComPtr<ID3D12Resource>  mD3DResource;
 	public:
 		virtual bool IsValid() const override;
-		virtual bool SetData(u64 elementSize, u64 elementCount, void* initDatas = nullptr) override;
+		virtual bool SetData(u64 elementSize, u64 elementCount, const  void* initDatas = nullptr) override;
 		virtual void SetDataByIndex(u64 index, void* data) const override;
 		virtual u64 GetDataSize() const override;
 		virtual u64 GetElementCount() const override;
@@ -157,7 +157,7 @@ namespace JG
 		virtual ~DirectX12ReadBackBuffer();
 	public:
 		virtual bool IsValid() const override;
-		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer, bool asCompute) override;
+		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer) override;
 		virtual bool GetData(void* out_data, u64 out_data_size) override;
 		virtual u64 GetDataSize() const override;
 	public:
