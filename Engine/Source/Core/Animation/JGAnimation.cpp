@@ -70,9 +70,9 @@ namespace JG
 		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{
 			if (controller == nullptr) continue;
-
 			controller->Update();
 		}
+
 		if (mRegisteredAnimationControllers.empty() == false)
 		{
 			mAnimThreadSH = Scheduler::GetInstance().ScheduleAsync([this]()
@@ -80,8 +80,6 @@ namespace JG
 				Update_Thread();
 			});
 		}
-
-
 		return EScheduleResult::Continue;
 	}
 	EScheduleResult JGAnimation::EndFrame()

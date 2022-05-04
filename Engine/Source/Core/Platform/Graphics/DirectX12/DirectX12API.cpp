@@ -125,7 +125,7 @@ namespace JG
 			return nullptr;
 		}
 		ECommandQueueType type = GetCommandQueueType(queueID);
-		if (type == ECommandQueueType::Graphics || type == ECommandQueueType::Compute)
+		if (type == ECommandQueueType::Compute)
 		{
 			return static_cast<ComputeCommandList*>(queue->RequestCommandList(cmdID));
 		}
@@ -1010,6 +1010,7 @@ namespace JG
 		mCommandList->BindPipelineState(pso);
 		mCommandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}
+
 	void DirectX12GraphicsContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
 	{
 		if (mCommandList == nullptr)
@@ -1250,7 +1251,11 @@ namespace JG
 			return;
 		}
 		auto dx12AS = static_cast<DirectX12TopLevelAccelerationStructure*>(as.get());
-		mCommandList->BindStructuredBuffer(rootParam, dx12AS->GetResult()->GetGPUVirtualAddress());
+		if (dx12AS->IsValid())
+		{
+			mCommandList->BindStructuredBuffer(rootParam, dx12AS->GetResult()->GetGPUVirtualAddress());
+		}
+		
 	}
 	void DirectX12ComputeContext::Dispatch1D(u32 ThreadCountX, u32 GroupSizeX)
 	{
@@ -1449,7 +1454,7 @@ namespace JG
 			dest_iBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
 			dest_iBuffer->SetData(nullptr, src_dx12_iBuffer->GetIndexCount());
 			mCommandList->CopyResource(dest_iBuffer->Get(), src_dx12_iBuffer->Get());
-
+	
 
 			SharedPtr<ISubMesh> dest_subMesh = ISubMesh::Create(src_subMesh->GetName());
 			dest_subMesh->SetVertexBuffer(dest_vBuffer);
@@ -1467,13 +1472,17 @@ namespace JG
 				dest_subMesh->SetBoneBuffer(dest_bBuffer);
 			}
 			
+
+			mCommandList->TransitionBarrier(src_dx12_vBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
+			mCommandList->TransitionBarrier(src_dx12_iBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
+			if (src_dx12_bBuffer != nullptr)
+			{
+				mCommandList->TransitionBarrier(src_dx12_bBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
+			}
+			mCommandList->FlushResourceBarrier();
+
 			result->AddMesh(dest_subMesh);
 		}
-
-
-
-
-
 		return result;
 	}
 }

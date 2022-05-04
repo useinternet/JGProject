@@ -17,7 +17,7 @@ namespace JG
 		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 instanceMask) = 0;
 		virtual void Generate(SharedPtr<IComputeContext> context, bool onlyUpdate = false, bool allowUpdate = false) = 0;
 		virtual void Reset() = 0;
-
+		virtual bool IsValid() const = 0;
 	public:
 		static SharedPtr<ITopLevelAccelerationStructure> Create();
 	};

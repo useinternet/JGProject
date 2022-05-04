@@ -113,6 +113,11 @@ namespace JG
 		mTopASGen = TopLevelASGenerator();
 	}
 
+	bool DirectX12TopLevelAccelerationStructure::IsValid() const
+	{
+		return mResult != nullptr && mScratch != nullptr && mInstance != nullptr && mPrevInstance != nullptr && mPrevInstance->IsValid();
+	}
+
 	void DirectX12TopLevelAccelerationStructure::Clear()
 	{
 		DirectX12API::DestroyCommittedResource(mScratch);

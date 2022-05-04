@@ -49,7 +49,7 @@ namespace JG
 
 		Dictionary<String, std::wstring> mEntryPointNameDic;
 	public:
-		virtual ~DirectX12RayTracingShaderResourceTable() = default;
+		virtual ~DirectX12RayTracingShaderResourceTable();
 	public:
 		virtual void AddRayGeneration(const String& entryPoint) override;
 		virtual void AddMiss(const String& entryPoint) override;

@@ -608,6 +608,7 @@ namespace JG
 	private:
 		void TextureAsset_OnCompelete(AssetLoadCompeleteData* data);
 		void MaterialAsset_OnCompelete(AssetLoadCompeleteData* data);
+		void MeshAsset_OnCompelete(AssetLoadCompeleteData* data);
 	public:
 
 		bool WriteAsset(const String& path, EAssetFormat format, SharedPtr<Json> json);

@@ -183,6 +183,7 @@ namespace JG
 		virtual void Draw(u32 vertexCount, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation) override;
 
 		// 상태 변경 함수
+		
 		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
 		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) override;
 		// 인터페이스 변경 함수

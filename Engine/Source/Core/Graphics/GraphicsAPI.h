@@ -162,6 +162,7 @@ namespace JG
 		virtual void Draw(u32 vertexCount, u32 instanceCount = 1, u32 startVertexLocation = 0, u32 startInstanceLocation = 0) = 0;
 
 		// 상태 변경 함수
+		
 		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
 		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;
 
@@ -213,7 +214,6 @@ namespace JG
 		virtual void Dispatch(u32 groupX, u32 groupY, u32 groupZ) = 0;
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) = 0;
 	
-
 
 		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
 		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;

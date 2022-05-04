@@ -353,7 +353,10 @@ namespace JG
 		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
-
+	DirectX12StructuredBuffer::~DirectX12StructuredBuffer()
+	{
+		Reset();
+	}
 	bool DirectX12StructuredBuffer::IsValid() const
 	{
 		return mD3DResource != nullptr;

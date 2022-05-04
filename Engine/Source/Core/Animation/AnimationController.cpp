@@ -90,7 +90,7 @@ namespace JG
 
 	SharedPtr<IMesh> AnimationController::GetBindedMesh() const
 	{
-		return mSkinnedMesh;
+		return CanUseSkinnedMesh() ? mSkinnedMesh : mOriginMesh;
 	}
 
 	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters() const
@@ -142,7 +142,23 @@ namespace JG
 		mPendingTransform != nullptr ? 
 			*mFinalTransform = *mPendingTransform : mFinalTransform->Reset();
 
+
+		// 스키닝 Mesh 생성
+		SharedPtr<IGraphicsContext> context = JGGraphics::GetInstance().GetGraphicsAPI()->GetGraphicsContext();
+		SharedPtr<ICopyContext> copyContext = context->QueryInterfaceAsCopyContext();
+
+		if (mSkinnedMesh == nullptr)
+		{
+			mWaitFrameCount = 0;
+			mSkinnedMesh = copyContext->CopyMesh(mOriginMesh);
+
+		}
+		else if (mSkinnedMesh != nullptr && CanUseSkinnedMesh() == false)
+		{
+			++mWaitFrameCount;
+		}
 	}
+
 
 	void AnimationController::Update_Thread(SharedPtr<IComputeContext> computeContext)
 	{
@@ -154,24 +170,23 @@ namespace JG
 
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
 		{
-			//SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
-			//if (mAnimationSkinning == nullptr)
-			//{
-			//	mAnimationSkinning = CreateUniquePtr<Compute::AnimationSkinning>();
-			//}
-			//// 스키닝 Mesh 생성
-			//if (mSkinnedMesh == nullptr)
-			//{
-			//	mSkinnedMesh = copyContext->CopyMesh(mOriginMesh);
-			//}
+			SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
+			if (mAnimationSkinning == nullptr)
+			{
+				mAnimationSkinning = CreateUniquePtr<Compute::AnimationSkinning>();
+			}
 
-			//// 애니메이션 스키닝
-			//Compute::AnimationSkinning::Input input;
-			//input.AnimTransform = animTransform;
-			//input.OriginMesh    = mOriginMesh;
-			//input.SkinnedMesh   = mSkinnedMesh;
-			//mAnimationSkinning->Execute(computeContext, input);
+			// 애니메이션 스키닝
+			Compute::AnimationSkinning::Input input;
+			input.AnimTransform = animTransform;
+			input.OriginMesh    = mOriginMesh;
+			input.SkinnedMesh   = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
+			mAnimationSkinning->Execute(computeContext, input);
 		}
 		
+	}
+	bool AnimationController::CanUseSkinnedMesh() const
+	{
+		return mSkinnedMesh != nullptr && mSkinnedMesh->IsValid() && mWaitFrameCount >= JGGraphics::GetInstance().GetBufferCount();
 	}
 }

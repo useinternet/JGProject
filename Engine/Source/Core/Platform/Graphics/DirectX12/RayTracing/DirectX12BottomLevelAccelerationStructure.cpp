@@ -28,9 +28,6 @@ namespace JG
 		auto dx12IBuffer = static_cast<DirectX12IndexBuffer*>(iBuffer.get());
 		auto dx12Context = static_cast<DirectX12ComputeContext*>(context.get());
 
-
-
-
 		BottomLevelASGenerator btASGen;
 		btASGen.AddVertexBuffer(
 			dx12VBuffer->Get(), 0, dx12VBuffer->GetVertexCount(), dx12VBuffer->GetVertexSize(), 

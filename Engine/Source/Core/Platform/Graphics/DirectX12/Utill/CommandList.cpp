@@ -200,7 +200,7 @@ namespace JG
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(uploadBuffer.GetAddressOf()));
-
+		
 		uploadBuffer->SetName(TT("UploadBuffer"));
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};

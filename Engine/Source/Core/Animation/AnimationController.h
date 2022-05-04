@@ -50,6 +50,8 @@ namespace JG
 
 		Queue<ClipCommandData>        mClipCommandDataQueue;
 		SharedPtr<AnimationTransform> mPendingTransform;
+
+		u64 mWaitFrameCount = 0;
 	public:
 		// Clip Ã£±â
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags);
@@ -69,5 +71,7 @@ namespace JG
 		void Init();
 		void Update();
 		void Update_Thread(SharedPtr<IComputeContext> computeContext);
+
+		bool CanUseSkinnedMesh() const;
 	};
 }

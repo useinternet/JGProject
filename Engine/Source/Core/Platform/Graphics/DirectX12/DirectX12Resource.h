@@ -131,6 +131,9 @@ namespace JG
 		EBufferLoadMethod		mLoadMethod;
 		ComPtr<ID3D12Resource>  mD3DResource;
 	public:
+		DirectX12StructuredBuffer() = default;
+		virtual ~DirectX12StructuredBuffer();
+	public:
 		virtual bool IsValid() const override;
 		virtual bool SetData(u64 elementSize, u64 elementCount, const  void* initDatas = nullptr) override;
 		virtual void SetDataByIndex(u64 index, void* data) const override;

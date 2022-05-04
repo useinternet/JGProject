@@ -808,10 +808,6 @@ namespace JG
 			LoadData->Stock = stock;
 			LoadData->OnComplete = std::bind(&AssetDataBase::TextureAsset_OnCompelete, this, std::placeholders::_1);
 			LoadData->Stock->LoadJson(assetVal);
-			if (assetFormat == EAssetFormat::CubeMap)
-			{
-				int n = 0;
-			}
 			List<jbyte> uncom;
 			u64 originSize = stock->OriginPixelSize + 10;
 			uncom.resize(originSize);
@@ -827,14 +823,10 @@ namespace JG
 		}
 		case EAssetFormat::Mesh:
 		{
-			StaticMeshAssetStock stock;
-			stock.LoadJson(assetVal);
-			auto mAsset = LoadData->Asset->As<Asset<IMesh>>();
-			if (mAsset != nullptr)
-			{
-				mAsset->mData->SetMeshStock(stock);
-			}
-			else return false;
+			
+			LoadData->Stock = CreateSharedPtr<StaticMeshAssetStock>();
+			LoadData->OnComplete = std::bind(&AssetDataBase::MeshAsset_OnCompelete, this, std::placeholders::_1);
+			LoadData->Stock->LoadJson(assetVal);
 			break;
 		}
 		case EAssetFormat::Material:
@@ -1186,7 +1178,17 @@ namespace JG
 			}
 		}
 	}
+	void AssetDataBase::MeshAsset_OnCompelete(AssetLoadCompeleteData* data)
+	{
+		if (data == nullptr || data->Stock == nullptr || data->Asset == nullptr)
+		{
+			return;
+		}
+		auto meshAsset = static_cast<Asset<IMesh>*>(data->Asset.get());
+		auto meshStock = static_cast<StaticMeshAssetStock*>(data->Stock.get());
 
+		meshAsset->mData->SetMeshStock(*meshStock);
+	}
 	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
 	{
 		// Mesh, Material, Texture
@@ -1338,6 +1340,8 @@ namespace JG
 		}
 		return assetFormat;
 	}
+
+
 
 
 

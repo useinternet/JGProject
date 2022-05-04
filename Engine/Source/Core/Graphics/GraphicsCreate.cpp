@@ -222,7 +222,7 @@ namespace JG
 			if (stock.BoneVertices[i].empty() == false)
 			{
 				auto bBuffer = IStructuredBuffer::Create(stock.SubMeshNames[i] + "_BBuffer", sizeof(JGBoneVertex), stock.BoneVertices[i].size(), EBufferLoadMethod::GPULoad);
-				bBuffer->SetData(sizeof(JGBoneVertex), stock.BoneVertices[i].size(), stock.BoneVertices.data());
+				bBuffer->SetData(sizeof(JGBoneVertex), stock.BoneVertices[i].size(), stock.BoneVertices[i].data());
 				subMesh->SetBoneBuffer(bBuffer);
 			}
 
@@ -244,12 +244,6 @@ namespace JG
 		mesh->SetMeshStock(stock);
 		return mesh;
 	}
-
-
-
-
-
-
 
 	// ********************   RayTracing   ******************** //
 	SharedPtr<IRootSignatureCreater> IRootSignatureCreater::Create()

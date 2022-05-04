@@ -29,6 +29,7 @@ namespace JG
 		virtual void AddInstance(SharedPtr<IBottomLevelAccelerationStructure> btAS, const JMatrix& transform, u32 instanceID, u32 hitGroupIndex, u32 instanceMask) override;
 		virtual void Generate(SharedPtr<IComputeContext> context, bool onlyUpdate = false,  bool allowUpdate = false) override;
 		virtual void Reset() override;
+		virtual bool IsValid() const override;
 	public:
 		void Clear();
 		ID3D12Resource* GetResult() const {

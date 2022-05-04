@@ -283,7 +283,10 @@ namespace JG
 
 
 
-
+		if (mSceneAS[currentIndex]->IsValid() == false)
+		{
+			return;
+		}
 		// CB Bind
 		context->BindConstantBuffer(ERootParam::RootParam_CB, mCB);
 

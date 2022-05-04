@@ -9,6 +9,25 @@
 #endif
 namespace JG
 {
+	DirectX12RayTracingShaderResourceTable::~DirectX12RayTracingShaderResourceTable()
+	{
+		if (mRayGenSRT != nullptr)
+		{
+			mRayGenSRT->Unmap(0, nullptr);
+			DirectX12API::DestroyCommittedResource(mRayGenSRT);
+		}
+		if (mMissSRT != nullptr)
+		{
+			mMissSRT->Unmap(0, nullptr);
+			DirectX12API::DestroyCommittedResource(mMissSRT);
+		}
+		if (mHitSRT != nullptr)
+		{
+			mHitSRT->Unmap(0, nullptr);
+			DirectX12API::DestroyCommittedResource(mHitSRT);
+		}
+		Reset();
+	}
 	void DirectX12RayTracingShaderResourceTable::AddRayGeneration(const String& entryPoint)
 	{
 		mRayGenLocalRootArgInfos.push_back(LocalRootArgumentInfo(entryPoint));
