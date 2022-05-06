@@ -61,12 +61,12 @@ namespace JG
 
 		return api->CreateStrucuredBuffer(name, elementSize, elementCount, method);
 	}
-	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name)
+	SharedPtr<IReadBackBuffer> IReadBackBuffer::Create(const String& name, u64 dataSize)
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-		return api->CreateReadBackBuffer(name);
+		return api->CreateReadBackBuffer(name, dataSize);
 	}
 	SharedPtr<ITexture> ITexture::Create(const String& name)
 	{
@@ -218,12 +218,13 @@ namespace JG
 			iBuffer->SetData(stock.Indices[i].data(), stock.Indices[i].size());
 			subMesh->SetVertexBuffer(vBuffer);
 			subMesh->SetIndexBuffer(iBuffer);
-
+		
 			if (stock.BoneVertices[i].empty() == false)
 			{
 				auto bBuffer = IStructuredBuffer::Create(stock.SubMeshNames[i] + "_BBuffer", sizeof(JGBoneVertex), stock.BoneVertices[i].size(), EBufferLoadMethod::GPULoad);
 				bBuffer->SetData(sizeof(JGBoneVertex), stock.BoneVertices[i].size(), stock.BoneVertices[i].data());
 				subMesh->SetBoneBuffer(bBuffer);
+				subMesh->SetBoneOffset(stock.BoneOffsetDatas[i]);
 			}
 
 			AddMesh(subMesh);

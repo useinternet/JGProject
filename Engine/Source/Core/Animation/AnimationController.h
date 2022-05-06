@@ -13,12 +13,13 @@ namespace JG
 	class Skeletone;
 	class IMesh;
 	class IComputeContext;
+	class IReadBackBuffer;
 	namespace Compute
 	{
 		class AnimationSkinning;
 	}
 	
-	class AnimationController : public Enable_Shared_From_This<AnimationController>
+	class AnimationController
 	{
 		friend class JGAnimation;
 
@@ -29,11 +30,9 @@ namespace JG
 		SharedPtr<Skeletone> mSkeletone;
 		SharedPtr<IMesh> mSkinnedMesh;
 		SharedPtr<IMesh> mOriginMesh;
-		SharedPtr<AnimationTransform> mFinalTransform;
 		SharedPtr<Compute::AnimationSkinning> mAnimationSkinning;
 		Dictionary<String, SharedPtr<AnimationClip>>     mAnimClips;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> mAnimClipInfos;
-
 
 		struct ClipCommandData
 		{
@@ -49,8 +48,6 @@ namespace JG
 		};
 
 		Queue<ClipCommandData>        mClipCommandDataQueue;
-		SharedPtr<AnimationTransform> mPendingTransform;
-
 		u64 mWaitFrameCount = 0;
 	public:
 		// Clip Ã£±â
@@ -64,14 +61,13 @@ namespace JG
 
 		SharedPtr<Skeletone>		   GetBindedSkeletone()       const;
 		SharedPtr<IMesh>			   GetBindedMesh() const;
+		SharedPtr<IMesh>			   GetBindedOriginMesh() const;
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationSequence>   GetRootAnimationSequence() const;
-		SharedPtr<AnimationTransform>  GetFinalTransform() const;
 	private:
 		void Init();
 		void Update();
 		void Update_Thread(SharedPtr<IComputeContext> computeContext);
-
 		bool CanUseSkinnedMesh() const;
 	};
 }

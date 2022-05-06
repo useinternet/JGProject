@@ -44,14 +44,14 @@ namespace JG
 		mBindedGraphicsRootSig = nullptr;
 		mBindedComputeRootSig  = nullptr;
 
-		mIsClose = false;
+		//mIsClose = false;
 	}
 
 	void CommandList::Close()
 	{
 		mResourceStateTracker->FlushResourceBarrier(Get());
 		mD3DCommandList->Close();
-		mIsClose = true;
+		//mIsClose = true;
 	}
 
 	bool CommandList::Close(CommandList* commandList)
@@ -65,10 +65,10 @@ namespace JG
 		return isExistBarrier;
 	}
 
-	bool CommandList::IsClosing() const
-	{
-		return mIsClose;
-	}
+	//bool CommandList::IsClosing() const
+	//{
+	//	return mIsClose;
+	//}
 
 	void CommandList::TransitionBarrier(ID3D12Resource* d3dResource, D3D12_RESOURCE_STATES state, u32 subResource, bool flush)
 	{
@@ -522,12 +522,12 @@ namespace JG
 	void GraphicsCommandList::DrawIndexed(u32 indexCount, u32 instancedCount, u32 startIndexLocation,
 		u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
+		mBindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawIndexedInstanced(indexCount, instancedCount, startIndexLocation, startVertexLocation, startInstanceLocation);
 	}
 	void GraphicsCommandList::Draw(u32 vertexPerInstance, u32 instanceCount, u32 startVertexLocation, u32 startInstanceLocation)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
+		mBindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, true);
 		mD3DCommandList->DrawInstanced(vertexPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
@@ -612,10 +612,6 @@ namespace JG
 			}
 		}
 		break;
-		case RootSignature::__ShaderResourceView__:
-			break;
-		case RootSignature::__UnorderedAccessView__:
-			break;
 		default:
 			JGASSERT("BindTextures not support ConstantBufferView / Constant");
 			break;
@@ -679,6 +675,31 @@ namespace JG
 			BackupResource(backUpResource);
 		}
 	}
+	void ComputeCommandList::BindStructuredBuffer(u32 rootParam, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	{
+		i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
+		switch (initType)
+		{
+		case RootSignature::__DescriptorTable__:
+		{
+			D3D12_DESCRIPTOR_RANGE_TYPE tableType = mDynamicDescriptorAllocator->GetDescriptorTableType(rootParam);
+			switch (tableType)
+			{
+			case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
+			case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
+				mDynamicDescriptorAllocator->CommitDescriptorTable(rootParam, { handle });
+				break;
+			default:
+				JGASSERT("trying bind CBV or Sampler in BindStructuredBuffer");
+				break;
+			}
+		}
+		break;
+		default:
+			JGASSERT("BindStructuredBuffer not support ConstantBufferView / Constant");
+			break;
+		}
+	}
 	void ComputeCommandList::BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset)
 	{
 		int initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootparam);
@@ -694,13 +715,13 @@ namespace JG
 	}
 	void ComputeCommandList::Dispatch(u32 groupX, u32 groupY, u32 groupZ)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
+		mBindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
 		mD3DCommandList->Dispatch(groupX, groupY, groupZ);
 	}
 
 	void ComputeCommandList::DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc)
 	{
-		mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
+		mBindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(mD3DCommandList, mBindedDescriptorHeap, false);
 		mD3DCommandList->DispatchRays(&desc);
 
 	}

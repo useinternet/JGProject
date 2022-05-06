@@ -19,7 +19,7 @@ namespace JG
 		None = 0,
 		Fix_RotatePitch = 0x001,
 		Fix_RotateYaw   = 0x002,
-
+		Fix_Zoom   = 0x004,
 	};
 
 	struct EditorUISceneConfig
@@ -35,7 +35,12 @@ namespace JG
 		f32 FarZ  = 1000000.0f;
 		f32 NearZ = 1.0f;
 		JVector3  EyePos    = JVector3(0, 0, -200.0f);
-		JVector3  TargetVec = JVector3(0, 0, -1);
+		JVector3  TargetVec = JVector3(0, 0, 1);
+
+
+		f32 ZoomSpeed = 10.0f;
+		f32 MinZoomDistance = 200.0f;
+		f32 MaxZoomDistance = 10000.0f;
 		EEditorUISceneFlags Flags = EEditorUISceneFlags::None;
 	};
 

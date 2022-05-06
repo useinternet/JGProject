@@ -265,21 +265,18 @@ namespace JG
 
 			if (info.Argument.GetVertexBuffer() != nullptr)
 			{
-				DirectX12VertexBuffer* dx12VBuffer = static_cast<DirectX12VertexBuffer*>(info.Argument.GetVertexBuffer().get());
-				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect(dx12VBuffer->GetSRV());
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect({ info.Argument.GetVertexBuffer()->GetSRV() });
 				gpuHandles.push_back(gpuHandle);
 			}
 			// Prev VertexBuffer
 			if (info.Argument.GetVertexBuffer() != nullptr)
 			{
-				DirectX12VertexBuffer* dx12VBuffer = static_cast<DirectX12VertexBuffer*>(info.Argument.GetVertexBuffer().get());
-				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect(dx12VBuffer->GetSRV());
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect({ info.Argument.GetVertexBuffer()->GetSRV() });
 				gpuHandles.push_back(gpuHandle);
 			}
 			if (info.Argument.GetIndexBuffer() != nullptr)
 			{
-				DirectX12IndexBuffer* dx12IBuffer = static_cast<DirectX12IndexBuffer*>(info.Argument.GetIndexBuffer().get());
-				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect(dx12IBuffer->GetSRV());
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect({ info.Argument.GetIndexBuffer()->GetSRV() });
 				gpuHandles.push_back(gpuHandle);
 			}
 
@@ -292,7 +289,7 @@ namespace JG
 				}
 				else
 				{
-					D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect({ t->GetTextureID() });
+					D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = commandList->UploadDirect({ t->GetSRV() });
 					gpuHandles.push_back(gpuHandle);
 				}
 			}

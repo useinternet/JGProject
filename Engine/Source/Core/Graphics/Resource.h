@@ -4,6 +4,42 @@
 #include "InputLayout.h"
 namespace JG
 {
+#pragma region Define
+
+#define DEFINE_NOT_SUPPORTED_SRV \
+	virtual ResourceViewPtr GetSRV() const override \
+	{ \
+		JG_LOG_ERROR("This Resource Not Supported Shader Resource View"); \
+		return 0; \
+	} \
+
+#define DEFINE_NOT_SUPPORTED_UAV \
+	virtual ResourceViewPtr GetUAV() const override \
+	{ \
+		JG_LOG_ERROR("This Resource Not Supported Unordered Access View"); \
+		return 0; \
+	} \
+
+#define DEFINE_NOT_SUPPORTED_RTV \
+	virtual ResourceViewPtr GetRTV() const override \
+	{ \
+		JG_LOG_ERROR("This Resource Not Supported Render Target View"); \
+		return 0; \
+	} \
+
+#define DEFINE_NOT_SUPPORTED_DSV \
+	virtual ResourceViewPtr GetDSV() const override \
+	{ \
+		JG_LOG_ERROR("This Resource Not Supported Depth Stencil View"); \
+		return 0; \
+	} \
+
+
+#pragma endregion
+
+
+
+
 	class ITexture;
 	class IComputeShader;
 	class IResource
@@ -21,12 +57,20 @@ namespace JG
 		{
 			return mName;
 		}
+		
 	public:
+		virtual PrimitiveResourcePtr      GetPrimitiveResourcePtr()      const = 0;
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const = 0;
+		virtual ResourceViewPtr GetSRV() const = 0;
+		virtual ResourceViewPtr GetUAV() const = 0;
+		virtual ResourceViewPtr GetRTV() const = 0;
+		virtual ResourceViewPtr GetDSV() const = 0;
 		virtual bool IsValid() const = 0;
 	private:
 		IResource(const IResource&) = delete;
 		const IResource& operator=(const IResource&) = delete;
 	};
+
 
 	class IVertexBuffer : public IResource
 	{
@@ -53,8 +97,6 @@ namespace JG
 		virtual bool SetData(const u32* datas, u64 count) = 0;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const = 0;
 		virtual u32 GetIndexCount() const = 0;
-	protected:
-		//virtual void Bind() = 0;
 	public:
 		static SharedPtr<IIndexBuffer> Create(const String& name, EBufferLoadMethod method);
 	};
@@ -81,7 +123,6 @@ namespace JG
 		virtual u64      GetDataSize()     const = 0;
 		virtual u64      GetElementCount() const = 0;
 		virtual u64		 GetElementSize()  const = 0;
-		virtual BufferID GetBufferID()     const = 0;
 		virtual void*    GetDataPtr() const = 0;
 
 	protected:
@@ -96,11 +137,10 @@ namespace JG
 	public:
 		virtual ~IReadBackBuffer() = default;
 	public:
-		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer) = 0;
 		virtual bool GetData(void* out_data, u64 out_data_size) = 0;
 		virtual u64  GetDataSize() const = 0;
 	public:
-		static SharedPtr<IReadBackBuffer> Create(const String& name);
+		static SharedPtr<IReadBackBuffer> Create(const String& name, u64 dataSize);
 	};
 	
 	class TextureAssetStock;

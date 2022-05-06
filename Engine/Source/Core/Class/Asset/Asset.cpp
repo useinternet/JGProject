@@ -86,11 +86,20 @@ namespace JG
 				bvArrayJson->AddMember(boneVertexJson);
 			}
 
+			SharedPtr<JsonData> boArrayJson = viJson->CreateJsonData();
+			for (auto& bo : BoneOffsetDatas[i])
+			{
+				SharedPtr<JsonData> boneOffsetJson = viJson->CreateJsonData();
+				bo.MakeJson(boneOffsetJson);
+				boArrayJson->AddMember(boneOffsetJson);
+			}
+
+
 
 			viJson->AddMember(VERTICES_KEY, vArrayJson);
 			viJson->AddMember(BONE_VERTICES_KEY, bvArrayJson);
 			viJson->AddMember(INDICES_KEY, Indices[i]);
-
+			viJson->AddMember(BONE_OFFSETDATAS_KEY, boArrayJson);
 
 			meshJson->AddMember(viJson);
 		}
@@ -118,7 +127,7 @@ namespace JG
 			Vertices.resize(cnt);
 			BoneVertices.resize(cnt);
 			Indices.resize(cnt);
-			
+			BoneOffsetDatas.resize(cnt);
 			SubMeshNames.resize(cnt);
 			for (u64 i = 0; i < cnt; ++i)
 			{
@@ -126,6 +135,7 @@ namespace JG
 
 				SharedPtr<JsonData> verticesJson	 = meshJson->GetMember(VERTICES_KEY);
 				SharedPtr<JsonData> boneVerticesJson = meshJson->GetMember(BONE_VERTICES_KEY);
+				SharedPtr<JsonData> boneOffsetJson = meshJson->GetMember(BONE_OFFSETDATAS_KEY);
 				SharedPtr<JsonData> indicesJson		 = meshJson->GetMember(INDICES_KEY);
 				SharedPtr<JsonData> meshNameJson	 = meshJson->GetMember(NAME_KEY);
 
@@ -154,6 +164,17 @@ namespace JG
 						JGBoneVertex v;
 						v.LoadJson(vJson);
 						BoneVertices[i][j] = v;
+					}
+				}
+				if (boneOffsetJson != nullptr)
+				{
+					BoneOffsetDatas[i].resize(boneOffsetJson->GetSize());
+					for (u64 j = 0; j < boneOffsetJson->GetSize(); ++j)
+					{
+						SharedPtr<JsonData> boJson = boneOffsetJson->GetJsonDataFromIndex(j);
+						JGBoneOffsetData v;
+						v.LoadJson(boJson);
+						BoneOffsetDatas[i][j] = v;
 					}
 				}
 				if (indicesJson != nullptr)
@@ -188,9 +209,6 @@ namespace JG
 			boneNodeJson->AddMember(PARENT_BONDE_NODE_KEY, boneNode.ParentNode);
 			boneNodeJson->AddMember(CHILD_BONE_NODES_KEY, boneNode.ChildNodes);
 			boneNodeJson->AddMember(TRANSFORM_KEY, boneNode.Transform);
-			boneNodeJson->AddMember(BONE_OFFSET_KEY, boneNode.BoneOffset);
-
-
 			boneNodeArrayJson->AddMember(boneNodeJson);
 		}
 		jsonData->AddMember(BONE_NODES_KEY, boneNodeArrayJson);
@@ -255,12 +273,6 @@ namespace JG
 				if (val != nullptr)
 				{
 					BoneNodes[i].Transform = val->GetMatrix();
-				}
-
-				val = boneNodeJson->GetMember(BONE_OFFSET_KEY);
-				if (val != nullptr)
-				{
-					BoneNodes[i].BoneOffset = val->GetMatrix();
 				}
 			}
 		}

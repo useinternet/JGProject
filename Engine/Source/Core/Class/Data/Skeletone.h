@@ -18,7 +18,6 @@ namespace JG
 			List<u32> ChildNodes;
 
 			JMatrix Transform;
-			JMatrix BoneOffset;
 		};
 	private:
 		String mName;

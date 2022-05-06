@@ -6,19 +6,19 @@
 #include "AnimationClip.h"
 namespace JG
 {
-	AnimationSequence::AnimationSequence(SharedPtr<AnimationController> controller)
+	AnimationSequence::AnimationSequence(AnimationController* controller)
 	{
 		mOwnerAnimController = controller;
 	}
 
 	bool AnimationSequence::IsValid() const
 	{
-		return mOwnerAnimController.lock() != nullptr;
+		return mOwnerAnimController != nullptr;
 	}
 
-	SharedPtr<AnimationController> AnimationSequence::GetOwnerAnimationController() const
+	AnimationController* AnimationSequence::GetOwnerAnimationController() const
 	{
-		return mOwnerAnimController.lock();
+		return mOwnerAnimController;
 	}
 
 	AnimationSequence& AnimationSequence::Begin(const String& startNodeName)
@@ -94,7 +94,7 @@ namespace JG
 		if (GetOwnerAnimationController() != nullptr)
 		{
 			transitionData.AnimationController = GetOwnerAnimationController();
-			transitionData.AnimationParameters = GetOwnerAnimationController()->GetAnimationParameters();
+			transitionData.AnimationParameters = GetOwnerAnimationController()->GetAnimationParameters().get();
 		}
 		transitionData.PrevNodeName = prevName;
 		transitionData.NextNodeName = nextName;
@@ -121,7 +121,7 @@ namespace JG
 		mIsMakingSequence = false;
 	}
 
-	SharedPtr<AnimationTransform> AnimationSequence::Execute()
+	List<SharedPtr<AnimationTransform>> AnimationSequence::Execute()
 	{
 		if (mCurrentNode == nullptr)
 		{
@@ -129,7 +129,7 @@ namespace JG
 		}
 		if(mCurrentNode == nullptr)
 		{
-			return nullptr;
+			return List<SharedPtr<AnimationTransform>>();
 		}
 		mIsRunning = true;
 		return ExecuteInternal(mCurrentNode);
@@ -176,14 +176,14 @@ namespace JG
 		}
 		return mNodeDic.at(name).get();
 	}
-	SharedPtr<AnimationTransform> AnimationSequence::ExecuteInternal(Node* node)
+	List<SharedPtr<AnimationTransform>> AnimationSequence::ExecuteInternal(Node* node)
 	{
-		SharedPtr<AnimationController> animController = GetOwnerAnimationController();
+		AnimationController* animController = GetOwnerAnimationController();
 		if (animController == nullptr)
 		{
-			return nullptr;
+			return List<SharedPtr<AnimationTransform>>();
 		}
-		SharedPtr<AnimationTransform> result = nullptr;
+		List<SharedPtr<AnimationTransform>> result;
 		u32 transitionCnt = node->ConnectedNode.size();
 		for (u32 i = 0; i < transitionCnt; ++i)
 		{
@@ -195,7 +195,7 @@ namespace JG
 			}
 		}
 
-		if (result == nullptr)
+		if (result.empty())
 		{
 			switch (node->NodeType)
 			{
@@ -213,10 +213,10 @@ namespace JG
 				if (animClip == nullptr || animClipInfo == nullptr)
 				{
 					JG_LOG_ERROR("%s is not exist Animation Clip", name);
-					return nullptr;
+					return List<SharedPtr<AnimationTransform>>();
 				}
-				result = CreateSharedPtr<AnimationTransform>();
-				EAnimationClipState clipState = animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
+				EAnimationClipState clipState = animClip->Update(
+					animClipInfo, animController->GetBindedOriginMesh(), animController->GetBindedSkeletone(), result);
 				switch (clipState)
 				{
 				case EAnimationClipState::Running:
@@ -224,12 +224,11 @@ namespace JG
 					if (animClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
 					{
 						animClipInfo->Reset();
-						result->Reset();
-						animClip->Update(animClipInfo, animController->GetBindedSkeletone(), result);
+						animClip->Update(animClipInfo, animController->GetBindedOriginMesh(), animController->GetBindedSkeletone(), result);
 					}
 					break;
 				default:
-					result = nullptr;
+					result.clear();
 				break;
 				}
 

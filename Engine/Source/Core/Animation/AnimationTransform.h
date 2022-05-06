@@ -5,7 +5,7 @@ namespace JG
 {
 	class AnimationTransform
 	{
-		JMatrix mTransform[64];
+		JMatrix mTransform[128];
 	public:
 		AnimationTransform();
 
@@ -15,6 +15,8 @@ namespace JG
 
 		void Set(i32 i, const JMatrix& m);
 		const JMatrix& Get(i32 i) const;
+
+		void ForEach(const std::function<void(JMatrix&)>& action);
 	public:
 		JMatrix& operator[](i32 i);
 	};

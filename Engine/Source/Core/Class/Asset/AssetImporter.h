@@ -80,10 +80,15 @@ namespace JG
 		static EAssetImportResult Import(const MaterialAssetImportSettings& settings); 
 		static EAssetImportResult Import(const CubeMapAssetImportSettings& settings);
 	private:
-		static void ReadMesh(const aiMesh* mesh, StaticMeshAssetStock* output);
-		static void ReadSkeletal(const aiScene* scene, const aiMesh* mesh, SkeletalAssetStock* output);
-		static void ReadSkeletalNode(const aiMesh* mesh, Dictionary<String, u32>& boneNodeDic, SkeletalAssetStock* output);
-		static void ReadSkeletalHierarchy(const aiNode* node, const Dictionary<String, u32>& boneNodeDic, SkeletalAssetStock* output);
+		struct SceneHierarchyInfo
+		{
+			Dictionary<String, u32> NodeIDDic;
+			HashSet<String>		    MeshNodeSet;
+		};
+		static void ReadMesh(const aiScene* scene, const aiMesh* mesh, StaticMeshAssetStock* output);
+		static void ReadSkeletal(const aiScene* scene, SkeletalAssetStock* output, SceneHierarchyInfo* info);
+		//static void ReadSkeletalNode(const aiMesh* mesh, SkeletalAssetStock* output, );
+		static void ReadSkeletalNodeHierarchy(const aiNode* node, SceneHierarchyInfo* info, SkeletalAssetStock* output);
 		static void ReadAnimation(const aiAnimation* anim, AnimationClipAssetStock* output);
 		static void ReadTexture(const aiTexture* tex, TextureAssetStock* output);
 		static void ReadMaterial(const aiMaterial* mat, MaterialAssetStock* output);

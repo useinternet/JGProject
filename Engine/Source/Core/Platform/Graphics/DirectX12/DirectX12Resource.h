@@ -26,37 +26,47 @@ namespace JG
 
 
 		mutable bool mSRVDirty = true;
+		mutable bool mUAVDirty = true;
+		mutable std::mutex mSRV_UAVMutex;
+
 		mutable DescriptorAllocation mSRV;
-		mutable std::mutex mSRVMutex;
+		mutable DescriptorAllocation mUAV;
 	public:
 		DirectX12VertexBuffer() = default;
 		virtual ~DirectX12VertexBuffer();
 	public:
-		virtual bool  SetData(const void* datas, u64 elementSize, u64 elementCount) override;
+		// --- Resource Interface --- 
 		virtual bool  IsValid() const override;
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+		// ------------------------
+
+		virtual bool SetData(const void* datas, u64 elementSize, u64 elementCount) override;
 		virtual void SetBufferLoadMethod(EBufferLoadMethod type) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
+
+
 		virtual u64 GetVertexCount() const override;
 		virtual u64 GetVertexSize() const override;
+
+
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
 	protected:
 		void Reset();
+		void SendResourceViewDirty();
 	public:
 		void* GetData() const
 		{
 			return mCPUData;
 		}
-		u64 GetElementSize() const
-		{
-			return mElementSize;
-		}
-		u64 GetElementCount() const
-		{
-			return mElementCount;
-		}
-		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
+		
+		virtual ResourceViewPtr GetSRV() const override;
+		virtual ResourceViewPtr GetUAV() const override;
+
+		DEFINE_NOT_SUPPORTED_RTV
+		DEFINE_NOT_SUPPORTED_DSV
 	};
 	class DirectX12IndexBuffer : public IIndexBuffer
 	{
@@ -69,23 +79,33 @@ namespace JG
 		ComPtr<ID3D12Resource>  mD3DResource;
 
 		mutable bool mSRVDirty = true;
+		mutable bool mUAVDirty = true;
 		mutable DescriptorAllocation mSRV;
-		mutable std::mutex mSRVMutex;
+		mutable DescriptorAllocation mUAV;
+		mutable std::mutex mSRV_UAVMutex;
 	public:
 		DirectX12IndexBuffer() = default;
 		virtual ~DirectX12IndexBuffer();
 	public:
-		virtual bool SetData(const u32* datas, u64 count) override;
+		// --- Resource Interface --- 
 		virtual bool IsValid() const override;
 
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+
+		// ------------------------
+
+		virtual bool SetData(const u32* datas, u64 count) override;
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
+
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
 	protected:
-		//virtual void Bind() override;
 		void Reset();
+		void SendResourceViewDirty();
 	public:
 		u32* GetData() const
 		{
@@ -95,7 +115,11 @@ namespace JG
 		{
 			return mIndexCount;
 		}
-		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
+		virtual ResourceViewPtr GetSRV() const override;
+		virtual ResourceViewPtr GetUAV() const override;
+
+		DEFINE_NOT_SUPPORTED_RTV
+		DEFINE_NOT_SUPPORTED_DSV
 	};
 
 	class DirectX12ByteAddressBuffer : public IByteAddressBuffer
@@ -111,11 +135,23 @@ namespace JG
 		DirectX12ByteAddressBuffer() = default;
 		virtual ~DirectX12ByteAddressBuffer() = default;
 	public:
+		// --- Resource Interface --- 
 		virtual bool IsValid() const override;
+
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+
+		// ------------------------
+
+
 		virtual bool SetData(u64 elementCount, const void* initDatas = nullptr) override;
 	public:
-		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
-		D3D12_CPU_DESCRIPTOR_HANDLE GetUAV() const;
+		virtual ResourceViewPtr GetSRV() const override;
+		virtual ResourceViewPtr GetUAV() const override;
+
+		DEFINE_NOT_SUPPORTED_RTV
+		DEFINE_NOT_SUPPORTED_DSV
 		ID3D12Resource* Get() const;
 	private:
 		void CreateViews();
@@ -134,7 +170,16 @@ namespace JG
 		DirectX12StructuredBuffer() = default;
 		virtual ~DirectX12StructuredBuffer();
 	public:
+		// --- Resource Interface --- 
 		virtual bool IsValid() const override;
+
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+
+		// ------------------------
+
+
 		virtual bool SetData(u64 elementSize, u64 elementCount, const  void* initDatas = nullptr) override;
 		virtual void SetDataByIndex(u64 index, void* data) const override;
 		virtual u64 GetDataSize() const override;
@@ -142,10 +187,15 @@ namespace JG
 		virtual u64 GetElementSize() const override;
 		virtual void* GetDataPtr() const override;
 
-		virtual BufferID GetBufferID() const override;
 		virtual void SetBufferLoadMethod(EBufferLoadMethod method) override;
 		virtual EBufferLoadMethod GetBufferLoadMethod() const override;
 		ID3D12Resource* Get() const;
+
+
+		DEFINE_NOT_SUPPORTED_SRV
+		DEFINE_NOT_SUPPORTED_UAV
+		DEFINE_NOT_SUPPORTED_RTV
+		DEFINE_NOT_SUPPORTED_DSV
 	private:
 		void Reset();
 	};
@@ -159,14 +209,25 @@ namespace JG
 	public:
 		virtual ~DirectX12ReadBackBuffer();
 	public:
+		// --- Resource Interface --- 
 		virtual bool IsValid() const override;
-		virtual bool Read(SharedPtr<IStructuredBuffer> readWriteBuffer) override;
+
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+
+		// ------------------------
 		virtual bool GetData(void* out_data, u64 out_data_size) override;
 		virtual u64 GetDataSize() const override;
 	public:
+		DEFINE_NOT_SUPPORTED_SRV
+		DEFINE_NOT_SUPPORTED_UAV
+		DEFINE_NOT_SUPPORTED_RTV
+		DEFINE_NOT_SUPPORTED_DSV
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();
 		}
+		void Init(u64 dataSize);
 	private:
 		void Reset();
 	};
@@ -190,6 +251,15 @@ namespace JG
 		DirectX12Texture() = default;
 		virtual ~DirectX12Texture();
 	public:
+		// --- Resource Interface --- 
+		virtual bool IsValid() const override;
+
+		virtual PrimitiveResourcePtr GetPrimitiveResourcePtr() const override;
+
+		virtual ResourceGPUVirtualAddress GetResourceGPUVirtualAddress() const override;
+
+		// ------------------------
+
 		virtual void SetName(const String& name) override;
 		virtual TextureID          GetTextureID() const override;
 		virtual const TextureInfo& GetTextureInfo() const override;
@@ -197,18 +267,16 @@ namespace JG
 		virtual void SetTextureMemory(const jbyte* pixels, i32 width, i32 height, i32 channels, u32 pixelPerUnit,
 			u32 arraySize = 1, u32 mipLevel = 1, ETextureFlags flags = ETextureFlags::None, ETextureFormat format = ETextureFormat::R8G8B8A8_Unorm) override;
 		virtual void SetClearColor(const Color& clearColor) override;
-		virtual bool IsValid() const override;
 	public:
 		void Create(const String& name, const TextureInfo& info);
 		void CreateFromMemory(const String& name, const jbyte* pixels, i32 width, i32 height, i32 comp, u32 pixelPerUnit = 1);
 		void Reset();
 
 
-		D3D12_CPU_DESCRIPTOR_HANDLE GetRTV() const;
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDSV() const;
-		D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const;
-		D3D12_CPU_DESCRIPTOR_HANDLE GetUAV() const;
-
+		virtual ResourceViewPtr GetSRV() const override;
+		virtual ResourceViewPtr GetUAV() const override;
+		virtual ResourceViewPtr GetRTV() const override;
+		virtual ResourceViewPtr GetDSV() const override;
 
 		ID3D12Resource* Get() const {
 			return mD3DResource.Get();

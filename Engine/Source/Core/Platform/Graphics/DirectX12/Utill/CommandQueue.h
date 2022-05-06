@@ -13,6 +13,11 @@ namespace JG
 	class Fence;
 	class CommandQueue
 	{
+		enum ECommandListState
+		{
+			Open,
+			Close,
+		};
 	private:
 		ComPtr<ID3D12CommandQueue> mD3DCmdQueue;
 		D3D12_COMMAND_LIST_TYPE    mD3DType;
@@ -23,6 +28,7 @@ namespace JG
 		std::atomic_bool mIsCommandListExcute = false;
 		Dictionary<u64, SortedDictionary<u64, SharedPtr<CommandList>>> mExcuteCmdLists;
 		Dictionary<u64, SortedDictionary<u64, SharedPtr<CommandList>>> mExcutePendingCmdLists;
+		Dictionary<CommandList*, ECommandListState> mCmdListStates;
 	public:
 		CommandQueue(u64 bufferCount, D3D12_COMMAND_LIST_TYPE type);
 		~CommandQueue();
@@ -41,6 +47,8 @@ namespace JG
 		
 	private:
 		SharedPtr<CommandList> CreateCommandList();
+		ECommandListState GetCommandListState(CommandList* cmdList);
+		void SetCommandListState(CommandList* cmdList, ECommandListState state);
 	};
 }
 

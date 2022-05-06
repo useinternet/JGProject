@@ -471,11 +471,11 @@ namespace JG
 		btAddrBuffer->SetData(elementCount);
 		return btAddrBuffer;
 	}
-	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name)
+	SharedPtr<IReadBackBuffer> DirectX12API::CreateReadBackBuffer(const String& name, u64 dataSize)
 	{
 		auto rbBuffer = CreateSharedPtr<DirectX12ReadBackBuffer>();
 		rbBuffer->SetName(name);
-	
+		rbBuffer->Init(dataSize);
 		return rbBuffer;
 	}
 	SharedPtr<IGraphicsShader> DirectX12API::CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList)
@@ -670,24 +670,24 @@ namespace JG
 		for (auto& texture : rtTextures)
 		{
 			if (texture == nullptr || texture->IsValid() == false) continue;
-			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
-			if (handle.ptr == 0) continue;
+			ResourceViewPtr ptr = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+			if (ptr == 0) continue;
 
 
 			TextureInfo info = texture->GetTextureInfo();
 
-			mCommandList->ClearRenderTargetTexture(static_cast<DirectX12Texture*>(texture.get())->Get(), handle, info.ClearColor);
+			mCommandList->ClearRenderTargetTexture(static_cast<DirectX12Texture*>(texture.get())->Get(), {ptr}, info.ClearColor);
 		}
 		if (depthTexture && depthTexture->IsValid())
 		{
-			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+			ResourceViewPtr ptr = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
 
-			if (handle.ptr != 0)
+			if (ptr != 0)
 			{
 				TextureInfo info = depthTexture->GetTextureInfo();
 
 				mCommandList->ClearDepthTexture(static_cast<DirectX12Texture*>(depthTexture.get())->Get(),
-					handle, info.ClearDepth, info.ClearStencil);
+					{ ptr }, info.ClearDepth, info.ClearStencil);
 			}
 		}
 	}
@@ -712,26 +712,24 @@ namespace JG
 		for (auto& texture : rtTextures)
 		{
 			if (texture == nullptr || texture->IsValid() == false) continue;
-			auto handle = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
-			if (handle.ptr == 0) continue;
+			ResourceViewPtr ptr = static_cast<DirectX12Texture*>(texture.get())->GetRTV();
+			if (ptr == 0) continue;
 
 
 			rtFormats.push_back(ConvertDXGIFormat(texture->GetTextureInfo().Format));
 
 			d3dRTResources.push_back(static_cast<DirectX12Texture*>(texture.get())->Get());
-			rtvHandles.push_back(handle);
-
-
+			rtvHandles.push_back({ ptr });
 		}
 		if (depthTexture && depthTexture->IsValid())
 		{
-			auto handle = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
-			if (handle.ptr != 0)
+			ResourceViewPtr ptr = static_cast<DirectX12Texture*>(depthTexture.get())->GetDSV();
+			if (ptr != 0)
 			{
 				dsFormat = ConvertDXGIFormat(depthTexture->GetTextureInfo().Format);
 				d3dDSResource = static_cast<DirectX12Texture*>(depthTexture.get())->Get();
 				dsvHandle = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
-				*dsvHandle = handle;
+				*dsvHandle = {ptr};
 			}
 		}
 
@@ -800,11 +798,11 @@ namespace JG
 			{
 			case EDescriptorTableRangeType::SRV:
 				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-				handles.push_back(dx12Tex->GetSRV());
+				handles.push_back({ dx12Tex->GetSRV() });
 				break;
 			case EDescriptorTableRangeType::UAV:
 				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-				handles.push_back(dx12Tex->GetUAV());
+				handles.push_back({ dx12Tex->GetUAV() });
 				break;
 			}
 
@@ -821,13 +819,13 @@ namespace JG
 
 		mCommandList->BindConstantBuffer(rootParam, data, dataSize);
 	}
-	void DirectX12GraphicsContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb)
+	void DirectX12GraphicsContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> resource)
 	{
-		if (mCommandList == nullptr || sb == nullptr)
+		if (mCommandList == nullptr || resource == nullptr || resource->IsValid() == false)
 		{
 			return;
 		}
-		mCommandList->BindStructuredBuffer(rootParam, sb->GetBufferID(), static_cast<DirectX12StructuredBuffer*>(sb.get())->Get());
+		mCommandList->BindStructuredBuffer(rootParam, resource->GetResourceGPUVirtualAddress(), static_cast<ID3D12Resource*>(resource->GetPrimitiveResourcePtr()));
 	}
 	void DirectX12GraphicsContext::BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount)
 	{
@@ -838,9 +836,9 @@ namespace JG
 		mCommandList->BindStructuredBuffer(rootParam, data, elementCount, elementSize);
 
 	}
-	void DirectX12GraphicsContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab)
+	void DirectX12GraphicsContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource)
 	{
-		if (bab == nullptr || bab->IsValid() || mCommandList == nullptr)
+		if (resource == nullptr || resource->IsValid() || mCommandList == nullptr)
 		{
 			return;
 		}
@@ -848,15 +846,13 @@ namespace JG
 
 		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(bab.get());;
 		switch (type)
 		{
 		case EDescriptorTableRangeType::SRV:
-			handles.push_back(dx12byteAddressBuffer->GetSRV());
+			handles.push_back({ resource->GetSRV() });
 			break;
 		case EDescriptorTableRangeType::UAV:
-			handles.push_back(dx12byteAddressBuffer->GetUAV());
+			handles.push_back({ resource->GetUAV() });
 			break;
 		}
 		mCommandList->BindTextures(rootParam, handles);
@@ -878,8 +874,8 @@ namespace JG
 			auto dx12VBuffer = static_cast<DirectX12VertexBuffer*>(vertexBuffer.get());
 			D3D12_VERTEX_BUFFER_VIEW View = {};
 			View.BufferLocation = dx12VBuffer->Get()->GetGPUVirtualAddress();
-			View.SizeInBytes = (u32)dx12VBuffer->GetElementSize() * (u32)dx12VBuffer->GetElementCount();
-			View.StrideInBytes = (u32)dx12VBuffer->GetElementSize();
+			View.SizeInBytes = (u32)dx12VBuffer->GetVertexSize() * (u32)dx12VBuffer->GetVertexCount();
+			View.StrideInBytes = (u32)dx12VBuffer->GetVertexSize();
 			mCommandList->BindVertexBuffer(View);
 
 		}
@@ -1011,42 +1007,47 @@ namespace JG
 		mCommandList->Draw(vertexCount, instanceCount, startVertexLocation, startInstanceLocation);
 	}
 
-	void DirectX12GraphicsContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
+	void DirectX12GraphicsContext::TransitionBarrier(const List<SharedPtr<IResource>>& resources, const List<EResourceState>& states)
 	{
 		if (mCommandList == nullptr)
 		{
 			return;
 		}
 
-		if (textures.size() != states.size())
+		if (resources.size() != states.size())
 		{
-			JG_LOG_ERROR("Not Match TextureCount And ResourceStateCount");
+			JG_LOG_ERROR("Not Match Resource Count And ResourceStateCount");
 			return;
 		}
-		u32 count = textures.size();
+		u32 count = resources.size();
 
 		for (u32 i = 0; i < count; ++i)
 		{
-			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			if (resources[i] == nullptr || resources[i]->IsValid() == false)
+				continue;
+
 			D3D12_RESOURCE_STATES dx12State = ConvertDX12ResourceState(states[i]);
-			mCommandList->TransitionBarrier(dx12Tex->Get(), dx12State);
+			ID3D12Resource* dx12Resource = static_cast<ID3D12Resource*>(resources[i]->GetPrimitiveResourcePtr());
+			mCommandList->TransitionBarrier(dx12Resource, dx12State);
 		}
 
 		mCommandList->FlushResourceBarrier();
 	}
-	void DirectX12GraphicsContext::UAVBarrier(const List<SharedPtr<ITexture>>& textures)
+	void DirectX12GraphicsContext::UAVBarrier(const List<SharedPtr<IResource>>& resources)
 	{
 		if (mCommandList == nullptr)
 		{
 			return;
 		}
 
-		u32 count = textures.size();
+		u32 count = resources.size();
 
 		for (u32 i = 0; i < count; ++i)
 		{
-			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
-			mCommandList->UAVBarrier(dx12Tex->Get());
+			if (resources[i] == nullptr || resources[i]->IsValid() == false)
+				continue;
+			ID3D12Resource* dx12Resource = static_cast<ID3D12Resource*>(resources[i]->GetPrimitiveResourcePtr());
+			mCommandList->UAVBarrier(dx12Resource);
 		}
 		mCommandList->FlushResourceBarrier();
 	}
@@ -1094,52 +1095,22 @@ namespace JG
 
 
 
-	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer)
+	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<IResource> resource)
 	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		if (mCommandList == nullptr || resource == nullptr || resource->IsValid() == false)
 		{
 			return;
 		}
 
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
-
-		mCommandList->ClearUAVUint(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
-
-
-
+		mCommandList->ClearUAVUint({ resource->GetUAV() }, static_cast<ID3D12Resource*>(resource->GetPrimitiveResourcePtr()));
 	}
-	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer)
+	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<IResource> resource)
 	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
+		if (mCommandList == nullptr || resource == nullptr || resource->IsValid() == false)
 		{
 			return;
 		}
-
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(buffer.get());
-
-		mCommandList->ClearUAVFloat(dx12byteAddressBuffer->GetUAV(), dx12byteAddressBuffer->Get());
-	}
-
-	void DirectX12ComputeContext::ClearUAVUint(SharedPtr<ITexture> buffer)
-	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
-		{
-			return;
-		}
-
-		DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(buffer.get());
-
-		mCommandList->ClearUAVFloat(dx12Tex->GetUAV(), dx12Tex->Get());
-	}
-	void DirectX12ComputeContext::ClearUAVFloat(SharedPtr<ITexture> buffer)
-	{
-		if (mCommandList == nullptr || buffer == nullptr || buffer->IsValid() == false)
-		{
-			return;
-		}
-		DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(buffer.get());
-
-		mCommandList->ClearUAVUint(dx12Tex->GetUAV(), dx12Tex->Get());
+		mCommandList->ClearUAVFloat({ resource->GetUAV() }, static_cast<ID3D12Resource*>(resource->GetPrimitiveResourcePtr()));
 	}
 	void DirectX12ComputeContext::BindRootSignature(SharedPtr<IRootSignature> rootSig)
 	{
@@ -1183,11 +1154,11 @@ namespace JG
 			{
 			case EDescriptorTableRangeType::SRV:
 				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-				handles.push_back(dx12Tex->GetSRV());
+				handles.push_back({ dx12Tex->GetSRV() } );
 				break;
 			case EDescriptorTableRangeType::UAV:
 				mCommandList->TransitionBarrier(dx12Tex->Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-				handles.push_back(dx12Tex->GetUAV());
+				handles.push_back({ dx12Tex->GetUAV() });
 				break;
 			}
 		}
@@ -1205,14 +1176,31 @@ namespace JG
 
 		mCommandList->BindConstantBuffer(rootParam, data, dataSize);
 	}
-	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb)
+	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> resource)
 	{
-		if (mCommandList == nullptr || sb == nullptr)
+		if (mCommandList == nullptr || resource == nullptr)
 		{
 			return;
 		}
-		mCommandList->BindStructuredBuffer(rootParam, sb->GetBufferID(), static_cast<DirectX12StructuredBuffer*>(sb.get())->Get());
+		DirectX12RootSignature* dx12RootSig = static_cast<DirectX12RootSignature*>(mBindedRootSignature.get());
+		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
+
+		switch (type)
+		{
+		case EDescriptorTableRangeType::SRV:
+			mCommandList->BindStructuredBuffer(rootParam, { resource->GetSRV() });
+			break;
+		case EDescriptorTableRangeType::UAV:
+			mCommandList->BindStructuredBuffer(rootParam, { resource->GetUAV() });
+			break;
+		default:
+			mCommandList->BindStructuredBuffer(rootParam, resource->GetResourceGPUVirtualAddress(), static_cast<ID3D12Resource*>(resource->GetPrimitiveResourcePtr()));
+		}
+
+
+		
 	}
+
 	void DirectX12ComputeContext::BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount)
 	{
 		if (mCommandList == nullptr || data == nullptr)
@@ -1221,9 +1209,10 @@ namespace JG
 		}
 		mCommandList->BindStructuredBuffer(rootParam, data, elementCount, elementSize);
 	}
-	void DirectX12ComputeContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab)
+
+	void DirectX12ComputeContext::BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource)
 	{
-		if (bab == nullptr || bab->IsValid() || mCommandList == nullptr)
+		if (resource == nullptr || resource->IsValid() || mCommandList == nullptr)
 		{
 			return;
 		}
@@ -1231,15 +1220,13 @@ namespace JG
 
 		EDescriptorTableRangeType type = dx12RootSig->GetDescriptorRangeType(rootParam);
 		List<D3D12_CPU_DESCRIPTOR_HANDLE> handles;
-
-		DirectX12ByteAddressBuffer* dx12byteAddressBuffer = static_cast<DirectX12ByteAddressBuffer*>(bab.get());
 		switch (type)
 		{
 		case EDescriptorTableRangeType::SRV:
-			handles.push_back(dx12byteAddressBuffer->GetSRV());
+			handles.push_back({ resource->GetSRV() });
 			break;
 		case EDescriptorTableRangeType::UAV:
-			handles.push_back(dx12byteAddressBuffer->GetUAV());
+			handles.push_back({ resource->GetUAV() });
 			break;
 		}
 		mCommandList->BindTextures(rootParam, handles);
@@ -1253,7 +1240,7 @@ namespace JG
 		auto dx12AS = static_cast<DirectX12TopLevelAccelerationStructure*>(as.get());
 		if (dx12AS->IsValid())
 		{
-			mCommandList->BindStructuredBuffer(rootParam, dx12AS->GetResult()->GetGPUVirtualAddress());
+			mCommandList->BindStructuredBuffer(rootParam, dx12AS->GetResult()->GetGPUVirtualAddress(), dx12AS->GetResult());
 		}
 		
 	}
@@ -1334,42 +1321,46 @@ namespace JG
 		mCommandList->DispatchRays(dispatchRays);
 	}
 
-	void DirectX12ComputeContext::TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states)
+	void DirectX12ComputeContext::TransitionBarrier(const List<SharedPtr<IResource>>& resources, const List<EResourceState>& states)
 	{
 		if (mCommandList == nullptr)
 		{
 			return;
 		}
 
-		if (textures.size() != states.size())
+		if (resources.size() != states.size())
 		{
-			JG_LOG_ERROR("Not Match TextureCount And ResourceStateCount");
+			JG_LOG_ERROR("Not Match Resource Count And ResourceStateCount");
 			return;
 		}
-		u32 count = textures.size();
+		u32 count = resources.size();
 
 		for (u32 i = 0; i < count; ++i)
 		{
-			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
+			if (resources[i] == nullptr || resources[i]->IsValid() == false)
+				continue;
+
 			D3D12_RESOURCE_STATES dx12State = ConvertDX12ResourceState(states[i]);
-			mCommandList->TransitionBarrier(dx12Tex->Get(), dx12State);
+			ID3D12Resource* dx12Resource    = static_cast<ID3D12Resource*>(resources[i]->GetPrimitiveResourcePtr());
+			mCommandList->TransitionBarrier(dx12Resource, dx12State);
 		}
 
 		mCommandList->FlushResourceBarrier();
 	}
-	void DirectX12ComputeContext::UAVBarrier(const List<SharedPtr<ITexture>>& textures)
+	void DirectX12ComputeContext::UAVBarrier(const List<SharedPtr<IResource>>& resources)
 	{
 		if (mCommandList == nullptr)
 		{
 			return;
 		}
 
-		u32 count = textures.size();
-
+		u32 count = resources.size();
 		for (u32 i = 0; i < count; ++i)
 		{
-			DirectX12Texture* dx12Tex = static_cast<DirectX12Texture*>(textures[i].get());
-			mCommandList->UAVBarrier(dx12Tex->Get());
+			if (resources[i] == nullptr || resources[i]->IsValid() == false)
+				continue;
+			ID3D12Resource* dx12Resource = static_cast<ID3D12Resource*>(resources[i]->GetPrimitiveResourcePtr());
+			mCommandList->UAVBarrier(dx12Resource);
 		}
 		mCommandList->FlushResourceBarrier();
 	}
@@ -1390,31 +1381,43 @@ namespace JG
 
 
 
-	void DirectX12CopyContext::CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState)
+	void DirectX12CopyContext::CopyResource(SharedPtr<IResource> dest, SharedPtr<IResource> src)
+	{
+		if (mCommandList == nullptr || dest == nullptr || src == nullptr)
+		{
+			return;
+		}
+		ID3D12Resource* destDx12Resource = static_cast<ID3D12Resource*>(dest->GetPrimitiveResourcePtr());
+		ID3D12Resource* srcDx12Resource = static_cast<ID3D12Resource*>(src->GetPrimitiveResourcePtr());
+
+		mCommandList->CopyResource(destDx12Resource, srcDx12Resource);
+	}
+
+	void DirectX12CopyContext::CopyTextureRegion(SharedPtr<IResource> dest, SharedPtr<IResource> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState)
 	{
 		if (mCommandList == nullptr || dest == nullptr || src == nullptr)
 		{
 			return;
 		}
 
-		DirectX12Texture* destDx12Tex = static_cast<DirectX12Texture*>(dest.get());
-		DirectX12Texture* srcDx12Tex = static_cast<DirectX12Texture*>(src.get());
+		ID3D12Resource* destDx12Resource = static_cast<ID3D12Resource*>(dest->GetPrimitiveResourcePtr());
+		ID3D12Resource* srcDx12Resource = static_cast<ID3D12Resource*>(src->GetPrimitiveResourcePtr());
 		D3D12_RESOURCE_STATES destState = ConvertDX12ResourceState(inDestState);
 		D3D12_RESOURCE_STATES srcState = ConvertDX12ResourceState(inSrcState);
 
-		mCommandList->CopyTextureRegion(destDx12Tex->Get(), srcDx12Tex->Get(), srcRect, destState, srcState);
+		mCommandList->CopyTextureRegion(destDx12Resource, srcDx12Resource, srcRect, destState, srcState);
 
 	}
-	void DirectX12CopyContext::CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount)
+	void DirectX12CopyContext::CopyBuffer(SharedPtr<IResource> sb, const void* datas, u64 elementSize, u64 elementCount)
 	{
 		if (mCommandList == nullptr || datas == nullptr)
 		{
 			return;
 		}
 
-		DirectX12StructuredBuffer* dx12SB = static_cast<DirectX12StructuredBuffer*>(sb.get());
+		ID3D12Resource* dx12Resource = static_cast<ID3D12Resource*>(sb->GetPrimitiveResourcePtr());
 
-		mCommandList->CopyBuffer(dx12SB->Get(), datas, elementSize, elementCount);
+		mCommandList->CopyBuffer(dx12Resource, datas, elementSize, elementCount);
 
 	}
 	SharedPtr<IMesh> DirectX12CopyContext::CopyMesh(SharedPtr<IMesh> src)
@@ -1436,49 +1439,28 @@ namespace JG
 			
 			DirectX12VertexBuffer* src_dx12_vBuffer     = static_cast<DirectX12VertexBuffer*>(src_subMesh->GetVertexBuffer().get());
 			DirectX12IndexBuffer*  src_dx12_iBuffer      = static_cast<DirectX12IndexBuffer*>(src_subMesh->GetIndexBuffer().get());
-			DirectX12StructuredBuffer* src_dx12_bBuffer = nullptr;
-			if (src_subMesh->GetBoneBuffer() != nullptr)
-			{
-				src_dx12_bBuffer = static_cast<DirectX12StructuredBuffer*>(src_subMesh->GetBoneBuffer().get());
-			}
-			
 
 			SharedPtr<DirectX12VertexBuffer> dest_vBuffer = CreateSharedPtr<DirectX12VertexBuffer>();
 			dest_vBuffer->SetName(src->GetName() + "_VertexBuffer");
 			dest_vBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
-			dest_vBuffer->SetData(nullptr, src_dx12_vBuffer->GetElementSize(), src_dx12_vBuffer->GetElementCount());
-			mCommandList->CopyResource(dest_vBuffer->Get(), src_dx12_vBuffer->Get());
+			dest_vBuffer->SetData(nullptr, src_dx12_vBuffer->GetVertexSize(), src_dx12_vBuffer->GetVertexCount());
+			//mCommandList->CopyResource(dest_vBuffer->Get(), src_dx12_vBuffer->Get());
 
-			SharedPtr<DirectX12IndexBuffer> dest_iBuffer = CreateSharedPtr<DirectX12IndexBuffer>();
-			dest_iBuffer->SetName(src->GetName() + "_IndexBuffer");
-			dest_iBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
-			dest_iBuffer->SetData(nullptr, src_dx12_iBuffer->GetIndexCount());
-			mCommandList->CopyResource(dest_iBuffer->Get(), src_dx12_iBuffer->Get());
+			//SharedPtr<DirectX12IndexBuffer> dest_iBuffer = CreateSharedPtr<DirectX12IndexBuffer>();
+			//dest_iBuffer->SetName(src->GetName() + "_IndexBuffer");
+			//dest_iBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
+			//dest_iBuffer->SetData(nullptr, src_dx12_iBuffer->GetIndexCount());
+			//mCommandList->CopyResource(dest_iBuffer->Get(), src_dx12_iBuffer->Get());
 	
 
 			SharedPtr<ISubMesh> dest_subMesh = ISubMesh::Create(src_subMesh->GetName());
 			dest_subMesh->SetVertexBuffer(dest_vBuffer);
-			dest_subMesh->SetIndexBuffer(dest_iBuffer);
+			dest_subMesh->SetIndexBuffer(src_subMesh->GetIndexBuffer());
 
-
-			if (src_dx12_bBuffer != nullptr)
-			{
-				SharedPtr<DirectX12StructuredBuffer> dest_bBuffer = CreateSharedPtr<DirectX12StructuredBuffer>();
-				dest_bBuffer->SetName(src->GetName() + "_BoneBuffer");
-				dest_bBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
-				dest_bBuffer->SetData(src_dx12_bBuffer->GetElementSize(), src_dx12_bBuffer->GetElementCount(), nullptr);
-
-				mCommandList->CopyResource(dest_bBuffer->Get(), src_dx12_bBuffer->Get());
-				dest_subMesh->SetBoneBuffer(dest_bBuffer);
-			}
-			
 
 			mCommandList->TransitionBarrier(src_dx12_vBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
+			mCommandList->TransitionBarrier(dest_vBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
 			mCommandList->TransitionBarrier(src_dx12_iBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
-			if (src_dx12_bBuffer != nullptr)
-			{
-				mCommandList->TransitionBarrier(src_dx12_bBuffer->Get(), D3D12_RESOURCE_STATE_COMMON);
-			}
 			mCommandList->FlushResourceBarrier();
 
 			result->AddMesh(dest_subMesh);

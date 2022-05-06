@@ -58,13 +58,12 @@ namespace JG
 	}
 
 
-	void DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap>& d3dDescriptorHeap, bool is_graphics)
+	ComPtr<ID3D12DescriptorHeap> DynamicDescriptorAllocator::PushDescriptorTable(ComPtr<ID3D12GraphicsCommandList> d3dCmdList, ComPtr<ID3D12DescriptorHeap> bindedD3DDescriptorHeap, bool is_graphics)
 	{
-		if (d3dDescriptorHeap.Get() != mD3DHeap.Get())
+		if (bindedD3DDescriptorHeap.Get() != mD3DHeap.Get())
 		{
 			RequestDescriptorHeap();
-			d3dDescriptorHeap = mD3DHeap;
-			d3dCmdList->SetDescriptorHeaps(1, d3dDescriptorHeap.GetAddressOf());
+			d3dCmdList->SetDescriptorHeaps(1, mD3DHeap.GetAddressOf());
 		}
 		
 		if (!mCPUCache.empty())
@@ -120,6 +119,9 @@ namespace JG
 			}
 
 		}
+
+
+		return mD3DHeap;
 	}
 	i32 DynamicDescriptorAllocator::GetDescriptorInitAsType(u32 rootParam) const
 	{

@@ -15,6 +15,7 @@ namespace JG
 	enum class EBlendStateTemplate;
 	enum class ERasterizerStateTemplate;
 	enum class EResourceState;
+
 	class InputLayout;
 	class ITexture;
 	class IVertexBuffer;
@@ -43,7 +44,7 @@ namespace JG
 	struct FrameBufferInfo;
 
 	class TextureAssetStock;
-
+	class IResource;
 
 	namespace Graphics
 	{
@@ -82,7 +83,7 @@ namespace JG
 		virtual SharedPtr<IIndexBuffer>   CreateIndexBuffer(const String& name, EBufferLoadMethod method) = 0;
 		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount, EBufferLoadMethod method)   = 0;
 		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) = 0;
-		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) = 0;
+		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, u64 dataSize) = 0;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) = 0;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) = 0;
 		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const String& sourceCode, const SharedPtr<IShaderScript> script) = 0;
@@ -125,9 +126,9 @@ namespace JG
 		virtual void BindShader(SharedPtr<IGraphicsShader> shader) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
-		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> resource) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
-		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource) = 0;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) = 0;
 		virtual void DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList) = 0;
 
@@ -163,8 +164,8 @@ namespace JG
 
 		// 상태 변경 함수
 		
-		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
-		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void TransitionBarrier(const List<SharedPtr<IResource>>& resources, const List<EResourceState>& states) = 0;
+		virtual void UAVBarrier(const List<SharedPtr<IResource>>& resources) = 0;
 
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext>  QueryInterfaceAsComputeContext() const  = 0;
@@ -179,17 +180,17 @@ namespace JG
 	public:
 		virtual ~IComputeContext() = default;
 	public:
+		virtual void ClearUAVUint(SharedPtr<IResource> resource) = 0;
+		virtual void ClearUAVFloat(SharedPtr<IResource> resource) = 0;
+
+
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) = 0;
 		virtual void BindShader(SharedPtr<IComputeShader> shader) = 0;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>& textures) = 0;
-		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) = 0;
-		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) = 0;
-		virtual void ClearUAVUint(SharedPtr<ITexture> buffer) = 0;
-		virtual void ClearUAVFloat(SharedPtr<ITexture> buffer) = 0;
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) = 0;
-		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) = 0;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> sb) = 0;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) = 0;
-		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) = 0;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource) = 0;
 		virtual void BindAccelerationStructure(u32 rootParam, SharedPtr<ITopLevelAccelerationStructure> as) = 0;
 		template<class T>
 		void BindConstantBuffer(u32 rootParam, const T& data)
@@ -215,8 +216,8 @@ namespace JG
 		virtual void DispatchRay(u32 width, u32 height, u32 depth, SharedPtr<IRayTracingPipeline> pipeline, SharedPtr<IRayTracingShaderResourceTable> srt) = 0;
 	
 
-		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) = 0;
-		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) = 0;
+		virtual void TransitionBarrier(const List<SharedPtr<IResource>>& resources, const List<EResourceState>& states) = 0;
+		virtual void UAVBarrier(const List<SharedPtr<IResource>>& resources) = 0;
 
 
 		// 인터페이스 변경 함수
@@ -231,8 +232,9 @@ namespace JG
 	public:
 		virtual ~ICopyContext() = default;
 	public:
-		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) = 0;
-		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) = 0;
+		virtual void CopyResource(SharedPtr<IResource> dest, SharedPtr<IResource> src) = 0;
+		virtual void CopyTextureRegion(SharedPtr<IResource> dest, SharedPtr<IResource> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) = 0;
+		virtual void CopyBuffer(SharedPtr<IResource> sb, const void* datas, u64 elementSize, u64 elementCount) = 0;
 		virtual SharedPtr<IMesh> CopyMesh(SharedPtr<IMesh> src) = 0;
 	};
 

@@ -12,6 +12,7 @@ namespace JG
 	class StaticMeshAssetStock;
 	class IBottomLevelAccelerationStructure;
 	class IComputeContext;
+	struct JGBoneOffsetData;
 	class ISubMesh 
 	{
 	public:
@@ -20,9 +21,11 @@ namespace JG
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) = 0;
 		virtual void SetBoneBuffer(SharedPtr<IStructuredBuffer> boneBuffer) = 0;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer)    = 0;
+		virtual void SetBoneOffset(const List<JGBoneOffsetData>& boneOffsetData) = 0;
 		virtual SharedPtr<IVertexBuffer> GetVertexBuffer() const			= 0;
 		virtual SharedPtr<IStructuredBuffer> GetBoneBuffer() const			= 0;
 		virtual SharedPtr<IIndexBuffer>  GetIndexBuffer() const				= 0;
+		virtual bool GetBoneOffset(u32 ID, JMatrix* output) = 0;
 	public:
 		virtual void SetName(const String& name) = 0;
 		virtual const String& GetName() const	 = 0;

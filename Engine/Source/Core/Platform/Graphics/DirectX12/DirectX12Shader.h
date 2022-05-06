@@ -112,7 +112,7 @@ namespace JG
 			return mCSData.Get();
 		}
 	private:
-		bool Compile(ComPtr<IDxcBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error);
+		bool Compile(const String& sourceCode, const CompileConfig& config, String* error);
 	};
 
 

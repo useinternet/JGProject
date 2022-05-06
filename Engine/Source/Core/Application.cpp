@@ -209,10 +209,13 @@ namespace JG
 		while (!mEventQueue.empty()) { mEventQueue.pop(); }
 		Scheduler::GetInstance().FlushAsyncTask(false);
 		ITexture::DestroyNullTexture();
-		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGAnimation>();
-		GlobalSingletonManager::GetInstance().UnRegisterSingleton<PhysicsManager>();
 		JGGraphics::GetInstance().Flush();
 		mLayerStack.reset();
+
+
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGAnimation>();
+		GlobalSingletonManager::GetInstance().UnRegisterSingleton<PhysicsManager>();
+	
 
 		GlobalSingletonManager::GetInstance().UnRegisterSingleton<AssetDataBase>();
 		GlobalSingletonManager::GetInstance().UnRegisterSingleton<JGGraphics>();

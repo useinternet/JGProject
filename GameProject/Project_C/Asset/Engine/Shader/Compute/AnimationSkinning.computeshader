@@ -1,0 +1,58 @@
+
+struct Vertex
+{
+	float3 Position;
+	float2 Texcoord;
+	float3 Normal;
+	float3 Tangent;
+	float3 Bitangent;
+};
+
+struct Bone
+{
+    int4 ID;
+    float4 Weights;
+};
+
+StructuredBuffer<Vertex>   InputVertices   : register(t0);
+StructuredBuffer<Bone>     InputBones      : register(t1);
+RWStructuredBuffer<Vertex> OutputVertices : register(u0);
+cbuffer CB0 : register(b0)
+{
+    float4x4 _AnimationTransform[128];
+    uint _VertexCount;
+};
+
+[numthreads( 256, 1, 1 )]
+void cs_main(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : SV_DispatchThreadID )
+{
+    uint index = DTid.x;
+    if(_VertexCount <= index)
+    {
+        return;
+    }
+
+
+    Vertex in_v   = InputVertices[index];
+    Bone   in_b   = InputBones[index];
+    float4x4 animTransform;
+
+    float3 posL       = float3(0,0,0);
+    float3 normalL    = float3(0,0,0);
+    float3 tangentL   = float3(0,0,0);
+    float3 bitangentL = float3(0,0,0);
+
+    for(int i = 0; i < 4; ++i)
+    {
+        posL       += in_b.Weights[i] * mul(float4(in_v.Position, 1.0f), _AnimationTransform[in_b.ID[i]]).xyz;
+        normalL    += in_b.Weights[i] * mul(in_v.Normal, (float3x3)_AnimationTransform[in_b.ID[i]]);
+        tangentL   += in_b.Weights[i] * mul(in_v.Tangent, (float3x3)_AnimationTransform[in_b.ID[i]]);
+        bitangentL += in_b.Weights[i] * mul(in_v.Bitangent, (float3x3)_AnimationTransform[in_b.ID[i]]);
+    }
+
+    OutputVertices[index].Position  = posL;
+    OutputVertices[index].Normal    = normalize(normalL);
+    OutputVertices[index].Tangent   = normalize(tangentL);
+    OutputVertices[index].Bitangent = normalize(bitangentL);
+    OutputVertices[index].Texcoord  = in_v.Texcoord;
+}

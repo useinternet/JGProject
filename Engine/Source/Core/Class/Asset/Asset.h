@@ -164,7 +164,48 @@ namespace JG
 			}
 		}
 	};
+	struct JGBoneOffsetData
+	{
+		u32 ID;
+		JMatrix Offset;
+	public:
+		void MakeJson(SharedPtr<JsonData> jsonData) const
+		{
+			auto& val = jsonData->GetValue();
+			val.SetArray();
+			val.PushBack(ID, jsonData->GetJsonAllocator());
 
+			for (int col = 0; col < 4; ++col)
+			{
+				for (int raw = 0; raw < 4; ++raw)
+				{
+					val.PushBack(Offset.Get_C(col, raw), jsonData->GetJsonAllocator());
+				}
+			}
+		}
+		void LoadJson(SharedPtr<JsonData> jsonData)
+		{
+			auto& val = jsonData->GetValue();
+			i32 index = 0;
+			for (const auto& value : val.GetArray())
+			{
+				if (index == 0)
+				{
+					i32 i = value.GetInt();
+					ID = i;
+				}
+				else
+				{
+					i32 col = (index - 1) / 4;
+					i32 row = (index - 1) % 4;
+					
+					f32 f = value.GetFloat();
+					Offset.Get(col, row) = f;
+				}
+				++index;
+			}
+		}
+	};
 
 	class IAssetStock : public IJson
 	{
@@ -200,12 +241,14 @@ namespace JG
 		static const constexpr char* SUBMESHS_KEY		= "SubMeshs";
 		static const constexpr char* VERTICES_KEY		= "Vertices";
 		static const constexpr char* BONE_VERTICES_KEY	= "BoneVertices";
+		static const constexpr char* BONE_OFFSETDATAS_KEY   = "BoneOffsetDatas";
 		static const constexpr char* INDICES_KEY		= "Indices";
 	public:
 		String Name;
 		List<String>			 SubMeshNames;
 		List<List<JGVertex>>     Vertices;
 		List<List<JGBoneVertex>> BoneVertices;
+		List<List<JGBoneOffsetData>> BoneOffsetDatas;
 		List<List<u32>>			 Indices;
 		JBBox BoundingBox;
 	public:
@@ -229,7 +272,6 @@ namespace JG
 		static const constexpr char* PARENT_BONDE_NODE_KEY	= "ParentBoneNode";
 		static const constexpr char* CHILD_BONE_NODES_KEY	= "ChildNodes";
 		static const constexpr char* TRANSFORM_KEY			= "Transform";
-		static const constexpr char* BONE_OFFSET_KEY		= "BoneOffset";
 	public:
 		struct BoneNode
 		{
@@ -240,7 +282,6 @@ namespace JG
 			List<u32> ChildNodes;
 
 			JMatrix Transform;
-			JMatrix BoneOffset;
 		};
 	public:
 		String Name;

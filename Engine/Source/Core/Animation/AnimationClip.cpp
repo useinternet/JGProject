@@ -4,36 +4,44 @@
 #include "Application.h"
 #include "Class/Asset/Asset.h"
 #include "Class/Data/Skeletone.h"
-
+#include "Graphics/Mesh.h"
 
 namespace JG
 {
 	AnimationClipInfo::AnimationClipInfo(const String& name, SharedPtr<AnimationClip> clip, EAnimationClipFlags flags)
 	{
 		Name = name;
-		AccTime = 0.0f;
+		TimePos = 0.0f;
 		Clip = clip;
 		Flags = flags;
 	}
 
 
-	EAnimationClipState AnimationClip::Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform)
+	EAnimationClipState AnimationClip::Update(
+		SharedPtr<AnimationClipInfo> clipInfo, 
+		SharedPtr<IMesh> mesh,
+		SharedPtr<JG::Skeletone> skeletone, 
+		List<SharedPtr<AnimationTransform>>& out_animTransform)
 	{
-		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr || animTransform == nullptr)
+		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr || mesh == nullptr)
 		{
 			return EAnimationClipState::None;
 		}
 		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
-
-		clipInfo->AccTime += tick;
-		if (clipInfo->AccTime >= mDuration)
+		clipInfo->TimePos += tick * mTickPerSecond * 10;
+		if (clipInfo->TimePos >= mDuration)
 		{
-			clipInfo->AccTime = 0.0f;
+			clipInfo->TimePos = std::fmodf(clipInfo->TimePos, mDuration);
 			return EAnimationClipState::Compelete;
 		}
 
-		UpdateInternal(skeletone->GetRootNodeID(), tick, skeletone, JMatrix::Identity(), animTransform);
-
+		u32 subMeshCount = mesh->GetSubMeshCount();
+		out_animTransform.resize(subMeshCount);
+		for (u32 i = 0; i < subMeshCount; ++i)
+		{
+			out_animTransform[i] =  CreateSharedPtr<AnimationTransform>();
+			UpdateInternal(skeletone->GetRootNodeID(), clipInfo->TimePos, skeletone, mesh->GetSubMesh(i), JMatrix::Identity(), out_animTransform[i]);
+		}
 		return EAnimationClipState::Running;
 	}
 	bool AnimationClip::IsValid() const
@@ -77,7 +85,7 @@ namespace JG
 	}
 
 
-	void AnimationClip::UpdateInternal(u32 nodeID, f32 tick, SharedPtr<JG::Skeletone> skeletone, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
+	void AnimationClip::UpdateInternal(u32 nodeID, f32 timePos, SharedPtr<JG::Skeletone> skeletone, SharedPtr<ISubMesh> mesh, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
 	{
 		const Skeletone::Node* node = skeletone->GetNode(nodeID);
 		JMatrix nodeTransform = node->Transform;
@@ -87,41 +95,40 @@ namespace JG
 
 		if (animNode != nullptr)
 		{
-			JVector3    Scale = CalcLerpScale(tick, animNode);
-			JQuaternion RotationQ = CalcLerpRotation(tick, animNode);
-			JVector3    Location = CalcLerpLocation(tick, animNode);
+			JVector3    Scale     = CalcLerpScale(timePos, animNode);
+			JQuaternion RotationQ = CalcLerpRotation(timePos, animNode);
+			JVector3    Location  = CalcLerpLocation(timePos, animNode);
 
-			JMatrix S = JMatrix::Scaling(Scale);
-			JMatrix R = JMatrix::Rotation(RotationQ);
-			JMatrix T = JMatrix::Translation(Location);
-
-
-			nodeTransform = S * R * T;
+			nodeTransform = JMatrix::AffineTransformation(Location, RotationQ, Scale);
 		}
 
 
-		JMatrix globalTransform =  nodeTransform * parentTransform;
-		JMatrix finalTransform = node->BoneOffset * globalTransform * skeletone->GetRootOffsetTransform();
+		JMatrix resultTransform = nodeTransform * parentTransform;
 
-		animTransform->Set(node->ID, finalTransform);
+		JMatrix boneOffset = JMatrix::Identity();
+		if (mesh->GetBoneOffset(node->ID, &boneOffset) == true)
+		{
+			JMatrix finalTransform = skeletone->GetRootOffsetTransform() * boneOffset * resultTransform;
+			animTransform->Set(node->ID, JMatrix::Transpose(finalTransform));
+		}
 		for (u32 nodeID : node->ChildNodes)
 		{
 			const Skeletone::Node* childNode = skeletone->GetNode(nodeID);
-			UpdateInternal(childNode->ID, tick, skeletone, globalTransform, animTransform);
+			UpdateInternal(childNode->ID, timePos, skeletone, mesh, resultTransform, animTransform);
 		}
 	}
-	JVector3 AnimationClip::CalcLerpLocation(f32 tick, const AnimationNode* node)
+	JVector3 AnimationClip::CalcLerpLocation(f32 timePos, const AnimationNode* node)
 	{
 		if (node->LocationValues.size() == 1)
 		{
 			return node->LocationValues[0];
 		}
-		u32 LocationIndex = FindLocation(tick, node);
+		u32 LocationIndex = FindLocation(timePos, node);
 		u32 NextLocationIndex = (LocationIndex + 1);
 
 
 		f32 DeltaTime = node->LocationTimes[NextLocationIndex] - node->LocationTimes[LocationIndex];
-		f32 Factor = (tick - node->LocationTimes[LocationIndex]) / DeltaTime;
+		f32 Factor = (timePos - node->LocationTimes[LocationIndex]) / DeltaTime;
 
 
 		JGASSERT(Factor >= 0.0f && Factor <= 1.0f);
@@ -134,18 +141,18 @@ namespace JG
 
 		return Result;
 	}
-	JVector3 AnimationClip::CalcLerpScale(f32 tick, const AnimationNode* node)
+	JVector3 AnimationClip::CalcLerpScale(f32 timePos, const AnimationNode* node)
 	{
 		if (node->ScaleValues.size() == 1)
 		{
 			return node->ScaleValues[0];
 		}
-		u32 ScaleIndex = FindScale(tick, node);
+		u32 ScaleIndex = FindScale(timePos, node);
 		u32 NextScaleIndex = (ScaleIndex + 1);
 
 
 		f32 DeltaTime = node->ScaleTimes[NextScaleIndex] - node->ScaleTimes[ScaleIndex];
-		f32 Factor = (tick - node->ScaleTimes[ScaleIndex]) / DeltaTime;
+		f32 Factor = (timePos - node->ScaleTimes[ScaleIndex]) / DeltaTime;
 
 
 		JGASSERT(Factor >= 0.0f && Factor <= 1.0f);
@@ -158,19 +165,19 @@ namespace JG
 
 		return Result;
 	}
-	JQuaternion AnimationClip::CalcLerpRotation(f32 tick, const  AnimationNode* node)
+	JQuaternion AnimationClip::CalcLerpRotation(f32 timePos, const  AnimationNode* node)
 	{
 
 		if (node->RotationValues.size() == 1) {
 			return node->RotationValues[0];
 		}
 
-		u32 RotationIndex = FindRotation(tick, node);
+		u32 RotationIndex = FindRotation(timePos, node);
 		u32 NextRotationIndex = (RotationIndex + 1);
 
 
 		f32 DeltaTime = node->RotationTimes[NextRotationIndex] - node->RotationTimes[RotationIndex];
-		f32 Factor = (tick - node->RotationTimes[RotationIndex]) / DeltaTime;
+		f32 Factor = (timePos - node->RotationTimes[RotationIndex]) / DeltaTime;
 		JGASSERT(Factor >= 0.0f && Factor <= 1.0f);
 		const JQuaternion& StartRotationQ = node->RotationValues[RotationIndex];
 		const JQuaternion& EndRotationQ    = node->RotationValues[NextRotationIndex];
@@ -180,28 +187,28 @@ namespace JG
 
 		return ResultQ;
 	}
-	u32 AnimationClip::FindRotation(f32 tick, const AnimationNode* node)
+	u32 AnimationClip::FindRotation(f32 timePos, const AnimationNode* node)
 	{
 		for (u32 i = 0; i < node->RotationTimes.size() - 1; i++) {
-			if (tick < node->RotationTimes[i + 1]) {
+			if (timePos < node->RotationTimes[i + 1]) {
 				return i;
 			}
 		}
 		return 0;
 	}
-	u32 AnimationClip::FindLocation(f32 tick, const AnimationNode* node)
+	u32 AnimationClip::FindLocation(f32 timePos, const AnimationNode* node)
 	{
 		for (u32 i = 0; i < node->LocationTimes.size() - 1; i++) {
-			if (tick < node->LocationTimes[i + 1]) {
+			if (timePos < node->LocationTimes[i + 1]) {
 				return i;
 			}
 		}
 		return 0;
 	}
-	u32 AnimationClip::FindScale(f32 tick, const AnimationNode* node)
+	u32 AnimationClip::FindScale(f32 timePos, const AnimationNode* node)
 	{
 		for (u32 i = 0; i < node->ScaleTimes.size() - 1; i++) {
-			if (tick < node->ScaleTimes[i + 1]) {
+			if (timePos < node->ScaleTimes[i + 1]) {
 				return i;
 			}
 		}
@@ -218,8 +225,6 @@ namespace JG
 		return &mAnimationNodes[nodeName];
 	}
 
-	
-
 	SharedPtr<AnimationClip> AnimationClip::Create(const String& name)
 	{
 		SharedPtr<AnimationClip> animClip = CreateSharedPtr<AnimationClip>();
@@ -233,6 +238,4 @@ namespace JG
 		animClip->SetAnimationClipStock(stock);
 		return animClip;
 	}
-
-
 }

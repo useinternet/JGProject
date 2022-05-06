@@ -27,8 +27,6 @@ namespace JG
 
 	CommandList* CommandQueue::RequestCommandList()
 	{
-		//Lock();
-
 		std::lock_guard<std::mutex> lock(mMutex);
 		mIsLock = true;
 		std::thread::id curr_thread_id = std::this_thread::get_id();
@@ -51,8 +49,7 @@ namespace JG
 		CommandList* result = nullptr;
 		if (CmdLists.find(commandID) == CmdLists.end())
 		{
-			auto pCmdList = CreateCommandList();
-			CmdLists[commandID] = pCmdList;
+			CmdLists[commandID]        = CreateCommandList();;
 			PendingCmdLists[commandID] = CreateCommandList();
 			result =  CmdLists[commandID].get();
 		}
@@ -60,10 +57,16 @@ namespace JG
 		{
 			auto pCmdList = CmdLists[commandID].get();
 			auto pPendingCmdList = PendingCmdLists[commandID].get();
-			if (pCmdList->IsClosing())
+
+			if (GetCommandListState(pCmdList) == ECommandListState::Close)
 			{
 				pCmdList->Reset();
+				SetCommandListState(pCmdList, ECommandListState::Open);
+			}
+			if (GetCommandListState(pPendingCmdList) == ECommandListState::Close)
+			{
 				pPendingCmdList->Reset();
+				SetCommandListState(pPendingCmdList, ECommandListState::Open);
 			}
 			result =  pCmdList;
 		}
@@ -93,8 +96,11 @@ namespace JG
 		auto& PendingCmdLists = mExcutePendingCmdLists[buffIndex];
 		for (auto cmdList : mExcuteCmdLists[buffIndex])
 		{
-			if (cmdList.second->IsClosing() == true) continue;
 			auto pendCmdList = PendingCmdLists[cmdList.first];
+			if (GetCommandListState(cmdList.second.get()) == ECommandListState::Close) continue;
+			if (GetCommandListState(pendCmdList.get()) == ECommandListState::Close) continue;
+
+			
 			bool has_pending_barrier = cmdList.second->Close(pendCmdList.get());
 
 			pendCmdList->Close();
@@ -103,6 +109,9 @@ namespace JG
 				d3dCmdLists.push_back(pendCmdList->Get());
 			}
 			d3dCmdLists.push_back(cmdList.second->Get());
+
+			SetCommandListState(cmdList.second.get(), ECommandListState::Close);
+			SetCommandListState(pendCmdList.get(), ECommandListState::Close);
 		}
 		ResourceStateTracker::UnLock();
 		mD3DCmdQueue->ExecuteCommandLists((uint32_t)d3dCmdLists.size(), d3dCmdLists.data());
@@ -117,6 +126,7 @@ namespace JG
 	{
 		End();
 		Flush();
+		Begin();
 	}
 
 	void CommandQueue::Flush()
@@ -140,7 +150,15 @@ namespace JG
 			cmdList = CreateSharedPtr<CommandList>(mD3DType);
 			break;
 		}
-
+		SetCommandListState(cmdList.get(), ECommandListState::Open);
 		return cmdList;
+	}
+	CommandQueue::ECommandListState CommandQueue::GetCommandListState(CommandList* cmdList)
+	{
+		return mCmdListStates[cmdList];
+	}
+	void CommandQueue::SetCommandListState(CommandList* cmdList, ECommandListState state)
+	{
+		mCmdListStates[cmdList] = state;
 	}
 }

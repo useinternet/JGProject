@@ -183,16 +183,16 @@ namespace JG
 		String libCode = ShaderLibrary::GetInstance().GetGlobalShaderLibCode() + "\n";
 		mSourceCode = libCode + sourceCode;
 		mErrorMessage = "";
-		mIsCompileSuccess = Compile(mCSData, mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), &mErrorMessage);
+		mIsCompileSuccess = Compile(mSourceCode, CompileConfig(HLSL::CSEntry, HLSL::CSTarget), &mErrorMessage);
 		return mIsCompileSuccess;
 	}
 
 
-	bool DirectX12ComputeShader::Compile(ComPtr<IDxcBlob>& blob, const String& sourceCode, const CompileConfig& config, String* error)
+	bool DirectX12ComputeShader::Compile(const String& sourceCode, const CompileConfig& config, String* error)
 	{
-		blob = CompileShader(GetName(), sourceCode, config.Entry, config.Target);
+		mCSData = CompileShader(GetName(), sourceCode, config.Entry, config.Target);
 
-		if (blob != nullptr)
+		if (mCSData != nullptr)
 		{
 			mIsCompileSuccess = true;
 		}

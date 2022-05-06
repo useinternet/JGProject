@@ -200,10 +200,6 @@ namespace JG
 			(*iter).second.RefCount += 1;
 		
 		}
-		if (gResourceRefMap[d3dResource].Name == "1_TargetTexture_1" && gResourceRefMap[d3dResource].RefCount == 2)
-		{
-			int n = 0;
-		}
 		JG_LOG_TRACE("Add Counting Resource : {0}   Ref : {1}", gResourceRefMap[d3dResource].Name, gResourceRefMap[d3dResource].RefCount);
 	}
 	void ResourceStateTracker::SetResourceName(ID3D12Resource* d3dResource, const String& name)

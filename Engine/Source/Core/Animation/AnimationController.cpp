@@ -5,6 +5,7 @@
 #include "AnimationSequence.h"
 #include "AnimationTransform.h"
 #include "AnimationClip.h"
+#include "Class/Asset/Asset.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsAPI.h"
@@ -93,6 +94,11 @@ namespace JG
 		return CanUseSkinnedMesh() ? mSkinnedMesh : mOriginMesh;
 	}
 
+	SharedPtr<IMesh> AnimationController::GetBindedOriginMesh() const
+	{
+		return mOriginMesh;
+	}
+
 	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters() const
 	{
 		return mAnimParams;
@@ -103,15 +109,10 @@ namespace JG
 		return mRootSequence;
 	}
 
-	SharedPtr<AnimationTransform> AnimationController::GetFinalTransform() const
-	{
-		return mFinalTransform;
-	}
-
 	void AnimationController::Init()
 	{
 		mAnimParams   = CreateSharedPtr<AnimationParameters>();
-		mRootSequence = CreateSharedPtr<AnimationSequence>(shared_from_this());
+		mRootSequence = CreateSharedPtr<AnimationSequence>(this);
 	}
 
 	void AnimationController::Update()
@@ -134,15 +135,6 @@ namespace JG
 				break;
 			}
 		}
-		if (mFinalTransform == nullptr)
-		{
-			mFinalTransform = CreateSharedPtr<AnimationTransform>();
-		}
-
-		mPendingTransform != nullptr ? 
-			*mFinalTransform = *mPendingTransform : mFinalTransform->Reset();
-
-
 		// 스키닝 Mesh 생성
 		SharedPtr<IGraphicsContext> context = JGGraphics::GetInstance().GetGraphicsAPI()->GetGraphicsContext();
 		SharedPtr<ICopyContext> copyContext = context->QueryInterfaceAsCopyContext();
@@ -151,7 +143,6 @@ namespace JG
 		{
 			mWaitFrameCount = 0;
 			mSkinnedMesh = copyContext->CopyMesh(mOriginMesh);
-
 		}
 		else if (mSkinnedMesh != nullptr && CanUseSkinnedMesh() == false)
 		{
@@ -166,8 +157,7 @@ namespace JG
 		{
 			return;
 		}
-		SharedPtr<AnimationTransform> animTransform = mRootSequence->Execute();
-
+		List<SharedPtr<AnimationTransform>> animTransforms = mRootSequence->Execute();
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
 		{
 			SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
@@ -178,15 +168,17 @@ namespace JG
 
 			// 애니메이션 스키닝
 			Compute::AnimationSkinning::Input input;
-			input.AnimTransform = animTransform;
-			input.OriginMesh    = mOriginMesh;
-			input.SkinnedMesh   = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
+			input.AnimTransforms = animTransforms;
+			input.OriginMesh     = mOriginMesh;
+			input.SkinnedMesh    = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
 			mAnimationSkinning->Execute(computeContext, input);
 		}
-		
 	}
 	bool AnimationController::CanUseSkinnedMesh() const
 	{
-		return mSkinnedMesh != nullptr && mSkinnedMesh->IsValid() && mWaitFrameCount >= JGGraphics::GetInstance().GetBufferCount();
+		return
+			mSkinnedMesh != nullptr && mSkinnedMesh->IsValid() && 
+			mWaitFrameCount >= JGGraphics::GetInstance().GetBufferCount() &&
+			mSkeletone != nullptr && mSkeletone->IsValid();
 	}
 }

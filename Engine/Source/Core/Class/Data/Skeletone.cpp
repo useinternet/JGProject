@@ -55,7 +55,6 @@ namespace JG
 			node.ChildNodes = boneNode.ChildNodes;
 
 			node.Transform  = boneNode.Transform;
-			node.BoneOffset = boneNode.BoneOffset;
 
 			mBoneNodes.push_back(node);
 		}

@@ -49,8 +49,8 @@ namespace JG
 
 	struct AnimationTransitionData
 	{
-		SharedPtr<AnimationParameters> AnimationParameters;
-		SharedPtr<AnimationController> AnimationController;
+		AnimationParameters* AnimationParameters;
+		AnimationController* AnimationController;
 
 		String PrevNodeName;
 		String NextNodeName;

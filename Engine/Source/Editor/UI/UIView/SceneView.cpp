@@ -771,7 +771,10 @@ namespace JG
 		}
 
 		auto scene = mainCam->GetScene();
-		
+		if (scene == nullptr)
+		{
+			return;
+		}
 		scene->PushPostRenderingEvent(JG_I32_MAX, [&](SharedPtr<Graphics::SceneResultInfo> resultInfo)
 		{
 			if (mEditorUIRenderer == nullptr || resultInfo == nullptr)

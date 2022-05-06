@@ -121,7 +121,7 @@ namespace JG
 			return result;
 		}
 
-
+		static JMatrix AffineTransformation(const JVector3& T, const JQuaternion& Quat, const JVector3& S);
 		//inline static JVector3 
 	public:
 		float& Get(int col, int row) {

@@ -21,6 +21,8 @@ namespace JG
 
 	JGAnimation::~JGAnimation()
 	{
+		JGGraphics::GetInstance().GetGraphicsAPI()->Flush(ANIMATION_COMMAND_QUEUE_ID);
+
 		if (mAnimThreadSH != nullptr)
 		{
 			mAnimThreadSH->Reset();
@@ -97,7 +99,6 @@ namespace JG
 
 	void JGAnimation::Update_Thread()
 	{
-
 		SharedPtr<IComputeContext> computeContext = JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext(ANIMATION_COMMAND_QUEUE_ID, ANIMATION_CONTEXT_ID);
 		u64 cnt = mRegisteredAnimationControllers.size();
 		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
@@ -105,7 +106,9 @@ namespace JG
 			controller->Update_Thread(computeContext);
 		}
 
+	
 		// 끝날때까지 기다리기
 		JGGraphics::GetInstance().GetGraphicsAPI()->SubmitAndFlush(ANIMATION_COMMAND_QUEUE_ID);
+
 	}
 }

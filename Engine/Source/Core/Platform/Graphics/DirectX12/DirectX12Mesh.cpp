@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DirectX12Mesh.h"
 #include "DirectX12API.h"
+#include "Class/Asset/Asset.h"
 #include "RayTracing/DirectX12BottomLevelAccelerationStructure.h"
 #include "Utill/PipelineState.h"
 #include "Utill/CommandList.h"
@@ -22,6 +23,15 @@ namespace JG
 		mIndexBuffer = indexBuffer;
 	}
 
+	void DirectX12SubMesh::SetBoneOffset(const List<JGBoneOffsetData>& boneOffset)
+	{
+		mBoneOffsetDic.clear();
+		for (const JGBoneOffsetData& data : boneOffset)
+		{
+			mBoneOffsetDic[data.ID] = data.Offset;
+		}
+	}
+
 	SharedPtr<IVertexBuffer> DirectX12SubMesh::GetVertexBuffer() const
 	{
 		return mVertexBuffer;
@@ -36,6 +46,24 @@ namespace JG
 	{
 		return mIndexBuffer;
 	}
+
+	bool DirectX12SubMesh::GetBoneOffset(u32 ID, JMatrix* output)
+	{
+		if (mBoneOffsetDic.find(ID) == mBoneOffsetDic.end())
+		{
+			return false;
+		}
+		else
+		{
+			if (output)
+			{
+				*output = mBoneOffsetDic[ID];
+			}
+			return true;
+		}
+	}
+
+
 
 	SharedPtr<IBottomLevelAccelerationStructure> DirectX12SubMesh::GetBottomLevelAS() const
 	{

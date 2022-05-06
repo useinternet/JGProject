@@ -38,9 +38,9 @@ namespace JG
 			// System
 			OnGUI			       = 1000000,
 			Graphics_RenderFinish  = 2000000,
-
+			Animation_EndFrame     = Graphics_RenderFinish,
 			Graphics_EndFrame	   = 2000001,
-			Animation_EndFrame   = Graphics_EndFrame,
+			
 
 			DestroyObject          = 2000002,
 			Graphics_DestroyObject = 2000003,

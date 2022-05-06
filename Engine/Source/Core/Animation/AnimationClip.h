@@ -7,6 +7,8 @@ namespace JG
 	class AnimationTransform;
 	class AnimationClipAssetStock;
 	class Skeletone;
+	class IMesh;
+	class ISubMesh;
 	class AnimationClip;
 	class AnimationClipInfo
 	{
@@ -15,7 +17,7 @@ namespace JG
 		friend class AnimationController;
 	private:
 		String Name;
-		f32    AccTime;
+		f32    TimePos;
 
 		SharedPtr<AnimationClip> Clip;
 		EAnimationClipFlags Flags = EAnimationClipFlags::None;
@@ -23,7 +25,7 @@ namespace JG
 		AnimationClipInfo(const String& name, SharedPtr<AnimationClip> clip, EAnimationClipFlags flags);
 		void Reset()
 		{
-			AccTime = 0.0f;
+			TimePos = 0.0f;
 		}
 		EAnimationClipFlags GetFlags() const
 		{
@@ -53,7 +55,11 @@ namespace JG
 		f32 mTickPerSecond = 0.0f;
 		Dictionary<String, AnimationNode> mAnimationNodes;
 	public:
-		EAnimationClipState Update(SharedPtr<AnimationClipInfo> clipInfo, SharedPtr<JG::Skeletone> skeletone, SharedPtr<AnimationTransform> animTransform);
+		EAnimationClipState Update(
+			SharedPtr<AnimationClipInfo> clipInfo, 
+			SharedPtr<IMesh> mesh,  
+			SharedPtr<JG::Skeletone> skeletone, 
+			List<SharedPtr<AnimationTransform>>& out_animTransform);
 
 
 		bool IsValid() const;
@@ -62,15 +68,15 @@ namespace JG
 		const String& GetName() const;
 		const String& GetClipName() const;
 	private:
-		void UpdateInternal(u32 nodeID, f32 tick, SharedPtr<JG::Skeletone> skeletone, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
+		void UpdateInternal(u32 nodeID, f32 timePos, SharedPtr<JG::Skeletone> skeletone, SharedPtr<ISubMesh> mesh, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
 
-		JVector3 CalcLerpLocation(f32 tick, const AnimationNode* node);
-		JVector3 CalcLerpScale(f32 tick, const AnimationNode* node);
-		JQuaternion CalcLerpRotation(f32 tick, const AnimationNode* node);
+		JVector3 CalcLerpLocation(f32 timePos, const AnimationNode* node);
+		JVector3 CalcLerpScale(f32 timePos, const AnimationNode* node);
+		JQuaternion CalcLerpRotation(f32 timePos, const AnimationNode* node);
 
-		u32 FindRotation(f32 tick, const AnimationNode* node);
-		u32 FindLocation(f32 tick, const AnimationNode* node);
-		u32 FindScale(f32 tick, const AnimationNode* node);
+		u32 FindRotation(f32 timePos, const AnimationNode* node);
+		u32 FindLocation(f32 timePos, const AnimationNode* node);
+		u32 FindScale(f32 timePos, const AnimationNode* node);
 		const AnimationNode* FindAnimationNode(const String& nodeName);
 
 

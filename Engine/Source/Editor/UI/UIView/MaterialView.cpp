@@ -23,7 +23,10 @@ namespace JG
 	}
 	void MaterialView::Initialize()
 	{
+		String enginePath = Application::GetEnginePath();
+		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
 		UpdateScene();
+		
 	}
 	void MaterialView::OnGUI()
 	{
@@ -163,34 +166,9 @@ namespace JG
 
 	void MaterialView::UpdateScene()
 	{
-		const JVector3 targetVec(0, 0, -1);
-		const JVector3 upVec(0, 1, 0);
-		const JVector3 eyePos(0, 0, -200.0f);
+		const JVector3 eyePos(0, 0.0f, -200.0f);
 		const f32 farZ = 1000000.0f;
 		const f32 nearZ = 1.0f;
-
-		if (mSkyBox == nullptr)
-		{
-			mSkyBox = GraphicsHelper::CreateSkyBox(eyePos, farZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
-		}
-		if (mModel == nullptr)
-		{
-			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
-			if (mMaterialAsset != nullptr && mMaterialAsset->IsValid())
-			{
-				mModel->MaterialList.resize(1);
-				mModel->MaterialList[0] = mMaterialAsset->Get();
-			}
-		}
-		if (mModel->Mesh == nullptr)
-		{
-			String enginePath = Application::GetEnginePath();
-			auto   meshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
-			if (meshAsset != nullptr && meshAsset->IsValid())
-			{
-				mModel->Mesh = meshAsset->Get();
-			}
-		}
 		if (mEditorUIScene == nullptr)
 		{
 			EditorUISceneConfig config;
@@ -198,16 +176,29 @@ namespace JG
 			config.ImageSize = mImageSize;
 			config.OffsetScale = JVector3(1.5f, 1.5f, 1.5f);
 			config.Model = mModel;
-			config.SkyBox = mSkyBox;
+			config.SkyBox = GraphicsHelper::CreateSkyBox(eyePos, farZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");;
 			config.FarZ = farZ;
 			config.NearZ = nearZ;
 			config.EyePos = eyePos;
-
+			config.MinZoomDistance = 100.0f;
 			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
+		}
+		if (mModel == nullptr)
+		{
+			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
+		}
+		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
+		{
+			mModel->Mesh = mMeshAsset->Get();
+		}
+		if (mMaterialAsset != nullptr && mMaterialAsset->IsValid())
+		{
+			mModel->MaterialList.resize(1);
+			mModel->MaterialList[0] = mMaterialAsset->Get();
 		}
 
 
-
+		mEditorUIScene->SetModel(mModel);
 	}
 
 	void MaterialView::SaveAndApplyScript()

@@ -86,7 +86,7 @@ namespace JG
 
 		virtual SharedPtr<IStructuredBuffer>  CreateStrucuredBuffer(const String& name, u64 elementSize, u64 elementCount, EBufferLoadMethod method) override;
 		virtual SharedPtr<IByteAddressBuffer> CreateByteAddressBuffer(const String& name, u64 elementCount) override;
-		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name) override;
+		virtual SharedPtr<IReadBackBuffer>  CreateReadBackBuffer(const String& name, u64 dataSize) override;
 		virtual SharedPtr<IGraphicsShader> CreateGraphicsShader(const String& name, const String& sourceCode, EShaderFlags flags, const List<SharedPtr<IShaderScript>>& scriptList) override;
 		virtual SharedPtr<IComputeShader>  CreateComputeShader(const String& name, const String& sourceCode) override;
 		virtual SharedPtr<IClosestHitShader> CreateClosestHitShader(const String& name, const String& sourceCode, const SharedPtr<IShaderScript> script) override;
@@ -167,9 +167,9 @@ namespace JG
 		virtual void BindShader(SharedPtr<IGraphicsShader> shader) override;
 		virtual void BindTextures(u32 rootParam, const List<SharedPtr<ITexture>>&textures) override;
 		virtual void BindConstantBuffer(u32 rootParam, const void*, u32 dataSize) override;
-		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> resource) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
-		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource) override;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) override;
 		virtual void DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList) override;
 		// 셋팅 함수
@@ -184,8 +184,8 @@ namespace JG
 
 		// 상태 변경 함수
 		
-		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
-		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) override;
+		virtual void TransitionBarrier(const List<SharedPtr<IResource>>& textures, const List<EResourceState>& states) override;
+		virtual void UAVBarrier(const List<SharedPtr<IResource>>& textures) override;
 		// 인터페이스 변경 함수
 		virtual SharedPtr<IComputeContext> QueryInterfaceAsComputeContext() const override;
 		virtual SharedPtr<ICopyContext>	   QueryInterfaceAsCopyContext() const override;
@@ -203,10 +203,8 @@ namespace JG
 		SharedPtr<IRootSignature> mBindedRootSignature = nullptr;
 	public:
 		// Clear 함수
-		virtual void ClearUAVUint(SharedPtr<IByteAddressBuffer> buffer) override;
-		virtual void ClearUAVFloat(SharedPtr<IByteAddressBuffer> buffer) override;
-		virtual void ClearUAVUint(SharedPtr<ITexture> buffer) override;
-		virtual void ClearUAVFloat(SharedPtr<ITexture> buffer) override;
+		virtual void ClearUAVUint(SharedPtr<IResource> resource) override;
+		virtual void ClearUAVFloat(SharedPtr<IResource> resource) override;
 		// Bind 함수
 		virtual void BindRootSignature(SharedPtr<IRootSignature> rootSig) override;
 		virtual void BindShader(SharedPtr<IComputeShader> shader) override;
@@ -214,9 +212,9 @@ namespace JG
 
 
 		virtual void BindConstantBuffer(u32 rootParam, const void* data, u32 dataSize) override;
-		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IStructuredBuffer> sb) override;
+		virtual void BindSturcturedBuffer(u32 rootParam, SharedPtr<IResource> resource) override;
 		virtual void BindSturcturedBuffer(u32 rootParam, const void* data, u32 elementSize, u32 elementCount) override;
-		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IByteAddressBuffer> bab) override;
+		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource) override;
 		virtual void BindAccelerationStructure(u32 rootParam, SharedPtr<ITopLevelAccelerationStructure> as) override;
 		// Dispatch 함수
 		virtual void Dispatch1D(u32 ThreadCountX, u32 GroupSizeX = 64) override;
@@ -227,8 +225,8 @@ namespace JG
 	
 
 		// 상태 변경 함수
-		virtual void TransitionBarrier(const List<SharedPtr<ITexture>>& textures, const List<EResourceState>& states) override;
-		virtual void UAVBarrier(const List<SharedPtr<ITexture>>& textures) override;
+		virtual void TransitionBarrier(const List<SharedPtr<IResource>>& resources, const List<EResourceState>& states) override;
+		virtual void UAVBarrier(const List<SharedPtr<IResource>>& resources) override;
 		virtual SharedPtr<ICopyContext>		QueryInterfaceAsCopyContext() const override;
 	public:
 		ComputeCommandList* Get() const {
@@ -245,8 +243,9 @@ namespace JG
 		friend DirectX12ComputeContext;
 		CommandList* mCommandList = nullptr;
 	public:
-		virtual void CopyTextureRegion(SharedPtr<ITexture> dest, SharedPtr<ITexture> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) override;
-		virtual void CopyBuffer(SharedPtr<IStructuredBuffer> sb, const void* datas, u64 elementSize, u64 elementCount) override;
+		virtual void CopyResource(SharedPtr<IResource> dest, SharedPtr<IResource> src) override;
+		virtual void CopyTextureRegion(SharedPtr<IResource> dest, SharedPtr<IResource> src, const JRect& srcRect, EResourceState inDestState, EResourceState inSrcState) override;
+		virtual void CopyBuffer(SharedPtr<IResource> sb, const void* datas, u64 elementSize, u64 elementCount) override;
 		virtual SharedPtr<IMesh> CopyMesh(SharedPtr<IMesh> src) override;
 	};
 

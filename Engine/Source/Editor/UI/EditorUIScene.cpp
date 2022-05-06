@@ -39,6 +39,8 @@ namespace JG
 
 		ImGui::ImageButton((ImTextureID)texID, ImVec2(mConfig.ImageSize.x, mConfig.ImageSize.y), ImVec2(0, 0), ImVec2(1, 1), 0);
 
+
+		
 		if (ImGui::IsItemHovered() == true && 
 			ImGui::IsMouseDown(ImGuiMouseButton_Left) == true)
 		{
@@ -72,6 +74,19 @@ namespace JG
 			mMousePosition = JVector2(-1, -1);
 			mPrevMousePosition = JVector2(-1, -1);
 		}
+
+		if (ImGui::IsItemHovered() == true &&
+			(mConfig.Flags & EEditorUISceneFlags::Fix_Zoom) == false)
+		{
+			f32 distance = JVector3::Length(mConfig.EyePos);
+			if ((ImGui::GetIO().MouseWheel > 0 && distance >= mConfig.MinZoomDistance) ||
+				(ImGui::GetIO().MouseWheel < 0 && distance <= mConfig.MaxZoomDistance))
+			{
+				mConfig.EyePos.z += ImGui::GetIO().MouseWheel * mConfig.ZoomSpeed;
+			}
+		}
+
+
 		UpdateScene();
 		UpdateModel();
 		UpdateLight();
@@ -139,6 +154,12 @@ namespace JG
 
 			mConfig.Model->WorldMatrix = S * R * T;
 		}
+		if (mConfig.SkyBox)
+		{
+			JMatrix S = JMatrix::Scaling(JVector3(mConfig.FarZ, mConfig.FarZ, mConfig.FarZ));
+			JMatrix T = JMatrix::Translation(mConfig.EyePos);
+			mConfig.SkyBox->WorldMatrix = S * T;
+		}
 	}
 
 	void EditorUIScene::UpdateLight()
@@ -148,7 +169,7 @@ namespace JG
 			SharedPtr<Graphics::DirectionalLight> dl = CreateSharedPtr<Graphics::DirectionalLight>();
 			dl->Color = Color::White();
 			dl->Direction = JVector3(-0.2f, -0.8f, 1.0f);
-			dl->Intensity = 1.0f;
+			dl->Intensity = 3.0f;
 			mLight = dl;
 		}
 

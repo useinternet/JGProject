@@ -185,4 +185,10 @@ namespace JG
 
 		return JVector3(x,y,z);
 	}
+	JMatrix JMatrix::AffineTransformation(const JVector3& T, const JQuaternion& Quat, const JVector3& S)
+	{
+		JMatrix m;
+		m.SetSIMD(DirectX::XMMatrixAffineTransformation(JVector3::GetSIMD(S), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), Quat.GetSIMD(), JVector3::GetSIMD(T)));
+		return m;
+	}
 }

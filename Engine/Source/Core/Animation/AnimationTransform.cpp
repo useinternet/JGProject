@@ -4,16 +4,13 @@
 
 namespace JG
 {
-
-
-
 	AnimationTransform::AnimationTransform()
 	{
 		Reset();
 	}
 	void AnimationTransform::Reset()
 	{
-		for (u32 i = 0; i < 64; ++i)
+		for (u32 i = 0; i < 128; ++i)
 		{
 			mTransform[i] = JMatrix::Identity();
 		}
@@ -33,6 +30,16 @@ namespace JG
 	const JMatrix& AnimationTransform::Get(i32 i) const
 	{
 		return mTransform[i];
+	}
+	void AnimationTransform::ForEach(const std::function<void(JMatrix&)>& action)
+	{
+		for (i32 i = 0; i < 64; ++i)
+		{
+			if (action)
+			{
+				action(mTransform[i]);
+			}
+		}
 	}
 	JMatrix& AnimationTransform::operator[](i32 i)
 	{

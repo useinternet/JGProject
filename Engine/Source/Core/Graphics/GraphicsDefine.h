@@ -13,7 +13,11 @@ namespace JG
 #define MAIN_GRAPHICS_COMMAND_ID 0
 
 	using TextureID  = u64;
-	using BufferID   = u64;
+	
+	using PrimitiveResourcePtr      = void*;
+	using ResourceGPUVirtualAddress = u64;
+	using ResourceViewPtr           = u64;
+	//using BufferID   = u64;
 	enum class ETextureFormat
 	{
 		None,

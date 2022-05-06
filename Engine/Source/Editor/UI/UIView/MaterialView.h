@@ -31,7 +31,7 @@ namespace JG
 		JVector2 mPrevMousePosition;
 		JVector2 mModelRotation;
 
-
+		SharedPtr<Asset<IMesh>>		mMeshAsset = nullptr;
 
 		SharedPtr<ITexture>		    mSceneTexture;
 		SharedPtr<Asset<IMaterial>> mMaterialAsset = nullptr;
@@ -39,7 +39,6 @@ namespace JG
 		UniquePtr<EditorUIScene>	mEditorUIScene;
 		List<String> mMaterialLogs;
 
-		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
 		SharedPtr<Graphics::StaticRenderObject> mModel;
 
 		StorableString mFailedCompileShaderCode;

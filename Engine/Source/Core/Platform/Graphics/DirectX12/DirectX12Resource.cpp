@@ -16,7 +16,18 @@ namespace JG
 		Reset();
 	}
 
-
+	bool DirectX12VertexBuffer::IsValid() const
+	{
+		return mD3DResource != nullptr;
+	}
+	PrimitiveResourcePtr DirectX12VertexBuffer::GetPrimitiveResourcePtr() const
+	{
+		return IsValid() ? mD3DResource.Get() : nullptr;
+	}
+	ResourceGPUVirtualAddress DirectX12VertexBuffer::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
+	}
 	bool DirectX12VertexBuffer::SetData(const void* datas, u64 elementSize, u64 elementCount)
 	{
 		u64 originBtSize = mElementSize * mElementCount;
@@ -24,20 +35,25 @@ namespace JG
 		u64 btSize = mElementSize * mElementCount;
 
 		// Create
-		mSRVDirty = originBtSize != btSize;
+		if (mD3DResource && (originBtSize != btSize))
+		{
+			Reset();
+		}
 		switch (mLoadMethod)
 		{
 		case EBufferLoadMethod::GPULoad:
 		{
-			Reset();
-			mD3DResource = DirectX12API::CreateCommittedResource(
-				GetName(),
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
-				D3D12_RESOURCE_STATE_COMMON,
-				nullptr);
-
+			if (mD3DResource == nullptr)
+			{
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
+					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Buffer(btSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+					D3D12_RESOURCE_STATE_COMMON,
+					nullptr);
+				SendResourceViewDirty();
+			}
 			if (mD3DResource && datas != nullptr)
 			{
 				auto commandList = DirectX12API::GetGraphicsCommandList();
@@ -46,7 +62,7 @@ namespace JG
 		}
 		break;
 		case EBufferLoadMethod::CPULoad:
-			if (mD3DResource && (originBtSize != btSize || mCPUData == nullptr))
+			if (mD3DResource != nullptr && mCPUData == nullptr)
 			{
 				Reset();
 			}
@@ -60,6 +76,7 @@ namespace JG
 					D3D12_RESOURCE_STATE_GENERIC_READ,
 					nullptr
 				);
+				SendResourceViewDirty();
 				if (mD3DResource)
 				{
 					mD3DResource->Map(0, nullptr, &mCPUData);
@@ -80,10 +97,7 @@ namespace JG
 		return true;
 	}
 
-	bool DirectX12VertexBuffer::IsValid() const
-	{
-		return mD3DResource != nullptr;
-	}
+
 	EBufferLoadMethod DirectX12VertexBuffer::GetBufferLoadMethod() const
 	{
 		return mLoadMethod;
@@ -115,10 +129,17 @@ namespace JG
 		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12VertexBuffer::GetSRV() const
+	void DirectX12VertexBuffer::SendResourceViewDirty()
+	{
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
+		mSRVDirty = true;
+		mUAVDirty = true;
+	}
+
+	ResourceViewPtr DirectX12VertexBuffer::GetSRV() const
 	{
 		if (IsValid() == false) return { 0 };
-		if (mSRVDirty == false) return { mSRV.CPU()};
+		if (mSRVDirty == false) return { mSRV.CPU().ptr};
 
 		mSRVDirty = false;
 
@@ -126,17 +147,40 @@ namespace JG
 		D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 		desc.ViewDimension			 = D3D12_SRV_DIMENSION_BUFFER;
 		desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		desc.Buffer.NumElements		 = mElementCount;
-		desc.Format = DXGI_FORMAT_UNKNOWN;
-		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		desc.Buffer.StructureByteStride = mElementSize;
+		desc.Format				= DXGI_FORMAT_UNKNOWN;
+		desc.Buffer.Flags		= D3D12_BUFFER_SRV_FLAG_NONE;
+		desc.Buffer.NumElements = GetVertexCount();
+		desc.Buffer.StructureByteStride = GetVertexSize();
 
-		std::lock_guard<std::mutex> lock(mSRVMutex);
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
 		auto alloc = DirectX12API::CSUAllocate();
 		DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), &desc, alloc.CPU());
 
 		mSRV = std::move(alloc);
-		return mSRV.CPU();
+		return mSRV.CPU().ptr;
+	}
+
+	ResourceViewPtr DirectX12VertexBuffer::GetUAV() const
+	{
+		if (IsValid() == false) return { 0 };
+		if (mUAVDirty == false) return { mUAV.CPU().ptr };
+
+		mUAVDirty = false;
+
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+		desc.ViewDimension	= D3D12_UAV_DIMENSION_BUFFER;
+		desc.Format			= DXGI_FORMAT_UNKNOWN;
+		desc.Buffer.Flags	= D3D12_BUFFER_UAV_FLAG_NONE;
+		desc.Buffer.NumElements			= GetVertexCount();
+		desc.Buffer.StructureByteStride = GetVertexSize();
+
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
+		auto alloc = DirectX12API::CSUAllocate();
+		DirectX12API::GetD3DDevice()->CreateUnorderedAccessView(Get(), nullptr, &desc, alloc.CPU());
+
+		mUAV = std::move(alloc);
+		return mUAV.CPU().ptr;
 	}
 
 
@@ -146,7 +190,18 @@ namespace JG
 	{
 		Reset();
 	}
-
+	bool DirectX12IndexBuffer::IsValid() const
+	{
+		return mD3DResource != nullptr;
+	}
+	PrimitiveResourcePtr DirectX12IndexBuffer::GetPrimitiveResourcePtr() const
+	{
+		return IsValid() ? mD3DResource.Get() : nullptr;
+	}
+	ResourceGPUVirtualAddress DirectX12IndexBuffer::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
+	}
 	bool DirectX12IndexBuffer::SetData(const u32* datas, u64 count)
 	{
 		u64 originBtSize = sizeof(u32) * mIndexCount;
@@ -154,19 +209,28 @@ namespace JG
 		u64 btSize = sizeof(u32) * mIndexCount;
 
 		// Create
+
+		if (mD3DResource && (originBtSize != btSize))
+		{
+			Reset();
+		}
 		switch (mLoadMethod)
 		{
 		case EBufferLoadMethod::GPULoad:
 		{
-			Reset();
-			mD3DResource = DirectX12API::CreateCommittedResource(
-				GetName(),
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(btSize),
-				D3D12_RESOURCE_STATE_COMMON,
-				nullptr
-			);
+			if (mD3DResource == nullptr)
+			{
+				mD3DResource = DirectX12API::CreateCommittedResource(
+					GetName(),
+					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Buffer(btSize),
+					D3D12_RESOURCE_STATE_COMMON,
+					nullptr
+				);
+				SendResourceViewDirty();
+			}
+
 			if (mD3DResource != nullptr && datas != nullptr)
 			{
 				auto commandList = DirectX12API::GetGraphicsCommandList();
@@ -175,7 +239,7 @@ namespace JG
 		}
 		break;
 		case EBufferLoadMethod::CPULoad:
-			if (mD3DResource && (originBtSize != btSize || mCPUData == nullptr))
+			if (mD3DResource != nullptr && mCPUData == nullptr)
 			{
 				Reset();
 			}
@@ -189,6 +253,7 @@ namespace JG
 					D3D12_RESOURCE_STATE_GENERIC_READ,
 					nullptr
 				);
+				SendResourceViewDirty();
 
 				if (mD3DResource)
 				{
@@ -212,10 +277,7 @@ namespace JG
 		return true;
 	}
 
-	bool DirectX12IndexBuffer::IsValid() const
-	{
-		return mD3DResource != nullptr;
-	}
+
 	EBufferLoadMethod DirectX12IndexBuffer::GetBufferLoadMethod() const
 	{
 		return mLoadMethod;
@@ -239,10 +301,17 @@ namespace JG
 		mD3DResource.Reset(); mD3DResource = nullptr;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12IndexBuffer::GetSRV() const
+	void DirectX12IndexBuffer::SendResourceViewDirty()
 	{
-		if (IsValid() == false) return { 0 };
-		if (mSRVDirty == false) return { mSRV.CPU() };
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
+		mSRVDirty = true;
+		mUAVDirty = true;
+	}
+
+	ResourceViewPtr DirectX12IndexBuffer::GetSRV() const
+	{
+		if (IsValid() == false) return 0;
+		if (mSRVDirty == false) return { mSRV.CPU().ptr };
 		
 		mSRVDirty = false;
 
@@ -255,17 +324,50 @@ namespace JG
 		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 		desc.Buffer.StructureByteStride = 0;
 
-		std::lock_guard<std::mutex> lock(mSRVMutex);
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
 		auto alloc = DirectX12API::CSUAllocate();
 		DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), &desc, alloc.CPU());
 
 		mSRV = std::move(alloc);
-		return mSRV.CPU();
+		return mSRV.CPU().ptr;
+	}
+
+	ResourceViewPtr DirectX12IndexBuffer::GetUAV() const
+	{
+		if (IsValid() == false) return { 0 };
+		if (mUAVDirty == false) return { mUAV.CPU().ptr };
+
+		mUAVDirty = false;
+
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+		desc.ViewDimension		= D3D12_UAV_DIMENSION_BUFFER;
+		desc.Format				= DXGI_FORMAT_R32_TYPELESS;
+		desc.Buffer.Flags		= D3D12_BUFFER_UAV_FLAG_RAW;
+		desc.Buffer.NumElements = mIndexCount;
+		desc.Buffer.StructureByteStride = 0;
+
+		std::lock_guard<std::mutex> lock(mSRV_UAVMutex);
+		auto alloc = DirectX12API::CSUAllocate();
+		DirectX12API::GetD3DDevice()->CreateUnorderedAccessView(Get(), nullptr,  &desc, alloc.CPU());
+
+		mUAV = std::move(alloc);
+		return mUAV.CPU().ptr;
 	}
 
 	bool DirectX12ByteAddressBuffer::IsValid() const
 	{
 		return mD3DResource != nullptr;
+	}
+
+	PrimitiveResourcePtr DirectX12ByteAddressBuffer::GetPrimitiveResourcePtr() const
+	{
+		return IsValid() ? mD3DResource.Get() : nullptr;
+	}
+
+	ResourceGPUVirtualAddress DirectX12ByteAddressBuffer::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
 	}
 
 	bool DirectX12ByteAddressBuffer::SetData(u64 elementCount, const void* initDatas)
@@ -298,14 +400,16 @@ namespace JG
 		}
 		return IsValid();
 	}
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12ByteAddressBuffer::GetSRV() const
+	ResourceViewPtr DirectX12ByteAddressBuffer::GetSRV() const
 	{
-		return mSRV->CPU();
+		if (IsValid() == false) return 0;
+		return mSRV->CPU().ptr;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12ByteAddressBuffer::GetUAV() const
+	ResourceViewPtr DirectX12ByteAddressBuffer::GetUAV() const
 	{
-		return mUAV->CPU();
+		if (IsValid() == false) return 0;
+		return mUAV->CPU().ptr;
 	}
 
 	ID3D12Resource* DirectX12ByteAddressBuffer::Get() const
@@ -360,6 +464,16 @@ namespace JG
 	bool DirectX12StructuredBuffer::IsValid() const
 	{
 		return mD3DResource != nullptr;
+	}
+
+	PrimitiveResourcePtr DirectX12StructuredBuffer::GetPrimitiveResourcePtr() const
+	{
+		return IsValid() ? mD3DResource.Get() : nullptr;
+	}
+
+	ResourceGPUVirtualAddress DirectX12StructuredBuffer::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
 	}
 	bool DirectX12StructuredBuffer::SetData(u64 elementSize, u64 elementCount, const void* initDatas)
 	{
@@ -467,14 +581,8 @@ namespace JG
 	{
 		return mCPUData;
 	}
-	BufferID DirectX12StructuredBuffer::GetBufferID() const
-	{
-		if (IsValid() == true)
-		{
-			return mD3DResource->GetGPUVirtualAddress();
-		}
-		return 0;
-	}
+
+
 
 	void DirectX12StructuredBuffer::SetBufferLoadMethod(EBufferLoadMethod method)
 	{
@@ -514,42 +622,18 @@ namespace JG
 		return mD3DResource != nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::Read(SharedPtr<IStructuredBuffer> readWriteBuffer)
+	PrimitiveResourcePtr DirectX12ReadBackBuffer::GetPrimitiveResourcePtr() const
 	{
-		if (readWriteBuffer == nullptr || readWriteBuffer->IsValid() == false)
-		{
-			return false;
-		}
-		auto originBtSize = mBufferSize;
-		mBufferSize = readWriteBuffer->GetDataSize();
-		if (originBtSize != mBufferSize)
-		{
-			Reset();
-		}
-
-		if (mD3DResource == nullptr)
-		{
-			mD3DResource = DirectX12API::CreateCommittedResource(GetName(),
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Buffer(mBufferSize),
-				D3D12_RESOURCE_STATE_COPY_DEST,
-				nullptr
-			);
-			if (mD3DResource != nullptr)
-			{
-				mD3DResource->Map(0, nullptr, &mCPU);
-			}
-		}
-
-		auto dxRWBuffer = static_cast<DirectX12StructuredBuffer*>(readWriteBuffer.get());
-
-		auto commandList = DirectX12API::GetGraphicsCommandList();
-		commandList->CopyResource(Get(), dxRWBuffer->Get());
-		return IsValid();
+		return IsValid() ? mD3DResource.Get() : nullptr;
 	}
 
-	bool DirectX12ReadBackBuffer::GetData(void* out_data,u64 out_data_size)
+	ResourceGPUVirtualAddress DirectX12ReadBackBuffer::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
+	}
+
+
+	bool DirectX12ReadBackBuffer::GetData(void* out_data, u64 out_data_size)
 	{
 		if (IsValid() == false)
 		{
@@ -564,7 +648,32 @@ namespace JG
 	{
 		return mBufferSize;
 	}
+	void DirectX12ReadBackBuffer::Init(u64 dataSize)
+	{
+		auto originBtSize = mBufferSize;
+		mBufferSize = dataSize;
 
+		if (originBtSize != mBufferSize)
+		{
+			Reset();
+		}
+
+		if (mD3DResource == nullptr)
+		{
+			mD3DResource = DirectX12API::CreateCommittedResource(GetName(),
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
+				D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(mBufferSize),
+				D3D12_RESOURCE_STATE_COPY_DEST,
+				nullptr
+			);
+
+			if (mD3DResource != nullptr)
+			{
+				mD3DResource->Map(0, nullptr, &mCPU);
+			}
+		}
+	}
 	void DirectX12ReadBackBuffer::Reset()
 	{
 		if (mD3DResource)
@@ -582,6 +691,22 @@ namespace JG
 	{
 		Reset();
 	}
+	bool DirectX12Texture::IsValid() const
+	{
+
+		return mD3DResource != nullptr;
+	}
+
+	PrimitiveResourcePtr DirectX12Texture::GetPrimitiveResourcePtr() const
+	{
+		return IsValid() ? mD3DResource.Get() : nullptr;
+	}
+
+	ResourceGPUVirtualAddress DirectX12Texture::GetResourceGPUVirtualAddress() const
+	{
+		return IsValid() ? mD3DResource->GetGPUVirtualAddress() : 0;
+	}
+
 
 	void DirectX12Texture::SetName(const String& name)
 	{
@@ -593,9 +718,11 @@ namespace JG
 		}
 	}
 
+
+
 	TextureID DirectX12Texture::GetTextureID() const
 	{
-		return GetSRV().ptr;
+		return GetSRV();
 	}
 
 	const TextureInfo& DirectX12Texture::GetTextureInfo() const
@@ -681,11 +808,7 @@ namespace JG
 	{
 		mTextureInfo.ClearColor = clearColor;
 	}
-	bool DirectX12Texture::IsValid() const
-	{
-		
-		return mD3DResource != nullptr;
-	}
+
 
 	void DirectX12Texture::Create(const String& name, const TextureInfo& info)
 	{
@@ -714,7 +837,72 @@ namespace JG
 		mD3DResource.Reset();
 		mD3DResource = nullptr;
 	}
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetRTV() const
+
+	ResourceViewPtr DirectX12Texture::GetSRV() const
+	{
+		if (IsValid() == false) return { 0 };
+		SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> srvDesc = CreateSRVDesc(mTextureInfo.Flags);
+
+		u64 hash = 0;
+		if (srvDesc != nullptr)
+		{
+			hash = std::hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*srvDesc);
+		}
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = { 0 };
+		bool isFind = false;
+		{
+			std::shared_lock<std::shared_mutex> lock(mSRVMutex);
+			isFind = mSRVs.find(hash) != mSRVs.end();
+			if (isFind == true)
+			{
+				handle = mSRVs[hash].CPU();
+			}
+		}
+		if (isFind == false)
+		{
+			std::lock_guard<std::shared_mutex> lock(mSRVMutex);
+			auto alloc = DirectX12API::CSUAllocate();
+			DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), srvDesc.get(), alloc.CPU());
+			mSRVs.emplace(hash, std::move(alloc));
+			handle = mSRVs[hash].CPU();
+		}
+
+		return handle.ptr;
+	}
+	ResourceViewPtr DirectX12Texture::GetUAV() const
+	{
+		if (IsValid() == false) return { 0 };
+
+		SharedPtr<D3D12_UNORDERED_ACCESS_VIEW_DESC> uavDesc = CreateUAVDesc(mTextureInfo.Flags);
+		u64 hash = 0;
+		if (uavDesc != nullptr)
+		{
+			hash = std::hash<D3D12_UNORDERED_ACCESS_VIEW_DESC>{}(*uavDesc);
+		}
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = { 0 };
+		bool isFind = false;
+		{
+			std::shared_lock<std::shared_mutex> lock(mUAVMutex);
+			isFind = mUAVs.find(hash) != mUAVs.end();
+			if (isFind == true)
+			{
+				handle = mUAVs[hash].CPU();
+			}
+		}
+		if (isFind == false)
+		{
+			std::lock_guard<std::shared_mutex> lock(mUAVMutex);
+			auto alloc = DirectX12API::CSUAllocate();
+			DirectX12API::GetD3DDevice()->CreateUnorderedAccessView(Get(), nullptr, uavDesc.get(), alloc.CPU());
+			mUAVs.emplace(hash, std::move(alloc));
+			handle = mUAVs[hash].CPU();
+		}
+
+		return handle.ptr;
+	}
+	ResourceViewPtr DirectX12Texture::GetRTV() const
 	{
 		if (IsValid() == false) return { 0 };
 		// 렌더 타겟 텍스쳐가 아니라면 0을 뿜어냄
@@ -752,9 +940,9 @@ namespace JG
 			handle = mRTVs[hash].CPU();
 		}
 
-		return handle;
+		return handle.ptr;
 	}
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetDSV() const
+	ResourceViewPtr DirectX12Texture::GetDSV() const
 	{
 		if (IsValid() == false) return { 0 };
 		if ((mTextureInfo.Flags & ETextureFlags::Allow_DepthStencil) == false)
@@ -791,72 +979,9 @@ namespace JG
 			handle = mDSVs[hash].CPU();
 		}
 
-		return handle;
+		return handle.ptr;
 	}
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetSRV() const
-	{
-		if (IsValid() == false) return { 0 };
-		SharedPtr<D3D12_SHADER_RESOURCE_VIEW_DESC> srvDesc = CreateSRVDesc(mTextureInfo.Flags);
 
-		u64 hash = 0;
-		if (srvDesc != nullptr)
-		{
-			hash = std::hash<D3D12_SHADER_RESOURCE_VIEW_DESC>{}(*srvDesc);
-		}
-
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = { 0 };
-		bool isFind = false;
-		{
-			std::shared_lock<std::shared_mutex> lock(mSRVMutex);
-			isFind = mSRVs.find(hash) != mSRVs.end();
-			if (isFind == true)
-			{
-				handle = mSRVs[hash].CPU();
-			}
-		}
-		if (isFind == false)
-		{
-			std::lock_guard<std::shared_mutex> lock(mSRVMutex);
-			auto alloc = DirectX12API::CSUAllocate();
-			DirectX12API::GetD3DDevice()->CreateShaderResourceView(Get(), srvDesc.get(), alloc.CPU());
-			mSRVs.emplace(hash, std::move(alloc));
-			handle = mSRVs[hash].CPU();
-		}
-
-		return handle;
-	}
-	D3D12_CPU_DESCRIPTOR_HANDLE DirectX12Texture::GetUAV() const
-	{
-		if (IsValid() == false) return { 0 };
-
-		SharedPtr<D3D12_UNORDERED_ACCESS_VIEW_DESC> uavDesc = CreateUAVDesc(mTextureInfo.Flags);
-		u64 hash = 0;
-		if (uavDesc != nullptr)
-		{
-			hash = std::hash<D3D12_UNORDERED_ACCESS_VIEW_DESC>{}(*uavDesc);
-		}
-
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = { 0 };
-		bool isFind = false;
-		{
-			std::shared_lock<std::shared_mutex> lock(mUAVMutex);
-			isFind = mUAVs.find(hash) != mUAVs.end();
-			if (isFind == true)
-			{
-				handle = mUAVs[hash].CPU();
-			}
-		}
-		if (isFind == false)
-		{
-			std::lock_guard<std::shared_mutex> lock(mUAVMutex);
-			auto alloc = DirectX12API::CSUAllocate();
-			DirectX12API::GetD3DDevice()->CreateUnorderedAccessView(Get(), nullptr, uavDesc.get(), alloc.CPU());
-			mUAVs.emplace(hash, std::move(alloc));
-			handle = mUAVs[hash].CPU();
-		}
-
-		return handle;
-	}
 
 	SharedPtr<D3D12_RENDER_TARGET_VIEW_DESC> DirectX12Texture::CreateRTVDesc(ETextureFlags flag) const
 	{

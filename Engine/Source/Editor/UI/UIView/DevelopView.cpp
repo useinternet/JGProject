@@ -77,11 +77,15 @@ namespace JG
 		if (mainCamera)
 		{
 			scene = mainCamera->GetScene();
-			auto renderer = scene->GetRenderer();
-			if (renderer)
+			if (scene != nullptr)
 			{
-				mRenderParamManager = renderer->GetRenderParamManager();
+				auto renderer = scene->GetRenderer();
+				if (renderer)
+				{
+					mRenderParamManager = renderer->GetRenderParamManager();
+				}
 			}
+			
 		}
 		else
 		{

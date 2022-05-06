@@ -220,30 +220,29 @@ namespace JG
 			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
 		}
 
-
 		if (mModel == nullptr)
 		{
 			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
+			mModel->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
 		}
-
-
-
 
 		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
 		{
-			mModel->Mesh = mMeshAsset->Get();
-			JBBox boundingBox = mModel->Mesh->GetBoundingBox();
+			JBBox boundingBox = mMeshAsset->Get()->GetBoundingBox();
 
 			JVector3 Center = boundingBox.Center();
 			mEditorUIScene->SetLocation(Center * -1);
 
-			JVector3 targetVec = EyePos * -1;
+			JVector3 targetVec = JVector3::Normalize(EyePos * -1);
+			targetVec.y = Math::Clamp(targetVec.y - 0.15f, 0.0f, targetVec.y);
 			mEditorUIScene->SetTargetVector(targetVec);
 
 			if (mAnimController != nullptr)
 			{
 				mAnimController->BindMesh(mMeshAsset->Get());
+				mModel->Mesh = mAnimController->GetBindedMesh();
 			}
+			else mModel->Mesh = mMeshAsset->Get();
 		}
 		mModel->MaterialList.clear();
 		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
@@ -255,6 +254,8 @@ namespace JG
 			mModel->MaterialList.push_back(material->Get());
 		}
 		
+
+
 		mEditorUIScene->SetModel(mModel);
 
 
@@ -272,8 +273,6 @@ namespace JG
 					.MakeAnimationClipNode(CLIP_NAME, nullptr)
 					.ConnectNode("Start", CLIP_NAME, nullptr)
 					.End();
-
-				
 			}
 
 
@@ -281,8 +280,6 @@ namespace JG
 			{
 				mAnimController->BindSkeletone(mSkeletoneAsset->Get());
 			}
-
-			SharedPtr<AnimationTransform> transform = mAnimController->GetFinalTransform();
 		}
 	}
 

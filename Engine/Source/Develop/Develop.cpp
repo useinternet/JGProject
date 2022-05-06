@@ -36,34 +36,34 @@ namespace JG
 		Init();
 		Load();
 
-		u32 index = DirectX12API::GetInstance()->GetBufferIndex(); 
-		DirectX12Texture* targetTexture      = static_cast<DirectX12Texture*>(mRenderTextures[index].get());
-		DirectX12Texture* targetDepthTexture = static_cast<DirectX12Texture*>(mDepthTextures[index].get());
+		//u32 index = DirectX12API::GetInstance()->GetBufferIndex(); 
+		//DirectX12Texture* targetTexture      = static_cast<DirectX12Texture*>(mRenderTextures[index].get());
+		//DirectX12Texture* targetDepthTexture = static_cast<DirectX12Texture*>(mDepthTextures[index].get());
 
 
-		SharedPtr<ComputeCommandList> cmdList = DirectX12API::GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
-		
-		List<ID3D12Resource*>             d3dRTResources;
-		List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+		//SharedPtr<ComputeCommandList> cmdList = DirectX12API::GetGraphicsCommandList()->QueryInterfaceAsComputeCommandList();
+		//
+		//List<ID3D12Resource*>             d3dRTResources;
+		//List<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
 
-		ID3D12Resource* d3dDSResource = nullptr;
-		UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandle = nullptr;
+		//ID3D12Resource* d3dDSResource = nullptr;
+		//UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandle = nullptr;
 
 
-		d3dRTResources.push_back(targetTexture->Get());
-		rtvHandles.push_back(targetTexture->GetRTV());
+		//d3dRTResources.push_back(targetTexture->Get());
+		//rtvHandles.push_back(targetTexture->GetRTV());
 
 
-		d3dDSResource = targetDepthTexture->Get();
-		dsvHandle  = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
-		*dsvHandle = targetDepthTexture->GetDSV();
+		//d3dDSResource = targetDepthTexture->Get();
+		//dsvHandle  = CreateUniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE>();
+		//*dsvHandle = targetDepthTexture->GetDSV();
 
 
-		cmdList->BindRootSignature(static_cast<DirectX12RootSignature*>(mGlobalRootSignature.get())->Get());
-		cmdList->BindTextures(0, { targetTexture->GetUAV() });
-		cmdList->BindStructuredBuffer(1, static_cast<DirectX12TopLevelAccelerationStructure*>(mSceneAS.get())->GetResult()->GetGPUVirtualAddress());
-		cmdList->Get()->SetPipelineState1(static_cast<DirectX12RayTracingPipeline*>(mRaytracingPipeline.get())->GetPipelineState());
+		//cmdList->BindRootSignature(static_cast<DirectX12RootSignature*>(mGlobalRootSignature.get())->Get());
+		//cmdList->BindTextures(0, { targetTexture->GetUAV() });
+		//cmdList->BindStructuredBuffer(1, static_cast<DirectX12TopLevelAccelerationStructure*>(mSceneAS.get())->GetResult()->GetGPUVirtualAddress());
+		//cmdList->Get()->SetPipelineState1(static_cast<DirectX12RayTracingPipeline*>(mRaytracingPipeline.get())->GetPipelineState());
 
 
 		//D3D12_DISPATCH_RAYS_DESC dispatchRays{};
@@ -84,7 +84,7 @@ namespace JG
 		//dispatchRays.Depth = 1;
 
 		//cmdList->DispatchRays(dispatchRays);
-		mFrameBuffers[index]->SubmitTexture(mRenderTextures[index]);
+		//mFrameBuffers[index]->SubmitTexture(mRenderTextures[index]);
 
 	}
 	void Develop::OnError()

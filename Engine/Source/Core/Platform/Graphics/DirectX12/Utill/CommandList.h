@@ -36,7 +36,7 @@ namespace JG
 
 
 		SharedPtr<DynamicDescriptorAllocator> mDynamicDescriptorAllocator; // 따로
-		bool mIsClose = false;
+		//bool mIsClose = false;
 	public:
 		CommandList() = default;
 		CommandList(D3D12_COMMAND_LIST_TYPE d3dType);
@@ -49,7 +49,7 @@ namespace JG
 		virtual void Reset();
 		virtual void Close();
 		virtual bool Close(CommandList* commandList);
-		bool IsClosing() const;
+		//bool IsClosing() const;
 		void TransitionBarrier(ID3D12Resource* d3dResource, D3D12_RESOURCE_STATES state, u32 subResource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, bool flush = false);
 		void UAVBarrier(ID3D12Resource* d3dResource, bool flush = false);
 		void AliasBarrier(ID3D12Resource* beforeResource, ID3D12Resource* afterResource, bool flush = false);
@@ -127,10 +127,11 @@ namespace JG
 		void BindTextures(u32 rootParam, List<D3D12_CPU_DESCRIPTOR_HANDLE> handles);
 		void BindConstantBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
 		void BindConstantBuffer(u32 rootParam, const void* data, u64 dataSize);
-		void BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
+		void BindConstantBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource);
 		void BindStructuredBuffer(u32 rootParam, UploadAllocator::Allocation alloc);
 		void BindStructuredBuffer(u32 rootParam, const void* data, u64 elementCount, u64 elementSize);
-		void BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource = nullptr);
+		void BindStructuredBuffer(u32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, ID3D12Resource* backUpResource);
+		void BindStructuredBuffer(u32 rootParam, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 		void BindConstants(u32 rootparam, u32 btSize, const void* data, u32 offset = 0);
 		void Dispatch(u32 groupX, u32 groupY, u32 groupZ);
 		void DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc);

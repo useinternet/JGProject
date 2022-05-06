@@ -13,6 +13,7 @@
 
 namespace JG
 {
+	static JG::List<String> Test;
 	JMatrix ToJMatrix(const aiMatrix4x4& aiMatrix) 
 	{
 		return JMatrix::Transpose(JMatrix(
@@ -54,32 +55,42 @@ namespace JG
 		
 		if (scene != nullptr)
 		{
-			if (scene->HasMeshes() == true && setting.Flags & EFBXAssetImportFlags::Import_Mesh)
+			//SceneHierarchyInfo info;
+			//info.Flags = setting.Flags;
+			//ReadScene(scene, info);
+
+
+			if (scene->HasMeshes() == true)
 			{
-				StaticMeshAssetStock meshInfo;
-				meshInfo.Name = scene->mName.C_Str();
-				u32 meshCount = scene->mNumMeshes;
-				for (u32 i = 0; i < meshCount; ++i)
+				
+				if (setting.Flags & EFBXAssetImportFlags::Import_Skeletal)
 				{
-					auto mesh = scene->mMeshes[i];
-					ReadMesh(mesh, &meshInfo);
-				}
-				WriteMesh(setting.OutputPath, meshInfo);
-			}
-			if (scene->HasMeshes() == true && setting.Flags & EFBXAssetImportFlags::Import_Skeletal)
-			{
-				u32 meshCount = scene->mNumMeshes;
-				for (u32 i = 0; i < meshCount; ++i)
-				{
-					aiMesh* mesh = scene->mMeshes[i];
-					if (mesh->HasBones() == true)
+					u32 meshCount = scene->mNumMeshes;
+					for (u32 i = 0; i < meshCount; ++i)
 					{
-						SkeletalAssetStock skeletalInfo;
-						skeletalInfo.Name = mesh->mName.C_Str() + String("_Skeletal");
-					
-						ReadSkeletal(scene, mesh, &skeletalInfo);
-						WriteSkeletal(setting.OutputPath, skeletalInfo);
+						aiMesh* mesh = scene->mMeshes[i];
+						if (mesh->HasBones() == true)
+						{
+							SceneHierarchyInfo hierarchyInfo;
+							SkeletalAssetStock skeletalInfo;
+							skeletalInfo.Name = mesh->mName.C_Str() + String("_Skeletal");
+
+							ReadSkeletal(scene, &skeletalInfo, &hierarchyInfo);
+							WriteSkeletal(setting.OutputPath, skeletalInfo);
+						}
 					}
+				}
+				if (setting.Flags & EFBXAssetImportFlags::Import_Mesh)
+				{
+					StaticMeshAssetStock meshInfo;
+					meshInfo.Name = scene->mName.C_Str();
+					u32 meshCount = scene->mNumMeshes;
+					for (u32 i = 0; i < meshCount; ++i)
+					{
+						auto mesh = scene->mMeshes[i];
+						ReadMesh(scene, mesh, &meshInfo);
+					}
+					WriteMesh(setting.OutputPath, meshInfo);
 				}
 			}
 			if (scene->HasAnimations() == true && setting.Flags & EFBXAssetImportFlags::Import_AnimationClip)
@@ -107,8 +118,6 @@ namespace JG
 					ReadMaterial(mat, &materialInfo);
 
 				}
-				// Material Property
-				// TextureIndex
 			}
 			if (scene->HasTextures() == true && setting.Flags & EFBXAssetImportFlags::Import_Texture)
 			{
@@ -223,7 +232,7 @@ namespace JG
 
 		return EAssetImportResult::Success;
 	}
-	void AssetImporter::ReadMesh(const aiMesh* mesh, StaticMeshAssetStock* output)
+	void AssetImporter::ReadMesh(const aiScene* scene, const aiMesh* mesh, StaticMeshAssetStock* output)
 	{
 		if (output == nullptr || mesh == nullptr)
 		{
@@ -231,6 +240,7 @@ namespace JG
 		}
 		List<JGVertex> vertices;
 		List<JGBoneVertex> boneVertices;
+		List<JGBoneOffsetData> boneOffsetDatas;
 		List<u32>   indices;
 		output->SubMeshNames.push_back(mesh->mName.C_Str());
 
@@ -321,11 +331,17 @@ namespace JG
 		{
 			boneVertices.resize(vertices.size());
 
+			SceneHierarchyInfo info;
+			ReadSkeletal(scene, nullptr, &info);
+
+
 			u32 boneCount = mesh->mNumBones;
 			for (u32 i = 0; i < boneCount; ++i)
 			{
 				aiBone* bone = mesh->mBones[i];
+				// Bone 
 
+				// Weight
 				u32 weightCnt = bone->mNumWeights;
 				for (u32 j = 0; j < weightCnt; ++j)
 				{
@@ -337,56 +353,72 @@ namespace JG
 						JGBoneVertex& boneVertex = boneVertices[vertexID];
 						if (boneVertex.BoneWeights[k] == 0.0f)
 						{
-							boneVertex.BoneIDs[k]	  = vertexID;
+							boneVertex.BoneIDs[k]	  = info.NodeIDDic[bone->mName.C_Str()];
 							boneVertex.BoneWeights[k] = vertexWeight;
 							break;
 						}
 					}
 				}
+
+				// Offset
+				JGBoneOffsetData offsetData;
+				offsetData.ID = info.NodeIDDic[bone->mName.C_Str()];
+				offsetData.Offset = ToJMatrix(bone->mOffsetMatrix);
+				boneOffsetDatas.push_back(offsetData);
 			}
+
+
+			output->BoneOffsetDatas.push_back(boneOffsetDatas);
 			output->BoneVertices.push_back(boneVertices);
 		}
-
-
 	}
-	void AssetImporter::ReadSkeletal(const aiScene* scene, const aiMesh* mesh, SkeletalAssetStock* output)
+	void AssetImporter::ReadSkeletal(const aiScene* scene, SkeletalAssetStock* output, SceneHierarchyInfo* info)
 	{
-		output->RootOffset = ToJMatrix(scene->mRootNode->mTransformation.Inverse());
-		Dictionary<String, u32> boneNodeDIc;
-
-		ReadSkeletalNode(mesh, boneNodeDIc, output);
-
-		output->RootBoneNode = -1;
-		ReadSkeletalHierarchy(scene->mRootNode, boneNodeDIc, output);
-
-	}
-	void AssetImporter::ReadSkeletalNode(const aiMesh* mesh, Dictionary<String, u32>& boneNodeDIc,  SkeletalAssetStock* output)
-	{
-		u32 boneCount = mesh->mNumBones;
-		output->BoneNodes.resize(boneCount);
-
-		for (u32 i = 0; i < boneCount; ++i)
+		if (output)
 		{
-			aiBone* bone = mesh->mBones[i];
+			output->RootOffset = ToJMatrix(scene->mRootNode->mTransformation.Inverse());
+			output->RootBoneNode = -1;
+		}
+		for (i32 i = 0; i < scene->mNumMeshes; ++i)
+		{
+			info->MeshNodeSet.insert(scene->mMeshes[i]->mName.C_Str());
+		}
+		for (u32 i = 0; i < scene->mRootNode->mNumChildren; ++i)
+		{
+			ReadSkeletalNodeHierarchy(scene->mRootNode->mChildren[i], info, output);
+		}
+	}
+	void AssetImporter::ReadSkeletalNodeHierarchy(
+		const aiNode* node, SceneHierarchyInfo* info, SkeletalAssetStock* output)
+	{
+		if (node == nullptr)
+		{
+			return;
+		}
+		if (info->MeshNodeSet.find(node->mName.C_Str()) != info->MeshNodeSet.end())
+		{
+			return;
+		}
+		if (info->NodeIDDic.find(node->mName.C_Str()) == info->NodeIDDic.end())
+		{
+			if (output)
+			{
+				SkeletalAssetStock::BoneNode boneNode;
+				boneNode.ID   = info->NodeIDDic.size();
+				boneNode.Name = node->mName.C_Str();
 
 
-			SkeletalAssetStock::BoneNode& boneNode = output->BoneNodes[i];
-			boneNode.ID = i;
-			boneNode.Name = bone->mName.C_Str();
-			boneNode.BoneOffset = ToJMatrix(bone->mOffsetMatrix);
-			boneNodeDIc[boneNode.Name] = i;
+				output->BoneNodes.push_back(boneNode);
+			}
+
+			info->NodeIDDic.emplace(node->mName.C_Str(), info->NodeIDDic.size());
 		}
 
+		u32 boneID = info->NodeIDDic[node->mName.C_Str()];
 
-
-	}
-	void AssetImporter::ReadSkeletalHierarchy(const aiNode* node, const Dictionary<String, u32>& boneNodeDic, SkeletalAssetStock* output)
-	{
-		if (boneNodeDic.find(node->mName.C_Str()) != boneNodeDic.end())
+		if (output)
 		{
-			u32 boneID = boneNodeDic.at(node->mName.C_Str());
 			SkeletalAssetStock::BoneNode& boneNode = output->BoneNodes[boneID];
-
 			if (output->RootBoneNode == -1)
 			{
 				output->RootBoneNode = boneID;
@@ -394,8 +426,8 @@ namespace JG
 			}
 			else
 			{
-				aiNode* parentNode	= node->mParent;
-				u32 parentBoneID	= boneNodeDic.at(parentNode->mName.C_Str());
+				aiNode* parentNode = node->mParent;
+				u32 parentBoneID = info->NodeIDDic[parentNode->mName.C_Str()];
 				SkeletalAssetStock::BoneNode& parentBoneNode = output->BoneNodes[parentBoneID];
 
 				boneNode.ParentNode = parentBoneID;
@@ -403,10 +435,9 @@ namespace JG
 			}
 			boneNode.Transform = ToJMatrix(node->mTransformation);
 		}
-
 		for (u32 i = 0; i < node->mNumChildren; ++i)
 		{
-			ReadSkeletalHierarchy(node->mChildren[i], boneNodeDic, output);
+			ReadSkeletalNodeHierarchy(node->mChildren[i], info, output);
 		}
 	}
 	void AssetImporter::ReadAnimation(const aiAnimation* anim, AnimationClipAssetStock* output)

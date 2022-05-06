@@ -11,6 +11,7 @@ namespace JG
 		SharedPtr<IVertexBuffer>     mVertexBuffer;
 		SharedPtr<IIndexBuffer>      mIndexBuffer;
 		SharedPtr<IStructuredBuffer> mBoneBuffer;
+		Dictionary<u32, JMatrix> mBoneOffsetDic;
 		String mName;
 		u64	   mInstanceCount = 1;
 
@@ -22,10 +23,11 @@ namespace JG
 		virtual void SetVertexBuffer(SharedPtr<IVertexBuffer> vertexBuffer) override;
 		virtual void SetBoneBuffer(SharedPtr<IStructuredBuffer> boneBuffer) override;
 		virtual void SetIndexBuffer(SharedPtr<IIndexBuffer> indexBuffer) override;
+		virtual void SetBoneOffset(const List<JGBoneOffsetData>& boneOffset) override;
 		virtual SharedPtr<IVertexBuffer> GetVertexBuffer() const override;
 		virtual SharedPtr<IStructuredBuffer> GetBoneBuffer() const override;
 		virtual SharedPtr<IIndexBuffer>  GetIndexBuffer() const override;
-
+		virtual bool GetBoneOffset(u32 ID, JMatrix* output) override;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> GetBottomLevelAS() const override ;
 		virtual void SetBottomLevelAS(SharedPtr<IBottomLevelAccelerationStructure> bottomAS) override;
 	public:

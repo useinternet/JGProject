@@ -34,7 +34,7 @@ namespace JG
 			List<SharedPtr<AnimationTransition>> ConnectedNodeTransitions;
 		};
 
-		WeakPtr<AnimationController> mOwnerAnimController;
+		AnimationController* mOwnerAnimController = nullptr;
 
 		Dictionary<String, SharedPtr<Node>> mNodeDic;
 		List<SharedPtr<AnimationSequence>>  mAnimSequenceList;
@@ -46,11 +46,11 @@ namespace JG
 		bool  mIsMakingSequence = false;
 		bool  mIsRunning = false;
 	public:
-		AnimationSequence(SharedPtr<AnimationController> controller);
+		AnimationSequence(AnimationController* controller);
 
 
 		bool IsValid() const;
-		SharedPtr<AnimationController> GetOwnerAnimationController() const;
+		AnimationController* GetOwnerAnimationController() const;
 
 		AnimationSequence& Begin(const String& startNodeName);
 		AnimationSequence& MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
@@ -58,13 +58,13 @@ namespace JG
 		AnimationSequence& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		void End();
 	
-		SharedPtr<AnimationTransform> Execute();
+		List<SharedPtr<AnimationTransform>> Execute();
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);
 		bool IsExistNode(const String& name) const;
 		AnimationSequence::Node* FindNode(const String& name) const;
 
-		SharedPtr<AnimationTransform> ExecuteInternal(Node* node);
+		List<SharedPtr<AnimationTransform>> ExecuteInternal(Node* node);
 
 
 		void Reset();

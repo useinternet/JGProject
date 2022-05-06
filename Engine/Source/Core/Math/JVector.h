@@ -449,7 +449,7 @@ namespace JG
 		inline static JVector3 Lerp(const JVector3& v1, const JVector3& v2, f32 a)
 		{
 			auto sim = DirectX::XMVectorLerp(GetSIMD(v1), GetSIMD(v2), a);
-			return ConvertJVector3(sim).x;
+			return ConvertJVector3(sim);
 		}
 		inline static bool Equals(const JVector3& v1, const JVector3& v2, float error_range = ERROR_RANGE)
 		{
