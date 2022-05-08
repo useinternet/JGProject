@@ -277,6 +277,18 @@ namespace JG
 			}
 		}
 	}
+
+	void AnimationStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+
+	}
+	void AnimationStock::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+
+	}
+
+
+
 	void AnimationClipAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		jsonData->AddMember(NAME_KEY, Name);

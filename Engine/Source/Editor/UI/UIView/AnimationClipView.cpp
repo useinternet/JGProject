@@ -14,11 +14,13 @@
 #include "Animation/AnimationController.h"
 #include "Animation/AnimationSequence.h"
 #include "Animation/AnimationClip.h"
+
 namespace JG
 {
 	AnimationClipView::AnimationClipView()
 	{
 		DisableUniqueView();
+
 	}
 
 	void AnimationClipView::Load()
@@ -108,8 +110,6 @@ namespace JG
 		{
 			mEditorUIScene->OnGUI();
 		}
-		ImGui::Separator();
-		ImGui::Button("TestButton");
 		ImGui::EndChild();
 	}
 	void AnimationClipView::RightOnGUI()
@@ -255,7 +255,7 @@ namespace JG
 		}
 		
 
-
+		
 		mEditorUIScene->SetModel(mModel);
 
 

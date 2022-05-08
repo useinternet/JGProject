@@ -13,6 +13,11 @@ inline bool operator&(enumName c1, enumName c2) \
 { \
 	return (bool)((int)c1 & (int)c2); \
 } \
+inline enumName operator~(enumName flags)\
+{\
+	return (enumName)~((int)flags);\
+}\
+
 
 namespace JG
 {
@@ -105,7 +110,7 @@ namespace JG
 		Comma			= VK_OEM_COMMA,	Minus			= VK_OEM_MINUS,
 		Period			= VK_OEM_PERIOD,Slash			= VK_OEM_2,
 		GraveAccent		= VK_OEM_3,
-
+		Del = VK_DELETE,
 		MouseLeftButton  = VK_LBUTTON,
 		MouseRightButton = VK_RBUTTON,
 		MouseMidButton	 = VK_MBUTTON,
@@ -226,7 +231,7 @@ namespace JG
 		case EKeyCode::MouseLeftButton: return "MouseLeftButton";
 		case EKeyCode::MouseRightButton:return "MouseRightButton";
 		case EKeyCode::MouseMidButton:  return "MouseMidButton";
-			
+		case EKeyCode::Del:				return "Del";
 
 		case EKeyCode::Mouse_X: return "Mouse_X";
 		case EKeyCode::Mouse_Y: return "Mouse_Y";
@@ -351,6 +356,7 @@ namespace JG
 		else if (code == "MouseMidButton") { return EKeyCode::MouseMidButton; }
 		else if (code == "Mouse_X") { return EKeyCode::Mouse_X; }
 		else if (code == "Mouse_Y") { return EKeyCode::Mouse_Y; }
+		else if (code == "Del") { return EKeyCode::Del; }
 		else { return EKeyCode::Unknown; }
 	}
 

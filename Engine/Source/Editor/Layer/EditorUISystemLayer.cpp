@@ -14,6 +14,7 @@
 #include "UI/UIView/MaterialView.h"
 #include "UI/UIView/PrefabView.h"
 #include "UI/UIView/AnimationClipView.h"
+#include "UI/UIView/AnimationView.h"
 
 // PopupUI
 #include "UI/ContextUI/ComponentFinderContextView.h"
@@ -205,6 +206,7 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<MaterialView>();
 		UIManager::GetInstance().RegisterUIView<PrefabView>();
 		UIManager::GetInstance().RegisterUIView<AnimationClipView>();
+		UIManager::GetInstance().RegisterUIView<AnimationView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()

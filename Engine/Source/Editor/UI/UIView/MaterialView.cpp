@@ -8,7 +8,6 @@
 #include "Graphics/GraphicsHelper.h"
 #include "UI/UIManager.h"
 #include "UI/EditorUIScene.h"
-
 namespace JG
 {
 	MaterialView::MaterialView()

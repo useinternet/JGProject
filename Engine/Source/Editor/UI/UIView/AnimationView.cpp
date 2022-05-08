@@ -8,35 +8,45 @@
 #include "Graphics/GraphicsHelper.h"
 #include "UI/UIManager.h"
 #include "UI/EditorUIScene.h"
-
+#include "UI/NodeGUI.h"
+#include "UI/UIManager.h";
 
 namespace JG
 {
 	AnimationView::AnimationView()
 	{
+		DisableUniqueView();
+
 	}
 
 	void AnimationView::Load()
 	{
-
-
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
+		{
+			CreateAnimationClipNode();
+			JG_LOG_INFO("Create Node");
+		}, nullptr);
 	}
 
 	void AnimationView::Initialize()
 	{
+		mNodeEditor = CreateUniquePtr<NodeGUI::NodeEditor>();
+		mNodeEditor->BindContextMenuFunc([&]()
+		{
+			if (UIManager::GetInstance().ShowContextMenu(GetType(), false) == true)
+			{
+
+			}
+		});
+		CreateRootNode();
 	}
 
 	void AnimationView::OnGUI()
 	{
+		mNodeEditor->OnGUI();
+
 	}
 
-	void AnimationView::PreOnGUI()
-	{
-	}
-
-	void AnimationView::LateOnGUI()
-	{
-	}
 
 	void AnimationView::Destroy()
 	{
@@ -46,50 +56,31 @@ namespace JG
 	{
 	}
 
+	void AnimationView::CreateRootNode()
+	{
+		NodeGUI::NodeBuilder nodeBuilder;
+		nodeBuilder.SetInitLocation(JVector2(250, 100));
+		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkOutPin);
+		nodeBuilder.SetHeader("Root");
+		mNodeEditor->CreateNode(nodeBuilder);
+
+	}
+
+	void AnimationView::CreateAnimationClipNode()
+	{
+		ImVec2 mousePos = ImGui::GetMousePos();
+		JVector2 winPos   = mNodeEditor->GetWindowPos();
+		NodeGUI::NodeBuilder nodeBuilder;
+		
+		nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y));
+		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkPin);
+		nodeBuilder.SetHeader("AnimationClip");
+		mNodeEditor->CreateNode(nodeBuilder);
+	}
+
 	void AnimationView::UpdateScene()
 	{
-		const JVector3 targetVec(0, 0, -1);
-		const JVector3 upVec(0, 1, 0);
-		const JVector3 eyePos(0, 0, -200.0f);
-		const f32 farZ  = 1000000.0f;
-		const f32 nearZ = 1.0f;
 
-		//if (mSkyBox == nullptr)
-		//{
-		//	mSkyBox = GraphicsHelper::CreateSkyBox(eyePos, farZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
-		//}
-		//if (mModel == nullptr)
-		//{
-		//	mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
-		//	if (mMaterialAsset != nullptr && mMaterialAsset->IsValid())
-		//	{
-		//		mModel->MaterialList.resize(1);
-		//		mModel->MaterialList[0] = mMaterialAsset->Get();
-		//	}
-		//}
-		//if (mModel->Mesh == nullptr)
-		//{
-		//	String enginePath = Application::GetEnginePath();
-		//	auto   meshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
-		//	if (meshAsset != nullptr && meshAsset->IsValid())
-		//	{
-		//		mModel->Mesh = meshAsset->Get();
-		//	}
-		//}
-		//if (mEditorUIScene == nullptr)
-		//{
-		//	EditorUISceneConfig config;
-		//	config.Resolution = mResolution;
-		//	config.ImageSize = mImageSize;
-		//	config.OffsetScale = JVector3(1.5f, 1.5f, 1.5f);
-		//	config.Model = mModel;
-		//	config.SkyBox = mSkyBox;
-		//	config.FarZ = farZ;
-		//	config.NearZ = nearZ;
-		//	config.EyePos = eyePos;
-
-		//	mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
-		//}
 	}
 
 }

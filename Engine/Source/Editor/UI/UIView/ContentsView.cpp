@@ -18,6 +18,7 @@
 #include "UI/UIView/MaterialView.h"
 #include "UI/UIView/PrefabView.h"
 #include "UI/UIView/AnimationClipView.h"
+#include "UI/UIView/AnimationView.h"
 #include "UI/UIManager.h"
 namespace JG
 {
@@ -42,6 +43,11 @@ namespace JG
 			CreateSurfaceMaterial(GetTargetDirectory());
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Material/Lighting", 0, [&]() {}, nullptr);
+
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Animiation/Animiation", 0, [&]() {
+			CreateAnimation(GetTargetDirectory());
+		}, nullptr);
+
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "CopyToPath", 20, [&]() {
 			CopyToPath();
@@ -832,6 +838,7 @@ namespace JG
 		}
 			break;
 		case EAssetFormat::AnimationClip:
+		{
 			u64 pathHash = std::hash<String>()(path);
 			AnimationClipView* animClipView = UIManager::GetInstance().GetUIView<AnimationClipView>(pathHash);
 			if (animClipView != nullptr)
@@ -840,6 +847,19 @@ namespace JG
 				animClipView->Open();
 			}
 			break;
+		}
+
+		case EAssetFormat::Animation:
+		{
+			u64 pathHash = std::hash<String>()(path);
+			AnimationView* animView = UIManager::GetInstance().GetUIView<AnimationView>(pathHash);
+			if (animView != nullptr)
+			{
+				animView->Open();
+			}
+			break;
+		}
+
 		}
 
 
@@ -1140,6 +1160,16 @@ namespace JG
 
 		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
 		AssetDataBase::GetInstance().WriteAsset(path, EAssetFormat::Material, json);
+	}
+
+	void ContentsView::CreateAnimation(const String& targetDir)
+	{
+		auto path = PathHelper::CombinePath(targetDir, std::string("NewAnimation") + JG_ASSET_FORMAT);
+		path = PathHelper::GetUniqueFileName(path);
+
+
+		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
+		AssetHelper::WriteAsset(EAssetFormat::Animation, path, nullptr);
 	}
 
 	void ContentsView::Rename(const String& path, const String& name)

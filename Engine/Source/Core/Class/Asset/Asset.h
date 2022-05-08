@@ -298,6 +298,21 @@ namespace JG
 			return EAssetFormat::Skeletal;
 		}
 	};
+
+	class AnimationStock : public IAssetStock
+	{
+	public:
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	public:
+		virtual ~AnimationStock() = default;
+	public:
+		virtual EAssetFormat GetAssetFormat() const override {
+			return EAssetFormat::Animation;
+		}
+
+	};
+
 	class AnimationClipAssetStock : public IAssetStock
 	{
 		static const constexpr char* NAME_KEY	  = "Name";

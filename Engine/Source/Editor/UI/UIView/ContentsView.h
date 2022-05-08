@@ -145,7 +145,7 @@ namespace JG
 		void CreateFolder(const String& targetDir);
 		void CreateGameWorld(const String& targetDir);
 		void CreateSurfaceMaterial(const String& targetDir);
-
+		void CreateAnimation(const String& targetDir);
 		void Rename(const String& path, const String& name);
 		void CopyToPath();
 		void Copy();

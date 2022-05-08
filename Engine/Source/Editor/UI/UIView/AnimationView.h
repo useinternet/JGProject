@@ -11,6 +11,10 @@ namespace JG
 		class StaticRenderObject;
 		class SkeletalRenderObject;
 	}
+	namespace NodeGUI
+	{
+		class NodeEditor;
+	}
 	class EditorUIScene;
 
 	class AnimationView : public UIView
@@ -21,9 +25,8 @@ namespace JG
 		SharedPtr<Graphics::SkeletalRenderObject> mModel;
 
 		UniquePtr<EditorUIScene> mEditorUIScene;
-
+		UniquePtr<NodeGUI::NodeEditor> mNodeEditor;
 		StorableString mModelAssetPath;
-		//StorableString mModelAssetPath;
 	public:
 		AnimationView();
 		virtual ~AnimationView() = default;
@@ -31,13 +34,14 @@ namespace JG
 		virtual void Load() override;
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
-		virtual void PreOnGUI() override;
-		virtual void LateOnGUI() override;
 		virtual void Destroy() override;
 		virtual void OnEvent(IEvent& e) override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override { }
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override { }
 	private:
+		void CreateRootNode();
+		void CreateAnimationClipNode();
+
 		void UpdateScene();
 	};
 }
