@@ -60,7 +60,7 @@ namespace JG
 	{
 		NodeGUI::NodeBuilder nodeBuilder;
 		nodeBuilder.SetInitLocation(JVector2(250, 100));
-		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkOutPin);
+		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkOutPin | NodeGUI::ENodeFlags::No_Remove | NodeGUI::ENodeFlags::No_ReName);
 		nodeBuilder.SetHeader("Root");
 		mNodeEditor->CreateNode(nodeBuilder);
 
@@ -68,12 +68,15 @@ namespace JG
 
 	void AnimationView::CreateAnimationClipNode()
 	{
+		JVector2 offset = mNodeEditor->GetOffset();
 		ImVec2 mousePos = ImGui::GetMousePos();
 		JVector2 winPos   = mNodeEditor->GetWindowPos();
 		NodeGUI::NodeBuilder nodeBuilder;
 		
-		nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y));
-		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkPin);
+		nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
+		nodeBuilder.SetNodeFlags(
+			NodeGUI::ENodeFlags::LinkPin | 
+			NodeGUI::ENodeFlags::MultipleOutLinkable);
 		nodeBuilder.SetHeader("AnimationClip");
 		mNodeEditor->CreateNode(nodeBuilder);
 	}
