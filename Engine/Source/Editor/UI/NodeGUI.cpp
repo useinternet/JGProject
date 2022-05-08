@@ -382,7 +382,7 @@ namespace JG
 			mNode.mFlags = flags;
 		}
 
-		void NodeBuilder::SetContextMenuFunc(const std::function<void()>& createFunc, const std::function<void()>& showFunc)
+		void NodeBuilder::SetContextMenuFunc(const std::function<void(Node*)>& createFunc, const std::function<void(Node*)>& showFunc)
 		{
 			mNode.mCreateContextMenuFunc = createFunc;
 			mNode.mShowContextMenuFunc = showFunc;
