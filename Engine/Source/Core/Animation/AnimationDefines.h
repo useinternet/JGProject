@@ -9,10 +9,35 @@ namespace JG
 		Bool,
 		Float,
 		Int,
-		Vector2,
-		Vector3,
-		Vector4
+		Count,
 	};
+
+	inline String AnimationParameterTypeToString(EAnimationParameterType type)
+	{
+		switch (type)
+		{
+		case EAnimationParameterType::Bool: return "Bool";
+		case EAnimationParameterType::Float: return "Float";
+		case EAnimationParameterType::Int: return "Int";
+		default:
+			return "Unknown";
+		}
+	}
+
+	inline EAnimationParameterType StringToAnimationParameterType(const String& name)
+	{
+		if (name == "Bool")			return EAnimationParameterType::Bool;
+		else if (name == "Float")   return EAnimationParameterType::Float;
+		else if (name == "Int")     return EAnimationParameterType::Int;
+		else return EAnimationParameterType::Unknown;
+	}
+
+
+
+
+
+
+
 
 	enum class EAnimationCondition
 	{

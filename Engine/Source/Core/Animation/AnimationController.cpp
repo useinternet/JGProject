@@ -2,7 +2,7 @@
 #include "AnimationController.h"
 #include "JGAnimation.h"
 #include "AnimationParameters.h"
-#include "AnimationSequence.h"
+#include "AnimationStateMachine.h"
 #include "AnimationTransform.h"
 #include "AnimationClip.h"
 #include "Class/Asset/Asset.h"
@@ -104,15 +104,15 @@ namespace JG
 		return mAnimParams;
 	}
 
-	SharedPtr<AnimationSequence> AnimationController::GetRootAnimationSequence() const
+	SharedPtr<AnimationStateMachine> AnimationController::GetAnimationStateMachine() const
 	{
-		return mRootSequence;
+		return mAnimationStateMachine;
 	}
 
 	void AnimationController::Init()
 	{
 		mAnimParams   = CreateSharedPtr<AnimationParameters>();
-		mRootSequence = CreateSharedPtr<AnimationSequence>(this);
+		mAnimationStateMachine = CreateSharedPtr<AnimationStateMachine>(this);
 	}
 
 	void AnimationController::Update()
@@ -157,7 +157,7 @@ namespace JG
 		{
 			return;
 		}
-		List<SharedPtr<AnimationTransform>> animTransforms = mRootSequence->Execute();
+		List<SharedPtr<AnimationTransform>> animTransforms = mAnimationStateMachine->Execute();
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
 		{
 			SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();

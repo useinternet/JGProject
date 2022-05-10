@@ -12,7 +12,7 @@
 
 #include "Animation/JGAnimation.h"
 #include "Animation/AnimationController.h"
-#include "Animation/AnimationSequence.h"
+#include "Animation/AnimationStateMachine.h"
 #include "Animation/AnimationClip.h"
 
 namespace JG
@@ -268,7 +268,7 @@ namespace JG
 				JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
 
 				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
-				mAnimController->GetRootAnimationSequence()->
+				mAnimController->GetAnimationStateMachine()->
 					 Begin("Start")
 					.MakeAnimationClipNode(CLIP_NAME, nullptr)
 					.ConnectNode("Start", CLIP_NAME, nullptr)

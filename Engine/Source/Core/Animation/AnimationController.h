@@ -6,7 +6,7 @@ namespace JG
 {
 	class AnimationClip;
 	class AnimationClipInfo;
-	class AnimationSequence;
+	class AnimationStateMachine;
 	class AnimationTransition;
 	class AnimationParameters;
 	class AnimationTransform;
@@ -25,7 +25,7 @@ namespace JG
 
 
 		// 클립 이 추가되면 AnimationClipInfo 생성
-		SharedPtr<AnimationSequence>   mRootSequence;
+		SharedPtr<AnimationStateMachine>   mAnimationStateMachine;
 		SharedPtr<AnimationParameters> mAnimParams;
 		SharedPtr<Skeletone> mSkeletone;
 		SharedPtr<IMesh> mSkinnedMesh;
@@ -63,7 +63,7 @@ namespace JG
 		SharedPtr<IMesh>			   GetBindedMesh() const;
 		SharedPtr<IMesh>			   GetBindedOriginMesh() const;
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
-		SharedPtr<AnimationSequence>   GetRootAnimationSequence() const;
+		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine() const;
 	private:
 		void Init();
 		void Update();

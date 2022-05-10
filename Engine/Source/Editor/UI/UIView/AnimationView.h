@@ -2,7 +2,7 @@
 #include "JGCore.h"
 #include "UI/UIView.h"
 #include "Class/Asset/Asset.h"
-
+#include "Animation/AnimationDefines.h"
 namespace JG
 {
 	namespace Graphics
@@ -20,10 +20,16 @@ namespace JG
 		class StateNodeEditor;
 	}
 	class EditorUIScene;
-
+	
 	class AnimationView : public UIView
 	{
 		JGCLASS
+	private:
+		struct AnimParamData {
+			
+			String Name;
+			EAnimationParameterType Type;
+		};
 	private:
 		SharedPtr<Graphics::StaticRenderObject>   mSkyBox;
 		SharedPtr<Graphics::SkeletalRenderObject> mModel;

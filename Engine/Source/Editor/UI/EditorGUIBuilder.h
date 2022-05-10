@@ -70,7 +70,6 @@ namespace JG
 	public:
 		void SetID(u64 id);
 		void Label(const String& text);
-
 		//
 		void Execute();
 	};

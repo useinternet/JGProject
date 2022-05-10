@@ -49,11 +49,12 @@ namespace JG
 
 			void DrawTransition(
 				StateNodeEditor* editor,
-				ImDrawList* draw_list, 
-				bool islinkingLine, 
+				ImDrawList* draw_list,
 				const JVector2& from, const JVector2& to, 
 				u32 lineColor, u32 rectColor, u32 outlineColor,
-				JRect* outTransitionNodeRect = nullptr)
+				JRect* outTransitionNodeRect,
+				bool islinkingLine, 
+				bool isFromNodeIsRootNode)
 			{
 				StateNodeTransition::StateNodeTransitionStyle& style = editor->GetNodeTransitionStyle();
 				StateNode::StateNodeStyle& nodeStyle = editor->GetNodeStyle();
@@ -63,7 +64,7 @@ namespace JG
 				JVector2 rectHalfSize = style.NodeRectSize * 0.5f;
 				f32 dist = JVector2::Length(to - from);
 
-				if (islinkingLine == false && dist <= (nodeStyle.NodeRectSize.y + nodeStyle.PinArea) * 2)
+				if (islinkingLine == false && dist <= nodeStyle.NodeRectSize.y  * 2)
 				{
 					return;
 				}
@@ -132,7 +133,7 @@ namespace JG
 
 				draw_list->AddLine(ToImVec2(start), ToImVec2(end - (dir* halfArrowSize)), lineColor, style.LineThick);
 
-				if (islinkingLine == false)
+				if (islinkingLine == false && isFromNodeIsRootNode == false)
 				{
 					draw_list->AddRectFilled(ToImVec2(rectMin), ToImVec2(rectMax), rectColor, style.NodeRectRounding, ImDrawFlags_RoundCornersAll);
 
@@ -253,14 +254,14 @@ namespace JG
 				drawer.DrawTransition(
 					mNodeEditor,
 					ImGui::GetWindowDrawList(),
-					false,
 					from->GetLocation(),
 					to->GetLocation(),
 					GetColor(ColorStyle_LineColor),
 					GetColor(ColorStyle_NodeBody),
 					dataStorage.GetSelectedNode() == GetID() ? 
 						GetColor(ColorStyle_HightlightOutline) : 
-						GetColor(ColorStyle_NormalOutline), &transitionNodeRect);
+						GetColor(ColorStyle_NormalOutline), 
+					&transitionNodeRect, false, from->GetFlags() & EStateNodeFlags::RootNode);
 				if (transitionNodeRect.Width() > 0 && transitionNodeRect.Height() > 0)
 				{
 					JVector2 cursorPos = mNodeEditor->GetOffset() + JVector2(transitionNodeRect.left, transitionNodeRect.top);
@@ -279,12 +280,12 @@ namespace JG
 				drawer.DrawTransition(
 					mNodeEditor,
 					ImGui::GetWindowDrawList(),
-					true,
 					from->GetLocation(),
 					localMousePos,
 					GetColor(ColorStyle_LineColor),
 					GetColor(ColorStyle_NodeBody),
-					GetColor(ColorStyle_NormalOutline));
+					GetColor(ColorStyle_NormalOutline), 
+					nullptr, true, from->GetFlags() & EStateNodeFlags::RootNode);
 			}
 		}
 		u32 StateNodeTransition::GetColor(EColorStyle style)
@@ -491,10 +492,13 @@ namespace JG
 				mDataStorage->SetLinkingNode(0);
 				return;
 			}
-			if (from->mFlags & EStateNodeFlags::RootNode && from->mOutLinkedNodeIDs.empty() == false)
+			if (from->mFlags & EStateNodeFlags::RootNode)
 			{
-				mDataStorage->SetLinkingNode(0);
-				return;
+				HashSet<StateNodeID> outlinkedNodeIDs = from->mOutLinkedNodeIDs;
+				for (StateNodeID id : outlinkedNodeIDs)
+				{
+					UnLink(from->GetID(), id);
+				}
 			}
 
 			from->mOutLinkedNodeIDs.insert(toID);
@@ -503,6 +507,7 @@ namespace JG
 
 			// Transition »ý¼º
 			from->mOutLinkedTransitionDic[toID] = CreateTransition(fromID, toID);
+			
 		}
 		void StateNodeEditor::UnLink(StateNodeID fromID, StateNodeID toID)
 		{

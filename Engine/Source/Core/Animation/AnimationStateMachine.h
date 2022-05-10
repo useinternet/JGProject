@@ -7,22 +7,21 @@ namespace JG
 	class AnimationTransition;
 	class AnimationTransform;
 	class AnimationClipInfo;
-	class AnimationSequence;
+	class AnimationStateMachine;
 
 
 	template<class T>
 	using MakeAnimationAction = std::function<void(T* )>;
 
-	using MakeAnimationSequenceAction = MakeAnimationAction<AnimationSequence>;
+	using MakeAnimationSequenceAction = MakeAnimationAction<AnimationStateMachine>;
 	using MakeAnimationClipAction	  = MakeAnimationAction<AnimationClipInfo>;
 	using MakeTransitionAction		  = MakeAnimationAction<AnimationTransition>;
-	class AnimationSequence
+	class AnimationStateMachine
 	{
 		enum class ENodeType
 		{
 			Begin,
 			AnimationClip,
-			AnimationSequence,
 		};
 		struct Node
 		{
@@ -37,7 +36,6 @@ namespace JG
 		AnimationController* mOwnerAnimController = nullptr;
 
 		Dictionary<String, SharedPtr<Node>> mNodeDic;
-		List<SharedPtr<AnimationSequence>>  mAnimSequenceList;
 		List<String> mAnimClipNameList;
 
 		String mBeginNodeName;
@@ -46,23 +44,22 @@ namespace JG
 		bool  mIsMakingSequence = false;
 		bool  mIsRunning = false;
 	public:
-		AnimationSequence(AnimationController* controller);
+		AnimationStateMachine(AnimationController* controller);
 
 
 		bool IsValid() const;
 		AnimationController* GetOwnerAnimationController() const;
 
-		AnimationSequence& Begin(const String& startNodeName);
-		AnimationSequence& MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction);
-		AnimationSequence& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
-		AnimationSequence& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
+		AnimationStateMachine& Begin(const String& startNodeName);
+		AnimationStateMachine& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
+		AnimationStateMachine& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		void End();
 	
 		List<SharedPtr<AnimationTransform>> Execute();
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);
 		bool IsExistNode(const String& name) const;
-		AnimationSequence::Node* FindNode(const String& name) const;
+		AnimationStateMachine::Node* FindNode(const String& name) const;
 
 		List<SharedPtr<AnimationTransform>> ExecuteInternal(Node* node);
 

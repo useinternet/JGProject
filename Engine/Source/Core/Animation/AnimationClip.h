@@ -13,7 +13,7 @@ namespace JG
 	class AnimationClipInfo
 	{
 		friend class AnimationClip;
-		friend class AnimationSequence;
+		friend class AnimationStateMachine;
 		friend class AnimationController;
 	private:
 		String Name;

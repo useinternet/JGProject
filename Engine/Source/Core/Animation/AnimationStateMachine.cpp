@@ -1,27 +1,27 @@
 #include "pch.h"
-#include "AnimationSequence.h"
+#include "AnimationStateMachine.h"
 #include "AnimationController.h"
 #include "AnimationTransform.h"
 #include "AnimationTransition.h"
 #include "AnimationClip.h"
 namespace JG
 {
-	AnimationSequence::AnimationSequence(AnimationController* controller)
+	AnimationStateMachine::AnimationStateMachine(AnimationController* controller)
 	{
 		mOwnerAnimController = controller;
 	}
 
-	bool AnimationSequence::IsValid() const
+	bool AnimationStateMachine::IsValid() const
 	{
 		return mOwnerAnimController != nullptr;
 	}
 
-	AnimationController* AnimationSequence::GetOwnerAnimationController() const
+	AnimationController* AnimationStateMachine::GetOwnerAnimationController() const
 	{
 		return mOwnerAnimController;
 	}
 
-	AnimationSequence& AnimationSequence::Begin(const String& startNodeName)
+	AnimationStateMachine& AnimationStateMachine::Begin(const String& startNodeName)
 	{
 		if (mIsRunning) *this;
 		Reset();
@@ -34,29 +34,8 @@ namespace JG
 		return *this;
 	}
 
-	AnimationSequence& AnimationSequence::MakeSequenceNode(const String& name, const MakeAnimationSequenceAction& makeAction)
-	{
-		if (mIsRunning) *this;
-		if (mIsMakingSequence == false)
-		{
-			return *this;
-		}
-		if (CreateNode(ENodeType::AnimationSequence, name) == false)
-		{
-			return *this;
-		}
 
-		const Node* node = FindNode(name);
-		AnimationSequence* pAnimSequence = mAnimSequenceList[node->ID].get();
-		if (makeAction != nullptr)
-		{
-			makeAction(pAnimSequence);
-		}
-
-		return *this;
-	}
-
-	AnimationSequence& AnimationSequence::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
+	AnimationStateMachine& AnimationStateMachine::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
 	{
 		if (mIsRunning) *this;
 		if (mIsMakingSequence == false)
@@ -77,7 +56,7 @@ namespace JG
 		return *this;
 	}
 
-	AnimationSequence& AnimationSequence::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
+	AnimationStateMachine& AnimationStateMachine::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
 		if (mIsRunning) *this;
 		if (mIsMakingSequence == false)
@@ -115,13 +94,13 @@ namespace JG
 	}
 
 
-	void AnimationSequence::End()
+	void AnimationStateMachine::End()
 	{
 		if (mIsRunning) return;
 		mIsMakingSequence = false;
 	}
 
-	List<SharedPtr<AnimationTransform>> AnimationSequence::Execute()
+	List<SharedPtr<AnimationTransform>> AnimationStateMachine::Execute()
 	{
 		if (mCurrentNode == nullptr)
 		{
@@ -134,7 +113,7 @@ namespace JG
 		mIsRunning = true;
 		return ExecuteInternal(mCurrentNode);
 	}
-	bool AnimationSequence::CreateNode(ENodeType nodeType, const String& name)
+	bool AnimationStateMachine::CreateNode(ENodeType nodeType, const String& name)
 	{
 		if (mNodeDic.find(name) != mNodeDic.end())
 		{
@@ -148,12 +127,6 @@ namespace JG
 		newNode.NodeType = nodeType;
 		switch (nodeType)
 		{
-		case ENodeType::AnimationSequence:
-		{
-			newNode.ID = mAnimSequenceList.size();
-			mAnimSequenceList.push_back(CreateUniquePtr<AnimationSequence>(GetOwnerAnimationController()));
-		}
-			break;
 		case ENodeType::AnimationClip:
 		{
 			newNode.ID = mAnimClipNameList.size();
@@ -164,11 +137,11 @@ namespace JG
 
 		return true;
 	}
-	bool AnimationSequence::IsExistNode(const String& name) const
+	bool AnimationStateMachine::IsExistNode(const String& name) const
 	{
 		return mNodeDic.find(name) != mNodeDic.end();
 	}
-	AnimationSequence::Node* AnimationSequence::FindNode(const String& name) const
+	AnimationStateMachine::Node* AnimationStateMachine::FindNode(const String& name) const
 	{
 		if (IsExistNode(name) == false)
 		{
@@ -176,7 +149,7 @@ namespace JG
 		}
 		return mNodeDic.at(name).get();
 	}
-	List<SharedPtr<AnimationTransform>> AnimationSequence::ExecuteInternal(Node* node)
+	List<SharedPtr<AnimationTransform>> AnimationStateMachine::ExecuteInternal(Node* node)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
 		if (animController == nullptr)
@@ -199,12 +172,6 @@ namespace JG
 		{
 			switch (node->NodeType)
 			{
-			case ENodeType::AnimationSequence:
-			{
-				AnimationSequence* sequence = mAnimSequenceList[node->ID].get();
-				result = sequence->Execute();
-			}
-			break;
 			case ENodeType::AnimationClip:
 				String name = mAnimClipNameList[node->ID];
 				SharedPtr<AnimationClip>	 animClip = animController->FindAnimationClip(name);
@@ -231,18 +198,6 @@ namespace JG
 					result.clear();
 				break;
 				}
-
-				// clipState 에 따른 대처 고민 해보자
-				// Clip이면 애니메이션이 모두 완료될때까지 Clip에서 실행
-				// Clip이 완료되면 Transition 검사 이후 
-				// 트랜지션이  false 애니메이션 다시 시작 머물러서
-
-				// clipState 에 따른 대처 고민 해보자
-				// Clip이면 애니메이션이 모두 완료될때까지 Clip에서 실행
-				// Clip이 완료되면 Transition 검사 이후 
-				// 트랜지션이  false 애니메이션 다시 시작 머물러서
-				// 트랜지션 true면 다음 시퀸스나 클립 노드로 이동
-				break;
 			}
 		}
 		
@@ -250,10 +205,9 @@ namespace JG
 
 		return result;
 	}
-	void AnimationSequence::Reset()
+	void AnimationStateMachine::Reset()
 	{
 		mNodeDic.clear();
-		mAnimSequenceList.clear();
 		mAnimClipNameList.clear();
 		mBeginNodeName.clear();
 		mCurrentNode = nullptr;

@@ -30,7 +30,7 @@ namespace JG
 			struct StateNodeTransitionStyle
 			{
 				// 
-				JVector2 NodeRectSize = JVector2(40.0f, 40.0f);
+				JVector2 NodeRectSize = JVector2(30, 30);
 				f32 NodeRectRounding = 3.0f;
 				f32 NodeOutlineThick = 3.0f;
 				f32 LineThick = 3.0f;
@@ -79,10 +79,10 @@ namespace JG
 		public:
 			struct StateNodeStyle
 			{
-				JVector2 NodeRectSize = JVector2(160, 80.0f);
+				JVector2 NodeRectSize = JVector2(140, 70);
 				f32 NodeRectRounding = 10.0f;
 				f32 NodeOutlineThick = 3.0f;
-				f32 PinArea = 35.0f;
+				f32 PinArea = 30.0f;
 			};
 		private:
 			enum EColorStyle
@@ -128,6 +128,9 @@ namespace JG
 			}
 			const JVector2& GetLocation() const {
 				return mLocation;
+			}
+			EStateNodeFlags GetFlags() const {
+				return mFlags;
 			}
 		private:
 			void OnGUI();
