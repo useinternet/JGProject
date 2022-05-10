@@ -15,6 +15,10 @@ namespace JG
 	{
 		class NodeEditor;
 	}
+	namespace StateNodeGUI
+	{
+		class StateNodeEditor;
+	}
 	class EditorUIScene;
 
 	class AnimationView : public UIView
@@ -25,7 +29,7 @@ namespace JG
 		SharedPtr<Graphics::SkeletalRenderObject> mModel;
 
 		UniquePtr<EditorUIScene> mEditorUIScene;
-		UniquePtr<NodeGUI::NodeEditor> mNodeEditor;
+		UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
 		StorableString mModelAssetPath;
 	public:
 		AnimationView();

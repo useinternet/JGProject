@@ -30,7 +30,7 @@ namespace JG
 
 	void AnimationView::Initialize()
 	{
-		mNodeEditor = CreateUniquePtr<NodeGUI::NodeEditor>();
+		mNodeEditor = CreateUniquePtr<StateNodeGUI::StateNodeEditor>();
 		mNodeEditor->BindContextMenuFunc([&]()
 		{
 			if (UIManager::GetInstance().ShowContextMenu(GetType(), false) == true)
@@ -58,26 +58,24 @@ namespace JG
 
 	void AnimationView::CreateRootNode()
 	{
-		NodeGUI::NodeBuilder nodeBuilder;
+		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		nodeBuilder.SetInitLocation(JVector2(250, 100));
-		nodeBuilder.SetNodeFlags(NodeGUI::ENodeFlags::LinkOutPin | NodeGUI::ENodeFlags::No_Remove | NodeGUI::ENodeFlags::No_ReName);
-		nodeBuilder.SetHeader("Root");
+		nodeBuilder.SetName("Root");
+		nodeBuilder.SetNodeFlags(
+			StateNodeGUI::EStateNodeFlags::No_Remove | 
+			StateNodeGUI::EStateNodeFlags::No_ReName | 
+			StateNodeGUI::EStateNodeFlags::RootNode);
 		mNodeEditor->CreateNode(nodeBuilder);
-
 	}
 
 	void AnimationView::CreateAnimationClipNode()
 	{
 		JVector2 offset = mNodeEditor->GetOffset();
 		ImVec2 mousePos = ImGui::GetMousePos();
-		JVector2 winPos   = mNodeEditor->GetWindowPos();
-		NodeGUI::NodeBuilder nodeBuilder;
-		
+		JVector2 winPos = mNodeEditor->GetWindowPos();
+		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
-		nodeBuilder.SetNodeFlags(
-			NodeGUI::ENodeFlags::LinkPin | 
-			NodeGUI::ENodeFlags::MultipleOutLinkable);
-		nodeBuilder.SetHeader("AnimationClip");
+		nodeBuilder.SetName("AnimationClip");
 		mNodeEditor->CreateNode(nodeBuilder);
 	}
 
