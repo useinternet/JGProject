@@ -1,3 +1,6 @@
+#include "AnimationParameters.h"
+#include "AnimationParameters.h"
+#include "AnimationParameters.h"
 #include "pch.h"
 #include "AnimationParameters.h"
 
@@ -33,6 +36,7 @@ namespace JG
 	{
 		return GetData(EAnimationParameterType::Float, name, out_value);
 	}
+
 
 	SharedPtr<AnimationParameters> AnimationParameters::Copy() const
 	{
@@ -92,7 +96,7 @@ namespace JG
 		memcpy(out_data, paramData.Data.data(), dataSize);
 
 
-		return false;
+		return true;
 	}
 
 	u64 AnimationParameters::GetTypeDataSize(EAnimationParameterType type)

@@ -73,7 +73,7 @@ namespace JG
 		if (GetOwnerAnimationController() != nullptr)
 		{
 			transitionData.AnimationController = GetOwnerAnimationController();
-			transitionData.AnimationParameters = GetOwnerAnimationController()->GetAnimationParameters().get();
+			transitionData.AnimationParameters = GetOwnerAnimationController()->GetAnimationParameters_Thread().get();
 		}
 		transitionData.PrevNodeName = prevName;
 		transitionData.NextNodeName = nextName;
@@ -208,6 +208,7 @@ namespace JG
 	void AnimationStateMachine::Reset()
 	{
 		mNodeDic.clear();
+
 		mAnimClipNameList.clear();
 		mBeginNodeName.clear();
 		mCurrentNode = nullptr;

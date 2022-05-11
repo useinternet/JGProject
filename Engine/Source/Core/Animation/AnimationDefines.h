@@ -32,13 +32,6 @@ namespace JG
 		else return EAnimationParameterType::Unknown;
 	}
 
-
-
-
-
-
-
-
 	enum class EAnimationCondition
 	{
 		Equal,
@@ -47,7 +40,35 @@ namespace JG
 		EqualLess,
 		Over,
 		Less,
+		Count,
 	};
+
+	inline String AnimationConditionTypeToString(EAnimationCondition type)
+	{
+		switch (type)
+		{
+		case EAnimationCondition::Equal:     return "Equal";
+		case EAnimationCondition::NotEqual:  return "NotEqual";
+		case EAnimationCondition::EqualOver: return "EqualOver";
+		case EAnimationCondition::EqualLess: return "EqualLess";
+		case EAnimationCondition::Over:      return "Over";
+		case EAnimationCondition::Less:      return "Less";
+		default:
+			return "Unknown";
+		}
+	}
+
+	inline EAnimationCondition StringToAnimationConditionType(const String& name)
+	{
+		if (name == "Equal")			return EAnimationCondition::Equal;
+		else if (name == "NotEqual")   return EAnimationCondition::NotEqual;
+		else if (name == "EqualOver")     return EAnimationCondition::EqualOver;
+		if (name == "EqualLess")			return EAnimationCondition::EqualLess;
+		else if (name == "Over")   return EAnimationCondition::Over;
+		else if (name == "Less")     return EAnimationCondition::Less;
+		else return EAnimationCondition::Equal;
+	}
+
 
 	ENUM_FLAG(EAnimationTransitionFlags)
 	enum class EAnimationTransitionFlags

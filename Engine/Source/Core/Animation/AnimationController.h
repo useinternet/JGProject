@@ -27,6 +27,7 @@ namespace JG
 		// 클립 이 추가되면 AnimationClipInfo 생성
 		SharedPtr<AnimationStateMachine>   mAnimationStateMachine;
 		SharedPtr<AnimationParameters> mAnimParams;
+		SharedPtr<AnimationParameters> mAnimParams_Thread;
 		SharedPtr<Skeletone> mSkeletone;
 		SharedPtr<IMesh> mSkinnedMesh;
 		SharedPtr<IMesh> mOriginMesh;
@@ -63,6 +64,7 @@ namespace JG
 		SharedPtr<IMesh>			   GetBindedMesh() const;
 		SharedPtr<IMesh>			   GetBindedOriginMesh() const;
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
+		SharedPtr<AnimationParameters> GetAnimationParameters_Thread()   const;
 		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine() const;
 	private:
 		void Init();

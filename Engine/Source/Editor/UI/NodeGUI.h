@@ -123,6 +123,9 @@ namespace JG
 		public:
 			StateNode();
 
+			const String& GetName() const {
+				return mName;
+			}
 			StateNodeID GetID() const {
 				return mID;
 			}
@@ -132,6 +135,7 @@ namespace JG
 			EStateNodeFlags GetFlags() const {
 				return mFlags;
 			}
+			List<StateNodeID> GetTransitionList() const;
 		private:
 			void OnGUI();
 			void AddFlags(EStateNodeFlags flags);
@@ -156,22 +160,30 @@ namespace JG
 
 		class StateNodeEditor
 		{
+			friend class StateNodeEditorDataStorage;
+
 			u64 mIDOffset = 0;
 			StateNodeTransition::StateNodeTransitionStyle mNodeTransitionStyle;
 			StateNode::StateNodeStyle mNodeStyle;
 			Dictionary<StateNodeID, StateNode> mNodeDic;
 			Dictionary<StateNodeID, StateNodeTransition> mNodeTransitionDic;
-			
-	
+
+
 			JVector2 mWindowSize;
 			JVector2 mWindowPos;
 			JVector2 mOffset;
 
 			SharedPtr<StateNodeEditorDataStorage> mDataStorage;
 			std::function<void()> mContextMenuFunc;
+			std::function<void(StateNodeID)> mRemoveNodeCallBack;
+			std::function<void(StateNodeID)> mRemoveTransitionCallBack;
+			std::function<void(StateNodeID, StateNodeID, StateNodeID)> mLinkNodeCallBack;
+			std::function<void(StateNodeID, StateNodeID, StateNodeID)> mUnLinkNodeCallBack;
+			std::function<void(StateNodeID, const String&)> mReNameCallBack;
 		public:
 			StateNodeEditor();
 		public:
+			StateNodeID GetSelectedNodeID() const;
 			StateNodeID CreateNode(const StateNodeBuilder& builder);
 			void RemoveNode(StateNodeID id);
 		
@@ -181,6 +193,13 @@ namespace JG
 			void Link(StateNodeID fromID, StateNodeID toID);
 			void UnLink(StateNodeID fromID, StateNodeID toID);
 			void BindContextMenuFunc(const std::function<void()>& func);
+			void BindRemoveNodeCallBack(const std::function<void(StateNodeID)>& callBack);
+			void BindRemoveTransitionCallBack(const std::function<void(StateNodeID)>& callBack);
+			void BindLinkNodeCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack);
+			void BindUnLinkCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack);
+			void BindReNameCallBack(const std::function<void(StateNodeID, const String&)>& callBack);
+
+
 			void OnGUI(const JVector2& size = JVector2(0.0f, 0.0f));
 			StateNodeID CreateTransition(StateNodeID fromID, StateNodeID toID);
 			void RemoveTransition(StateNodeID transitionID);

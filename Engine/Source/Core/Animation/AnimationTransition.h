@@ -17,6 +17,7 @@ namespace JG
 
 	class AnimationTransition
 	{
+		friend class AnimationTransitionModifier;
 		enum class ETransitionType
 		{
 			Script,

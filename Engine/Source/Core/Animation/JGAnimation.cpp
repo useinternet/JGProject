@@ -99,7 +99,9 @@ namespace JG
 
 	void JGAnimation::Update_Thread()
 	{
-		SharedPtr<IComputeContext> computeContext = JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext(ANIMATION_COMMAND_QUEUE_ID, ANIMATION_CONTEXT_ID);
+		SharedPtr<IComputeContext> computeContext = 
+			JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext(ANIMATION_COMMAND_QUEUE_ID, ANIMATION_CONTEXT_ID);
+
 		u64 cnt = mRegisteredAnimationControllers.size();
 		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{

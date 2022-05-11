@@ -209,6 +209,10 @@ namespace JG
 				{
 					prev_node->mName = TempStr;
 					TempStr = "";
+					if (mNodeEditor->mReNameCallBack)
+					{
+						mNodeEditor->mReNameCallBack(mRenamingNodeID, prev_node->mName);
+					}
 				}
 				
 				mRenamingNodeID = id;
@@ -262,7 +266,8 @@ namespace JG
 						GetColor(ColorStyle_HightlightOutline) : 
 						GetColor(ColorStyle_NormalOutline), 
 					&transitionNodeRect, false, from->GetFlags() & EStateNodeFlags::RootNode);
-				if (transitionNodeRect.Width() > 0 && transitionNodeRect.Height() > 0)
+
+				if (transitionNodeRect.Width() > 0 && transitionNodeRect.Height() > 0 && (from->GetFlags() & EStateNodeFlags::RootNode) == false)
 				{
 					JVector2 cursorPos = mNodeEditor->GetOffset() + JVector2(transitionNodeRect.left, transitionNodeRect.top);
 					ImGui::SetCursorPos(ToImVec2(cursorPos));
@@ -299,6 +304,15 @@ namespace JG
 			mColors[ColorStyle_HightlightOutline] = ImGui::GetColorU32(ImVec4(1.0f, 0.5f, 0.2f, 0.4f));
 			mColors[ColorStyle_NodeBody] = ImGui::GetColorU32(ImVec4(0.05f, 0.06f, 0.04f, 0.8F));
 			mColors[ColorStyle_NodePinArea] = ImGui::GetColorU32(ImVec4(0.5f, 0.51f, 0.52f, 1.0f));
+		}
+		List<StateNodeID> StateNode::GetTransitionList() const
+		{
+			List<StateNodeID> result;
+			for (auto _pair : mOutLinkedTransitionDic)
+			{
+				result.push_back(_pair.second);
+			}
+			return result;
 		}
 		void StateNode::OnGUI()
 		{
@@ -423,6 +437,10 @@ namespace JG
 			mDataStorage = CreateSharedPtr<StateNodeEditorDataStorage>(this);
 			
 		}
+		StateNodeID StateNodeEditor::GetSelectedNodeID() const
+		{
+			return mDataStorage->GetSelectedNode();
+		}
 		StateNodeID StateNodeEditor::CreateNode(const StateNodeBuilder& builder)
 		{
 			StateNode newNode = builder.mNode;
@@ -460,6 +478,11 @@ namespace JG
 				UnLink(node->GetID(), outLinkedID);
 			}
 			mNodeDic.erase(id);
+
+			if (mRemoveNodeCallBack)
+			{
+				mRemoveNodeCallBack(id);
+			}
 		}
 		StateNode* StateNodeEditor::FindNode(StateNodeID id)
 		{
@@ -505,9 +528,14 @@ namespace JG
 			to->mInLinkedNodeIDs.insert(fromID);
 			mDataStorage->SetLinkingNode(0);
 
-			// Transition »ý¼º
 			from->mOutLinkedTransitionDic[toID] = CreateTransition(fromID, toID);
+	
 			
+
+			if (mLinkNodeCallBack)
+			{
+				mLinkNodeCallBack(fromID, toID, from->mOutLinkedTransitionDic[toID]);
+			}
 		}
 		void StateNodeEditor::UnLink(StateNodeID fromID, StateNodeID toID)
 		{
@@ -521,19 +549,42 @@ namespace JG
 			{
 				return;
 			}
-
-			// from
+			if (mUnLinkNodeCallBack)
+			{
+				mUnLinkNodeCallBack(fromID, toID, from->mOutLinkedTransitionDic[toID]);
+			}
 			from->mOutLinkedNodeIDs.erase(toID);
 			RemoveTransition(from->mOutLinkedTransitionDic[toID]);
 			from->mOutLinkedTransitionDic.erase(toID);
 			to->mInLinkedNodeIDs.erase(fromID);
+
+
 		}
 
 		void StateNodeEditor::BindContextMenuFunc(const std::function<void()>& func)
 		{
 			mContextMenuFunc = func;
 		}
-
+		void StateNodeEditor::BindRemoveNodeCallBack(const std::function<void(StateNodeID)>& callBack)
+		{
+			mRemoveNodeCallBack = callBack;
+		}
+		void StateNodeEditor::BindRemoveTransitionCallBack(const std::function<void(StateNodeID)>& callBack)
+		{
+			mRemoveTransitionCallBack = callBack;
+		}
+		void StateNodeEditor::BindLinkNodeCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack)
+		{
+			mLinkNodeCallBack = callBack;
+		}
+		void StateNodeEditor::BindUnLinkCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack)
+		{
+			mUnLinkNodeCallBack = callBack;
+		}
+		void StateNodeEditor::BindReNameCallBack(const std::function<void(StateNodeID, const String&)>& callBack)
+		{
+			mReNameCallBack = callBack;
+		}
 		void StateNodeEditor::OnGUI(const JVector2& size)
 		{
 			mDataStorage->IsNodeHoveredInOneFrame = false;
@@ -598,12 +649,18 @@ namespace JG
 				return;
 			}
 			mNodeTransitionDic.erase(id);
+
+			if (mRemoveTransitionCallBack)
+			{
+				mRemoveTransitionCallBack(id);
+			}
 		}
 		void StateNodeEditor::UpdateNodeInteraction()
 		{
 			if (mDataStorage->IsNodeHoveredInOneFrame == false)
 			{
-				if (ImGui::IsMouseClicked(0))
+
+				if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered())
 				{
 					if (mDataStorage->GetLinkingNode() > 0)
 					{

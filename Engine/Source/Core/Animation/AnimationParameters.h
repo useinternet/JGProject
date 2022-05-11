@@ -10,10 +10,10 @@ namespace JG
 		struct ParamData
 		{
 			String Name;
-			List<byte> Data;
+			List<jbyte> Data;
 			EAnimationParameterType ParamType;
 		};
-
+		
 		Dictionary<String, ParamData> mParamDatas;
 	public:
 		bool SetBool(const String& name, bool value);
@@ -24,7 +24,6 @@ namespace JG
 		bool GetBool(const String& name, bool* out_value);
 		bool GetInt(const String& name, i32* out_value);
 		bool GetFloat(const String& name, f32* out_value);
-
 
 		// Copy
 		SharedPtr<AnimationParameters> Copy() const;

@@ -104,6 +104,11 @@ namespace JG
 		return mAnimParams;
 	}
 
+	SharedPtr<AnimationParameters> AnimationController::GetAnimationParameters_Thread() const
+	{
+		return mAnimParams_Thread;
+	}
+
 	SharedPtr<AnimationStateMachine> AnimationController::GetAnimationStateMachine() const
 	{
 		return mAnimationStateMachine;
@@ -112,6 +117,7 @@ namespace JG
 	void AnimationController::Init()
 	{
 		mAnimParams   = CreateSharedPtr<AnimationParameters>();
+		mAnimParams_Thread = CreateSharedPtr<AnimationParameters>();
 		mAnimationStateMachine = CreateSharedPtr<AnimationStateMachine>(this);
 	}
 
@@ -135,6 +141,10 @@ namespace JG
 				break;
 			}
 		}
+
+		*mAnimParams_Thread = *mAnimParams;
+
+
 		// ½ºÅ°´× Mesh »ý¼º
 		SharedPtr<IGraphicsContext> context = JGGraphics::GetInstance().GetGraphicsAPI()->GetGraphicsContext();
 		SharedPtr<ICopyContext> copyContext = context->QueryInterfaceAsCopyContext();

@@ -1,9 +1,14 @@
 #include "pch.h"
 #include "AnimationView.h"
 #include "Application.h"
+#include "Animation/JGAnimation.h"
+#include "Animation/AnimationClip.h"
+#include "Animation/AnimationController.h"
+#include "Animation/AnimationParameters.h"
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/TextEditor.h"
 #include "Class/Asset/Asset.h"
+#include "Class/Data/Skeletone.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
 #include "UI/UIManager.h"
@@ -21,12 +26,16 @@ namespace JG
 
 	void AnimationView::Load()
 	{
-		
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
 		{
 			CreateAnimationClipNode();
 			JG_LOG_INFO("Create Node");
 		}, nullptr);
+
+		mBgColorByParamTypeDic[EAnimationParameterType::Bool]  = Color(0.8f, 0.1f, 0.1f, 1.0f);
+		mBgColorByParamTypeDic[EAnimationParameterType::Float] = Color(0.4f, 0.8f, 0.05f, 1.0f);
+		mBgColorByParamTypeDic[EAnimationParameterType::Int]  = Color(0.05f,0.4f,0.8f, 1.0f);
+		mBgColorByParamTypeDic[EAnimationParameterType::Unknown] = Color(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	void AnimationView::Initialize()
@@ -34,124 +43,658 @@ namespace JG
 		mNodeEditor = CreateUniquePtr<StateNodeGUI::StateNodeEditor>();
 		mNodeEditor->BindContextMenuFunc([&]()
 		{
-			if (UIManager::GetInstance().ShowContextMenu(GetType(), false) == true)
-			{
-
-			}
+			UIManager::GetInstance().ShowContextMenu(GetType(), false);
 		});
+		mNodeEditor->BindLinkNodeCallBack(
+			[&](StateNodeGUI::StateNodeID fromID, StateNodeGUI::StateNodeID toID, StateNodeGUI::StateNodeID transID)
+		{
+			AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
+			buildData.From = fromID;
+			buildData.To = toID;
+		});
+		mNodeEditor->BindRemoveNodeCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			mAnimClipBuildDataDic.erase(id);
+		});
+		mNodeEditor->BindRemoveTransitionCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			mAnimTransitionBuildDataDic.erase(id);
+		});
+
+
+		SetMesh(mModelAssetPath.GetValue());
+		SetSkeletal(mSkeletoneAssetPath.GetValue());
+		SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
 		CreateRootNode();
+
+		// 임시
+		mAnimController = CreateUniquePtr<AnimationController>();
+		JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
 	}
 
 	void AnimationView::OnGUI()
 	{
+		UpdateScene();
 		ImVec2 winSize = ImGui::GetWindowSize();
+		f32 minWinWidth = Math::Max(winSize.x, mLeftWidth + mRightWidth + 10.0f);
+		ImGui::SetWindowSize(ImVec2(minWinWidth, winSize.y));
 		ImGui::Columns(3);
 		// 애니메이션 뷰
-		ImGui::SetColumnWidth(0, 350.0f);
-		ImGui::BeginChild("AnimSceneView");
-		ImGui::Text("Animation Asset Management && Scene View");
-		ImGui::EndChild();
+		AnimationScene_OnGUI();
 		ImGui::NextColumn();
-		ImGui::SetColumnWidth(1, Math::Max<f32>(winSize.x - 700, 1));
-
-		// Animation Play && Debugging
-		ImGui::BeginChild("aosijasdf", ImVec2(0.0f, 30.0f));
-		ImGui::Button("Play"); ImGui::SameLine();
-		ImGui::Text("Debbuging && Anim Play");
-	
-		ImGui::Separator();
-		ImGui::EndChild();
-		mNodeEditor->OnGUI();
-		// 
+		AnimationNodeEditor_OnGUI();
 		ImGui::NextColumn();
-
-
-		// Param Controller 
-		ImGui::SetColumnWidth(2, 350.0f);
-		ImGui::BeginChild("ParamEditor", ImVec2(350.0f, 0.0f));
-
-		List<AnimParamData> data;
-		data.resize(6);
-
-		data[0] = { "Test1", EAnimationParameterType::Bool };
-		data[1] = { "Test2", EAnimationParameterType::Float };
-		data[2] = { "Test4", EAnimationParameterType::Int };
-		data[3] = { "Test5", EAnimationParameterType::Float };
-		data[4] = { "Test6", EAnimationParameterType::Int };
-		data[5] = { "Test8", EAnimationParameterType::Int };
-
-
-		ImGui::Button("Default"); ImGui::SameLine(); ImGui::Button("Edit"); ImGui::SameLine(); ImGui::Button("Delete");
-		ImGui::Separator();
-
-		ImGui::BeginTable("ParamEditorTable", 4, ImGuiTableFlags_None);
-		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 80.0f);
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 120.0F);
-		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, 50.0f);
-		ImGui::TableSetupColumn("##Interaction", ImGuiTableColumnFlags_WidthStretch, 100);
-		ImGui::TableHeadersRow();
-
-		for (i32 i = 0; i < 6; ++i)
-		{
-			ImGui::TableNextColumn();
-			String type = AnimationParameterTypeToString(data[i].Type);
-
-			ImGui::SetNextItemWidth(80.0f);
-			if (ImGui::BeginCombo(("##ComboBox" + std::to_string(i)).c_str(), type.c_str()))
-			{
-				for (i32 paramType = 0; paramType < (i32)EAnimationParameterType::Count; ++paramType)
-				{
-					String typeName = AnimationParameterTypeToString((EAnimationParameterType)paramType);
-					if (ImGui::Selectable(typeName.c_str()) == true)
-					{
-						data[i].Type = (EAnimationParameterType)paramType;
-					}
-				}
-				ImGui::EndCombo();
-			}
-
-			ImGui::TableNextColumn();
-			String str = data[i].Name;
-			str.resize(512);
-			ImGui::SetNextItemWidth(120.0F);
-			ImGui::InputText(("##InputText" + std::to_string(i)).c_str(), str.data(), 512);
-			if (ImGui::IsItemDeactivated())
-			{
-				data[i].Name = str;
-			}
-
-			ImGui::TableNextColumn();
-
-			ImGui::Text("0.0");
-
-			ImGui::TableNextColumn();
-
-
-			ImGui::ArrowButton(("##UpButton" + std::to_string(i)).c_str(), ImGuiDir_Up); ImGui::SameLine();
-			ImGui::ArrowButton(("##DownButton" + std::to_string(i)).c_str(), ImGuiDir_Down); ImGui::SameLine();
-
-		}
-		ImGui::EndTable();
-
-		auto padding = ImGui::GetStyle().FramePadding;
-
-		ImGui::Button("+", ImVec2(350.0f - (padding.x * 4), 0.0f));
-
-
-		ImGui::EndChild();
+		AnimationInspector_OnGUI();
 		ImGui::Columns(1);
-
 	}
 
 
 	void AnimationView::Destroy()
 	{
+		mAnimClipBuildDataDic.clear();
+		mAnimTransitionBuildDataDic.clear();
+		mAnimParamBuildDataList.clear();
+		mAddedAnimParamNameSet.clear();
+
+		mAnimParamEditMode = EEditMode::Default;
+		mTransitionConditionEditMode = EEditMode::Default;
+
+
+		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
+		{
+			mModelAssetPath.SetValue(mMeshAsset->GetAssetPath());
+		}
+		if (mSkeletoneAsset != nullptr && mSkeletoneAsset->IsValid())
+		{
+			mSkeletoneAssetPath.SetValue(mSkeletoneAsset->GetAssetPath());
+		}
+
+		String materialAssetPathStr;
+		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
+		{
+			if (material != nullptr && material->IsValid())
+			{
+				materialAssetPathStr += material->GetAssetPath() + ",";
+			}
+		}
+		mMaterialAssetPath.SetValue(materialAssetPathStr);
+		mMaterialAssetList.clear();
+		mSkyBox = nullptr;
+		mModel = nullptr;
+
+		if (mAnimController != nullptr)
+		{
+			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimController);
+			mAnimController = nullptr;
+		}
+		mEditorUIScene = nullptr;
+		mNodeEditor = nullptr;
 	}
 
 	void AnimationView::OnEvent(IEvent& e)
 	{
-	}
 
+
+	}
+	void AnimationView::AnimationScene_OnGUI()
+	{
+		ImGui::SetColumnWidth(0, mLeftWidth);
+		ImGui::BeginChild("AnimSceneView");
+
+		if (mEditorUIScene != nullptr)
+		{
+			mEditorUIScene->OnGUI();
+		}
+
+
+
+
+
+		ImGui::Separator();
+
+		f32 label_Space = ImGui::CalcTextSize("        ").x;
+
+		{
+			ImGui::AssetField_OnGUI("Mesh", (mMeshAsset != nullptr && mMeshAsset->IsValid()) ? mMeshAsset->GetAssetName() : "None",
+				EAssetFormat::Mesh, [&](const String& assetPath)
+			{
+				SetMesh(assetPath);
+			}, label_Space);
+		}
+
+		{
+			List<String> inputText;
+			for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
+			{
+				if (material == nullptr)
+				{
+					inputText.push_back("None");
+				}
+				else
+				{
+					inputText.push_back(material->GetAssetName());
+				}
+			}
+			ImGui::AssetField_List_OnGUI("Material", inputText, EAssetFormat::Material,
+				[&](int i, const String& assetPath)
+			{
+				SharedPtr<Asset<IMaterial>> originMaterial = AssetDataBase::GetInstance().LoadOriginAsset<IMaterial>(assetPath);
+				if (originMaterial != nullptr)
+				{
+					mMaterialAssetList[i] = AssetDataBase::GetInstance().LoadReadWriteAsset<IMaterial>(originMaterial->GetAssetID());
+				}
+			},
+				[&]()
+			{
+				mMaterialAssetList.push_back(nullptr);
+			},
+				[&]()
+			{
+				mMaterialAssetList.pop_back();
+			}, label_Space);
+		}
+
+		{
+			ImGui::AssetField_OnGUI("Skeletal", (mSkeletoneAsset != nullptr && mSkeletoneAsset->IsValid()) ? mSkeletoneAsset->GetAssetName() : "None",
+				EAssetFormat::Skeletal, [&](const String& assetPath)
+			{
+				SetSkeletal(assetPath);
+			}, label_Space);
+		}
+		ImGui::EndChild();
+	
+	}
+	void AnimationView::AnimationInspector_OnGUI()
+	{
+		// Param Controller 
+		ImGui::SetColumnWidth(2, mRightWidth);
+		ImGui::BeginChild("StateNodeInspector", ImVec2(mRightWidth, 350.0f));
+
+
+		StateNodeGUI::StateNodeID selectedNodeID = mNodeEditor->GetSelectedNodeID();
+		StateNodeGUI::StateNode* node = mNodeEditor->FindNode(selectedNodeID);
+		if (node != nullptr)
+		{
+			if (node->GetFlags() & StateNodeGUI::EStateNodeFlags::RootNode)
+			{
+				ImGui::Text("Root Node");
+			}
+			else
+			{
+				AnimationClip_OnGUI(mAnimClipBuildDataDic[selectedNodeID]);
+			}
+			
+		}
+		else if (mNodeEditor->FindNodeTransition(selectedNodeID) != nullptr)
+		{
+			Transition_OnGUI(mAnimTransitionBuildDataDic[selectedNodeID]);
+		}
+
+		ImGui::EndChild();
+		ImGui::BeginChild("ParamEditor", ImVec2(mRightWidth, 0.0f));
+		ImGui::Separator();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+		if (ImGui::Selectable("Default##AnimParamEdit", mAnimParamEditMode == EEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f,25.0f)) == true)
+		{
+			mAnimParamEditMode = EEditMode::Default;
+		}	ImGui::SameLine();
+		if (ImGui::Selectable("Move##AnimParamEdit", mAnimParamEditMode == EEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		{
+			mAnimParamEditMode = EEditMode::Move;
+		}	ImGui::SameLine();
+		if (ImGui::Selectable("Delete##AnimParamEdit", mAnimParamEditMode == EEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		{
+			mAnimParamEditMode = EEditMode::Delete;
+		}
+		ImGui::PopStyleVar();
+		ImGui::Separator();
+
+
+		
+		ImGui::BeginTable("ParamEditorTable", 3, ImGuiTableFlags_BordersH);
+
+
+		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, mTableTypeRowWidth);
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, mTableNameRowWidth);
+		ImGui::TableSetupColumn("##Edit", ImGuiTableColumnFlags_WidthStretch, mEditRowWidth);
+		ImGui::TableHeadersRow();
+
+		i32 index = 0;
+		i32 moveIndex = -1;
+		i32 moveDir = 0;
+		List<String> removeParamList;
+		for (AnimParamBuildData& data : mAnimParamBuildDataList)
+		{
+			ImGui::TableNextColumn();
+	
+			String paramName = data.Name;
+			EAnimationParameterType paramType = data.Type;
+		
+		
+			
+			ImGui::PushID(index);
+
+		
+			ImGui::SetNextItemWidth(mTableTypeRowWidth);
+			//-- Type GUI --
+			String type = AnimationParameterTypeToString(paramType);
+
+			Color bgColor = GetBgColor(paramType);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(bgColor.R, bgColor.G, bgColor.B, bgColor.A));
+			bool openCombo = ImGui::BeginCombo("##TypeComboBox", type.c_str());
+			ImGui::PopStyleColor();
+			if (openCombo)
+			{
+				for (i32 iParamType = 1; iParamType < (i32)EAnimationParameterType::Count; ++iParamType)
+				{
+					String typeName = AnimationParameterTypeToString((EAnimationParameterType)iParamType);
+					if (ImGui::Selectable(typeName.c_str()) == true)
+					{
+						data.Type = (EAnimationParameterType)iParamType;
+						u32 dataSize = 0;
+						switch (data.Type)
+						{
+						case EAnimationParameterType::Bool:
+							dataSize = 1;
+							break;
+						case EAnimationParameterType::Int:
+						case EAnimationParameterType::Float:
+							dataSize = 4;
+							break;
+						}
+						if (dataSize > 0)
+						{
+							data.Data.resize(dataSize, 0);
+						}
+
+						UpdateTransitionBuildData(data.Name, data.Type);
+					}
+				}
+				ImGui::EndCombo();
+			}
+	
+			//--------------
+
+
+			ImGui::TableNextColumn();
+			ImGui::SetNextItemWidth(mTableNameRowWidth);
+
+			// -- Param Name GUI -- 
+
+			ImGui::InputText("##InputText", &paramName);
+			if (ImGui::IsItemDeactivated())
+			{
+				mAddedAnimParamNameSet.erase(data.Name);
+				mAddedAnimParamNameSet.insert(paramName);
+				
+
+				UpdateTransitionBuildData(data.Name, paramName);
+				data.Name = paramName;
+			}
+
+
+
+			ImGui::TableNextColumn();
+
+
+			switch (mAnimParamEditMode)
+			{
+				// 값편집
+			case EEditMode::Default:
+				AnimationParam_OnGUI(data);
+				break;
+			case EEditMode::Delete:
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+				if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
+				{
+					removeParamList.push_back(paramName);
+				}
+				ImGui::PopStyleColor();
+				break;
+			case EEditMode::Move:
+				if (ImGui::ArrowButton("##UpArrow_AnimParamEdit", ImGuiDir_Up))
+				{
+					moveIndex = index;
+					moveDir = ImGuiDir_Up;
+				}ImGui::SameLine();
+				if (ImGui::ArrowButton("##DownArrow_AnimParmEdit", ImGuiDir_Down))
+				{
+					moveIndex = index;
+					moveDir = ImGuiDir_Down;
+				}
+				break;
+			}
+			
+			++index;
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
+		auto padding = ImGui::GetStyle().FramePadding;
+
+		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true)
+		{
+			i32 cnt = 0;
+			while (true)
+			{
+				String newName = "NewParam (" + std::to_string(cnt++) + ")";
+				if (mAddedAnimParamNameSet.find(newName) == mAddedAnimParamNameSet.end())
+				{
+					mAddedAnimParamNameSet.insert(newName);
+					AnimParamBuildData buildData;
+					buildData.Name = newName;
+					buildData.Type = EAnimationParameterType::Bool;
+					buildData.Data.resize(1, 0);
+					mAnimParamBuildDataList.push_back(buildData);
+					break;
+				}
+			}
+			
+		}
+
+		for (const String& removedParamName : removeParamList)
+		{
+			mAddedAnimParamNameSet.erase(removedParamName);
+			mAnimParamBuildDataList.erase(std::remove_if(mAnimParamBuildDataList.begin(), mAnimParamBuildDataList.end(), [&](const AnimParamBuildData& data)
+			{
+				return data.Name == removedParamName;
+			}));
+
+			RemoveTransitionBuildData(removedParamName);
+
+		}
+		if (moveIndex >= 0)
+		{
+			if (moveDir == ImGuiDir_Up && mAnimParamBuildDataList.size() > moveIndex && moveIndex > 0)
+			{
+				AnimParamBuildData tempData = mAnimParamBuildDataList[moveIndex - 1];
+				mAnimParamBuildDataList[moveIndex - 1] = mAnimParamBuildDataList[moveIndex];
+				mAnimParamBuildDataList[moveIndex] = tempData;
+			}
+			if (moveDir == ImGuiDir_Down && mAnimParamBuildDataList.size() > (moveIndex + 1))
+			{
+				AnimParamBuildData tempData = mAnimParamBuildDataList[moveIndex + 1];
+				mAnimParamBuildDataList[moveIndex + 1] = mAnimParamBuildDataList[moveIndex];
+				mAnimParamBuildDataList[moveIndex] = tempData;
+			}
+		}
+
+		ImGui::EndChild();
+	}
+	void AnimationView::AnimationNodeEditor_OnGUI()
+	{
+		ImVec2 winSize = ImGui::GetWindowSize();
+		ImGui::SetColumnWidth(1, Math::Max<f32>(winSize.x - (mLeftWidth + mRightWidth), 1));
+
+		// Animation Play && Debugging
+		ImGui::BeginChild("Animation Top Menu", ImVec2(0.0f, 30.0f));
+		
+
+		ImGui::Button("Build", ImVec2(70.0f, 26.0f)); ImGui::SameLine();
+		
+
+		if (mAnimState == EAnimState::Playing) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.1f, 1.0f));
+		if (ImGui::Button(mAnimState == EAnimState::Editable ? "Play" : "Pause", ImVec2(70.0f, 26.0f)))
+		{
+			switch (mAnimState)
+			{
+			case EAnimState::Editable:
+				mAnimState = EAnimState::Playing;
+				break;
+			case EAnimState::Playing:
+				mAnimState = EAnimState::Editable;
+				break;
+			}
+		} ImGui::SameLine();
+		if (mAnimState == EAnimState::Playing) ImGui::PopStyleColor();
+
+		ImGui::Button("Pause", ImVec2(70.0f, 26.0f)); 
+
+		ImGui::Separator();
+		ImGui::EndChild();
+
+		mNodeEditor->OnGUI();
+	}
+	void AnimationView::AnimationParam_OnGUI(AnimParamBuildData& buildData)
+	{
+		String typeStr = AnimationParameterTypeToString(buildData.Type);
+		ImGui::SetNextItemWidth(mEditRowWidth);
+		switch (buildData.Type)
+		{
+		case EAnimationParameterType::Bool:
+		{
+			ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
+		}
+		break;
+		case EAnimationParameterType::Float:
+		{
+			f32 value = *((f32*)buildData.Data.data());
+			ImGui::InputFloat("##InputFloat", &value);
+			if (ImGui::IsItemDeactivated())
+			{
+				memcpy(buildData.Data.data(), &value, sizeof(f32));
+			}
+		}
+
+		break;
+		case EAnimationParameterType::Int:
+		{
+			i32 value = *((i32*)buildData.Data.data());
+			ImGui::InputInt("##InputInt", &value, 0, 0);
+			if (ImGui::IsItemDeactivated())
+			{
+				memcpy(buildData.Data.data(), &value, sizeof(i32));
+			}
+		}
+		break;
+		}
+	}
+	void AnimationView::Transition_OnGUI(AnimTransitionBuildData& buildData)
+	{
+
+		StateNodeGUI::StateNode* fromNode = mNodeEditor->FindNode(buildData.From);
+		StateNodeGUI::StateNode* toNode = mNodeEditor->FindNode(buildData.To);
+
+		ImGui::Text("%s -> %s", 
+			fromNode == nullptr ? "None" : fromNode->GetName().c_str(),
+			toNode == nullptr ? "None" : toNode->GetName().c_str());
+
+		ImGui::Separator();
+		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+		if (ImGui::Selectable("Default##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		{
+			mTransitionConditionEditMode = EEditMode::Default;
+		}	ImGui::SameLine();
+		if (ImGui::Selectable("Move##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		{
+			mTransitionConditionEditMode = EEditMode::Move;
+		}	ImGui::SameLine();
+		if (ImGui::Selectable("Delete##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		{
+			mTransitionConditionEditMode = EEditMode::Delete;
+		}
+		ImGui::PopStyleVar();
+		ImGui::Separator();
+		ImGui::BeginTable("ParamEditorTable", 3, ImGuiTableFlags_BordersH);
+		ImGui::TableSetupColumn("Parameter", ImGuiTableColumnFlags_WidthFixed, mTransitionParamNameRowWidth);
+		ImGui::TableSetupColumn("Condition", ImGuiTableColumnFlags_WidthFixed, mTransitionConditionRowWidth);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, mTransitionValueRowWidth);
+		ImGui::TableHeadersRow();
+		ImVec2 padding = ImGui::GetStyle().FramePadding;
+		
+		i32 index		= 0;
+		i32 removeIndex = -1;
+		i32 moveIndex	= -1;
+		i32 moveDir		= 0;
+		for (AnimTransitionConditionBuildData& condBuildData : buildData.Conditions)
+		{
+			ImGui::PushID(index);
+
+			ImGui::TableNextColumn();
+			ImGui::SetNextItemWidth(mTransitionParamNameRowWidth);
+			//-- Param GUI --
+
+			Color bgColor = GetBgColor(condBuildData.Type);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(bgColor.R, bgColor.G, bgColor.B, bgColor.A));
+			bool openCombo = ImGui::BeginCombo("##ParameterComboBox", condBuildData.ParamName.c_str());
+			ImGui::PopStyleColor();
+			if (openCombo)
+			{
+				for (AnimParamBuildData& paramBuildData : mAnimParamBuildDataList)
+				{
+					if (ImGui::Selectable(paramBuildData.Name.c_str()) == true)
+					{
+						condBuildData.ParamName = paramBuildData.Name;
+						condBuildData.Type = paramBuildData.Type;
+						condBuildData.Data.resize(paramBuildData.Data.size(), 0);
+					}
+				}
+				ImGui::EndCombo();
+			}
+	
+
+			//--------------
+
+
+			ImGui::TableNextColumn();
+			ImGui::SetNextItemWidth(mTransitionConditionRowWidth);
+			// -- Condition GUI -- 
+			String conditionStr = AnimationConditionTypeToString(condBuildData.Condition);
+			if (ImGui::BeginCombo("##ConditionComboBox", conditionStr.c_str()))
+			{
+				if (condBuildData.Type == EAnimationParameterType::Bool)
+				{
+					conditionStr = AnimationConditionTypeToString(EAnimationCondition::Equal);
+					if (ImGui::Selectable(conditionStr.c_str()) == true)
+					{
+						condBuildData.Condition = EAnimationCondition::Equal;
+					}
+				}
+				else
+				{
+					for (i32 iParamType = 1; iParamType < (i32)EAnimationCondition::Count; ++iParamType)
+					{
+						conditionStr = AnimationConditionTypeToString((EAnimationCondition)iParamType);
+						if (ImGui::Selectable(conditionStr.c_str()) == true)
+						{
+							condBuildData.Condition = (EAnimationCondition)iParamType;
+						}
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+			//--------------
+
+
+			ImGui::TableNextColumn();
+			ImGui::SetNextItemWidth(mTransitionValueRowWidth);
+			switch (mTransitionConditionEditMode)
+			{
+				// 값편집
+			case EEditMode::Default:
+				TransitionConditionValue_OnGUI(condBuildData);
+				break;
+			case EEditMode::Delete:
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+				if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
+				{
+					removeIndex = index;
+				}
+				ImGui::PopStyleColor();
+				break;
+			case EEditMode::Move:
+				if (ImGui::ArrowButton("##UpArrow_TransitionEdit", ImGuiDir_Up))
+				{
+					moveIndex = index;
+					moveDir = ImGuiDir_Up;
+				} ImGui::SameLine();
+				if (ImGui::ArrowButton("##DownArrow_TransitionEdit", ImGuiDir_Down))
+				{
+					moveIndex = index;
+					moveDir = ImGuiDir_Down;
+				}
+				break;
+			}
+
+
+			index += 1;
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
+		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true)
+		{
+			AnimTransitionConditionBuildData newData;
+			newData.ParamName = "None";
+			buildData.Conditions.push_back(newData);
+		}
+		if (removeIndex >= 0)
+		{
+			buildData.Conditions.erase(buildData.Conditions.begin() + removeIndex);
+		}
+		if (moveIndex >= 0)
+		{
+			if (moveDir == ImGuiDir_Up && buildData.Conditions.size() > moveIndex && moveIndex > 0)
+			{
+				AnimTransitionConditionBuildData tempData = buildData.Conditions[moveIndex - 1];
+				buildData.Conditions[moveIndex - 1] = buildData.Conditions[moveIndex];
+				buildData.Conditions[moveIndex] = tempData;
+			}
+			if (moveDir == ImGuiDir_Down && buildData.Conditions.size() > (moveIndex + 1))
+			{
+				AnimTransitionConditionBuildData tempData = buildData.Conditions[moveIndex + 1];
+				buildData.Conditions[moveIndex + 1] = buildData.Conditions[moveIndex];
+				buildData.Conditions[moveIndex] = tempData;
+			}
+		}
+
+	}
+	void AnimationView::TransitionConditionValue_OnGUI(AnimTransitionConditionBuildData& buildData)
+	{
+		String typeStr = AnimationParameterTypeToString(buildData.Type);
+		switch (buildData.Type)
+		{
+		case EAnimationParameterType::Bool:
+		{
+			ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
+		}
+		break;
+		case EAnimationParameterType::Float:
+		{
+			f32 value = *((f32*)buildData.Data.data());
+			ImGui::InputFloat("##InputFloat", &value);
+			if (ImGui::IsItemDeactivated())
+			{
+				memcpy(buildData.Data.data(), &value, sizeof(f32));
+			}
+		}
+
+		break;
+		case EAnimationParameterType::Int:
+		{
+			i32 value = *((i32*)buildData.Data.data());
+			ImGui::InputInt("##InputInt", &value, 0, 0);
+			if (ImGui::IsItemDeactivated())
+			{
+				memcpy(buildData.Data.data(), &value, sizeof(i32));
+			}
+		}
+		break;
+		}
+	}
+	void AnimationView::AnimationClip_OnGUI(AnimClipBuildData& buildData)
+	{
+		ImGui::Text("Name : NodeName");
+		f32 label_Space = ImGui::CalcTextSize("         ").x;
+
+		ImGui::AssetField_OnGUI("AnimationClip", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
+			EAssetFormat::AnimationClip, [&](const String& assetPath)
+		{
+			buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(assetPath);
+		}, label_Space);
+	}
 	void AnimationView::CreateRootNode()
 	{
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
@@ -177,7 +720,112 @@ namespace JG
 
 	void AnimationView::UpdateScene()
 	{
+		static const JVector3 EyePos = JVector3(0, 100.0f, -200.0f);
+		if (mEditorUIScene == nullptr)
+		{
+			EditorUISceneConfig config;
+			config.EyePos = EyePos;
+			config.Resolution = mSceneResolution;
+			config.ImageSize = config.Resolution;
+			config.OffsetScale = JVector3(1, 1, 1);
+			config.Flags   = EEditorUISceneFlags::Fix_RotatePitch;
+			config.SkyBox  = GraphicsHelper::CreateSkyBox(config.EyePos, config.FarZ, "Asset/Engine/CubeMap/DefaultSky.jgasset");
+			mEditorUIScene = CreateUniquePtr<EditorUIScene>(config);
+		}
 
+		if (mModel == nullptr)
+		{
+			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
+			mModel->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
+		}
+
+		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
+		{
+			JBBox boundingBox = mMeshAsset->Get()->GetBoundingBox();
+
+			JVector3 Center = boundingBox.Center();
+			mEditorUIScene->SetLocation(Center * -1);
+
+			JVector3 targetVec = JVector3::Normalize(EyePos * -1);
+			targetVec.y = Math::Clamp(targetVec.y - 0.15f, 0.0f, targetVec.y);
+			mEditorUIScene->SetTargetVector(targetVec);
+
+			if (mAnimController != nullptr)
+			{
+				mAnimController->BindMesh(mMeshAsset->Get());
+				mModel->Mesh = mAnimController->GetBindedMesh();
+			}
+			else mModel->Mesh = mMeshAsset->Get();
+		}
+		mModel->MaterialList.clear();
+		for (SharedPtr<Asset<IMaterial>> material : mMaterialAssetList)
+		{
+			if (material == nullptr || material->IsValid() == false)
+			{
+				continue;
+			}
+			mModel->MaterialList.push_back(material->Get());
+		}
+		mEditorUIScene->SetModel(mModel);
 	}
+	void AnimationView::SetMesh(const String& meshAssetPath)
+	{
+		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(meshAssetPath);
+	}
+	void AnimationView::SetSkeletal(const String& skeletalAssetPath)
+	{
+		mSkeletoneAsset = AssetDataBase::GetInstance().LoadOriginAsset<Skeletone>(skeletalAssetPath);
+	}
+	void AnimationView::SetMaterial(const List<String>& materialAssetPath)
+	{
+		mMaterialAssetList.clear();
+		for (const String& path : materialAssetPath)
+		{
+			SharedPtr<Asset<IMaterial>> originMaterial = AssetDataBase::GetInstance().LoadOriginAsset<IMaterial>(path);
+			if (originMaterial == nullptr)
+			{
+				continue;
+			}
 
+			mMaterialAssetList.push_back(AssetDataBase::GetInstance().LoadReadWriteAsset<IMaterial>(originMaterial->GetAssetID()));
+
+		}
+	}
+	void AnimationView::UpdateTransitionBuildData(const String& paramName, EAnimationParameterType type)
+	{
+		for (auto& _pair : mAnimTransitionBuildDataDic)
+		{
+			for (AnimTransitionConditionBuildData& condBuildData : _pair.second.Conditions)
+			{
+				if (condBuildData.ParamName == paramName)
+				{
+					condBuildData.Type = type;
+				}
+			}
+		}
+	}
+	void AnimationView::UpdateTransitionBuildData(const String& oldName, const String& newName)
+	{
+		for (auto& _pair : mAnimTransitionBuildDataDic)
+		{
+			for (AnimTransitionConditionBuildData& condBuildData : _pair.second.Conditions)
+			{
+				if (condBuildData.ParamName == oldName)
+				{
+					condBuildData.ParamName = newName;
+				}
+			}
+		}
+	}
+	void AnimationView::RemoveTransitionBuildData(const String& removedName)
+	{
+		for (auto& _pair : mAnimTransitionBuildDataDic)
+		{
+			_pair.second.Conditions.erase(std::remove_if(_pair.second.Conditions.begin(), _pair.second.Conditions.end(),
+				[&](const AnimTransitionConditionBuildData& data)
+			{
+				return data.ParamName == removedName;
+			}));
+		}
+	}
 }
