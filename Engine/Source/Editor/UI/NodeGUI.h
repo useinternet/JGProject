@@ -103,9 +103,6 @@ namespace JG
 			String      mName;
 
 
-			HashSet<StateNodeID> mInLinkedNodeIDs;
-
-
 			HashSet<StateNodeID> mOutLinkedNodeIDs;
 			Dictionary<StateNodeID, StateNodeID> mOutLinkedTransitionDic;
 			
@@ -136,6 +133,7 @@ namespace JG
 				return mFlags;
 			}
 			List<StateNodeID> GetTransitionList() const;
+			StateNodeID GetTransition(StateNodeID id);
 		private:
 			void OnGUI();
 			void AddFlags(EStateNodeFlags flags);
@@ -157,7 +155,12 @@ namespace JG
 			void SetContextMenuFunc(const std::function<void(StateNode*)>& createFunc, const std::function<void(StateNode*)>& showFunc);
 		};
 
-
+		struct StateNodeLinkInfo
+		{
+			StateNodeID RootNodeID = 0;
+			List<StateNodeID> NodeIDList;
+			List<List<StateNodeID>> LinkedNodeIDLists;
+		};
 		class StateNodeEditor
 		{
 			friend class StateNodeEditorDataStorage;
@@ -224,7 +227,7 @@ namespace JG
 			StateNodeEditorDataStorage& GetDataStorage() {
 				return *mDataStorage;
 			}
-
+			StateNodeLinkInfo GetNodeLinkInfo() const;
 		};
 	}
 

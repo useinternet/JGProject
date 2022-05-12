@@ -5,9 +5,12 @@
 #include "Animation/AnimationClip.h"
 #include "Animation/AnimationController.h"
 #include "Animation/AnimationParameters.h"
+#include "Animation/AnimationTransition.h"
+#include "Animation/AnimationStateMachine.h"
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/TextEditor.h"
 #include "Class/Asset/Asset.h"
+#include "Class/Asset/AssetHelper.h"
 #include "Class/Data/Skeletone.h"
 #include "Graphics/JGGraphics.h"
 #include "Graphics/GraphicsHelper.h"
@@ -23,7 +26,16 @@ namespace JG
 		DisableUniqueView();
 
 	}
+	void AnimationView::SetAnimation(const String& animatinoAssetPath)
+	{
+		String assetPath;
+		AssetHelper::GetResourcePath(animatinoAssetPath, nullptr, &assetPath);
 
+		mModelAssetPath = StorableString("AnimationView/ModelAssetPath/" + assetPath, "");
+		mSkeletoneAssetPath = StorableString("AnimationView/SkeletoneAssetPath/" + assetPath, "");
+		mMaterialAssetPath = StorableString("AnimationView/MaterialAssetPath/" + assetPath, "");
+
+	}
 	void AnimationView::Load()
 	{
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
@@ -146,11 +158,14 @@ namespace JG
 			mEditorUIScene->OnGUI();
 		}
 
-
+		//f32 fraction = mAnimController->GetAnimationStateMachine()->Get
+		ImGui::ProgressBar(1.0f);
 
 
 
 		ImGui::Separator();
+
+
 
 		f32 label_Space = ImGui::CalcTextSize("        ").x;
 
@@ -221,6 +236,7 @@ namespace JG
 			}
 			else
 			{
+				mAnimClipBuildDataDic[selectedNodeID].ID = selectedNodeID;
 				AnimationClip_OnGUI(mAnimClipBuildDataDic[selectedNodeID]);
 			}
 			
@@ -431,26 +447,40 @@ namespace JG
 		ImGui::BeginChild("Animation Top Menu", ImVec2(0.0f, 30.0f));
 		
 
-		ImGui::Button("Build", ImVec2(70.0f, 26.0f)); ImGui::SameLine();
-		
+		if (ImGui::Button("Build", ImVec2(70.0f, 26.0f)) == true)
+		{
+			SharedPtr<AnimationController> newController = CreateSharedPtr<AnimationController>();
+			JGAnimation::GetInstance().RegisterAnimationController(newController);
+			if (Build(newController))
+			{
+				JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimController);
+				mAnimController = newController;
+			}
+			else
+			{
+				JGAnimation::GetInstance().UnRegisterAnimatioinController(newController);
+			}
+			
+		}; ImGui::SameLine();
 
 		if (mAnimState == EAnimState::Playing) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.1f, 1.0f));
-		if (ImGui::Button(mAnimState == EAnimState::Editable ? "Play" : "Pause", ImVec2(70.0f, 26.0f)))
+		bool isClickPlayButton = ImGui::Button(mAnimState == EAnimState::Editable ? "Play" : "Pause", ImVec2(70.0f, 26.0f));
+		if (mAnimState == EAnimState::Playing) ImGui::PopStyleColor();
+		if(isClickPlayButton)
 		{
 			switch (mAnimState)
 			{
 			case EAnimState::Editable:
+				Play();
 				mAnimState = EAnimState::Playing;
 				break;
 			case EAnimState::Playing:
+				Editable();
 				mAnimState = EAnimState::Editable;
 				break;
 			}
 		} ImGui::SameLine();
-		if (mAnimState == EAnimState::Playing) ImGui::PopStyleColor();
-
-		ImGui::Button("Pause", ImVec2(70.0f, 26.0f)); 
-
+		
 		ImGui::Separator();
 		ImGui::EndChild();
 
@@ -686,7 +716,20 @@ namespace JG
 	}
 	void AnimationView::AnimationClip_OnGUI(AnimClipBuildData& buildData)
 	{
+		ImGui::PushID(buildData.ID);
 		ImGui::Text("Name : NodeName");
+		ImGui::Spacing();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Repeat "); ImGui::SameLine();
+
+		bool _bool = buildData.Flags & EAnimationClipFlags::Repeat;
+		if (ImGui::Checkbox("##CheckBox_Repeat", &_bool) == true)
+		{
+			if (_bool == false) buildData.Flags = (EAnimationClipFlags)((i32)buildData.Flags & (~(i32)EAnimationClipFlags::Repeat));
+			else buildData.Flags = buildData.Flags | EAnimationClipFlags::Repeat;
+		}
+
+
 		f32 label_Space = ImGui::CalcTextSize("         ").x;
 
 		ImGui::AssetField_OnGUI("AnimationClip", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
@@ -694,6 +737,8 @@ namespace JG
 		{
 			buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(assetPath);
 		}, label_Space);
+
+		ImGui::PopID();
 	}
 	void AnimationView::CreateRootNode()
 	{
@@ -768,6 +813,7 @@ namespace JG
 		}
 		mEditorUIScene->SetModel(mModel);
 	}
+
 	void AnimationView::SetMesh(const String& meshAssetPath)
 	{
 		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(meshAssetPath);
@@ -827,5 +873,179 @@ namespace JG
 				return data.ParamName == removedName;
 			}));
 		}
+	}
+
+	bool AnimationView::Build(SharedPtr<AnimationController> newController)
+	{
+		if (mSkeletoneAsset == nullptr || mSkeletoneAsset->IsValid() == false)
+		{
+			JG_LOG_ERROR("Skeleton Asset is Null");
+			return false;
+		}
+		newController->BindSkeletone(mSkeletoneAsset->Get());
+
+		if (mMeshAsset == nullptr || mMeshAsset->IsValid() == false)
+		{
+			JG_LOG_ERROR("Mesh Asset is Null");
+			return false;
+		}
+		newController->BindMesh(mMeshAsset->Get());
+
+		if (mMaterialAssetList.empty() == true)
+		{
+			JG_LOG_WARN("Material Asset is Empty");
+		}
+		
+
+		// Animation Parameter 설정
+		SharedPtr<AnimationParameters> animParam = newController->GetAnimationParameters();
+		for (const AnimParamBuildData& buildData : mAnimParamBuildDataList)
+		{
+			bool isSuccess = false;
+			switch (buildData.Type)
+			{
+			case EAnimationParameterType::Bool:
+				isSuccess = animParam->SetBool(buildData.Name, *((bool*)buildData.Data.data()));
+				break;
+			case EAnimationParameterType::Float:
+				isSuccess = animParam->SetFloat(buildData.Name, *((f32*)buildData.Data.data()));
+				break;
+			case EAnimationParameterType::Int:
+				isSuccess = animParam->SetInt(buildData.Name, *((i32*)buildData.Data.data()));
+				break;
+			}
+			if (isSuccess == false)
+			{
+				JG_LOG_ERROR("Fail Build Animation Parmeters : {0}", buildData.Name);
+				return false;
+			}
+		}
+
+		
+
+		for (auto _pair : mAnimClipBuildDataDic)
+		{
+			SharedPtr<Asset<AnimationClip>> clipAsset = _pair.second.Asset;
+			if (clipAsset == nullptr || clipAsset->IsValid() == false)
+			{
+				JG_LOG_ERROR("AnimationClipNode's Asset is Null -> Node ID :  {0}", _pair.first);
+				return false;
+			}
+			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(_pair.first);
+			if (node == nullptr)
+			{
+				JG_LOG_ERROR("Can't Find StateNode In NodeEditor: {0}", _pair.first);
+				return false;
+			}
+			newController->AddAnimationClip(node->GetName(), clipAsset->Get(), _pair.second.Flags, true);
+		}
+		
+
+		SharedPtr<AnimationStateMachine> stateMachine = newController->GetAnimationStateMachine();
+		StateNodeGUI::StateNodeLinkInfo nodeLinkInfo  = mNodeEditor->GetNodeLinkInfo();
+
+		StateNodeGUI::StateNode* rootNode = mNodeEditor->FindNode(nodeLinkInfo.RootNodeID);
+		if (rootNode == nullptr)
+		{
+			JG_LOG_ERROR("Can't Find RootNode");
+			return false;
+		}
+		stateMachine->Begin(rootNode->GetName());
+
+		// Add Clip Node
+		for (StateNodeGUI::StateNodeID nodeID : nodeLinkInfo.NodeIDList)
+		{
+			if (nodeLinkInfo.RootNodeID == nodeID) continue;
+
+			StateNodeGUI::StateNode* clipNode = mNodeEditor->FindNode(nodeID);
+			if (clipNode == nullptr)
+			{
+				JG_LOG_ERROR("Can't Find Node {0}", nodeID);
+				return false;
+			}
+			
+			bool isSuccessMakeAnimClipNode = false;
+			stateMachine->MakeAnimationClipNode(clipNode->GetName(),[&](AnimationClipInfo* clipInfo)
+			{
+				isSuccessMakeAnimClipNode = true;
+			});
+			if (isSuccessMakeAnimClipNode == false)
+			{
+				JG_LOG_ERROR("Fail Make Animation Clip Node {0}", clipNode->GetName());
+				return false;
+			}
+		}
+
+		// Create Transition
+		u32 nodeCnt = nodeLinkInfo.NodeIDList.size();
+		for (u32 i = 0; i < nodeCnt; ++i)
+		{
+			StateNodeGUI::StateNodeID nodeID = nodeLinkInfo.NodeIDList[i];
+			List<StateNodeGUI::StateNodeID> linkedNodeIDList = nodeLinkInfo.LinkedNodeIDLists[i];
+			StateNodeGUI::StateNode* prevNode = mNodeEditor->FindNode(nodeID);
+
+
+			for (StateNodeGUI::StateNodeID linkedNodeID : linkedNodeIDList)
+			{
+				StateNodeGUI::StateNode* nextNode = mNodeEditor->FindNode(linkedNodeID);
+				if (nextNode == nullptr)
+				{
+					JG_LOG_ERROR("Can't Find Node {0}", nodeID);
+					return false;
+				}
+				bool isSuccessConnectNode = false;
+				stateMachine->ConnectNode(prevNode->GetName(), nextNode->GetName(),
+					[&](AnimationTransition* transition)
+				{
+					StateNodeGUI::StateNodeID transitionNodeID = prevNode->GetTransition(nextNode->GetID());
+					if (transitionNodeID == 0 || mAnimTransitionBuildDataDic.find(transitionNodeID) == mAnimTransitionBuildDataDic.end())
+					{
+						return;
+					}
+
+					const AnimTransitionBuildData& tranBuildData = mAnimTransitionBuildDataDic[transitionNodeID];
+					for (const AnimTransitionConditionBuildData& condBuildData : tranBuildData.Conditions)
+					{
+						switch (condBuildData.Type)
+						{
+						case EAnimationParameterType::Bool:
+							transition->AddCondition_Bool(condBuildData.ParamName, *((bool*)condBuildData.Data.data()));
+							break;
+						case EAnimationParameterType::Float:
+							transition->AddCondition_Float(condBuildData.ParamName, *((f32*)condBuildData.Data.data()), condBuildData.Condition);
+							break;
+						case EAnimationParameterType::Int:
+							transition->AddCondition_Int(condBuildData.ParamName, *((i32*)condBuildData.Data.data()), condBuildData.Condition);
+							break;
+						default:
+							JG_LOG_ERROR("Transition's Parameter Type is Unknown");
+							return;
+						}
+					}
+
+					isSuccessConnectNode = true;
+				});
+				if (isSuccessConnectNode == false)
+				{
+					JG_LOG_ERROR("Fail ConnectNode  {0}  ->  {1}", prevNode->GetName(), nextNode->GetName());
+					return false;
+				}
+			}
+
+		}
+
+
+		stateMachine->End();
+		return true;
+	}
+	void AnimationView::Play()
+	{
+		// 처음부터 플레이
+		// NodeEditor 락
+		// 
+	}
+	void AnimationView::Editable()
+	{
+		// NodeEditor unlock
 	}
 }

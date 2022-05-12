@@ -51,6 +51,7 @@ namespace JG
 		struct AnimClipBuildData
 		{
 			StateNodeGUI::StateNodeID ID;
+			EAnimationClipFlags Flags = EAnimationClipFlags::None;
 			SharedPtr<Asset<AnimationClip>> Asset;
 		};
 		enum class EEditMode
@@ -74,7 +75,7 @@ namespace JG
 		const f32 mTransitionParamNameRowWidth = 150.0f;
 		const f32 mTransitionConditionRowWidth = 150.0f;
 		const f32 mTransitionValueRowWidth = 70.0f;
-		const JVector2 mSceneResolution = JVector2(mLeftWidth, mLeftWidth);
+		const JVector2 mSceneResolution = JVector2(mLeftWidth, mLeftWidth + 50.0f);
 
 	private:
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;
@@ -83,9 +84,6 @@ namespace JG
 		SharedPtr<Asset<Skeletone>> mSkeletoneAsset = nullptr;
 		SharedPtr<Asset<IMesh>>		mMeshAsset = nullptr;
 		UniquePtr<EditorUIScene>    mEditorUIScene;
-
-
-
 
 		SharedPtr<AnimationController> mAnimController;
 		UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
@@ -108,6 +106,8 @@ namespace JG
 	public:
 		AnimationView();
 		virtual ~AnimationView() = default;
+
+		void SetAnimation(const String& animatinoAssetPath);
 	protected:
 		virtual void Load() override;
 		virtual void Initialize() override;
@@ -116,6 +116,8 @@ namespace JG
 		virtual void OnEvent(IEvent& e) override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override { }
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override { }
+
+
 	private:
 		void AnimationScene_OnGUI();
 		void AnimationInspector_OnGUI();
@@ -129,6 +131,7 @@ namespace JG
 		void CreateAnimationClipNode();
 
 		void UpdateScene();
+	
 		void SetMesh(const String& meshAssetPath);
 		void SetSkeletal(const String& skeletalAssetPath);
 		void SetMaterial(const List<String>& materialAssetPath);
@@ -136,6 +139,18 @@ namespace JG
 		void UpdateTransitionBuildData(const String& paramName, EAnimationParameterType type);
 		void UpdateTransitionBuildData(const String& oldName, const String& newName);
 		void RemoveTransitionBuildData(const String& removedName);
+
+		// Animation Controller 생성
+		// 생성 이후 기존 Controller 는 제거
+		bool Build(SharedPtr<AnimationController> newController);
+
+
+		// 플레이 시 노드 에디터 락(편집 불가)  애니메이션 파라미터에 따라서 노드  Flow 가 발생
+		void Play();
+
+		// 편집 가능,
+		void Editable();
+
 		Color GetBgColor(EAnimationParameterType type) {
 			return mBgColorByParamTypeDic[type];
 		}

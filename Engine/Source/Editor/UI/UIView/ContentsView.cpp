@@ -855,6 +855,7 @@ namespace JG
 			AnimationView* animView = UIManager::GetInstance().GetUIView<AnimationView>(pathHash);
 			if (animView != nullptr)
 			{
+				animView->SetAnimation(path);
 				animView->Open();
 			}
 			break;

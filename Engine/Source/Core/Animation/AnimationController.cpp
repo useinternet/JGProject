@@ -14,7 +14,7 @@
 
 namespace JG
 {
-	void AnimationController::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags)
+	void AnimationController::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate)
 	{
 		if (animationClip == nullptr || animationClip->IsValid() == false)
 		{
@@ -25,17 +25,39 @@ namespace JG
 		data.Name = name;
 		data.Clip = animationClip;
 		data.ClipInfo = CreateSharedPtr<AnimationClipInfo>(name, animationClip, flags);
-		mClipCommandDataQueue.push(data);
+
+		if (immediate)
+		{
+			if (mAnimClips.find(data.Name) == mAnimClips.end())
+			{
+				mAnimClips.emplace(data.Name, data.Clip);
+				mAnimClipInfos.emplace(data.Name, data.ClipInfo);
+			}
+		}
+		else
+		{
+			mClipCommandDataQueue.push(data);
+		}
+
 	}
 
-	void AnimationController::RemoveAnimationClip(const String& name)
+	void AnimationController::RemoveAnimationClip(const String& name, bool immediate)
 	{
 		ClipCommandData data;
 		data.Command = ClipCommandData::Command_Remove;
 		data.Name = name;
 		data.Clip     = nullptr;
 		data.ClipInfo = nullptr;
-		mClipCommandDataQueue.push(data);
+		
+		if (immediate)
+		{
+			mAnimClips.erase(data.Name);
+			mAnimClipInfos.erase(data.Name);
+		}
+		else
+		{
+			mClipCommandDataQueue.push(data);
+		}
 	}
 
 	void AnimationController::BindSkeletone(SharedPtr<Skeletone> skeletone)

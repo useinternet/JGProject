@@ -18,14 +18,14 @@ namespace JG
 	private:
 		String Name;
 		f32    TimePos;
-
+		f32    Duration;
 		SharedPtr<AnimationClip> Clip;
 		EAnimationClipFlags Flags = EAnimationClipFlags::None;
 	public:
 		AnimationClipInfo(const String& name, SharedPtr<AnimationClip> clip, EAnimationClipFlags flags);
 		void Reset()
 		{
-			TimePos = 0.0f;
+			TimePos = std::fmodf(TimePos, Duration);
 		}
 		EAnimationClipFlags GetFlags() const
 		{
@@ -67,6 +67,7 @@ namespace JG
 		void SetName(const String& name);
 		const String& GetName() const;
 		const String& GetClipName() const;
+		f32 GetDuration() const;
 	private:
 		void UpdateInternal(u32 nodeID, f32 timePos, SharedPtr<JG::Skeletone> skeletone, SharedPtr<ISubMesh> mesh, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
 

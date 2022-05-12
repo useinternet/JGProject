@@ -187,6 +187,7 @@ namespace JG
 				switch (clipState)
 				{
 				case EAnimationClipState::Running:
+					break;
 				case EAnimationClipState::Compelete:
 					if (animClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
 					{

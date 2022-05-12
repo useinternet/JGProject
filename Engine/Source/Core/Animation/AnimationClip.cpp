@@ -12,8 +12,10 @@ namespace JG
 	{
 		Name = name;
 		TimePos = 0.0f;
+		Duration = clip->GetDuration();
 		Clip = clip;
 		Flags = flags;
+
 	}
 
 
@@ -31,10 +33,9 @@ namespace JG
 		clipInfo->TimePos += tick * mTickPerSecond * 10;
 		if (clipInfo->TimePos >= mDuration)
 		{
-			clipInfo->TimePos = std::fmodf(clipInfo->TimePos, mDuration);
 			return EAnimationClipState::Compelete;
 		}
-
+		JG_LOG_INFO("Test TimePos : {0}", clipInfo->TimePos);
 		u32 subMeshCount = mesh->GetSubMeshCount();
 		out_animTransform.resize(subMeshCount);
 		for (u32 i = 0; i < subMeshCount; ++i)
@@ -82,6 +83,11 @@ namespace JG
 	const String& AnimationClip::GetClipName() const
 	{
 		return mClipName;
+	}
+
+	f32 AnimationClip::GetDuration() const
+	{
+		return mDuration;
 	}
 
 

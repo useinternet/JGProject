@@ -314,6 +314,14 @@ namespace JG
 			}
 			return result;
 		}
+		StateNodeID StateNode::GetTransition(StateNodeID id)
+		{
+			if (mOutLinkedTransitionDic.find(id) == mOutLinkedTransitionDic.end())
+			{
+				return 0;
+			}
+			return mOutLinkedTransitionDic[id];
+		}
 		void StateNode::OnGUI()
 		{
 			StateNodeEditorDataStorage& dataStorage = mNodeEditor->GetDataStorage();
@@ -465,12 +473,6 @@ namespace JG
 			{
 				mDataStorage->SetLinkingNode(0);
 			}
-			// 들어오는 링크 노드 연결 해제
-			HashSet<StateNodeID> inLinkedNodeIDs = node->mInLinkedNodeIDs;
-			for (StateNodeID inLinkID : inLinkedNodeIDs)
-			{
-				UnLink(inLinkID, node->GetID());
-			}
 			// 내보내는 링크 노드 연결 해제
 			HashSet<StateNodeID> outLinkedNodeIDs = node->mOutLinkedNodeIDs;
 			for (StateNodeID outLinkedID : outLinkedNodeIDs)
@@ -525,7 +527,6 @@ namespace JG
 			}
 
 			from->mOutLinkedNodeIDs.insert(toID);
-			to->mInLinkedNodeIDs.insert(fromID);
 			mDataStorage->SetLinkingNode(0);
 
 			from->mOutLinkedTransitionDic[toID] = CreateTransition(fromID, toID);
@@ -556,9 +557,6 @@ namespace JG
 			from->mOutLinkedNodeIDs.erase(toID);
 			RemoveTransition(from->mOutLinkedTransitionDic[toID]);
 			from->mOutLinkedTransitionDic.erase(toID);
-			to->mInLinkedNodeIDs.erase(fromID);
-
-
 		}
 
 		void StateNodeEditor::BindContextMenuFunc(const std::function<void()>& func)
@@ -715,6 +713,34 @@ namespace JG
 				}
 				else mDataStorage->SetDraggingNode(0);
 			}
+		}
+		StateNodeLinkInfo StateNodeEditor::GetNodeLinkInfo() const
+		{
+			StateNodeLinkInfo info;
+			for (const std::pair<StateNodeID, StateNode>& _pair : mNodeDic)
+			{
+				StateNodeID id		  = _pair.first;
+				const StateNode& node = _pair.second;
+
+				List<StateNodeID> linkedNodeIDList;
+
+
+				if (node.GetFlags() & EStateNodeFlags::RootNode)
+				{
+					info.RootNodeID = id;
+				}
+				
+				for (StateNodeID linkedNodeID : node.mOutLinkedNodeIDs)
+				{
+					linkedNodeIDList.push_back(linkedNodeID);
+				}
+				
+
+				info.NodeIDList.push_back(id);
+				info.LinkedNodeIDLists.push_back(linkedNodeIDList);
+			}
+
+			return info;
 		}
 	}
 }

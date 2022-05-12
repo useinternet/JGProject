@@ -52,8 +52,8 @@ namespace JG
 		u64 mWaitFrameCount = 0;
 	public:
 		// Clip Ã£±â
-		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags);
-		void RemoveAnimationClip(const String& name);
+		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate = false);
+		void RemoveAnimationClip(const String& name, bool immediate = false);
 		void BindSkeletone(SharedPtr<Skeletone> skeletone);
 		void BindMesh(SharedPtr<IMesh> mesh);
 
