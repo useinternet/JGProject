@@ -5,8 +5,10 @@
 #include "Application.h"
 #include "Graphics/JGGraphics.h"
 #include "Class/Data/Skeletone.h"
+#include "Animation/AnimationDefines.h"
 #include "Animation/AnimationClip.h"
 #include "Animation/AnimationController.h"
+#include "Animation/AnimationStateMachine.h"
 #include "AssetImporter.h"
 
 namespace JG
@@ -278,12 +280,176 @@ namespace JG
 		}
 	}
 
-	void AnimationStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	void AnimationAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 
+		jsonData->AddMember(ROOT_NAME_KEY, RootName);
+
+
+		SharedPtr<JsonData> animClipListJson = jsonData->CreateJsonData();
+		for (const AnimationClipInfo& clipInfo : AnimClips)
+		{
+			SharedPtr<JsonData> animClipJson = animClipListJson->CreateJsonData();
+
+
+			animClipJson->AddMember(ANIM_CLIP_NAME_KEY, clipInfo.Name);
+			animClipJson->AddMember(ANIM_CLIP_ASSETPATH_KEY, clipInfo.AssetPath);
+			animClipJson->AddMember(ANIM_CLIP_ANIM_FLAGS_KEY, (u32)clipInfo.Flags);
+			animClipListJson->AddMember(animClipJson);
+		}
+		jsonData->AddMember(ANIM_CLIP_LIST_KEY, animClipListJson);
+
+
+		SharedPtr<JsonData> animParamListJson = jsonData->CreateJsonData();
+
+		for (auto _pair : Parameters)
+		{
+			SharedPtr<JsonData> animParamJson = animParamListJson->CreateJsonData();
+
+			animParamJson->AddMember(ANIM_PARAM_NAME_KEY, _pair.second.Name);
+			animParamJson->AddMember(ANIM_PARAM_TYPE_KEY, AnimationParameterTypeToString(_pair.second.Type));
+			animParamJson->AddMember(ANIM_PARAM_DATA_KEY, _pair.second.Data);
+
+			animParamListJson->AddMember(animParamJson);
+		}
+		jsonData->AddMember(ANIM_PARAM_LIST_KEY, animParamListJson);
+
+
+		//
+		SharedPtr<JsonData> linkInfoListJson = jsonData->CreateJsonData();
+		for (const AnimationNodeLinkInfo& linkInfo : LinkInfos)
+		{
+			SharedPtr<JsonData> linkInfoJson = linkInfoListJson->CreateJsonData();
+			
+			
+			linkInfoJson->AddMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY, linkInfo.PrevName);
+			linkInfoJson->AddMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY, linkInfo.NextName);
+
+			SharedPtr<JsonData> transitionListJson = linkInfoJson->CreateJsonData();
+			for (const AnimationTransitionInfo& tranInfo : linkInfo.Transitions)
+			{
+				SharedPtr<JsonData> transitionJson = transitionListJson->CreateJsonData();
+
+				transitionJson->AddMember(ANIM_TRANSITION_NAME_KEY, tranInfo.ParameterName);
+				transitionJson->AddMember(ANIM_TRANSITION_CONDITION_KEY, AnimationConditionTypeToString(tranInfo.Condition));
+				transitionJson->AddMember(ANIM_TRANSITION_DATA_KEY, tranInfo.Data);
+
+				transitionListJson->AddMember(transitionJson);
+			}
+			linkInfoJson->AddMember(ANIM_LINKINFO_TRANSITION_LIST_KEY, transitionListJson);
+			linkInfoListJson->AddMember(linkInfoJson);
+		}
+		jsonData->AddMember(ANIM_LINKINFO_LIST_KEY, linkInfoListJson);
+
 	}
-	void AnimationStock::LoadJson(SharedPtr<JsonData> jsonData)
+	void AnimationAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
+		SharedPtr<JsonData> val = jsonData->GetMember(ROOT_NAME_KEY);
+
+		if (val != nullptr && val->IsString())
+		{
+			RootName = val->GetString();
+		}
+		val = jsonData->GetMember(ANIM_CLIP_LIST_KEY);
+
+		if (val != nullptr && val->IsArray())
+		{
+			u32 cnt = val->GetSize();
+			for (u32 i = 0; i < cnt; ++i)
+			{
+				SharedPtr<JsonData> clipJson = val->GetJsonDataFromIndex(i);
+				AnimationClipInfo clipInfo;
+				if (clipJson != nullptr)
+				{
+					clipInfo.Name      = clipJson->GetMember(ANIM_CLIP_NAME_KEY)->GetString();
+					clipInfo.AssetPath = clipJson->GetMember(ANIM_CLIP_ASSETPATH_KEY)->GetString();
+					clipInfo.Flags     = (EAnimationClipFlags)clipJson->GetMember(ANIM_CLIP_ANIM_FLAGS_KEY)->GetUint32();
+					AnimClips.push_back(clipInfo);
+				}
+
+			}
+		}
+
+		val = jsonData->GetMember(ANIM_PARAM_LIST_KEY);
+		if (val != nullptr && val->IsArray())
+		{
+			u32 cnt = val->GetSize();
+			for (u32 i = 0; i < cnt; ++i)
+			{
+				SharedPtr<JsonData> animParamJson = val->GetJsonDataFromIndex(i);
+
+				ParameterData paramData;
+
+				paramData.Name = animParamJson->GetMember(ANIM_PARAM_NAME_KEY)->GetString();
+				paramData.Type = StringToAnimationParameterType(animParamJson->GetMember(ANIM_PARAM_TYPE_KEY)->GetString());
+				paramData.Data = animParamJson->GetMember(ANIM_PARAM_DATA_KEY)->GetByteList();
+				Parameters[paramData.Name] = paramData;
+			}
+		}
+
+		val = jsonData->GetMember(ANIM_LINKINFO_LIST_KEY);
+		if (val != nullptr && val->IsArray())
+		{
+			u32 cnt = val->GetSize();
+			for (u32 i = 0; i < cnt; ++i)
+			{
+				AnimationNodeLinkInfo linkInfo;
+				SharedPtr<JsonData> linkInfoJson = val->GetJsonDataFromIndex(i);
+				if (linkInfoJson != nullptr)
+				{
+					linkInfo.PrevName = linkInfoJson->GetMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY)->GetString();
+					linkInfo.NextName = linkInfoJson->GetMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY)->GetString();
+
+					SharedPtr<JsonData> transitionListJson = linkInfoJson->GetMember(ANIM_LINKINFO_TRANSITION_LIST_KEY);
+					if (transitionListJson != nullptr && transitionListJson->IsArray())
+					{
+						u32 transitionCnt = transitionListJson->GetSize();
+						for (u32 j = 0; j < transitionCnt; ++j)
+						{
+							AnimationTransitionInfo transitionInfo;
+							SharedPtr<JsonData> transitionJson = transitionListJson->GetJsonDataFromIndex(j);
+							if (transitionJson != nullptr)
+							{
+								transitionInfo.ParameterName = transitionJson->GetMember(ANIM_TRANSITION_NAME_KEY)->GetString();
+								transitionInfo.Condition = StringToAnimationConditionType(transitionJson->GetMember(ANIM_TRANSITION_CONDITION_KEY)->GetString());
+								transitionInfo.Data = transitionJson->GetMember(ANIM_TRANSITION_DATA_KEY)->GetByteList();
+								linkInfo.Transitions.push_back(transitionInfo);
+							}
+						}
+					}
+
+					LinkInfos.push_back(linkInfo);
+				}
+			}
+		}
+
+
+		/*
+SharedPtr<JsonData> linkInfoListJson = jsonData->CreateJsonData();
+		for (const AnimationNodeLinkInfo& linkInfo : LinkInfos)
+		{
+			SharedPtr<JsonData> linkInfoJson = linkInfoListJson->CreateJsonData();
+
+
+			linkInfoJson->AddMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY, linkInfo.PrevName);
+			linkInfoJson->AddMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY, linkInfo.NextName);
+
+			SharedPtr<JsonData> transitionListJson = linkInfoJson->CreateJsonData();
+			for (const AnimationTransitionInfo& tranInfo : linkInfo.Transitions)
+			{
+				SharedPtr<JsonData> transitionJson = transitionListJson->CreateJsonData();
+
+				transitionJson->AddMember(ANIM_TRANSITION_NAME_KEY, tranInfo.ParameterName);
+				transitionJson->AddMember(ANIM_TRANSITION_CONDITION_KEY, AnimationConditionTypeToString(tranInfo.Condition));
+				transitionJson->AddMember(ANIM_TRANSITION_DATA_KEY, tranInfo.Data);
+
+				transitionListJson->AddMember(transitionJson);
+			}
+			linkInfoJson->AddMember(ANIM_LINKINFO_TRANSITION_LIST_KEY, transitionListJson);
+			linkInfoListJson->AddMember(linkInfoJson);
+		}
+		jsonData->AddMember(ANIM_LINKINFO_LIST_KEY, linkInfoListJson);
+		*/
 
 	}
 
@@ -609,6 +775,82 @@ namespace JG
 	
 		return result;
 	}
+
+	SharedPtr<IAsset> AssetDataBase::LoadOriginAssetImmediate(const String& path)
+	{
+		
+		String resourcePath;
+		String absolutePath;
+		if (AssetHelper::GetResourcePath(path, &absolutePath, &resourcePath) == false)
+		{
+			return nullptr;
+		}
+		if (fs::exists(absolutePath) == false)
+		{
+			return nullptr;
+		}
+
+
+		SharedPtr<AssetLoadData> assetLoadData = CreateSharedPtr<AssetLoadData>();
+		UniquePtr<AssetData> assetData = CreateUniquePtr<AssetData>();
+		AssetID assetID;
+		SharedPtr<IAsset> result = nullptr;
+		{
+			std::lock_guard<std::mutex> lock(mAssetLoadMutex);
+			auto iter = mOriginAssetDataPool.find(resourcePath);
+			if (iter != mOriginAssetDataPool.end())
+			{
+				if (iter->second->Asset == nullptr)
+				{
+					return nullptr;
+				}
+				else
+				{
+					return iter->second->Asset->Copy();
+				}
+
+			}
+
+			assetID  = RequestOriginAssetID();
+			assetData->State = EAssetDataState::Loading;
+			assetData->Path = resourcePath;
+			assetData->Asset = CreateAsset(assetID, absolutePath);
+			assetData->ID = assetData->Asset->GetAssetID();
+			result = assetData->Asset;
+
+
+			assetLoadData->ID = assetData->ID;
+			assetLoadData->Asset = assetData->Asset;
+			strcpy(assetLoadData->Path, absolutePath.c_str());
+
+			mOriginAssetDataPool.emplace(resourcePath, assetData.get());
+			mAssetDataPool.emplace(assetID, std::move(assetData));
+		}
+		
+		if (LoadAssetInternal(assetLoadData.get()) == false)
+		{
+			std::lock_guard<std::mutex> lock(mAssetLoadMutex);
+			JG_LOG_ERROR("Asset Load Fail  : {0}", resourcePath);
+			mOriginAssetDataPool.erase(resourcePath);
+			mAssetDataPool.erase(assetID);
+			return nullptr;
+		}
+		if (assetLoadData->OnComplete != nullptr)
+		{
+			AssetLoadCompeleteData data;
+			data.Asset = assetLoadData->Asset;
+			data.Stock = assetLoadData->Stock;
+			data.Json = assetLoadData->Json;
+			data.OnComplete = assetLoadData->OnComplete;
+			assetLoadData->OnComplete(&data);
+		}
+
+
+
+		return result;
+	}
+
+
 	SharedPtr<IAsset> AssetDataBase::LoadReadWriteAsset(AssetID originID)
 	{
 		auto iter = mAssetDataPool.find(originID);
@@ -880,6 +1122,19 @@ namespace JG
 			if (aAsset != nullptr)
 			{
 				aAsset->mData->SetAnimationClipStock(stock);
+			}
+			else return false;
+			break;
+		}
+		case EAssetFormat::Animation:
+		{
+			AnimationAssetStock stock;
+			stock.LoadJson(assetVal);
+			auto aAsset = LoadData->Asset->As<Asset<AnimationController>>();
+			if (aAsset != nullptr)
+			{
+				aAsset->mData->SetAnimationStock(stock);
+				aAsset->mData->GetAnimationStateMachine()->UnLock();
 			}
 			else return false;
 			break;
@@ -1213,6 +1468,7 @@ namespace JG
 
 		meshAsset->mData->SetMeshStock(*meshStock);
 	}
+
 	SharedPtr<IAsset> AssetDataBase::CreateAsset(AssetID assetID, const String& path)
 	{
 		// Mesh, Material, Texture
@@ -1225,6 +1481,12 @@ namespace JG
 		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path, assetFormat);
 		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path, assetFormat);
 		case EAssetFormat::AnimationClip: return CreateSharedPtr<Asset<AnimationClip>>(assetID, path, assetFormat);
+		case EAssetFormat::Animation:
+		{
+			auto animAsset = CreateSharedPtr<Asset<AnimationController>>(assetID, path, assetFormat);
+			animAsset->Get()->GetAnimationStateMachine()->Lock();
+			return animAsset;
+		}
 		case EAssetFormat::Skeletal: return CreateSharedPtr<Asset<Skeletone>>(assetID, path, assetFormat);
 		}
 

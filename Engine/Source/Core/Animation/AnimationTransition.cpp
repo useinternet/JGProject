@@ -75,6 +75,7 @@ namespace JG
 		return false;
 	}
 
+
 	bool AnimationTransition::TransitionBool(const TransitionConditionInfo& info) const
 	{
 		const TransitionCondition<bool>& condition = mBoolTransitionList[info.ID];

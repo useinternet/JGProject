@@ -42,7 +42,6 @@ namespace JG
 
 	void JGAnimation::RegisterAnimationController(SharedPtr<AnimationController> controller)
 	{
-		controller->Init();
 		mCommandQueue.push(CommandData(controller, CommandData::Command_Add));
 	}
 

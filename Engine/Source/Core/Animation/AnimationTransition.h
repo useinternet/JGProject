@@ -14,7 +14,8 @@ namespace JG
 		virtual bool Transition(const AnimationTransitionData& transitionData) = 0;
 	};
 
-
+	// 바로 변경
+	// 완료하고 변경
 	class AnimationTransition
 	{
 		friend class AnimationTransitionModifier;
@@ -54,6 +55,9 @@ namespace JG
 
 		AnimationTransitionData   mData;
 		EAnimationTransitionFlags mFlags;
+
+		// 
+		f32 mTransitionDuration = 0.0f;
 	public:
 		AnimationTransition(const AnimationTransitionData& transitionData) : mData(transitionData) {}
 		void SetFlags(EAnimationTransitionFlags flags);
@@ -62,7 +66,16 @@ namespace JG
 		void AddCondition_Bool(const String& name, bool value);
 		void AddCondition_Int(const String& name, i32 value, EAnimationCondition condition);
 		void AddCondition_Float(const String& name, f32 value, EAnimationCondition condition);
+
+		
 		bool Transition() const;
+
+		void SetTransitionDuration(f32 duration) {
+			mTransitionDuration = duration;
+		}
+		f32 GetTransitionDuration() const {
+			return mTransitionDuration;
+		}
 	private:
 		bool TransitionBool(const TransitionConditionInfo& info) const;
 		bool TransitionInt(const TransitionConditionInfo& info) const;

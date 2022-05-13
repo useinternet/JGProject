@@ -21,11 +21,13 @@ namespace JG
 		return mOwnerAnimController;
 	}
 
+
+
 	AnimationStateMachine& AnimationStateMachine::Begin(const String& startNodeName)
 	{
 		if (mIsRunning) *this;
 		Reset();
-		mIsMakingSequence = true;
+		mIsMakingMachine = true;
 		if (CreateNode(ENodeType::Begin, startNodeName) == false)
 		{
 			return *this;
@@ -38,7 +40,7 @@ namespace JG
 	AnimationStateMachine& AnimationStateMachine::MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction)
 	{
 		if (mIsRunning) *this;
-		if (mIsMakingSequence == false)
+		if (mIsMakingMachine == false)
 		{
 			return *this;
 		}
@@ -59,7 +61,7 @@ namespace JG
 	AnimationStateMachine& AnimationStateMachine::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
 		if (mIsRunning) *this;
-		if (mIsMakingSequence == false)
+		if (mIsMakingMachine == false)
 		{
 			return *this;
 		}
@@ -97,11 +99,19 @@ namespace JG
 	void AnimationStateMachine::End()
 	{
 		if (mIsRunning) return;
-		mIsMakingSequence = false;
+		mIsMakingMachine = false;
 	}
 
-	List<SharedPtr<AnimationTransform>> AnimationStateMachine::Execute()
+	const AnimationStateFlow& AnimationStateMachine::GetAnimationStateFlow_Thread() const
 	{
+		return mFlow_Thread;
+	}
+	List<SharedPtr<AnimationTransform>> AnimationStateMachine::Execute_Thread()
+	{
+		if (mLock == true)
+		{
+			return List<SharedPtr<AnimationTransform>>();
+		}
 		if (mCurrentNode == nullptr)
 		{
 			mCurrentNode = FindNode(mBeginNodeName);
@@ -111,7 +121,9 @@ namespace JG
 			return List<SharedPtr<AnimationTransform>>();
 		}
 		mIsRunning = true;
-		return ExecuteInternal(mCurrentNode);
+		mFlow_Thread.NodeList.clear();
+		mFlow_Thread.NodeList.push_back(mBeginNodeName);
+		return ExecuteInternal_Thread(mCurrentNode);
 	}
 	bool AnimationStateMachine::CreateNode(ENodeType nodeType, const String& name)
 	{
@@ -149,7 +161,7 @@ namespace JG
 		}
 		return mNodeDic.at(name).get();
 	}
-	List<SharedPtr<AnimationTransform>> AnimationStateMachine::ExecuteInternal(Node* node)
+	List<SharedPtr<AnimationTransform>> AnimationStateMachine::ExecuteInternal_Thread(Node* node)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
 		if (animController == nullptr)
@@ -164,7 +176,8 @@ namespace JG
 			SharedPtr<AnimationTransition> transiton = node->ConnectedNodeTransitions[i];
 			if (transiton->Transition() == true)
 			{
-				result = ExecuteInternal(connectedNode);
+				mFlow_Thread.NodeList.push_back(mAnimClipNameList[connectedNode->ID]);
+				result = ExecuteInternal_Thread(connectedNode);
 			}
 		}
 

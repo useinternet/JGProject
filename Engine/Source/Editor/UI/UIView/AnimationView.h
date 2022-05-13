@@ -85,7 +85,7 @@ namespace JG
 		SharedPtr<Asset<IMesh>>		mMeshAsset = nullptr;
 		UniquePtr<EditorUIScene>    mEditorUIScene;
 
-		SharedPtr<AnimationController> mAnimController;
+		SharedPtr<Asset<AnimationController>> mAnimationAsset;
 		UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
 
 
@@ -96,13 +96,16 @@ namespace JG
 		StorableString mModelAssetPath;
 		StorableString mSkeletoneAssetPath;
 		StorableString mMaterialAssetPath;
+		StorableString mNodeSaveData;
 
 		// BuildData
 		Dictionary<EAnimationParameterType, Color> mBgColorByParamTypeDic;
 		HashSet<String> mAddedAnimParamNameSet;
 		List<AnimParamBuildData>	  mAnimParamBuildDataList;
 		Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
-		Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData> mAnimClipBuildDataDic;
+		Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
+		Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
+		Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
 	public:
 		AnimationView();
 		virtual ~AnimationView() = default;
@@ -116,8 +119,6 @@ namespace JG
 		virtual void OnEvent(IEvent& e) override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override { }
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override { }
-
-
 	private:
 		void AnimationScene_OnGUI();
 		void AnimationInspector_OnGUI();
@@ -131,7 +132,7 @@ namespace JG
 		void CreateAnimationClipNode();
 
 		void UpdateScene();
-	
+
 		void SetMesh(const String& meshAssetPath);
 		void SetSkeletal(const String& skeletalAssetPath);
 		void SetMaterial(const List<String>& materialAssetPath);
@@ -142,15 +143,16 @@ namespace JG
 
 		// Animation Controller 생성
 		// 생성 이후 기존 Controller 는 제거
-		bool Build(SharedPtr<AnimationController> newController);
-
+		bool Build();
+		
+		void RefreshAnimAsset(const String& path);
 
 		// 플레이 시 노드 에디터 락(편집 불가)  애니메이션 파라미터에 따라서 노드  Flow 가 발생
 		void Play();
-
+		void UpdateFlow();
 		// 편집 가능,
 		void Editable();
-
+		void SaveNodeLocation();
 		Color GetBgColor(EAnimationParameterType type) {
 			return mBgColorByParamTypeDic[type];
 		}

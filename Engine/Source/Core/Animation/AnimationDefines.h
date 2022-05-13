@@ -100,6 +100,8 @@ namespace JG
 
 		String PrevNodeName;
 		String NextNodeName;
+
+
 		AnimationTransitionData() = default;
 	};
 

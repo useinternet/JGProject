@@ -53,6 +53,7 @@ namespace JG
 				const JVector2& from, const JVector2& to, 
 				u32 lineColor, u32 rectColor, u32 outlineColor,
 				JRect* outTransitionNodeRect,
+				bool isFlowState,
 				bool islinkingLine, 
 				bool isFromNodeIsRootNode)
 			{
@@ -131,7 +132,7 @@ namespace JG
 					end   += offset;
 				}
 
-				draw_list->AddLine(ToImVec2(start), ToImVec2(end - (dir* halfArrowSize)), lineColor, style.LineThick);
+				draw_list->AddLine(ToImVec2(start), ToImVec2(end - (dir* halfArrowSize)), lineColor, (isFlowState) ? style.FlowLineThick : style.LineThick);
 
 				if (islinkingLine == false && isFromNodeIsRootNode == false)
 				{
@@ -159,6 +160,7 @@ namespace JG
 			StateNodeID mLinkingNodeID  = 0;
 			StateNodeID mDraggingNodeID = 0;
 			StateNodeID mRenamingNodeID = 0;
+			HashSet<u64> mFlowStateNodeIDSet;
 		public:
 			StateNodeID TempNodeTransitionID = 0;
 			JVector2 TempVector;
@@ -170,6 +172,24 @@ namespace JG
 		public:
 			StateNodeID GetSelectedNode() const {
 				return mSelectedNodeID;
+			}
+			bool IsFlowState(StateNodeID from, StateNodeID to)
+			{
+				u64 seed = std::hash<u64>()(from) ^ std::hash<u64>()(to);
+				return mFlowStateNodeIDSet.find(seed) != mFlowStateNodeIDSet.end();
+			}
+			void SetFlowState(const List<StateNodeID>& flowList)
+			{
+				mFlowStateNodeIDSet.clear();
+				i32 cnt = flowList.size();
+				for (i32 i = 0; i < cnt - 1; ++i)
+				{
+					StateNodeID from = flowList[i];
+					StateNodeID to = flowList[i + 1];
+					u64 seed = std::hash<u64>()(from) ^ std::hash<u64>()(to);
+
+					mFlowStateNodeIDSet.insert(seed);
+				}
 			}
 			void SetSelectedNode(StateNodeID id) {
 				mSelectedNodeID = id;
@@ -207,11 +227,12 @@ namespace JG
 				StateNode* prev_node = mNodeEditor->FindNode(mRenamingNodeID);
 				if (prev_node != nullptr)
 				{
+					String oldName = prev_node->mName;
 					prev_node->mName = TempStr;
 					TempStr = "";
 					if (mNodeEditor->mReNameCallBack)
 					{
-						mNodeEditor->mReNameCallBack(mRenamingNodeID, prev_node->mName);
+						mNodeEditor->mReNameCallBack(id, oldName, prev_node->mName);
 					}
 				}
 				
@@ -237,8 +258,9 @@ namespace JG
 		{
 			mColors[ColorStyle_NormalOutline] = ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 0.2f));
 			mColors[ColorStyle_HightlightOutline] = ImGui::GetColorU32(ImVec4(1.0f, 0.5f, 0.2f, 0.4f));
-			mColors[ColorStyle_NodeBody] = ImGui::GetColorU32(ImVec4(0.05f, 0.06f, 0.04f, 1.0F));
-			mColors[ColorStyle_LineColor] = ImGui::GetColorU32(ImVec4(1.0F, 1.0F, 1.0F, 1.0f));
+			mColors[ColorStyle_NodeBody]      = ImGui::GetColorU32(ImVec4(0.05f, 0.06f, 0.04f, 1.0F));
+			mColors[ColorStyle_LineColor]     = ImGui::GetColorU32(ImVec4(1.0F, 1.0F, 1.0F, 0.7f));
+			mColors[ColorStyle_FlowLineColor] = ImGui::GetColorU32(ImVec4(1.0F, 1.0F, 0.5F, 1.0f));
 		}
 		void StateNodeTransition::OnGUI()
 		{
@@ -254,18 +276,23 @@ namespace JG
 			StateNodeEditorDataStorage& dataStorage = mNodeEditor->GetDataStorage();
 			if (to != nullptr)
 			{
+				bool isFlow = dataStorage.IsFlowState(mFromID, mToID);
+
 				JRect transitionNodeRect;
 				drawer.DrawTransition(
 					mNodeEditor,
 					ImGui::GetWindowDrawList(),
 					from->GetLocation(),
 					to->GetLocation(),
-					GetColor(ColorStyle_LineColor),
+					isFlow ? GetColor(ColorStyle_FlowLineColor) : GetColor(ColorStyle_LineColor),
 					GetColor(ColorStyle_NodeBody),
 					dataStorage.GetSelectedNode() == GetID() ? 
 						GetColor(ColorStyle_HightlightOutline) : 
 						GetColor(ColorStyle_NormalOutline), 
-					&transitionNodeRect, false, from->GetFlags() & EStateNodeFlags::RootNode);
+					&transitionNodeRect,
+					isFlow,
+					false, 
+					from->GetFlags() & EStateNodeFlags::RootNode);
 
 				if (transitionNodeRect.Width() > 0 && transitionNodeRect.Height() > 0 && (from->GetFlags() & EStateNodeFlags::RootNode) == false)
 				{
@@ -290,7 +317,7 @@ namespace JG
 					GetColor(ColorStyle_LineColor),
 					GetColor(ColorStyle_NodeBody),
 					GetColor(ColorStyle_NormalOutline), 
-					nullptr, true, from->GetFlags() & EStateNodeFlags::RootNode);
+					nullptr, false, true, from->GetFlags() & EStateNodeFlags::RootNode);
 			}
 		}
 		u32 StateNodeTransition::GetColor(EColorStyle style)
@@ -455,6 +482,10 @@ namespace JG
 			newNode.mID = ++mIDOffset;
 			newNode.mNodeEditor = this;
 			mNodeDic[newNode.GetID()] = newNode;
+			if (mCreateNodeCallBack)
+			{
+				mCreateNodeCallBack(newNode.mID);
+			}
 			return newNode.mID;
 		}
 
@@ -501,6 +532,11 @@ namespace JG
 				return nullptr;
 			}
 			return &mNodeTransitionDic[id];
+		}
+
+		void StateNodeEditor::Flow(const List<StateNodeID>& flowList)
+		{
+			mDataStorage->SetFlowState(flowList);
 		}
 
 
@@ -563,6 +599,14 @@ namespace JG
 		{
 			mContextMenuFunc = func;
 		}
+		void StateNodeEditor::BindCreateNodeCallBack(const std::function<void(StateNodeID)>& callBack)
+		{
+			mCreateNodeCallBack = callBack;
+		}
+		void StateNodeEditor::BindDraggingNodeCallBack(const std::function<void(StateNodeID)>& callBack)
+		{
+			mDraggingNodeCallBack = callBack;
+		}
 		void StateNodeEditor::BindRemoveNodeCallBack(const std::function<void(StateNodeID)>& callBack)
 		{
 			mRemoveNodeCallBack = callBack;
@@ -579,7 +623,7 @@ namespace JG
 		{
 			mUnLinkNodeCallBack = callBack;
 		}
-		void StateNodeEditor::BindReNameCallBack(const std::function<void(StateNodeID, const String&)>& callBack)
+		void StateNodeEditor::BindReNameCallBack(const std::function<void(StateNodeID, const String&, const String&)>& callBack)
 		{
 			mReNameCallBack = callBack;
 		}
@@ -710,6 +754,10 @@ namespace JG
 				if (ImGui::IsMouseDown(0))
 				{
 					draggingNode->mLocation = (mousePos - winPos - GetOffset()) - mDataStorage->TempVector;
+					if (mDraggingNodeCallBack)
+					{
+						mDraggingNodeCallBack(draggingNode->GetID());
+					}
 				}
 				else mDataStorage->SetDraggingNode(0);
 			}

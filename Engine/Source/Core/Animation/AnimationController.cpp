@@ -5,6 +5,7 @@
 #include "AnimationStateMachine.h"
 #include "AnimationTransform.h"
 #include "AnimationClip.h"
+#include "AnimationTransition.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/JGGraphics.h"
@@ -14,6 +15,13 @@
 
 namespace JG
 {
+	AnimationController::AnimationController()
+	{
+		mAnimParams = CreateSharedPtr<AnimationParameters>();
+		mAnimParams_Thread = CreateSharedPtr<AnimationParameters>();
+		mAnimationStateMachine = CreateSharedPtr<AnimationStateMachine>(this);
+		mFlow = CreateSharedPtr<AnimationStateFlow>();
+	}
 	void AnimationController::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate)
 	{
 		if (animationClip == nullptr || animationClip->IsValid() == false)
@@ -62,6 +70,7 @@ namespace JG
 
 	void AnimationController::BindSkeletone(SharedPtr<Skeletone> skeletone)
 	{
+		std::lock_guard<std::mutex> lock(mSkeletonLock);
 		mSkeletone = skeletone;
 	}
 
@@ -80,6 +89,7 @@ namespace JG
 				return;
 			}
 		}
+		std::lock_guard<std::mutex> lock(mMeshLock);
 		if (mOriginMesh != mesh)
 		{
 			mSkinnedMesh = nullptr;
@@ -87,6 +97,7 @@ namespace JG
 
 		mOriginMesh = mesh;
 	}
+
 
 	SharedPtr<AnimationClip> AnimationController::FindAnimationClip(const String& name) const
 	{
@@ -108,11 +119,13 @@ namespace JG
 
 	SharedPtr<Skeletone> AnimationController::GetBindedSkeletone() const
 	{
+		std::lock_guard<std::mutex> lock(mSkeletonLock);
 		return mSkeletone;
 	}
 
 	SharedPtr<IMesh> AnimationController::GetBindedMesh() const
 	{
+		std::lock_guard<std::mutex> lock(mMeshLock);
 		return CanUseSkinnedMesh() ? mSkinnedMesh : mOriginMesh;
 	}
 
@@ -136,11 +149,90 @@ namespace JG
 		return mAnimationStateMachine;
 	}
 
+	const AnimationStateFlow& AnimationController::GetAnimationStateFlow() const
+	{
+		return *mFlow;
+	}
+
+	void AnimationController::SetAnimationStock(const AnimationAssetStock& stock)
+	{
+		SharedPtr<AnimationStateMachine> stateMachine = GetAnimationStateMachine();
+		SharedPtr<AnimationParameters> animParameters = GetAnimationParameters();
+		stateMachine->Begin(stock.RootName);
+
+		Dictionary<String, EAnimationParameterType> paramTypeDic;
+		// Anim Param
+		for (auto _pair : stock.Parameters)
+		{
+			const AnimationAssetStock::ParameterData& data = _pair.second;
+
+			switch (data.Type)
+			{
+			case EAnimationParameterType::Bool:
+				animParameters->SetBool(data.Name, *((bool*)data.Data.data()));
+				break;
+			case EAnimationParameterType::Float:
+				animParameters->SetFloat(data.Name, *((f32*)data.Data.data()));
+				break;
+			case EAnimationParameterType::Int:
+				animParameters->SetInt(data.Name, *((i32*)data.Data.data()));
+				break;
+			}
+			paramTypeDic[data.Name] = data.Type;
+		}
+
+		// Anim Clip
+		for(const AnimationAssetStock::AnimationClipInfo& clipInfo : stock.AnimClips)
+		{
+			SharedPtr<Asset<AnimationClip>> clipAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationClip>(clipInfo.AssetPath);
+			if (clipAsset == nullptr || clipAsset->IsValid() == false)
+			{
+				continue;
+			}
+			AddAnimationClip(clipInfo.Name, clipAsset->Get(), clipInfo.Flags, true);
+			stateMachine->MakeAnimationClipNode(clipInfo.Name, nullptr);
+		}
+
+		// Transition Info
+		for (const AnimationAssetStock::AnimationNodeLinkInfo& linkInfo : stock.LinkInfos)
+		{
+			stateMachine->ConnectNode(linkInfo.PrevName, linkInfo.NextName,
+				[&](AnimationTransition* transition)
+			{
+				for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : linkInfo.Transitions)
+				{
+					switch (paramTypeDic[transInfo.ParameterName])
+					{
+					case EAnimationParameterType::Bool:
+						transition->AddCondition_Bool(transInfo.ParameterName, *((bool*)transInfo.Data.data()));
+						break;
+					case EAnimationParameterType::Float:
+						transition->AddCondition_Float(transInfo.ParameterName, *((f32*)transInfo.Data.data()), transInfo.Condition);
+						break;
+					case EAnimationParameterType::Int:
+						transition->AddCondition_Int(transInfo.ParameterName, *((i32*)transInfo.Data.data()), transInfo.Condition);
+						break;
+					}
+				}
+			});
+
+		}
+		stateMachine->End();
+	}
+
+	bool AnimationController::IsValid() const
+	{
+		return GetAnimationStateMachine()->IsLock() == false;
+	}
+
+	SharedPtr<AnimationController> AnimationController::Create(const String& name)
+	{
+		return CreateSharedPtr<AnimationController>();
+	}
+
 	void AnimationController::Init()
 	{
-		mAnimParams   = CreateSharedPtr<AnimationParameters>();
-		mAnimParams_Thread = CreateSharedPtr<AnimationParameters>();
-		mAnimationStateMachine = CreateSharedPtr<AnimationStateMachine>(this);
+
 	}
 
 	void AnimationController::Update()
@@ -165,7 +257,7 @@ namespace JG
 		}
 
 		*mAnimParams_Thread = *mAnimParams;
-
+		*mFlow = GetAnimationStateMachine()->GetAnimationStateFlow_Thread();
 
 		// 스키닝 Mesh 생성
 		SharedPtr<IGraphicsContext> context = JGGraphics::GetInstance().GetGraphicsAPI()->GetGraphicsContext();
@@ -189,7 +281,7 @@ namespace JG
 		{
 			return;
 		}
-		List<SharedPtr<AnimationTransform>> animTransforms = mAnimationStateMachine->Execute();
+		List<SharedPtr<AnimationTransform>> animTransforms = mAnimationStateMachine->Execute_Thread();
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
 		{
 			SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
@@ -201,8 +293,8 @@ namespace JG
 			// 애니메이션 스키닝
 			Compute::AnimationSkinning::Input input;
 			input.AnimTransforms = animTransforms;
-			input.OriginMesh     = mOriginMesh;
-			input.SkinnedMesh    = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
+			input.OriginMesh = mOriginMesh;
+			input.SkinnedMesh = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
 			mAnimationSkinning->Execute(computeContext, input);
 		}
 	}

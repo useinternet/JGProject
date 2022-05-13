@@ -16,6 +16,11 @@ namespace JG
 	using MakeAnimationSequenceAction = MakeAnimationAction<AnimationStateMachine>;
 	using MakeAnimationClipAction	  = MakeAnimationAction<AnimationClipInfo>;
 	using MakeTransitionAction		  = MakeAnimationAction<AnimationTransition>;
+	class AnimationStateFlow
+	{
+	public:
+		List<String> NodeList;
+	};
 	class AnimationStateMachine
 	{
 		enum class ENodeType
@@ -41,8 +46,11 @@ namespace JG
 		String mBeginNodeName;
 
 		Node* mCurrentNode = nullptr;
-		bool  mIsMakingSequence = false;
-		bool  mIsRunning = false;
+		bool  mIsMakingMachine = false;
+		bool  mIsRunning       = false;
+		std::atomic_bool mLock = false;
+
+		AnimationStateFlow mFlow_Thread;
 	public:
 		AnimationStateMachine(AnimationController* controller);
 
@@ -54,14 +62,27 @@ namespace JG
 		AnimationStateMachine& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
 		AnimationStateMachine& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		void End();
-	
-		List<SharedPtr<AnimationTransform>> Execute();
+
+
+
+		// 
+		bool IsLock() {
+			return mLock;
+		}
+		void Lock() {
+			mLock = true;
+		}
+		void UnLock() {
+			mLock = false;
+		}
+		const AnimationStateFlow& GetAnimationStateFlow_Thread() const;
+		List<SharedPtr<AnimationTransform>> Execute_Thread();
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);
 		bool IsExistNode(const String& name) const;
 		AnimationStateMachine::Node* FindNode(const String& name) const;
 
-		List<SharedPtr<AnimationTransform>> ExecuteInternal(Node* node);
+		List<SharedPtr<AnimationTransform>> ExecuteInternal_Thread(Node* node);
 
 
 		void Reset();

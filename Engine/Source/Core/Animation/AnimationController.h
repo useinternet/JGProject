@@ -14,6 +14,8 @@ namespace JG
 	class IMesh;
 	class IComputeContext;
 	class IReadBackBuffer;
+	class AnimationAssetStock;
+	class AnimationStateFlow;
 	namespace Compute
 	{
 		class AnimationSkinning;
@@ -23,7 +25,7 @@ namespace JG
 	{
 		friend class JGAnimation;
 
-
+		String mName;
 		// 클립 이 추가되면 AnimationClipInfo 생성
 		SharedPtr<AnimationStateMachine>   mAnimationStateMachine;
 		SharedPtr<AnimationParameters> mAnimParams;
@@ -47,16 +49,20 @@ namespace JG
 			SharedPtr<AnimationClip>     Clip;
 			SharedPtr<AnimationClipInfo> ClipInfo;
 		};
+		
 
+		mutable std::mutex mMeshLock;
+		mutable std::mutex mSkeletonLock;
 		Queue<ClipCommandData>        mClipCommandDataQueue;
 		u64 mWaitFrameCount = 0;
+		SharedPtr<AnimationStateFlow> mFlow;
 	public:
+		AnimationController();
 		// Clip 찾기
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate = false);
 		void RemoveAnimationClip(const String& name, bool immediate = false);
 		void BindSkeletone(SharedPtr<Skeletone> skeletone);
 		void BindMesh(SharedPtr<IMesh> mesh);
-
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
 
@@ -66,6 +72,18 @@ namespace JG
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationParameters> GetAnimationParameters_Thread()   const;
 		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine() const;
+		const AnimationStateFlow& GetAnimationStateFlow() const;
+		void SetAnimationStock(const AnimationAssetStock& stock);
+		
+		void SetName(const String& name) {
+			mName = name;
+		}
+		const String& GetName() const {
+			return mName;
+		}
+		bool IsValid() const;
+
+		static SharedPtr<AnimationController> Create(const String& name);
 	private:
 		void Init();
 		void Update();

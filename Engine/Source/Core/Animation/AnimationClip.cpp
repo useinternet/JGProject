@@ -47,7 +47,7 @@ namespace JG
 	}
 	bool AnimationClip::IsValid() const
 	{
-		return mDuration > 0.0f;
+		return mDuration > 0;
 	}
 
 	void AnimationClip::SetAnimationClipStock(const AnimationClipAssetStock& stock)

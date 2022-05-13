@@ -34,6 +34,7 @@ namespace JG
 				f32 NodeRectRounding = 3.0f;
 				f32 NodeOutlineThick = 3.0f;
 				f32 LineThick = 3.0f;
+				f32 FlowLineThick = 5.0f;
 				f32 ArrowSize = 15.0f;
 			};
 		private:
@@ -43,6 +44,7 @@ namespace JG
 				ColorStyle_HightlightOutline,
 				ColorStyle_NodeBody,
 				ColorStyle_LineColor,
+				ColorStyle_FlowLineColor,
 				ColorStyle_Count
 			};
 
@@ -178,11 +180,13 @@ namespace JG
 
 			SharedPtr<StateNodeEditorDataStorage> mDataStorage;
 			std::function<void()> mContextMenuFunc;
+			std::function<void(StateNodeID)> mCreateNodeCallBack;
+			std::function<void(StateNodeID)> mDraggingNodeCallBack;
 			std::function<void(StateNodeID)> mRemoveNodeCallBack;
 			std::function<void(StateNodeID)> mRemoveTransitionCallBack;
 			std::function<void(StateNodeID, StateNodeID, StateNodeID)> mLinkNodeCallBack;
 			std::function<void(StateNodeID, StateNodeID, StateNodeID)> mUnLinkNodeCallBack;
-			std::function<void(StateNodeID, const String&)> mReNameCallBack;
+			std::function<void(StateNodeID, const String&, const String&)> mReNameCallBack;
 		public:
 			StateNodeEditor();
 		public:
@@ -192,15 +196,18 @@ namespace JG
 		
 			StateNode* FindNode(StateNodeID id);
 			StateNodeTransition* FindNodeTransition(StateNodeID id);
-
+			void Flow(const List<StateNodeID>& flowList);
 			void Link(StateNodeID fromID, StateNodeID toID);
 			void UnLink(StateNodeID fromID, StateNodeID toID);
+		
 			void BindContextMenuFunc(const std::function<void()>& func);
+			void BindCreateNodeCallBack(const std::function<void(StateNodeID)>& callBack);
+			void BindDraggingNodeCallBack(const std::function<void(StateNodeID)>& callBack);
 			void BindRemoveNodeCallBack(const std::function<void(StateNodeID)>& callBack);
 			void BindRemoveTransitionCallBack(const std::function<void(StateNodeID)>& callBack);
 			void BindLinkNodeCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack);
 			void BindUnLinkCallBack(const std::function<void(StateNodeID, StateNodeID, StateNodeID)>& callBack);
-			void BindReNameCallBack(const std::function<void(StateNodeID, const String&)>& callBack);
+			void BindReNameCallBack(const std::function<void(StateNodeID, const String&, const String&)>& callBack);
 
 
 			void OnGUI(const JVector2& size = JVector2(0.0f, 0.0f));
