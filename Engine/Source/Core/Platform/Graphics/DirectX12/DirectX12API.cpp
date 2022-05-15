@@ -1444,7 +1444,7 @@ namespace JG
 			dest_vBuffer->SetName(src->GetName() + "_VertexBuffer");
 			dest_vBuffer->SetBufferLoadMethod(EBufferLoadMethod::GPULoad);
 			dest_vBuffer->SetData(nullptr, src_dx12_vBuffer->GetVertexSize(), src_dx12_vBuffer->GetVertexCount());
-			mCommandList->CopyResource(dest_vBuffer->Get(), src_dx12_vBuffer->Get());
+			//mCommandList->CopyResource(dest_vBuffer->Get(), src_dx12_vBuffer->Get());
 
 			//SharedPtr<DirectX12IndexBuffer> dest_iBuffer = CreateSharedPtr<DirectX12IndexBuffer>();
 			//dest_iBuffer->SetName(src->GetName() + "_IndexBuffer");

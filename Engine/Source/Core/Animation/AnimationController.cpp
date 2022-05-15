@@ -194,23 +194,24 @@ namespace JG
 		}
 
 		// Transition Info
-		for (const AnimationAssetStock::AnimationNodeLinkInfo& linkInfo : stock.LinkInfos)
+		for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : stock.TransitionInfos)
 		{
-			stateMachine->ConnectNode(linkInfo.PrevName, linkInfo.NextName,
+			stateMachine->ConnectNode(transInfo.PrevName, transInfo.NextName,
 				[&](AnimationTransition* transition)
 			{
-				for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : linkInfo.Transitions)
+				transition->SetTransitionDuration(transInfo.TransitionDuration);
+				for (const AnimationAssetStock::AnimationTransitionConditionInfo& condInfo : transInfo.Transitions)
 				{
-					switch (paramTypeDic[transInfo.ParameterName])
+					switch (paramTypeDic[condInfo.ParameterName])
 					{
 					case EAnimationParameterType::Bool:
-						transition->AddCondition_Bool(transInfo.ParameterName, *((bool*)transInfo.Data.data()));
+						transition->AddCondition_Bool(condInfo.ParameterName, *((bool*)condInfo.Data.data()));
 						break;
 					case EAnimationParameterType::Float:
-						transition->AddCondition_Float(transInfo.ParameterName, *((f32*)transInfo.Data.data()), transInfo.Condition);
+						transition->AddCondition_Float(condInfo.ParameterName, *((f32*)condInfo.Data.data()), condInfo.Condition);
 						break;
 					case EAnimationParameterType::Int:
-						transition->AddCondition_Int(transInfo.ParameterName, *((i32*)transInfo.Data.data()), transInfo.Condition);
+						transition->AddCondition_Int(condInfo.ParameterName, *((i32*)condInfo.Data.data()), condInfo.Condition);
 						break;
 					}
 				}
@@ -223,6 +224,11 @@ namespace JG
 	bool AnimationController::IsValid() const
 	{
 		return GetAnimationStateMachine()->IsLock() == false;
+	}
+
+	void AnimationController::Reset()
+	{
+		mIsResetStateMachine = true;
 	}
 
 	SharedPtr<AnimationController> AnimationController::Create(const String& name)
@@ -280,6 +286,11 @@ namespace JG
 		if (mSkeletone == nullptr || mSkeletone->IsValid() == false)
 		{
 			return;
+		}
+		if (mIsResetStateMachine == true)
+		{
+			mAnimationStateMachine->Reset_Thread();
+			mIsResetStateMachine = false;
 		}
 		List<SharedPtr<AnimationTransform>> animTransforms = mAnimationStateMachine->Execute_Thread();
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())

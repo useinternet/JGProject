@@ -46,6 +46,7 @@ namespace JG
 		{
 			StateNodeGUI::StateNodeID From;
 			StateNodeGUI::StateNodeID To;
+			f32 TransitionDuration = 0.0f;
 			List<AnimTransitionConditionBuildData> Conditions;
 		};
 		struct AnimClipBuildData
@@ -127,6 +128,7 @@ namespace JG
 
 		void Transition_OnGUI(AnimTransitionBuildData& buildData);
 		void TransitionConditionValue_OnGUI(AnimTransitionConditionBuildData& buildData);
+
 		void AnimationClip_OnGUI(AnimClipBuildData& buildData);
 		void CreateRootNode();
 		void CreateAnimationClipNode();
@@ -152,6 +154,9 @@ namespace JG
 		void UpdateFlow();
 		// 편집 가능,
 		void Editable();
+		bool IsEditable() const {
+			return mAnimState != EAnimState::Playing;
+		}
 		void SaveNodeLocation();
 		Color GetBgColor(EAnimationParameterType type) {
 			return mBgColorByParamTypeDic[type];

@@ -60,6 +60,31 @@ namespace JG
 		auto sim_v = DirectX::XMVector4Transform(sim, GetSIMD());
 		return JVector4::ConvertJVector4(sim_v);
 	}
+	bool JMatrix::Decompose(JVector3* T, JQuaternion* R, JVector3* S) const
+	{
+		JVector3 temp_t;
+		JVector3 temp_s;
+		JQuaternion temp_r;
+
+		if (T) temp_t = *T;
+		if (R) temp_r = *R;
+		if (S) temp_s = *S;
+
+		auto sim_t = JVector3::GetSIMD(temp_t);
+		auto sim_r = temp_r.GetSIMD();
+		auto sim_s = JVector3::GetSIMD(temp_s);
+
+		bool result = DirectX::XMMatrixDecompose(&sim_s, &sim_r, &sim_t, GetSIMD());
+		if (result == false)
+		{
+			return false;
+		}
+
+		if (T) *T = JVector3::ConvertJVector3(sim_t);
+		if (R) R->SetSIMD(sim_r);
+		if (S) *S = JVector3::ConvertJVector3(sim_s);
+		return true;
+	}
 	JMatrix JMatrix::Translation(const JVector3& v)
 	{
 		JMatrix m;
@@ -187,6 +212,7 @@ namespace JG
 	}
 	JMatrix JMatrix::AffineTransformation(const JVector3& T, const JQuaternion& Quat, const JVector3& S)
 	{
+
 		JMatrix m;
 		m.SetSIMD(DirectX::XMMatrixAffineTransformation(JVector3::GetSIMD(S), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), Quat.GetSIMD(), JVector3::GetSIMD(T)));
 		return m;

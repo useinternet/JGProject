@@ -56,6 +56,7 @@ namespace JG
 		Queue<ClipCommandData>        mClipCommandDataQueue;
 		u64 mWaitFrameCount = 0;
 		SharedPtr<AnimationStateFlow> mFlow;
+		bool mIsResetStateMachine = false;
 	public:
 		AnimationController();
 		// Clip Ã£±â
@@ -72,7 +73,9 @@ namespace JG
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationParameters> GetAnimationParameters_Thread()   const;
 		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine() const;
+
 		const AnimationStateFlow& GetAnimationStateFlow() const;
+
 		void SetAnimationStock(const AnimationAssetStock& stock);
 		
 		void SetName(const String& name) {
@@ -82,7 +85,8 @@ namespace JG
 			return mName;
 		}
 		bool IsValid() const;
-
+		
+		void Reset();
 		static SharedPtr<AnimationController> Create(const String& name);
 	private:
 		void Init();

@@ -5,7 +5,7 @@ namespace JG
 {
 	class AnimationTransform
 	{
-		JMatrix mTransform[128];
+		JMatrix mTransform[96];
 	public:
 		AnimationTransform();
 

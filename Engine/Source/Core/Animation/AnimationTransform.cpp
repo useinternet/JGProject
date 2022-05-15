@@ -10,14 +10,14 @@ namespace JG
 	}
 	void AnimationTransform::Reset()
 	{
-		for (u32 i = 0; i < 128; ++i)
+		for (u32 i = 0; i < 96; ++i)
 		{
 			mTransform[i] = JMatrix::Identity();
 		}
 	}
 	u32 AnimationTransform::GetMatrixCount() const
 	{
-		return 64;
+		return 96;
 	}
 	const JMatrix* AnimationTransform::GetMatrixPointer() const
 	{
@@ -33,7 +33,7 @@ namespace JG
 	}
 	void AnimationTransform::ForEach(const std::function<void(JMatrix&)>& action)
 	{
-		for (i32 i = 0; i < 64; ++i)
+		for (i32 i = 0; i < 96; ++i)
 		{
 			if (action)
 			{

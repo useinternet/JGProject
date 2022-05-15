@@ -72,6 +72,7 @@ namespace JG
 		JVector3 TransformPoint(const JVector3& v) const;
 		JVector3 TransformVector(const JVector3& v) const;
 		JVector4 Transform(const JVector4& v) const;
+		bool Decompose(JVector3* T, JQuaternion* R, JVector3* S) const;
 	public:
 		inline static JMatrix Identity() {
 			JMatrix m;
@@ -120,8 +121,8 @@ namespace JG
 			result.SetSIMD(DirectX::XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nearZ, farZ));
 			return result;
 		}
-
 		static JMatrix AffineTransformation(const JVector3& T, const JQuaternion& Quat, const JVector3& S);
+
 		//inline static JVector3 
 	public:
 		float& Get(int col, int row) {

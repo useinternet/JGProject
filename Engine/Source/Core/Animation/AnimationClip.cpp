@@ -15,7 +15,7 @@ namespace JG
 		Duration = clip->GetDuration();
 		Clip = clip;
 		Flags = flags;
-
+		TickPerSecond = clip->GetTickPerSecond();
 	}
 
 
@@ -30,12 +30,11 @@ namespace JG
 			return EAnimationClipState::None;
 		}
 		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
-		clipInfo->TimePos += tick * mTickPerSecond * 10;
+		clipInfo->TimePos += tick * clipInfo->TickPerSecond * clipInfo->Speed * 10;
 		if (clipInfo->TimePos >= mDuration)
 		{
 			return EAnimationClipState::Compelete;
 		}
-		JG_LOG_INFO("Test TimePos : {0}", clipInfo->TimePos);
 		u32 subMeshCount = mesh->GetSubMeshCount();
 		out_animTransform.resize(subMeshCount);
 		for (u32 i = 0; i < subMeshCount; ++i)
@@ -88,6 +87,11 @@ namespace JG
 	f32 AnimationClip::GetDuration() const
 	{
 		return mDuration;
+	}
+
+	f32 AnimationClip::GetTickPerSecond() const
+	{
+		return mTickPerSecond;
 	}
 
 

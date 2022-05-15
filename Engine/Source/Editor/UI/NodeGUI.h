@@ -93,6 +93,7 @@ namespace JG
 				ColorStyle_HightlightOutline,
 				ColorStyle_NodeBody,
 				ColorStyle_NodePinArea,
+				ColorStyle_FlowHighlight,
 				ColorStyle_Count
 			};
 			friend class StateNodeEditor;

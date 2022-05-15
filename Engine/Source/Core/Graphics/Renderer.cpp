@@ -23,7 +23,7 @@ namespace JG
 	{
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-
+		
 
 		u64 buffCount = api->GetBufferCount();
 		// Context 초기화

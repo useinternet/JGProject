@@ -21,7 +21,12 @@ namespace JG
 		class StateNodeDrawer
 		{
 		public:
-			void DrawNode(StateNodeEditor* editor, ImDrawList* draw_list, const JVector2& location, u32 nodeColor, u32 pinAreaColor, u32 outlineColor)
+			void DrawNode(
+				StateNodeEditor* editor, 
+				ImDrawList* draw_list,
+				const JVector2& location, 
+				bool isFlowNode,
+				u32 nodeColor, u32 pinAreaColor, u32 outlineColor, u32 flowOutlineColor)
 			{
 				StateNode::StateNodeStyle& style = editor->GetNodeStyle();
 				JVector2 halfRectSize = style.NodeRectSize * 0.5f;
@@ -45,6 +50,12 @@ namespace JG
 
 				draw_list->AddRect(ToImVec2(rectMin), ToImVec2(rectMax),
 					outlineColor, style.NodeRectRounding, ImDrawFlags_RoundCornersAll, style.NodeOutlineThick);
+
+				if (isFlowNode)
+				{
+					draw_list->AddRect(ToImVec2(pinAreaMin), ToImVec2(pinAreaMax),
+						flowOutlineColor, style.NodeRectRounding, ImDrawFlags_RoundCornersAll, style.NodeOutlineThick);
+				}
 			}
 
 			void DrawTransition(
@@ -161,6 +172,7 @@ namespace JG
 			StateNodeID mDraggingNodeID = 0;
 			StateNodeID mRenamingNodeID = 0;
 			HashSet<u64> mFlowStateNodeIDSet;
+			u64 mFinalFlowStateNodeID = 0;
 		public:
 			StateNodeID TempNodeTransitionID = 0;
 			JVector2 TempVector;
@@ -175,21 +187,30 @@ namespace JG
 			}
 			bool IsFlowState(StateNodeID from, StateNodeID to)
 			{
-				u64 seed = std::hash<u64>()(from) ^ std::hash<u64>()(to);
+				u64 seed = std::hash<u64>()(from + 56789) ^ std::hash<u64>()(to + 12345);
 				return mFlowStateNodeIDSet.find(seed) != mFlowStateNodeIDSet.end();
+			}
+			StateNodeID GetFinalFlowStateNode() {
+				return mFinalFlowStateNodeID;
 			}
 			void SetFlowState(const List<StateNodeID>& flowList)
 			{
+				mFinalFlowStateNodeID = 0;
 				mFlowStateNodeIDSet.clear();
 				i32 cnt = flowList.size();
 				for (i32 i = 0; i < cnt - 1; ++i)
 				{
 					StateNodeID from = flowList[i];
 					StateNodeID to = flowList[i + 1];
-					u64 seed = std::hash<u64>()(from) ^ std::hash<u64>()(to);
+					u64 seed = std::hash<u64>()(from + 56789) ^ std::hash<u64>()(to + 12345);
 
 					mFlowStateNodeIDSet.insert(seed);
 				}
+				if (cnt > 0)
+				{
+					mFinalFlowStateNodeID = flowList[cnt - 1];
+				}
+				
 			}
 			void SetSelectedNode(StateNodeID id) {
 				mSelectedNodeID = id;
@@ -331,6 +352,7 @@ namespace JG
 			mColors[ColorStyle_HightlightOutline] = ImGui::GetColorU32(ImVec4(1.0f, 0.5f, 0.2f, 0.4f));
 			mColors[ColorStyle_NodeBody] = ImGui::GetColorU32(ImVec4(0.05f, 0.06f, 0.04f, 0.8F));
 			mColors[ColorStyle_NodePinArea] = ImGui::GetColorU32(ImVec4(0.5f, 0.51f, 0.52f, 1.0f));
+			mColors[ColorStyle_FlowHighlight] = ImGui::GetColorU32(ImVec4(1, 1, 0.5f, 1.0f));
 		}
 		List<StateNodeID> StateNode::GetTransitionList() const
 		{
@@ -392,9 +414,11 @@ namespace JG
 				mNodeEditor,
 				ImGui::GetWindowDrawList(),
 				mLocation,
+				dataStorage.GetFinalFlowStateNode() == GetID(),
 				GetColor(ColorStyle_NodeBody),
 				GetColor(ColorStyle_NodePinArea),
-				dataStorage.GetSelectedNode() == GetID() ? GetColor(ColorStyle_HightlightOutline) : GetColor(ColorStyle_NormalOutline));
+				dataStorage.GetSelectedNode() == GetID() ? GetColor(ColorStyle_HightlightOutline) : GetColor(ColorStyle_NormalOutline),
+				GetColor(ColorStyle_FlowHighlight));
 
 
 

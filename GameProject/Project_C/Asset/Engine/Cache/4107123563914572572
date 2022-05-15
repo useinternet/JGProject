@@ -1,0 +1,25 @@
+{
+    "Main": [
+        {
+            "Name": "Root",
+            "Location": [
+                229.0,
+                194.0
+            ]
+        },
+        {
+            "Name": "Idle",
+            "Location": [
+                277.0,
+                449.0
+            ]
+        },
+        {
+            "Name": "Walk&Run",
+            "Location": [
+                785.0,
+                277.0
+            ]
+        }
+    ]
+}

@@ -110,6 +110,15 @@ namespace JG
 		{
 			mEditorUIScene->OnGUI();
 		}
+		if (mAnimController != nullptr)
+		{
+			SharedPtr<AnimationClipInfo> clipInfo = mAnimController->FindAnimationClipInfo(CLIP_NAME);
+			if (clipInfo != nullptr)
+			{
+				ImGui::ProgressBar(clipInfo->GetNormalizedTimePos());
+			}
+		}
+	
 		ImGui::EndChild();
 	}
 	void AnimationClipView::RightOnGUI()
@@ -267,7 +276,7 @@ namespace JG
 				mAnimController = CreateUniquePtr<AnimationController>();
 				JGAnimation::GetInstance().RegisterAnimationController(mAnimController);
 
-				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::None);
+				mAnimController->AddAnimationClip(CLIP_NAME, mAnimClipAsset->Get(), EAnimationClipFlags::Repeat);
 				mAnimController->GetAnimationStateMachine()->
 					 Begin("Start")
 					.MakeAnimationClipNode(CLIP_NAME, nullptr)

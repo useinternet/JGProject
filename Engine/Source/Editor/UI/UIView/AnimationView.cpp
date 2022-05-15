@@ -183,7 +183,7 @@ namespace JG
 				mAnimClipBuildDataDic[nodeIDDic[clipInfo.Name]] = buildData;
 			}
 			// Node 연결
-			for (const AnimationAssetStock::AnimationNodeLinkInfo& linkInfo : stock.LinkInfos)
+			for (const AnimationAssetStock::AnimationTransitionInfo& linkInfo : stock.TransitionInfos)
 			{
 				StateNodeGUI::StateNodeID fromID = nodeIDDic[linkInfo.PrevName];
 				StateNodeGUI::StateNodeID toID = nodeIDDic[linkInfo.NextName];
@@ -196,7 +196,7 @@ namespace JG
 
 				AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
 
-				for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : linkInfo.Transitions)
+				for (const AnimationAssetStock::AnimationTransitionConditionInfo& transInfo : linkInfo.Transitions)
 				{
 					AnimTransitionConditionBuildData condBuildData;
 					condBuildData.ParamName = transInfo.ParameterName;
@@ -264,11 +264,16 @@ namespace JG
 
 		if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
 		{
+			RefreshAnimAsset(mAnimationAsset->GetAssetPath());
 			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimationAsset->Get());
 			mAnimationAsset = nullptr;
 		}
 		mEditorUIScene = nullptr;
 		mNodeEditor = nullptr;
+
+		mAnimParamEditMode			 = EEditMode::Default;
+		mTransitionConditionEditMode = EEditMode::Default;
+		mAnimState					 = EAnimState::Editable;
 	}
 
 	void AnimationView::OnEvent(IEvent& e)
@@ -390,129 +395,137 @@ namespace JG
 		ImGui::Separator();
 
 
-		
-		ImGui::BeginTable("ParamEditorTable", 3, ImGuiTableFlags_BordersH);
-
-
-		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, mTableTypeRowWidth);
-		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, mTableNameRowWidth);
-		ImGui::TableSetupColumn("##Edit", ImGuiTableColumnFlags_WidthStretch, mEditRowWidth);
-		ImGui::TableHeadersRow();
-
 		i32 index = 0;
 		i32 moveIndex = -1;
 		i32 moveDir = 0;
 		List<String> removeParamList;
-		for (AnimParamBuildData& data : mAnimParamBuildDataList)
+
+		if (ImGui::BeginTable("ParamEditorTable", 3, ImGuiTableFlags_BordersH) == true)
 		{
-			ImGui::TableNextColumn();
+			ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, mTableTypeRowWidth);
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, mTableNameRowWidth);
+			ImGui::TableSetupColumn("##Edit", ImGuiTableColumnFlags_WidthStretch, mEditRowWidth);
+			ImGui::TableHeadersRow();
+
 	
-			String paramName = data.Name;
-			EAnimationParameterType paramType = data.Type;
-		
-		
-			
-			ImGui::PushID(index);
-
-		
-			ImGui::SetNextItemWidth(mTableTypeRowWidth);
-			//-- Type GUI --
-			String type = AnimationParameterTypeToString(paramType);
-
-			Color bgColor = GetBgColor(paramType);
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(bgColor.R, bgColor.G, bgColor.B, bgColor.A));
-			bool openCombo = ImGui::BeginCombo("##TypeComboBox", type.c_str());
-			ImGui::PopStyleColor();
-			if (openCombo)
+			for (AnimParamBuildData& data : mAnimParamBuildDataList)
 			{
-				for (i32 iParamType = 1; iParamType < (i32)EAnimationParameterType::Count; ++iParamType)
-				{
-					String typeName = AnimationParameterTypeToString((EAnimationParameterType)iParamType);
-					if (ImGui::Selectable(typeName.c_str()) == true)
-					{
-						data.Type = (EAnimationParameterType)iParamType;
-						u32 dataSize = 0;
-						switch (data.Type)
-						{
-						case EAnimationParameterType::Bool:
-							dataSize = 1;
-							break;
-						case EAnimationParameterType::Int:
-						case EAnimationParameterType::Float:
-							dataSize = 4;
-							break;
-						}
-						if (dataSize > 0)
-						{
-							data.Data.resize(dataSize, 0);
-						}
+				ImGui::TableNextColumn();
 
-						UpdateTransitionBuildData(data.Name, data.Type);
-					}
-				}
-				ImGui::EndCombo();
-			}
-	
-			//--------------
-
-
-			ImGui::TableNextColumn();
-			ImGui::SetNextItemWidth(mTableNameRowWidth);
-
-			// -- Param Name GUI -- 
-
-			ImGui::InputText("##InputText", &paramName);
-			if (ImGui::IsItemDeactivated())
-			{
-				mAddedAnimParamNameSet.erase(data.Name);
-				mAddedAnimParamNameSet.insert(paramName);
-				
-
-				UpdateTransitionBuildData(data.Name, paramName);
-				data.Name = paramName;
-			}
+				String paramName = data.Name;
+				EAnimationParameterType paramType = data.Type;
 
 
 
-			ImGui::TableNextColumn();
+				ImGui::PushID(index);
 
 
-			switch (mAnimParamEditMode)
-			{
-				// 값편집
-			case EEditMode::Default:
-				AnimationParam_OnGUI(data);
-				break;
-			case EEditMode::Delete:
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-				if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
-				{
-					removeParamList.push_back(paramName);
-				}
+				ImGui::SetNextItemWidth(mTableTypeRowWidth);
+				//-- Type GUI --
+				String type = AnimationParameterTypeToString(paramType);
+
+				Color bgColor = GetBgColor(paramType);
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(bgColor.R, bgColor.G, bgColor.B, bgColor.A));
+				bool openCombo = ImGui::BeginCombo("##TypeComboBox", type.c_str());
 				ImGui::PopStyleColor();
-				break;
-			case EEditMode::Move:
-				if (ImGui::ArrowButton("##UpArrow_AnimParamEdit", ImGuiDir_Up))
+				if (openCombo)
 				{
-					moveIndex = index;
-					moveDir = ImGuiDir_Up;
-				}ImGui::SameLine();
-				if (ImGui::ArrowButton("##DownArrow_AnimParmEdit", ImGuiDir_Down))
-				{
-					moveIndex = index;
-					moveDir = ImGuiDir_Down;
+					for (i32 iParamType = 1; iParamType < (i32)EAnimationParameterType::Count; ++iParamType)
+					{
+						String typeName = AnimationParameterTypeToString((EAnimationParameterType)iParamType);
+						if (ImGui::Selectable(typeName.c_str()) == true && IsEditable())
+						{
+							data.Type = (EAnimationParameterType)iParamType;
+							u32 dataSize = 0;
+							switch (data.Type)
+							{
+							case EAnimationParameterType::Bool:
+								dataSize = 1;
+								break;
+							case EAnimationParameterType::Int:
+							case EAnimationParameterType::Float:
+								dataSize = 4;
+								break;
+							}
+							if (dataSize > 0)
+							{
+								data.Data.resize(dataSize, 0);
+							}
+
+							UpdateTransitionBuildData(data.Name, data.Type);
+						}
+					}
+					ImGui::EndCombo();
 				}
-				break;
+
+				//--------------
+
+
+				ImGui::TableNextColumn();
+				ImGui::SetNextItemWidth(mTableNameRowWidth);
+
+				// -- Param Name GUI -- 
+
+				ImGui::InputText("##InputText", &paramName);
+				if (ImGui::IsItemDeactivated() && IsEditable())
+				{
+					mAddedAnimParamNameSet.erase(data.Name);
+					mAddedAnimParamNameSet.insert(paramName);
+
+
+					UpdateTransitionBuildData(data.Name, paramName);
+					data.Name = paramName;
+				}
+
+
+
+				ImGui::TableNextColumn();
+
+
+				switch (mAnimParamEditMode)
+				{
+					// 값편집
+				case EEditMode::Default:
+					AnimationParam_OnGUI(data);
+					break;
+				case EEditMode::Delete:
+					if (IsEditable())
+					{
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+						if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
+						{
+							removeParamList.push_back(paramName);
+						}
+						ImGui::PopStyleColor();
+					}
+
+					break;
+				case EEditMode::Move:
+					if (ImGui::ArrowButton("##UpArrow_AnimParamEdit", ImGuiDir_Up))
+					{
+						moveIndex = index;
+						moveDir = ImGuiDir_Up;
+					}ImGui::SameLine();
+					if (ImGui::ArrowButton("##DownArrow_AnimParmEdit", ImGuiDir_Down))
+					{
+						moveIndex = index;
+						moveDir = ImGuiDir_Down;
+					}
+					break;
+				}
+
+				++index;
+				ImGui::PopID();
 			}
-			
-			++index;
-			ImGui::PopID();
+
+			ImGui::EndTable();
 		}
 
-		ImGui::EndTable();
+
+		
 		auto padding = ImGui::GetStyle().FramePadding;
 
-		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true)
+		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true && IsEditable())
 		{
 			i32 cnt = 0;
 			while (true)
@@ -611,37 +624,84 @@ namespace JG
 	}
 	void AnimationView::AnimationParam_OnGUI(AnimParamBuildData& buildData)
 	{
-		String typeStr = AnimationParameterTypeToString(buildData.Type);
+	
 		ImGui::SetNextItemWidth(mEditRowWidth);
-		switch (buildData.Type)
+
+		if (IsEditable() == false && mAnimationAsset != nullptr && mAnimationAsset->IsValid() == true)
 		{
-		case EAnimationParameterType::Bool:
-		{
-			ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
-		}
-		break;
-		case EAnimationParameterType::Float:
-		{
-			f32 value = *((f32*)buildData.Data.data());
-			ImGui::InputFloat("##InputFloat", &value);
-			if (ImGui::IsItemDeactivated())
+			SharedPtr<AnimationParameters> animParams= mAnimationAsset->Get()->GetAnimationParameters();
+
+			switch (buildData.Type)
 			{
-				memcpy(buildData.Data.data(), &value, sizeof(f32));
+			case EAnimationParameterType::Bool:
+			{
+				bool _bool;
+				animParams->GetBool(buildData.Name, &_bool);
+				ImGui::Checkbox("##CheckBox", &_bool);
+				animParams->SetBool(buildData.Name, &_bool);
+			}
+			break;
+			case EAnimationParameterType::Float:
+			{
+				f32 value = 0.0f;
+				animParams->GetFloat(buildData.Name, &value);
+				ImGui::InputFloat("##InputFloat", &value);
+				if (ImGui::IsItemDeactivated())
+				{
+					animParams->SetFloat(buildData.Name, value);
+				}
+			}
+
+			break;
+			case EAnimationParameterType::Int:
+			{
+				i32 value = 0.0f;
+				animParams->GetInt(buildData.Name, &value);
+				ImGui::InputInt("##InputInt", &value, 0, 0);
+				if (ImGui::IsItemDeactivated())
+				{
+					animParams->SetInt(buildData.Name, value);
+				}
+			}
+			break;
+			}
+			
+		}
+		else
+		{
+			String typeStr = AnimationParameterTypeToString(buildData.Type);
+			switch (buildData.Type)
+			{
+			case EAnimationParameterType::Bool:
+			{
+				ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
+			}
+			break;
+			case EAnimationParameterType::Float:
+			{
+				f32 value = *((f32*)buildData.Data.data());
+				ImGui::InputFloat("##InputFloat", &value);
+				if (ImGui::IsItemDeactivated())
+				{
+					memcpy(buildData.Data.data(), &value, sizeof(f32));
+				}
+			}
+
+			break;
+			case EAnimationParameterType::Int:
+			{
+				i32 value = *((i32*)buildData.Data.data());
+				ImGui::InputInt("##InputInt", &value, 0, 0);
+				if (ImGui::IsItemDeactivated())
+				{
+					memcpy(buildData.Data.data(), &value, sizeof(i32));
+				}
+			}
+			break;
 			}
 		}
 
-		break;
-		case EAnimationParameterType::Int:
-		{
-			i32 value = *((i32*)buildData.Data.data());
-			ImGui::InputInt("##InputInt", &value, 0, 0);
-			if (ImGui::IsItemDeactivated())
-			{
-				memcpy(buildData.Data.data(), &value, sizeof(i32));
-			}
-		}
-		break;
-		}
+		
 	}
 	void AnimationView::Transition_OnGUI(AnimTransitionBuildData& buildData)
 	{
@@ -652,6 +712,17 @@ namespace JG
 		ImGui::Text("%s -> %s", 
 			fromNode == nullptr ? "None" : fromNode->GetName().c_str(),
 			toNode == nullptr ? "None" : toNode->GetName().c_str());
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("TransitionDuration "); ImGui::SameLine();
+
+		f32 transitionDuration = buildData.TransitionDuration;
+		ImGui::SetNextItemWidth(200.0f);
+		ImGui::InputFloat("##InputText_TransitionDuration", &transitionDuration);
+		if (ImGui::IsItemDeactivated())
+		{
+			buildData.TransitionDuration = transitionDuration;
+		}
 
 		ImGui::Separator();
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
@@ -696,7 +767,7 @@ namespace JG
 			{
 				for (AnimParamBuildData& paramBuildData : mAnimParamBuildDataList)
 				{
-					if (ImGui::Selectable(paramBuildData.Name.c_str()) == true)
+					if (ImGui::Selectable(paramBuildData.Name.c_str()) == true && IsEditable())
 					{
 						condBuildData.ParamName = paramBuildData.Name;
 						condBuildData.Type = paramBuildData.Type;
@@ -719,7 +790,7 @@ namespace JG
 				if (condBuildData.Type == EAnimationParameterType::Bool)
 				{
 					conditionStr = AnimationConditionTypeToString(EAnimationCondition::Equal);
-					if (ImGui::Selectable(conditionStr.c_str()) == true)
+					if (ImGui::Selectable(conditionStr.c_str()) == true && IsEditable())
 					{
 						condBuildData.Condition = EAnimationCondition::Equal;
 					}
@@ -729,7 +800,7 @@ namespace JG
 					for (i32 iParamType = 1; iParamType < (i32)EAnimationCondition::Count; ++iParamType)
 					{
 						conditionStr = AnimationConditionTypeToString((EAnimationCondition)iParamType);
-						if (ImGui::Selectable(conditionStr.c_str()) == true)
+						if (ImGui::Selectable(conditionStr.c_str()) == true && IsEditable())
 						{
 							condBuildData.Condition = (EAnimationCondition)iParamType;
 						}
@@ -750,12 +821,16 @@ namespace JG
 				TransitionConditionValue_OnGUI(condBuildData);
 				break;
 			case EEditMode::Delete:
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-				if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
+				if (IsEditable())
 				{
-					removeIndex = index;
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+					if (ImGui::Button("-", ImVec2(50.0f, 0.0)))
+					{
+						removeIndex = index;
+					}
+					ImGui::PopStyleColor();
 				}
-				ImGui::PopStyleColor();
+	
 				break;
 			case EEditMode::Move:
 				if (ImGui::ArrowButton("##UpArrow_TransitionEdit", ImGuiDir_Up))
@@ -777,7 +852,7 @@ namespace JG
 		}
 
 		ImGui::EndTable();
-		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true)
+		if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true && IsEditable())
 		{
 			AnimTransitionConditionBuildData newData;
 			newData.ParamName = "None";
@@ -811,14 +886,22 @@ namespace JG
 		{
 		case EAnimationParameterType::Bool:
 		{
-			ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
+			if (IsEditable())
+			{
+				ImGui::Checkbox("##CheckBox", (bool*)buildData.Data.data());
+			}
+			else
+			{
+				bool _bool = *(bool*)buildData.Data.data();
+				ImGui::Checkbox("##CheckBox", &_bool);
+			}
 		}
 		break;
 		case EAnimationParameterType::Float:
 		{
 			f32 value = *((f32*)buildData.Data.data());
 			ImGui::InputFloat("##InputFloat", &value);
-			if (ImGui::IsItemDeactivated())
+			if (ImGui::IsItemDeactivated() && IsEditable())
 			{
 				memcpy(buildData.Data.data(), &value, sizeof(f32));
 			}
@@ -829,7 +912,7 @@ namespace JG
 		{
 			i32 value = *((i32*)buildData.Data.data());
 			ImGui::InputInt("##InputInt", &value, 0, 0);
-			if (ImGui::IsItemDeactivated())
+			if (ImGui::IsItemDeactivated() && IsEditable())
 			{
 				memcpy(buildData.Data.data(), &value, sizeof(i32));
 			}
@@ -846,7 +929,7 @@ namespace JG
 		ImGui::Text("Repeat "); ImGui::SameLine();
 
 		bool _bool = buildData.Flags & EAnimationClipFlags::Repeat;
-		if (ImGui::Checkbox("##CheckBox_Repeat", &_bool) == true)
+		if (ImGui::Checkbox("##CheckBox_Repeat", &_bool) == true && IsEditable())
 		{
 			if (_bool == false) buildData.Flags = (EAnimationClipFlags)((i32)buildData.Flags & (~(i32)EAnimationClipFlags::Repeat));
 			else buildData.Flags = buildData.Flags | EAnimationClipFlags::Repeat;
@@ -858,7 +941,11 @@ namespace JG
 		ImGui::AssetField_OnGUI("AnimationClip", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
 			EAssetFormat::AnimationClip, [&](const String& assetPath)
 		{
-			buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(assetPath);
+			if (IsEditable())
+			{
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(assetPath);
+			}
+			
 		}, label_Space);
 
 		ImGui::PopID();
@@ -1080,20 +1167,23 @@ namespace JG
 				}
 
 
-				AnimationAssetStock::AnimationNodeLinkInfo linkInfo;
-				linkInfo.PrevName = prevNode->GetName();
-				linkInfo.NextName = nextNode->GetName();
+				AnimationAssetStock::AnimationTransitionInfo transInfo;
+				transInfo.PrevName = prevNode->GetName();
+				transInfo.NextName = nextNode->GetName();
+		
 				StateNodeGUI::StateNodeID transitionNodeID = prevNode->GetTransition(nextNode->GetID());
 				const AnimTransitionBuildData& tranBuildData = mAnimTransitionBuildDataDic[transitionNodeID];
+
+				transInfo.TransitionDuration = tranBuildData.TransitionDuration;
 				for (const AnimTransitionConditionBuildData& condBuildData : tranBuildData.Conditions)
 				{
-					AnimationAssetStock::AnimationTransitionInfo transInfo;
-					transInfo.ParameterName = condBuildData.ParamName;
-					transInfo.Condition = condBuildData.Condition;
-					transInfo.Data = condBuildData.Data;
-					linkInfo.Transitions.push_back(transInfo);
+					AnimationAssetStock::AnimationTransitionConditionInfo condInfo;
+					condInfo.ParameterName = condBuildData.ParamName;
+					condInfo.Condition = condBuildData.Condition;
+					condInfo.Data = condBuildData.Data;
+					transInfo.Transitions.push_back(condInfo);
 				}
-				assetStock.LinkInfos.push_back(linkInfo);
+				assetStock.TransitionInfos.push_back(transInfo);
 			}
 
 		}
@@ -1167,7 +1257,27 @@ namespace JG
 	}
 	void AnimationView::Editable()
 	{
-
+		mNodeEditor->Flow(List<StateNodeGUI::StateNodeID>());
+		if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
+		{
+			mAnimationAsset->Get()->Reset();
+		}
+		SharedPtr<AnimationParameters> animParams = mAnimationAsset->Get()->GetAnimationParameters();
+		for (const AnimParamBuildData& buildData : mAnimParamBuildDataList)
+		{
+			switch (buildData.Type)
+			{
+			case EAnimationParameterType::Bool:
+				animParams->SetBool(buildData.Name, *((bool*)buildData.Data.data()));
+			break;
+			case EAnimationParameterType::Float:
+				animParams->SetFloat(buildData.Name, *((f32*)buildData.Data.data()));
+			break;
+			case EAnimationParameterType::Int:
+				animParams->SetInt(buildData.Name, *((i32*)buildData.Data.data()));
+			break;
+			}
+		}
 	}
 	void AnimationView::SaveNodeLocation()
 	{

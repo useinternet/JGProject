@@ -32,29 +32,41 @@ namespace JG
 		{
 			u32 ID = -1;
 			ENodeType NodeType;
-
-			
 			List<Node*> ConnectedNode;
-			List<SharedPtr<AnimationTransition>> ConnectedNodeTransitions;
+			List<AnimationTransition*> ConnectedNodeTransitions;
 		};
 
 		AnimationController* mOwnerAnimController = nullptr;
 
 		Dictionary<String, SharedPtr<Node>> mNodeDic;
+		Dictionary<String, SharedPtr<AnimationTransition>> mTransitionDic;
+
+
+
 		List<String> mAnimClipNameList;
 
 		String mBeginNodeName;
 
+		Node* mPrevNode    = nullptr;
 		Node* mCurrentNode = nullptr;
-		bool  mIsMakingMachine = false;
+
+
+		// Animation Transition 간 정보
+		bool  mIsTransitioning = false; // Transition 변경 중
+		f32 mTransitionTimePos = 0.0f;
+
+
+
+		bool  mIsMakingMachine = false; //
 		bool  mIsRunning       = false;
 		std::atomic_bool mLock = false;
 
+
+		Stack<Node*>	   mFlowNodeStack_Thread;
 		AnimationStateFlow mFlow_Thread;
+		List<SharedPtr<AnimationTransform>> mFinalAnimationTransforms;
 	public:
 		AnimationStateMachine(AnimationController* controller);
-
-
 		bool IsValid() const;
 		AnimationController* GetOwnerAnimationController() const;
 
@@ -77,14 +89,25 @@ namespace JG
 		}
 		const AnimationStateFlow& GetAnimationStateFlow_Thread() const;
 		List<SharedPtr<AnimationTransform>> Execute_Thread();
+		void Reset_Thread();
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);
+		AnimationTransition* CreateTransition(const String& prevName, const String& nextName);
+
+
+
+
 		bool IsExistNode(const String& name) const;
 		AnimationStateMachine::Node* FindNode(const String& name) const;
+		AnimationTransition* FindTransition(const String& prevName, const String& nextName);
 
-		List<SharedPtr<AnimationTransform>> ExecuteInternal_Thread(Node* node);
 
-
-		void Reset();
+		const String& FindNodeName(Node* node) const;
+		void UpdateFlow_Thread();
+		void UpdateFlow_Thread(Node* node);
+		void UpdateAnimationTransform_Thread();
+		void UpdateAnimationTransform_AnimClip_Thread(Node* node, List<SharedPtr<AnimationTransform>>& out_animTransform);
+		void ExecuteInternal_Thread(Node* node);
+		void Clear();
 	};
 }

@@ -308,26 +308,26 @@ namespace JG
 		static const constexpr char* ROOT_NAME_KEY = "RootName";
 		static const constexpr char* ANIM_CLIP_LIST_KEY = "AnimClipList";
 		static const constexpr char* ANIM_PARAM_LIST_KEY = "AimParamList";
-		static const constexpr char* ANIM_LINK_INFO_LIST_KEY = "AnimLinkInfoList";
 
 		static const constexpr char* ANIM_CLIP_NAME_KEY = "AnimClipName";
 		static const constexpr char* ANIM_CLIP_ASSETPATH_KEY = "AnimClipAssetPath";
 		static const constexpr char* ANIM_CLIP_ANIM_FLAGS_KEY = "AnimClipFlags";
 
-		static const constexpr char* ANIM_PARAM_NAME_KEY = "AnimParamName";
-		static const constexpr char* ANIM_PARAM_TYPE_KEY = "AnimParamType";
-		static const constexpr char* ANIM_PARAM_DATA_KEY = "AnimParamData";
+		static const constexpr char* ANIM_PARAM_NAME_KEY = "Name";
+		static const constexpr char* ANIM_PARAM_TYPE_KEY = "Type";
+		static const constexpr char* ANIM_PARAM_DATA_KEY = "Data";
 
 
-		static const constexpr char* ANIM_LINKINFO_LIST_KEY = "AnimationLinkInfoList";
+		static const constexpr char* ANIM_TRANSITION_LIST_KEY = "TransitionList";
 
-		static const constexpr char* ANIM_LINKINFO_PREV_NODE_NAME_KEY = "AnimationLinkInfoPrevNodeName";
-		static const constexpr char* ANIM_LINKINFO_NEXT_NODE_NAME_KEY = "AnimationLinkInfoNextNodeName";
-		static const constexpr char* ANIM_LINKINFO_TRANSITION_LIST_KEY = "AnimationLinkInfoTransitionList";
+		static const constexpr char* ANIM_TRANSITION_PREV_NODE_NAME_KEY = "PrevNodeName";
+		static const constexpr char* ANIM_TRANSITION_NEXT_NODE_NAME_KEY = "NextNodeName";
+		static const constexpr char* ANIM_TRANSITION_DURATION_KEY = "TransitionDuration";
+		static const constexpr char* ANIM_TRANSITION_CONDITION_LIST_KEY = "TransitionConditionList";
 
-		static const constexpr char* ANIM_TRANSITION_NAME_KEY      = "AnimTransitionName";
-		static const constexpr char* ANIM_TRANSITION_CONDITION_KEY = "AnimTransitionCondition";
-		static const constexpr char* ANIM_TRANSITION_DATA_KEY      = "AnimTransitionData";
+		static const constexpr char* ANIM_CONDITION_NAME_KEY = "Name";
+		static const constexpr char* ANIM_CONDITION_TYPE_KEY = "Condition";
+		static const constexpr char* ANIM_CONDITION_DATA_KEY = "Data";
 	public:
 		struct ParameterData
 		{
@@ -341,22 +341,23 @@ namespace JG
 			String AssetPath;
 			EAnimationClipFlags Flags;
 		};
-		struct AnimationTransitionInfo
+		struct AnimationTransitionConditionInfo
 		{
 			String ParameterName;
 			EAnimationCondition Condition;
 			List<jbyte> Data;
 		};
-		struct AnimationNodeLinkInfo
+		struct AnimationTransitionInfo
 		{
 			String PrevName;
 			String NextName;
-			List<AnimationTransitionInfo> Transitions;
+			f32 TransitionDuration = 0.0f;
+			List<AnimationTransitionConditionInfo> Transitions;
 		};
 		String RootName;
 		List<AnimationClipInfo> AnimClips;
 		Dictionary<String, ParameterData> Parameters;
-		List<AnimationNodeLinkInfo> LinkInfos;
+		List<AnimationTransitionInfo> TransitionInfos;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;

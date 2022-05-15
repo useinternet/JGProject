@@ -19,7 +19,7 @@ StructuredBuffer<Bone>     InputBones      : register(t1);
 RWStructuredBuffer<Vertex> OutputVertices : register(u0);
 cbuffer CB0 : register(b0)
 {
-    float4x4 _AnimationTransform[128];
+    float4x4 _AnimationTransform[96];
     uint _VertexCount;
 };
 

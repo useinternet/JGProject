@@ -316,30 +316,30 @@ namespace JG
 
 
 		//
-		SharedPtr<JsonData> linkInfoListJson = jsonData->CreateJsonData();
-		for (const AnimationNodeLinkInfo& linkInfo : LinkInfos)
+		SharedPtr<JsonData> transListJson = jsonData->CreateJsonData();
+		for (const AnimationTransitionInfo& transInfo : TransitionInfos)
 		{
-			SharedPtr<JsonData> linkInfoJson = linkInfoListJson->CreateJsonData();
+			SharedPtr<JsonData> transJson = transListJson->CreateJsonData();
 			
 			
-			linkInfoJson->AddMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY, linkInfo.PrevName);
-			linkInfoJson->AddMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY, linkInfo.NextName);
-
-			SharedPtr<JsonData> transitionListJson = linkInfoJson->CreateJsonData();
-			for (const AnimationTransitionInfo& tranInfo : linkInfo.Transitions)
+			transJson->AddMember(ANIM_TRANSITION_PREV_NODE_NAME_KEY, transInfo.PrevName);
+			transJson->AddMember(ANIM_TRANSITION_NEXT_NODE_NAME_KEY, transInfo.NextName);
+			transJson->AddMember(ANIM_TRANSITION_DURATION_KEY, transInfo.TransitionDuration);
+			SharedPtr<JsonData> condListJson = transJson->CreateJsonData();
+			for (const AnimationTransitionConditionInfo& conInfo : transInfo.Transitions)
 			{
-				SharedPtr<JsonData> transitionJson = transitionListJson->CreateJsonData();
+				SharedPtr<JsonData> condJson = condListJson->CreateJsonData();
 
-				transitionJson->AddMember(ANIM_TRANSITION_NAME_KEY, tranInfo.ParameterName);
-				transitionJson->AddMember(ANIM_TRANSITION_CONDITION_KEY, AnimationConditionTypeToString(tranInfo.Condition));
-				transitionJson->AddMember(ANIM_TRANSITION_DATA_KEY, tranInfo.Data);
+				condJson->AddMember(ANIM_CONDITION_NAME_KEY, conInfo.ParameterName);
+				condJson->AddMember(ANIM_CONDITION_TYPE_KEY, AnimationConditionTypeToString(conInfo.Condition));
+				condJson->AddMember(ANIM_CONDITION_DATA_KEY, conInfo.Data);
 
-				transitionListJson->AddMember(transitionJson);
+				condListJson->AddMember(condJson);
 			}
-			linkInfoJson->AddMember(ANIM_LINKINFO_TRANSITION_LIST_KEY, transitionListJson);
-			linkInfoListJson->AddMember(linkInfoJson);
+			transJson->AddMember(ANIM_TRANSITION_CONDITION_LIST_KEY, condListJson);
+			transListJson->AddMember(transJson);
 		}
-		jsonData->AddMember(ANIM_LINKINFO_LIST_KEY, linkInfoListJson);
+		jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, transListJson);
 
 	}
 	void AnimationAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
@@ -387,70 +387,43 @@ namespace JG
 			}
 		}
 
-		val = jsonData->GetMember(ANIM_LINKINFO_LIST_KEY);
+		val = jsonData->GetMember(ANIM_TRANSITION_LIST_KEY);
 		if (val != nullptr && val->IsArray())
 		{
 			u32 cnt = val->GetSize();
 			for (u32 i = 0; i < cnt; ++i)
 			{
-				AnimationNodeLinkInfo linkInfo;
-				SharedPtr<JsonData> linkInfoJson = val->GetJsonDataFromIndex(i);
-				if (linkInfoJson != nullptr)
+				AnimationTransitionInfo transInfo;
+				SharedPtr<JsonData> transJson = val->GetJsonDataFromIndex(i);
+				if (transJson != nullptr)
 				{
-					linkInfo.PrevName = linkInfoJson->GetMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY)->GetString();
-					linkInfo.NextName = linkInfoJson->GetMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY)->GetString();
+					transInfo.PrevName = transJson->GetMember(ANIM_TRANSITION_PREV_NODE_NAME_KEY)->GetString();
+					transInfo.NextName = transJson->GetMember(ANIM_TRANSITION_NEXT_NODE_NAME_KEY)->GetString();
+					transInfo.TransitionDuration = transJson->GetMember(ANIM_TRANSITION_DURATION_KEY)->GetFloat();
 
-					SharedPtr<JsonData> transitionListJson = linkInfoJson->GetMember(ANIM_LINKINFO_TRANSITION_LIST_KEY);
-					if (transitionListJson != nullptr && transitionListJson->IsArray())
+	
+					SharedPtr<JsonData> condListJson = transJson->GetMember(ANIM_TRANSITION_CONDITION_LIST_KEY);
+					if (condListJson != nullptr && condListJson->IsArray())
 					{
-						u32 transitionCnt = transitionListJson->GetSize();
+						u32 transitionCnt = condListJson->GetSize();
 						for (u32 j = 0; j < transitionCnt; ++j)
 						{
-							AnimationTransitionInfo transitionInfo;
-							SharedPtr<JsonData> transitionJson = transitionListJson->GetJsonDataFromIndex(j);
-							if (transitionJson != nullptr)
+							AnimationTransitionConditionInfo transitionInfo;
+							SharedPtr<JsonData> condJson = condListJson->GetJsonDataFromIndex(j);
+							if (condJson != nullptr)
 							{
-								transitionInfo.ParameterName = transitionJson->GetMember(ANIM_TRANSITION_NAME_KEY)->GetString();
-								transitionInfo.Condition = StringToAnimationConditionType(transitionJson->GetMember(ANIM_TRANSITION_CONDITION_KEY)->GetString());
-								transitionInfo.Data = transitionJson->GetMember(ANIM_TRANSITION_DATA_KEY)->GetByteList();
-								linkInfo.Transitions.push_back(transitionInfo);
+								transitionInfo.ParameterName = condJson->GetMember(ANIM_CONDITION_NAME_KEY)->GetString();
+								transitionInfo.Condition = StringToAnimationConditionType(condJson->GetMember(ANIM_CONDITION_TYPE_KEY)->GetString());
+								transitionInfo.Data = condJson->GetMember(ANIM_CONDITION_DATA_KEY)->GetByteList();
+								transInfo.Transitions.push_back(transitionInfo);
 							}
 						}
 					}
 
-					LinkInfos.push_back(linkInfo);
+					TransitionInfos.push_back(transInfo);
 				}
 			}
 		}
-
-
-		/*
-SharedPtr<JsonData> linkInfoListJson = jsonData->CreateJsonData();
-		for (const AnimationNodeLinkInfo& linkInfo : LinkInfos)
-		{
-			SharedPtr<JsonData> linkInfoJson = linkInfoListJson->CreateJsonData();
-
-
-			linkInfoJson->AddMember(ANIM_LINKINFO_PREV_NODE_NAME_KEY, linkInfo.PrevName);
-			linkInfoJson->AddMember(ANIM_LINKINFO_NEXT_NODE_NAME_KEY, linkInfo.NextName);
-
-			SharedPtr<JsonData> transitionListJson = linkInfoJson->CreateJsonData();
-			for (const AnimationTransitionInfo& tranInfo : linkInfo.Transitions)
-			{
-				SharedPtr<JsonData> transitionJson = transitionListJson->CreateJsonData();
-
-				transitionJson->AddMember(ANIM_TRANSITION_NAME_KEY, tranInfo.ParameterName);
-				transitionJson->AddMember(ANIM_TRANSITION_CONDITION_KEY, AnimationConditionTypeToString(tranInfo.Condition));
-				transitionJson->AddMember(ANIM_TRANSITION_DATA_KEY, tranInfo.Data);
-
-				transitionListJson->AddMember(transitionJson);
-			}
-			linkInfoJson->AddMember(ANIM_LINKINFO_TRANSITION_LIST_KEY, transitionListJson);
-			linkInfoListJson->AddMember(linkInfoJson);
-		}
-		jsonData->AddMember(ANIM_LINKINFO_LIST_KEY, linkInfoListJson);
-		*/
-
 	}
 
 
