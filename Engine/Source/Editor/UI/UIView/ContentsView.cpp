@@ -805,6 +805,7 @@ namespace JG
 		}
 			break;
 		case EAssetFormat::Mesh:
+		case EAssetFormat::SkeletalMesh:
 		{
 			u64 pathHash = std::hash<String>()(path);
 			ModelView* modelView = UIManager::GetInstance().GetUIView<ModelView>(pathHash);
@@ -1429,6 +1430,7 @@ namespace JG
 		case JG::EAssetFormat::Material:  return ICON_MATERIAL;
 		case JG::EAssetFormat::Texture:   return ICON_TEXTURE;
 		case JG::EAssetFormat::GameWorld: return ICON_GAMEWORLD;
+		case JG::EAssetFormat::SkeletalMesh:
 		case JG::EAssetFormat::Mesh:   return ICON_MESH;
 		case JG::EAssetFormat::Prefab: return ICON_PREFAB;
 		case JG::EAssetFormat::Skeletal:

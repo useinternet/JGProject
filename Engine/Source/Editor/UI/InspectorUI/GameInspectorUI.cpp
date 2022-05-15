@@ -1,13 +1,10 @@
 #include "pch.h"
 #include "GameInspectorUI.h"
-
-
-
-
-
 #include "UI/UIManager.h"
 #include "UI/UIView/InspectorView.h"
 #include "UI/ContextUI/ComponentFinderContextView.h"
+#include "Animation/AnimationController.h"
+#include "Class/Data/Skeletone.h"
 namespace JG
 {
 	void GameNodeInspectorUI::OnGUI_Impl(GameNode* obj)
@@ -149,9 +146,9 @@ namespace JG
 		f32 nearZ = obj->GetNearZ();
 		f32 farZ = obj->GetFarZ();
 		bool isOrth = obj->IsOrthographic();
-
+		bool isMainCam = obj->IsMainCamera();
 		f32 label_width = ImGui::CalcTextSize("Field of View").x;
-
+		ImGui::Bool_OnGUI("MainCamera", isMainCam);
 		ImGui::Vector2_OnGUI("Resolution", resolution, label_width);
 		ImGui::Float_OnGUI("Field of View", fov, label_width);
 		ImGui::Float_OnGUI("NearZ", nearZ, label_width);
@@ -160,7 +157,7 @@ namespace JG
 		ImGui::Color4_OnGUI("ClearColor", color, label_width);
 
 
-
+		obj->SetMainCamera(isMainCam);
 		obj->SetFOV(fov);
 		obj->SetClearColor(color);
 		obj->SetFarZ(farZ);
@@ -314,6 +311,77 @@ namespace JG
 
 
 
+
+
+	void SkeletalMeshRendererInspectorUI::OnGUI_Impl(SkeletalMeshRenderer* obj)
+	{
+		f32 label_width = ImGui::CalcTextSize("Materials").x;
+
+
+
+		String inputText = "None";
+		if (obj->GetMesh())
+		{
+			inputText = obj->GetMesh()->GetAssetName();
+		}
+		ImGui::AssetField_OnGUI("Mesh", inputText, EAssetFormat::SkeletalMesh, [&](const std::string& path)
+		{
+			obj->SetMesh(path);
+		}, label_width);
+
+
+		List<String> inputTextList;
+		obj->ForEach([&](Asset<IMaterial>* m)
+		{
+			if (m == nullptr) {
+				inputTextList.push_back("None");
+			}
+			else
+			{
+				inputTextList.push_back(m->GetAssetName());
+			}
+		});
+		ImGui::AssetField_List_OnGUI("Materials", inputTextList, EAssetFormat::Material,
+			[&](int index, const std::string& path)
+		{
+			obj->SetMaterial(index, path);
+		}, [&]()
+		{
+			obj->AddMaterial("");
+		}, [&]()
+		{
+			obj->PopMaterial();
+		}, label_width);
+
+
+
+		if (obj->GetSkeletone())
+		{
+			inputText = obj->GetSkeletone()->GetAssetName();
+		}
+		else
+		{
+			inputText = "None";
+		}
+		ImGui::AssetField_OnGUI("Skeletone", inputText, EAssetFormat::Skeletal, [&](const std::string& path)
+		{
+			obj->SetSkeletone(path);
+		}, label_width);
+
+
+		if (obj->GetAnimation())
+		{
+			inputText = obj->GetAnimation()->GetAssetName();
+		}
+		else
+		{
+			inputText = "None";
+		}
+		ImGui::AssetField_OnGUI("Animation", inputText, EAssetFormat::Animation, [&](const std::string& path)
+		{
+			obj->SetAnimation(path);
+		}, label_width);
+	}
 
 
 }

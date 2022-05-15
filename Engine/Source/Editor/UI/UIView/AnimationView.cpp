@@ -299,7 +299,7 @@ namespace JG
 
 		{
 			ImGui::AssetField_OnGUI("Mesh", (mMeshAsset != nullptr && mMeshAsset->IsValid()) ? mMeshAsset->GetAssetName() : "None",
-				EAssetFormat::Mesh, [&](const String& assetPath)
+				EAssetFormat::SkeletalMesh, [&](const String& assetPath)
 			{
 				SetMesh(assetPath);
 			}, label_Space);
@@ -1202,6 +1202,7 @@ namespace JG
 		if (mAnimationAsset != nullptr)
 		{
 			RefreshAnimAsset(mAnimationAsset->GetAssetPath());
+			
 		}
 		if (mSkeletoneAsset == nullptr || mSkeletoneAsset->IsValid() == false)
 		{
@@ -1222,9 +1223,10 @@ namespace JG
 
 	
 		mAnimationAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationController>(assetPath);
-
+		
 		if (mAnimationAsset != nullptr)
 		{
+			AssetDataBase::GetInstance().RefreshAsset(mAnimationAsset->GetAssetID());
 			JGAnimation::GetInstance().RegisterAnimationController(mAnimationAsset->Get());
 		}
 	}

@@ -56,6 +56,7 @@ namespace JG
 		Prefab    = 8,
 		AnimationClip = 9,
 		Animation = 10,
+		SkeletalMesh = 11,
 	};
 
 	enum class ERendererPath

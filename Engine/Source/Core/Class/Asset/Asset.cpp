@@ -817,9 +817,6 @@ namespace JG
 			data.OnComplete = assetLoadData->OnComplete;
 			assetLoadData->OnComplete(&data);
 		}
-
-
-
 		return result;
 	}
 
@@ -1061,6 +1058,7 @@ namespace JG
 			break;
 		}
 		case EAssetFormat::Mesh:
+		case EAssetFormat::SkeletalMesh:
 		{
 			
 			LoadData->Stock = CreateSharedPtr<StaticMeshAssetStock>();
@@ -1452,6 +1450,7 @@ namespace JG
 		case EAssetFormat::Material: return CreateSharedPtr<Asset<IMaterial>>(assetID, path, assetFormat);
 		case EAssetFormat::CubeMap:
 		case EAssetFormat::Texture:  return CreateSharedPtr<Asset<ITexture>>(assetID, path, assetFormat);
+		case EAssetFormat::SkeletalMesh:
 		case EAssetFormat::Mesh:     return CreateSharedPtr<Asset<IMesh>>(assetID, path, assetFormat);
 		case EAssetFormat::AnimationClip: return CreateSharedPtr<Asset<AnimationClip>>(assetID, path, assetFormat);
 		case EAssetFormat::Animation:

@@ -45,21 +45,8 @@ namespace JG
 			aiProcess_SortByPType |               // 단일타입의  프리미티브로 구성된 '깨끗한' 매쉬를 만듬
 			aiProcess_CalcTangentSpace            // 탄젠트 공간 계산 )
 		);
-		// Skeletal
-
-		// Bone Data
-
-		// BoneTransform[64];
-
-		// 이걸로 vertex 
-		
 		if (scene != nullptr)
 		{
-			//SceneHierarchyInfo info;
-			//info.Flags = setting.Flags;
-			//ReadScene(scene, info);
-
-
 			if (scene->HasMeshes() == true)
 			{
 				
@@ -542,7 +529,7 @@ namespace JG
 		auto json = CreateSharedPtr<Json>();
 		json->AddMember(JG_ASSET_KEY, stock);
 
-		if (AssetDataBase::GetInstance().WriteAsset(filePath, EAssetFormat::Mesh, json) == false)
+		if (AssetDataBase::GetInstance().WriteAsset(filePath, stock.BoneVertices.empty() ? EAssetFormat::Mesh : EAssetFormat::SkeletalMesh, json) == false)
 		{
 			JG_LOG_ERROR("Fail Write Mesh : {0} ", outputPath);
 		}

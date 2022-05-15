@@ -73,7 +73,7 @@ namespace JG
 		};
 		Camera* mainCamera			  = Camera::GetMainCamera();
 		Graphics::Scene* scene		  = nullptr;
-
+		mRenderParamManager = nullptr;
 		if (mainCamera)
 		{
 			scene = mainCamera->GetScene();
@@ -86,10 +86,6 @@ namespace JG
 				}
 			}
 			
-		}
-		else
-		{
-			mRenderParamManager = nullptr;
 		}
 
 		InitRenderParamInfo(mRenderParamManager);

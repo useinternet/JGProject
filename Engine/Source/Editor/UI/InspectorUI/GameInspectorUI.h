@@ -11,7 +11,7 @@
 #include "Components/SkyDome.h"
 #include "Components/SpriteRenderer.h"
 #include "Components/StaticMeshRenderer.h"
-
+#include "Components/SkeletalMeshRenderer.h"
 
 
 namespace JG
@@ -28,4 +28,5 @@ namespace JG
 	class SkyDomeInspectorUI			: public InspectorUI<SkyDome>				{	virtual void OnGUI_Impl(SkyDome*			obj) override;};
 	class SpriteRendererInspectorUI		: public InspectorUI<SpriteRenderer>		{	virtual void OnGUI_Impl(SpriteRenderer*		obj) override;};
 	class StaticMeshRendererInspectorUI : public InspectorUI<StaticMeshRenderer>	{	virtual void OnGUI_Impl(StaticMeshRenderer* obj) override;};
+	class SkeletalMeshRendererInspectorUI : public InspectorUI<SkeletalMeshRenderer> { virtual void OnGUI_Impl(SkeletalMeshRenderer* obj) override; };
 }

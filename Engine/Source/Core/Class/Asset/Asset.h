@@ -258,7 +258,7 @@ namespace JG
 		virtual ~StaticMeshAssetStock() = default;
 	public:
 		virtual EAssetFormat GetAssetFormat() const override {
-			return EAssetFormat::Mesh;
+			return BoneVertices.empty() ? EAssetFormat::Mesh : EAssetFormat::SkeletalMesh;
 		}
 	};
 	class SkeletalAssetStock : public IAssetStock

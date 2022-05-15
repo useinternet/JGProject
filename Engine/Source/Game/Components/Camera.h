@@ -66,7 +66,7 @@ namespace JG
 		void SetCullingLayerMask(u64 mask);
 		void SetClearColor(const Color& color);
 		void SetRendererPath(ERendererPath rendererPath);
-
+		void SetMainCamera(bool _bool);
 		JVector3 ScreenToWorldPoint(const JVector3& screenPos) const;
 		JRay ScreenToWorldRay(const JVector3& screenPos) const;
 	public:

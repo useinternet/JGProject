@@ -10,6 +10,7 @@
 #include "Components/Camera.h"
 #include "Components/SpriteRenderer.h"
 #include "Components/StaticMeshRenderer.h"
+#include "Components/SkeletalMeshRenderer.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/SpotLight.h"
@@ -225,6 +226,11 @@ namespace JG
 			RequestSaveGameWorldEvent e;
 			e.CompeleteAction = [&]()
 			{
+				Camera* editorCam = Camera::GetMainCamera();
+				if (editorCam->GetType() == JGTYPE(EditorCamera))
+				{
+					editorCam->GetOwner()->Destroy(editorCam);
+				}
 				mGameWorld->RemoveFlags(EGameWorldFlags::All_Update_Lock);
 				mIsGamePlaying = true;
 			};
@@ -297,6 +303,7 @@ namespace JG
 		GameObjectFactory::GetInstance().RegisterComponentType<EditorCamera>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SpriteRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<StaticMeshRenderer>();
+		GameObjectFactory::GetInstance().RegisterComponentType<SkeletalMeshRenderer>();
 		GameObjectFactory::GetInstance().RegisterComponentType<PointLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<DirectionalLight>();
 		GameObjectFactory::GetInstance().RegisterComponentType<SpotLight>();

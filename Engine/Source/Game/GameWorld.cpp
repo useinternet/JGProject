@@ -131,7 +131,6 @@ namespace JG
 
 		}
 	}
-
 	void GameWorld::RegisterGraphicsScene(GameComponent* com, Graphics::Scene* scene)
 	{
 		mGraphicsSceneDic.emplace(com, scene);

@@ -8,10 +8,6 @@ namespace JG
 	Camera* Camera::smMainCamera = nullptr;
 	void Camera::SetMainCamera(Camera* mainCamera)
 	{
-		if (mainCamera == nullptr)
-		{
-			return;
-		}
 		smMainCamera = mainCamera;
 	}
 	Camera* Camera::GetMainCamera()
@@ -31,9 +27,8 @@ namespace JG
 		if (GetType() == JGTYPE(EditorCamera) && smMainCamera == nullptr)
 		{
 			smMainCamera = this;
+			UpdateGraphicsScene();
 		}
-
-		UpdateGraphicsScene();
 	}
 
 	void Camera::Start()
@@ -56,8 +51,6 @@ namespace JG
 	{
 		GameComponent::Update();
 
-
-
 		if (GetMainCamera() == nullptr)
 		{
 			SetMainCamera(this);
@@ -70,10 +63,6 @@ namespace JG
 		if (GetMainCamera() == this)
 		{
 			SetMainCamera(nullptr);
-		}
-		if (smMainCamera == this)
-		{
-			smMainCamera = nullptr;
 		}
 		if (mScene != nullptr)
 		{
@@ -137,7 +126,7 @@ namespace JG
 		val = jsonData->GetMember("IsMainCamera");
 		if (val)
 		{
-			mIsMainCamera = val->GetBool();
+			SetMainCamera(val->GetBool());
 		}
 	}
 	void Camera::SetFOV(f32 fov)
@@ -192,6 +181,10 @@ namespace JG
 	void Camera::SetRendererPath(ERendererPath rendererPath)
 	{
 		mRendererPath = rendererPath;
+	}
+	void Camera::SetMainCamera(bool _bool)
+	{
+		mIsMainCamera = _bool;
 	}
 	JVector3 Camera::ScreenToWorldPoint(const JVector3& screenPos) const
 	{
