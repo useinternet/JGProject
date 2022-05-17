@@ -18,40 +18,34 @@ namespace JG
 		mRootSignature = creater->Generate();
 		mShader = ShaderLibrary::GetInstance().FindComputeShader(SHADER_NAME);
 
-		GraphicsHelper::InitStrucutredBuffer("LightGridSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER, sizeof(Graphics::LightGrid), &mLightGridSB);
-		GraphicsHelper::InitStrucutredBuffer("VisibleLightIndiciesSB", PreRenderProcess_ComputeCluster::NUM_CLUSTER * 64, sizeof(u32), &mVisibleLightIndiciesSB);
+
+		mLightGridSB = IStructuredBuffer::Create("LightGridSB", sizeof(Graphics::LightGrid), PreRenderProcess_ComputeCluster::NUM_CLUSTER, EBufferLoadMethod::GPULoad);
+		mVisibleLightIndiciesSB = IStructuredBuffer::Create("VisibleLightIndiciesSB", sizeof(u32), PreRenderProcess_ComputeCluster::NUM_CLUSTER * 64, EBufferLoadMethod::GPULoad);
 	}
 	void PreRenderProcess_LightCulling::Ready(const ReadyData& data)
 	{
-
-
-		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		CB.ViewMatirx      = JMatrix::Transpose(data.Info.ViewMatrix);
 		CB.PointLightCount = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight).Count;
 		CB.NumXSlice = PreRenderProcess_ComputeCluster::NUM_X_SLICE;
 		CB.NumYSlice = PreRenderProcess_ComputeCluster::NUM_Y_SLICE;
 		CB.NumZSlice = PreRenderProcess_ComputeCluster::NUM_Z_SLICE;
 
-		data.pRenderer->SetLightGrid(mLightGridSB[bufferIndex]);
-		data.pRenderer->SetVisibleLightIndicies(mVisibleLightIndiciesSB[bufferIndex]);
+		data.pRenderer->SetLightGrid(mLightGridSB);
+		data.pRenderer->SetVisibleLightIndicies(mVisibleLightIndiciesSB);
 		SharedPtr<IGraphicsContext> context = data.GraphicsContext;
-		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB[bufferIndex]);
-		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB[bufferIndex]);
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::LightGrid, mLightGridSB);
+		context->BindSturcturedBuffer((u32)Renderer::ERootParam::VisibleLightIndicies, mVisibleLightIndiciesSB);
 	}
 	void PreRenderProcess_LightCulling::Run(const RunData& data)
 	{
 		auto pointLightsInfo = data.pRenderer->GetLightInfo(Graphics::ELightType::PointLight);
 
-		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-		SharedPtr<IStructuredBuffer> targetLightGridSB = mLightGridSB[bufferIndex];
-		SharedPtr<IStructuredBuffer> targetVisibleLightIndiciesSB = mVisibleLightIndiciesSB[bufferIndex];
-
 		SharedPtr<IComputeContext> context = data.ComputeContext;
 		context->BindRootSignature(mRootSignature);
 		context->BindShader(mShader);
 		context->BindConstantBuffer(0, CB); 
-		context->BindSturcturedBuffer(1, targetVisibleLightIndiciesSB);
-		context->BindSturcturedBuffer(2, targetLightGridSB);
+		context->BindSturcturedBuffer(1, mVisibleLightIndiciesSB);
+		context->BindSturcturedBuffer(2, mLightGridSB);
 		context->BindSturcturedBuffer(3, pointLightsInfo.Data.data(), pointLightsInfo.Size, pointLightsInfo.Count);
 		context->BindSturcturedBuffer(4, mClusterSB);
 		context->Dispatch(

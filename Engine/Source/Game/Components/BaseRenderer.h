@@ -3,9 +3,6 @@
 #include "Class/Asset/Asset.h"
 #include "Class/Asset/AssetManager.h"
 
-
-
-
 namespace JG
 {
 	class BaseRenderer : public GameComponent

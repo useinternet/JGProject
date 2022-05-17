@@ -95,8 +95,7 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() = 0;
-		//virtual SharedPtr<IComputeContext> GetComputeContext()   = 0;
-		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
+		//virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() = 0;

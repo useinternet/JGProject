@@ -145,7 +145,7 @@ namespace JG
 
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
-			api->GetGraphicsContext()->ClearRenderTarget({ gNullTexture }, nullptr);
+			api->GetGraphicsContext(GRAPHICS_COMMAND_QUEUE_ID, GRAPHICS_CONTEXT_ID)->ClearRenderTarget({ gNullTexture }, nullptr);
 		}
 	}
 	void ITexture::DestroyNullTexture()

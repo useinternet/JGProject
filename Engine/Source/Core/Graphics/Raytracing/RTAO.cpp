@@ -42,18 +42,13 @@ namespace JG
         mShuffledIndices.resize(mNumSamples * mNumSampleSets);
         mHemisphereSamples.resize(mNumSamples * mNumSampleSets, HemisphereSample3D(FLT_MAX, FLT_MAX, FLT_MAX));
 
-        // Reset generator and initialize distributions.
         {
-            // Initialize to the same seed for determinism.
             mGeneratorURNG.seed(s_seed);
 
             std::uniform_int_distribution<u32> jumpDistribution(0, mNumSamples - 1);
             std::uniform_int_distribution<u32> jumpSetDistribution(0, mNumSampleSets - 1);
 
             std::uniform_real_distribution<f32> unitSquareDistribution(0.f, 1.f);
-
-            // Specify the next representable value for the end range, since
-            // uniform_real_distribution constructs excluding the end value [being, end).
             std::uniform_real_distribution<f32> unitSquareDistributionInclusive(0.f, nextafter(1.f, FLT_MAX));
 
             GetRandomJump = bind(jumpDistribution, ref(mGeneratorURNG));
@@ -258,8 +253,7 @@ namespace JG
                 GetResource(EResource::AoRayDistance)
             });
 
-        u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-        context->BindSturcturedBuffer(3, mHemisphereSamples[bufferIndex]);
+        context->BindSturcturedBuffer(3, mHemisphereSamples);
         context->BindAccelerationStructure(4, input.SceneAS);
         
         context->DispatchRay(input.Resolution.x, input.Resolution.y, 1.0F, mPipeline, mSRT);
@@ -288,7 +282,9 @@ namespace JG
 
         mTex[EResource::AO] = RP_Global_Tex::Create("Renderer/RTAO/AO", nullptr, mRenderer->GetRenderParamManager());
         mTex[EResource::AoRayDistance] = RP_Global_Tex::Create("Renderer/RTAO/AoRayDistance", nullptr, mRenderer->GetRenderParamManager());
-        GraphicsHelper::InitStrucutredBuffer("HemisphereSamples", 1024 * 8 * 8 * mNumSampleSets, sizeof(JVector4), &mHemisphereSamples, EBufferLoadMethod::CPULoad);
+
+        mHemisphereSamples = IStructuredBuffer::Create("HemisphereSamples", sizeof(JVector4), 1024 * 8 * 8 * mNumSampleSets, EBufferLoadMethod::CPULoad);
+
 
 
         mSamplerUpdateSH = Scheduler::GetInstance().ScheduleByFrame(0, 0, -1,
@@ -348,15 +344,14 @@ namespace JG
         texInfo.Flags = ETextureFlags::Allow_UnorderedAccessView | ETextureFlags::Allow_RenderTarget;
         texInfo.MipLevel = 1;
         texInfo.ClearColor = Color();
+        mResources[EResource::AO] = ITexture::Create("AOOutput", texInfo);
+        mResources[EResource::AoRayDistance] =  ITexture::Create("AORayDistanceOutput", texInfo);
 
-        GraphicsHelper::InitRenderTextures(texInfo, "AOOutput", &mResources[EResource::AO]);
-        GraphicsHelper::InitRenderTextures(texInfo, "AORayDistanceOutput", &mResources[EResource::AoRayDistance]);
     }
 
     void RTAO::UpdateSampler()
     {
-        u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-        SharedPtr<IStructuredBuffer> sb = mHemisphereSamples[bufferIndex];
+        SharedPtr<IStructuredBuffer> sb = mHemisphereSamples;
         u32 pixelsInSampleSet1D = mAOSampleSetDistributedAcrossPixels.GetValue();
         u32 samplesPerSet = mSPP.GetValue() * pixelsInSampleSet1D * pixelsInSampleSet1D;
         mRandomSampler.Reset(samplesPerSet, mNumSampleSets, Cosine);
@@ -372,8 +367,7 @@ namespace JG
 
     SharedPtr<ITexture> RTAO::GetResource(EResource resource)
     {
-        u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-        return mResources[resource][bufferIndex];
+        return mResources[resource];
     }
 
 

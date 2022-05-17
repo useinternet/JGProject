@@ -6,9 +6,6 @@ namespace JG
 {
 	Render2DBatch::Render2DBatch()
 	{
-		auto bufferCnt = JGGraphics::GetInstance().GetBufferCount();
-		mFrameResources.resize(bufferCnt);
-
 		auto inputLayout = InputLayout::Create();
 		inputLayout->Add(EShaderDataType::_float3, "POSITION", 0);
 		inputLayout->Add(EShaderDataType::_float2, "TEXCOORD", 0);
@@ -23,23 +20,13 @@ namespace JG
 		textureInfo.Format     = ETextureFormat::R8G8B8A8_Unorm; textureInfo.Flags = ETextureFlags::Allow_RenderTarget;
 		mWhiteTexture = ITexture::Create("WhiteTexture", textureInfo);
 
-		for (i32 i = 0; i < bufferCnt; ++i)
-		{
-			FrameResource rsc;
-			rsc.QuadMesh = IMesh::Create("Renderer2D_QuadMesh");
-			rsc.QuadMesh->SetInputLayout(inputLayout);
-			rsc.QuadMesh->AddMesh(ISubMesh::Create("Renderer2D_QuadSubMesh"));
-
-
-
-			rsc.QuadVBuffer = IVertexBuffer::Create("Renderer2D_VBuffer", EBufferLoadMethod::CPULoad);
-			rsc.QuadIBuffer = IIndexBuffer::Create("Renderer2D_IBuffer", EBufferLoadMethod::CPULoad);
-
-			rsc.QuadMesh->GetSubMesh(0)->SetVertexBuffer(rsc.QuadVBuffer);
-			rsc.QuadMesh->GetSubMesh(0)->SetIndexBuffer(rsc.QuadIBuffer);
-
-			mFrameResources[i] = rsc;
-		}
+		mFrameResource.QuadMesh = IMesh::Create("Renderer2D_QuadMesh");
+		mFrameResource.QuadMesh->SetInputLayout(inputLayout);
+		mFrameResource.QuadMesh->AddMesh(ISubMesh::Create("Renderer2D_QuadSubMesh"));
+		mFrameResource.QuadVBuffer = IVertexBuffer::Create("Renderer2D_VBuffer", EBufferLoadMethod::CPULoad);
+		mFrameResource.QuadIBuffer = IIndexBuffer::Create("Renderer2D_IBuffer", EBufferLoadMethod::CPULoad);
+		mFrameResource.QuadMesh->GetSubMesh(0)->SetVertexBuffer(mFrameResource.QuadVBuffer);
+		mFrameResource.QuadMesh->GetSubMesh(0)->SetIndexBuffer(mFrameResource.QuadIBuffer);
 
 		mStandardQuadPosition[0] = JVector3(-0.5f, -0.5f, 0.0f);
 		mStandardQuadPosition[1] = JVector3(-0.5f, +0.5f, 0.0f);
@@ -88,15 +75,13 @@ namespace JG
 			auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 			JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 
-			SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
+			SharedPtr<IGraphicsContext> context = api->GetGraphicsContext(GRAPHICS_COMMAND_QUEUE_ID, GRAPHICS_CONTEXT_ID);
 
 			context->ClearRenderTarget({ mWhiteTexture }, nullptr);
 			mIsClearWhiteTexture = true;
 		}
 
 
-		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
-		mCurrFrameResource = &mFrameResources[bufferIndex];
 
 		JMatrix V = JMatrix::LookAtLH(JVector3(0.0f, 0.0f, -10.0f), JVector3(0.0f, 0.0f, 1.0f), JVector3(0.0f, 1.0f, 0.0f));
 		JMatrix P = JMatrix::OrthographicLH(info.Resolution.x, info.Resolution.y, info.NearZ, info.FarZ);
@@ -187,8 +172,8 @@ namespace JG
 		u32 quadIndexCount  = mQuadCount * QuadIndexCount;
 
 
-		mCurrFrameResource->QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
-		mCurrFrameResource->QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
+		mFrameResource.QuadVBuffer->SetData(mVertices.data(), sizeof(QuadVertex), quadVertexCount);
+		mFrameResource.QuadIBuffer->SetData(mIndices.data(), quadIndexCount);
 
 		context->SetViewports({ Viewport(renderInfo.Resolution.x, renderInfo.Resolution.y) });
 		context->SetScissorRects({ ScissorRect(0,0, renderInfo.Resolution.x, renderInfo.Resolution.y) });
@@ -196,7 +181,7 @@ namespace JG
 
 		context->SetDepthStencilState(EDepthStencilStateTemplate::NoDepth);
 		context->SetBlendState(0, EBlendStateTemplate::Transparent_Default);
-		context->SetInputLayout(mCurrFrameResource->QuadMesh->GetInputLayout());
+		context->SetInputLayout(mFrameResource.QuadMesh->GetInputLayout());
 
 		context->BindShader(m2DShader);
 		context->BindRootSignature(GetConnectedRenderer()->GetGraphicsRootSignature());
@@ -205,7 +190,7 @@ namespace JG
 		context->BindConstantBuffer((u32)Renderer::ERootParam::ObjectCB, passData.ViewProjMatrix);
 	
 		context->BindTextures((u32)Renderer::ERootParam::Texture2D, mTextureArray);
-		context->BindVertexAndIndexBuffer(mCurrFrameResource->QuadVBuffer, mCurrFrameResource->QuadIBuffer);
+		context->BindVertexAndIndexBuffer(mFrameResource.QuadVBuffer, mFrameResource.QuadIBuffer);
 		context->DrawIndexed(quadIndexCount);
 
 		StartBatch();

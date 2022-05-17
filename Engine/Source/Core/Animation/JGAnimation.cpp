@@ -67,11 +67,12 @@ namespace JG
 				break;
 			}
 		}
-
+		SharedPtr<IComputeContext> computeContext =
+			JGGraphics::GetInstance().GetGraphicsAPI()->GetComputeContext(ANIMATION_COMMAND_QUEUE_ID, ANIMATION_CONTEXT_ID);
 		for (SharedPtr<AnimationController> controller : mRegisteredAnimationControllers)
 		{
 			if (controller == nullptr) continue;
-			controller->Update();
+			controller->Update(computeContext);
 		}
 
 		if (mRegisteredAnimationControllers.empty() == false)

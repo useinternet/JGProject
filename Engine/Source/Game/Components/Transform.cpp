@@ -203,6 +203,7 @@ namespace JG
 		auto worldQuat     = GetWorldQuaternion();
 		auto worldScale    = GetWorldScale();
 		mWorldMatrix = JMatrix::Scaling(worldScale) * JMatrix::Rotation(worldQuat) * JMatrix::Translation(worldLocation);
+
 	}
 	void Transform::UpdateWorldLocation() const
 	{

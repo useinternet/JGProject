@@ -42,7 +42,6 @@ namespace JG
 	private:
 		JVector3 mStandardQuadPosition[4];
 		JVector2 mStandardQuadTexcoord[4];
-		List<FrameResource> mFrameResources;
 		List<QuadVertex>    mVertices;
 		List<u32>           mIndices;
 		List<SharedPtr<ITexture>> mTextureArray;
@@ -51,7 +50,7 @@ namespace JG
 		u64 mQuadCount = 0;
 		u64 mTextureCount = 0;
 		JMatrix mQuadViewProj;
-		FrameResource* mCurrFrameResource = nullptr;
+		FrameResource mFrameResource;
 		List<SharedPtr<ITexture>> mRenderTarges;
 
 		bool mIsClearWhiteTexture = false;

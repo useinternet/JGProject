@@ -8,11 +8,22 @@ namespace JG
 		JGCLASS
 
 		f32 mCamLength = 1000.0f;
-		f32 mSpeed = 1.5f;
+		f32 mSpeed     = 2.5f;
 		Camera* mCamera = nullptr;
+
+		class Transform* mMeshTransform = nullptr;
+		class Transform* mRootTransform = nullptr;
+		class Transform* mCameraTransform = nullptr;
+
 		class SkeletalMeshRenderer* mRenderer = nullptr;
 		class AnimationController* mAnimController = nullptr;
 		class AnimationParameters* mAnimParams = nullptr;
+
+
+
+
+
+		JVector2 mValue;
 		bool mIsRunning = false;
 	protected:
 		virtual void Start()  override;

@@ -26,7 +26,6 @@ namespace JG
 			{
 				return Blur_Float::Output();
 			}
-			u32 currIndex = JGGraphics::GetInstance().GetBufferIndex();
 
 			context->BindShader(mShader);
 			context->BindRootSignature(mRenderer->GetComputeRootSignature());

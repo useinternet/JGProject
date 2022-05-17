@@ -126,7 +126,7 @@ namespace JG
 			Denoise_Count
 		};
 	private:
-		List<SharedPtr<ITopLevelAccelerationStructure>> mSceneAS;
+		SharedPtr<ITopLevelAccelerationStructure> mSceneAS;
 		List<InstanceData> mInstances;
 
 		SharedPtr<IRayTracingShaderResourceTable> mSRT;
@@ -150,7 +150,7 @@ namespace JG
 		SharedPtr<RTAO>     mRTAO;
 
 		SharedPtr<Denoiser> mDenoiser[EDenoiser::Denoise_Count];
-		List<SharedPtr<ITexture>> mResources[EResource::Count];
+		SharedPtr<ITexture> mResources[EResource::Count];
 		CB mCB;
 	public:
 		RayTracer(Renderer* renderer);

@@ -14,6 +14,7 @@
 #include "Graphics/Develop/RenderStatistics.h"
 #include "Application.h"
 
+
 namespace JG
 {
 	JGGraphics::JGGraphics(const JGGraphicsDesc& desc)
@@ -52,7 +53,6 @@ namespace JG
 
 			if (userData->Is<RemoveObjectData>())
 			{
-				Flush();
 				RemoveObject(userData->As<RemoveObjectData>()->GObject);
 			}
 			return EScheduleResult::Continue;
@@ -134,6 +134,7 @@ namespace JG
 			{
 				return EScheduleResult::Break;
 			}
+			mGraphcisAPI->Flush(GRAPHICS_COMMAND_QUEUE_ID);
 			mGraphcisAPI->BeginFrame();
 			Reset();
 			
@@ -147,11 +148,14 @@ namespace JG
 			{
 				return EScheduleResult::Break;
 			}
+
 			mGraphcisAPI->EndFrame();
+			
 
 			return EScheduleResult::Continue;
 		});
 
+		mGraphcisAPI->AllocateCommandQueue(ECommandQueueType::Graphics, GRAPHICS_COMMAND_QUEUE_ID);
 		GlobalSingletonManager::GetInstance().RegisterSingleton<ShaderLibrary>();
 	}
 	void JGGraphics::Reset()

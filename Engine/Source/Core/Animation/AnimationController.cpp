@@ -241,7 +241,7 @@ namespace JG
 
 	}
 
-	void AnimationController::Update()
+	void AnimationController::Update(SharedPtr<IComputeContext> computeContext)
 	{
 		while (mClipCommandDataQueue.empty() == false)
 		{
@@ -266,8 +266,7 @@ namespace JG
 		*mFlow = GetAnimationStateMachine()->GetAnimationStateFlow_Thread();
 
 		// ½ºÅ°´× Mesh »ý¼º
-		SharedPtr<IGraphicsContext> context = JGGraphics::GetInstance().GetGraphicsAPI()->GetGraphicsContext();
-		SharedPtr<ICopyContext> copyContext = context->QueryInterfaceAsCopyContext();
+		SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
 
 		if (mSkinnedMesh == nullptr)
 		{

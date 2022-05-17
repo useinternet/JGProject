@@ -23,8 +23,6 @@ namespace JG
 			mResolution = input.Resolution;
 			InitTexture();
 		}
-
-		u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		u32 temporalCachePreviousFrameResourceIndex = mTemporalCacheCurrentFrameResourceIndex;
 		mTemporalCacheCurrentFrameResourceIndex = (mTemporalCacheCurrentFrameResourceIndex + 1) % 2;
 

@@ -24,10 +24,8 @@ namespace JG
 		auto api = JGGraphics::GetInstance().GetGraphicsAPI();
 		JGASSERT_IF(api != nullptr, "GraphicsApi is nullptr");
 		
-
-		u64 buffCount = api->GetBufferCount();
 		// Context 초기화
-		mGraphicsContext = api->GetGraphicsContext();
+		mGraphicsContext = api->GetGraphicsContext(GRAPHICS_COMMAND_QUEUE_ID, GRAPHICS_CONTEXT_ID);
 		mComputeContext  = mGraphicsContext->QueryInterfaceAsComputeContext();
 		mCopyContext	 = mGraphicsContext->QueryInterfaceAsCopyContext();
 		mRenderInfo		 = info;
@@ -47,8 +45,6 @@ namespace JG
 			info.Size = item->GetBtSize();
 			item->PushBtData(info.Data);
 		}
-
-		u64 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 		// PassData  바인딩
 		// Light 정보 바인딩
 		Graphics::RenderPassData passData;
@@ -86,14 +82,12 @@ namespace JG
 
 
 
-
-		SharedPtr<IGraphicsContext> context = api->GetGraphicsContext();
-		context->BindConstantBuffer((u32)ERootParam::PassCB, passData);
+		mGraphicsContext->BindConstantBuffer((u32)ERootParam::PassCB, passData);
 
 		(*mPassData) = passData;
 
 		const LightInfo& lInfo = mLightInfos[Graphics::ELightType::PointLight];
-		context->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.Data.data(), lInfo.Size, lInfo.Count);
+		mGraphicsContext->BindSturcturedBuffer((u32)ERootParam::PointLight, lInfo.Data.data(), lInfo.Size, lInfo.Count);
 
 		return BeginBatch(info);
 	}
@@ -143,23 +137,6 @@ namespace JG
 			}
 		}
 			break;
-		case Graphics::ESceneObjectType::Skeletal:
-		{
-			Graphics::SkeletalRenderObject* skeletalObj = static_cast<Graphics::SkeletalRenderObject*>(sceneObject.get());
-			if (skeletalObj->Mesh != nullptr && skeletalObj->MaterialList.empty() == false)
-			{
-				ObjectInfo info;
-				info.WorldMatrix = skeletalObj->WorldMatrix;
-				info.Mesh = skeletalObj->Mesh;
-				info.MaterialList = skeletalObj->MaterialList;
-				info.Flags = skeletalObj->Flags;
-				i32 type = ArrangeObject(info);
-				mObjectInfoListDic[type].push_back(info);
-				Statistics.VisibleObjectCount += 1;
-			}
-		}
-			
-			break;
 		}
 	}
 	SharedPtr<RenderResult> Renderer::End()
@@ -182,6 +159,7 @@ namespace JG
 		}
 
 	
+
 		while (true)
 		{
 			bool isCompelete = true;

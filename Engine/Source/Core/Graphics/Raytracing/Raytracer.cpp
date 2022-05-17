@@ -112,18 +112,18 @@ namespace JG
 
 	void RayTracer::Reset()
 	{
-		if (mSceneAS.empty() == true)
+		if (mSceneAS == nullptr)
 		{
 			return;
 		}
 
-		u32 currentIndex = JGGraphics::GetInstance().GetGraphicsAPI()->GetBufferIndex();
-		if (mSceneAS[currentIndex] == nullptr)
+
+		if (mSceneAS == nullptr)
 		{
 			return;
 		}
 		mInstances.clear();
-		mSceneAS[currentIndex]->Reset();
+		mSceneAS->Reset();
 		mHitGroupOffset = 0;
 	}
 
@@ -131,7 +131,7 @@ namespace JG
 
 	void RayTracer::Init()
 	{
-		GraphicsHelper::InitTopLevelAccelerationStructure(&mSceneAS);
+		mSceneAS = ITopLevelAccelerationStructure::Create();
 		mRayBounds = RP_Global_Int::Create("Renderer/RayTracing/MaxRayBounds", 3, 1, 5, mRenderer->GetRenderParamManager());	
 
 
@@ -180,36 +180,38 @@ namespace JG
 		texInfo.MipLevel  = 1;
 		texInfo.ClearColor = Color();
 
-		GraphicsHelper::InitRenderTextures(texInfo, "DirectOutput", &mResources[EResource::Direct]);
-		GraphicsHelper::InitRenderTextures(texInfo, "EmissiveOutput", &mResources[EResource::Emissive]);
+		mResources[EResource::Direct] = ITexture::Create("DirectOutput", texInfo);
+		mResources[EResource::Emissive] = ITexture::Create("EmissiveOutput", texInfo);
+
+
 
 		texInfo.Format = ETextureFormat::R16_Float;
-		GraphicsHelper::InitRenderTextures(texInfo, "IndirectROutput", &mResources[EResource::IndirectR]);
-		GraphicsHelper::InitRenderTextures(texInfo, "IndirectGOutput", &mResources[EResource::IndirectG]);
-		GraphicsHelper::InitRenderTextures(texInfo, "IndirectBOutput", &mResources[EResource::IndirectB]);
-		GraphicsHelper::InitRenderTextures(texInfo, "ShadowOutput", &mResources[EResource::Shadow]);
-		GraphicsHelper::InitRenderTextures(texInfo, "RayDistance", &mResources[EResource::RayDistance]);
+
+		mResources[EResource::IndirectR] = ITexture::Create("IndirectROutput", texInfo);
+		mResources[EResource::IndirectG] = ITexture::Create("IndirectGOutput", texInfo);
+		mResources[EResource::IndirectB] = ITexture::Create("IndirectBOutput", texInfo);
+		mResources[EResource::Shadow]    = ITexture::Create("ShadowOutput", texInfo);
+		mResources[EResource::RayDistance] = ITexture::Create("RayDistance", texInfo);
+	
 		
 		texInfo.Format = ETextureFormat::R32_Uint;
-		GraphicsHelper::InitRenderTextures(texInfo, "NormalDepthOutput", &mResources[EResource::NormalDepth]);
-		GraphicsHelper::InitRenderTextures(texInfo, "ReprojectedNormalDepth", &mResources[EResource::ReprojectedNormalDepth]);
+		mResources[EResource::NormalDepth] = ITexture::Create("NormalDepthOutput", texInfo);
+		mResources[EResource::ReprojectedNormalDepth] = ITexture::Create("ReprojectedNormalDepth", texInfo);
 
 
 		texInfo.Format = ETextureFormat::R32G32B32A32_Float;
-		GraphicsHelper::InitRenderTextures(texInfo, "HitPosition", &mResources[EResource::HitPosition]);
+		mResources[EResource::HitPosition] = ITexture::Create("HitPosition", texInfo);
 
 		texInfo.Format = ETextureFormat::R16G16_Float;
-		GraphicsHelper::InitRenderTextures(texInfo, "MotionVectorOutput", &mResources[EResource::MotionVector]);
-		GraphicsHelper::InitRenderTextures(texInfo, "PartialDepthDerivatives", &mResources[EResource::PartialDepthDerivatives]);
+		mResources[EResource::MotionVector] = ITexture::Create("MotionVectorOutput", texInfo);
+		mResources[EResource::PartialDepthDerivatives] = ITexture::Create("PartialDepthDerivatives", texInfo);
 
 		texInfo.Format = ETextureFormat::R16_Float;
-		GraphicsHelper::InitRenderTextures(texInfo, "DepthOutput", &mResources[EResource::Depth]);
-		
+		mResources[EResource::Depth] = ITexture::Create("DepthOutput", texInfo);
 	}
 
 	void RayTracer::UpdateAccelerationStructure(SharedPtr<IComputeContext> context)
 	{
-		u32 currentIndex = JGGraphics::GetInstance().GetBufferIndex();
 		for (InstanceData& instance : mInstances)
 		{
 			SharedPtr<IBottomLevelAccelerationStructure> blas = instance.SubMesh->GetBottomLevelAS();
@@ -225,9 +227,9 @@ namespace JG
 				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer());
 			}
 
-			mSceneAS[currentIndex]->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex, instance.InstanceMask);
+			mSceneAS->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex, instance.InstanceMask);
 		}
-		mSceneAS[currentIndex]->Generate(context);
+		mSceneAS->Generate(context);
 	}
 	void RayTracer::Update(SharedPtr<IComputeContext> context, SharedPtr<ITexture> targetTexture)
 	{
@@ -271,7 +273,6 @@ namespace JG
 
 
 		}
-		u32 currentIndex = JGGraphics::GetInstance().GetBufferIndex();
 		SharedPtr<IRayTracingPipeline> pipeline = ShaderLibrary::GetInstance().FindRayTracingPipeline(GetDefaultRayTracingPipelineName());
 		pipeline->Generate();
 
@@ -283,7 +284,7 @@ namespace JG
 
 
 
-		if (mSceneAS[currentIndex]->IsValid() == false)
+		if (mSceneAS->IsValid() == false)
 		{
 			return;
 		}
@@ -291,7 +292,7 @@ namespace JG
 		context->BindConstantBuffer(ERootParam::RootParam_CB, mCB);
 
 		// SceneAS
-		context->BindAccelerationStructure(ERootParam::RootParam_SceneAS, mSceneAS[currentIndex]);
+		context->BindAccelerationStructure(ERootParam::RootParam_SceneAS, mSceneAS);
 
 		// Result
 		context->BindTextures(ERootParam::RootParam_UAV, {
@@ -323,7 +324,7 @@ namespace JG
 		// VisibleLightIndicies
 		context->BindSturcturedBuffer(ERootParam::RootParam_VisibleLightIndicies, mRenderer->GetVisibleLightIndicies());
 		// PrevFrameTransform
-		context->BindSturcturedBuffer(ERootParam::RootParam_PrevFrameBLASTransform, mSceneAS[currentIndex]->GetPrevFrameTransformBuffer());
+		context->BindSturcturedBuffer(ERootParam::RootParam_PrevFrameBLASTransform, mSceneAS->GetPrevFrameTransformBuffer());
 		// 
 
 
@@ -353,7 +354,7 @@ namespace JG
 			input.Resolution = mResolution;
 			input.NormalDepth = GetResource(EResource::NormalDepth);
 			input.HitPosition = GetResource(EResource::HitPosition);
-			input.SceneAS = mSceneAS[currentIndex];
+			input.SceneAS = mSceneAS;
 			RTAO::Output output = mRTAO->Execute(context, input);
 
 			AOResult = output.AO;
@@ -429,7 +430,7 @@ namespace JG
 
 	SharedPtr<ITexture> RayTracer::GetResource(EResource type)
 	{
-		return mResources[type][JGGraphics::GetInstance().GetBufferIndex()];
+		return mResources[type];
 	}
 
 	const String& RayTracer::GetDefaultRayTracingPipelineName()

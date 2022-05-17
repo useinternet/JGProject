@@ -11,6 +11,10 @@
 #include "SceneLight.h"
 namespace JG
 {
+#define GRAPHICS_COMMAND_QUEUE_ID 1
+#define GRAPHICS_CONTEXT_ID std::hash<std::thread::id>()(std::this_thread::get_id())
+
+
 	namespace Graphics
 	{
 		class Scene;
@@ -46,9 +50,6 @@ namespace JG
 		UniquePtr<IGraphicsAPI> mGraphcisAPI;
 		UniquePtr<DebugGeometryDrawer> mDebugGeometryDrawer;
 		JGGraphicsDesc mDesc;
-
-
-	
 	public:
 		JGGraphics(const JGGraphicsDesc& desc);
 		~JGGraphics();

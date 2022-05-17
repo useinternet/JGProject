@@ -12,7 +12,6 @@ namespace JG
 	class Camera : public GameComponent
 	{
 		static Camera* smMainCamera;
-		static Camera* smEditorCamera;
 		static void SetMainCamera(Camera* mainCamera);
 	public:
 		static Camera* GetMainCamera();

@@ -103,9 +103,6 @@ namespace JG
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() override;
 		virtual SharedPtr<ITopLevelAccelerationStructure> CreateTopLevelAccelerationStructure() override;
 		virtual SharedPtr<IBottomLevelAccelerationStructure> CreateBottomLevelAccelerationStructure() override;
-		virtual SharedPtr<IGraphicsContext> GetGraphicsContext() override;
-		//virtual SharedPtr<IComputeContext>  GetComputeContext()  override;
-
 		virtual bool AllocateCommandQueue(ECommandQueueType type, u64 queueID) override;
 		virtual SharedPtr<IComputeContext>  GetComputeContext(u64 queueID, u64 contextID) override;
 		virtual SharedPtr<IGraphicsContext> GetGraphicsContext(u64 queueID, u64 contextID) override;
@@ -131,13 +128,21 @@ namespace JG
 		std::mutex mGraphicsPSOMutex;
 		std::mutex mComputePSOMutex;
 		std::mutex mRootSigMutex;
-		std::mutex mGraphicsContextMutex;
+
+		
 		std::mutex mCommandQueueMutex;
 
 
+
+		Dictionary<u64, SharedPtr<IGraphicsContext>> mCacheGraphicsContextDic;
+		Dictionary<u64, SharedPtr<IComputeContext>> mCacheComputeContextDic;
+		std::mutex mCacheGraphicsContextMutex;
+		std::mutex mCacheComputeContextMutex;
+
+
+		
 		Dictionary<std::thread::id, SharedPtr<GraphicsPipelineState>> mGraphicsPSOs;
 		Dictionary<std::thread::id, SharedPtr<ComputePipelineState>>  mComputePSOs;
-		Dictionary<std::thread::id, SharedPtr<IGraphicsContext>> mGraphicsContextDic;
 
 		std::mutex mDeviceMutex;
 

@@ -6,6 +6,8 @@ namespace JG
 {
 	class AnimationController;
 	class Skeletone;
+	class IMaterial;
+	class IMesh;
 	class SkeletalMeshRenderer : public BaseRenderer
 	{
 		JGCLASS

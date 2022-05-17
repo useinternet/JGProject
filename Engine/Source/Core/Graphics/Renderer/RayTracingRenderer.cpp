@@ -31,7 +31,6 @@ namespace JG
 			return;
 		}
 		mRayTracer->Reset();
-		u32 bufferIndex = JGGraphics::GetInstance().GetBufferIndex();
 
 		const RenderInfo& info = GetRenderInfo();
 
@@ -45,7 +44,7 @@ namespace JG
 
 		SharedPtr<IGraphicsContext> context = GetGraphicsContext();
 		context->BindRootSignature(GetGraphicsRootSignature());
-		context->ClearRenderTarget({ mTargetTextures[bufferIndex] }, nullptr);
+		context->ClearRenderTarget({ mTargetTexture }, nullptr);
 
 	}
 
@@ -55,8 +54,6 @@ namespace JG
 		{
 			return;
 		}
-
-		u64 buffIndex = JGGraphics::GetInstance().GetBufferIndex();
 		ForEach([&](int objectType, const List<ObjectInfo>& objectList)
 		{
 			for (auto& info : objectList)
@@ -89,8 +86,8 @@ namespace JG
 				}
 			}
 		});
-		mRayTracer->Execute(GetComputeContext(), mTargetTextures[buffIndex]);
-		result->SceneTexture = mTargetTextures[buffIndex];
+		mRayTracer->Execute(GetComputeContext(), mTargetTexture);
+		result->SceneTexture = mTargetTexture;
 	}
 
 	void RayTracingRenderer::CompeleteImpl(SharedPtr<RenderResult> result)
@@ -112,8 +109,7 @@ namespace JG
 		mainTexInfo.Flags     = ETextureFlags::Allow_RenderTarget | ETextureFlags::Allow_UnorderedAccessView;
 		mainTexInfo.MipLevel  = 1;
 		mainTexInfo.ClearColor = clearColor;
-
-		GraphicsHelper::InitRenderTextures(mainTexInfo, "RayTracing_TargetTexture", &mTargetTextures);
+		mTargetTexture = ITexture::Create("RayTracing_TargetTexture", mainTexInfo);
 		mRayTracer->SetResolution(size);
 
 

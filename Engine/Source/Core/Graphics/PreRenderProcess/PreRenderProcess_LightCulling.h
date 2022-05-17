@@ -26,8 +26,8 @@ namespace JG
 		};
 		CB CB;
 	private:
-		List<SharedPtr<IStructuredBuffer>> mLightGridSB;
-		List<SharedPtr<IStructuredBuffer>> mVisibleLightIndiciesSB;
+		SharedPtr<IStructuredBuffer> mLightGridSB;
+		SharedPtr<IStructuredBuffer> mVisibleLightIndiciesSB;
 		SharedPtr<IStructuredBuffer> mClusterSB;
 		SharedPtr<IComputeShader> mShader;
 		SharedPtr<IRootSignature> mRootSignature;

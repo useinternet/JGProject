@@ -44,7 +44,6 @@ namespace JG
 	private:
 		JVector3 mStandardQuadPosition[4];
 		JVector2 mStandardQuadTexcoord[4];
-		List<FrameResource> mFrameResources;
 		SharedPtr<IGraphicsShader> mEditorUIShader;
 		List<QuadVertex>    mVertices;
 		List<u32>           mIndices;
@@ -54,7 +53,7 @@ namespace JG
 		u64 mQuadCount = 0;
 		u64 mTextureCount = 0;
 
-		FrameResource* mCurrFrameResource = nullptr;
+		FrameResource mFrameResource;
 		bool mIsClearWhiteTexture = false;
 	public:
 		EditorUIRenderer();

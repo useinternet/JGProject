@@ -90,7 +90,7 @@ namespace JG
 		static SharedPtr<AnimationController> Create(const String& name);
 	private:
 		void Init();
-		void Update();
+		void Update(SharedPtr<IComputeContext> computeContext);
 		void Update_Thread(SharedPtr<IComputeContext> computeContext);
 		bool CanUseSkinnedMesh() const;
 	};

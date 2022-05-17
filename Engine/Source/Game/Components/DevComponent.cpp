@@ -24,6 +24,10 @@ namespace JG
 
 		mRenderer = GetOwner()->FindNode(0)->FindComponent<JG::SkeletalMeshRenderer>();
 		mCamera = GetOwner()->FindNode(1)->FindComponent<JG::Camera>();
+
+		mMeshTransform = mRenderer->GetOwner()->GetTransform();
+		mCameraTransform = mCamera->GetOwner()->GetTransform();
+		mRootTransform = GetOwner()->GetTransform();
 		if (mRenderer != nullptr)
 		{
 			JG::Asset<JG::AnimationController>* animAsset = mRenderer->GetAnimation();
@@ -33,10 +37,7 @@ namespace JG
 				mAnimParams = animAsset->Get()->GetAnimationParameters().get();
 			}
 		}
-		JG::Transform* camTransform    = mCamera->GetOwner()->GetTransform();
-		JG::Transform* playerTransform = GetOwner()->GetTransform();
-
-		mCamLength = JVector3::Length(playerTransform->GetWorldLocation() - camTransform->GetWorldLocation());
+		mCamLength = JVector3::Length(mRootTransform->GetWorldLocation() - mCameraTransform->GetWorldLocation());
 	}
 
 	void DevComponent::Update()
@@ -46,6 +47,34 @@ namespace JG
 		{
 			JG_LOG_INFO("Dev Player Pressed A");
 		}
+
+		if (mIsRunning)
+		{
+			mValue = JVector2::Normalize(mValue);
+			JG::JVector3 location = mRootTransform->GetWorldLocation();
+			JG::JVector3 camLook = mCamera->GetLook();
+			camLook = JG::JVector3::Normalize(JVector3(camLook.x, 0.0f, camLook.z));
+
+			JG::JVector3 camRight = mCamera->GetRight();
+			camRight = JG::JVector3::Normalize(JVector3(camRight.x, 0.0f, camRight.z));
+
+			JVector3 moveDir = camLook * mValue.x + camRight * mValue.y;
+			moveDir = JVector3::Normalize(moveDir);
+
+
+
+
+			location += moveDir * mSpeed;
+			mRootTransform->SetWorldLocation(location);
+
+			f32 yaw = std::atan2f(-moveDir.z, moveDir.x);
+
+			
+			JG::JQuaternion q = JG::JQuaternion::FromTwoVectors(moveDir, JVector3::FowardVector() * -1);
+			mMeshTransform->SetLocalRotation(JVector3(0.0f, Math::ConvertToDegrees(yaw) - 90.0f, 0.0f));
+		}
+
+
 		if (mAnimParams)
 		{
 			if (mIsRunning == true)
@@ -53,48 +82,30 @@ namespace JG
 				if (JG::InputManager::GetInstance().IsKeyDown(JG::EKeyCode::LeftShift) == true)
 				{
 					mAnimParams->SetFloat("Velocity", 100.0f);
-					JG_LOG_INFO("Velocity 100");
+					//JG_LOG_INFO("Velocity 100");
 				}
 				else
 				{
 					mAnimParams->SetFloat("Velocity", 10.0f);
-					JG_LOG_INFO("Velocity 10");
+					//JG_LOG_INFO("Velocity 10");
 				}
 			}
 			else
 			{
 				mAnimParams->SetFloat("Velocity", 0.0f);
-				JG_LOG_INFO("Velocity 0");
+				//JG_LOG_INFO("Velocity 0");
 			}
-			mIsRunning = false;
+		
 		}
-
+		mValue = JVector2(0.0f, 0.0f);
+		mIsRunning = false;
 	}
 
 	void DevComponent::MoveForward(JG::f32 value)
 	{
 		if (IsShowCursor() == true) return;
-		if (mCamera == nullptr)
-		{
-			return;
-		}
-		JG::JVector3 location = GetOwner()->GetTransform()->GetWorldLocation();
-
-		JG::JVector3 camLook = mCamera->GetLook();
-		camLook.y = 0;
-		camLook = JG::JVector3::Normalize(camLook * value);
-
-		// 위치 변경
-		location += camLook * mSpeed;
-		GetOwner()->GetTransform()->SetWorldLocation(location);
-
+		mValue.x = value;
 		mIsRunning = true;
-		JG::JVector3 objLook = mRenderer->GetOwner()->GetTransform()->GetLook();
-		objLook.y = 0;
-		objLook = JG::JVector3::Normalize(objLook * value);
-
-		JG::JQuaternion q = JG::JQuaternion::FromTwoVectors(camLook, objLook);
-		mRenderer->GetOwner()->GetTransform()->SetLocalQuaternion(q);
 	}
 
 	void DevComponent::MoveRight(JG::f32 value)
@@ -104,22 +115,8 @@ namespace JG
 		{
 			return;
 		}
-		JG::Transform* transform = GetOwner()->GetTransform();
-		JG::JVector3 location = transform->GetWorldLocation();
-		JG::JVector3 camRight = mCamera->GetRight();
-		camRight.y = 0;
-		camRight = JG::JVector3::Normalize(camRight * value);
-		location += camRight * mSpeed;
-		transform->SetWorldLocation(location);
-
-
+		mValue.y = value;
 		mIsRunning = true;
-		JG::JVector3 objLook = mRenderer->GetOwner()->GetTransform()->GetLook();
-		objLook.y = 0;
-		objLook = JG::JVector3::Normalize(objLook * value);
-
-		JG::JQuaternion q = JG::JQuaternion::FromTwoVectors(objLook, camRight);
-		mRenderer->GetOwner()->GetTransform()->SetLocalQuaternion(q);
 	}
 
 	void DevComponent::YawRotate(JG::f32 value)

@@ -24,11 +24,6 @@ namespace JG
 			return;
 		}
 
-		
-		// Shader
-		//
-		u32 currIndex = JGGraphics::GetInstance().GetBufferIndex();
-
 		context->BindShader(mShader);
 		context->BindRootSignature(mRenderer->GetComputeRootSignature());
 

@@ -229,17 +229,19 @@ namespace JG
 		auto sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
 		auto transform = GetOwner()->GetTransform();
 		sceneObject->WorldMatrix = transform->GetWorldMatrix();
-		sceneObject->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
+		
 		if (mAnimation != nullptr &&
 			mAnimation->IsValid() &&
 			mAnimation->Get()->GetBindedMesh() != nullptr &&
 			mAnimation->Get()->GetBindedSkeletone() != nullptr)
 		{
 			sceneObject->Mesh = mAnimation->Get()->GetBindedMesh();
+			sceneObject->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
 		}
 		else
 		{
 			sceneObject->Mesh = mMesh->Get();
+			sceneObject->Flags = Graphics::ESceneObjectFlags::None;
 		}
 		
 		GetOwner()->SetPickingBoundingBox(sceneObject->Mesh->GetBoundingBox());

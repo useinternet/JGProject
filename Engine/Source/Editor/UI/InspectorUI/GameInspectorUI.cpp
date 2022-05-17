@@ -3,8 +3,10 @@
 #include "UI/UIManager.h"
 #include "UI/UIView/InspectorView.h"
 #include "UI/ContextUI/ComponentFinderContextView.h"
-#include "Animation/AnimationController.h"
+#include "Graphics/JGGraphics.h"
 #include "Class/Data/Skeletone.h"
+#include "Animation/JGAnimation.h"
+#include "Animation/AnimationController.h"
 namespace JG
 {
 	void GameNodeInspectorUI::OnGUI_Impl(GameNode* obj)

@@ -26,30 +26,27 @@ namespace JG
 			{
 				return FloatAccumulater::Output();
 			}
-			InitTextures(input.Resolution);
+			//InitTextures(input.Resolution);
+
+			//context->BindShader(mShader);
+			//context->BindRootSignature(mRenderer->GetComputeRootSignature());
 
 
-			u32 currIndex = JGGraphics::GetInstance().GetBufferIndex();
+			//// prev, cur
+			//if (input.IsResetAccumCount)
+			//{
+			//	mCB.AccumCount = 0;
+			//}
 
-			context->BindShader(mShader);
-			context->BindRootSignature(mRenderer->GetComputeRootSignature());
-
-
-			// prev, cur
-			if (input.IsResetAccumCount)
-			{
-				mCB.AccumCount = 0;
-			}
-
-			context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, mCB);
-			context->BindTextures((u32)Renderer::EComputeRootParam::SRV, { mResults[currIndex], input.CurrFrame });
-			context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { mResults[currIndex] });
-			context->Dispatch2D(mResolution.x, mResolution.y);
+			//context->BindConstantBuffer((u32)Renderer::EComputeRootParam::CB0, mCB);
+			//context->BindTextures((u32)Renderer::EComputeRootParam::SRV, { mResults[currIndex], input.CurrFrame });
+			//context->BindTextures((u32)Renderer::EComputeRootParam::UAV, { mResults[currIndex] });
+			//context->Dispatch2D(mResolution.x, mResolution.y);
 
 			FloatAccumulater::Output output;
-			output.Result = mResults[currIndex];
+			//output.Result = mResults[currIndex];
 
-			mCB.AccumCount++;
+			//mCB.AccumCount++;
 			return output;
 		}
 		void FloatAccumulater::ResetAccumCount()
@@ -72,7 +69,7 @@ namespace JG
 			texInfo.Flags = ETextureFlags::Allow_UnorderedAccessView;
 			texInfo.MipLevel = 1;
 			texInfo.ClearColor = Color();
-			GraphicsHelper::InitRenderTextures(texInfo, "ResultAccumTexture", &mResults);
+			//GraphicsHelper::InitRenderTextures(texInfo, "ResultAccumTexture", &mResults);
 
 
 		}

@@ -101,9 +101,7 @@ namespace JG
         };
         u32 mNumSampleSets = 83;
         MultiJittered mRandomSampler;
-        List<SharedPtr<IStructuredBuffer>> mHemisphereSamples;
-
-
+        SharedPtr<IStructuredBuffer> mHemisphereSamples;
 
         RP_Global_Float mSPP;
         RP_Global_Int mAOSampleSetDistributedAcrossPixels;
@@ -116,7 +114,7 @@ namespace JG
 
 
 
-        List<SharedPtr<ITexture>> mResources[EResource::Count];
+        SharedPtr<ITexture> mResources[EResource::Count];
         RP_Global_Tex mTex[EResource::Count];
         SharedPtr<IRootSignature> mRootSignature;
         SharedPtr<IRayTracingShaderResourceTable> mSRT;

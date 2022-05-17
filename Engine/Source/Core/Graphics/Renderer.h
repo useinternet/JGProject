@@ -140,12 +140,7 @@ namespace JG
 
 		SharedPtr<IRootSignature> mGraphicsRootSignature;
 		SharedPtr<IRootSignature> mComputeRootSignature;
-
-
-
-
 		u64		  mFrameCount = 0;
-		const u64 mResultDelayFrameCount = 240;
 		SharedPtr<Graphics::RenderPassData> mPassData;
 		SharedPtr<IStructuredBuffer> mLightGrid;
 		SharedPtr<IStructuredBuffer> mVisibleLightIndicies;

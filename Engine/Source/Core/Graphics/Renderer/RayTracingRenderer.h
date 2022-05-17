@@ -8,8 +8,8 @@ namespace JG
 	class RayTracer;
 	class RayTracingRenderer : public Renderer
 	{
-		List<SharedPtr<ITexture>> mTargetTextures;
-		SharedPtr<RayTracer>      mRayTracer;
+		SharedPtr<ITexture> mTargetTexture;
+		SharedPtr<RayTracer> mRayTracer;
 
 		JVector2 mResolution;
 		Color    mClearColor;
