@@ -320,6 +320,8 @@ namespace JG
 		friend JQuaternion;
 		friend JMatrix;
 		using SimVec = DirectX::XMVECTOR;
+
+		
 	public:
 		float x, y, z;
 	public: // 생성자 및 소멸자
@@ -331,6 +333,7 @@ namespace JG
 		JVector3(const Color& color);
 		JVector3(const JVector3& v) = default;
 		JVector3(JVector3&& v) = default;
+
 	public: // 연산자
 		inline JVector3& operator=(const JVector3& v) = default;
 		inline JVector3& operator=(JVector3&& v) = default;
@@ -451,6 +454,22 @@ namespace JG
 			auto sim = DirectX::XMVectorLerp(GetSIMD(v1), GetSIMD(v2), a);
 			return ConvertJVector3(sim);
 		}
+		inline static const JVector3& FowardVector()
+		{
+			static JVector3 v = JVector3(0.0f, 0.0f, 1.0f);
+			return v;
+		}
+		inline static const JVector3& RightVector()
+		{
+			static JVector3 v = JVector3(1.0f, 0.0f, 0.0f);
+			return v;
+		}
+		inline static const JVector3& UpVector()
+		{
+			static JVector3 v = JVector3(0.0f, 1.0f, 0.0f);
+			return v;
+		}
+
 		inline static bool Equals(const JVector3& v1, const JVector3& v2, float error_range = ERROR_RANGE)
 		{
 			JVector3 delta_v = v1 - v2;

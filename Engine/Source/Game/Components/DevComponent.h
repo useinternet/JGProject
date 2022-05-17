@@ -6,6 +6,14 @@ namespace JG
 	class DevComponent : public GameComponent
 	{
 		JGCLASS
+
+		f32 mCamLength = 1000.0f;
+		f32 mSpeed = 1.5f;
+		Camera* mCamera = nullptr;
+		class SkeletalMeshRenderer* mRenderer = nullptr;
+		class AnimationController* mAnimController = nullptr;
+		class AnimationParameters* mAnimParams = nullptr;
+		bool mIsRunning = false;
 	protected:
 		virtual void Start()  override;
 		virtual void Update() override;

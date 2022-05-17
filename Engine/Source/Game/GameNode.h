@@ -80,7 +80,7 @@ namespace JG
 		{
 			for (auto& com : mComponents)
 			{
-				if (com->GetObjectType().GetID() == Type(TypeID<T>()).GetID())
+				if (com->GetType().GetID() == Type(TypeID<T>()).GetID())
 				{
 					return static_cast<T*>(com);
 				}

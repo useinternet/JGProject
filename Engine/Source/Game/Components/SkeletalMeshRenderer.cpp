@@ -17,25 +17,25 @@ namespace JG
 	void SkeletalMeshRenderer::Start()
 	{
 		BaseRenderer::Start();
-		if (mAnimatioin != nullptr && mAnimatioin->IsValid())
+		if (mAnimation != nullptr && mAnimation->IsValid())
 		{
-			JGAnimation::GetInstance().RegisterAnimationController(mAnimatioin->Get());
+			JGAnimation::GetInstance().RegisterAnimationController(mAnimation->Get());
 			if (mSkeletone != nullptr)
 			{
-				mAnimatioin->Get()->BindSkeletone(mSkeletone->Get());
+				mAnimation->Get()->BindSkeletone(mSkeletone->Get());
 			}
 			if (mMesh != nullptr)
 			{
-				mAnimatioin->Get()->BindMesh(mMesh->Get());
+				mAnimation->Get()->BindMesh(mMesh->Get());
 			}
 		}
 	}
 	void SkeletalMeshRenderer::Destory()
 	{
 		BaseRenderer::Destory();
-		if (mAnimatioin != nullptr && mAnimatioin->IsValid())
+		if (mAnimation != nullptr && mAnimation->IsValid())
 		{
-			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimatioin->Get());
+			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimation->Get());
 		}
 
 	}
@@ -99,7 +99,7 @@ namespace JG
 		{
 			return;
 		}
-		mAnimatioin = GetGameWorld()->GetAssetManager()->RequestRWAsset<AnimationController>(path);
+		mAnimation = GetGameWorld()->GetAssetManager()->RequestRWAsset<AnimationController>(path);
 	}
 	void SkeletalMeshRenderer::AddMaterial(const String& path)
 	{
@@ -143,7 +143,7 @@ namespace JG
 	}
 	Asset<AnimationController>* SkeletalMeshRenderer::GetAnimation() const
 	{
-		return mAnimatioin;
+		return mAnimation;
 	}
 	void SkeletalMeshRenderer::ForEach(const std::function<void(Asset<IMaterial>*)>& action)
 	{
@@ -178,9 +178,9 @@ namespace JG
 		{
 			jsonData->AddMember("Skeletone", mSkeletone->GetAssetPath());
 		}
-		if (mAnimatioin)
+		if (mAnimation)
 		{
-			jsonData->AddMember("Animation", mAnimatioin->GetAssetPath());
+			jsonData->AddMember("Animation", mAnimation->GetAssetPath());
 		}
 	}
 	void SkeletalMeshRenderer::LoadJson(SharedPtr<JsonData> jsonData)
@@ -229,13 +229,13 @@ namespace JG
 		auto sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
 		auto transform = GetOwner()->GetTransform();
 		sceneObject->WorldMatrix = transform->GetWorldMatrix();
-
-		if (mAnimatioin != nullptr && 
-			mAnimatioin->IsValid() &&
-			mAnimatioin->Get()->GetBindedMesh() != nullptr &&
-			mAnimatioin->Get()->GetBindedSkeletone() != nullptr)
+		sceneObject->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
+		if (mAnimation != nullptr &&
+			mAnimation->IsValid() &&
+			mAnimation->Get()->GetBindedMesh() != nullptr &&
+			mAnimation->Get()->GetBindedSkeletone() != nullptr)
 		{
-			sceneObject->Mesh = mAnimatioin->Get()->GetBindedMesh();
+			sceneObject->Mesh = mAnimation->Get()->GetBindedMesh();
 		}
 		else
 		{

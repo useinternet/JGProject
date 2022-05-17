@@ -31,7 +31,9 @@ namespace JG
 
 		mutable JMatrix mWorldMatrix;
 		mutable JMatrix mInvWorldMatrix;
-
+		mutable JVector3 mLookVec;
+		mutable JVector3 mRightVec;
+		mutable JVector3 mUpVec;
 
 		mutable bool mIsDirty = true;
 		mutable bool mIsLocationDirty = true;
@@ -70,6 +72,10 @@ namespace JG
 
 		const JQuaternion& GetLocalQuaternion() const;
 		const JQuaternion& GetWorldQuaternion() const;
+
+		const JVector3& GetLook() const;
+		const JVector3& GetRight() const;
+		const JVector3& GetUp() const;
 		void NormalizeRotation(JVector3& toDegree) const;
 		void Refresh();
 	public:

@@ -195,7 +195,7 @@ namespace JG
 				if (transID == 0) continue;
 
 				AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
-
+				buildData.TransitionDuration = linkInfo.TransitionDuration;
 				for (const AnimationAssetStock::AnimationTransitionConditionInfo& transInfo : linkInfo.Transitions)
 				{
 					AnimTransitionConditionBuildData condBuildData;
@@ -203,6 +203,7 @@ namespace JG
 					condBuildData.Data = transInfo.Data;
 					condBuildData.Condition = transInfo.Condition;
 					condBuildData.Type = paramTypeDic[condBuildData.ParamName];
+
 					buildData.Conditions.push_back(condBuildData);
 				}
 			}

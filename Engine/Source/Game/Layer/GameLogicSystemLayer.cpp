@@ -120,7 +120,7 @@ namespace JG
 			}
 
 
-			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
+			Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
 				{
 					RequestCloseProgressBarEvent e;
@@ -188,7 +188,7 @@ namespace JG
 			mGameWorld->LoadJson(worldAssetJsonData);
 
 
-			Scheduler::GetInstance().ScheduleOnce(1.0f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
+			Scheduler::GetInstance().ScheduleOnce(0.1f, 0, [&](SharedPtr<IJGObject> userData)->EScheduleResult
 			{
 				{
 					RequestCloseProgressBarEvent e;

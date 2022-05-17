@@ -24,6 +24,7 @@ namespace JG
 			Graphics_Rendering        = BeginSystem + 3,
 
 			AssetDataBase_Update      = BeginSystem + 4,
+			Input_Update			  = BeginSystem + 5,
 			// Layer
 			ImGuiSystemLayer		 = -900000,
 			GameLayer				 = -800000,

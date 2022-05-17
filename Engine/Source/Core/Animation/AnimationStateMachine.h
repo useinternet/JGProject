@@ -8,7 +8,8 @@ namespace JG
 	class AnimationTransform;
 	class AnimationClipInfo;
 	class AnimationStateMachine;
-
+	class AnimationClip;
+	class ISubMesh;
 
 	template<class T>
 	using MakeAnimationAction = std::function<void(T* )>;
@@ -54,6 +55,7 @@ namespace JG
 		// Animation Transition 간 정보
 		bool  mIsTransitioning = false; // Transition 변경 중
 		f32 mTransitionTimePos = 0.0f;
+		f32 mTransitionFactor  = 1.0f;
 
 
 
@@ -65,6 +67,7 @@ namespace JG
 		Stack<Node*>	   mFlowNodeStack_Thread;
 		AnimationStateFlow mFlow_Thread;
 		List<SharedPtr<AnimationTransform>> mFinalAnimationTransforms;
+		List<SharedPtr<AnimationTransform>> mPrevAnimationTransform;
 	public:
 		AnimationStateMachine(AnimationController* controller);
 		bool IsValid() const;
@@ -95,7 +98,7 @@ namespace JG
 		AnimationTransition* CreateTransition(const String& prevName, const String& nextName);
 
 
-
+		bool GetKeyFrame(Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S);
 
 		bool IsExistNode(const String& name) const;
 		AnimationStateMachine::Node* FindNode(const String& name) const;
@@ -106,7 +109,13 @@ namespace JG
 		void UpdateFlow_Thread();
 		void UpdateFlow_Thread(Node* node);
 		void UpdateAnimationTransform_Thread();
+		void UpdateAnimationClipInfo_Thread();
 		void UpdateAnimationTransform_AnimClip_Thread(Node* node, List<SharedPtr<AnimationTransform>>& out_animTransform);
+		void UpdateAnimationTransform_AnimClip_Internal_Thread(SharedPtr<ISubMesh> subMesh, u32 nodeID,  const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
+
+
+
+
 		void ExecuteInternal_Thread(Node* node);
 		void Clear();
 	};

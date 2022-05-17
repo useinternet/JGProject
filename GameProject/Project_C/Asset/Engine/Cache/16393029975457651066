@@ -1,24 +1,17 @@
 {
     "Main": [
         {
-            "Name": "Idle",
+            "Name": "AnimationClip",
             "Location": [
-                668.0,
-                454.0
-            ]
-        },
-        {
-            "Name": "Walk",
-            "Location": [
-                232.0,
-                406.0
+                410.0,
+                397.0
             ]
         },
         {
             "Name": "Root",
             "Location": [
-                512.0,
-                130.0
+                129.0,
+                152.0
             ]
         }
     ]

@@ -75,8 +75,10 @@ namespace JG
 		virtual void EndFrame()   override;
 	public:
 		virtual bool IsSupportedRayTracing() const override;
+		virtual void SubmitAndFlush() override;
 		virtual void Flush() override;
 
+		
 		virtual void SubmitAndFlush(u64 queueID) override;
 		virtual void Flush(u64 queueID) override;
 	protected:
@@ -121,9 +123,6 @@ namespace JG
 
 		Dictionary<u64, std::pair<ECommandQueueType, SharedPtr<CommandQueue>>> mCommandQueueDic;
 		SharedPtr<CommandQueue> mGraphicsCommandQueue;
-		//SharedPtr<CommandQueue> mComputeCommandQueue;
-		//SharedPtr<CommandQueue> mCopyCommandQueue;
-
 
 		Dictionary<handle, SharedPtr<DirectX12FrameBuffer>> mFrameBuffers;
 		const u64 mFrameBufferCount = 3;
@@ -134,13 +133,11 @@ namespace JG
 		std::mutex mRootSigMutex;
 		std::mutex mGraphicsContextMutex;
 		std::mutex mCommandQueueMutex;
-		//std::mutex mComputeContextMutex;
 
 
 		Dictionary<std::thread::id, SharedPtr<GraphicsPipelineState>> mGraphicsPSOs;
 		Dictionary<std::thread::id, SharedPtr<ComputePipelineState>>  mComputePSOs;
 		Dictionary<std::thread::id, SharedPtr<IGraphicsContext>> mGraphicsContextDic;
-		//Dictionary<std::thread::id, SharedPtr<IComputeContext>> mComputeContextDic;
 
 		std::mutex mDeviceMutex;
 

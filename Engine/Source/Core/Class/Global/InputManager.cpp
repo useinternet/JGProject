@@ -13,7 +13,7 @@ namespace JG
 			}
 			return EScheduleResult::Continue;
 		});
-		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Default, SCHEDULE_BIND_FN(&InputManager::Update));
+		Scheduler::GetInstance().ScheduleByFrame(0, 0, -1, SchedulePriority::Input_Update, SCHEDULE_BIND_FN(&InputManager::Update));
 	}
 	ActionMappingData* InputManager::AddActionMappings(const String& name)
 	{

@@ -18,32 +18,6 @@ namespace JG
 		TickPerSecond = clip->GetTickPerSecond();
 	}
 
-
-	EAnimationClipState AnimationClip::Update(
-		SharedPtr<AnimationClipInfo> clipInfo, 
-		SharedPtr<IMesh> mesh,
-		SharedPtr<JG::Skeletone> skeletone, 
-		List<SharedPtr<AnimationTransform>>& out_animTransform)
-	{
-		if (skeletone == nullptr || skeletone->IsValid() == false || clipInfo == nullptr || mesh == nullptr)
-		{
-			return EAnimationClipState::None;
-		}
-		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
-		clipInfo->TimePos += tick * clipInfo->TickPerSecond * clipInfo->Speed * 10;
-		if (clipInfo->TimePos >= mDuration)
-		{
-			return EAnimationClipState::Compelete;
-		}
-		u32 subMeshCount = mesh->GetSubMeshCount();
-		out_animTransform.resize(subMeshCount);
-		for (u32 i = 0; i < subMeshCount; ++i)
-		{
-			out_animTransform[i] =  CreateSharedPtr<AnimationTransform>();
-			UpdateInternal(skeletone->GetRootNodeID(), clipInfo->TimePos, skeletone, mesh->GetSubMesh(i), JMatrix::Identity(), out_animTransform[i]);
-		}
-		return EAnimationClipState::Running;
-	}
 	bool AnimationClip::IsValid() const
 	{
 		return mDuration > 0;
@@ -94,39 +68,29 @@ namespace JG
 		return mTickPerSecond;
 	}
 
-
-	void AnimationClip::UpdateInternal(u32 nodeID, f32 timePos, SharedPtr<JG::Skeletone> skeletone, SharedPtr<ISubMesh> mesh, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
+	bool AnimationClip::GetCurrentKeyFrame(const String& nodeName, f32 timePos, JVector3* T, JQuaternion* Q, JVector3* S)
 	{
-		const Skeletone::Node* node = skeletone->GetNode(nodeID);
-		JMatrix nodeTransform = node->Transform;
-
-
-		const AnimationNode* animNode = FindAnimationNode(node->Name);
-
+		const AnimationNode* animNode = FindAnimationNode(nodeName);
 		if (animNode != nullptr)
 		{
-			JVector3    Scale     = CalcLerpScale(timePos, animNode);
-			JQuaternion RotationQ = CalcLerpRotation(timePos, animNode);
-			JVector3    Location  = CalcLerpLocation(timePos, animNode);
-
-			nodeTransform = JMatrix::AffineTransformation(Location, RotationQ, Scale);
+			if (T != nullptr)
+			{
+				*T = CalcLerpLocation(timePos, animNode);
+			}
+			if (Q != nullptr)
+			{
+				*Q = CalcLerpRotation(timePos, animNode);
+			}
+			if (S != nullptr)
+			{
+				*S = CalcLerpScale(timePos, animNode);
+			}
+			return true;
 		}
-
-
-		JMatrix resultTransform = nodeTransform * parentTransform;
-
-		JMatrix boneOffset = JMatrix::Identity();
-		if (mesh->GetBoneOffset(node->ID, &boneOffset) == true)
-		{
-			JMatrix finalTransform = skeletone->GetRootOffsetTransform() * boneOffset * resultTransform;
-			animTransform->Set(node->ID, JMatrix::Transpose(finalTransform));
-		}
-		for (u32 nodeID : node->ChildNodes)
-		{
-			const Skeletone::Node* childNode = skeletone->GetNode(nodeID);
-			UpdateInternal(childNode->ID, timePos, skeletone, mesh, resultTransform, animTransform);
-		}
+		return false;
 	}
+
+
 	JVector3 AnimationClip::CalcLerpLocation(f32 timePos, const AnimationNode* node)
 	{
 		if (node->LocationValues.size() == 1)

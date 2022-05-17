@@ -74,6 +74,7 @@ namespace JG
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame()	 = 0;
 		virtual bool IsSupportedRayTracing() const = 0;
+		virtual void SubmitAndFlush() = 0;
 		virtual void Flush() = 0;
 		virtual void SubmitAndFlush(u64 queueID) = 0;
 		virtual void Flush(u64 queueID) = 0;

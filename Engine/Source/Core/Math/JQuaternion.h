@@ -113,6 +113,7 @@ namespace JG
 		static JQuaternion RotationRollPitchYawFromVector(const JVector3& angles);
 		static void ToAxisAngle(JVector3& out_axis, f32& out_angle, const JQuaternion& q);
 		static JQuaternion RotatationAxis(const JVector3& axis, float angle);
+		static JQuaternion FromTwoVectors(const JVector3& u, const JVector3& v);
 	private:
 		inline DirectX::XMVECTOR GetSIMD() const
 		{

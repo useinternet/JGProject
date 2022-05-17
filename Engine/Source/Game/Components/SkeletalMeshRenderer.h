@@ -12,7 +12,7 @@ namespace JG
 	private:
 		Asset<IMesh>* mMesh = nullptr;
 		Asset<Skeletone>* mSkeletone = nullptr;
-		Asset<AnimationController>* mAnimatioin = nullptr;
+		Asset<AnimationController>* mAnimation = nullptr;
 		List<Asset<IMaterial>*>     mMaterialList;
 	public:
 		virtual ~SkeletalMeshRenderer() = default;

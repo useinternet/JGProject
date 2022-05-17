@@ -1,87 +1,159 @@
 #include "pch.h"
 #include "DevComponent.h"
+#include "Class/Asset/Asset.h"
 #include "GameNode.h"
-#include "Camera.h"
-#include "Transform.h"
+#include "Components/Camera.h"
+#include "Components/Transform.h"
+#include "Components/SkeletalMeshRenderer.h"
+#include "Animation/AnimationController.h"
+#include "Animation/AnimationParameters.h"
+
 
 namespace JG
 {
-
 	void DevComponent::Start()
 	{
-		__super::Start();
-		BindInputAxis("Foward",  INPUT_AXIS_BIND(&DevComponent::MoveForward));
+		JG::GameComponent::Start();
+
+		BindInputAxis("Foward", INPUT_AXIS_BIND(&DevComponent::MoveForward));
 		BindInputAxis("RightLeft", INPUT_AXIS_BIND(&DevComponent::MoveRight));
 		BindInputAxis("YawRotate", INPUT_AXIS_BIND(&DevComponent::YawRotate));
 		BindInputAxis("PitchRotate", INPUT_AXIS_BIND(&DevComponent::PitchRotate));
-		BindInputAction("DevTestAction", EInputAction::Released, INPUT_ACTION_BIND(&DevComponent::SetShowCursor));
+		BindInputAction("DevTestAction", JG::EInputAction::Released, INPUT_ACTION_BIND(&DevComponent::SetShowCursor));
 
+
+		mRenderer = GetOwner()->FindNode(0)->FindComponent<JG::SkeletalMeshRenderer>();
+		mCamera = GetOwner()->FindNode(1)->FindComponent<JG::Camera>();
+		if (mRenderer != nullptr)
+		{
+			JG::Asset<JG::AnimationController>* animAsset = mRenderer->GetAnimation();
+			if (animAsset != nullptr && animAsset->IsValid())
+			{
+				mAnimController = animAsset->Get().get();
+				mAnimParams = animAsset->Get()->GetAnimationParameters().get();
+			}
+		}
+		JG::Transform* camTransform    = mCamera->GetOwner()->GetTransform();
+		JG::Transform* playerTransform = GetOwner()->GetTransform();
+
+		mCamLength = JVector3::Length(playerTransform->GetWorldLocation() - camTransform->GetWorldLocation());
 	}
+
 	void DevComponent::Update()
 	{
 		__super::Update();
+		if (JG::InputManager::GetInstance().IsKeyPressed(JG::EKeyCode::A) == true)
+		{
+			JG_LOG_INFO("Dev Player Pressed A");
+		}
+		if (mAnimParams)
+		{
+			if (mIsRunning == true)
+			{
+				if (JG::InputManager::GetInstance().IsKeyDown(JG::EKeyCode::LeftShift) == true)
+				{
+					mAnimParams->SetFloat("Velocity", 100.0f);
+					JG_LOG_INFO("Velocity 100");
+				}
+				else
+				{
+					mAnimParams->SetFloat("Velocity", 10.0f);
+					JG_LOG_INFO("Velocity 10");
+				}
+			}
+			else
+			{
+				mAnimParams->SetFloat("Velocity", 0.0f);
+				JG_LOG_INFO("Velocity 0");
+			}
+			mIsRunning = false;
+		}
 
 	}
 
-	void DevComponent::MoveForward(f32 value)
+	void DevComponent::MoveForward(JG::f32 value)
 	{
 		if (IsShowCursor() == true) return;
-		if (Camera::GetMainCamera() == nullptr)
+		if (mCamera == nullptr)
 		{
 			return;
 		}
-		auto transform = Camera::GetMainCamera()->GetOwner()->GetTransform();
-		auto location  = transform->GetWorldLocation();
-		auto lookVec   = Camera::GetMainCamera()->GetLook();
-		lookVec.y = 0;
-		lookVec = JVector3::Normalize(lookVec);
-		location += lookVec * value * GetTick() * 50;
+		JG::JVector3 location = GetOwner()->GetTransform()->GetWorldLocation();
+
+		JG::JVector3 camLook = mCamera->GetLook();
+		camLook.y = 0;
+		camLook = JG::JVector3::Normalize(camLook * value);
+
+		// 위치 변경
+		location += camLook * mSpeed;
+		GetOwner()->GetTransform()->SetWorldLocation(location);
+
+		mIsRunning = true;
+		JG::JVector3 objLook = mRenderer->GetOwner()->GetTransform()->GetLook();
+		objLook.y = 0;
+		objLook = JG::JVector3::Normalize(objLook * value);
+
+		JG::JQuaternion q = JG::JQuaternion::FromTwoVectors(camLook, objLook);
+		mRenderer->GetOwner()->GetTransform()->SetLocalQuaternion(q);
+	}
+
+	void DevComponent::MoveRight(JG::f32 value)
+	{
+		if (IsShowCursor() == true) return;
+		if (mCamera == nullptr)
+		{
+			return;
+		}
+		JG::Transform* transform = GetOwner()->GetTransform();
+		JG::JVector3 location = transform->GetWorldLocation();
+		JG::JVector3 camRight = mCamera->GetRight();
+		camRight.y = 0;
+		camRight = JG::JVector3::Normalize(camRight * value);
+		location += camRight * mSpeed;
 		transform->SetWorldLocation(location);
+
+
+		mIsRunning = true;
+		JG::JVector3 objLook = mRenderer->GetOwner()->GetTransform()->GetLook();
+		objLook.y = 0;
+		objLook = JG::JVector3::Normalize(objLook * value);
+
+		JG::JQuaternion q = JG::JQuaternion::FromTwoVectors(objLook, camRight);
+		mRenderer->GetOwner()->GetTransform()->SetLocalQuaternion(q);
 	}
 
-	void DevComponent::MoveRight(f32 value)
+	void DevComponent::YawRotate(JG::f32 value)
 	{
 		if (IsShowCursor() == true) return;
-		if (Camera::GetMainCamera() == nullptr)
+		if (JG::Camera::GetMainCamera() == nullptr)
 		{
 			return;
 		}
-		auto transform = Camera::GetMainCamera()->GetOwner()->GetTransform();
-		auto location = transform->GetWorldLocation();
-		auto rightVec = Camera::GetMainCamera()->GetRight();
-		rightVec.y = 0;
-		rightVec = JVector3::Normalize(rightVec);
-		location += rightVec * value * GetTick() * 50;
-		transform->SetWorldLocation(location);
-		
-	}
+		JG::Transform* camTransform = mCamera->GetOwner()->GetTransform();
+		JG::Transform* playerTransform = GetOwner()->GetTransform();
+		JVector3 targetPos = playerTransform->GetWorldLocation();
 
-	void DevComponent::YawRotate(f32 value)
-	{
-		if (IsShowCursor() == true) return;
-		if (Camera::GetMainCamera() == nullptr)
-		{
-			return;
-		}
-		auto transform = Camera::GetMainCamera()->GetOwner()->GetTransform();
-		auto rotation = transform->GetWorldRotation();
-		
 
+		JVector3 rotation = camTransform->GetWorldRotation();
+
+
+		GetOwner()->GetTransform();
 		rotation.y += value * GetTick() * 10;
+	
 
-
-		transform->SetWorldRotation(rotation);
+		camTransform->SetLocalRotation(rotation);
+		camTransform->SetWorldLocation(targetPos - camTransform->GetLook() * mCamLength);
 	}
 
-	void DevComponent::PitchRotate(f32 value)
+	void DevComponent::PitchRotate(JG::f32 value)
 	{
 		if (IsShowCursor() == true) return;
-		if (Camera::GetMainCamera() == nullptr)
-		{
-			return;
-		}
 
-		auto transform = Camera::GetMainCamera()->GetOwner()->GetTransform();
+		JG::Transform* playerTransform = GetOwner()->GetTransform();
+		JVector3 targetPos = playerTransform->GetWorldLocation();
+
+
+		auto transform = mCamera->GetOwner()->GetTransform();
 		auto rotation = transform->GetWorldRotation();
 		rotation.x += value * GetTick() * 10;
 		transform->NormalizeRotation(rotation);
@@ -89,16 +161,17 @@ namespace JG
 
 		if (rotation.x >= 0 && rotation.x < 180.0f)
 		{
-			rotation.x = Math::Min(rotation.x, 70.0f);
+			rotation.x = JG::Math::Min(rotation.x, 70.0f);
 		}
 		else
 		{
-			rotation.x = Math::Max(rotation.x, 290.0f);
+			rotation.x = JG::Math::Max(rotation.x, 290.0f);
 		}
 
 
 
-		transform->SetWorldRotation(rotation);
+		transform->SetLocalRotation(rotation);
+		transform->SetWorldLocation(targetPos - transform->GetLook() * mCamLength);
 	}
 
 
@@ -106,6 +179,4 @@ namespace JG
 	{
 		GameComponent::SetShowCursor(!IsShowCursor());
 	}
-
-
 }

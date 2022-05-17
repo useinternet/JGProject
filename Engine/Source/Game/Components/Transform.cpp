@@ -114,6 +114,21 @@ namespace JG
 		UpdateWorldRotation();
 		return mWorldQuaternion;
 	}
+	const JVector3& Transform::GetLook() const
+	{
+		UpdateWorldRotation();
+		return mLookVec;
+	}
+	const JVector3& Transform::GetRight() const
+	{
+		UpdateWorldRotation();
+		return mRightVec;
+	}
+	const JVector3& Transform::GetUp() const
+	{
+		UpdateWorldRotation();
+		return mUpVec;
+	}
 	void Transform::NormalizeRotation(JVector3& toDegree) const
 	{
 		while (toDegree.x <= 0.0f)
@@ -228,6 +243,20 @@ namespace JG
 			mWorldQuaternion = parent->GetTransform()->GetWorldQuaternion() * GetLocalQuaternion();
 		}
 		NormalizeRotation(mWorldRotation);
+		/*
+				auto rotation = GetOwner()->GetTransform()->GetWorldRotation();
+		rotation = Math::ConvertToRadians(rotation);
+		return JVector3::Normalize(JMatrix::Rotation(rotation).TransformVector(JVector3(0, 0, 1)));
+		*/
+
+		// Look, Up, Right Update
+		mLookVec  = JMatrix::Rotation(mWorldQuaternion).TransformVector(JVector3::FowardVector());
+		mRightVec = JMatrix::Rotation(mWorldQuaternion).TransformVector(JVector3::RightVector());
+		mUpVec	  = JMatrix::Rotation(mWorldQuaternion).TransformVector(JVector3::UpVector());
+
+		mLookVec  = JVector3::Normalize(mLookVec);
+		mRightVec = JVector3::Normalize(mRightVec);
+		mUpVec	  = JVector3::Normalize(mUpVec);
 	}
 	void Transform::UpdateWorldScale() const
 	{

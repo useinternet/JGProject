@@ -54,7 +54,7 @@ namespace JG
 
 	JQuaternion JQuaternion::RotationRollPitchYawFromVector(const JVector3& angles)
 	{
-		
+	
 		JQuaternion result;
 		auto simQ = DirectX::XMQuaternionRotationRollPitchYawFromVector(JVector3::GetSIMD(angles));
 		result.SetSIMD(simQ);
@@ -76,6 +76,25 @@ namespace JG
 		DirectX::XMFLOAT3 v_axis = { axis.x, axis.y, axis.z };
 		q.SetSIMD(DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&v_axis), angle));
 		return q;
+	}
+	JQuaternion JQuaternion::FromTwoVectors(const JVector3& u, const JVector3& v)
+	{
+		float norm_u_norm_v = sqrt(JVector3::Dot(u, u) * JVector3::Dot(v, v));
+		float real_part = norm_u_norm_v + JVector3::Dot(u, v);
+		JVector3 w;
+
+		if (real_part < 1.e-6f * norm_u_norm_v)
+		{
+			real_part = 0.0f;
+			w = Math::Abs(u.x) > Math::Abs(u.z) ? JVector3(-u.y, u.x, 0.f)
+				: JVector3(0.f, -u.z, u.y);
+		}
+		else
+		{
+			w = JVector3::Cross(u, v);
+		}
+
+		return JQuaternion::Normalize(JQuaternion(w.x, w.y, w.z, real_part));
 	}
 }
 

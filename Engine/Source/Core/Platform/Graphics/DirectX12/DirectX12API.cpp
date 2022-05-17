@@ -399,6 +399,11 @@ namespace JG
 	{
 		return mIsSupportedRayTracing;
 	}
+	void DirectX12API::SubmitAndFlush()
+	{
+		mGraphicsCommandQueue->End();
+		mGraphicsCommandQueue->Flush();
+	}
 	void DirectX12API::Flush()
 	{
 		mGraphicsCommandQueue->Flush();
