@@ -91,6 +91,12 @@ namespace JG
 	const static u32 JG_U32_MAX = 0xffffffff;
 	const static u64 JG_U64_MAX = 0xffffffffffffffff;
 
+	const static f32 JG_F32_MAX = 3.40282e+38;
+	const static f32 JG_F32_MIN = 1.17549e-38;
+
+	const static f64 JG_F64_MAX = 1.79769e+308;
+	const static f64 JG_F64_MIN = 2.22507e-308;
+
 	// Container
 	template<class T>
 	using List  = std::vector<T>;

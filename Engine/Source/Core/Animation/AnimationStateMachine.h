@@ -17,6 +17,8 @@ namespace JG
 	using MakeAnimationSequenceAction = MakeAnimationAction<AnimationStateMachine>;
 	using MakeAnimationClipAction	  = MakeAnimationAction<AnimationClipInfo>;
 	using MakeTransitionAction		  = MakeAnimationAction<AnimationTransition>;
+
+
 	class AnimationStateFlow
 	{
 	public:
@@ -28,6 +30,8 @@ namespace JG
 		{
 			Begin,
 			AnimationClip,
+			AnimationBlend1D,
+			AnimationBlend2D,
 		};
 		struct Node
 		{
@@ -37,6 +41,7 @@ namespace JG
 			List<AnimationTransition*> ConnectedNodeTransitions;
 		};
 
+
 		AnimationController* mOwnerAnimController = nullptr;
 
 		Dictionary<String, SharedPtr<Node>> mNodeDic;
@@ -45,6 +50,7 @@ namespace JG
 
 
 		List<String> mAnimClipNameList;
+
 
 		String mBeginNodeName;
 
@@ -96,9 +102,12 @@ namespace JG
 	private:
 		bool CreateNode(ENodeType nodeType, const String& name);
 		AnimationTransition* CreateTransition(const String& prevName, const String& nextName);
+		
+
+		bool GetKeyFrame(Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S, bool apply_transtioning = true);
 
 
-		bool GetKeyFrame(Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S);
+
 
 		bool IsExistNode(const String& name) const;
 		AnimationStateMachine::Node* FindNode(const String& name) const;
@@ -108,11 +117,14 @@ namespace JG
 		const String& FindNodeName(Node* node) const;
 		void UpdateFlow_Thread();
 		void UpdateFlow_Thread(Node* node);
-		void UpdateAnimationTransform_Thread();
-		void UpdateAnimationClipInfo_Thread();
-		void UpdateAnimationTransform_AnimClip_Thread(Node* node, List<SharedPtr<AnimationTransform>>& out_animTransform);
-		void UpdateAnimationTransform_AnimClip_Internal_Thread(SharedPtr<ISubMesh> subMesh, u32 nodeID,  const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
-
+		void UpdateNode_Thread();
+		void UpdateNode_Internal_Thread(Node* node);
+		void UpdateAnimationClipInfo_Thread(const String& clipName);
+		void UpdateAnimationBlend1DInfo_Thread(const String& nodeName);
+		void UpdateAnimationBlend2DInfo_Thread(const String& nodeName);
+		void UpdateAnimationTransform_Thread(List<SharedPtr<AnimationTransform>>& out_animTransform);
+		void UpdateAnimationTransform_Internal_Thread(SharedPtr<ISubMesh> subMesh, u32 nodeID,  const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform);
+		void ResetNode_Thread(Node* node);
 
 
 

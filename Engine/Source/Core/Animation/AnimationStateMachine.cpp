@@ -3,6 +3,7 @@
 #include "AnimationController.h"
 #include "AnimationTransform.h"
 #include "AnimationTransition.h"
+#include "AnimationParameters.h"
 #include "AnimationClip.h"
 #include "Application.h"
 #include "Class/Asset/Asset.h"
@@ -61,7 +62,6 @@ namespace JG
 		}
 		return *this;
 	}
-
 	AnimationStateMachine& AnimationStateMachine::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
 		if (mIsRunning) *this;
@@ -119,7 +119,7 @@ namespace JG
 		mIsRunning = true;
 		ExecuteInternal_Thread(mCurrentNode);
 		UpdateFlow_Thread();
-		UpdateAnimationTransform_Thread();
+		UpdateNode_Thread();
 		return mFinalAnimationTransforms;
 	}
 	void AnimationStateMachine::Reset_Thread()
@@ -146,10 +146,12 @@ namespace JG
 		switch (nodeType)
 		{
 		case ENodeType::AnimationClip:
-		{
 			newNode.ID = mAnimClipNameList.size();
 			mAnimClipNameList.push_back(name);
-		}
+			break;
+		case ENodeType::AnimationBlend1D:
+			break;
+		case ENodeType::AnimationBlend2D:
 			break;
 		}
 
@@ -172,18 +174,19 @@ namespace JG
 
 		return mTransitionDic[key].get();
 	}
-	bool AnimationStateMachine::GetKeyFrame(AnimationStateMachine::Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S)
+
+	bool AnimationStateMachine::GetKeyFrame(AnimationStateMachine::Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S, bool apply_transtioning)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
 		if (animController == nullptr)
 		{
 			return false;
 		}
-		switch (mCurrentNode->NodeType)
+		switch (node->NodeType)
 		{
 		case ENodeType::AnimationClip:
 		{
-			String currentNodeName = FindNodeName(mCurrentNode);
+			String currentNodeName = FindNodeName(node);
 			SharedPtr<AnimationClip>	 currentAnimClip	  = animController->FindAnimationClip(currentNodeName);
 			SharedPtr<AnimationClipInfo> currentAnimClipInfo  = animController->FindAnimationClipInfo(currentNodeName);
 
@@ -191,24 +194,28 @@ namespace JG
 			{
 				return false;
 			}
+		}
+		break;
+		case ENodeType::AnimationBlend1D:
+			break;
+		case ENodeType::AnimationBlend2D:
+			break;
+		}
 
-			if (mIsTransitioning)
+		if (mIsTransitioning && apply_transtioning)
+		{
+			JVector3 prev_T; JQuaternion prev_Q;
+			JVector3 prev_S;
+			if (GetKeyFrame(mPrevNode, boneName, &prev_T, &prev_Q, &prev_S, false) == false)
 			{
-				String prevNodeName = FindNodeName(mPrevNode);
-				SharedPtr<AnimationClip>	 prevAnimClip = animController->FindAnimationClip(prevNodeName);
-				SharedPtr<AnimationClipInfo> prevAnimClipInfo = animController->FindAnimationClipInfo(prevNodeName);
-				JVector3 prev_T; JQuaternion prev_Q;
-				JVector3 prev_S;
-				if (prevAnimClip->GetCurrentKeyFrame(boneName, prevAnimClipInfo->TimePos, &prev_T, &prev_Q, &prev_S) == false)
-				{
-					return true;
-				}
-				if (T) *T = JVector3::Lerp(prev_T, *T, mTransitionFactor);
-				if (Q) *Q = JQuaternion::Slerp(prev_Q, *Q, mTransitionFactor);
-				if (S) *S = JVector3::Lerp(prev_S, *S, mTransitionFactor);
+				return false;
 			}
+			if (T) *T = JVector3::Lerp(prev_T, *T, mTransitionFactor);
+			if (Q) *Q = JQuaternion::Slerp(prev_Q, *Q, mTransitionFactor);
+			if (S) *S = JVector3::Lerp(prev_S, *S, mTransitionFactor);
 		}
-		}
+
+
 		return true;
 	}
 
@@ -240,6 +247,8 @@ namespace JG
 		{
 		case ENodeType::AnimationClip:
 			return mAnimClipNameList[node->ID];
+		case ENodeType::AnimationBlend1D:
+		case ENodeType::AnimationBlend2D:
 		default:
 			return mBeginNodeName;
 		}
@@ -282,7 +291,7 @@ namespace JG
 		}
 	}
 
-	void AnimationStateMachine::UpdateAnimationTransform_Thread()
+	void AnimationStateMachine::UpdateNode_Thread()
 	{
 		AnimationController* animController = GetOwnerAnimationController();
 		if (animController == nullptr)
@@ -290,71 +299,20 @@ namespace JG
 			return;
 		}
 
-		switch (mCurrentNode->NodeType)
-		{
-		case ENodeType::AnimationClip:
-			UpdateAnimationTransform_AnimClip_Thread(mCurrentNode, mFinalAnimationTransforms);
-			break;
-		}
-	}
-
-	void AnimationStateMachine::UpdateAnimationClipInfo_Thread()
-	{
-		AnimationController* animController = GetOwnerAnimationController();
-		if (animController == nullptr)
-		{
-			return;
-		}
-		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
-		// Current Update
-		String currentNodeName = FindNodeName(mCurrentNode);
-
-		SharedPtr<AnimationClipInfo> currentAnimClipInfo = animController->FindAnimationClipInfo(currentNodeName);
-
-		if (currentAnimClipInfo == nullptr)
-		{
-			JG_LOG_ERROR("%s is not exist Animation Clip", currentNodeName);
-			return;
-		}
-
-		currentAnimClipInfo->TimePos += tick * currentAnimClipInfo->TickPerSecond * currentAnimClipInfo->Speed * 10;
-		if (currentAnimClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
-		{
-			if (currentAnimClipInfo->TimePos >= currentAnimClipInfo->Duration)
-			{
-				currentAnimClipInfo->Reset();
-			}
-		}
-
-
+		UpdateNode_Internal_Thread(mCurrentNode);
 
 		if (mIsTransitioning && mPrevNode != nullptr && mPrevNode->NodeType != ENodeType::Begin)
 		{
-
-			String prevNodeName = FindNodeName(mPrevNode);
-			SharedPtr<AnimationClipInfo> prevAnimClipInfo = animController->FindAnimationClipInfo(prevNodeName);
-
-			if (prevAnimClipInfo == nullptr)
-			{
-				JG_LOG_ERROR("%s is not exist Animation Clip", prevNodeName);
-				return;
-			}
-
-			prevAnimClipInfo->TimePos += tick * prevAnimClipInfo->TickPerSecond * prevAnimClipInfo->Speed * 10;
-			if (prevAnimClipInfo->GetFlags() & EAnimationClipFlags::Repeat)
-			{
-				if (prevAnimClipInfo->TimePos >= prevAnimClipInfo->Duration)
-				{
-					prevAnimClipInfo->Reset();
-				}
-			}
-
+			f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+			String currentNodeName = FindNodeName(mCurrentNode);
+			String prevNodeName    = FindNodeName(mPrevNode);
+			UpdateNode_Internal_Thread(mPrevNode);
 			mTransitionTimePos += tick;
 			AnimationTransition* transition = FindTransition(prevNodeName, currentNodeName);
 			if (transition != nullptr && transition->GetTransitionDuration() < mTransitionTimePos)
 			{
 				mIsTransitioning = false;
-				mPrevNode        = nullptr;
+				mPrevNode = nullptr;
 				mTransitionTimePos = 0.0f;
 				mTransitionFactor = 1.0f;
 				return;
@@ -367,31 +325,113 @@ namespace JG
 			mIsTransitioning = false;
 		}
 
-
+		UpdateAnimationTransform_Thread(mFinalAnimationTransforms);
 	}
+	void AnimationStateMachine::UpdateNode_Internal_Thread(Node* node)
+	{
+		if (node == nullptr || node->NodeType == ENodeType::Begin)
+		{
+			return;
+		}
 
-	void AnimationStateMachine::UpdateAnimationTransform_AnimClip_Thread(Node* node, List<SharedPtr<AnimationTransform>>& out_animTransform)
+		String nodeName = FindNodeName(node);
+
+		AnimationController* animController = GetOwnerAnimationController();
+		switch (node->NodeType)
+		{
+		case ENodeType::AnimationClip:
+			UpdateAnimationClipInfo_Thread(nodeName);
+			break;
+		case ENodeType::AnimationBlend1D:
+			UpdateAnimationBlend1DInfo_Thread(nodeName);
+		case ENodeType::AnimationBlend2D:
+			UpdateAnimationBlend2DInfo_Thread(nodeName);
+			break;
+		}
+	}
+	void AnimationStateMachine::UpdateAnimationClipInfo_Thread(const String& clipName)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
-
-		String name = mAnimClipNameList[node->ID];
-		SharedPtr<AnimationClip>	 animClip     = animController->FindAnimationClip(name);
-		SharedPtr<AnimationClipInfo> animClipInfo = animController->FindAnimationClipInfo(name);
-		SharedPtr<IMesh> mesh					  = animController->GetBindedOriginMesh();
-		SharedPtr<Skeletone> skeletone			  = animController->GetBindedSkeletone();
-		if (animClip == nullptr || animClipInfo == nullptr)
-		{
-			JG_LOG_ERROR("%s is not exist Animation Clip", name);
-			return;
-		}
-
-		if (skeletone == nullptr || skeletone->IsValid() == false  || mesh == nullptr)
+		if (animController == nullptr)
 		{
 			return;
 		}
+		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+		// Current Update
+		SharedPtr<AnimationClipInfo> clipInfo = animController->FindAnimationClipInfo(clipName);
 
-		UpdateAnimationClipInfo_Thread();
-		if (animClipInfo->TimePos >= animClipInfo->Duration)
+		if (clipInfo == nullptr)
+		{
+			JG_LOG_ERROR("%s is not exist Animation Clip", clipName);
+			return;
+		}
+
+		clipInfo->TimePos += tick * clipInfo->TickPerSecond * clipInfo->Speed * 10;
+		if (clipInfo->GetFlags() & EAnimationClipFlags::Repeat)
+		{
+			if (clipInfo->TimePos >= clipInfo->Duration)
+			{
+				clipInfo->Reset();
+			}
+		}
+	}
+
+	void AnimationStateMachine::UpdateAnimationBlend1DInfo_Thread(const String& nodeName)
+	{
+		AnimationController* animController = GetOwnerAnimationController();
+		if (animController == nullptr)
+		{
+			return;
+		}
+		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+		// Current Update
+		Node* node = FindNode(nodeName);
+
+
+		if (node == nullptr)
+		{
+			JG_LOG_ERROR("%s is not exist BlendNode", nodeName);
+			return;
+		}
+
+		//AnimationBlend1DInfo& _1dInfo = mAnimBlend1DInfoList[node->ID];
+		//for (const String& clipName : _1dInfo.ClipNameList)
+		//{
+		//	UpdateAnimationClipInfo_Thread(clipName);
+		//}
+	}
+
+	void AnimationStateMachine::UpdateAnimationBlend2DInfo_Thread(const String& nodeName)
+	{
+		AnimationController* animController = GetOwnerAnimationController();
+		if (animController == nullptr)
+		{
+			return;
+		}
+		f32 tick = Application::GetInstance().GetAppTimer()->GetTick();
+		// Current Update
+		Node* node = FindNode(nodeName);
+
+
+		if (node == nullptr)
+		{
+			JG_LOG_ERROR("%s is not exist BlendNode", nodeName);
+			return;
+		}
+
+		//AnimationBlend2DInfo& _2dInfo = mAnimBlend2DInfoList[node->ID];
+		//for (const String& clipName : _2dInfo.ClipNameList)
+		//{
+		//	UpdateAnimationClipInfo_Thread(clipName);
+		//}
+	}
+
+	void AnimationStateMachine::UpdateAnimationTransform_Thread(List<SharedPtr<AnimationTransform>>& out_animTransform)
+	{
+		AnimationController* animController = GetOwnerAnimationController();
+		SharedPtr<IMesh>     mesh = animController->GetBindedOriginMesh();
+		SharedPtr<Skeletone> skeletone = animController->GetBindedSkeletone();
+		if (skeletone == nullptr || skeletone->IsValid() == false || mesh == nullptr)
 		{
 			return;
 		}
@@ -401,11 +441,11 @@ namespace JG
 		for (u32 i = 0; i < subMeshCount; ++i)
 		{
 			out_animTransform[i] = CreateSharedPtr<AnimationTransform>();
-			UpdateAnimationTransform_AnimClip_Internal_Thread(mesh->GetSubMesh(i), skeletone->GetRootNodeID(),  JMatrix::Identity(), out_animTransform[i]);
+			UpdateAnimationTransform_Internal_Thread(mesh->GetSubMesh(i), skeletone->GetRootNodeID(),  JMatrix::Identity(), out_animTransform[i]);
 		}
 	}
 
-	void AnimationStateMachine::UpdateAnimationTransform_AnimClip_Internal_Thread(SharedPtr<ISubMesh> subMesh, u32 nodeID, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
+	void AnimationStateMachine::UpdateAnimationTransform_Internal_Thread(SharedPtr<ISubMesh> subMesh, u32 nodeID, const JMatrix& parentTransform, SharedPtr<AnimationTransform> animTransform)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
 		SharedPtr<Skeletone> skeletone = animController->GetBindedSkeletone();
@@ -437,9 +477,34 @@ namespace JG
 		for (u32 nodeID : node->ChildNodes)
 		{
 			const Skeletone::Node* childNode = skeletone->GetNode(nodeID);
-			UpdateAnimationTransform_AnimClip_Internal_Thread(subMesh, childNode->ID, resultTransform, animTransform);
+			UpdateAnimationTransform_Internal_Thread(subMesh, childNode->ID, resultTransform, animTransform);
 		}
 	}
+
+	void AnimationStateMachine::ResetNode_Thread(Node* node)
+	{
+		AnimationController* animController = GetOwnerAnimationController();
+		switch (node->NodeType)
+		{
+		case ENodeType::AnimationClip:
+		{
+			SharedPtr<AnimationClipInfo> animClipInfo = animController->FindAnimationClipInfo(FindNodeName(node));
+			if (animClipInfo != nullptr)
+			{
+				animClipInfo->Reset();
+			}
+			
+		}
+			break;
+		case ENodeType::AnimationBlend1D:
+			break;
+		case ENodeType::AnimationBlend2D:
+			break;
+
+		}
+	}
+
+
 
 	void AnimationStateMachine::ExecuteInternal_Thread(Node* node)
 	{
@@ -449,6 +514,7 @@ namespace JG
 			mTransitionTimePos = 0.0f;
 			mPrevNode    = mCurrentNode;
 			mCurrentNode = node;
+			ResetNode_Thread(mCurrentNode);
 		}
 		u32 transitionCnt = node->ConnectedNode.size();
 		for (u32 i = 0; i < transitionCnt; ++i)

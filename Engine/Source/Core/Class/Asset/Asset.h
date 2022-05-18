@@ -415,7 +415,10 @@ namespace JG
 	};
 
 	
+	class AnimationBlendSpace1DStock
+	{
 
+	};
 
 
 	class MaterialAssetStock : public IAssetStock
