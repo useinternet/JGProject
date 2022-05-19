@@ -6,6 +6,7 @@
 #include "AnimationTransform.h"
 #include "AnimationClip.h"
 #include "AnimationTransition.h"
+#include "AnimationBlendSpace1D.h"
 #include "Class/Asset/Asset.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/JGGraphics.h"
@@ -29,7 +30,7 @@ namespace JG
 			return;
 		}
 		ClipCommandData data;
-		data.Command = ClipCommandData::Command_Add;
+		data.Command = ClipCommandData::Command_AnimClip_Add;
 		data.Name = name;
 		data.Clip = animationClip;
 		data.ClipInfo = CreateSharedPtr<AnimationClipInfo>(name, animationClip, flags);
@@ -44,15 +45,42 @@ namespace JG
 		}
 		else
 		{
-			mClipCommandDataQueue.push(data);
+			mCommandDataQueue.push(data);
 		}
 
+	}
+
+	void AnimationController::AddAnimationBlendSpace1D(const String& name, SharedPtr<AnimationBlendSpace1D> blendSpace1D, EAnimationBlendSpace1DFlag flags, bool immediate)
+	{
+
+		if (blendSpace1D == nullptr || blendSpace1D->IsValid() == false)
+		{
+			return;
+		}
+		ClipCommandData data;
+		data.Command = ClipCommandData::Command_BlendSpace1D_Add;
+		data.Name = name;
+		data.BlendSpace1D = blendSpace1D;
+		data.BlendSpace1DInfo = CreateSharedPtr<AnimationBlendSpace1DInfo>(name, blendSpace1D, flags);
+
+		if (immediate)
+		{
+			if (mAnimBlendSpace1Ds.find(data.Name) == mAnimBlendSpace1Ds.end())
+			{
+				mAnimBlendSpace1Ds.emplace(data.Name, data.BlendSpace1D);
+				mAnimBlendSpace1DInfos.emplace(data.Name, data.BlendSpace1DInfo);
+			}
+		}
+		else
+		{
+			mCommandDataQueue.push(data);
+		}
 	}
 
 	void AnimationController::RemoveAnimationClip(const String& name, bool immediate)
 	{
 		ClipCommandData data;
-		data.Command = ClipCommandData::Command_Remove;
+		data.Command = ClipCommandData::Command_AnimClip_Remove;
 		data.Name = name;
 		data.Clip     = nullptr;
 		data.ClipInfo = nullptr;
@@ -64,7 +92,24 @@ namespace JG
 		}
 		else
 		{
-			mClipCommandDataQueue.push(data);
+			mCommandDataQueue.push(data);
+		}
+	}
+
+	void AnimationController::RemoveBlendSpace1D(const String& name, bool immediate)
+	{
+		ClipCommandData data;
+		data.Command = ClipCommandData::Command_BlendSpace1D_Remove;
+		data.Name = name;
+
+		if (immediate)
+		{
+			mAnimBlendSpace1Ds.erase(data.Name);
+			mAnimBlendSpace1DInfos.erase(data.Name);
+		}
+		else
+		{
+			mCommandDataQueue.push(data);
 		}
 	}
 
@@ -115,6 +160,24 @@ namespace JG
 			return nullptr;
 		}
 		return mAnimClipInfos.at(name);
+	}
+
+	SharedPtr<AnimationBlendSpace1D> AnimationController::FindAnimationBlendSpace1D(const String& name) const
+	{
+		if (mAnimBlendSpace1Ds.find(name) == mAnimBlendSpace1Ds.end())
+		{
+			return nullptr;
+		}
+		return mAnimBlendSpace1Ds.at(name);
+	}
+
+	SharedPtr<AnimationBlendSpace1DInfo> AnimationController::FindAnimationBlendSpace1DInfo(const String& name) const
+	{
+		if (mAnimBlendSpace1DInfos.find(name) == mAnimBlendSpace1DInfos.end())
+		{
+			return nullptr;
+		}
+		return mAnimBlendSpace1DInfos.at(name);
 	}
 
 	SharedPtr<Skeletone> AnimationController::GetBindedSkeletone() const
@@ -236,28 +299,34 @@ namespace JG
 		return CreateSharedPtr<AnimationController>();
 	}
 
-	void AnimationController::Init()
-	{
-
-	}
-
 	void AnimationController::Update(SharedPtr<IComputeContext> computeContext)
 	{
-		while (mClipCommandDataQueue.empty() == false)
+		while (mCommandDataQueue.empty() == false)
 		{
-			ClipCommandData commandData = mClipCommandDataQueue.front(); mClipCommandDataQueue.pop();
+			ClipCommandData commandData = mCommandDataQueue.front(); mCommandDataQueue.pop();
 			switch (commandData.Command)
 			{
-			case ClipCommandData::Command_Add:
+			case ClipCommandData::Command_AnimClip_Add:
 				if (mAnimClips.find(commandData.Name) == mAnimClips.end())
 				{
 					mAnimClips.emplace(commandData.Name, commandData.Clip);
 					mAnimClipInfos.emplace(commandData.Name, commandData.ClipInfo);
 				}
 				break;
-			case ClipCommandData::Command_Remove:
+			case ClipCommandData::Command_AnimClip_Remove:
 				mAnimClips.erase(commandData.Name);
 				mAnimClipInfos.erase(commandData.Name);
+				break;
+			case ClipCommandData::Command_BlendSpace1D_Add:
+				if (mAnimBlendSpace1Ds.find(commandData.Name) == mAnimBlendSpace1Ds.end())
+				{
+					mAnimBlendSpace1Ds.emplace(commandData.Name, commandData.BlendSpace1D);
+					mAnimBlendSpace1DInfos.emplace(commandData.Name, commandData.BlendSpace1DInfo);
+				}
+				break;
+			case ClipCommandData::Command_BlendSpace1D_Remove:
+				mAnimBlendSpace1Ds.erase(commandData.Name);
+				mAnimBlendSpace1DInfos.erase(commandData.Name);
 				break;
 			}
 		}

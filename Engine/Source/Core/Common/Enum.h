@@ -57,6 +57,8 @@ namespace JG
 		AnimationClip = 9,
 		Animation = 10,
 		SkeletalMesh = 11,
+		AnimationBlendSpace1D = 12,
+		AnimationBlendSpace = 13,
 	};
 
 	enum class ERendererPath

@@ -6,6 +6,8 @@ namespace JG
 {
 	class AnimationClip;
 	class AnimationClipInfo;
+	class AnimationBlendSpace1D;
+	class AnimationBlendSpace1DInfo;
 	class AnimationStateMachine;
 	class AnimationTransition;
 	class AnimationParameters;
@@ -37,35 +39,50 @@ namespace JG
 		Dictionary<String, SharedPtr<AnimationClip>>     mAnimClips;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> mAnimClipInfos;
 
+		Dictionary<String, SharedPtr<AnimationBlendSpace1D>>     mAnimBlendSpace1Ds;
+		Dictionary<String, SharedPtr<AnimationBlendSpace1DInfo>> mAnimBlendSpace1DInfos;
+
 		struct ClipCommandData
 		{
 			enum 
 			{
-				Command_Add,
-				Command_Remove,
+				Command_AnimClip_Add,
+				Command_AnimClip_Remove,
+				Command_BlendSpace1D_Add,
+				Command_BlendSpace1D_Remove,
 			};
 			i32    Command;
 			String Name;
 			SharedPtr<AnimationClip>     Clip;
 			SharedPtr<AnimationClipInfo> ClipInfo;
+			SharedPtr<AnimationBlendSpace1D>     BlendSpace1D;
+			SharedPtr<AnimationBlendSpace1DInfo> BlendSpace1DInfo;
 		};
 		
 
 		mutable std::mutex mMeshLock;
 		mutable std::mutex mSkeletonLock;
-		Queue<ClipCommandData>        mClipCommandDataQueue;
+		Queue<ClipCommandData>        mCommandDataQueue;
 		u64 mWaitFrameCount = 0;
 		SharedPtr<AnimationStateFlow> mFlow;
 		bool mIsResetStateMachine = false;
 	public:
 		AnimationController();
 		// Clip Ã£±â
+		
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate = false);
+		void AddAnimationBlendSpace1D(const String& name, SharedPtr< AnimationBlendSpace1D> blendSpace1D, EAnimationBlendSpace1DFlag flags, bool immediate = false);
 		void RemoveAnimationClip(const String& name, bool immediate = false);
+		void RemoveBlendSpace1D(const String& name, bool immediate = false);
 		void BindSkeletone(SharedPtr<Skeletone> skeletone);
 		void BindMesh(SharedPtr<IMesh> mesh);
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
+		SharedPtr<AnimationBlendSpace1D> FindAnimationBlendSpace1D(const String& name) const;
+		SharedPtr<AnimationBlendSpace1DInfo> FindAnimationBlendSpace1DInfo(const String& name) const;
+
+
+
 
 		SharedPtr<Skeletone>		   GetBindedSkeletone()       const;
 		SharedPtr<IMesh>			   GetBindedMesh() const;
@@ -89,7 +106,6 @@ namespace JG
 		void Reset();
 		static SharedPtr<AnimationController> Create(const String& name);
 	private:
-		void Init();
 		void Update(SharedPtr<IComputeContext> computeContext);
 		void Update_Thread(SharedPtr<IComputeContext> computeContext);
 		bool CanUseSkinnedMesh() const;

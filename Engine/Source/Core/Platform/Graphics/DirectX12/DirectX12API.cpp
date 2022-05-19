@@ -579,22 +579,6 @@ namespace JG
 		return CreateSharedPtr<DirectX12BottomLevelAccelerationsStructure>();
 	}
 
-	//SharedPtr<IGraphicsContext> DirectX12API::GetGraphicsContext()
-	//{
-	//	std::lock_guard<std::mutex> lock(mGraphicsContextMutex);
-
-	//	std::thread::id curr_thread_id = std::this_thread::get_id();
-
-	//	if (mGraphicsContextDic.find(curr_thread_id) == mGraphicsContextDic.end())
-	//	{
-	//		SharedPtr<DirectX12GraphicsContext> graphicsContext = CreateSharedPtr<DirectX12GraphicsContext>();
-	//		graphicsContext->Reset();
-	//		mGraphicsContextDic[curr_thread_id] = graphicsContext;
-	//		return graphicsContext;
-	//	}
-
-	//	return mGraphicsContextDic[curr_thread_id];
-	//}
 	bool DirectX12API::AllocateCommandQueue(ECommandQueueType type, u64 queueID)
 	{
 

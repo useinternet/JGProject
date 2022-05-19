@@ -20,14 +20,6 @@ namespace JG
 		if (mAnimation != nullptr && mAnimation->IsValid())
 		{
 			JGAnimation::GetInstance().RegisterAnimationController(mAnimation->Get());
-			if (mSkeletone != nullptr)
-			{
-				mAnimation->Get()->BindSkeletone(mSkeletone->Get());
-			}
-			if (mMesh != nullptr)
-			{
-				mAnimation->Get()->BindMesh(mMesh->Get());
-			}
 		}
 	}
 	void SkeletalMeshRenderer::Destory()
@@ -224,16 +216,24 @@ namespace JG
 		{
 			return;
 		}
-
+		if (mAnimation != nullptr && mAnimation->IsValid())
+		{
+			if (mSkeletone != nullptr)
+			{
+				mAnimation->Get()->BindSkeletone(mSkeletone->Get());
+			}
+			if (mMesh != nullptr)
+			{
+				mAnimation->Get()->BindMesh(mMesh->Get());
+			}
+		}
 
 		auto sceneObject = CreateSharedPtr<Graphics::StaticRenderObject>();
 		auto transform = GetOwner()->GetTransform();
 		sceneObject->WorldMatrix = transform->GetWorldMatrix();
 		
 		if (mAnimation != nullptr &&
-			mAnimation->IsValid() &&
-			mAnimation->Get()->GetBindedMesh() != nullptr &&
-			mAnimation->Get()->GetBindedSkeletone() != nullptr)
+			mAnimation->IsValid())
 		{
 			sceneObject->Mesh = mAnimation->Get()->GetBindedMesh();
 			sceneObject->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
@@ -243,7 +243,6 @@ namespace JG
 			sceneObject->Mesh = mMesh->Get();
 			sceneObject->Flags = Graphics::ESceneObjectFlags::None;
 		}
-		
 		GetOwner()->SetPickingBoundingBox(sceneObject->Mesh->GetBoundingBox());
 
 

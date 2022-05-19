@@ -1,3 +1,4 @@
+#include "Asset.h"
 #include "pch.h"
 #include "Asset.h"
 #include "AssetManager.h"
@@ -9,6 +10,7 @@
 #include "Animation/AnimationClip.h"
 #include "Animation/AnimationController.h"
 #include "Animation/AnimationStateMachine.h"
+#include "Animation/AnimationBlendSpace1D.h"
 #include "AssetImporter.h"
 
 namespace JG
@@ -535,6 +537,48 @@ namespace JG
 			}
 		}
 	}
+
+	void AnimationBlendSpace1DStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+		jsonData->AddMember("Name", Name);
+		jsonData->AddMember("XParamName", XParamName);
+		jsonData->AddMember("ClipDataList", AnimClipDatas);
+		jsonData->AddMember("MinMaxValue", MinMaxValue);
+	}
+	void AnimationBlendSpace1DStock::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+		auto val = jsonData->GetMember("Name");
+		if (val != nullptr && val->IsString())
+		{
+			Name = val->GetString();
+		}
+		val = jsonData->GetMember("XParamName");
+		if (val != nullptr && val->IsString())
+		{
+			XParamName = val->GetString();
+		}
+		val = jsonData->GetMember("ClipDataList");
+		if (val != nullptr)
+		{
+			AnimClipDatas = val->GetIJsonDataList<AnimClipData>();
+		}
+		val = jsonData->GetMember("MinMaxValue");
+		if (val != nullptr)
+		{
+			MinMaxValue = val->GetVector2();
+		}
+	}
+
+	void AnimationBlendSpaceStock::MakeJson(SharedPtr<JsonData> jsonData) const
+	{
+
+	}
+	void AnimationBlendSpaceStock::LoadJson(SharedPtr<JsonData> jsonData)
+	{
+
+	}
+
+
 	void MaterialAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
 		jsonData->AddMember("Name", Name);
@@ -892,13 +936,10 @@ namespace JG
 
 
 
-	void AssetDataBase::RefreshAsset(AssetID originID, const String& reName)
+	void AssetDataBase::RefreshAsset(AssetID originID, bool originImmediate,  const String& reName)
 	{
 		if (originID.IsOrigin()== false) return;
-		if (mAssetDependencies.find(originID) == mAssetDependencies.end())
-		{
-			return;
-		}
+
 		if (reName.length() > 0)
 		{
 			RefreshAssetName(originID, reName);
@@ -912,13 +953,33 @@ namespace JG
 			assetLoadData->ID    = originAssetData->ID;
 			assetLoadData->Asset = originAssetData->Asset;
 			strcpy(assetLoadData->Path, (originAssetData->Asset->GetAssetFullPath()).c_str());
-			mLoadAssetDataQueue.push(assetLoadData);
 
+			if (originImmediate)
+			{
+				LoadAssetInternal(assetLoadData.get());
+				if (assetLoadData->OnComplete != nullptr)
+				{
+					AssetLoadCompeleteData data;
+					data.Asset = assetLoadData->Asset;
+					data.Stock = assetLoadData->Stock;
+					data.Json = assetLoadData->Json;
+					data.OnComplete = assetLoadData->OnComplete;
+					assetLoadData->OnComplete(&data);
+				}
+			}
+			else
+			{
+				mLoadAssetDataQueue.push(assetLoadData);
+			}
 		}
 
 
 
 		// Dependency Asset Update
+		if (mAssetDependencies.find(originID) == mAssetDependencies.end())
+		{
+			return;
+		}
 		auto& dependenciesSet = mAssetDependencies[originID];
 		List<AssetID> garbageAssetList;
 		for (auto& assetID : dependenciesSet)
@@ -940,6 +1001,7 @@ namespace JG
 			dependenciesSet.erase(garbage);
 		}
 	}
+
 	void AssetDataBase::RefreshAssetName(AssetID originID, const String& reName)
 	{
 	
@@ -1110,6 +1172,18 @@ namespace JG
 			else return false;
 			break;
 		}
+		case EAssetFormat::AnimationBlendSpace1D:
+		{
+			AnimationBlendSpace1DStock stock;
+			stock.LoadJson(assetVal);
+			auto aAsset = LoadData->Asset->As<Asset<AnimationBlendSpace1D>>();
+			if (aAsset != nullptr)
+			{
+				aAsset->mData->SetAnimationBlendSpace1DStock(stock);
+			}
+			else return false;
+		}
+			break;
 		case EAssetFormat::GameWorld:
 		default:
 			JG_LOG_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
@@ -1460,6 +1534,7 @@ namespace JG
 			return animAsset;
 		}
 		case EAssetFormat::Skeletal: return CreateSharedPtr<Asset<Skeletone>>(assetID, path, assetFormat);
+		case EAssetFormat::AnimationBlendSpace1D: return CreateSharedPtr<Asset<AnimationBlendSpace1D>>(assetID, path, assetFormat);
 		}
 
 
@@ -1598,11 +1673,4 @@ namespace JG
 		}
 		return assetFormat;
 	}
-
-
-
-
-
-
-
 }

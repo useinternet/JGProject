@@ -4,6 +4,7 @@
 #include "AnimationTransform.h"
 #include "AnimationTransition.h"
 #include "AnimationParameters.h"
+#include "AnimationBlendSpace1D.h"
 #include "AnimationClip.h"
 #include "Application.h"
 #include "Class/Asset/Asset.h"
@@ -59,6 +60,26 @@ namespace JG
 		if (makeAction != nullptr && pClipInfo != nullptr)
 		{
 			makeAction(pClipInfo.get());
+		}
+		return *this;
+	}
+	AnimationStateMachine& AnimationStateMachine::MakeAnimationBlendSpace1DNode(const String& name, const MakeAnimationBlendSpaceAction& makeAction)
+	{
+		if (mIsRunning) *this;
+		if (mIsMakingMachine == false)
+		{
+			return *this;
+		}
+		if (CreateNode(ENodeType::AnimationBlend1D, name) == false)
+		{
+			return *this;
+		}
+
+		const Node* node = FindNode(name);
+		SharedPtr<AnimationBlendSpace1DInfo> pBlendInfo = GetOwnerAnimationController()->FindAnimationBlendSpace1DInfo(name);
+		if (makeAction != nullptr && pBlendInfo != nullptr)
+		{
+			makeAction(pBlendInfo.get());
 		}
 		return *this;
 	}
@@ -141,19 +162,9 @@ namespace JG
 		u32 resultID = -1;
 		mNodeDic[name] = CreateUniquePtr<Node>();
 		Node& newNode = *(mNodeDic[name].get());
-		newNode.ID = -1;
 		newNode.NodeType = nodeType;
-		switch (nodeType)
-		{
-		case ENodeType::AnimationClip:
-			newNode.ID = mAnimClipNameList.size();
-			mAnimClipNameList.push_back(name);
-			break;
-		case ENodeType::AnimationBlend1D:
-			break;
-		case ENodeType::AnimationBlend2D:
-			break;
-		}
+		newNode.ID = mAnimNodeNameList.size();
+		mAnimNodeNameList.push_back(name);
 
 		return true;
 	}
@@ -178,25 +189,38 @@ namespace JG
 	bool AnimationStateMachine::GetKeyFrame(AnimationStateMachine::Node* node, const String& boneName, JVector3* T, JQuaternion* Q, JVector3* S, bool apply_transtioning)
 	{
 		AnimationController* animController = GetOwnerAnimationController();
+		SharedPtr<AnimationParameters> animParams = animController->GetAnimationParameters_Thread();
 		if (animController == nullptr)
 		{
 			return false;
 		}
+		String currentNodeName = FindNodeName(node);
+
 		switch (node->NodeType)
 		{
 		case ENodeType::AnimationClip:
 		{
-			String currentNodeName = FindNodeName(node);
+			
 			SharedPtr<AnimationClip>	 currentAnimClip	  = animController->FindAnimationClip(currentNodeName);
 			SharedPtr<AnimationClipInfo> currentAnimClipInfo  = animController->FindAnimationClipInfo(currentNodeName);
 
-			if (currentAnimClip->GetCurrentKeyFrame(boneName, currentAnimClipInfo->TimePos, T, Q, S) == false)
+			if (currentAnimClip->GetCurrentKeyFrame(boneName, *currentAnimClipInfo, T, Q, S) == false)
 			{
 				return false;
 			}
 		}
 		break;
 		case ENodeType::AnimationBlend1D:
+		{
+			SharedPtr<AnimationBlendSpace1D> currentBlendSpace1D = animController->FindAnimationBlendSpace1D(currentNodeName);
+			SharedPtr<AnimationBlendSpace1DInfo> currentBlendSpace1DInfo = animController->FindAnimationBlendSpace1DInfo(currentNodeName);
+			animParams->GetFloat(currentBlendSpace1D->GetXParamName(), &currentBlendSpace1DInfo->BlendValue);
+
+			if (currentBlendSpace1D->GetCurrentKeyFrame(boneName, *currentBlendSpace1DInfo, T, Q, S) == false)
+			{
+				return false;
+			}
+		}
 			break;
 		case ENodeType::AnimationBlend2D:
 			break;
@@ -246,9 +270,9 @@ namespace JG
 		switch (node->NodeType)
 		{
 		case ENodeType::AnimationClip:
-			return mAnimClipNameList[node->ID];
 		case ENodeType::AnimationBlend1D:
 		case ENodeType::AnimationBlend2D:
+			return mAnimNodeNameList[node->ID];
 		default:
 			return mBeginNodeName;
 		}
@@ -394,11 +418,26 @@ namespace JG
 			return;
 		}
 
-		//AnimationBlend1DInfo& _1dInfo = mAnimBlend1DInfoList[node->ID];
-		//for (const String& clipName : _1dInfo.ClipNameList)
-		//{
-		//	UpdateAnimationClipInfo_Thread(clipName);
-		//}
+		SharedPtr<AnimationBlendSpace1DInfo> animBlend1DInfo = animController->FindAnimationBlendSpace1DInfo(nodeName);
+		for (auto& _pair : animBlend1DInfo->AnimationClipInfoDic)
+		{
+			_pair.second->TimePos += tick * _pair.second->TickPerSecond * _pair.second->Speed * 10;
+			if (_pair.second->GetFlags() & EAnimationClipFlags::Repeat)
+			{
+				if (_pair.second->TimePos >= _pair.second->Duration)
+				{
+					_pair.second->Reset();
+				}
+			}
+		}
+		if (animBlend1DInfo->Duration > 0.0f)
+		{
+			animBlend1DInfo->TimePos += tick;
+			if (animBlend1DInfo->TimePos >= animBlend1DInfo->Duration)
+			{
+				animBlend1DInfo->Reset();
+			}
+		}
 	}
 
 	void AnimationStateMachine::UpdateAnimationBlend2DInfo_Thread(const String& nodeName)
@@ -497,6 +536,18 @@ namespace JG
 		}
 			break;
 		case ENodeType::AnimationBlend1D:
+		{
+			SharedPtr<AnimationBlendSpace1DInfo> blendSpaceInfo = animController->FindAnimationBlendSpace1DInfo(FindNodeName(node));
+			if (blendSpaceInfo != nullptr)
+			{
+				blendSpaceInfo->Reset();
+				for (auto _pair : blendSpaceInfo->AnimationClipInfoDic)
+				{
+					_pair.second->Reset();
+				}
+			}
+
+		}
 			break;
 		case ENodeType::AnimationBlend2D:
 			break;
@@ -533,7 +584,7 @@ namespace JG
 	{
 		Reset_Thread();
 		mNodeDic.clear();
-		mAnimClipNameList.clear();
+		mAnimNodeNameList.clear();
 		mBeginNodeName.clear();
 	}
 }

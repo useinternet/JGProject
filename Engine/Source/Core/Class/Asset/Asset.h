@@ -415,11 +415,57 @@ namespace JG
 	};
 
 	
-	class AnimationBlendSpace1DStock
+	class AnimationBlendSpace1DStock : public IAssetStock
 	{
+	public:
+		struct AnimClipData : public IJson
+		{
+			String Name;
+			String AssetPath;
+			f32    Value;
 
+
+			// IJson을(를) 통해 상속됨
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override {
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("AssetPath", AssetPath);
+				jsonData->AddMember("Value", Value);
+			}
+
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override {
+				Name = jsonData->GetMember("Name")->GetString();
+				AssetPath = jsonData->GetMember("AssetPath")->GetString();
+				Value = jsonData->GetMember("Value")->GetFloat();
+			}
+
+		};
+	public:
+		String Name;
+		String XParamName;
+		JVector2 MinMaxValue;
+		List<AnimClipData> AnimClipDatas;
+	public:
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	public:
+		virtual ~AnimationBlendSpace1DStock() = default;
+	public:
+		virtual EAssetFormat GetAssetFormat() const override {
+			return EAssetFormat::AnimationClip;
+		}
 	};
-
+	class AnimationBlendSpaceStock : public IAssetStock
+	{
+	public:
+		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
+		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;
+	public:
+		virtual ~AnimationBlendSpaceStock() = default;
+	public:
+		virtual EAssetFormat GetAssetFormat() const override {
+			return EAssetFormat::AnimationBlendSpace;
+		}
+	};
 
 	class MaterialAssetStock : public IAssetStock
 	{
@@ -719,7 +765,7 @@ namespace JG
 		}
 
 		void UnLoadAsset(AssetID id);
-		void RefreshAsset(AssetID originID, const String& reName = String());
+		void RefreshAsset(AssetID originID, bool originImmediate = false, const String& reName = String());
 		void RefreshAssetName(AssetID originID, const String& reName);
 	private:
 		AssetID RequestOriginAssetID();

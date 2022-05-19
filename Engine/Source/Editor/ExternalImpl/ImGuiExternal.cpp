@@ -378,7 +378,10 @@ namespace ImGui
 		});
 
 		ImGui::Columns(1);
-		JG::u64 hash = std::hash<JG::String>()(label);
+		
+
+		JG::u64 hash = std::hash<JG::String>()(label) ^ std::hash<ImGuiID>()(ImGui::GetCurrentWindow()->IDStack.back());
+	
 		if (isOpenContext)
 		{
 			JG::UIManager::GetInstance().OpenPopupUIView<JG::AssetFinderContextView>(JG::AssetFinderInitData(format), hash);

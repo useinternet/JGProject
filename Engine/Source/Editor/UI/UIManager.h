@@ -188,6 +188,7 @@ namespace JG
 			{
 				HashHelper::Combine(typeID, viewID);
 			}
+
 			if (view->GetViewID() == typeID && view->IsOpen() && view->GetPopupType() == EPopupType::Context)
 			{
 				bool result = pInterfaceView->OnGUI();

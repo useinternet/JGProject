@@ -68,22 +68,22 @@ namespace JG
 		return mTickPerSecond;
 	}
 
-	bool AnimationClip::GetCurrentKeyFrame(const String& nodeName, f32 timePos, JVector3* T, JQuaternion* Q, JVector3* S)
+	bool AnimationClip::GetCurrentKeyFrame(const String& nodeName, const AnimationClipInfo& clipInfo, JVector3* T, JQuaternion* Q, JVector3* S)
 	{
 		const AnimationNode* animNode = FindAnimationNode(nodeName);
 		if (animNode != nullptr)
 		{
 			if (T != nullptr)
 			{
-				*T = CalcLerpLocation(timePos, animNode);
+				*T = CalcLerpLocation(clipInfo.TimePos, animNode);
 			}
 			if (Q != nullptr)
 			{
-				*Q = CalcLerpRotation(timePos, animNode);
+				*Q = CalcLerpRotation(clipInfo.TimePos, animNode);
 			}
 			if (S != nullptr)
 			{
-				*S = CalcLerpScale(timePos, animNode);
+				*S = CalcLerpScale(clipInfo.TimePos, animNode);
 			}
 			return true;
 		}

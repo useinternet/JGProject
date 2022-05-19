@@ -224,7 +224,7 @@ namespace JG
 			}
 			else if (instance.Flags & Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS)
 			{
-				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer());
+				blas->Generate(context, instance.SubMesh->GetVertexBuffer(), instance.SubMesh->GetIndexBuffer(), false, true);
 			}
 
 			mSceneAS->AddInstance(blas, instance.Transform, instance.InstanceID, instance.HitGroupIndex, instance.InstanceMask);

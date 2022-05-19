@@ -24,7 +24,7 @@ namespace JG
 		JsonData(Json* json, bool isRoot = false) : mJson(json), mIsRoot(isRoot) {}
 		virtual ~JsonData() = default;
 	public:
-		SharedPtr<JsonData> CreateJsonData() const {
+		SharedPtr<JsonData> CreateJsonData() {
 			return CreateSharedPtr<JsonData>(mJson);
 		}
 		rapidjson::Document::AllocatorType& GetJsonAllocator();
@@ -44,6 +44,35 @@ namespace JG
 			}
 		
 			mValue.PushBack(value->mValue, GetJsonAllocator());
+		}
+		template<class T>
+		void AddMember(const T& value)
+		{
+			if (mJson == nullptr)
+			{
+				return;
+			}
+			auto jsonData = CreateSharedPtr<JsonData>(mJson);
+
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				static_cast<const IJson*>(&value)->MakeJson(jsonData);
+				mValue.PushBack(value->mValue, GetJsonAllocator());
+			}
+			else
+			{
+				JG_LOG_ERROR("{0} not IJson Class", JGTYPE(T).GetName());
+			}
+		}
+		template<class T>
+		void AddMemberList(const String& key, const List<T>& values)
+		{
+			SharedPtr<JsonData> listJson = CreateJsonData();
+			for (const T& val : values)
+			{
+				listJson->AddMember(val);
+			}
+			AddMember(key, listJson);
 		}
 	private:
 		template<class T>
@@ -109,7 +138,7 @@ namespace JG
 		f32  GetFloat() const { return mValue.GetFloat(); }
 		f64  GetDouble() const { return mValue.GetDouble(); }
 		String GetString() const { return mValue.GetString(); }
-		SharedPtr<JsonData> GetJsonDataFromIndex(i32 index) 
+		SharedPtr<JsonData> GetJsonDataFromIndex(i32 index)
 		{
 			auto cnt = (u64)mValue.Size();
 			if (cnt <= index)
@@ -299,6 +328,38 @@ namespace JG
 			}
 			return jbbox;
 		}
+		template<class T>
+		T GetIJsonData()
+		{
+			T value;
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				SharedPtr<JsonData> jsonData = CreateJsonData();
+				*jsonData = *this;
+				static_cast<IJson*>(&value)->LoadJson(jsonData);
+			}
+			return value;
+		}
+		template<class T>
+		List<T> GetIJsonDataList() 
+		{
+			List<T> values;
+			if (IsArray() == false)
+			{
+				return List<T>();
+			}
+
+			u64 cnt = GetSize();
+			for (u64 i = 0; i < cnt; ++i)
+			{
+				SharedPtr<JsonData> jsonData = GetJsonDataFromIndex(i);
+				if (jsonData == nullptr) continue;
+				values.push_back(jsonData->GetIJsonData<T>());
+			}
+
+			return values;
+		}
+
 	public:
 		void SetString(const String& str) {
 			mValue.SetString(str.c_str(), (rapidjson::SizeType)str.length(), GetJsonAllocator());
@@ -337,7 +398,6 @@ namespace JG
 		bool IsArray() const { return mValue.IsArray(); }
 	public:
 		SharedPtr<JsonData> GetMember(const String& key);
-		
 	public:
 		rapidjson::Value& GetValue() {
 			return mValue;
@@ -465,6 +525,7 @@ namespace JG
 			AddMember_Base(key, MakeJsonValue(value));
 		}
 	}
+
 
 
 	template<>

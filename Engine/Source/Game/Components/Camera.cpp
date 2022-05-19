@@ -43,8 +43,12 @@ namespace JG
 	void Camera::FixedLateUpdate()
 	{
 		GameComponent::FixedLateUpdate();
-		UpdateGraphicsScene();
-		Rendering();
+		if (smMainCamera == this)
+		{
+			UpdateGraphicsScene();
+			Rendering();
+
+		}
 
 	}
 	void Camera::Update()

@@ -7,6 +7,7 @@ namespace JG
 	class AnimationTransition;
 	class AnimationTransform;
 	class AnimationClipInfo;
+	class AnimationBlendSpace1DInfo;
 	class AnimationStateMachine;
 	class AnimationClip;
 	class ISubMesh;
@@ -16,6 +17,7 @@ namespace JG
 
 	using MakeAnimationSequenceAction = MakeAnimationAction<AnimationStateMachine>;
 	using MakeAnimationClipAction	  = MakeAnimationAction<AnimationClipInfo>;
+	using MakeAnimationBlendSpaceAction = MakeAnimationAction<AnimationBlendSpace1DInfo>;
 	using MakeTransitionAction		  = MakeAnimationAction<AnimationTransition>;
 
 
@@ -49,7 +51,8 @@ namespace JG
 
 
 
-		List<String> mAnimClipNameList;
+		List<String> mAnimNodeNameList;
+
 
 
 		String mBeginNodeName;
@@ -81,6 +84,7 @@ namespace JG
 
 		AnimationStateMachine& Begin(const String& startNodeName);
 		AnimationStateMachine& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
+		AnimationStateMachine& MakeAnimationBlendSpace1DNode(const String& name, const MakeAnimationBlendSpaceAction& makeAction);
 		AnimationStateMachine& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		void End();
 

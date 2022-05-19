@@ -19,6 +19,7 @@
 #include "UI/UIView/PrefabView.h"
 #include "UI/UIView/AnimationClipView.h"
 #include "UI/UIView/AnimationView.h"
+#include "UI/UIView/AnimationBlendSpace1DView.h"
 #include "UI/UIManager.h"
 namespace JG
 {
@@ -46,8 +47,11 @@ namespace JG
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Animiation/Animiation", 0, [&]() {
 			CreateAnimation(GetTargetDirectory());
-		}, nullptr);
 
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/Animiation/AnimationBlendSpace1D", 0, [&]() {
+			CreateAnimationBlendSpace1D(GetTargetDirectory());
+		}, nullptr);
 
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "CopyToPath", 20, [&]() {
 			CopyToPath();
@@ -861,6 +865,18 @@ namespace JG
 			}
 			break;
 		}
+		case EAssetFormat::AnimationBlendSpace1D:
+		{
+			u64 pathHash = std::hash<String>()(path);
+			AnimationBlendSpace1DView* animBlend1DView = UIManager::GetInstance().GetUIView<AnimationBlendSpace1DView>(pathHash);
+			if (animBlend1DView != nullptr)
+			{
+				animBlend1DView->SetAnimationBlendSpace1D(path);
+				animBlend1DView->Open();
+			}
+			break;
+		}
+			break;
 
 		}
 
@@ -1172,6 +1188,16 @@ namespace JG
 
 		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
 		AssetHelper::WriteAsset(EAssetFormat::Animation, path, nullptr);
+	}
+
+	void ContentsView::CreateAnimationBlendSpace1D(const String& targetDir)
+	{
+		auto path = PathHelper::CombinePath(targetDir, std::string("NewAnimationBlendSpace1D") + JG_ASSET_FORMAT);
+		path = PathHelper::GetUniqueFileName(path);
+
+
+		std::lock_guard<std::mutex> lock(mUpdateDirectoryMutex);
+		AssetHelper::WriteAsset(EAssetFormat::AnimationBlendSpace1D, path, nullptr);
 	}
 
 	void ContentsView::Rename(const String& path, const String& name)

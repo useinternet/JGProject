@@ -92,6 +92,12 @@ namespace JG
 		Repeat,
 	};
 
+	ENUM_FLAG(EAnimationBlendSpaceFlag)
+	enum class EAnimationBlendSpaceFlag
+	{
+		None,
+		Repeat,
+	};
 
 	enum class EAnimationClipState
 	{

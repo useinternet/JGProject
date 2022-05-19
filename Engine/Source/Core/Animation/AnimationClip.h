@@ -42,6 +42,10 @@ namespace JG
 		{
 			return Flags;
 		}
+		void SetFlags(EAnimationClipFlags clipFlags)
+		{
+			Flags = clipFlags;
+		}
 	};
 
 
@@ -74,7 +78,7 @@ namespace JG
 		f32 GetDuration() const;
 		f32 GetTickPerSecond() const;
 
-		bool GetCurrentKeyFrame(const String& nodeName, f32 timePos, JVector3* T, JQuaternion* Q, JVector3* S);
+		bool GetCurrentKeyFrame(const String& nodeName, const AnimationClipInfo& clipInfo, JVector3* T, JQuaternion* Q, JVector3* S);
 	private:
 		JVector3 CalcLerpLocation(f32 timePos, const AnimationNode* node);
 		JVector3 CalcLerpScale(f32 timePos, const AnimationNode* node);
