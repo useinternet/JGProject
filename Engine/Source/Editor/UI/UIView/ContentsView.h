@@ -147,6 +147,7 @@ namespace JG
 		void CreateSurfaceMaterial(const String& targetDir);
 		void CreateAnimation(const String& targetDir);
 		void CreateAnimationBlendSpace1D(const String& targetDir);
+		void CreateAnimationBlendSpace(const String& targetDir);
 		void Rename(const String& path, const String& name);
 		void CopyToPath();
 		void Copy();

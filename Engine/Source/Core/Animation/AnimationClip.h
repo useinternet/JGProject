@@ -15,10 +15,12 @@ namespace JG
 		friend class AnimationClip;
 		friend class AnimationStateMachine;
 		friend class AnimationController;
+		friend class AnimationBlendSpace1DInfo;
+		friend class AnimationBlendSpaceInfo;
 	private:
 		String Name;
-		f32    TimePos;
-		f32    Duration;
+		f32    TimePos = 0.0f;
+		f32    Duration = 0.0f;
 		f32    Speed = 1;
 		f32    TickPerSecond = 1.0f;
 		SharedPtr<AnimationClip> Clip;
@@ -29,14 +31,24 @@ namespace JG
 		{
 			TimePos = std::fmodf(TimePos, Duration);
 		}
+		void SetNormalizedTimePos(f32 normalizedTimePos) {
+			normalizedTimePos = Math::Clamp(normalizedTimePos, 0.0f, 1.0f);
+			TimePos = Duration * normalizedTimePos;
+		}
 		f32 GetNormalizedTimePos() const {
 			return TimePos / Duration;
 		}
 		f32 GetSpeed() const {
 			return Speed;
 		}
+		void SetSpeed(f32 speed) {
+			Speed = speed;
+		}
 		f32 GetDuration() const {
 			return Duration / 10 / TickPerSecond;
+		}
+		SharedPtr<AnimationClip> GetClip() const {
+			return Clip;
 		}
 		EAnimationClipFlags GetFlags() const
 		{
@@ -46,6 +58,8 @@ namespace JG
 		{
 			Flags = clipFlags;
 		}
+	private:
+		void Update(f32 tick, f32 multiplier = 1.0f);
 	};
 
 

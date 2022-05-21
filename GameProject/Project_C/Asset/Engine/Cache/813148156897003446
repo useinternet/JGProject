@@ -1,0 +1,20 @@
+{
+    "Main": [
+        {
+            "Name": "Root",
+            "NodeType": 0,
+            "Location": [
+                284.0,
+                166.0
+            ]
+        },
+        {
+            "Name": "BlendSpace1D",
+            "NodeType": 2,
+            "Location": [
+                588.0,
+                449.0
+            ]
+        }
+    ]
+}

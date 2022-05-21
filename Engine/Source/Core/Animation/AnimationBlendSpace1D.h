@@ -21,19 +21,26 @@ namespace JG
 		String Name;
 		f32 TimePos  = 0.0f;
 		f32 Duration = 0.0f;
-		f32 BlendValue = 0.0f;
 		EAnimationBlendSpace1DFlag Flags = EAnimationBlendSpace1DFlag::Repeat;
 		SharedPtr<AnimationBlendSpace1D> BlendSpace1D;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> AnimationClipInfoDic;
+
+		SharedPtr<AnimationClip> LeftAnimationClip;
+		SharedPtr<AnimationClipInfo> LeftAnimationClipInfo;
+		SharedPtr<AnimationClip> RightAnimationClip;
+		SharedPtr<AnimationClipInfo> RightAnimationClipInfo;
+		f32 BlendFactor = 0.0f;
 	public:
 		AnimationBlendSpace1DInfo(const String& name, SharedPtr<AnimationBlendSpace1D> blendSpace, EAnimationBlendSpace1DFlag flags);
 
 		void Reset();
 		f32  GetNormalizedTimePos() const;
+		f32  GetBlendFactor() const;
+		const AnimationClipInfo& GetLeftBlendingAnimationClipInfo() const;
+		const AnimationClipInfo& GetRightBlendingAnimationClipInfo() const;
+	private:
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name) const;
-		f32 GetBlendValue() const {
-			return BlendValue;
-		}
+		void Update(f32 tick, f32 currValue);
 	};
 
 
@@ -44,11 +51,14 @@ namespace JG
 		JVector2 mMinMaxValue;
 		Dictionary<String, f32>							 mAnimClipXParamValueDic;
 		Dictionary<String, SharedPtr<AnimationClip>>     mAnimationClipDIc;
+		Dictionary<String, f32> mAnimClipSpeedDic;
+
+
 
 	public:
-		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, f32 value);
+		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, f32 value, f32 speed);
 		bool GetCurrentKeyFrame(const String& nodeName, const AnimationBlendSpace1DInfo& blendInfo, JVector3* T, JQuaternion* Q, JVector3* S);
-
+		
 		
 		void SetXParamName(const String& paramData);
 		const String& GetXParamName() const;
@@ -63,6 +73,7 @@ namespace JG
 			return mMinMaxValue.y;
 		}
 
+		f32 GetAnimationClipSpeed(const String& name) const;
 
 
 		bool IsValid() const;
@@ -74,7 +85,7 @@ namespace JG
 
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 
-		f32 FindAnimationXParamValue(const String& name) const;
+		f32  FindAnimationXParamValue(const String& name) const;
 		void ForEach(const std::function<void(const String&,SharedPtr<AnimationClip>, f32)>& action);
 	public:
 		static SharedPtr<AnimationBlendSpace1D> Create(const String& name);

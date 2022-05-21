@@ -2,6 +2,16 @@
 #include "JGCore.h"
 #include "AnimationDefines.h"
 
+/*
+Animation Blend Space
+Skeletone Viewer
+Animation Bone Layer Weight, Mask
+
+
+// Layer 마다 Transform 계산 
+// 후 Weight로 곱해줌
+// Mask 지정 -> Mask에 해당하는 본은
+*/
 namespace JG
 {
 	// 언리얼에서 특징을 잘보자
@@ -21,20 +31,28 @@ namespace JG
 		String Name;
 		f32 TimePos = 0.0f;
 		f32 Duration = 0.0f;
-		f32 BlendXValue = 0.0f;
-		f32 BlendYValue = 0.0f;
 		EAnimationBlendSpaceFlag Flags = EAnimationBlendSpaceFlag::Repeat;
-		SharedPtr<AnimationBlendSpace> BlendSpace1D;
+		SharedPtr<AnimationBlendSpace> BlendSpace;
 		Dictionary<String, SharedPtr<AnimationClipInfo>> AnimationClipInfoDic;
+
+
+
+		SharedPtr<AnimationClipInfo> LeftTopAnimationClipInfo;
+		SharedPtr<AnimationClipInfo> LeftBottomAnimationClipInfo;
+		SharedPtr<AnimationClipInfo> RightTopAnimationClipInfo;
+		SharedPtr<AnimationClipInfo> RightBottomAnimationClipInfo;
+		f32 LTBBlendFactor = 0.0f;
+		f32 RTBBlendFactor = 0.0f;
+		f32 FinalBlendFactor = 0.0f;
+
 	public:
 		AnimationBlendSpaceInfo(const String& name, SharedPtr<AnimationBlendSpace> blendSpace, EAnimationBlendSpaceFlag flags);
 
 		void Reset();
 		f32  GetNormalizedTimePos() const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name) const;
-		JVector2 GetBlendValue() const {
-			return JVector2(BlendXValue, BlendYValue);
-		}
+	private:
+		void Update(f32 tick, const JVector2& blendValue);
 	};
 
 
@@ -48,12 +66,12 @@ namespace JG
 		JVector2Int mValueXYNumGrid;
 		Dictionary<String, JVector2>					mAnimClipParamValueDic;
 		Dictionary<String, SharedPtr<AnimationClip>>    mAnimationClipDIc;
-
+		Dictionary<String, f32>					        mAnimClipSpeedDic;
 	public:
-		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, f32 value);
+		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, const JVector2& value, f32 speed);
 		bool GetCurrentKeyFrame(const String& nodeName, const AnimationBlendSpaceInfo& blendInfo, JVector3* T, JQuaternion* Q, JVector3* S);
 
-
+		f32 GetAnimationClipSpeed(const String& name) const;
 		void SetXParamName(const String& paramName) {
 			mXParamName = paramName;
 		}

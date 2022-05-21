@@ -35,7 +35,7 @@ namespace JG
 		SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
 
 
-		if (mAnimBlendAsset != nullptr && mAnimBlendAsset->IsValid())
+		if (mAnimBlendAsset != nullptr)
 		{
 			AnimationBlendSpace1DStock stock;
 			AssetHelper::ReadAsset(EAssetFormat::AnimationBlendSpace1D, mAnimBlendAsset->GetAssetPath(), [&](SharedPtr<JsonData> jsonData)
@@ -49,6 +49,7 @@ namespace JG
 				data.Name = clipData.Name;
 				data.Asset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationClip>(clipData.AssetPath);
 				data.Value = clipData.Value;
+				data.Speed = clipData.Speed;
 				mBuildData.AnimClipDatas.push_back(data);
 			}
 			mBuildData.MinMaxValue = stock.MinMaxValue;
@@ -132,6 +133,7 @@ namespace JG
 			data.AssetPath = clipData.Asset->GetAssetPath();
 			data.Name      = clipData.Name;
 			data.Value     = clipData.Value;
+			data.Speed = clipData.Speed;
 			stock.AnimClipDatas.push_back(data);
 		}
 		stock.MinMaxValue = mBuildData.MinMaxValue;
@@ -169,7 +171,7 @@ namespace JG
 		{
 			mAnimController = CreateUniquePtr<AnimationController>();
 			mAnimController->GetAnimationParameters()->SetFloat(mAnimBlendAsset->Get()->GetXParamName(), 0.0f);
-			mAnimController->AddAnimationBlendSpace1D(BLEND_SPACE_NAME, mAnimBlendAsset->Get(), EAnimationBlendSpace1DFlag::Repeat);
+			mAnimController->AddAnimationBlendSpace1D(BLEND_SPACE_NAME, mAnimBlendAsset->Get(), EAnimationBlendSpace1DFlag::Repeat, true);
 			mAnimController->GetAnimationStateMachine()->
 				Begin("Start")
 				.MakeAnimationBlendSpace1DNode(BLEND_SPACE_NAME, nullptr)
@@ -197,7 +199,7 @@ namespace JG
 	}
 	void AnimationBlendSpace1DView::RightOnGUI()
 	{
-		ImGui::BeginChild("AnimationClipView_Inspector");
+		ImGui::BeginChild("AnimationBlendSpace1DView_Inspector");
 
 		f32 label_Space = ImGui::CalcTextSize("          ").x;
 
@@ -251,7 +253,7 @@ namespace JG
 
 		ImGui::Separator();
 		ImGui::Text("ParamName"); ImGui::SameLine();
-		String inputText;
+		String inputText = mBuildData.XParamName;
 		ImGui::SetNextItemWidth(150.0F);
 		ImGui::InputText("##X_ParamName_InputText", mBuildData.XParamName, inputText);
 		if (ImGui::IsItemDeactivated())
@@ -278,9 +280,6 @@ namespace JG
 			mBuildData.MinMaxValue.y = maxValue;
 		}
 		
-		
-
-
 
 		if (mAnimController != nullptr)
 		{
@@ -300,12 +299,14 @@ namespace JG
 		static f32 nameRowWidth = 120.0f;
 		static f32 assetFieldRowWidth = 200.0f;
 		static f32 valueRowWidth = 80.0f;
+		static f32 speedRowWidth = 80.0f;
 		static f32 buttonRowWidth = 40.0f;
 		// Animation Clip 추가
-		ImGui::BeginTable("AnimClipTable", 4, ImGuiTableFlags_BordersH);
+		ImGui::BeginTable("AnimClipTable", 5, ImGuiTableFlags_BordersH);
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, nameRowWidth);
 		ImGui::TableSetupColumn("AnimClip", ImGuiTableColumnFlags_WidthFixed, assetFieldRowWidth);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, valueRowWidth);
+		ImGui::TableSetupColumn("Speed", ImGuiTableColumnFlags_WidthFixed, speedRowWidth);
 		ImGui::TableSetupColumn("##Button", ImGuiTableColumnFlags_WidthFixed, buttonRowWidth);
 		ImGui::TableHeadersRow();
 		ImVec2 padding = ImGui::GetStyle().FramePadding;
@@ -337,9 +338,14 @@ namespace JG
 			// Value
 			ImGui::InputFloat("##InputFloat", &clipData.Value);
 
+			ImGui::TableNextColumn();
+			ImGui::SetNextItemWidth(speedRowWidth);
+			ImGui::InputFloat("##Speed_InputFloat", &clipData.Speed);
+
 
 			ImGui::TableNextColumn();
 			//삭제
+			
 			if (ImGui::Button("-", ImVec2(buttonRowWidth, 0.0f)) == true)
 			{
 				removeIndex = index;

@@ -18,7 +18,7 @@ namespace JG
 		BlendSpace1D->ForEach([&](const String& name, SharedPtr<AnimationClip> animClip,  f32 value)
 		{
 			AnimationClipInfoDic[name] = CreateSharedPtr<AnimationClipInfo>(name, animClip, EAnimationClipFlags::Repeat);
-
+			AnimationClipInfoDic[name]->SetSpeed(BlendSpace1D->GetAnimationClipSpeed(name));
 		});
 
 		bool isDurationDiff = false;
@@ -54,6 +54,18 @@ namespace JG
 		if (Duration == 0.0f) return 1.0f;
 		else return TimePos / Duration;
 	}
+	f32  AnimationBlendSpace1DInfo::GetBlendFactor() const
+	{
+		return BlendFactor;
+	}
+	const AnimationClipInfo& AnimationBlendSpace1DInfo::GetLeftBlendingAnimationClipInfo() const
+	{
+		return *LeftAnimationClipInfo;
+	}
+	const AnimationClipInfo& AnimationBlendSpace1DInfo::GetRightBlendingAnimationClipInfo() const
+	{
+		return *RightAnimationClipInfo;
+	}
 	SharedPtr<AnimationClipInfo> AnimationBlendSpace1DInfo::FindAnimationClipInfo(const String& name) const
 	{
 		if (AnimationClipInfoDic.find(name) == AnimationClipInfoDic.end())
@@ -63,32 +75,15 @@ namespace JG
 		return AnimationClipInfoDic.at(name);
 	}
 
-	void AnimationBlendSpace1D::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, f32 value)
+	void AnimationBlendSpace1DInfo::Update(f32 tick, f32 currValue)
 	{
-		if (FindAnimationClip(name) != nullptr)
-		{
-			return;
-		}
-
-		mAnimationClipDIc[name]		  = animationClip;
-		mAnimClipXParamValueDic[name] = value;
-	}
-
-	bool AnimationBlendSpace1D::GetCurrentKeyFrame(const String& nodeName, const AnimationBlendSpace1DInfo& blendInfo, JVector3* T, JQuaternion* Q, JVector3* S)
-	{
-		f32 currValue = blendInfo.BlendValue;
-
-		blendInfo.BlendSpace1D->GetXParamName();
-
-
-
 		String leftNodeName;
 		String rightNodeName;
 
 		f32 leftDist = JG_F32_MAX;
 		f32 rightDist = JG_F32_MAX;
 
-		ForEach([&](const String& name, SharedPtr<AnimationClip> animClip, f32 value)
+		BlendSpace1D->ForEach([&](const String& name, SharedPtr<AnimationClip> animClip, f32 value)
 		{
 			f32 dist = Math::Abs(currValue - value);
 			if (currValue >= value && dist < leftDist)
@@ -103,34 +98,112 @@ namespace JG
 			}
 		});
 
-		SharedPtr<AnimationClip>	 leftClip     = FindAnimationClip(leftNodeName);
-		SharedPtr<AnimationClipInfo> leftClipInfo = blendInfo.FindAnimationClipInfo(leftNodeName);
+		SharedPtr<AnimationClip>	 leftAnimClip = BlendSpace1D->FindAnimationClip(leftNodeName);
+		SharedPtr<AnimationClipInfo> leftAnimClipInfo = FindAnimationClipInfo(leftNodeName);
 
-		SharedPtr<AnimationClip>	 rightClip	   = FindAnimationClip(rightNodeName);
-		SharedPtr<AnimationClipInfo> rightClipInfo = blendInfo.FindAnimationClipInfo(rightNodeName);
-		if (rightClip == nullptr && rightClipInfo == nullptr)
+		SharedPtr<AnimationClip>	 rightAnimClip = BlendSpace1D->FindAnimationClip(rightNodeName);
+		SharedPtr<AnimationClipInfo> rightAnimClipInfo = FindAnimationClipInfo(rightNodeName);
+		if (rightAnimClip == nullptr && rightAnimClipInfo == nullptr)
 		{
-			rightClip    = leftClip;
-			rightClipInfo = leftClipInfo;
+			rightAnimClip = leftAnimClip;
+			rightAnimClipInfo = leftAnimClipInfo;
 		}
-		f32 factor = leftDist / (rightDist + leftDist);
+		if (leftAnimClip == nullptr && leftAnimClipInfo == nullptr)
+		{
+			leftAnimClip = rightAnimClip;
+			leftAnimClipInfo = rightAnimClipInfo;
+		}
+
+		if (leftAnimClip != LeftAnimationClip)
+		{
+			SharedPtr<AnimationClipInfo> prevAnimClipInfo = LeftAnimationClipInfo;
+
+			LeftAnimationClip     = leftAnimClip;
+			LeftAnimationClipInfo = leftAnimClipInfo;
+
+			if (prevAnimClipInfo != nullptr)
+			{
+				LeftAnimationClipInfo->SetNormalizedTimePos(prevAnimClipInfo->GetNormalizedTimePos());
+			}
+		}
+		if (rightAnimClip != RightAnimationClip)
+		{
+			SharedPtr<AnimationClipInfo> prevAnimClipInfo = RightAnimationClipInfo;
+
+			RightAnimationClip = rightAnimClip;
+			RightAnimationClipInfo = rightAnimClipInfo;
+			if (prevAnimClipInfo != nullptr)
+			{
+				RightAnimationClipInfo->SetNormalizedTimePos(prevAnimClipInfo->GetNormalizedTimePos());
+			}
+		}
+		BlendFactor = leftDist / (rightDist + leftDist);
+
+		f32 leftDuration  = LeftAnimationClipInfo->GetDuration() / LeftAnimationClipInfo->GetSpeed();
+		f32 rightDuration = RightAnimationClipInfo->GetDuration() / RightAnimationClipInfo->GetSpeed();
+
+		if (LeftAnimationClip != nullptr && RightAnimationClip != nullptr)
+		{
+			f32 a = 1.0f;
+			f32 b = leftDuration / rightDuration;
+			f32 leftTimePosFactor = Math::Lerp(a, b, BlendFactor);
+
+
+			a = rightDuration / leftDuration;
+			b = 1.0f;
+			f32 rightTimePosFactor = Math::Lerp(a, b, BlendFactor);
+		
+
+
+			LeftAnimationClipInfo->Update(tick, leftTimePosFactor);
+			if (LeftAnimationClipInfo != RightAnimationClipInfo)
+			{
+				RightAnimationClipInfo->Update(tick, rightTimePosFactor);
+			}
+			
+		}
+		if (Duration > 0.0f)
+		{
+			TimePos += tick;
+			if (TimePos >= Duration)
+			{
+				Reset();
+			}
+		}
+	}
+
+	void AnimationBlendSpace1D::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, f32 value, f32 speed)
+	{
+		if (FindAnimationClip(name) != nullptr)
+		{
+			return;
+		}
+
+		mAnimationClipDIc[name]		  = animationClip;
+		mAnimClipXParamValueDic[name] = value;
+		mAnimClipSpeedDic[name]		  = speed;
+	}
+
+	bool AnimationBlendSpace1D::GetCurrentKeyFrame(const String& nodeName, const AnimationBlendSpace1DInfo& blendInfo, JVector3* T, JQuaternion* Q, JVector3* S)
+	{
+		blendInfo.BlendSpace1D->GetXParamName();
 
 		JVector3 left_T; JQuaternion left_Q;
 		JVector3 left_S;
-		if (leftClip->GetCurrentKeyFrame(nodeName, *leftClipInfo, &left_T, &left_Q, &left_S) == false)
+		if (blendInfo.LeftAnimationClip->GetCurrentKeyFrame(nodeName, *blendInfo.LeftAnimationClipInfo, &left_T, &left_Q, &left_S) == false)
 		{
 			return false;
 		}
 		JVector3 right_T; JQuaternion right_Q;
 		JVector3 right_S;
-		if (rightClip->GetCurrentKeyFrame(nodeName, *rightClipInfo, &right_T, &right_Q, &right_S) == false)
+		if (blendInfo.RightAnimationClip->GetCurrentKeyFrame(nodeName, *blendInfo.RightAnimationClipInfo, &right_T, &right_Q, &right_S) == false)
 		{
 			return false;
 		}
 
-		if (T) *T = JVector3::Lerp(left_T, right_T, factor);
-		if (Q) *Q = JQuaternion::Slerp(left_Q, right_Q, factor);
-		if (S) *S = JVector3::Lerp(left_S, right_S, factor);
+		if (T) *T = JVector3::Lerp(left_T, right_T, blendInfo.BlendFactor);
+		if (Q) *Q = JQuaternion::Slerp(left_Q, right_Q, blendInfo.BlendFactor);
+		if (S) *S = JVector3::Lerp(left_S, right_S, blendInfo.BlendFactor);
 
 		return true;
 	}
@@ -145,6 +218,14 @@ namespace JG
 		return mXParamName;
 	}
 
+	f32 AnimationBlendSpace1D::GetAnimationClipSpeed(const String& name) const 
+	{
+		if (mAnimationClipDIc.find(name) == mAnimationClipDIc.end())
+		{
+			return 0.0f;
+		}
+		return mAnimClipSpeedDic.at(name);
+	}
 
 	bool AnimationBlendSpace1D::IsValid() const
 	{
@@ -169,6 +250,7 @@ namespace JG
 
 		SetName(stock.Name);
 		SetXParamName(stock.XParamName);
+		SetMinMaxValue(stock.MinMaxValue.x, stock.MinMaxValue.y);
 		for (const AnimationBlendSpace1DStock::AnimClipData& clipData : stock.AnimClipDatas)
 		{
 			SharedPtr<Asset<AnimationClip>> asset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationClip>(clipData.AssetPath);
@@ -177,7 +259,8 @@ namespace JG
 				continue;
 			}
 
-			AddAnimationClip(clipData.Name, asset->Get(), clipData.Value);
+			AddAnimationClip(clipData.Name, asset->Get(), clipData.Value, clipData.Speed);
+			
 		}
 
 	}

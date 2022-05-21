@@ -120,6 +120,8 @@ namespace JG
 
 			std::function<void(StateNode*)> mCreateContextMenuFunc;
 			std::function<void(StateNode*)> mShowContextMenuFunc;
+
+			List<jbyte> mUserData;
 		public:
 			StateNode();
 
@@ -137,10 +139,17 @@ namespace JG
 			}
 			List<StateNodeID> GetTransitionList() const;
 			StateNodeID GetTransition(StateNodeID id);
+
+			template<class T>
+			T GetUserData() const {
+				return *((T*)mUserData.data());
+			}
 		private:
 			void OnGUI();
 			void AddFlags(EStateNodeFlags flags);
 			u32 GetColor(EColorStyle style);
+
+
 		};
 
 
@@ -155,6 +164,12 @@ namespace JG
 			void SetInitLocation(const JVector2& location);
 			void SetNodeFlags(EStateNodeFlags flags);
 
+			template<class T>
+			void SetUserData(const T& userData) 
+			{
+				mNode.mUserData.resize(sizeof(T));
+				memcpy(mNode.mUserData.data(), &userData, sizeof(T));
+			}
 			void SetContextMenuFunc(const std::function<void(StateNode*)>& createFunc, const std::function<void(StateNode*)>& showFunc);
 		};
 

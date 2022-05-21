@@ -18,6 +18,15 @@ namespace JG
 		TickPerSecond = clip->GetTickPerSecond();
 	}
 
+	void AnimationClipInfo::Update(f32 tick, f32 multiplier)
+	{
+		TimePos += (tick * TickPerSecond * Speed * 10 * multiplier);
+		if (Flags & EAnimationClipFlags::Repeat)
+		{
+			Reset();
+		}
+	}
+
 	bool AnimationClip::IsValid() const
 	{
 		return mDuration > 0;
@@ -99,7 +108,10 @@ namespace JG
 		}
 		u32 LocationIndex = FindLocation(timePos, node);
 		u32 NextLocationIndex = (LocationIndex + 1);
-
+		if (NextLocationIndex == node->LocationTimes.size())
+		{
+			return node->LocationValues[LocationIndex];
+		}
 
 		f32 DeltaTime = node->LocationTimes[NextLocationIndex] - node->LocationTimes[LocationIndex];
 		f32 Factor = (timePos - node->LocationTimes[LocationIndex]) / DeltaTime;
@@ -123,7 +135,10 @@ namespace JG
 		}
 		u32 ScaleIndex = FindScale(timePos, node);
 		u32 NextScaleIndex = (ScaleIndex + 1);
-
+		if (NextScaleIndex == node->ScaleTimes.size())
+		{
+			return node->ScaleValues[ScaleIndex];
+		}
 
 		f32 DeltaTime = node->ScaleTimes[NextScaleIndex] - node->ScaleTimes[ScaleIndex];
 		f32 Factor = (timePos - node->ScaleTimes[ScaleIndex]) / DeltaTime;
@@ -148,7 +163,10 @@ namespace JG
 
 		u32 RotationIndex = FindRotation(timePos, node);
 		u32 NextRotationIndex = (RotationIndex + 1);
-
+		if (NextRotationIndex == node->RotationTimes.size())
+		{
+			return node->RotationValues[RotationIndex];
+		}
 
 		f32 DeltaTime = node->RotationTimes[NextRotationIndex] - node->RotationTimes[RotationIndex];
 		f32 Factor = (timePos - node->RotationTimes[RotationIndex]) / DeltaTime;
@@ -168,7 +186,7 @@ namespace JG
 				return i;
 			}
 		}
-		return 0;
+		return node->RotationTimes.size() - 1;
 	}
 	u32 AnimationClip::FindLocation(f32 timePos, const AnimationNode* node)
 	{
@@ -177,7 +195,7 @@ namespace JG
 				return i;
 			}
 		}
-		return 0;
+		return node->LocationTimes.size() - 1;
 	}
 	u32 AnimationClip::FindScale(f32 timePos, const AnimationNode* node)
 	{
@@ -186,7 +204,7 @@ namespace JG
 				return i;
 			}
 		}
-		return 0;
+		return node->ScaleTimes.size() - 1;
 	}
 	const AnimationClip::AnimationNode* AnimationClip::FindAnimationNode(const String& nodeName)
 	{

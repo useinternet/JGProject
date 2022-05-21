@@ -302,6 +302,8 @@ namespace JG
 
 	enum class EAnimationParameterType;
 	enum class EAnimationClipFlags;
+	enum class EAnimationBlendSpace1DFlag;
+	enum class EAnimationBlendSpaceFlag;
 	enum class EAnimationCondition;
 	class AnimationAssetStock : public IAssetStock
 	{
@@ -328,6 +330,10 @@ namespace JG
 		static const constexpr char* ANIM_CONDITION_NAME_KEY = "Name";
 		static const constexpr char* ANIM_CONDITION_TYPE_KEY = "Condition";
 		static const constexpr char* ANIM_CONDITION_DATA_KEY = "Data";
+
+
+		static const constexpr char* ANIM_BLENDSPACE1D_LIST_KEY = "AnimationBlendSpace1DList";
+		static const constexpr char* ANIM_BLENDSPACE_LIST_KEY   = "AnimationBlendSpaceList";
 	public:
 		struct ParameterData
 		{
@@ -340,6 +346,68 @@ namespace JG
 			String Name;
 			String AssetPath;
 			EAnimationClipFlags Flags;
+		};
+		struct AnimationBlendSpace1DInfo : public IJson
+		{
+			String Name;
+			String AssetPath;
+			EAnimationBlendSpace1DFlag Flags;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("AssetPath", AssetPath);
+				jsonData->AddMember("Flags", (u32)Flags);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("Name");
+				if (val != nullptr)
+				{
+					Name = val->GetString();
+				}
+				val = jsonData->GetMember("AssetPath");
+				if (val != nullptr)
+				{
+					AssetPath = val->GetString();
+				}
+				val = jsonData->GetMember("Flags");
+				if (val != nullptr)
+				{
+					Flags = (EAnimationBlendSpace1DFlag)val->GetUint32();
+				}
+			}
+		};
+		struct AnimationBlendSpaceInfo : public IJson
+		{
+			String Name;
+			String AssetPath;
+			EAnimationBlendSpaceFlag Flags;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("AssetPath", AssetPath);
+				jsonData->AddMember("Flags", (u32)Flags);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("Name");
+				if (val != nullptr)
+				{
+					Name = val->GetString();
+				}
+				val = jsonData->GetMember("AssetPath");
+				if (val != nullptr)
+				{
+					AssetPath = val->GetString();
+				}
+				val = jsonData->GetMember("Flags");
+				if (val != nullptr)
+				{
+					Flags = (EAnimationBlendSpaceFlag)val->GetUint32();
+				}
+			}
 		};
 		struct AnimationTransitionConditionInfo
 		{
@@ -356,6 +424,8 @@ namespace JG
 		};
 		String RootName;
 		List<AnimationClipInfo> AnimClips;
+		List<AnimationBlendSpace1DInfo> AnimBlendSpace1Ds;
+		List<AnimationBlendSpaceInfo>   AnimBlendSpaces;
 		Dictionary<String, ParameterData> Parameters;
 		List<AnimationTransitionInfo> TransitionInfos;
 	public:
@@ -422,20 +492,28 @@ namespace JG
 		{
 			String Name;
 			String AssetPath;
+			f32	   Speed;
 			f32    Value;
-
 
 			// IJson을(를) 통해 상속됨
 			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override {
 				jsonData->AddMember("Name", Name);
 				jsonData->AddMember("AssetPath", AssetPath);
 				jsonData->AddMember("Value", Value);
+				jsonData->AddMember("Speed", Speed);
 			}
 
 			virtual void LoadJson(SharedPtr<JsonData> jsonData) override {
 				Name = jsonData->GetMember("Name")->GetString();
 				AssetPath = jsonData->GetMember("AssetPath")->GetString();
 				Value = jsonData->GetMember("Value")->GetFloat();
+
+				SharedPtr<JsonData> val = jsonData->GetMember("Speed");
+				if (val)
+				{
+					Speed = val->GetFloat();
+				}
+				
 			}
 
 		};
@@ -456,6 +534,43 @@ namespace JG
 	};
 	class AnimationBlendSpaceStock : public IAssetStock
 	{
+	public:
+		struct AnimClipData : public IJson
+		{
+			String Name;
+			String AssetPath;
+			JVector2  Value;
+			f32 Speed = 1.0f;
+
+			// IJson을(를) 통해 상속됨
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override {
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("AssetPath", AssetPath);
+				jsonData->AddMember("Value", Value);
+				jsonData->AddMember("Speed", Speed);
+			}
+
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override {
+				Name = jsonData->GetMember("Name")->GetString();
+				AssetPath = jsonData->GetMember("AssetPath")->GetString();
+				Value = jsonData->GetMember("Value")->GetVector2();
+				SharedPtr<JsonData> val = jsonData->GetMember("Speed");
+				if (val)
+				{
+					Speed = val->GetFloat();
+				}
+			}
+		};
+
+
+		String Name;
+		String XParamName;
+		String YParamName;
+		JVector2 MinMaxXValue;
+		JVector2 MinMaxYValue;
+		JVector2Int ValueXYNumGrid;
+		List<AnimClipData> AnimClipDatas;
+
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;

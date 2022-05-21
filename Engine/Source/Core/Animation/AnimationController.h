@@ -18,6 +18,8 @@ namespace JG
 	class IReadBackBuffer;
 	class AnimationAssetStock;
 	class AnimationStateFlow;
+	class AnimationBlendSpace;
+	class AnimationBlendSpaceInfo;
 	namespace Compute
 	{
 		class AnimationSkinning;
@@ -42,6 +44,10 @@ namespace JG
 		Dictionary<String, SharedPtr<AnimationBlendSpace1D>>     mAnimBlendSpace1Ds;
 		Dictionary<String, SharedPtr<AnimationBlendSpace1DInfo>> mAnimBlendSpace1DInfos;
 
+
+		Dictionary<String, SharedPtr<AnimationBlendSpace>>     mAnimBlendSpaces;
+		Dictionary<String, SharedPtr<AnimationBlendSpaceInfo>> mAnimBlendSpaceInfos;
+
 		struct ClipCommandData
 		{
 			enum 
@@ -50,6 +56,8 @@ namespace JG
 				Command_AnimClip_Remove,
 				Command_BlendSpace1D_Add,
 				Command_BlendSpace1D_Remove,
+				Command_BlendSpace_Add,
+				Command_BlendSpace_Remove,
 			};
 			i32    Command;
 			String Name;
@@ -57,6 +65,9 @@ namespace JG
 			SharedPtr<AnimationClipInfo> ClipInfo;
 			SharedPtr<AnimationBlendSpace1D>     BlendSpace1D;
 			SharedPtr<AnimationBlendSpace1DInfo> BlendSpace1DInfo;
+
+			SharedPtr<AnimationBlendSpace>     BlendSpace;
+			SharedPtr<AnimationBlendSpaceInfo> BlendSpaceInfo;
 		};
 		
 
@@ -72,15 +83,18 @@ namespace JG
 		
 		void AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate = false);
 		void AddAnimationBlendSpace1D(const String& name, SharedPtr< AnimationBlendSpace1D> blendSpace1D, EAnimationBlendSpace1DFlag flags, bool immediate = false);
+		void AddAnimationBlendSpace(const String& name, SharedPtr<AnimationBlendSpace> blendSpace, EAnimationBlendSpaceFlag flags, bool immediate = false);
 		void RemoveAnimationClip(const String& name, bool immediate = false);
 		void RemoveBlendSpace1D(const String& name, bool immediate = false);
+		void RemoveBlendSpace(const String& name, bool immediate = false);
 		void BindSkeletone(SharedPtr<Skeletone> skeletone);
 		void BindMesh(SharedPtr<IMesh> mesh);
 		SharedPtr<AnimationClip>	 FindAnimationClip(const String& name) const;
 		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name);
 		SharedPtr<AnimationBlendSpace1D> FindAnimationBlendSpace1D(const String& name) const;
 		SharedPtr<AnimationBlendSpace1DInfo> FindAnimationBlendSpace1DInfo(const String& name) const;
-
+		SharedPtr<AnimationBlendSpace> FindAnimationBlendSpace(const String& name) const;
+		SharedPtr<AnimationBlendSpaceInfo> FindAnimationBlendSpaceInfo(const String& name) const;
 
 
 

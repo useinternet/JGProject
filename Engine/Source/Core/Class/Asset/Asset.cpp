@@ -11,6 +11,7 @@
 #include "Animation/AnimationController.h"
 #include "Animation/AnimationStateMachine.h"
 #include "Animation/AnimationBlendSpace1D.h"
+#include "Animation/AnimationBlendSpace.h"
 #include "AssetImporter.h"
 
 namespace JG
@@ -342,7 +343,8 @@ namespace JG
 			transListJson->AddMember(transJson);
 		}
 		jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, transListJson);
-
+		jsonData->AddMember(ANIM_BLENDSPACE1D_LIST_KEY, AnimBlendSpace1Ds);
+		jsonData->AddMember(ANIM_BLENDSPACE_LIST_KEY, AnimBlendSpaces);
 	}
 	void AnimationAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
@@ -425,6 +427,19 @@ namespace JG
 					TransitionInfos.push_back(transInfo);
 				}
 			}
+		}
+
+
+
+		val = jsonData->GetMember(ANIM_BLENDSPACE1D_LIST_KEY);
+		if (val != nullptr)
+		{
+			AnimBlendSpace1Ds = val->GetIJsonDataList<AnimationBlendSpace1DInfo>();
+		}
+		val = jsonData->GetMember(ANIM_BLENDSPACE_LIST_KEY);
+		if (val != nullptr)
+		{
+			AnimBlendSpaces = val->GetIJsonDataList<AnimationBlendSpaceInfo>();
 		}
 	}
 
@@ -571,10 +586,54 @@ namespace JG
 
 	void AnimationBlendSpaceStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-
+		jsonData->AddMember("Name", Name);
+		jsonData->AddMember("XParamName", XParamName);
+		jsonData->AddMember("YParamName", YParamName);
+		jsonData->AddMember("MinMaxXValue", MinMaxXValue);
+		jsonData->AddMember("MinMaxYValue", MinMaxYValue);
+		jsonData->AddMember("ValueXYNumGrid", ValueXYNumGrid);
+		jsonData->AddMember("ClipDataList", AnimClipDatas);
 	}
 	void AnimationBlendSpaceStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
+		auto val = jsonData->GetMember("Name");
+		if (val != nullptr && val->IsString())
+		{
+			Name = val->GetString();
+		}
+		val = jsonData->GetMember("XParamName");
+		if (val != nullptr && val->IsString())
+		{
+			XParamName = val->GetString();
+		}
+		val = jsonData->GetMember("YParamName");
+		if (val != nullptr && val->IsString())
+		{
+			YParamName = val->GetString();
+		}
+
+		val = jsonData->GetMember("MinMaxXValue");
+		if (val != nullptr)
+		{
+			MinMaxXValue = val->GetVector2();
+		}
+
+		val = jsonData->GetMember("MinMaxYValue");
+		if (val != nullptr)
+		{
+			MinMaxYValue = val->GetVector2();
+		}
+		val = jsonData->GetMember("ValueXYNumGrid");
+		if (val != nullptr)
+		{
+			ValueXYNumGrid = val->GetVector2Int();
+		}
+
+		val = jsonData->GetMember("ClipDataList");
+		if (val != nullptr)
+		{
+			AnimClipDatas = val->GetIJsonDataList<AnimClipData>();
+		}
 
 	}
 
@@ -1184,6 +1243,18 @@ namespace JG
 			else return false;
 		}
 			break;
+		case EAssetFormat::AnimationBlendSpace:
+		{
+			AnimationBlendSpaceStock stock;
+			stock.LoadJson(assetVal);
+			auto aAsset = LoadData->Asset->As<Asset<AnimationBlendSpace>>();
+			if (aAsset != nullptr)
+			{
+				aAsset->mData->SetAnimationBlendSpaceStock(stock);
+			}
+			else return false;
+		}
+			break;
 		case EAssetFormat::GameWorld:
 		default:
 			JG_LOG_ERROR("{0} AssetFormat is not supported in LoadAsset", (int)assetFormat);
@@ -1535,6 +1606,7 @@ namespace JG
 		}
 		case EAssetFormat::Skeletal: return CreateSharedPtr<Asset<Skeletone>>(assetID, path, assetFormat);
 		case EAssetFormat::AnimationBlendSpace1D: return CreateSharedPtr<Asset<AnimationBlendSpace1D>>(assetID, path, assetFormat);
+		case EAssetFormat::AnimationBlendSpace: return CreateSharedPtr<Asset<AnimationBlendSpace>>(assetID, path, assetFormat);
 		}
 
 

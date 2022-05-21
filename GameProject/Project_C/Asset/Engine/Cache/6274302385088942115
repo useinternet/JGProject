@@ -1,0 +1,12 @@
+{
+    "Main": [
+        {
+            "Name": "Root",
+            "NodeType": 0,
+            "Location": [
+                250.0,
+                100.0
+            ]
+        }
+    ]
+}

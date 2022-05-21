@@ -27,6 +27,7 @@ namespace JG
 			String Name;
 			SharedPtr<Asset<AnimationClip>> Asset;
 			f32 Value;
+			f32 Speed;
 		};
 		struct AnimationBlendSpace1DBuildData
 		{
@@ -36,7 +37,7 @@ namespace JG
 		};
 	private:
 		const JVector2 mSceneResolution = JVector2(350.0f, 450.0f);
-		const f32 mInspectorWidth = 490.0f;
+		const f32 mInspectorWidth = 570.0f;
 
 
 		SharedPtr<Graphics::StaticRenderObject> mSkyBox;

@@ -7,6 +7,8 @@
 #include "Animation/AnimationParameters.h"
 #include "Animation/AnimationTransition.h"
 #include "Animation/AnimationStateMachine.h"
+#include "Animation/AnimationBlendSpace.h"
+#include "Animation/AnimationBlendSpace1D.h"
 #include "ExternalImpl/JGImGui.h"
 #include "ExternalImpl/TextEditor.h"
 #include "Class/Asset/Asset.h"
@@ -41,7 +43,14 @@ namespace JG
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
 		{
 			CreateAnimationClipNode();
-			JG_LOG_INFO("Create Node");
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace1D", 0, [&]()
+		{
+			CreateAnimationBlendSpace1DNode();
+		}, nullptr);
+		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace", 0, [&]()
+		{
+			CreateAnimationBlendSpaceNode();
 		}, nullptr);
 
 		mBgColorByParamTypeDic[EAnimationParameterType::Bool]  = Color(0.8f, 0.1f, 0.1f, 1.0f);
@@ -52,162 +61,11 @@ namespace JG
 
 	void AnimationView::Initialize()
 	{
-		mNodeEditor = CreateUniquePtr<StateNodeGUI::StateNodeEditor>();
-		mNodeEditor->BindContextMenuFunc([&]()
-		{
-			UIManager::GetInstance().ShowContextMenu(GetType(), false);
-		});
-
-		mNodeEditor->BindCreateNodeCallBack([&](StateNodeGUI::StateNodeID id)
-		{
-			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(id);
-			mNodeLocationDic[id] = mNodeEditor->FindNode(id)->GetLocation();
-			mNodeNameDic[node->GetName()] = id;
-
-			mAnimClipBuildDataDic[id] = AnimClipBuildData();
-		});
-		mNodeEditor->BindReNameCallBack([&](StateNodeGUI::StateNodeID id, const String& oldName, const String& newName)
-		{
-			mNodeNameDic.erase(oldName);
-			mNodeNameDic[newName] = id;
-		});
-		mNodeEditor->BindDraggingNodeCallBack([&](StateNodeGUI::StateNodeID id)
-		{
-			mNodeLocationDic[id] = mNodeEditor->FindNode(id)->GetLocation();
-		});
-		mNodeEditor->BindLinkNodeCallBack(
-			[&](StateNodeGUI::StateNodeID fromID, StateNodeGUI::StateNodeID toID, StateNodeGUI::StateNodeID transID)
-		{
-			AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
-			buildData.From = fromID;
-			buildData.To = toID;
-		});
-		mNodeEditor->BindRemoveNodeCallBack([&](StateNodeGUI::StateNodeID id)
-		{
-			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(id);
-			if (node != nullptr)
-			{
-				mNodeNameDic.erase(node->GetName());
-			}
-			mAnimClipBuildDataDic.erase(id);
-			mNodeLocationDic.erase(id);
-		});
-		mNodeEditor->BindRemoveTransitionCallBack([&](StateNodeGUI::StateNodeID id)
-		{
-			mAnimTransitionBuildDataDic.erase(id);
-		});
-
-
+		InitNodeEditor();
 		SetMesh(mModelAssetPath.GetValue());
 		SetSkeletal(mSkeletoneAssetPath.GetValue());
 		SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
-
-		if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
-		{
-			// BuildData 최신화
-			AnimationAssetStock stock;
-			AssetHelper::ReadAsset(EAssetFormat::Animation, mAnimationAsset->GetAssetPath(), [&](SharedPtr<JsonData> jsonData)
-			{
-				stock.LoadJson(jsonData);
-			});
-
-			mAddedAnimParamNameSet.clear();
-			mAnimParamBuildDataList.clear();
-			Dictionary<String, EAnimationParameterType> paramTypeDic;
-			for (auto _pair : stock.Parameters)
-			{
-				const AnimationAssetStock::ParameterData& paramData = _pair.second;
-				AnimParamBuildData buildData;
-				buildData.Data = paramData.Data;
-				buildData.Type = paramData.Type;
-				buildData.Name = paramData.Name;
-				mAnimParamBuildDataList.push_back(buildData);
-				mAddedAnimParamNameSet.insert(buildData.Name);
-				paramTypeDic[buildData.Name] = buildData.Type;
-			}
-
-			// Node 생성
-			mNodeLocationDic.clear();
-			Dictionary<String, StateNodeGUI::StateNodeID> nodeIDDic;
-			SharedPtr<Json> json = Json::ToObject(mNodeSaveData.GetValue());
-			SharedPtr<JsonData> jsonMain = json->GetMember("Main");
-			if (jsonMain != nullptr && jsonMain->IsArray())
-			{
-				u32 nodeCnt = jsonMain->GetSize();
-				for (u32 i = 0; i < nodeCnt; ++i)
-				{
-					SharedPtr<JsonData> dataJson = jsonMain->GetJsonDataFromIndex(i);
-
-					String   name     = dataJson->GetMember("Name")->GetString();
-					JVector2 location = dataJson->GetMember("Location")->GetVector2();
-					StateNodeGUI::StateNodeBuilder nodeBuilder;
-					nodeBuilder.SetInitLocation(location);
-					nodeBuilder.SetName(name);
-					if (stock.RootName == name)
-					{
-						nodeBuilder.SetNodeFlags(
-							StateNodeGUI::EStateNodeFlags::No_Remove |
-							StateNodeGUI::EStateNodeFlags::No_ReName |
-							StateNodeGUI::EStateNodeFlags::RootNode);
-
-					}
-					nodeIDDic[name] = mNodeEditor->CreateNode(nodeBuilder);
-				}
-			}
-			if (nodeIDDic.find(stock.RootName) == nodeIDDic.end())
-			{
-				StateNodeGUI::StateNodeBuilder nodeBuilder;
-				nodeBuilder.SetInitLocation(JVector2(250, 100));
-				nodeBuilder.SetName("Root");
-				nodeBuilder.SetNodeFlags(
-					StateNodeGUI::EStateNodeFlags::No_Remove |
-					StateNodeGUI::EStateNodeFlags::No_ReName |
-					StateNodeGUI::EStateNodeFlags::RootNode);
-				nodeIDDic["Root"] = mNodeEditor->CreateNode(nodeBuilder);
-			}
-			for (const AnimationAssetStock::AnimationClipInfo& clipInfo : stock.AnimClips)
-			{
-				if (nodeIDDic.find(clipInfo.Name) == nodeIDDic.end())
-				{
-					StateNodeGUI::StateNodeBuilder nodeBuilder;
-					nodeBuilder.SetInitLocation(JVector2(100.0,100.0f));
-					nodeBuilder.SetName(clipInfo.Name);
-					nodeIDDic[clipInfo.Name] = mNodeEditor->CreateNode(nodeBuilder);
-				}
-
-
-				AnimClipBuildData buildData;
-				buildData.ID    = nodeIDDic[clipInfo.Name];
-				buildData.Flags = clipInfo.Flags;
-				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(clipInfo.AssetPath);
-				mAnimClipBuildDataDic[nodeIDDic[clipInfo.Name]] = buildData;
-			}
-			// Node 연결
-			for (const AnimationAssetStock::AnimationTransitionInfo& linkInfo : stock.TransitionInfos)
-			{
-				StateNodeGUI::StateNodeID fromID = nodeIDDic[linkInfo.PrevName];
-				StateNodeGUI::StateNodeID toID = nodeIDDic[linkInfo.NextName];
-
-				mNodeEditor->Link(fromID, toID);
-
-				StateNodeGUI::StateNode* fromNode = mNodeEditor->FindNode(fromID);
-				StateNodeGUI::StateNodeID transID = fromNode->GetTransition(toID);
-				if (transID == 0) continue;
-
-				AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
-				buildData.TransitionDuration = linkInfo.TransitionDuration;
-				for (const AnimationAssetStock::AnimationTransitionConditionInfo& transInfo : linkInfo.Transitions)
-				{
-					AnimTransitionConditionBuildData condBuildData;
-					condBuildData.ParamName = transInfo.ParameterName;
-					condBuildData.Data = transInfo.Data;
-					condBuildData.Condition = transInfo.Condition;
-					condBuildData.Type = paramTypeDic[condBuildData.ParamName];
-
-					buildData.Conditions.push_back(condBuildData);
-				}
-			}
-		}
+		InitBuildData();
 	}
 
 	void AnimationView::OnGUI()
@@ -230,7 +88,8 @@ namespace JG
 	void AnimationView::Destroy()
 	{
 		SaveNodeLocation();
-
+		mAnimBlendSpace1DBuildDataDic.clear();
+		mAnimBlendSpaceBuildDataDic.clear();
 		mAnimClipBuildDataDic.clear();
 		mAnimTransitionBuildDataDic.clear();
 		mAnimParamBuildDataList.clear();
@@ -276,11 +135,193 @@ namespace JG
 		mTransitionConditionEditMode = EEditMode::Default;
 		mAnimState					 = EAnimState::Editable;
 	}
-
-	void AnimationView::OnEvent(IEvent& e)
+	void AnimationView::InitNodeEditor()
 	{
+		mNodeEditor = CreateUniquePtr<StateNodeGUI::StateNodeEditor>();
+		mNodeEditor->BindContextMenuFunc([&]()
+		{
+			UIManager::GetInstance().ShowContextMenu(GetType(), false);
+		});
+
+		mNodeEditor->BindCreateNodeCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(id);
+			mNodeLocationDic[id] = mNodeEditor->FindNode(id)->GetLocation();
+			mNodeNameDic[node->GetName()] = id;
 
 
+			switch (node->GetUserData<ENodeType>())
+			{
+			case ENodeType::AnimationClip:
+				mAnimClipBuildDataDic[id] = AnimClipBuildData();
+				break;
+			case ENodeType::AnimationBlendSpace1D:
+				mAnimBlendSpace1DBuildDataDic[id] = AnimBlendSpace1DBuildData();
+				break;
+			case ENodeType::AnimationBlendSpace:
+				mAnimBlendSpaceBuildDataDic[id] = AnimBlendSpaceBuildData();
+				break;
+			}
+
+
+		});
+		mNodeEditor->BindReNameCallBack([&](StateNodeGUI::StateNodeID id, const String& oldName, const String& newName)
+		{
+			mNodeNameDic.erase(oldName);
+			mNodeNameDic[newName] = id;
+		});
+		mNodeEditor->BindDraggingNodeCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			mNodeLocationDic[id] = mNodeEditor->FindNode(id)->GetLocation();
+		});
+		mNodeEditor->BindLinkNodeCallBack(
+			[&](StateNodeGUI::StateNodeID fromID, StateNodeGUI::StateNodeID toID, StateNodeGUI::StateNodeID transID)
+		{
+			AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
+			buildData.From = fromID;
+			buildData.To = toID;
+		});
+		mNodeEditor->BindRemoveNodeCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(id);
+			if (node != nullptr)
+			{
+				mNodeNameDic.erase(node->GetName());
+			}
+			switch (node->GetUserData<ENodeType>())
+			{
+			case ENodeType::AnimationClip:
+				mAnimClipBuildDataDic.erase(id);
+				break;
+			case ENodeType::AnimationBlendSpace1D:
+				mAnimBlendSpace1DBuildDataDic.erase(id);
+				break;
+			case ENodeType::AnimationBlendSpace:
+				mAnimBlendSpaceBuildDataDic.erase(id);
+				break;
+			}
+
+
+			mNodeLocationDic.erase(id);
+		});
+		mNodeEditor->BindRemoveTransitionCallBack([&](StateNodeGUI::StateNodeID id)
+		{
+			mAnimTransitionBuildDataDic.erase(id);
+		});
+	}
+	void AnimationView::InitBuildData()
+	{
+		if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
+		{
+			AnimationAssetStock stock;
+			AssetHelper::ReadAsset(EAssetFormat::Animation, mAnimationAsset->GetAssetPath(), [&](SharedPtr<JsonData> jsonData)
+			{
+				stock.LoadJson(jsonData);
+			});
+
+			mAddedAnimParamNameSet.clear();
+			mAnimParamBuildDataList.clear();
+			Dictionary<String, EAnimationParameterType> paramTypeDic;
+			for (auto _pair : stock.Parameters)
+			{
+				const AnimationAssetStock::ParameterData& paramData = _pair.second;
+				AnimParamBuildData buildData;
+				buildData.Data = paramData.Data;
+				buildData.Type = paramData.Type;
+				buildData.Name = paramData.Name;
+				mAnimParamBuildDataList.push_back(buildData);
+				mAddedAnimParamNameSet.insert(buildData.Name);
+				paramTypeDic[buildData.Name] = buildData.Type;
+			}
+
+			// Node 생성
+			mNodeLocationDic.clear();
+			Dictionary<String, StateNodeGUI::StateNodeID> nodeIDDic;
+			SharedPtr<Json> json = Json::ToObject(mNodeSaveData.GetValue());
+			SharedPtr<JsonData> jsonMain = json->GetMember("Main");
+			if (jsonMain != nullptr && jsonMain->IsArray())
+			{
+				u32 nodeCnt = jsonMain->GetSize();
+				for (u32 i = 0; i < nodeCnt; ++i)
+				{
+					SharedPtr<JsonData> dataJson = jsonMain->GetJsonDataFromIndex(i);
+
+					String   name     = dataJson->GetMember("Name")->GetString();
+					JVector2 location = dataJson->GetMember("Location")->GetVector2();
+					ENodeType type = (ENodeType)dataJson->GetMember("NodeType")->GetUint32();
+				
+					nodeIDDic[name] = CreateNode(type, location);
+				}
+			}
+			if (nodeIDDic.find(stock.RootName) == nodeIDDic.end())
+			{
+				CreateRootNode();
+			}
+			for (const AnimationAssetStock::AnimationClipInfo& clipInfo : stock.AnimClips)
+			{
+				if (nodeIDDic.find(clipInfo.Name) == nodeIDDic.end())
+				{
+					nodeIDDic[clipInfo.Name] = CreateNode(ENodeType::AnimationClip, JVector2(100.0, 100.0f));
+				}
+
+
+				AnimClipBuildData buildData;
+				buildData.ID = nodeIDDic[clipInfo.Name];
+				buildData.Flags = clipInfo.Flags;
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(clipInfo.AssetPath);
+				mAnimClipBuildDataDic[nodeIDDic[clipInfo.Name]] = buildData;
+			}
+			for (const AnimationAssetStock::AnimationBlendSpace1DInfo& blendSpaceInfo : stock.AnimBlendSpace1Ds)
+			{
+				if (nodeIDDic.find(blendSpaceInfo.Name) == nodeIDDic.end())
+				{
+					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace1D, JVector2(100.0, 100.0f));
+				}
+				AnimBlendSpace1DBuildData buildData;
+				buildData.ID = nodeIDDic[blendSpaceInfo.Name];
+				buildData.Flags = blendSpaceInfo.Flags;
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationBlendSpace1D>(blendSpaceInfo.AssetPath);
+				mAnimBlendSpace1DBuildDataDic[nodeIDDic[blendSpaceInfo.Name]] = buildData;
+			}
+			for (const AnimationAssetStock::AnimationBlendSpaceInfo& blendSpaceInfo : stock.AnimBlendSpaces)
+			{
+				if (nodeIDDic.find(blendSpaceInfo.Name) == nodeIDDic.end())
+				{
+					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace, JVector2(100.0, 100.0f));
+				}
+
+				AnimBlendSpaceBuildData buildData;
+				buildData.ID = nodeIDDic[blendSpaceInfo.Name];
+				buildData.Flags = blendSpaceInfo.Flags;
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationBlendSpace>(blendSpaceInfo.AssetPath);
+				mAnimBlendSpaceBuildDataDic[nodeIDDic[blendSpaceInfo.Name]] = buildData;
+			}
+			// Node 연결
+			for (const AnimationAssetStock::AnimationTransitionInfo& linkInfo : stock.TransitionInfos)
+			{
+				StateNodeGUI::StateNodeID fromID = nodeIDDic[linkInfo.PrevName];
+				StateNodeGUI::StateNodeID toID = nodeIDDic[linkInfo.NextName];
+
+				mNodeEditor->Link(fromID, toID);
+
+				StateNodeGUI::StateNode* fromNode = mNodeEditor->FindNode(fromID);
+				StateNodeGUI::StateNodeID transID = fromNode->GetTransition(toID);
+				if (transID == 0) continue;
+
+				AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
+				buildData.TransitionDuration = linkInfo.TransitionDuration;
+				for (const AnimationAssetStock::AnimationTransitionConditionInfo& transInfo : linkInfo.Transitions)
+				{
+					AnimTransitionConditionBuildData condBuildData;
+					condBuildData.ParamName = transInfo.ParameterName;
+					condBuildData.Data = transInfo.Data;
+					condBuildData.Condition = transInfo.Condition;
+					condBuildData.Type = paramTypeDic[condBuildData.ParamName];
+
+					buildData.Conditions.push_back(condBuildData);
+				}
+			}
+		}
 	}
 	void AnimationView::AnimationScene_OnGUI()
 	{
@@ -359,16 +400,24 @@ namespace JG
 		StateNodeGUI::StateNode* node = mNodeEditor->FindNode(selectedNodeID);
 		if (node != nullptr)
 		{
-			if (node->GetFlags() & StateNodeGUI::EStateNodeFlags::RootNode)
+			switch (node->GetUserData<ENodeType>())
 			{
+			case ENodeType::Root:
 				ImGui::Text("Root Node");
-			}
-			else
-			{
+				break;
+			case ENodeType::AnimationClip:
 				mAnimClipBuildDataDic[selectedNodeID].ID = selectedNodeID;
 				AnimationClip_OnGUI(mAnimClipBuildDataDic[selectedNodeID]);
+				break;
+			case ENodeType::AnimationBlendSpace1D:
+				mAnimBlendSpace1DBuildDataDic[selectedNodeID].ID = selectedNodeID;
+				AnimationBlendSpace1D_OnGUI(mAnimBlendSpace1DBuildDataDic[selectedNodeID]);
+				break;
+			case ENodeType::AnimationBlendSpace:
+				mAnimBlendSpaceBuildDataDic[selectedNodeID].ID = selectedNodeID;
+				AnimationBlendSpace_OnGUI(mAnimBlendSpaceBuildDataDic[selectedNodeID]);
+				break;
 			}
-			
 		}
 		else if (mNodeEditor->FindNodeTransition(selectedNodeID) != nullptr)
 		{
@@ -921,9 +970,13 @@ namespace JG
 		break;
 		}
 	}
+	void AnimationView::AnimationRoot_OnGUI()
+	{
+	}
 	void AnimationView::AnimationClip_OnGUI(AnimClipBuildData& buildData)
 	{
 		ImGui::PushID(buildData.ID);
+		ImGui::Text("AnimationClip");
 		ImGui::Text("Name : NodeName");
 		ImGui::Spacing();
 		ImGui::AlignTextToFramePadding();
@@ -951,7 +1004,84 @@ namespace JG
 
 		ImGui::PopID();
 	}
-	void AnimationView::CreateRootNode()
+	void AnimationView::AnimationBlendSpace1D_OnGUI(AnimBlendSpace1DBuildData& buildData)
+	{
+		ImGui::PushID(buildData.ID);
+		ImGui::Text("AnimationBlendSpace1D");
+		ImGui::Spacing();
+		ImGui::AlignTextToFramePadding();
+
+		f32 label_Space = ImGui::CalcTextSize("         ").x;
+		StateNodeGUI::StateNode* node = mNodeEditor->FindNode(buildData.ID);
+
+
+		ImGui::AssetField_OnGUI("Asset", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
+			EAssetFormat::AnimationBlendSpace1D, [&](const String& assetPath)
+		{
+			if (IsEditable())
+			{
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationBlendSpace1D>(assetPath);
+			}
+
+		}, label_Space);
+		ImGui::Separator();
+		if (buildData.Asset != nullptr && buildData.Asset->IsValid())
+		{
+			ImGui::Text("Param Name : %s", buildData.Asset->Get()->GetXParamName().c_str());
+			ImGui::Text("Value :  %3.f  ~  %3.f", buildData.Asset->Get()->GetMinValue(), buildData.Asset->Get()->GetMaxValue());
+
+			if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
+			{
+				SharedPtr<AnimationBlendSpace1DInfo> blendSpace1DInfo = mAnimationAsset->Get()->FindAnimationBlendSpace1DInfo(node->GetName());
+			}
+		}
+
+
+
+
+
+		ImGui::PopID();
+	}
+	void AnimationView::AnimationBlendSpace_OnGUI(AnimBlendSpaceBuildData& buildData)
+	{
+		ImGui::PushID(buildData.ID);
+		ImGui::Text("AnimationBlendSpace");
+		ImGui::Text("Name : NodeName");
+		ImGui::Spacing();
+		ImGui::AlignTextToFramePadding();
+
+		f32 label_Space = ImGui::CalcTextSize("         ").x;
+
+		ImGui::AssetField_OnGUI("AnimationClip", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
+			EAssetFormat::AnimationBlendSpace, [&](const String& assetPath)
+		{
+			if (IsEditable())
+			{
+				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationBlendSpace>(assetPath);
+			}
+
+		}, label_Space);
+
+		ImGui::PopID();
+	}
+	StateNodeGUI::StateNodeID AnimationView::CreateNode(ENodeType nodeType, const JVector2& initPos)
+	{
+		switch (nodeType)
+		{
+		case ENodeType::Root:
+			return CreateRootNode();
+		case ENodeType::AnimationClip:
+			return CreateAnimationClipNode(initPos);
+		case ENodeType::AnimationBlendSpace1D:
+			return CreateAnimationBlendSpace1DNode(initPos);
+		case ENodeType::AnimationBlendSpace:
+			return CreateAnimationBlendSpaceNode(initPos);
+		default:
+			return 0;
+		}
+
+	}
+	StateNodeGUI::StateNodeID AnimationView::CreateRootNode()
 	{
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		nodeBuilder.SetInitLocation(JVector2(250, 100));
@@ -960,20 +1090,72 @@ namespace JG
 			StateNodeGUI::EStateNodeFlags::No_Remove | 
 			StateNodeGUI::EStateNodeFlags::No_ReName | 
 			StateNodeGUI::EStateNodeFlags::RootNode);
-		mNodeEditor->CreateNode(nodeBuilder);
+		nodeBuilder.SetUserData<ENodeType>(ENodeType::Root);
+		return mNodeEditor->CreateNode(nodeBuilder);
 	}
 
-	void AnimationView::CreateAnimationClipNode()
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationClipNode(const JVector2& initPos)
 	{
-		JVector2 offset = mNodeEditor->GetOffset();
-		ImVec2 mousePos = ImGui::GetMousePos();
-		JVector2 winPos = mNodeEditor->GetWindowPos();
-		StateNodeGUI::StateNodeBuilder nodeBuilder;
-		nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
-		nodeBuilder.SetName("AnimationClip");
-		mNodeEditor->CreateNode(nodeBuilder);
-	}
 
+		StateNodeGUI::StateNodeBuilder nodeBuilder;
+		JVector2 offset = mNodeEditor->GetOffset();
+
+		if (initPos.x == JG_F32_MAX || initPos.y == JG_F32_MAX)
+		{
+			ImVec2 mousePos = ImGui::GetMousePos();
+			JVector2 winPos = mNodeEditor->GetWindowPos();
+			nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
+		}
+		else
+		{
+			nodeBuilder.SetInitLocation(initPos - offset);
+		}
+		
+		nodeBuilder.SetName("AnimationClip");
+		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationClip);
+		return mNodeEditor->CreateNode(nodeBuilder);
+	}
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpace1DNode(const JVector2& initPos)
+	{
+		StateNodeGUI::StateNodeBuilder nodeBuilder;
+		JVector2 offset = mNodeEditor->GetOffset();
+
+		if (initPos.x == JG_F32_MAX || initPos.y == JG_F32_MAX)
+		{
+			ImVec2 mousePos = ImGui::GetMousePos();
+			JVector2 winPos = mNodeEditor->GetWindowPos();
+			nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
+		}
+		else
+		{
+			nodeBuilder.SetInitLocation(initPos - offset);
+		}
+		nodeBuilder.SetNodeColor(Color(0.1F, 1.0F, 0.1F, 0.2F));
+		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationBlendSpace1D);
+		nodeBuilder.SetName("BlendSpace1D");
+		return mNodeEditor->CreateNode(nodeBuilder);
+	}
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpaceNode(const JVector2& initPos)
+	{
+		StateNodeGUI::StateNodeBuilder nodeBuilder;
+		JVector2 offset = mNodeEditor->GetOffset();
+
+		if (initPos.x == JG_F32_MAX || initPos.y == JG_F32_MAX)
+		{
+			ImVec2 mousePos = ImGui::GetMousePos();
+			JVector2 winPos = mNodeEditor->GetWindowPos();
+			nodeBuilder.SetInitLocation(JVector2(mousePos.x - winPos.x, mousePos.y - winPos.y) - offset);
+		}
+		else
+		{
+			nodeBuilder.SetInitLocation(initPos - offset);
+		}
+		
+		nodeBuilder.SetNodeColor(Color(1.0F,0.1F,0.1F,0.2F));
+		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationBlendSpace);
+		nodeBuilder.SetName("BlendSpace1D");
+		return mNodeEditor->CreateNode(nodeBuilder);
+	}
 	void AnimationView::UpdateScene()
 	{
 		static const JVector3 EyePos = JVector3(0, 100.0f, -200.0f);
@@ -992,7 +1174,7 @@ namespace JG
 		if (mModel == nullptr)
 		{
 			mModel = CreateSharedPtr<Graphics::StaticRenderObject>();
-			mModel->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
+			
 		}
 
 		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
@@ -1010,8 +1192,12 @@ namespace JG
 			{
 				mAnimationAsset->Get()->BindMesh(mMeshAsset->Get());
 				mModel->Mesh = mAnimationAsset->Get()->GetBindedMesh();
+				mModel->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
 			}
-			else mModel->Mesh = mMeshAsset->Get();
+			else {
+				mModel->Mesh = mMeshAsset->Get();
+				mModel->Flags = Graphics::ESceneObjectFlags::None;
+			}
 		}
 		if (mSkeletoneAsset != nullptr && mSkeletoneAsset->IsValid())
 		{
@@ -1099,10 +1285,8 @@ namespace JG
 	{
 		AnimationAssetStock assetStock;
 		StateNodeGUI::StateNodeLinkInfo nodeLinkInfo = mNodeEditor->GetNodeLinkInfo();
-		// Animation Parameter 설정
 		for (const AnimParamBuildData& buildData : mAnimParamBuildDataList)
 		{
-			//bool isSuccess = false;
 			AnimationAssetStock::ParameterData& paramData = assetStock.Parameters[buildData.Name];
 			paramData.Name = buildData.Name;
 			paramData.Type = buildData.Type;
@@ -1139,7 +1323,63 @@ namespace JG
 			cachedNodeName.insert(node->GetName());
 			assetStock.AnimClips.push_back(clipInfo);
 		}
-	
+		for (auto _pair : mAnimBlendSpace1DBuildDataDic)
+		{
+			if (_pair.first == nodeLinkInfo.RootNodeID) continue;
+
+			SharedPtr<Asset<AnimationBlendSpace1D>> blendAsset = _pair.second.Asset;
+			if (blendAsset == nullptr || blendAsset->IsValid() == false)
+			{
+				JG_LOG_ERROR("AnimationBlendSpace1D's Asset is Null -> Node ID :  {0}", _pair.first);
+				return false;
+			}
+			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(_pair.first);
+			if (node == nullptr)
+			{
+				JG_LOG_ERROR("Can't Find StateNode In NodeEditor: {0}", _pair.first);
+				return false;
+			}
+			if (cachedNodeName.find(node->GetName()) != cachedNodeName.end())
+			{
+				JG_LOG_ERROR("Is Duplicates StateNodeName In NodeEditor: {0}", _pair.first);
+				return false;
+			}
+			AnimationAssetStock::AnimationBlendSpace1DInfo blendSpaceInfo;
+			blendSpaceInfo.Name = node->GetName();
+			blendSpaceInfo.AssetPath = blendAsset->GetAssetPath();
+			blendSpaceInfo.Flags = _pair.second.Flags;
+			cachedNodeName.insert(node->GetName());
+			assetStock.AnimBlendSpace1Ds.push_back(blendSpaceInfo);
+		}
+		for (auto _pair : mAnimBlendSpaceBuildDataDic)
+		{
+			if (_pair.first == nodeLinkInfo.RootNodeID) continue;
+
+			SharedPtr<Asset<AnimationBlendSpace>> blendAsset = _pair.second.Asset;
+			if (blendAsset == nullptr || blendAsset->IsValid() == false)
+			{
+				JG_LOG_ERROR("AnimationBlendSpace's Asset is Null -> Node ID :  {0}", _pair.first);
+				return false;
+			}
+			StateNodeGUI::StateNode* node = mNodeEditor->FindNode(_pair.first);
+			if (node == nullptr)
+			{
+				JG_LOG_ERROR("Can't Find StateNode In NodeEditor: {0}", _pair.first);
+				return false;
+			}
+			if (cachedNodeName.find(node->GetName()) != cachedNodeName.end())
+			{
+				JG_LOG_ERROR("Is Duplicates StateNodeName In NodeEditor: {0}", _pair.first);
+				return false;
+			}
+			AnimationAssetStock::AnimationBlendSpaceInfo blendSpaceInfo;
+			blendSpaceInfo.Name = node->GetName();
+			blendSpaceInfo.AssetPath = blendAsset->GetAssetPath();
+			blendSpaceInfo.Flags = _pair.second.Flags;
+			cachedNodeName.insert(node->GetName());
+			assetStock.AnimBlendSpaces.push_back(blendSpaceInfo);
+		}
+
 
 		StateNodeGUI::StateNode* rootNode = mNodeEditor->FindNode(nodeLinkInfo.RootNodeID);
 		if (rootNode == nullptr)
@@ -1294,6 +1534,7 @@ namespace JG
 
 			SharedPtr<JsonData> dataJson = jsonMain->CreateJsonData();
 			dataJson->AddMember("Name", node->GetName());
+			dataJson->AddMember("NodeType", (u32)node->GetUserData<ENodeType>());
 			dataJson->AddMember("Location", node->GetLocation());
 			jsonMain->AddMember(dataJson);
 		}

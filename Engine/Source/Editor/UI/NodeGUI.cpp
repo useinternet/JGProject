@@ -528,6 +528,10 @@ namespace JG
 			{
 				mDataStorage->SetLinkingNode(0);
 			}
+			if (mRemoveNodeCallBack)
+			{
+				mRemoveNodeCallBack(id);
+			}
 			// 내보내는 링크 노드 연결 해제
 			HashSet<StateNodeID> outLinkedNodeIDs = node->mOutLinkedNodeIDs;
 			for (StateNodeID outLinkedID : outLinkedNodeIDs)
@@ -536,10 +540,7 @@ namespace JG
 			}
 			mNodeDic.erase(id);
 
-			if (mRemoveNodeCallBack)
-			{
-				mRemoveNodeCallBack(id);
-			}
+
 		}
 		StateNode* StateNodeEditor::FindNode(StateNodeID id)
 		{

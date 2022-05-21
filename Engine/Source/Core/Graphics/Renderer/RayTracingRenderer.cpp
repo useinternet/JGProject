@@ -69,7 +69,7 @@ namespace JG
 					{
 						SharedPtr<ISubMesh> subMesh = mesh->GetSubMesh(i);
 						SharedPtr<IMaterial> material = nullptr;
-						if (subMesh == nullptr)
+						if (subMesh == nullptr || materialList.empty())
 						{
 							continue;
 						}

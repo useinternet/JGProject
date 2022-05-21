@@ -20,14 +20,24 @@ namespace JG
 		using StateNodeID = u64;
 	}
 	class AnimationClip;
+	class AnimationBlendSpace1D;
+	class AnimationBlendSpace;
 	class Skeletone;
 	class EditorUIScene;
 	class IMesh;
+	
 
 	class AnimationView : public UIView
 	{
 		JGCLASS
 	private:
+		enum class ENodeType
+		{
+			Root,
+			AnimationClip,
+			AnimationBlendSpace1D,
+			AnimationBlendSpace,
+		};
 		struct AnimParamBuildData
 		{
 			String Name;
@@ -54,6 +64,18 @@ namespace JG
 			StateNodeGUI::StateNodeID ID;
 			EAnimationClipFlags Flags = EAnimationClipFlags::None;
 			SharedPtr<Asset<AnimationClip>> Asset;
+		};
+		struct AnimBlendSpace1DBuildData
+		{
+			StateNodeGUI::StateNodeID ID;
+			EAnimationBlendSpace1DFlag Flags = EAnimationBlendSpace1DFlag::Repeat;
+			SharedPtr<Asset<AnimationBlendSpace1D>> Asset;
+		};
+		struct AnimBlendSpaceBuildData
+		{
+			StateNodeGUI::StateNodeID ID;
+			EAnimationBlendSpaceFlag Flags = EAnimationBlendSpaceFlag::Repeat;
+			SharedPtr<Asset<AnimationBlendSpace>> Asset;
 		};
 		enum class EEditMode
 		{
@@ -105,6 +127,8 @@ namespace JG
 		List<AnimParamBuildData>	  mAnimParamBuildDataList;
 		Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
+		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    mAnimBlendSpace1DBuildDataDic;
+		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      mAnimBlendSpaceBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
 		Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
 	public:
@@ -117,10 +141,13 @@ namespace JG
 		virtual void Initialize() override;
 		virtual void OnGUI() override;
 		virtual void Destroy() override;
-		virtual void OnEvent(IEvent& e) override;
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override { }
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override { }
 	private:
+		void InitNodeEditor();
+		void InitBuildData();
+
+
 		void AnimationScene_OnGUI();
 		void AnimationInspector_OnGUI();
 		void AnimationNodeEditor_OnGUI();
@@ -129,10 +156,18 @@ namespace JG
 		void Transition_OnGUI(AnimTransitionBuildData& buildData);
 		void TransitionConditionValue_OnGUI(AnimTransitionConditionBuildData& buildData);
 
-		void AnimationClip_OnGUI(AnimClipBuildData& buildData);
-		void CreateRootNode();
-		void CreateAnimationClipNode();
 
+		void AnimationRoot_OnGUI();
+		void AnimationClip_OnGUI(AnimClipBuildData& buildData);
+		void AnimationBlendSpace1D_OnGUI(AnimBlendSpace1DBuildData& buildData);
+		void AnimationBlendSpace_OnGUI(AnimBlendSpaceBuildData& buildData);
+
+
+		StateNodeGUI::StateNodeID CreateNode(ENodeType nodeType, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateRootNode();
+		StateNodeGUI::StateNodeID CreateAnimationClipNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateAnimationBlendSpace1DNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateAnimationBlendSpaceNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
 		void UpdateScene();
 
 		void SetMesh(const String& meshAssetPath);
@@ -143,16 +178,10 @@ namespace JG
 		void UpdateTransitionBuildData(const String& oldName, const String& newName);
 		void RemoveTransitionBuildData(const String& removedName);
 
-		// Animation Controller 생성
-		// 생성 이후 기존 Controller 는 제거
 		bool Build();
-		
 		void RefreshAnimAsset(const String& path);
-
-		// 플레이 시 노드 에디터 락(편집 불가)  애니메이션 파라미터에 따라서 노드  Flow 가 발생
 		void Play();
 		void UpdateFlow();
-		// 편집 가능,
 		void Editable();
 		bool IsEditable() const {
 			return mAnimState != EAnimState::Playing;

@@ -16,6 +16,7 @@
 #include "UI/UIView/AnimationClipView.h"
 #include "UI/UIView/AnimationView.h"
 #include "UI/UIView/AnimationBlendSpace1DView.h"
+#include "UI/UIView/AnimationBlendSpaceView.h"
 
 // PopupUI
 #include "UI/ContextUI/ComponentFinderContextView.h"
@@ -209,6 +210,7 @@ namespace JG
 		UIManager::GetInstance().RegisterUIView<AnimationClipView>();
 		UIManager::GetInstance().RegisterUIView<AnimationView>();
 		UIManager::GetInstance().RegisterUIView<AnimationBlendSpace1DView>();
+		UIManager::GetInstance().RegisterUIView<AnimationBlendSpaceView>();
 	}
 
 	void EditorUISystemLayer::RegisterPopupUIView()
