@@ -13,8 +13,6 @@ namespace JG
 	MaterialView::MaterialView()
 	{
 		DisableUniqueView();
-		
-
 	}
 	void MaterialView::Load()
 	{
@@ -23,7 +21,7 @@ namespace JG
 	void MaterialView::Initialize()
 	{
 		String enginePath = Application::GetEnginePath();
-		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
+		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<IMesh>(PathHelper::CombinePath(enginePath, "Mesh/Sphere.jgasset"));
 		UpdateScene();
 		
 	}

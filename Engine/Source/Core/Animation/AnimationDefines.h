@@ -9,6 +9,7 @@ namespace JG
 		Bool,
 		Float,
 		Int,
+		Trigger,
 		Count,
 	};
 
@@ -19,6 +20,7 @@ namespace JG
 		case EAnimationParameterType::Bool: return "Bool";
 		case EAnimationParameterType::Float: return "Float";
 		case EAnimationParameterType::Int: return "Int";
+		case EAnimationParameterType::Trigger: return "Trigger";
 		default:
 			return "Unknown";
 		}
@@ -29,6 +31,7 @@ namespace JG
 		if (name == "Bool")			return EAnimationParameterType::Bool;
 		else if (name == "Float")   return EAnimationParameterType::Float;
 		else if (name == "Int")     return EAnimationParameterType::Int;
+		else if (name == "Trigger")  return EAnimationParameterType::Trigger;
 		else return EAnimationParameterType::Unknown;
 	}
 

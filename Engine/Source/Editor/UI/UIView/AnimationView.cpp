@@ -42,29 +42,27 @@ namespace JG
 	{
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
 		{
-			CreateAnimationClipNode();
+			CreateAnimationClipNode("AnimationClip");
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace1D", 0, [&]()
 		{
-			CreateAnimationBlendSpace1DNode();
+			CreateAnimationBlendSpace1DNode("AnimationBlendSpace1D");
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace", 0, [&]()
 		{
-			CreateAnimationBlendSpaceNode();
+			CreateAnimationBlendSpaceNode("AnimationBlendSpace");
 		}, nullptr);
 
 		mBgColorByParamTypeDic[EAnimationParameterType::Bool]  = Color(0.8f, 0.1f, 0.1f, 1.0f);
 		mBgColorByParamTypeDic[EAnimationParameterType::Float] = Color(0.4f, 0.8f, 0.05f, 1.0f);
 		mBgColorByParamTypeDic[EAnimationParameterType::Int]  = Color(0.05f,0.4f,0.8f, 1.0f);
+		mBgColorByParamTypeDic[EAnimationParameterType::Trigger] = Color(0.8f, 0.1f, 0.8f, 1.0f);
 		mBgColorByParamTypeDic[EAnimationParameterType::Unknown] = Color(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	void AnimationView::Initialize()
 	{
 		InitNodeEditor();
-		SetMesh(mModelAssetPath.GetValue());
-		SetSkeletal(mSkeletoneAssetPath.GetValue());
-		SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
 		InitBuildData();
 	}
 
@@ -222,9 +220,8 @@ namespace JG
 			mAddedAnimParamNameSet.clear();
 			mAnimParamBuildDataList.clear();
 			Dictionary<String, EAnimationParameterType> paramTypeDic;
-			for (auto _pair : stock.Parameters)
+			for (const AnimationAssetStock::ParameterData& paramData : stock.Parameters)
 			{
-				const AnimationAssetStock::ParameterData& paramData = _pair.second;
 				AnimParamBuildData buildData;
 				buildData.Data = paramData.Data;
 				buildData.Type = paramData.Type;
@@ -250,7 +247,7 @@ namespace JG
 					JVector2 location = dataJson->GetMember("Location")->GetVector2();
 					ENodeType type = (ENodeType)dataJson->GetMember("NodeType")->GetUint32();
 				
-					nodeIDDic[name] = CreateNode(type, location);
+					nodeIDDic[name] = CreateNode(type,name, location);
 				}
 			}
 			if (nodeIDDic.find(stock.RootName) == nodeIDDic.end())
@@ -261,13 +258,14 @@ namespace JG
 			{
 				if (nodeIDDic.find(clipInfo.Name) == nodeIDDic.end())
 				{
-					nodeIDDic[clipInfo.Name] = CreateNode(ENodeType::AnimationClip, JVector2(100.0, 100.0f));
+					nodeIDDic[clipInfo.Name] = CreateNode(ENodeType::AnimationClip, clipInfo.Name, JVector2(100.0, 100.0f));
 				}
 
 
 				AnimClipBuildData buildData;
 				buildData.ID = nodeIDDic[clipInfo.Name];
 				buildData.Flags = clipInfo.Flags;
+				buildData.Speed = clipInfo.Speed;
 				buildData.Asset = AssetDataBase::GetInstance().LoadOriginAsset<AnimationClip>(clipInfo.AssetPath);
 				mAnimClipBuildDataDic[nodeIDDic[clipInfo.Name]] = buildData;
 			}
@@ -275,7 +273,7 @@ namespace JG
 			{
 				if (nodeIDDic.find(blendSpaceInfo.Name) == nodeIDDic.end())
 				{
-					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace1D, JVector2(100.0, 100.0f));
+					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace1D, blendSpaceInfo.Name, JVector2(100.0, 100.0f));
 				}
 				AnimBlendSpace1DBuildData buildData;
 				buildData.ID = nodeIDDic[blendSpaceInfo.Name];
@@ -287,7 +285,7 @@ namespace JG
 			{
 				if (nodeIDDic.find(blendSpaceInfo.Name) == nodeIDDic.end())
 				{
-					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace, JVector2(100.0, 100.0f));
+					nodeIDDic[blendSpaceInfo.Name] = CreateNode(ENodeType::AnimationBlendSpace, blendSpaceInfo.Name, JVector2(100.0, 100.0f));
 				}
 
 				AnimBlendSpaceBuildData buildData;
@@ -310,6 +308,8 @@ namespace JG
 
 				AnimTransitionBuildData& buildData = mAnimTransitionBuildDataDic[transID];
 				buildData.TransitionDuration = linkInfo.TransitionDuration;
+				buildData.HasExitTime = linkInfo.HasExitTime;
+				buildData.ExitTime = linkInfo.ExitTime;
 				for (const AnimationAssetStock::AnimationTransitionConditionInfo& transInfo : linkInfo.Transitions)
 				{
 					AnimTransitionConditionBuildData condBuildData;
@@ -688,7 +688,16 @@ namespace JG
 				bool _bool;
 				animParams->GetBool(buildData.Name, &_bool);
 				ImGui::Checkbox("##CheckBox", &_bool);
-				animParams->SetBool(buildData.Name, &_bool);
+				animParams->SetBool(buildData.Name, _bool);
+			}
+			break;
+			case EAnimationParameterType::Trigger:
+			{
+				bool _bool = false;
+				if (ImGui::RadioButton("##RadioButton", &_bool) == true)
+				{
+					animParams->SetTrigger(buildData.Name);
+				}
 			}
 			break;
 			case EAnimationParameterType::Float:
@@ -774,6 +783,22 @@ namespace JG
 			buildData.TransitionDuration = transitionDuration;
 		}
 
+		if (fromNode != nullptr && fromNode->GetUserData<ENodeType>() == ENodeType::AnimationClip)
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("HasExitTime"); ImGui::SameLine();
+			ImGui::Checkbox("##HasExitTime_CheckBox", &buildData.HasExitTime);
+
+			if (buildData.HasExitTime)
+			{
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text("ExitTime"); ImGui::SameLine();
+				ImGui::SetNextItemWidth(200.0f);
+				ImGui::InputFloat("##ExitTime_InputFloat", &buildData.ExitTime);
+			}
+		}
+		
+
 		ImGui::Separator();
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 		if (ImGui::Selectable("Default##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
@@ -844,6 +869,10 @@ namespace JG
 					{
 						condBuildData.Condition = EAnimationCondition::Equal;
 					}
+				}
+				else if (condBuildData.Type == EAnimationParameterType::Trigger)
+				{
+
 				}
 				else
 				{
@@ -981,13 +1010,18 @@ namespace JG
 		ImGui::Spacing();
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Repeat "); ImGui::SameLine();
-
+		StateNodeGUI::StateNode* node = mNodeEditor->FindNode(buildData.ID);
 		bool _bool = buildData.Flags & EAnimationClipFlags::Repeat;
 		if (ImGui::Checkbox("##CheckBox_Repeat", &_bool) == true && IsEditable())
 		{
 			if (_bool == false) buildData.Flags = (EAnimationClipFlags)((i32)buildData.Flags & (~(i32)EAnimationClipFlags::Repeat));
 			else buildData.Flags = buildData.Flags | EAnimationClipFlags::Repeat;
 		}
+
+		ImGui::Text("Speed"); ImGui::SameLine();
+		ImGui::InputFloat("##Speed_InputFloat", &buildData.Speed);
+
+
 
 
 		f32 label_Space = ImGui::CalcTextSize("         ").x;
@@ -1002,6 +1036,20 @@ namespace JG
 			
 		}, label_Space);
 
+		
+		ImGui::Separator();
+		if (buildData.Asset != nullptr && buildData.Asset->IsValid())
+		{
+			if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
+			{
+				SharedPtr<AnimationClipInfo> animClipInfo = mAnimationAsset->Get()->FindAnimationClipInfo(node->GetName());
+				if (animClipInfo != nullptr)
+				{
+					ImGui::ProgressBar(animClipInfo->GetNormalizedTimePos(), ImVec2(-FLT_MIN, 0), animClipInfo->GetName().c_str());
+				}
+
+			}
+		}
 		ImGui::PopID();
 	}
 	void AnimationView::AnimationBlendSpace1D_OnGUI(AnimBlendSpace1DBuildData& buildData)
@@ -1033,26 +1081,44 @@ namespace JG
 			if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
 			{
 				SharedPtr<AnimationBlendSpace1DInfo> blendSpace1DInfo = mAnimationAsset->Get()->FindAnimationBlendSpace1DInfo(node->GetName());
+				if (blendSpace1DInfo != nullptr)
+				{
+					const AnimationClipInfo& leftAnimClipInfo = blendSpace1DInfo->GetLeftBlendingAnimationClipInfo();
+					const AnimationClipInfo& rightAnimClipInfo = blendSpace1DInfo->GetRightBlendingAnimationClipInfo();
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					f32 regionWidth = ImGui::GetWindowContentRegionWidth();
+					f32 progressBarWidth = regionWidth * 0.5f - 5.0f;
+
+
+					ImGui::Text("Left : %s", leftAnimClipInfo.GetName().c_str());
+					ImGui::SameLine(regionWidth * 0.5f + 5.0f);
+					ImGui::Text("Right : %s", rightAnimClipInfo.GetName().c_str());
+					ImGui::Spacing();
+					ImGui::Text("BlendFactor : %f", blendSpace1DInfo->GetBlendFactor());
+					ImGui::ProgressBar(leftAnimClipInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), leftAnimClipInfo.GetName().c_str());
+					ImGui::SameLine();
+					ImGui::ProgressBar(rightAnimClipInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), rightAnimClipInfo.GetName().c_str());
+				}
+				
 			}
 		}
-
-
-
-
-
 		ImGui::PopID();
 	}
 	void AnimationView::AnimationBlendSpace_OnGUI(AnimBlendSpaceBuildData& buildData)
 	{
 		ImGui::PushID(buildData.ID);
 		ImGui::Text("AnimationBlendSpace");
-		ImGui::Text("Name : NodeName");
 		ImGui::Spacing();
 		ImGui::AlignTextToFramePadding();
 
 		f32 label_Space = ImGui::CalcTextSize("         ").x;
+		StateNodeGUI::StateNode* node = mNodeEditor->FindNode(buildData.ID);
 
-		ImGui::AssetField_OnGUI("AnimationClip", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
+
+		ImGui::AssetField_OnGUI("Asset", (buildData.Asset != nullptr && buildData.Asset->IsValid()) ? buildData.Asset->GetAssetName() : "None",
 			EAssetFormat::AnimationBlendSpace, [&](const String& assetPath)
 		{
 			if (IsEditable())
@@ -1061,21 +1127,75 @@ namespace JG
 			}
 
 		}, label_Space);
+		ImGui::Separator();
+		if (buildData.Asset != nullptr && buildData.Asset->IsValid())
+		{
+			ImGui::Text("Param X Name : %s", buildData.Asset->Get()->GetXParamName().c_str());
+			ImGui::Text("Value :  %3.f  ~  %3.f", buildData.Asset->Get()->GetMinXValue(), buildData.Asset->Get()->GetMaxXValue());
+
+
+			ImGui::Text("Param Y Name : %s", buildData.Asset->Get()->GetYParamName().c_str());
+			ImGui::Text("Value :  %3.f  ~  %3.f", buildData.Asset->Get()->GetMinYValue(), buildData.Asset->Get()->GetMaxYValue());
+
+			
+			if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
+			{
+				SharedPtr<AnimationBlendSpaceInfo> blendSpaceInfo = mAnimationAsset->Get()->FindAnimationBlendSpaceInfo(node->GetName());
+				if (blendSpaceInfo != nullptr)
+				{
+					const AnimationClipInfo& ltInfo = blendSpaceInfo->GetLeftTopBlendingAnimationClipInfo();
+					const AnimationClipInfo& lbInfo = blendSpaceInfo->GetLeftBottomBlendingAnimationClipInfo();
+					const AnimationClipInfo& rtInfo = blendSpaceInfo->GetRightTopBlendingAnimationClipInfo();
+					const AnimationClipInfo& rbInfo = blendSpaceInfo->GetRightBottomBlendingAnimationClipInfo();
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					f32 regionWidth = ImGui::GetWindowContentRegionWidth();
+					f32 progressBarWidth = regionWidth * 0.5f - 5.0f;
+
+
+					ImGui::Text("LeftTop : %s", ltInfo.GetName().c_str());
+					ImGui::SameLine(regionWidth * 0.5f + 5.0f);
+					ImGui::Text("RightTop : %s", rtInfo.GetName().c_str());
+					ImGui::Text("LeftBottom : %s", lbInfo.GetName().c_str());
+					ImGui::SameLine(regionWidth * 0.5f + 5.0f);
+					ImGui::Text("RightBottom : %s", rbInfo.GetName().c_str());
+
+
+					ImGui::Spacing();
+					ImGui::Text("BlendFactor : %f", blendSpaceInfo->GetBlendFactor());
+					ImGui::ProgressBar(ltInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), ltInfo.GetName().c_str());
+					ImGui::SameLine();
+					ImGui::ProgressBar(rtInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), rtInfo.GetName().c_str());
+
+					ImGui::ProgressBar(lbInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), lbInfo.GetName().c_str());
+					ImGui::SameLine();
+					ImGui::ProgressBar(rbInfo.GetNormalizedTimePos(), ImVec2(progressBarWidth, 0), rbInfo.GetName().c_str());
+				}
+				
+			
+			}
+		}
+
+
+
+
 
 		ImGui::PopID();
 	}
-	StateNodeGUI::StateNodeID AnimationView::CreateNode(ENodeType nodeType, const JVector2& initPos)
+	StateNodeGUI::StateNodeID AnimationView::CreateNode(ENodeType nodeType, const String& name, const JVector2& initPos)
 	{
 		switch (nodeType)
 		{
 		case ENodeType::Root:
 			return CreateRootNode();
 		case ENodeType::AnimationClip:
-			return CreateAnimationClipNode(initPos);
+			return CreateAnimationClipNode(name, initPos);
 		case ENodeType::AnimationBlendSpace1D:
-			return CreateAnimationBlendSpace1DNode(initPos);
+			return CreateAnimationBlendSpace1DNode(name, initPos);
 		case ENodeType::AnimationBlendSpace:
-			return CreateAnimationBlendSpaceNode(initPos);
+			return CreateAnimationBlendSpaceNode(name, initPos);
 		default:
 			return 0;
 		}
@@ -1083,6 +1203,10 @@ namespace JG
 	}
 	StateNodeGUI::StateNodeID AnimationView::CreateRootNode()
 	{
+		if (mNodeNameDic.find("Root") != mNodeNameDic.end())
+		{
+			return mNodeNameDic["Root"];
+		}
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		nodeBuilder.SetInitLocation(JVector2(250, 100));
 		nodeBuilder.SetName("Root");
@@ -1094,7 +1218,7 @@ namespace JG
 		return mNodeEditor->CreateNode(nodeBuilder);
 	}
 
-	StateNodeGUI::StateNodeID AnimationView::CreateAnimationClipNode(const JVector2& initPos)
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationClipNode(const String& name, const JVector2& initPos)
 	{
 
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
@@ -1111,11 +1235,11 @@ namespace JG
 			nodeBuilder.SetInitLocation(initPos - offset);
 		}
 		
-		nodeBuilder.SetName("AnimationClip");
+		nodeBuilder.SetName(name);
 		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationClip);
 		return mNodeEditor->CreateNode(nodeBuilder);
 	}
-	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpace1DNode(const JVector2& initPos)
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpace1DNode(const String& name, const JVector2& initPos)
 	{
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		JVector2 offset = mNodeEditor->GetOffset();
@@ -1132,10 +1256,10 @@ namespace JG
 		}
 		nodeBuilder.SetNodeColor(Color(0.1F, 1.0F, 0.1F, 0.2F));
 		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationBlendSpace1D);
-		nodeBuilder.SetName("BlendSpace1D");
+		nodeBuilder.SetName(name);
 		return mNodeEditor->CreateNode(nodeBuilder);
 	}
-	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpaceNode(const JVector2& initPos)
+	StateNodeGUI::StateNodeID AnimationView::CreateAnimationBlendSpaceNode(const String& name, const JVector2& initPos)
 	{
 		StateNodeGUI::StateNodeBuilder nodeBuilder;
 		JVector2 offset = mNodeEditor->GetOffset();
@@ -1153,11 +1277,41 @@ namespace JG
 		
 		nodeBuilder.SetNodeColor(Color(1.0F,0.1F,0.1F,0.2F));
 		nodeBuilder.SetUserData<ENodeType>(ENodeType::AnimationBlendSpace);
-		nodeBuilder.SetName("BlendSpace1D");
+		nodeBuilder.SetName(name);
 		return mNodeEditor->CreateNode(nodeBuilder);
 	}
 	void AnimationView::UpdateScene()
 	{
+		if (mMeshAsset == nullptr)
+		{
+			SetMesh(mModelAssetPath.GetValue());
+		}
+		if (mSkeletoneAsset == nullptr)
+		{
+			SetSkeletal(mSkeletoneAssetPath.GetValue());
+		}
+		if (mMaterialAssetList.empty())
+		{
+			SetMaterial(StringHelper::Split(mMaterialAssetPath.GetValue(), ','));
+		}
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		static const JVector3 EyePos = JVector3(0, 100.0f, -200.0f);
 		if (mEditorUIScene == nullptr)
 		{
@@ -1191,12 +1345,11 @@ namespace JG
 			if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
 			{
 				mAnimationAsset->Get()->BindMesh(mMeshAsset->Get());
-				mModel->Mesh = mAnimationAsset->Get()->GetBindedMesh();
+				mModel->Mesh = mAnimationAsset->Get()->GetBindedMesh();				
 				mModel->Flags = Graphics::ESceneObjectFlags::Always_Update_Bottom_Level_AS;
 			}
 			else {
 				mModel->Mesh = mMeshAsset->Get();
-				mModel->Flags = Graphics::ESceneObjectFlags::None;
 			}
 		}
 		if (mSkeletoneAsset != nullptr && mSkeletoneAsset->IsValid())
@@ -1217,12 +1370,9 @@ namespace JG
 		}
 		mEditorUIScene->SetModel(mModel);
 	}
-
-
-
 	void AnimationView::SetMesh(const String& meshAssetPath)
 	{
-		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAsset<IMesh>(meshAssetPath);
+		mMeshAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<IMesh>(meshAssetPath);
 	}
 	void AnimationView::SetSkeletal(const String& skeletalAssetPath)
 	{
@@ -1273,11 +1423,20 @@ namespace JG
 	{
 		for (auto& _pair : mAnimTransitionBuildDataDic)
 		{
-			_pair.second.Conditions.erase(std::remove_if(_pair.second.Conditions.begin(), _pair.second.Conditions.end(),
-				[&](const AnimTransitionConditionBuildData& data)
+			if (_pair.second.Conditions.empty() == false)
 			{
-				return data.ParamName == removedName;
-			}));
+				auto iter = std::remove_if(_pair.second.Conditions.begin(), _pair.second.Conditions.end(),
+					[&](const AnimTransitionConditionBuildData& data)
+				{
+					return data.ParamName == removedName;
+				});
+				if (iter != _pair.second.Conditions.end())
+				{
+					_pair.second.Conditions.erase(iter);
+				}
+				
+			}
+
 		}
 	}
 
@@ -1287,10 +1446,12 @@ namespace JG
 		StateNodeGUI::StateNodeLinkInfo nodeLinkInfo = mNodeEditor->GetNodeLinkInfo();
 		for (const AnimParamBuildData& buildData : mAnimParamBuildDataList)
 		{
-			AnimationAssetStock::ParameterData& paramData = assetStock.Parameters[buildData.Name];
+			AnimationAssetStock::ParameterData paramData;
 			paramData.Name = buildData.Name;
 			paramData.Type = buildData.Type;
 			paramData.Data = buildData.Data;
+
+			assetStock.Parameters.push_back(paramData);
 		}
 
 
@@ -1320,6 +1481,7 @@ namespace JG
 			clipInfo.Name      = node->GetName();
 			clipInfo.AssetPath = clipAsset->GetAssetPath();
 			clipInfo.Flags     = _pair.second.Flags;
+			clipInfo.Speed = _pair.second.Speed;
 			cachedNodeName.insert(node->GetName());
 			assetStock.AnimClips.push_back(clipInfo);
 		}
@@ -1416,6 +1578,8 @@ namespace JG
 				const AnimTransitionBuildData& tranBuildData = mAnimTransitionBuildDataDic[transitionNodeID];
 
 				transInfo.TransitionDuration = tranBuildData.TransitionDuration;
+				transInfo.HasExitTime = tranBuildData.HasExitTime;
+				transInfo.ExitTime = tranBuildData.ExitTime;
 				for (const AnimTransitionConditionBuildData& condBuildData : tranBuildData.Conditions)
 				{
 					AnimationAssetStock::AnimationTransitionConditionInfo condInfo;
@@ -1459,15 +1623,13 @@ namespace JG
 		if (mAnimationAsset != nullptr && mAnimationAsset->IsValid())
 		{
 			JGAnimation::GetInstance().UnRegisterAnimatioinController(mAnimationAsset->Get());
-			AssetDataBase::GetInstance().UnLoadAsset(mAnimationAsset->GetAssetID());
+	
 		}
 
-	
 		mAnimationAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationController>(assetPath);
-		
 		if (mAnimationAsset != nullptr)
 		{
-			AssetDataBase::GetInstance().RefreshAsset(mAnimationAsset->GetAssetID());
+			AssetDataBase::GetInstance().RefreshAsset(mAnimationAsset->GetAssetID(), true);
 			JGAnimation::GetInstance().RegisterAnimationController(mAnimationAsset->Get());
 		}
 	}

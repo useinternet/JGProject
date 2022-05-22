@@ -285,66 +285,12 @@ namespace JG
 
 	void AnimationAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-
 		jsonData->AddMember(ROOT_NAME_KEY, RootName);
-
-
-		SharedPtr<JsonData> animClipListJson = jsonData->CreateJsonData();
-		for (const AnimationClipInfo& clipInfo : AnimClips)
-		{
-			SharedPtr<JsonData> animClipJson = animClipListJson->CreateJsonData();
-
-
-			animClipJson->AddMember(ANIM_CLIP_NAME_KEY, clipInfo.Name);
-			animClipJson->AddMember(ANIM_CLIP_ASSETPATH_KEY, clipInfo.AssetPath);
-			animClipJson->AddMember(ANIM_CLIP_ANIM_FLAGS_KEY, (u32)clipInfo.Flags);
-			animClipListJson->AddMember(animClipJson);
-		}
-		jsonData->AddMember(ANIM_CLIP_LIST_KEY, animClipListJson);
-
-
-		SharedPtr<JsonData> animParamListJson = jsonData->CreateJsonData();
-
-		for (auto _pair : Parameters)
-		{
-			SharedPtr<JsonData> animParamJson = animParamListJson->CreateJsonData();
-
-			animParamJson->AddMember(ANIM_PARAM_NAME_KEY, _pair.second.Name);
-			animParamJson->AddMember(ANIM_PARAM_TYPE_KEY, AnimationParameterTypeToString(_pair.second.Type));
-			animParamJson->AddMember(ANIM_PARAM_DATA_KEY, _pair.second.Data);
-
-			animParamListJson->AddMember(animParamJson);
-		}
-		jsonData->AddMember(ANIM_PARAM_LIST_KEY, animParamListJson);
-
-
-		//
-		SharedPtr<JsonData> transListJson = jsonData->CreateJsonData();
-		for (const AnimationTransitionInfo& transInfo : TransitionInfos)
-		{
-			SharedPtr<JsonData> transJson = transListJson->CreateJsonData();
-			
-			
-			transJson->AddMember(ANIM_TRANSITION_PREV_NODE_NAME_KEY, transInfo.PrevName);
-			transJson->AddMember(ANIM_TRANSITION_NEXT_NODE_NAME_KEY, transInfo.NextName);
-			transJson->AddMember(ANIM_TRANSITION_DURATION_KEY, transInfo.TransitionDuration);
-			SharedPtr<JsonData> condListJson = transJson->CreateJsonData();
-			for (const AnimationTransitionConditionInfo& conInfo : transInfo.Transitions)
-			{
-				SharedPtr<JsonData> condJson = condListJson->CreateJsonData();
-
-				condJson->AddMember(ANIM_CONDITION_NAME_KEY, conInfo.ParameterName);
-				condJson->AddMember(ANIM_CONDITION_TYPE_KEY, AnimationConditionTypeToString(conInfo.Condition));
-				condJson->AddMember(ANIM_CONDITION_DATA_KEY, conInfo.Data);
-
-				condListJson->AddMember(condJson);
-			}
-			transJson->AddMember(ANIM_TRANSITION_CONDITION_LIST_KEY, condListJson);
-			transListJson->AddMember(transJson);
-		}
-		jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, transListJson);
+		jsonData->AddMember(ANIM_CLIP_LIST_KEY, AnimClips);
 		jsonData->AddMember(ANIM_BLENDSPACE1D_LIST_KEY, AnimBlendSpace1Ds);
 		jsonData->AddMember(ANIM_BLENDSPACE_LIST_KEY, AnimBlendSpaces);
+		jsonData->AddMember(ANIM_PARAM_LIST_KEY, Parameters);
+		jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, TransitionInfos);
 	}
 	void AnimationAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
@@ -355,81 +301,10 @@ namespace JG
 			RootName = val->GetString();
 		}
 		val = jsonData->GetMember(ANIM_CLIP_LIST_KEY);
-
-		if (val != nullptr && val->IsArray())
+		if (val != nullptr)
 		{
-			u32 cnt = val->GetSize();
-			for (u32 i = 0; i < cnt; ++i)
-			{
-				SharedPtr<JsonData> clipJson = val->GetJsonDataFromIndex(i);
-				AnimationClipInfo clipInfo;
-				if (clipJson != nullptr)
-				{
-					clipInfo.Name      = clipJson->GetMember(ANIM_CLIP_NAME_KEY)->GetString();
-					clipInfo.AssetPath = clipJson->GetMember(ANIM_CLIP_ASSETPATH_KEY)->GetString();
-					clipInfo.Flags     = (EAnimationClipFlags)clipJson->GetMember(ANIM_CLIP_ANIM_FLAGS_KEY)->GetUint32();
-					AnimClips.push_back(clipInfo);
-				}
-
-			}
+			AnimClips = val->GetIJsonDataList<AnimationClipInfo>();
 		}
-
-		val = jsonData->GetMember(ANIM_PARAM_LIST_KEY);
-		if (val != nullptr && val->IsArray())
-		{
-			u32 cnt = val->GetSize();
-			for (u32 i = 0; i < cnt; ++i)
-			{
-				SharedPtr<JsonData> animParamJson = val->GetJsonDataFromIndex(i);
-
-				ParameterData paramData;
-
-				paramData.Name = animParamJson->GetMember(ANIM_PARAM_NAME_KEY)->GetString();
-				paramData.Type = StringToAnimationParameterType(animParamJson->GetMember(ANIM_PARAM_TYPE_KEY)->GetString());
-				paramData.Data = animParamJson->GetMember(ANIM_PARAM_DATA_KEY)->GetByteList();
-				Parameters[paramData.Name] = paramData;
-			}
-		}
-
-		val = jsonData->GetMember(ANIM_TRANSITION_LIST_KEY);
-		if (val != nullptr && val->IsArray())
-		{
-			u32 cnt = val->GetSize();
-			for (u32 i = 0; i < cnt; ++i)
-			{
-				AnimationTransitionInfo transInfo;
-				SharedPtr<JsonData> transJson = val->GetJsonDataFromIndex(i);
-				if (transJson != nullptr)
-				{
-					transInfo.PrevName = transJson->GetMember(ANIM_TRANSITION_PREV_NODE_NAME_KEY)->GetString();
-					transInfo.NextName = transJson->GetMember(ANIM_TRANSITION_NEXT_NODE_NAME_KEY)->GetString();
-					transInfo.TransitionDuration = transJson->GetMember(ANIM_TRANSITION_DURATION_KEY)->GetFloat();
-
-	
-					SharedPtr<JsonData> condListJson = transJson->GetMember(ANIM_TRANSITION_CONDITION_LIST_KEY);
-					if (condListJson != nullptr && condListJson->IsArray())
-					{
-						u32 transitionCnt = condListJson->GetSize();
-						for (u32 j = 0; j < transitionCnt; ++j)
-						{
-							AnimationTransitionConditionInfo transitionInfo;
-							SharedPtr<JsonData> condJson = condListJson->GetJsonDataFromIndex(j);
-							if (condJson != nullptr)
-							{
-								transitionInfo.ParameterName = condJson->GetMember(ANIM_CONDITION_NAME_KEY)->GetString();
-								transitionInfo.Condition = StringToAnimationConditionType(condJson->GetMember(ANIM_CONDITION_TYPE_KEY)->GetString());
-								transitionInfo.Data = condJson->GetMember(ANIM_CONDITION_DATA_KEY)->GetByteList();
-								transInfo.Transitions.push_back(transitionInfo);
-							}
-						}
-					}
-
-					TransitionInfos.push_back(transInfo);
-				}
-			}
-		}
-
-
 
 		val = jsonData->GetMember(ANIM_BLENDSPACE1D_LIST_KEY);
 		if (val != nullptr)
@@ -440,6 +315,16 @@ namespace JG
 		if (val != nullptr)
 		{
 			AnimBlendSpaces = val->GetIJsonDataList<AnimationBlendSpaceInfo>();
+		}
+		val = jsonData->GetMember(ANIM_PARAM_LIST_KEY);
+		if (val != nullptr)
+		{
+			Parameters = val->GetIJsonDataList<ParameterData>();
+		}
+		val = jsonData->GetMember(ANIM_TRANSITION_LIST_KEY);
+		if (val != nullptr)
+		{
+			TransitionInfos = val->GetIJsonDataList<AnimationTransitionInfo>();
 		}
 	}
 
@@ -1625,14 +1510,14 @@ namespace JG
 			return false;
 		}
 		String assetJsonText = Json::ToString(json);
-		u64 assetJsonLen = assetJsonText.length();
+		u64 assetJsonLen = assetJsonText.size();
 
 
 		auto headerJson = CreateSharedPtr<Json>();
 		headerJson->AddMember("Version", "1.0");
 		headerJson->AddMember(JG_ASSET_FORMAT_KEY, (u64)format);
 		String headerJsonText = Json::ToString(headerJson);
-		u64 headerJsonLen = headerJsonText.length();
+		u64 headerJsonLen = headerJsonText.size();
 
 
 		std::lock_guard<std::mutex> lock(mAssetRWMutex);

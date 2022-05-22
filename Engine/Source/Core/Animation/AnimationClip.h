@@ -10,6 +10,9 @@ namespace JG
 	class IMesh;
 	class ISubMesh;
 	class AnimationClip;
+
+
+
 	class AnimationClipInfo
 	{
 		friend class AnimationClip;
@@ -25,11 +28,14 @@ namespace JG
 		f32    TickPerSecond = 1.0f;
 		SharedPtr<AnimationClip> Clip;
 		EAnimationClipFlags Flags = EAnimationClipFlags::None;
+		EAnimationClipState State = EAnimationClipState::None;
+		AnimationClipInfo() = default;
 	public:
+
 		AnimationClipInfo(const String& name, SharedPtr<AnimationClip> clip, EAnimationClipFlags flags);
 		void Reset()
 		{
-			TimePos = std::fmodf(TimePos, Duration);
+			TimePos = 0.0f;
 		}
 		void SetNormalizedTimePos(f32 normalizedTimePos) {
 			normalizedTimePos = Math::Clamp(normalizedTimePos, 0.0f, 1.0f);
@@ -47,6 +53,9 @@ namespace JG
 		f32 GetDuration() const {
 			return Duration / 10 / TickPerSecond;
 		}
+		const String& GetName() const {
+			return Name;
+		}
 		SharedPtr<AnimationClip> GetClip() const {
 			return Clip;
 		}
@@ -57,6 +66,9 @@ namespace JG
 		void SetFlags(EAnimationClipFlags clipFlags)
 		{
 			Flags = clipFlags;
+		}
+		EAnimationClipState GetState() const {
+			return State;
 		}
 	private:
 		void Update(f32 tick, f32 multiplier = 1.0f);

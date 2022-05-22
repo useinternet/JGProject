@@ -30,7 +30,6 @@ namespace JG
 				isDurationDiff = true;
 			}
 		}
-
 		if (isDurationDiff == true)
 		{
 			for (auto _pair : AnimationClipInfoDic)
@@ -42,7 +41,7 @@ namespace JG
 	}
 	void AnimationBlendSpace1DInfo::Reset()
 	{
-		TimePos = std::fmodf(TimePos, Duration);
+		TimePos = 0.0f;
 		for (auto _pair : AnimationClipInfoDic)
 		{
 			_pair.second->Reset();
@@ -60,10 +59,20 @@ namespace JG
 	}
 	const AnimationClipInfo& AnimationBlendSpace1DInfo::GetLeftBlendingAnimationClipInfo() const
 	{
+		static AnimationClipInfo staticAnimClip;
+		if (LeftAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
 		return *LeftAnimationClipInfo;
 	}
 	const AnimationClipInfo& AnimationBlendSpace1DInfo::GetRightBlendingAnimationClipInfo() const
 	{
+		static AnimationClipInfo staticAnimClip;
+		if (RightAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
 		return *RightAnimationClipInfo;
 	}
 	SharedPtr<AnimationClipInfo> AnimationBlendSpace1DInfo::FindAnimationClipInfo(const String& name) const
@@ -167,7 +176,7 @@ namespace JG
 			TimePos += tick;
 			if (TimePos >= Duration)
 			{
-				Reset();
+				TimePos = std::fmodf(TimePos, Duration);
 			}
 		}
 	}

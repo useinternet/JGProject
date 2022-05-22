@@ -24,14 +24,19 @@ namespace JG
 	{
 		class AnimationSkinning;
 	}
+	// Weight 설정
+	// Mask 설정
+	// 
+	// 일단 레이어 설정
 	
 	class AnimationController
 	{
 		friend class JGAnimation;
 
 		String mName;
-		// 클립 이 추가되면 AnimationClipInfo 생성
-		SharedPtr<AnimationStateMachine>   mAnimationStateMachine;
+		Dictionary<String, SharedPtr<AnimationStateMachine>> mAnimationStateMachineDic;
+		String mBaseLayer = "Base Layer";
+
 		SharedPtr<AnimationParameters> mAnimParams;
 		SharedPtr<AnimationParameters> mAnimParams_Thread;
 		SharedPtr<Skeletone> mSkeletone;
@@ -104,7 +109,7 @@ namespace JG
 		SharedPtr<AnimationParameters> GetAnimationParameters()   const;
 		SharedPtr<AnimationParameters> GetAnimationParameters_Thread()   const;
 		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine() const;
-
+		SharedPtr<AnimationStateMachine>   GetAnimationStateMachine(const String& layerName) const;
 		const AnimationStateFlow& GetAnimationStateFlow() const;
 
 		void SetAnimationStock(const AnimationAssetStock& stock);
@@ -120,6 +125,8 @@ namespace JG
 		void Reset();
 		static SharedPtr<AnimationController> Create(const String& name);
 	private:
+		void ForEach(const std::function<void(const String&, SharedPtr<AnimationStateMachine>)>& action);
+
 		void Update(SharedPtr<IComputeContext> computeContext);
 		void Update_Thread(SharedPtr<IComputeContext> computeContext);
 		bool CanUseSkinnedMesh() const;

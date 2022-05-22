@@ -131,7 +131,11 @@ namespace JG
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr);
 
-			mRayGenSRT->Map(0, nullptr, &mRayGenSRTPointer);
+			if (mRayGenSRT != nullptr)
+			{
+				mRayGenSRT->Map(0, nullptr, &mRayGenSRTPointer);
+			}
+			
 		}
 		if (mRayGenSRTPointer == nullptr)
 		{

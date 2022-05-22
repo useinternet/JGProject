@@ -64,16 +64,7 @@ namespace JG
 				JG_LOG_ERROR("{0} not IJson Class", JGTYPE(T).GetName());
 			}
 		}
-		template<class T>
-		void AddMemberList(const String& key, const List<T>& values)
-		{
-			SharedPtr<JsonData> listJson = CreateJsonData();
-			for (const T& val : values)
-			{
-				listJson->AddMember(val);
-			}
-			AddMember(key, listJson);
-		}
+
 	private:
 		template<class T>
 		rapidjson::Value MakeJsonValue(const T& value)
@@ -110,6 +101,25 @@ namespace JG
 
 		template<class T>
 		rapidjson::Value MakeJsonValue(const List<T>& valueList);
+
+		template<class Key, class Value>
+		rapidjson::Value MakeJsonValue(const Dictionary<Key, Value>& valueDic);
+
+		template<class Key, class Value>
+		rapidjson::Value MakeJsonValue(const SortedDictionary<Key, Value>& valueDic);
+
+		template<class T>
+		rapidjson::Value MakeJsonValue(const HashSet<T>& valueSet);
+
+		template<class T>
+		rapidjson::Value MakeJsonValue(const SortedSet<T>& valueSet);
+
+
+		template<class T>
+		rapidjson::Value MakeJsonValue(const Queue<T>& valueQueue);
+
+		template<class T>
+		rapidjson::Value MakeJsonValue(const Stack<T>& valueStack);
 
 		template<>
 		rapidjson::Value MakeJsonValue(const List<jbyte>& value);
@@ -356,9 +366,9 @@ namespace JG
 				if (jsonData == nullptr) continue;
 				values.push_back(jsonData->GetIJsonData<T>());
 			}
-
 			return values;
 		}
+
 
 	public:
 		void SetString(const String& str) {
@@ -532,7 +542,8 @@ namespace JG
 	rapidjson::Value JsonData::MakeJsonValue(const String& value)
 	{
 		rapidjson::Value val;
-		val.SetString(value.c_str(), (rapidjson::SizeType)value.length(), mJson->GetAllocator());
+		String str = value.substr(0, std::strlen(value.c_str()));
+		val.SetString(str.c_str(), (rapidjson::SizeType)str.length(), mJson->GetAllocator());
 		return val;
 	}
 	template<>
@@ -693,6 +704,103 @@ namespace JG
 		val.SetString(value.data(), (rapidjson::SizeType)value.size(), mJson->GetAllocator());
 		return val;
 	}
+
+	template<class T>
+	rapidjson::Value JsonData::MakeJsonValue(const HashSet<T>& valueSet)
+	{
+		rapidjson::Value valArr; valArr.SetArray();
+		for (auto& value : valueSet)
+		{
+			rapidjson::Value val;
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				auto jsonData = CreateSharedPtr<JsonData>(mJson);
+				static_cast<const IJson*>(&value)->MakeJson(jsonData);
+				val = jsonData->GetValue();
+			}
+			else
+			{
+				val = MakeJsonValue(value);
+			}
+			valArr.PushBack(val, mJson->GetAllocator());
+		}
+		return valArr;
+	}
+
+	template<class T>
+	rapidjson::Value JsonData::MakeJsonValue(const SortedSet<T>& valueSet)
+	{
+		rapidjson::Value valArr; valArr.SetArray();
+		for (auto& value : valueSet)
+		{
+			rapidjson::Value val;
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				auto jsonData = CreateSharedPtr<JsonData>(mJson);
+				static_cast<const IJson*>(&value)->MakeJson(jsonData);
+				val = jsonData->GetValue();
+			}
+			else
+			{
+				val = MakeJsonValue(value);
+			}
+			valArr.PushBack(val, mJson->GetAllocator());
+		}
+		return valArr;
+	}
+
+	template<class T>
+	rapidjson::Value JsonData::MakeJsonValue(const Queue<T>& valueQueue)
+	{
+		rapidjson::Value valArr; valArr.SetArray();
+
+		Queue<T> tempQueue = valueQueue;
+		while (tempQueue.empty() == false)
+		{
+			T value = tempQueue.front(); tempQueue.pop();
+			rapidjson::Value val;
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				auto jsonData = CreateSharedPtr<JsonData>(mJson);
+				static_cast<const IJson*>(&value)->MakeJson(jsonData);
+				val = jsonData->GetValue();
+			}
+			else
+			{
+				val = MakeJsonValue(value);
+			}
+			valArr.PushBack(val, mJson->GetAllocator());
+		}
+
+		return valArr;
+	}
+
+	template<class T>
+	rapidjson::Value JsonData::MakeJsonValue(const Stack<T>& valueStack)
+	{
+		rapidjson::Value valArr; valArr.SetArray();
+
+		Stack<T> tempStack = valueStack;
+		while (tempStack.empty() == false)
+		{
+			T value = tempStack.top(); tempStack.pop();
+			rapidjson::Value val;
+			if constexpr (std::is_base_of<IJson, T>::value == true)
+			{
+				auto jsonData = CreateSharedPtr<JsonData>(mJson);
+				static_cast<const IJson*>(&value)->MakeJson(jsonData);
+				val = jsonData->GetValue();
+			}
+			else
+			{
+				val = MakeJsonValue(value);
+			}
+			valArr.PushBack(val, mJson->GetAllocator());
+		}
+
+		return valArr;
+	}
+
 	inline SharedPtr<JsonData> JsonData::GetMember(const String& key)
 	{
 		bool isFind = (mIsRoot) ?

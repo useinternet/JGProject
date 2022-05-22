@@ -21,6 +21,11 @@ namespace JG
 		return SetData(EAnimationParameterType::Float, name, &value);
 	}
 
+	bool AnimationParameters::SetTrigger(const String& name, bool value)
+	{
+		return SetData(EAnimationParameterType::Trigger, name, &value);
+	}
+
 
 	bool AnimationParameters::GetBool(const String& name, bool* out_value)
 	{
@@ -36,7 +41,46 @@ namespace JG
 	{
 		return GetData(EAnimationParameterType::Float, name, out_value);
 	}
-
+	void AnimationParameters::ForEach_Trigger(const std::function<void(const String& name)>& action)
+	{
+		for (auto _pair : mParamDatas)
+		{
+			if (action && _pair.second.ParamType == EAnimationParameterType::Trigger)
+			{
+				action(_pair.first);
+			}
+		}
+	}
+	void AnimationParameters::ForEach_Bool(const std::function<void(const String& name)>& action)
+	{
+		for (auto _pair : mParamDatas)
+		{
+			if (action && _pair.second.ParamType == EAnimationParameterType::Bool)
+			{
+				action(_pair.first);
+			}
+		}
+	}
+	void AnimationParameters::ForEach_Float(const std::function<void(const String& name)>& action)
+	{
+		for (auto _pair : mParamDatas)
+		{
+			if (action && _pair.second.ParamType == EAnimationParameterType::Float)
+			{
+				action(_pair.first);
+			}
+		}
+	}
+	void AnimationParameters::ForEach_Int(const std::function<void(const String& name)>& action)
+	{
+		for (auto _pair : mParamDatas)
+		{
+			if (action && _pair.second.ParamType == EAnimationParameterType::Int)
+			{
+				action(_pair.first);
+			}
+		}
+	}
 
 	SharedPtr<AnimationParameters> AnimationParameters::Copy() const
 	{
@@ -103,6 +147,7 @@ namespace JG
 	{
 		switch (type)
 		{
+		case EAnimationParameterType::Trigger:  
 		case EAnimationParameterType::Bool:		return sizeof(bool);
 		case EAnimationParameterType::Float:	return sizeof(f32);
 		case EAnimationParameterType::Int:		return sizeof(i32);

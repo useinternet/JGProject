@@ -674,7 +674,15 @@ namespace JG
 			UpdateNodeInteraction();
 			if (ImGui::IsKeyPressed((int)EKeyCode::Del))
 			{
-				RemoveNode(mDataStorage->GetSelectedNode());
+				StateNodeTransition* tansition = FindNodeTransition(mDataStorage->GetSelectedNode());
+				if (tansition == nullptr)
+				{
+					RemoveNode(mDataStorage->GetSelectedNode());
+				}
+				else
+				{
+					UnLink(tansition->mFromID, tansition->mToID);
+				}
 			}
 			if (ImGui::IsMouseDown(2) == true && ImGui::IsWindowHovered())
 			{

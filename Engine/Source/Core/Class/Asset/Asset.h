@@ -310,42 +310,79 @@ namespace JG
 		static const constexpr char* ROOT_NAME_KEY = "RootName";
 		static const constexpr char* ANIM_CLIP_LIST_KEY = "AnimClipList";
 		static const constexpr char* ANIM_PARAM_LIST_KEY = "AimParamList";
-
-		static const constexpr char* ANIM_CLIP_NAME_KEY = "AnimClipName";
-		static const constexpr char* ANIM_CLIP_ASSETPATH_KEY = "AnimClipAssetPath";
-		static const constexpr char* ANIM_CLIP_ANIM_FLAGS_KEY = "AnimClipFlags";
-
-		static const constexpr char* ANIM_PARAM_NAME_KEY = "Name";
-		static const constexpr char* ANIM_PARAM_TYPE_KEY = "Type";
-		static const constexpr char* ANIM_PARAM_DATA_KEY = "Data";
-
-
 		static const constexpr char* ANIM_TRANSITION_LIST_KEY = "TransitionList";
-
-		static const constexpr char* ANIM_TRANSITION_PREV_NODE_NAME_KEY = "PrevNodeName";
-		static const constexpr char* ANIM_TRANSITION_NEXT_NODE_NAME_KEY = "NextNodeName";
-		static const constexpr char* ANIM_TRANSITION_DURATION_KEY = "TransitionDuration";
-		static const constexpr char* ANIM_TRANSITION_CONDITION_LIST_KEY = "TransitionConditionList";
-
-		static const constexpr char* ANIM_CONDITION_NAME_KEY = "Name";
-		static const constexpr char* ANIM_CONDITION_TYPE_KEY = "Condition";
-		static const constexpr char* ANIM_CONDITION_DATA_KEY = "Data";
-
-
 		static const constexpr char* ANIM_BLENDSPACE1D_LIST_KEY = "AnimationBlendSpace1DList";
 		static const constexpr char* ANIM_BLENDSPACE_LIST_KEY   = "AnimationBlendSpaceList";
 	public:
-		struct ParameterData
+#pragma region AnimationStateMachine_Info
+		struct ParameterData : public IJson
 		{
 			EAnimationParameterType Type;
 			String Name;
 			List<jbyte> Data;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("Type", (u32)Type);
+				jsonData->AddMember("Data", Data);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("Name");
+				if (val != nullptr)
+				{
+					Name = val->GetString();
+				}
+				val = jsonData->GetMember("Type");
+				if (val != nullptr)
+				{
+					Type = (EAnimationParameterType)val->GetUint32();
+				}
+				val = jsonData->GetMember("Data");
+				if (val != nullptr)
+				{
+					Data = val->GetByteList();
+				}
+			}
 		};
-		struct AnimationClipInfo
+		struct AnimationClipInfo : public IJson
 		{
 			String Name;
 			String AssetPath;
 			EAnimationClipFlags Flags;
+
+			f32 Speed = 1.0f;
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("Name", Name);
+				jsonData->AddMember("AssetPath", AssetPath);
+				jsonData->AddMember("Flags", (u32)Flags);
+				jsonData->AddMember("Speed", Speed);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("Name");
+				if (val != nullptr)
+				{
+					Name = val->GetString();
+				}
+				val = jsonData->GetMember("AssetPath");
+				if (val != nullptr)
+				{
+					AssetPath = val->GetString();
+				}
+				val = jsonData->GetMember("Flags");
+				if (val != nullptr)
+				{
+					Flags = (EAnimationClipFlags)val->GetUint32();
+				}
+				val = jsonData->GetMember("Speed");
+				if (val != nullptr)
+				{
+					Speed = val->GetFloat();
+				}
+			}
 		};
 		struct AnimationBlendSpace1DInfo : public IJson
 		{
@@ -409,24 +446,97 @@ namespace JG
 				}
 			}
 		};
-		struct AnimationTransitionConditionInfo
+		struct AnimationTransitionConditionInfo : public IJson
 		{
 			String ParameterName;
 			EAnimationCondition Condition;
 			List<jbyte> Data;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("ParameterName", ParameterName);
+				jsonData->AddMember("Condition", (u32)Condition);
+				jsonData->AddMember("Data", Data);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("ParameterName");
+				if (val != nullptr)
+				{
+					ParameterName = val->GetString();
+				}
+				val = jsonData->GetMember("Condition");
+				if (val != nullptr)
+				{
+					Condition = (EAnimationCondition)val->GetUint32();
+				}
+				val = jsonData->GetMember("Data");
+				if (val != nullptr)
+				{
+					Data = val->GetByteList();
+				}
+			}
 		};
-		struct AnimationTransitionInfo
+		struct AnimationTransitionInfo : public IJson
 		{
 			String PrevName;
 			String NextName;
 			f32 TransitionDuration = 0.0f;
+			bool HasExitTime = false;
+			f32 ExitTime = 0.0f;
 			List<AnimationTransitionConditionInfo> Transitions;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember("PrevName", PrevName);
+				jsonData->AddMember("NextName", NextName);
+				jsonData->AddMember("HasExitTime", HasExitTime);
+				jsonData->AddMember("EixtTime", ExitTime);
+				jsonData->AddMember("TransitionDuration", TransitionDuration);
+				jsonData->AddMember("Transitions", Transitions);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember("PrevName");
+				if (val != nullptr)
+				{
+					PrevName = val->GetString();
+				}
+				val = jsonData->GetMember("NextName");
+				if (val != nullptr)
+				{
+					NextName = val->GetString();
+				}
+				val = jsonData->GetMember("HasExitTime");
+				if (val != nullptr)
+				{
+					HasExitTime = val->GetBool();
+				}
+				val = jsonData->GetMember("EixtTime");
+				if (val != nullptr)
+				{
+					ExitTime = val->GetFloat();
+				}
+				val = jsonData->GetMember("TransitionDuration");
+				if (val != nullptr)
+				{
+					TransitionDuration = val->GetFloat();
+				}
+				val = jsonData->GetMember("Transitions");
+				if (val != nullptr)
+				{
+					Transitions = val->GetIJsonDataList< AnimationTransitionConditionInfo>();
+				}
+			}
 		};
+#pragma endregion AnimationStateMachine_Info
+		
+
 		String RootName;
 		List<AnimationClipInfo> AnimClips;
 		List<AnimationBlendSpace1DInfo> AnimBlendSpace1Ds;
 		List<AnimationBlendSpaceInfo>   AnimBlendSpaces;
-		Dictionary<String, ParameterData> Parameters;
+		List<ParameterData> Parameters;
 		List<AnimationTransitionInfo> TransitionInfos;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;

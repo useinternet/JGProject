@@ -134,7 +134,7 @@ namespace JG
 			{
 				return EScheduleResult::Break;
 			}
-			mGraphcisAPI->Flush(GRAPHICS_COMMAND_QUEUE_ID);
+	
 			mGraphcisAPI->BeginFrame();
 			Reset();
 			
@@ -150,7 +150,7 @@ namespace JG
 			}
 
 			mGraphcisAPI->EndFrame();
-			
+			mGraphcisAPI->Flush(GRAPHICS_COMMAND_QUEUE_ID);
 
 			return EScheduleResult::Continue;
 		});

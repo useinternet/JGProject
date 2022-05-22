@@ -41,7 +41,7 @@ namespace JG
 
 	void AnimationBlendSpaceInfo::Reset()
 	{
-		TimePos = std::fmodf(TimePos, Duration);
+		TimePos = 0.0f;
 		for (auto _pair : AnimationClipInfoDic)
 		{
 			_pair.second->Reset();
@@ -53,7 +53,54 @@ namespace JG
 		if (Duration == 0.0f) return 1.0f;
 		else return TimePos / Duration;
 	}
-
+	f32 AnimationBlendSpaceInfo::GetLeftTopBottomBlendFactor() const
+	{
+		return LTBBlendFactor;
+	}
+	f32 AnimationBlendSpaceInfo::GetRightTopBottomBlendFactor() const
+	{
+		return RTBBlendFactor;
+	}
+	f32 AnimationBlendSpaceInfo::GetBlendFactor()
+	{
+		return FinalBlendFactor;
+	}
+	const AnimationClipInfo& AnimationBlendSpaceInfo::GetLeftTopBlendingAnimationClipInfo() const
+	{
+		static AnimationClipInfo staticAnimClip;
+		if (LeftTopAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
+		return *LeftTopAnimationClipInfo;
+	}
+	const AnimationClipInfo& AnimationBlendSpaceInfo::GetLeftBottomBlendingAnimationClipInfo() const
+	{
+		static AnimationClipInfo staticAnimClip;
+		if (LeftBottomAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
+		return *LeftBottomAnimationClipInfo;
+	}
+	const AnimationClipInfo& AnimationBlendSpaceInfo::GetRightTopBlendingAnimationClipInfo() const
+	{
+		static AnimationClipInfo staticAnimClip;
+		if (RightTopAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
+		return *RightTopAnimationClipInfo;
+	}
+	const AnimationClipInfo& AnimationBlendSpaceInfo::GetRightBottomBlendingAnimationClipInfo() const
+	{
+		static AnimationClipInfo staticAnimClip;
+		if (RightBottomAnimationClipInfo == nullptr)
+		{
+			return staticAnimClip;
+		}
+		return *RightBottomAnimationClipInfo;
+	}
 	SharedPtr<AnimationClipInfo> AnimationBlendSpaceInfo::FindAnimationClipInfo(const String& name) const
 	{
 		if (AnimationClipInfoDic.find(name) == AnimationClipInfoDic.end())
@@ -295,7 +342,7 @@ namespace JG
 			TimePos += tick;
 			if (TimePos >= Duration)
 			{
-				Reset();
+				TimePos = std::fmodf(TimePos, Duration);
 			}
 		}
 	}

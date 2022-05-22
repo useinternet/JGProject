@@ -19,6 +19,16 @@ namespace JG
 		class StateNodeEditor;
 		using StateNodeID = u64;
 	}
+	// Layer 기반 애니메이션
+	// Animation 에는 Base Layer, SubLayer가 있고
+	// Base Layer에서는 AnimClip, BlendSpace, BlendSpace1D 모두 사용 가능
+	// Sub  Layer에서는 AnimClip만 허용
+	// Sub Layer의 경우에는 RootNode와 더불어 Begin, Exit 노드가 존재
+	// Exit 노드에 도달하면 Layer 재생 완료 RootNode부터 다시 시작
+	// 에디터에서는 SubLayer <-> Base Layer 전환 가능
+
+
+
 	class AnimationClip;
 	class AnimationBlendSpace1D;
 	class AnimationBlendSpace;
@@ -57,13 +67,18 @@ namespace JG
 			StateNodeGUI::StateNodeID From;
 			StateNodeGUI::StateNodeID To;
 			f32 TransitionDuration = 0.0f;
+
+			bool HasExitTime = false;
+			f32  ExitTime = 0.0f;
 			List<AnimTransitionConditionBuildData> Conditions;
 		};
 		struct AnimClipBuildData
 		{
 			StateNodeGUI::StateNodeID ID;
-			EAnimationClipFlags Flags = EAnimationClipFlags::None;
 			SharedPtr<Asset<AnimationClip>> Asset;
+		
+			EAnimationClipFlags Flags = EAnimationClipFlags::None;
+			f32 Speed    = 1.0f;
 		};
 		struct AnimBlendSpace1DBuildData
 		{
@@ -108,13 +123,13 @@ namespace JG
 		SharedPtr<Asset<IMesh>>		mMeshAsset = nullptr;
 		UniquePtr<EditorUIScene>    mEditorUIScene;
 
-		SharedPtr<Asset<AnimationController>> mAnimationAsset;
+		SharedPtr<Asset<AnimationController>>    mAnimationAsset;
 		UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
 
 
-		EEditMode mAnimParamEditMode = EEditMode::Default;
-		EEditMode mTransitionConditionEditMode = EEditMode::Default;
-		EAnimState mAnimState = EAnimState::Editable;
+		EEditMode  mAnimParamEditMode		    = EEditMode::Default;
+		EEditMode  mTransitionConditionEditMode = EEditMode::Default;
+		EAnimState mAnimState				    = EAnimState::Editable;
 
 		StorableString mModelAssetPath;
 		StorableString mSkeletoneAssetPath;
@@ -125,12 +140,35 @@ namespace JG
 		Dictionary<EAnimationParameterType, Color> mBgColorByParamTypeDic;
 		HashSet<String> mAddedAnimParamNameSet;
 		List<AnimParamBuildData>	  mAnimParamBuildDataList;
+
+
+
+		// 레이어 기반
+		//struct AnimationLayerBuildData
+		//{
+		//	UniquePtr<StateNodeGUI::StateNodeEditor> NodeEditor;
+		//	Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> AnimTransitionBuildDataDic;
+		//	Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       AnimClipBuildDataDic;
+		//	Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    AnimBlendSpace1DBuildDataDic;
+		//	Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      AnimBlendSpaceBuildDataDic;
+		//	Dictionary<StateNodeGUI::StateNodeID, JVector2> NodeLocationDic;
+		//	Dictionary<String, StateNodeGUI::StateNodeID>   NodeNameDic;
+		//};
+		//Dictionary<String, AnimationLayerBuildData> mAnimLayerBuildDataDic;
+
+
+
+
 		Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    mAnimBlendSpace1DBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      mAnimBlendSpaceBuildDataDic;
 		Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
 		Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
+
+
+
+
 	public:
 		AnimationView();
 		virtual ~AnimationView() = default;
@@ -163,11 +201,11 @@ namespace JG
 		void AnimationBlendSpace_OnGUI(AnimBlendSpaceBuildData& buildData);
 
 
-		StateNodeGUI::StateNodeID CreateNode(ENodeType nodeType, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateNode(ENodeType nodeType, const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
 		StateNodeGUI::StateNodeID CreateRootNode();
-		StateNodeGUI::StateNodeID CreateAnimationClipNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
-		StateNodeGUI::StateNodeID CreateAnimationBlendSpace1DNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
-		StateNodeGUI::StateNodeID CreateAnimationBlendSpaceNode(const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateAnimationClipNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateAnimationBlendSpace1DNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateAnimationBlendSpaceNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
 		void UpdateScene();
 
 		void SetMesh(const String& meshAssetPath);

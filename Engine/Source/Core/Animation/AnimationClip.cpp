@@ -16,15 +16,22 @@ namespace JG
 		Clip = clip;
 		Flags = flags;
 		TickPerSecond = clip->GetTickPerSecond();
+		State = EAnimationClipState::Running;
 	}
 
 	void AnimationClipInfo::Update(f32 tick, f32 multiplier)
 	{
+		State = EAnimationClipState::Running;
 		TimePos += (tick * TickPerSecond * Speed * 10 * multiplier);
-		if (Flags & EAnimationClipFlags::Repeat)
+		if (TimePos >= Duration)
 		{
-			Reset();
+			State = EAnimationClipState::Compelete;
+			if (Flags & EAnimationClipFlags::Repeat)
+			{
+				TimePos = std::fmodf(TimePos, Duration);
+			}
 		}
+
 	}
 
 	bool AnimationClip::IsValid() const

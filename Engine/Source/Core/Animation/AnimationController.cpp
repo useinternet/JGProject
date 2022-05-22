@@ -21,7 +21,7 @@ namespace JG
 	{
 		mAnimParams = CreateSharedPtr<AnimationParameters>();
 		mAnimParams_Thread = CreateSharedPtr<AnimationParameters>();
-		mAnimationStateMachine = CreateSharedPtr<AnimationStateMachine>(this);
+		mAnimationStateMachineDic[mBaseLayer] = CreateSharedPtr<AnimationStateMachine>(this);
 		mFlow = CreateSharedPtr<AnimationStateFlow>();
 	}
 	void AnimationController::AddAnimationClip(const String& name, SharedPtr<AnimationClip> animationClip, EAnimationClipFlags flags, bool immediate)
@@ -273,7 +273,16 @@ namespace JG
 
 	SharedPtr<AnimationStateMachine> AnimationController::GetAnimationStateMachine() const
 	{
-		return mAnimationStateMachine;
+		return GetAnimationStateMachine(mBaseLayer);
+	}
+
+	SharedPtr<AnimationStateMachine> AnimationController::GetAnimationStateMachine(const String& layerName) const
+	{
+		if (mAnimationStateMachineDic.find(layerName) == mAnimationStateMachineDic.end())
+		{
+			return nullptr;
+		}
+		return mAnimationStateMachineDic.at(layerName);
 	}
 
 	const AnimationStateFlow& AnimationController::GetAnimationStateFlow() const
@@ -283,16 +292,16 @@ namespace JG
 
 	void AnimationController::SetAnimationStock(const AnimationAssetStock& stock)
 	{
+		mAnimParams = CreateSharedPtr<AnimationParameters>();
+		mAnimationStateMachineDic[mBaseLayer] = CreateSharedPtr<AnimationStateMachine>(this);
 		SharedPtr<AnimationStateMachine> stateMachine = GetAnimationStateMachine();
 		SharedPtr<AnimationParameters> animParameters = GetAnimationParameters();
 		stateMachine->Begin(stock.RootName);
 
 		Dictionary<String, EAnimationParameterType> paramTypeDic;
 		// Anim Param
-		for (auto _pair : stock.Parameters)
+		for (const AnimationAssetStock::ParameterData& data : stock.Parameters)
 		{
-			const AnimationAssetStock::ParameterData& data = _pair.second;
-
 			switch (data.Type)
 			{
 			case EAnimationParameterType::Bool:
@@ -303,6 +312,9 @@ namespace JG
 				break;
 			case EAnimationParameterType::Int:
 				animParameters->SetInt(data.Name, *((i32*)data.Data.data()));
+				break;
+			case EAnimationParameterType::Trigger:
+				animParameters->SetTrigger(data.Name, false);
 				break;
 			}
 			paramTypeDic[data.Name] = data.Type;
@@ -317,7 +329,10 @@ namespace JG
 				continue;
 			}
 			AddAnimationClip(clipInfo.Name, clipAsset->Get(), clipInfo.Flags, true);
-			stateMachine->MakeAnimationClipNode(clipInfo.Name, nullptr);
+			stateMachine->MakeAnimationClipNode(clipInfo.Name, [&](AnimationClipInfo* animClipInfo)
+			{
+				animClipInfo->SetSpeed(clipInfo.Speed);
+			});
 		}
 		for (const AnimationAssetStock::AnimationBlendSpace1DInfo& blend1DInfo : stock.AnimBlendSpace1Ds)
 		{
@@ -346,6 +361,8 @@ namespace JG
 				[&](AnimationTransition* transition)
 			{
 				transition->SetTransitionDuration(transInfo.TransitionDuration);
+				transition->SetHasExitTime(transInfo.HasExitTime);
+				transition->SetExitTime(transInfo.ExitTime);
 				for (const AnimationAssetStock::AnimationTransitionConditionInfo& condInfo : transInfo.Transitions)
 				{
 					switch (paramTypeDic[condInfo.ParameterName])
@@ -358,6 +375,9 @@ namespace JG
 						break;
 					case EAnimationParameterType::Int:
 						transition->AddCondition_Int(condInfo.ParameterName, *((i32*)condInfo.Data.data()), condInfo.Condition);
+						break;
+					case EAnimationParameterType::Trigger:
+						transition->AddCondition_Trigger(condInfo.ParameterName);
 						break;
 					}
 				}
@@ -380,6 +400,18 @@ namespace JG
 	SharedPtr<AnimationController> AnimationController::Create(const String& name)
 	{
 		return CreateSharedPtr<AnimationController>();
+	}
+
+
+	void AnimationController::ForEach(const std::function<void(const String&, SharedPtr<AnimationStateMachine>)>& action)
+	{
+		for (auto _pair : mAnimationStateMachineDic)
+		{
+			if (action != nullptr)
+			{
+				action(_pair.first, _pair.second);
+			}
+		}
 	}
 
 	void AnimationController::Update(SharedPtr<IComputeContext> computeContext)
@@ -427,6 +459,12 @@ namespace JG
 		}
 
 		*mAnimParams_Thread = *mAnimParams;
+
+		mAnimParams->ForEach_Trigger([this](const String& name)
+		{
+			mAnimParams->SetTrigger(name, false);
+		});
+
 		*mFlow = GetAnimationStateMachine()->GetAnimationStateFlow_Thread();
 
 		// 스키닝 Mesh 생성
@@ -452,10 +490,18 @@ namespace JG
 		}
 		if (mIsResetStateMachine == true)
 		{
-			mAnimationStateMachine->Reset_Thread();
+			ForEach([](const String& name, SharedPtr<AnimationStateMachine> animStateMachine)
+			{
+				animStateMachine->Reset_Thread();
+			});
 			mIsResetStateMachine = false;
 		}
-		List<SharedPtr<AnimationTransform>> animTransforms = mAnimationStateMachine->Execute_Thread();
+		List<SharedPtr<AnimationTransform>> animTransforms;
+		// 블랜딩 추가 일단 디폴트 레이어 만 계산
+		ForEach([&](const String& name, SharedPtr<AnimationStateMachine> animStateMachine)
+		{
+			animTransforms = animStateMachine->Execute_Thread();
+		});
 		if (mOriginMesh != nullptr && mOriginMesh->IsValid())
 		{
 			SharedPtr<ICopyContext> copyContext = computeContext->QueryInterfaceAsCopyContext();
@@ -467,7 +513,7 @@ namespace JG
 			// 애니메이션 스키닝
 			Compute::AnimationSkinning::Input input;
 			input.AnimTransforms = animTransforms;
-			input.OriginMesh = mOriginMesh;
+			input.OriginMesh  = mOriginMesh;
 			input.SkinnedMesh = CanUseSkinnedMesh() ? mSkinnedMesh : nullptr;
 			mAnimationSkinning->Execute(computeContext, input);
 		}

@@ -1,17 +1,35 @@
 {
     "Main": [
         {
-            "Name": "AnimationClip",
+            "Name": "Root",
+            "NodeType": 0,
             "Location": [
-                410.0,
-                397.0
+                214.0,
+                141.0
             ]
         },
         {
-            "Name": "Root",
+            "Name": "Test_Kick",
+            "NodeType": 1,
             "Location": [
-                129.0,
-                152.0
+                700.0,
+                653.0
+            ]
+        },
+        {
+            "Name": "Walk&Run",
+            "NodeType": 2,
+            "Location": [
+                228.0,
+                448.0
+            ]
+        },
+        {
+            "Name": "TestBuild",
+            "NodeType": 3,
+            "Location": [
+                753.0,
+                173.0
             ]
         }
     ]

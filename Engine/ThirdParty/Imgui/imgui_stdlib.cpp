@@ -44,7 +44,13 @@ bool ImGui::InputText(const char* label, std::string* str, ImGuiInputTextFlags f
     cb_user_data.Str = str;
     cb_user_data.ChainCallback = callback;
     cb_user_data.ChainCallbackUserData = user_data;
-    return InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+
+    bool result = InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+    if (str != nullptr)
+    {
+        str->resize(std::strlen(str->c_str()));
+    }
+    return result;
 }
 
 bool ImGui::InputTextMultiline(const char* label, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)

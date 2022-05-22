@@ -1,0 +1,28 @@
+{
+    "Main": [
+        {
+            "Name": "Root",
+            "NodeType": 0,
+            "Location": [
+                201.0,
+                154.0
+            ]
+        },
+        {
+            "Name": "Idle",
+            "NodeType": 1,
+            "Location": [
+                325.0,
+                510.0
+            ]
+        },
+        {
+            "Name": "Kick",
+            "NodeType": 1,
+            "Location": [
+                746.0,
+                280.0
+            ]
+        }
+    ]
+}

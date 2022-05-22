@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "AnimationTransition.h"
 #include "AnimationParameters.h"
-
+#include "AnimationController.h"
+#include "AnimationClip.h"
+#include "Application.h"
 namespace JG
 {
 
@@ -39,40 +41,76 @@ namespace JG
 		mFloatTransitionList.push_back(TransitionCondition<f32>(name, value, condition));
 	}
 
-
-	bool AnimationTransition::Transition() const
+	void AnimationTransition::AddCondition_Trigger(const String& name)
 	{
+		mTransitionInfoList.push_back(TransitionConditionInfo(mTriggerTransitionList.size(), ETransitionType::Trigger));
+		mTriggerTransitionList.push_back(name);
+	}
+
+
+	bool AnimationTransition::Transition() 
+	{
+		bool result = false;
 		if (mTransitionInfoList.empty())
 		{
-			return true;
+			result = true;
 		}
-		for (const TransitionConditionInfo& info : mTransitionInfoList)
+		else
 		{
-			switch (info.Type)
+			for (const TransitionConditionInfo& info : mTransitionInfoList)
 			{
-			case ETransitionType::Script:
-				if (mScriptTransitionList[info.ID]->Transition(mData) == true)
+				switch (info.Type)
 				{
-					return true;
-				}
-			case ETransitionType::Bool:
-				if (TransitionBool(info) == true)
-				{
-					return true;
-				}
-			case ETransitionType::Int:
-				if (TransitionInt(info) == true)
-				{
-					return true;
-				}
-			case ETransitionType::Float:
-				if (TransitionFloat(info) == true)
-				{
-					return true;
+				case ETransitionType::Script:
+					if (mScriptTransitionList[info.ID]->Transition(mData) == true)
+					{
+						result = true;
+					}
+					break;
+				case ETransitionType::Bool:
+					if (TransitionBool(info) == true)
+					{
+						result = true;
+					}
+					break;
+				case ETransitionType::Int:
+					if (TransitionInt(info) == true)
+					{
+						result = true;
+					}
+					break;
+				case ETransitionType::Float:
+					if (TransitionFloat(info) == true)
+					{
+						result = true;
+					}
+					break;
+				case ETransitionType::Trigger:
+					if (TransitionTrigger(info) == true)
+					{
+						result = true;
+					}
+					break;
 				}
 			}
 		}
-		return false;
+		// Prev
+		// Next
+		
+		if (mHasExitTime && result)
+		{
+			SharedPtr<AnimationClipInfo> PrevClipInfo = mData.AnimationController->FindAnimationClipInfo(mData.PrevNodeName);
+			if (PrevClipInfo != nullptr)
+			{
+				if (mExitTime > PrevClipInfo->GetNormalizedTimePos() && 
+					PrevClipInfo->GetState() != EAnimationClipState::Compelete)
+				{
+					result = false;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 
@@ -150,6 +188,23 @@ namespace JG
 			return lvalue > rvalue;
 		default:
 			return false;
+		}
+		return false;
+	}
+	bool AnimationTransition::TransitionTrigger(const TransitionConditionInfo& info) const
+	{
+		const String& paramName = mTriggerTransitionList[info.ID];
+
+		bool trigger = false;
+		if (mData.AnimationParameters->GetData(EAnimationParameterType::Trigger, paramName, &trigger) == false)
+		{
+			JG_LOG_ERROR("%s Is Not Exist Animation Paramter", paramName);
+			return false;
+		}
+		if (trigger)
+		{
+			mData.AnimationParameters->SetTrigger(paramName, false);
+			return true;
 		}
 		return false;
 	}

@@ -420,15 +420,7 @@ namespace JG
 			JG_LOG_ERROR("%s is not exist Animation Clip", clipName);
 			return;
 		}
-
-		clipInfo->TimePos += tick * clipInfo->TickPerSecond * clipInfo->Speed * 10;
-		if (clipInfo->GetFlags() & EAnimationClipFlags::Repeat)
-		{
-			if (clipInfo->TimePos >= clipInfo->Duration)
-			{
-				clipInfo->Reset();
-			}
-		}
+		clipInfo->Update(tick);
 	}
 
 	void AnimationStateMachine::UpdateAnimationBlend1DInfo_Thread(const String& nodeName)
@@ -484,25 +476,6 @@ namespace JG
 		animParams->GetFloat(animBlendInfo->BlendSpace->GetYParamName(), &currValue.y);
 
 		animBlendInfo->Update(tick, currValue);
-		//for (auto& _pair : animBlendInfo->AnimationClipInfoDic)
-		//{
-		//	_pair.second->TimePos += tick * _pair.second->TickPerSecond * _pair.second->Speed * 10;
-		//	if (_pair.second->GetFlags() & EAnimationClipFlags::Repeat)
-		//	{
-		//		if (_pair.second->TimePos >= _pair.second->Duration)
-		//		{
-		//			_pair.second->Reset();
-		//		}
-		//	}
-		//}
-		//if (animBlendInfo->Duration > 0.0f)
-		//{
-		//	animBlendInfo->TimePos += tick;
-		//	if (animBlendInfo->TimePos >= animBlendInfo->Duration)
-		//	{
-		//		animBlendInfo->Reset();
-		//	}
-		//}
 	}
 
 	void AnimationStateMachine::UpdateAnimationTransform_Thread(List<SharedPtr<AnimationTransform>>& out_animTransform)
@@ -581,10 +554,6 @@ namespace JG
 			if (blendSpaceInfo != nullptr)
 			{
 				blendSpaceInfo->Reset();
-				for (auto _pair : blendSpaceInfo->AnimationClipInfoDic)
-				{
-					_pair.second->Reset();
-				}
 			}
 
 		}
@@ -594,10 +563,6 @@ namespace JG
 			if (blendSpaceInfo != nullptr)
 			{
 				blendSpaceInfo->Reset();
-				for (auto _pair : blendSpaceInfo->AnimationClipInfoDic)
-				{
-					_pair.second->Reset();
-				}
 			}
 			break;
 
@@ -625,6 +590,7 @@ namespace JG
 			{
 				UpdateFlow_Thread(connectedNode);
 				ExecuteInternal_Thread(connectedNode);
+				return;
 			}
 		}
 		

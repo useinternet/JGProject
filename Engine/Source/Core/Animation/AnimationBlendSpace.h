@@ -50,8 +50,16 @@ namespace JG
 
 		void Reset();
 		f32  GetNormalizedTimePos() const;
-		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name) const;
+		f32 GetLeftTopBottomBlendFactor() const;
+		f32 GetRightTopBottomBlendFactor() const;
+		f32 GetBlendFactor();
+		const AnimationClipInfo& GetLeftTopBlendingAnimationClipInfo() const;
+		const AnimationClipInfo& GetLeftBottomBlendingAnimationClipInfo() const;
+		const AnimationClipInfo& GetRightTopBlendingAnimationClipInfo() const;
+		const AnimationClipInfo& GetRightBottomBlendingAnimationClipInfo() const;
+
 	private:
+		SharedPtr<AnimationClipInfo> FindAnimationClipInfo(const String& name) const;
 		void Update(f32 tick, const JVector2& blendValue);
 	};
 

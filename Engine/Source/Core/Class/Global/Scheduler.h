@@ -17,14 +17,11 @@ namespace JG
 			BeginSystem = -2000000,
 
 			Graphics_BeginFrame		  = BeginSystem + 1,
-			Animation_BeginFrame      = Graphics_BeginFrame,
-
-
 			Graphics_PushSceneObject  = BeginSystem + 2,
 			Graphics_Rendering        = BeginSystem + 3,
-
 			AssetDataBase_Update      = BeginSystem + 4,
-			Input_Update			  = BeginSystem + 5,
+			Animation_BeginFrame	  = BeginSystem + 5,
+			Input_Update			  = BeginSystem + 6,
 			// Layer
 			ImGuiSystemLayer		 = -900000,
 			GameLayer				 = -800000,
