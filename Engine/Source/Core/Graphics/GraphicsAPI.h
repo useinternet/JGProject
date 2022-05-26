@@ -95,7 +95,6 @@ namespace JG
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name) = 0;
 		virtual SharedPtr<ITexture>       CreateTexture(const String& name, const TextureInfo& info) = 0;
 		virtual SharedPtr<IRootSignatureCreater> CreateRootSignatureCreater() = 0;
-		//virtual SharedPtr<IGraphicsContext> GetGraphicsContext() = 0;
 
 		virtual SharedPtr<IRayTracingPipeline> CreateRayTracingPipeline() = 0;
 		virtual SharedPtr<IRayTracingShaderResourceTable> CreateRayTracingShaderResourceTable() = 0;
@@ -131,9 +130,6 @@ namespace JG
 		virtual void BindByteAddressBuffer(u32 rootParam, SharedPtr<IResource> resource) = 0;
 		virtual void BindVertexAndIndexBuffer(SharedPtr<IVertexBuffer> vertexBuffer, SharedPtr<IIndexBuffer> indexBuffer) = 0;
 		virtual void DrawIndexedAfterBindMeshAndMaterial(SharedPtr<IMesh> mesh, const List<SharedPtr<IMaterial>>& materialList) = 0;
-
-
-
 		template<class T>
 		void BindConstantBuffer(u32 rootParam, const T& data)
 		{
@@ -149,9 +145,6 @@ namespace JG
 		{
 			BindSturcturedBuffer(rootParam, datas.data(), sizeof(T), datas.size());
 		}
-
-
-
 		// 셋팅 함수
 		virtual void SetDepthStencilState(EDepthStencilStateTemplate _template) = 0;
 		virtual void SetBlendState(u32 renderTargetSlot, EBlendStateTemplate _template) = 0;

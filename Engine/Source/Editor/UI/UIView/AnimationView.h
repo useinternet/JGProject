@@ -36,62 +36,13 @@ namespace JG
 	class EditorUIScene;
 	class IMesh;
 	
+	enum class ENodeType;
+
 
 	class AnimationView : public UIView
 	{
 		JGCLASS
 	private:
-		enum class ENodeType
-		{
-			Root,
-			AnimationClip,
-			AnimationBlendSpace1D,
-			AnimationBlendSpace,
-		};
-		struct AnimParamBuildData
-		{
-			String Name;
-			EAnimationParameterType Type;
-			List<jbyte> Data;
-		};
-
-		struct AnimTransitionConditionBuildData
-		{
-			String ParamName;
-			EAnimationParameterType Type;
-			EAnimationCondition Condition;
-			List<jbyte> Data;
-		};
-		struct AnimTransitionBuildData
-		{
-			StateNodeGUI::StateNodeID From;
-			StateNodeGUI::StateNodeID To;
-			f32 TransitionDuration = 0.0f;
-
-			bool HasExitTime = false;
-			f32  ExitTime = 0.0f;
-			List<AnimTransitionConditionBuildData> Conditions;
-		};
-		struct AnimClipBuildData
-		{
-			StateNodeGUI::StateNodeID ID;
-			SharedPtr<Asset<AnimationClip>> Asset;
-		
-			EAnimationClipFlags Flags = EAnimationClipFlags::None;
-			f32 Speed    = 1.0f;
-		};
-		struct AnimBlendSpace1DBuildData
-		{
-			StateNodeGUI::StateNodeID ID;
-			EAnimationBlendSpace1DFlag Flags = EAnimationBlendSpace1DFlag::Repeat;
-			SharedPtr<Asset<AnimationBlendSpace1D>> Asset;
-		};
-		struct AnimBlendSpaceBuildData
-		{
-			StateNodeGUI::StateNodeID ID;
-			EAnimationBlendSpaceFlag Flags = EAnimationBlendSpaceFlag::Repeat;
-			SharedPtr<Asset<AnimationBlendSpace>> Asset;
-		};
 		enum class EEditMode
 		{
 			Default,
@@ -124,7 +75,7 @@ namespace JG
 		UniquePtr<EditorUIScene>    mEditorUIScene;
 
 		SharedPtr<Asset<AnimationController>>    mAnimationAsset;
-		UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
+		//UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
 
 
 		EEditMode  mAnimParamEditMode		    = EEditMode::Default;
@@ -139,32 +90,22 @@ namespace JG
 		// BuildData
 		Dictionary<EAnimationParameterType, Color> mBgColorByParamTypeDic;
 		HashSet<String> mAddedAnimParamNameSet;
-		List<AnimParamBuildData>	  mAnimParamBuildDataList;
-
-
-
-		// 레이어 기반
-		//struct AnimationLayerBuildData
-		//{
-		//	UniquePtr<StateNodeGUI::StateNodeEditor> NodeEditor;
-		//	Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> AnimTransitionBuildDataDic;
-		//	Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       AnimClipBuildDataDic;
-		//	Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    AnimBlendSpace1DBuildDataDic;
-		//	Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      AnimBlendSpaceBuildDataDic;
-		//	Dictionary<StateNodeGUI::StateNodeID, JVector2> NodeLocationDic;
-		//	Dictionary<String, StateNodeGUI::StateNodeID>   NodeNameDic;
-		//};
-		//Dictionary<String, AnimationLayerBuildData> mAnimLayerBuildDataDic;
+		List<struct AnimParamBuildData>	  mAnimParamBuildDataList;
 
 
 
 
-		Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
-		Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
-		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    mAnimBlendSpace1DBuildDataDic;
-		Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      mAnimBlendSpaceBuildDataDic;
-		Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
-		Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
+		Dictionary<String, SharedPtr<struct AnimationLayerBuildData>> mAnimLayerBuildDataDic;
+		SharedPtr<AnimationLayerBuildData> mCurrentAnimLayerBuildData = nullptr;
+
+
+
+		//Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
+		//Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
+		//Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    mAnimBlendSpace1DBuildDataDic;
+		//Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      mAnimBlendSpaceBuildDataDic;
+		//Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
+		//Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
 
 
 
@@ -182,30 +123,26 @@ namespace JG
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override { }
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override { }
 	private:
-		void InitNodeEditor();
-		void InitBuildData();
-
 
 		void AnimationScene_OnGUI();
 		void AnimationInspector_OnGUI();
 		void AnimationNodeEditor_OnGUI();
-		void AnimationParam_OnGUI(AnimParamBuildData& buildData);
+		void AnimationParamEditor_OnGUI();
 
-		void Transition_OnGUI(AnimTransitionBuildData& buildData);
-		void TransitionConditionValue_OnGUI(AnimTransitionConditionBuildData& buildData);
+		void AnimationParam_OnGUI(struct AnimParamBuildData& buildData);
+
+		void Transition_OnGUI(struct AnimTransitionBuildData& buildData);
+		void TransitionConditionValue_OnGUI(struct AnimTransitionConditionBuildData& buildData);
 
 
 		void AnimationRoot_OnGUI();
-		void AnimationClip_OnGUI(AnimClipBuildData& buildData);
-		void AnimationBlendSpace1D_OnGUI(AnimBlendSpace1DBuildData& buildData);
-		void AnimationBlendSpace_OnGUI(AnimBlendSpaceBuildData& buildData);
+		void AnimationClip_OnGUI(struct AnimClipBuildData& buildData);
+		void AnimationBlendSpace1D_OnGUI(struct AnimBlendSpace1DBuildData& buildData);
+		void AnimationBlendSpace_OnGUI(struct AnimBlendSpaceBuildData& buildData);
 
 
-		StateNodeGUI::StateNodeID CreateNode(ENodeType nodeType, const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
-		StateNodeGUI::StateNodeID CreateRootNode();
-		StateNodeGUI::StateNodeID CreateAnimationClipNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
-		StateNodeGUI::StateNodeID CreateAnimationBlendSpace1DNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
-		StateNodeGUI::StateNodeID CreateAnimationBlendSpaceNode(const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		StateNodeGUI::StateNodeID CreateNode(const String& layerName, ENodeType nodeType, const String& name, const JVector2& initPos = JVector2(JG_F32_MAX, JG_F32_MAX));
+		
 		void UpdateScene();
 
 		void SetMesh(const String& meshAssetPath);
@@ -228,5 +165,8 @@ namespace JG
 		Color GetBgColor(EAnimationParameterType type) {
 			return mBgColorByParamTypeDic[type];
 		}
+
+		SharedPtr<AnimationLayerBuildData> GetCurrentLayerBuildData() const;
+		SharedPtr<AnimationLayerBuildData> GetLayerBuildData(const String& name) const;
 	};
 }

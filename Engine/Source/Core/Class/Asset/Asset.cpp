@@ -285,46 +285,27 @@ namespace JG
 
 	void AnimationAssetStock::MakeJson(SharedPtr<JsonData> jsonData) const
 	{
-		jsonData->AddMember(ROOT_NAME_KEY, RootName);
-		jsonData->AddMember(ANIM_CLIP_LIST_KEY, AnimClips);
-		jsonData->AddMember(ANIM_BLENDSPACE1D_LIST_KEY, AnimBlendSpace1Ds);
-		jsonData->AddMember(ANIM_BLENDSPACE_LIST_KEY, AnimBlendSpaces);
+		jsonData->AddMember(ANIM_STATE_MACHINE_LIST_KEY, AnimStateMachineInfos);
 		jsonData->AddMember(ANIM_PARAM_LIST_KEY, Parameters);
-		jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, TransitionInfos);
+		//jsonData->AddMember(ROOT_NAME_KEY, RootName);
+		//jsonData->AddMember(ANIM_CLIP_LIST_KEY, AnimClips);
+		//jsonData->AddMember(ANIM_BLENDSPACE1D_LIST_KEY, AnimBlendSpace1Ds);
+		//jsonData->AddMember(ANIM_BLENDSPACE_LIST_KEY, AnimBlendSpaces);
+		//jsonData->AddMember(ANIM_PARAM_LIST_KEY, Parameters);
+		//jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, TransitionInfos);
 	}
 	void AnimationAssetStock::LoadJson(SharedPtr<JsonData> jsonData)
 	{
-		SharedPtr<JsonData> val = jsonData->GetMember(ROOT_NAME_KEY);
 
-		if (val != nullptr && val->IsString())
-		{
-			RootName = val->GetString();
-		}
-		val = jsonData->GetMember(ANIM_CLIP_LIST_KEY);
+		SharedPtr<JsonData> val = jsonData->GetMember(ANIM_STATE_MACHINE_LIST_KEY);
 		if (val != nullptr)
 		{
-			AnimClips = val->GetIJsonDataList<AnimationClipInfo>();
-		}
-
-		val = jsonData->GetMember(ANIM_BLENDSPACE1D_LIST_KEY);
-		if (val != nullptr)
-		{
-			AnimBlendSpace1Ds = val->GetIJsonDataList<AnimationBlendSpace1DInfo>();
-		}
-		val = jsonData->GetMember(ANIM_BLENDSPACE_LIST_KEY);
-		if (val != nullptr)
-		{
-			AnimBlendSpaces = val->GetIJsonDataList<AnimationBlendSpaceInfo>();
+			AnimStateMachineInfos = val->GetIJsonDataList<AnimationStateMachineInfo>();
 		}
 		val = jsonData->GetMember(ANIM_PARAM_LIST_KEY);
 		if (val != nullptr)
 		{
 			Parameters = val->GetIJsonDataList<ParameterData>();
-		}
-		val = jsonData->GetMember(ANIM_TRANSITION_LIST_KEY);
-		if (val != nullptr)
-		{
-			TransitionInfos = val->GetIJsonDataList<AnimationTransitionInfo>();
 		}
 	}
 

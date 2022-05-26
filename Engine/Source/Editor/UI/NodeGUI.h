@@ -22,6 +22,8 @@ namespace JG
 			No_ReName = 0x002,
 			//
 			RootNode  = 0x004,
+			//
+			ExitNode  = 0x008
 		};
 
 		class StateNodeTransition
@@ -176,6 +178,7 @@ namespace JG
 		struct StateNodeLinkInfo
 		{
 			StateNodeID RootNodeID = 0;
+			StateNodeID ExitNodeID = 0;
 			List<StateNodeID> NodeIDList;
 			List<List<StateNodeID>> LinkedNodeIDLists;
 		};

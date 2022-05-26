@@ -104,6 +104,20 @@ namespace JG
 		}
 		return *this;
 	}
+	AnimationStateMachine& AnimationStateMachine::MakeExitNode(const String& name)
+	{
+		if (mIsRunning) *this;
+		if (mIsMakingMachine == false)
+		{
+			return *this;
+		}
+		if (CreateNode(ENodeType::End, name) == false)
+		{
+			return *this;
+		}
+		mExitNodeName = name;
+		return *this;
+	}
 	AnimationStateMachine& AnimationStateMachine::ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction)
 	{
 		if (mIsRunning) *this;
@@ -365,6 +379,7 @@ namespace JG
 			AnimationTransition* transition = FindTransition(prevNodeName, currentNodeName);
 			if (transition != nullptr && transition->GetTransitionDuration() < mTransitionTimePos)
 			{
+				ResetNode_Thread(mPrevNode);
 				mIsTransitioning = false;
 				mPrevNode = nullptr;
 				mTransitionTimePos = 0.0f;

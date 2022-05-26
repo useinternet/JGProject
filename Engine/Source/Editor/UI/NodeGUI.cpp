@@ -250,6 +250,7 @@ namespace JG
 				{
 					String oldName = prev_node->mName;
 					prev_node->mName = TempStr;
+					prev_node->mName = prev_node->mName.substr(0, std::strlen(prev_node->mName.c_str()));
 					TempStr = "";
 					if (mNodeEditor->mReNameCallBack)
 					{
@@ -809,6 +810,10 @@ namespace JG
 				if (node.GetFlags() & EStateNodeFlags::RootNode)
 				{
 					info.RootNodeID = id;
+				}
+				else if (node.GetFlags() & EStateNodeFlags::ExitNode)
+				{
+					info.ExitNodeID = id;
 				}
 				
 				for (StateNodeID linkedNodeID : node.mOutLinkedNodeIDs)

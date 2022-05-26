@@ -16,7 +16,7 @@ namespace JG
 	{
 		static GlobalSingletonManager* smGlobalSingletonManager;
 	private:
-		Dictionary<Type, UniquePtr<IGlobalSingletonBase>> mSingletonManagerPool;
+		Dictionary<Type, UniquePtr<IGlobalSingletonBase>> mSingletonPool;
 
 		GlobalSingletonManager()  = default;
 		~GlobalSingletonManager() = default;
@@ -33,32 +33,32 @@ namespace JG
 		void RegisterSingleton(Args... args)
 		{
 			Type type = JGTYPE(T);
-			if (mSingletonManagerPool.find(type) != mSingletonManagerPool.end())
+			if (mSingletonPool.find(type) != mSingletonPool.end())
 			{
 				return;
 			}
 			UniquePtr<T> ptr = CreateUniquePtr<T>(args...);
-			mSingletonManagerPool.emplace(type, std::move(ptr));
+			mSingletonPool.emplace(type, std::move(ptr));
 		}
 		template<class T>
 		void UnRegisterSingleton()
 		{
 			Type type = JGTYPE(T);
-			if (mSingletonManagerPool.find(type) == mSingletonManagerPool.end())
+			if (mSingletonPool.find(type) == mSingletonPool.end())
 			{
 				return;
 			}
-			mSingletonManagerPool.erase(type);
+			mSingletonPool.erase(type);
 		}
 		template<class T>
 		T* GetSingletonInstance()
 		{
 			Type type = JGTYPE(T);
-			if (mSingletonManagerPool.find(type) == mSingletonManagerPool.end())
+			if (mSingletonPool.find(type) == mSingletonPool.end())
 			{
 				return nullptr;
 			}
-			return static_cast<T*>(mSingletonManagerPool[type].get());
+			return static_cast<T*>(mSingletonPool[type].get());
 		}
 
 		template<class T>
@@ -66,7 +66,7 @@ namespace JG
 		{
 			
 			Type type = JGTYPE(T);
-			return mSingletonManagerPool.find(type) != mSingletonManagerPool.end();
+			return mSingletonPool.find(type) != mSingletonPool.end();
 		}
 	};
 

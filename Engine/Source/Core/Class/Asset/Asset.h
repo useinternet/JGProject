@@ -307,12 +307,15 @@ namespace JG
 	enum class EAnimationCondition;
 	class AnimationAssetStock : public IAssetStock
 	{
+		static const constexpr char* NAME_KEY = "Name";
 		static const constexpr char* ROOT_NAME_KEY = "RootName";
+		static const constexpr char* EXIT_NAME_KEY = "ExitName";
 		static const constexpr char* ANIM_CLIP_LIST_KEY = "AnimClipList";
 		static const constexpr char* ANIM_PARAM_LIST_KEY = "AimParamList";
 		static const constexpr char* ANIM_TRANSITION_LIST_KEY = "TransitionList";
 		static const constexpr char* ANIM_BLENDSPACE1D_LIST_KEY = "AnimationBlendSpace1DList";
 		static const constexpr char* ANIM_BLENDSPACE_LIST_KEY   = "AnimationBlendSpaceList";
+		static const constexpr char* ANIM_STATE_MACHINE_LIST_KEY = "AnimationStateMachineList";
 	public:
 #pragma region AnimationStateMachine_Info
 		struct ParameterData : public IJson
@@ -532,12 +535,77 @@ namespace JG
 #pragma endregion AnimationStateMachine_Info
 		
 
-		String RootName;
-		List<AnimationClipInfo> AnimClips;
-		List<AnimationBlendSpace1DInfo> AnimBlendSpace1Ds;
-		List<AnimationBlendSpaceInfo>   AnimBlendSpaces;
-		List<ParameterData> Parameters;
-		List<AnimationTransitionInfo> TransitionInfos;
+		struct AnimationStateMachineInfo : public IJson
+		{
+			String Name;
+			String RootName;
+			String ExitName;
+			List<AnimationClipInfo>			AnimClips;
+			List<AnimationBlendSpace1DInfo> AnimBlendSpace1Ds;
+			List<AnimationBlendSpaceInfo>   AnimBlendSpaces;
+			List<AnimationTransitionInfo>   TransitionInfos;
+
+			virtual void MakeJson(SharedPtr<JsonData> jsonData) const override
+			{
+				jsonData->AddMember(NAME_KEY, Name);
+				jsonData->AddMember(ROOT_NAME_KEY, RootName);
+				jsonData->AddMember(EXIT_NAME_KEY, ExitName);
+				jsonData->AddMember(ANIM_CLIP_LIST_KEY, AnimClips);
+				jsonData->AddMember(ANIM_BLENDSPACE1D_LIST_KEY, AnimBlendSpace1Ds);
+				jsonData->AddMember(ANIM_BLENDSPACE_LIST_KEY, AnimBlendSpaces);
+		
+				jsonData->AddMember(ANIM_TRANSITION_LIST_KEY, TransitionInfos);
+			}
+			virtual void LoadJson(SharedPtr<JsonData> jsonData) override
+			{
+				SharedPtr<JsonData> val = jsonData->GetMember(NAME_KEY);
+				if (val != nullptr && val->IsString())
+				{
+					Name = val->GetString();
+				}
+				val = jsonData->GetMember(ROOT_NAME_KEY);
+				if (val != nullptr && val->IsString())
+				{
+					RootName = val->GetString();
+				}
+				val = jsonData->GetMember(EXIT_NAME_KEY);
+				if (val != nullptr && val->IsString())
+				{
+					ExitName = val->GetString();
+				}
+				val = jsonData->GetMember(ANIM_CLIP_LIST_KEY);
+				if (val != nullptr)
+				{
+					AnimClips = val->GetIJsonDataList<AnimationClipInfo>();
+				}
+
+				val = jsonData->GetMember(ANIM_BLENDSPACE1D_LIST_KEY);
+				if (val != nullptr)
+				{
+					AnimBlendSpace1Ds = val->GetIJsonDataList<AnimationBlendSpace1DInfo>();
+				}
+				val = jsonData->GetMember(ANIM_BLENDSPACE_LIST_KEY);
+				if (val != nullptr)
+				{
+					AnimBlendSpaces = val->GetIJsonDataList<AnimationBlendSpaceInfo>();
+				}
+		
+				val = jsonData->GetMember(ANIM_TRANSITION_LIST_KEY);
+				if (val != nullptr)
+				{
+					TransitionInfos = val->GetIJsonDataList<AnimationTransitionInfo>();
+				}
+			}
+		};
+		List<AnimationStateMachineInfo> AnimStateMachineInfos;
+		List<ParameterData>				Parameters;
+
+		//String RootName;
+		//List<AnimationClipInfo>			AnimClips;
+		//List<AnimationBlendSpace1DInfo> AnimBlendSpace1Ds;
+		//List<AnimationBlendSpaceInfo>   AnimBlendSpaces;
+		//List<ParameterData> Parameters;
+		//List<AnimationTransitionInfo> TransitionInfos;
 	public:
 		virtual void MakeJson(SharedPtr<JsonData> jsonData) const override;
 		virtual void LoadJson(SharedPtr<JsonData> jsonData) override;

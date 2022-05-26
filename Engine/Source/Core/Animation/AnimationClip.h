@@ -36,6 +36,7 @@ namespace JG
 		void Reset()
 		{
 			TimePos = 0.0f;
+			State = EAnimationClipState::Running;
 		}
 		void SetNormalizedTimePos(f32 normalizedTimePos) {
 			normalizedTimePos = Math::Clamp(normalizedTimePos, 0.0f, 1.0f);

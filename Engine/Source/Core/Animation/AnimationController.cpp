@@ -293,10 +293,7 @@ namespace JG
 	void AnimationController::SetAnimationStock(const AnimationAssetStock& stock)
 	{
 		mAnimParams = CreateSharedPtr<AnimationParameters>();
-		mAnimationStateMachineDic[mBaseLayer] = CreateSharedPtr<AnimationStateMachine>(this);
-		SharedPtr<AnimationStateMachine> stateMachine = GetAnimationStateMachine();
-		SharedPtr<AnimationParameters> animParameters = GetAnimationParameters();
-		stateMachine->Begin(stock.RootName);
+		mAnimationStateMachineDic.clear();
 
 		Dictionary<String, EAnimationParameterType> paramTypeDic;
 		// Anim Param
@@ -305,86 +302,105 @@ namespace JG
 			switch (data.Type)
 			{
 			case EAnimationParameterType::Bool:
-				animParameters->SetBool(data.Name, *((bool*)data.Data.data()));
+				mAnimParams->SetBool(data.Name, *((bool*)data.Data.data()));
 				break;
 			case EAnimationParameterType::Float:
-				animParameters->SetFloat(data.Name, *((f32*)data.Data.data()));
+				mAnimParams->SetFloat(data.Name, *((f32*)data.Data.data()));
 				break;
 			case EAnimationParameterType::Int:
-				animParameters->SetInt(data.Name, *((i32*)data.Data.data()));
+				mAnimParams->SetInt(data.Name, *((i32*)data.Data.data()));
 				break;
 			case EAnimationParameterType::Trigger:
-				animParameters->SetTrigger(data.Name, false);
+				mAnimParams->SetTrigger(data.Name, false);
 				break;
 			}
 			paramTypeDic[data.Name] = data.Type;
 		}
 
-		// Anim Clip
-		for(const AnimationAssetStock::AnimationClipInfo& clipInfo : stock.AnimClips)
+		for (const AnimationAssetStock::AnimationStateMachineInfo& stateMachineInfo : stock.AnimStateMachineInfos)
 		{
-			SharedPtr<Asset<AnimationClip>> clipAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationClip>(clipInfo.AssetPath);
-			if (clipAsset == nullptr || clipAsset->IsValid() == false)
+			if (mAnimationStateMachineDic.find(stateMachineInfo.Name) != mAnimationStateMachineDic.end())
 			{
 				continue;
 			}
-			AddAnimationClip(clipInfo.Name, clipAsset->Get(), clipInfo.Flags, true);
-			stateMachine->MakeAnimationClipNode(clipInfo.Name, [&](AnimationClipInfo* animClipInfo)
-			{
-				animClipInfo->SetSpeed(clipInfo.Speed);
-			});
-		}
-		for (const AnimationAssetStock::AnimationBlendSpace1DInfo& blend1DInfo : stock.AnimBlendSpace1Ds)
-		{
-			SharedPtr<Asset<AnimationBlendSpace1D>> blendAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationBlendSpace1D>(blend1DInfo.AssetPath);
-			if (blendAsset == nullptr || blendAsset->IsValid() == false)
-			{
-				continue;
-			}
-			AddAnimationBlendSpace1D(blend1DInfo.Name, blendAsset->Get(), blend1DInfo.Flags, true);
-			stateMachine->MakeAnimationBlendSpace1DNode(blend1DInfo.Name, nullptr);
-		}
-		for (const AnimationAssetStock::AnimationBlendSpaceInfo& blendInfo : stock.AnimBlendSpaces)
-		{
-			SharedPtr<Asset<AnimationBlendSpace>> blendAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationBlendSpace>(blendInfo.AssetPath);
-			if (blendAsset == nullptr || blendAsset->IsValid() == false)
-			{
-				continue;
-			}
-			AddAnimationBlendSpace(blendInfo.Name, blendAsset->Get(), blendInfo.Flags, true);
-			stateMachine->MakeAnimationBlendSpaceNode(blendInfo.Name, nullptr);
-		}
-		// Transition Info
-		for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : stock.TransitionInfos)
-		{
-			stateMachine->ConnectNode(transInfo.PrevName, transInfo.NextName,
-				[&](AnimationTransition* transition)
-			{
-				transition->SetTransitionDuration(transInfo.TransitionDuration);
-				transition->SetHasExitTime(transInfo.HasExitTime);
-				transition->SetExitTime(transInfo.ExitTime);
-				for (const AnimationAssetStock::AnimationTransitionConditionInfo& condInfo : transInfo.Transitions)
-				{
-					switch (paramTypeDic[condInfo.ParameterName])
-					{
-					case EAnimationParameterType::Bool:
-						transition->AddCondition_Bool(condInfo.ParameterName, *((bool*)condInfo.Data.data()));
-						break;
-					case EAnimationParameterType::Float:
-						transition->AddCondition_Float(condInfo.ParameterName, *((f32*)condInfo.Data.data()), condInfo.Condition);
-						break;
-					case EAnimationParameterType::Int:
-						transition->AddCondition_Int(condInfo.ParameterName, *((i32*)condInfo.Data.data()), condInfo.Condition);
-						break;
-					case EAnimationParameterType::Trigger:
-						transition->AddCondition_Trigger(condInfo.ParameterName);
-						break;
-					}
-				}
-			});
+			mAnimationStateMachineDic[stateMachineInfo.Name] = CreateSharedPtr<AnimationStateMachine>(this);
 
+			SharedPtr<AnimationStateMachine> stateMachine = mAnimationStateMachineDic[stateMachineInfo.Name];
+
+
+			stateMachine->Begin(stateMachineInfo.RootName);
+			// Anim Clip
+			for (const AnimationAssetStock::AnimationClipInfo& clipInfo : stateMachineInfo.AnimClips)
+			{
+				SharedPtr<Asset<AnimationClip>> clipAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationClip>(clipInfo.AssetPath);
+				if (clipAsset == nullptr || clipAsset->IsValid() == false)
+				{
+					continue;
+				}
+				AddAnimationClip(clipInfo.Name, clipAsset->Get(), clipInfo.Flags, true);
+				stateMachine->MakeAnimationClipNode(clipInfo.Name, [&](AnimationClipInfo* animClipInfo)
+				{
+					animClipInfo->SetSpeed(clipInfo.Speed);
+				});
+			}
+			for (const AnimationAssetStock::AnimationBlendSpace1DInfo& blend1DInfo : stateMachineInfo.AnimBlendSpace1Ds)
+			{
+				SharedPtr<Asset<AnimationBlendSpace1D>> blendAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationBlendSpace1D>(blend1DInfo.AssetPath);
+				if (blendAsset == nullptr || blendAsset->IsValid() == false)
+				{
+					continue;
+				}
+				AddAnimationBlendSpace1D(blend1DInfo.Name, blendAsset->Get(), blend1DInfo.Flags, true);
+				stateMachine->MakeAnimationBlendSpace1DNode(blend1DInfo.Name, nullptr);
+			}
+
+			for (const AnimationAssetStock::AnimationBlendSpaceInfo& blendInfo : stateMachineInfo.AnimBlendSpaces)
+			{
+				SharedPtr<Asset<AnimationBlendSpace>> blendAsset = AssetDataBase::GetInstance().LoadOriginAssetImmediate<AnimationBlendSpace>(blendInfo.AssetPath);
+				if (blendAsset == nullptr || blendAsset->IsValid() == false)
+				{
+					continue;
+				}
+				AddAnimationBlendSpace(blendInfo.Name, blendAsset->Get(), blendInfo.Flags, true);
+				stateMachine->MakeAnimationBlendSpaceNode(blendInfo.Name, nullptr);
+			}
+			// Transition Info
+			for (const AnimationAssetStock::AnimationTransitionInfo& transInfo : stateMachineInfo.TransitionInfos)
+			{
+				stateMachine->ConnectNode(transInfo.PrevName, transInfo.NextName,
+					[&](AnimationTransition* transition)
+				{
+					transition->SetTransitionDuration(transInfo.TransitionDuration);
+					transition->SetHasExitTime(transInfo.HasExitTime);
+					transition->SetExitTime(transInfo.ExitTime);
+					for (const AnimationAssetStock::AnimationTransitionConditionInfo& condInfo : transInfo.Transitions)
+					{
+						switch (paramTypeDic[condInfo.ParameterName])
+						{
+						case EAnimationParameterType::Bool:
+							transition->AddCondition_Bool(condInfo.ParameterName, *((bool*)condInfo.Data.data()));
+							break;
+						case EAnimationParameterType::Float:
+							transition->AddCondition_Float(condInfo.ParameterName, *((f32*)condInfo.Data.data()), condInfo.Condition);
+							break;
+						case EAnimationParameterType::Int:
+							transition->AddCondition_Int(condInfo.ParameterName, *((i32*)condInfo.Data.data()), condInfo.Condition);
+							break;
+						case EAnimationParameterType::Trigger:
+							transition->AddCondition_Trigger(condInfo.ParameterName);
+							break;
+						}
+					}
+				});
+
+			}
+			stateMachine->End();
 		}
-		stateMachine->End();
+		if (mAnimationStateMachineDic.empty() == true)
+		{
+			mAnimationStateMachineDic[mBaseLayer] = CreateSharedPtr<AnimationStateMachine>(this);
+		}
+		
 	}
 
 	bool AnimationController::IsValid() const

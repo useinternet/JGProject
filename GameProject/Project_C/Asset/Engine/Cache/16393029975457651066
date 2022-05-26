@@ -1,36 +1,30 @@
 {
-    "Main": [
-        {
-            "Name": "Root",
-            "NodeType": 0,
-            "Location": [
-                214.0,
-                141.0
-            ]
-        },
-        {
-            "Name": "Test_Kick",
-            "NodeType": 1,
-            "Location": [
-                700.0,
-                653.0
-            ]
-        },
-        {
-            "Name": "Walk&Run",
-            "NodeType": 2,
-            "Location": [
-                228.0,
-                448.0
-            ]
-        },
-        {
-            "Name": "TestBuild",
-            "NodeType": 3,
-            "Location": [
-                753.0,
-                173.0
-            ]
-        }
-    ]
+    "Main": {
+        "Base Layer": [
+            {
+                "Name": "Root",
+                "NodeType": 0,
+                "Location": [
+                    250.0,
+                    100.0
+                ]
+            },
+            {
+                "Name": "Walk&Run",
+                "NodeType": 2,
+                "Location": [
+                    271.0,
+                    420.0
+                ]
+            },
+            {
+                "Name": "Kick",
+                "NodeType": 1,
+                "Location": [
+                    753.0,
+                    512.0
+                ]
+            }
+        ]
+    }
 }

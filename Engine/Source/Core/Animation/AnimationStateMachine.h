@@ -36,6 +36,7 @@ namespace JG
 			AnimationClip,
 			AnimationBlend1D,
 			AnimationBlend,
+			End,
 		};
 		struct Node
 		{
@@ -58,6 +59,7 @@ namespace JG
 
 
 		String mBeginNodeName;
+		String mExitNodeName;
 
 		Node* mPrevNode    = nullptr;
 		Node* mCurrentNode = nullptr;
@@ -88,6 +90,7 @@ namespace JG
 		AnimationStateMachine& MakeAnimationClipNode(const String& name, const MakeAnimationClipAction& makeAction);
 		AnimationStateMachine& MakeAnimationBlendSpace1DNode(const String& name, const MakeAnimationBlend1DSpaceAction& makeAction);
 		AnimationStateMachine& MakeAnimationBlendSpaceNode(const String& name, const MakeAnimationBlendSpaceAction& makeAction);
+		AnimationStateMachine& MakeExitNode(const String& name);
 		AnimationStateMachine& ConnectNode(const String& prevName, const String& nextName, const MakeTransitionAction& makeAction);
 		void End();
 
