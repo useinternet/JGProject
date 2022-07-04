@@ -31,11 +31,14 @@ namespace JG
 	
 	class AnimationController
 	{
+	public:
+		static constexpr char* BASE_LAYER_NAME = "Base Layer";
+	private:
 		friend class JGAnimation;
 
 		String mName;
 		Dictionary<String, SharedPtr<AnimationStateMachine>> mAnimationStateMachineDic;
-		String mBaseLayer = "Base Layer";
+		String mBaseLayer = BASE_LAYER_NAME;
 
 		SharedPtr<AnimationParameters> mAnimParams;
 		SharedPtr<AnimationParameters> mAnimParams_Thread;

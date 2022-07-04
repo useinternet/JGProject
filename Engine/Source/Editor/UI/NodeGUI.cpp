@@ -574,11 +574,12 @@ namespace JG
 			{
 				return;
 			}
-			if (to->mFlags & EStateNodeFlags::RootNode)
+			if (to->mFlags & EStateNodeFlags::RootNode || from->mFlags & EStateNodeFlags::ExitNode)
 			{
 				mDataStorage->SetLinkingNode(0);
 				return;
 			}
+
 			if (from->mFlags & EStateNodeFlags::RootNode)
 			{
 				HashSet<StateNodeID> outlinkedNodeIDs = from->mOutLinkedNodeIDs;

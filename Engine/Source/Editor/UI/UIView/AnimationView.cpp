@@ -165,6 +165,16 @@ namespace JG
 				AnimTransitionBuildDataDic.erase(id);
 			});
 		}
+		void InitBuildData(const String& name, bool is_base_layer = false)
+		{
+			Name = name;
+			NodeLocationDic.clear();
+			CreateRootNode();
+			if (is_base_layer == false)
+			{
+				CreateExitNode();
+			}
+		}
 		void InitBuildData(
 			SharedPtr<JsonData> nodeLocationJson, 
 			const AnimationAssetStock::AnimationStateMachineInfo& animStateMachineInfo,
@@ -191,6 +201,13 @@ namespace JG
 			if (nodeIDDic.find(animStateMachineInfo.RootName) == nodeIDDic.end())
 			{
 				CreateRootNode();
+			}
+			if (Name != AnimationController::BASE_LAYER_NAME)
+			{
+				if (nodeIDDic.find(animStateMachineInfo.ExitName) == nodeIDDic.end())
+				{
+					CreateExitNode();
+				}
 			}
 			for (const AnimationAssetStock::AnimationClipInfo& clipInfo : animStateMachineInfo.AnimClips)
 			{
@@ -293,6 +310,23 @@ namespace JG
 			nodeBuilder.SetUserData<ENodeType>(ENodeType::Root);
 			return NodeEditor->CreateNode(nodeBuilder);
 		}
+		StateNodeGUI::StateNodeID CreateExitNode()
+		{
+			if (NodeNameDic.find("Exit") != NodeNameDic.end())
+			{
+				return NodeNameDic["Exit"];
+			}
+
+			StateNodeGUI::StateNodeBuilder nodeBuilder;
+			nodeBuilder.SetInitLocation(JVector2(250, 300));
+			nodeBuilder.SetName("Exit");
+			nodeBuilder.SetNodeFlags(
+				StateNodeGUI::EStateNodeFlags::No_Remove |
+				StateNodeGUI::EStateNodeFlags::No_ReName |
+				StateNodeGUI::EStateNodeFlags::ExitNode);
+			nodeBuilder.SetUserData<ENodeType>(ENodeType::Exit);
+			return NodeEditor->CreateNode(nodeBuilder);
+		}
 		StateNodeGUI::StateNodeID CreateAnimationClipNode(const String& name, const JVector2& initPos)
 		{
 
@@ -356,8 +390,6 @@ namespace JG
 			return NodeEditor->CreateNode(nodeBuilder);
 		}
 	};
-
-
 	AnimationView::AnimationView()
 	{
 		DisableUniqueView();
@@ -377,27 +409,27 @@ namespace JG
 	{
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationClip", 0, [&]()
 		{
-			if (mCurrentAnimLayerBuildData == nullptr)
+			if (GetCurrentLayerBuildData() == nullptr)
 			{
 				return;
 			}
-			CreateNode(mCurrentAnimLayerBuildData->Name, ENodeType::AnimationClip, "AnimationClip");
+			CreateNode(GetCurrentLayerBuildData()->Name, ENodeType::AnimationClip, "AnimationClip");
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace1D", 0, [&]()
 		{
-			if (mCurrentAnimLayerBuildData == nullptr)
+			if (GetCurrentLayerBuildData() == nullptr)
 			{
 				return;
 			}
-			CreateNode(mCurrentAnimLayerBuildData->Name, ENodeType::AnimationBlendSpace1D, "AnimationBlendSpace1D");
+			CreateNode(GetCurrentLayerBuildData()->Name, ENodeType::AnimationBlendSpace1D, "AnimationBlendSpace1D");
 		}, nullptr);
 		UIManager::GetInstance().RegisterContextMenuItem(GetType(), "Create/AnimationBlendSpace", 0, [&]()
 		{
-			if (mCurrentAnimLayerBuildData == nullptr)
+			if (GetCurrentLayerBuildData() == nullptr)
 			{
 				return;
 			}
-			CreateNode(mCurrentAnimLayerBuildData->Name, ENodeType::AnimationBlendSpace, "AnimationBlendSpace");
+			CreateNode(GetCurrentLayerBuildData()->Name, ENodeType::AnimationBlendSpace, "AnimationBlendSpace");
 		}, nullptr);
 
 		mBgColorByParamTypeDic[EAnimationParameterType::Bool]  = Color(0.8f, 0.1f, 0.1f, 1.0f);
@@ -435,7 +467,7 @@ namespace JG
 			SharedPtr<JsonData> jsonMain = json->GetMember("Main");
 			for (const AnimationAssetStock::AnimationStateMachineInfo& animStateMachineInfo : stock.AnimStateMachineInfos)
 			{
-				if (mAnimLayerBuildDataDic.find(animStateMachineInfo.Name) != mAnimLayerBuildDataDic.end())
+				if (mAddedAnimLayerNameSet.find(animStateMachineInfo.Name) != mAddedAnimLayerNameSet.end())
 				{
 					continue;
 				}
@@ -443,22 +475,26 @@ namespace JG
 				SharedPtr<AnimationLayerBuildData> buildData = CreateSharedPtr<AnimationLayerBuildData>();
 				buildData->InitNodeEditor();
 				buildData->InitBuildData(nodeLocationJson, animStateMachineInfo, paramTypeDic);
-				mAnimLayerBuildDataDic[animStateMachineInfo.Name] = buildData;
+
+				mAddedAnimLayerNameSet.insert(animStateMachineInfo.Name);
+				mAnimLayerBuildDataList.push_back(buildData);
 			}
 
 
-			if (mAnimLayerBuildDataDic.empty() == true)
+			if (mAnimParamBuildDataList.empty() == true)
 			{
-				mAnimLayerBuildDataDic["Base Layer"] = CreateSharedPtr<AnimationLayerBuildData>();
-				mCurrentAnimLayerBuildData = mAnimLayerBuildDataDic["Base Layer"];
-			
-				mCurrentAnimLayerBuildData->InitNodeEditor();
-				mCurrentAnimLayerBuildData->InitBuildData(nullptr, AnimationAssetStock::AnimationStateMachineInfo(), paramTypeDic);
-				mCurrentAnimLayerBuildData->Name = "Base Layer";
+				SharedPtr<AnimationLayerBuildData> baseLayer = CreateSharedPtr<AnimationLayerBuildData>();
+				baseLayer->Name = AnimationController::BASE_LAYER_NAME;
+				baseLayer->InitNodeEditor();
+				baseLayer->InitBuildData(nullptr, AnimationAssetStock::AnimationStateMachineInfo(), paramTypeDic);
+
+
+				mCurrentAnimLayerBuildData = baseLayer->Name;
+				mAnimLayerBuildDataList.push_back(baseLayer);
 			}
 			else
 			{
-				mCurrentAnimLayerBuildData = mAnimLayerBuildDataDic["Base Layer"];
+				mCurrentAnimLayerBuildData = AnimationController::BASE_LAYER_NAME;
 			}
 		}
 	}
@@ -475,7 +511,9 @@ namespace JG
 		ImGui::NextColumn();
 		AnimationNodeEditor_OnGUI();
 		ImGui::NextColumn();
+		ImGui::SetColumnWidth(2, mRightWidth);
 		AnimationInspector_OnGUI();
+		AnimationDataEditor_OnGUI();
 		ImGui::Columns(1);
 	}
 
@@ -483,12 +521,15 @@ namespace JG
 	void AnimationView::Destroy()
 	{
 		SaveNodeLocation();
-		mAnimLayerBuildDataDic.clear();
+		mAddedAnimLayerNameSet.clear();
+		mAnimLayerBuildDataList.clear();
 		mAnimParamBuildDataList.clear();
 		mAddedAnimParamNameSet.clear();
-		mAnimParamEditMode = EEditMode::Default;
-		mTransitionConditionEditMode = EEditMode::Default;
-
+		mDataEditMode				 = EDataEditMode::Default;
+		mTransitionConditionEditMode = EDataEditMode::Default;
+		mAnimState = EAnimState::Editable;
+		mEditMode  = EEditMode::AnimationParameters;
+		mRenamingLayerBuildData = nullptr;
 
 		if (mMeshAsset != nullptr && mMeshAsset->IsValid())
 		{
@@ -519,10 +560,9 @@ namespace JG
 			mAnimationAsset = nullptr;
 		}
 		mEditorUIScene = nullptr;
-		//mNodeEditor = nullptr;
 
-		mAnimParamEditMode			 = EEditMode::Default;
-		mTransitionConditionEditMode = EEditMode::Default;
+		mDataEditMode   			 = EDataEditMode::Default;
+		mTransitionConditionEditMode = EDataEditMode::Default;
 		mAnimState					 = EAnimState::Editable;
 	}
 
@@ -592,68 +632,7 @@ namespace JG
 		ImGui::EndChild();
 	
 	}
-	void AnimationView::AnimationInspector_OnGUI()
-	{
-		// Param Controller 
-		ImGui::SetColumnWidth(2, mRightWidth);
-		
 
-
-		SharedPtr<AnimationLayerBuildData> buildData = GetCurrentLayerBuildData();
-		if (buildData != nullptr)
-		{
-			ImGui::BeginChild("StateNodeInspector", ImVec2(mRightWidth, 350.0f));
-
-			StateNodeGUI::StateNodeID selectedNodeID = GetCurrentLayerBuildData()->NodeEditor->GetSelectedNodeID();
-			StateNodeGUI::StateNode* node = GetCurrentLayerBuildData()->NodeEditor->FindNode(selectedNodeID);
-			if (node != nullptr)
-			{
-				switch (node->GetUserData<ENodeType>())
-				{
-				case ENodeType::Root:
-					ImGui::Text("Root Node");
-					break;
-				case ENodeType::AnimationClip:
-					buildData->AnimClipBuildDataDic[selectedNodeID].ID = selectedNodeID;
-					AnimationClip_OnGUI(buildData->AnimClipBuildDataDic[selectedNodeID]);
-					break;
-				case ENodeType::AnimationBlendSpace1D:
-					buildData->AnimBlendSpace1DBuildDataDic[selectedNodeID].ID = selectedNodeID;
-					AnimationBlendSpace1D_OnGUI(buildData->AnimBlendSpace1DBuildDataDic[selectedNodeID]);
-					break;
-				case ENodeType::AnimationBlendSpace:
-					buildData->AnimBlendSpaceBuildDataDic[selectedNodeID].ID = selectedNodeID;
-					AnimationBlendSpace_OnGUI(buildData->AnimBlendSpaceBuildDataDic[selectedNodeID]);
-					break;
-				}
-			}
-			else if (GetCurrentLayerBuildData()->NodeEditor->FindNodeTransition(selectedNodeID) != nullptr)
-			{
-				Transition_OnGUI(buildData->AnimTransitionBuildDataDic[selectedNodeID]);
-			}
-
-			ImGui::EndChild();
-
-			ImGui::BeginChild("Select View", ImVec2(mRightWidth, 30.0f));
-			ImGui::Separator();
-			if (ImGui::Selectable("Layer", false, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
-			{
-			
-			}	ImGui::SameLine();
-			if (ImGui::Selectable("Parameters", true, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
-			{
-			
-			}
-			ImGui::Separator();
-			ImGui::EndChild();
-		
-			AnimationParamEditor_OnGUI();
-		}
-
-		
-
-
-	}
 	void AnimationView::AnimationNodeEditor_OnGUI()
 	{
 		if (GetCurrentLayerBuildData() == nullptr)
@@ -706,28 +685,250 @@ namespace JG
 		}
 		GetCurrentLayerBuildData()->NodeEditor->OnGUI();
 	}
+	void AnimationView::AnimationInspector_OnGUI()
+	{
+		SharedPtr<AnimationLayerBuildData> buildData = GetCurrentLayerBuildData();
+		if (buildData != nullptr)
+		{
+			ImGui::BeginChild("StateNodeInspector", ImVec2(mRightWidth, 350.0f));
+
+			StateNodeGUI::StateNodeID selectedNodeID = GetCurrentLayerBuildData()->NodeEditor->GetSelectedNodeID();
+			StateNodeGUI::StateNode* node = GetCurrentLayerBuildData()->NodeEditor->FindNode(selectedNodeID);
+			if (node != nullptr)
+			{
+				switch (node->GetUserData<ENodeType>())
+				{
+				case ENodeType::Root:
+					ImGui::Text("Root Node");
+					break;
+				case ENodeType::AnimationClip:
+					buildData->AnimClipBuildDataDic[selectedNodeID].ID = selectedNodeID;
+					AnimationClip_OnGUI(buildData->AnimClipBuildDataDic[selectedNodeID]);
+					break;
+				case ENodeType::AnimationBlendSpace1D:
+					buildData->AnimBlendSpace1DBuildDataDic[selectedNodeID].ID = selectedNodeID;
+					AnimationBlendSpace1D_OnGUI(buildData->AnimBlendSpace1DBuildDataDic[selectedNodeID]);
+					break;
+				case ENodeType::AnimationBlendSpace:
+					buildData->AnimBlendSpaceBuildDataDic[selectedNodeID].ID = selectedNodeID;
+					AnimationBlendSpace_OnGUI(buildData->AnimBlendSpaceBuildDataDic[selectedNodeID]);
+					break;
+				}
+			}
+			else if (GetCurrentLayerBuildData()->NodeEditor->FindNodeTransition(selectedNodeID) != nullptr)
+			{
+				Transition_OnGUI(buildData->AnimTransitionBuildDataDic[selectedNodeID]);
+			}
+
+			ImGui::EndChild();
+		}
+	}
+	void AnimationView::AnimationDataEditor_OnGUI()
+	{
+		SharedPtr<AnimationLayerBuildData> buildData = GetCurrentLayerBuildData();
+		if (buildData != nullptr)
+		{
+			ImGui::BeginChild("Select View", ImVec2(mRightWidth, 30.0f));
+			ImGui::Separator();
+			if (ImGui::Selectable("Layer", mEditMode == EEditMode::AnimationLayer, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+			{
+				mEditMode = EEditMode::AnimationLayer;
+			}	ImGui::SameLine();
+			if (ImGui::Selectable("Parameters", mEditMode == EEditMode::AnimationParameters, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+			{
+				mEditMode = EEditMode::AnimationParameters;
+			}
+			ImGui::Separator();
+			ImGui::EndChild();
+
+
+			ImGui::BeginChild("DataEditor", ImVec2(mRightWidth, 0.0f));
+			ImGui::Separator();
+
+			ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+			if (ImGui::Selectable("Default##AnimParamEdit", mDataEditMode == EDataEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+			{
+				mDataEditMode = EDataEditMode::Default;
+			}	ImGui::SameLine();
+			if (ImGui::Selectable("Move##AnimParamEdit", mDataEditMode == EDataEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+			{
+				mDataEditMode = EDataEditMode::Move;
+			}	ImGui::SameLine();
+			if (ImGui::Selectable("Delete##AnimParamEdit", mDataEditMode == EDataEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+			{
+				mDataEditMode = EDataEditMode::Delete;
+			}
+			ImGui::PopStyleVar();
+			ImGui::Separator();
+
+
+			switch (mEditMode)
+			{
+			case EEditMode::AnimationLayer:
+				AnimationLayerEditor_OnGUI();
+				break;
+			case EEditMode::AnimationParameters:
+				AnimationParamEditor_OnGUI();
+				break;
+			}
+			ImGui::EndChild();
+		}
+
+	}
+
+	void AnimationView::AnimationLayerEditor_OnGUI()
+	{
+		i32 index = 0;
+		i32 moveIndex = -1;
+		i32 moveDir = 0;
+		List<String> removeLayerList;
+
+		if (ImGui::BeginTable("AnimLayerTable", 2, ImGuiTableFlags_BordersH) == true)
+		{
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, mTableTypeRowWidth + mTableNameRowWidth);
+			ImGui::TableSetupColumn("##Edit", ImGuiTableColumnFlags_WidthStretch, mEditRowWidth);
+			ImGui::TableHeadersRow();
+
+			SharedPtr<AnimationLayerBuildData> currLayerBuildData = GetCurrentLayerBuildData();
+			bool   isInputTextDeactived = false;
+			String inputText;
+			for (auto buildData : mAnimLayerBuildDataList)
+			{
+				ImGui::TableNextColumn();
+				ImGui::PushID(index);
+				String layerName = buildData->Name;
+			
+				ImGui::SetNextItemWidth(mTableTypeRowWidth + mTableNameRowWidth);
+
+				bool isSelected = false;
+	
+				if (currLayerBuildData != nullptr)
+				{
+					isSelected = layerName == currLayerBuildData->Name;
+				}
+
+				if (isSelected && mRenamingLayerBuildData != nullptr && layerName != AnimationController::BASE_LAYER_NAME)
+				{
+					
+					ImGui::InputText("##LayerNameInputText", layerName, inputText);
+					if (ImGui::IsItemDeactivated() == true && inputText != AnimationController::BASE_LAYER_NAME)
+					{
+						isInputTextDeactived = true;
+					}
+				}
+				else if (ImGui::Selectable(layerName.c_str(), isSelected) == true)
+				{
+					SetCurrentLayerBuildData(layerName);
+
+					if (mRenamingLayerBuildData != nullptr && inputText != AnimationController::BASE_LAYER_NAME)
+					{
+						isInputTextDeactived = true;
+					}
+				}
+				ImGui::TableNextColumn();
+
+
+				switch (mDataEditMode)
+				{
+				case EDataEditMode::Delete:
+					if (IsEditable())
+					{
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+						if (ImGui::Button("-", ImVec2(50.0f, 0.0)) && buildData->Name != AnimationController::BASE_LAYER_NAME)
+						{
+							removeLayerList.push_back(buildData->Name);
+						}
+						ImGui::PopStyleColor();
+					}
+
+					break;
+				case EDataEditMode::Move:
+					if (ImGui::ArrowButton("##UpArrow_AnimParamEdit", ImGuiDir_Up))
+					{
+						moveIndex = index;
+						moveDir = ImGuiDir_Up;
+					}ImGui::SameLine();
+					if (ImGui::ArrowButton("##DownArrow_AnimParmEdit", ImGuiDir_Down))
+					{
+						moveIndex = index;
+						moveDir = ImGuiDir_Down;
+					}
+					break;
+				}
+
+				++index;
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+
+
+
+			if (isInputTextDeactived && mRenamingLayerBuildData != nullptr)
+			{
+				String oldName = mRenamingLayerBuildData->Name;
+				UpdateLayerBuildData(oldName, inputText);
+				mRenamingLayerBuildData = nullptr;
+			}
+
+
+			if (ImGui::IsKeyPressed((i32)EKeyCode::F2) == true)
+			{
+				mRenamingLayerBuildData = GetCurrentLayerBuildData().get();
+			}
+
+
+			auto padding = ImGui::GetStyle().FramePadding;
+			if (ImGui::Button("+", ImVec2(mRightWidth - (padding.x * 4), 0.0f)) == true && IsEditable())
+			{
+				i32 cnt = 0;
+				while (true)
+				{
+					String newName = "NewLayer (" + std::to_string(cnt++) + ")";
+					if (mAddedAnimLayerNameSet.find(newName) == mAddedAnimLayerNameSet.end())
+					{
+						SharedPtr<AnimationLayerBuildData> buildData = CreateSharedPtr< AnimationLayerBuildData>();
+						buildData->Name = newName;
+						buildData->InitNodeEditor();
+						buildData->InitBuildData(newName);
+						mAddedAnimLayerNameSet.insert(newName);
+						mAnimLayerBuildDataList.push_back(buildData);
+						break;
+					}
+				}
+			}
+
+			for (const String& removedLayerName : removeLayerList)
+			{
+				mAddedAnimLayerNameSet.erase(removedLayerName);
+				mAnimLayerBuildDataList.erase(std::remove_if(mAnimLayerBuildDataList.begin(), mAnimLayerBuildDataList.end(), [&](SharedPtr<AnimationLayerBuildData> data)
+				{
+					return data->Name == removedLayerName;
+				}));
+			}
+			if (moveIndex >= 0)
+			{
+				if (moveDir == ImGuiDir_Up && mAnimLayerBuildDataList.size() > moveIndex && moveIndex > 0)
+				{
+					SharedPtr<AnimationLayerBuildData> tempData = mAnimLayerBuildDataList[moveIndex - 1];
+					mAnimLayerBuildDataList[moveIndex - 1] = mAnimLayerBuildDataList[moveIndex];
+					mAnimLayerBuildDataList[moveIndex] = tempData;
+				}
+				if (moveDir == ImGuiDir_Down && mAnimLayerBuildDataList.size() > (moveIndex + 1))
+				{
+					SharedPtr<AnimationLayerBuildData> tempData = mAnimLayerBuildDataList[moveIndex + 1];
+					mAnimLayerBuildDataList[moveIndex + 1] = mAnimLayerBuildDataList[moveIndex];
+					mAnimLayerBuildDataList[moveIndex] = tempData;
+				}
+			}
+
+	
+		}
+	}
+
+
 	void AnimationView::AnimationParamEditor_OnGUI()
 	{
-		ImGui::BeginChild("AnimatoinParamEditor", ImVec2(mRightWidth, 0.0f));
-		ImGui::Separator();
-
-		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
-		if (ImGui::Selectable("Default##AnimParamEdit", mAnimParamEditMode == EEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
-		{
-			mAnimParamEditMode = EEditMode::Default;
-		}	ImGui::SameLine();
-		if (ImGui::Selectable("Move##AnimParamEdit", mAnimParamEditMode == EEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
-		{
-			mAnimParamEditMode = EEditMode::Move;
-		}	ImGui::SameLine();
-		if (ImGui::Selectable("Delete##AnimParamEdit", mAnimParamEditMode == EEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
-		{
-			mAnimParamEditMode = EEditMode::Delete;
-		}
-		ImGui::PopStyleVar();
-		ImGui::Separator();
-
-
 		i32 index = 0;
 		i32 moveIndex = -1;
 		i32 moveDir = 0;
@@ -815,13 +1016,13 @@ namespace JG
 				ImGui::TableNextColumn();
 
 
-				switch (mAnimParamEditMode)
+				switch (mDataEditMode)
 				{
 					// 값편집
-				case EEditMode::Default:
+				case EDataEditMode::Default:
 					AnimationParam_OnGUI(data);
 					break;
-				case EEditMode::Delete:
+				case EDataEditMode::Delete:
 					if (IsEditable())
 					{
 						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -833,7 +1034,7 @@ namespace JG
 					}
 
 					break;
-				case EEditMode::Move:
+				case EDataEditMode::Move:
 					if (ImGui::ArrowButton("##UpArrow_AnimParamEdit", ImGuiDir_Up))
 					{
 						moveIndex = index;
@@ -852,7 +1053,6 @@ namespace JG
 			}
 
 			ImGui::EndTable();
-			ImGui::EndChild();
 		}
 
 
@@ -1035,17 +1235,17 @@ namespace JG
 
 		ImGui::Separator();
 		ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
-		if (ImGui::Selectable("Default##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		if (ImGui::Selectable("Default##TransitionConditionEditMode", mTransitionConditionEditMode == EDataEditMode::Default, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
 		{
-			mTransitionConditionEditMode = EEditMode::Default;
+			mTransitionConditionEditMode = EDataEditMode::Default;
 		}	ImGui::SameLine();
-		if (ImGui::Selectable("Move##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		if (ImGui::Selectable("Move##TransitionConditionEditMode", mTransitionConditionEditMode == EDataEditMode::Move, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
 		{
-			mTransitionConditionEditMode = EEditMode::Move;
+			mTransitionConditionEditMode = EDataEditMode::Move;
 		}	ImGui::SameLine();
-		if (ImGui::Selectable("Delete##TransitionConditionEditMode", mTransitionConditionEditMode == EEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
+		if (ImGui::Selectable("Delete##TransitionConditionEditMode", mTransitionConditionEditMode == EDataEditMode::Delete, ImGuiSelectableFlags_None, ImVec2(70.0f, 25.0f)) == true)
 		{
-			mTransitionConditionEditMode = EEditMode::Delete;
+			mTransitionConditionEditMode = EDataEditMode::Delete;
 		}
 		ImGui::PopStyleVar();
 		ImGui::Separator();
@@ -1130,10 +1330,10 @@ namespace JG
 			switch (mTransitionConditionEditMode)
 			{
 				// 값편집
-			case EEditMode::Default:
+			case EDataEditMode::Default:
 				TransitionConditionValue_OnGUI(condBuildData);
 				break;
-			case EEditMode::Delete:
+			case EDataEditMode::Delete:
 				if (IsEditable())
 				{
 					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -1145,7 +1345,7 @@ namespace JG
 				}
 	
 				break;
-			case EEditMode::Move:
+			case EDataEditMode::Move:
 				if (ImGui::ArrowButton("##UpArrow_TransitionEdit", ImGuiDir_Up))
 				{
 					moveIndex = index;
@@ -1525,9 +1725,9 @@ namespace JG
 	}
 	void AnimationView::UpdateTransitionBuildData(const String& paramName, EAnimationParameterType type)
 	{
-		for (auto& layer_pair : mAnimLayerBuildDataDic)
+		for (auto& buildData : mAnimLayerBuildDataList)
 		{
-			for (auto& _pair : layer_pair.second->AnimTransitionBuildDataDic)
+			for (auto& _pair : buildData->AnimTransitionBuildDataDic)
 			{
 				for (AnimTransitionConditionBuildData& condBuildData : _pair.second.Conditions)
 				{
@@ -1541,9 +1741,9 @@ namespace JG
 	}
 	void AnimationView::UpdateTransitionBuildData(const String& oldName, const String& newName)
 	{
-		for (auto& layer_pair : mAnimLayerBuildDataDic)
+		for (auto& buildData : mAnimLayerBuildDataList)
 		{
-			for (auto& _pair : layer_pair.second->AnimTransitionBuildDataDic)
+			for (auto& _pair : buildData->AnimTransitionBuildDataDic)
 			{
 				for (AnimTransitionConditionBuildData& condBuildData : _pair.second.Conditions)
 				{
@@ -1558,9 +1758,9 @@ namespace JG
 	}
 	void AnimationView::RemoveTransitionBuildData(const String& removedName)
 	{
-		for (auto& layer_pair : mAnimLayerBuildDataDic) 
+		for (auto& buildData : mAnimLayerBuildDataList)
 		{
-			for (auto& _pair : layer_pair.second->AnimTransitionBuildDataDic)
+			for (auto& _pair : buildData->AnimTransitionBuildDataDic)
 			{
 				if (_pair.second.Conditions.empty() == false)
 				{
@@ -1580,7 +1780,28 @@ namespace JG
 		}
 
 	}
+	void AnimationView::UpdateLayerBuildData(const String& oldName, const String& newName)
+	{
+		for (auto& buildData : mAnimLayerBuildDataList)
+		{
+			if (buildData->Name == oldName)
+			{
+				buildData->Name = newName;
 
+
+				if (mCurrentAnimLayerBuildData == oldName)
+				{
+					mCurrentAnimLayerBuildData = newName;
+				}
+				mAddedAnimLayerNameSet.erase(oldName);
+				mAddedAnimLayerNameSet.insert(newName);
+
+			}
+		}
+
+
+
+	}
 	bool AnimationView::Build()
 	{
 		AnimationAssetStock assetStock;
@@ -1594,11 +1815,8 @@ namespace JG
 
 			assetStock.Parameters.push_back(paramData);
 		}
-		for (auto& layer_pair : mAnimLayerBuildDataDic)
+		for (auto& buildData : mAnimLayerBuildDataList)
 		{
-			SharedPtr<AnimationLayerBuildData> buildData = layer_pair.second;
-
-
 			StateNodeGUI::StateNodeLinkInfo nodeLinkInfo = buildData->NodeEditor->GetNodeLinkInfo();
 
 			AnimationAssetStock::AnimationStateMachineInfo animStateMachineInfo;
@@ -1854,13 +2072,12 @@ namespace JG
 		// Location 저장
 		SharedPtr<JsonData> jsonMain = json->CreateJsonData();
 
-		for (auto _pair : mAnimLayerBuildDataDic)
+		for (auto buildData : mAnimLayerBuildDataList)
 		{
-			const AnimationLayerBuildData& buildData = *(_pair.second);
 			SharedPtr<JsonData> nodeLocationListJson = jsonMain->CreateJsonData();
-			for (auto _nodeLocation_pair : buildData.NodeLocationDic)
+			for (auto _nodeLocation_pair : buildData->NodeLocationDic)
 			{
-				StateNodeGUI::StateNode* node = buildData.NodeEditor->FindNode(_nodeLocation_pair.first);
+				StateNodeGUI::StateNode* node = buildData->NodeEditor->FindNode(_nodeLocation_pair.first);
 				if (node == nullptr) continue;
 
 				SharedPtr<JsonData> dataJson = nodeLocationListJson->CreateJsonData();
@@ -1869,7 +2086,7 @@ namespace JG
 				dataJson->AddMember("Location", node->GetLocation());
 				nodeLocationListJson->AddMember(dataJson);
 			}
-			jsonMain->AddMember(_pair.first, nodeLocationListJson);
+			jsonMain->AddMember(buildData->Name, nodeLocationListJson);
 		}
 		json->AddMember("Main", jsonMain);
 		mNodeSaveData.SetValue(Json::ToString(json));
@@ -1877,14 +2094,30 @@ namespace JG
 
 	SharedPtr<AnimationLayerBuildData> AnimationView::GetCurrentLayerBuildData() const
 	{
-		return mCurrentAnimLayerBuildData;
+		return GetLayerBuildData(mCurrentAnimLayerBuildData);
+	}
+
+	void AnimationView::SetCurrentLayerBuildData(const String& layerName)
+	{
+		if (mAddedAnimLayerNameSet.find(layerName) == mAddedAnimLayerNameSet.end())
+		{
+			return;
+		}
+		mCurrentAnimLayerBuildData = layerName;
 	}
 	SharedPtr<AnimationLayerBuildData> AnimationView::GetLayerBuildData(const String& name) const
 	{
-		if (mAnimLayerBuildDataDic.find(name) == mAnimLayerBuildDataDic.end())
+		if (mAddedAnimLayerNameSet.find(name) == mAddedAnimLayerNameSet.end())
 		{
 			return nullptr;
 		}
-		return mAnimLayerBuildDataDic.at(name);
+		for (auto buildData : mAnimLayerBuildDataList)
+		{
+			if (buildData->Name == name)
+			{
+				return buildData;
+			}
+		}
+		return nullptr;
 	}
 }

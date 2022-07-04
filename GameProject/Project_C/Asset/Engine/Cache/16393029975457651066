@@ -13,8 +13,8 @@
                 "Name": "Walk&Run",
                 "NodeType": 2,
                 "Location": [
-                    271.0,
-                    420.0
+                    241.0,
+                    425.0
                 ]
             },
             {
@@ -23,6 +23,32 @@
                 "Location": [
                     753.0,
                     512.0
+                ]
+            }
+        ],
+        "Test Layer": [
+            {
+                "Name": "Root",
+                "NodeType": 0,
+                "Location": [
+                    250.0,
+                    100.0
+                ]
+            },
+            {
+                "Name": "AnimationClip",
+                "NodeType": 1,
+                "Location": [
+                    268.0,
+                    409.0
+                ]
+            },
+            {
+                "Name": "Exit",
+                "NodeType": 5,
+                "Location": [
+                    457.0,
+                    617.0
                 ]
             }
         ]

@@ -45,6 +45,11 @@ namespace JG
 	private:
 		enum class EEditMode
 		{
+			AnimationParameters,
+			AnimationLayer,
+		};
+		enum class EDataEditMode
+		{
 			Default,
 			Delete,
 			Move,
@@ -75,12 +80,11 @@ namespace JG
 		UniquePtr<EditorUIScene>    mEditorUIScene;
 
 		SharedPtr<Asset<AnimationController>>    mAnimationAsset;
-		//UniquePtr<StateNodeGUI::StateNodeEditor> mNodeEditor;
 
-
-		EEditMode  mAnimParamEditMode		    = EEditMode::Default;
-		EEditMode  mTransitionConditionEditMode = EEditMode::Default;
-		EAnimState mAnimState				    = EAnimState::Editable;
+		EDataEditMode  mDataEditMode				= EDataEditMode::Default;
+		EDataEditMode  mTransitionConditionEditMode = EDataEditMode::Default;
+		EEditMode	   mEditMode					= EEditMode::AnimationParameters;
+		EAnimState mAnimState						= EAnimState::Editable;
 
 		StorableString mModelAssetPath;
 		StorableString mSkeletoneAssetPath;
@@ -90,26 +94,12 @@ namespace JG
 		// BuildData
 		Dictionary<EAnimationParameterType, Color> mBgColorByParamTypeDic;
 		HashSet<String> mAddedAnimParamNameSet;
-		List<struct AnimParamBuildData>	  mAnimParamBuildDataList;
+		HashSet<String> mAddedAnimLayerNameSet;
+		List<struct AnimParamBuildData>	     mAnimParamBuildDataList;
+		List<SharedPtr<struct AnimationLayerBuildData>> mAnimLayerBuildDataList;
 
-
-
-
-		Dictionary<String, SharedPtr<struct AnimationLayerBuildData>> mAnimLayerBuildDataDic;
-		SharedPtr<AnimationLayerBuildData> mCurrentAnimLayerBuildData = nullptr;
-
-
-
-		//Dictionary<StateNodeGUI::StateNodeID, AnimTransitionBuildData> mAnimTransitionBuildDataDic;
-		//Dictionary<StateNodeGUI::StateNodeID, AnimClipBuildData>       mAnimClipBuildDataDic;
-		//Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpace1DBuildData>    mAnimBlendSpace1DBuildDataDic;
-		//Dictionary<StateNodeGUI::StateNodeID, AnimBlendSpaceBuildData>      mAnimBlendSpaceBuildDataDic;
-		//Dictionary<StateNodeGUI::StateNodeID, JVector2> mNodeLocationDic;
-		//Dictionary<String, StateNodeGUI::StateNodeID>   mNodeNameDic;
-
-
-
-
+		String mCurrentAnimLayerBuildData;
+		AnimationLayerBuildData* mRenamingLayerBuildData = nullptr;
 	public:
 		AnimationView();
 		virtual ~AnimationView() = default;
@@ -125,8 +115,11 @@ namespace JG
 	private:
 
 		void AnimationScene_OnGUI();
-		void AnimationInspector_OnGUI();
+
 		void AnimationNodeEditor_OnGUI();
+		void AnimationInspector_OnGUI();
+		void AnimationDataEditor_OnGUI();
+		void AnimationLayerEditor_OnGUI();
 		void AnimationParamEditor_OnGUI();
 
 		void AnimationParam_OnGUI(struct AnimParamBuildData& buildData);
@@ -153,6 +146,8 @@ namespace JG
 		void UpdateTransitionBuildData(const String& oldName, const String& newName);
 		void RemoveTransitionBuildData(const String& removedName);
 
+		void UpdateLayerBuildData(const String& oldName, const String& newName);
+
 		bool Build();
 		void RefreshAnimAsset(const String& path);
 		void Play();
@@ -167,6 +162,9 @@ namespace JG
 		}
 
 		SharedPtr<AnimationLayerBuildData> GetCurrentLayerBuildData() const;
+		void SetCurrentLayerBuildData(const String& layerName);
+
+
 		SharedPtr<AnimationLayerBuildData> GetLayerBuildData(const String& name) const;
 	};
 }

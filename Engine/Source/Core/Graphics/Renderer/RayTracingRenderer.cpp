@@ -3,7 +3,6 @@
 #include "Graphics/JGGraphics.h"
 #include "Graphics/RootSignature.h"
 #include "Graphics/GraphicsHelper.h"
-#include "Graphics/Manager/LightManager.h"
 #include "Graphics/RayTracing/RayTracingPipeline.h"
 #include "Graphics/RayTracing/TopLevelAccelerationStructure.h"
 #include "Graphics/RayTracing/BottomLevelAccelerationStructure.h"
