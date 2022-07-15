@@ -1,0 +1,2 @@
+﻿  Main.cpp
+LINK : fatal error LNK1181: 'C:\JGProject\Engine\Bin\DevelopGame\Core.lib' 입력 파일을 열 수 없습니다.

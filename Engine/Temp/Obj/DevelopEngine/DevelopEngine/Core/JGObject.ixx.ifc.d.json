@@ -1,0 +1,10 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\jgproject\\engine\\source\\runtime\\core\\object\\jgobject.ixx",
+        "ProvidedModule": "JGObject",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

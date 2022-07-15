@@ -1,0 +1,6 @@
+﻿  모듈 종속성의 소스를 검사하는 중...
+  컴파일하는 중...
+  Main.cpp
+C:\JGProject\Engine\Source\Programs\JGConsole\Main.cpp(3,16): warning C5050: 'std.core' 모듈을 가져오는 동안 가능한 호환되지 않는 환경: _DEBUG is defined in current command line and not in module command line
+C:\JGProject\Engine\Source\Programs\JGConsole\Main.cpp(3,16): warning C5050: 'std.core' 모듈을 가져오는 동안 가능한 호환되지 않는 환경: _M_FP_PRECISE is defined in current command line and not in module command line
+  JGConsole.vcxproj -> C:\JGProject\Engine\Bin\DevelopEngine\JGConsole.exe
