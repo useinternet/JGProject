@@ -100,6 +100,8 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>true</EnableModules>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>true</TranslateIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,6 +172,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Runtime\Core\Core.ixx" />
+    <ClCompile Include="..\..\Source\Runtime\Core\CoreDefines.ixx" />
     <ClCompile Include="..\..\Source\Runtime\Core\Object\JGClass.ixx">
       <FileType>Document</FileType>
     </ClCompile>
@@ -177,6 +181,9 @@
     <ClCompile Include="..\..\Source\Runtime\Core\Object\JGObject.ixx">
       <FileType>Document</FileType>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\Object\ObjectRefrection.ixx" />
+    <ClCompile Include="..\..\Source\Runtime\Core\String\Name.ixx" />
+    <ClCompile Include="..\..\Source\Runtime\Core\String\String.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

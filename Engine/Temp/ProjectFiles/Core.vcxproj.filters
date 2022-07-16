@@ -4,6 +4,9 @@
     <Filter Include="Object">
       <UniqueIdentifier>{bc88e7ca-b5e1-4d6d-919e-5274c55af6d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{24a18ea5-2d62-40b4-a711-b0e9cb3d99c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Runtime\Core\Object\JGClass.ixx">
@@ -15,5 +18,16 @@
     <ClCompile Include="..\..\Source\Runtime\Core\Object\JGField.ixx">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\Object\ObjectRefrection.ixx">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\String\String.ixx">
+      <Filter>String</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\String\Name.ixx">
+      <Filter>String</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\Core.ixx" />
+    <ClCompile Include="..\..\Source\Runtime\Core\CoreDefines.ixx" />
   </ItemGroup>
 </Project>
