@@ -36,8 +36,7 @@
 # 무시하고싶은 파일이나 폴더 추가
 
 # ParkJeongHee Ignore File
-ParkJeongHee/JGProject/JGEngine/.vs
-
+Engine\Temp\Obj
 
 
 
