@@ -7,27 +7,67 @@
     <Filter Include="String">
       <UniqueIdentifier>{24a18ea5-2d62-40b4-a711-b0e9cb3d99c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{8f402234-65ae-4caf-906c-6b5c7dc52c83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{77f84261-09fb-40db-86fa-6fe3fadc8866}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Runtime\Core\Object\JGClass.ixx">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\Object\JGObject.ixx">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\Object\JGField.ixx">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\Object\ObjectRefrection.ixx">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\String\String.ixx">
+    <ClCompile Include="..\..\Source\Runtime\Core\CoreSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Core\String\String.cpp">
       <Filter>String</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\String\Name.ixx">
-      <Filter>String</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Core\Object\ObjectGlobalSystem.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Core\Core.ixx" />
-    <ClCompile Include="..\..\Source\Runtime\Core\CoreDefines.ixx" />
+    <ClCompile Include="..\..\Source\Runtime\Core\Object\Class.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\Memory\Memory.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Core\Misc\Scheduler.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Runtime\Core\Memory\Memory.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Misc\Delegate.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Misc\Hash.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Object\JGObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Object\ObjectDefines.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Object\ObjectGlobalSystem.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\String\Name.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\String\String.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Core.h" />
+    <ClInclude Include="..\..\Source\Runtime\Core\CoreDefines.h" />
+    <ClInclude Include="..\..\Source\Runtime\Core\CoreSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\Core\Object\Class.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Misc\Scheduler.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Core\Misc\Log.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

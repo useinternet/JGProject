@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Programs\JGHeaderTool\Main.cpp" />
+    <ClCompile Include="..\..\Source\Programs\JGHeaderTool\Test\Test.h">
+      <Filter>Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Test">
+      <UniqueIdentifier>{15e509cb-be85-4ec8-9e30-056368056670}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
