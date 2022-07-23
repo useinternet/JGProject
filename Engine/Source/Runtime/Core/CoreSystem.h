@@ -55,7 +55,7 @@ public:
 			return nullptr;
 		}
 		uint64 code = getTypeHashCode<T>();
-		return SystemInstancePool[code];
+		return static_cast<T*>(SystemInstancePool[code]);
 	}
 
 	template<class T>

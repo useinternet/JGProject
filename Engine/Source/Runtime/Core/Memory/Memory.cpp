@@ -2,137 +2,80 @@
 
 
 
-AMemoryGlobalSystem::AMemoryGlobalSystem(uint32 processBlockCountPerFrame)
+AMemoryGlobalSystem::AMemoryGlobalSystem(int32 processBlockCountPerFrame)
 {
-	PList<ThreadID> threadIDs = ACoreSystem::GetAllThreadIDs();
-	for (ThreadID id : threadIDs)
-	{
-		_reservedJobMap.emplace(id, PReservedJobs());
-	}
-
 	_processBlockCountPerFrame = processBlockCountPerFrame;
 	_bLock = false;
+}
+AMemoryGlobalSystem::~AMemoryGlobalSystem()
+{
+
+	while (_allocatedMemoryBlockQueue.empty())
+	{
+		void* ptr = _allocatedMemoryBlockQueue.front();
+
+		delete ptr;
+		ptr = nullptr;
+
+		_allocatedMemoryBlockQueue.pop();
+	}
+	_allocatedMemoryBlocks.clear();
 }
 
 void AMemoryGlobalSystem::Update()
 {
-	lock();
+	garbageCollection(_processBlockCountPerFrame);
+}
+void AMemoryGlobalSystem::waitAndLock() const
+{
+	while (_bLock) {}
+	_bLock = true;
+}
+void AMemoryGlobalSystem::unlock() const
+{
+	_bLock = false;
+}
 
-	// add
-	uint32 tempCnt = 0;
+void AMemoryGlobalSystem::Flush()
+{
+	garbageCollection(-1);
+}
 
-	for (PPair<const ThreadID, PReservedJobs>& pair : _reservedJobMap)
+void AMemoryGlobalSystem::garbageCollection(int32 countPerFrame)
+{
+	waitAndLock();
+
+	int32 tempCnt = 0;
+
+	while (_allocatedMemoryBlockQueue.empty() == false)
 	{
-		PReservedJobs& reservedJob = pair.second;
-
-		while (reservedJob.AddedMemoryBlocks.empty() == false)
-		{
-			addMemoryBlock(reservedJob.AddedMemoryBlocks.front());
-			reservedJob.AddedMemoryBlocks.pop();
-
-			tempCnt += 1;
-			if (tempCnt > _processBlockCountPerFrame)
-			{
-				break;
-			}
-		}
-
-		if (tempCnt > _processBlockCountPerFrame)
+		if (tempCnt > countPerFrame && countPerFrame >= 0)
 		{
 			break;
 		}
-	}
+		++tempCnt;
 
-	tempCnt = 0;
+		void* ptr = _allocatedMemoryBlockQueue.front();
 
-	for (PPair<const ThreadID, PReservedJobs>& pair : _reservedJobMap)
-	{
-		PReservedJobs& reservedJob = pair.second;
+		_allocatedMemoryBlockQueue.pop();
 
-		while (reservedJob.RemovedMemoryBlocks.empty() == false)
+		const PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
+
+		int32 refCount = memoryBlock.RefCount->load();
+		int32 weakCount = memoryBlock.WeakCount->load();
+
+		if (refCount == 0 && weakCount == 0)
 		{
-			removeMemoryBlock(reservedJob.RemovedMemoryBlocks.front());
-			reservedJob.RemovedMemoryBlocks.pop();
+			_allocatedMemoryBlocks.erase(ptr);
 
-			tempCnt += 1;
-			if (tempCnt > _processBlockCountPerFrame)
-			{
-				break;
-			}
+			delete ptr;
+			ptr = nullptr;
 		}
-
-		if (tempCnt > _processBlockCountPerFrame)
+		else if(countPerFrame >= 0)
 		{
-			break;
+			_allocatedMemoryBlockQueue.push(ptr);
 		}
 	}
 
 	unlock();
-}
-
-void AMemoryGlobalSystem::deallocate(void* ptr)
-{
-	ThreadID currentThreadID = std::this_thread::get_id();
-	PReservedJobs& reservedJob = _reservedJobMap[currentThreadID];
-
-	PMemoryBlock memoryBlock;
-	memoryBlock.Ptr = ptr;
-
-	wait();
-
-	reservedJob.RemovedMemoryBlocks.push(memoryBlock);
-}
-
-void AMemoryGlobalSystem::wait()
-{
-	while (_bLock) {}
-}
-void AMemoryGlobalSystem::lock()
-{
-	
-	PLockGuard<PMutex> lock(_lockMutex);
-	if (_bLock == false)
-	{
-		_bLock = true;
-	}
-}
-void AMemoryGlobalSystem::unlock()
-{
-	PLockGuard<PMutex> lock(_lockMutex);
-	if (_bLock == true)
-	{
-		_bLock = false;
-	}
-}
-
-void AMemoryGlobalSystem::addMemoryBlock(const PMemoryBlock& memoryBlock)
-{
-	if (memoryBlock.Ptr == nullptr)
-	{
-		return;
-	}
-
-	PMemoryBlock& originMemoryBlock = _allocatedMemoryBlockMap[memoryBlock.Ptr];
-	originMemoryBlock.RefCount += 1;
-	originMemoryBlock.Size = memoryBlock.Size;
-}
-
-void AMemoryGlobalSystem::removeMemoryBlock(const PMemoryBlock& memoryBlock)
-{
-	if (memoryBlock.Ptr == nullptr)
-	{
-		return;
-	}
-	PMemoryBlock& originMemoryBlock = _allocatedMemoryBlockMap[memoryBlock.Ptr];
-	originMemoryBlock.RefCount -= 1;
-
-	if (originMemoryBlock.RefCount == 0)
-	{
-		void* deletePtr = originMemoryBlock.Ptr;
-
-		_allocatedMemoryBlockMap.erase(deletePtr);
-
-		delete deletePtr;
-		deletePtr = nullptr;
-	}
 }
