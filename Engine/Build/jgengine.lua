@@ -60,14 +60,7 @@ workspace "JGEngine"
             path .. "**.h",
             path .. "**.cpp",
             path .. "**.c",
-            path .. "**.ixx"
         }
-
-        filter "files:**.ixx"
-        compileas "Module"
-  
-        filter "files:**.cpp"
-        compileas "ModulePartition"
     end
 
     group "Engine"

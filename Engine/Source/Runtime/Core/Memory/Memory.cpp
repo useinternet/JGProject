@@ -1,55 +1,73 @@
 #include "Memory.h"
 
-
-
-AMemoryGlobalSystem::AMemoryGlobalSystem(int32 processBlockCountPerFrame)
+GMemoryGlobalSystem::GMemoryGlobalSystem(int32 processBlockCountPerFrame)
 {
 	_processBlockCountPerFrame = processBlockCountPerFrame;
 	_bLock = false;
 }
-AMemoryGlobalSystem::~AMemoryGlobalSystem()
+GMemoryGlobalSystem::~GMemoryGlobalSystem()
 {
-
-	while (_allocatedMemoryBlockQueue.empty())
-	{
-		void* ptr = _allocatedMemoryBlockQueue.front();
-
-		delete ptr;
-		ptr = nullptr;
-
-		_allocatedMemoryBlockQueue.pop();
-	}
+	Flush();
 	_allocatedMemoryBlocks.clear();
 }
 
-void AMemoryGlobalSystem::Update()
+void GMemoryGlobalSystem::Update()
 {
-	garbageCollection(_processBlockCountPerFrame);
+	garbageCollection(1);
 }
-void AMemoryGlobalSystem::waitAndLock() const
+void GMemoryGlobalSystem::waitAndLock() const
 {
 	while (_bLock) {}
 	_bLock = true;
 }
-void AMemoryGlobalSystem::unlock() const
+void GMemoryGlobalSystem::unlock() const
 {
 	_bLock = false;
 }
 
-void AMemoryGlobalSystem::Flush()
+void GMemoryGlobalSystem::Flush()
 {
 	garbageCollection(-1);
 }
 
-void AMemoryGlobalSystem::garbageCollection(int32 countPerFrame)
+void GMemoryGlobalSystem::garbageCollection(int32 level)
 {
 	waitAndLock();
 
-	int32 tempCnt = 0;
+	if (level < 0)
+	{
+		while (_allocatedMemoryBlockQueue.empty() == false)
+		{
+			int32 deleteCount = garbageCollectionInternal(_allocatedMemoryBlocks.size());
+
+			if (deleteCount <= 0)
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		int32 tempCnt = 0;
+
+		while (_allocatedMemoryBlockQueue.empty() == false || tempCnt < level)
+		{
+			++tempCnt;
+			garbageCollectionInternal(_processBlockCountPerFrame);
+		}
+	}
+
+	unlock();
+}
+
+int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
+{
+	int32 deleteCount = 0;
+	int32 tempCnt     = 0;
 
 	while (_allocatedMemoryBlockQueue.empty() == false)
 	{
-		if (tempCnt > countPerFrame && countPerFrame >= 0)
+		if (tempCnt > countPerFrame)
 		{
 			break;
 		}
@@ -61,21 +79,31 @@ void AMemoryGlobalSystem::garbageCollection(int32 countPerFrame)
 
 		const PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
 
+		bool bIsClass = memoryBlock.bIsClass;
 		int32 refCount = memoryBlock.RefCount->load();
 		int32 weakCount = memoryBlock.WeakCount->load();
 
-		if (refCount == 0 && weakCount == 0)
+		if (refCount == 0)
 		{
 			_allocatedMemoryBlocks.erase(ptr);
+			if (bIsClass == true)
+			{
+				delete (IMemoryObject*)ptr;
+			}
+			else
+			{
+				delete ptr;
+			}
 
-			delete ptr;
 			ptr = nullptr;
+
+			++deleteCount;
 		}
-		else if(countPerFrame >= 0)
+		else
 		{
 			_allocatedMemoryBlockQueue.push(ptr);
 		}
 	}
 
-	unlock();
+	return deleteCount;
 }

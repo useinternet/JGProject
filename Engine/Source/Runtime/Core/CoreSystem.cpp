@@ -1,62 +1,77 @@
 #include "CoreSystem.h"
+#include "Misc/Log.h"
 #include "Memory/Memory.h"
 #include "Object/ObjectGlobalSystem.h"
+#include "Misc/Scheduler.h"
 
-ACoreSystem* ACoreSystem::Instance = nullptr;
-PHashMap<uint64, AGlobalSystemInstanceBase*> ACoreSystem::SystemInstancePool;
-PList<ThreadID> ACoreSystem::ThreadIDList;
+GCoreSystem* GCoreSystem::Instance = nullptr;
+PHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
+PList<ThreadID> GCoreSystem::ThreadIDList;
 
-void ACoreSystem::Create()
+bool GCoreSystem::Create()
 {
+	/* CoreSystem 구현할 목록
+
+* AScheduler
+* * 쓰레드 실행 및 함수 실행 관리
+* * 할수 있다면 C++20 코루틴도 도입
+*
+* AStringGlobalSystem
+* * 문자열 관리, 유니코드 <-> 아스키 간 변환 및 스트링 코드관리
+*
+* AModuleGlobalSystem
+* 모듈 관리
+*/
+
 	if (Instance != nullptr)
 	{
-		return;
+		return false;
 	}
 
-	Instance = new ACoreSystem;
+	Instance = new GCoreSystem;
 
 	collectionThreadIDs();
 
+	GCoreSystem::RegisterSystemInstance<GLogGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GMemoryGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GScheduleGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
 
-	/* CoreSystem 구현할 목록
-	
-	* AScheduler
-	* * 쓰레드 실행 및 함수 실행 관리
-	* * 할수 있다면 C++20 코루틴도 도입
-	* 
-	* AMemoryGlobalSystem
-	* * 메모리 관리
-	* 
-	* AObjectGlobalSystem
-	* * 오브젝트 코드 생성 및 프로퍼티 관리
-	* 
-	* AStringGlobalSystem
-	* * 문자열 관리, 유니코드 <-> 아스키 간 변환 및 스트링 코드관리
-	* 
-	* AModuleGlobalSystem
-	* 모듈 관리
-	* 
-	* ALogGlobalSystem
-	* 로그 출력 및 파일 관리
-	
-	
-	*/
-	ACoreSystem::RegisterSystemInstance<AMemoryGlobalSystem>();
-	ACoreSystem::RegisterSystemInstance<AObjectGlobalSystem>();
+	if (GObjectGlobalSystem::GetInstance().codeGen() == false)
+	{
+		JG_LOG(Core, ELogLevel::Critical, "Fail ObjectGlobalSystem Code Generation");
+	}
+
+	for (const PPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	{
+		pair.second->Start();
+	}
+
+	return true;
 }
-void ACoreSystem::Update()
+void GCoreSystem::Update()
 {
+	for (PPair<const uint64, GGlobalSystemInstanceBase*>& pair : SystemInstancePool)
+	{
+		pair.second->Update();
+	}
 }
-void ACoreSystem::Destroy()
+void GCoreSystem::Destroy()
 {
 	if (Instance == nullptr)
 	{
 		return;
 	}
 
-	ACoreSystem::RegisterSystemInstance<AMemoryGlobalSystem>();
-	ACoreSystem::UnRegisterSystemInstance<AObjectGlobalSystem>();
+	for (const PPair< uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	{
+		pair.second->Destroy();
+	}
 
+	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GScheduleGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GMemoryGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GLogGlobalSystem>();
 
 	SystemInstancePool.clear();
 	ThreadIDList.clear();
@@ -67,18 +82,18 @@ void ACoreSystem::Destroy()
 }
 
 
-uint32 ACoreSystem::GetThreadCount()
+uint32 GCoreSystem::GetThreadCount()
 {
 	static uint32  threadCount = std::thread::hardware_concurrency();
 	return threadCount;
 }
 
-PList<ThreadID> ACoreSystem::GetAllThreadIDs()
+PList<ThreadID> GCoreSystem::GetAllThreadIDs()
 {
 	return ThreadIDList;
 }
 
-void ACoreSystem::collectionThreadIDs()
+void GCoreSystem::collectionThreadIDs()
 {
 	PList<std::thread> tempThreads;
 	PMutex tempMutex;

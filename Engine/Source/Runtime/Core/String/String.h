@@ -5,7 +5,6 @@
 #include <iostream>
 
 
-
 #pragma warning(disable : 4996)
 
 using PRawString  = std::string;
@@ -27,7 +26,7 @@ public:
 			return PString();
 		}
 
-		uint64 len = snprintf(nullptr, 0, string.GetRawString().c_str(), args ...) + 1; // Extra space for '\0'
+		uint64 len = snprintf(nullptr, 0, string.GetRawString().c_str(), convert(args) ...) + 1; // Extra space for '\0'
 		if (len <= 0)
 		{
 			return PString();
@@ -36,13 +35,25 @@ public:
 		PString result;
 		result._rawString.resize(len);
 
-		snprintf(result._rawString.data(), len, string.GetRawString().c_str(), args ...);
+		snprintf(result._rawString.data(), len, string.GetRawString().c_str(), convert(args) ...);
 		return result;
 	}
 	static PString ReplaceAll(const PString& message, const PString& pattern, const PString& replace)
 	{
 		PString result = message;
 		return result.ReplaceAll(pattern, replace);
+	}
+
+private:
+	template<class T>
+	static auto convert(T& arg)
+	{
+		return std::forward<T>(arg);
+	}
+	template<>
+	static auto convert(PString& arg)
+	{
+		return arg.GetRawString().c_str();
 	}
 public:
 	PString() = default;
@@ -56,6 +67,8 @@ public: // -- operation --
 	PString& operator=(const char* string);
 	PString& operator=(const wchar_t* string);
 
+	bool operator==(const PString& string) const;
+	bool operator!=(const PString& string) const;
 public:
 	PString& Append(const PString& string);
 	PString& Insert(const PString& string, uint64 pos);
@@ -83,6 +96,7 @@ public:
 	void Reset();
 
 public:
+	const char* GetCStr() const;
 	const PRawString& GetRawString() const;
 	const PRawWString& GetRawWString() const;
 
@@ -94,3 +108,14 @@ private:
 	PRawWString s2ws(const PRawString& str) const;
 	PRawString ws2s(const PRawWString& wstr) const;
 };
+
+namespace std {
+	template <>
+	struct hash<PString>
+	{
+		std::size_t operator()(const PString& k) const noexcept
+		{
+			return k.GetStringTableID();
+		}
+	};
+}

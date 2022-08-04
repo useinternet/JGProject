@@ -4,12 +4,21 @@
 #include "CoreDefines.h"
 #include "CoreSystem.h"
 #include "String/String.h"
+#include "Memory/Memory.h"
 
 #define TYPE_NULL_ID -1
+
+
+#define CODE_GENERATION_INCLUDE_BEGIN(...)
+#define CODE_GENERATION_INCLUDE_END(...)
+
+#define CODE_GENERATION_BEGIN(...)
+#define CODE_GENERATION_END(...)
 
 enum class EPropertyType
 {
 	Unknown,
+	Void,
 	Bool,
 	Int8,
 	Int16,
@@ -19,8 +28,8 @@ enum class EPropertyType
 	Uint16,
 	Uint32,
 	Uint64,
-	Float,
-	Double,
+	Float32,
+	Float64,
 	List,
 	Map,
 	HashMap,
@@ -30,56 +39,53 @@ enum class EPropertyType
 	Class,
 	Enum,
 	EnumFlags,
+	Function,
 };
 
+class JGType;
+class JGStruct;
+class JGClass;
+class JGEnum;
 
-class PProperty
+
+class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
-	// 변수
-	// 이름
-public:
-	EPropertyType PropertyType = EPropertyType::Unknown;
-	PString Name;
-	void* PropertyPtr = nullptr;
-};
-
-class PField
-{
-public:
-	PList<PProperty> Properties;
-};
-
-class PType
-{
-public:
-	PString Name;
-	uint64  ID = TYPE_NULL_ID;
-};
-
-class PStruct
-{
-public:
-	PType  Type;
-	PField Field;
-	void* StructPtr = nullptr;
-};
-
-
-class AObjectGlobalSystem : public AGlobalSystemInstance<AObjectGlobalSystem>
-{
-
-
-public:
-	AObjectGlobalSystem();
-
-	virtual ~AObjectGlobalSystem() = default;
+	friend class GCoreSystem;
 private:
+	PHashMap<PString, uint64> _typeIDMap;
 
+	PHashMap<uint64, PSharedPtr<JGClass>>  _classMap;
+	PHashMap<uint64, PSharedPtr<JGStruct>> _structMap;
+	PHashMap<uint64, PSharedPtr<JGEnum>>   _enumMap;
+public:
+	GObjectGlobalSystem();
 
+	virtual ~GObjectGlobalSystem();
 
+protected:
+	virtual void Destroy() override;
 
+public:
+	PSharedPtr<JGStruct> GetStaticStruct(uint64 typeID) const;
 
+	template<class T>
+	PSharedPtr<JGStruct> GetStaticStruct() const
+	{
+		uint64 typeID = JGTYPEID(T);
+		return GetStaticStruct(typeID);
+	}
 
+private:
+	bool registerClass(PSharedPtr<JGClass> classObject);
+	bool registerStruct(PSharedPtr<JGStruct> structObject);
+	bool registerEnum(PSharedPtr<JGEnum> enumObject);
+
+	bool registerType(PSharedPtr<JGType> type);
+
+	PSharedPtr<JGStruct> copyStruct(uint64 typeID);
+
+private:
+	bool codeGen();
 };
 
 

@@ -3,19 +3,19 @@
 #include "CoreDefines.h"
 
 
-class AGlobalSystemInstanceBase;
-class ACoreSystem
+class GGlobalSystemInstanceBase;
+class GCoreSystem
 {
 private:
-	static ACoreSystem* Instance;
-	static PHashMap<uint64, AGlobalSystemInstanceBase*> SystemInstancePool;
+	static GCoreSystem* Instance;
+	static PHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
 	static PList<ThreadID> ThreadIDList;
 private:
-	ACoreSystem() = default;
-	~ACoreSystem() = default;
+	GCoreSystem() = default;
+	~GCoreSystem() = default;
 
 public:
-	static void Create();
+	static bool Create();
 	static void Update();
 	static void Destroy();
 
@@ -79,29 +79,32 @@ private:
 	static void collectionThreadIDs();
 };
 
-class AGlobalSystemInstanceBase
+class GGlobalSystemInstanceBase
 {
+	friend GCoreSystem;
 public:
-	virtual ~AGlobalSystemInstanceBase() = default;
+	virtual ~GGlobalSystemInstanceBase() = default;
 	
 protected:
-	virtual void Update() {}
+	virtual void Start()   {}
+	virtual void Update()  {}
+	virtual void Destroy() {}
 };
 
 template<class T>
-class AGlobalSystemInstance : public AGlobalSystemInstanceBase
+class GGlobalSystemInstance : public GGlobalSystemInstanceBase
 {
 public:
-	virtual ~AGlobalSystemInstance() = default;
+	virtual ~GGlobalSystemInstance() = default;
 
 
 	static T& GetInstance()
 	{
-		T* instance = ACoreSystem::GetSystemInstance<T>();
+		T* instance = GCoreSystem::GetSystemInstance<T>();
 		return *instance;
 	}
 	static bool IsValid()
 	{
-		return ACoreSystem::IsValidSystemInstance<T>();
+		return GCoreSystem::IsValidSystemInstance<T>();
 	}
 };

@@ -2,48 +2,64 @@
 
 //
 #include "Core.h"
+#include "Test/TestObject.h"
 #include <iostream>
 
 
-using namespace std;
+
+
+class A : public IMemoryObject
+{
+	int Value = -1;
+public:
+	virtual ~A() = default;
+};
+
+
+class B : public A
+{
+	int Value2 = 3;
+public:
+	virtual ~B() = default;
+};
+
+
+class C : public B
+{
+	int Value3 = 2;
+public:
+	virtual ~C() = default;
+};
+
+class D : public IMemoryObject
+{
+	int Value3 = 2;
+public:
+	virtual ~D() = default;
+};
+
 int main()
 {
-	ACoreSystem::Create();
+	
+	GCoreSystem::Create();
 
-	PWeakPtr<int32> testw;
 	{
-		PSharedPtr<int32> test = AMemoryGlobalSystem::GetInstance().Allocate<int32>();
+		PSharedPtr<A> A2 = Allocate<B>();
+		PSharedPtr<D> D2;
+		PSharedPtr<C> C2 = Allocate<C>();
 
-		*test = 3;
+		A2 = C2;
 
-		testw = test;
+		//A2 = D2;
+	
+		PSharedPtr<A> AAA;
 
-		if (testw.IsValid())
-		{
-			cout << "valid" << endl;
-		}
-		PSharedPtr<int32> test1 = test;
+		AAA = std::move(A2);
+			
 
-		
 	}
 
-	if (testw.IsValid())
-	{
-		cout << "valid" << endl;
-	}
 
-	AMemoryGlobalSystem::GetInstance().Flush();
-	
-
-
-
-
-
-
-
-	ACoreSystem::Update();
-	
-
-	ACoreSystem::Destroy();
+	GCoreSystem::Destroy();
 	return 0;
 }

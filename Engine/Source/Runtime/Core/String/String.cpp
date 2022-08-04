@@ -6,6 +6,7 @@
 #include <cctype>
 #include <codecvt>
 #include <xhash>
+#include "String.h"
 
 
 PString::PString(const char* string)
@@ -27,6 +28,16 @@ PString& PString::operator=(const wchar_t* string)
 {
 	setWString(string);
 	return *this;
+}
+
+bool PString::operator==(const PString& string) const
+{
+	return GetStringTableID() == string.GetStringTableID();
+}
+
+bool PString::operator!=(const PString& string) const
+{
+	return GetStringTableID() != string.GetStringTableID();
 }
 
 PString& PString::Append(const PString& string)
@@ -124,7 +135,7 @@ bool PString::Empty() const
 
 bool PString::Equal(const PString& string) const
 {
-	return _rawString == string.GetRawString();
+	return GetStringTableID() == string.GetStringTableID();
 }
 
 bool PString::StartWidth(const PString& pattern) const
@@ -173,6 +184,11 @@ void PString::Reset()
 	_stringCode = STRING_TABLE_NULL_ID;
 	//_rawWString = L"";
 	//_rawWString = STRING_TABLE_NULL_ID;
+}
+
+const char* PString::GetCStr() const
+{
+	return GetRawString().c_str();
 }
 
 const PRawString& PString::GetRawString() const

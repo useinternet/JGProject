@@ -1,8 +1,26 @@
 #pragma once
+#include "CoreDefines.h"
+#include "Memory/Memory.h"
+#include "String/String.h"
+
+
+// 이거는 object가 destroy에 진입 전 연결을 끊어버림
+template< class T>
+class PWeakJGObjectPtr
+{
+
+};
+
+// 평범
+template< class T>
+class PJGObjectPtr
+{
+
+};
 
 
 
-class JGObject
+class JGObject : public IMemoryObject
 {
 	// JGObject 에 포함될 정보들
 
@@ -33,7 +51,15 @@ class JGObject
 	JGClass* GetClass();
 	JGClass* GetStaticClass();
 	*/
-public:
 
+private:
+	PString _name;
+public:
+	virtual ~JGObject() = default;
+
+public:
+	void SetName(const PString& name);
+
+	const PString& GetName() const;
 };
 

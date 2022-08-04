@@ -10,10 +10,12 @@
 
 
 
-#define JGCLASS() 
-#define JGSTRUCT() 
+#define JGCLASS(...) 
+#define JGSTRUCT(...) 
 
-#define GENERATED_JGCLASS_BODY() 
+#define GENERATED_JGCLASS_BODY(...) \
+	friend class PObjectGlobalsPrivateUtils; \
 
-#define JGPROPERTY()
-#define JGFUNCTION()
+#define JGPROPERTY(...)
+#define JGFUNCTION(...)
+#define JGMETA(...)
