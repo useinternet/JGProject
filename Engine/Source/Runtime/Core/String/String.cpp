@@ -1,13 +1,5 @@
-
-
 #include "String.h"
 #include "Misc/Hash.h"
-
-#include <cctype>
-#include <codecvt>
-#include <xhash>
-#include "String.h"
-
 
 PString::PString(const char* string)
 {
@@ -182,8 +174,6 @@ void PString::Reset()
 {
 	_rawString = "";
 	_stringCode = STRING_TABLE_NULL_ID;
-	//_rawWString = L"";
-	//_rawWString = STRING_TABLE_NULL_ID;
 }
 
 const char* PString::GetCStr() const
@@ -198,8 +188,6 @@ const PRawString& PString::GetRawString() const
 
 const PRawWString& PString::GetRawWString() const
 {
-	//updateRawWString();
-	//return _rawWString;
 	static PRawWString result = L"";
 	return result;
 }
@@ -211,38 +199,10 @@ void PString::setString(const PRawString& string)
 }
 void PString::setWString(const PRawWString& string)
 {
-	_rawString = ws2s(string);
-	updateHashCode();
-	updateRawWString();
-}
 
-void PString::updateRawWString() const
-{
-	//if (_stringCode == _wstringCode)
-	//{
-	//	return;
-	//}
-	//_wstringCode = _stringCode;
-	//_rawWString  = s2ws(_rawString);
 }
 
 void PString::updateHashCode()
 {
 	_stringCode = PHash::Hash<PRawString>(_rawString);
-}
-
-PRawWString PString::s2ws(const PRawString& str) const
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.from_bytes(str);
-}
-
-PRawString PString::ws2s(const PRawWString& wstr) const
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.to_bytes(wstr);
 }

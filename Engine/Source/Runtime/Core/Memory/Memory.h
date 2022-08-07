@@ -26,6 +26,12 @@ namespace PMemoryPrivate
 			, pWeakCount(sharedPtr._pWeakCount)
 		{}
 
+		PTemporaryOwner(const PWeakPtr<T>& weakPtr)
+			: ptr(weakPtr._ptr)
+			, pRefCount(weakPtr._pRefCount)
+			, pWeakCount(weakPtr._pWeakCount)
+		{}
+
 		PTemporaryOwner(PSharedPtr<T>&& sharedPtr)
 			: ptr(sharedPtr._ptr)
 			, pRefCount(sharedPtr._pRefCount)
@@ -34,6 +40,16 @@ namespace PMemoryPrivate
 			sharedPtr._ptr = nullptr;
 			sharedPtr._pRefCount = nullptr;
 			sharedPtr._pWeakCount = nullptr;
+		}
+		
+		PTemporaryOwner(PWeakPtr<T>&& weakPtr)
+			: ptr(weakPtr._ptr)
+			, pRefCount(weakPtr._pRefCount)
+			, pWeakCount(weakPtr._pWeakCount)
+		{
+			weakPtr._ptr = nullptr;
+			weakPtr._pRefCount  = nullptr;
+			weakPtr._pWeakCount = nullptr;
 		}
 	};
 };
@@ -248,28 +264,52 @@ private:
 template<class T>
 class PWeakPtr
 {
+	friend PMemoryPrivate::PTemporaryOwner<T>;
 	friend class GMemoryGlobalSystem;
 
 	T* _ptr = nullptr;
+
 	AtomicInt32* _pRefCount   = nullptr;
 	AtomicInt32* _pWeakCount  = nullptr;
+
 public:
 	PWeakPtr() = default;
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr(const PWeakPtr<U>& rhs)
+	{
+		copy<U>(rhs);
+	}
 	PWeakPtr(const PWeakPtr<T>& rhs)
 	{
-		copy(rhs);
+		copy<T>(rhs);
+	}
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr(PWeakPtr<U>&& rhs)
+	{
+		move<U>(std::move(rhs));
 	}
 	PWeakPtr(PWeakPtr<T>&& rhs)
 	{
-		move(std::move(rhs));
+		move<T>(std::move(rhs));
+	}
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr(const PSharedPtr<U>& rhs)
+	{
+		set<U>(rhs);
 	}
 	PWeakPtr(const PSharedPtr<T>& rhs)
 	{
-		set(rhs);
+		set<T>(rhs);
+	}
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr(PSharedPtr<U>&& rhs)
+	{
+		set<U>(rhs);
 	}
 	PWeakPtr(PSharedPtr<T>&& rhs)
 	{
-		set(rhs);
+		set<T>(rhs);
 	}
 
 	~PWeakPtr()
@@ -288,18 +328,21 @@ public:
 
 		return *this;
 	}
+
 	PWeakPtr<T>& operator=(PWeakPtr<T>&& rhs)
 	{
 		move(std::move(rhs));
 
 		return *this;
 	}
+
 	PWeakPtr<T>& operator=(const PSharedPtr<T>& rhs)
 	{
 		set(rhs);
 
 		return *this;
 	}
+
 	PWeakPtr<T>& operator=(PSharedPtr<T>&& rhs)
 	{
 		set(rhs);
@@ -322,10 +365,11 @@ public:
 	{
 		if (IsValid() == false)
 		{
-			return PSharedPtr<T>();
+			return nullptr;
 		}
 		return GMemoryGlobalSystem::GetInstance().Wrap(_ptr);
 	}
+
 public:
 	bool IsValid() const
 	{
@@ -335,12 +379,15 @@ public:
 		}
 		return _pRefCount->load() > 0;
 	}
+
 private:
 	bool isValidPointer() const 
 	{
 		return _ptr != nullptr;
 	}
-	void set(const PSharedPtr<T>& ptr)
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	void set(const PSharedPtr<U>& ptr)
 	{
 		if (ptr.IsValid() == false)
 		{
@@ -349,13 +396,17 @@ private:
 
 		Reset();
 
-		_ptr = ptr._ptr;
-		_pRefCount  = ptr._pRefCount;
-		_pWeakCount = ptr._pWeakCount;
+		PMemoryPrivate::PTemporaryOwner<U> owner(ptr);
+
+		_ptr = owner.ptr;
+		_pRefCount  = owner.pRefCount;
+		_pWeakCount = owner.pWeakCount;
 
 		addWeakCount();
 	}
-	void copy(const PWeakPtr<T>& rhs)
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	void copy(const PWeakPtr<U>& rhs)
 	{
 		if (rhs.IsValid() == false)
 		{
@@ -364,13 +415,17 @@ private:
 
 		Reset();
 
-		_ptr = rhs._ptr;
-		_pRefCount  = rhs._pRefCount;
-		_pWeakCount = rhs._pWeakCount;
+		PMemoryPrivate::PTemporaryOwner<U> owner(rhs);
+
+		_ptr = owner.ptr;
+		_pRefCount  = owner.pRefCount;
+		_pWeakCount = owner.pWeakCount;
 
 		addWeakCount();
 	}
-	void move(PWeakPtr<T>&& rhs)
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	void move(PWeakPtr<U>&& rhs)
 	{
 		if (rhs.IsValid() == false)
 		{
@@ -379,13 +434,11 @@ private:
 
 		Reset();
 
-		_ptr = rhs._ptr;
-		_pRefCount = rhs._pRefCount;
-		_pWeakCount = rhs._pWeakCount;
+		PMemoryPrivate::PTemporaryOwner<U> owner(std::move(rhs));
 
-		rhs._ptr = nullptr;
-		rhs._pRefCount = nullptr;
-		rhs._pWeakCount = nullptr;
+		_ptr = owner.ptr;
+		_pRefCount  = owner.pRefCount;
+		_pWeakCount = owner.pWeakCount;
 	}
 
 	void addWeakCount()
@@ -397,6 +450,7 @@ private:
 
 		_pWeakCount->fetch_add(1);
 	}
+
 	void subWeakCount()
 	{
 		if (_pWeakCount == nullptr)
@@ -406,6 +460,7 @@ private:
 
 		_pWeakCount->fetch_sub(1);
 	}
+
 };
 
 class GMemoryGlobalSystem : public GGlobalSystemInstance<GMemoryGlobalSystem>
@@ -427,6 +482,7 @@ class GMemoryGlobalSystem : public GGlobalSystemInstance<GMemoryGlobalSystem>
 	//
 	mutable AtomicBool _bLock = false;
 	int32 _processBlockCountPerFrame;
+
 public:
 	GMemoryGlobalSystem(int32 processBlockCountPerFrame = 10);
 	virtual ~GMemoryGlobalSystem();
@@ -495,6 +551,44 @@ public:
 		return ptr;
 	}
 
+	template<class T, class U>
+	PSharedPtr<T> Cast(PSharedPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		PSharedPtr<T> result;
+		result._ptr = static_cast<T*>(ptr._ptr);
+		result._pRefCount  = ptr._pRefCount;
+		result._pWeakCount = ptr._pWeakCount;
+		result.addRefCount();
+
+		return result;
+	}
+
+	template<class T, class U>
+	PWeakPtr<T> Cast(PWeakPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		JG_ASSERT(true);
+		// 현재 금지
+		// VTable 확인
+
+		PWeakPtr<T> result;
+		result._ptr = static_cast<T*>(ptr._ptr);
+		result._pRefCount  = ptr._pRefCount;
+		result._pWeakCount = ptr._pWeakCount;
+		result.addWeakCount();
+
+		return result;
+	}
+
 	void Flush();
 private:
 	void waitAndLock() const;
@@ -523,3 +617,17 @@ inline PSharedPtr<T> SharedWrap(const T* fromThis)
 {
 	return GMemoryGlobalSystem::GetInstance().Wrap(fromThis);
 }
+
+template<class T, class U>
+inline PSharedPtr<T> Cast(PSharedPtr<U> ptr)
+{
+	return GMemoryGlobalSystem::GetInstance().Cast<T, U>(ptr);
+}
+
+template<class T, class U>
+inline PWeakPtr<T> Cast(PWeakPtr<U> ptr)
+{
+	return GMemoryGlobalSystem::GetInstance().Cast<T, U>(ptr);
+}
+
+

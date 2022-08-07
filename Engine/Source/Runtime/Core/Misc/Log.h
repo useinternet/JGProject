@@ -20,10 +20,12 @@ enum class ELogLevel
 class GLogGlobalSystem : public GGlobalSystemInstance<GLogGlobalSystem>
 {
 	mutable std::shared_ptr<spdlog::logger> _logger;
+
 public:
 	GLogGlobalSystem();
 	virtual ~GLogGlobalSystem();
 
+public:
 	template<class ...T>
 	void AddLog(const PString& category, ELogLevel loglevel, T&& ...args) const
 	{

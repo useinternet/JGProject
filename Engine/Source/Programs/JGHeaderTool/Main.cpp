@@ -40,24 +40,21 @@ public:
 
 int main()
 {
-	
 	GCoreSystem::Create();
 
 	{
-		PSharedPtr<A> A2 = Allocate<B>();
-		PSharedPtr<D> D2;
-		PSharedPtr<C> C2 = Allocate<C>();
+		// 
+		PSharedPtr<JGStruct> staticStruct = PTestObject::GetStaticStruct();
+		
+		PTestObject testObject;
+		PSharedPtr<JGStruct> Struct = testObject.GetStruct();
 
-		A2 = C2;
-
-		//A2 = D2;
+		testObject.TestValue1;
 	
-		PSharedPtr<A> AAA;
-
-		AAA = std::move(A2);
-			
-
+		//Struct->GetType
 	}
+
+	// map<uint64, class*>
 
 
 	GCoreSystem::Destroy();

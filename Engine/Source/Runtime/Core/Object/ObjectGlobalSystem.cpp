@@ -2,19 +2,6 @@
 #include "ObjectGlobals.h"
 #include "Misc/Log.h"
 
-
-
-
-GObjectGlobalSystem::GObjectGlobalSystem()
-{
-
-}
-
-GObjectGlobalSystem::~GObjectGlobalSystem()
-{
-
-}
-
 void GObjectGlobalSystem::Destroy()
 {
 	_enumMap.clear();

@@ -5,9 +5,7 @@
 #include "CoreSystem.h"
 #include "String/String.h"
 #include "Memory/Memory.h"
-
-#define TYPE_NULL_ID -1
-
+#include "ObjectGlobals.h"
 
 #define CODE_GENERATION_INCLUDE_BEGIN(...)
 #define CODE_GENERATION_INCLUDE_END(...)
@@ -39,14 +37,12 @@ enum class EPropertyType
 	Class,
 	Enum,
 	EnumFlags,
-	Function,
 };
 
 class JGType;
 class JGStruct;
 class JGClass;
 class JGEnum;
-
 
 class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
@@ -58,9 +54,7 @@ private:
 	PHashMap<uint64, PSharedPtr<JGStruct>> _structMap;
 	PHashMap<uint64, PSharedPtr<JGEnum>>   _enumMap;
 public:
-	GObjectGlobalSystem();
-
-	virtual ~GObjectGlobalSystem();
+	virtual ~GObjectGlobalSystem() = default;
 
 protected:
 	virtual void Destroy() override;

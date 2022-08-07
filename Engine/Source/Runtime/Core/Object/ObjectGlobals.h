@@ -3,10 +3,10 @@
 #include "JGObject.h"
 #include "Math/Math.h"
 #include "Memory/Memory.h"
-#include "ObjectGlobalSystem.h"
 #include "String/String.h"
 #include "Misc/StdExternal.h"
 
+#define TYPE_NULL_ID -1
 
 #define JGTYPE(x)    JGType::GenerateType<##x>()
 #define JGTYPEID(x)  JGType::GenerateTypeID<##x>()
@@ -122,6 +122,9 @@ protected:
 
 	PHashMap<PString, uint64> PropertyMap;
 	PHashMap<PString, uint64> FunctionMap;
+public:
+	//bool HasProperty(const PString& name);
+
 public:
 	JGField();
 	virtual ~JGField() = default;

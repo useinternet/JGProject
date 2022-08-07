@@ -2,6 +2,7 @@
 
 
 #include "CoreDefines.h"
+#include "Memory/Memory.h"
 #include <iostream>
 
 
@@ -10,13 +11,13 @@
 using PRawString  = std::string;
 using PRawWString = std::wstring;
 
-#define STRING_TABLE_NULL_ID -1
 
-class PString
+class PString : public IMemoryObject
 {
 private:
-	uint64	   _stringCode = STRING_TABLE_NULL_ID;
+	uint64	    _stringCode = NULL_ID;
 	PRawString  _rawString;
+
 public:
 	template <class ...Args>
 	static PString Format(const PString& string, Args&& ... args)
@@ -103,10 +104,7 @@ public:
 private:
 	void setString(const PRawString& string);
 	void setWString(const PRawWString& string);
-	void updateRawWString() const;
 	void updateHashCode();
-	PRawWString s2ws(const PRawString& str) const;
-	PRawString ws2s(const PRawWString& wstr) const;
 };
 
 namespace std {

@@ -3,6 +3,7 @@
 #include "CoreDefines.h"
 
 
+
 class GGlobalSystemInstanceBase;
 class GCoreSystem
 {
@@ -10,6 +11,7 @@ private:
 	static GCoreSystem* Instance;
 	static PHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
 	static PList<ThreadID> ThreadIDList;
+
 private:
 	GCoreSystem() = default;
 	~GCoreSystem() = default;
@@ -22,7 +24,6 @@ public:
 	template<class T, class ...Args>
 	static void RegisterSystemInstance(Args... args)
 	{
-
 		if (IsValidSystemInstance<T>() == true)
 		{
 			return;
@@ -40,7 +41,7 @@ public:
 		}
 
 		uint64 code = getTypeHashCode<T>();
-		T* instance = static_cast<T*>(SystemInstancePool[code]);
+		GGlobalSystemInstanceBase*& instance = SystemInstancePool[code];
 
 		delete instance;
 		instance = nullptr;
@@ -82,7 +83,8 @@ private:
 class GGlobalSystemInstanceBase
 {
 	friend GCoreSystem;
-public:
+protected:
+	GGlobalSystemInstanceBase() = default;
 	virtual ~GGlobalSystemInstanceBase() = default;
 	
 protected:
@@ -94,10 +96,13 @@ protected:
 template<class T>
 class GGlobalSystemInstance : public GGlobalSystemInstanceBase
 {
-public:
+	friend GCoreSystem;
+
+protected:
+	GGlobalSystemInstance() = default;
 	virtual ~GGlobalSystemInstance() = default;
 
-
+public:
 	static T& GetInstance()
 	{
 		T* instance = GCoreSystem::GetSystemInstance<T>();

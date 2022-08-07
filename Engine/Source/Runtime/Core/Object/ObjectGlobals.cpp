@@ -1,5 +1,6 @@
 #include "ObjectGlobals.h"
 #include "Misc/Log.h"
+#include "ObjectGlobalSystem.h"
 
 
 PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const PList<PPair<PString, PString>>& pairList)

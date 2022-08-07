@@ -5,6 +5,7 @@ GMemoryGlobalSystem::GMemoryGlobalSystem(int32 processBlockCountPerFrame)
 	_processBlockCountPerFrame = processBlockCountPerFrame;
 	_bLock = false;
 }
+
 GMemoryGlobalSystem::~GMemoryGlobalSystem()
 {
 	Flush();
@@ -79,8 +80,8 @@ int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
 
 		const PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
 
-		bool bIsClass = memoryBlock.bIsClass;
-		int32 refCount = memoryBlock.RefCount->load();
+		bool bIsClass   = memoryBlock.bIsClass;
+		int32 refCount  = memoryBlock.RefCount->load();
 		int32 weakCount = memoryBlock.WeakCount->load();
 
 		if (refCount == 0)
