@@ -1,4 +1,6 @@
 #include "StringTable.h"
+#include "String/String.h"
+
 #include <cctype>
 #include <codecvt>
 #include <xhash>
@@ -8,6 +10,8 @@ GStringTable::GStringTable(int32 removeCountPerFrame, int32 stringInfoLifeFrameC
 	: _removeCountPerFrame(removeCountPerFrame)
 	, _stringInfoLifeFrameCount(stringInfoLifeFrameCount)
 {}
+
+GStringTable::~GStringTable() {}
 
 void GStringTable::Update()
 {
@@ -38,12 +42,12 @@ void GStringTable::RegisterString(const PString& str, uint64* outID, AtomicInt32
 			info.WStr = s2ws(info.Str);
 			info.RefCount = std::make_unique<AtomicInt32>();
 			_stringInfoMap[hashCode] = std::move(info);
-
-			pStringInfo = &_stringInfoMap[hashCode];
-
 			_stringIDQueue.push(info.ID);
 		}
+
+		pStringInfo = &_stringInfoMap[hashCode];
 	}
+
 
 	if (pStringInfo != nullptr)
 	{
@@ -51,6 +55,7 @@ void GStringTable::RegisterString(const PString& str, uint64* outID, AtomicInt32
 		*outRefCount = pStringInfo->RefCount.get();
 	}
 }
+
 bool GStringTable::FindString(uint64 ID, PString* outStr)  const
 {
 	if (outStr != nullptr)

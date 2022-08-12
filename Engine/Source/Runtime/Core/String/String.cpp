@@ -173,7 +173,7 @@ double PString::ToDouble() const
 void PString::Reset()
 {
 	_rawString = "";
-	_stringCode = STRING_TABLE_NULL_ID;
+	_stringCode = NULL_ID;
 }
 
 const char* PString::GetCStr() const

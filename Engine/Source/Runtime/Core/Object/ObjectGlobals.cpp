@@ -3,10 +3,10 @@
 #include "ObjectGlobalSystem.h"
 
 
-PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const PList<PPair<PString, PString>>& pairList)
+PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const PList<PPair<PName, PString>>& pairList)
 {
 	PSharedPtr<JGMeta> result = Allocate<JGMeta>();
-	for (const PPair<PString, PString>& pair : pairList)
+	for (const PPair<PName, PString>& pair : pairList)
 	{
 		result->MetaDataMap.emplace(pair.first, pair.second);
 	}
@@ -46,6 +46,37 @@ PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStaticStruct(const JGType& 
 	return result;
 }
 
+PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
+{
+	PSharedPtr<JGClass> result = Allocate<JGClass>();
+	result->Type = Allocate<JGType>(type);
+	result->Properties = properties;
+	result->Functions  = functions;
+	result->MetaData   = metaData;
+
+	for (const JGType& type : virtualTypeList)
+	{
+		result->VTypeSet.insert(type);
+	}
+
+	return result;
+}
+
+PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
+{
+	PSharedPtr<JGInterface> result = Allocate<JGInterface>();
+	result->Type = Allocate<JGType>(type);
+	result->Functions = functions;
+	result->MetaData  = metaData;
+
+	for (const JGType& type : virtualTypeList)
+	{
+		result->VTypeSet.insert(type);
+	}
+
+	return result;
+}
+
 JGType::JGType()
 {
 	SetName("JGType");
@@ -65,21 +96,59 @@ JGProperty::JGProperty()
 {
 	SetName("JGProperty");
 }
+bool JGProperty::IsValid() const
+{
+	if (OwnerObject.IsValid() == false)
+	{
+		return false;
+	}
+
+	if (DataPtr == nullptr)
+	{
+		return false;
+	}
+
+	return true;
+}
 JGFunction::JGFunction()
 {
 	SetName("JGFunction");
 }
+
 JGField::JGField()
 {
 	SetName("JGField");
 }
+
+bool JGField::HasProperty(const PName& name) const
+{
+	if (PropertyMap.find(name) == PropertyMap.end())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+PSharedPtr<JGProperty> JGField::findProperty(const PName& name) const
+{
+	if (HasProperty(name) == false)
+	{
+		return nullptr;
+	}
+
+	uint64 index = PropertyMap.at(name);
+	return Properties[index];
+}
+
+
 
 JGStruct::JGStruct()
 {
 	SetName("JGStruct");
 }
 
-PSharedPtr<JGType> JGStruct::GetType() const
+PSharedPtr<JGType> JGStruct::GetClassType() const
 {
 	return Type;
 }
@@ -89,14 +158,18 @@ JGEnum::JGEnum()
 	SetName("JGEnum");
 }
 
-PSharedPtr<JGType> JGEnum::GetType() const
+PSharedPtr<JGType> JGEnum::GetEnumType() const
 {
 	return Type;
 }
 
 JGClass::JGClass()
 {
-	SetName("JGEnum");
+	SetName("JGClass");
 }
 
+JGInterface::JGInterface()
+{
+	SetName("JGInterface");
+}
 

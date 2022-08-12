@@ -27,7 +27,7 @@ bool GObjectGlobalSystem::registerClass(PSharedPtr<JGClass> classObject)
 		return false;
 	}
 
-	PSharedPtr<JGType> classType = classObject->GetType();
+	PSharedPtr<JGType> classType = classObject->GetClassType();
 	if (classType.IsValid() == false)
 	{
 		JG_LOG(Core, ELogLevel::Critical, "{0} : Invalid Type", classObject->GetName());
@@ -52,7 +52,7 @@ bool GObjectGlobalSystem::registerStruct(PSharedPtr<JGStruct> structObject)
 		return false;
 	}
 
-	PSharedPtr<JGType> structType = structObject->GetType();
+	PSharedPtr<JGType> structType = structObject->GetClassType();
 	if (structType.IsValid() == false)
 	{
 		JG_LOG(Core, ELogLevel::Critical, "{0} : Invalid Type", structObject->GetName());
@@ -77,7 +77,7 @@ bool GObjectGlobalSystem::registerEnum(PSharedPtr<JGEnum> enumObject)
 		return false;
 	}
 
-	PSharedPtr<JGType> enumType = enumObject->GetType();
+	PSharedPtr<JGType> enumType = enumObject->GetEnumType();
 	if (enumType.IsValid() == false)
 	{
 		JG_LOG(Core, ELogLevel::Critical, "{0} : Invalid Type", enumObject->GetName());

@@ -6,18 +6,15 @@
 
 
 
-
 template<class T, class ...Args>
 class PDelegate
 {
+
+
 	std::function<T(Args...)> Func;
 
 public:
 	void Bind(const std::function<T(Args...)>& func)
-	{
-
-	}
-	void BindRaw(T* ptr, const std::function<T(Args...)>& func)
 	{
 
 	}
@@ -26,10 +23,6 @@ public:
 
 	}
 	void BindJGObject(PWeakJGObjectPtr<T> ptr, const std::function<T(Args...)>& func)
-	{
-
-	}
-	void UnBindRaw(T* ptr)
 	{
 
 	}

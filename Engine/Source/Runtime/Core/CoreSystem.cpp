@@ -3,6 +3,8 @@
 #include "Memory/Memory.h"
 #include "Object/ObjectGlobalSystem.h"
 #include "Misc/Scheduler.h"
+#include "String/StringTable.h"
+#include <crtdbg.h>
 
 GCoreSystem* GCoreSystem::Instance = nullptr;
 PHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
@@ -33,6 +35,7 @@ bool GCoreSystem::Create()
 	collectionThreadIDs();
 
 	GCoreSystem::RegisterSystemInstance<GLogGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GStringTable>();
 	GCoreSystem::RegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GScheduleGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
@@ -69,6 +72,7 @@ void GCoreSystem::Destroy()
 	}
 
 	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GStringTable>();
 	GCoreSystem::UnRegisterSystemInstance<GScheduleGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GLogGlobalSystem>();
@@ -79,6 +83,10 @@ void GCoreSystem::Destroy()
 
 	delete Instance;
 	Instance = nullptr;
+
+#if _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif // _DEBUG
 }
 
 

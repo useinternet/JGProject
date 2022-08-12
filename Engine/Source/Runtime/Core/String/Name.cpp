@@ -2,83 +2,157 @@
 #include "String/String.h"
 #include "StringTable.h"
 
-PName::PName() {}
+PName::PName() 
+{
+	reset();
+}
+
 PName::PName(uint64 id)
 {
+	set(id);
 }
+
 PName::PName(const PString& str)
 {
-	GStringTable::GetInstance().RegisterString(str, &_id, &_pRefCount);
+	set(str);
 }
 
 PName::PName(const PName& name)
 {
+	copy(name);
 }
 
 PName::PName(PName&& name)
 {
+	move(std::move(name));
 }
 
 PName::~PName()
 {
+	reset();
 }
 
 PName& PName::operator=(uint64 id)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	set(id);
+
+	return *this;
 }
 
 PName& PName::operator=(const PString& str)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	set(str);
+
+	return *this;
 }
 
 PName& PName::operator=(const PName& name)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	copy(name);
+
+	return *this;
 }
 
 PName& PName::operator=(PName&& name)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	move(std::move(name));
+
+	return *this;
 }
 
 bool PName::operator==(uint64 id) const
 {
-	return false;
+	return _id == id;
 }
 
 bool PName::operator!=(uint64 id) const
 {
-	return false;
+	return _id != id;
 }
 
 bool PName::operator==(const PName& name) const
 {
-	return false;
+	return _id == name._id;
 }
 
 bool PName::operator!=(const PName& name) const
 {
-	return false;
+	return _id != name._id;
 }
 
 const uint64& PName::GetID() const
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	return _id;
 }
 
-const PString& PName::ToString() const
+void PName::ToString(PString* outStr) const
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	GStringTable::GetInstance().FindString(_id, outStr);
 }
 
-const PRawString& PName::ToRawString() const
+void PName::set(uint64 id)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	reset();
+
+	if (id != NAME_NONE)
+	{
+		PString str;
+		GStringTable::GetInstance().FindString(id, &str);
+
+		set(str);
+	}
 }
 
-const PRawWString& PName::ToRawWString() const
+void PName::set(const PString& str)
 {
-	// // O: 여기에 return 문을 삽입합니다.
+	reset();
+
+	GStringTable::GetInstance().RegisterString(str, &_id, &_pRefCount);
+
+	addRefCount();
+}
+
+void PName::copy(const PName& name)
+{
+	reset();
+
+	_id = name._id;
+	_pRefCount = name._pRefCount;
+
+	addRefCount();
+}
+
+void PName::move(PName&& name)
+{
+	reset();
+
+	_id        = name._id;
+	_pRefCount = name._pRefCount;
+
+	name._id = NAME_NONE;
+	name._pRefCount = nullptr;
+}
+
+void PName::reset()
+{
+	subRefCount();
+
+	_id = NAME_NONE;
+	_pRefCount = nullptr;
+}
+
+void PName::addRefCount()
+{
+	if (_pRefCount != nullptr)
+	{
+		_pRefCount->fetch_add(1);
+	}
+}
+
+void PName::subRefCount()
+{
+	if (_pRefCount != nullptr)
+	{
+		_pRefCount->fetch_sub(1);
+	}
 }

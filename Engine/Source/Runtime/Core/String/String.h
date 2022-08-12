@@ -8,10 +8,6 @@
 
 #pragma warning(disable : 4996)
 
-using PRawString  = std::string;
-using PRawWString = std::wstring;
-
-
 class PString : public IMemoryObject
 {
 private:

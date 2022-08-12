@@ -1,42 +1,8 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-
-# Executables
-*.exe
-*.out
-*.app
-
-# PreHeader
-*.ipch
-
-
 # 무시하고싶은 파일이나 폴더 추가
 
 # ParkJeongHee Ignore File
-Engine/Temp/Obj/
+Engine/Bin/
+Engine/Temp/
 Engine/.vs/
 
 

@@ -39,7 +39,7 @@ void GMemoryGlobalSystem::garbageCollection(int32 level)
 	{
 		while (_allocatedMemoryBlockQueue.empty() == false)
 		{
-			int32 deleteCount = garbageCollectionInternal(_allocatedMemoryBlocks.size());
+			int32 deleteCount = garbageCollectionInternal((int32)_allocatedMemoryBlocks.size());
 
 			if (deleteCount <= 0)
 			{
@@ -51,7 +51,7 @@ void GMemoryGlobalSystem::garbageCollection(int32 level)
 	{
 		int32 tempCnt = 0;
 
-		while (_allocatedMemoryBlockQueue.empty() == false || tempCnt < level)
+		while (_allocatedMemoryBlockQueue.empty() == false && tempCnt <= level)
 		{
 			++tempCnt;
 			garbageCollectionInternal(_processBlockCountPerFrame);

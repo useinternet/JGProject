@@ -1,8 +1,10 @@
 #pragma once
 #include "CoreDefines.h"
+#include "ObjectDefines.h"
 #include "Memory/Memory.h"
 #include "String/String.h"
 
+class JGType;
 
 // 이거는 object가 destroy에 진입 전 연결을 끊어버림
 template< class T>
@@ -58,6 +60,8 @@ public:
 	virtual ~JGObject() = default;
 
 public:
+	virtual JGType GetType() const;
+
 	void SetName(const PString& name);
 
 	const PString& GetName() const;

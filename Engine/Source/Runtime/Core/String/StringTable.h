@@ -2,7 +2,9 @@
 
 #include "CoreDefines.h"
 #include "CoreSystem.h"
-#include "String/String.h"
+
+
+class PString;
 
 class GStringTable : public GGlobalSystemInstance<GStringTable>
 {
@@ -35,7 +37,7 @@ class GStringTable : public GGlobalSystemInstance<GStringTable>
 
 public:
 	GStringTable(int32 removeCountPerFrame = 1, int32 stringInfoLifeFrameCount = JG_INT32_MAX);
-	virtual ~GStringTable() = default;
+	virtual ~GStringTable();
 
 protected:
 	virtual void Update() override;

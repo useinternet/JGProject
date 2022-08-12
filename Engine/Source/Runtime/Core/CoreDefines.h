@@ -96,22 +96,26 @@ using PLockGuard = std::lock_guard<T>;
 template<class First, class Second>
 using PPair = std::pair<First, Second>;
 
-const static int8  JG_INT8_Min = -128;
-const static int8  JG_INT8_MAX = 127;
-const static int16 JG_INT16_Min = -32768i16;
-const static int16 JG_INT16_MAX = 32767;
-const static int32 JG_INT32_Min = -2147483648i32;
-const static int32 JG_INT32_MAX = 2147483647;
-const static int64 JG_INT64_Min = -9223372036854775808i64;
-const static int64 JG_INT64_MAX = 9223372036854775807;
+using PRawString = std::string;
+using PRawWString = std::wstring;
+
+
+const static int8  JG_INT8_Min = (int8)-128i8;
+const static int8  JG_INT8_MAX = (int8)127;
+const static int16 JG_INT16_Min = (int16)-32768i16;
+const static int16 JG_INT16_MAX = (int16)32767;
+const static int32 JG_INT32_Min = (int32)-2147483648i32;
+const static int32 JG_INT32_MAX = (int32)2147483647;
+const static int64 JG_INT64_Min = (int64)-9223372036854775808i64;
+const static int64 JG_INT64_MAX = (int64)9223372036854775807;
 
 const static uint8  JG_UINT8_MAX = 0xff;
 const static uint16 JG_UINT16_MAX = 0xffff;
 const static uint32 JG_UINT32_MAX = 0xffffffff;
 const static uint64 JG_UINT64_MAX = 0xffffffffffffffff;
 
-const static float32 JG_FLOAT32_MAX = 3.40282e+38;
-const static float32 JG_FLOAT32_MIN = 1.17549e-38;
+const static float32 JG_FLOAT32_MAX = (float32)3.40282e+38;
+const static float32 JG_FLOAT32_MIN = (float32)1.17549e-38;
 
 const static float64 JG_FLOAT64_MAX = 1.79769e+308;
 const static float64 JG_FLOAT64_MIN = 2.22507e-308;

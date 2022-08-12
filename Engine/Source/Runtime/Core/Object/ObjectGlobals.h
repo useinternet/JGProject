@@ -4,6 +4,7 @@
 #include "Math/Math.h"
 #include "Memory/Memory.h"
 #include "String/String.h"
+#include "String/Name.h"
 #include "Misc/StdExternal.h"
 
 #define TYPE_NULL_ID -1
@@ -18,31 +19,29 @@ class JGType;
 class JGFunction;
 class JGStruct;
 class GObjectGlobalSystem;
+class JGClass;
+class JGInterface;
 
 class PObjectGlobalsPrivateUtils
 {
 	using address = uint64;
 public:
-	static PSharedPtr<JGMeta>     MakeStaticMeta(const PList<PPair<PString, PString>>& pairList);
+	static PSharedPtr<JGMeta>     MakeStaticMeta(const PList<PPair<PName, PString>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const PList<PSharedPtr<JGProperty>>& args = PList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGStruct>   MakeStaticStruct(const JGType& type, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-
+	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 
 	template<class T>
 	static PSharedPtr<JGStruct> MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct);
 };
 
-class JGMeta : public JGObject
-{
-	friend PObjectGlobalsPrivateUtils;
-	friend GObjectGlobalSystem;
-protected:
-	PHashMap<PString, PString> MetaDataMap;
-};
+
 
 class JGType : public JGObject
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -51,7 +50,15 @@ protected:
 public:
 	JGType();
 	virtual ~JGType() = default;
-
+public:
+	bool operator==(const JGType& type) const
+	{
+		return GetID() == type.GetID();
+	}
+	bool operator!=(const JGType& type) const 
+	{
+		return GetID() != type.GetID();
+	}
 public:
 	uint64 GetID() const;
 	uint64 GetSize() const;
@@ -80,10 +87,36 @@ public:
 		return result;
 	}
 
+	template<class T>
+	static JGType GenerateType(T* _this)
+	{
+		return GenerateType<T>();
+	}
+};
+
+namespace std {
+	template <>
+	struct hash<JGType>
+	{
+		std::size_t operator()(const JGType& k) const noexcept
+		{
+			return k.GetID();
+		}
+	};
+}
+
+class JGMeta : public JGObject
+{
+	GENERATED_SIMPLE_BODY
+	friend PObjectGlobalsPrivateUtils;
+	friend GObjectGlobalSystem;
+protected:
+	PHashMap<PName, PString> MetaDataMap;
 };
 
 class JGProperty : public JGObject
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -95,10 +128,52 @@ protected:
 public:
 	JGProperty();
 	virtual ~JGProperty() = default;
+
+public:
+	bool IsValid() const;
+
+	template<class T>
+	bool SetValue(const T& data)
+	{
+		if (IsValid() == false)
+		{
+			return false;
+		}
+
+		if (Type != JGTYPE(T))
+		{
+			return false;
+		}
+
+		uint64 dataSize = Type->Size();
+		memcpy_s(DataPtr, dataSize, &data, dataSize);
+
+		return true;
+	}
+
+	template<class T>
+	bool GetValue(T& outData) const
+	{
+		if (IsValid() == false)
+		{
+			return false;
+		}
+
+		if (Type != JGTYPE(T))
+		{
+			return false;
+		}
+
+		uint64 dataSize = Type->Size();
+		memcpy_s(&outData, dataSize, DataPtr, dataSize);
+
+		return true;
+	}
 };
 
 class JGFunction : public JGObject
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -120,19 +195,51 @@ protected:
 	PList<PSharedPtr<JGProperty>> Properties;
 	PList<PSharedPtr<JGFunction>> Functions;
 
-	PHashMap<PString, uint64> PropertyMap;
-	PHashMap<PString, uint64> FunctionMap;
-public:
-	//bool HasProperty(const PString& name);
+	PHashMap<PName, uint64> PropertyMap;
+	PHashMap<PName, uint64> FunctionMap;
 
 public:
 	JGField();
 	virtual ~JGField() = default;
+
+public:
+	bool HasProperty(const PName& name) const;
+
+	template<class T>
+	bool SetPropertyValue(const PName& name, const T& data)
+	{
+		PSharedPtr<JGProperty> property = findProperty(name);
+		if (property == nullptr)
+		{
+			return false;
+		}
+
+		return property->SetValue(data);
+	}
+
+	template<class T>
+	bool GetPropertyValue(const PName& name, T& outData) const
+	{
+		PSharedPtr<JGProperty> property = findProperty(name);
+		if (property == nullptr)
+		{
+			return false;
+		}
+
+		return property->GetValue(outData);
+	}
+
+private:
+	PSharedPtr<JGProperty> findProperty(const PName& name) const;
 };
 
-
+/* Struct 정보
+* 기본적으로 프로퍼티 정보만 저장 / 관리
+* 함수는 메타 정보 / 이름 정보만 
+*/
 class JGStruct : public JGField
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -144,12 +251,12 @@ public:
 	virtual ~JGStruct() = default;
 
 public:
-	PSharedPtr<JGType> GetType() const;
-
+	PSharedPtr<JGType> GetClassType() const;
 };
 
 class JGEnum : public JGObject
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -160,26 +267,46 @@ public:
 	virtual ~JGEnum() = default;
 
 public:
-	PSharedPtr<JGType> GetType() const;
+	PSharedPtr<JGType> GetEnumType() const;
 };
 
-
-class JGVTable : public JGObject
-{
-
-
-};
-
+/* JGClass
+* 프로퍼티 정보만 저장 / 관리 ( Struct 기능 )
+* 함수 Invoke 기능 추가 -> 함수 저장 / 관리
+* VTable 관리 -> VTable에는 Class, Interface만 상속할 수 있음.
+* 상속 검사 시 중복 상속 시 에러 검출
+*/
 class JGClass : public JGStruct
 {
+	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	PSharedPtr<JGVTable> VTable;
+	PList<PWeakPtr<JGStruct>> VList;
+	PHashSet<JGType> VTypeSet;
 
 public:
 	JGClass();
 	virtual ~JGClass() = default;
+};
+
+/* JGInterface
+* 함수 Invoke 기능 추가 -> 함수 저장 / 관리
+* VTable 관리 -> Interface만 상속 가능, 다른 것이 상속되어져 잇으면 오류 검출
+* 상속 검사 시 중복 상속 시 에러 검출
+*/
+class JGInterface : public JGStruct
+{
+	GENERATED_SIMPLE_BODY
+	friend PObjectGlobalsPrivateUtils;
+	friend GObjectGlobalSystem;
+public:
+	PList<PWeakPtr<JGStruct>> VList;
+	PHashSet<JGType> VTypeSet;
+
+public:
+	JGInterface();
+	virtual ~JGInterface() = default;
 };
 
 template<class T>

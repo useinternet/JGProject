@@ -2,8 +2,10 @@
 
 //
 #include "Core.h"
+#include "String/StringTable.h"
 #include "Test/TestObject.h"
 #include <iostream>
+
 
 
 
@@ -40,23 +42,25 @@ public:
 
 int main()
 {
+
 	GCoreSystem::Create();
 
 	{
 		// 
 		PSharedPtr<JGStruct> staticStruct = PTestObject::GetStaticStruct();
-		
+
 		PTestObject testObject;
 		PSharedPtr<JGStruct> Struct = testObject.GetStruct();
 
-		testObject.TestValue1;
-	
-		//Struct->GetType
+
+		
 	}
+	GCoreSystem::Update();
 
-	// map<uint64, class*>
-
+	
 
 	GCoreSystem::Destroy();
+
+
 	return 0;
 }

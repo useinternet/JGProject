@@ -15,8 +15,6 @@ std::unormed_map ->
 #pragma warning(disable : 4996)
 
 class PString;
-class PRawString;
-class PRawWString;
 
 class PName : public IMemoryObject
 {
@@ -46,11 +44,10 @@ public:
 
 public:
 	const uint64& GetID() const;
-	const PString&     ToString() const;
-	const PRawString&  ToRawString() const;
-	const PRawWString& ToRawWString() const;
+	void  ToString(PString* outStr) const;
 
 private:
+	void set(uint64 id);
 	void set(const PString& str);
 	void copy(const PName& name);
 	void move(PName&& name);
