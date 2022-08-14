@@ -2,18 +2,51 @@
 
 #include "Core.h"
 
-class PTestObject;
 
-JGSTRUCT()
-struct PTestObject2
+JGCLASS()
+class JGTestClassA;
+PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const JGTestClassA* fromThis);
+
+class JGTestClassA : public JGObject
 {
+	GENERATED_JGCLASS_BODY()
+	PSharedPtr<JGStruct> GetStruct() const
+	{
+		return Module_Core_Code_Generation_Create_JGClass_TestClassA(this);
+	}
+
+	static PSharedPtr<JGStruct> GetStaticStruct()
+	{
+		return GObjectGlobalSystem::GetInstance().GetStaticStruct<JGTestClassA>();
+	}
+
+
+
+	//
 	JGPROPERTY()
-	int TestValue;
+	int TestValue1 = -1;
 
 	JGPROPERTY()
-	float TestValue2;
+	int32 TestValue3 = 3;
 
-	JGPROPERTY()
-	PSharedPtr<PTestObject> TestObject;
+	JGPROPERTY(TestMeta, Category = TestCategory, BlueprintOnly)
+	int64 TestValue2 = 1;
 
+	JGFUNCTION()
+	virtual void TestFunc()
+	{
+
+	}
+
+	JGFUNCTION(TestMetaFunc)
+	virtual int32 TestFunc2(float32 value, int32 value2)
+	{
+
+	}
+
+	JGFUNCTION()
+	float32 TestFunc3(const PString& str)
+	{
+
+	}
 };
