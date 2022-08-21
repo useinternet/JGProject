@@ -1,4 +1,5 @@
 #include "Json.h"
+#include "rapidjson/prettywriter.h"
 
 PJsonData::PJsonData(PJson* ownerJson, bool bIsRoot)
 	: _pOwnerJson(ownerJson)
@@ -6,8 +7,23 @@ PJsonData::PJsonData(PJson* ownerJson, bool bIsRoot)
 	, _value(rapidjson::Value(rapidjson::kObjectType))
 {}
 
+void PJsonData::WriteJson(PJsonData& json) const
+{
+	json._value = _value;
+}
+
+void PJsonData::ReadJson(PJsonData& json) 
+{
+	_value = json._value;
+}
+
 void PJsonData::addMemberInternal(const PString& key, rapidjson::Value& value)
 {
+	if (IsValid() == false)
+	{
+		return;
+	}
+
 	rapidjson::Value keyVal;
 	keyVal.SetString(key.GetCStr(), (rapidjson::SizeType)key.Length(), _pOwnerJson->GetAllocator());
 
@@ -21,6 +37,80 @@ void PJsonData::addMemberInternal(const PString& key, rapidjson::Value& value)
 	}
 }
 
+bool PJsonData::FindMember(const PString& key, PJsonData* outJsonData) const
+{
+	if (IsValid() == true)
+	{
+		if (_bIsRoot == true)
+		{
+			rapidjson::Document& doc = _pOwnerJson->GetDocument();
+			if (doc.FindMember(key.GetCStr()) != doc.MemberEnd())
+			{
+				PJsonData result = PJsonData(_pOwnerJson);
+				result._value = doc[key.GetCStr()];
+
+				*outJsonData = result;
+				return true;
+			}
+		}
+		else
+		{
+			if (_value.FindMember(key.GetCStr()) != _value.MemberEnd())
+			{
+				PJsonData result = PJsonData(_pOwnerJson);
+				result._value = _value[key.GetCStr()];
+
+				*outJsonData = result;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+bool PJsonData::FindMemberFromIndex(int32 index, PJsonData* outJsonData) const
+{
+	if (IsValid() == false)
+	{
+		outJsonData = nullptr;
+		return false;
+	}
+
+	int32 len = GetSize();
+	if (len <= index)
+	{
+		outJsonData = nullptr;
+		return false;
+	}
+
+
+	PJsonData result = PJsonData(_pOwnerJson);
+	result._value    = _value[(rapidjson::SizeType)index];
+
+	if (outJsonData != nullptr)
+	{
+		*outJsonData = result;
+	}
+
+	return true;
+}
+
+int32 PJsonData::GetSize() const
+{
+	if (_value.IsArray() == false)
+	{
+		return 1;
+	}
+	else
+	{
+		return (int32)_value.Size();
+	}
+}
+
+bool PJsonData::IsValid() const
+{
+	return _pOwnerJson != nullptr;
+}
+
 PJson::PJson() : PJsonData(this, true)
 {}
 
@@ -28,11 +118,47 @@ rapidjson::Document::AllocatorType& PJson::GetAllocator()
 {
 	return _doc.GetAllocator();
 }
+
 rapidjson::Document& PJson::GetDocument()
 {
 	return _doc;
 }
 
+bool PJson::ToString(PJson& json, PString* outStr)
+{
+	if (json.IsValid() == false || outStr == nullptr) 
+	{
+		return false;
+	}
+
+	rapidjson::Document& doc = json.GetDocument();
+
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+
+	if (doc.Accept(writer) == false)
+	{
+		return false;
+	}
+	PRawString jsonStr;
+	jsonStr.resize(buffer.GetSize());
+	memcpy(jsonStr.data(), buffer.GetString(), buffer.GetSize());
+
+	*outStr = jsonStr.c_str();
+
+	return true;
+}
+bool PJson::ToObject(const PString& jsonText, PJson* outJson)
+{
+	if (outJson == nullptr || outJson->IsValid() == false)
+	{
+		return false;
+	}
+
+	outJson->GetDocument().Parse(jsonText.GetCStr());
+
+	return true;
+}
 //namespace JG
 //{
 //	class Json;

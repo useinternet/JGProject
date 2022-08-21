@@ -48,10 +48,11 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Static_JGClass_TestClassA
 			PObjectGlobalsPrivateUtils::MakeStaticProperty(JGTYPE(PString), "str")
 		}));
 
-	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGTYPE(PTestObject), PropertyMap, FunctionMap);
+	return nullptr;
+	//return PObjectGlobalsPrivateUtils::MakeStaticClass(JGTYPE(JGTestClassA), PropertyMap, FunctionMap);
 }
 
-PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const JGTestClassA* fromThis);
+PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const JGTestClassA* fromThis)
 {
 	return nullptr;
 }

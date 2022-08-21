@@ -85,9 +85,9 @@ const uint64& PName::GetID() const
 	return _id;
 }
 
-void PName::ToString(PString* outStr) const
+void PName::ToString(PString& outStr) const
 {
-	GStringTable::GetInstance().FindString(_id, outStr);
+	GStringTable::GetInstance().FindString(_id, &outStr);
 }
 
 void PName::set(uint64 id)

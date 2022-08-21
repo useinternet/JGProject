@@ -32,12 +32,22 @@ bool PString::operator!=(const PString& string) const
 	return GetStringTableID() != string.GetStringTableID();
 }
 
+PString& PString::operator+(const PString& string)
+{
+	return Append(string);
+}
+
 PString& PString::Append(const PString& string)
 {
 	_rawString += string._rawString;
 	updateHashCode();
 
 	return *this;
+}
+
+PString& PString::AppendLine(const PString& string)
+{
+	return Append(string).Append("\n");
 }
 
 PString& PString::Insert(const PString& string, uint64 pos)
@@ -174,6 +184,12 @@ void PString::Reset()
 {
 	_rawString = "";
 	_stringCode = NULL_ID;
+}
+
+void PString::Resize(uint64 size)
+{
+	_rawString.resize(size);
+	updateHashCode();
 }
 
 const char* PString::GetCStr() const

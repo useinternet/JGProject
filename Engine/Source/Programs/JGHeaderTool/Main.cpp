@@ -33,11 +33,32 @@ public:
 	virtual ~C() = default;
 };
 
-class D : public IMemoryObject
+class D : public IMemoryObject, public IJsonable
 {
 	int Value3 = 2;
+	PString TestValue = "TestVa;ie";
 public:
 	virtual ~D() = default;
+
+protected:
+	virtual void WriteJson(PJsonData& json) const override
+	{
+		json.AddMember(Value3);
+		json.AddMember(TestValue);
+	}
+	virtual void ReadJson(PJsonData& json) override
+	{
+		PJsonData val;
+		if (json.FindMemberFromIndex(0, &val) == true)
+		{
+			val.GetData(&Value3);
+		}
+		
+		if (json.FindMemberFromIndex(1, &val) == true)
+		{
+			val.GetData(&TestValue);
+		}
+	}
 };
 
 int main()
@@ -45,16 +66,8 @@ int main()
 
 	GCoreSystem::Create();
 
-	{
-		// 
-		PSharedPtr<JGStruct> staticStruct = PTestObject::GetStaticStruct();
-
-		PTestObject testObject;
-		PSharedPtr<JGStruct> Struct = testObject.GetStruct();
 
 
-		
-	}
 	GCoreSystem::Update();
 
 	

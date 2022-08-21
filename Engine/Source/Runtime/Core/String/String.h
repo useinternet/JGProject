@@ -23,7 +23,7 @@ public:
 			return PString();
 		}
 
-		uint64 len = snprintf(nullptr, 0, string.GetRawString().c_str(), convert(args) ...) + 1; // Extra space for '\0'
+		uint64 len = (uint64)snprintf(nullptr, 0, string.GetRawString().c_str(), convert(args) ...) + 1; // Extra space for '\0'
 		if (len <= 0)
 		{
 			return PString();
@@ -35,6 +35,7 @@ public:
 		snprintf(result._rawString.data(), len, string.GetRawString().c_str(), convert(args) ...);
 		return result;
 	}
+
 	static PString ReplaceAll(const PString& message, const PString& pattern, const PString& replace)
 	{
 		PString result = message;
@@ -66,8 +67,11 @@ public: // -- operation --
 
 	bool operator==(const PString& string) const;
 	bool operator!=(const PString& string) const;
+
+	PString& operator+(const PString& string);
 public:
 	PString& Append(const PString& string);
+	PString& AppendLine(const PString& string);
 	PString& Insert(const PString& string, uint64 pos);
 
 	void SubString(PString& outString, uint64 startPos, uint64 length) const;
@@ -91,7 +95,7 @@ public:
 	double ToDouble() const;
 
 	void Reset();
-
+	void Resize(uint64 size);
 public:
 	const char* GetCStr() const;
 	const PRawString& GetRawString() const;
