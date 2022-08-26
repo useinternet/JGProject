@@ -110,9 +110,52 @@ bool JGProperty::IsValid() const
 
 	return true;
 }
+const JGType& JGProperty::GetPropertyType() const
+{
+	if (Type == nullptr)
+	{
+		static JGType nullType = JGType();
+		return nullType;
+	}
+	return *Type;
+}
 JGFunction::JGFunction()
 {
 	SetName("JGFunction");
+}
+
+bool JGFunction::IsBound() const
+{
+	if (FunctionReference == nullptr || FunctionReference->IsBound() == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool JGFunction::checkArgsType(const PList<JGType>& compareArgsList)
+{
+	int32 count = (int32)Arguments.size();
+	for (int32 i = 0; i < count; ++i)
+	{
+		if (Arguments[i]->GetPropertyType() != compareArgsList[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool JGFunction::checkRetType(JGType compareRetType)
+{
+	if (Return->GetPropertyType() != compareRetType)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 JGField::JGField()
@@ -130,7 +173,7 @@ bool JGField::HasProperty(const PName& name) const
 	return true;
 }
 
-PSharedPtr<JGProperty> JGField::findProperty(const PName& name) const
+PSharedPtr<JGProperty> JGField::FindProperty(const PName& name) const
 {
 	if (HasProperty(name) == false)
 	{
@@ -138,10 +181,41 @@ PSharedPtr<JGProperty> JGField::findProperty(const PName& name) const
 	}
 
 	uint64 index = PropertyMap.at(name);
+
 	return Properties[index];
 }
 
+bool JGField::HasFunction(const PName& name) const
+{
+	if (FunctionMap.find(name) == FunctionMap.end())
+	{
+		return false;
+	}
 
+	return true;
+}
+
+PSharedPtr<JGFunction> JGField::FindFunction(const PName& name) const
+{
+	if (HasFunction(name) == false)
+	{
+		return nullptr;
+	}
+
+	uint64 index = FunctionMap.at(name);
+
+	return Functions[index];
+}
+
+const PList<PSharedPtr<JGProperty>>& JGField::GetPropertyList() const
+{
+	return Properties;
+}
+
+const PList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
+{
+	return Functions;
+}
 
 JGStruct::JGStruct()
 {

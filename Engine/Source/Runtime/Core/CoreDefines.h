@@ -43,6 +43,21 @@
 #define JG_MEMORY_OFFSET 8
 #define JG_ASSERT(expression) assert(expression)
 
+#define ENUM_FLAG(enumName) \
+enum class enumName; \
+inline enumName operator|(enumName c1, enumName c2) \
+{ \
+	return (enumName)((int32)c1 | (int32)c2); \
+} \
+inline bool operator&(enumName c1, enumName c2) \
+{ \
+	return (bool)((int32)c1 & (int32)c2); \
+} \
+inline enumName operator~(enumName flags)\
+{\
+	return (enumName)~((int)flags);\
+}\
+
 
 using int8 = char;
 using int16 = short;

@@ -2,7 +2,12 @@
 
 #include "CoreDefines.h"
 
-
+ENUM_FLAG(ECoreSystemFlags)
+enum class ECoreSystemFlags
+{
+	None = 0x000,
+	No_CodeGen = 0x001
+};
 
 class GGlobalSystemInstanceBase;
 class GCoreSystem
@@ -17,7 +22,7 @@ private:
 	~GCoreSystem() = default;
 
 public:
-	static bool Create();
+	static bool Create(ECoreSystemFlags flags = ECoreSystemFlags::None);
 	static void Update();
 	static void Destroy();
 

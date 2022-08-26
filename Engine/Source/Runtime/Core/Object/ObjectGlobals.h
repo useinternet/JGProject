@@ -5,6 +5,7 @@
 #include "Memory/Memory.h"
 #include "String/String.h"
 #include "String/Name.h"
+#include "Misc/Delegate.h"
 #include "Misc/StdExternal.h"
 
 #define TYPE_NULL_ID -1
@@ -35,9 +36,10 @@ public:
 
 	template<class T>
 	static PSharedPtr<JGStruct> MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct);
+
+	template<class T, class Ret, class ... Args>
+	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func);
 };
-
-
 
 class JGType : public JGObject
 {
@@ -80,10 +82,23 @@ public:
 		static const char* type_name = typeid(T).name();
 
 		JGType result;
-		result.ID = GenerateTypeID<T>();
+		result.ID   = GenerateTypeID<T>();
 		result.Size = sizeof(T);
 		result.SetName(type_name);
 		
+		return result;
+	}
+
+	template<>
+	static JGType GenerateType<void>()
+	{
+		static const char* type_name = typeid(void).name();
+
+		JGType result;
+		result.ID = GenerateTypeID<void>();
+		result.Size = 0;
+		result.SetName(type_name);
+
 		return result;
 	}
 
@@ -132,6 +147,8 @@ public:
 public:
 	bool IsValid() const;
 
+	const JGType& GetPropertyType() const;
+
 	template<class T>
 	bool SetValue(const T& data)
 	{
@@ -176,15 +193,33 @@ class JGFunction : public JGObject
 	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
+
 protected:
 	PSharedPtr<JGMeta>			  MetaData;
 	PSharedPtr<JGProperty>		  Return;
 	PList<PSharedPtr<JGProperty>> Arguments;
 
 	PWeakPtr<JGObject> OwnerObject;
+	PSharedPtr<PDelegateInstanceBase> FunctionReference;
+
 public:
 	JGFunction();
 	virtual ~JGFunction() = default;
+
+	bool IsBound() const;
+
+	template<class Ret, class ... Args>
+	Ret Invoke(Args ... args)
+	{
+		PFunctionInstance<Ret, Args...>* pFuncRef = static_cast<PFunctionInstance<Ret, Args...>*>(FunctionReference.GetRawPointer());
+
+		return pFuncRef->Execute(args...);
+	}
+
+private:
+	bool checkArgsType(const PList<JGType>& compareArgsList);
+	bool checkRetType(JGType compareRetType);
+
 };
 
 class JGField : public JGObject
@@ -205,10 +240,12 @@ public:
 public:
 	bool HasProperty(const PName& name) const;
 
+	PSharedPtr<JGProperty> FindProperty(const PName& name) const;
+
 	template<class T>
 	bool SetPropertyValue(const PName& name, const T& data)
 	{
-		PSharedPtr<JGProperty> property = findProperty(name);
+		PSharedPtr<JGProperty> property = FindProperty(name);
 		if (property == nullptr)
 		{
 			return false;
@@ -220,7 +257,7 @@ public:
 	template<class T>
 	bool GetPropertyValue(const PName& name, T& outData) const
 	{
-		PSharedPtr<JGProperty> property = findProperty(name);
+		PSharedPtr<JGProperty> property = FindProperty(name);
 		if (property == nullptr)
 		{
 			return false;
@@ -229,8 +266,12 @@ public:
 		return property->GetValue(outData);
 	}
 
-private:
-	PSharedPtr<JGProperty> findProperty(const PName& name) const;
+	bool HasFunction(const PName& name) const;
+
+	PSharedPtr<JGFunction> FindFunction(const PName& name) const;
+
+	const PList<PSharedPtr<JGProperty>>& GetPropertyList() const;
+	const PList<PSharedPtr<JGFunction>>& GetFunctionList() const;
 };
 
 /* Struct 정보
@@ -282,8 +323,7 @@ class JGClass : public JGStruct
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	PList<PWeakPtr<JGStruct>> VList;
-	PHashSet<JGType> VTypeSet;
+	PHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGClass();
@@ -300,9 +340,9 @@ class JGInterface : public JGStruct
 	GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
+
 public:
-	PList<PWeakPtr<JGStruct>> VList;
-	PHashSet<JGType> VTypeSet;
+	PHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGInterface();
@@ -338,9 +378,31 @@ inline PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStruct(const T* from
 	for (int32 i = 0; i < functionCount; ++i)
 	{
 		PSharedPtr<JGFunction> function = staticStruct->Functions[i];
-
 		staticStruct->FunctionMap.emplace(function->GetName(), i);
 	}
 
 	return staticStruct;
+}
+
+template<class T, class Ret, class ...Args>
+inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func)
+{
+	if (fromThis == nullptr || function == nullptr)
+	{
+		return false;
+	}
+
+	if (function->checkRetType(JGTYPE(Ret)) == false)
+	{
+		return false;
+	}
+
+	if (function->checkArgsType({ JGTYPE(Args)... }) == false)
+	{
+		return false;
+	}
+
+	function->FunctionReference = Allocate(PSingleDelegateInstance<T, Ret, Args...>::Create(fromThis, func));
+
+	return true;
 }

@@ -6,7 +6,8 @@
 
 
 
-#define JGCLASS(...) 
+#define JGCLASS(...)
+#define JGINTERFACE(...)
 #define JGSTRUCT(...) 
 
 

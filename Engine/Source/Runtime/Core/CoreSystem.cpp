@@ -10,7 +10,7 @@ GCoreSystem* GCoreSystem::Instance = nullptr;
 PHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
 PList<ThreadID> GCoreSystem::ThreadIDList;
 
-bool GCoreSystem::Create()
+bool GCoreSystem::Create(ECoreSystemFlags flags)
 {
 	/* CoreSystem 구현할 목록
 
@@ -40,9 +40,12 @@ bool GCoreSystem::Create()
 	GCoreSystem::RegisterSystemInstance<GScheduleGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
 
-	if (GObjectGlobalSystem::GetInstance().codeGen() == false)
+	if ((flags & ECoreSystemFlags::No_CodeGen) == false)
 	{
-		JG_LOG(Core, ELogLevel::Critical, "Fail ObjectGlobalSystem Code Generation");
+		if (GObjectGlobalSystem::GetInstance().codeGen() == false)
+		{
+			JG_LOG(Core, ELogLevel::Critical, "Fail ObjectGlobalSystem Code Generation");
+		}
 	}
 
 	for (const PPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)

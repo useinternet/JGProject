@@ -9,10 +9,10 @@ struct PTestObject;
 PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_JGStruct_TestObject(const PTestObject* fromThis);
 //
 
-struct PTestObject
+struct PTestObject : public IMemoryObject
 {
 	GENERATED_JGCLASS_BODY()
-		
+
 	// Auto Code Gen
 	PSharedPtr<JGStruct> GetStruct() const
 	{

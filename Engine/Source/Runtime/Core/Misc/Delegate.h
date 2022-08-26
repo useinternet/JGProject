@@ -4,15 +4,34 @@
 #include "Object/JGObject.h"
 #include <functional>
 
+// ¿Ã∏ß ∞ÌπŒ
+class PDelegateInstanceBase : public IMemoryObject
+{
+public:
+	virtual ~PDelegateInstanceBase() = default;
 
+	virtual bool IsBound() const = 0;
+};
 
 template<class Ret, class ...Args>
-class PSingleDelegateInstance
+class PFunctionInstance : public PDelegateInstanceBase
+{
+public:
+	virtual ~PFunctionInstance() = default;
+
+	virtual Ret Execute(Args ... args) = 0;
+};
+
+template<class T, class Ret, class ...Args>
+class PSingleDelegateInstance : public PFunctionInstance<Ret, Args...>
 {
 	bool _bIsStatic;
-	std::function<Ret(Args...)> _func;
 
-	PWeakPtr<IMemoryObject> _refObject;
+	std::function<Ret(Args...)> _func;
+	PWeakPtr<T> _refObject;
+public:
+	virtual ~PSingleDelegateInstance() = default;
+
 public:
 	void Bind(const std::function<Ret(Args...)>& func)
 	{
@@ -21,26 +40,24 @@ public:
 		_bIsStatic = true;
 	}
 
-	template<class T>
 	void Bind(T* rawPtr, const std::function<Ret(Args...)>& func)
 	{
-		Bind(Wrap<T>(rawPtr), func);
+		Bind(SharedWrap<T>(rawPtr), func);
 	}
 
-	template<class T>
 	void Bind(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
 	{
 		_refObject = ptr;
 		_func      = func;
 		_bIsStatic = false;
 	}
-	
-	Ret Execute(Args ... args)
+
+	virtual Ret Execute(Args ... args) override
 	{
 		return _func(args...);
 	}
 
-	bool IsBound() const
+	virtual bool IsBound() const override
 	{
 		if (_func == nullptr)
 		{
@@ -63,27 +80,27 @@ public:
 		_refObject = nullptr;
 	}
 
-	static PSingleDelegateInstance<Ret, Args ...> Create(const std::function<Ret(Args...)>& func)
+	static PSingleDelegateInstance<T, Ret, Args ...> Create(const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<Ret, Args ...> result;
+		PSingleDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(func);
 
 		return result;
 	}
 
 	template<class T>
-	static PSingleDelegateInstance<Ret, Args ...> Create(T* rawPtr, const std::function<Ret(Args...)>& func)
+	static PSingleDelegateInstance<T, Ret, Args ...> Create(T* rawPtr, const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<Ret, Args ...> result;
+		PSingleDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(rawPtr, func);
 
 		return result;
 	}
 
 	template<class T>
-	static PSingleDelegateInstance<Ret, Args ...> Create(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
+	static PSingleDelegateInstance<T, Ret, Args ...> Create(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<Ret, Args ...> result;
+		PSingleDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(ptr, func);
 
 		return result;

@@ -125,6 +125,27 @@ workspace "JGEngine"
                 ConfirmConfig()
             filter "configurations:ReleaseGame"
                 ReleaseConfig()
+
+        -- JGBuildTool --
+        project "JGBuildTool"
+            includedirs{
+                "Source/Programs/JGBuildTool/",
+                "Source/Runtime/Core/",
+                "Source/ThirdParty/",
+            }
+            
+            links{
+                "Core"
+            }
+            SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", "_JGBUILDTOOL")
+            filter "configurations:DevelopEngine"
+                DebugConfig()
+            filter "configurations:DevelopGame"
+                ConfirmConfig()
+            filter "configurations:ConfirmGame"
+                ConfirmConfig()
+            filter "configurations:ReleaseGame"
+                ReleaseConfig()
                 
             
             

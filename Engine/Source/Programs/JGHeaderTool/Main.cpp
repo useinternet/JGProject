@@ -61,18 +61,12 @@ protected:
 	}
 };
 
+// 생성과 동시에 할당하는 로직 고민
+
 int main()
 {
 
-	GCoreSystem::Create();
 
-
-
-	GCoreSystem::Update();
-
-	
-
-	GCoreSystem::Destroy();
 
 
 	return 0;

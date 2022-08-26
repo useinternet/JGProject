@@ -163,6 +163,11 @@ public:
 		return _ptr;
 	}
 
+	const T* operator->() const
+	{
+		return _ptr;
+	}
+
 	T& operator*()
 	{
 		return *_ptr;
@@ -322,30 +327,62 @@ public:
 		subWeakCount();
 	}
 public:
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr<T>& operator=(const PWeakPtr<U>& rhs)
+	{
+		copy<U>(rhs);
+
+		return *this;
+	}
+
 	PWeakPtr<T>& operator=(const PWeakPtr<T>& rhs)
 	{
-		copy(rhs);
+		copy<T>(rhs);
+
+		return *this;
+	}
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr<T>& operator=(PWeakPtr<U>&& rhs)
+	{
+		move<U>(std::move(rhs));
 
 		return *this;
 	}
 
 	PWeakPtr<T>& operator=(PWeakPtr<T>&& rhs)
 	{
-		move(std::move(rhs));
+		move<T>(std::move(rhs));
+
+		return *this;
+	}
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr<T>& operator=(const PSharedPtr<U>& rhs)
+	{
+		set<U>(rhs);
 
 		return *this;
 	}
 
 	PWeakPtr<T>& operator=(const PSharedPtr<T>& rhs)
 	{
-		set(rhs);
+		set<T>(rhs);
+
+		return *this;
+	}
+
+	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	PWeakPtr<T>& operator=(PSharedPtr<U>&& rhs)
+	{
+		set<U>(rhs);
 
 		return *this;
 	}
 
 	PWeakPtr<T>& operator=(PSharedPtr<T>&& rhs)
 	{
-		set(rhs);
+		set<T>(rhs);
 
 		return *this;
 	}
@@ -538,6 +575,7 @@ public:
 		waitAndLock();
 		if (_allocatedMemoryBlocks.find(fromThis) == _allocatedMemoryBlocks.end())
 		{
+			unlock();
 			return PSharedPtr<T>();
 		}
 		PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[(const void*)fromThis];
