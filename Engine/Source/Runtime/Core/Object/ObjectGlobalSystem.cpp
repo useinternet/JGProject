@@ -33,7 +33,7 @@ bool GObjectGlobalSystem::registerClass(PSharedPtr<JGClass> classObject)
 		JG_LOG(Core, ELogLevel::Critical, "{0} : Invalid Type", classObject->GetName());
 		return false;
 	}
-
+	
 	if (registerType(classType) == false)
 	{
 		return false;

@@ -90,8 +90,7 @@ workspace "JGEngine"
         project "JGConsole"
             includedirs{
                 "Source/Programs/JGConsole/",
-                "Source/Runtime/Core/",
-                "Source/ThirdParty/",
+                "Source/Runtime/Core/"
             }
             links{
                 "Core"
@@ -110,34 +109,12 @@ workspace "JGEngine"
         project "JGHeaderTool"
             includedirs{
                 "Source/Programs/JGHeaderTool/",
-                "Source/Runtime/Core/",
-                "Source/ThirdParty/",
+                "Source/Runtime/Core/"
             }
             links{
                 "Core"
             }
             SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", "_JGHEADERTOOL")
-            filter "configurations:DevelopEngine"
-                DebugConfig()
-            filter "configurations:DevelopGame"
-                ConfirmConfig()
-            filter "configurations:ConfirmGame"
-                ConfirmConfig()
-            filter "configurations:ReleaseGame"
-                ReleaseConfig()
-
-        -- JGBuildTool --
-        project "JGBuildTool"
-            includedirs{
-                "Source/Programs/JGBuildTool/",
-                "Source/Runtime/Core/",
-                "Source/ThirdParty/",
-            }
-            
-            links{
-                "Core"
-            }
-            SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", "_JGBUILDTOOL")
             filter "configurations:DevelopEngine"
                 DebugConfig()
             filter "configurations:DevelopGame"

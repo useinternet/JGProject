@@ -10,6 +10,9 @@
 
 class PString : public IMemoryObject
 {
+public:
+	static const uint64 NPOS = -1;
+
 private:
 	uint64	    _stringCode = NULL_ID;
 	PRawString  _rawString;
@@ -44,17 +47,18 @@ public:
 
 private:
 	template<class T>
-	static auto convert(T& arg)
+	static auto convert(const T& arg)
 	{
-		return std::forward<T>(arg);
+		return arg;
 	}
 	template<>
-	static auto convert(PString& arg)
+	static auto convert(const PString& arg)
 	{
-		return arg.GetRawString().c_str();
+		return arg.GetCStr();
 	}
 public:
 	PString() = default;
+	PString(char inChar);
 	PString(const char* string);
 	PString(const wchar_t* string);
 
@@ -62,23 +66,26 @@ public:
 
 public: // -- operation --
 	PString& operator=(const PString& string) = default;
+	PString& operator=(const char inChar);
 	PString& operator=(const char* string);
 	PString& operator=(const wchar_t* string);
 
 	bool operator==(const PString& string) const;
 	bool operator!=(const PString& string) const;
 
-	PString& operator+(const PString& string);
+	char& operator[](uint64 index);
+	const char& operator[](uint64 index) const;
 public:
 	PString& Append(const PString& string);
 	PString& AppendLine(const PString& string);
 	PString& Insert(const PString& string, uint64 pos);
 
-	void SubString(PString& outString, uint64 startPos, uint64 length) const;
+	void SubString(PString& outString, uint64 startPos, uint64 length = PString::NPOS) const;
 
 	PString& ReplaceAll(const PString& pattern, const PString& replace);
 
-	uint64 Find(const PString& pattern, uint64 offset, uint64 order = 1) const;
+	uint64 Find(const PString& pattern, uint64 offset = 0, uint64 order = 1) const;
+	uint64 FindLastOf(const PString& pattern, uint64 offset = PString::NPOS, uint64 order = 1) const;
 
 	PList<PString> Split(char delimiter) const;
 
@@ -97,6 +104,7 @@ public:
 	void Reset();
 	void Resize(uint64 size);
 public:
+	char GetChar(uint64 index) const;
 	const char* GetCStr() const;
 	const PRawString& GetRawString() const;
 	const PRawWString& GetRawWString() const;

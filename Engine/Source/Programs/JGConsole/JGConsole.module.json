@@ -1,0 +1,15 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "ConsoleApp",
+    "ModuleDependencies": [ "Core" ],
+    "ModuleName": "JGConsole",
+    "ModulePath": "Source/Programs/JGConsole/",
+    "Defines": [
+      "_JGCONSOLE"
+    ],
+    "DevelopEngineFilter": "DebugConfig",
+    "DevelopGameFilter": "ConfirmConfig",
+    "DevelopConfirmGameFilter": "ConfirmConfig",
+    "DevelopReleaseGameFilter": "ReleaseConfig"
+  }
+}

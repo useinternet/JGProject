@@ -1,0 +1,22 @@
+{
+    "ModuleInfo": {
+        "ModuleFormat": "SharedLib/StaticLib/ConsoleApp",
+        "ModuleDependencies": [
+            "Module_A",
+            "Module_B"
+        ],
+        "ModuleName": "SharedLib/StaticLib/ConsoleApp",
+        "ModulePath": [
+            "Module_A",
+            "Module_B"
+        ],
+        "Defines": [
+            "DEFINE_A",
+            "DEFINE_B"
+        ],
+        "DevelopEngineFilter": "",
+        "DevelopGameFilter": "DebugConfig/ConfirmConfig/ReleaseConfig",
+        "DevelopConfirmGameFilter": "",
+        "DevelopReleaseGameFilter": ""
+    }
+}

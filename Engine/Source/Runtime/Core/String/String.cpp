@@ -1,5 +1,15 @@
 #include "String.h"
 #include "Misc/Hash.h"
+#include "Math/Math.h"
+
+PString::PString(char inChar)
+{
+	PRawString str;
+	str.resize(1);
+	str[0] = inChar;
+
+	setString(str);
+}
 
 PString::PString(const char* string)
 {
@@ -9,6 +19,17 @@ PString::PString(const char* string)
 PString::PString(const wchar_t* string)
 {
 	setWString(string);
+}
+
+PString& PString::operator=(const char inChar)
+{
+	PRawString str;
+	str.resize(1);
+	str[0] = inChar;
+
+	setString(str);
+
+	return *this;
 }
 
 PString& PString::operator=(const char* string)
@@ -32,9 +53,36 @@ bool PString::operator!=(const PString& string) const
 	return GetStringTableID() != string.GetStringTableID();
 }
 
-PString& PString::operator+(const PString& string)
+char& PString::operator[](uint64 index)
 {
-	return Append(string);
+	if (index == NPOS)
+	{
+		JG_ASSERT(false && "invalid index");
+	}
+
+	uint64 len = Length();
+	if (index >= len)
+	{
+		JG_ASSERT(false && "invalid index");
+	}
+
+	return _rawString[index];
+}
+
+const char& PString::operator[](uint64 index) const
+{
+	if (index == NPOS)
+	{
+		JG_ASSERT(false && "invalid index");
+	}
+
+	uint64 len = Length();
+	if (index >= len)
+	{
+		JG_ASSERT(false && "invalid index");
+	}
+
+	return _rawString[index];
 }
 
 PString& PString::Append(const PString& string)
@@ -72,7 +120,7 @@ PString& PString::ReplaceAll(const PString& pattern, const PString& replace)
 	uint64 pos = 0;
 	uint64 offset = 0;
 
-	while ((pos = _rawString.find(pattern.GetRawString(), offset)) != PRawString::npos)
+	while ((pos = _rawString.find(pattern.GetRawString(), offset)) != PString::NPOS)
 	{
 		_rawString.replace(_rawString.begin() + pos, _rawString.begin() + pos + pattern.GetRawString().size(), replace.GetRawString());
 		offset = pos + replace._rawString.size();
@@ -85,15 +133,38 @@ PString& PString::ReplaceAll(const PString& pattern, const PString& replace)
 uint64 PString::Find(const PString& pattern, uint64 offset, uint64 order) const
 {
 	uint64 cnt = 0;
-	uint64 result = PRawString::npos;
+	uint64 result = PString::NPOS;
 	while (cnt < order)
 	{
 		uint64 pos = _rawString.find(pattern.GetRawString(), offset);
-		if (pos == PRawString::npos)
+		if (pos == PString::NPOS)
 		{
 			break;
 		}
 		offset = pos + pattern.Length();
+		result = pos;
+		cnt += 1;
+	}
+	
+	return result;
+}
+
+uint64 PString::FindLastOf(const PString& pattern, uint64 offset, uint64 order) const
+{
+	uint64 cnt = 0;
+	uint64 result = PString::NPOS;
+
+	offset = PMath::Min(_rawString.length() - 1, offset);
+
+	while (cnt < order)
+	{
+		uint64 pos = _rawString.rfind(pattern.GetRawString(), offset);
+		if (pos == PString::NPOS)
+		{
+			break;
+		}
+
+		offset = pos - pattern.Length();
 		result = pos;
 		cnt += 1;
 	}
@@ -215,7 +286,7 @@ void PString::setString(const PRawString& string)
 }
 void PString::setWString(const PRawWString& string)
 {
-
+	JG_ASSERT(false && "not impl setwstring");
 }
 
 void PString::updateHashCode()

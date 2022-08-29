@@ -46,7 +46,8 @@ protected:
 		json.AddMember(Value3);
 		json.AddMember(TestValue);
 	}
-	virtual void ReadJson(PJsonData& json) override
+
+	virtual void ReadJson(const PJsonData& json) override
 	{
 		PJsonData val;
 		if (json.FindMemberFromIndex(0, &val) == true)

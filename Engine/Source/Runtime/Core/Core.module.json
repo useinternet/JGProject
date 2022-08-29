@@ -1,0 +1,15 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "StaticLib",
+    "ModuleDependencies": [],
+    "ModuleName": "Core",
+    "ModulePath": "Source/Runtime/Core/",
+    "Defines": [
+      "_CORE"
+    ],
+    "DevelopEngineFilter": "DebugConfig",
+    "DevelopGameFilter": "ConfirmConfig",
+    "DevelopConfirmGameFilter": "ConfirmConfig",
+    "DevelopReleaseGameFilter": "ReleaseConfig"
+  }
+}

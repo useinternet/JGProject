@@ -14,6 +14,9 @@
 #include <atomic>
 #include <mutex>
 #include <cassert>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 #define _KB   1024
 #define _2KB  2048

@@ -8,9 +8,17 @@
 #include "FileIO/FileHelper.h"
 #include "spdlog/spdlog.h"
 
+template<typename OStream>
+OStream& operator<<(OStream& os, const PString& to_log)
+{
+	fmt::format_to(std::ostream_iterator<char>(os), "{0}", to_log.GetRawString());
+	return os;
+}
+
 enum class ELogLevel
 {
 	Debug,
+	Trace,
 	Info,
 	Warning,
 	Error,
@@ -26,13 +34,16 @@ public:
 	virtual ~GLogGlobalSystem();
 
 public:
-	template<class ...T>
-	void AddLog(const PString& category, ELogLevel loglevel, T&& ...args) const
+	template<class ...Args>
+	void AddLog(const PString& category, ELogLevel loglevel, const PString& logText, Args&& ...args) const
 	{
-		PString log = PString::Format("[%s]: %s", category.GetRawString().c_str(), args...);
+		PString log = PString::Format("[%s]: %s", category, logText);
+		log = PString::Format(log, args...);
+
 		switch (loglevel)
 		{
-		case ELogLevel::Debug:    _logger->trace(log.GetRawString());	 break;
+		case ELogLevel::Debug:    _logger->debug(log.GetRawString());	 break;
+		case ELogLevel::Trace:    _logger->trace(log.GetRawString());	 break;
 		case ELogLevel::Info:     _logger->info(log.GetRawString());	 break;
 		case ELogLevel::Warning:  _logger->warn(log.GetRawString());	 break;
 		case ELogLevel::Error:	  _logger->error(log.GetRawString());	 break;
@@ -42,4 +53,4 @@ public:
 };
 
 
-#define JG_LOG(Category, LogLevel, ...) ::GLogGlobalSystem::GetInstance().AddLog(#Category, LogLevel, __VA_ARGS__);
+#define JG_LOG(Category, LogLevel, LogText, ...) ::GLogGlobalSystem::GetInstance().AddLog(#Category, LogLevel, LogText, __VA_ARGS__);

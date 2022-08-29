@@ -12,7 +12,7 @@ void PJsonData::WriteJson(PJsonData& json) const
 	json._value = _value;
 }
 
-void PJsonData::ReadJson(PJsonData& json) 
+void PJsonData::ReadJson(const PJsonData& json)
 {
 	_value = json._value;
 }

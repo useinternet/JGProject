@@ -31,7 +31,7 @@ public:
 	virtual ~IJsonable() = default;
 protected:
 	virtual void WriteJson(PJsonData& json) const {}
-	virtual void ReadJson(PJsonData& json) {}
+	virtual void ReadJson(const PJsonData& json) {}
 };
 
 class PJsonData : public IMemoryObject, public IJsonable
@@ -70,7 +70,7 @@ public:
 
 protected:
 	virtual void WriteJson(PJsonData& json) const override;
-	virtual void ReadJson(PJsonData& json) override;
+	virtual void ReadJson(const PJsonData& json) override;
 
 private:
 #pragma region Make Json Value Declare

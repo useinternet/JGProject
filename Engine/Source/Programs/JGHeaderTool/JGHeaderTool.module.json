@@ -1,0 +1,15 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "ConsoleApp",
+    "ModuleDependencies": [ "Core" ],
+    "ModuleName": "JGHeaderTool",
+    "ModulePath": "Source/Programs/JGHeaderTool/",
+    "Defines": [
+      "_JGHEADERTOOL"
+    ],
+    "DevelopEngineFilter": "DebugConfig",
+    "DevelopGameFilter": "ConfirmConfig",
+    "DevelopConfirmGameFilter": "ConfirmConfig",
+    "DevelopReleaseGameFilter": "ReleaseConfig"
+  }
+}

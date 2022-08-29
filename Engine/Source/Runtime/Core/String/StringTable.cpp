@@ -149,7 +149,7 @@ void GStringTable::removeOldStringInfos(int32 removeCountPerFrame)
 	if (removeCountPerFrame < 0)
 	{
 		bIsFlush = true;
-		removeCountPerFrame = _stringInfoMap.size();
+		removeCountPerFrame = (int32)_stringInfoMap.size();
 	}
 
 	int32 tempCnt = 0;
