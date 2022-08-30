@@ -197,9 +197,43 @@ void PFileHelper::AbsolutePath(const PString& inPath, PString* outPath)
 	NormalizePath(outPath);
 }
 
+const PString& PFileHelper::EngineDirectory()
+{
+	static PString enginePath = "../../";
+
+	return enginePath;
+}
+
+const PString& PFileHelper::EngineContentsDirectory()
+{
+	static PString engineContentsPath;
+	if (engineContentsPath.Empty())
+	{
+		CombinePath(EngineDirectory(), "Contents", &engineContentsPath);
+	}
+
+	return engineContentsPath;
+}
+
+const PString& PFileHelper::EngineConfigDirectory()
+{
+	static PString engineConfigPath;
+	if (engineConfigPath.Empty())
+	{
+		CombinePath(EngineDirectory(), "Config", &engineConfigPath);
+	}
+
+	return engineConfigPath;
+}
+
 const PString& PFileHelper::EngineSourceDirectory()
 {
-	static PString engineSourcePath = "../../Source";
+	static PString engineSourcePath;
+	if (engineSourcePath.Empty())
+	{
+		CombinePath(EngineDirectory(), "Source", &engineSourcePath);
+	}
+
 	return engineSourcePath;
 }
 

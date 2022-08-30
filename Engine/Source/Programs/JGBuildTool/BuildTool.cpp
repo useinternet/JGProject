@@ -1,4 +1,5 @@
 #include "BuildTool.h"
+#include<stdio.h>
 
 const PString& PBuildTool::BuildToolDirectory()
 {
@@ -184,7 +185,7 @@ bool PBuildTool::generateBuildScript()
 	const PArguments& arguments = getArguments();
 
 	PString resultPath;
-	PFileHelper::CombinePath(BuildToolDirectory(), "jgengine.lua", &resultPath);
+	PFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &resultPath);
 	
 	if (PFileHelper::WriteAllText(resultPath, buildScript) == false)
 	{
@@ -219,9 +220,12 @@ bool PBuildTool::generateBuildScriptInternal(const PHashMap<PString, PList<PModu
 			outScript.Append("project \"").Append(moduleInfo.ModuleName).AppendLine("\"");
 			outScript.Append("\t\t\t\t");
 
+			PString thirdPartyPath = arguments.ThirdPartyDirectory;
+			thirdPartyPath.ReplaceAll(PFileHelper::EngineDirectory(), "");
+
 			PString includeDirs;
 			includeDirs.Append("\"").Append(moduleInfo.ModulePath).Append("\", ");
-			includeDirs.Append("\"").Append(arguments.ThirdPartyDirectory).Append("\", ");
+			includeDirs.Append("\"").Append(thirdPartyPath).Append("\", ");
 
 			PString links;
 			PString defines;
@@ -295,10 +299,53 @@ bool PBuildTool::generateBuildScriptInternal(const PHashMap<PString, PList<PModu
 
 bool PBuildTool::makeBuild()
 {
-	// Step 1. 최초 성공 lua 스크립트 백업
-	// Step 2. 현재 생성된 스크립트 옮겨옴
-	// Step 3. 실행 후 성공 여부
-	// Step 4. 실패 시 백업한 스크립트 다시 가져오고, 성공 시 백업한 스크립트 삭제
+	PString newScriptPath;
+	PFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &newScriptPath);
+
+	PString oldScriptPath;
+	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), SCRIPT_NAME, &oldScriptPath);
+
+
+	PString newScriptText;
+	if (PFileHelper::ReadAllText(newScriptPath, &newScriptText) == false)
+	{
+		JG_LOG(BuildTool, ELogLevel::Error, "Fail Read New Script");
+		return false;
+	}
+
+	PString oldScriptText;
+	if (PFileHelper::ReadAllText(oldScriptPath, &oldScriptText) == false)
+	{
+		JG_LOG(BuildTool, ELogLevel::Error, "Fail Read Old Script");
+		return false;
+	}
+
+	if (PFileHelper::WriteAllText(oldScriptPath, newScriptText) == false)
+	{
+		JG_LOG(BuildTool, ELogLevel::Error, "Fail Replace New Script");
+		return false;
+	}
+
+	PString premakeFilePath;
+	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), PREMAKE_FILE_NAME, &premakeFilePath);
+	PFileHelper::AbsolutePath(premakeFilePath, &premakeFilePath);
+
+	PString batCommand;
+	batCommand.Append("call ").Append("\"").Append(premakeFilePath).Append("\"").Append(" vs2022 --file=").Append(oldScriptPath);
+
+	PString batFilePath;
+	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), BATCH_NAME, &batFilePath);
+	PFileHelper::AbsolutePath(batFilePath, &batFilePath);
+
+	if (PFileHelper::WriteAllText(batFilePath, batCommand) == false)
+	{
+		JG_LOG(BuildTool, ELogLevel::Error, "Fail Create Batch File");
+		return false;
+	}
+	
+	system(batFilePath.GetCStr());
+
+	PFileHelper::RemoveFileOrDirectory(batFilePath);
 
 	return true;
 }

@@ -63,7 +63,7 @@ workspace "JGEngine"
     group "Engine"
 		group "Engine/Programs"
 			project "JGBuildTool"
-				includedirs{ "Source/Programs/JGBuildTool/", "../../Source/ThirdParty", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGBuildTool/", "Source/ThirdParty", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", {"_JGBUILDTOOL", })
 				filter "configurations:DevelopEngine"
@@ -77,7 +77,7 @@ workspace "JGEngine"
 
 
 			project "JGConsole"
-				includedirs{ "Source/Programs/JGConsole/", "../../Source/ThirdParty", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGConsole/", "Source/ThirdParty", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGConsole/", {"_JGCONSOLE", })
 				filter "configurations:DevelopEngine"
@@ -91,7 +91,7 @@ workspace "JGEngine"
 
 
 			project "JGHeaderTool"
-				includedirs{ "Source/Programs/JGHeaderTool/", "../../Source/ThirdParty", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGHeaderTool/", "Source/ThirdParty", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", {"_JGHEADERTOOL", })
 				filter "configurations:DevelopEngine"
@@ -106,7 +106,7 @@ workspace "JGEngine"
 
 		group "Engine/Runtime"
 			project "Core"
-				includedirs{ "Source/Runtime/Core/", "../../Source/ThirdParty", }
+				includedirs{ "Source/Runtime/Core/", "Source/ThirdParty", }
 				links{ }
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
 				filter "configurations:DevelopEngine"

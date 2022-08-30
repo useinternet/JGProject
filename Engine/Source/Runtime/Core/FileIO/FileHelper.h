@@ -26,6 +26,9 @@ public:
 	static void NormalizePath(PString* outPath);
 	static void AbsolutePath(const PString& inPath, PString* outPath);
 
+	static const PString& EngineDirectory();
+	static const PString& EngineContentsDirectory();
+	static const PString& EngineConfigDirectory();
 	static const PString& EngineSourceDirectory();
 	static const PString& EngineEditorSourceDirectory();
 	static const PString& EngineProgramsSourceDirectory();

@@ -7,7 +7,9 @@ class PBuildTool
 {
 public:
 	static constexpr char const* ARGUMENTS_JSON_FILE_NAME = "buildtool_arguments.json";
-
+	static constexpr char const* SCRIPT_NAME = "jgengine.lua";
+	static constexpr char const* BATCH_NAME = "jgengine.bat";
+	static constexpr char const* PREMAKE_FILE_NAME = "premake5.exe";
 	static const PString& BuildToolDirectory();
 private:
 	// json 파일 분석
