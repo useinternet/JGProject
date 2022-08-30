@@ -40,8 +40,8 @@ bool PBuildTool::Run()
 	}
 
 	// Step 4. make Build
-	JG_LOG(BuildTool, ELogLevel::Info, "Step 4. Make Build..");
-	if (makeBuild() == false)
+	JG_LOG(BuildTool, ELogLevel::Info, "Step 4. Make Project Files..");
+	if (makeProjectFiles() == false)
 	{
 		return false;
 	}
@@ -297,7 +297,7 @@ bool PBuildTool::generateBuildScriptInternal(const PHashMap<PString, PList<PModu
 	return true;
 }
 
-bool PBuildTool::makeBuild()
+bool PBuildTool::makeProjectFiles()
 {
 	PString newScriptPath;
 	PFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &newScriptPath);
@@ -313,25 +313,28 @@ bool PBuildTool::makeBuild()
 		return false;
 	}
 
-	PString oldScriptText;
-	if (PFileHelper::ReadAllText(oldScriptPath, &oldScriptText) == false)
-	{
-		JG_LOG(BuildTool, ELogLevel::Error, "Fail Read Old Script");
-		return false;
-	}
-
 	if (PFileHelper::WriteAllText(oldScriptPath, newScriptText) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Error, "Fail Replace New Script");
 		return false;
 	}
 
-	PString premakeFilePath;
-	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), PREMAKE_FILE_NAME, &premakeFilePath);
-	PFileHelper::AbsolutePath(premakeFilePath, &premakeFilePath);
+	PString premakeFileOriginPath;
+	PFileHelper::CombinePath(PFileHelper::EngineBuildDirectory(), PREMAKE_FILE_NAME, &premakeFileOriginPath);
+	PFileHelper::AbsolutePath(premakeFileOriginPath, &premakeFileOriginPath);
+
+	PString premakeTempFilePath;
+	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), PREMAKE_FILE_NAME, &premakeTempFilePath);
+	PFileHelper::AbsolutePath(premakeTempFilePath, &premakeTempFilePath);
+
+	if (PFileHelper::CopyFileOrDirectory(premakeFileOriginPath, premakeTempFilePath) == false)
+	{
+		JG_LOG(BuildTool, ELogLevel::Error, "Fail Copy Premake File");
+		return false;
+	}
 
 	PString batCommand;
-	batCommand.Append("call ").Append("\"").Append(premakeFilePath).Append("\"").Append(" vs2022 --file=").Append(oldScriptPath);
+	batCommand.Append("call ").Append("\"").Append(premakeTempFilePath).Append("\"").Append(" vs2022 --file=").Append(oldScriptPath);
 
 	PString batFilePath;
 	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), BATCH_NAME, &batFilePath);
@@ -346,6 +349,8 @@ bool PBuildTool::makeBuild()
 	system(batFilePath.GetCStr());
 
 	PFileHelper::RemoveFileOrDirectory(batFilePath);
+	PFileHelper::RemoveFileOrDirectory(oldScriptPath);
+	PFileHelper::RemoveFileOrDirectory(premakeTempFilePath);
 
 	return true;
 }

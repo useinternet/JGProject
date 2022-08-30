@@ -12,6 +12,7 @@ public:
 	static bool WriteAllText(const PString& path, const PString& str);
 	static bool ReadAllText(const PString& path, PString* out_str);
 
+	static bool CopyFileOrDirectory(const PString& dest, const PString& src);
 	static bool RemoveFileOrDirectory(const PString& path);
 
 	static bool Exists(const PString& inPath);
@@ -27,6 +28,7 @@ public:
 	static void AbsolutePath(const PString& inPath, PString* outPath);
 
 	static const PString& EngineDirectory();
+	static const PString& EngineBuildDirectory();
 	static const PString& EngineContentsDirectory();
 	static const PString& EngineConfigDirectory();
 	static const PString& EngineSourceDirectory();

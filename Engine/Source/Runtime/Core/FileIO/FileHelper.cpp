@@ -1,4 +1,5 @@
 #include "FileHelper.h"
+#include "Misc/Log.h"
 #include <fstream>
 
 static const char EXTENSION_TOKEN = '.';
@@ -46,6 +47,28 @@ bool PFileHelper::ReadAllText(const PString& path, PString* out_str)
 		fin.close();
 		return false;
 	}
+}
+
+bool PFileHelper::CopyFileOrDirectory(const PString& dest, const PString& src)
+{
+	std::error_code errCode;
+
+	if (IsDirectory(dest) == true)
+	{
+		fs::copy(dest.GetRawString(), src.GetRawString(), fs::copy_options::recursive, errCode);
+	}
+	else
+	{
+		fs::copy_file(dest.GetRawString(), src.GetRawString(), fs::copy_options::overwrite_existing, errCode);
+	}
+
+	if (errCode.value() != 0)
+	{
+		JG_LOG(Core, ELogLevel::Error, "Fail Copy[%s -> %s]: %s", dest, src, errCode.message().c_str());
+		return false;
+	}
+
+	return true;
 }
 
 bool PFileHelper::RemoveFileOrDirectory(const PString& path)
@@ -202,6 +225,17 @@ const PString& PFileHelper::EngineDirectory()
 	static PString enginePath = "../../";
 
 	return enginePath;
+}
+
+const PString& PFileHelper::EngineBuildDirectory()
+{
+	static PString engineBuildPath;
+	if (engineBuildPath.Empty())
+	{
+		CombinePath(EngineDirectory(), "Build", &engineBuildPath);
+	}
+
+	return engineBuildPath;
 }
 
 const PString& PFileHelper::EngineContentsDirectory()

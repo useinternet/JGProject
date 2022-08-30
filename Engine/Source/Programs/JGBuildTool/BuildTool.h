@@ -31,7 +31,7 @@ private:
 	void collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, PHashMap<PString, PList<PModuleInfo>>& outModuleInfoMap);
 	bool generateBuildScript();
 	bool generateBuildScriptInternal(const PHashMap<PString, PList<PModuleInfo>>& moduleInfoMap, const PString& inGroupName, PString& outScript);
-	bool makeBuild();
+	bool makeProjectFiles();
 	bool findModuleInfo(const PString& modulePath, PModuleInfo* outModuleInfo) const;
 	
 	PString getUserProjectName() const;
