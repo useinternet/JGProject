@@ -9,7 +9,7 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const 
 
 class JGTestClassA : public JGObject
 {
-	GENERATED_JGCLASS_BODY()
+	JG_GENERATED_JGCLASS_BODY()
 	PSharedPtr<JGStruct> GetStruct() const
 	{
 		return Module_Core_Code_Generation_Create_JGClass_TestClassA(this);

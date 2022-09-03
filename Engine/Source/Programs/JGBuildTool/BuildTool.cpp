@@ -46,7 +46,7 @@ bool PBuildTool::Run()
 		return false;
 	}
 	
-
+	JG_LOG(BuildTool, ELogLevel::Info, "Compelete Build Tool Run..");
 	return true;
 }
 

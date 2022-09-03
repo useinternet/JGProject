@@ -56,8 +56,16 @@ namespace PMemoryPrivate
 
 class IMemoryObject
 {
+protected:
+	IMemoryObject() = default;
 public:
 	virtual ~IMemoryObject() = default;
+};
+
+class PMemoryObject : public IMemoryObject
+{
+public:
+	virtual ~PMemoryObject() = default;
 };
 
 template<class T>
@@ -285,33 +293,40 @@ public:
 	{
 		copy<U>(rhs);
 	}
+
 	PWeakPtr(const PWeakPtr<T>& rhs)
 	{
 		copy<T>(rhs);
 	}
+
 	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
 	PWeakPtr(PWeakPtr<U>&& rhs)
 	{
 		move<U>(std::move(rhs));
 	}
+
 	PWeakPtr(PWeakPtr<T>&& rhs)
 	{
 		move<T>(std::move(rhs));
 	}
+
 	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
 	PWeakPtr(const PSharedPtr<U>& rhs)
 	{
 		set<U>(rhs);
 	}
+
 	PWeakPtr(const PSharedPtr<T>& rhs)
 	{
 		set<T>(rhs);
 	}
+
 	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
 	PWeakPtr(PSharedPtr<U>&& rhs)
 	{
 		set<U>(rhs);
 	}
+
 	PWeakPtr(PSharedPtr<T>&& rhs)
 	{
 		set<T>(rhs);
@@ -423,7 +438,7 @@ private:
 		return _ptr != nullptr;
 	}
 
-	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	template <class U>
 	void set(const PSharedPtr<U>& ptr)
 	{
 		if (ptr.IsValid() == false)
@@ -442,7 +457,7 @@ private:
 		addWeakCount();
 	}
 
-	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	template <class U>
 	void copy(const PWeakPtr<U>& rhs)
 	{
 		if (rhs.IsValid() == false)
@@ -461,7 +476,7 @@ private:
 		addWeakCount();
 	}
 
-	template <class U, std::enable_if<std::is_base_of<T, U>::value, int32>::type = 0>
+	template <class U>
 	void move(PWeakPtr<U>&& rhs)
 	{
 		if (rhs.IsValid() == false)
@@ -667,5 +682,4 @@ inline PWeakPtr<T> Cast(PWeakPtr<U> ptr)
 {
 	return GMemoryGlobalSystem::GetInstance().Cast<T, U>(ptr);
 }
-
 

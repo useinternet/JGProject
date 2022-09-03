@@ -4,33 +4,32 @@
 #include "Object/JGObject.h"
 #include <functional>
 
-// ¿Ã∏ß ∞ÌπŒ
-class PDelegateInstanceBase : public IMemoryObject
+class IDelegateInstanceBase : public IMemoryObject
 {
 public:
-	virtual ~PDelegateInstanceBase() = default;
+	virtual ~IDelegateInstanceBase() = default;
 
 	virtual bool IsBound() const = 0;
 };
 
 template<class Ret, class ...Args>
-class PFunctionInstance : public PDelegateInstanceBase
+class IDelegateInstance : public IDelegateInstanceBase
 {
 public:
-	virtual ~PFunctionInstance() = default;
+	virtual ~IDelegateInstance() = default;
 
 	virtual Ret Execute(Args ... args) = 0;
 };
 
 template<class T, class Ret, class ...Args>
-class PSingleDelegateInstance : public PFunctionInstance<Ret, Args...>
+class PDelegateInstance : public IDelegateInstance<Ret, Args...>
 {
 	bool _bIsStatic;
 
 	std::function<Ret(Args...)> _func;
 	PWeakPtr<T> _refObject;
 public:
-	virtual ~PSingleDelegateInstance() = default;
+	virtual ~PDelegateInstance() = default;
 
 public:
 	void Bind(const std::function<Ret(Args...)>& func)
@@ -47,6 +46,7 @@ public:
 
 	void Bind(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
 	{
+		Reset();
 		_refObject = ptr;
 		_func      = func;
 		_bIsStatic = false;
@@ -80,73 +80,99 @@ public:
 		_refObject = nullptr;
 	}
 
-	static PSingleDelegateInstance<T, Ret, Args ...> Create(const std::function<Ret(Args...)>& func)
+	static PDelegateInstance<T, Ret, Args ...> Create(const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<T, Ret, Args ...> result;
+		PDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(func);
 
 		return result;
 	}
 
 	template<class T>
-	static PSingleDelegateInstance<T, Ret, Args ...> Create(T* rawPtr, const std::function<Ret(Args...)>& func)
+	static PDelegateInstance<T, Ret, Args ...> Create(T* rawPtr, const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<T, Ret, Args ...> result;
+		PDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(rawPtr, func);
 
 		return result;
 	}
 
 	template<class T>
-	static PSingleDelegateInstance<T, Ret, Args ...> Create(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
+	static PDelegateInstance<T, Ret, Args ...> Create(PWeakPtr<T> ptr, const std::function<Ret(Args...)>& func)
 	{
-		PSingleDelegateInstance<T, Ret, Args ...> result;
+		PDelegateInstance<T, Ret, Args ...> result;
 		result.Bind(ptr, func);
 
 		return result;
 	}
 };
 
-//using PMultiDelegateHandle = uint64;
-//
-//template<class ...Args>
-//class PMultiDelegate
-//{
-//	using PSingleDelegate = PDelegate<void, Args...>
-//
-//	PList<PSharedPtr<PSingleDelegate>> _singleDelegates;
-//public:
-//	void Add(const std::function<T(Args...)>& func)
-//	{
-//		_singleDelegates.push_back(Allocate<PSingleDelegate>(PSingleDelegate::Create(func)));
-//	}
-//
-//	void Add(T* ptr, const std::function<T(Args...)>& func)
-//	{
-//		if (ptr == nullptr)
-//		{
-//			return;
-//		}
-//
-//		Bind(Wrap<T>(ptr), func);
-//	}
-//
-//	void Add(PWeakPtr<T> ptr, const std::function<T(Args...)>& func)
-//	{
-//		_singleDelegates.push_back(Allocate<PSingleDelegate>(PSingleDelegate::Create(ptr, func)));
-//	}
-//
-//	void RemoveAll(T* ptr)
-//	{
-//		if (ptr == nullptr)
-//		{
-//			return;
-//		}
-//	}
-//
-//	void Clear()
-//	{
-//	
-//	}
-//
-//};
+template<class ... Args>
+class PDelegate
+{
+	PSharedPtr<IDelegateInstance<void, const Args&...>> Instance;
+
+public:
+	template<class T>
+	void Bind(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	{
+		Instance = Allocate(PDelegateInstance<T, void, const Args&...>::Create(ptr, func));\
+	}
+	
+	bool IsBound() const\
+	{
+		if (Instance == nullptr)\
+		{
+			return false;
+		}
+
+		return Instance->IsBound();
+	}
+	
+	void Execute(const Args& ... args)
+	{
+		if (Instance == nullptr)
+		{
+			return;
+		}
+			
+		Instance->Execute(args...);
+	}
+			
+	void ExecuteIfBound(const Args& ... args)
+	{
+		if (Instance->IsBound() == false)\
+		{
+			return;
+		}
+			
+		Instance->Execute(args...);
+	}
+			
+public:
+	template<class T>
+	static PDelegate<const Args&...> Create(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	{
+		PDelegate<const Args&...> delegate;
+		delegate.Bind(ptr, func);
+		return delegate;
+	}
+};
+
+#define JG_DECLARE_DELEGATE(DelegateName) \
+using DelegateName = PDelegate<>;\
+
+#define JG_DECLARE_DELEGATE_ONEPARAM(DelegateName, OneParam)\
+using DelegateName   = PDelegate<##OneParam>;\
+
+#define JG_DECLARE_DELEGATE_TWOPARAM(DelegateName, OneParam, TwoParam) \
+using DelegateName   = PDelegate<##OneParam, ##TwoParam>;\
+
+#define JG_DECLARE_DELEGATE_THREEPARAM(DelegateName, OneParam, TwoParam, ThreeParam) \
+using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam>; \
+
+#define JG_DECLARE_DELEGATE_FOURPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam) \
+using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam>; \
+
+#define JG_DECLARE_DELEGATE_FIVEPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
+using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \

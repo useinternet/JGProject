@@ -78,9 +78,7 @@ PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JG
 }
 
 JGType::JGType()
-{
-	SetName("JGType");
-}
+{}
 
 uint64 JGType::GetID() const
 {
@@ -93,9 +91,7 @@ uint64 JGType::GetSize() const
 }
 
 JGProperty::JGProperty()
-{
-	SetName("JGProperty");
-}
+{}
 bool JGProperty::IsValid() const
 {
 	if (OwnerObject.IsValid() == false)
@@ -119,10 +115,7 @@ const JGType& JGProperty::GetPropertyType() const
 	}
 	return *Type;
 }
-JGFunction::JGFunction()
-{
-	SetName("JGFunction");
-}
+JGFunction::JGFunction() {}
 
 bool JGFunction::IsBound() const
 {
@@ -158,10 +151,7 @@ bool JGFunction::checkRetType(JGType compareRetType)
 	return true;
 }
 
-JGField::JGField()
-{
-	SetName("JGField");
-}
+JGField::JGField() {}
 
 bool JGField::HasProperty(const PName& name) const
 {
@@ -217,33 +207,21 @@ const PList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
 	return Functions;
 }
 
-JGStruct::JGStruct()
-{
-	SetName("JGStruct");
-}
+JGStruct::JGStruct() {}
 
 PSharedPtr<JGType> JGStruct::GetClassType() const
 {
 	return Type;
 }
 
-JGEnum::JGEnum()
-{
-	SetName("JGEnum");
-}
+JGEnum::JGEnum() {}
 
 PSharedPtr<JGType> JGEnum::GetEnumType() const
 {
 	return Type;
 }
 
-JGClass::JGClass()
-{
-	SetName("JGClass");
-}
+JGClass::JGClass() {}
 
-JGInterface::JGInterface()
-{
-	SetName("JGInterface");
-}
+JGInterface::JGInterface() {}
 

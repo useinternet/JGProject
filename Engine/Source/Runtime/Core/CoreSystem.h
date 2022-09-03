@@ -2,7 +2,7 @@
 
 #include "CoreDefines.h"
 
-ENUM_FLAG(ECoreSystemFlags)
+JG_ENUM_FLAG(ECoreSystemFlags)
 enum class ECoreSystemFlags
 {
 	None = 0x000,

@@ -102,7 +102,7 @@ bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 		return false;
 	}
 
-	const PString& typeName   = type->GetName();
+	const PName&   typeName   = type->GetName();
 	const uint64   typeID     = type->GetID();
 
 	if (_typeIDMap.find(typeName) != _typeIDMap.end())

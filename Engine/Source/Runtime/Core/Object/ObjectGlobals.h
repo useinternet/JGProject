@@ -43,7 +43,7 @@ public:
 
 class JGType : public JGObject
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -84,7 +84,7 @@ public:
 		JGType result;
 		result.ID   = GenerateTypeID<T>();
 		result.Size = sizeof(T);
-		result.SetName(type_name);
+		result.SetName(PName(type_name));
 		
 		return result;
 	}
@@ -97,7 +97,7 @@ public:
 		JGType result;
 		result.ID = GenerateTypeID<void>();
 		result.Size = 0;
-		result.SetName(type_name);
+		result.SetName(PName(type_name));
 
 		return result;
 	}
@@ -122,7 +122,7 @@ namespace std {
 
 class JGMeta : public JGObject
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -131,7 +131,7 @@ protected:
 
 class JGProperty : public JGObject
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -190,7 +190,7 @@ public:
 
 class JGFunction : public JGObject
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 
@@ -200,7 +200,7 @@ protected:
 	PList<PSharedPtr<JGProperty>> Arguments;
 
 	PWeakPtr<JGObject> OwnerObject;
-	PSharedPtr<PDelegateInstanceBase> FunctionReference;
+	PSharedPtr<IDelegateInstanceBase> FunctionReference;
 
 public:
 	JGFunction();
@@ -211,7 +211,7 @@ public:
 	template<class Ret, class ... Args>
 	Ret Invoke(Args ... args)
 	{
-		PFunctionInstance<Ret, Args...>* pFuncRef = static_cast<PFunctionInstance<Ret, Args...>*>(FunctionReference.GetRawPointer());
+		IDelegateInstance<Ret, Args...>* pFuncRef = static_cast<IDelegateInstance<Ret, Args...>*>(FunctionReference.GetRawPointer());
 
 		return pFuncRef->Execute(args...);
 	}
@@ -280,7 +280,7 @@ public:
 */
 class JGStruct : public JGField
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -297,7 +297,7 @@ public:
 
 class JGEnum : public JGObject
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -319,7 +319,7 @@ public:
 */
 class JGClass : public JGStruct
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
@@ -337,7 +337,7 @@ public:
 */
 class JGInterface : public JGStruct
 {
-	GENERATED_SIMPLE_BODY
+	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 
@@ -402,7 +402,7 @@ inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedP
 		return false;
 	}
 
-	function->FunctionReference = Allocate(PSingleDelegateInstance<T, Ret, Args...>::Create(fromThis, func));
+	function->FunctionReference = Allocate(PDelegateInstance<T, Ret, Args...>::Create(fromThis, func));
 
 	return true;
 }

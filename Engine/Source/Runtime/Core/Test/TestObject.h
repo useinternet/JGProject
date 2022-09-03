@@ -5,13 +5,13 @@
 
 JGSTRUCT()
 // Auto Code Gen
-struct PTestObject;
+class PTestObject;
 PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_JGStruct_TestObject(const PTestObject* fromThis);
 //
 
-struct PTestObject : public IMemoryObject
+class PTestObject : public JGObject
 {
-	GENERATED_JGCLASS_BODY()
+	JG_GENERATED_JGCLASS_BODY()
 
 	// Auto Code Gen
 	PSharedPtr<JGStruct> GetStruct() const
@@ -23,7 +23,7 @@ struct PTestObject : public IMemoryObject
 	{
 		return GObjectGlobalSystem::GetInstance().GetStaticStruct<PTestObject>();
 	}
-
+public:
 	//
 	JGPROPERTY()
 	int TestValue1 = -1;

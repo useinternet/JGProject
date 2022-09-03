@@ -46,7 +46,7 @@ namespace fs = std::filesystem;
 #define JG_MEMORY_OFFSET 8
 #define JG_ASSERT(expression) assert(expression)
 
-#define ENUM_FLAG(enumName) \
+#define JG_ENUM_FLAG(enumName) \
 enum class enumName; \
 inline enumName operator|(enumName c1, enumName c2) \
 { \
@@ -61,7 +61,7 @@ inline enumName operator~(enumName flags)\
 	return (enumName)~((int)flags);\
 }\
 
-
+using byte = char;
 using int8 = char;
 using int16 = short;
 using int32 = int;
@@ -81,7 +81,7 @@ using AtomicBool   = std::atomic_bool;
 using AtomicInt32  = std::atomic_int;
 using AtomicUint32 = std::atomic_uint;
 
-using ThreadID = std::thread::id;
+using ThreadID = uint64;
 
 
 template<class Key, class Value>
@@ -105,7 +105,7 @@ using PQueue = std::queue<T>;
 template<class T>
 using PStack = std::stack<T>;
 
-
+using PConditionVariable = std::condition_variable;
 using PMutex = std::mutex;
 
 template<class T>
@@ -138,12 +138,11 @@ const static float32 JG_FLOAT32_MIN = (float32)1.17549e-38;
 const static float64 JG_FLOAT64_MAX = 1.79769e+308;
 const static float64 JG_FLOAT64_MIN = 2.22507e-308;
 
-
-
-
 enum
 {
 	INDEX_NONE = -1,
 	NAME_NONE  = -1,
 	NULL_ID	   = -1,
 };
+
+#define JG_MEMBER_FUNC_BIND(funcName) std::bind(this, &##funcName)

@@ -48,7 +48,7 @@ class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
 	friend class GCoreSystem;
 private:
-	PHashMap<PString, uint64> _typeIDMap;
+	PHashMap<PName, uint64> _typeIDMap;
 
 	PHashMap<uint64, PSharedPtr<JGClass>>  _classMap;
 	PHashMap<uint64, PSharedPtr<JGStruct>> _structMap;

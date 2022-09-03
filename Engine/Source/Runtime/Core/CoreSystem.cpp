@@ -2,7 +2,7 @@
 #include "Misc/Log.h"
 #include "Memory/Memory.h"
 #include "Object/ObjectGlobalSystem.h"
-#include "Misc/Scheduler.h"
+#include "Thread/Scheduler.h"
 #include "String/StringTable.h"
 #include <crtdbg.h>
 
@@ -118,7 +118,7 @@ void GCoreSystem::collectionThreadIDs()
 		tempThreads[i] = std::thread([&]()
 		{
 			PLockGuard<PMutex> lock(tempMutex);
-			ThreadIDList.push_back(std::this_thread::get_id());
+			ThreadIDList.push_back(std::hash<std::thread::id>()(std::this_thread::get_id()));
 		});
 	}
 	for (uint32 i = 0; i < threadCount; ++i)

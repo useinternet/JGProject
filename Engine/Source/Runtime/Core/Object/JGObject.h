@@ -3,6 +3,7 @@
 #include "ObjectDefines.h"
 #include "Memory/Memory.h"
 #include "String/String.h"
+#include "String/Name.h"
 
 class JGType;
 
@@ -55,15 +56,15 @@ class JGObject : public IMemoryObject
 	*/
 
 private:
-	PString _name;
+	mutable PName _name;
 public:
 	virtual ~JGObject() = default;
 
 public:
 	virtual JGType GetType() const;
 
-	void SetName(const PString& name);
+	void SetName(const PName& name);
 
-	const PString& GetName() const;
+	const PName& GetName() const;
 };
 

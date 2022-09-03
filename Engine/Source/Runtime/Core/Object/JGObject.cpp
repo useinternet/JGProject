@@ -6,12 +6,17 @@ JGType JGObject::GetType() const
 	return JGTYPE(JGObject);
 }
 
-void JGObject::SetName(const PString& name)
+void JGObject::SetName(const PName& name)
 {
 	_name = name;
 }
 
-const PString& JGObject::GetName() const
+const PName& JGObject::GetName() const
 {
+	if (_name == NAME_NONE)
+	{
+		_name = GetType().GetName();
+	}
+
 	return _name;
 }
