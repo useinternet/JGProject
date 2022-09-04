@@ -1,24 +1,25 @@
 #pragma once
 #include "Core.h"
 
-class PModuleInfo : public IJsonable
+class PModuleInfo : public IMemoryObject, public IJsonable
 {
 public:
 	/*
 	* ex) SharedLib, StaticLib, ConsoleApp*/
 	PString ModuleFormat;
 
-	PList<PString> ModuleDependencies;
+	HList<PString> ModuleDependencies;
 
 	PString ModuleName;
 	PString ModulePath;
-	PList<PString> Defines;
+	HList<PString> Defines;
 
 	PString DevelopEngineFilter;
 	PString DevelopGameFilter;
 	PString DevelopConfirmGameFilter;
 	PString DevelopReleaseGameFilter;
 
+	virtual ~PModuleInfo() = default;
 protected:
 	virtual void WriteJson(PJsonData& json) const
 	{

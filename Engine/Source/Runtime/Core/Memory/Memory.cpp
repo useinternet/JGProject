@@ -78,7 +78,7 @@ int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
 
 		_allocatedMemoryBlockQueue.pop();
 
-		const PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
+		const HMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
 
 		bool bIsClass   = memoryBlock.bIsClass;
 		int32 refCount  = memoryBlock.RefCount->load();

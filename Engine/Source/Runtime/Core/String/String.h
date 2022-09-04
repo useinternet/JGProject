@@ -15,7 +15,7 @@ public:
 
 private:
 	uint64	    _stringCode = NULL_ID;
-	PRawString  _rawString;
+	HRawString  _rawString;
 
 public:
 	template <class ...Args>
@@ -87,7 +87,7 @@ public:
 	uint64 Find(const PString& pattern, uint64 offset = 0, uint64 order = 1) const;
 	uint64 FindLastOf(const PString& pattern, uint64 offset = PString::NPOS, uint64 order = 1) const;
 
-	PList<PString> Split(char delimiter) const;
+	HList<PString> Split(char delimiter) const;
 
 	uint64 GetStringTableID() const;
 	uint64 Size() const;
@@ -106,12 +106,12 @@ public:
 public:
 	char GetChar(uint64 index) const;
 	const char* GetCStr() const;
-	const PRawString& GetRawString() const;
-	const PRawWString& GetRawWString() const;
+	const HRawString& GetRawString() const;
+	const HRawWString& GetRawWString() const;
 
 private:
-	void setString(const PRawString& string);
-	void setWString(const PRawWString& string);
+	void setString(const HRawString& string);
+	void setWString(const HRawWString& string);
 	void updateHashCode();
 };
 

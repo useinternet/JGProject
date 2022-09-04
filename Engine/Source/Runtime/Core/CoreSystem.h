@@ -14,8 +14,8 @@ class GCoreSystem
 {
 private:
 	static GCoreSystem* Instance;
-	static PHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
-	static PList<ThreadID> ThreadIDList;
+	static HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
+	static HList<ThreadID> ThreadIDList;
 
 private:
 	GCoreSystem() = default;
@@ -73,7 +73,7 @@ public:
 	}
 
 	static uint32 GetThreadCount();
-	static PList<ThreadID> GetAllThreadIDs();
+	static HList<ThreadID> GetAllThreadIDs();
 	
 private:
 	template<class T>

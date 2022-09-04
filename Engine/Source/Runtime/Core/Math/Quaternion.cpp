@@ -3,27 +3,27 @@
 #include "Vector.h"
 using namespace std;
 
-PQuaternion::PQuaternion(const PVector3& v)
+HQuaternion::HQuaternion(const HVector3& v)
 {
 	ToQuaternion(v);
 }
-PQuaternion::PQuaternion(float32  pitch, float32  yaw, float32  roll)
+HQuaternion::HQuaternion(float32  pitch, float32  yaw, float32  roll)
 {
 	ToQuaternion({ pitch, yaw, roll });
 }
 // 
-PQuaternion PQuaternion::ToQuaternion(const PVector3& euler)
+HQuaternion HQuaternion::ToQuaternion(const HVector3& euler)
 {
-	PQuaternion q;
+	HQuaternion q;
 	q.SetSIMD(DirectX::XMQuaternionRotationRollPitchYaw(euler.x, euler.y, euler.z));
-	return PQuaternion::Normalize(q);
+	return HQuaternion::Normalize(q);
 }
 
-PQuaternion PQuaternion::ToQuaternion(float32  pitch, float32  yaw, float32  roll)
+HQuaternion HQuaternion::ToQuaternion(float32  pitch, float32  yaw, float32  roll)
 {
 	return ToQuaternion({ pitch, yaw, roll });
 }
-PVector3 PQuaternion::ToEuler(const PQuaternion& q)
+HVector3 HQuaternion::ToEuler(const HQuaternion& q)
 {
 
 	float32 sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
@@ -43,52 +43,52 @@ PVector3 PQuaternion::ToEuler(const PQuaternion& q)
 	float32 cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
 	float32 yaw = std::atan2(siny_cosp, cosy_cosp);
 
-	return PVector3(pitch, yaw, roll);
+	return HVector3(pitch, yaw, roll);
 }
 
-PQuaternion PQuaternion::RotationRollPitchYawFromVector(const PVector3& angles)
+HQuaternion HQuaternion::RotationRollPitchYawFromVector(const HVector3& angles)
 {
 
-	PQuaternion result;
-	auto simQ = DirectX::XMQuaternionRotationRollPitchYawFromVector(PVector3::GetSIMD(angles));
+	HQuaternion result;
+	auto simQ = DirectX::XMQuaternionRotationRollPitchYawFromVector(HVector3::GetSIMD(angles));
 	result.SetSIMD(simQ);
 	return result;
 }
 
-void PQuaternion::ToAxisAngle(PVector3& out_axis, float32& out_angle, const PQuaternion& q)
+void HQuaternion::ToAxisAngle(HVector3& out_axis, float32& out_angle, const HQuaternion& q)
 {
-	auto sim_axis = PVector3::GetSIMD(out_axis);
+	auto sim_axis = HVector3::GetSIMD(out_axis);
 	auto sim_q = q.GetSIMD();
 
 	DirectX::XMQuaternionToAxisAngle(&sim_axis, &out_angle, sim_q);
-	out_axis = PVector3::ConvertPVector3(sim_axis);
+	out_axis = HVector3::ConvertPVector3(sim_axis);
 }
 
-PQuaternion PQuaternion::RotatationAxis(const PVector3& axis, float32  angle)
+HQuaternion HQuaternion::RotatationAxis(const HVector3& axis, float32  angle)
 {
-	PQuaternion q;
+	HQuaternion q;
 	DirectX::XMFLOAT3 v_axis = { axis.x, axis.y, axis.z };
 	q.SetSIMD(DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&v_axis), angle));
 	return q;
 }
-PQuaternion PQuaternion::FromTwoVectors(const PVector3& u, const PVector3& v)
+HQuaternion HQuaternion::FromTwoVectors(const HVector3& u, const HVector3& v)
 {
-	float32  norm_u_norm_v = sqrt(PVector3::Dot(u, u) * PVector3::Dot(v, v));
-	float32  real_part = norm_u_norm_v + PVector3::Dot(u, v);
-	PVector3 w;
+	float32  norm_u_norm_v = sqrt(HVector3::Dot(u, u) * HVector3::Dot(v, v));
+	float32  real_part = norm_u_norm_v + HVector3::Dot(u, v);
+	HVector3 w;
 
 	if (real_part < 1.e-6f * norm_u_norm_v)
 	{
 		real_part = 0.0f;
-		w = PMath::Abs(u.x) > PMath::Abs(u.z) ? PVector3(-u.y, u.x, 0.f)
-			: PVector3(0.f, -u.z, u.y);
+		w = HMath::Abs(u.x) > HMath::Abs(u.z) ? HVector3(-u.y, u.x, 0.f)
+			: HVector3(0.f, -u.z, u.y);
 	}
 	else
 	{
-		w = PVector3::Cross(u, v);
+		w = HVector3::Cross(u, v);
 	}
 
-	return PQuaternion::Normalize(PQuaternion(w.x, w.y, w.z, real_part));
+	return HQuaternion::Normalize(HQuaternion(w.x, w.y, w.z, real_part));
 }
 
 

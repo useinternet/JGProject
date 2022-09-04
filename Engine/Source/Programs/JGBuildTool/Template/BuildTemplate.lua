@@ -1,7 +1,9 @@
 local GEN_PROJECT_FILE_PATH = "Temp/ProjectFiles/"
-local BIN_PATH = "Bin/%{cfg.buildcfg}/"
-local OBJECT_PATH = "Temp/Obj/%{cfg.buildcfg}/"
-
+local BIN_PATH        = "Bin/%{cfg.buildcfg}/"
+local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
+--local PCH_HEADER      = "PCH.h"
+--local PCH_HEADER_PATH = "Source/PCH/PCH.h"
+--local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 
 function DebugConfig()
     symbols       "On"
@@ -49,6 +51,8 @@ workspace "JGEngine"
         debugdir  (BIN_PATH)
         targetdir (BIN_PATH)
         objdir(OBJECT_PATH)
+        pchheader (PCH_HEADER)
+        pchsource (PCH_CPP_PATH)
         if defined ~= nil then
             defines {defined}
         end
@@ -57,6 +61,8 @@ workspace "JGEngine"
             path .. "**.h",
             path .. "**.cpp",
             path .. "**.c",
+            --PCH_HEADER_PATH,
+            --PCH_CPP_PATH,
         }
     end
 

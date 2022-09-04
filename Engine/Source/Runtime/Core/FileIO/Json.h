@@ -92,73 +92,73 @@ private:
 	rapidjson::Value makeJsonValue(const PName& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector2& value);
+	rapidjson::Value makeJsonValue(const HVector2& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector3& value);
+	rapidjson::Value makeJsonValue(const HVector3& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector4& value);
+	rapidjson::Value makeJsonValue(const HVector4& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector2Int& value);
+	rapidjson::Value makeJsonValue(const HVector2Int& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector3Int& value);
+	rapidjson::Value makeJsonValue(const HVector3Int& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector4Int& value);
+	rapidjson::Value makeJsonValue(const HVector4Int& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector2Uint& value);
+	rapidjson::Value makeJsonValue(const HVector2Uint& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector3Uint& value);
+	rapidjson::Value makeJsonValue(const HVector3Uint& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PVector4Uint& value);
+	rapidjson::Value makeJsonValue(const HVector4Uint& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PMatrix& value);
+	rapidjson::Value makeJsonValue(const HMatrix& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PQuaternion& value);
+	rapidjson::Value makeJsonValue(const HQuaternion& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PRect& value);
+	rapidjson::Value makeJsonValue(const HRect& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PRay& value);
+	rapidjson::Value makeJsonValue(const HRay& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PFrustum& value);
+	rapidjson::Value makeJsonValue(const HFrustum& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PBBox& value);
+	rapidjson::Value makeJsonValue(const HBBox& value);
 
 	template<>
-	rapidjson::Value makeJsonValue(const PPlane& value);
+	rapidjson::Value makeJsonValue(const HPlane& value);
 
 	template<class T>
-	rapidjson::Value makeJsonValue(const PList<T>& values);
+	rapidjson::Value makeJsonValue(const HList<T>& values);
 
 	template<class T>
-	rapidjson::Value makeJsonValue(const PStack<T>& values);
+	rapidjson::Value makeJsonValue(const HStack<T>& values);
 
 	template<class T>
-	rapidjson::Value makeJsonValue(const PQueue<T>& values);
+	rapidjson::Value makeJsonValue(const HQueue<T>& values);
 
 	template<class KeyType, class ValueType>
-	rapidjson::Value makeJsonValue(const PHashMap<KeyType, ValueType>& values);
+	rapidjson::Value makeJsonValue(const HHashMap<KeyType, ValueType>& values);
 
 	template<class KeyType, class ValueType>
-	rapidjson::Value makeJsonValue(const PMap<KeyType, ValueType>& values);
+	rapidjson::Value makeJsonValue(const HMap<KeyType, ValueType>& values);
 
 	template<class KeyType>
-	rapidjson::Value makeJsonValue(const PHashSet<KeyType>& values);
+	rapidjson::Value makeJsonValue(const HHashSet<KeyType>& values);
 
 	template<class KeyType>
-	rapidjson::Value makeJsonValue(const PSet<KeyType>& values);
+	rapidjson::Value makeJsonValue(const HSet<KeyType>& values);
 #pragma endregion
 #pragma region Read Json Value Declare
 	template<class T>
@@ -195,73 +195,73 @@ private:
 	bool readJsonValue(PName* value) const;
 
 	template<>
-	bool readJsonValue(PVector2* value) const;
+	bool readJsonValue(HVector2* value) const;
 
 	template<>
-	bool readJsonValue(PVector3* value) const;
+	bool readJsonValue(HVector3* value) const;
 
 	template<>
-	bool readJsonValue(PVector4* value) const;
+	bool readJsonValue(HVector4* value) const;
 
 	template<>
-	bool readJsonValue(PVector2Int* value) const;
+	bool readJsonValue(HVector2Int* value) const;
 
 	template<>
-	bool readJsonValue(PVector3Int* value) const;
+	bool readJsonValue(HVector3Int* value) const;
 
 	template<>
-	bool readJsonValue(PVector4Int* value) const;
+	bool readJsonValue(HVector4Int* value) const;
 
 	template<>
-	bool readJsonValue(PVector2Uint* value) const;
+	bool readJsonValue(HVector2Uint* value) const;
 
 	template<>
-	bool readJsonValue(PVector3Uint* value) const;
+	bool readJsonValue(HVector3Uint* value) const;
 
 	template<>
-	bool readJsonValue(PVector4Uint* value) const;
+	bool readJsonValue(HVector4Uint* value) const;
 
 	template<>
-	bool readJsonValue(PMatrix* value) const;
+	bool readJsonValue(HMatrix* value) const;
 
 	template<>
-	bool readJsonValue(PQuaternion* value) const;
+	bool readJsonValue(HQuaternion* value) const;
 
 	template<>
-	bool readJsonValue(PRect* value) const;
+	bool readJsonValue(HRect* value) const;
 
 	template<>
-	bool readJsonValue(PRay* value) const;
+	bool readJsonValue(HRay* value) const;
 
 	template<>
-	bool readJsonValue(PFrustum* value) const;
+	bool readJsonValue(HFrustum* value) const;
 
 	template<>
-	bool readJsonValue(PBBox* value) const;
+	bool readJsonValue(HBBox* value) const;
 
 	template<>
-	bool readJsonValue(PPlane* value) const;
+	bool readJsonValue(HPlane* value) const;
 
 	template<class T>
-	bool readJsonValue(PList<T>* values) const;
+	bool readJsonValue(HList<T>* values) const;
 
 	template<class T>
-	bool readJsonValue(PStack<T>* values) const;
+	bool readJsonValue(HStack<T>* values) const;
 
 	template<class T>
-	bool readJsonValue(PQueue<T>* values) const;
+	bool readJsonValue(HQueue<T>* values) const;
 
 	template<class KeyType, class ValueType>
-	bool readJsonValue(PHashMap<KeyType, ValueType>* values) const;
+	bool readJsonValue(HHashMap<KeyType, ValueType>* values) const;
 
 	template<class KeyType, class ValueType>
-	bool readJsonValue(PMap<KeyType, ValueType>* values) const;
+	bool readJsonValue(HMap<KeyType, ValueType>* values) const;
 
 	template<class KeyType>
-	bool readJsonValue(PHashSet<KeyType>* values) const;
+	bool readJsonValue(HHashSet<KeyType>* values) const;
 
 	template<class KeyType>
-	bool readJsonValue(PSet<KeyType>* values) const;
+	bool readJsonValue(HSet<KeyType>* values) const;
 
 #pragma endregion
 #pragma region Util Function Declare
@@ -429,61 +429,61 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PName& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector2& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector2& value)
 {
 	return makeJsonValue_Vector(value, 2);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector3& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector3& value)
 {
 	return makeJsonValue_Vector(value, 3);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector4& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector4& value)
 {
 	return makeJsonValue_Vector(value, 4);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector2Int& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector2Int& value)
 {
 	return makeJsonValue_Vector(value, 2);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector3Int& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector3Int& value)
 {
 	return makeJsonValue_Vector(value, 3);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector4Int& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector4Int& value)
 {
 	return makeJsonValue_Vector(value, 4);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector2Uint& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector2Uint& value)
 {
 	return makeJsonValue_Vector(value, 2);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector3Uint& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector3Uint& value)
 {
 	return makeJsonValue_Vector(value, 3);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PVector4Uint& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HVector4Uint& value)
 {
 	return makeJsonValue_Vector(value, 4);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PMatrix& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HMatrix& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
@@ -500,13 +500,13 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PMatrix& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PQuaternion& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HQuaternion& value)
 {
 	return makeJsonValue_Vector(value, 4);
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PRect& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HRect& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
@@ -520,7 +520,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PRect& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PRay& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HRay& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
@@ -537,12 +537,12 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PRay& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PFrustum& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HFrustum& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
 
-	for (int32 i = 0; i < PFrustum::Count; ++i)
+	for (int32 i = 0; i < HFrustum::Count; ++i)
 	{
 		val.PushBack(value.Plane[i].N.x, _pOwnerJson->GetAllocator());
 		val.PushBack(value.Plane[i].N.y, _pOwnerJson->GetAllocator());
@@ -555,7 +555,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PFrustum& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PBBox& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HBBox& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
@@ -572,7 +572,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PBBox& value)
 }
 
 template<>
-inline rapidjson::Value PJsonData::makeJsonValue(const PPlane& value)
+inline rapidjson::Value PJsonData::makeJsonValue(const HPlane& value)
 {
 	rapidjson::Value val;
 	val.SetArray();
@@ -587,7 +587,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PPlane& value)
 }
 
 template<class T>
-inline rapidjson::Value PJsonData::makeJsonValue(const PList<T>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HList<T>& values)
 {
 	rapidjson::Value valArr; valArr.SetArray();
 
@@ -600,11 +600,11 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PList<T>& values)
 }
 
 template<class T>
-inline rapidjson::Value PJsonData::makeJsonValue(const PStack<T>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HStack<T>& values)
 {
 	rapidjson::Value valArr; valArr.SetArray();
 
-	PStack<T> tempStack = values;
+	HStack<T> tempStack = values;
 
 	while (tempStack.empty() == false)
 	{
@@ -616,11 +616,11 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PStack<T>& values)
 }
 
 template<class T>
-inline rapidjson::Value PJsonData::makeJsonValue(const PQueue<T>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HQueue<T>& values)
 {
 	rapidjson::Value valArr; valArr.SetArray();
 
-	PQueue<T> tempQueue = values;
+	HQueue<T> tempQueue = values;
 
 	while (tempQueue.empty() == false)
 	{
@@ -632,12 +632,12 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PQueue<T>& values)
 }
 
 template<class KeyType, class ValueType>
-inline rapidjson::Value PJsonData::makeJsonValue(const PHashMap<KeyType, ValueType>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HHashMap<KeyType, ValueType>& values)
 {
 	rapidjson::Value valArr; 
 	valArr.SetArray();
 
-	for (const PPair<KeyType, ValueType>& pair : values)
+	for (const HPair<KeyType, ValueType>& pair : values)
 	{
 		rapidjson::Value pairVal;
 		pairVal.SetArray();
@@ -658,12 +658,12 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PHashMap<KeyType, ValueTy
 }
 
 template<class KeyType, class ValueType>
-inline rapidjson::Value PJsonData::makeJsonValue(const PMap<KeyType, ValueType>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HMap<KeyType, ValueType>& values)
 {
 	rapidjson::Value valArr; 
 	valArr.SetArray();
 
-	for (const PPair<KeyType, ValueType>& pair : values)
+	for (const HPair<KeyType, ValueType>& pair : values)
 	{
 		rapidjson::Value pairVal;
 		pairVal.SetArray();
@@ -684,7 +684,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PMap<KeyType, ValueType>&
 }
 
 template<class KeyType>
-inline rapidjson::Value PJsonData::makeJsonValue(const PHashSet<KeyType>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HHashSet<KeyType>& values)
 {
 	rapidjson::Value valArr; valArr.SetArray();
 
@@ -697,7 +697,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PHashSet<KeyType>& values
 }
 
 template<class KeyType>
-inline rapidjson::Value PJsonData::makeJsonValue(const PSet<KeyType>& values)
+inline rapidjson::Value PJsonData::makeJsonValue(const HSet<KeyType>& values)
 {
 	rapidjson::Value valArr; valArr.SetArray();
 
@@ -858,68 +858,68 @@ inline bool PJsonData::readJsonValue(PName* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector2* value) const
+inline bool PJsonData::readJsonValue(HVector2* value) const
 {
 	return readJsonValue_Vector(value, 2);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector3* value) const
+inline bool PJsonData::readJsonValue(HVector3* value) const
 {
 	return readJsonValue_Vector(value, 3);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector4* value) const
+inline bool PJsonData::readJsonValue(HVector4* value) const
 {
 	return readJsonValue_Vector(value, 4);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector2Int* value) const
+inline bool PJsonData::readJsonValue(HVector2Int* value) const
 {
 	return readJsonValue_Vector(value, 2);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector3Int* value) const
+inline bool PJsonData::readJsonValue(HVector3Int* value) const
 {
 	return readJsonValue_Vector(value, 3);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector4Int* value) const
+inline bool PJsonData::readJsonValue(HVector4Int* value) const
 {
 	return readJsonValue_Vector(value, 4);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector2Uint* value) const
+inline bool PJsonData::readJsonValue(HVector2Uint* value) const
 {
 	return readJsonValue_Vector(value, 2);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector3Uint* value) const
+inline bool PJsonData::readJsonValue(HVector3Uint* value) const
 {
 	return readJsonValue_Vector(value, 3);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PVector4Uint* value) const
+inline bool PJsonData::readJsonValue(HVector4Uint* value) const
 {
 	return readJsonValue_Vector(value, 4);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PMatrix* value) const
+inline bool PJsonData::readJsonValue(HMatrix* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
 		return false;
 	}
 
-	*value = PMatrix();
+	*value = HMatrix();
 
 	int32 index = 0;
 	for (int32 i = 0; i < 4; ++i)
@@ -946,13 +946,13 @@ inline bool PJsonData::readJsonValue(PMatrix* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PQuaternion* value) const
+inline bool PJsonData::readJsonValue(HQuaternion* value) const
 {
 	return readJsonValue_Vector(value, 4);
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PRect* value) const
+inline bool PJsonData::readJsonValue(HRect* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
@@ -984,14 +984,14 @@ inline bool PJsonData::readJsonValue(PRect* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PRay* value) const
+inline bool PJsonData::readJsonValue(HRay* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
 		return false;
 	}
 
-	*value = PRay();
+	*value = HRay();
 
 	PJsonData jsonData;
 	int32 index = 0;
@@ -1022,19 +1022,19 @@ inline bool PJsonData::readJsonValue(PRay* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PFrustum* value) const
+inline bool PJsonData::readJsonValue(HFrustum* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
 		return false;
 	}
 
-	*value = PFrustum();
+	*value = HFrustum();
 
 	PJsonData jsonData;
 	int32	  index = 0;
 
-	for (int32 i = 0; i < PFrustum::Count; ++i)
+	for (int32 i = 0; i < HFrustum::Count; ++i)
 	{
 	
 		for (int32 j = 0; j < 3; ++j)
@@ -1057,14 +1057,14 @@ inline bool PJsonData::readJsonValue(PFrustum* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PBBox* value) const
+inline bool PJsonData::readJsonValue(HBBox* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
 		return false;
 	}
 
-	*value = PBBox();
+	*value = HBBox();
 
 	PJsonData jsonData;
 	int32 index = 0;
@@ -1095,14 +1095,14 @@ inline bool PJsonData::readJsonValue(PBBox* value) const
 }
 
 template<>
-inline bool PJsonData::readJsonValue(PPlane* value) const
+inline bool PJsonData::readJsonValue(HPlane* value) const
 {
 	if (_value.IsArray() == false || value == nullptr)
 	{
 		return false;
 	}
 
-	*value = PPlane();
+	*value = HPlane();
 
 	PJsonData jsonData;
 	int32	  index = 0;
@@ -1126,7 +1126,7 @@ inline bool PJsonData::readJsonValue(PPlane* value) const
 }
 
 template<class T>
-inline bool PJsonData::readJsonValue(PList<T>* values) const
+inline bool PJsonData::readJsonValue(HList<T>* values) const
 {
 	if (_value.IsArray() == false)
 	{
@@ -1156,14 +1156,14 @@ inline bool PJsonData::readJsonValue(PList<T>* values) const
 }
 
 template<class T>
-inline bool PJsonData::readJsonValue(PStack<T>* values) const
+inline bool PJsonData::readJsonValue(HStack<T>* values) const
 {
 	if (_value.IsArray() == false)
 	{
 		return false;
 	}
 
-	(*values) = PStack<T>();
+	(*values) = HStack<T>();
 	
 	bool  bResult = true;
 	int32 len = GetSize();
@@ -1191,14 +1191,14 @@ inline bool PJsonData::readJsonValue(PStack<T>* values) const
 }
 
 template<class T>
-inline bool PJsonData::readJsonValue(PQueue<T>* values) const
+inline bool PJsonData::readJsonValue(HQueue<T>* values) const
 {
 	if (_value.IsArray() == false)
 	{
 		return false;
 	}
 
-	(*values) = PQueue<T>();
+	(*values) = HQueue<T>();
 
 	bool  bResult = true;
 	int32 len = GetSize();
@@ -1226,7 +1226,7 @@ inline bool PJsonData::readJsonValue(PQueue<T>* values) const
 }
 
 template<class KeyType, class ValueType>
-inline bool PJsonData::readJsonValue(PHashMap<KeyType, ValueType>* values) const
+inline bool PJsonData::readJsonValue(HHashMap<KeyType, ValueType>* values) const
 {
 	if (_value.IsArray() == false)
 	{
@@ -1282,7 +1282,7 @@ inline bool PJsonData::readJsonValue(PHashMap<KeyType, ValueType>* values) const
 }
 
 template<class KeyType, class ValueType>
-inline bool PJsonData::readJsonValue(PMap<KeyType, ValueType>* values) const
+inline bool PJsonData::readJsonValue(HMap<KeyType, ValueType>* values) const
 {
 	if (_value.IsArray() == false)
 	{
@@ -1338,7 +1338,7 @@ inline bool PJsonData::readJsonValue(PMap<KeyType, ValueType>* values) const
 }
 
 template<class KeyType>
-inline bool PJsonData::readJsonValue(PHashSet<KeyType>* values) const
+inline bool PJsonData::readJsonValue(HHashSet<KeyType>* values) const
 {
 	if (_value.IsArray() == false)
 	{
@@ -1373,7 +1373,7 @@ inline bool PJsonData::readJsonValue(PHashSet<KeyType>* values) const
 }
 
 template<class KeyType>
-inline bool PJsonData::readJsonValue(PSet<KeyType>* values) const
+inline bool PJsonData::readJsonValue(HSet<KeyType>* values) const
 {
 	if (_value.IsArray() == false)
 	{

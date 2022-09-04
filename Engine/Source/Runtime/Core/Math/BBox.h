@@ -2,17 +2,17 @@
 #include "Math.h"
 #include "Vector.h"
 
-class PRay;
-class PBBox
+class HRay;
+class HBBox
 {
 public:
-	PVector3 min;
-	PVector3 max;
+	HVector3 min;
+	HVector3 max;
 
 public:
-	bool Contain(const PVector3& point) const;
+	bool Contain(const HVector3& point) const;
 
-	bool Intersection(const PRay& ray) const;
+	bool Intersection(const HRay& ray) const;
 
-	PVector3 Center() const;
+	HVector3 Center() const;
 };

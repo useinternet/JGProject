@@ -61,7 +61,6 @@ inline enumName operator~(enumName flags)\
 	return (enumName)~((int)flags);\
 }\
 
-using byte = char;
 using int8 = char;
 using int16 = short;
 using int32 = int;
@@ -77,45 +76,45 @@ using float32 = float;
 using float64 = double;
 
 
-using AtomicBool   = std::atomic_bool;
-using AtomicInt32  = std::atomic_int;
-using AtomicUint32 = std::atomic_uint;
+using HAtomicBool   = std::atomic_bool;
+using HAtomicInt32  = std::atomic_int;
+using HAtomicUint32 = std::atomic_uint;
 
 using ThreadID = uint64;
 
 
 template<class Key, class Value>
-using PHashMap = std::unordered_map<Key, Value>;
+using HHashMap = std::unordered_map<Key, Value>;
 
 template<class Key, class Value>
-using PMap = std::map<Key, Value>;
+using HMap = std::map<Key, Value>;
 
 template<class T>
-using PHashSet = std::unordered_set<T>;
+using HHashSet = std::unordered_set<T>;
 
 template<class T>
-using PSet = std::set<T>;
+using HSet = std::set<T>;
 
 template<class T>
-using PList = std::vector<T>;
+using HList = std::vector<T>;
 
 template<class T>
-using PQueue = std::queue<T>;
+using HQueue = std::queue<T>;
 
 template<class T>
-using PStack = std::stack<T>;
+using HStack = std::stack<T>;
 
-using PConditionVariable = std::condition_variable;
-using PMutex = std::mutex;
+using HConditionVariable = std::condition_variable;
+using HMutex = std::mutex;
 
 template<class T>
-using PLockGuard = std::lock_guard<T>;
+using HLockGuard = std::lock_guard<T>;
 
 template<class First, class Second>
-using PPair = std::pair<First, Second>;
+using HPair = std::pair<First, Second>;
 
-using PRawString = std::string;
-using PRawWString = std::wstring;
+using HRawString = std::string;
+using HRawWString = std::wstring;
 
 
 const static int8  JG_INT8_Min = (int8)-128i8;

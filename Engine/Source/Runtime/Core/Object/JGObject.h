@@ -6,23 +6,6 @@
 #include "String/Name.h"
 
 class JGType;
-
-// 이거는 object가 destroy에 진입 전 연결을 끊어버림
-template< class T>
-class PWeakJGObjectPtr
-{
-
-};
-
-// 평범
-template< class T>
-class PJGObjectPtr
-{
-
-};
-
-
-
 class JGObject : public IMemoryObject
 {
 	// JGObject 에 포함될 정보들

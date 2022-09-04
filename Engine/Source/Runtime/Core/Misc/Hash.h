@@ -6,11 +6,11 @@
 #include "CoreDefines.h"
 
 
-class PHash
+class PHash : public IMemoryObject
 {
 public:
 	PHash() = default;
-	~PHash() = default;
+	virtual ~PHash() = default;
 public:
 	template<class T>
 	static uint64 Hash(const T& obj)

@@ -2,7 +2,7 @@
 #include "Vector.h"
 #include "String/String.h"
 
-class PRect
+class HRect
 {
 public:
 	float32 left   = 0.0f;
@@ -11,21 +11,21 @@ public:
 	float32 bottom = 0.0f;
 
 public:
-	PRect() noexcept = default;
-	PRect(float32 left, float32 top, float32 right, float32 bottom) noexcept : left(left), right(right), top(top), bottom(bottom) {}
-	PRect(const PVector2& min, const PVector2& max) noexcept : left(min.x), right(max.x), top(min.y), bottom(max.y) {}
+	HRect() noexcept = default;
+	HRect(float32 left, float32 top, float32 right, float32 bottom) noexcept : left(left), right(right), top(top), bottom(bottom) {}
+	HRect(const HVector2& min, const HVector2& max) noexcept : left(min.x), right(max.x), top(min.y), bottom(max.y) {}
 
 	void Set(float32 left, float32 top, float32 right, float32 bottom) noexcept 
 	{
 		this->left = left; this->right = right; this->top = top; this->bottom = bottom;
 	}
 
-	void Set(const PVector2& min, const PVector2& max) noexcept 
+	void Set(const HVector2& min, const HVector2& max) noexcept
 	{
 		this->left = min.x; this->right = max.x; this->top = min.y; this->bottom = max.y;
 	}
 
-	PVector2 Center() const noexcept 
+	HVector2 Center() const noexcept 
 	{
 		return { Width() * 0.5f + left, Height() * 0.5f + top };
 	}
@@ -37,20 +37,20 @@ public:
 
 	float32 Width()  const noexcept 
 	{
-		return PMath::Abs(right - left);
+		return HMath::Abs(right - left);
 	}
 
 	float32 Height() const noexcept 
 	{
-		return PMath::Abs(bottom - top);
+		return HMath::Abs(bottom - top);
 	}
 
-	bool  Contain(const PRect& rect) const noexcept 
+	bool  Contain(const HRect& rect) const noexcept 
 	{
 		return Contain({ rect.left, rect.top }) && Contain({ rect.right, rect.bottom });
 	}
 
-	bool Contain(const PVector2& v) const
+	bool Contain(const HVector2& v) const
 	{
 		if (left <= v.x && right >= v.x && top <= v.y && bottom >= v.y) 
 			return true;
@@ -59,21 +59,21 @@ public:
 
 	bool Contain(float32 x, float32 y) 
 	{
-		return Contain(PVector2(x, y));
+		return Contain(HVector2(x, y));
 	}
 
-	bool  Overlap(const PRect& rect) const noexcept 
+	bool  Overlap(const HRect& rect) const noexcept 
 	{
 		return Contain({ rect.left, rect.top }) || Contain({ rect.right, rect.bottom }) ||
 			Contain({ rect.left, rect.bottom }) || Contain({ rect.right, rect.top });
 	}
 
-	bool Equal(const PRect& rect, float32 errorRange = ERROR_RANGE) const noexcept
+	bool Equal(const HRect& rect, float32 errorRange = ERROR_RANGE) const noexcept
 	{
-		if (PMath::Abs(rect.left - left)	 > errorRange) return false;
-		if (PMath::Abs(rect.right - right)	 > errorRange) return false;
-		if (PMath::Abs(rect.top - top)		 > errorRange) return false;
-		if (PMath::Abs(rect.bottom - bottom) > errorRange) return false;
+		if (HMath::Abs(rect.left - left)	 > errorRange) return false;
+		if (HMath::Abs(rect.right - right)	 > errorRange) return false;
+		if (HMath::Abs(rect.top - top)		 > errorRange) return false;
+		if (HMath::Abs(rect.bottom - bottom) > errorRange) return false;
 		return true;
 	}
 

@@ -2,12 +2,12 @@
 #include "Vector.h"
 
 
-PVector3 PMath::ConvertToRadians(const PVector3& vDegrees)
+HVector3 HMath::ConvertToRadians(const HVector3& vDegrees)
 {
-	return PVector3(ConvertToRadians(vDegrees.x), ConvertToRadians(vDegrees.y), ConvertToRadians(vDegrees.z));
+	return HVector3(ConvertToRadians(vDegrees.x), ConvertToRadians(vDegrees.y), ConvertToRadians(vDegrees.z));
 }
 
-PVector3 PMath::ConvertToDegrees(const PVector3& vRadians)
+HVector3 HMath::ConvertToDegrees(const HVector3& vRadians)
 {
-	return PVector3(ConvertToDegrees(vRadians.x), ConvertToDegrees(vRadians.y), ConvertToDegrees(vRadians.z));
+	return HVector3(ConvertToDegrees(vRadians.x), ConvertToDegrees(vRadians.y), ConvertToDegrees(vRadians.z));
 }

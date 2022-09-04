@@ -14,8 +14,8 @@ enum class ENamedThread
 	AnimThread   = 0x0002,
 	InputThread  = 0x0004,
 	GameThread   = 0x0008,
-
-	AssetLoadThread = Any & ((~RenderThread) & (~AnimThread) & (~InputThread) & (~GameThread))
+	RemainThread    = Any & ((~RenderThread) & (~AnimThread) & (~InputThread) & (~GameThread)),
+	AssetLoadThread = RemainThread,
 };
 
 class PThread : public IMemoryObject
@@ -23,13 +23,13 @@ class PThread : public IMemoryObject
 	std::thread _thread;
 	uint64 _id;
 
-	PQueue<PSharedPtr<PTask>> _taskQueue;
+	HQueue<PSharedPtr<PTask>> _taskQueue;
 
-	AtomicBool _bIsActive;
-	AtomicBool _bIsRunning;
+	HAtomicBool _bIsActive;
+	HAtomicBool _bIsRunning;
 
-	PMutex _mutex;
-	PConditionVariable _conditionVariable;
+	HMutex _mutex;
+	HConditionVariable _conditionVariable;
 public:
 	PThread();
 	virtual ~PThread();
@@ -38,10 +38,9 @@ public:
 	template<class ... Args>
 	void PushTask(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		PSharedPtr<PTask> task = Allocate<PTask>();
-		task->Bind(PTaskDelegate::Create(refObject, func), args...);
+		PSharedPtr<PTask> task = PTask::Create(refObject, func, args...);
 
-		PLockGuard<PMutex> lock(_mutex);
+		HLockGuard<HMutex> lock(_mutex);
 		_taskQueue.push(task);
 
 		_conditionVariable.notify_one();

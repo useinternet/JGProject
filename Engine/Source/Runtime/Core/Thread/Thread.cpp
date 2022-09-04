@@ -66,7 +66,7 @@ void PThread::run()
 void PThread::destroy()
 {
 	{
-		PLockGuard<PMutex> lock(_mutex);
+		HLockGuard<HMutex> lock(_mutex);
 		_bIsActive = false;
 		_conditionVariable.notify_all();
 	}

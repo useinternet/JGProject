@@ -8,8 +8,8 @@
 class Test
 {
 public:
-	PList<float> ss;
-	PHashSet<int> ss2;
+	HList<float> ss;
+	HHashSet<int> ss2;
 
 };
 

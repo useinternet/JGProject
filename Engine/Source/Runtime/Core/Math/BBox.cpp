@@ -1,7 +1,7 @@
 #include "BBox.h"
 #include "Ray.h"
 
-bool PBBox::Contain(const PVector3& point) const
+bool HBBox::Contain(const HVector3& point) const
 {
 	return
 		min.x <= point.x && max.x >= point.x &&
@@ -9,15 +9,15 @@ bool PBBox::Contain(const PVector3& point) const
 		min.z <= point.z && max.z >= point.z;
 }
 
-bool PBBox::Intersection(const PRay& ray) const
+bool HBBox::Intersection(const HRay& ray) const
 {
 	float32 MinT = JG_FLOAT32_MAX;
 	float32 MaxS = JG_FLOAT32_MIN;
-	PVector3 center = Center();
+	HVector3 center = Center();
 
 	for (int32 i = 0; i < 3; ++i)
 	{
-		if (PMath::Abs(ray.dir.At(i)) <= ERROR_RANGE)
+		if (HMath::Abs(ray.dir.At(i)) <= ERROR_RANGE)
 		{
 			if (ray.origin.At(i) < min.At(i) || ray.origin.At(i) > max.At(i))
 				return false;
@@ -43,7 +43,7 @@ bool PBBox::Intersection(const PRay& ray) const
 	return true;
 }
 
-PVector3 PBBox::Center() const
+HVector3 HBBox::Center() const
 {
 	return 	(max + min) * 0.5f;
 }

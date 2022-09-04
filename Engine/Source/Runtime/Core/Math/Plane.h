@@ -1,18 +1,18 @@
 #pragma once
 #include "Vector.h"
 
-class PPlane
+class HPlane
 {
 public:
-	PPlane() = default;
-	PPlane(const PVector3& p1, const PVector3& p2, const PVector3& p3) noexcept;
-	PPlane(const PVector3& p, const PVector3& N) noexcept;
-	PPlane(const PVector3& N, float32 D) noexcept;
+	HPlane() = default;
+	HPlane(const HVector3& p1, const HVector3& p2, const HVector3& p3) noexcept;
+	HPlane(const HVector3& p, const HVector3& N) noexcept;
+	HPlane(const HVector3& N, float32 D) noexcept;
 
 public:
-	float Dot(const PVector4& v);
+	float Dot(const HVector4& v);
 
 public:
-	PVector3 N;
+	HVector3 N;
 	float32 D = 0.0f;
 };

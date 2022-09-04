@@ -140,7 +140,7 @@ bool PJson::ToString(PJson& json, PString* outStr)
 	{
 		return false;
 	}
-	PRawString jsonStr;
+	HRawString jsonStr;
 	jsonStr.resize(buffer.GetSize());
 	memcpy(jsonStr.data(), buffer.GetString(), buffer.GetSize());
 

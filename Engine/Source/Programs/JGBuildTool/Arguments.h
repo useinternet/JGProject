@@ -1,15 +1,14 @@
 #pragma once
 #include "Core.h"
 
-
-class PArguments : public IJsonable
+class PArguments : public IMemoryObject, public IJsonable
 {
 public:
 	PString EngineWorkDirectory;
-	PHashSet<PString> EngineWorkCategories;
+	HHashSet<PString> EngineWorkCategories;
 
 	PString UserWorkDirectory;
-	PHashSet<PString> UserWorkCategories;
+	HHashSet<PString> UserWorkCategories;
 
 	PString ModuleInfoFileExtension;
 	PString ModuleRecognitionName;
@@ -33,6 +32,8 @@ public:
 
 		PFileHelper::CombinePath(PFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool/Template/BuildTemplate.lua", &BuildScriptTemplatePath);
 	}
+
+	virtual ~PArguments() = default;
 
 protected:
 	virtual void WriteJson(PJsonData& json) const

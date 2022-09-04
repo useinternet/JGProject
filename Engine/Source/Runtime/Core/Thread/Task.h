@@ -10,17 +10,17 @@ JG_DECLARE_DELEGATE_ONEPARAM(PTaskDelegate, PTaskArguments)
 class PTaskArguments : public IMemoryObject
 {
 	friend class PTask;
-	struct PArgumentData
+	struct HArgumentData
 	{
 		JGType Type;
-		PList<byte> BtData;
+		HList<int8> BtData;
 
-		PArgumentData(const JGType& type, const PList<byte>& btData)
+		HArgumentData(const JGType& type, const HList<int8>& btData)
 			: Type(type)
 			, BtData(btData) {}
 	};
 
-	PList<PArgumentData> _argumentDatas;
+	HList<HArgumentData> _argumentDatas;
 
 	PTaskArguments() = default;
 
@@ -35,7 +35,7 @@ public:
 			return false;
 		}
 
-		const PArgumentData& argData = _argumentDatas[index];
+		const HArgumentData& argData = _argumentDatas[index];
 		if (argData.BtData.size() != argData.Type.GetSize())
 		{
 			return false;
@@ -60,7 +60,7 @@ private:
 	template<class T>
 	void add(const T& value)
 	{
-		PList<byte> btData;
+		HList<int8> btData;
 		btData.resize(sizeof(T));
 
 		memcpy(btData.data(), &value, sizeof(T));
@@ -88,7 +88,7 @@ private:
 	PTaskArguments _taskArguments;
 	PTaskDelegate  _taskDelegate;
 
-	AtomicBool _bIsRunning;
+	HAtomicBool _bIsRunning;
 private:
 	PTask();
 
@@ -109,6 +109,16 @@ public:
 	}
 
 	void DoTask();
+
+public:
+	template<class ... Args>
+	PSharedPtr<PTask> Create(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	{
+		PSharedPtr<PTask> task = Allocate<PTask>();
+		task->Bind(PTaskDelegate::Create(refObject, func), args...);
+
+		return task;
+	}
 };
 
 

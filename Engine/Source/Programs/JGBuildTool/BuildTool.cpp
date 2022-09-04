@@ -55,7 +55,7 @@ const PArguments& PBuildTool::getArguments() const
 	return _arguments;
 }
 
-bool PBuildTool::collectionModuleInfos(const PString& workDir, const PHashSet<PString>& workCategories, PHashMap<PString, PList<PModuleInfo>>& outModuleInfoMap)
+bool PBuildTool::collectionModuleInfos(const PString& workDir, const HHashSet<PString>& workCategories, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap)
 {
 	if (PFileHelper::Exists(workDir) == false)
 	{
@@ -64,7 +64,7 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const PHashSet<PS
 		return false;
 	}
 
-	PList<PString> workCategoies;
+	HList<PString> workCategoies;
 	PFileHelper::FileListInDirectory(workDir, &workCategoies);
 
 	for (const PString& categoryPath : workCategoies)
@@ -93,9 +93,9 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const PHashSet<PS
 	}
 
 	uint64 totalCount = 0;
-	PHashMap<PString, uint64> moduleCountMap;
+	HHashMap<PString, uint64> moduleCountMap;
 
-	for (const PPair<PString, PList<PModuleInfo>>& pair : outModuleInfoMap)
+	for (const HPair<PString, HList<PModuleInfo>>& pair : outModuleInfoMap)
 	{
 		moduleCountMap[pair.first] = 0;
 
@@ -112,7 +112,7 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const PHashSet<PS
 		JG_LOG(BuildTool, ELogLevel::Trace, "----------------------------------------------------");
 	}
 
-	for (const PPair<PString, uint64>& pair : moduleCountMap)
+	for (const HPair<PString, uint64>& pair : moduleCountMap)
 	{
 		JG_LOG(BuildTool, ELogLevel::Trace, "%s: %d", pair.first, pair.second);
 	}
@@ -122,9 +122,9 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const PHashSet<PS
 	return true;
 }
 
-void PBuildTool::collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, PHashMap<PString, PList<PModuleInfo>>& outModuleInfoMap)
+void PBuildTool::collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap)
 {
-	PList<PString> modulePathList;
+	HList<PString> modulePathList;
 	PFileHelper::FileListInDirectory(inCategoryPath, &modulePathList);
 
 	PString moduleInfoFileName;
@@ -196,12 +196,12 @@ bool PBuildTool::generateBuildScript()
 	return true;
 }
 
-bool PBuildTool::generateBuildScriptInternal(const PHashMap<PString, PList<PModuleInfo>>& moduleInfoMap, const PString& inGroupName, PString& outScript)
+bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModuleInfo>>& moduleInfoMap, const PString& inGroupName, PString& outScript)
 {
 	const PArguments& arguments = getArguments();
 
 	outScript = PString();
-	for (const PPair<PString, PList<PModuleInfo>>& pair : moduleInfoMap)
+	for (const HPair<PString, HList<PModuleInfo>>& pair : moduleInfoMap)
 	{
 		outScript.Append("\t\t");
 
@@ -364,7 +364,7 @@ bool PBuildTool::findModuleInfo(const PString& modulePath, PModuleInfo* outModul
 
 	const PArguments& arguments = getArguments();
 
-	PList<PString> fileListInModule;
+	HList<PString> fileListInModule;
 	PFileHelper::FileListInDirectory(modulePath, &fileListInModule);
 
 	PString moduleName;
@@ -380,7 +380,7 @@ bool PBuildTool::findModuleInfo(const PString& modulePath, PModuleInfo* outModul
 		PString fileName;
 		PFileHelper::FileName(filePath, &fileName);
 
-		PList<PString> split = fileName.Split('.');
+		HList<PString> split = fileName.Split('.');
 		if (split.empty() == false && split.size() == 3)
 		{
 			PString fileExtension         = split[2];

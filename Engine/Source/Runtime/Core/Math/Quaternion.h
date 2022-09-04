@@ -2,48 +2,48 @@
 #include "Math.h"
 #include <DirectXMath.h>
 
-class PVector3;
-class PMatrix;
-class PQuaternion
+class HVector3;
+class HMatrix;
+class HQuaternion
 {
-	friend PMatrix;
+	friend HMatrix;
 
 public:
 	float32 x, y, z, w;
 
 public:
-	PQuaternion(const PVector3& v);
-	PQuaternion(float32 pitch, float32 yaw, float32 roll);
-	PQuaternion(float32 x = 0.0f, float32 y = 0.0f, float32 z = 0.0f, float32 w = 0.0f) 
+	HQuaternion(const HVector3& v);
+	HQuaternion(float32 pitch, float32 yaw, float32 roll);
+	HQuaternion(float32 x = 0.0f, float32 y = 0.0f, float32 z = 0.0f, float32 w = 0.0f) 
 		: x(x), y(y), z(z), w(w) {}
 
-	PQuaternion(const PQuaternion& copy) = default;
+	HQuaternion(const HQuaternion& copy) = default;
 
-	PQuaternion& operator=(const PQuaternion& q)
+	HQuaternion& operator=(const HQuaternion& q)
 	{
 		x = q.x;  y = q.y;  z = q.z; w = q.w;
 		return *this;
 	}
 
-	PQuaternion operator*(const PQuaternion& q) const
+	HQuaternion operator*(const HQuaternion& q) const
 	{
-		PQuaternion result;
+		HQuaternion result;
 		result.SetSIMD(DirectX::XMQuaternionMultiply(GetSIMD(), q.GetSIMD()));
 		return result;
 	}
 
-	PQuaternion& operator*=(const PQuaternion& q)
+	HQuaternion& operator*=(const HQuaternion& q)
 	{
 		SetSIMD(DirectX::XMQuaternionMultiply(GetSIMD(), q.GetSIMD()));
 		return *this;
 	}
 
-	bool operator==(const PQuaternion& q) const
+	bool operator==(const HQuaternion& q) const
 	{
 		return DirectX::XMQuaternionEqual(GetSIMD(), q.GetSIMD());
 	}
 
-	bool operator!=(const PQuaternion& q) const
+	bool operator!=(const HQuaternion& q) const
 	{
 		return !DirectX::XMQuaternionEqual(GetSIMD(), q.GetSIMD());
 	}
@@ -80,46 +80,46 @@ public:
 		return x;
 	}
 
-	static PQuaternion ToQuaternion(const PVector3& euler);
-	static PQuaternion ToQuaternion(float32 pitch, float32 yaw, float32 roll);
+	static HQuaternion ToQuaternion(const HVector3& euler);
+	static HQuaternion ToQuaternion(float32 pitch, float32 yaw, float32 roll);
 
-	static PQuaternion Identity()
+	static HQuaternion Identity()
 	{
-		PQuaternion q;
+		HQuaternion q;
 		q.SetSIMD(DirectX::XMQuaternionIdentity());
 		return q;
 	}
 
-	static PQuaternion Inverse(const PQuaternion& q)
+	static HQuaternion Inverse(const HQuaternion& q)
 	{
-		PQuaternion result;
+		HQuaternion result;
 		result.SetSIMD(DirectX::XMQuaternionInverse(q.GetSIMD()));
 		return result;
 	}
 
-	static PQuaternion Normalize(const PQuaternion& q)
+	static HQuaternion Normalize(const HQuaternion& q)
 	{
-		PQuaternion result;
+		HQuaternion result;
 		result.SetSIMD(DirectX::XMQuaternionNormalize(q.GetSIMD()));
 		return result;
 	}
 
-	static PQuaternion Slerp(const PQuaternion& q1, const PQuaternion& q2, float32 t)
+	static HQuaternion Slerp(const HQuaternion& q1, const HQuaternion& q2, float32 t)
 	{
-		PQuaternion result;
+		HQuaternion result;
 		result.SetSIMD(DirectX::XMQuaternionSlerp(q1.GetSIMD(), q2.GetSIMD(), t));
 		return result;
 	}
 
-	static PVector3 ToEuler(const PQuaternion& q);
+	static HVector3 ToEuler(const HQuaternion& q);
 
-	static PQuaternion RotationRollPitchYawFromVector(const PVector3& angles);
+	static HQuaternion RotationRollPitchYawFromVector(const HVector3& angles);
 
-	static void ToAxisAngle(PVector3& out_axis, float32& out_angle, const PQuaternion& q);
+	static void ToAxisAngle(HVector3& out_axis, float32& out_angle, const HQuaternion& q);
 
-	static PQuaternion RotatationAxis(const PVector3& axis, float32 angle);
+	static HQuaternion RotatationAxis(const HVector3& axis, float32 angle);
 
-	static PQuaternion FromTwoVectors(const PVector3& u, const PVector3& v);
+	static HQuaternion FromTwoVectors(const HVector3& u, const HVector3& v);
 
 private:
 	DirectX::XMVECTOR GetSIMD() const

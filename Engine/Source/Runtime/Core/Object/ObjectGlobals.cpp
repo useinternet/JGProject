@@ -3,10 +3,10 @@
 #include "ObjectGlobalSystem.h"
 
 
-PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const PList<PPair<PName, PString>>& pairList)
+PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const HList<HPair<PName, PString>>& pairList)
 {
 	PSharedPtr<JGMeta> result = Allocate<JGMeta>();
-	for (const PPair<PName, PString>& pair : pairList)
+	for (const HPair<PName, PString>& pair : pairList)
 	{
 		result->MetaDataMap.emplace(pair.first, pair.second);
 	}
@@ -24,7 +24,7 @@ PSharedPtr<JGProperty> PObjectGlobalsPrivateUtils::MakeStaticProperty(const JGTy
 	return result;
 }
 
-PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const PList<PSharedPtr<JGProperty>>& args, PSharedPtr<JGMeta> metaData)
+PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGFunction> result = Allocate<JGFunction>();
 	result->Return    = returnProperty;
@@ -35,7 +35,7 @@ PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PStr
 	return result;
 }
 
-PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStaticStruct(const JGType& type, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
+PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStaticStruct(const JGType& type, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGStruct> result = Allocate<JGStruct>();
 	result->Type = Allocate<JGType>(type);
@@ -46,7 +46,7 @@ PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStaticStruct(const JGType& 
 	return result;
 }
 
-PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
+PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGClass> result = Allocate<JGClass>();
 	result->Type = Allocate<JGType>(type);
@@ -62,7 +62,7 @@ PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& ty
 	return result;
 }
 
-PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
+PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGInterface> result = Allocate<JGInterface>();
 	result->Type = Allocate<JGType>(type);
@@ -127,7 +127,7 @@ bool JGFunction::IsBound() const
 	return true;
 }
 
-bool JGFunction::checkArgsType(const PList<JGType>& compareArgsList)
+bool JGFunction::checkArgsType(const HList<JGType>& compareArgsList)
 {
 	int32 count = (int32)Arguments.size();
 	for (int32 i = 0; i < count; ++i)
@@ -197,12 +197,12 @@ PSharedPtr<JGFunction> JGField::FindFunction(const PName& name) const
 	return Functions[index];
 }
 
-const PList<PSharedPtr<JGProperty>>& JGField::GetPropertyList() const
+const HList<PSharedPtr<JGProperty>>& JGField::GetPropertyList() const
 {
 	return Properties;
 }
 
-const PList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
+const HList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
 {
 	return Functions;
 }

@@ -4,7 +4,7 @@
 
 PString::PString(char inChar)
 {
-	PRawString str;
+	HRawString str;
 	str.resize(1);
 	str[0] = inChar;
 
@@ -23,7 +23,7 @@ PString::PString(const wchar_t* string)
 
 PString& PString::operator=(const char inChar)
 {
-	PRawString str;
+	HRawString str;
 	str.resize(1);
 	str[0] = inChar;
 
@@ -154,7 +154,7 @@ uint64 PString::FindLastOf(const PString& pattern, uint64 offset, uint64 order) 
 	uint64 cnt = 0;
 	uint64 result = PString::NPOS;
 
-	offset = PMath::Min(_rawString.length() - 1, offset);
+	offset = HMath::Min(_rawString.length() - 1, offset);
 
 	while (cnt < order)
 	{
@@ -172,13 +172,13 @@ uint64 PString::FindLastOf(const PString& pattern, uint64 offset, uint64 order) 
 	return result;
 }
 
-PList<PString> PString::Split(char delimiter) const
+HList<PString> PString::Split(char delimiter) const
 {
-	PList<PString> result;
+	HList<PString> result;
 	std::stringstream ss(_rawString);
 
 
-	PRawString tmp;
+	HRawString tmp;
 
 	while (std::getline(ss, tmp, delimiter)) {
 		result.push_back(PString(tmp.c_str()));
@@ -268,28 +268,28 @@ const char* PString::GetCStr() const
 	return GetRawString().c_str();
 }
 
-const PRawString& PString::GetRawString() const
+const HRawString& PString::GetRawString() const
 {
 	return _rawString;
 }
 
-const PRawWString& PString::GetRawWString() const
+const HRawWString& PString::GetRawWString() const
 {
-	static PRawWString result = L"";
+	static HRawWString result = L"";
 	return result;
 }
 
-void PString::setString(const PRawString& string)
+void PString::setString(const HRawString& string)
 {
 	_rawString = string;
 	updateHashCode();
 }
-void PString::setWString(const PRawWString& string)
+void PString::setWString(const HRawWString& string)
 {
 	JG_ASSERT(false && "not impl setwstring");
 }
 
 void PString::updateHashCode()
 {
-	_stringCode = PHash::Hash<PRawString>(_rawString);
+	_stringCode = PHash::Hash<HRawString>(_rawString);
 }

@@ -156,7 +156,7 @@ bool PFileHelper::FileExtension(const PString& inPath, PString* outStr)
 	return true;
 }
 
-void PFileHelper::FileListInDirectory(const PString& inDir, PList<PString>* outFileList)
+void PFileHelper::FileListInDirectory(const PString& inDir, HList<PString>* outFileList)
 {
 	if (outFileList == nullptr)
 	{

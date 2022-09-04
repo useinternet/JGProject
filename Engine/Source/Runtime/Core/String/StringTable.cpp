@@ -18,7 +18,7 @@ void GStringTable::Update()
 	removeOldStringInfos(_removeCountPerFrame);
 }
 
-void GStringTable::RegisterString(const PString& str, uint64* outID, AtomicInt32** outRefCount)
+void GStringTable::RegisterString(const PString& str, uint64* outID, HAtomicInt32** outRefCount)
 {
 	if (outID == nullptr || outRefCount == nullptr)
 	{
@@ -31,16 +31,16 @@ void GStringTable::RegisterString(const PString& str, uint64* outID, AtomicInt32
 		return;
 	}
 
-	PStringInfo* pStringInfo = nullptr;
+	HStringInfo* pStringInfo = nullptr;
 	{
-		PLockGuard<PMutex> lock(_mutex);
+		HLockGuard<HMutex> lock(_mutex);
 		if (_stringInfoMap.find(hashCode) == _stringInfoMap.end())
 		{
-			PStringInfo info;
+			HStringInfo info;
 			info.ID   = hashCode;
 			info.Str  = str.GetRawString();
 			info.WStr = s2ws(info.Str);
-			info.RefCount = std::make_unique<AtomicInt32>();
+			info.RefCount = std::make_unique<HAtomicInt32>();
 			_stringInfoMap[hashCode] = std::move(info);
 			_stringIDQueue.push(info.ID);
 		}
@@ -63,7 +63,7 @@ bool GStringTable::FindString(uint64 ID, PString* outStr)  const
 		*outStr = NULL_STR.c_str();
 	}
 
-	PRawString result;
+	HRawString result;
 	if (FindRawString(ID, &result) == true)
 	{
 		if (outStr != nullptr)
@@ -76,14 +76,14 @@ bool GStringTable::FindString(uint64 ID, PString* outStr)  const
 
 	return false;
 }
-bool GStringTable::FindRawString(uint64 ID, PRawString* outStr) const
+bool GStringTable::FindRawString(uint64 ID, HRawString* outStr) const
 {
 	if (outStr != nullptr)
 	{
 		*outStr = NULL_STR;
 	}
 
-	const PStringInfo* pInfo = findStringInfo(ID);
+	const HStringInfo* pInfo = findStringInfo(ID);
 	if (pInfo == nullptr)
 	{
 		return false;
@@ -96,14 +96,14 @@ bool GStringTable::FindRawString(uint64 ID, PRawString* outStr) const
 
 	return true;
 }
-bool GStringTable::FindRawWString(uint64 ID, PRawWString* outStr) const
+bool GStringTable::FindRawWString(uint64 ID, HRawWString* outStr) const
 {
 	if (outStr != nullptr)
 	{
 		*outStr = NULL_WSTR;
 	}
 
-	const PStringInfo* pInfo = findStringInfo(ID);
+	const HStringInfo* pInfo = findStringInfo(ID);
 	if (pInfo == nullptr)
 	{
 		return false;
@@ -122,14 +122,14 @@ void GStringTable::Flush()
 	removeOldStringInfos(-1);
 }
 
-const GStringTable::PStringInfo* GStringTable::findStringInfo(uint64 id) const
+const GStringTable::HStringInfo* GStringTable::findStringInfo(uint64 id) const
 {
 	if (id == NULL_ID)
 	{
 		return nullptr;
 	}
 
-	PLockGuard<PMutex> lock(_mutex);
+	HLockGuard<HMutex> lock(_mutex);
 
 	auto iter = _stringInfoMap.find(id);
 	if (iter == _stringInfoMap.end())
@@ -142,7 +142,7 @@ const GStringTable::PStringInfo* GStringTable::findStringInfo(uint64 id) const
 
 void GStringTable::removeOldStringInfos(int32 removeCountPerFrame)
 {
-	PLockGuard<PMutex> lock(_mutex);
+	HLockGuard<HMutex> lock(_mutex);
 
 	bool bIsFlush = false;
 
@@ -162,7 +162,7 @@ void GStringTable::removeOldStringInfos(int32 removeCountPerFrame)
 
 		uint64 ID = _stringIDQueue.front(); _stringIDQueue.pop();
 
-		PStringInfo& infoRef  = _stringInfoMap[ID];
+		HStringInfo& infoRef  = _stringInfoMap[ID];
 		uint64		 refCount = *infoRef.RefCount;
 		if (refCount == 0)
 		{
@@ -182,7 +182,7 @@ void GStringTable::removeOldStringInfos(int32 removeCountPerFrame)
 	}
 }
 
-PRawWString GStringTable::s2ws(const PRawString& str) const
+HRawWString GStringTable::s2ws(const HRawString& str) const
 {
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
@@ -190,7 +190,7 @@ PRawWString GStringTable::s2ws(const PRawString& str) const
 	return converterX.from_bytes(str);
 }
 
-PRawString GStringTable::ws2s(const PRawWString& wstr) const
+HRawString GStringTable::ws2s(const HRawWString& wstr) const
 {
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;

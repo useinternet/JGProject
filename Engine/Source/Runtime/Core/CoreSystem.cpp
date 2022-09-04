@@ -7,8 +7,8 @@
 #include <crtdbg.h>
 
 GCoreSystem* GCoreSystem::Instance = nullptr;
-PHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
-PList<ThreadID> GCoreSystem::ThreadIDList;
+HHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
+HList<ThreadID> GCoreSystem::ThreadIDList;
 
 bool GCoreSystem::Create(ECoreSystemFlags flags)
 {
@@ -48,7 +48,7 @@ bool GCoreSystem::Create(ECoreSystemFlags flags)
 		}
 	}
 
-	for (const PPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	for (const HPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
 	{
 		pair.second->Start();
 	}
@@ -57,7 +57,7 @@ bool GCoreSystem::Create(ECoreSystemFlags flags)
 }
 void GCoreSystem::Update()
 {
-	for (PPair<const uint64, GGlobalSystemInstanceBase*>& pair : SystemInstancePool)
+	for (HPair<const uint64, GGlobalSystemInstanceBase*>& pair : SystemInstancePool)
 	{
 		pair.second->Update();
 	}
@@ -69,7 +69,7 @@ void GCoreSystem::Destroy()
 		return;
 	}
 
-	for (const PPair< uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	for (const HPair< uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
 	{
 		pair.second->Destroy();
 	}
@@ -86,7 +86,7 @@ void GCoreSystem::Destroy()
 
 	delete Instance;
 	Instance = nullptr;
-
+	int* ss = new int;
 #if _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif // _DEBUG
@@ -99,15 +99,15 @@ uint32 GCoreSystem::GetThreadCount()
 	return threadCount;
 }
 
-PList<ThreadID> GCoreSystem::GetAllThreadIDs()
+HList<ThreadID> GCoreSystem::GetAllThreadIDs()
 {
 	return ThreadIDList;
 }
 
 void GCoreSystem::collectionThreadIDs()
 {
-	PList<std::thread> tempThreads;
-	PMutex tempMutex;
+	HList<std::thread> tempThreads;
+	HMutex tempMutex;
 
 
 	uint32 threadCount = GetThreadCount();
@@ -117,7 +117,7 @@ void GCoreSystem::collectionThreadIDs()
 	{
 		tempThreads[i] = std::thread([&]()
 		{
-			PLockGuard<PMutex> lock(tempMutex);
+			HLockGuard<HMutex> lock(tempMutex);
 			ThreadIDList.push_back(std::hash<std::thread::id>()(std::this_thread::get_id()));
 		});
 	}

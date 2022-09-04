@@ -1,9 +1,9 @@
 #pragma once
 #include "Vector.h"
 
-class PRay
+class HRay
 {
 public:
-	PVector3 origin;
-	PVector3 dir;
+	HVector3 origin;
+	HVector3 dir;
 };

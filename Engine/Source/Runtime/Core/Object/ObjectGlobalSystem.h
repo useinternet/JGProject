@@ -48,11 +48,11 @@ class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
 	friend class GCoreSystem;
 private:
-	PHashMap<PName, uint64> _typeIDMap;
+	HHashMap<PName, uint64> _typeIDMap;
 
-	PHashMap<uint64, PSharedPtr<JGClass>>  _classMap;
-	PHashMap<uint64, PSharedPtr<JGStruct>> _structMap;
-	PHashMap<uint64, PSharedPtr<JGEnum>>   _enumMap;
+	HHashMap<uint64, PSharedPtr<JGClass>>  _classMap;
+	HHashMap<uint64, PSharedPtr<JGStruct>> _structMap;
+	HHashMap<uint64, PSharedPtr<JGEnum>>   _enumMap;
 public:
 	virtual ~GObjectGlobalSystem() = default;
 

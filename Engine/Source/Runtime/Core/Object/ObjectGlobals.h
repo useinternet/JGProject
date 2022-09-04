@@ -27,12 +27,12 @@ class PObjectGlobalsPrivateUtils
 {
 	using address = uint64;
 public:
-	static PSharedPtr<JGMeta>     MakeStaticMeta(const PList<PPair<PName, PString>>& pairList);
+	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, PString>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const PList<PSharedPtr<JGProperty>>& args = PList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGStruct>   MakeStaticStruct(const JGType& type, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGProperty>>& properties, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const PList<JGType>& virtualTypeList, const PList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args = HList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGStruct>   MakeStaticStruct(const JGType& type, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 
 	template<class T>
 	static PSharedPtr<JGStruct> MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct);
@@ -126,7 +126,7 @@ class JGMeta : public JGObject
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	PHashMap<PName, PString> MetaDataMap;
+	HHashMap<PName, PString> MetaDataMap;
 };
 
 class JGProperty : public JGObject
@@ -197,7 +197,7 @@ class JGFunction : public JGObject
 protected:
 	PSharedPtr<JGMeta>			  MetaData;
 	PSharedPtr<JGProperty>		  Return;
-	PList<PSharedPtr<JGProperty>> Arguments;
+	HList<PSharedPtr<JGProperty>> Arguments;
 
 	PWeakPtr<JGObject> OwnerObject;
 	PSharedPtr<IDelegateInstanceBase> FunctionReference;
@@ -217,7 +217,7 @@ public:
 	}
 
 private:
-	bool checkArgsType(const PList<JGType>& compareArgsList);
+	bool checkArgsType(const HList<JGType>& compareArgsList);
 	bool checkRetType(JGType compareRetType);
 
 };
@@ -227,11 +227,11 @@ class JGField : public JGObject
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	PList<PSharedPtr<JGProperty>> Properties;
-	PList<PSharedPtr<JGFunction>> Functions;
+	HList<PSharedPtr<JGProperty>> Properties;
+	HList<PSharedPtr<JGFunction>> Functions;
 
-	PHashMap<PName, uint64> PropertyMap;
-	PHashMap<PName, uint64> FunctionMap;
+	HHashMap<PName, uint64> PropertyMap;
+	HHashMap<PName, uint64> FunctionMap;
 
 public:
 	JGField();
@@ -270,8 +270,8 @@ public:
 
 	PSharedPtr<JGFunction> FindFunction(const PName& name) const;
 
-	const PList<PSharedPtr<JGProperty>>& GetPropertyList() const;
-	const PList<PSharedPtr<JGFunction>>& GetFunctionList() const;
+	const HList<PSharedPtr<JGProperty>>& GetPropertyList() const;
+	const HList<PSharedPtr<JGFunction>>& GetFunctionList() const;
 };
 
 /* Struct 정보
@@ -302,7 +302,7 @@ class JGEnum : public JGObject
 	friend GObjectGlobalSystem;
 protected:
 	PSharedPtr<JGType>  Type;
-	PHashMap<uint64, PSharedPtr<JGMeta>>  MetaDataMap;
+	HHashMap<uint64, PSharedPtr<JGMeta>>  MetaDataMap;
 public:
 	JGEnum();
 	virtual ~JGEnum() = default;
@@ -323,7 +323,7 @@ class JGClass : public JGStruct
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	PHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
+	HHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGClass();
@@ -342,7 +342,7 @@ class JGInterface : public JGStruct
 	friend GObjectGlobalSystem;
 
 public:
-	PHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
+	HHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGInterface();
@@ -370,7 +370,7 @@ inline PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStruct(const T* from
 
 		property->DataPtr = (void*)rawAddr;
 
-		rawAddr += PMath::Align<int64>((int64)type->GetSize(), JG_MEMORY_OFFSET);
+		rawAddr += HMath::Align<int64>((int64)type->GetSize(), JG_MEMORY_OFFSET);
 	}
 
 	int32 functionCount = (int32)staticStruct->Functions.size();

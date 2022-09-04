@@ -20,7 +20,7 @@ class PName : public IMemoryObject
 {
 	uint64 _id = NAME_NONE;
 
-	AtomicInt32* _pRefCount = nullptr;
+	HAtomicInt32* _pRefCount = nullptr;
 public:
 	PName();
 	PName(uint64 id);

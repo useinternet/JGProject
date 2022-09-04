@@ -3,22 +3,22 @@
 #include "String/String.h"
 #include <DirectXMath.h>
 
-class PVector3;
-class PVector4;
-class PQuaternion;
+class HVector3;
+class HVector4;
+class HQuaternion;
 
-class PMatrix
+class HMatrix
 {
-	friend PVector3;
+	friend HVector3;
 	using SimMat = DirectX::XMMATRIX;
 
 private:
 	DirectX::XMFLOAT4X4 m_Data;
 
 public:
-	PMatrix();
-	PMatrix(float32 init_value);
-	PMatrix(
+	HMatrix();
+	HMatrix(float32 init_value);
+	HMatrix(
 		float32 _11, float32 _12, float32 _13, float32 _14,
 		float32 _21, float32 _22, float32 _23, float32 _24,
 		float32 _31, float32 _32, float32 _33, float32 _34,
@@ -28,20 +28,20 @@ public:
 			_31, _32, _33, _34,
 			_41, _42, _43, _44) {}
 
-	PMatrix(float32 w,
-		const PVector3& v1,
-		const PVector3& v2,
-		const PVector3& v3,
-		const PVector3& v4);
+	HMatrix(float32 w,
+		const HVector3& v1,
+		const HVector3& v2,
+		const HVector3& v3,
+		const HVector3& v4);
 
-	PMatrix(
-		const PVector3& v1, float32 w1,
-		const PVector3& v2, float32 w2,
-		const PVector3& v3, float32 w3,
-		const PVector3& v4, float32 w4);
+	HMatrix(
+		const HVector3& v1, float32 w1,
+		const HVector3& v2, float32 w2,
+		const HVector3& v3, float32 w3,
+		const HVector3& v4, float32 w4);
 
-	PMatrix(const PMatrix& copy) = default;
-	PMatrix(PMatrix&& rhs) = default;
+	HMatrix(const HMatrix& copy) = default;
+	HMatrix(HMatrix&& rhs) = default;
 
 	float32* GetFloatPtr() const 
 	{
@@ -49,102 +49,102 @@ public:
 	}
 
 public: // ¿¬»êÀÚ
-	PMatrix& operator=(const PMatrix& rhs) = default;
-	PMatrix& operator=(PMatrix&& rhs)	   = default;
+	HMatrix& operator=(const HMatrix& rhs) = default;
+	HMatrix& operator=(HMatrix&& rhs)	   = default;
 
-	PMatrix operator*(const PMatrix& m) const 
+	HMatrix operator*(const HMatrix& m) const 
 	{
-		PMatrix result;
+		HMatrix result;
 		DirectX::XMMATRIX sim_result = DirectX::XMMatrixMultiply(GetSIMD(), m.GetSIMD());
 		result.SetSIMD(sim_result);
 		return result;
 	}
 
-	PMatrix& operator*=(const PMatrix& m) 
+	HMatrix& operator*=(const HMatrix& m) 
 	{
 		DirectX::XMMATRIX sim_result = DirectX::XMMatrixMultiply(GetSIMD(), m.GetSIMD());
 		SetSIMD(sim_result);
 		return *this;
 	}
 
-	PMatrix operator*(float32 k)  const 
+	HMatrix operator*(float32 k)  const 
 	{
-		PMatrix m2(k);
+		HMatrix m2(k);
 		return (*this) * m2;
 	}
 
-	PMatrix& operator*=(float32 k) 
+	HMatrix& operator*=(float32 k) 
 	{
-		PMatrix m2(k);
+		HMatrix m2(k);
 		(*this) *= m2;
 		return *this;
 	}
 
-	PVector3 TransformPoint(const PVector3& v)  const;
-	PVector3 TransformVector(const PVector3& v) const;
-	PVector4 Transform(const PVector4& v)       const;
+	HVector3 TransformPoint(const HVector3& v)  const;
+	HVector3 TransformVector(const HVector3& v) const;
+	HVector4 Transform(const HVector4& v)       const;
 
-	bool Decompose(PVector3* T, PQuaternion* R, PVector3* S) const;
+	bool Decompose(HVector3* T, HQuaternion* R, HVector3* S) const;
 
 public:
-	static PMatrix Identity() 
+	static HMatrix Identity() 
 	{
-		PMatrix m;
+		HMatrix m;
 		m.SetSIMD(DirectX::XMMatrixIdentity());
 		return m;
 	}
 
-	static PMatrix Inverse(const PMatrix& m) 
+	static HMatrix Inverse(const HMatrix& m) 
 	{
-		PMatrix result;
+		HMatrix result;
 		DirectX::XMVECTOR sim_det = DirectX::XMMatrixDeterminant(m.GetSIMD());
 		DirectX::XMMATRIX sim_mat = DirectX::XMMatrixInverse(&sim_det, m.GetSIMD());
 		result.SetSIMD(sim_mat);
 		return result;
 	}
 
-	static PMatrix Transpose(const PMatrix& m) 
+	static HMatrix Transpose(const HMatrix& m) 
 	{
-		PMatrix result;
+		HMatrix result;
 		result.SetSIMD(DirectX::XMMatrixTranspose(m.GetSIMD()));
 		return result;
 	}
 
-	static PMatrix Translation(const PVector3& v);
-	static PMatrix Rotation(const PVector3& v);
-	static PMatrix RotationYaw(float32 yaw);
-	static PMatrix RotationPitch(float32 pitch);
-	static PMatrix RotationRoll(float32 roll);
-	static PMatrix Rotation(const PQuaternion& q);
-	static PMatrix RotationAxis(const PVector3& axis, float32 angle);
-	static PMatrix Scaling(const PVector3& v);
-	static PMatrix LookAtLH(const PVector3& pos, const PVector3& target, const PVector3& up);
-	static PMatrix LookToLH(const PVector3& pos, const PVector3& targetDir, const PVector3& up);
-	static PMatrix LookToLH(const PVector3& pos, const PVector3& up, const PVector3& right, const PVector3& look);
-	static PVector3 ToEulerAngles(const PMatrix& m);
+	static HMatrix Translation(const HVector3& v);
+	static HMatrix Rotation(const HVector3& v);
+	static HMatrix RotationYaw(float32 yaw);
+	static HMatrix RotationPitch(float32 pitch);
+	static HMatrix RotationRoll(float32 roll);
+	static HMatrix Rotation(const HQuaternion& q);
+	static HMatrix RotationAxis(const HVector3& axis, float32 angle);
+	static HMatrix Scaling(const HVector3& v);
+	static HMatrix LookAtLH(const HVector3& pos, const HVector3& target, const HVector3& up);
+	static HMatrix LookToLH(const HVector3& pos, const HVector3& targetDir, const HVector3& up);
+	static HMatrix LookToLH(const HVector3& pos, const HVector3& up, const HVector3& right, const HVector3& look);
+	static HVector3 ToEulerAngles(const HMatrix& m);
 
-	static PMatrix PerspectiveFovLH(float32 fov, float32 aspectRatio, float32 nearZ, float32 farZ)
+	static HMatrix PerspectiveFovLH(float32 fov, float32 aspectRatio, float32 nearZ, float32 farZ)
 	{
-		PMatrix result;
+		HMatrix result;
 		result.SetSIMD(DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ));
 		return result;
 	}
 
-	static PMatrix OrthographicLH(float32 width, float32 height, float32 nearZ, float32 farZ)
+	static HMatrix OrthographicLH(float32 width, float32 height, float32 nearZ, float32 farZ)
 	{
-		PMatrix result;
+		HMatrix result;
 		result.SetSIMD(DirectX::XMMatrixOrthographicLH(width, height, nearZ, farZ));
 		return result;
 	}
 
-	static PMatrix OrthographicOffCenterLH(float32 left, float32 right, float32 bottom, float32 top, float32 nearZ, float32 farZ)
+	static HMatrix OrthographicOffCenterLH(float32 left, float32 right, float32 bottom, float32 top, float32 nearZ, float32 farZ)
 	{
-		PMatrix result;
+		HMatrix result;
 		result.SetSIMD(DirectX::XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nearZ, farZ));
 		return result;
 	}
 
-	static PMatrix AffineTransformation(const PVector3& T, const PQuaternion& Quat, const PVector3& S);
+	static HMatrix AffineTransformation(const HVector3& T, const HQuaternion& Quat, const HVector3& S);
 
 public:
 	float32& Get(int32 col, int32 row) 
@@ -182,7 +182,7 @@ private:
 	}
 };
 
-inline PMatrix operator*(float32 k, const PMatrix& m)
+inline HMatrix operator*(float32 k, const HMatrix& m)
 {
 	return m * k;
 }

@@ -8,19 +8,19 @@ class PString;
 
 class GStringTable : public GGlobalSystemInstance<GStringTable>
 {
-	const PRawString    NULL_STR  = "(null)";
-	const PRawWString   NULL_WSTR = L"(null)";
+	const HRawString    NULL_STR  = "(null)";
+	const HRawWString   NULL_WSTR = L"(null)";
 
-	struct PStringInfo
+	struct HStringInfo
 	{
 		uint64 ID = NULL_ID;
 		uint64 FrameCount = 0;
-		PRawString  Str;
-		PRawWString WStr;
-		std::unique_ptr<AtomicInt32> RefCount;
+		HRawString  Str;
+		HRawWString WStr;
+		std::unique_ptr<HAtomicInt32> RefCount;
 
-		PStringInfo() = default;
-		PStringInfo(const PRawString& str, const PRawWString& wstr)
+		HStringInfo() = default;
+		HStringInfo(const HRawString& str, const HRawWString& wstr)
 			: ID(NULL_ID)
 			, Str(str)
 			, WStr(wstr) {}
@@ -29,11 +29,11 @@ class GStringTable : public GGlobalSystemInstance<GStringTable>
 	int32 _stringInfoLifeFrameCount;
 	int32 _removeCountPerFrame;
 
-	PHashMap<uint64, PStringInfo> _stringInfoMap;
-	PQueue<uint64> _stringIDQueue;
+	HHashMap<uint64, HStringInfo> _stringInfoMap;
+	HQueue<uint64> _stringIDQueue;
 	
 
-	mutable PMutex _mutex;
+	mutable HMutex _mutex;
 
 public:
 	GStringTable(int32 removeCountPerFrame = 1, int32 stringInfoLifeFrameCount = JG_INT32_MAX);
@@ -43,18 +43,18 @@ protected:
 	virtual void Update() override;
 
 public:
-	void RegisterString(const PString& str, uint64* outID, AtomicInt32** outRefCount);
+	void RegisterString(const PString& str, uint64* outID, HAtomicInt32** outRefCount);
 
 	bool FindString(uint64 ID, PString* outStr)  const;
-	bool FindRawString(uint64 ID, PRawString* outStr) const;
-	bool FindRawWString(uint64 ID, PRawWString* OutStr) const;
+	bool FindRawString(uint64 ID, HRawString* outStr) const;
+	bool FindRawWString(uint64 ID, HRawWString* OutStr) const;
 
 	void Flush();
 
 private:
-	const PStringInfo* findStringInfo(uint64 id) const;
+	const HStringInfo* findStringInfo(uint64 id) const;
 	void removeOldStringInfos(int32 removeCountPerFrame);
 
-	PRawWString s2ws(const PRawString& str) const;
-	PRawString ws2s(const PRawWString& wstr) const;
+	HRawWString s2ws(const HRawString& str) const;
+	HRawString ws2s(const HRawWString& wstr) const;
 };

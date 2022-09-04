@@ -4,7 +4,7 @@
 #include "BBox.h"
 #include "Matrix.h"
 
-class PFrustum
+class HFrustum
 {
 public:
 	enum
@@ -19,12 +19,12 @@ public:
 	};
 
 
-	mutable PPlane Plane[Count];
+	mutable HPlane Plane[Count];
 
 public:
-	PFrustum() = default;
-	PFrustum(const PMatrix& invViewProj) noexcept;
+	HFrustum() = default;
+	HFrustum(const HMatrix& invViewProj) noexcept;
 
 public:
-	bool IntersectBBox(const PBBox& b) const;
+	bool IntersectBBox(const HBBox& b) const;
 };

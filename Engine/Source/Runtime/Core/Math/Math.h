@@ -7,15 +7,15 @@
 #define JG_PI  3.14159265359f
 #define JG_2PI 6.28318530718f
 
-class PVector3;
-class PMath
+class HVector3;
+class HMath
 {
 public:
 	constexpr static float32 ConvertToRadians(float32 fDegrees) { return fDegrees * (JG_PI / 180.0f); }
 	constexpr static float32 ConvertToDegrees(float32 fRadians) { return fRadians * (180.0f / JG_PI); }
 
-	static PVector3 ConvertToRadians(const PVector3& vDegrees);
-	static PVector3 ConvertToDegrees(const PVector3& vRadians);
+	static HVector3 ConvertToRadians(const HVector3& vDegrees);
+	static HVector3 ConvertToDegrees(const HVector3& vRadians);
 
 	template<class T>
 	static T Abs(T value)

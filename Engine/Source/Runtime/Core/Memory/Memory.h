@@ -3,6 +3,20 @@
 #include "CoreDefines.h"
 #include "CoreSystem.h"
 
+class IMemoryObject
+{
+protected:
+	IMemoryObject() = default;
+public:
+	virtual ~IMemoryObject() = default;
+};
+
+class PMemoryObject : public IMemoryObject
+{
+public:
+	virtual ~PMemoryObject() = default;
+};
+
 template<class T>
 class PWeakPtr;
 
@@ -12,13 +26,13 @@ class PSharedPtr;
 namespace PMemoryPrivate
 {
 	template<class T>
-	class PTemporaryOwner
+	class PTemporaryOwner : public IMemoryObject
 	{
 	public:
 		T* ptr = nullptr;
 
-		AtomicInt32* pRefCount = nullptr;
-		AtomicInt32* pWeakCount = nullptr;
+		HAtomicInt32* pRefCount = nullptr;
+		HAtomicInt32* pWeakCount = nullptr;
 
 		PTemporaryOwner(const PSharedPtr<T>& sharedPtr)
 			: ptr(sharedPtr._ptr)
@@ -51,25 +65,13 @@ namespace PMemoryPrivate
 			weakPtr._pRefCount  = nullptr;
 			weakPtr._pWeakCount = nullptr;
 		}
+
+		virtual ~PTemporaryOwner() = default;
 	};
 };
 
-class IMemoryObject
-{
-protected:
-	IMemoryObject() = default;
-public:
-	virtual ~IMemoryObject() = default;
-};
-
-class PMemoryObject : public IMemoryObject
-{
-public:
-	virtual ~PMemoryObject() = default;
-};
-
 template<class T>
-class PSharedPtr
+class PSharedPtr : public IMemoryObject
 {
 private:
 	friend class GMemoryGlobalSystem;
@@ -78,8 +80,8 @@ private:
 
 	T* _ptr = nullptr;
 
-	AtomicInt32* _pRefCount = nullptr;
-	AtomicInt32* _pWeakCount = nullptr;
+	HAtomicInt32* _pRefCount = nullptr;
+	HAtomicInt32* _pWeakCount = nullptr;
 
 public:
 	PSharedPtr()  = default;
@@ -107,7 +109,7 @@ public:
 		move<T>(std::move(rhs));
 	}
 
-	~PSharedPtr()
+	virtual ~PSharedPtr()
 	{
 		if (IsValid() == false)
 		{
@@ -273,17 +275,16 @@ private:
 	}
 };
 
-
 template<class T>
-class PWeakPtr
+class PWeakPtr : public IMemoryObject
 {
 	friend PMemoryPrivate::PTemporaryOwner<T>;
 	friend class GMemoryGlobalSystem;
 
 	T* _ptr = nullptr;
 
-	AtomicInt32* _pRefCount   = nullptr;
-	AtomicInt32* _pWeakCount  = nullptr;
+	HAtomicInt32* _pRefCount   = nullptr;
+	HAtomicInt32* _pWeakCount  = nullptr;
 
 public:
 	PWeakPtr() = default;
@@ -332,7 +333,7 @@ public:
 		set<T>(rhs);
 	}
 
-	~PWeakPtr()
+	virtual ~PWeakPtr()
 	{
 		if (IsValid() == false)
 		{
@@ -517,22 +518,22 @@ private:
 
 class GMemoryGlobalSystem : public GGlobalSystemInstance<GMemoryGlobalSystem>
 {
-	struct PMemoryBlock
+	struct HMemoryBlock
 	{
 		void*  Ptr  = nullptr;
 		uint64 Size = 0;
 		bool bIsClass = false;
-		std::unique_ptr<AtomicInt32> RefCount;
-		std::unique_ptr<AtomicInt32> WeakCount;
+		std::unique_ptr<HAtomicInt32> RefCount;
+		std::unique_ptr<HAtomicInt32> WeakCount;
 	};
 
-	mutable PHashMap<const void*, PMemoryBlock> _allocatedMemoryBlocks;
-	mutable PQueue<void*> _allocatedMemoryBlockQueue;
+	mutable HHashMap<const void*, HMemoryBlock> _allocatedMemoryBlocks;
+	mutable HQueue<void*> _allocatedMemoryBlockQueue;
 	// Wrap
 	// 메모리 시스템 특징
 	// 메모리 할당 시 쓰레드 별로 메모리 수거
 	//
-	mutable AtomicBool _bLock = false;
+	mutable HAtomicBool _bLock = false;
 	int32 _processBlockCountPerFrame;
 
 public:
@@ -555,12 +556,12 @@ public:
 		PSharedPtr<T> ptr;
 		ptr._ptr = new T(args ...);
 
-		PMemoryBlock memoryBlock;
+		HMemoryBlock memoryBlock;
 		memoryBlock.Ptr = ptr._ptr;
 		memoryBlock.Size	 = sizeof(T);
 		memoryBlock.bIsClass = std::is_class<T>::value;
-		memoryBlock.RefCount = std::make_unique<AtomicInt32>();
-		memoryBlock.WeakCount = std::make_unique<AtomicInt32>();
+		memoryBlock.RefCount = std::make_unique<HAtomicInt32>();
+		memoryBlock.WeakCount = std::make_unique<HAtomicInt32>();
 
 		ptr._pWeakCount = memoryBlock.WeakCount.get();
 		ptr._pRefCount = memoryBlock.RefCount.get();
@@ -593,7 +594,7 @@ public:
 			unlock();
 			return PSharedPtr<T>();
 		}
-		PMemoryBlock& memoryBlock = _allocatedMemoryBlocks[(const void*)fromThis];
+		HMemoryBlock& memoryBlock = _allocatedMemoryBlocks[(const void*)fromThis];
 		
 		PSharedPtr<T> ptr;
 		ptr._ptr = static_cast<T*>(memoryBlock.Ptr);
@@ -605,6 +606,18 @@ public:
 	}
 
 	template<class T, class U>
+	PSharedPtr<T> CastUnChecked(PSharedPtr<U> ptr)
+	{
+		PSharedPtr<T> result;
+		result._ptr = static_cast<T*>(ptr._ptr);
+		result._pRefCount = ptr._pRefCount;
+		result._pWeakCount = ptr._pWeakCount;
+		result.addRefCount();
+
+		return result;
+	}
+
+	template<class T, class U>
 	PSharedPtr<T> Cast(PSharedPtr<U> ptr)
 	{
 		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
@@ -612,11 +625,17 @@ public:
 			return nullptr;
 		}
 
-		PSharedPtr<T> result;
+		return CastUnChecked<T, U>(ptr);
+	}
+
+	template<class T, class U>
+	PWeakPtr<T> CastUnChecked(PWeakPtr<U> ptr)
+	{
+		PWeakPtr<T> result;
 		result._ptr = static_cast<T*>(ptr._ptr);
-		result._pRefCount  = ptr._pRefCount;
+		result._pRefCount = ptr._pRefCount;
 		result._pWeakCount = ptr._pWeakCount;
-		result.addRefCount();
+		result.addWeakCount();
 
 		return result;
 	}
@@ -629,17 +648,7 @@ public:
 			return nullptr;
 		}
 
-		JG_ASSERT(true);
-		// 현재 금지
-		// VTable 확인
-
-		PWeakPtr<T> result;
-		result._ptr = static_cast<T*>(ptr._ptr);
-		result._pRefCount  = ptr._pRefCount;
-		result._pWeakCount = ptr._pWeakCount;
-		result.addWeakCount();
-
-		return result;
+		return CastUnChecked<T, U>(ptr);
 	}
 
 	void Flush();
@@ -669,6 +678,18 @@ template<class T>
 inline PSharedPtr<T> SharedWrap(const T* fromThis)
 {
 	return GMemoryGlobalSystem::GetInstance().Wrap(fromThis);
+}
+
+template<class T, class U>
+inline PSharedPtr<T> CastUnChecked(PSharedPtr<U> ptr)
+{
+	return GMemoryGlobalSystem::GetInstance().CastUnChecked<T, U>(ptr);
+}
+
+template<class T, class U>
+inline PWeakPtr<T> CastUnChecked(PWeakPtr<U> ptr)
+{
+	return GMemoryGlobalSystem::GetInstance().CastUnChecked<T, U>(ptr);
 }
 
 template<class T, class U>
