@@ -5,28 +5,17 @@
 #include <iostream>
 #include "Core.h"
 
-class Test
-{
-public:
-	HList<float> ss;
-	HHashSet<int> ss2;
-
-};
-
 
 using namespace std;
 int main()
 {
-	//ACoreSystem::Create();
+	GCoreSystem::Create();
 
-	Test t;
-	Test t2;
-	t = t2;
+	while (true)
+	{
+		GCoreSystem::Update();
+	}
 
-	//t = t2;
-	cout << "test" << endl;
-
-
-	//ACoreSystem::Destroy();
+	GCoreSystem::Destroy();
 	return 0;
 }

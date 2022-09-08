@@ -30,15 +30,59 @@ GScheduleGlobalSystem::GScheduleGlobalSystem()
 	assignNamedThread();
 
 	_idGenerator = Allocate<PSequentialIDGenerator>();
-	_bIsRunning = false;
+	_bIsTaskRunning = false;
 }
 
 void GScheduleGlobalSystem::Start()
 {
+
 }
 
 void GScheduleGlobalSystem::Update()
 {
+	_bIsTaskRunning = true;
+
+	//HMap<int32, HList<PWeakPtr<ISyncTask>>>  _sortedSyncTasks;
+	for (HPair<const int32, HList<PWeakPtr<ISyncTask>>>& pair : _sortedSyncTasks)
+	{
+		const int32 id = pair.first;
+
+		HList<PWeakPtr<ISyncTask>>& tasks = pair.second;
+
+		uint64 taskCount = tasks.size();
+		for (uint64 i = 0; i < taskCount;)
+		{
+			PSharedPtr<ISyncTask> task = tasks[i].Pin();
+			if (task.IsValid() == true)
+			{
+				ESyncTaskType taskType = task->GetTaskType();
+
+				switch (taskType)
+				{
+				case ESyncTaskType::SyncByFrame:
+					break;
+
+				case ESyncTaskType::SyncByTick:
+					break;
+				}
+
+				++i;
+			}
+			else
+			{
+				PWeakPtr<ISyncTask> temp = tasks[i];
+
+				tasks[i] = tasks[taskCount - 1];
+				tasks[taskCount - 1] = temp;
+
+				tasks.pop_back();
+				taskCount = tasks.size();
+			}
+
+		}
+	}
+
+	_bIsTaskRunning = false;
 }
 
 void GScheduleGlobalSystem::Destroy()
@@ -71,4 +115,57 @@ void GScheduleGlobalSystem::assignNamedThread()
 
 	_mappedThreadIndexOffset = threadCount > 3 ? 4 : prevThreadIndex;
 	_threadIndexMappingMaps[ENamedThread::RemainThread] = INDEX_NONE;
+}
+
+int32 GScheduleGlobalSystem::getRecommandThreadIndex(ENamedThread inNamedThread)
+{
+	// 처음 돌때는 현재 대기중인 thread 할당
+	int32 fixedThreadIndex = INDEX_NONE;
+	int32 threadCount = (int32)_threads.size();
+
+	if (_mappedThreadIndexOffset == threadCount)
+	{
+		fixedThreadIndex = threadCount - 1;
+	}
+	else
+	{
+		for (const HPair<ENamedThread, int32>& pair : _threadIndexMappingMaps)
+		{
+			ENamedThread namedThread = pair.first;
+			int32 threadIndex = pair.second;
+
+			if ((namedThread & inNamedThread) == false)
+			{
+				continue;
+			}
+
+			if (threadIndex == INDEX_NONE)
+			{
+				for (int32 i = _mappedThreadIndexOffset; i < threadCount; ++i)
+				{
+					PSharedPtr<PThread> thread = _threads[threadIndex];
+					if (thread == nullptr || thread->IsRunning())
+					{
+						continue;
+					}
+
+					fixedThreadIndex = i;
+					break;
+				}
+
+				if (fixedThreadIndex == INDEX_NONE)
+				{
+					fixedThreadIndex = _mappedThreadIndexOffset;
+				}
+			}
+			else
+			{
+				fixedThreadIndex = threadIndex;
+			}
+
+			break;
+		}
+	}
+
+	return fixedThreadIndex;
 }

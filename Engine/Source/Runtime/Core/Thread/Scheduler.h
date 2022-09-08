@@ -63,7 +63,7 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 	HQueue<PWeakPtr<ISyncTask>> _reservedSyncTasks;
 
 	PSharedPtr<PSequentialIDGenerator> _idGenerator;
-	bool _bIsRunning;
+	bool _bIsTaskRunning;
 public:
 	GScheduleGlobalSystem();
 	virtual ~GScheduleGlobalSystem() = default;
@@ -165,11 +165,15 @@ public:
 	template<class ... Args>
 	void ScheduleAsync(ENamedThread namedThread, PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		_threadIndexMappingMaps;
-		//for(PPair<)
+		int32 fixedThreadIndex = getRecommandThreadIndex();
+
+		PSharedPtr<PThread> thread = _threads[fixedThreadIndex];
+
+		thread->PushTask(refObject, func, args...);
 	}
 
 	void RemoveSchedule(uint64 id);
 private:
-	void assignNamedThread();
+	void  assignNamedThread();
+	int32 getRecommandThreadIndex(ENamedThread namedThread);
 };

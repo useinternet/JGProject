@@ -17,6 +17,7 @@
 #include "FileIO/Json.h"
 #include "Misc/Hash.h"
 #include "Misc/Delegate.h"
+#include "Misc/SequentialIDGenerator.h"
 #include "Misc/Log.h"
 #include "Misc/StdExternal.h"
 #include "Object/ObjectGlobals.h"
@@ -24,6 +25,7 @@
 #include "Object/ObjectGlobalSystem.h"
 #include "Object/JGObject.h"
 #include "Memory/Memory.h"
+#include "Thread/Scheduler.h"
 
 #include "CoreSystem.h"
 

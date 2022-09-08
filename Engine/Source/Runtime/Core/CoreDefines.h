@@ -15,6 +15,7 @@
 #include <mutex>
 #include <cassert>
 #include <filesystem>
+#include <chrono>
 
 namespace fs = std::filesystem;
 
@@ -116,6 +117,7 @@ using HPair = std::pair<First, Second>;
 using HRawString = std::string;
 using HRawWString = std::wstring;
 
+using HSteadyClock = std::chrono::steady_clock;
 
 const static int8  JG_INT8_Min = (int8)-128i8;
 const static int8  JG_INT8_MAX = (int8)127;
