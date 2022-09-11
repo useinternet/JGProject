@@ -16,12 +16,12 @@ void PTimer::Stop()
 
 }
 
-float32 PTimer::GetTotalTime(ETimeStepType stepType = ETimeStepType::Second) const
+float32 PTimer::GetTotalTime(ETimeStepType stepType) const
 {
 	return 0.0f;
 }
 
-float32 PTimer::GetTick(ETimeStepType stepType = ETimeStepType::Second) const
+float32 PTimer::GetTick(ETimeStepType stepType) const
 {
 	return 0.0f;
 }
@@ -38,5 +38,5 @@ bool PTimer::IsValid() const
 
 PSharedPtr<PTimer> PTimer::Create()
 {
-
+	return nullptr;
 }

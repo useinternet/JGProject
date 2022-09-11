@@ -20,6 +20,8 @@
 #include "Misc/SequentialIDGenerator.h"
 #include "Misc/Log.h"
 #include "Misc/StdExternal.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 #include "Object/ObjectGlobals.h"
 #include "Object/ObjectDefines.h"
 #include "Object/ObjectGlobalSystem.h"

@@ -147,4 +147,48 @@ public:
 		return value + (-value & mask);
 	}
 
+	static float64 RoundToFloat64(float64 f)
+	{
+		return std::round(f);
+	}
+
+	static float64 CeilToFloat64(float64 f)
+	{
+		return std::ceil(f);
+	}
+
+	static float64 FloorToFloat64(float64 f)
+	{
+		return std::floor(f);
+	}
+
+	static float32 RoundToFloat32(float32 f)
+	{
+		return std::roundf(f);
+	}
+
+	static float32 CeilToFloat32(float32 f)
+	{
+		return std::ceilf(f);
+	}
+
+	static float32 FloorToFloat32(float32 f)
+	{
+		return std::floorf(f);
+	}
+	
+	static int32 RoundToInt(float32 f)
+	{
+		return (int32)RoundToFloat32(f);
+	}
+
+	static int32 CeilToInt(float32 f)
+	{
+		return (int32)CeilToFloat32(f);
+	}
+
+	static int32 FloorToInt(float32 f)
+	{
+		return (int32)FloorToFloat32(f);
+	}
 };

@@ -106,7 +106,7 @@ public:
 
 		_syncTaskPool.emplace(syncTask->ID, syncTask);
 
-		if (_bIsRunning == true)
+		if (_bIsTaskRunning == true)
 		{
 			_reservedSyncTasks.push(syncTask);
 		}
@@ -150,7 +150,7 @@ public:
 
 		_syncTaskPool.emplace(syncTask->ID, syncTask);
 
-		if (_bIsRunning == true)
+		if (_bIsTaskRunning == true)
 		{
 			_reservedSyncTasks.push(syncTask);
 		}

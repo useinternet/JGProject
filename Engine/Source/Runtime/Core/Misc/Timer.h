@@ -36,8 +36,8 @@ public:
 	void Stop();
 	float32 GetTotalTime(ETimeStepType stepType = ETimeStepType::Second) const;
 	float32 GetTick(ETimeStepType stepType = ETimeStepType::Second) const;
-	uint64 GetFPS() const;
-	bool IsValid() const;
+	uint64  GetFPS() const;
+	bool    IsValid() const;
 
 public:
 	static PSharedPtr<PTimer> Create();

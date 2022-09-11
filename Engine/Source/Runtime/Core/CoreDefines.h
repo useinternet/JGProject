@@ -117,7 +117,13 @@ using HPair = std::pair<First, Second>;
 using HRawString = std::string;
 using HRawWString = std::wstring;
 
-using HSteadyClock = std::chrono::steady_clock;
+using HSteadyClock     = std::chrono::steady_clock;
+using HSteadyClock_TimePoint = std::chrono::steady_clock::time_point;
+using HSteadyClock_Duration  = std::chrono::steady_clock::duration;
+
+using HSystemClock			 = std::chrono::system_clock;
+using HSystemClock_TimePoint = std::chrono::system_clock::time_point;
+using HSystemClock_Duration  = std::chrono::system_clock::duration;
 
 const static int8  JG_INT8_Min = (int8)-128i8;
 const static int8  JG_INT8_MAX = (int8)127;
