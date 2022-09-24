@@ -119,11 +119,12 @@ using HRawWString = std::wstring;
 
 using HSteadyClock     = std::chrono::steady_clock;
 using HSteadyClock_TimePoint = std::chrono::steady_clock::time_point;
-using HSteadyClock_Duration  = std::chrono::steady_clock::duration;
 
 using HSystemClock			 = std::chrono::system_clock;
 using HSystemClock_TimePoint = std::chrono::system_clock::time_point;
-using HSystemClock_Duration  = std::chrono::system_clock::duration;
+
+template<class T>
+using HDuration = std::chrono::duration<T>;
 
 const static int8  JG_INT8_Min = (int8)-128i8;
 const static int8  JG_INT8_MAX = (int8)127;
@@ -153,3 +154,14 @@ enum
 };
 
 #define JG_MEMBER_FUNC_BIND(funcName) std::bind(this, &##funcName)
+
+
+#if _DEVELOPENGINE
+#define JG_CONFIGURATIONS_NAME "DevelopEngine"
+#elif _DEVELOPGAME
+#define JG_CONFIGURATIONS_NAME "DevelopGame"
+#elif _CONFIRMGAME
+#define JG_CONFIGURATIONS_NAME "ConfirmGame"
+#elif _RELEASEGAME
+#define JG_CONFIGURATIONS_NAME "ReleaseGame"
+#endif

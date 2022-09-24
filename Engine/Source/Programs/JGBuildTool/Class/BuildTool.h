@@ -18,12 +18,6 @@ local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 			PCH_HEADER_PATH,
 			PCH_CPP_PATH,
 		}
-		vpaths {
-				["Headers"] = "**.h",
-				["Sources/*"] = {"**.c", "**.cpp"},
-				["Docs"] = "**.txt"
-		}
-
 */
 
 class PBuildTool : public IMemoryObject

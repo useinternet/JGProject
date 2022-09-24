@@ -1,7 +1,7 @@
 #include "Scheduler.h"
 #include "MainThreadExecutionOrder.h"
 #include "Misc/Log.h"
-
+#include "Misc/Timer.h"
 
 GScheduleGlobalSystem::GScheduleGlobalSystem()
 {
@@ -35,14 +35,13 @@ GScheduleGlobalSystem::GScheduleGlobalSystem()
 
 void GScheduleGlobalSystem::Start()
 {
-
+	_timer = PTimer::Create();
 }
 
 void GScheduleGlobalSystem::Update()
 {
 	_bIsTaskRunning = true;
 
-	//HMap<int32, HList<PWeakPtr<ISyncTask>>>  _sortedSyncTasks;
 	for (HPair<const int32, HList<PWeakPtr<ISyncTask>>>& pair : _sortedSyncTasks)
 	{
 		const int32 id = pair.first;
@@ -52,7 +51,10 @@ void GScheduleGlobalSystem::Update()
 		uint64 taskCount = tasks.size();
 		for (uint64 i = 0; i < taskCount;)
 		{
+			bool bIsRemoveTask = true;
+
 			PSharedPtr<ISyncTask> task = tasks[i].Pin();
+			
 			if (task.IsValid() == true)
 			{
 				ESyncTaskType taskType = task->GetTaskType();
@@ -60,12 +62,23 @@ void GScheduleGlobalSystem::Update()
 				switch (taskType)
 				{
 				case ESyncTaskType::SyncByFrame:
+					if (updateTask(static_cast<PSyncTaskByFrame*>(task.GetRawPointer())) == true)
+					{
+						bIsRemoveTask = false;
+					}
 					break;
 
 				case ESyncTaskType::SyncByTick:
+					if (updateTask(static_cast<PSyncTaskByTick*>(task.GetRawPointer())) == true)
+					{
+						bIsRemoveTask = false;
+					}
 					break;
 				}
+			}
 
+			if (bIsRemoveTask == false)
+			{
 				++i;
 			}
 			else
@@ -87,11 +100,69 @@ void GScheduleGlobalSystem::Update()
 
 void GScheduleGlobalSystem::Destroy()
 {
-
+	// Flush
 }
 
-void GScheduleGlobalSystem::RemoveSchedule(uint64 id)
+bool GScheduleGlobalSystem::updateTask(PSyncTaskByFrame* task)
 {
+	if (task == nullptr)
+	{
+		return false;
+	}
+	
+	if (task->Task == nullptr || task->Task->IsValid() == false)
+	{
+		return false;
+	}
+
+	if (task->Repeat > 0 && task->CallCount > task->Repeat)
+	{
+		return false;
+	}
+
+	if (task->Delay <= task->Frame && task->FrameCycle <= task->Frame)
+	{
+		task->Task->DoTask();
+
+		task->CallCount += 1;
+		task->Frame = 0;
+		task->Delay = 0;
+	}
+
+	task->Frame += 1;
+
+	return true;
+}
+
+bool GScheduleGlobalSystem::updateTask(PSyncTaskByTick* task)
+{
+	if (task == nullptr)
+	{
+		return false;
+	}
+
+	if (task->Task == nullptr || task->Task->IsValid() == false)
+	{
+		return false;
+	}
+
+	if (task->Repeat > 0 && task->CallCount > task->Repeat)
+	{
+		return false;
+	}
+
+	if (task->Delay <= task->Tick && task->TickCycle <= task->Tick)
+	{
+		task->Task->DoTask();
+
+		task->CallCount += 1;
+		task->Tick  = 0.0f;
+		task->Delay = 0.0f;
+	}
+
+	task->Tick += _timer->GetTick();
+
+	return true;
 }
 
 void GScheduleGlobalSystem::assignNamedThread()

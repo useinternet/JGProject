@@ -1,5 +1,5 @@
 #include "Core.h"
-#include "BuildTool.h"
+#include "Class/BuildTool.h"
 
 bool ReadArguments(PArguments* outArguments);
 void CreateModuleInfoTemplate();
@@ -39,10 +39,10 @@ bool ReadArguments(PArguments* outArguments)
 	PString buildToolSourcePath = PBuildTool::BuildToolDirectory();
 
 	PString argumentsJsonPath;
-	PFileHelper::CombinePath(buildToolSourcePath, PBuildTool::ARGUMENTS_JSON_FILE_NAME, &argumentsJsonPath);
+	HFileHelper::CombinePath(buildToolSourcePath, PBuildTool::ARGUMENTS_JSON_FILE_NAME, &argumentsJsonPath);
 
 	PString argumentsJsonText;
-	if (PFileHelper::ReadAllText(argumentsJsonPath, &argumentsJsonText) == false)
+	if (HFileHelper::ReadAllText(argumentsJsonPath, &argumentsJsonText) == false)
 	{
 		// Create Default Json File
 		PJson json;
@@ -57,7 +57,7 @@ bool ReadArguments(PArguments* outArguments)
 
 		argumentsJsonText = jsonText;
 
-		if (PFileHelper::WriteAllText(argumentsJsonPath, argumentsJsonText) == false)
+		if (HFileHelper::WriteAllText(argumentsJsonPath, argumentsJsonText) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Critical, "Fail write default arguments json file");
 			return false;
@@ -83,10 +83,10 @@ bool ReadArguments(PArguments* outArguments)
 void CreateModuleInfoTemplate()
 {
 	PString buildToolSourcePath;
-	PFileHelper::CombinePath(PFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool", &buildToolSourcePath);
+	HFileHelper::CombinePath(HFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool", &buildToolSourcePath);
 
 	PString moduleInfoTemplatePath;
-	PFileHelper::CombinePath(buildToolSourcePath, "ModuleInfoTemplate.json", &moduleInfoTemplatePath);
+	HFileHelper::CombinePath(buildToolSourcePath, "ModuleInfoTemplate.json", &moduleInfoTemplatePath);
 
 	PModuleInfo info;
 	info.ModuleFormat = "SharedLib/StaticLib/ConsoleApp";
@@ -110,5 +110,5 @@ void CreateModuleInfoTemplate()
 	PString jsonText;
 	PJson::ToString(json, &jsonText);
 
-	PFileHelper::WriteAllText(moduleInfoTemplatePath, jsonText);
+	HFileHelper::WriteAllText(moduleInfoTemplatePath, jsonText);
 }

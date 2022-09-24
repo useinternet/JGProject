@@ -3,9 +3,7 @@
 #include "CoreDefines.h"
 #include "String/String.h"
 
-
-
-class PFileHelper
+class HFileHelper
 {
 
 public:
@@ -20,7 +18,7 @@ public:
 	static void FileNameOnly(const PString& inPath, PString* outStr);
 	static void FilePathOnly(const PString& inPath, PString* outStr);
 	static bool FileExtension(const PString& inPath, PString* outStr);
-	static void FileListInDirectory(const PString& inDir, HList<PString>* outFileList);
+	static void FileListInDirectory(const PString& inDir, HList<PString>* outFileList, bool bIsRecursive = false, const HList<PString>& filterFileFormats = const HList<PString>());
 
 	static bool IsDirectory(const PString& directoryName);
 	static void CombinePath(const PString& p1, const PString& p2, PString* outStr);

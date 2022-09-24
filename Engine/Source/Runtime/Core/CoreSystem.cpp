@@ -4,6 +4,8 @@
 #include "Object/ObjectGlobalSystem.h"
 #include "Thread/Scheduler.h"
 #include "String/StringTable.h"
+#include "Misc/Timer.h"
+#include "Misc/Module.h"
 #include <crtdbg.h>
 
 GCoreSystem* GCoreSystem::Instance = nullptr;
@@ -37,8 +39,10 @@ bool GCoreSystem::Create(ECoreSystemFlags flags)
 	GCoreSystem::RegisterSystemInstance<GLogGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GStringTable>();
 	GCoreSystem::RegisterSystemInstance<GMemoryGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GTimerGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GScheduleGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GModuleGlobalSystem>();
 
 	if ((flags & ECoreSystemFlags::No_CodeGen) == false)
 	{
@@ -74,9 +78,11 @@ void GCoreSystem::Destroy()
 		pair.second->Destroy();
 	}
 
+	GCoreSystem::UnRegisterSystemInstance<GModuleGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GStringTable>();
 	GCoreSystem::UnRegisterSystemInstance<GScheduleGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GTimerGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GLogGlobalSystem>();
 

@@ -18,19 +18,19 @@ public:
 
 	PArguments()
 	{
-		EngineWorkDirectory = PFileHelper::EngineSourceDirectory();
+		EngineWorkDirectory = HFileHelper::EngineSourceDirectory();
 		EngineWorkCategories.insert("Editor");
 		EngineWorkCategories.insert("Runtime");
 		EngineWorkCategories.insert("Programs");
 
-		PFileHelper::CombinePath(PFileHelper::EngineSourceDirectory(), "Dummy", &UserWorkDirectory);
+		HFileHelper::CombinePath(HFileHelper::EngineSourceDirectory(), "Dummy", &UserWorkDirectory);
 
 		ModuleInfoFileExtension = "json";
 		ModuleRecognitionName = "module";
 
-		ThirdPartyDirectory = PFileHelper::EngineThirdPartyDirectory();
+		ThirdPartyDirectory = HFileHelper::EngineThirdPartyDirectory();
 
-		PFileHelper::CombinePath(PFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool/Template/BuildTemplate.lua", &BuildScriptTemplatePath);
+		HFileHelper::CombinePath(HFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool/Template/BuildTemplate.lua", &BuildScriptTemplatePath);
 	}
 
 	virtual ~PArguments() = default;

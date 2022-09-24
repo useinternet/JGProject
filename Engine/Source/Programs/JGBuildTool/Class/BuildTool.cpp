@@ -6,7 +6,7 @@ const PString& PBuildTool::BuildToolDirectory()
 	static PString buildToolDir;
 	if(buildToolDir.Empty() == true)
 	{
-		PFileHelper::CombinePath(PFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool", &buildToolDir);
+		HFileHelper::CombinePath(HFileHelper::EngineProgramsSourceDirectory(), "JGBuildTool", &buildToolDir);
 	}
 	
 	return buildToolDir;
@@ -57,7 +57,7 @@ const PArguments& PBuildTool::getArguments() const
 
 bool PBuildTool::collectionModuleInfos(const PString& workDir, const HHashSet<PString>& workCategories, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap)
 {
-	if (PFileHelper::Exists(workDir) == false)
+	if (HFileHelper::Exists(workDir) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Critical, "work directory doesn't exist.");
 
@@ -65,20 +65,20 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const HHashSet<PS
 	}
 
 	HList<PString> workCategoies;
-	PFileHelper::FileListInDirectory(workDir, &workCategoies);
+	HFileHelper::FileListInDirectory(workDir, &workCategoies);
 
 	for (const PString& categoryPath : workCategoies)
 	{
 		PString categoryName;
-		PFileHelper::FileName(categoryPath, &categoryName);
+		HFileHelper::FileName(categoryPath, &categoryName);
 
-		if (PFileHelper::Exists(categoryPath) == false)
+		if (HFileHelper::Exists(categoryPath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Critical, "work category(%s) doesn't exist.", categoryName);
 			continue;
 		}
 
-		if (PFileHelper::IsDirectory(categoryPath) == false)
+		if (HFileHelper::IsDirectory(categoryPath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Critical, "work category(%s) must directory file", categoryName);
 			continue;
@@ -125,22 +125,22 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const HHashSet<PS
 void PBuildTool::collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap)
 {
 	HList<PString> modulePathList;
-	PFileHelper::FileListInDirectory(inCategoryPath, &modulePathList);
+	HFileHelper::FileListInDirectory(inCategoryPath, &modulePathList);
 
 	PString moduleInfoFileName;
 	PString moduleName;
 
 	for (const PString& modulePath : modulePathList)
 	{
-		PFileHelper::FileName(modulePath, &moduleName);
+		HFileHelper::FileName(modulePath, &moduleName);
 
-		if (PFileHelper::Exists(modulePath) == false)
+		if (HFileHelper::Exists(modulePath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Critical, "module(%s) doesn't exist.", moduleName);
 			continue;
 		}
 
-		if (PFileHelper::IsDirectory(modulePath) == false)
+		if (HFileHelper::IsDirectory(modulePath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Critical, "module(%s) must directory file", moduleName);
 			continue;
@@ -174,7 +174,7 @@ bool PBuildTool::generateBuildScript()
 
 
 	PString buildScript;
-	if (PFileHelper::ReadAllText(getBuildScriptTemplatePath(), &buildScript) == false)
+	if (HFileHelper::ReadAllText(getBuildScriptTemplatePath(), &buildScript) == false)
 	{
 		return false;
 	}
@@ -185,9 +185,9 @@ bool PBuildTool::generateBuildScript()
 	const PArguments& arguments = getArguments();
 
 	PString resultPath;
-	PFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &resultPath);
+	HFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &resultPath);
 	
-	if (PFileHelper::WriteAllText(resultPath, buildScript) == false)
+	if (HFileHelper::WriteAllText(resultPath, buildScript) == false)
 	{
 		return false;
 	}
@@ -221,7 +221,7 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			outScript.Append("\t\t\t\t");
 
 			PString thirdPartyPath = arguments.ThirdPartyDirectory;
-			thirdPartyPath.ReplaceAll(PFileHelper::EngineDirectory(), "");
+			thirdPartyPath.ReplaceAll(HFileHelper::EngineDirectory(), "");
 
 			PString includeDirs;
 			includeDirs.Append("\"").Append(moduleInfo.ModulePath).Append("\", ");
@@ -274,18 +274,22 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 
 			outScript.AppendLine("filter \"configurations:DevelopEngine\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopEngineFilter).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_DEVELOPENGINE\"}");
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:DevelopGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopGameFilter).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_DEVELOPGAME\"}");
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ConfirmGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopConfirmGameFilter).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_CONFIRMGAME\"}");
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ReleaseGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopReleaseGameFilter).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_RELEASEGAME\"}");
 
 			outScript.AppendLine("");
 			outScript.AppendLine("");
@@ -300,34 +304,34 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 bool PBuildTool::makeProjectFiles()
 {
 	PString newScriptPath;
-	PFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &newScriptPath);
+	HFileHelper::CombinePath(BuildToolDirectory(), SCRIPT_NAME, &newScriptPath);
 
 	PString oldScriptPath;
-	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), SCRIPT_NAME, &oldScriptPath);
+	HFileHelper::CombinePath(HFileHelper::EngineDirectory(), SCRIPT_NAME, &oldScriptPath);
 
 
 	PString newScriptText;
-	if (PFileHelper::ReadAllText(newScriptPath, &newScriptText) == false)
+	if (HFileHelper::ReadAllText(newScriptPath, &newScriptText) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Error, "Fail Read New Script");
 		return false;
 	}
 
-	if (PFileHelper::WriteAllText(oldScriptPath, newScriptText) == false)
+	if (HFileHelper::WriteAllText(oldScriptPath, newScriptText) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Error, "Fail Replace New Script");
 		return false;
 	}
 
 	PString premakeFileOriginPath;
-	PFileHelper::CombinePath(PFileHelper::EngineBuildDirectory(), PREMAKE_FILE_NAME, &premakeFileOriginPath);
-	PFileHelper::AbsolutePath(premakeFileOriginPath, &premakeFileOriginPath);
+	HFileHelper::CombinePath(HFileHelper::EngineBuildDirectory(), PREMAKE_FILE_NAME, &premakeFileOriginPath);
+	HFileHelper::AbsolutePath(premakeFileOriginPath, &premakeFileOriginPath);
 
 	PString premakeTempFilePath;
-	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), PREMAKE_FILE_NAME, &premakeTempFilePath);
-	PFileHelper::AbsolutePath(premakeTempFilePath, &premakeTempFilePath);
+	HFileHelper::CombinePath(HFileHelper::EngineDirectory(), PREMAKE_FILE_NAME, &premakeTempFilePath);
+	HFileHelper::AbsolutePath(premakeTempFilePath, &premakeTempFilePath);
 
-	if (PFileHelper::CopyFileOrDirectory(premakeFileOriginPath, premakeTempFilePath) == false)
+	if (HFileHelper::CopyFileOrDirectory(premakeFileOriginPath, premakeTempFilePath) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Error, "Fail Copy Premake File");
 		return false;
@@ -337,10 +341,10 @@ bool PBuildTool::makeProjectFiles()
 	batCommand.Append("call ").Append("\"").Append(premakeTempFilePath).Append("\"").Append(" vs2022 --file=").Append(oldScriptPath);
 
 	PString batFilePath;
-	PFileHelper::CombinePath(PFileHelper::EngineDirectory(), BATCH_NAME, &batFilePath);
-	PFileHelper::AbsolutePath(batFilePath, &batFilePath);
+	HFileHelper::CombinePath(HFileHelper::EngineDirectory(), BATCH_NAME, &batFilePath);
+	HFileHelper::AbsolutePath(batFilePath, &batFilePath);
 
-	if (PFileHelper::WriteAllText(batFilePath, batCommand) == false)
+	if (HFileHelper::WriteAllText(batFilePath, batCommand) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Error, "Fail Create Batch File");
 		return false;
@@ -348,9 +352,9 @@ bool PBuildTool::makeProjectFiles()
 	
 	system(batFilePath.GetCStr());
 
-	PFileHelper::RemoveFileOrDirectory(batFilePath);
-	PFileHelper::RemoveFileOrDirectory(oldScriptPath);
-	PFileHelper::RemoveFileOrDirectory(premakeTempFilePath);
+	HFileHelper::RemoveFileOrDirectory(batFilePath);
+	HFileHelper::RemoveFileOrDirectory(oldScriptPath);
+	HFileHelper::RemoveFileOrDirectory(premakeTempFilePath);
 
 	return true;
 }
@@ -365,20 +369,20 @@ bool PBuildTool::findModuleInfo(const PString& modulePath, PModuleInfo* outModul
 	const PArguments& arguments = getArguments();
 
 	HList<PString> fileListInModule;
-	PFileHelper::FileListInDirectory(modulePath, &fileListInModule);
+	HFileHelper::FileListInDirectory(modulePath, &fileListInModule);
 
 	PString moduleName;
-	PFileHelper::FileName(modulePath, &moduleName);
+	HFileHelper::FileName(modulePath, &moduleName);
 
 	for (const PString& filePath : fileListInModule)
 	{
-		if (PFileHelper::IsDirectory(filePath) == true)
+		if (HFileHelper::IsDirectory(filePath) == true)
 		{
 			continue;
 		}
 
 		PString fileName;
-		PFileHelper::FileName(filePath, &fileName);
+		HFileHelper::FileName(filePath, &fileName);
 
 		HList<PString> split = fileName.Split('.');
 		if (split.empty() == false && split.size() == 3)
@@ -398,7 +402,7 @@ bool PBuildTool::findModuleInfo(const PString& modulePath, PModuleInfo* outModul
 			}
 
 			PString jsonText;
-			if (PFileHelper::ReadAllText(filePath, &jsonText) == false)
+			if (HFileHelper::ReadAllText(filePath, &jsonText) == false)
 			{
 				JG_LOG(BuildTool, ELogLevel::Error, "module(%s) fail read json file", moduleName);
 				continue;
@@ -429,7 +433,7 @@ PString PBuildTool::getUserProjectName() const
 	const PArguments& arguments = getArguments();
 
 	PString UserProjectName;
-	PFileHelper::FileName(arguments.UserWorkDirectory, &UserProjectName);
+	HFileHelper::FileName(arguments.UserWorkDirectory, &UserProjectName);
 
 	return UserProjectName;
 }

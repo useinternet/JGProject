@@ -1,0 +1,12 @@
+{
+    "Arguments": {
+        "EngineWorkDirectory": "../../Source",
+        "EngineWorkCategories": [
+            "Programs",
+            "Editor",
+            "Runtime"
+        ],
+        "UserWorkDirectory": "../../Source/Dummy",
+        "UserWorkCategories": []
+    }
+}

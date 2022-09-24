@@ -5,7 +5,7 @@ local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
 --local PCH_HEADER_PATH = "Source/PCH/PCH.h"
 --local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 
-function DebugConfig()
+function DebugConfig(defined)
     symbols       "On"
     optimize      "Off"
     defines       {"_DEBUG", "_PROFILE"}
@@ -14,7 +14,7 @@ function DebugConfig()
     runtime       "Debug"
 end
 
-function ConfirmConfig()
+function ConfirmConfig(defined)
     optimize        "Full" 
     defines         {"_RELEASE", "NDEBUG", "_PROFILE"}
     cppdialect      "C++20"
@@ -22,7 +22,7 @@ function ConfirmConfig()
     runtime         "Release"
 end
 
-function ReleaseConfig()
+function ReleaseConfig(defined)
     optimize        "Full" 
     defines         {"_RELEASE", "NDEBUG"}
     cppdialect      "C++20"

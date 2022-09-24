@@ -5,7 +5,7 @@
 
 GLogGlobalSystem::GLogGlobalSystem()
 {
-	PFileHelper::WriteAllText("jg_log.txt", "");
+	HFileHelper::WriteAllText("jg_log.txt", "");
 
 	spdlog::set_pattern("%^[:%t:][%l]%v%$");
 	_logger = spdlog::basic_logger_mt("JGLog", "jg_log.txt");

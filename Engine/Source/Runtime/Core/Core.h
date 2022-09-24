@@ -11,6 +11,7 @@
 #include "Math/Frustum.h"
 #include "Math/Plane.h"
 #include "Math/Color.h"
+#include "String/StringTable.h"
 #include "String/String.h"
 #include "String/Name.h"
 #include "FileIO/FileHelper.h"

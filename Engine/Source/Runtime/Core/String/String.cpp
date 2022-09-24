@@ -105,6 +105,19 @@ PString& PString::Insert(const PString& string, uint64 pos)
 	return *this;
 }
 
+PString& PString::Trim()
+{
+	static const char* WHITE_SPACE = " \\t\\n\\v";
+
+	HRawString str = _rawString.erase(_rawString.find_last_not_of(WHITE_SPACE) + 1);
+	str.erase(0, str.find_first_not_of(WHITE_SPACE));
+	
+	_rawString = str;
+
+	updateHashCode();
+	return *this;
+}
+
 void PString::SubString(PString& outString, uint64 startPos, uint64 length) const
 {
 	outString.Reset();

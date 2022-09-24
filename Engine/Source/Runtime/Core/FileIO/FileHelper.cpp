@@ -6,7 +6,7 @@ static const char EXTENSION_TOKEN = '.';
 static const char PATH_SEP_TOKEN1 = '/';
 static const char PATH_SEP_TOKEN2 = '\\';
 
-bool PFileHelper::WriteAllText(const PString& path, const PString& str)
+bool HFileHelper::WriteAllText(const PString& path, const PString& str)
 {
 	std::ofstream fout;
 	fout.open(path.GetRawString());
@@ -24,7 +24,7 @@ bool PFileHelper::WriteAllText(const PString& path, const PString& str)
 	}
 }
 
-bool PFileHelper::ReadAllText(const PString& path, PString* out_str)
+bool HFileHelper::ReadAllText(const PString& path, PString* out_str)
 {
 	if (out_str == nullptr)
 	{
@@ -49,7 +49,7 @@ bool PFileHelper::ReadAllText(const PString& path, PString* out_str)
 	}
 }
 
-bool PFileHelper::CopyFileOrDirectory(const PString& dest, const PString& src)
+bool HFileHelper::CopyFileOrDirectory(const PString& dest, const PString& src)
 {
 	std::error_code errCode;
 
@@ -71,7 +71,7 @@ bool PFileHelper::CopyFileOrDirectory(const PString& dest, const PString& src)
 	return true;
 }
 
-bool PFileHelper::RemoveFileOrDirectory(const PString& path)
+bool HFileHelper::RemoveFileOrDirectory(const PString& path)
 {
 	if (IsDirectory(path) == true)
 	{
@@ -83,12 +83,12 @@ bool PFileHelper::RemoveFileOrDirectory(const PString& path)
 	}
 }
 
-bool PFileHelper::Exists(const PString& inPath)
+bool HFileHelper::Exists(const PString& inPath)
 {
 	return fs::exists(inPath.GetRawString());
 }
 
-void PFileHelper::FileName(const PString& inPath, PString* outStr)
+void HFileHelper::FileName(const PString& inPath, PString* outStr)
 {
 	if (outStr == nullptr)
 	{
@@ -104,7 +104,7 @@ void PFileHelper::FileName(const PString& inPath, PString* outStr)
 	inPath.SubString(*outStr, pos + 1);
 }
 
-void PFileHelper::FileNameOnly(const PString& inPath, PString* outStr)
+void HFileHelper::FileNameOnly(const PString& inPath, PString* outStr)
 {
 	if (outStr == nullptr)
 	{
@@ -122,7 +122,7 @@ void PFileHelper::FileNameOnly(const PString& inPath, PString* outStr)
 	FileName(path, outStr);
 }
 
-void PFileHelper::FilePathOnly(const PString& inPath, PString* outStr)
+void HFileHelper::FilePathOnly(const PString& inPath, PString* outStr)
 {
 	if (outStr == nullptr)
 	{
@@ -138,7 +138,7 @@ void PFileHelper::FilePathOnly(const PString& inPath, PString* outStr)
 	inPath.SubString(*outStr, 0, pos);
 }
 
-bool PFileHelper::FileExtension(const PString& inPath, PString* outStr)
+bool HFileHelper::FileExtension(const PString& inPath, PString* outStr)
 {
 	if (outStr == nullptr)
 	{
@@ -156,7 +156,39 @@ bool PFileHelper::FileExtension(const PString& inPath, PString* outStr)
 	return true;
 }
 
-void PFileHelper::FileListInDirectory(const PString& inDir, HList<PString>* outFileList)
+void AddFileList(const PString& inFilePath, HList<PString>* outFileList, const HList<PString>& filterFileFormats)
+{
+	PString filePath = inFilePath;
+	PString fileExtension;
+	HFileHelper::FileExtension(filePath, &fileExtension);
+
+	bool bPass = true;
+	if (filterFileFormats.empty() == false)
+	{
+		for (const PString& extension : filterFileFormats)
+		{
+			if (fileExtension == extension)
+			{
+				bPass = false;
+				break;
+			}
+		}
+	}
+	else
+	{
+		bPass = false;
+	}
+
+	if (bPass == true)
+	{
+		return;
+	}
+
+	HFileHelper::NormalizePath(&filePath);
+	outFileList->push_back(filePath);
+}
+
+void HFileHelper::FileListInDirectory(const PString& inDir, HList<PString>* outFileList, bool bIsRecursive, const HList<PString>& filterFileFormats)
 {
 	if (outFileList == nullptr)
 	{
@@ -165,21 +197,34 @@ void PFileHelper::FileListInDirectory(const PString& inDir, HList<PString>* outF
 
 	outFileList->clear();
 
-	fs::directory_iterator dirIter = fs::directory_iterator(inDir.GetRawString());
-	for (auto& fileIter : dirIter)
+	if (bIsRecursive == false)
 	{
-		PString filePath = fs::path(fileIter).string().c_str();
-		NormalizePath(&filePath);
-		outFileList->push_back(filePath);
+		fs::directory_iterator dirIter = fs::directory_iterator(inDir.GetRawString());
+		for (auto& fileIter : dirIter)
+		{
+			PString filePath  = fs::path(fileIter).string().c_str();
+
+			AddFileList(filePath, outFileList, filterFileFormats);
+		}
+	}
+	else
+	{
+		fs::recursive_directory_iterator dirIter = fs::recursive_directory_iterator(inDir.GetRawString());
+		for (auto& fileIter : dirIter)
+		{
+			PString filePath = fs::path(fileIter).string().c_str();
+
+			AddFileList(filePath, outFileList, filterFileFormats);
+		}
 	}
 }
 
-bool PFileHelper::IsDirectory(const PString& directoryName)
+bool HFileHelper::IsDirectory(const PString& directoryName)
 {
 	return fs::is_directory(directoryName.GetRawString());
 }
 
-void PFileHelper::CombinePath(const PString& p1, const PString& p2, PString* outStr)
+void HFileHelper::CombinePath(const PString& p1, const PString& p2, PString* outStr)
 {
 	if (outStr == nullptr)
 	{
@@ -199,7 +244,7 @@ void PFileHelper::CombinePath(const PString& p1, const PString& p2, PString* out
 	outStr->Append(p2);
 }
 
-void PFileHelper::NormalizePath(PString* outPath)
+void HFileHelper::NormalizePath(PString* outPath)
 {
 	if (outPath == nullptr)
 	{
@@ -209,7 +254,7 @@ void PFileHelper::NormalizePath(PString* outPath)
 	outPath->ReplaceAll(PATH_SEP_TOKEN2, PATH_SEP_TOKEN1);
 }
 
-void PFileHelper::AbsolutePath(const PString& inPath, PString* outPath)
+void HFileHelper::AbsolutePath(const PString& inPath, PString* outPath)
 {
 	if (outPath == nullptr)
 	{
@@ -220,14 +265,14 @@ void PFileHelper::AbsolutePath(const PString& inPath, PString* outPath)
 	NormalizePath(outPath);
 }
 
-const PString& PFileHelper::EngineDirectory()
+const PString& HFileHelper::EngineDirectory()
 {
 	static PString enginePath = "../../";
 
 	return enginePath;
 }
 
-const PString& PFileHelper::EngineBuildDirectory()
+const PString& HFileHelper::EngineBuildDirectory()
 {
 	static PString engineBuildPath;
 	if (engineBuildPath.Empty())
@@ -238,7 +283,7 @@ const PString& PFileHelper::EngineBuildDirectory()
 	return engineBuildPath;
 }
 
-const PString& PFileHelper::EngineContentsDirectory()
+const PString& HFileHelper::EngineContentsDirectory()
 {
 	static PString engineContentsPath;
 	if (engineContentsPath.Empty())
@@ -249,7 +294,7 @@ const PString& PFileHelper::EngineContentsDirectory()
 	return engineContentsPath;
 }
 
-const PString& PFileHelper::EngineConfigDirectory()
+const PString& HFileHelper::EngineConfigDirectory()
 {
 	static PString engineConfigPath;
 	if (engineConfigPath.Empty())
@@ -260,7 +305,7 @@ const PString& PFileHelper::EngineConfigDirectory()
 	return engineConfigPath;
 }
 
-const PString& PFileHelper::EngineSourceDirectory()
+const PString& HFileHelper::EngineSourceDirectory()
 {
 	static PString engineSourcePath;
 	if (engineSourcePath.Empty())
@@ -271,7 +316,7 @@ const PString& PFileHelper::EngineSourceDirectory()
 	return engineSourcePath;
 }
 
-const PString& PFileHelper::EngineEditorSourceDirectory()
+const PString& HFileHelper::EngineEditorSourceDirectory()
 {
 	static PString engineEditorSourcePath;
 	if (engineEditorSourcePath.Empty())
@@ -282,7 +327,7 @@ const PString& PFileHelper::EngineEditorSourceDirectory()
 	return engineEditorSourcePath;
 }
 
-const PString& PFileHelper::EngineProgramsSourceDirectory()
+const PString& HFileHelper::EngineProgramsSourceDirectory()
 {
 	static PString engineProgramsSourcePath;
 	if (engineProgramsSourcePath.Empty())
@@ -293,7 +338,7 @@ const PString& PFileHelper::EngineProgramsSourceDirectory()
 	return engineProgramsSourcePath;
 }
 
-const PString& PFileHelper::EngineRuntimeSourceDirectory()
+const PString& HFileHelper::EngineRuntimeSourceDirectory()
 {
 	static PString engineRuntimeSourcePath;
 	if (engineRuntimeSourcePath.Empty())
@@ -304,7 +349,7 @@ const PString& PFileHelper::EngineRuntimeSourceDirectory()
 	return engineRuntimeSourcePath;
 }
 
-const PString& PFileHelper::EngineThirdPartyDirectory()
+const PString& HFileHelper::EngineThirdPartyDirectory()
 {
 	static PString engineThirdPartyPath;
 	if (engineThirdPartyPath.Empty())

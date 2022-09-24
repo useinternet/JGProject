@@ -6,6 +6,7 @@
 #include "Misc/SequentialIDGenerator.h"
 
 enum class EMainThreadExecutionOrder;
+class PTimer;
 
 class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem>
 {
@@ -64,6 +65,8 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 
 	PSharedPtr<PSequentialIDGenerator> _idGenerator;
 	bool _bIsTaskRunning;
+
+	PSharedPtr<PTimer> _timer;
 public:
 	GScheduleGlobalSystem();
 	virtual ~GScheduleGlobalSystem() = default;
@@ -171,9 +174,11 @@ public:
 
 		thread->PushTask(refObject, func, args...);
 	}
-
-	void RemoveSchedule(uint64 id);
+	
 private:
+	bool updateTask(PSyncTaskByFrame* task);
+	bool updateTask(PSyncTaskByTick* task);
+
 	void  assignNamedThread();
 	int32 getRecommandThreadIndex(ENamedThread namedThread);
 };
