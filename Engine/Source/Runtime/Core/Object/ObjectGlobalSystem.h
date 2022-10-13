@@ -61,6 +61,15 @@ protected:
 
 public:
 	PSharedPtr<JGStruct> GetStaticStruct(uint64 typeID) const;
+	PSharedPtr<JGClass> GetStaticClass(uint64 typeID) const;
+
+
+	template<class T>
+	PSharedPtr<JGClass> GetStaticClass() const
+	{
+		uint64 typeID = JGTYPEID(T);
+		return GetStaticClass(typeID);
+	}
 
 	template<class T>
 	PSharedPtr<JGStruct> GetStaticStruct() const

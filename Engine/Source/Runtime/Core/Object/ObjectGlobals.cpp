@@ -3,10 +3,10 @@
 #include "ObjectGlobalSystem.h"
 
 
-PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const HList<HPair<PName, PString>>& pairList)
+PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const HList<HPair<PName, HHashSet<PString>>>& pairList)
 {
 	PSharedPtr<JGMeta> result = Allocate<JGMeta>();
-	for (const HPair<PName, PString>& pair : pairList)
+	for (const HPair<PName, HHashSet<PString>>& pair : pairList)
 	{
 		result->MetaDataMap.emplace(pair.first, pair.second);
 	}

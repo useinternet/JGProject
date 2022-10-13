@@ -19,9 +19,9 @@ PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_Static_JGStruct_TestObje
 		"TestValue2",
 		PObjectGlobalsPrivateUtils::MakeStaticMeta(
 		{
-			HPair<PString, PString>("TestMeta", ""),
-			HPair<PString, PString>("Category", "TestCategory"),
-			HPair<PString, PString>("BlueprintOnly", "")
+			HPair<PString, HHashSet<PString>>("TestMeta", { "" }),
+			HPair<PString, HHashSet<PString>>("Category", { "TestCategory" }),
+			HPair<PString, HHashSet<PString>>("BlueprintOnly", { "" })
 		})));
 
 	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(
@@ -42,7 +42,7 @@ PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_Static_JGStruct_TestObje
 			PObjectGlobalsPrivateUtils::MakeStaticProperty(JGTYPE(int32), "value2"),
 		}, 
 		PObjectGlobalsPrivateUtils::MakeStaticMeta({
-			HPair<PString, PString>("TestMetaFunc", "")
+			HPair<PString, HHashSet<PString>>("TestMetaFunc", {""})
 		})));
 
 	FunctionMap.push_back (PObjectGlobalsPrivateUtils::MakeStaticFunction(

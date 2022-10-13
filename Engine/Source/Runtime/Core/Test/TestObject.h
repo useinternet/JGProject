@@ -3,15 +3,22 @@
 
 
 
-JGSTRUCT()
+JGENUM(TestOnlyDisplay, BlueprintOnly)
+enum class ETestEnum
+{
+	_1, JGENUMMETA(Display = {DIOSK}, TypeTest)
+	_2, JGENUMMETA(Display = {aOSIDJF}, TypeTest)
+};
+
+
 // Auto Code Gen
 class PTestObject;
 PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_JGStruct_TestObject(const PTestObject* fromThis);
 //
-
+JGCLASS(TEST, Category = {asoijfd,aosdifjaosdf})
 class PTestObject : public JGObject
 {
-	JG_GENERATED_JGCLASS_BODY()
+	JG_GENERATED_CLASS_BODY()
 
 	// Auto Code Gen
 	PSharedPtr<JGStruct> GetStruct() const
@@ -31,7 +38,7 @@ public:
 	JGPROPERTY()
 	int32 TestValue3 = 3;
 
-	JGPROPERTY(TestMeta, Category = TestCategory, BlueprintOnly)
+	JGPROPERTY(TestMeta, Category = { TestCategory, BlueprintOnly })
 	int64 TestValue2 = 1;
 
 	JGFUNCTION()

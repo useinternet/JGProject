@@ -3,13 +3,13 @@
 #include "Core.h"
 
 
-JGCLASS()
+
 class JGTestClassA;
 PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const JGTestClassA* fromThis);
-
+JGCLASS()
 class JGTestClassA : public JGObject
 {
-	JG_GENERATED_JGCLASS_BODY()
+	JG_GENERATED_CLASS_BODY()
 	PSharedPtr<JGStruct> GetStruct() const
 	{
 		return Module_Core_Code_Generation_Create_JGClass_TestClassA(this);
@@ -29,7 +29,7 @@ class JGTestClassA : public JGObject
 	JGPROPERTY()
 	int32 TestValue3 = 3;
 
-	JGPROPERTY(TestMeta, Category = TestCategory, BlueprintOnly)
+	JGPROPERTY(TestMeta, Category = { TestCategory, BlueprintOnly })
 	int64 TestValue2 = 1;
 
 	JGFUNCTION()

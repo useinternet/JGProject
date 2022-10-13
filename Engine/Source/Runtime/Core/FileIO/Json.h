@@ -411,7 +411,7 @@ inline rapidjson::Value PJsonData::makeJsonValue(const PString& value)
 	rapidjson::Value val;
 
 	PString str;
-	value.SubString(str, 0, std::strlen(value.GetCStr()));
+	value.SubString(&str, 0, std::strlen(value.GetCStr()));
 
 	val.SetString(str.GetCStr(), (rapidjson::SizeType)str.Length(), _pOwnerJson->GetAllocator());
 

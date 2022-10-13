@@ -107,7 +107,7 @@ PString& PString::Insert(const PString& string, uint64 pos)
 
 PString& PString::Trim()
 {
-	static const char* WHITE_SPACE = " \\t\\n\\v";
+	static const char* WHITE_SPACE = " \t\n\r\f\v";
 
 	HRawString str = _rawString.erase(_rawString.find_last_not_of(WHITE_SPACE) + 1);
 	str.erase(0, str.find_first_not_of(WHITE_SPACE));
@@ -118,10 +118,18 @@ PString& PString::Trim()
 	return *this;
 }
 
-void PString::SubString(PString& outString, uint64 startPos, uint64 length) const
+void PString::SubString(PString* outString, uint64 startPos, uint64 length) const
 {
-	outString.Reset();
-	outString.setString(_rawString.substr(startPos, length));
+	if (outString == nullptr)
+	{
+		return;
+	}
+
+	if (outString != this)
+	{
+		outString->Reset();
+	}
+	outString->setString(_rawString.substr(startPos, length));
 }
 
 PString& PString::ReplaceAll(const PString& pattern, const PString& replace) 
@@ -244,9 +252,19 @@ bool PString::EndWidth(const PString& pattern) const
 	}
 
 	PString endStr;
-	SubString(endStr, len - patternLen, patternLen);
+	SubString(&endStr, len - patternLen, patternLen);
 
 	return std::strncmp(endStr.GetRawString().c_str(), pattern.GetRawString().c_str(), patternLen) == 0;
+}
+
+bool PString::Contains(const PString& pattern) const
+{
+	if (_rawString.find(pattern.GetRawString()) == PString::NPOS)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 int32 PString::ToInt(int32 base) const

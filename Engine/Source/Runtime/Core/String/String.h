@@ -36,6 +36,8 @@ public:
 		result._rawString.resize(len);
 
 		snprintf(result._rawString.data(), len, string.GetRawString().c_str(), convert(args) ...);
+
+		result._rawString.resize(len - 1); // '\0' 맨끝 제거
 		return result;
 	}
 
@@ -81,7 +83,7 @@ public:
 	PString& Insert(const PString& string, uint64 pos);
 	PString& Trim();
 
-	void SubString(PString& outString, uint64 startPos, uint64 length = PString::NPOS) const;
+	void SubString(PString* outString, uint64 startPos, uint64 length = PString::NPOS) const;
 
 	PString& ReplaceAll(const PString& pattern, const PString& replace);
 
@@ -97,6 +99,7 @@ public:
 	bool Equal(const PString& string) const;
 	bool StartWidth(const PString& pattern) const;
 	bool EndWidth(const PString& pattern) const;
+	bool Contains(const PString& pattern) const;
 
 	int32  ToInt(int32 base = 0) const;
 	float  ToFloat() const;

@@ -20,6 +20,16 @@ PSharedPtr<JGStruct> GObjectGlobalSystem::GetStaticStruct(uint64 typeID) const
 	return _structMap.at(typeID);
 }
 
+PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(uint64 typeID) const
+{
+	if (_classMap.find(typeID) == _classMap.end())
+	{
+		return nullptr;
+	}
+
+	return _classMap.at(typeID);
+}
+
 bool GObjectGlobalSystem::registerClass(PSharedPtr<JGClass> classObject)
 {
 	if (classObject.IsValid() == false)

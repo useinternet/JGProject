@@ -101,7 +101,7 @@ void HFileHelper::FileName(const PString& inPath, PString* outStr)
 		pos = inPath.FindLastOf(PATH_SEP_TOKEN2);
 	}
 
-	inPath.SubString(*outStr, pos + 1);
+	inPath.SubString(outStr, pos + 1);
 }
 
 void HFileHelper::FileNameOnly(const PString& inPath, PString* outStr)
@@ -111,15 +111,14 @@ void HFileHelper::FileNameOnly(const PString& inPath, PString* outStr)
 		return;
 	}
 
-	PString path = inPath;
-
-	uint64 pos = path.FindLastOf(EXTENSION_TOKEN);
+	PString tempPath = inPath;
+	uint64 pos = inPath.FindLastOf(EXTENSION_TOKEN);
 	if (pos != PString::NPOS)
 	{
-		path.SubString(path, 0, pos);
+		inPath.SubString(&tempPath, 0, pos);
 	}
 
-	FileName(path, outStr);
+	FileName(tempPath, outStr);
 }
 
 void HFileHelper::FilePathOnly(const PString& inPath, PString* outStr)
@@ -135,7 +134,7 @@ void HFileHelper::FilePathOnly(const PString& inPath, PString* outStr)
 		pos = inPath.FindLastOf(PATH_SEP_TOKEN2);
 	}
 
-	inPath.SubString(*outStr, 0, pos);
+	inPath.SubString(outStr, 0, pos);
 }
 
 bool HFileHelper::FileExtension(const PString& inPath, PString* outStr)
@@ -151,7 +150,7 @@ bool HFileHelper::FileExtension(const PString& inPath, PString* outStr)
 		return false;
 	}
 
-	inPath.SubString(*outStr, pos);
+	inPath.SubString(outStr, pos);
 
 	return true;
 }
@@ -358,4 +357,26 @@ const PString& HFileHelper::EngineThirdPartyDirectory()
 	}
 
 	return engineThirdPartyPath;
+}
+
+const PString& HFileHelper::EngineTempDirectory()
+{
+	static PString engineTempDirectory;
+	if (engineTempDirectory.Empty())
+	{
+		CombinePath(EngineDirectory(), "Temp", &engineTempDirectory);
+	}
+
+	return engineTempDirectory;
+}
+
+const PString& HFileHelper::EngineCodeGenDirectory()
+{
+	static PString engineCodeGenDirectory;
+	if (engineCodeGenDirectory.Empty())
+	{
+		CombinePath(EngineTempDirectory(), "CodeGen", &engineCodeGenDirectory);
+	}
+
+	return engineCodeGenDirectory;
 }

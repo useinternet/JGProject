@@ -27,7 +27,7 @@ class PObjectGlobalsPrivateUtils
 {
 	using address = uint64;
 public:
-	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, PString>>& pairList);
+	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, HHashSet<PString>>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args = HList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGStruct>   MakeStaticStruct(const JGType& type, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
@@ -36,6 +36,9 @@ public:
 
 	template<class T>
 	static PSharedPtr<JGStruct> MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct);
+
+	template<class T>
+	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
 
 	template<class T, class Ret, class ... Args>
 	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func);
@@ -126,7 +129,7 @@ class JGMeta : public JGObject
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	HHashMap<PName, PString> MetaDataMap;
+	HHashMap<PName, HHashSet<PString>> MetaDataMap;
 };
 
 class JGProperty : public JGObject
@@ -382,6 +385,12 @@ inline PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStruct(const T* from
 	}
 
 	return staticStruct;
+}
+
+template<class T>
+inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass)
+{
+	return PSharedPtr<JGClass>();
 }
 
 template<class T, class Ret, class ...Args>

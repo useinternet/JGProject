@@ -29,7 +29,7 @@
 #include "Object/JGObject.h"
 #include "Memory/Memory.h"
 #include "Thread/Scheduler.h"
-
+#include "Platform/Platform.h"
 #include "CoreSystem.h"
 
 
