@@ -11,6 +11,7 @@ enum class ETestEnum
 };
 
 
+
 // Auto Code Gen
 class PTestObject;
 PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_JGStruct_TestObject(const PTestObject* fromThis);

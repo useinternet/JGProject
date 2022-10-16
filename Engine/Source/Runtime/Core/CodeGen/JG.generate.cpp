@@ -1,6 +1,5 @@
 #include "Object/ObjectGlobalSystem.h"
 #include "Object/ObjectGlobals.h"
-
 #include "Misc/Log.h"
 
 CODE_GENERATION_INCLUDE_BEGIN()

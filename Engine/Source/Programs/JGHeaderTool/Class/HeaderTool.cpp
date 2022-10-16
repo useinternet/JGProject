@@ -2,6 +2,11 @@
 #include "HeaderToolConstants.h"
 
 PHeaderTool::PHeaderTool(const PArguments& args) : _args(args) {}
+//
+
+// Token , Start Token Push, EndToken Pop
+// 무시 토큰 JGPROPERTY(, , , ,)
+// 데이터 뽑아내기/ 
 
 const PString& PHeaderTool::HeaderToolDirectory()
 {
@@ -445,15 +450,16 @@ bool PHeaderTool::analysisFunction(const PString& line, HFunction* outFunction)
 	HList<PString> funcArgsType;
 	HList<PString> funcArgsName;
 
-	uint64 argsStartPos = funcBody.Find("(");
-	uint64 argsEndPos   = funcBody.Find(")");
+	uint64 argsStartPos = line.Find("(");
+	uint64 argsEndPos   = line.Find(")");
 	if (argsStartPos == PString::NPOS || argsEndPos == PString::NPOS)
 	{
 		return false;
 	}
 
-	funcBody.SubString(&funcName, 0, argsStartPos);
-	funcBody.SubString(&funcArgsBody, argsStartPos, argsEndPos - argsStartPos);
+	uint64 funcBodyPos = line.Find(funcBody);
+	line.SubString(&funcName, line.Find(funcBody), argsStartPos - funcBodyPos);
+	line.SubString(&funcArgsBody, argsStartPos, argsEndPos - argsStartPos);
 
 	HList<PString> argTokens = funcArgsBody.ReplaceAll("(", "").Split(',');
 	for (const PString& argToken : argTokens)
@@ -491,7 +497,7 @@ bool PHeaderTool::analysisMetaDatas(const PString& line, const PString& analysis
 		return false;
 	}
 
-	uint64 declarePos  = line.Find("#define");
+	uint64 declarePos  = line.Find("#");
 	uint64 commentPos  = line.Find("//");
 	uint64 defineStart = line.Find(analysisToken);
 	
@@ -600,8 +606,21 @@ bool PHeaderTool::analysisEnumElement(const PString& line, HEnum* pEnum)
 bool PHeaderTool::generateCodeGenFiles()
 {
 	const PString& engineCodeGenPath = HFileHelper::EngineCodeGenDirectory();
+	HQueue<const HClass*> collectedClassQueue;
+
 	for (const HHeaderInfo& headerInfo : _engineHeaderInfos)
 	{
+		if (headerInfo.Classes.empty() == true)
+		{
+			continue;
+		}
+
+		if (headerInfo.Classes.size() > 1)
+		{
+			// Error Log
+			continue;
+		}
+
 		PString headerFileName;
 		headerFileName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenHeaderFileName, HHeaderToolConstants::Token::ModuleName, headerInfo.ModuleName);
 		headerFileName = PString::ReplaceAll(headerFileName, HHeaderToolConstants::Token::FileName, headerInfo.FileName);
@@ -642,28 +661,94 @@ bool PHeaderTool::generateCodeGenFiles()
 			// Error Log
 			continue;
 		}
+
+		collectedClassQueue.push(&(headerInfo.Classes[0]));
+		// 생성
 	}
+
+	while (collectedClassQueue.empty() == false)
+	{
+		const HClass* targetClass = collectedClassQueue.front(); collectedClassQueue.pop();
+
+
+
+			/*
+			CODE_GENERATION_INCLUDE_BEGIN()
+	extern PSharedPtr<JGStruct> Module_Core_Code_Generation_Create_Static_JGStruct_TestObject();
+
+	CODE_GENERATION_INCLUDE_END()
+
+	bool GObjectGlobalSystem::codeGen()
+	{
+		JG_LOG(Core, ELogLevel::Info, "Begin Object Code Generation");
+		CODE_GENERATION_BEGIN()
+
+			registerStruct(Module_Core_Code_Generation_Create_Static_JGStruct_TestObject());
+
+
+		CODE_GENERATION_END()
+		JG_LOG(Core, ELogLevel::Info, "End Object Code Generation");
+
+		return true;
+	}
+			*/
+	}
+
+
 
 	for (const HHeaderInfo& headerInfo : _userHeaderInfos)
 	{
-
+		// 아직
 	}
 
 	return true;
 }
 
 bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo, PString* outCode)
-{		
-	
-	/*
-			PString ModuleName;
-	PString FileName;
-	PString Contents;
+{	
 
-	HList<HClass> Classes;
-	HList<HEnum> Enums;
-		*/
+	// Class
+	if (outCode == nullptr)
+	{
+		return false;
+	}
 
+	outCode->Reset();
+
+	if (headerInfo.Classes.empty())
+	{
+		return false;
+	}
+
+	const HClass& targetClass = headerInfo.Classes[0];
+
+	PString codeGenStaticCreateFuncName;
+	codeGenStaticCreateFuncName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateStaticClassFunction, HHeaderToolConstants::Token::ModuleName, headerInfo.ModuleName);
+	codeGenStaticCreateFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, HHeaderToolConstants::Token::ClassName, targetClass.Name);
+
+	PString codeGenCreateFuncName;
+	codeGenCreateFuncName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateClassFunction, HHeaderToolConstants::Token::ModuleName, headerInfo.ModuleName);
+	codeGenCreateFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, HHeaderToolConstants::Token::ClassName, targetClass.Name);
+
+	outCode->AppendLine("#if JGCLASS(...)")
+		.AppendLine("#undef JGCLASS(...)")
+		.AppendLine("#endif").AppendLine("")
+		.AppendLine("#if JG_GENERATED_CLASS_BODY()")
+		.AppendLine("#undef JG_GENERATED_CLASS_BODY()")
+		.AppendLine("#endif").AppendLine("")
+		.AppendLine("#define JGCLASS(...)  \\")
+		.Append("extern ").Append(codeGenStaticCreateFuncName).AppendLine("\\")
+		.Append("extern ").Append(codeGenCreateFuncName).AppendLine("\\").AppendLine("")
+		.AppendLine("#define JG_GENERATED_CLASS_BODY() \\")
+		.AppendLine("public: \\")
+		.AppendLine("PSharedPtr<JGClass> GetClass() const\\")
+		.AppendLine("{ \\")
+		.Append("\treturn ").Append(PString::ReplaceAll(codeGenCreateFuncName, PString::Format("const %s* fromThis", targetClass.Name), "this")).AppendLine("\\")
+		.AppendLine("} \\")
+		.AppendLine("static PSharedPtr<JGStruct> GetStaticClass()\\")
+		.AppendLine("{ \\")
+		.AppendLine(PString::Format("\treturn GObjectGlobalSystem::GetInstance().GetStaticClass<%s>();\\", targetClass.Name))
+		.AppendLine("} \\");
 
 	return true;
 }
@@ -828,31 +913,24 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 			funcCode.AppendLine("\t\t}");
 			funcCode.AppendLine("\t}");
 
-			funcCode.AppendLine("\treturn Class;");
 		}
+
+		funcCode.AppendLine("\treturn Class;");
+		outCode->AppendLine("#include \"Core.h\"").AppendLine("");
 		outCode->AppendLine(codeGenStaticCreateFuncName).AppendLine("{").AppendLine(staticFuncCode).AppendLine("}\n");
 		outCode->AppendLine(codeGenCreateFuncName).AppendLine("{").AppendLine(funcCode).AppendLine("}\n");
 
 		return true;
 	}
 
-
-	// Module_{ModuleName}_Code_Generation_Static_Create_Class_{ClassName}
-// Module_{ModuleName}_Code_Generation_Create_Class_{ClassName}
-
-// Module_{ModuleName}_Code_Generation_Static_Create_Enum_{ClassName}
-// Module_{ModuleName}_Code_Generation_Create_Enum_{ClassName}
-
-
-/*
-	HList<HHeaderInfo> _engineHeaderInfos;
-HList<HHeaderInfo> _userHeaderInfos;
-*/
-// Module.{ModuleName}.{FileName}.generation.cpp
-// Module.{ModuleName}.{FileName}.generation.h
-
-
 	return true;
+}
+
+bool PHeaderTool::generateCodeGenRegistration(const HQueue<const HClass*>& collectedClassQueue)
+{
+	// Codegen cpp
+
+	return false;
 }
 
 const PArguments& PHeaderTool::getArguments() const

@@ -106,6 +106,7 @@ private:
 	bool generateCodeGenFiles();
 	bool generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo, PString* outCode);
 	bool generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PString* outCode);
+	bool generateCodeGenRegistration(const HQueue<const HClass*>& collectedClassQueue);
 
 	const PArguments& getArguments() const;
 };

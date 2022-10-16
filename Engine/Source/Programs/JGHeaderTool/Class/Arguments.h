@@ -6,7 +6,9 @@ class PArguments : public IMemoryObject, public IJsonable
 {
 public:
 	PString EngineWorkDirectory;
+	PString EngineCodeGenCppFilePath;
 	HHashSet<PString> EngineWorkCategories;
+	
 
 	PString UserWorkDirectory;
 	HHashSet<PString> UserWorkCategories;
@@ -18,6 +20,7 @@ public:
 		EngineWorkCategories.insert("Runtime");
 		EngineWorkCategories.insert("Programs");
 
+		HFileHelper::CombinePath(EngineWorkDirectory, "Runtime/Core/CodeGen/JG.generate.cpp", &EngineCodeGenCppFilePath);
 		HFileHelper::CombinePath(HFileHelper::EngineSourceDirectory(), "Dummy", &UserWorkDirectory);
 	}
 
@@ -27,7 +30,7 @@ protected:
 	{
 		json.AddMember("EngineWorkDirectory", EngineWorkDirectory);
 		json.AddMember("EngineWorkCategories", EngineWorkCategories);
-
+		json.AddMember("EngineCodeGenCppFilePath", EngineCodeGenCppFilePath);
 		json.AddMember("UserWorkDirectory", UserWorkDirectory);
 		json.AddMember("UserWorkCategories", UserWorkCategories);
 	}
@@ -40,6 +43,11 @@ protected:
 		}
 
 		if (json.GetData("EngineWorkCategories", &EngineWorkCategories) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "EngineWorkCategories: fail read json data");
+		}
+
+		if (json.GetData("EngineCodeGenCppFilePath", &EngineCodeGenCppFilePath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Error, "EngineWorkCategories: fail read json data");
 		}
