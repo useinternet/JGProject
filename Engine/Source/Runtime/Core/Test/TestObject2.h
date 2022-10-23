@@ -3,26 +3,24 @@
 #include "Core.h"
 
 
-
-class JGTestClassA;
-PSharedPtr<JGClass> Module_Core_Code_Generation_Create_JGClass_TestClassA(const JGTestClassA* fromThis);
 JGCLASS()
 class JGTestClassA : public JGObject
 {
-	JG_GENERATED_CLASS_BODY()
-	PSharedPtr<JGStruct> GetStruct() const
-	{
-		return Module_Core_Code_Generation_Create_JGClass_TestClassA(this);
-	}
+	//JG_GENERATED_CLASS_BODY()
+	//PSharedPtr<JGStruct> GetStruct() const
+	//{
+	//	return Module_Core_Code_Generation_Create_JGClass_TestClassA(this);
+	//}
 
-	static PSharedPtr<JGStruct> GetStaticStruct()
-	{
-		return GObjectGlobalSystem::GetInstance().GetStaticStruct<JGTestClassA>();
-	}
+	//static PSharedPtr<JGStruct> GetStaticStruct()
+	//{
+	//	return GObjectGlobalSystem::GetInstance().GetStaticStruct<JGTestClassA>();
+	//}
 
 
 
 	//
+public:
 	JGPROPERTY()
 	int TestValue1 = -1;
 
@@ -41,12 +39,12 @@ class JGTestClassA : public JGObject
 	JGFUNCTION(TestMetaFunc)
 	virtual int32 TestFunc2(float32 value, int32 value2)
 	{
-
+		return 0;
 	}
 
 	JGFUNCTION()
 	float32 TestFunc3(const PString& str)
 	{
-
+		return  0.0f;
 	}
 };

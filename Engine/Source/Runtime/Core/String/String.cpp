@@ -105,6 +105,14 @@ PString& PString::Insert(const PString& string, uint64 pos)
 	return *this;
 }
 
+PString& PString::Remove(uint64 startPos, uint64 len)
+{
+	_rawString.erase(startPos, len);
+	updateHashCode();
+
+	return *this;
+}
+
 PString& PString::Trim()
 {
 	static const char* WHITE_SPACE = " \t\n\r\f\v";

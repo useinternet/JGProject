@@ -10,12 +10,20 @@ enum class ECoreSystemFlags
 };
 
 class GGlobalSystemInstanceBase;
+class GCoreSystem;
+
+namespace HCoreSystemPrivate
+{
+	void SetInstance(GCoreSystem* instance);
+}
+
 class GCoreSystem
 {
+	friend void HCoreSystemPrivate::SetInstance(GCoreSystem* instance);
 private:
 	static GCoreSystem* Instance;
-	static HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
-	static HList<ThreadID> ThreadIDList;
+	HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
+	HList<ThreadID> ThreadIDList;
 
 private:
 	GCoreSystem() = default;
@@ -26,6 +34,8 @@ public:
 	static void Update();
 	static void Destroy();
 
+	static GCoreSystem& GetInstance();
+
 	template<class T, class ...Args>
 	static void RegisterSystemInstance(Args... args)
 	{
@@ -35,7 +45,7 @@ public:
 		}
 
 		uint64 code = getTypeHashCode<T>();
-		SystemInstancePool.emplace(code, new T(args...));
+		Instance->SystemInstancePool.emplace(code, new T(args...));
 	}
 	template<class T>
 	static void UnRegisterSystemInstance()
@@ -46,12 +56,12 @@ public:
 		}
 
 		uint64 code = getTypeHashCode<T>();
-		GGlobalSystemInstanceBase*& instance = SystemInstancePool[code];
+		GGlobalSystemInstanceBase*& instance = Instance->SystemInstancePool[code];
 
 		delete instance;
 		instance = nullptr;
 
-		SystemInstancePool.erase(code);
+		Instance->SystemInstancePool.erase(code);
 	}
 	template<class T>
 	static T* GetSystemInstance()
@@ -61,7 +71,7 @@ public:
 			return nullptr;
 		}
 		uint64 code = getTypeHashCode<T>();
-		return static_cast<T*>(SystemInstancePool[code]);
+		return static_cast<T*>(Instance->SystemInstancePool[code]);
 	}
 
 	template<class T>
@@ -69,11 +79,12 @@ public:
 	{
 		uint64 code = getTypeHashCode<T>();
 
-		return SystemInstancePool.find(code) != SystemInstancePool.end();
+		return Instance->SystemInstancePool.find(code) != Instance->SystemInstancePool.end();
 	}
 
 	static uint32 GetThreadCount();
 	static HList<ThreadID> GetAllThreadIDs();
+	
 	
 private:
 	template<class T>
@@ -118,3 +129,5 @@ public:
 		return GCoreSystem::IsValidSystemInstance<T>();
 	}
 };
+
+

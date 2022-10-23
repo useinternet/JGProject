@@ -22,6 +22,12 @@ namespace HHeaderToolConstants
 		static const PString FileName = "{FILE_NAME}";
 		static const PString ClassName = "{CLASS_NAME}";
 		static const PString EnumName = "{ENUM_NAME}";
+
+		static const PString CodeGenerationIncludeBegin = "CODE_GENERATION_INCLUDE_BEGIN()";
+		static const PString CodeGenerationIncludeEnd = "CODE_GENERATION_INCLUDE_END()";
+
+		static const PString CodeGenerationBegin = "CODE_GENERATION_BEGIN()";
+		static const PString CodeGenerationEnd = "CODE_GENERATION_END()";
 	}
 
 	namespace Template
@@ -35,11 +41,7 @@ namespace HHeaderToolConstants
 		static const PString CodeGenCreateStaticEnumFunction = "PSharedPtr<JGClass> Module_{MODULE_NAME}_Code_Generation_Static_Create_Enum_{ENUM_NAME}()";
 		static const PString CodeGenCreateEnumFunction = "PSharedPtr<JGClass> Module_{MODULE_NAME}_Code_Generation_Create_Enum_{ENUM_NAME}(const {ENUM_NAME}* fromThis)";
 
-		static const PString CodeGenerationIncludeBegin = "CODE_GENERATION_INCLUDE_BEGIN()";
-		static const PString CodeGenerationIncludeEnd   = "CODE_GENERATION_INCLUDE_END()";
 
-		static const PString CodeGenerationBegin = "CODE_GENERATION_BEGIN()";
-		static const PString CodeGenerationEnd = "CODE_GENERATION_END()";
 	}
 
 

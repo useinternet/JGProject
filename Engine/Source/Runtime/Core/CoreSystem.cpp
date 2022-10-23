@@ -8,9 +8,13 @@
 #include "Misc/Module.h"
 #include <crtdbg.h>
 
+void HCoreSystemPrivate::SetInstance(GCoreSystem* instance)
+{
+	GCoreSystem::Instance = instance;
+}
+
+
 GCoreSystem* GCoreSystem::Instance = nullptr;
-HHashMap<uint64, GGlobalSystemInstanceBase*> GCoreSystem::SystemInstancePool;
-HList<ThreadID> GCoreSystem::ThreadIDList;
 
 bool GCoreSystem::Create(ECoreSystemFlags flags)
 {
@@ -61,7 +65,7 @@ bool GCoreSystem::Create(ECoreSystemFlags flags)
 }
 void GCoreSystem::Update()
 {
-	for (HPair<const uint64, GGlobalSystemInstanceBase*>& pair : SystemInstancePool)
+	for (HPair<const uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
 	{
 		pair.second->Update();
 	}
@@ -86,8 +90,8 @@ void GCoreSystem::Destroy()
 	GCoreSystem::UnRegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GLogGlobalSystem>();
 
-	SystemInstancePool.clear();
-	ThreadIDList.clear();
+	Instance->SystemInstancePool.clear();
+	Instance->ThreadIDList.clear();
 
 
 	delete Instance;
@@ -96,6 +100,11 @@ void GCoreSystem::Destroy()
 #if _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif // _DEBUG
+}
+
+GCoreSystem& GCoreSystem::GetInstance()
+{
+	return *Instance;
 }
 
 
@@ -107,7 +116,7 @@ uint32 GCoreSystem::GetThreadCount()
 
 HList<ThreadID> GCoreSystem::GetAllThreadIDs()
 {
-	return ThreadIDList;
+	return Instance->ThreadIDList;
 }
 
 void GCoreSystem::collectionThreadIDs()
@@ -124,7 +133,7 @@ void GCoreSystem::collectionThreadIDs()
 		tempThreads[i] = std::thread([&]()
 		{
 			HLockGuard<HMutex> lock(tempMutex);
-			ThreadIDList.push_back(std::hash<std::thread::id>()(std::this_thread::get_id()));
+			Instance->ThreadIDList.push_back(std::hash<std::thread::id>()(std::this_thread::get_id()));
 		});
 	}
 	for (uint32 i = 0; i < threadCount; ++i)
@@ -132,3 +141,5 @@ void GCoreSystem::collectionThreadIDs()
 		tempThreads[i].join();
 	}
 }
+
+

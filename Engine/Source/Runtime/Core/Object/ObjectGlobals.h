@@ -30,12 +30,8 @@ public:
 	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, HHashSet<PString>>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args = HList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGStruct>   MakeStaticStruct(const JGType& type, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-
-	template<class T>
-	static PSharedPtr<JGStruct> MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct);
 
 	template<class T>
 	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
@@ -277,27 +273,6 @@ public:
 	const HList<PSharedPtr<JGFunction>>& GetFunctionList() const;
 };
 
-/* Struct 정보
-* 기본적으로 프로퍼티 정보만 저장 / 관리
-* 함수는 메타 정보 / 이름 정보만 
-*/
-class JGStruct : public JGField
-{
-	JG_GENERATED_SIMPLE_BODY
-	friend PObjectGlobalsPrivateUtils;
-	friend GObjectGlobalSystem;
-protected:
-	PSharedPtr<JGType>  Type;
-	PSharedPtr<JGMeta>  MetaData;
-
-public:
-	JGStruct();
-	virtual ~JGStruct() = default;
-
-public:
-	PSharedPtr<JGType> GetClassType() const;
-};
-
 class JGEnum : public JGObject
 {
 	JG_GENERATED_SIMPLE_BODY
@@ -320,17 +295,22 @@ public:
 * VTable 관리 -> VTable에는 Class, Interface만 상속할 수 있음.
 * 상속 검사 시 중복 상속 시 에러 검출
 */
-class JGClass : public JGStruct
+class JGClass : public JGField
 {
 	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
+	PSharedPtr<JGType>  Type;
+	PSharedPtr<JGMeta>  MetaData;
+
 	HHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGClass();
 	virtual ~JGClass() = default;
+
+	PSharedPtr<JGType> GetClassType() const;
 };
 
 /* JGInterface
@@ -338,14 +318,11 @@ public:
 * VTable 관리 -> Interface만 상속 가능, 다른 것이 상속되어져 잇으면 오류 검출
 * 상속 검사 시 중복 상속 시 에러 검출
 */
-class JGInterface : public JGStruct
+class JGInterface : public JGClass
 {
 	JG_GENERATED_SIMPLE_BODY
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
-
-public:
-	HHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
 
 public:
 	JGInterface();
@@ -353,7 +330,7 @@ public:
 };
 
 template<class T>
-inline PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStruct(const T* fromThis, PSharedPtr<JGStruct> staticStruct)
+inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass)
 {
 	if (fromThis == nullptr)
 	{
@@ -362,35 +339,29 @@ inline PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStruct(const T* from
 
 	address rawAddr = (address)fromThis;
 
-	int32 propertyCount = (int32)staticStruct->Properties.size();
+	int32 propertyCount = (int32)staticClass->Properties.size();
 
 	for (int32 i = 0; i < propertyCount; ++i)
 	{
-		PSharedPtr<JGProperty> property = staticStruct->Properties[i];
-		PSharedPtr<JGType>	   type		= property->Type;
-		
-		staticStruct->PropertyMap.emplace(property->GetName(), i);
+		PSharedPtr<JGProperty> property = staticClass->Properties[i];
+		PSharedPtr<JGType>	   type = property->Type;
+
+		staticClass->PropertyMap.emplace(property->GetName(), i);
 
 		property->DataPtr = (void*)rawAddr;
 
 		rawAddr += HMath::Align<int64>((int64)type->GetSize(), JG_MEMORY_OFFSET);
 	}
 
-	int32 functionCount = (int32)staticStruct->Functions.size();
+	int32 functionCount = (int32)staticClass->Functions.size();
 
 	for (int32 i = 0; i < functionCount; ++i)
 	{
-		PSharedPtr<JGFunction> function = staticStruct->Functions[i];
-		staticStruct->FunctionMap.emplace(function->GetName(), i);
+		PSharedPtr<JGFunction> function = staticClass->Functions[i];
+		staticClass->FunctionMap.emplace(function->GetName(), i);
 	}
 
-	return staticStruct;
-}
-
-template<class T>
-inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass)
-{
-	return PSharedPtr<JGClass>();
+	return staticClass;
 }
 
 template<class T, class Ret, class ...Args>

@@ -17,6 +17,11 @@
 #include <filesystem>
 #include <chrono>
 
+
+
+
+
+//
 namespace fs = std::filesystem;
 
 #define _KB   1024
@@ -82,6 +87,9 @@ using HAtomicInt32  = std::atomic_int;
 using HAtomicUint32 = std::atomic_uint;
 
 using ThreadID = uint64;
+using ModuleID = uint64;
+using InstanceID = uint64;
+
 
 
 template<class Key, class Value>
@@ -165,3 +173,7 @@ enum
 #elif _RELEASEGAME
 #define JG_CONFIGURATIONS_NAME "ReleaseGame"
 #endif
+
+
+
+

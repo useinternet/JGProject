@@ -2,6 +2,9 @@
 #include "Core.h"
 #include "Arguments.h"
 
+
+struct HHeaderInfo;
+
 struct HMeta
 {
 	HHashMap<PString, HHashSet<PString>> Metas;
@@ -35,6 +38,13 @@ struct HClass
 	HList<HProperty> Properties;
 	HList<HFunction> Functions;
 	HMeta MetaData;
+
+	HHeaderInfo* OwnerHeaderInfo = nullptr;
+
+	HClass(HHeaderInfo* pOwnerHeaderInfo) : OwnerHeaderInfo(pOwnerHeaderInfo) {}
+
+	void GetCodeGenStaticCreateFuncName(PString* outName) const;
+	void GetCodeGenCreateFuncName(PString* outName) const;
 };
 
 struct HEnumElement
@@ -54,6 +64,7 @@ struct HHeaderInfo
 	PString ModuleName;
 	PString FileName;
 	PString Contents;
+	PString LocalRelativePath;
 
 	HList<HClass> Classes;
 	HList<HEnum> Enums;
@@ -65,9 +76,6 @@ public:
 	static constexpr char const* ARGUMENTS_JSON_FILE_NAME = "headertool_arguments.json";
 
 private:
-	// Module이름, Engine
-	// C:\JGProject\Engine\Temp\CodeGen <- 여기에 cpp 파일로 생성
-
 	PArguments _args;
 	HList<HHeaderInfo> _engineHeaderInfos;
 	HList<HHeaderInfo> _userHeaderInfos;
@@ -91,11 +99,11 @@ private:
 	bool extractReflectionDatas();
 	bool extractReflectionDatasInternal(HList<HHeaderInfo>& inHeaderInfos);
 
-	bool isCanAnalysisClass(const PString& line);
-	bool isCanAnalysisProperty(const PString& line);
-	bool isCanAnalysisFunction(const PString& line);
-	bool isCanAnalysisEnum(const PString& line);
-	bool isCanAnalysisEnumMeta(const PString& line);
+	bool isCanAnalysisClass(const PString& line) const;
+	bool isCanAnalysisProperty(const PString& line) const;
+	bool isCanAnalysisFunction(const PString& line) const;
+	bool isCanAnalysisEnum(const PString& line) const;
+	bool isCanAnalysisEnumMeta(const PString& line) const;
 
 	bool analysisBaseClass(const PString& line, HClass* outClass);
 	bool analysisProperty(const PString& line, HProperty* outProperty);
@@ -106,7 +114,7 @@ private:
 	bool generateCodeGenFiles();
 	bool generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo, PString* outCode);
 	bool generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PString* outCode);
-	bool generateCodeGenRegistration(const HQueue<const HClass*>& collectedClassQueue);
+	bool generateCodeGenRegistration(HQueue<const HClass*>& collectedClassQueue, PString* outCode);
 
 	const PArguments& getArguments() const;
 };

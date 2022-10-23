@@ -606,7 +606,51 @@ public:
 	}
 
 	template<class T, class U>
-	PSharedPtr<T> CastUnChecked(PSharedPtr<U> ptr)
+	PSharedPtr<T> RawFastCast(PSharedPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		return RawFastCastUnChecked<T, U>(ptr);
+	}
+
+	template<class T, class U>
+	PWeakPtr<T> RawFastCast(PWeakPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		return RawFastCastUnChecked<T, U>(ptr);
+	}
+
+	template<class T, class U>
+	PSharedPtr<T> RawDynamicCast(PSharedPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		return RawDynamicCastUnChecked<T, U>(ptr);
+	}
+
+	template<class T, class U>
+	PWeakPtr<T> RawDynamicCast(PWeakPtr<U> ptr)
+	{
+		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		{
+			return nullptr;
+		}
+
+		return RawDynamicCastUnChecked<T, U>(ptr);
+	}
+
+	template<class T, class U>
+	PSharedPtr<T> RawFastCastUnChecked(PSharedPtr<U> ptr)
 	{
 		PSharedPtr<T> result;
 		result._ptr = static_cast<T*>(ptr._ptr);
@@ -618,18 +662,7 @@ public:
 	}
 
 	template<class T, class U>
-	PSharedPtr<T> Cast(PSharedPtr<U> ptr)
-	{
-		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
-		{
-			return nullptr;
-		}
-
-		return CastUnChecked<T, U>(ptr);
-	}
-
-	template<class T, class U>
-	PWeakPtr<T> CastUnChecked(PWeakPtr<U> ptr)
+	PWeakPtr<T> RawFastCastUnChecked(PWeakPtr<U> ptr)
 	{
 		PWeakPtr<T> result;
 		result._ptr = static_cast<T*>(ptr._ptr);
@@ -641,14 +674,39 @@ public:
 	}
 
 	template<class T, class U>
-	PWeakPtr<T> Cast(PWeakPtr<U> ptr)
+	PWeakPtr<T> RawDynamicCastUnChecked(PWeakPtr<U> ptr)
 	{
-		if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+		T* result_ptr = dynamic_cast<T*>(ptr._ptr);
+		if (result_ptr == nullptr)
 		{
 			return nullptr;
 		}
 
-		return CastUnChecked<T, U>(ptr);
+		PWeakPtr<T> result;
+		result._ptr = result_ptr;
+		result._pRefCount  = ptr._pRefCount;
+		result._pWeakCount = ptr._pWeakCount;
+		result.addWeakCount();
+
+		return result;
+	}
+
+	template<class T, class U>
+	PSharedPtr<T> RawDynamicCastUnChecked(PSharedPtr<U> ptr)
+	{
+		T* result_ptr = dynamic_cast<T*>(ptr._ptr);
+		if (result_ptr == nullptr)
+		{
+			return nullptr;
+		}
+
+		PSharedPtr<T> result;
+		result._ptr = result_ptr;
+		result._pRefCount = ptr._pRefCount;
+		result._pWeakCount = ptr._pWeakCount;
+		result.addRefCount();
+
+		return result;
 	}
 
 	void Flush();
@@ -681,26 +739,26 @@ inline PSharedPtr<T> SharedWrap(const T* fromThis)
 }
 
 template<class T, class U>
-inline PSharedPtr<T> CastUnChecked(PSharedPtr<U> ptr)
+inline PSharedPtr<T> RawFastCast(PSharedPtr<U> ptr)
 {
-	return GMemoryGlobalSystem::GetInstance().CastUnChecked<T, U>(ptr);
+	return GMemoryGlobalSystem::GetInstance().RawFastCast<T, U>(ptr);
 }
 
 template<class T, class U>
-inline PWeakPtr<T> CastUnChecked(PWeakPtr<U> ptr)
+inline PWeakPtr<T> RawFastCast(PWeakPtr<U> ptr)
 {
-	return GMemoryGlobalSystem::GetInstance().CastUnChecked<T, U>(ptr);
+	return GMemoryGlobalSystem::GetInstance().RawFastCast<T, U>(ptr);
 }
 
 template<class T, class U>
-inline PSharedPtr<T> Cast(PSharedPtr<U> ptr)
+inline PSharedPtr<T> RawDynamicCast(PSharedPtr<U> ptr)
 {
-	return GMemoryGlobalSystem::GetInstance().Cast<T, U>(ptr);
+	return GMemoryGlobalSystem::GetInstance().RawDynamicCast<T, U>(ptr);
 }
 
 template<class T, class U>
-inline PWeakPtr<T> Cast(PWeakPtr<U> ptr)
+inline PWeakPtr<T> RawDynamicCast(PWeakPtr<U> ptr)
 {
-	return GMemoryGlobalSystem::GetInstance().Cast<T, U>(ptr);
+	return GMemoryGlobalSystem::GetInstance().RawDynamicCast<T, U>(ptr);
 }
 

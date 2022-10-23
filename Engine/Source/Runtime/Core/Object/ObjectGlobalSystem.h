@@ -39,7 +39,6 @@ enum class EPropertyType
 	EnumFlags,
 };
 
-class JGType;
 class JGStruct;
 class JGClass;
 class JGEnum;
@@ -48,11 +47,11 @@ class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
 	friend class GCoreSystem;
 private:
-	HHashMap<PName, uint64> _typeIDMap;
+	HHashMap<PName, JGType> _typeMap;
 
-	HHashMap<uint64, PSharedPtr<JGClass>>  _classMap;
-	HHashMap<uint64, PSharedPtr<JGStruct>> _structMap;
-	HHashMap<uint64, PSharedPtr<JGEnum>>   _enumMap;
+	HHashMap<JGType, PSharedPtr<JGClass>>  _classMap;
+	HHashMap<JGType, PSharedPtr<JGEnum>>   _enumMap;
+
 public:
 	virtual ~GObjectGlobalSystem() = default;
 
@@ -60,38 +59,55 @@ protected:
 	virtual void Destroy() override;
 
 public:
-	PSharedPtr<JGStruct> GetStaticStruct(uint64 typeID) const;
-	PSharedPtr<JGClass> GetStaticClass(uint64 typeID) const;
-
+	PSharedPtr<JGClass> GetStaticClass(const JGType& type) const;
+	PSharedPtr<JGInterface> GetStaticInterface(const JGType& type) const;
 
 	template<class T>
 	PSharedPtr<JGClass> GetStaticClass() const
 	{
-		uint64 typeID = JGTYPEID(T);
-		return GetStaticClass(typeID);
+		return GetStaticClass(JGTYPE(T));
 	}
 
-	template<class T>
-	PSharedPtr<JGStruct> GetStaticStruct() const
+	bool CanCast(const JGType& destType, const JGType& srcType) const;
+
+	template<class T, class U>
+	bool CanCast() const
 	{
-		uint64 typeID = JGTYPEID(T);
-		return GetStaticStruct(typeID);
+		return CanCast(JGTYPE(T), JGTYPE(U));
 	}
+
+	bool RegisterJGClass(PSharedPtr<JGClass> classObject);
+	bool RegisterJGEnum(PSharedPtr<JGEnum> enumObject);
 
 private:
-	bool registerClass(PSharedPtr<JGClass> classObject);
-	bool registerStruct(PSharedPtr<JGStruct> structObject);
-	bool registerEnum(PSharedPtr<JGEnum> enumObject);
-
 	bool registerType(PSharedPtr<JGType> type);
 
-	PSharedPtr<JGStruct> copyStruct(uint64 typeID);
+	bool canCastInternal(const JGType& destType, const JGType& srcType) const;
 
 private:
 	bool codeGen();
 };
 
+template<class T, class U>
+inline PSharedPtr<T> Cast(PSharedPtr<U> ptr)
+{
+	if (GObjectGlobalSystem::GetInstance().CanCast<T, U>() == false)
+	{
+		return nullptr;
+	}
 
+	return RawFastCast<T, U>(ptr);
+}
 
+template<class T, class U>
+inline PWeakPtr<T> Cast(PWeakPtr<U> ptr)
+{
+	if (GObjectGlobalSystem::GetInstance().CanCast<T, U>() == false)
+	{
+		return nullptr;
+	}
+
+	return RawFastCast<T, U>(ptr);
+}
 
 

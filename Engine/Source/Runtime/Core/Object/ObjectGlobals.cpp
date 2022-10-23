@@ -35,17 +35,6 @@ PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PStr
 	return result;
 }
 
-PSharedPtr<JGStruct> PObjectGlobalsPrivateUtils::MakeStaticStruct(const JGType& type, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
-{
-	PSharedPtr<JGStruct> result = Allocate<JGStruct>();
-	result->Type = Allocate<JGType>(type);
-	result->Properties = properties;
-	result->Functions  = functions;
-	result->MetaData   = metaData;
-
-	return result;
-}
-
 PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGClass> result = Allocate<JGClass>();
@@ -207,13 +196,6 @@ const HList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
 	return Functions;
 }
 
-JGStruct::JGStruct() {}
-
-PSharedPtr<JGType> JGStruct::GetClassType() const
-{
-	return Type;
-}
-
 JGEnum::JGEnum() {}
 
 PSharedPtr<JGType> JGEnum::GetEnumType() const
@@ -222,6 +204,11 @@ PSharedPtr<JGType> JGEnum::GetEnumType() const
 }
 
 JGClass::JGClass() {}
+PSharedPtr<JGType> JGClass::GetClassType() const
+{
+	return Type;
+}
+
 
 JGInterface::JGInterface() {}
 

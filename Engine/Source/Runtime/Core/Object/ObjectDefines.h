@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "CoreDefines.h"
 
 
@@ -16,8 +15,10 @@
 #define JG_GENERATED_SIMPLE_BODY \
 public:  \
 	virtual JGType GetType() const override { return JGType::GenerateType(this); } \
+\
 private: \
+\
 
 #define JG_GENERATED_CLASS_BODY(...) \
-	friend class PObjectGlobalsPrivateUtils; \
 	JG_GENERATED_SIMPLE_BODY \
+	friend class PObjectGlobalsPrivateUtils; \

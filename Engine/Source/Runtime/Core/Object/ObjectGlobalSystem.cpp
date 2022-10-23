@@ -1,36 +1,46 @@
 #include "ObjectGlobalSystem.h"
 #include "ObjectGlobals.h"
 #include "Misc/Log.h"
+#include "Platform/Platform.h"
 
 void GObjectGlobalSystem::Destroy()
 {
 	_enumMap.clear();
-	_structMap.clear();
 	_classMap.clear();
-	_typeIDMap.clear();
+	_typeMap.clear();
 }
 
-PSharedPtr<JGStruct> GObjectGlobalSystem::GetStaticStruct(uint64 typeID) const
+PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(const JGType& type) const
 {
-	if (_structMap.find(typeID) == _structMap.end())
+	if (_classMap.find(type) == _classMap.end())
 	{
 		return nullptr;
 	}
 
-	return _structMap.at(typeID);
+	return _classMap.at(type);
 }
 
-PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(uint64 typeID) const
+PSharedPtr<JGInterface> GObjectGlobalSystem::GetStaticInterface(const JGType& type) const
 {
-	if (_classMap.find(typeID) == _classMap.end())
+	return nullptr;
+}
+
+bool GObjectGlobalSystem::CanCast(const JGType& destType, const JGType& srcType) const
+{
+	if (canCastInternal(destType, srcType) == true)
 	{
-		return nullptr;
+		return true;
 	}
 
-	return _classMap.at(typeID);
+	if (canCastInternal(srcType, destType) == true)
+	{
+		return true;
+	}
+
+	return false;
 }
 
-bool GObjectGlobalSystem::registerClass(PSharedPtr<JGClass> classObject)
+bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject)
 {
 	if (classObject.IsValid() == false)
 	{
@@ -49,38 +59,13 @@ bool GObjectGlobalSystem::registerClass(PSharedPtr<JGClass> classObject)
 		return false;
 	}
 
-	const uint64 typeID = classType->GetID();
-	_classMap.emplace(typeID, classObject);
+	_classMap.emplace(*classType, classObject);
 
 	return true;
 }
 
-bool GObjectGlobalSystem::registerStruct(PSharedPtr<JGStruct> structObject)
-{
-	if (structObject.IsValid() == false)
-	{
-		return false;
-	}
 
-	PSharedPtr<JGType> structType = structObject->GetClassType();
-	if (structType.IsValid() == false)
-	{
-		JG_LOG(Core, ELogLevel::Critical, "{0} : Invalid Type", structObject->GetName());
-		return false;
-	}
-
-	if (registerType(structType) == false)
-	{
-		return false;
-	}
-
-	const uint64 typeID = structType->GetID();
-	_structMap.emplace(typeID, structObject);
-
-	return true;
-}
-
-bool GObjectGlobalSystem::registerEnum(PSharedPtr<JGEnum> enumObject)
+bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 {
 	if (enumObject.IsValid() == false)
 	{
@@ -99,8 +84,7 @@ bool GObjectGlobalSystem::registerEnum(PSharedPtr<JGEnum> enumObject)
 		return false;
 	}
 
-	const uint64 typeID = enumType->GetID();
-	_enumMap.emplace(typeID, enumObject);
+	_enumMap.emplace(*enumType, enumObject);
 
 	return true;
 }
@@ -113,42 +97,65 @@ bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 	}
 
 	const PName&   typeName   = type->GetName();
-	const uint64   typeID     = type->GetID();
 
-	if (_typeIDMap.find(typeName) != _typeIDMap.end())
+	if (_typeMap.find(typeName) != _typeMap.end())
 	{
 		JG_LOG(Core, ELogLevel::Critical, "Duplicate Type Name : {0}", typeName);
 		return false;
 	}
 
-	_typeIDMap.emplace(typeName, typeID);
+	_typeMap.emplace(typeName, *type);
 
 	return true;
 }
 
-PSharedPtr<JGStruct> GObjectGlobalSystem::copyStruct(uint64 typeID)
+// Base,  Dervie
+// Dervie Base
+bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& srcType) const
 {
-	PSharedPtr<JGStruct> staticStruct = GetStaticStruct(typeID);
-	if (staticStruct == nullptr)
+	PSharedPtr<JGClass> destClass = GetStaticClass(destType);
+	if (destClass == nullptr)
 	{
-		return nullptr;
+		destClass = GetStaticInterface(destType);
 	}
 
-	PSharedPtr<JGStruct> result = Allocate<JGStruct>();
-	result->Type     = staticStruct->Type;
-	result->MetaData = staticStruct->MetaData;
-
-	for (const PSharedPtr<JGProperty>& property : staticStruct->Properties)
+	PSharedPtr<JGClass> srcClass  = GetStaticClass(srcType);
+	if (srcClass == nullptr)
 	{
-		result->Properties.push_back(Allocate<JGProperty>(*property));
+		srcClass = GetStaticInterface(srcType);
 	}
 
-	for (const PSharedPtr<JGFunction>& function : staticStruct->Functions)
+	if (destClass == nullptr || srcClass == nullptr)
 	{
-		result->Functions.push_back(Allocate<JGFunction>(*function));
+		return false;
 	}
 
-	result->SetName(staticStruct->GetName());
+	if (destClass->VTypeSet.contains(srcType) == true)
+	{
+		return true;
+	}
 
-	return result;
+	for (const JGType& type : destClass->VTypeSet)
+	{
+		if (canCastInternal(type, srcType) == true)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool GObjectGlobalSystem::codeGen()
+{
+	HPlatformInstance ins = HPlatform::LoadDll("CodeGen.dll");
+
+	auto func1 = HPlatform::LoadFuncInDll<void, GCoreSystem*>(ins, "Link_Module");
+	func1(&GCoreSystem::GetInstance());
+
+	auto func = HPlatform::LoadFuncInDll<bool, GObjectGlobalSystem*>(ins, "Engine_CodeGenerate");
+	func(this);
+
+	HPlatform::UnLoadDll(ins);
+	return true;
 }

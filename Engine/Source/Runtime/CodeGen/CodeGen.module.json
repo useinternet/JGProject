@@ -1,0 +1,17 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "SharedLib",
+    "ModuleDependencies": [
+      "Core"
+    ],
+    "ModuleName": "CodeGen",
+    "ModulePath": "Source/Runtime/CodeGen/",
+    "Defines": [
+      "_CODEGEN"
+    ],
+    "DevelopEngineFilter": "DebugConfig",
+    "DevelopGameFilter": "ConfirmConfig",
+    "DevelopConfirmGameFilter": "ConfirmConfig",
+    "DevelopReleaseGameFilter": "ReleaseConfig"
+  }
+}

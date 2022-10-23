@@ -123,6 +123,24 @@ workspace "JGEngine"
 
 
 		group "Engine/Runtime"
+			project "CodeGen"
+				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/Runtime/Core/", }
+				links{ "Core", }
+				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE"}
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME"}
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME"}
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME"}
+
+
 			project "Core"
 				includedirs{ "Source/Runtime/Core/", "Source/ThirdParty", }
 				links{ }

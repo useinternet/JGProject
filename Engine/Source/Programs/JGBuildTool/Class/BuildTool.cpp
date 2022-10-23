@@ -352,9 +352,9 @@ bool PBuildTool::makeProjectFiles()
 	
 	system(batFilePath.GetCStr());
 
-	HFileHelper::RemoveFileOrDirectory(batFilePath);
-	HFileHelper::RemoveFileOrDirectory(oldScriptPath);
-	HFileHelper::RemoveFileOrDirectory(premakeTempFilePath);
+	//HFileHelper::RemoveFileOrDirectory(batFilePath);
+	//HFileHelper::RemoveFileOrDirectory(oldScriptPath);
+	//HFileHelper::RemoveFileOrDirectory(premakeTempFilePath);
 
 	return true;
 }

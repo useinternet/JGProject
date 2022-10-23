@@ -230,17 +230,37 @@ void HFileHelper::CombinePath(const PString& p1, const PString& p2, PString* out
 		return;
 	}
 
-	*outStr = PString();
-	outStr->Append(p1);
-
-	uint64 p1LastPos = p1.Length() - 1;
-	
-	if (p1[p1LastPos] != PATH_SEP_TOKEN1 && p1[p1LastPos] != PATH_SEP_TOKEN2)
+	if (&p1 == outStr && &p2 == outStr)
 	{
-		outStr->Append("/");
-	}
+		PString temp1 = p1;
+		PString temp2 = p2;
 
-	outStr->Append(p2);
+		CombinePath(temp1, temp2, outStr);
+	}
+	else if (&p1 == outStr)
+	{
+		PString temp1 = p1;
+		CombinePath(temp1, p2, outStr);
+	}
+	else if (&p2 == outStr)
+	{
+		PString temp2 = p2;
+		CombinePath(p1, temp2, outStr);
+	}
+	else
+	{
+		*outStr = PString();
+		outStr->Append(p1);
+
+		uint64 p1LastPos = p1.Length() - 1;
+
+		if (p1[p1LastPos] != PATH_SEP_TOKEN1 && p1[p1LastPos] != PATH_SEP_TOKEN2)
+		{
+			outStr->Append("/");
+		}
+
+		outStr->Append(p2);
+	}
 }
 
 void HFileHelper::NormalizePath(PString* outPath)
@@ -375,7 +395,7 @@ const PString& HFileHelper::EngineCodeGenDirectory()
 	static PString engineCodeGenDirectory;
 	if (engineCodeGenDirectory.Empty())
 	{
-		CombinePath(EngineTempDirectory(), "CodeGen", &engineCodeGenDirectory);
+		CombinePath(EngineRuntimeSourceDirectory(), "CodeGen", &engineCodeGenDirectory);
 	}
 
 	return engineCodeGenDirectory;
