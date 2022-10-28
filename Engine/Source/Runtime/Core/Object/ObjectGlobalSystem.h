@@ -43,8 +43,6 @@ class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 	friend class GCoreSystem;
 
 	using HCreateObjectFunc = HPlatformFunction<PSharedPtr<JGClass>, const JGObject*>;
-	using HSaveObjectFunc = HPlatformFunction<bool, const JGObject*, PString*>;
-	using HLoadObjectFunc = HPlatformFunction<bool, const PString&, JGObject*>;
 private:
 	HHashMap<PName, JGType> _typeMap;
 
@@ -52,8 +50,6 @@ private:
 	HHashMap<JGType, PSharedPtr<JGEnum>>   _enumMap;
 
 	HHashMap<JGType, HCreateObjectFunc> _createObjectFuncPool;
-	HHashMap<JGType, HSaveObjectFunc> _saveObjectFuncPool;
-	HHashMap<JGType, HLoadObjectFunc> _loadObjectFuncPool;
 
 public:
 	virtual ~GObjectGlobalSystem() = default;
@@ -93,13 +89,9 @@ public:
 		return CanCast(JGTYPE(T), JGTYPE(U));
 	}
 
-	bool RegisterJGClass(PSharedPtr<JGClass> classObject);
+	bool RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateObjectFunc& func);
 	bool RegisterJGInterface(PSharedPtr<JGInterface> ifObject);
 	bool RegisterJGEnum(PSharedPtr<JGEnum> enumObject);
-
-	bool BindCreateObjectFunc(const JGType& type, const HCreateObjectFunc& func);
-	bool BindSaveObjectFunc(const JGType& type, const HSaveObjectFunc& func);
-	bool BindLoadObjectFunc(const JGType& type, const HLoadObjectFunc& func);
 
 private:
 	bool registerType(PSharedPtr<JGType> type);

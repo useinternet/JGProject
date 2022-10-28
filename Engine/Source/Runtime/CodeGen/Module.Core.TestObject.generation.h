@@ -5,7 +5,7 @@
 #define JG_GENERATED_CLASS_BODY \
 friend class PObjectGlobalsPrivateUtils; \
 JG_GENERATED_SIMPLE_BODY \
-friend PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const PTestObject* fromThis);\
+friend PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const JGObject* fromThis);\
 friend PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject();\
 protected: \
  \
@@ -45,4 +45,5 @@ protected: \
 \
 \
 	}\
+private:\
 \

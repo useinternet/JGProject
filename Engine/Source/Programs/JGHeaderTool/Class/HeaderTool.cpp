@@ -26,6 +26,19 @@ void HClass::GetCodeGenCreateFuncName(PString* outName) const
 	*outName = PString::ReplaceAll(*outName, HHeaderToolConstants::Token::ClassName, Name);
 }
 
+
+void HEnum::GetCodeGenStaticCreateFuncName(PString* outName) const
+{
+	if (outName == nullptr || OwnerHeaderInfo == nullptr)
+	{
+		return;
+	}
+	outName->Reset();
+
+	*outName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateEnumFunction, HHeaderToolConstants::Token::ModuleName, (OwnerHeaderInfo->ModuleName));
+	*outName = PString::ReplaceAll(*outName, HHeaderToolConstants::Token::EnumName, Name);
+}
+
 PHeaderTool::PHeaderTool(const PArguments& args) : _args(args) {}
 
 const PString& PHeaderTool::HeaderToolDirectory()
@@ -839,6 +852,38 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 	outCode->Reset();
 
+	/*
+	PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_ETestEnum()
+{
+	HList<PSharedPtr<JGMeta>> MetaList;
+	HList<PName> EnumStringList;
+
+
+	MetaList.resize(2);
+	EnumStringList.resize(2);
+
+
+	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
+			{
+				HPair<PString, HHashSet<PString>>("Display", {"DIOSK", 			}),
+				HPair<PString, HHashSet<PString>>("TypeTest", { "TypeTest", }),
+			});
+	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
+		{
+			HPair<PString, HHashSet<PString>>("Display", {"aOSIDJF", 			}),
+			HPair<PString, HHashSet<PString>>("TypeTest", { "TypeTest", }),
+		});
+
+	EnumStringList[0] = "_1";
+	EnumStringList[1] = "_2";
+}
+	*/
+	for (const HEnum& Enum : headerInfo.Enums)
+	{
+
+	}
+
+
 	for (const HClass& Class : headerInfo.Classes)
 	{
 		PString codeGenStaticCreateFuncName;
@@ -954,8 +999,8 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 		PString funcCode;
 
-		funcCode.AppendLine(PString::Format("\t%s* noneConstThisPtr = const_cast<%s*>(fromThis);", Class.Name, Class.Name));
-		funcCode.AppendLine(PString::Format("\tPSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(fromThis, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(%s)));", Class.Name));
+		funcCode.AppendLine(PString::Format("\t%s* noneConstThisPtr = const_cast<%s*>(static_cast<const %s*>(fromThis));", Class.Name, Class.Name, Class.Name));
+		funcCode.AppendLine(PString::Format("\tPSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(%s)));", Class.Name));
 
 
 		for (const HFunction& function : Class.Functions)
@@ -980,7 +1025,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 				funcCode.Append(PString::Format(", std::placeholders::_%d", i+ 1));
 			}
 			funcCode.AppendLine(");");
-			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(fromThis, Class->FindFunction(PName(\"%s\")), functionRef) == false)", function.Name));
+			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName(\"%s\")), functionRef) == false)", function.Name));
 			funcCode.AppendLine("\t\t{");
 			funcCode.AppendLine(PString::Format("\t\t\tJG_LOG(CodeGen, ELogLevel::Error, \"%s: Fail Bind Function : %s\");", Class.Name, function.Name));
 			funcCode.AppendLine("\t\t}");
@@ -1039,10 +1084,17 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 		PString codeGenStaticCreateFuncName;
 		targetClass->GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
 
+		PString codeGenCreateFuncName;
+		targetClass->GetCodeGenCreateFuncName(&codeGenCreateFuncName);
+
+
 		PString onlyCodeGenStaticFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, "PSharedPtr<JGClass> ", "");
+		PString onlyCodeGenFuncName = PString::ReplaceAll(codeGenCreateFuncName, "PSharedPtr<JGClass> ", "").ReplaceAll("(const JGObject* fromThis)", "");
 
 		newCodeIncludeBody.Append("extern ").Append(codeGenStaticCreateFuncName).AppendLine(";");
-		newCodeGenBody.Append("    objectGlobalSystem->RegisterJGClass(").Append(onlyCodeGenStaticFuncName).AppendLine(");");
+		newCodeIncludeBody.Append("extern ").Append(codeGenCreateFuncName).AppendLine(";");
+
+		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGClass(%s, %s);", onlyCodeGenStaticFuncName, onlyCodeGenFuncName));
 	}
 
 	outCode->AppendLine(newCodeIncludeBody).AppendLine("");

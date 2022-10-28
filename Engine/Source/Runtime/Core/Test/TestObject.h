@@ -26,7 +26,8 @@ private:
 
 	JGPROPERTY(TestMeta, Category = { TestCategory, BlueprintOnly })
 	int64 TestValue2 = 1;
-public:
+
+private:
 	JGFUNCTION()
 	void TestFunc();
 

@@ -45,7 +45,7 @@ bool GObjectGlobalSystem::CanCast(const JGType& destType, const JGType& srcType)
 	return false;
 }
 
-bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject)
+bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateObjectFunc& func)
 {
 	if (classObject.IsValid() == false)
 	{
@@ -65,7 +65,7 @@ bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject)
 	}
 
 	_classMap.emplace(*classType, classObject);
-
+	_createObjectFuncPool.emplace(*classType, func);
 	return true;
 }
 
@@ -96,48 +96,6 @@ bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 
 	_enumMap.emplace(*enumType, enumObject);
 
-	return true;
-}
-
-bool GObjectGlobalSystem::BindCreateObjectFunc(const JGType& type, const HCreateObjectFunc& func)
-{
-	const PName& typeName = type.GetName();
-
-	if (_createObjectFuncPool.contains(type) == true)
-	{
-		JG_LOG(Core, ELogLevel::Critical, "BindCreateObjectFunc: Duplicate Type Name : {0}", typeName);
-		return false;
-	}
-
-	_createObjectFuncPool.emplace(type, func);
-	return true;
-}
-
-bool GObjectGlobalSystem::BindSaveObjectFunc(const JGType& type, const HSaveObjectFunc& func)
-{
-	const PName& typeName = type.GetName();
-
-	if (_saveObjectFuncPool.contains(type) == true)
-	{
-		JG_LOG(Core, ELogLevel::Critical, "BindSaveObjectFunc: Duplicate Type Name : {0}", typeName);
-		return false;
-	}
-
-	_saveObjectFuncPool.emplace(type, func);
-	return true;
-}
-
-bool GObjectGlobalSystem::BindLoadObjectFunc(const JGType& type, const HLoadObjectFunc& func)
-{
-	const PName& typeName = type.GetName();
-
-	if (_loadObjectFuncPool.contains(type) == true)
-	{
-		JG_LOG(Core, ELogLevel::Critical, "BindLoadObjectFunc: Duplicate Type Name : {0}", typeName);
-		return false;
-	}
-
-	_loadObjectFuncPool.emplace(type, func);
 	return true;
 }
 

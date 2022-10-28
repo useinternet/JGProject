@@ -29,6 +29,8 @@ class HPlatformFunction
 private:
 	ReturnType(*func)(Args...);
 public:
+	HPlatformFunction() = default;
+	HPlatformFunction(ReturnType(*inFunc)(Args...)) : func(inFunc) {}
 	ReturnType operator()(Args... args)
 	{
 		return func(args...);

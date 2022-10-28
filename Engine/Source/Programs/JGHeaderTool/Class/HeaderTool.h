@@ -55,8 +55,13 @@ struct HEnumElement
 
 struct HEnum
 {
+	PString Name;
 	HList<HEnumElement> Elements;
 	HMeta MetaData;
+
+	HHeaderInfo* OwnerHeaderInfo = nullptr;
+
+	void GetCodeGenStaticCreateFuncName(PString* outName) const;
 };
 
 struct HHeaderInfo

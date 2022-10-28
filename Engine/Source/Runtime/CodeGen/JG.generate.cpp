@@ -19,12 +19,13 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 
 
 extern PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject();
+extern PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const JGObject* fromThis);
 
 
 CODEGEN_API bool Engine_CodeGenerate(GObjectGlobalSystem* objectGlobalSystem)
 {
 
-    objectGlobalSystem->RegisterJGClass(Module_Core_Code_Generation_Static_Create_Class_PTestObject());
+    objectGlobalSystem->RegisterJGClass(Module_Core_Code_Generation_Static_Create_Class_PTestObject(), Module_Core_Code_Generation_Create_Class_PTestObject);
 
 
     return true;
