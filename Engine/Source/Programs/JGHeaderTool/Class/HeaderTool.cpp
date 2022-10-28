@@ -751,6 +751,7 @@ bool PHeaderTool::generateCodeGenFiles()
 
 bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo, PString* outCode)
 {	
+	// 현재는 필요 없어보임
 	if (outCode == nullptr)
 	{
 		return false;
@@ -770,28 +771,60 @@ bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo,
 
 	targetClass.GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
 	targetClass.GetCodeGenCreateFuncName(&codeGenCreateFuncName);
+
+
+	PString writeJsonContents;
+	PString readJsonContents;
+
+	for (const HProperty& property : targetClass.Properties)
+	{
+		writeJsonContents.AppendLine(PString::Format("    dataJson.AddMember(\"%s\", %s); \\", property.Name, property.Name));
+		readJsonContents.AppendLine(PString::Format(R"(\
+		if (dataJson.GetData("%s", &%s) == false)\
+		{\
+			\
+		}\
+\)", property.Name, property.Name));
+	}
 	
-	outCode->AppendLine("#include \"CoreDefines.h\"");
-	outCode->AppendLine("#if JGCLASS")
-		.AppendLine("#undef JGCLASS(...)")
+	writeJsonContents.Append("\\");
+	readJsonContents.Append("\\");
+
+	outCode->
+		AppendLine("#ifdef JG_GENERATED_CLASS_BODY")
+		.AppendLine("#undef JG_GENERATED_CLASS_BODY")
 		.AppendLine("#endif").AppendLine("")
-		.AppendLine("#if JG_GENERATED_CLASS_BODY")
-		.AppendLine("#undef JG_GENERATED_CLASS_BODY()")
-		.AppendLine("#endif").AppendLine("")
-		.AppendLine("#define JGCLASS(...)  \\")
-		.Append("class ").Append(targetClass.Name).AppendLine(";")
-		.Append("extern ").Append(codeGenStaticCreateFuncName).AppendLine("\\")
-		.Append("extern ").Append(codeGenCreateFuncName).AppendLine("\\").AppendLine("")
-		.AppendLine("#define JG_GENERATED_CLASS_BODY() \\")
-		.AppendLine("public: \\")
-		.AppendLine("PSharedPtr<JGClass> GetClass() const\\")
-		.AppendLine("{ \\")
-		.Append("\treturn ").Append(PString::ReplaceAll(codeGenCreateFuncName, PString::Format("const %s* fromThis", targetClass.Name), "this")).AppendLine("\\")
-		.AppendLine("} \\")
-		.AppendLine("static PSharedPtr<JGStruct> GetStaticClass()\\")
-		.AppendLine("{ \\")
-		.AppendLine(PString::Format("\treturn GObjectGlobalSystem::GetInstance().GetStaticClass<%s>();\\", targetClass.Name))
-		.AppendLine("} \\");
+		.AppendLine("#define JG_GENERATED_CLASS_BODY \\")
+		.AppendLine("friend class PObjectGlobalsPrivateUtils; \\")
+		.AppendLine("JG_GENERATED_SIMPLE_BODY \\")
+		.Append("friend ").Append(codeGenCreateFuncName).AppendLine(";\\")
+		.Append("friend ").Append(codeGenStaticCreateFuncName).AppendLine(";\\")
+		.AppendLine("protected: \\")
+		.AppendLine(PString::Format(R"( \
+	virtual void WriteJson(PJsonData& json) const override \
+	{ \
+		__super::WriteJson(json); \
+ \
+		PJsonData dataJson = json.CreateJsonData(); \
+\
+%s
+\
+		json.AddMember(JGTYPE(%s).GetName().ToString(), dataJson);\
+	}\
+	virtual void ReadJson(const PJsonData& json) override\
+	{\
+		__super::ReadJson(json);\
+\
+		PJsonData dataJson;\
+		if (json.FindMember(JGTYPE(%s).GetName().ToString(), &dataJson) == false)\
+		{\
+			return;\
+		}\
+%s
+\
+	}\
+private:\
+\)", writeJsonContents, targetClass.Name, targetClass.Name, readJsonContents));
 
 	return true;
 }

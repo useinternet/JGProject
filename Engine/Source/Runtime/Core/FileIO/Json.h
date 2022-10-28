@@ -68,6 +68,7 @@ public:
 	int32 GetSize() const;
 	bool  IsValid() const;
 
+	PJsonData CreateJsonData() const;
 protected:
 	virtual void WriteJson(PJsonData& json) const override;
 	virtual void ReadJson(const PJsonData& json) override;

@@ -111,6 +111,11 @@ bool PJsonData::IsValid() const
 	return _pOwnerJson != nullptr;
 }
 
+PJsonData PJsonData::CreateJsonData() const
+{
+	return PJsonData(_pOwnerJson, false);
+}
+
 PJson::PJson() : PJsonData(this, true)
 {}
 

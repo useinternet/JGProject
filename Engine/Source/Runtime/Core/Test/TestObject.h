@@ -2,7 +2,6 @@
 #include "Core.h"
 
 
-
 JGENUM(TestOnlyDisplay, BlueprintOnly)
 enum class ETestEnum
 {
@@ -11,30 +10,14 @@ enum class ETestEnum
 };
 
 
+#include "../CodeGen/Module.Core.TestObject.generation.h"
+
 JGCLASS(TEST, Category = {asoijfd,aosdifjaosdf})
 class PTestObject : public JGObject
 {
-	//JG_GENERATED_CLASS_BODY()
+	JG_GENERATED_CLASS_BODY
 
-		// Auto Code Gen
-		//PSharedPtr<JGStruct> GetStruct() const
-		//{
-		//	return Module_Core_Code_Generation_Create_JGStruct_TestObject(this);
-		//}
-
-		//static PSharedPtr<JGStruct> GetStaticStruct()
-		//{
-		//	return GObjectGlobalSystem::GetInstance().GetStaticStruct<PTestObject>();
-		//}
-
-		//
-public:
-	void SampleFunc()
-	{
-
-	}
-
-public:
+private:
 	JGPROPERTY()
 	int TestValue1 = -1;
 
@@ -43,7 +26,6 @@ public:
 
 	JGPROPERTY(TestMeta, Category = { TestCategory, BlueprintOnly })
 	int64 TestValue2 = 1;
-
 public:
 	JGFUNCTION()
 	void TestFunc();
@@ -53,4 +35,6 @@ public:
 
 	JGFUNCTION()
 	float32 TestFunc3(const PString& str);
+
+	
 };

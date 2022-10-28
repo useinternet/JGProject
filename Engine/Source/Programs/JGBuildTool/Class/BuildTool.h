@@ -3,6 +3,7 @@
 #include "Arguments.h"
 #include "ModuleInfo.h"
 
+
 /* 스케줄러 완료 후 작업 시작
 local PCH_HEADER = "PCH.h"
 local PCH_HEADER_PATH = "Source/PCH/PCH.h"
@@ -29,9 +30,6 @@ public:
 	static constexpr char const* PREMAKE_FILE_NAME = "premake5.exe";
 	static const PString& BuildToolDirectory();
 private:
-	// json 파일 분석
-	// lua  코드 생성
-	// bat  실행
 	PArguments _arguments;
 
 	HHashMap<PString, HList<PModuleInfo>> _engineModuleInfoMap;

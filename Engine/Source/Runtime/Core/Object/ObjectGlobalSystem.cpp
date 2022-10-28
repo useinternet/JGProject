@@ -10,6 +10,11 @@ void GObjectGlobalSystem::Destroy()
 	_typeMap.clear();
 }
 
+PSharedPtr<JGEnum> GObjectGlobalSystem::GetStaticEnum(const JGType& type) const
+{
+	return nullptr;
+}
+
 PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(const JGType& type) const
 {
 	if (_classMap.find(type) == _classMap.end())
@@ -64,6 +69,11 @@ bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject)
 	return true;
 }
 
+bool GObjectGlobalSystem::RegisterJGInterface(PSharedPtr<JGInterface> ifObject)
+{
+	return false;
+}
+
 
 bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 {
@@ -89,6 +99,48 @@ bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 	return true;
 }
 
+bool GObjectGlobalSystem::BindCreateObjectFunc(const JGType& type, const HCreateObjectFunc& func)
+{
+	const PName& typeName = type.GetName();
+
+	if (_createObjectFuncPool.contains(type) == true)
+	{
+		JG_LOG(Core, ELogLevel::Critical, "BindCreateObjectFunc: Duplicate Type Name : {0}", typeName);
+		return false;
+	}
+
+	_createObjectFuncPool.emplace(type, func);
+	return true;
+}
+
+bool GObjectGlobalSystem::BindSaveObjectFunc(const JGType& type, const HSaveObjectFunc& func)
+{
+	const PName& typeName = type.GetName();
+
+	if (_saveObjectFuncPool.contains(type) == true)
+	{
+		JG_LOG(Core, ELogLevel::Critical, "BindSaveObjectFunc: Duplicate Type Name : {0}", typeName);
+		return false;
+	}
+
+	_saveObjectFuncPool.emplace(type, func);
+	return true;
+}
+
+bool GObjectGlobalSystem::BindLoadObjectFunc(const JGType& type, const HLoadObjectFunc& func)
+{
+	const PName& typeName = type.GetName();
+
+	if (_loadObjectFuncPool.contains(type) == true)
+	{
+		JG_LOG(Core, ELogLevel::Critical, "BindLoadObjectFunc: Duplicate Type Name : {0}", typeName);
+		return false;
+	}
+
+	_loadObjectFuncPool.emplace(type, func);
+	return true;
+}
+
 bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 {
 	if (type.IsValid() == false)
@@ -109,8 +161,6 @@ bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 	return true;
 }
 
-// Base,  Dervie
-// Dervie Base
 bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& srcType) const
 {
 	PSharedPtr<JGClass> destClass = GetStaticClass(destType);
@@ -149,12 +199,27 @@ bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& 
 bool GObjectGlobalSystem::codeGen()
 {
 	HPlatformInstance ins = HPlatform::LoadDll("CodeGen.dll");
+	if (ins == nullptr)
+	{
+		// Error Log
+		return false;
+	}
 
-	auto func1 = HPlatform::LoadFuncInDll<void, GCoreSystem*>(ins, "Link_Module");
-	func1(&GCoreSystem::GetInstance());
+	HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(ins, "Link_Module");
+	if (linkModuleFunc.IsVaild() == false)
+	{
+		// Error Log
+		return false;
+	}
 
-	auto func = HPlatform::LoadFuncInDll<bool, GObjectGlobalSystem*>(ins, "Engine_CodeGenerate");
-	func(this);
+	linkModuleFunc(&GCoreSystem::GetInstance());
+
+	HPlatformFunction<bool, GObjectGlobalSystem*> codeGenFunc = HPlatform::LoadFuncInDll<bool, GObjectGlobalSystem*>(ins, "Engine_CodeGenerate");
+	if (codeGenFunc.IsVaild() == false)
+	{
+		// Error Log
+		codeGenFunc(this);
+	}
 
 	HPlatform::UnLoadDll(ins);
 	return true;

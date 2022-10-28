@@ -90,6 +90,13 @@ void PName::ToString(PString& outStr) const
 	GStringTable::GetInstance().FindString(_id, &outStr);
 }
 
+PString PName::ToString() const
+{
+	PString result;
+	ToString(result);
+	return result;
+}
+
 void PName::set(uint64 id)
 {
 	reset();

@@ -141,7 +141,12 @@ public:
 			
 	void ExecuteIfBound(const Args& ... args)
 	{
-		if (Instance->IsBound() == false)\
+		if (Instance == nullptr)
+		{
+			return;
+		}
+
+		if (Instance->IsBound() == false)
 		{
 			return;
 		}
@@ -158,6 +163,82 @@ public:
 		return delegate;
 	}
 };
+
+template<class ... Args>
+class PMultiDelegate
+{
+	HList<PDelegate<Args...>> _delegates;
+	HList<void*> _delegateKeys;
+public:
+	template<class T>
+	void Add(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	{
+		_delegates.push_back(PDelegate<Args...>::Create(ptr, func));
+		_delegateKeys.push_back((void*)(ptr.Pin().GetRawPointer()));
+	}
+
+	void Remove(void* ptr)
+	{
+		if (ptr == nullptr)
+		{
+			return;
+		}
+
+		for (uint64 i = 0; i < _delegates.size();)
+		{
+			if (_delegates[i].IsBound() == false)
+			{
+				removeInternal(i);
+			}
+			else if (_delegateKeys[i] == ptr)
+			{
+				removeInternal(i);
+			}
+			else ++i;
+		}
+	}
+
+	void BroadCast(const Args& ... args)
+	{
+		for (uint64 i = 0; i < _delegates.size();)
+		{
+			if (_delegates[i].IsBound() == false)
+			{
+				removeInternal(i);
+			}
+			else
+			{
+				_delegates[i].Execute(args);
+				++i;
+			}
+		}
+	}
+
+private:
+	void removeInternal(int32 index)
+	{
+		uint64 len = _delegates.size();
+
+		PDelegate<Args...> tempDelegate = _delegates[len - 1];
+
+		_delegates[len - 1] = _delegates[index];
+		_delegates[index] = tempDelegate;
+		_delegates.pop_back();
+
+		void* tempKey = _delegateKeys[len - 1];
+		_delegateKeys[len - 1] = _delegateKeys[index];
+		_delegateKeys[index] = tempKey;
+		_delegateKeys.pop_back();
+	}
+};
+
+
+
+
+
+
+
+
 
 #define JG_DECLARE_DELEGATE(DelegateName) \
 using DelegateName = PDelegate<>;\
@@ -176,3 +257,25 @@ using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourPar
 
 #define JG_DECLARE_DELEGATE_FIVEPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
 using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
+
+
+#define JG_DECLARE_MULTI_DELEGATE(DelegateName) \
+using DelegateName = PMultiDelegate<>;\
+
+#define JG_DECLARE_MULTI_DELEGATE_ONEPARAM(DelegateName, OneParam)\
+using DelegateName   = PMultiDelegate<##OneParam>;\
+
+#define JG_DECLARE_MULTI_DELEGATE_TWOPARAM(DelegateName, OneParam, TwoParam) \
+using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam>;\
+
+#define JG_DECLARE_MULTI_DELEGATE_THREEPARAM(DelegateName, OneParam, TwoParam, ThreeParam) \
+using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam, ##ThreeParam>; \
+
+#define JG_DECLARE_MULTI_DELEGATE_FOURPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam) \
+using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam>; \
+
+#define JG_DECLARE_MULTI_DELEGATE_FIVEPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
+using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
+
+
+

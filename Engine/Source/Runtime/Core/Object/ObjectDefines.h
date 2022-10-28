@@ -19,6 +19,8 @@ public:  \
 private: \
 \
 
-#define JG_GENERATED_CLASS_BODY(...) \
-	JG_GENERATED_SIMPLE_BODY \
+#define JG_GENERATED_CLASS_BODY \
 	friend class PObjectGlobalsPrivateUtils; \
+	JG_GENERATED_SIMPLE_BODY \
+
+	

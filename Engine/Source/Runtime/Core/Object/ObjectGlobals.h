@@ -8,6 +8,7 @@
 #include "Misc/Delegate.h"
 #include "Misc/StdExternal.h"
 
+
 #define TYPE_NULL_ID -1
 
 #define JGTYPE(x)    JGType::GenerateType<##x>()
@@ -38,6 +39,8 @@ public:
 
 	template<class T, class Ret, class ... Args>
 	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func);
+
+	//static bool BindProperty()
 };
 
 class JGType : public JGObject

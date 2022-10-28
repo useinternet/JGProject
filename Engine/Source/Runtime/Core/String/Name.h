@@ -44,8 +44,8 @@ public:
 
 public:
 	const uint64& GetID() const;
-	void  ToString(PString& outStr) const;
-
+	void    ToString(PString& outStr) const;
+	PString ToString() const;
 private:
 	void set(uint64 id);
 	void set(const PString& str);
