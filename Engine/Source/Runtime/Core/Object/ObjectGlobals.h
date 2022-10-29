@@ -22,17 +22,19 @@ class JGFunction;
 class JGStruct;
 class GObjectGlobalSystem;
 class JGClass;
+class JGEnum;
 class JGInterface;
 
 class PObjectGlobalsPrivateUtils
 {
 	using address = uint64;
 public:
-	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, HHashSet<PString>>>& pairList);
+	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, HHashSet<PName>>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args = HList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGEnum> MakeStaticEnum(const JGType& type, const PString& name, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas);
 
 	template<class T>
 	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
@@ -128,7 +130,7 @@ class JGMeta : public JGObject
 	friend PObjectGlobalsPrivateUtils;
 	friend GObjectGlobalSystem;
 protected:
-	HHashMap<PName, HHashSet<PString>> MetaDataMap;
+	HHashMap<PName, HHashSet<PName>> MetaDataMap;
 };
 
 class JGProperty : public JGObject
@@ -283,7 +285,8 @@ class JGEnum : public JGObject
 	friend GObjectGlobalSystem;
 protected:
 	PSharedPtr<JGType>  Type;
-	HHashMap<uint64, PSharedPtr<JGMeta>>  MetaDataMap;
+	HList<PSharedPtr<JGMeta>>  ElementMetaDatas;
+	HList<PName> ElementNames;
 public:
 	JGEnum();
 	virtual ~JGEnum() = default;

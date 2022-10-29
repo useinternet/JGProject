@@ -1,33 +1,6 @@
 #include "Core.h"
 #include "Test/TestObject.h"
 
-PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_ETestEnum()
-{
-	HList<PSharedPtr<JGMeta>> MetaList;
-	HList<PName> EnumStringList;
-
-
-	MetaList.resize(2);
-	EnumStringList.resize(2);
-
-
-	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
-			{
-				HPair<PString, HHashSet<PString>>("Display", {"DIOSK", 			}),
-				HPair<PString, HHashSet<PString>>("TypeTest", { "TypeTest", }),
-			});
-	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
-		{
-			HPair<PString, HHashSet<PString>>("Display", {"aOSIDJF", 			}),
-			HPair<PString, HHashSet<PString>>("TypeTest", { "TypeTest", }),
-		});
-
-	EnumStringList[0] = "_1";
-	EnumStringList[1] = "_2";
-}
-
-
-
 
 PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject()
 {
@@ -52,7 +25,7 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject(
 		},
 		PObjectGlobalsPrivateUtils::MakeStaticMeta(
 		{
-			HPair<PString, HHashSet<PString>>("TestMetaFunc", {"TestMetaFunc", 			}), 
+			HPair<PName, HHashSet<PName>>("TestMetaFunc", {PName("TestMetaFunc"), 			}), 
 		})));
 	FunctionMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticFunction("TestFunc3",
 		PObjectGlobalsPrivateUtils::MakeStaticProperty(JGTYPE(float32), ""),
@@ -67,8 +40,8 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject(
 			JGTYPE(JGObject), 
 		},
 		PropertyMap, FunctionMap,PObjectGlobalsPrivateUtils::MakeStaticMeta({
-			HPair<PString, HHashSet<PString>>("TEST", {"TEST",}),
-			HPair<PString, HHashSet<PString>>("Category", {"asoijfd","aosdifjaosdf",}),
+			HPair<PName, HHashSet<PName>>("TEST", {PName("TEST"),}),
+			HPair<PName, HHashSet<PName>>("Category", {PName("asoijfd"),PName("aosdifjaosdf"),}),
 		}));
 
 }
@@ -104,4 +77,38 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const J
 	return Class;
 
 }
+
+PSharedPtr<JGEnum> Module_Core_Code_Generation_Create_Enum_ETestEnum(const ETestEnum* fromThis)
+{
+
+	HList<PSharedPtr<JGMeta>> MetaList;
+	HList<PName> EnumStringList;
+
+
+	MetaList.resize(2);
+	EnumStringList.resize(2);
+
+    EnumStringList[0] = "_1";
+
+
+	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
+	{
+            HPair<PName, HHashSet<PName>>("Display", {PName("DIOSK"),}),
+            HPair<PName, HHashSet<PName>>("TypeTest", {PName("TypeTest"),}),
+
+	});
+
+    EnumStringList[1] = "_2";
+
+
+	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
+	{
+            HPair<PName, HHashSet<PName>>("TypeTest", {PName("TypeTest"),}),
+            HPair<PName, HHashSet<PName>>("Display", {PName("aOSIDJF"),}),
+
+	});
+
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETestEnum), "ETestEnum", EnumStringList ,MetaList);
+}
+
 

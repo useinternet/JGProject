@@ -115,6 +115,26 @@ inline PSharedPtr<JGEnum> StaticEnum()
 }
 
 
+template<class T>
+bool SaveObject(T* obj)
+{
+	//
+	return false;
+}
+
+template<class T>
+PSharedPtr<T> LoadObject(const PString& path)
+{
+	//
+	return nullptr;
+}
+
+
+
+
+
+
+
 template<class T, class U>
 inline PSharedPtr<T> Cast(PSharedPtr<U> ptr)
 {

@@ -3,10 +3,10 @@
 #include "ObjectGlobalSystem.h"
 
 
-PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const HList<HPair<PName, HHashSet<PString>>>& pairList)
+PSharedPtr<JGMeta> PObjectGlobalsPrivateUtils::MakeStaticMeta(const HList<HPair<PName, HHashSet<PName>>>& pairList)
 {
 	PSharedPtr<JGMeta> result = Allocate<JGMeta>();
-	for (const HPair<PName, HHashSet<PString>>& pair : pairList)
+	for (const HPair<PName, HHashSet<PName>>& pair : pairList)
 	{
 		result->MetaDataMap.emplace(pair.first, pair.second);
 	}
@@ -64,6 +64,16 @@ PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JG
 	}
 
 	return result;
+}
+
+PSharedPtr<JGEnum> PObjectGlobalsPrivateUtils::MakeStaticEnum(const JGType& type, const PString& name, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas)
+{
+	PSharedPtr<JGEnum> Enum = Allocate<JGEnum>();
+	Enum->Type = Allocate<JGType>(type);
+	Enum->ElementMetaDatas = metas;
+	Enum->ElementNames = enumElementNames;
+
+	return Enum;
 }
 
 JGType::JGType()

@@ -61,6 +61,8 @@ struct HEnum
 
 	HHeaderInfo* OwnerHeaderInfo = nullptr;
 
+	HEnum(HHeaderInfo* pOwnerHeaderInfo) : OwnerHeaderInfo(pOwnerHeaderInfo) {}
+
 	void GetCodeGenStaticCreateFuncName(PString* outName) const;
 };
 
@@ -114,6 +116,7 @@ private:
 	bool analysisProperty(const PString& line, HProperty* outProperty);
 	bool analysisFunction(const PString& line, HFunction* outFunction);
 	bool analysisMetaDatas(const PString& line, const PString& token, HMeta* pMeta);
+	bool analysisEnum(const PString& line, HEnum* pEnum);
 	bool analysisEnumElement(const PString& line, HEnum* pEnum);
 
 	bool generateCodeGenFiles();
