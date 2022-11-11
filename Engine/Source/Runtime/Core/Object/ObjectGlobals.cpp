@@ -24,10 +24,10 @@ PSharedPtr<JGProperty> PObjectGlobalsPrivateUtils::MakeStaticProperty(const JGTy
 	return result;
 }
 
-PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args, PSharedPtr<JGMeta> metaData)
+PSharedPtr<JGFunction> PObjectGlobalsPrivateUtils::MakeStaticFunction(const PString& name, const JGType& returnType, const HList<JGType>& args, PSharedPtr<JGMeta> metaData)
 {
 	PSharedPtr<JGFunction> result = Allocate<JGFunction>();
-	result->Return    = returnProperty;
+	result->Return    = returnType;
 	result->Arguments = args;
 	result->MetaData  = metaData;
 	result->SetName(name);
@@ -42,21 +42,6 @@ PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& ty
 	result->Properties = properties;
 	result->Functions  = functions;
 	result->MetaData   = metaData;
-
-	for (const JGType& type : virtualTypeList)
-	{
-		result->VTypeSet.insert(type);
-	}
-
-	return result;
-}
-
-PSharedPtr<JGInterface> PObjectGlobalsPrivateUtils::MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData)
-{
-	PSharedPtr<JGInterface> result = Allocate<JGInterface>();
-	result->Type = Allocate<JGType>(type);
-	result->Functions = functions;
-	result->MetaData  = metaData;
 
 	for (const JGType& type : virtualTypeList)
 	{
@@ -89,6 +74,43 @@ uint64 JGType::GetSize() const
 	return Size;
 }
 
+bool JGMeta::HasMeta(const PName& key) const
+{
+	if (MetaDataMap.contains(key) == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool JGMeta::HasMeta(const PName& key, const PName& data) const
+{
+	if (MetaDataMap.contains(key) == false)
+	{
+		return false;
+	}
+
+	return MetaDataMap.at(key).contains(data);
+}
+
+bool JGMeta::GetMetaValues(const PName& key, HHashSet<PName>& outDatas) const
+{
+	if (MetaDataMap.contains(key) == false)
+	{
+		return false;
+	}
+
+	outDatas = MetaDataMap.at(key);
+
+	return true;
+}
+
+const HHashMap<PName, HHashSet<PName>>& JGMeta::GetMetaDatas() const
+{
+	return MetaDataMap;
+}
+
 JGProperty::JGProperty()
 {}
 bool JGProperty::IsValid() const
@@ -114,6 +136,12 @@ const JGType& JGProperty::GetPropertyType() const
 	}
 	return *Type;
 }
+
+PSharedPtr<JGMeta> JGProperty::GetMeta() const
+{
+	return MetaData;
+}
+
 JGFunction::JGFunction() {}
 
 bool JGFunction::IsBound() const
@@ -129,9 +157,14 @@ bool JGFunction::IsBound() const
 bool JGFunction::checkArgsType(const HList<JGType>& compareArgsList)
 {
 	int32 count = (int32)Arguments.size();
+	if (count > compareArgsList.size())
+	{
+		return false;
+	}
+
 	for (int32 i = 0; i < count; ++i)
 	{
-		if (Arguments[i]->GetPropertyType() != compareArgsList[i])
+		if (Arguments[i] != compareArgsList[i])
 		{
 			return false;
 		}
@@ -142,7 +175,7 @@ bool JGFunction::checkArgsType(const HList<JGType>& compareArgsList)
 
 bool JGFunction::checkRetType(JGType compareRetType)
 {
-	if (Return->GetPropertyType() != compareRetType)
+	if (Return != compareRetType)
 	{
 		return false;
 	}
@@ -218,7 +251,3 @@ PSharedPtr<JGType> JGClass::GetClassType() const
 {
 	return Type;
 }
-
-
-JGInterface::JGInterface() {}
-

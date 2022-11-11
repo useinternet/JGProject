@@ -23,7 +23,6 @@ class JGStruct;
 class GObjectGlobalSystem;
 class JGClass;
 class JGEnum;
-class JGInterface;
 
 class PObjectGlobalsPrivateUtils
 {
@@ -31,18 +30,18 @@ class PObjectGlobalsPrivateUtils
 public:
 	static PSharedPtr<JGMeta>     MakeStaticMeta(const HList<HPair<PName, HHashSet<PName>>>& pairList);
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, PSharedPtr<JGProperty> returnProperty, const HList<PSharedPtr<JGProperty>>& args = HList<PSharedPtr<JGProperty>>(), PSharedPtr<JGMeta> metaData = nullptr);
+	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, const JGType& returnType, const HList<JGType>& args = HList<JGType>(), PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGInterface> MakeStaticInterface(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGEnum> MakeStaticEnum(const JGType& type, const PString& name, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas);
 
 	template<class T>
 	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
 
 	template<class T, class Ret, class ... Args>
-	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func);
+	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func, const HList<JGType>& funArgTypes);
 
-	//static bool BindProperty()
+	template<class T>
+	static bool BindProperty(const JGObject* fromThis, const PName& Name, T* value);
 };
 
 class JGType : public JGObject
@@ -131,6 +130,13 @@ class JGMeta : public JGObject
 	friend GObjectGlobalSystem;
 protected:
 	HHashMap<PName, HHashSet<PName>> MetaDataMap;
+
+public:
+	bool HasMeta(const PName& key) const;
+	bool HasMeta(const PName& key, const PName& data) const;
+	bool GetMetaValues(const PName& Key, HHashSet<PName>& outDatas) const;
+
+	const HHashMap<PName, HHashSet<PName>>& GetMetaDatas() const;
 };
 
 class JGProperty : public JGObject
@@ -161,12 +167,12 @@ public:
 			return false;
 		}
 
-		if (Type != JGTYPE(T))
+		if (*Type != JGTYPE(T))
 		{
 			return false;
 		}
 
-		uint64 dataSize = Type->Size();
+		uint64 dataSize = Type->GetSize();
 		memcpy_s(DataPtr, dataSize, &data, dataSize);
 
 		return true;
@@ -180,16 +186,18 @@ public:
 			return false;
 		}
 
-		if (Type != JGTYPE(T))
+		if (*Type != JGTYPE(T))
 		{
 			return false;
 		}
 
-		uint64 dataSize = Type->Size();
+		uint64 dataSize = Type->GetSize();
 		memcpy_s(&outData, dataSize, DataPtr, dataSize);
 
 		return true;
 	}
+
+	PSharedPtr<JGMeta> GetMeta() const;
 };
 
 class JGFunction : public JGObject
@@ -199,9 +207,9 @@ class JGFunction : public JGObject
 	friend GObjectGlobalSystem;
 
 protected:
-	PSharedPtr<JGMeta>			  MetaData;
-	PSharedPtr<JGProperty>		  Return;
-	HList<PSharedPtr<JGProperty>> Arguments;
+	PSharedPtr<JGMeta> MetaData;
+	JGType Return;
+	HList<JGType> Arguments;
 
 	PWeakPtr<JGObject> OwnerObject;
 	PSharedPtr<IDelegateInstanceBase> FunctionReference;
@@ -223,7 +231,6 @@ public:
 private:
 	bool checkArgsType(const HList<JGType>& compareArgsList);
 	bool checkRetType(JGType compareRetType);
-
 };
 
 class JGField : public JGObject
@@ -319,22 +326,6 @@ public:
 	PSharedPtr<JGType> GetClassType() const;
 };
 
-/* JGInterface
-* 함수 Invoke 기능 추가 -> 함수 저장 / 관리
-* VTable 관리 -> Interface만 상속 가능, 다른 것이 상속되어져 잇으면 오류 검출
-* 상속 검사 시 중복 상속 시 에러 검출
-*/
-class JGInterface : public JGClass
-{
-	JG_GENERATED_SIMPLE_BODY
-	friend PObjectGlobalsPrivateUtils;
-	friend GObjectGlobalSystem;
-
-public:
-	JGInterface();
-	virtual ~JGInterface() = default;
-};
-
 template<class T>
 inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass)
 {
@@ -371,7 +362,7 @@ inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromTh
 }
 
 template<class T, class Ret, class ...Args>
-inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func)
+inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func, const HList<JGType>& funArgTypes)
 {
 	if (fromThis == nullptr || function == nullptr)
 	{
@@ -383,12 +374,20 @@ inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedP
 		return false;
 	}
 
-	if (function->checkArgsType({ JGTYPE(Args)... }) == false)
+	if (function->checkArgsType(funArgTypes) == false)
 	{
 		return false;
 	}
 
 	function->FunctionReference = Allocate(PDelegateInstance<T, Ret, Args...>::Create(fromThis, func));
+
+	return true;
+}
+
+template<class T>
+inline bool PObjectGlobalsPrivateUtils::BindProperty(const JGObject* fromThis, const PName& Name, T* value)
+{
+
 
 	return true;
 }

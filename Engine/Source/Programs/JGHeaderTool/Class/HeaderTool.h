@@ -122,7 +122,7 @@ private:
 	bool generateCodeGenFiles();
 	bool generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo, PString* outCode);
 	bool generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PString* outCode);
-	bool generateCodeGenRegistration(HQueue<const HClass*>& collectedClassQueue, PString* outCode);
+	bool generateCodeGenRegistration(HQueue<const HClass*>& collectedClassQueue, HQueue<const HEnum*>& collectedEnumQueue, PString* outCode);
 
 	const PArguments& getArguments() const;
 };

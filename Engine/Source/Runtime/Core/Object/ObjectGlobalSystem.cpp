@@ -12,7 +12,12 @@ void GObjectGlobalSystem::Destroy()
 
 PSharedPtr<JGEnum> GObjectGlobalSystem::GetStaticEnum(const JGType& type) const
 {
-	return nullptr;
+	if (_enumMap.find(type) == _enumMap.end())
+	{
+		return nullptr;
+	}
+
+	return _enumMap.at(type);
 }
 
 PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(const JGType& type) const
@@ -25,9 +30,26 @@ PSharedPtr<JGClass> GObjectGlobalSystem::GetStaticClass(const JGType& type) cons
 	return _classMap.at(type);
 }
 
-PSharedPtr<JGInterface> GObjectGlobalSystem::GetStaticInterface(const JGType& type) const
+PSharedPtr<JGClass> GObjectGlobalSystem::GetClass(const JGType& type, const JGObject* object) const
 {
-	return nullptr;
+	if (object == nullptr)
+	{
+		return nullptr;
+	}
+
+	if (type != object->GetType())
+	{
+		return nullptr;
+	}
+
+	if (_createObjectFuncPool.find(type) == _createObjectFuncPool.end())
+	{
+		return nullptr;
+	}
+
+	HCreateObjectFunc Func = _createObjectFuncPool.at(type);
+
+	return Func(object);
 }
 
 bool GObjectGlobalSystem::CanCast(const JGType& destType, const JGType& srcType) const
@@ -64,16 +86,18 @@ bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const
 		return false;
 	}
 
+	for (const JGType& type : classObject->VTypeSet)
+	{
+		if (registerType(Allocate<JGType>(type)) == false)
+		{
+			return false;
+		}
+	}
+
 	_classMap.emplace(*classType, classObject);
 	_createObjectFuncPool.emplace(*classType, func);
 	return true;
 }
-
-bool GObjectGlobalSystem::RegisterJGInterface(PSharedPtr<JGInterface> ifObject)
-{
-	return false;
-}
-
 
 bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 {
@@ -99,6 +123,18 @@ bool GObjectGlobalSystem::RegisterJGEnum(PSharedPtr<JGEnum> enumObject)
 	return true;
 }
 
+bool GObjectGlobalSystem::IsRegisteredType(const JGType& type) const
+{
+	const PName& typeName = type.GetName();
+
+	if (_typeMap.find(typeName) != _typeMap.end())
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 {
 	if (type.IsValid() == false)
@@ -106,34 +142,32 @@ bool GObjectGlobalSystem::registerType(PSharedPtr<JGType> type)
 		return false;
 	}
 
-	const PName&   typeName   = type->GetName();
-
-	if (_typeMap.find(typeName) != _typeMap.end())
+	if (IsRegisteredType(*type) == true)
 	{
-		JG_LOG(Core, ELogLevel::Critical, "Duplicate Type Name : {0}", typeName);
-		return false;
+		return true;
 	}
 
-	_typeMap.emplace(typeName, *type);
+	_typeMap.emplace(type->GetName(), *type);
 
 	return true;
 }
 
 bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& srcType) const
 {
-	PSharedPtr<JGClass> destClass = GetStaticClass(destType);
-	if (destClass == nullptr)
+	if (IsRegisteredType(destType) == false || IsRegisteredType(srcType) == false)
 	{
-		destClass = GetStaticInterface(destType);
+		return false;
 	}
 
+	PSharedPtr<JGClass> destClass = GetStaticClass(destType);
 	PSharedPtr<JGClass> srcClass  = GetStaticClass(srcType);
-	if (srcClass == nullptr)
-	{
-		srcClass = GetStaticInterface(srcType);
-	}
 
 	if (destClass == nullptr || srcClass == nullptr)
+	{
+		return false;
+	}
+
+	if (srcClass == nullptr)
 	{
 		return false;
 	}
@@ -176,9 +210,68 @@ bool GObjectGlobalSystem::codeGen()
 	if (codeGenFunc.IsVaild() == false)
 	{
 		// Error Log
-		codeGenFunc(this);
+		return false;
 	}
 
+	codeGenFunc(this);
 	HPlatform::UnLoadDll(ins);
+	return true;
+}
+
+bool GObjectGlobalSystem::auditClassMultipleInheritance() const
+{
+	for (const HPair<JGType, PSharedPtr<JGClass>>& pair : _classMap)
+	{
+		PSharedPtr<JGClass> Class = pair.second;
+
+		HHashSet<JGType> typeVisitor;
+
+		// 검사 타입
+		for (const JGType& type : Class->VTypeSet)
+		{
+			if (typeVisitor.contains(type) == true)
+			{
+				return false;
+			}
+
+			typeVisitor.insert(type);
+
+			if (auditClassMultipleInheritanceInteral(type, typeVisitor) == false)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool GObjectGlobalSystem::auditClassMultipleInheritanceInteral(const JGType& inType, HHashSet<JGType>& typeVisitor) const
+{
+	if (inType == JGTYPE(JGObject))
+	{
+		return typeVisitor.contains(JGTYPE(JGObject)) == false;
+	}
+
+	PSharedPtr<JGClass> Class = GetStaticClass(inType);
+	if (Class == nullptr)
+	{
+		return true;
+	}
+
+	for (const JGType& type : Class->VTypeSet)
+	{
+		if (typeVisitor.contains(type) == true)
+		{
+			return false;
+		}
+		typeVisitor.insert(type);
+
+		if (auditClassMultipleInheritanceInteral(type, typeVisitor) == false)
+		{
+			return false;
+		}
+	}
+
 	return true;
 }

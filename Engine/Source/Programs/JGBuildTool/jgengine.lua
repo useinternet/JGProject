@@ -69,7 +69,7 @@ workspace "JGEngine"
     group "Engine"
 		group "Engine/Programs"
 			project "JGBuildTool"
-				includedirs{ "Source/Programs/JGBuildTool/", "Source/ThirdParty", "Source", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGBuildTool/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", {"_JGBUILDTOOL", })
 				filter "configurations:DevelopEngine"
@@ -87,7 +87,7 @@ workspace "JGEngine"
 
 
 			project "JGConsole"
-				includedirs{ "Source/Programs/JGConsole/", "Source/ThirdParty", "Source", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGConsole/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGConsole/", {"_JGCONSOLE", })
 				filter "configurations:DevelopEngine"
@@ -105,7 +105,7 @@ workspace "JGEngine"
 
 
 			project "JGHeaderTool"
-				includedirs{ "Source/Programs/JGHeaderTool/", "Source/ThirdParty", "Source", "Source/Runtime/Core/", }
+				includedirs{ "Source/Programs/JGHeaderTool/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", {"_JGHEADERTOOL", })
 				filter "configurations:DevelopEngine"
@@ -124,7 +124,7 @@ workspace "JGEngine"
 
 		group "Engine/Runtime"
 			project "CodeGen"
-				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source", "Source/Runtime/Core/", }
+				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
 				links{ "Core", }
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
@@ -142,7 +142,7 @@ workspace "JGEngine"
 
 
 			project "Core"
-				includedirs{ "Source/Runtime/Core/", "Source/ThirdParty", "Source", }
+				includedirs{ "Source/Runtime/Core/", "Source/ThirdParty", "Source/", }
 				links{ }
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
 				filter "configurations:DevelopEngine"

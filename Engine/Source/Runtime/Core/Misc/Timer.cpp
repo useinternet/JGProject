@@ -95,6 +95,8 @@ void GTimerGlobalSystem::Update()
 		if (timer.IsValid() == true)
 		{
 			timer->Update();
+			
+			++i;
 		}
 		else
 		{

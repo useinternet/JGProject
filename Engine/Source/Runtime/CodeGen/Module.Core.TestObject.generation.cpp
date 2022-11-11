@@ -2,7 +2,7 @@
 #include "Test/TestObject.h"
 
 
-PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject()
+PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_JGTestObject()
 {
 	HList<PSharedPtr<JGFunction>> FunctionMap;
 	HList<PSharedPtr<JGProperty>> PropertyMap;
@@ -36,7 +36,7 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject(
 		PObjectGlobalsPrivateUtils::MakeStaticMeta(
 		{
 		})));
-	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGTYPE(PTestObject),{
+	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGTYPE(JGTestObject),{
 			JGTYPE(JGObject), 
 		},
 		PropertyMap, FunctionMap,PObjectGlobalsPrivateUtils::MakeStaticMeta({
@@ -46,39 +46,39 @@ PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject(
 
 }
 
-PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const JGObject* fromThis)
+PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_JGTestObject(const JGObject* fromThis)
 {
-	PTestObject* noneConstThisPtr = const_cast<PTestObject*>(static_cast<const PTestObject*>(fromThis));
-	PSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(PTestObject)));
+	JGTestObject* noneConstThisPtr = const_cast<JGTestObject*>(static_cast<const JGTestObject*>(fromThis));
+	PSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(JGTestObject)));
 	if(Class->HasFunction(PName("TestFunc")) == true)
 	{
-		std::function<void()> functionRef = std::bind(&PTestObject::TestFunc, noneConstThisPtr);
+		std::function<void()> functionRef = std::bind(&JGTestObject::TestFunc, noneConstThisPtr);
 		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("TestFunc")), functionRef) == false)
 		{
-			JG_LOG(CodeGen, ELogLevel::Error, "PTestObject: Fail Bind Function : TestFunc");
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestObject: Fail Bind Function : TestFunc");
 		}
 	}
 	if(Class->HasFunction(PName("TestFunc2")) == true)
 	{
-		std::function<int32(float32,int32)> functionRef = std::bind(&PTestObject::TestFunc2, noneConstThisPtr, std::placeholders::_1, std::placeholders::_2);
+		std::function<int32(float32,int32)> functionRef = std::bind(&JGTestObject::TestFunc2, noneConstThisPtr, std::placeholders::_1, std::placeholders::_2);
 		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("TestFunc2")), functionRef) == false)
 		{
-			JG_LOG(CodeGen, ELogLevel::Error, "PTestObject: Fail Bind Function : TestFunc2");
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestObject: Fail Bind Function : TestFunc2");
 		}
 	}
 	if(Class->HasFunction(PName("TestFunc3")) == true)
 	{
-		std::function<float32(const PString&)> functionRef = std::bind(&PTestObject::TestFunc3, noneConstThisPtr, std::placeholders::_1);
+		std::function<float32(const PString&)> functionRef = std::bind(&JGTestObject::TestFunc3, noneConstThisPtr, std::placeholders::_1);
 		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("TestFunc3")), functionRef) == false)
 		{
-			JG_LOG(CodeGen, ELogLevel::Error, "PTestObject: Fail Bind Function : TestFunc3");
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestObject: Fail Bind Function : TestFunc3");
 		}
 	}
 	return Class;
 
 }
 
-PSharedPtr<JGEnum> Module_Core_Code_Generation_Create_Enum_ETestEnum(const ETestEnum* fromThis)
+PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_ETestEnum()
 {
 
 	HList<PSharedPtr<JGMeta>> MetaList;

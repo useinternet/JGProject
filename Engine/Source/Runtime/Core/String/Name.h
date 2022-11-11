@@ -21,6 +21,9 @@ class PName : public IMemoryObject
 	uint64 _id = NAME_NONE;
 
 	HAtomicInt32* _pRefCount = nullptr;
+#ifdef _DEBUG
+	HRawString _str;
+#endif
 public:
 	PName();
 	PName(uint64 id);

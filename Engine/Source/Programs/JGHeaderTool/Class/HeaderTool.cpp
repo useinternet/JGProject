@@ -35,7 +35,7 @@ void HEnum::GetCodeGenStaticCreateFuncName(PString* outName) const
 	}
 	outName->Reset();
 
-	*outName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateEnumFunction, HHeaderToolConstants::Token::ModuleName, (OwnerHeaderInfo->ModuleName));
+	*outName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateStaticEnumFunction, HHeaderToolConstants::Token::ModuleName, (OwnerHeaderInfo->ModuleName));
 	*outName = PString::ReplaceAll(*outName, HHeaderToolConstants::Token::EnumName, Name);
 }
 
@@ -145,14 +145,10 @@ bool PHeaderTool::collectionHeaderFiles_Internal(const PString& inDir, HList<HHe
 
 		PString tempPath;
 		HFileHelper::AbsolutePath(headerFilePath, &tempPath);
-		tempPath.ReplaceAll(sourcePath, "");
-
-		PString moduleName = headerInfo.ModuleName;
-		pos = tempPath.Find(moduleName.Append("/"));
-		if (pos != PString::NPOS)
+		headerInfo.LocalRelativePath = tempPath.ReplaceAll(sourcePath, "");
+		if (headerInfo.LocalRelativePath.StartWidth("/"))
 		{
-			pos += moduleName.Length();
-			tempPath.SubString(&headerInfo.LocalRelativePath, pos);
+			headerInfo.LocalRelativePath.SubString(&headerInfo.LocalRelativePath, 1);
 		}
 
 		inHeaderInfos.push_back(headerInfo);
@@ -255,7 +251,8 @@ bool PHeaderTool::extractReflectionDatasInternal(HList<HHeaderInfo>& inHeaderInf
 				{
 					Mode &= ~EAnalysisCommand::AnalysisBaseClass;
 				}
-				else if (Mode & EAnalysisCommand::AnalysisBaseClass)
+
+				if (Mode & EAnalysisCommand::AnalysisBaseClass)
 				{
 					if (analysisBaseClass(line, pClass) == false)
 					{
@@ -459,12 +456,17 @@ bool PHeaderTool::analysisProperty(const PString& line, HProperty* outProperty)
 		return false;
 	}
 
-	PString property_type = tokens[0];
-	PString property_name = tokens[1];
+	PString property_type = tokens[0].Trim();
+	PString property_name = tokens[1].Trim();
+
 	if (property_name.Contains("=") == true)
 	{
 		property_name = property_name.Split('=')[0];
 	}
+
+	property_name.ReplaceAll(" ", "");
+	property_name.ReplaceAll(";", "");
+	property_type.ReplaceAll(" ", "");
 
 	outProperty->Type = property_type.Trim();
 	outProperty->Name = property_name.Trim();
@@ -732,6 +734,7 @@ bool PHeaderTool::generateCodeGenFiles()
 {
 	const PString& engineCodeGenPath = HFileHelper::EngineCodeGenDirectory();
 	HQueue<const HClass*> collectedClassQueue;
+	HQueue<const HEnum*> collectedEnumQueue;
 
 	for (const HHeaderInfo& headerInfo : _engineHeaderInfos)
 	{
@@ -788,7 +791,10 @@ bool PHeaderTool::generateCodeGenFiles()
 		}
 
 		collectedClassQueue.push(&(headerInfo.Classes[0]));
-		// »ý¼º
+		for (const HEnum& Enum : headerInfo.Enums)
+		{
+			collectedEnumQueue.push(&Enum);
+		}
 	}
 
 	for (const HHeaderInfo& headerInfo : _userHeaderInfos)
@@ -798,7 +804,7 @@ bool PHeaderTool::generateCodeGenFiles()
 
 	PString engineCodeGenRegisterCppCode;
 
-	if (generateCodeGenRegistration(collectedClassQueue, &engineCodeGenRegisterCppCode) == false)
+	if (generateCodeGenRegistration(collectedClassQueue, collectedEnumQueue, &engineCodeGenRegisterCppCode) == false)
 	{
 		// Error Log
 		return false;
@@ -958,19 +964,17 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		{
 			staticFuncCode.Append("\tFunctionMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticFunction(");
 			staticFuncCode.Append("\"").Append(function.Name).AppendLine("\",");
-			staticFuncCode.Append("\t\tPObjectGlobalsPrivateUtils::MakeStaticProperty(JGTYPE(").Append(function.Return).AppendLine("), \"\"),");
-			staticFuncCode.AppendLine("\t\t{");
 
-			for (const HProperty& Property : Class.Properties)
+			staticFuncCode.Append(PString::Format("\t\tJGTYPE(%s), ", function.Return));
+
+			PString propertyTypeListCode;
+
+			for (const HProperty& Property : function.Argmuments)
 			{
-				staticFuncCode.Append("\t\t\tPObjectGlobalsPrivateUtils::MakeStaticProperty(JGTYPE(")
-					.Append(Property.Type)
-					.Append("), \"")
-					.Append(Property.Name)
-					.AppendLine("\"),");
+				propertyTypeListCode.Append(PString::Format("JGTYPE(%s), ", Property.Type));
 			}
 
-			staticFuncCode.AppendLine("\t\t},");
+			staticFuncCode.AppendLine(PString::Format("{%s}, ", propertyTypeListCode));
 			staticFuncCode.AppendLine("\t\tPObjectGlobalsPrivateUtils::MakeStaticMeta(");
 			staticFuncCode.AppendLine("\t\t{");
 
@@ -1030,23 +1034,27 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 			funcCode.AppendLine("\t{");
 			funcCode.Append("\t\tstd::function<").Append(function.Return).Append("(");
 
+			PString argTypeListCode;
 			uint64 len = function.Argmuments.size();
 			for (uint64 i = 0; i < len; ++i)
 			{
 				funcCode.Append(function.Argmuments[i].Type);
+				argTypeListCode.Append(PString::Format("JGTYPE(%s)", function.Argmuments[i].Type));
 				if (i < len - 1)
 				{
 					funcCode.Append(",");
+					argTypeListCode.Append(",");
 				}
 			}
 			funcCode.Append(")> functionRef = std::bind(&").Append(Class.Name).Append("::").Append(function.Name).Append(", noneConstThisPtr");
-			std::placeholders::_1;
+		
 			for (uint64 i = 0; i < len; ++i)
 			{
 				funcCode.Append(PString::Format(", std::placeholders::_%d", i+ 1));
 			}
+
 			funcCode.AppendLine(");");
-			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName(\"%s\")), functionRef) == false)", function.Name));
+			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName(\"%s\")), functionRef, {%s}) == false)", function.Name, argTypeListCode));
 			funcCode.AppendLine("\t\t{");
 			funcCode.AppendLine(PString::Format("\t\t\tJG_LOG(CodeGen, ELogLevel::Error, \"%s: Fail Bind Function : %s\");", Class.Name, function.Name));
 			funcCode.AppendLine("\t\t}");
@@ -1121,12 +1129,13 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 	return true;
 }
 
-bool PHeaderTool::generateCodeGenRegistration(HQueue<const HClass*>& collectedClassQueue, PString* outCode)
+bool PHeaderTool::generateCodeGenRegistration(HQueue<const HClass*>& collectedClassQueue, HQueue<const HEnum*>& collectedEnumQueue, PString* outCode)
 {
 	if (outCode == nullptr)
 	{
 		return false;
 	}
+
 	outCode->AppendLine("#include \"CoreSystem.h\"");
 	outCode->AppendLine("#include \"Object/ObjectGlobalSystem.h\"");
 	outCode->AppendLine("#include \"Object/ObjectGlobals.h\"");
@@ -1171,6 +1180,21 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 
 		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGClass(%s, %s);", onlyCodeGenStaticFuncName, onlyCodeGenFuncName));
 	}
+
+	while (collectedEnumQueue.empty() == false)
+	{
+		const HEnum* targetEnum = collectedEnumQueue.front(); collectedEnumQueue.pop();
+
+		PString codeGenStaticCreateFuncName;
+		targetEnum->GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
+
+		newCodeIncludeBody.Append("extern ").Append(codeGenStaticCreateFuncName).AppendLine(";");
+
+		PString onlyCodeGenStaticFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, "PSharedPtr<JGEnum> ", "");
+		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGEnum(%s);", onlyCodeGenStaticFuncName));
+	}
+
+
 
 	outCode->AppendLine(newCodeIncludeBody).AppendLine("");
 	outCode->AppendLine("CODEGEN_API bool Engine_CodeGenerate(GObjectGlobalSystem* objectGlobalSystem)");

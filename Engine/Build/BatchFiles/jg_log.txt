@@ -1,59 +1,59 @@
-[:28920:][info][Core]: Active Thread: [142742259]
-[:28920:][info][Core]: Active Thread: [695880259]
-[:28920:][info][Core]: Active Thread: [2464000558]
-[:28920:][info][Core]: Active Thread: [389680884]
-[:28920:][info][Core]: Active Thread: [2625441531]
-[:28920:][info][Core]: Active Thread: [3888878073]
-[:28920:][info][Core]: Active Thread: [1130835890]
-[:28920:][info][Core]: Active Thread: [4047656009]
-[:28920:][info][Core]: Active Thread: [4160016651]
-[:28920:][info][Core]: Active Thread: [927964566]
-[:28920:][info][Core]: Active Thread: [1590617562]
-[:28920:][info][Core]: Active Thread: [1580463230]
-[:28920:][info][Core]: Active Thread: [583858748]
-[:28920:][info][Core]: Active Thread: [1772604145]
-[:28920:][info][Core]: Active Thread: [558613152]
-[:28920:][info][Core]: Active Thread: [781534433]
-[:28920:][info][Core]: Active Thread: [3466270245]
-[:28920:][info][Core]: Active Thread: [1817167099]
-[:28920:][info][Core]: Active Thread: [763338816]
-[:28920:][info][Core]: Active Thread: [369970058]
-[:28920:][info][Core]: Active Thread Totoal Count: 20 
-[:28920:][info][BuildTool]: Step 1. Engine Collection Module Infos..
-[:28920:][error][BuildTool]: Defines: fail read json data
-[:28920:][error][BuildTool]: Defines: fail read json data
-[:28920:][error][BuildTool]: Defines: fail read json data
-[:28920:][warning][BuildTool]: module(Asset) can't find module info
-[:28920:][warning][BuildTool]: module(GameFrameWork) can't find module info
-[:28920:][warning][BuildTool]: module(Graphics) can't find module info
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: Programs Category Module List
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: JGBuildTool
-[:28920:][trace][BuildTool]: JGConsole
-[:28920:][trace][BuildTool]: JGHeaderTool
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: Runtime Category Module List
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: Core
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][trace][BuildTool]: Programs: 3
-[:28920:][trace][BuildTool]: Runtime: 1
-[:28920:][trace][BuildTool]: Total: 4
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][info][BuildTool]: Step 2. User Collection Module Infos..
-[:28920:][trace][BuildTool]: Total: 0
-[:28920:][trace][BuildTool]: ----------------------------------------------------
-[:28920:][info][BuildTool]: Step 3. Generate Build Script..
-[:28920:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
-[:28920:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
-[:28920:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
-[:28920:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
-[:28920:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
-[:28920:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
-[:28920:][trace][BuildTool]: Module: Core: Start Generate Build Script
-[:28920:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
-[:28920:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
-[:28920:][info][BuildTool]: Step 4. Make Project Files..
-[:28920:][info][BuildTool]: Compelete Build Tool Run..
+[:21376:][info][Core]: Active Thread: [1225157437]
+[:21376:][info][Core]: Active Thread: [3717439290]
+[:21376:][info][Core]: Active Thread: [2892925766]
+[:21376:][info][Core]: Active Thread: [3823769509]
+[:21376:][info][Core]: Active Thread: [795736576]
+[:21376:][info][Core]: Active Thread: [1366235409]
+[:21376:][info][Core]: Active Thread: [452282933]
+[:21376:][info][Core]: Active Thread: [353078791]
+[:21376:][info][Core]: Active Thread: [1237166109]
+[:21376:][info][Core]: Active Thread: [1571456726]
+[:21376:][info][Core]: Active Thread: [4092558094]
+[:21376:][info][Core]: Active Thread: [2230116248]
+[:21376:][info][Core]: Active Thread: [2703943541]
+[:21376:][info][Core]: Active Thread: [3592024333]
+[:21376:][info][Core]: Active Thread: [2134409927]
+[:21376:][info][Core]: Active Thread: [1766286765]
+[:21376:][info][Core]: Active Thread: [958012333]
+[:21376:][info][Core]: Active Thread: [717391088]
+[:21376:][info][Core]: Active Thread: [2856560619]
+[:21376:][info][Core]: Active Thread: [857660363]
+[:21376:][info][Core]: Active Thread Totoal Count: 20 
+[:21376:][info][BuildTool]: Step 1. Engine Collection Module Infos..
+[:21376:][warning][BuildTool]: module(Asset) can't find module info
+[:21376:][warning][BuildTool]: module(GameFrameWork) can't find module info
+[:21376:][warning][BuildTool]: module(Graphics) can't find module info
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: Programs Category Module List
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: JGBuildTool
+[:21376:][trace][BuildTool]: JGConsole
+[:21376:][trace][BuildTool]: JGHeaderTool
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: Runtime Category Module List
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: CodeGen
+[:21376:][trace][BuildTool]: Core
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][trace][BuildTool]: Programs: 3
+[:21376:][trace][BuildTool]: Runtime: 2
+[:21376:][trace][BuildTool]: Total: 5
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][info][BuildTool]: Step 2. User Collection Module Infos..
+[:21376:][trace][BuildTool]: Total: 0
+[:21376:][trace][BuildTool]: ----------------------------------------------------
+[:21376:][info][BuildTool]: Step 3. Generate Build Script..
+[:21376:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
+[:21376:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
+[:21376:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
+[:21376:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
+[:21376:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
+[:21376:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
+[:21376:][trace][BuildTool]: Module: CodeGen: Start Generate Build Script
+[:21376:][trace][BuildTool]: Module: CodeGen: Compelete Generate Build Script
+[:21376:][trace][BuildTool]: Module: Core: Start Generate Build Script
+[:21376:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
+[:21376:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
+[:21376:][info][BuildTool]: Step 4. Make Project Files..
+[:21376:][info][BuildTool]: Compelete Build Tool Run..

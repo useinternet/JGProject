@@ -226,7 +226,7 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			PString includeDirs;
 			includeDirs.Append("\"").Append(moduleInfo.ModulePath).Append("\", ");
 			includeDirs.Append("\"").Append(thirdPartyPath).Append("\", ");
-			includeDirs.Append("\"").Append("Source").Append("\", ");
+			includeDirs.Append("\"").Append("Source/").Append("\", ");
 			PString links;
 			PString defines;
 

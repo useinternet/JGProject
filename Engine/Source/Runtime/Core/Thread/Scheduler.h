@@ -4,8 +4,8 @@
 #include "CoreSystem.h"
 #include "Thread.h"
 #include "Misc/SequentialIDGenerator.h"
+#include "MainThreadExecutionOrder.h"
 
-enum class EMainThreadExecutionOrder;
 class PTimer;
 
 class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem>
@@ -19,6 +19,11 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 	class ISyncTask : public IMemoryObject
 	{
 	public:
+		uint64 ID;
+		int32  Repeat = 0;
+		int32  Priority = 0;
+		int32  CallCount = 0;
+	public:
 		virtual ~ISyncTask() = default;
 		virtual ESyncTaskType GetTaskType() const = 0;
 	};
@@ -26,11 +31,7 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 	class PSyncTaskByTick : public ISyncTask
 	{
 	public:
-		uint64 ID;
 		PSharedPtr<PTask> Task;
-		int32   Repeat = 0;
-		int32   Priority = 0;
-		int32   CallCount = 0;
 		float32 Delay     = 0.0f;
 		float32 TickCycle = 0.0f;
 		float32 Tick      = 0.0f;
@@ -42,11 +43,7 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 	class PSyncTaskByFrame : public ISyncTask
 	{
 	public:
-		uint64 ID;
 		PSharedPtr<PTask> Task;
-		int32 Repeat    = 0;
-		int32 Priority  = 0;
-		int32 CallCount = 0;
 		int32 Delay = 0;
 		int32 FrameCycle = 0;
 		int32 Frame = 0;
@@ -77,6 +74,19 @@ protected:
 	virtual void Destroy() override;
 
 public:
+
+	template<class ... Args>
+	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	{
+		return ScheduleByFrame(refObject, delayFrame, 0, 0, order, func, args...);
+	}
+
+	template<class ... Args>
+	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	{
+		return ScheduleByFrame(refObject, 0, 0, 0, order, func, args...);
+	}
+
 	template<class ... Args>
 	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
@@ -122,21 +132,33 @@ public:
 	}
 
 	template<class ... Args>
+	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	{
+		return Schedule(refObject, delay, 0.0f, 0, order, func, args...);
+	}
+
+	template<class ... Args>
+	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	{
+		return Schedule(refObject, 0.0f, 0.0f, 0, order, func, args...);
+	}
+
+	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, 0.0f, 0.0f, -1, func, args...);
+		return Schedule(refObject, 0.0f, 0.0f, -1, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, delay, 0.0f, -1, func, args...);
+		return Schedule(refObject, delay, 0.0f, -1, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, float32 tickCycle, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, delay, tickCycle, -1, func, args...);
+		return Schedule(refObject, delay, tickCycle, -1, order, func, args...);
 	}
 
 	template<class ... Args>

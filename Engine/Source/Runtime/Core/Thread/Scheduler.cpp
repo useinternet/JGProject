@@ -36,6 +36,7 @@ GScheduleGlobalSystem::GScheduleGlobalSystem()
 void GScheduleGlobalSystem::Start()
 {
 	_timer = PTimer::Create();
+	_timer->Start();
 }
 
 void GScheduleGlobalSystem::Update()
@@ -96,6 +97,17 @@ void GScheduleGlobalSystem::Update()
 	}
 
 	_bIsTaskRunning = false;
+
+	while (_reservedSyncTasks.empty() == false)
+	{
+		PSharedPtr<ISyncTask> reservedTask = _reservedSyncTasks.front().Pin(); _reservedSyncTasks.pop();
+		if (reservedTask.IsValid() == false)
+		{
+			continue;
+		}
+
+		_sortedSyncTasks[reservedTask->Priority].push_back(reservedTask);
+	}
 }
 
 void GScheduleGlobalSystem::Destroy()

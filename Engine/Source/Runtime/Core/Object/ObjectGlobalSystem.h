@@ -6,6 +6,7 @@
 #include "String/String.h"
 #include "Memory/Memory.h"
 #include "Platform/Platform.h"
+#include "FileIO/Json.h"
 #include "ObjectGlobals.h"
 
 enum class EPropertyType
@@ -60,7 +61,8 @@ protected:
 public:
 	PSharedPtr<JGEnum> GetStaticEnum(const JGType& type) const;
 	PSharedPtr<JGClass> GetStaticClass(const JGType& type) const;
-	PSharedPtr<JGInterface> GetStaticInterface(const JGType& type) const;
+	PSharedPtr<JGClass> GetClass(const JGType& type, const JGObject* object) const;
+
 
 	template<class T>
 	PSharedPtr<JGEnum> GetStaticEnum() const
@@ -72,6 +74,12 @@ public:
 	PSharedPtr<JGClass> GetStaticClass() const
 	{
 		return GetStaticClass(JGTYPE(T));
+	}
+
+	template<class T>
+	PSharedPtr<JGClass> GetClass(const JGObject* object) const
+	{
+		return GetClass(JGTYPE(T), object);
 	}
 
 	template<class T>
@@ -90,15 +98,16 @@ public:
 	}
 
 	bool RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateObjectFunc& func);
-	bool RegisterJGInterface(PSharedPtr<JGInterface> ifObject);
 	bool RegisterJGEnum(PSharedPtr<JGEnum> enumObject);
-
+	bool IsRegisteredType(const JGType& type) const;
 private:
 	bool registerType(PSharedPtr<JGType> type);
 	bool canCastInternal(const JGType& destType, const JGType& srcType) const;
 
 private:
 	bool codeGen();
+	bool auditClassMultipleInheritance() const;
+	bool auditClassMultipleInheritanceInteral(const JGType& inType, HHashSet<JGType>& typeVisitor) const;
 };
 
 template<class T>
@@ -107,6 +116,21 @@ inline PSharedPtr<JGClass> StaticClass()
 	return GObjectGlobalSystem::GetInstance().GetStaticClass<T>();
 }
 
+inline PSharedPtr<JGClass> StaticClass(const JGType& type)
+{
+	return GObjectGlobalSystem::GetInstance().GetStaticClass(type);
+}
+
+template<class T>
+inline PSharedPtr<JGClass> BindedClass(const JGObject* obj)
+{
+	return GObjectGlobalSystem::GetInstance().GetClass<T>(obj);
+}
+
+inline PSharedPtr<JGClass> BindedClass(const JGType& type, const JGObject* obj)
+{
+	return GObjectGlobalSystem::GetInstance().GetClass(type, obj);
+}
 
 template<class T>
 inline PSharedPtr<JGEnum> StaticEnum()
@@ -116,23 +140,54 @@ inline PSharedPtr<JGEnum> StaticEnum()
 
 
 template<class T>
-bool SaveObject(T* obj)
+inline bool SaveObject(const PString& path, T* obj)
 {
-	//
+	PString typeName = JGTYPE(T).GetName().ToString();
+
+	if (std::is_base_of<JGObject, T>::value == true && obj != nullptr)
+	{
+		PJson Json;
+		Json.AddMember(*obj);
+
+		PString jsonString;
+		if (PJson::ToString(Json, &jsonString) == true)
+		{
+			if (HFileHelper::WriteAllText(path, jsonString) == true)
+			{
+				JG_LOG(Core, ELogLevel::Trace, PString::Format("%s: Success Save at %s", typeName, path));
+				return true;
+			}
+		}
+	}
+
+	JG_LOG(Core, ELogLevel::Error, PString::Format("%s: Fail Save", typeName, path));
 	return false;
 }
 
 template<class T>
-PSharedPtr<T> LoadObject(const PString& path)
+inline PSharedPtr<T> LoadObject(const PString& path)
 {
-	//
+	PString typeName = JGTYPE(T).GetName().ToString();
+
+	PString jsonString;
+	if (HFileHelper::ReadAllText(path, &jsonString) == true)
+	{
+		PJson Json;
+
+		if (PJson::ToObject(jsonString, &Json) == true)
+		{
+			PSharedPtr<T> result = Allocate<T>();
+			if (Json.GetData(result->GetRawPointer()) == true)
+			{
+				JG_LOG(Core, ELogLevel::Trace, PString::Format("%s: Success Load at %s", typeName, path));
+				return result;
+			}
+		}
+	}
+
+	JG_LOG(Core, ELogLevel::Error, PString::Format("%s: Fail Load at %s", typeName, path));
 	return nullptr;
 }
-
-
-
-
-
 
 
 template<class T, class U>

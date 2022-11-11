@@ -5,8 +5,8 @@
 #define JG_GENERATED_CLASS_BODY \
 friend class PObjectGlobalsPrivateUtils; \
 JG_GENERATED_SIMPLE_BODY \
-friend PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_PTestObject(const JGObject* fromThis);\
-friend PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_PTestObject();\
+friend PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_JGTestObject(const JGObject* fromThis);\
+friend PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_JGTestObject();\
 protected: \
  \
 	virtual void WriteJson(PJsonData& json) const override \
@@ -19,14 +19,14 @@ protected: \
     dataJson.AddMember("TestValue3", TestValue3); \
 \
 \
-		json.AddMember(JGTYPE(PTestObject).GetName().ToString(), dataJson);\
+		json.AddMember(JGTYPE(JGTestObject).GetName().ToString(), dataJson);\
 	}\
 	virtual void ReadJson(const PJsonData& json) override\
 	{\
 		__super::ReadJson(json);\
 \
 		PJsonData dataJson;\
-		if (json.FindMember(JGTYPE(PTestObject).GetName().ToString(), &dataJson) == false)\
+		if (json.FindMember(JGTYPE(JGTestObject).GetName().ToString(), &dataJson) == false)\
 		{\
 			return;\
 		}\
