@@ -301,6 +301,11 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 	return true;
 }
 
+bool PBuildTool::insertIncludePCHHeaderCode(const PString& modulePath)
+{
+	return false;
+}
+
 bool PBuildTool::makeProjectFiles()
 {
 	PString newScriptPath;

@@ -58,6 +58,36 @@ PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Create_Class_JGTestClassA(c
 {
 	JGTestClassA* noneConstThisPtr = const_cast<JGTestClassA*>(static_cast<const JGTestClassA*>(fromThis));
 	PSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(JGTestClassA)));
+
+	if (Class->HasProperty(PName("TestValue1")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("TestValue1")), &(noneConstThisPtr->TestValue1)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Property : TestValue1");
+		}
+	}
+
+
+
+	if (Class->HasProperty(PName("TestValue2")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("TestValue2")), &(noneConstThisPtr->TestValue2)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Property : TestValue2");
+		}
+	}
+
+
+
+	if (Class->HasProperty(PName("TestValue3")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("TestValue3")), &(noneConstThisPtr->TestValue3)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Property : TestValue3");
+		}
+	}
+
+
 	if(Class->HasFunction(PName("GetTestFunc")) == true)
 	{
 		std::function<float()> functionRef = std::bind(&JGTestClassA::GetTestFunc, noneConstThisPtr);

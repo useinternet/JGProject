@@ -47,6 +47,7 @@ private:
 	void collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap);
 	bool generateBuildScript();
 	bool generateBuildScriptInternal(const HHashMap<PString, HList<PModuleInfo>>& moduleInfoMap, const PString& inGroupName, PString& outScript);
+	bool insertIncludePCHHeaderCode(const PString& modulePath);
 	bool makeProjectFiles();
 	bool findModuleInfo(const PString& modulePath, PModuleInfo* outModuleInfo) const;
 	

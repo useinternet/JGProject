@@ -11,6 +11,10 @@
 #define JGENUM(...)
 #define JGENUMMETA(...)
 
+#define TYPE_NULL_ID -1
+
+#define JGTYPE(x)    JGType::GenerateType<##x>()
+#define JGTYPEID(x)  JGType::GenerateTypeID<##x>()
 
 #define JG_GENERATED_SIMPLE_BODY \
 public:  \

@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreDefines.h"
 #include "Memory/Memory.h"
+#include "Object/JGType.h"
 #include "Object/JGObject.h"
 #include <functional>
 
@@ -9,7 +10,8 @@ class IDelegateInstanceBase : public IMemoryObject
 public:
 	virtual ~IDelegateInstanceBase() = default;
 
-	virtual bool IsBound() const = 0;
+	virtual bool IsBound() const   = 0;
+	virtual JGType GetDelegateInstanceType() const = 0;
 };
 
 template<class Ret, class ...Args>
@@ -19,6 +21,11 @@ public:
 	virtual ~IDelegateInstance() = default;
 
 	virtual Ret Execute(Args ... args) = 0;
+
+	virtual JGType GetDelegateInstanceType() const override
+	{
+		return JGType::GenerateType<IDelegateInstance<Ret, Args...>>();
+	}
 };
 
 template<class T, class Ret, class ...Args>

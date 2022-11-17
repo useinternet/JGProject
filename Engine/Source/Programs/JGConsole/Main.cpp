@@ -45,19 +45,24 @@ int main()
 			int n = 0;
 		}
 
-		JGTestClassA TestClass;
-		PSharedPtr<JGClass> BindedClass = ::BindedClass<JGTestClassA>(&TestClass);
+		PSharedPtr<JGTestClassA> TestClass = Allocate< JGTestClassA>();
+
+		PSharedPtr<JGClass> BindedClass = ::BindedClass<JGTestClassA>(TestClass.GetRawPointer());
 
 		if (BindedClass != nullptr)
 		{
 			int32 Value = 0;
 			BindedClass->GetPropertyValue(PName("TestValue1"), Value);
 
+			float Value2 = 0.0f;
+			BindedClass->GetPropertyValue(PName("TestValue2"), Value2);
+			PString Value3 = "";
+			BindedClass->GetPropertyValue(PName("TestValue3"), Value3);
 
-			int n = 0;
+			PSharedPtr<JGFunction> Func = BindedClass->FindFunction(PName("TestFuncFunc"));
+			Func->Invoke<void>(0.0f, 1.0f, 5);
 		}
-		//float Value = 0.0f;
-		//Class->GetPropertyValue(PName("TestValue1"), 
+
 	});
 
 

@@ -4,6 +4,7 @@
 #include "String/String.h"
 #include "String/Name.h"
 #include "Misc/Log.h"
+#include "Object/JGType.h"
 
 #include "Math/Vector.h"
 #include "Math/Quaternion.h"

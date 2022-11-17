@@ -1027,6 +1027,24 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		funcCode.AppendLine(PString::Format("\t%s* noneConstThisPtr = const_cast<%s*>(static_cast<const %s*>(fromThis));", Class.Name, Class.Name, Class.Name));
 		funcCode.AppendLine(PString::Format("\tPSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(%s)));", Class.Name));
 
+		for (const HProperty& property : Class.Properties)
+		{
+			PString propertyCode = R"(
+	if (Class->HasProperty(PName("#__PROPERTY__")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("#__PROPERTY__")), &(noneConstThisPtr->#__PROPERTY__)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "#__CLASS__: Fail Bind Property : #__PROPERTY__");
+		}
+	}
+)";
+			propertyCode = PString::ReplaceAll(propertyCode, "#__PROPERTY__", property.Name);
+			propertyCode = PString::ReplaceAll(propertyCode, "#__CLASS__", Class.Name);
+
+			funcCode.AppendLine(propertyCode).AppendLine("");
+		}
+
+
 
 		for (const HFunction& function : Class.Functions)
 		{

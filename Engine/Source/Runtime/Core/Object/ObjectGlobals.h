@@ -1,18 +1,13 @@
 #pragma once
 
 #include "JGObject.h"
+#include "JGType.h"
 #include "Math/Math.h"
 #include "Memory/Memory.h"
 #include "String/String.h"
 #include "String/Name.h"
 #include "Misc/Delegate.h"
 #include "Misc/StdExternal.h"
-
-
-#define TYPE_NULL_ID -1
-
-#define JGTYPE(x)    JGType::GenerateType<##x>()
-#define JGTYPEID(x)  JGType::GenerateTypeID<##x>()
 
 class JGMeta;
 class JGProperty;
@@ -40,88 +35,9 @@ public:
 	template<class T, class Ret, class ... Args>
 	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func, const HList<JGType>& funArgTypes);
 
-	template<class T>
-	static bool BindProperty(const JGObject* fromThis, const PName& Name, T* value);
+	template<class T, class U>
+	static bool BindProperty(const T* fromThis, PSharedPtr<JGProperty> inProperty, U* value);
 };
-
-class JGType : public JGObject
-{
-	JG_GENERATED_SIMPLE_BODY
-	friend PObjectGlobalsPrivateUtils;
-	friend GObjectGlobalSystem;
-protected:
-	uint64 ID = TYPE_NULL_ID;
-	uint64 Size = 0;
-public:
-	JGType();
-	virtual ~JGType() = default;
-public:
-	bool operator==(const JGType& type) const
-	{
-		return GetID() == type.GetID();
-	}
-	bool operator!=(const JGType& type) const 
-	{
-		return GetID() != type.GetID();
-	}
-public:
-	uint64 GetID() const;
-	uint64 GetSize() const;
-public:
-	template<class T>
-	static uint64 GenerateTypeID()
-	{
-		static uint64 type_id = TYPE_NULL_ID;
-		if (type_id == TYPE_NULL_ID)
-		{
-			type_id = typeid(T).hash_code();
-		}
-		return type_id;
-	}
-
-	template<class T>
-	static JGType GenerateType()
-	{
-		static const char* type_name = typeid(T).name();
-
-		JGType result;
-		result.ID   = GenerateTypeID<T>();
-		result.Size = sizeof(T);
-		result.SetName(PName(type_name));
-		
-		return result;
-	}
-
-	template<>
-	static JGType GenerateType<void>()
-	{
-		static const char* type_name = typeid(void).name();
-
-		JGType result;
-		result.ID = GenerateTypeID<void>();
-		result.Size = 0;
-		result.SetName(PName(type_name));
-
-		return result;
-	}
-
-	template<class T>
-	static JGType GenerateType(T* _this)
-	{
-		return GenerateType<T>();
-	}
-};
-
-namespace std {
-	template <>
-	struct hash<JGType>
-	{
-		std::size_t operator()(const JGType& k) const noexcept
-		{
-			return k.GetID();
-		}
-	};
-}
 
 class JGMeta : public JGObject
 {
@@ -192,7 +108,9 @@ public:
 		}
 
 		uint64 dataSize = Type->GetSize();
-		memcpy_s(&outData, dataSize, DataPtr, dataSize);
+
+		outData = *((T*)(DataPtr));
+		//memcpy_s(&outData, dataSize, DataPtr, dataSize);
 
 		return true;
 	}
@@ -223,7 +141,21 @@ public:
 	template<class Ret, class ... Args>
 	Ret Invoke(Args ... args)
 	{
+		if (FunctionReference == nullptr)
+		{
+			return Ret();
+		}
+
+		if (FunctionReference->GetDelegateInstanceType() != JGType::GenerateType<IDelegateInstance<Ret, Args...>>())
+		{
+			return Ret();
+		}
+
 		IDelegateInstance<Ret, Args...>* pFuncRef = static_cast<IDelegateInstance<Ret, Args...>*>(FunctionReference.GetRawPointer());
+		if (pFuncRef->IsBound() == false)
+		{
+			return Ret();
+		}
 
 		return pFuncRef->Execute(args...);
 	}
@@ -344,10 +276,6 @@ inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromTh
 		PSharedPtr<JGType>	   type = property->Type;
 
 		staticClass->PropertyMap.emplace(property->GetName(), i);
-
-		property->DataPtr = (void*)rawAddr;
-
-		rawAddr += HMath::Align<int64>((int64)type->GetSize(), JG_MEMORY_OFFSET);
 	}
 
 	int32 functionCount = (int32)staticClass->Functions.size();
@@ -384,10 +312,21 @@ inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedP
 	return true;
 }
 
-template<class T>
-inline bool PObjectGlobalsPrivateUtils::BindProperty(const JGObject* fromThis, const PName& Name, T* value)
+template<class T, class U>
+inline bool PObjectGlobalsPrivateUtils::BindProperty(const T* fromThis, PSharedPtr<JGProperty> inProperty, U* value)
 {
+	if (fromThis == nullptr || inProperty == nullptr || value == nullptr)
+	{
+		return false;
+	}
 
+	if (inProperty->GetPropertyType() != JGTYPE(U))
+	{
+		return false;
+	}
+
+	inProperty->OwnerObject = SharedWrap<T>(fromThis);
+	inProperty->DataPtr = value;
 
 	return true;
 }

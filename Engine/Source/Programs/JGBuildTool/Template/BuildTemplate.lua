@@ -1,9 +1,9 @@
 local GEN_PROJECT_FILE_PATH = "Temp/ProjectFiles/"
 local BIN_PATH        = "Bin/%{cfg.buildcfg}/"
 local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
---local PCH_HEADER      = "PCH.h"
---local PCH_HEADER_PATH = "Source/PCH/PCH.h"
---local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
+local PCH_HEADER      = "PCH.h"
+local PCH_HEADER_PATH = "Source/PCH/PCH.h"
+local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 
 function DebugConfig(defined)
     symbols       "On"
@@ -61,8 +61,8 @@ workspace "JGEngine"
             path .. "**.h",
             path .. "**.cpp",
             path .. "**.c",
-            --PCH_HEADER_PATH,
-            --PCH_CPP_PATH,
+            PCH_HEADER_PATH,
+            PCH_CPP_PATH,
         }
     end
 

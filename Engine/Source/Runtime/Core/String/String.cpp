@@ -21,6 +21,12 @@ PString::PString(const wchar_t* string)
 	setWString(string);
 }
 
+PString::~PString()
+{
+	_stringCode = NULL_ID;
+	_rawString.clear();
+}
+
 PString& PString::operator=(const char inChar)
 {
 	HRawString str;

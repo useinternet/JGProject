@@ -64,7 +64,7 @@ public:
 	PString(const char* string);
 	PString(const wchar_t* string);
 
-	virtual ~PString() = default;
+	virtual ~PString();
 
 public: // -- operation --
 	PString& operator=(const PString& string) = default;

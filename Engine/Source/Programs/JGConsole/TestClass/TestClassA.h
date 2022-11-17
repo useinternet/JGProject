@@ -23,10 +23,10 @@ private:
 	int32 TestValue1 = 10;
 
 	JGPROPERTY(Category = Setting, Meta = { Test4, Test5, Test6 })
-	float32 TestValue2;
+	float32 TestValue2 = 2.0f;
 
 	JGPROPERTY(Hidden, Category = { Setting, Hidden })
-	PString TestValue3;
+	PString TestValue3 = "Test";
 
 public:
 	JGFUNCTION(Category = Setting)
@@ -38,7 +38,7 @@ public:
 	JGFUNCTION(Hidden, Category = { Setting, Hidden })
 	void TestFuncFunc(float v, float a, int32 c)
 	{
-
+		int n = 0;
 	}
 
 	JGFUNCTION(exec, Category = { Setting, Hidden })
