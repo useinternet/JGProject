@@ -75,6 +75,8 @@ public: // -- operation --
 	bool operator==(const PString& string) const;
 	bool operator!=(const PString& string) const;
 
+	PString operator/(const PString& string) const;
+
 	char& operator[](uint64 index);
 	const char& operator[](uint64 index) const;
 public:

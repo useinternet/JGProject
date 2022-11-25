@@ -1,4 +1,6 @@
+#include "PCH/PCH.h"
 #include "String.h"
+#include "FileIO/FileHelper.h"
 #include "Misc/Hash.h"
 #include "Math/Math.h"
 
@@ -57,6 +59,14 @@ bool PString::operator==(const PString& string) const
 bool PString::operator!=(const PString& string) const
 {
 	return GetStringTableID() != string.GetStringTableID();
+}
+
+PString PString::operator/(const PString& string) const
+{
+	PString result;
+	HFileHelper::CombinePath(*this, string, &result);
+
+	return result;
 }
 
 char& PString::operator[](uint64 index)

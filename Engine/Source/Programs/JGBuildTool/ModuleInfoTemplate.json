@@ -14,9 +14,29 @@
             "DEFINE_A",
             "DEFINE_B"
         ],
-        "DevelopEngineFilter": "",
-        "DevelopGameFilter": "DebugConfig/ConfirmConfig/ReleaseConfig",
-        "DevelopConfirmGameFilter": "",
-        "DevelopReleaseGameFilter": ""
+        "DevelopEngine": {
+            "Config": "DebugConfig/ConfirmConfig/ReleaseConfig",
+            "Defines": [
+                "DEFINE_A"
+            ]
+        },
+        "DevelopGame": {
+            "Config": "DebugConfig/ConfirmConfig/ReleaseConfig",
+            "Defines": [
+                "DEFINE_A"
+            ]
+        },
+        "ConfirmGame": {
+            "Config": "DebugConfig/ConfirmConfig/ReleaseConfig",
+            "Defines": [
+                "DEFINE_A"
+            ]
+        },
+        "ReleaseGame": {
+            "Config": "DebugConfig/ConfirmConfig/ReleaseConfig",
+            "Defines": [
+                "DEFINE_A"
+            ]
+        }
     }
 }

@@ -1,6 +1,38 @@
 #pragma once
 #include "Core.h"
 
+enum class EGlobalFilter
+{
+	DevelopEngine,
+	DevelopGame,
+	ConfirmGame,
+	ReleaseGame,
+	Count
+};
+
+class HGlobalFilter : public IJsonable
+{
+public:
+	HList<PString> Defines;
+
+public:
+	virtual ~HGlobalFilter() = default;
+
+protected:
+	virtual void WriteJson(PJsonData& json) const override
+	{
+		json.AddMember("Defines", Defines);
+	}
+
+	virtual void ReadJson(const PJsonData& json) override
+	{
+		if (json.GetData("Defines", &Defines) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "Defines: fail read json data");
+		}
+	}
+};
+
 class PArguments : public IMemoryObject, public IJsonable
 {
 public:
@@ -15,6 +47,8 @@ public:
 
 	PString ThirdPartyDirectory;
 	PString BuildScriptTemplatePath;
+
+	HGlobalFilter GlobalFilters[(int32)EGlobalFilter::Count];
 
 	PArguments()
 	{
@@ -36,7 +70,7 @@ public:
 	virtual ~PArguments() = default;
 
 protected:
-	virtual void WriteJson(PJsonData& json) const
+	virtual void WriteJson(PJsonData& json) const override
 	{
 		json.AddMember("EngineWorkDirectory", EngineWorkDirectory);
 		json.AddMember("EngineWorkCategories", EngineWorkCategories);
@@ -49,9 +83,14 @@ protected:
 
 		json.AddMember("ThirdPartyDirectory", ThirdPartyDirectory);
 		json.AddMember("BuildScriptTemplatePath", BuildScriptTemplatePath);
+
+		json.AddMember("DevelopEngine", GlobalFilters[(int32)EGlobalFilter::DevelopEngine]);
+		json.AddMember("DevelopGame", GlobalFilters[(int32)EGlobalFilter::DevelopGame]);
+		json.AddMember("ConfirmGame", GlobalFilters[(int32)EGlobalFilter::ConfirmGame]);
+		json.AddMember("ReleaseGame", GlobalFilters[(int32)EGlobalFilter::ReleaseGame]);
 	}
 
-	virtual void ReadJson(PJsonData& json)
+	virtual void ReadJson(const PJsonData& json) override
 	{
 		if (json.GetData("EngineWorkDirectory", &EngineWorkDirectory) == false)
 		{
@@ -91,6 +130,26 @@ protected:
 		if (json.GetData("BuildScriptTemplatePath", &BuildScriptTemplatePath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Error, "BuildScriptTemplatePath: fail read json data");
+		}
+
+		if (json.GetData("DevelopEngine", &GlobalFilters[(int32)EGlobalFilter::DevelopEngine]) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "DevelopEngine: fail read json data");
+		}
+
+		if (json.GetData("DevelopGame", &GlobalFilters[(int32)EGlobalFilter::DevelopGame]) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "DevelopGame: fail read json data");
+		}
+
+		if (json.GetData("ConfirmGame", &GlobalFilters[(int32)EGlobalFilter::ConfirmGame]) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "ConfirmGame: fail read json data");
+		}
+
+		if (json.GetData("ReleaseGame", &GlobalFilters[(int32)EGlobalFilter::ReleaseGame]) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "ReleaseGame: fail read json data");
 		}
 	}
 };

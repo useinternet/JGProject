@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Memory.h"
 
 GMemoryGlobalSystem::GMemoryGlobalSystem(int32 processBlockCountPerFrame)

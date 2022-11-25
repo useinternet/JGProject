@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Thread.h"
 
 PThread::PThread()
@@ -38,8 +39,6 @@ void PThread::run()
 {
 	while (_bIsActive || _taskQueue.empty() == false)
 	{
-		_bIsRunning = false;
-
 		std::unique_lock<std::mutex> lock(_mutex);
 		_conditionVariable.wait(lock, [&]()->bool
 		{
@@ -49,17 +48,19 @@ void PThread::run()
 		if (_taskQueue.empty() == false)
 		{
 			PSharedPtr<PTask> task = _taskQueue.front(); _taskQueue.pop();
-
+			
 			lock.unlock();
 
 			_bIsRunning = true;
-
 			if (task != nullptr && task->IsValid() == true)
 			{
 				task->DoTask();
 			}
 		}
-
+		else
+		{
+			_bIsRunning = false;
+		}
 	}
 }
 

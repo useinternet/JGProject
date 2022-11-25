@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Scheduler.h"
 #include "MainThreadExecutionOrder.h"
 #include "Misc/Log.h"
@@ -127,7 +128,7 @@ bool GScheduleGlobalSystem::updateTask(PSyncTaskByFrame* task)
 		return false;
 	}
 
-	if (task->Repeat > 0 && task->CallCount > task->Repeat)
+	if (task->CallCount > task->Repeat)
 	{
 		return false;
 	}
@@ -158,7 +159,7 @@ bool GScheduleGlobalSystem::updateTask(PSyncTaskByTick* task)
 		return false;
 	}
 
-	if (task->Repeat > 0 && task->CallCount > task->Repeat)
+	if (task->CallCount > task->Repeat)
 	{
 		return false;
 	}
@@ -226,7 +227,7 @@ int32 GScheduleGlobalSystem::getRecommandThreadIndex(ENamedThread inNamedThread)
 			{
 				for (int32 i = _mappedThreadIndexOffset; i < threadCount; ++i)
 				{
-					PSharedPtr<PThread> thread = _threads[threadIndex];
+					PSharedPtr<PThread> thread = _threads[i];
 					if (thread == nullptr || thread->IsRunning())
 					{
 						continue;

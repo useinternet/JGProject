@@ -110,7 +110,6 @@ public:
 		uint64 dataSize = Type->GetSize();
 
 		outData = *((T*)(DataPtr));
-		//memcpy_s(&outData, dataSize, DataPtr, dataSize);
 
 		return true;
 	}

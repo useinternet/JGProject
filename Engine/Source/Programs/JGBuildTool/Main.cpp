@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Core.h"
 #include "Class/BuildTool.h"
 
@@ -71,7 +72,7 @@ bool ReadArguments(PArguments* outArguments)
 		return false;
 	}
 
-	if (json.GetData("Arguments", outArguments) == false)
+	if (json.GetData<PArguments>("Arguments", outArguments) == false)
 	{
 		JG_LOG(BuildTool, ELogLevel::Critical, "Fail getData in json");
 		return false;
@@ -99,10 +100,17 @@ void CreateModuleInfoTemplate()
 	info.Defines.push_back("DEFINE_A");
 	info.Defines.push_back("DEFINE_B");
 
-	info.DevelopGameFilter = "DebugConfig/ConfirmConfig/ReleaseConfig";
-	info.DevelopGameFilter = "DebugConfig/ConfirmConfig/ReleaseConfig";
-	info.DevelopGameFilter = "DebugConfig/ConfirmConfig/ReleaseConfig";
-	info.DevelopGameFilter = "DebugConfig/ConfirmConfig/ReleaseConfig";
+	info.ModuleFilters[(int32)EModuleFilter::DevelopEngine].Config = "DebugConfig/ConfirmConfig/ReleaseConfig";
+	info.ModuleFilters[(int32)EModuleFilter::DevelopEngine].Defines.push_back("DEFINE_A");
+
+	info.ModuleFilters[(int32)EModuleFilter::DevelopGame].Config = "DebugConfig/ConfirmConfig/ReleaseConfig";
+	info.ModuleFilters[(int32)EModuleFilter::DevelopGame].Defines.push_back("DEFINE_A");
+
+	info.ModuleFilters[(int32)EModuleFilter::ConfirmGame].Config = "DebugConfig/ConfirmConfig/ReleaseConfig";
+	info.ModuleFilters[(int32)EModuleFilter::ConfirmGame].Defines.push_back("DEFINE_A");
+
+	info.ModuleFilters[(int32)EModuleFilter::ReleaseGame].Config = "DebugConfig/ConfirmConfig/ReleaseConfig";
+	info.ModuleFilters[(int32)EModuleFilter::ReleaseGame].Defines.push_back("DEFINE_A");
 
 	PJson json;
 	json.AddMember("ModuleInfo", info);

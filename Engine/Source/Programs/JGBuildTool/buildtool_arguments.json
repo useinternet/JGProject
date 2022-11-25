@@ -1,16 +1,28 @@
 {
-    "Arguments": {
-        "EngineWorkDirectory": "../../Source",
-        "EngineWorkCategories": [
-            "Programs",
-            "Editor",
-            "Runtime"
-        ],
-        "UserWorkDirectory": "../../Source/Dummy",
-        "UserWorkCategories": [],
-        "ModuleInfoFileExtension": "json",
-        "ModuleRecognitionName": "module",
-        "ThirdPartyDirectory": "../../Source/ThirdParty",
-        "BuildScriptTemplatePath": "../../Source/Programs/JGBuildTool/Template/BuildTemplate.lua"
+  "Arguments": {
+    "EngineWorkDirectory": "../../Source",
+    "EngineWorkCategories": [
+      "Programs",
+      "Editor",
+      "Runtime"
+    ],
+    "UserWorkDirectory": "../../Source/Dummy",
+    "UserWorkCategories": [],
+    "ModuleInfoFileExtension": "json",
+    "ModuleRecognitionName": "module",
+    "ThirdPartyDirectory": "../../Source/ThirdParty",
+    "BuildScriptTemplatePath": "../../Source/Programs/JGBuildTool/Template/BuildTemplate.lua",
+    "DevelopEngine": {
+      "Defines": [ "_DEVELOPENGINE" ]
+    },
+    "DevelopGame": {
+      "Defines": [ "_DEVELOPGAME" ]
+    },
+    "ConfirmGame": {
+      "Defines": [ "_CONFIRMGAME" ]
+    },
+    "ReleaseGame": {
+      "Defines": [ "_RELEASEGAME" ]
     }
+  }
 }

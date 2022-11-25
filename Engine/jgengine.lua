@@ -1,14 +1,14 @@
 local GEN_PROJECT_FILE_PATH = "Temp/ProjectFiles/"
 local BIN_PATH        = "Bin/%{cfg.buildcfg}/"
 local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
-local PCH_HEADER      = "PCH.h"
+local PCH_HEADER      = "PCH/PCH.h"
 local PCH_HEADER_PATH = "Source/PCH/PCH.h"
 local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 
 function DebugConfig(defined)
     symbols       "On"
     optimize      "Off"
-    defines       {"_DEBUG", "_PROFILE"}
+    defines       {"_DEBUG"}
     cppdialect    "C++20"
     staticruntime "off"
     runtime       "Debug"
@@ -16,7 +16,7 @@ end
 
 function ConfirmConfig(defined)
     optimize        "Full" 
-    defines         {"_RELEASE", "NDEBUG", "_PROFILE"}
+    defines         {"_RELEASE", "NDEBUG"}
     cppdialect      "C++20"
     staticruntime   "off"
     runtime         "Release"
@@ -56,15 +56,13 @@ workspace "JGEngine"
         if defined ~= nil then
             defines {defined}
         end
-		pchheader (PCH_HEADER)
-		pchsource (PCH_CPP_PATH)
         -- file
         files {
             path .. "**.h",
             path .. "**.cpp",
             path .. "**.c",
-            --PCH_HEADER_PATH,
-            --PCH_CPP_PATH,
+            PCH_HEADER_PATH,
+            PCH_CPP_PATH,
         }
     end
 
@@ -76,16 +74,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", {"_JGBUILDTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE"}
+					defines{"_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME"}
+					defines{"_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME"}
+					defines{"_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME"}
+					defines{"_RELEASEGAME", }
 
 
 			project "JGConsole"
@@ -94,16 +92,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGConsole/", {"_JGCONSOLE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE"}
+					defines{"_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME"}
+					defines{"_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME"}
+					defines{"_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME"}
+					defines{"_RELEASEGAME", }
 
 
 			project "JGHeaderTool"
@@ -112,16 +110,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", {"_JGHEADERTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE"}
+					defines{"_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME"}
+					defines{"_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME"}
+					defines{"_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME"}
+					defines{"_RELEASEGAME", }
 
 
 		group "Engine/Runtime"
@@ -131,16 +129,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE"}
+					defines{"_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME"}
+					defines{"_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME"}
+					defines{"_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME"}
+					defines{"_RELEASEGAME", }
 
 
 			project "Core"
@@ -149,16 +147,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE"}
+					defines{"_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME"}
+					defines{"_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME"}
+					defines{"_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME"}
+					defines{"_RELEASEGAME", }
 
 
 

@@ -36,7 +36,7 @@ public:
 
 public:
 	template<class ... Args>
-	void PushTask(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	HTaskHandle PushTask(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
 		PSharedPtr<PTask> task = PTask::Create(refObject, func, args...);
 
@@ -44,6 +44,8 @@ public:
 		_taskQueue.push(task);
 
 		_conditionVariable.notify_one();
+
+		return task->CreateHandle();
 	}
 
 	uint64 GetThreadID() const;
@@ -54,4 +56,12 @@ private:
 	void init();
 	void run();
 	void destroy();
+
+public:
 };
+
+
+inline ThreadID CurrentThreadID()
+{
+	return std::hash<std::thread::id>()(std::this_thread::get_id());
+}

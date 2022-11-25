@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Task.h"
 
 PTask::PTask()
@@ -27,4 +28,45 @@ void PTask::DoTask()
 	_taskDelegate.ExecuteIfBound(_taskArguments);
 
 	_bIsRunning = false;
+}
+
+HTaskHandle PTask::CreateHandle() const
+{
+	return HTaskHandle(SharedWrap(this), &_bIsRunning);
+}
+
+HTaskHandle::HTaskHandle(PSharedPtr<PTask> inTask, const HAtomicBool* pInIsRunning)
+{
+	task = inTask;
+	pIsRunning = pInIsRunning;
+}
+
+bool HTaskHandle::IsValid() const
+{
+	return task.IsValid() && pIsRunning != nullptr;
+}
+
+bool HTaskHandle::IsRunning() const
+{
+	if (IsValid() == false)
+	{
+		return false;
+	}
+
+	return (*pIsRunning) == true;
+}
+
+bool HTaskHandle::IsWaiting() const
+{
+	if (IsValid() == false)
+	{
+		return false;
+	}
+
+	return (*pIsRunning) == false;
+}
+
+void HTaskHandle::Wait()
+{
+	while (IsRunning()) { }
 }

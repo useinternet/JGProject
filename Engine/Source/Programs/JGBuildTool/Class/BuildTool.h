@@ -3,24 +3,6 @@
 #include "Arguments.h"
 #include "ModuleInfo.h"
 
-
-/* 스케줄러 완료 후 작업 시작
-local PCH_HEADER = "PCH.h"
-local PCH_HEADER_PATH = "Source/PCH/PCH.h"
-local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
-
-		pchheader (PCH_HEADER)
-		pchsource (PCH_CPP_PATH)
-		files {
-			path .. "**.h",
-			path .. "**.cpp",
-			path .. "**.ico",
-			path .. "**.rc",
-			PCH_HEADER_PATH,
-			PCH_CPP_PATH,
-		}
-*/
-
 class PBuildTool : public IMemoryObject
 {
 public:
@@ -47,10 +29,11 @@ private:
 	void collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap);
 	bool generateBuildScript();
 	bool generateBuildScriptInternal(const HHashMap<PString, HList<PModuleInfo>>& moduleInfoMap, const PString& inGroupName, PString& outScript);
-	bool insertIncludePCHHeaderCode(const PString& modulePath);
+	void insertIncludePCHHeaderCode();
+	void insertIncludePCHHeaderCodeInternal(const HHashMap<PString, HList<PModuleInfo>>& moduleInfoMap);
 	bool makeProjectFiles();
 	bool findModuleInfo(const PString& modulePath, PModuleInfo* outModuleInfo) const;
-	
+	PString getDefines(const PModuleInfo& moduleInfo, EModuleFilter filter) const;
 	PString getUserProjectName() const;
 	const PString& getBuildScriptTemplatePath() const;
 };

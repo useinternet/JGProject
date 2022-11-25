@@ -76,7 +76,6 @@ using uint64 = unsigned long long;
 using float32 = float;
 using float64 = double;
 
-
 using HAtomicBool   = std::atomic_bool;
 using HAtomicInt32  = std::atomic_int;
 using HAtomicUint32 = std::atomic_uint;

@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "ObjectGlobalSystem.h"
 #include "ObjectGlobals.h"
 #include "Misc/Log.h"

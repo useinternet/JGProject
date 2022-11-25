@@ -1,14 +1,14 @@
 local GEN_PROJECT_FILE_PATH = "Temp/ProjectFiles/"
 local BIN_PATH        = "Bin/%{cfg.buildcfg}/"
 local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
-local PCH_HEADER      = "PCH.h"
+local PCH_HEADER      = "PCH/PCH.h"
 local PCH_HEADER_PATH = "Source/PCH/PCH.h"
 local PCH_CPP_PATH    = "Source/PCH/PCH.cpp"
 
 function DebugConfig(defined)
     symbols       "On"
     optimize      "Off"
-    defines       {"_DEBUG", "_PROFILE"}
+    defines       {"_DEBUG"}
     cppdialect    "C++20"
     staticruntime "off"
     runtime       "Debug"
@@ -16,7 +16,7 @@ end
 
 function ConfirmConfig(defined)
     optimize        "Full" 
-    defines         {"_RELEASE", "NDEBUG", "_PROFILE"}
+    defines         {"_RELEASE", "NDEBUG"}
     cppdialect      "C++20"
     staticruntime   "off"
     runtime         "Release"

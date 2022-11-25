@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "FileHelper.h"
 #include "Misc/Log.h"
 #include <fstream>

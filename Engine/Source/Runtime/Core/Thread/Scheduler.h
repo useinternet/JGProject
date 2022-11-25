@@ -188,13 +188,13 @@ public:
 	}
 
 	template<class ... Args>
-	void ScheduleAsync(ENamedThread namedThread, PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	HTaskHandle ScheduleAsync(ENamedThread namedThread, PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		int32 fixedThreadIndex = getRecommandThreadIndex();
+		int32 fixedThreadIndex = getRecommandThreadIndex(namedThread);
 
 		PSharedPtr<PThread> thread = _threads[fixedThreadIndex];
 
-		thread->PushTask(refObject, func, args...);
+		return thread->PushTask(refObject, func, args...);
 	}
 	
 private:

@@ -1,11 +1,41 @@
 #pragma once
 #include "Core.h"
+#include "Arguments.h"
+
+using EModuleFilter = EGlobalFilter;
+class HModuleFilter : public IJsonable
+{
+public:
+	PString Config;
+	HList<PString> Defines;
+
+public:
+	virtual ~HModuleFilter() = default;
+
+protected:
+	virtual void WriteJson(PJsonData& json) const override
+	{
+		json.AddMember("Config", Config);
+		json.AddMember("Defines", Defines);
+	}
+
+	virtual void ReadJson(const PJsonData& json) override
+	{
+		if (json.GetData("Config", &Config) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "Defines: fail read json data");
+		}
+
+		if (json.GetData("Defines", &Defines) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "Defines: fail read json data");
+		}
+	}
+};
 
 class PModuleInfo : public IMemoryObject, public IJsonable
 {
 public:
-	/*
-	* ex) SharedLib, StaticLib, ConsoleApp*/
 	PString ModuleFormat;
 
 	HList<PString> ModuleDependencies;
@@ -14,10 +44,12 @@ public:
 	PString ModulePath;
 	HList<PString> Defines;
 
-	PString DevelopEngineFilter;
-	PString DevelopGameFilter;
-	PString DevelopConfirmGameFilter;
-	PString DevelopReleaseGameFilter;
+	HModuleFilter ModuleFilters[(int32)EModuleFilter::Count];
+
+	//PString DevelopEngineFilter;
+	//PString DevelopGameFilter;
+	//PString DevelopConfirmGameFilter;
+	//PString DevelopReleaseGameFilter;
 
 	virtual ~PModuleInfo() = default;
 protected:
@@ -28,10 +60,12 @@ protected:
 		json.AddMember("ModuleName", ModuleFormat);
 		json.AddMember("ModulePath", ModuleDependencies);
 		json.AddMember("Defines", Defines);
-		json.AddMember("DevelopEngineFilter", DevelopEngineFilter);
-		json.AddMember("DevelopGameFilter", DevelopGameFilter);
-		json.AddMember("DevelopConfirmGameFilter", DevelopConfirmGameFilter);
-		json.AddMember("DevelopReleaseGameFilter", DevelopReleaseGameFilter);
+
+
+		json.AddMember("DevelopEngine", ModuleFilters[(int32)EModuleFilter::DevelopEngine]);
+		json.AddMember("DevelopGame", ModuleFilters[(int32)EModuleFilter::DevelopGame]);
+		json.AddMember("ConfirmGame", ModuleFilters[(int32)EModuleFilter::ConfirmGame]);
+		json.AddMember("ReleaseGame", ModuleFilters[(int32)EModuleFilter::ReleaseGame]);
 	}
 
 	virtual void ReadJson(const PJsonData& json)
@@ -61,24 +95,24 @@ protected:
 			JG_LOG(BuildTool, ELogLevel::Error, "Defines: fail read json data");
 		}
 
-		if (json.GetData("DevelopEngineFilter", &DevelopEngineFilter) == false)
+		if (json.GetData("DevelopEngine", &ModuleFilters[(int32)EModuleFilter::DevelopEngine]) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Error, "DevelopEngineFilter: fail read json data");
+			JG_LOG(BuildTool, ELogLevel::Error, "DevelopEngine: fail read json data");
 		}
 
-		if (json.GetData("DevelopGameFilter", &DevelopGameFilter) == false)
+		if (json.GetData("DevelopGame", &ModuleFilters[(int32)EModuleFilter::DevelopGame]) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Error, "DevelopGameFilter: fail read json data");
+			JG_LOG(BuildTool, ELogLevel::Error, "DevelopGame: fail read json data");
 		}
 
-		if (json.GetData("DevelopConfirmGameFilter", &DevelopConfirmGameFilter) == false)
+		if (json.GetData("ConfirmGame", &ModuleFilters[(int32)EModuleFilter::ConfirmGame]) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Error, "DevelopConfirmGameFilter: fail read json data");
+			JG_LOG(BuildTool, ELogLevel::Error, "ConfirmGame: fail read json data");
 		}
 
-		if (json.GetData("DevelopReleaseGameFilter", &DevelopReleaseGameFilter) == false)
+		if (json.GetData("ReleaseGame", &ModuleFilters[(int32)EModuleFilter::ReleaseGame]) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Error, "DevelopReleaseGameFilter: fail read json data");
+			JG_LOG(BuildTool, ELogLevel::Error, "ReleaseGame: fail read json data");
 		}
 	}
 };

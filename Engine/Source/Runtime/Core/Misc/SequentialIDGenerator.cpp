@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "SequentialIDGenerator.h"
 
 PSequentialIDGenerator::PSequentialIDGenerator()

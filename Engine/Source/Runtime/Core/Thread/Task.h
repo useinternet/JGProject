@@ -5,6 +5,8 @@
 #include "Object/ObjectGlobals.h"
 
 class PTaskArguments;
+class HTaskHandle;
+
 JG_DECLARE_DELEGATE_ONEPARAM(PTaskDelegate, const PTaskArguments&)
 
 class PTaskArguments : public IMemoryObject
@@ -111,6 +113,7 @@ public:
 
 	void DoTask();
 
+	HTaskHandle CreateHandle() const;
 public:
 	template<class ... Args>
 	static PSharedPtr<PTask> Create(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
@@ -120,6 +123,24 @@ public:
 
 		return task;
 	}
+};
+
+class HTaskHandle
+{
+	friend PTask;
+
+private:
+	PWeakPtr<PTask> task;
+	const HAtomicBool* pIsRunning;
+private:
+	HTaskHandle(PSharedPtr<PTask> inTask, const HAtomicBool* pInIsRunning);
+
+public:
+	bool IsValid() const;
+	bool IsRunning() const;
+	bool IsWaiting() const;
+	void Wait();
+	
 };
 
 

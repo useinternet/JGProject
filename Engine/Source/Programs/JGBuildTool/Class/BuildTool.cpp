@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "BuildTool.h"
 #include<stdio.h>
 
@@ -39,13 +40,17 @@ bool PBuildTool::Run()
 		return false;
 	}
 
-	// Step 4. make Build
-	JG_LOG(BuildTool, ELogLevel::Info, "Step 4. Make Project Files..");
+	// Step 4. 
+	JG_LOG(BuildTool, ELogLevel::Info, "Step 4. Insert Include PCH..");
+	insertIncludePCHHeaderCode();
+
+	// Step 5. make Build
+	JG_LOG(BuildTool, ELogLevel::Info, "Step 5. Make Project Files..");
 	if (makeProjectFiles() == false)
 	{
 		return false;
 	}
-	
+
 	JG_LOG(BuildTool, ELogLevel::Info, "Compelete Build Tool Run..");
 	return true;
 }
@@ -273,23 +278,23 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:DevelopEngine\"");
-			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopEngineFilter).AppendLine("()");
-			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_DEVELOPENGINE\"}");
+			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::DevelopEngine].Config).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::DevelopEngine));
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:DevelopGame\"");
-			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopGameFilter).AppendLine("()");
-			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_DEVELOPGAME\"}");
+			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::DevelopGame].Config).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::DevelopGame));
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ConfirmGame\"");
-			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopConfirmGameFilter).AppendLine("()");
-			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_CONFIRMGAME\"}");
+			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::ConfirmGame].Config).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::ConfirmGame));
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ReleaseGame\"");
-			outScript.Append("\t\t\t\t\t").Append(moduleInfo.DevelopReleaseGameFilter).AppendLine("()");
-			outScript.Append("\t\t\t\t\t").AppendLine("defines{\"_RELEASEGAME\"}");
+			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::ReleaseGame].Config).AppendLine("()");
+			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::ReleaseGame));
 
 			outScript.AppendLine("");
 			outScript.AppendLine("");
@@ -301,9 +306,47 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 	return true;
 }
 
-bool PBuildTool::insertIncludePCHHeaderCode(const PString& modulePath)
+void PBuildTool::insertIncludePCHHeaderCode()
 {
-	return false;
+	insertIncludePCHHeaderCodeInternal(_engineModuleInfoMap);
+	insertIncludePCHHeaderCodeInternal(_userModuleInfoMap);
+}
+
+void PBuildTool::insertIncludePCHHeaderCodeInternal(const HHashMap<PString, HList<PModuleInfo>>& moduleInfoMap)
+{
+	for (const HPair<PString, HList<PModuleInfo>>& pair : moduleInfoMap)
+	{
+		for (const PModuleInfo& moduleInfo : pair.second)
+		{
+			PString modulePath = HFileHelper::EngineDirectory() / moduleInfo.ModulePath;
+
+			HList<PString> cppFileList;
+
+			HFileHelper::FileListInDirectory(modulePath, &cppFileList, true, { ".cpp" });
+
+			for (const PString& cppFilePath : cppFileList)
+			{
+				PString cppText;
+				if (HFileHelper::ReadAllText(cppFilePath, &cppText) == false)
+				{
+					JG_LOG(BuildTool, ELogLevel::Error, "Module: %s: Fail Insert Include PCH.H Code", moduleInfo.ModuleName);
+					continue;
+				}
+
+				uint64 pos = cppText.Find("#include \"PCH/PCH.h\"");
+				if (pos == PString::NPOS)
+				{
+					cppText.Insert("#include \"PCH/PCH.h\"\n", 0);
+				}
+
+				if (HFileHelper::WriteAllText(cppFilePath, cppText) == false)
+				{
+					JG_LOG(BuildTool, ELogLevel::Error, "Module: %s: Fail Insert Include PCH.H Code", moduleInfo.ModuleName);
+					continue;
+				}
+			}
+		}
+	}
 }
 
 bool PBuildTool::makeProjectFiles()
@@ -431,6 +474,26 @@ bool PBuildTool::findModuleInfo(const PString& modulePath, PModuleInfo* outModul
 	}
 
 	return false;
+}
+
+PString PBuildTool::getDefines(const PModuleInfo& moduleInfo, EModuleFilter filter) const
+{
+	const PArguments& args = getArguments();
+
+	PString result;
+	result.Append("defines{");
+
+	for (const PString& define : args.GlobalFilters[(int32)filter].Defines)
+	{
+		result.Append("\"").Append(define).Append("\", ");
+	}
+	for (const PString& define : moduleInfo.ModuleFilters[(int32)filter].Defines)
+	{
+		result.Append("\"").Append(define).Append("\", ");
+	}
+	result.Append("}");
+
+	return result;
 }
 
 PString PBuildTool::getUserProjectName() const

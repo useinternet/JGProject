@@ -1,3 +1,4 @@
+#include "PCH/PCH.h"
 #include "Core.h"
 #include "Programs/JGConsole/TestClass/TestClassA.h"
 
