@@ -74,16 +74,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", {"_JGBUILDTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "JGConsole"
@@ -92,16 +92,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGConsole/", {"_JGCONSOLE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "JGHeaderTool"
@@ -110,16 +110,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", {"_JGHEADERTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "JGLauncher"
@@ -128,16 +128,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGLauncher/", {"_JGLAUNCHER", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 		group "Engine/Editor"
@@ -147,16 +147,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 		group "Engine/Runtime"
@@ -166,16 +166,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "Core"
@@ -184,16 +184,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "Game"
@@ -202,16 +202,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/Game/", {"_GAME", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "GameFrameWorks"
@@ -220,16 +220,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/GameFrameWorks/", {"_GAMEFRAMEWORKS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 			project "Graphics"
@@ -238,16 +238,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_RELEASEGAME", }
 
 
 

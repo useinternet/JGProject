@@ -12,6 +12,9 @@
     "ModuleRecognitionName": "module",
     "ThirdPartyDirectory": "../../Source/ThirdParty",
     "BuildScriptTemplatePath": "../../Source/Programs/JGBuildTool/Template/BuildTemplate.lua",
+    "Defines": [
+       "_PLATFORM_WINDOWS"
+    ],
     "DevelopEngine": {
       "Defines": [ "_DEVELOPENGINE" ]
     },

@@ -2,29 +2,33 @@
 #include "CoreDefines.h"
 #include "CoreSystem.h"
 #include "Object/ObjectGlobals.h"
-
+#pragma warning(disable : 4251)
 #define JG_MODULE_IMPL(ModuleName, APIDefine) \
-APIDefine void _Get_##ModuleName_Type_(JGType* outType) \
-{ \
-	*outType = JGTYPE(##ModuleName); \
-}\
-APIDefine IModuleInterface* _Create_##ModuleName_Module_Interface()\
+APIDefine IModuleInterface* _Create_Module_Interface_()\
 {\
-	return new ModuleName();\
+	return HPlatform::Allocate<##ModuleName>();\
 }\
+APIDefine void Link_Module(GCoreSystem* ins)\
+{ \
+HCoreSystemPrivate::SetInstance(ins); \
+} \
 
 class IModuleInterface
 {
+	friend class GModuleGlobalSystem;
 protected:
 // 시작/끝 함수
+	virtual JGType GetModuleType() const = 0;
 	virtual void StartupModule()  = 0;
 	virtual void ShutdownModule() = 0;
 };
 
 class GModuleGlobalSystem : public GGlobalSystemInstance<GModuleGlobalSystem>
 {
-	HHashMap<JGType, IModuleInterface*> _modules;
+	HHashMap<PName, IModuleInterface*>  _modulesByName;
+	HHashMap<JGType, IModuleInterface*> _modulesByType;
 
+	HMutex _mutex;
 public:
 	virtual ~GModuleGlobalSystem() = default;
 
@@ -36,8 +40,12 @@ public:
 	}
 
 	IModuleInterface* FindModule(const JGType& type);
+	IModuleInterface* FindModule(const PName& moduleName);
 
 	bool ConnectModule(const PString& moduleName);
 	bool DisconnectModule(const PString& moduleName);
 	bool ReconnectModule(const PString& moduleName);
+
+protected:
+	virtual void Destroy() override;
 };

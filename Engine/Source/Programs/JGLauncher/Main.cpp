@@ -5,7 +5,10 @@ using namespace std;
 
 int main()
 {
-	GCoreSystem::Create();
+	HCoreSystemArguments args;
+	args.LaunchModule = "JGEditor";
+
+	GCoreSystem::Create(args);
 	
 	while (true)
 	{

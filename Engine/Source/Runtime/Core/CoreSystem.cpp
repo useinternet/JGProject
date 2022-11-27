@@ -62,6 +62,14 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 		pair.second->Start();
 	}
 
+	if (args.LaunchModule.length() > 0)
+	{
+		if (GModuleGlobalSystem::GetInstance().ConnectModule(args.LaunchModule.c_str()) == false)
+		{
+			JG_LOG(Core, ELogLevel::Error, "Fail Launch Module:%s", args.LaunchModule.c_str());
+		}
+	}
+
 	return true;
 }
 void GCoreSystem::Update()

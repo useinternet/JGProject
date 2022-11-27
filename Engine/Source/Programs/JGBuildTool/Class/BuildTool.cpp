@@ -483,6 +483,11 @@ PString PBuildTool::getDefines(const PModuleInfo& moduleInfo, EModuleFilter filt
 	PString result;
 	result.Append("defines{");
 
+	for (const PString& define : args.Defines)
+	{
+		result.Append("\"").Append(define).Append("\", ");
+	}
+
 	for (const PString& define : args.GlobalFilters[(int32)filter].Defines)
 	{
 		result.Append("\"").Append(define).Append("\", ");

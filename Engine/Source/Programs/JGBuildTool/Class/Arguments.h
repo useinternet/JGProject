@@ -48,6 +48,7 @@ public:
 	PString ThirdPartyDirectory;
 	PString BuildScriptTemplatePath;
 
+	HList<PString> Defines;
 	HGlobalFilter GlobalFilters[(int32)EGlobalFilter::Count];
 
 	PArguments()
@@ -84,6 +85,7 @@ protected:
 		json.AddMember("ThirdPartyDirectory", ThirdPartyDirectory);
 		json.AddMember("BuildScriptTemplatePath", BuildScriptTemplatePath);
 
+		json.AddMember("Defines", Defines);
 		json.AddMember("DevelopEngine", GlobalFilters[(int32)EGlobalFilter::DevelopEngine]);
 		json.AddMember("DevelopGame", GlobalFilters[(int32)EGlobalFilter::DevelopGame]);
 		json.AddMember("ConfirmGame", GlobalFilters[(int32)EGlobalFilter::ConfirmGame]);
@@ -130,6 +132,11 @@ protected:
 		if (json.GetData("BuildScriptTemplatePath", &BuildScriptTemplatePath) == false)
 		{
 			JG_LOG(BuildTool, ELogLevel::Error, "BuildScriptTemplatePath: fail read json data");
+		}
+
+		if (json.GetData("Defines", &Defines) == false)
+		{
+			JG_LOG(BuildTool, ELogLevel::Error, "Defines: fail read json data");
 		}
 
 		if (json.GetData("DevelopEngine", &GlobalFilters[(int32)EGlobalFilter::DevelopEngine]) == false)

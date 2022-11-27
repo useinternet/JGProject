@@ -1,65 +1,23 @@
-[:20580:][info][Core]: Active Thread: [513893676]
-[:20580:][info][Core]: Active Thread: [1760751995]
-[:20580:][info][Core]: Active Thread: [82279344]
-[:20580:][info][Core]: Active Thread: [1074890352]
-[:20580:][info][Core]: Active Thread: [3964377915]
-[:20580:][info][Core]: Active Thread: [431580801]
-[:20580:][info][Core]: Active Thread: [1401635337]
-[:20580:][info][Core]: Active Thread: [638080381]
-[:20580:][info][Core]: Active Thread Totoal Count: 8 
-[:20580:][info][BuildTool]: Step 1. Engine Collection Module Infos..
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: Programs Category Module List
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: JGBuildTool
-[:20580:][trace][BuildTool]: JGConsole
-[:20580:][trace][BuildTool]: JGHeaderTool
-[:20580:][trace][BuildTool]: JGLauncher
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: Editor Category Module List
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: JGEditor
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: Runtime Category Module List
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: CodeGen
-[:20580:][trace][BuildTool]: Core
-[:20580:][trace][BuildTool]: Game
-[:20580:][trace][BuildTool]: GameFrameWorks
-[:20580:][trace][BuildTool]: Graphics
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][trace][BuildTool]: Editor: 1
-[:20580:][trace][BuildTool]: Programs: 4
-[:20580:][trace][BuildTool]: Runtime: 5
-[:20580:][trace][BuildTool]: Total: 10
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][info][BuildTool]: Step 2. User Collection Module Infos..
-[:20580:][trace][BuildTool]: Total: 0
-[:20580:][trace][BuildTool]: ----------------------------------------------------
-[:20580:][info][BuildTool]: Step 3. Generate Build Script..
-[:20580:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGLauncher: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGLauncher: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGEditor: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: JGEditor: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: CodeGen: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: CodeGen: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: Core: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: Game: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: Game: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: GameFrameWorks: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: GameFrameWorks: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Module: Graphics: Start Generate Build Script
-[:20580:][trace][BuildTool]: Module: Graphics: Compelete Generate Build Script
-[:20580:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
-[:20580:][info][BuildTool]: Step 4. Insert Include PCH..
-[:20580:][info][BuildTool]: Step 5. Make Project Files..
-[:20580:][info][BuildTool]: Compelete Build Tool Run..
+[:13792:][info][Core]: Active Thread: [1869614816]
+[:13792:][info][Core]: Active Thread: [47531591]
+[:13792:][info][Core]: Active Thread: [3121355730]
+[:13792:][info][Core]: Active Thread: [2711984826]
+[:13792:][info][Core]: Active Thread: [79590220]
+[:13792:][info][Core]: Active Thread: [3841808604]
+[:13792:][info][Core]: Active Thread: [1189757509]
+[:13792:][info][Core]: Active Thread: [3150751322]
+[:13792:][info][Core]: Active Thread: [3683343712]
+[:13792:][info][Core]: Active Thread: [681025941]
+[:13792:][info][Core]: Active Thread: [2778397740]
+[:13792:][info][Core]: Active Thread: [1601817537]
+[:13792:][info][Core]: Active Thread: [1833406191]
+[:13792:][info][Core]: Active Thread: [2336942120]
+[:13792:][info][Core]: Active Thread: [1806543201]
+[:13792:][info][Core]: Active Thread: [1920025584]
+[:13792:][info][Core]: Active Thread: [3232568544]
+[:13792:][info][Core]: Active Thread: [1214270506]
+[:13792:][info][Core]: Active Thread: [2701097895]
+[:13792:][info][Core]: Active Thread: [1177748837]
+[:13792:][info][Core]: Active Thread Totoal Count: 20 
+[:13792:][critical][BuildTool]: Fail getData in json
+[:13792:][critical][BuildTool]: Fail read arguments

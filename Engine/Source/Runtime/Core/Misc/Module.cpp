@@ -4,43 +4,124 @@
 
 IModuleInterface* GModuleGlobalSystem::FindModule(const JGType& type)
 {
-	return nullptr;
+	HLockGuard<HMutex> lock(_mutex);
+
+	if (_modulesByType.find(type) == _modulesByType.end())
+	{
+		return nullptr;
+	}
+	return _modulesByType[type];
 }
 
-bool ConnectModule(const PString& moduleName)
+IModuleInterface* GModuleGlobalSystem::FindModule(const PName& moduleName)
 {
-	
+	HLockGuard<HMutex> lock(_mutex);
+
+	if (_modulesByName.find(moduleName) == _modulesByName.end())
+	{
+		return nullptr;
+	}
+
+	return _modulesByName[moduleName]; nullptr;
+}
+
+bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
+{
+	if (FindModule(moduleName) != nullptr)
+	{
+		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		return false;
+	}
+
 	PString dllName = PString::Format("%s.dll", moduleName);;
 	PString getTypeFuncName = PString::Format("_Get_%s_Type_", moduleName);
-	PString createModuleFuncName = PString::Format("_Create_%s_Module_Interface", moduleName);
+	PString createModuleFuncName = "_Create_Module_Interface_";
 
 	HJInstance dllIns = HPlatform::LoadDll(dllName);
+	if (dllIns == 0)
+	{
+		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		return false;
+	}
 
-	/*
-	APIDefine void _Get_##ModuleName_Type_(JGType* outType) \
-{ \
-	*outType = JGTYPE(##ModuleName); \
-}\
-APIDefine IModuleInterface* _Create_##ModuleName_Module_Interface()\
-{\
-	return new ModuleName();\
-}\
-	*/
-	// Type
-	//HPlatformFunction<void, JGType> getTypeFunc = HPlatform::LoadFuncInDll<void, JGType>(dllIns, getTypeFuncName);
+	HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(dllIns, "Link_Module");
+	if (linkModuleFunc.IsVaild() == false)
+	{
+		// Error Log
+		return false;
+	}
 
-	// »ý¼º
-	//HPlatformFunction<IModuleInterface*> getTypeFunc = HPlatform::LoadFuncInDll<IModuleInterface*>(dllIns, getTypeFuncName);
+	linkModuleFunc(&GCoreSystem::GetInstance());
+
+	HPlatformFunction<IModuleInterface*> createModuleFunc = HPlatform::LoadFuncInDll<IModuleInterface*>(dllIns, createModuleFuncName);
+	if (createModuleFunc.IsVaild() == false)
+	{
+		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		return false;
+	}
+
+	IModuleInterface* moduleIf = createModuleFunc();
+	if (moduleIf == nullptr)
+	{
+		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		return false;
+	}
+
+	if (FindModule(moduleIf->GetModuleType()) != nullptr)
+	{
+		HPlatform::Deallocate(moduleIf);
+		
+		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		return false;
+	}
+
+	moduleIf->StartupModule();
+
+	HLockGuard<HMutex> lock(_mutex);
+	_modulesByType.emplace(moduleIf->GetModuleType(), moduleIf);
+	_modulesByName.emplace(PName(moduleName), moduleIf);
 
 	return true;
 }
 
-bool DisconnectModule(const PString& moduleName)
+bool GModuleGlobalSystem::DisconnectModule(const PString& moduleName)
 {
+	HLockGuard<HMutex> lock(_mutex);
+
+	if (_modulesByName.find(moduleName) == _modulesByName.end())
+	{
+		return true;
+	}
+
+	IModuleInterface* moduleIf = _modulesByName[moduleName];
+	if (moduleIf == nullptr)
+	{
+		return false;
+	}
+
+	moduleIf->ShutdownModule();
+
+	_modulesByType.erase(moduleIf->GetModuleType());
+	_modulesByName.erase(moduleName);
+
+	HPlatform::Deallocate(moduleIf);
+
 	return true;
 }
 
-bool ReconnectModule(const PString& moduleName)
+bool GModuleGlobalSystem::ReconnectModule(const PString& moduleName)
 {
+	JG_ASSERT("not impl reconnectModule");
 	return true;
+}
+
+void GModuleGlobalSystem::Destroy()
+{
+	for (HPair<const JGType, IModuleInterface*>& pair : _modulesByType)
+	{
+		HPlatform::Deallocate(pair.second);
+	}
+
+	_modulesByType.clear();
+	_modulesByName.clear();
 }

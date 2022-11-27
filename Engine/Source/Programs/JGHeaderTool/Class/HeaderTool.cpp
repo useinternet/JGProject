@@ -1083,6 +1083,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 		funcCode.AppendLine("\treturn Class;");
 
+		outCode->AppendLine("#include \"PCH/PCH.h\"");
 		outCode->AppendLine("#include \"Core.h\"");
 		outCode->AppendLine(PString::Format("#include \"%s\"", Class.OwnerHeaderInfo->LocalRelativePath)).AppendLine("");
 		outCode->AppendLine("");
@@ -1155,6 +1156,7 @@ bool PHeaderTool::generateCodeGenRegistration(HQueue<const HClass*>& collectedCl
 		return false;
 	}
 
+	outCode->AppendLine("#include \"PCH/PCH.h\"");
 	outCode->AppendLine("#include \"CoreSystem.h\"");
 	outCode->AppendLine("#include \"Object/ObjectGlobalSystem.h\"");
 	outCode->AppendLine("#include \"Object/ObjectGlobals.h\"");
