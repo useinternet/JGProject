@@ -4,7 +4,6 @@
 GMemoryGlobalSystem::GMemoryGlobalSystem(int32 processBlockCountPerFrame)
 {
 	_processBlockCountPerFrame = processBlockCountPerFrame;
-	_bLock = false;
 }
 
 GMemoryGlobalSystem::~GMemoryGlobalSystem()
@@ -17,15 +16,6 @@ void GMemoryGlobalSystem::Update()
 {
 	garbageCollection(1);
 }
-void GMemoryGlobalSystem::waitAndLock() const
-{
-	while (_bLock) {}
-	_bLock = true;
-}
-void GMemoryGlobalSystem::unlock() const
-{
-	_bLock = false;
-}
 
 void GMemoryGlobalSystem::Flush()
 {
@@ -34,7 +24,7 @@ void GMemoryGlobalSystem::Flush()
 
 void GMemoryGlobalSystem::garbageCollection(int32 level)
 {
-	waitAndLock();
+	HLockGuard<HMutex> lock(_mutex);
 
 	if (level < 0)
 	{
@@ -59,7 +49,6 @@ void GMemoryGlobalSystem::garbageCollection(int32 level)
 		}
 	}
 
-	unlock();
 }
 
 int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
@@ -77,14 +66,12 @@ int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
 
 		void* ptr = _allocatedMemoryBlockQueue.front();
 
-		_allocatedMemoryBlockQueue.pop();
-
 		const HMemoryBlock& memoryBlock = _allocatedMemoryBlocks[ptr];
 
 		bool bIsClass   = memoryBlock.bIsClass;
 		int32 refCount  = memoryBlock.RefCount->load();
 		int32 weakCount = memoryBlock.WeakCount->load();
-
+		_allocatedMemoryBlockQueue.pop();
 		if (refCount == 0)
 		{
 			_allocatedMemoryBlocks.erase(ptr);

@@ -17,6 +17,14 @@ namespace HCoreSystemPrivate
 	void SetInstance(GCoreSystem* instance);
 }
 
+struct HCoreSystemArguments
+{
+	ECoreSystemFlags Flags;
+	HRawString LaunchModule;
+
+	HCoreSystemArguments() : Flags(ECoreSystemFlags::None) {}
+};
+
 class GCoreSystem
 {
 	friend void HCoreSystemPrivate::SetInstance(GCoreSystem* instance);
@@ -30,7 +38,7 @@ private:
 	~GCoreSystem() = default;
 
 public:
-	static bool Create(ECoreSystemFlags flags = ECoreSystemFlags::None);
+	static bool Create(const HCoreSystemArguments& args = HCoreSystemArguments());
 	static void Update();
 	static void Destroy();
 

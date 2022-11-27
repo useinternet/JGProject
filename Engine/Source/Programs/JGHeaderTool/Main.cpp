@@ -12,7 +12,11 @@ bool ReadArguments(PArguments* outArguments);
 
 int main()
 {
-	GCoreSystem::Create(ECoreSystemFlags::No_CodeGen);
+	HCoreSystemArguments coreSystemArgs;
+	coreSystemArgs.Flags = ECoreSystemFlags::No_CodeGen;
+
+	GCoreSystem::Create(coreSystemArgs);
+
 	PArguments args;
 	if (ReadArguments(&args) == false)
 	{

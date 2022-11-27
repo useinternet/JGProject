@@ -7,7 +7,10 @@ void CreateModuleInfoTemplate();
 
 int32 main(int32 argc, char* argv[])
 {
-	GCoreSystem::Create(ECoreSystemFlags::No_CodeGen);
+	HCoreSystemArguments coreSystemArgs;
+	coreSystemArgs.Flags = ECoreSystemFlags::No_CodeGen;
+
+	GCoreSystem::Create(coreSystemArgs);
 
 	PArguments args;
 	if (ReadArguments(&args) == false)

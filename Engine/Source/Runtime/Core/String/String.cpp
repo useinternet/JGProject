@@ -1,5 +1,6 @@
 #include "PCH/PCH.h"
 #include "String.h"
+#include "StringTable.h"
 #include "FileIO/FileHelper.h"
 #include "Misc/Hash.h"
 #include "Math/Math.h"
@@ -16,11 +17,6 @@ PString::PString(char inChar)
 PString::PString(const char* string)
 {
 	setString(string);
-}
-
-PString::PString(const wchar_t* string)
-{
-	setWString(string);
 }
 
 PString::~PString()
@@ -43,11 +39,6 @@ PString& PString::operator=(const char inChar)
 PString& PString::operator=(const char* string)
 {
 	setString(string);
-	return *this;
-}
-PString& PString::operator=(const wchar_t* string)
-{
-	setWString(string);
 	return *this;
 }
 
@@ -328,20 +319,28 @@ const HRawString& PString::GetRawString() const
 	return _rawString;
 }
 
-const HRawWString& PString::GetRawWString() const
+HRawWString PString::GetRawWString() const
 {
-	static HRawWString result = L"";
-	return result;
+	HRawWString wStr;
+	GetRawWString(&wStr);
+
+	return wStr;
+}
+
+void PString::GetRawWString(HRawWString* outWStr) const
+{
+	if (outWStr == nullptr)
+	{
+		return;
+	}
+
+	GStringTable::GetInstance().FindRawWString(GetStringTableID(), outWStr);
 }
 
 void PString::setString(const HRawString& string)
 {
 	_rawString = string;
 	updateHashCode();
-}
-void PString::setWString(const HRawWString& string)
-{
-	JG_ASSERT(false && "not impl setwstring");
 }
 
 void PString::updateHashCode()

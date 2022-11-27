@@ -55,6 +55,7 @@ class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem
 	HList<PSharedPtr<PThread>> _threads;
 	HHashMap<ENamedThread, int32> _threadIndexMappingMaps;
 	int32 _mappedThreadIndexOffset;
+	HAtomicInt32 _remindThreadIndex;
 
 	HHashMap<uint64, PSharedPtr<ISyncTask>>  _syncTaskPool;
 	HMap<int32, HList<PWeakPtr<ISyncTask>>>  _sortedSyncTasks;
@@ -78,31 +79,31 @@ public:
 	template<class ... Args>
 	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return ScheduleByFrame(refObject, delayFrame, 0, 0, order, func, args...);
+		return ScheduleByFrame(refObject, delayFrame, 0, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return ScheduleByFrame(refObject, 0, 0, 0, order, func, args...);
+		return ScheduleByFrame(refObject, 0, 0, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return ScheduleByFrame(refObject, 0, 0, -1, order, func, args...);
+		return ScheduleByFrame(refObject, 0, 0, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return ScheduleByFrame(refObject, delayFrame, 0, -1, order, func, args...);
+		return ScheduleByFrame(refObject, delayFrame, 0, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, int32 frameCycle, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return ScheduleByFrame(refObject, delayFrame, frameCycle, -1, order, func, args...);
+		return ScheduleByFrame(refObject, delayFrame, frameCycle, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
@@ -134,31 +135,31 @@ public:
 	template<class ... Args>
 	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, delay, 0.0f, 0, order, func, args...);
+		return Schedule(refObject, delay, 0.0f, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, 0.0f, 0.0f, 0, order, func, args...);
+		return Schedule(refObject, 0.0f, 0.0f, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, 0.0f, 0.0f, -1, order, func, args...);
+		return Schedule(refObject, 0.0f, 0.0f, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, delay, 0.0f, -1, order, func, args...);
+		return Schedule(refObject, delay, 0.0f, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>
 	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, float32 tickCycle, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
 	{
-		return Schedule(refObject, delay, tickCycle, -1, order, func, args...);
+		return Schedule(refObject, delay, tickCycle, INDEX_NONE, order, func, args...);
 	}
 
 	template<class ... Args>

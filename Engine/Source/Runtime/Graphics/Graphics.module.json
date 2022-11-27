@@ -1,0 +1,27 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "StaticLib",
+    "ModuleDependencies": [ "Core" ],
+    "ModuleName": "Graphics",
+    "ModulePath": "Source/Runtime/Graphics/",
+    "Defines": [
+      "_GRAPHICS"
+    ],
+    "DevelopEngine": {
+      "Config": "DebugConfig",
+      "Defines": []
+    },
+    "DevelopGame": {
+      "Config": "ConfirmConfig",
+      "Defines": []
+    },
+    "ConfirmGame": {
+      "Config": "ConfirmConfig",
+      "Defines": []
+    },
+    "ReleaseGame": {
+      "Config": "ReleaseConfig",
+      "Defines": []
+    }
+  }
+}

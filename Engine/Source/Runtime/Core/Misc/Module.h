@@ -3,9 +3,17 @@
 #include "CoreSystem.h"
 #include "Object/ObjectGlobals.h"
 
-#define JG_MODULE_IMPL(ModuleName)
+#define JG_MODULE_IMPL(ModuleName, APIDefine) \
+APIDefine void _Get_##ModuleName_Type_(JGType* outType) \
+{ \
+	*outType = JGTYPE(##ModuleName); \
+}\
+APIDefine IModuleInterface* _Create_##ModuleName_Module_Interface()\
+{\
+	return new ModuleName();\
+}\
 
-class IModuleInterface : public IMemoryObject
+class IModuleInterface
 {
 protected:
 // 시작/끝 함수
@@ -27,26 +35,9 @@ public:
 		return static_cast<T*>(FindModule(JGTYPE(T)));
 	}
 
-	template<class T>
-	bool ConnectModule()
-	{
-		return ConnectModule(JGTYPE(T));
-	}
-
-	template<class T>
-	bool DisconnectModule()
-	{
-		return DisconnectModule(JGTYPE(T));
-	}
-
-	template<class T>
-	bool ReconnectModule()
-	{
-		return ReconnectModule(JGTYPE(T));
-	}
-
 	IModuleInterface* FindModule(const JGType& type);
-	bool ConnectModule(const JGType& type);
-	bool DisconnectModule(const JGType& type);
-	bool ReconnectModule(const JGType& type);
+
+	bool ConnectModule(const PString& moduleName);
+	bool DisconnectModule(const PString& moduleName);
+	bool ReconnectModule(const PString& moduleName);
 };

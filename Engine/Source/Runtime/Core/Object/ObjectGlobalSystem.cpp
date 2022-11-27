@@ -191,7 +191,7 @@ bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& 
 
 bool GObjectGlobalSystem::codeGen()
 {
-	HPlatformInstance ins = HPlatform::LoadDll("CodeGen.dll");
+	HJInstance ins = HPlatform::LoadDll("CodeGen.dll");
 	if (ins == nullptr)
 	{
 		// Error Log

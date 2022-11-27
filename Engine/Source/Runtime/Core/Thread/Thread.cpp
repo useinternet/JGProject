@@ -40,6 +40,9 @@ void PThread::run()
 	while (_bIsActive || _taskQueue.empty() == false)
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
+
+		_bIsRunning = _taskQueue.empty() == false;
+
 		_conditionVariable.wait(lock, [&]()->bool
 		{
 			return _taskQueue.empty() == false || _bIsActive == false;
@@ -51,15 +54,10 @@ void PThread::run()
 			
 			lock.unlock();
 
-			_bIsRunning = true;
 			if (task != nullptr && task->IsValid() == true)
 			{
 				task->DoTask();
 			}
-		}
-		else
-		{
-			_bIsRunning = false;
 		}
 	}
 }

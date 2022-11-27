@@ -62,7 +62,6 @@ public:
 	PString() = default;
 	PString(char inChar);
 	PString(const char* string);
-	PString(const wchar_t* string);
 
 	virtual ~PString();
 
@@ -70,7 +69,6 @@ public: // -- operation --
 	PString& operator=(const PString& string) = default;
 	PString& operator=(const char inChar);
 	PString& operator=(const char* string);
-	PString& operator=(const wchar_t* string);
 
 	bool operator==(const PString& string) const;
 	bool operator!=(const PString& string) const;
@@ -114,11 +112,10 @@ public:
 	char GetChar(uint64 index) const;
 	const char* GetCStr() const;
 	const HRawString& GetRawString() const;
-	const HRawWString& GetRawWString() const;
-
+	HRawWString GetRawWString() const;
+	void GetRawWString(HRawWString* outWStr) const;
 private:
 	void setString(const HRawString& string);
-	void setWString(const HRawWString& string);
 	void updateHashCode();
 };
 

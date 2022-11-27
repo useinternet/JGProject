@@ -17,7 +17,7 @@ void HCoreSystemPrivate::SetInstance(GCoreSystem* instance)
 
 GCoreSystem* GCoreSystem::Instance = nullptr;
 
-bool GCoreSystem::Create(ECoreSystemFlags flags)
+bool GCoreSystem::Create(const HCoreSystemArguments& args)
 {
 	/* CoreSystem 구현할 목록
 
@@ -49,7 +49,7 @@ bool GCoreSystem::Create(ECoreSystemFlags flags)
 	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GModuleGlobalSystem>();
 
-	if ((flags & ECoreSystemFlags::No_CodeGen) == false)
+	if ((args.Flags & ECoreSystemFlags::No_CodeGen) == false)
 	{
 		if (GObjectGlobalSystem::GetInstance().codeGen() == false)
 		{
@@ -93,7 +93,6 @@ void GCoreSystem::Destroy()
 
 	Instance->SystemInstancePool.clear();
 	Instance->ThreadIDList.clear();
-
 
 	delete Instance;
 	Instance = nullptr;

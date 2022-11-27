@@ -529,15 +529,12 @@ class GMemoryGlobalSystem : public GGlobalSystemInstance<GMemoryGlobalSystem>
 
 	mutable HHashMap<const void*, HMemoryBlock> _allocatedMemoryBlocks;
 	mutable HQueue<void*> _allocatedMemoryBlockQueue;
-	// Wrap
-	// 메모리 시스템 특징
-	// 메모리 할당 시 쓰레드 별로 메모리 수거
-	//
-	mutable HAtomicBool _bLock = false;
+
+	mutable HMutex _mutex;
 	int32 _processBlockCountPerFrame;
 
 public:
-	GMemoryGlobalSystem(int32 processBlockCountPerFrame = 10);
+	GMemoryGlobalSystem(int32 processBlockCountPerFrame = 1000);
 	virtual ~GMemoryGlobalSystem();
 
 protected:
@@ -567,10 +564,10 @@ public:
 		ptr._pRefCount = memoryBlock.RefCount.get();
 		ptr._pRefCount->fetch_add(1);
 
-		waitAndLock();
+		HLockGuard<HMutex> lock(_mutex);
 		_allocatedMemoryBlocks.emplace(ptr._ptr, std::move(memoryBlock));
 		_allocatedMemoryBlockQueue.push(ptr._ptr);
-		unlock();
+
 		return ptr;
 	}
 
@@ -588,10 +585,10 @@ public:
 			return PSharedPtr<T>();
 		}
 
-		waitAndLock();
+		HLockGuard<HMutex> lock(_mutex);
 		if (_allocatedMemoryBlocks.find(fromThis) == _allocatedMemoryBlocks.end())
 		{
-			unlock();
+			//unlock();
 			return PSharedPtr<T>();
 		}
 		HMemoryBlock& memoryBlock = _allocatedMemoryBlocks[(const void*)fromThis];
@@ -601,7 +598,6 @@ public:
 		ptr._pRefCount = memoryBlock.RefCount.get();
 		ptr._pRefCount->fetch_add(1);
 
-		unlock();
 		return ptr;
 	}
 
@@ -711,8 +707,6 @@ public:
 
 	void Flush();
 private:
-	void waitAndLock() const;
-	void unlock() const;
 	void garbageCollection(int32 level);
 	int32 garbageCollectionInternal(int32 countPerFrame);
 };

@@ -122,6 +122,43 @@ workspace "JGEngine"
 					defines{"_RELEASEGAME", }
 
 
+			project "JGLauncher"
+				includedirs{ "Source/Programs/JGLauncher/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
+				links{ "Core", }
+				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGLauncher/", {"_JGLAUNCHER", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME", }
+
+
+		group "Engine/Editor"
+			project "JGEditor"
+				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", }
+				links{ "Core", "GameFrameWorks", }
+				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME", }
+
+
 		group "Engine/Runtime"
 			project "CodeGen"
 				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
@@ -145,6 +182,60 @@ workspace "JGEngine"
 				includedirs{ "Source/Runtime/Core/", "Source/ThirdParty", "Source/", }
 				links{ }
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME", }
+
+
+			project "Game"
+				includedirs{ "Source/Runtime/Game/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", }
+				links{ "Core", "GameFrameWorks", }
+				SetCPPProjectConfig("SharedLib", "Source/Runtime/Game/", {"_GAME", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME", }
+
+
+			project "GameFrameWorks"
+				includedirs{ "Source/Runtime/GameFrameWorks/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
+				links{ "Core", }
+				SetCPPProjectConfig("StaticLib", "Source/Runtime/GameFrameWorks/", {"_GAMEFRAMEWORKS", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_RELEASEGAME", }
+
+
+			project "Graphics"
+				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
+				links{ "Core", }
+				SetCPPProjectConfig("StaticLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_DEVELOPENGINE", }

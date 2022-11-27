@@ -32,6 +32,7 @@ GScheduleGlobalSystem::GScheduleGlobalSystem()
 
 	_idGenerator = Allocate<PSequentialIDGenerator>();
 	_bIsTaskRunning = false;
+	_remindThreadIndex = _mappedThreadIndexOffset;
 }
 
 void GScheduleGlobalSystem::Start()
@@ -128,7 +129,7 @@ bool GScheduleGlobalSystem::updateTask(PSyncTaskByFrame* task)
 		return false;
 	}
 
-	if (task->CallCount > task->Repeat)
+	if (task->Repeat != INDEX_NONE && task->CallCount > task->Repeat)
 	{
 		return false;
 	}
@@ -159,7 +160,7 @@ bool GScheduleGlobalSystem::updateTask(PSyncTaskByTick* task)
 		return false;
 	}
 
-	if (task->CallCount > task->Repeat)
+	if (task->Repeat != INDEX_NONE && task->CallCount > task->Repeat)
 	{
 		return false;
 	}
@@ -206,6 +207,7 @@ int32 GScheduleGlobalSystem::getRecommandThreadIndex(ENamedThread inNamedThread)
 	// 처음 돌때는 현재 대기중인 thread 할당
 	int32 fixedThreadIndex = INDEX_NONE;
 	int32 threadCount = (int32)_threads.size();
+	int32 remindThreadCount = threadCount - _mappedThreadIndexOffset;
 
 	if (_mappedThreadIndexOffset == threadCount)
 	{
@@ -239,7 +241,9 @@ int32 GScheduleGlobalSystem::getRecommandThreadIndex(ENamedThread inNamedThread)
 
 				if (fixedThreadIndex == INDEX_NONE)
 				{
-					fixedThreadIndex = _mappedThreadIndexOffset;
+					fixedThreadIndex = _mappedThreadIndexOffset + (_remindThreadIndex % remindThreadCount);
+					
+					_remindThreadIndex += 1;
 				}
 			}
 			else

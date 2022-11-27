@@ -1,0 +1,27 @@
+{
+  "ModuleInfo": {
+    "ModuleFormat": "SharedLib",
+    "ModuleDependencies": [ "Core", "GameFrameWorks" ],
+    "ModuleName": "Game",
+    "ModulePath": "Source/Runtime/Game/",
+    "Defines": [
+      "_GAME"
+    ],
+    "DevelopEngine": {
+      "Config": "DebugConfig",
+      "Defines": []
+    },
+    "DevelopGame": {
+      "Config": "ConfirmConfig",
+      "Defines": []
+    },
+    "ConfirmGame": {
+      "Config": "ConfirmConfig",
+      "Defines": []
+    },
+    "ReleaseGame": {
+      "Config": "ReleaseConfig",
+      "Defines": []
+    }
+  }
+}
