@@ -33,13 +33,16 @@ private:
 	HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
 	HList<ThreadID> ThreadIDList;
 
+public:
+	bool bIsRunning;
+
 private:
 	GCoreSystem() = default;
 	~GCoreSystem() = default;
 
 public:
 	static bool Create(const HCoreSystemArguments& args = HCoreSystemArguments());
-	static void Update();
+	static bool Update();
 	static void Destroy();
 
 	static GCoreSystem& GetInstance();

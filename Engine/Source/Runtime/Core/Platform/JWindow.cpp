@@ -1,12 +1,6 @@
 #include "PCH/PCH.h"
 #include "JWindow.h"
 
-PJWindow::PJWindow(const HJWindowArguments& args)
-{
-	_args = args;
-	ConstructWindow(_args);
-}
-
 bool PJWindow::IsValid() const
 {
 	return GetHandle() != 0;
@@ -15,4 +9,24 @@ bool PJWindow::IsValid() const
 const HJWindowArguments& PJWindow::GetArguments() const
 {
 	return _args;
+}
+
+
+HJWindowCreater::HJWindowCreater(PJWindow* pWindow, const HJWindowArguments& args)
+{
+	_bIsSuccess = true;
+
+	if (pWindow == nullptr)
+	{
+		_bIsSuccess = false;
+		return;
+	}
+
+	pWindow->_args = args;
+	_bIsSuccess = pWindow->ConstructWindow();
+}
+
+bool HJWindowCreater::IsSuccess() const
+{
+	return _bIsSuccess;
 }

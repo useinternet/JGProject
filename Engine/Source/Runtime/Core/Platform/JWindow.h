@@ -16,11 +16,11 @@ struct HJWindowArguments
 
 class PJWindow : public IMemoryObject
 {
+	friend class HJWindowCreater;
 private:
 	HJWindowArguments _args;
 
 public:
-	PJWindow(const HJWindowArguments& args);
 	virtual ~PJWindow() = default;
 
 	virtual HJWHandle GetHandle() const { return 0; }
@@ -32,5 +32,14 @@ public:
 
 
 protected:
-	virtual void ConstructWindow(const HJWindowArguments& args) {}
+	virtual bool ConstructWindow() { return false; }
+};
+
+class HJWindowCreater
+{
+	bool _bIsSuccess;
+public:
+	HJWindowCreater(PJWindow* pWindow, const HJWindowArguments& args);
+
+	bool IsSuccess() const;
 };

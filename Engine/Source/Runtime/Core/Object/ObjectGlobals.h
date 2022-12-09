@@ -230,6 +230,8 @@ public:
 	virtual ~JGEnum() = default;
 
 public:
+	PName GetEnumNameByIndex(int32 index) const;
+	PSharedPtr<JGMeta> GetMetaDataByIndex(int32 index) const;
 	PSharedPtr<JGType> GetEnumType() const;
 };
 

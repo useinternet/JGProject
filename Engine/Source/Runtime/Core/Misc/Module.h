@@ -1,8 +1,10 @@
 #pragma once
+#pragma warning(disable : 4251 4275)
+
 #include "CoreDefines.h"
 #include "CoreSystem.h"
 #include "Object/ObjectGlobals.h"
-#pragma warning(disable : 4251)
+
 #define JG_MODULE_IMPL(ModuleName, APIDefine) \
 APIDefine IModuleInterface* _Create_Module_Interface_()\
 {\
@@ -16,6 +18,8 @@ HCoreSystemPrivate::SetInstance(ins); \
 class IModuleInterface
 {
 	friend class GModuleGlobalSystem;
+public:
+	virtual ~IModuleInterface() = default;
 protected:
 // 시작/끝 함수
 	virtual JGType GetModuleType() const = 0;
@@ -28,7 +32,7 @@ class GModuleGlobalSystem : public GGlobalSystemInstance<GModuleGlobalSystem>
 	HHashMap<PName, IModuleInterface*>  _modulesByName;
 	HHashMap<JGType, IModuleInterface*> _modulesByType;
 
-	HMutex _mutex;
+	mutable HMutex _mutex;
 public:
 	virtual ~GModuleGlobalSystem() = default;
 
@@ -39,8 +43,8 @@ public:
 		return static_cast<T*>(FindModule(JGTYPE(T)));
 	}
 
-	IModuleInterface* FindModule(const JGType& type);
-	IModuleInterface* FindModule(const PName& moduleName);
+	IModuleInterface* FindModule(const JGType& type) const;
+	IModuleInterface* FindModule(const PName& moduleName) const;
 
 	bool ConnectModule(const PString& moduleName);
 	bool DisconnectModule(const PString& moduleName);

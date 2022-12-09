@@ -3,6 +3,7 @@
 
 #include "CoreDefines.h"
 #include "Memory/Memory.h"
+#include "Name.h"
 #include <iostream>
 
 
@@ -58,6 +59,12 @@ private:
 	{
 		return arg.GetCStr();
 	}
+
+	template<>
+	static auto convert(const PName& arg)
+	{
+		return arg.ToString().GetCStr();
+	}
 public:
 	PString() = default;
 	PString(char inChar);
@@ -69,6 +76,8 @@ public: // -- operation --
 	PString& operator=(const PString& string) = default;
 	PString& operator=(const char inChar);
 	PString& operator=(const char* string);
+	PString  operator+(const PString& string) const;
+	PString& operator+=(const PString& string);
 
 	bool operator==(const PString& string) const;
 	bool operator!=(const PString& string) const;

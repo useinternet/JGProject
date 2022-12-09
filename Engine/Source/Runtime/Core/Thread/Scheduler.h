@@ -6,6 +6,8 @@
 #include "Misc/SequentialIDGenerator.h"
 #include "MainThreadExecutionOrder.h"
 
+#define SCHEDULE_FN_BIND(func) std::bind(&##func, this, std::placeholders::_1)
+
 class PTimer;
 
 class GScheduleGlobalSystem : public GGlobalSystemInstance<GScheduleGlobalSystem>

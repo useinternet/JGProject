@@ -42,6 +42,19 @@ PString& PString::operator=(const char* string)
 	return *this;
 }
 
+PString  PString::operator+(const PString& string) const
+{
+	PString result = *this;
+	result.Append(string);
+
+	return result;
+}
+
+PString& PString::operator+=(const PString& string)
+{
+	return Append(string);
+}
+
 bool PString::operator==(const PString& string) const
 {
 	return GetStringTableID() == string.GetStringTableID();
@@ -345,5 +358,5 @@ void PString::setString(const HRawString& string)
 
 void PString::updateHashCode()
 {
-	_stringCode = PHash::Hash<HRawString>(_rawString);
+	_stringCode = HHash::Hash<HRawString>(_rawString);
 }

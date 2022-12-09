@@ -242,6 +242,26 @@ const HList<PSharedPtr<JGFunction>>& JGField::GetFunctionList() const
 
 JGEnum::JGEnum() {}
 
+PName JGEnum::GetEnumNameByIndex(int32 index) const
+{
+	if (ElementNames.size() <= index)
+	{
+		return NAME_NONE;
+	}
+
+	return ElementNames[index];
+}
+
+PSharedPtr<JGMeta> JGEnum::GetMetaDataByIndex(int32 index) const
+{
+	if (ElementNames.size() <= index)
+	{
+		return nullptr;
+	}
+
+	return ElementMetaDatas[index];
+}
+
 PSharedPtr<JGType> JGEnum::GetEnumType() const
 {
 	return Type;

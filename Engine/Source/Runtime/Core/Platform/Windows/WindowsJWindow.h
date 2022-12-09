@@ -4,7 +4,7 @@
 #include <functional>
 
 using WindowsWindowProcCallBack = std::function<LRESULT(HWND, uint32, WPARAM wParam, LPARAM lParam)>;
-
+class PTaskArguments;
 class PWindowsJWindow : public PJWindow
 {
 private:
@@ -15,16 +15,17 @@ private:
 	HJWHandle _handle;
 
 public:
-	PWindowsJWindow(const HJWindowArguments& args) : PJWindow(args) {}
-
 	virtual ~PWindowsJWindow() = default;
-
 	virtual HJWHandle GetHandle() const override;
+
 protected:
-	virtual void ConstructWindow(const HJWindowArguments& args) override;
+	virtual bool ConstructWindow() override;
+
+private:
+	void Update(const PTaskArguments& args);
 
 public:
-	void AddWindowProcCallBack(const WindowsWindowProcCallBack& callBackFunc);
+	static void AddWindowProcCallBack(const WindowsWindowProcCallBack& callBackFunc);
 };
 
 

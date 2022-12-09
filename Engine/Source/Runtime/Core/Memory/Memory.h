@@ -739,6 +739,17 @@ inline PSharedPtr<T> RawFastCast(PSharedPtr<U> ptr)
 }
 
 template<class T, class U>
+inline T* RawFastCast(U* ptr)
+{
+	if (std::is_base_of<T, U>::value == false && std::is_base_of<U, T>::value == false)
+	{
+		return nullptr;
+	}
+
+	return static_cast<T*>(ptr);
+}
+
+template<class T, class U>
 inline PWeakPtr<T> RawFastCast(PWeakPtr<U> ptr)
 {
 	return GMemoryGlobalSystem::GetInstance().RawFastCast<T, U>(ptr);

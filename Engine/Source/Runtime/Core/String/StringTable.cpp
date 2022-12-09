@@ -12,14 +12,22 @@ GStringTable::GStringTable(int32 removeCountPerFrame, int32 stringInfoLifeFrameC
 	, _stringInfoLifeFrameCount(stringInfoLifeFrameCount)
 {}
 
-GStringTable::~GStringTable() {}
+GStringTable::~GStringTable() 
+{
+	Flush();
+}
 
 void GStringTable::Update()
 {
 	removeOldStringInfos(_removeCountPerFrame);
 }
 
-void GStringTable::RegisterString(const PString& str, uint64* outID, HAtomicInt32** outRefCount)
+void GStringTable::Destroy()
+{
+	Flush();
+}
+
+void GStringTable::RegisterString(const PString& str, uint64* outID, std::weak_ptr<HAtomicInt32>* outRefCount)
 {
 	if (outID == nullptr || outRefCount == nullptr)
 	{
@@ -41,7 +49,7 @@ void GStringTable::RegisterString(const PString& str, uint64* outID, HAtomicInt3
 			info.ID   = hashCode;
 			info.Str  = str.GetRawString();
 			info.WStr = s2ws(info.Str);
-			info.RefCount = std::make_unique<HAtomicInt32>();
+			info.RefCount = std::make_shared<HAtomicInt32>();
 			_stringInfoMap[hashCode] = std::move(info);
 			_stringIDQueue.push(info.ID);
 		}
@@ -53,7 +61,7 @@ void GStringTable::RegisterString(const PString& str, uint64* outID, HAtomicInt3
 	if (pStringInfo != nullptr)
 	{
 		*outID = pStringInfo->ID;
-		*outRefCount = pStringInfo->RefCount.get();
+		*outRefCount = pStringInfo->RefCount;
 	}
 }
 

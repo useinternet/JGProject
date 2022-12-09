@@ -3,6 +3,7 @@
 
 enum class EMainThreadExecutionOrder
 {
+	UpdateWindow,
 	Begin,
 
 

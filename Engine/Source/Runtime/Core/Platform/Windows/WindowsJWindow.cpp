@@ -1,5 +1,9 @@
 #include "PCH/PCH.h"
 #include "WindowsJWindow.h"
+#include "Thread/Scheduler.h"
+#include "CoreSystem.h"
+
+HList<WindowsWindowProcCallBack> PWindowsJWindow::_sCallBackList;
 
 LRESULT CALLBACK WndProc(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
@@ -8,8 +12,10 @@ HJWHandle PWindowsJWindow::GetHandle() const
 	return _handle;
 }
 
-void PWindowsJWindow::ConstructWindow(const HJWindowArguments& args)
+bool PWindowsJWindow::ConstructWindow()
 {
+	const HJWindowArguments& args = GetArguments();
+
 	_handle = 0;
 
 	HRawWString wTitle = args.Title.GetRawWString();
@@ -45,17 +51,39 @@ void PWindowsJWindow::ConstructWindow(const HJWindowArguments& args)
 	// WS_POPUP | WS_VISIBLE
 	if (_handle == 0)
 	{
-		return;
+		return false;
 	}
 
 	ShowWindow(_handle, SW_NORMAL);
 	UpdateWindow(_handle);
+
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(SharedWrap(this), EMainThreadExecutionOrder::UpdateWindow, SCHEDULE_FN_BIND(PWindowsJWindow::Update));
+
+	return true;
+}
+void PWindowsJWindow::Update(const PTaskArguments& args)
+{
+	MSG msg;
+	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		if (msg.message != WM_QUIT)
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			GCoreSystem::GetInstance().bIsRunning = false;
+		}
+	}
 }
 
 void PWindowsJWindow::AddWindowProcCallBack(const WindowsWindowProcCallBack& callBackFunc)
 {
 	_sCallBackList.push_back(callBackFunc);
 }
+
+
 
 LRESULT WndProc(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 {

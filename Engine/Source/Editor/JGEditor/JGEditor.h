@@ -7,6 +7,9 @@ class PJWindow;
 class JGEDITOR_API HJGEditorModule : public IModuleInterface
 {
 	PSharedPtr<PJWindow> _window;
+public:
+	virtual ~HJGEditorModule();
+
 protected:
 	virtual JGType GetModuleType() const override;
 

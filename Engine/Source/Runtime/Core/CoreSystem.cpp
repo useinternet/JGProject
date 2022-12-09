@@ -70,14 +70,18 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 		}
 	}
 
+	Instance->bIsRunning = true;
+
 	return true;
 }
-void GCoreSystem::Update()
+bool GCoreSystem::Update()
 {
 	for (HPair<const uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
 	{
 		pair.second->Update();
 	}
+
+	return Instance->bIsRunning;
 }
 void GCoreSystem::Destroy()
 {
@@ -104,7 +108,7 @@ void GCoreSystem::Destroy()
 
 	delete Instance;
 	Instance = nullptr;
-	int* ss = new int;
+
 #if _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif // _DEBUG

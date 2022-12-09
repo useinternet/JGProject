@@ -17,7 +17,7 @@ class GStringTable : public GGlobalSystemInstance<GStringTable>
 		uint64 FrameCount = 0;
 		HRawString  Str;
 		HRawWString WStr;
-		std::unique_ptr<HAtomicInt32> RefCount;
+		std::shared_ptr<HAtomicInt32> RefCount;
 
 		HStringInfo() = default;
 		HStringInfo(const HRawString& str, const HRawWString& wstr)
@@ -41,9 +41,9 @@ public:
 
 protected:
 	virtual void Update() override;
-
+	virtual void Destroy() override;
 public:
-	void RegisterString(const PString& str, uint64* outID, HAtomicInt32** outRefCount);
+	void RegisterString(const PString& str, uint64* outID, std::weak_ptr<HAtomicInt32>* outRefCount);
 
 	bool FindString(uint64 ID, PString* outStr)  const;
 	bool FindRawString(uint64 ID, HRawString* outStr) const;

@@ -9,11 +9,8 @@ int main()
 	args.LaunchModule = "JGEditor";
 
 	GCoreSystem::Create(args);
-	
-	while (true)
-	{
-		GCoreSystem::Update();
-	}
+
+	while (GCoreSystem::Update()) {}
 
 	GCoreSystem::Destroy();
 	return 0;

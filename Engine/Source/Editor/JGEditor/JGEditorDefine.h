@@ -7,3 +7,4 @@
 #define JGEDITOR_API __declspec(dllimport)
 #define JGEDITOR_C_API extern "C" __declspec(dllimport)
 #endif
+

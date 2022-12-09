@@ -1,23 +1,79 @@
-[:13792:][info][Core]: Active Thread: [1869614816]
-[:13792:][info][Core]: Active Thread: [47531591]
-[:13792:][info][Core]: Active Thread: [3121355730]
-[:13792:][info][Core]: Active Thread: [2711984826]
-[:13792:][info][Core]: Active Thread: [79590220]
-[:13792:][info][Core]: Active Thread: [3841808604]
-[:13792:][info][Core]: Active Thread: [1189757509]
-[:13792:][info][Core]: Active Thread: [3150751322]
-[:13792:][info][Core]: Active Thread: [3683343712]
-[:13792:][info][Core]: Active Thread: [681025941]
-[:13792:][info][Core]: Active Thread: [2778397740]
-[:13792:][info][Core]: Active Thread: [1601817537]
-[:13792:][info][Core]: Active Thread: [1833406191]
-[:13792:][info][Core]: Active Thread: [2336942120]
-[:13792:][info][Core]: Active Thread: [1806543201]
-[:13792:][info][Core]: Active Thread: [1920025584]
-[:13792:][info][Core]: Active Thread: [3232568544]
-[:13792:][info][Core]: Active Thread: [1214270506]
-[:13792:][info][Core]: Active Thread: [2701097895]
-[:13792:][info][Core]: Active Thread: [1177748837]
-[:13792:][info][Core]: Active Thread Totoal Count: 20 
-[:13792:][critical][BuildTool]: Fail getData in json
-[:13792:][critical][BuildTool]: Fail read arguments
+[:7712:][info][Core]: Active Thread: [3557120058]
+[:7712:][info][Core]: Active Thread: [2394741998]
+[:7712:][info][Core]: Active Thread: [3566126562]
+[:7712:][info][Core]: Active Thread: [3639432933]
+[:7712:][info][Core]: Active Thread: [387330891]
+[:7712:][info][Core]: Active Thread: [1281729063]
+[:7712:][info][Core]: Active Thread: [1681284766]
+[:7712:][info][Core]: Active Thread: [175140019]
+[:7712:][info][Core]: Active Thread: [1031788270]
+[:7712:][info][Core]: Active Thread: [4211316540]
+[:7712:][info][Core]: Active Thread: [971718823]
+[:7712:][info][Core]: Active Thread: [1190409684]
+[:7712:][info][Core]: Active Thread: [1880814791]
+[:7712:][info][Core]: Active Thread: [1522506830]
+[:7712:][info][Core]: Active Thread: [3059744987]
+[:7712:][info][Core]: Active Thread: [594013080]
+[:7712:][info][Core]: Active Thread: [1239516102]
+[:7712:][info][Core]: Active Thread: [2200564134]
+[:7712:][info][Core]: Active Thread: [3093107966]
+[:7712:][info][Core]: Active Thread: [2953571290]
+[:7712:][info][Core]: Active Thread Totoal Count: 20 
+[:7712:][info][BuildTool]: Step 1. Engine Collection Module Infos..
+[:7712:][warning][BuildTool]: module(Asset) can't find module info
+[:7712:][warning][BuildTool]: module(GameFrameWork) can't find module info
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: Programs Category Module List
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: JGBuildTool
+[:7712:][trace][BuildTool]: JGConsole
+[:7712:][trace][BuildTool]: JGHeaderTool
+[:7712:][trace][BuildTool]: JGLauncher
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: Editor Category Module List
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: JGEditor
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: Runtime Category Module List
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: CodeGen
+[:7712:][trace][BuildTool]: Core
+[:7712:][trace][BuildTool]: Game
+[:7712:][trace][BuildTool]: GameFrameWorks
+[:7712:][trace][BuildTool]: Graphics
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][trace][BuildTool]: Editor: 1
+[:7712:][trace][BuildTool]: Programs: 4
+[:7712:][trace][BuildTool]: Runtime: 5
+[:7712:][trace][BuildTool]: Total: 10
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][info][BuildTool]: Step 2. User Collection Module Infos..
+[:7712:][trace][BuildTool]: Total: 0
+[:7712:][trace][BuildTool]: ----------------------------------------------------
+[:7712:][info][BuildTool]: Step 3. Generate Build Script..
+[:7712:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGLauncher: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGLauncher: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGEditor: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: JGEditor: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: CodeGen: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: CodeGen: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: Core: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: Game: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: Game: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: GameFrameWorks: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: GameFrameWorks: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Module: Graphics: Start Generate Build Script
+[:7712:][trace][BuildTool]: Module: Graphics: Compelete Generate Build Script
+[:7712:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
+[:7712:][info][BuildTool]: Step 4. Insert Include PCH..
+[:7712:][info][BuildTool]: Step 5. Make Project Files..
+[:7712:][info][BuildTool]: Compelete Build Tool Run..

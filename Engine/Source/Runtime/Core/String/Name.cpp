@@ -115,7 +115,7 @@ void PName::set(const PString& str)
 {
 	reset();
 
-	GStringTable::GetInstance().RegisterString(str, &_id, &_pRefCount);
+	GStringTable::GetInstance().RegisterString(str, &_id, &_weakRefCount);
 
 	addRefCount();
 }
@@ -125,7 +125,7 @@ void PName::copy(const PName& name)
 	reset();
 
 	_id = name._id;
-	_pRefCount = name._pRefCount;
+	_weakRefCount = name._weakRefCount;
 
 	addRefCount();
 }
@@ -135,10 +135,10 @@ void PName::move(PName&& name)
 	reset();
 
 	_id        = name._id;
-	_pRefCount = name._pRefCount;
+	_weakRefCount = name._weakRefCount;
 
 	name._id = NAME_NONE;
-	name._pRefCount = nullptr;
+	name._weakRefCount.reset();
 }
 
 void PName::reset()
@@ -146,21 +146,31 @@ void PName::reset()
 	subRefCount();
 
 	_id = NAME_NONE;
-	_pRefCount = nullptr;
+	_weakRefCount.reset();
 }
 
 void PName::addRefCount()
 {
-	if (_pRefCount != nullptr)
+	if (_weakRefCount.expired())
 	{
-		_pRefCount->fetch_add(1);
+		_id = NAME_NONE;
+		_weakRefCount.reset();
+	}
+	else
+	{
+		_weakRefCount.lock()->fetch_add(1);
 	}
 }
 
 void PName::subRefCount()
 {
-	if (_pRefCount != nullptr)
+	if (_weakRefCount.expired())
 	{
-		_pRefCount->fetch_sub(1);
+		_id = NAME_NONE;
+		_weakRefCount.reset();
+	}
+	else
+	{
+		_weakRefCount.lock()->fetch_sub(1);
 	}
 }

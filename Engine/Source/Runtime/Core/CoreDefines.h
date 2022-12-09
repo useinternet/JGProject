@@ -13,9 +13,12 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <shared_mutex>
+#include <deque>
 #include <cassert>
 #include <filesystem>
 #include <chrono>
+
 
 namespace fs = std::filesystem;
 
@@ -46,6 +49,7 @@ namespace fs = std::filesystem;
 
 #define JG_MEMORY_OFFSET 8
 #define JG_ASSERT(expression) assert(expression)
+#define JG_ASSERT_IF(condition, expression) assert(condition && expression)
 
 #define JG_ENUM_FLAG(enumName) \
 enum class enumName; \
@@ -102,6 +106,9 @@ template<class T>
 using HList = std::vector<T>;
 
 template<class T>
+using HDeque = std::deque<T>;
+
+template<class T>
 using HQueue = std::queue<T>;
 
 template<class T>
@@ -109,6 +116,7 @@ using HStack = std::stack<T>;
 
 using HConditionVariable = std::condition_variable;
 using HMutex = std::mutex;
+using HSharedMutex = std::shared_mutex;
 
 template<class T>
 using HLockGuard = std::lock_guard<T>;
@@ -126,7 +134,14 @@ using HSystemClock			 = std::chrono::system_clock;
 using HSystemClock_TimePoint = std::chrono::system_clock::time_point;
 
 template<class T>
-using HDuration = std::chrono::duration<T>;
+using HDuration     = std::chrono::duration<T>;
+using HMilliseconds = std::chrono::milliseconds;
+
+template<class T>
+using HSTLUniquePtr = std::unique_ptr<T>;
+
+template<class T>
+using HSTLSharedPtr = std::shared_ptr<T>;
 
 const static int8  JG_INT8_Min = (int8)-128i8;
 const static int8  JG_INT8_MAX = (int8)127;

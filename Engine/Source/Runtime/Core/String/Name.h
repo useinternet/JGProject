@@ -1,12 +1,5 @@
 #pragma once
 
-
-/*
-String TableÀÌ Á¸Àç
-std::unormed_map ->
-
-
-*/
 #include "CoreDefines.h"
 #include "Memory/Memory.h"
 #include <iostream>
@@ -20,7 +13,7 @@ class PName : public IMemoryObject
 {
 	uint64 _id = NAME_NONE;
 
-	HAtomicInt32* _pRefCount = nullptr;
+	std::weak_ptr<HAtomicInt32> _weakRefCount;
 #ifdef _DEBUG
 	HRawString _str;
 #endif
@@ -57,6 +50,7 @@ private:
 	void reset();
 	void addRefCount();
 	void subRefCount();
+
 };
 
 namespace std {

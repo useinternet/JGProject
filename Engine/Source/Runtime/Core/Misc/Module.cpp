@@ -2,7 +2,7 @@
 #include "Module.h"
 #include "Platform/Platform.h"
 
-IModuleInterface* GModuleGlobalSystem::FindModule(const JGType& type)
+IModuleInterface* GModuleGlobalSystem::FindModule(const JGType& type) const
 {
 	HLockGuard<HMutex> lock(_mutex);
 
@@ -10,10 +10,10 @@ IModuleInterface* GModuleGlobalSystem::FindModule(const JGType& type)
 	{
 		return nullptr;
 	}
-	return _modulesByType[type];
+	return _modulesByType.at(type);
 }
 
-IModuleInterface* GModuleGlobalSystem::FindModule(const PName& moduleName)
+IModuleInterface* GModuleGlobalSystem::FindModule(const PName& moduleName) const
 {
 	HLockGuard<HMutex> lock(_mutex);
 
@@ -22,7 +22,7 @@ IModuleInterface* GModuleGlobalSystem::FindModule(const PName& moduleName)
 		return nullptr;
 	}
 
-	return _modulesByName[moduleName]; nullptr;
+	return _modulesByName.at(moduleName);
 }
 
 bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
@@ -48,6 +48,7 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 	if (linkModuleFunc.IsVaild() == false)
 	{
 		// Error Log
+		HPlatform::UnLoadDll(dllIns);
 		return false;
 	}
 
@@ -57,6 +58,8 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 	if (createModuleFunc.IsVaild() == false)
 	{
 		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+
+		HPlatform::UnLoadDll(dllIns);
 		return false;
 	}
 
@@ -64,14 +67,16 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 	if (moduleIf == nullptr)
 	{
 		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+		HPlatform::UnLoadDll(dllIns);
 		return false;
 	}
 
 	if (FindModule(moduleIf->GetModuleType()) != nullptr)
 	{
-		HPlatform::Deallocate(moduleIf);
-		
 		JG_LOG(Core, ELogLevel::Error, "Fail Connect Module:%s", moduleName);
+
+		HPlatform::UnLoadDll(dllIns);
+		HPlatform::Deallocate(moduleIf);
 		return false;
 	}
 
@@ -81,6 +86,7 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 	_modulesByType.emplace(moduleIf->GetModuleType(), moduleIf);
 	_modulesByName.emplace(PName(moduleName), moduleIf);
 
+	HPlatform::UnLoadDll(dllIns);
 	return true;
 }
 
@@ -117,6 +123,11 @@ bool GModuleGlobalSystem::ReconnectModule(const PString& moduleName)
 
 void GModuleGlobalSystem::Destroy()
 {
+	for (HPair<const JGType, IModuleInterface*>& pair : _modulesByType)
+	{
+		pair.second->ShutdownModule();
+	}
+
 	for (HPair<const JGType, IModuleInterface*>& pair : _modulesByType)
 	{
 		HPlatform::Deallocate(pair.second);
