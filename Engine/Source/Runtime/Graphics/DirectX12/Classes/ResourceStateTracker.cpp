@@ -105,8 +105,8 @@ bool PResourceStateTracker::FlushPendingResourceBarrier(HDX12CommandList* cmdLis
 			{
 				for (auto subresourceState : resourceState.StateMap)
 				{
-					auto prevState = subresourceState.second;
-					auto nextState = pending_barrier.Transition.StateAfter;
+					D3D12_RESOURCE_STATES prevState = subresourceState.second;
+					D3D12_RESOURCE_STATES nextState = pending_barrier.Transition.StateAfter;
 					if (prevState != nextState)
 					{
 						pending_barrier.Transition.Subresource = subresourceState.first;
@@ -118,8 +118,8 @@ bool PResourceStateTracker::FlushPendingResourceBarrier(HDX12CommandList* cmdLis
 			}
 			else
 			{
-				auto prevState = resourceState.Get(subresource);
-				auto nextState = pending_barrier.Transition.StateAfter;
+				D3D12_RESOURCE_STATES prevState = resourceState.Get(subresource);
+				D3D12_RESOURCE_STATES nextState = pending_barrier.Transition.StateAfter;
 				if (prevState != nextState)
 				{
 					pending_barrier.Transition.Subresource = subresource;
@@ -143,7 +143,7 @@ void PResourceStateTracker::CommitResourceState()
 {
 	HHashMap<HDX12Resource*, HResourceInfo>& resourceRefMap = HDirectXAPI::GetResourceRefCacheRef();
 
-	for (HPair<HDX12Resource*, HResourceState>& stateMap : _resourceStates)
+	for (HPair<HDX12Resource* const, HResourceState>& stateMap : _resourceStates)
 	{
 		resourceRefMap[stateMap.first].State = stateMap.second;
 	}

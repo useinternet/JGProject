@@ -1,15 +1,14 @@
 #pragma once
 #include "Core.h"
 #include "DirectX12Helper.h"
-
+#include "UploadAllocator.h"
 
 class PResourceStateTracker;
-class PUploadAllocator { public: class HAllocation; };
 class PDynamicDescriptionAllocator;
 class PGraphicsPipelineState;
 class PComputePipelineState;
-
 class PComputeCommandList;
+class PRootSignature;
 
 class PCommandList : public IMemoryObject
 {
@@ -111,8 +110,8 @@ public:
 	void ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, HDX12Resource* resource);
 	void ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, HDX12Resource* resource);
 
-	//void BindRootSignature(PSharedPtr<RootSignature> rootSig);
-	//void BindPipelineState(PSharedPtr<ComputePipelineState> pso);
+	void BindRootSignature(PSharedPtr<PRootSignature> rootSig);
+	void BindPipelineState(PSharedPtr<PComputePipelineState> pso);
 	void BindPipelineState(HDX12StateObject* pso);
 
 	void BindTextures(uint32 rootParam, HList<D3D12_CPU_DESCRIPTOR_HANDLE> handles);

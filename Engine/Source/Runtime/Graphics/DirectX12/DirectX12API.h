@@ -4,15 +4,33 @@
 #include "DirectX12/Classes/DirectX12Helper.h"
 #include "DirectX12/Classes/ResourceStateTracker.h"
 
+
+class PCommandQueue;
+class PDescriptionAllocator;
+class PDX12GraphicsShader;
+class PDX12ComputeShader;
+
 class PDirectX12API : public PJGGraphicsAPI
 {
-	HDX12ComPtr<HDX12Device> _dx12Device;
-	HHashMap<uint64, HDX12ComPtr<HDX12RootSignature>> _rootSignatureCache;
+	HDX12ComPtr<HDX12Factory> _dx12Factory;
+	HDX12ComPtr<HDX12Device>  _dx12Device;
 
+	PSharedPtr<PCommandQueue> _commandQueue;
+	PSharedPtr<PDescriptionAllocator> _csuAllocator;
+	PSharedPtr<PDescriptionAllocator> _rtvAllocator;
+	PSharedPtr<PDescriptionAllocator> _dsvAllocator;
+
+	HHashMap<uint64, PSharedPtr<PDX12GraphicsShader>> _graphicsPSOs;
+	HHashMap<uint64, PSharedPtr<PDX12ComputeShader>>  _computePSOs;
+
+	HHashMap<uint64, HDX12ComPtr<HDX12RootSignature>> _rootSignatureCache;
 	HHashMap<uint64, HDX12ComPtr<HDX12Pipeline>> _graphicsPSOCache;
 	HHashMap<uint64, HDX12ComPtr<HDX12Pipeline>> _computePSOCache;
-
 	HHashMap<HDX12Resource*, HResourceInfo> _resourceRefCache;
+
+	//HHashMap<uint64, SharedPtr<DirectX12FrameBuffer>> mFrameBuffers;
+	//const u64 mFrameBufferCount = 3;
+	//u64       mFrameBufferIndex = 0;
 
 public:
 	virtual ~PDirectX12API() = default;

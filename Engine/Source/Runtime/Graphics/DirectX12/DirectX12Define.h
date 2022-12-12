@@ -54,20 +54,25 @@ using HDX12Pipeline			= ID3D12PipelineState;
 using HDX12Object			= ID3D12Object;
 using HDX12StateObject		= ID3D12StateObject;
 
+enum class ECommandListType
+{
+	Graphics,
+	Compute,
+};
 
 namespace HHLSL
 {
-	const char* VSEntry = "vs_main";
-	const char* DSEntry = "ds_main";
-	const char* HSEntry = "hs_main";
-	const char* GSEntry = "gs_main";
-	const char* PSEntry = "ps_main";
-	const char* CSEntry = "cs_main";
-	const char* VSTarget = "vs_5_1";
-	const char* DSTarget = "ds_5_1";
-	const char* HSTarget = "hs_5_1";
-	const char* GSTarget = "gs_5_1";
-	const char* PSTarget = "ps_5_1";
-	const char* CSTarget = "cs_6_0";
-	const char* RTTarget = "lib_6_3";
+	constexpr const char* VSEntry = "vs_main";
+	constexpr const char* DSEntry = "ds_main";
+	constexpr const char* HSEntry = "hs_main";
+	constexpr const char* GSEntry = "gs_main";
+	constexpr const char* PSEntry = "ps_main";
+	constexpr const char* CSEntry = "cs_main";
+	constexpr const char* VSTarget = "vs_5_1";
+	constexpr const char* DSTarget = "ds_5_1";
+	constexpr const char* HSTarget = "hs_5_1";
+	constexpr const char* GSTarget = "gs_5_1";
+	constexpr const char* PSTarget = "ps_5_1";
+	constexpr const char* CSTarget = "cs_6_0";
+	constexpr const char* RTTarget = "lib_6_3";
 }

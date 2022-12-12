@@ -1,7 +1,6 @@
 #include "PCH/PCH.h"
 #include "CommandList.h"
 #include "DirectX12/DirectX12API.h"
-#include "DirectX12/Classes/UploadAllocator.h"
 #include "DirectX12/Classes/DynamicDescriptionAllocator.h"
 #include "DirectX12/Classes/DescriptionAllocator.h"
 #include "DirectX12/Classes/RootSignature.h"
@@ -137,10 +136,13 @@ void PCommandList::CopyTextrueFromMemory(HDX12Resource* resource, const void* pi
 
 	ComPtr<ID3D12Resource> uploadBuffer;
 
+	CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	CD3DX12_RESOURCE_DESC   resourceDesc   = CD3DX12_RESOURCE_DESC::Buffer(uploadSize * arraySize);
+
 	HRESULT hResult = dx12Device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(uploadSize * arraySize),
+		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(uploadBuffer.GetAddressOf()));
@@ -158,12 +160,11 @@ void PCommandList::CopyTextrueFromMemory(HDX12Resource* resource, const void* pi
 		subResources.push_back(subResourceData);
 	}
 
-
 	TransitionBarrier(resource, D3D12_RESOURCE_STATE_COPY_DEST);
 	FlushResourceBarrier();
 
 
-	UpdateSubresources(_dx12CommandList.Get(), resource, uploadBuffer.Get(), 0, 0, subResources.size(), subResources.data());
+	UpdateSubresources(_dx12CommandList.Get(), resource, uploadBuffer.Get(), 0, 0, (uint32)subResources.size(), subResources.data());
 
 	BackupResource(resource);
 	BackupResource(uploadBuffer.Get());
@@ -181,10 +182,13 @@ void PCommandList::CopyBuffer(HDX12Resource* buffer, const void* data, uint64 el
 
 	ComPtr<ID3D12Resource> uploadBuffer;
 
+	CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	CD3DX12_RESOURCE_DESC   resourceDesc   = CD3DX12_RESOURCE_DESC::Buffer(btSize);
+
 	HRESULT hResult = dx12Device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(btSize),
+		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(uploadBuffer.GetAddressOf()));
@@ -225,9 +229,9 @@ void PCommandList::CopyTextureRegion(HDX12Resource* dest, HDX12Resource* src, co
 	CD3DX12_TEXTURE_COPY_LOCATION copyDest(dest, 0);
 	CD3DX12_TEXTURE_COPY_LOCATION copySrc(src, 0);
 
-	_dx12CommandList->CopyTextureRegion(
-		&copyDest, 0, 0, 0, &copySrc,
-		&CD3DX12_BOX(0, 0, srcBox.Width(), srcBox.Height()));
+	CD3DX12_BOX regionBox = CD3DX12_BOX(0, 0, (int32)srcBox.Width(), (int32)srcBox.Height());
+
+	_dx12CommandList->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &regionBox);
 
 	TransitionBarrier(dest, inDestState);
 	TransitionBarrier(src, inSrcState);
@@ -251,9 +255,8 @@ void PGraphicsCommandList::Reset()
 
 void PGraphicsCommandList::SetViewport(const HViewport& viewport)
 {
-	_dx12CommandList->RSSetViewports(
-		1,
-		&CD3DX12_VIEWPORT(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth));
+	CD3DX12_VIEWPORT dx12Viewport = CD3DX12_VIEWPORT(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth);
+	_dx12CommandList->RSSetViewports(1, &dx12Viewport);
 }
 
 void PGraphicsCommandList::SetViewports(const HList<HViewport>& viewports)
@@ -272,7 +275,8 @@ void PGraphicsCommandList::SetViewports(const HList<HViewport>& viewports)
 
 void PGraphicsCommandList::SetScissorRect(const HScissorRect& rect)
 {
-	_dx12CommandList->RSSetScissorRects(1, &CD3DX12_RECT(rect.Left, rect.Top, rect.Right, rect.Bottom));
+	CD3DX12_RECT dx12Rect = CD3DX12_RECT(rect.Left, rect.Top, rect.Right, rect.Bottom);
+	_dx12CommandList->RSSetScissorRects(1, &dx12Rect);
 }
 
 void PGraphicsCommandList::SetScissorRects(const HList<HScissorRect>& rects)
@@ -293,7 +297,7 @@ void PGraphicsCommandList::ClearRenderTargetTexture(HDX12Resource* resource, D3D
 	TransitionBarrier(resource, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	FlushResourceBarrier();
 
-	FLOAT color[4] = { clearColor.R, clearColor.G, clearColor.B, clearColor.A };
+	float32 color[4] = { (float32)clearColor.R, (float32)clearColor.G, (float32)clearColor.B, (float32)clearColor.A };
 	_dx12CommandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
 }
 
@@ -338,7 +342,7 @@ void PGraphicsCommandList::SetRenderTarget(
 
 	FlushResourceBarrier();
 
-	_dx12CommandList->OMSetRenderTargets(rtTextureCount, rtvHandles, false, dsvHandle);
+	_dx12CommandList->OMSetRenderTargets((uint32)rtTextureCount, rtvHandles, false, dsvHandle);
 }
 
 void PGraphicsCommandList::BindRootSignature(PSharedPtr<PRootSignature> rootSig)
@@ -461,7 +465,7 @@ void PGraphicsCommandList::BindStructuredBuffer(uint32 rootParam, D3D12_GPU_VIRT
 
 void PGraphicsCommandList::BindConstants(uint32 rootParam, uint32 btSize, const void* data, uint32 offset)
 {
-	int initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
 	switch (initType)
 	{
 	case PRootSignature::__Constant__:
@@ -484,7 +488,7 @@ void PGraphicsCommandList::BindVertexBuffer(const D3D12_VERTEX_BUFFER_VIEW& view
 
 void PGraphicsCommandList::FlushVertexBuffer()
 {
-	_dx12CommandList->IASetVertexBuffers(0, _vertexViews.size(), _vertexViews.data());
+	_dx12CommandList->IASetVertexBuffers(0, (uint32)_vertexViews.size(), _vertexViews.data());
 	_vertexViews.clear();
 }
 
@@ -532,37 +536,37 @@ void PGraphicsCommandList::Draw(uint32 vertexPerInstance, uint32 instanceCount, 
 
 void PComputeCommandList::ClearUAVUint(D3D12_CPU_DESCRIPTOR_HANDLE handle, HDX12Resource* resource)
 {
-	//auto gpu = _dynamicDescriptionAllocator->UploadDirect(handle, _dx12CommandList, &_bindedDescriptorHeap);
-	//const uint32 ClearColor[4] = {};
-	//_dx12CommandList->ClearUnorderedAccessViewUint(gpu, handle, resource, ClearColor, 0, nullptr);
+	D3D12_GPU_DESCRIPTOR_HANDLE gpu = _dynamicDescriptionAllocator->UploadDirect(handle, _dx12CommandList, &_bindedDescriptorHeap);
+	const uint32 ClearColor[4] = {};
+	_dx12CommandList->ClearUnorderedAccessViewUint(gpu, handle, resource, ClearColor, 0, nullptr);
 }
 
 void PComputeCommandList::ClearUAVFloat(D3D12_CPU_DESCRIPTOR_HANDLE handle, HDX12Resource* resource)
 {
-	//auto gpu = _dynamicDescriptionAllocator->UploadDirect(handle, _dx12CommandList, &_bindedDescriptorHeap);
-	//const float32 ClearColor[4] = {};
-	//_dx12CommandList->ClearUnorderedAccessViewFloat(gpu, handle, resource, ClearColor, 0, nullptr);
+	D3D12_GPU_DESCRIPTOR_HANDLE gpu = _dynamicDescriptionAllocator->UploadDirect(handle, _dx12CommandList, &_bindedDescriptorHeap);
+	const float32 ClearColor[4] = {};
+	_dx12CommandList->ClearUnorderedAccessViewFloat(gpu, handle, resource, ClearColor, 0, nullptr);
 }
 
-//void PComputeCommandList::BindRootSignature(SharedPtr<RootSignature> rootSig)
-//{
-//	if (mBindedComputeRootSig.Get() == rootSig->Get())
-//	{
-//		return;
-//	}
-//	mBindedComputeRootSig = rootSig->Get();
-//	mD3DCommandList->SetComputeRootSignature(mBindedComputeRootSig.Get());
-//	mDynamicDescriptorAllocator->CommitRootSignature(*rootSig);
-//}
-//void PComputeCommandList::BindPipelineState(SharedPtr<ComputePipelineState> pso)
-//{
-//	if (mBindedPipelineState.Get() == pso->Get())
-//	{
-//		return;
-//	}
-//	mBindedPipelineState = pso->Get();
-//	mD3DCommandList->SetPipelineState(mBindedPipelineState.Get());
-//}
+void PComputeCommandList::BindRootSignature(PSharedPtr<PRootSignature> rootSig)
+{
+	if (_bindedComputeRootSig.Get() == rootSig->Get())
+	{
+		return;
+	}
+	_bindedComputeRootSig = rootSig->Get();
+	_dx12CommandList->SetComputeRootSignature(_bindedComputeRootSig.Get());
+	_dynamicDescriptionAllocator->CommitRootSignature(*rootSig);
+}
+void PComputeCommandList::BindPipelineState(PSharedPtr<PComputePipelineState> pso)
+{
+	if (_bindedPipelineState.Get() == pso->Get())
+	{
+		return;
+	}
+	_bindedPipelineState = pso->Get();
+	_dx12CommandList->SetPipelineState(_bindedPipelineState.Get());
+}
 
 void PComputeCommandList::BindPipelineState(HDX12StateObject* pso)
 {
@@ -572,29 +576,29 @@ void PComputeCommandList::BindPipelineState(HDX12StateObject* pso)
 
 void PComputeCommandList::BindTextures(uint32 rootParam, HList<D3D12_CPU_DESCRIPTOR_HANDLE> handles)
 {
-	//int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
 
-	//switch (initType)
-	//{
-	//case RootSignature::__DescriptorTable__:
-	//{
-	//	D3D12_DESCRIPTOR_RANGE_TYPE tableType = mDynamicDescriptorAllocator->GetDescriptorTableType(rootParam);
-	//	switch (tableType)
-	//	{
-	//	case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
-	//	case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
-	//		mDynamicDescriptorAllocator->CommitDescriptorTable(rootParam, handles);
-	//		break;
-	//	default:
-	//		JGASSERT("trying bind CBV or Sampler in BindTextures");
-	//		break;
-	//	}
-	//}
-	//break;
-	//default:
-	//	JGASSERT("BindTextures not support ConstantBufferView / Constant");
-	//	break;
-	//}
+	switch (initType)
+	{
+	case PRootSignature::__DescriptorTable__:
+	{
+		D3D12_DESCRIPTOR_RANGE_TYPE tableType = _dynamicDescriptionAllocator->GetDescriptorTableType(rootParam);
+		switch (tableType)
+		{
+		case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
+		case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
+			_dynamicDescriptionAllocator->CommitDescriptorTable(rootParam, handles);
+			break;
+		default:
+			JG_ASSERT("trying bind CBV or Sampler in BindTextures");
+			break;
+		}
+	}
+	break;
+	default:
+		JG_ASSERT("BindTextures not support ConstantBufferView / Constant");
+		break;
+	}
 }
 void PComputeCommandList::BindConstantBuffer(uint32 rootParam, PUploadAllocator::HAllocation alloc)
 {
@@ -610,15 +614,15 @@ void PComputeCommandList::BindConstantBuffer(uint32 rootParam, const void* data,
 }
 void PComputeCommandList::BindConstantBuffer(uint32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, HDX12Resource* backUpResource)
 {
-	//int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
-	//if (initType == RootSignature::__ConstantBufferView__)
-	//{
-	//	_dx12CommandList->SetComputeRootConstantBufferView(rootParam, gpu);
-	//}
-	//else
-	//{
-	//	JG_ASSERT("BindConstantBuffer not support ShaderResourceView / UnorderedAccessView / Constant / DescriptorTable");
-	//}
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
+	if (initType == PRootSignature::__ConstantBufferView__)
+	{
+		_dx12CommandList->SetComputeRootConstantBufferView(rootParam, gpu);
+	}
+	else
+	{
+		JG_ASSERT("BindConstantBuffer not support ShaderResourceView / UnorderedAccessView / Constant / DescriptorTable");
+	}
 
 	if (backUpResource != nullptr)
 	{
@@ -639,72 +643,72 @@ void PComputeCommandList::BindStructuredBuffer(uint32 rootParam, const void* dat
 }
 void PComputeCommandList::BindStructuredBuffer(uint32 rootParam, D3D12_GPU_VIRTUAL_ADDRESS gpu, HDX12Resource* backUpResource)
 {
-	//i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
-	//switch (initType)
-	//{
-	//case RootSignature::__ShaderResourceView__:
-	//	mD3DCommandList->SetComputeRootShaderResourceView(rootParam, gpu);
-	//	break;
-	//case RootSignature::__UnorderedAccessView__:
-	//	mD3DCommandList->SetComputeRootUnorderedAccessView(rootParam, gpu);
-	//	break;
-	//default:
-	//	assert("BindStructuredBuffer not support ConstantBufferView / Constant / DescriptorTable");
-	//	break;
-	//}
-	//if (backUpResource != nullptr)
-	//{
-	//	BackupResource(backUpResource);
-	//}
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
+	switch (initType)
+	{
+	case PRootSignature::__ShaderResourceView__:
+		_dx12CommandList->SetComputeRootShaderResourceView(rootParam, gpu);
+		break;
+	case PRootSignature::__UnorderedAccessView__:
+		_dx12CommandList->SetComputeRootUnorderedAccessView(rootParam, gpu);
+		break;
+	default:
+		assert("BindStructuredBuffer not support ConstantBufferView / Constant / DescriptorTable");
+		break;
+	}
+	if (backUpResource != nullptr)
+	{
+		BackupResource(backUpResource);
+	}
 }
 void PComputeCommandList::BindStructuredBuffer(uint32 rootParam, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
-	//i32 initType = mDynamicDescriptorAllocator->GetDescriptorInitAsType(rootParam);
-	//switch (initType)
-	//{
-	//case RootSignature::__DescriptorTable__:
-	//{
-	//	D3D12_DESCRIPTOR_RANGE_TYPE tableType = mDynamicDescriptorAllocator->GetDescriptorTableType(rootParam);
-	//	switch (tableType)
-	//	{
-	//	case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
-	//	case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
-	//		mDynamicDescriptorAllocator->CommitDescriptorTable(rootParam, { handle });
-	//		break;
-	//	default:
-	//		JGASSERT("trying bind CBV or Sampler in BindStructuredBuffer");
-	//		break;
-	//	}
-	//}
-	//break;
-	//default:
-	//	JGASSERT("BindStructuredBuffer not support ConstantBufferView / Constant");
-	//	break;
-	//}
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootParam);
+	switch (initType)
+	{
+	case PRootSignature::__DescriptorTable__:
+	{
+		D3D12_DESCRIPTOR_RANGE_TYPE tableType = _dynamicDescriptionAllocator->GetDescriptorTableType(rootParam);
+		switch (tableType)
+		{
+		case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
+		case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
+			_dynamicDescriptionAllocator->CommitDescriptorTable(rootParam, { handle });
+			break;
+		default:
+			JG_ASSERT("trying bind CBV or Sampler in BindStructuredBuffer");
+			break;
+		}
+	}
+	break;
+	default:
+		JG_ASSERT("BindStructuredBuffer not support ConstantBufferView / Constant");
+		break;
+	}
 }
 void PComputeCommandList::BindConstants(uint32 rootparam, uint32 btSize, const void* data, uint32 offset)
 {
-	//int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootparam);
-	//switch (initType)
-	//{
-	//case RootSignature::__Constant__:
-	//	mD3DCommandList->SetComputeRoot32BitConstants(rootparam, btSize / 4, data, offset / 4);
-	//	break;
-	//default:
-	//	JG_ASSERT("BindConstants not support CBV / SRV / UAV /DescriptorTable");
-	//	break;
-	//}
+	int32 initType = _dynamicDescriptionAllocator->GetDescriptorInitAsType(rootparam);
+	switch (initType)
+	{
+	case PRootSignature::__Constant__:
+		_dx12CommandList->SetComputeRoot32BitConstants(rootparam, btSize / 4, data, offset / 4);
+		break;
+	default:
+		JG_ASSERT("BindConstants not support CBV / SRV / UAV /DescriptorTable");
+		break;
+	}
 }
 
 void PComputeCommandList::Dispatch(uint32 groupX, uint32 groupY, uint32 groupZ)
 {
-	// _bindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(_dx12CommandList, _bindedDescriptorHeap, false);
+	_bindedDescriptorHeap = _dynamicDescriptionAllocator->PushDescriptorTable(_dx12CommandList, _bindedDescriptorHeap, false);
 	_dx12CommandList->Dispatch(groupX, groupY, groupZ);
 }
 
 void PComputeCommandList::DispatchRays(const D3D12_DISPATCH_RAYS_DESC& desc)
 {
-	// _bindedDescriptorHeap = mDynamicDescriptorAllocator->PushDescriptorTable(_dx12CommandList, _bindedDescriptorHeap, false);
+	_bindedDescriptorHeap = _dynamicDescriptionAllocator->PushDescriptorTable(_dx12CommandList, _bindedDescriptorHeap, false);
 	_dx12CommandList->DispatchRays(&desc);
 
 }
