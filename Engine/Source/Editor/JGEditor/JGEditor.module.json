@@ -1,7 +1,12 @@
 {
   "ModuleInfo": {
     "ModuleFormat": "SharedLib",
-    "ModuleDependencies": [ "Core", "GameFrameWorks" ],
+    "ModuleDependencies": [
+      "Core",
+      "GameFrameWorks",
+      "Graphics",
+      "imgui"
+    ],
     "ModuleName": "JGEditor",
     "ModulePath": "Source/Editor/JGEditor/",
     "Defines": [

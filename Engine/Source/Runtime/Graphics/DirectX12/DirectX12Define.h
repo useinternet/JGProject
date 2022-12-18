@@ -56,6 +56,7 @@ using HDX12StateObject		= ID3D12StateObject;
 
 enum class ECommandListType
 {
+	Base,
 	Graphics,
 	Compute,
 };

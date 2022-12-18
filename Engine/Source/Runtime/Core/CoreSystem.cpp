@@ -114,6 +114,11 @@ void GCoreSystem::Destroy()
 #endif // _DEBUG
 }
 
+HCoreSystemGlobalValues& GCoreSystem::GetGlobalValues()
+{
+	return Instance->GlobalValues;
+}
+
 GCoreSystem& GCoreSystem::GetInstance()
 {
 	return *Instance;

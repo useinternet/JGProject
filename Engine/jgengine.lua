@@ -142,8 +142,8 @@ workspace "JGEngine"
 
 		group "Engine/Editor"
 			project "JGEditor"
-				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", }
-				links{ "Core", "GameFrameWorks", }
+				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/ThirdParty/imgui/", }
+				links{ "Core", "GameFrameWorks", "Graphics", "imgui", }
 				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
@@ -233,9 +233,28 @@ workspace "JGEngine"
 
 
 			project "Graphics"
-				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
+				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", }
+				links{ "Core", "imgui", }
+				SetCPPProjectConfig("SharedLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+
+
+		group "Engine/ThirdParty"
+			project "imgui"
+				includedirs{ "Source/ThirdParty/imgui/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
 				links{ "Core", }
-				SetCPPProjectConfig("StaticLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
+				SetCPPProjectConfig("StaticLib", "Source/ThirdParty/imgui/", {"_IMGUI", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }

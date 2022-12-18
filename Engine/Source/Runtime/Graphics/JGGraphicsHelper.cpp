@@ -21,7 +21,7 @@ uint64 HJGGraphicsHelper::GetShaderDataTypeSize(EShaderDataType dataType)
 	PString sizeStr = (*Values.begin()).ToString();
 	int32 sizeInt   = sizeStr.ToInt();
 
-	return sizeInt;
+	return (uint64)sizeInt;
 }
 
 PName HJGGraphicsHelper::GetShaderDataTypeHLSLName(EShaderDataType dataType)
@@ -42,4 +42,27 @@ PName HJGGraphicsHelper::GetShaderDataTypeHLSLName(EShaderDataType dataType)
 	Meta->GetMetaValues(PName("HLSLName"), Values);
 
 	return (*Values.begin());
+}
+
+uint8  HJGGraphicsHelper::GetTextureFormatChannels(ETextureFormat format)
+{
+	PSharedPtr<JGEnum> Enum = StaticEnum<ETextureFormat>();
+	if (Enum == nullptr)
+	{
+		return 0;
+	}
+
+	PSharedPtr<JGMeta> Meta = Enum->GetMetaDataByIndex((int32)format);
+	if (Meta == nullptr)
+	{
+		return 0;
+	}
+
+	HHashSet<PName> Values;
+	Meta->GetMetaValues(PName("Channels"), Values);
+
+	PString sizeStr = (*Values.begin()).ToString();
+	int32   sizeInt = sizeStr.ToInt();
+
+	return (uint8)sizeInt;
 }

@@ -1,23 +1,33 @@
-[:23560:][info][Core]: Active Thread: [1457241744]
-[:23560:][info][Core]: Active Thread: [3242722876]
-[:23560:][info][Core]: Active Thread: [4186070944]
-[:23560:][info][Core]: Active Thread: [159057449]
-[:23560:][info][Core]: Active Thread: [1119792437]
-[:23560:][info][Core]: Active Thread: [671862915]
-[:23560:][info][Core]: Active Thread: [55077223]
-[:23560:][info][Core]: Active Thread: [2307729137]
-[:23560:][info][Core]: Active Thread: [2571219898]
-[:23560:][info][Core]: Active Thread: [1046642588]
-[:23560:][info][Core]: Active Thread: [1224661784]
-[:23560:][info][Core]: Active Thread: [2953075637]
-[:23560:][info][Core]: Active Thread: [3791058705]
-[:23560:][info][Core]: Active Thread: [4097910255]
-[:23560:][info][Core]: Active Thread: [3975001813]
-[:23560:][info][Core]: Active Thread: [2227609733]
-[:23560:][info][Core]: Active Thread: [1469250416]
-[:23560:][info][Core]: Active Thread: [428082980]
-[:23560:][info][Core]: Active Thread: [2774404266]
-[:23560:][info][Core]: Active Thread: [373128748]
-[:23560:][info][Core]: Active Thread Totoal Count: 20 
-[:23560:][trace][JGEditor]: Startup JGEditor Module...
-[:23560:][trace][JGEditor]: Shutdown JGEditor Module...
+[:25072:][info][Core]: Active Thread: [440743827]
+[:25072:][info][Core]: Active Thread: [2765397762]
+[:25072:][info][Core]: Active Thread: [1813695365]
+[:25072:][info][Core]: Active Thread: [4236638234]
+[:25072:][info][Core]: Active Thread: [2252279252]
+[:25072:][info][Core]: Active Thread: [1673086959]
+[:25072:][info][Core]: Active Thread: [1609858822]
+[:25072:][info][Core]: Active Thread: [3426902930]
+[:25072:][info][Core]: Active Thread: [1634528341]
+[:25072:][info][Core]: Active Thread: [2371846395]
+[:25072:][info][Core]: Active Thread: [731280187]
+[:25072:][info][Core]: Active Thread: [735091052]
+[:25072:][info][Core]: Active Thread: [1593619730]
+[:25072:][info][Core]: Active Thread: [3994086551]
+[:25072:][info][Core]: Active Thread: [1888856076]
+[:25072:][info][Core]: Active Thread: [119690134]
+[:25072:][info][Core]: Active Thread: [1559604576]
+[:25072:][info][Core]: Active Thread: [1578269759]
+[:25072:][info][Core]: Active Thread: [2469352719]
+[:25072:][info][Core]: Active Thread: [1780645430]
+[:25072:][info][Core]: Active Thread Totoal Count: 20 
+[:25072:][trace][Graphics]: DirectX12 Init Start
+[:25072:][trace][Graphics]: Success Create D3D12Device
+[:25072:][info][Graphics]: Description : NVIDIA GeForce RTX 3080
+[:25072:][info][Graphics]: VideoMemory : 10078  MB
+[:25072:][trace][Graphics]: Create DescriptorAllocator...
+[:25072:][trace][Graphics]: Create CommandQueue...
+[:25072:][trace][Graphics]: Create FrameBuffer...
+[:25072:][trace][Graphics]: DirectX12 Init End
+[:25072:][trace][Graphics]: Startup Graphics Module...
+[:25072:][trace][JGEditor]: Startup JGEditor Module...
+[:25072:][trace][JGEditor]: Shutdown JGEditor Module...
+[:25072:][trace][Graphics]: Shutdown Graphics Module...

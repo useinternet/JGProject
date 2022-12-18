@@ -15,6 +15,9 @@ protected:
 	void StartupModule() override;
 	void ShutdownModule() override;
 
+private:
+	void BeginFrame(const PTaskArguments& args);
+	void EndFrame(const PTaskArguments& args);
 public:
 	PSharedPtr<PJGGraphicsAPI> GetGraphicsAPI() const;
 	// Module ø° RenderScene ø‰√ª

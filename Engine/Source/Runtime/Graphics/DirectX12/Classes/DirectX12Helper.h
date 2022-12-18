@@ -1,12 +1,9 @@
 #pragma once
 #include "Core.h"
-#include "DirectX12/Utill/d3dx12.h"
-#include "DirectX12/Utill/dxcapi.h"
-#include "DirectX12/Utill/d3d12shader.h"
 #include "JGGraphicsDefine.h"
 #include "DirectX12/DirectX12Define.h"
 
-class HDirectX12Helper
+class GRAPHICS_API HDirectX12Helper
 {
 public:
 	static HDX12ComPtr<HDX12Factory>   CreateDXGIFactory();
@@ -20,7 +17,6 @@ public:
 	static HDX12ComPtr<HDX12DescriptorHeap> CreateD3DDescriptorHeap(HDX12ComPtr<HDX12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flag, uint32 numDescriptor);
 	static HDX12ComPtr<HDX12RootSignature>  CreateD3DRootSignature(HDX12ComPtr<HDX12Device> device, CD3DX12_ROOT_SIGNATURE_DESC* DESC);
 
-	static HDXC12Blob* CompileShader(const PString& filePath, const PString& sourceCode, const PString& entry, const PString& target, PString* errorMsg = nullptr);
 	static bool IsDirectXRaytracingSupported(HDX12Adapter* adapter);
 
 	static DXGI_FORMAT           ConvertDXGIFormat(ETextureFormat format);

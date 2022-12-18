@@ -34,6 +34,9 @@ public:
 	{
 		return _bSuccess;
 	}
+
+protected:
+	bool compile(HDX12ComPtr<HDX12Blob>& blob, const PString& sourceCode, const HCompileConfig& config, PString* error);
 };
 
 class PDX12GraphicsShader : public PDX12Shader
@@ -83,21 +86,18 @@ public:
 	}
 
 	bool Compile(const PString& code, EShaderFlags flags, PString* error);
-
-private:
-	bool compile(HDX12ComPtr<HDX12Blob>& blob, const PString& sourceCode, const HCompileConfig& config, PString* error);
 };
 
 class PDX12ComputeShader : public PDX12Shader
 {
-	HDX12ComPtr<HDXC12Blob> _CSData;
+	HDX12ComPtr<HDX12Blob> _CSData;
 
 public:
 	virtual ~PDX12ComputeShader() = default;
 
-	bool Compile(const PString& code, const HCompileConfig& config, PString* error);
+	bool Compile(const PString& code, PString* error);
 
-	HDXC12Blob* GetCSData() const {
+	HDX12Blob* GetCSData() const {
 		if (IsSuccessed() == false)
 		{
 			return nullptr;

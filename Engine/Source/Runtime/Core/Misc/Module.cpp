@@ -80,11 +80,13 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 		return false;
 	}
 
-	moduleIf->StartupModule();
+	{
+		HLockGuard<HMutex> lock(_mutex);
+		_modulesByType.emplace(moduleIf->GetModuleType(), moduleIf);
+		_modulesByName.emplace(PName(moduleName), moduleIf);
+	}
 
-	HLockGuard<HMutex> lock(_mutex);
-	_modulesByType.emplace(moduleIf->GetModuleType(), moduleIf);
-	_modulesByName.emplace(PName(moduleName), moduleIf);
+	moduleIf->StartupModule();
 
 	HPlatform::UnLoadDll(dllIns);
 	return true;

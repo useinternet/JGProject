@@ -21,15 +21,15 @@ private:
 	bool _bLock = false;
 
 	HAtomicBool _bCommandListExcute = false;
-	HHashMap<uint64, PSharedPtr<PCommandList>> _excuteCmdLists;
-	HHashMap<uint64, PSharedPtr<PCommandList>> _excutePendingCmdLists;
+	HMap<uint64, HHashMap<uint64, PSharedPtr<PCommandList>>> _excuteCmdLists;
+	HMap<uint64, HHashMap<uint64, PSharedPtr<PCommandList>>> _excutePendingCmdLists;
 	HHashMap<PCommandList*, ECommandListState> _cmdListStates;
 public:
-	PCommandQueue(uint64 bufferCount, D3D12_COMMAND_LIST_TYPE type);
+	PCommandQueue(D3D12_COMMAND_LIST_TYPE type);
 	~PCommandQueue();
 public:
-	PSharedPtr<PCommandList> RequestCommandList(ECommandListType commandListType);
-	PSharedPtr<PCommandList> RequestCommandList(ECommandListType commandListType, uint64 commandID);
+	PSharedPtr<PCommandList> RequestCommandList(ECommandListType commandListType, uint64 priority = 0);
+
 	void Begin();
 	void End();
 	void SubmitAndFlush();
@@ -40,6 +40,7 @@ public:
 	}
 
 private:
+	PSharedPtr<PCommandList> RequestCommandList(ECommandListType commandListType, uint64 commandID, uint64 priority);
 	PSharedPtr<PCommandList> CreateCommandList(ECommandListType commandListType);
 	ECommandListState GetCommandListState(PSharedPtr<PCommandList> cmdList);
 	void SetCommandListState(PSharedPtr<PCommandList> cmdList, ECommandListState state);

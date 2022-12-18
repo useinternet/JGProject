@@ -16,7 +16,7 @@ public:
 		HDX12ComPtr<HDX12DescriptorHeap>		D3DDescriptorHeap;
 		D3D12_DESCRIPTOR_HEAP_TYPE              D3DType;
 		HQueue<D3D12_CPU_DESCRIPTOR_HANDLE> AbandonedHandles;
-		HMap<uint64, HQueue<D3D12_CPU_DESCRIPTOR_HANDLE>> PendingHandles;
+		HQueue<D3D12_CPU_DESCRIPTOR_HANDLE> PendingHandles;
 		uint64 HeapSize = 0;
 		uint64 Offset   = 0;
 		HMutex FreeMutex;

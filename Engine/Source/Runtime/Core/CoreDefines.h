@@ -183,6 +183,8 @@ enum
 #define JG_CONFIGURATIONS_NAME "ReleaseGame"
 #endif
 
+#define TT(text) L##text
+
 
 
 

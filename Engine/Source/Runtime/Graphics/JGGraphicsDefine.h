@@ -20,22 +20,22 @@ using ResourceViewPtr			= uint64;
 JGENUM()
 enum class ETextureFormat
 {
-	None,					JGENUMMETA()
-	R8_Unorm,				JGENUMMETA()
-	R16_Float,				JGENUMMETA()
-	R32_Float,				JGENUMMETA()
-	R16G16_Float,			JGENUMMETA()
-	R8G8B8A8_Unorm,			JGENUMMETA()
-	R16G16B16A16_Unorm,		JGENUMMETA()
-	R11G11B10_Float,		JGENUMMETA()
-	R16G16B16A16_Float,		JGENUMMETA()
-	R32G32B32A32_Float,		JGENUMMETA()
-	R16G16B16A16_Uint,		JGENUMMETA()
-	R8_Uint,				JGENUMMETA()
-	R16_Uint,				JGENUMMETA()
-	R32_Uint,				JGENUMMETA()
-	R24G8_TYPELESS,			JGENUMMETA()
-	D24_Unorm_S8_Uint,		JGENUMMETA()
+	None,					JGENUMMETA(Channels = 0)
+	R8_Unorm,				JGENUMMETA(Channels = 1)
+	R16_Float,				JGENUMMETA(Channels = 1)
+	R32_Float,				JGENUMMETA(Channels = 1)
+	R16G16_Float,			JGENUMMETA(Channels = 2)
+	R8G8B8A8_Unorm,			JGENUMMETA(Channels = 4)
+	R16G16B16A16_Unorm,		JGENUMMETA(Channels = 4)
+	R11G11B10_Float,		JGENUMMETA(Channels = 3)
+	R16G16B16A16_Float,		JGENUMMETA(Channels = 4)
+	R32G32B32A32_Float,		JGENUMMETA(Channels = 4)
+	R16G16B16A16_Uint,		JGENUMMETA(Channels = 4)
+	R8_Uint,				JGENUMMETA(Channels = 1)
+	R16_Uint,				JGENUMMETA(Channels = 1)
+	R32_Uint,				JGENUMMETA(Channels = 1)
+	R24G8_TYPELESS,			JGENUMMETA(Channels = 2)
+	D24_Unorm_S8_Uint,		JGENUMMETA(Channels = 2)
 };
 
 JGENUM()
@@ -155,6 +155,7 @@ public:
 
 struct HTextureInfo
 {
+	PString Name;
 	uint32 Width = 0;
 	uint32 Height = 0;
 	uint32 PixelPerUnit = 1;
@@ -166,6 +167,11 @@ struct HTextureInfo
 	HColor   ClearColor;
 	float32  ClearDepth = 1.0f;
 	uint8    ClearStencil = 0;
+
+	HTextureInfo()
+	{
+		Name = "Texture";
+	}
 };
 
 struct MeshInfo

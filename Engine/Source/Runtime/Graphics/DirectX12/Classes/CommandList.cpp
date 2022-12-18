@@ -163,7 +163,6 @@ void PCommandList::CopyTextrueFromMemory(HDX12Resource* resource, const void* pi
 	TransitionBarrier(resource, D3D12_RESOURCE_STATE_COPY_DEST);
 	FlushResourceBarrier();
 
-
 	UpdateSubresources(_dx12CommandList.Get(), resource, uploadBuffer.Get(), 0, 0, (uint32)subResources.size(), subResources.data());
 
 	BackupResource(resource);

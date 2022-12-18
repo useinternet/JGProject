@@ -2,11 +2,6 @@
 #include "StringTable.h"
 #include "String/String.h"
 
-#include <cctype>
-#include <codecvt>
-#include <xhash>
-
-
 GStringTable::GStringTable(int32 removeCountPerFrame, int32 stringInfoLifeFrameCount)
 	: _removeCountPerFrame(removeCountPerFrame)
 	, _stringInfoLifeFrameCount(stringInfoLifeFrameCount)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreDefines.h"
+#include "Platform/PlatformDefines.h"
 
 JG_ENUM_FLAG(ECoreSystemFlags)
 enum class ECoreSystemFlags
@@ -25,6 +26,14 @@ struct HCoreSystemArguments
 	HCoreSystemArguments() : Flags(ECoreSystemFlags::None) {}
 };
 
+struct HCoreSystemGlobalValues
+{
+	HJWHandle WindowHandle;
+
+	HCoreSystemGlobalValues()
+		: WindowHandle(0) {}
+};
+
 class GCoreSystem
 {
 	friend void HCoreSystemPrivate::SetInstance(GCoreSystem* instance);
@@ -33,6 +42,7 @@ private:
 	HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
 	HList<ThreadID> ThreadIDList;
 
+	HCoreSystemGlobalValues GlobalValues;
 public:
 	bool bIsRunning;
 
@@ -44,7 +54,7 @@ public:
 	static bool Create(const HCoreSystemArguments& args = HCoreSystemArguments());
 	static bool Update();
 	static void Destroy();
-
+	static HCoreSystemGlobalValues& GetGlobalValues();
 	static GCoreSystem& GetInstance();
 
 	template<class T, class ...Args>

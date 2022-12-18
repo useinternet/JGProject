@@ -27,9 +27,15 @@ void HJGEditorModule::StartupModule()
 	winArgs.Size  = HVector2Int(800, 600);
 	_window = HPlatform::CreateJWindow(winArgs);
 
+	GCoreSystem::GetGlobalValues().WindowHandle = _window->GetHandle();
+
+	if (GModuleGlobalSystem::GetInstance().ConnectModule("Graphics") == false)
+	{
+		JG_LOG(JGEditor, ELogLevel::Critical, "Fail Connect Graphics Module...");
+	}
 	// Scheuler에 업데이트
-
-
+	// Graphics 연결
+	
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
 }
 

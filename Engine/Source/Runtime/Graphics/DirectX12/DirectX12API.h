@@ -9,6 +9,11 @@ class PCommandQueue;
 class PDescriptionAllocator;
 class PDX12GraphicsShader;
 class PDX12ComputeShader;
+class PGraphicsCommandList;
+class PComputeCommandList;
+class PCommandList;
+class PDX12FrameBuffer;
+class HDescriptionAllocation;
 
 class PDirectX12API : public PJGGraphicsAPI
 {
@@ -28,16 +33,24 @@ class PDirectX12API : public PJGGraphicsAPI
 	HHashMap<uint64, HDX12ComPtr<HDX12Pipeline>> _computePSOCache;
 	HHashMap<HDX12Resource*, HResourceInfo> _resourceRefCache;
 
-	//HHashMap<uint64, SharedPtr<DirectX12FrameBuffer>> mFrameBuffers;
-	//const u64 mFrameBufferCount = 3;
-	//u64       mFrameBufferIndex = 0;
+	HMutex _deviceMutex;
 
+	PSharedPtr<PDX12FrameBuffer> _frameBuffer;
+	bool _bIsSupportedRayTracing;
 public:
 	virtual ~PDirectX12API() = default;
 
+protected:
+	virtual void Initialize(const HJGGraphicsArguments& args) override;
+	virtual void BeginFrame() override;
+	virtual void EndFrame() override;
+public:
+	virtual PSharedPtr<ITexture> CreateTexture(const HTextureInfo& textureInfo) override;
+	virtual PSharedPtr<ITexture> CreateTexture(const char* pixels, const HTextureInfo& textureInfo) override;
 
 public:
 	HDX12Device* GetDevice() const { return _dx12Device.Get(); }
+	HDX12Factory* GetFactory() const { return _dx12Factory.Get(); }
 
 	HDX12ComPtr<HDX12Resource> CreateCommittedResource(
 		const PString& name,
@@ -61,14 +74,23 @@ public:
 	const HHashMap<HDX12Resource*, HResourceInfo>& GetResourceRefCache() const;
 	HHashMap<HDX12Resource*, HResourceInfo>& GetResourceRefCacheRef();
 
-	uint64 GetCurrentFrameIndex() const;
+	PSharedPtr<PGraphicsCommandList> RequestGraphicsCommandList();
+	PSharedPtr<PComputeCommandList>  RequestComputeCommandList();
+	PSharedPtr<PCommandList> RequestCommandList();
+
+	HDescriptionAllocation RTVAllocate();
+	HDescriptionAllocation DSVAllocate();
+	HDescriptionAllocation CSUAllocate();
+
+	PSharedPtr<PCommandQueue> GetCommandQueue() const;
 };
 
 
 class HDirectXAPI
 {
 public:
-	static HDX12Device* GetDevice();
+	static HDX12Device*  GetDevice();
+	static HDX12Factory* GetFactory();
 
 	static 	HDX12ComPtr<HDX12Resource> CreateCommittedResource(
 		const PString& name,
@@ -89,7 +111,13 @@ public:
 	static const HHashMap<HDX12Resource*, HResourceInfo>& GetResourceRefCache();
 	static HHashMap<HDX12Resource*, HResourceInfo>& GetResourceRefCacheRef();
 	
-	static uint64 GetCurrentFrameIndex();
+	static PSharedPtr<PGraphicsCommandList> RequestGraphicsCommandList();
+	static PSharedPtr<PComputeCommandList>  RequestComputeCommandList();
+	static PSharedPtr<PCommandList>  RequestCommandList();
+	static HDescriptionAllocation RTVAllocate();
+	static HDescriptionAllocation DSVAllocate();
+	static HDescriptionAllocation CSUAllocate();
+	static PSharedPtr<PCommandQueue> GetCommandQueue();
 private:
 	static PDirectX12API* getDX12API();
 };

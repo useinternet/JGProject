@@ -71,20 +71,17 @@ HDescriptionAllocation PDescriptionAllocator::PCPUDescriptionPage::Allocate()
 
 void PDescriptionAllocator::PCPUDescriptionPage::UpdatePage()
 {
-	uint64 frameBufferIndex = HDirectXAPI::GetCurrentFrameIndex();
-	while (!PendingHandles[frameBufferIndex].empty())
+	while (!PendingHandles.empty())
 	{
-		AbandonedHandles.push(PendingHandles[frameBufferIndex].front());
-		PendingHandles[frameBufferIndex].pop();
+		AbandonedHandles.push(PendingHandles.front());
+		PendingHandles.pop();
 	}
 }
 
 void PDescriptionAllocator::PCPUDescriptionPage::Free(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
 	HLockGuard<HMutex> lock(FreeMutex);
-	uint64 frameBufferIndex = HDirectXAPI::GetCurrentFrameIndex();
-
-	PendingHandles[frameBufferIndex].push(handle);
+	PendingHandles.push(handle);
 }
 
 HDescriptionAllocation::~HDescriptionAllocation()
