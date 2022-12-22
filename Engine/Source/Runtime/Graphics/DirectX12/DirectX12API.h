@@ -36,6 +36,7 @@ class PDirectX12API : public PJGGraphicsAPI
 	HMutex _deviceMutex;
 
 	PSharedPtr<PDX12FrameBuffer> _frameBuffer;
+	HJGGraphicsArguments _arguments;
 	bool _bIsSupportedRayTracing;
 public:
 	virtual ~PDirectX12API() = default;
@@ -49,8 +50,10 @@ public:
 	virtual PSharedPtr<ITexture> CreateTexture(const char* pixels, const HTextureInfo& textureInfo) override;
 
 public:
-	HDX12Device* GetDevice() const { return _dx12Device.Get(); }
+	HDX12Device*  GetDevice() const { return _dx12Device.Get(); }
 	HDX12Factory* GetFactory() const { return _dx12Factory.Get(); }
+
+	const HJGGraphicsArguments& GetArguments() const;
 
 	HDX12ComPtr<HDX12Resource> CreateCommittedResource(
 		const PString& name,
@@ -83,6 +86,7 @@ public:
 	HDescriptionAllocation CSUAllocate();
 
 	PSharedPtr<PCommandQueue> GetCommandQueue() const;
+	PSharedPtr<PDX12FrameBuffer> GetFrameBuffer() const;
 };
 
 
@@ -91,6 +95,7 @@ class HDirectXAPI
 public:
 	static HDX12Device*  GetDevice();
 	static HDX12Factory* GetFactory();
+	static const HJGGraphicsArguments& GetArguments();
 
 	static 	HDX12ComPtr<HDX12Resource> CreateCommittedResource(
 		const PString& name,
@@ -118,6 +123,7 @@ public:
 	static HDescriptionAllocation DSVAllocate();
 	static HDescriptionAllocation CSUAllocate();
 	static PSharedPtr<PCommandQueue> GetCommandQueue();
+	static PSharedPtr<PDX12FrameBuffer> GetFrameBuffer();
 private:
 	static PDirectX12API* getDX12API();
 };

@@ -117,13 +117,13 @@ public:
 template<class ... Args>
 class PDelegate
 {
-	PSharedPtr<IDelegateInstance<void, const Args&...>> Instance;
+	PSharedPtr<IDelegateInstance<void, Args...>> Instance;
 
 public:
 	template<class T>
-	void Bind(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	void Bind(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
 	{
-		Instance = Allocate(PDelegateInstance<T, void, const Args&...>::Create(ptr, func));\
+		Instance = Allocate(PDelegateInstance<T, void, Args...>::Create(ptr, func));\
 	}
 	
 	bool IsBound() const\
@@ -163,9 +163,9 @@ public:
 			
 public:
 	template<class T>
-	static PDelegate<const Args&...> Create(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	static PDelegate<Args&...> Create(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
 	{
-		PDelegate<const Args&...> delegate;
+		PDelegate<Args&...> delegate;
 		delegate.Bind(ptr, func);
 		return delegate;
 	}
@@ -178,7 +178,7 @@ class PMultiDelegate
 	HList<void*> _delegateKeys;
 public:
 	template<class T>
-	void Add(PWeakPtr<T> ptr, const std::function<void(const Args&...)>& func)\
+	void Add(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
 	{
 		_delegates.push_back(PDelegate<Args...>::Create(ptr, func));
 		_delegateKeys.push_back((void*)(ptr.Pin().GetRawPointer()));
@@ -205,7 +205,7 @@ public:
 		}
 	}
 
-	void BroadCast(const Args& ... args)
+	void BroadCast(Args... args)
 	{
 		for (uint64 i = 0; i < _delegates.size();)
 		{
@@ -215,7 +215,7 @@ public:
 			}
 			else
 			{
-				_delegates[i].Execute(args);
+				_delegates[i].Execute(args...);
 				++i;
 			}
 		}
@@ -283,6 +283,13 @@ using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##Fo
 
 #define JG_DECLARE_MULTI_DELEGATE_FIVEPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
 using DelegateName   = PMultiDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
+
+#define JG_DELEGATE_FN_BIND(fn) std::bind(&##fn, this)
+#define JG_DELEGATE_FN_BIND_ONEPARAM(fn) std::bind(&##fn, this, std::placeholders::_1)
+#define JG_DELEGATE_FN_BIND_TWOPARAM(fn) std::bind(&##fn, this, std::placeholders::_1, std::placeholders::_2)
+#define JG_DELEGATE_FN_BIND_THREEPARAM(fn) std::bind(&##fn, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+#define JG_DELEGATE_FN_BIND_FOURPARAM(fn) std::bind(&##fn, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)
+#define JG_DELEGATE_FN_BIND_FIVEPARAM(fn) std::bind(&##fn, this, std::placeholders::_1,std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)
 
 
 

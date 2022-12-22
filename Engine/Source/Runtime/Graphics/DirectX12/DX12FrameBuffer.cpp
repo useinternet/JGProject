@@ -75,20 +75,15 @@ void PDX12FrameBuffer::Update()
 		state = D3D12_RESOURCE_STATE_COPY_DEST;
 	}
 
-	//for (auto& callBack : mUpdateCallBackList)
-	//{
-	//	state = callBack(commandList->Get(), backBuffer.Get(), mRTVs[index].CPU(), state);
-	//}
+	OnUpdate.BroadCast(commandList->Get(), backBuffer.Get(), _rtvs[index].CPU(), state);
+
 	resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), state, D3D12_RESOURCE_STATE_PRESENT);
 	commandList->Get()->ResourceBarrier(1, &resourceBarrier);
 }
 
 bool PDX12FrameBuffer::Present()
 {
-	//for (auto& callBack : mPresentCallBackList)
-	//{
-	//	callBack();
-	//}
+	OnPresent.BroadCast();
 	HRESULT hResult = _dx12SwapChain->Present(0, 0);
 	return SUCCEEDED(hResult);
 }

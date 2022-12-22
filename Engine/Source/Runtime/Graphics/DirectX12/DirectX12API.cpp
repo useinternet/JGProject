@@ -12,7 +12,7 @@
 void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 {
 	JG_LOG(Graphics, ELogLevel::Trace, "DirectX12 Init Start");
-
+	_arguments   = args;
 	_dx12Factory = HDirectX12Helper::CreateDXGIFactory();
 
 	DXGI_ADAPTER_DESC1 adapterDesc = {};
@@ -93,6 +93,11 @@ PSharedPtr<ITexture> PDirectX12API::CreateTexture(const char* pixels, const HTex
 	texture->InitializeByMemory(pixels, textureInfo);
 
 	return texture;
+}
+
+const HJGGraphicsArguments& PDirectX12API::GetArguments() const
+{
+	return _arguments;
 }
 
 HDX12ComPtr<HDX12Resource> PDirectX12API::CreateCommittedResource(
@@ -202,6 +207,11 @@ PSharedPtr<PCommandQueue> PDirectX12API::GetCommandQueue() const
 	return _commandQueue;
 }
 
+PSharedPtr<PDX12FrameBuffer> PDirectX12API::GetFrameBuffer() const
+{
+	return _frameBuffer;
+}
+
 HDX12Device* HDirectXAPI::GetDevice()
 {
 	return getDX12API()->GetDevice();
@@ -210,6 +220,11 @@ HDX12Device* HDirectXAPI::GetDevice()
 HDX12Factory* HDirectXAPI::GetFactory()
 {
 	return getDX12API()->GetFactory();
+}
+
+const HJGGraphicsArguments& HDirectXAPI::GetArguments()
+{
+	return getDX12API()->GetArguments();
 }
 
 HDX12ComPtr<HDX12Resource> HDirectXAPI::CreateCommittedResource(const PString& name, const D3D12_HEAP_PROPERTIES* pHeapProperties, D3D12_HEAP_FLAGS heapFlags, const D3D12_RESOURCE_DESC* pDesc, D3D12_RESOURCE_STATES initialResourceState, const D3D12_CLEAR_VALUE* pOptimizedClearValue)
@@ -295,6 +310,11 @@ HDescriptionAllocation HDirectXAPI::CSUAllocate()
 PSharedPtr<PCommandQueue> HDirectXAPI::GetCommandQueue()
 {
 	return getDX12API()->GetCommandQueue();
+}
+
+PSharedPtr<PDX12FrameBuffer> HDirectXAPI::GetFrameBuffer()
+{
+	return getDX12API()->GetFrameBuffer();
 }
 
 PDirectX12API* HDirectXAPI::getDX12API()
