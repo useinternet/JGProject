@@ -163,9 +163,9 @@ public:
 			
 public:
 	template<class T>
-	static PDelegate<Args&...> Create(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
+	static PDelegate<Args...> Create(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
 	{
-		PDelegate<Args&...> delegate;
+		PDelegate<Args...> delegate;
 		delegate.Bind(ptr, func);
 		return delegate;
 	}
@@ -211,7 +211,7 @@ public:
 		{
 			if (_delegates[i].IsBound() == false)
 			{
-				removeInternal(i);
+				removeInternal((int32)i);
 			}
 			else
 			{

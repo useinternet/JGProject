@@ -19,6 +19,7 @@ public:
 };
 
 class ITexture;
+class IJGGui;
 class PJGGraphicsAPI : public IMemoryObject
 {
 	friend class HJGGraphicsModule;
@@ -30,6 +31,7 @@ protected:
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 public:
+	virtual IJGGui* GetGui() const = 0;
 	virtual PSharedPtr<ITexture> CreateTexture(const HTextureInfo& textureInfo) = 0;
 	virtual PSharedPtr<ITexture> CreateTexture(const char* pixels, const HTextureInfo& textureInfo) = 0;
 

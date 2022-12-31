@@ -3,7 +3,18 @@
 #include "String/String.h"
 #include "Math/Vector.h"
 #include "PlatformDefines.h"
+#include "Misc/Delegate.h"
 
+struct HWindowCallBacks
+{
+#ifdef _PLATFORM_WINDOWS
+	JG_DECLARE_MULTI_DELEGATE_FOURPARAM(HWndProc, HWND, uint32, WPARAM, LPARAM);
+	HWndProc WndProc;
+#endif
+
+	JG_DECLARE_MULTI_DELEGATE_TWOPARAM(HOnResize, uint32, uint32);
+	HOnResize OnResize;
+};
 
 struct HJWindowArguments
 {
@@ -24,7 +35,7 @@ public:
 	virtual ~PJWindow() = default;
 
 	virtual HJWHandle GetHandle() const { return 0; }
-
+	virtual HVector2Int GetClientSize() const { return HVector2Int(); }
 public:
 
 	bool IsValid() const;

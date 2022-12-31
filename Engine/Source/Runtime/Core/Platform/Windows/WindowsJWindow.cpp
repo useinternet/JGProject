@@ -3,13 +3,19 @@
 #include "Thread/Scheduler.h"
 #include "CoreSystem.h"
 
-HList<WindowsWindowProcCallBack> PWindowsJWindow::_sCallBackList;
-
 LRESULT CALLBACK WndProc(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
 HJWHandle PWindowsJWindow::GetHandle() const
 {
 	return _handle;
+}
+
+HVector2Int PWindowsJWindow::GetClientSize() const
+{
+	RECT result;
+	::GetClientRect(_handle, &result);
+
+	return HVector2Int(result.right - result.left, result.bottom - result.top);
 }
 
 bool PWindowsJWindow::ConstructWindow()
@@ -78,23 +84,11 @@ void PWindowsJWindow::Update(const PTaskArguments& args)
 	}
 }
 
-void PWindowsJWindow::AddWindowProcCallBack(const WindowsWindowProcCallBack& callBackFunc)
-{
-	_sCallBackList.push_back(callBackFunc);
-}
-
-
-
 LRESULT WndProc(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 {
-	for (WindowsWindowProcCallBack& callBack : PWindowsJWindow::_sCallBackList)
-	{
-		LRESULT result = callBack(hWnd, msg, wParam, lParam);
-		if (result)
-		{
-			return result;
-		}
-	}
+	HCoreSystemGlobalValues& globalValues = GCoreSystem::GetGlobalValues();
+	globalValues.WindowCallBacks->WndProc.BroadCast(hWnd, msg, wParam, lParam);
+
 	switch (msg)
 	{
 	//case WM_MOUSEWHEEL:
@@ -134,7 +128,9 @@ LRESULT WndProc(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	//	//return WindowCallBackFn::WindowKeyInputCallBack((EKeyCode)wParam, EInputAction::Released, EInputMode::Default);
 	//case WM_CHAR:
 	//	//return WindowCallBackFn::WindowCharCallBack(wParam);
-	//case WM_SIZE:
+	case WM_SIZE:
+		globalValues.WindowCallBacks->OnResize.BroadCast((uint32)LOWORD(lParam), (uint32)HIWORD(lParam));
+		return 0;
 	//	//return WindowCallBackFn::WindowResizeCallBack(LOWORD(lParam), HIWORD(lParam));
 	//	//case WM_SETCURSOR:
 	//	//	if (LOWORD(lParam) == HTCLIENT) return 1;

@@ -27,7 +27,7 @@ void HJGEditorModule::StartupModule()
 	winArgs.Size  = HVector2Int(800, 600);
 	_window = HPlatform::CreateJWindow(winArgs);
 
-	GCoreSystem::GetGlobalValues().WindowHandle = _window->GetHandle();
+	GCoreSystem::GetGlobalValues().MainWindow = _window.GetRawPointer();
 
 	if (GModuleGlobalSystem::GetInstance().ConnectModule("Graphics") == false)
 	{

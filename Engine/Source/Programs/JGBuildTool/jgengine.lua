@@ -250,6 +250,24 @@ workspace "JGEngine"
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
 
 
+			project "GUI"
+				includedirs{ "Source/Runtime/GUI/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", }
+				links{ "Core", "imgui", }
+				SetCPPProjectConfig("StaticLib", "Source/Runtime/GUI/", {})
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+
+
 		group "Engine/ThirdParty"
 			project "imgui"
 				includedirs{ "Source/ThirdParty/imgui/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }

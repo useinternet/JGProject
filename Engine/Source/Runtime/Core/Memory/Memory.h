@@ -9,6 +9,10 @@ protected:
 	IMemoryObject() = default;
 public:
 	virtual ~IMemoryObject() = default;
+	
+protected:
+	friend class GMemoryGlobalSystem;
+	virtual void Construct() {}
 };
 
 class PMemoryObject : public IMemoryObject
@@ -564,9 +568,14 @@ public:
 		ptr._pRefCount = memoryBlock.RefCount.get();
 		ptr._pRefCount->fetch_add(1);
 
-		HLockGuard<HMutex> lock(_mutex);
-		_allocatedMemoryBlocks.emplace(ptr._ptr, std::move(memoryBlock));
-		_allocatedMemoryBlockQueue.push(ptr._ptr);
+		{
+			HLockGuard<HMutex> lock(_mutex);
+			_allocatedMemoryBlocks.emplace(ptr._ptr, std::move(memoryBlock));
+			_allocatedMemoryBlockQueue.push(ptr._ptr);
+		}
+
+		IMemoryObject* memObject = ptr._ptr;
+		memObject->Construct();
 
 		return ptr;
 	}

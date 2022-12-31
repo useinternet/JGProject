@@ -14,6 +14,7 @@ class PComputeCommandList;
 class PCommandList;
 class PDX12FrameBuffer;
 class HDescriptionAllocation;
+class PDX12JGGui;
 
 class PDirectX12API : public PJGGraphicsAPI
 {
@@ -36,16 +37,19 @@ class PDirectX12API : public PJGGraphicsAPI
 	HMutex _deviceMutex;
 
 	PSharedPtr<PDX12FrameBuffer> _frameBuffer;
+	PSharedPtr<PDX12JGGui> _gui;
+
 	HJGGraphicsArguments _arguments;
 	bool _bIsSupportedRayTracing;
 public:
-	virtual ~PDirectX12API() = default;
+	virtual ~PDirectX12API();
 
 protected:
 	virtual void Initialize(const HJGGraphicsArguments& args) override;
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 public:
+	virtual IJGGui* GetGui() const override;
 	virtual PSharedPtr<ITexture> CreateTexture(const HTextureInfo& textureInfo) override;
 	virtual PSharedPtr<ITexture> CreateTexture(const char* pixels, const HTextureInfo& textureInfo) override;
 

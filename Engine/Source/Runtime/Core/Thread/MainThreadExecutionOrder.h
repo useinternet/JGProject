@@ -3,7 +3,6 @@
 
 enum class EMainThreadExecutionOrder
 {
-	UpdateWindow,
 	GraphicsBegin,
 	Begin,
 
@@ -13,4 +12,5 @@ enum class EMainThreadExecutionOrder
 
 	End,
 	GraphicsEnd,
+	UpdateWindow,
 };

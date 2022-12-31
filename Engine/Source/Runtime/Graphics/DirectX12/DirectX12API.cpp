@@ -8,6 +8,13 @@
 #include "Classes/CommandList.h"
 #include "DirectX12/DX12FrameBuffer.h"
 #include "DirectX12/DX12Texture.h"
+#include "DirectX12/DX12JGGui.h"
+
+PDirectX12API::~PDirectX12API()
+{
+	_commandQueue->Flush();
+	_gui.Reset();
+}
 
 void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 {
@@ -58,6 +65,9 @@ void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 	_frameBuffer = Allocate<PDX12FrameBuffer>();
 	_frameBuffer->Initialize(frameBufferInfo);
 	
+	_gui = Allocate<PDX12JGGui>();
+
+	GCoreSystem::GetGlobalValues().GraphicsAPI = this;
 	JG_LOG(Graphics, ELogLevel::Trace, "DirectX12 Init End");
 }
 
@@ -67,6 +77,7 @@ void PDirectX12API::BeginFrame()
 	//mCacheComputeContextDic.clear();
 
 	_commandQueue->Begin();
+	_gui->NewFrame();
 }
 
 void PDirectX12API::EndFrame()
@@ -77,6 +88,16 @@ void PDirectX12API::EndFrame()
 	_csuAllocator->UpdatePage();
 	_rtvAllocator->UpdatePage();
 	_dsvAllocator->UpdatePage();
+}
+
+IJGGui* PDirectX12API::GetGui() const
+{
+	if (_gui.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return _gui.GetRawPointer();
 }
 
 PSharedPtr<ITexture> PDirectX12API::CreateTexture(const HTextureInfo& textureInfo)

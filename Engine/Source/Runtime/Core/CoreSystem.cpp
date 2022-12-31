@@ -7,6 +7,7 @@
 #include "String/StringTable.h"
 #include "Misc/Timer.h"
 #include "Misc/Module.h"
+#include "Platform/JWindow.h"
 #include <crtdbg.h>
 
 void HCoreSystemPrivate::SetInstance(GCoreSystem* instance)
@@ -14,6 +15,12 @@ void HCoreSystemPrivate::SetInstance(GCoreSystem* instance)
 	GCoreSystem::Instance = instance;
 }
 
+HCoreSystemGlobalValues::HCoreSystemGlobalValues()
+{
+	GraphicsAPI = nullptr;
+	MainWindow = nullptr;
+	WindowCallBacks = std::make_unique<HWindowCallBacks>();
+}
 
 GCoreSystem* GCoreSystem::Instance = nullptr;
 
@@ -95,6 +102,10 @@ void GCoreSystem::Destroy()
 		pair.second->Destroy();
 	}
 
+	Instance->GlobalValues.MainWindow = nullptr;
+	Instance->GlobalValues.GraphicsAPI = nullptr;
+	Instance->GlobalValues.WindowCallBacks = nullptr;
+
 	GCoreSystem::UnRegisterSystemInstance<GModuleGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GStringTable>();
@@ -158,5 +169,3 @@ void GCoreSystem::collectionThreadIDs()
 		tempThreads[i].join();
 	}
 }
-
-

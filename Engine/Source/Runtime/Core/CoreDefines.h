@@ -18,7 +18,7 @@
 #include <cassert>
 #include <filesystem>
 #include <chrono>
-
+#include <functional>
 
 namespace fs = std::filesystem;
 

@@ -12,6 +12,9 @@ enum class ECoreSystemFlags
 
 class GGlobalSystemInstanceBase;
 class GCoreSystem;
+class PJGGraphicsAPI;
+class PJWindow;
+struct HWindowCallBacks;
 
 namespace HCoreSystemPrivate
 {
@@ -23,15 +26,17 @@ struct HCoreSystemArguments
 	ECoreSystemFlags Flags;
 	HRawString LaunchModule;
 
+
 	HCoreSystemArguments() : Flags(ECoreSystemFlags::None) {}
 };
 
 struct HCoreSystemGlobalValues
 {
-	HJWHandle WindowHandle;
-
-	HCoreSystemGlobalValues()
-		: WindowHandle(0) {}
+	PJGGraphicsAPI* GraphicsAPI;
+	PJWindow*		MainWindow;
+	HSTLSharedPtr<HWindowCallBacks> WindowCallBacks;
+	
+	HCoreSystemGlobalValues();
 };
 
 class GCoreSystem

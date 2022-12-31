@@ -2,6 +2,10 @@
 #include "JGGraphics.h"
 #include "JGGraphicsAPI.h"
 
+#ifdef _PLATFORM_WINDOWS
+#include "Platform/Windows/WindowsJWindow.h"
+#endif
+
 #ifdef _DIRECTX12
 #include "DirectX12/DirectX12API.h"
 
@@ -25,11 +29,13 @@ void HJGGraphicsModule::StartupModule()
 #else
 	JG_ASSERT("not supported graphics api");
 #endif
-	
+	HCoreSystemGlobalValues& globalValues = GCoreSystem::GetGlobalValues();
+	HVector2Int clientSize = globalValues.MainWindow->GetClientSize();
+
 	HJGGraphicsArguments arguments;
-	arguments.Handle = (uint64)GCoreSystem::GetGlobalValues().WindowHandle;
-	arguments.Width = 1920;
-	arguments.Height = 1080;
+	arguments.Handle = (uint64)globalValues.MainWindow->GetHandle();
+	arguments.Width  = clientSize.x;
+	arguments.Height = clientSize.y;
 	arguments.ClearColor = HLinearColor(0, 0, 0, 0);
 	arguments.BufferCount = 3;
 
