@@ -20,7 +20,8 @@ class IDelegateInstance : public IDelegateInstanceBase
 public:
 	virtual ~IDelegateInstance() = default;
 
-	virtual Ret Execute(Args ... args) = 0;
+	virtual Ret  Execute(Args ... args) const = 0;
+	virtual void Reset() = 0;
 
 	virtual JGType GetDelegateInstanceType() const override
 	{
@@ -59,9 +60,17 @@ public:
 		_bIsStatic = false;
 	}
 
-	virtual Ret Execute(Args ... args) override
+	virtual Ret Execute(Args ... args) const override
 	{
 		return _func(args...);
+	}
+
+	virtual void Reset() override
+	{
+		_func = nullptr;
+		_bIsStatic = false;
+		_refObject.Reset();
+		_refObject = nullptr;
 	}
 
 	virtual bool IsBound() const override
@@ -77,14 +86,6 @@ public:
 		}
 	
 		return true;
-	}
-
-	void Reset()
-	{
-		_func = nullptr;
-		_bIsStatic = false;
-		_refObject.Reset();
-		_refObject = nullptr;
 	}
 
 	static PDelegateInstance<T, Ret, Args ...> Create(const std::function<Ret(Args...)>& func)
@@ -114,16 +115,16 @@ public:
 	}
 };
 
-template<class ... Args>
+template<class RetType, class ... Args>
 class PDelegate
 {
-	PSharedPtr<IDelegateInstance<void, Args...>> Instance;
+	PSharedPtr<IDelegateInstance<RetType, Args...>> Instance;
 
 public:
 	template<class T>
-	void Bind(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
+	void Bind(PWeakPtr<T> ptr, const std::function<RetType(Args...)>& func)\
 	{
-		Instance = Allocate(PDelegateInstance<T, void, Args...>::Create(ptr, func));\
+		Instance = Allocate(PDelegateInstance<T, RetType, Args...>::Create(ptr, func));\
 	}
 	
 	bool IsBound() const\
@@ -136,36 +137,44 @@ public:
 		return Instance->IsBound();
 	}
 	
-	void Execute(const Args& ... args)
+	RetType Execute(const Args& ... args) const
 	{
 		if (Instance == nullptr)
 		{
 			return;
 		}
 			
-		Instance->Execute(args...);
+		return Instance->Execute(args...);
 	}
 			
-	void ExecuteIfBound(const Args& ... args)
+	RetType ExecuteIfBound(const Args& ... args) const
 	{
 		if (Instance == nullptr)
 		{
-			return;
+			return RetType();
 		}
 
 		if (Instance->IsBound() == false)
 		{
-			return;
+			return RetType();
 		}
 			
-		Instance->Execute(args...);
+		return Instance->Execute(args...);
+	}
+
+	void Reset()
+	{
+		if (nullptr != Instance)
+		{
+			Instance->Reset();
+		}
 	}
 			
 public:
 	template<class T>
-	static PDelegate<Args...> Create(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
+	static PDelegate<RetType, Args...> Create(PWeakPtr<T> ptr, const std::function<RetType(Args...)>& func)\
 	{
-		PDelegate<Args...> delegate;
+		PDelegate<RetType, Args...> delegate;
 		delegate.Bind(ptr, func);
 		return delegate;
 	}
@@ -174,13 +183,13 @@ public:
 template<class ... Args>
 class PMultiDelegate
 {
-	HList<PDelegate<Args...>> _delegates;
+	HList<PDelegate<void, Args...>> _delegates;
 	HList<void*> _delegateKeys;
 public:
 	template<class T>
 	void Add(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
 	{
-		_delegates.push_back(PDelegate<Args...>::Create(ptr, func));
+		_delegates.push_back(PDelegate<void, Args...>::Create(ptr, func));
 		_delegateKeys.push_back((void*)(ptr.Pin().GetRawPointer()));
 	}
 
@@ -226,7 +235,7 @@ private:
 	{
 		uint64 len = _delegates.size();
 
-		PDelegate<Args...> tempDelegate = _delegates[len - 1];
+		PDelegate<void, Args...> tempDelegate = _delegates[len - 1];
 
 		_delegates[len - 1] = _delegates[index];
 		_delegates[index] = tempDelegate;
@@ -239,31 +248,42 @@ private:
 	}
 };
 
-
-
-
-
-
-
-
-
 #define JG_DECLARE_DELEGATE(DelegateName) \
-using DelegateName = PDelegate<>;\
+using DelegateName = PDelegate<void>;\
 
 #define JG_DECLARE_DELEGATE_ONEPARAM(DelegateName, OneParam)\
-using DelegateName   = PDelegate<##OneParam>;\
+using DelegateName   = PDelegate<void, ##OneParam>;\
 
 #define JG_DECLARE_DELEGATE_TWOPARAM(DelegateName, OneParam, TwoParam) \
-using DelegateName   = PDelegate<##OneParam, ##TwoParam>;\
+using DelegateName   = PDelegate<void, ##OneParam, ##TwoParam>;\
 
 #define JG_DECLARE_DELEGATE_THREEPARAM(DelegateName, OneParam, TwoParam, ThreeParam) \
-using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam>; \
+using DelegateName   = PDelegate<void, ##OneParam, ##TwoParam, ##ThreeParam>; \
 
 #define JG_DECLARE_DELEGATE_FOURPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam) \
-using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam>; \
+using DelegateName   = PDelegate<void, ##OneParam, ##TwoParam, ##ThreeParam, ##FourParam>; \
 
 #define JG_DECLARE_DELEGATE_FIVEPARAM(DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
-using DelegateName   = PDelegate<##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
+using DelegateName   = PDelegate<void, ##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
+
+
+#define JG_DECLARE_DELEGATE_RETVAL(RetType, DelegateName) \
+using DelegateName = PDelegate<##RetType>;\
+
+#define JG_DECLARE_DELEGATE_ONEPARAM_RETVAL(RetType, DelegateName, OneParam)\
+using DelegateName   = PDelegate<##RetType, ##OneParam>;\
+
+#define JG_DECLARE_DELEGATE_TWOPARAM_RETVAL(RetType, DelegateName, OneParam, TwoParam) \
+using DelegateName   = PDelegate<##RetType, ##OneParam, ##TwoParam>;\
+
+#define JG_DECLARE_DELEGATE_THREEPARAM_RETVAL(RetType, DelegateName, OneParam, TwoParam, ThreeParam) \
+using DelegateName   = PDelegate<##RetType, ##OneParam, ##TwoParam, ##ThreeParam>; \
+
+#define JG_DECLARE_DELEGATE_FOURPARAM_RETVAL(RetType, DelegateName, OneParam, TwoParam, ThreeParam, FourParam) \
+using DelegateName   = PDelegate<##RetType, ##OneParam, ##TwoParam, ##ThreeParam, ##FourParam>; \
+
+#define JG_DECLARE_DELEGATE_FIVEPARAM_RETVAL(RetType, DelegateName, OneParam, TwoParam, ThreeParam, FourParam, FiveParam) \
+using DelegateName   = PDelegate<##RetType, ##OneParam, ##TwoParam, ##ThreeParam, ##FourParam, ##FiveParam>; \
 
 
 #define JG_DECLARE_MULTI_DELEGATE(DelegateName) \

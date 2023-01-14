@@ -1,19 +1,25 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
+#include "Builder/GUIBuilder.h"
+#include "Builder/MenuBuilder.h"
 
-
-class HGUIBuilder;
-class WWidget : public IMemoryObject
+class WWidget : public IMemoryObject 
 {
 	PName _widgetName;
 
 public:
-	WWidget();
+	WWidget() = default;
 	virtual ~WWidget() = default;
-	virtual void BuildWidget(HGUIBuilder& inBuilder) {}
 
-public:
-	void SetName(const PName& inName);
-	const PName& GetName() const;
+	void  SetName(PName inName);
+	PName GetName() const;
+
+protected:
+	friend class GGUIGlobalSystem;
+	virtual void OnConstruct() {}
+	virtual void OnOpen()  {}
+	virtual void OnClose() {}
+	virtual void OnGUIBuild(HGUIBuilder& inBuilder) {}
+	virtual void OnMenuBuild(HMenuBuilder& inBuilder) {}
 };

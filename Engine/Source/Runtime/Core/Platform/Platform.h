@@ -2,7 +2,7 @@
 #include "CoreDefines.h"
 #include "PlatformDefines.h"
 #include "String/String.h"
-
+#include "Misc/Guid.h"
 
 template<class ReturnType, class ...Args>
 class HPlatformFunction
@@ -68,4 +68,5 @@ public:
 
 	// -- Windows --
 	static PSharedPtr<PJWindow> CreateJWindow(const HJWindowArguments& args);
+	static HGuid NewGuid();
 };

@@ -42,3 +42,24 @@ PSharedPtr<PJWindow> HPlatform::CreateJWindow(const HJWindowArguments& args)
 	return nullptr;
 #endif
 }
+
+HGuid HPlatform::NewGuid()
+{
+	HGuid Guid;
+#ifdef _PLATFORM_WINDOWS
+	UUID newId;
+	UuidCreate(&newId);
+
+	Guid._data1 = newId.Data1;
+	Guid._data2 = newId.Data2;
+	Guid._data3 = newId.Data3;
+
+	for (int32 i = 0; i < 8; ++i)
+	{
+		Guid._data4[i] = newId.Data4[i];
+	}
+
+#endif
+
+	return Guid;
+}
