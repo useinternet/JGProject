@@ -82,6 +82,7 @@ name5 = in##name5; \
 virtual ~##ClassName() = default; \
 }; \
 
+class WWidgetComponent;
 class WWidget;
 class IGUIBuild;
 class HGUIBuilder
@@ -94,7 +95,9 @@ public:
 		EndHorizontal,
 		BeginVertical,
 		EndVertical,
-		PushWidget,
+		BeginWidget,
+		EndWidget,
+		PushWidgetComponent,
 		Text,
 		Button,
 	};
@@ -113,28 +116,33 @@ public:
 
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PTextCommandValue, PString, Text)
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetCommandValue, PSharedPtr<WWidget>, Widget)
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetComponentCommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent)
 public:
-	HGUIBuilder(PSharedPtr<IGUIBuild> inGuiBuildIF) : _guiBuild(inGuiBuildIF) {}
-
 	void BeginHorizontal(int32 fixedWidth = INDEX_NONE);
 	void EndHorizontal();
 
 	void BeginVertical(int32 fixedHeight = INDEX_NONE);
 	void EndVertical();
 
-	void PushWidget(PSharedPtr<WWidget> inWidget);
+	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
 	void Text(const PString& inText);
 
 private:
+	void BeginWidget(PSharedPtr<WWidget> inWidget);
+	void EndWidget();
+
+private:
+	friend class GGUIGlobalSystem;
 	void Build();
 
 private:
-	PSharedPtr<IGUIBuild> _guiBuild;
 	HQueue<HCommandData> _commandQueue;
 };
 
 class IGUIBuild
 {
 public:
-	virtual void OnBuild(const HGUIBuilder::HCommandData& inCommandData) = 0;
+	virtual void PushData(const HQueue<HGUIBuilder::HCommandData>& commandQueue) = 0;
+	virtual void Build() = 0;
+	virtual void Reset() = 0;
 };

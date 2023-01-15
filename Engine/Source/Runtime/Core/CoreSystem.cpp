@@ -64,17 +64,17 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 		}
 	}
 
-	for (const HPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
-	{
-		pair.second->Start();
-	}
-
 	if (args.LaunchModule.length() > 0)
 	{
 		if (GModuleGlobalSystem::GetInstance().ConnectModule(args.LaunchModule.c_str()) == false)
 		{
 			JG_LOG(Core, ELogLevel::Error, "Fail Launch Module:%s", args.LaunchModule.c_str());
 		}
+	}
+
+	for (const HPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	{
+		pair.second->Start();
 	}
 
 	Instance->bIsRunning = true;

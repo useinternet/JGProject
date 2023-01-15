@@ -48,6 +48,13 @@ public:
 		return result.ReplaceAll(pattern, replace);
 	}
 
+	static PString FromInt32(int32 num);
+	static PString FromInt64(int64 num);
+	static PString FromUint32(uint32 num);
+	static PString FromUint64(uint64 num);
+	static PString FromFloat32(float32 num);
+	static PString FromFloat64(float64 num);
+
 private:
 	template<class T>
 	static auto convert(const T& arg)

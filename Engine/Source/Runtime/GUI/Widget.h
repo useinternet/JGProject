@@ -7,16 +7,19 @@
 class WWidget : public IMemoryObject 
 {
 	PName _widgetName;
+	HGuid _widgetGuid;
 
+	bool _bIsOpen;
 public:
 	WWidget() = default;
 	virtual ~WWidget() = default;
 
 	void  SetName(PName inName);
 	PName GetName() const;
-
+	const HGuid& GetGuid() const;
 protected:
 	friend class GGUIGlobalSystem;
+	virtual void Construct() override;
 	virtual void OnConstruct() {}
 	virtual void OnOpen()  {}
 	virtual void OnClose() {}

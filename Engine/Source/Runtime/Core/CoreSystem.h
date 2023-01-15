@@ -14,6 +14,7 @@ class GGlobalSystemInstanceBase;
 class GCoreSystem;
 class PJGGraphicsAPI;
 class PJWindow;
+class IGUIBuild;
 struct HWindowCallBacks;
 
 namespace HCoreSystemPrivate
@@ -34,6 +35,7 @@ struct HCoreSystemGlobalValues
 {
 	PJGGraphicsAPI* GraphicsAPI;
 	PJWindow*		MainWindow;
+	IGUIBuild*		GUIBuild;
 	HSTLSharedPtr<HWindowCallBacks> WindowCallBacks;
 	
 	HCoreSystemGlobalValues();

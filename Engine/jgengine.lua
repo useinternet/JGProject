@@ -142,8 +142,8 @@ workspace "JGEngine"
 
 		group "Engine/Editor"
 			project "JGEditor"
-				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/ThirdParty/imgui/", }
-				links{ "Core", "GameFrameWorks", "Graphics", "imgui", }
+				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/ThirdParty/imgui/", "Source/Runtime/GUI/", }
+				links{ "Core", "GameFrameWorks", "Graphics", "imgui", "GUI", }
 				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
@@ -233,8 +233,8 @@ workspace "JGEngine"
 
 
 			project "Graphics"
-				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", }
-				links{ "Core", "imgui", }
+				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", "Source/Runtime/GUI/", }
+				links{ "Core", "imgui", "GUI", }
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()

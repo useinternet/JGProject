@@ -2,7 +2,7 @@
 #include "CoreDefines.h"
 #include "PlatformDefines.h"
 #include "String/String.h"
-#include "Misc/Guid.h"
+
 
 template<class ReturnType, class ...Args>
 class HPlatformFunction
@@ -23,6 +23,7 @@ public:
 };
 
 class PJWindow;
+class HGuid;
 struct HJWindowArguments;
 class HPlatform
 {
@@ -45,8 +46,6 @@ public:
 		inPtr = nullptr;
 	}
 
-	
-
 	// -- Dll -- 
 	static HJInstance LoadDll(const PString& dllPath);
 	static void UnLoadDll(HJInstance instance);
@@ -68,5 +67,6 @@ public:
 
 	// -- Windows --
 	static PSharedPtr<PJWindow> CreateJWindow(const HJWindowArguments& args);
-	static HGuid NewGuid();
+	static HGuid  NewGuid();
+	static uint64 GuidHash(const HGuid& hash);
 };

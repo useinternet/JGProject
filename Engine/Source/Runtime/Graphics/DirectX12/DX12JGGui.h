@@ -3,6 +3,9 @@
 #include "DirectX12/Classes/DirectX12Helper.h"
 #include "imgui/imgui.h"
 
+class PImGuiBuild;
+class IGUIBuild;
+
 class PDX12JGGui
 	: public IMemoryObject
 	, public IJGGui
@@ -10,6 +13,7 @@ class PDX12JGGui
 	HDX12ComPtr<HDX12DescriptorHeap>   _srvDescriptorHeap;
 	HDX12ComPtr<HDX12CommandAllocator> _commandAlloc;
 	HDX12ComPtr<HDX12CommandList>      _commandList;
+	PSharedPtr<PImGuiBuild> _imGuiBuild;
 
 	uint32 _increaseSize    = 0;
 	uint32 _currentSrvIndex = 0;
@@ -21,7 +25,7 @@ public:
 
 	virtual void Construct() override;
 	virtual uint64 GPUAllocate(TextureID textureID) override;
-
+	virtual IGUIBuild* GetGUIBuild() const override;
 public:
 	ImTextureID ConvertImGuiTextureID(TextureID id);
 	void	NewFrame();

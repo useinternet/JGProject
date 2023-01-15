@@ -1,7 +1,6 @@
 #include "PCH/PCH.h"
 #include "GUIBuilder.h"
-#include "Widgets/Widget.h"
-
+#include "Widget.h"
 
 void HGUIBuilder::BeginHorizontal(int32 fixedWidth)
 {
@@ -37,27 +36,47 @@ void HGUIBuilder::EndVertical()
 
 void HGUIBuilder::Text(const PString& inText)
 {
+	HCommandData commandData;
+	commandData.Command = ECommand::Text;
+	commandData.CommandValue = Allocate<PTextCommandValue>(inText);
+
+	_commandQueue.push(commandData);
 }
 
-void HGUIBuilder::PushWidget(PSharedPtr<WWidget> inWidget)
+void HGUIBuilder::BeginWidget(PSharedPtr<WWidget> inWidget)
 {
 	HCommandData commandData;
-	commandData.Command      = ECommand::PushWidget;
+	commandData.Command = ECommand::BeginWidget;
 	commandData.CommandValue = Allocate<PWidgetCommandValue>(inWidget);
+
+	_commandQueue.push(commandData);
+}
+
+void HGUIBuilder::EndWidget()
+{
+	HCommandData commandData;
+	commandData.Command = ECommand::EndWidget;
+
+	_commandQueue.push(commandData);
+}
+
+void HGUIBuilder::PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom)
+{
+	HCommandData commandData;
+	commandData.Command      = ECommand::PushWidgetComponent;
+	commandData.CommandValue = Allocate<PWidgetComponentCommandValue>(inWidgetCom);
 
 	_commandQueue.push(commandData);
 }
 
 void HGUIBuilder::Build()
 {
-	if (_guiBuild == nullptr)
+	const HCoreSystemGlobalValues& globalValues = GCoreSystem::GetGlobalValues();
+	IGUIBuild* guiBuild = globalValues.GUIBuild;
+	if (guiBuild == nullptr)
 	{
 		return;
 	}
 
-	while (_commandQueue.empty() == false)
-	{
-		_guiBuild->OnBuild(_commandQueue.front());
-		_commandQueue.pop();
-	}
+	guiBuild->PushData(_commandQueue);
 }

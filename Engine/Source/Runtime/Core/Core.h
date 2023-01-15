@@ -26,6 +26,7 @@
 #include "Misc/Timespan.h"
 #include "Misc/Hash.h"
 #include "Misc/Attribute.h"
+#include "Misc/Guid.h"
 #include "Object/ObjectDefines.h"
 #include "Object/ObjectGlobals.h"
 #include "Object/ObjectGlobalSystem.h"

@@ -1,8 +1,7 @@
 #pragma once
 #include "CoreDefines.h"
-#include "Memory/Memory.h"
+#include "Platform/Platform.h"
 
-// 나중에 구현
 class HGuid
 {
 	friend class HPlatform;
@@ -12,9 +11,25 @@ private:
 	uint16 _data3;
 	uint8  _data4[8];
 
+	mutable PString _dataStr;
 public:
 	HGuid();
 	bool IsValid() const;
+	bool operator==(const HGuid& inGuid) const;
+	bool operator!=(const HGuid& inGuid) const;
+
+	const PString& ToString() const;
 
 	static HGuid New();
 };
+
+namespace std {
+	template <>
+	struct hash<HGuid>
+	{
+		std::size_t operator()(const HGuid& k) const noexcept
+		{
+			return (std::size_t)HPlatform::GuidHash(k);
+		}
+	};
+}

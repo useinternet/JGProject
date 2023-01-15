@@ -1,6 +1,7 @@
 #include "PCH/PCH.h"
 #include "Platform.h"
 #include "JWindow.h"
+#include "Misc/Guid.h"
 
 #ifdef _PLATFORM_WINDOWS
 #include "Windows/WindowsJWindow.h"
@@ -62,4 +63,30 @@ HGuid HPlatform::NewGuid()
 #endif
 
 	return Guid;
+}
+
+uint64 HPlatform::GuidHash(const HGuid& inGuid)
+{
+	if (inGuid.IsValid())
+	{
+		return 0;
+	}
+
+	uint64 hash = 0;
+
+#ifdef _PLATFORM_WINDOWS
+	UUID uuid;
+
+	uuid.Data1 = inGuid._data1;
+	uuid.Data2 = inGuid._data2;
+	uuid.Data3 = inGuid._data3;
+	for (int32 i = 0; i < 8; ++i)
+	{
+		uuid.Data4[i] = inGuid._data4[i];
+	}
+
+	hash = ::UuidHash(&uuid, nullptr);
+
+#endif
+	return hash;
 }

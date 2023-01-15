@@ -38,3 +38,8 @@ namespace fs = std::filesystem;
 #pragma comment(lib,"Dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #endif
+
+#ifdef _PLATFORM_WINDOWS
+#include <Rpc.h>
+#pragma comment(lib, "Rpcrt4.lib")
+#endif 

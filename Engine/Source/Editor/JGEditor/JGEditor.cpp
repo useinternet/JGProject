@@ -2,10 +2,14 @@
 #include "JGEditor.h"
 #include "Platform/Platform.h"
 #include "Platform/JWindow.h"
+#include "GUI.h"
 
 #ifdef _PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsJWindow.h"
 #endif
+
+
+#include "Widgets/Develop/DevelopWidget.h"
 
 JG_MODULE_IMPL(HJGEditorModule, JGEDITOR_C_API)
 
@@ -35,14 +39,17 @@ void HJGEditorModule::StartupModule()
 	}
 	// Scheuler에 업데이트
 	// Graphics 연결
-	
+	GCoreSystem::RegisterSystemInstance<GGUIGlobalSystem>();
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
+
+	GGUIGlobalSystem::GetInstance().OpenWidget<WDevelopWidget>();
+
 }
 
 void HJGEditorModule::ShutdownModule()
 {
 	_window = nullptr;
-
+	GCoreSystem::UnRegisterSystemInstance<GGUIGlobalSystem>();
 	JG_LOG(JGEditor, ELogLevel::Trace, "Shutdown JGEditor Module...");
 }
 

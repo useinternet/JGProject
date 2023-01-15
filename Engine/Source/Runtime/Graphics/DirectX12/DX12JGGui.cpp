@@ -2,6 +2,7 @@
 #include "DX12JGGui.h"
 #include "DirectX12/DirectX12API.h"
 #include "DirectX12/DX12FrameBuffer.h"
+#include "External/ImGuiBuild.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx12.h"
@@ -49,8 +50,8 @@ void PDX12JGGui::Construct()
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
 
-#ifdef _PLATFORM_WINDOWS
 	HCoreSystemGlobalValues& globalValues = GCoreSystem::GetGlobalValues();
+#ifdef _PLATFORM_WINDOWS
 	globalValues.WindowCallBacks->WndProc.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnWndProc));
 	globalValues.WindowCallBacks->OnResize.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_TWOPARAM(PDX12JGGui::OnResize));
 
@@ -76,11 +77,19 @@ void PDX12JGGui::Construct()
 
 	frameBuffer->OnUpdate.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnUpdate));
 	frameBuffer->OnPresent.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND(PDX12JGGui::OnPresent));
+
+	_imGuiBuild = Allocate<PImGuiBuild>();
+	globalValues.GUIBuild = _imGuiBuild.GetRawPointer();
 }
 
 uint64 PDX12JGGui::GPUAllocate(TextureID textureID)
 {
 	return (uint64)ConvertImGuiTextureID(textureID);
+}
+
+IGUIBuild* PDX12JGGui::GetGUIBuild() const
+{
+	return _imGuiBuild.GetRawPointer();
 }
 
 ImTextureID PDX12JGGui::ConvertImGuiTextureID(TextureID id)
@@ -105,8 +114,35 @@ void PDX12JGGui::NewFrame()
 #endif
 	ImGui::NewFrame();
 
-	ImGui::Begin("test");
+
+	ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+	ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	const ImGuiViewport* viewport      = ImGui::GetMainViewport();
+
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	window_flags |= ImGuiWindowFlags_NoBackground;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("UISystemLayer", nullptr, window_flags);
+	ImGui::PopStyleVar();
+	ImGui::PopStyleVar(2);
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("UISystemLayer DockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
+
 	ImGui::End();
+
+	_imGuiBuild->Build();
+	_imGuiBuild->Reset();
 }
 
 void PDX12JGGui::OnUpdate(HDX12CommandList* cmdList, HDX12Resource* backBuffer, D3D12_CPU_DESCRIPTOR_HANDLE rtv, D3D12_RESOURCE_STATES& outState)
@@ -135,6 +171,8 @@ void PDX12JGGui::OnPresent()
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault(NULL, (void*)_commandList.Get());
 	}
+
+
 }
 
 void PDX12JGGui::OnResize(uint32 inWidth, uint32 inHeight)

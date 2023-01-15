@@ -73,9 +73,6 @@ void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 
 void PDirectX12API::BeginFrame()
 {
-	//mCacheGraphicsContextDic.clear();
-	//mCacheComputeContextDic.clear();
-
 	_commandQueue->Begin();
 	_gui->NewFrame();
 }

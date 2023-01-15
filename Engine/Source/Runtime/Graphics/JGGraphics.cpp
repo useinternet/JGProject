@@ -60,7 +60,7 @@ void HJGGraphicsModule::BeginFrame(const PTaskArguments& args)
 	{
 		return;
 	}
-
+	
 	_graphicsAPI->BeginFrame();
 }
 

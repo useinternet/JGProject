@@ -5,6 +5,36 @@
 #include "Misc/Hash.h"
 #include "Math/Math.h"
 
+
+PString PString::FromInt32(int32 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+PString PString::FromInt64(int64 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+
+PString PString::FromUint32(uint32 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+
+PString PString::FromUint64(uint64 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+
+PString PString::FromFloat32(float32 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+
+PString PString::FromFloat64(float64 num)
+{
+	return PString(std::to_string(num).c_str());
+}
+
 PString::PString(char inChar)
 {
 	HRawString str;
