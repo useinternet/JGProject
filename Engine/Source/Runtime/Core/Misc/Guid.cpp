@@ -65,7 +65,7 @@ bool HGuid::operator!=(const HGuid& inGuid) const
 }
 
 
-PString HGuid::ToString() const
+const PString& HGuid::ToString() const
 {
 	PString dataStr1 = PString::FromUint64(_data1);
 	PString dataStr2 = PString::FromUint32((uint32)_data2);

@@ -1,31 +1,33 @@
-[:5832:][info][Core]: Active Thread: [2368035530]
-[:5832:][info][Core]: Active Thread: [3404502980]
-[:5832:][info][Core]: Active Thread: [4074049433]
-[:5832:][info][Core]: Active Thread: [4049692958]
-[:5832:][info][Core]: Active Thread: [3313496645]
-[:5832:][info][Core]: Active Thread: [1808004073]
-[:5832:][info][Core]: Active Thread: [2596072026]
-[:5832:][info][Core]: Active Thread: [196650848]
-[:5832:][info][Core]: Active Thread: [2230116248]
-[:5832:][info][Core]: Active Thread: [2141799037]
-[:5832:][info][Core]: Active Thread: [2064105724]
-[:5832:][info][Core]: Active Thread: [3324540098]
-[:5832:][info][Core]: Active Thread: [1862958305]
-[:5832:][info][Core]: Active Thread: [2333131255]
-[:5832:][info][Core]: Active Thread: [1519348140]
-[:5832:][info][Core]: Active Thread: [2142451212]
-[:5832:][info][Core]: Active Thread: [1443848298]
-[:5832:][info][Core]: Active Thread: [1171901023]
-[:5832:][info][Core]: Active Thread: [1366887584]
-[:5832:][info][Core]: Active Thread: [1670084791]
-[:5832:][info][Core]: Active Thread Totoal Count: 20 
-[:5832:][trace][Graphics]: DirectX12 Init Start
-[:5832:][trace][Graphics]: Success Create D3D12Device
-[:5832:][info][Graphics]: Description : NVIDIA GeForce RTX 3080
-[:5832:][info][Graphics]: VideoMemory : 10078  MB
-[:5832:][trace][Graphics]: Create DescriptorAllocator...
-[:5832:][trace][Graphics]: Create CommandQueue...
-[:5832:][trace][Graphics]: Create FrameBuffer...
-[:5832:][trace][Graphics]: DirectX12 Init End
-[:5832:][trace][Graphics]: Startup Graphics Module...
-[:5832:][trace][JGEditor]: Startup JGEditor Module...
+[:27552:][info][Core]: Active Thread: [2957538677]
+[:27552:][info][Core]: Active Thread: [2128092547]
+[:27552:][info][Core]: Active Thread: [3107805762]
+[:27552:][info][Core]: Active Thread: [585163098]
+[:27552:][info][Core]: Active Thread: [3938636666]
+[:27552:][info][Core]: Active Thread: [3638128583]
+[:27552:][info][Core]: Active Thread: [2098696955]
+[:27552:][info][Core]: Active Thread: [1321828977]
+[:27552:][info][Core]: Active Thread: [92827144]
+[:27552:][info][Core]: Active Thread: [197146501]
+[:27552:][info][Core]: Active Thread: [378637431]
+[:27552:][info][Core]: Active Thread: [3461963727]
+[:27552:][info][Core]: Active Thread: [2009884091]
+[:27552:][info][Core]: Active Thread: [44529423]
+[:27552:][info][Core]: Active Thread: [2172159848]
+[:27552:][info][Core]: Active Thread: [458600313]
+[:27552:][info][Core]: Active Thread: [3888721551]
+[:27552:][info][Core]: Active Thread: [2421944119]
+[:27552:][info][Core]: Active Thread: [1802312781]
+[:27552:][info][Core]: Active Thread: [2351483394]
+[:27552:][info][Core]: Active Thread Totoal Count: 20 
+[:27552:][trace][Graphics]: DirectX12 Init Start
+[:27552:][trace][Graphics]: Success Create D3D12Device
+[:27552:][info][Graphics]: Description : NVIDIA GeForce RTX 3080
+[:27552:][info][Graphics]: VideoMemory : 10078  MB
+[:27552:][trace][Graphics]: Create DescriptorAllocator...
+[:27552:][trace][Graphics]: Create CommandQueue...
+[:27552:][trace][Graphics]: Create FrameBuffer...
+[:27552:][trace][Graphics]: DirectX12 Init End
+[:27552:][trace][Graphics]: Startup Graphics Module...
+[:27552:][trace][JGEditor]: Startup JGEditor Module...
+[:27552:][trace][JGEditor]: Shutdown JGEditor Module...
+[:27552:][trace][Graphics]: Shutdown Graphics Module...

@@ -76,12 +76,23 @@ public:
 			return;
 		}
 
+		CloseWidget(widget->GetGuid());
+	}
+
+	void CloseWidget(const HGuid& widgetGuid)
+	{
+		PSharedPtr<WWidget> widget = FindWidget<WWidget>(widgetGuid);
+		if (widget == nullptr)
+		{
+			return;
+		}
+
 		if (widget->_bIsOpen == false)
 		{
 			return;
 		}
 
-		_openWidgets.erase(widget->GetGuid());
+		_openWidgets.erase(widgetGuid);
 
 		widget->_bIsOpen = false;
 		widget->OnClose();
@@ -108,7 +119,7 @@ public:
 			return nullptr;
 		}
 
-		return _widgetPool[inGuid];
+		return RawFastCast<T>(_widgetPool[inGuid]);
 	}
 
 	template<class T>

@@ -20,7 +20,7 @@ class ClassName : public PCommandValue \
 public: \
 	type1 name1; \
 	type2 name2; \
-	ClassName(const type1 & in##name1, const type2 & in##name2,)\
+	ClassName(const type1 & in##name1, const type2 & in##name2)\
 {\
 name1 = in##name1; \
 name2 = in##name2; \
@@ -98,6 +98,7 @@ public:
 		BeginWidget,
 		EndWidget,
 		PushWidgetComponent,
+		Separator,
 		Text,
 		Button,
 	};
@@ -114,9 +115,11 @@ public:
 		PSharedPtr<PCommandValue> CommandValue;
 	};
 
-	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PTextCommandValue, PString, Text)
-	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetCommandValue, PSharedPtr<WWidget>, Widget)
-	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetComponentCommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent)
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PTextCommandValue, PString, Text);
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetCommandValue, PSharedPtr<WWidget>, Widget);
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetComponentCommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent);
+	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PButtonCommandValue, PString, Label, HVector2, Size);
+
 public:
 	void BeginHorizontal(int32 fixedWidth = INDEX_NONE);
 	void EndHorizontal();
@@ -126,7 +129,7 @@ public:
 
 	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
 	void Text(const PString& inText);
-
+	void Button(const PString& inLabel, const HVector2& inSize = HVector2());
 private:
 	void BeginWidget(PSharedPtr<WWidget> inWidget);
 	void EndWidget();

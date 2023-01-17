@@ -1,6 +1,7 @@
 #include "PCH/PCH.h"
 #include "ImGuiBuild.h"
 #include "Widget.h"
+#include "GUI.h"
 #include "imgui/imgui.h"
 
 
@@ -25,6 +26,8 @@ void PImGuiBuild::Build()
 void PImGuiBuild::Reset()
 {
 	_commandQueues.clear();
+	_currentWidget = nullptr;
+	_bOpenWidget = true;
 }
 
 
@@ -48,6 +51,9 @@ void PImGuiBuild::OnBuild(const HGUIBuilder::HCommandData& inCommandData)
 		break;
 	case HGUIBuilder::ECommand::PushWidgetComponent:
 		break;
+	case HGUIBuilder::ECommand::Separator:
+		ImGui::Separator();
+		break;
 	case HGUIBuilder::ECommand::Text:
 		OnBuildText(RawFastCast<HGUIBuilder::PTextCommandValue>(inCommandData.CommandValue.GetRawPointer()));
 		break;
@@ -55,7 +61,7 @@ void PImGuiBuild::OnBuild(const HGUIBuilder::HCommandData& inCommandData)
 		break;
 	}
 }
-bool test = true;
+
 void PImGuiBuild::OnBuildBeginWidget(HGUIBuilder::PWidgetCommandValue* inCV)
 {
 	if (inCV == nullptr)
@@ -70,13 +76,21 @@ void PImGuiBuild::OnBuildBeginWidget(HGUIBuilder::PWidgetCommandValue* inCV)
 	}
 
 	PString titleName = widget->GetName().ToString();
-	titleName += "##" + widget->GetGuid().to
-	
+	titleName += PString("##") + widget->GetGuid().ToString();
+
+	ImGui::Begin(titleName.GetCStr(), &_bOpenWidget);
+
+	_currentWidget = widget;
 }
 
 void PImGuiBuild::OnBuildEndWidget()
 {
 	ImGui::End();
+	if (_bOpenWidget == false)
+	{
+		GGUIGlobalSystem::GetInstance().CloseWidget(_currentWidget->GetGuid());
+		_bOpenWidget = true;
+	}
 }
 
 void PImGuiBuild::OnBuildText(HGUIBuilder::PTextCommandValue* inCV)
@@ -87,4 +101,14 @@ void PImGuiBuild::OnBuildText(HGUIBuilder::PTextCommandValue* inCV)
 	}
 
 	ImGui::Text(inCV->Text.GetCStr());
+}
+
+void PImGuiBuild::OnBuildButton(HGUIBuilder::PButtonCommandValue* inCV)
+{
+	if (inCV == nullptr)
+	{
+		return;
+	}
+
+	ImGui::Button(inCV->Label.GetCStr(), ImVec2(inCV->Size.x, inCV->Size.y));
 }

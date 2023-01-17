@@ -43,6 +43,15 @@ void HGUIBuilder::Text(const PString& inText)
 	_commandQueue.push(commandData);
 }
 
+void HGUIBuilder::Button(const PString& inLabel, const HVector2& inSize)
+{
+	HCommandData commandData;
+	commandData.Command = ECommand::Button;
+	commandData.CommandValue = Allocate<PButtonCommandValue>(inLabel, inSize);
+
+	_commandQueue.push(commandData);
+}
+
 void HGUIBuilder::BeginWidget(PSharedPtr<WWidget> inWidget)
 {
 	HCommandData commandData;
