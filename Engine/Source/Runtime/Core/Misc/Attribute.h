@@ -45,6 +45,13 @@ public:
 		_provideData.Reset();
 	}
 
+	T GetValue() const
+	{
+		T value;
+		GetValue(value);
+		return value;
+	}
+
 	void GetValue(T& outValue) const
 	{
 		if (_provideData.IsBound())
@@ -53,7 +60,7 @@ public:
 		}
 		else
 		{
-			_data = outValue;
+			outValue = _data;
 		}
 	}
 

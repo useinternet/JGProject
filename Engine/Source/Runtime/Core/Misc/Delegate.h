@@ -141,7 +141,7 @@ public:
 	{
 		if (Instance == nullptr)
 		{
-			return;
+			return RetType();
 		}
 			
 		return Instance->Execute(args...);

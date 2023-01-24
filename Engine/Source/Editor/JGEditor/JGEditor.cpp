@@ -33,13 +33,13 @@ void HJGEditorModule::StartupModule()
 
 	GCoreSystem::GetGlobalValues().MainWindow = _window.GetRawPointer();
 
+	GCoreSystem::RegisterSystemInstance<GGUIGlobalSystem>();
+
 	if (GModuleGlobalSystem::GetInstance().ConnectModule("Graphics") == false)
 	{
 		JG_LOG(JGEditor, ELogLevel::Critical, "Fail Connect Graphics Module...");
 	}
-	// Scheuler에 업데이트
-	// Graphics 연결
-	GCoreSystem::RegisterSystemInstance<GGUIGlobalSystem>();
+
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
 
 	GGUIGlobalSystem::GetInstance().OpenWidget<WDevelopWidget>();
@@ -49,7 +49,11 @@ void HJGEditorModule::StartupModule()
 void HJGEditorModule::ShutdownModule()
 {
 	_window = nullptr;
+
+	GModuleGlobalSystem::GetInstance().DisconnectModule("Graphics");
+
 	GCoreSystem::UnRegisterSystemInstance<GGUIGlobalSystem>();
+
 	JG_LOG(JGEditor, ELogLevel::Trace, "Shutdown JGEditor Module...");
 }
 

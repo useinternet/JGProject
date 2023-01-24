@@ -2,10 +2,11 @@
 #include "DX12JGGui.h"
 #include "DirectX12/DirectX12API.h"
 #include "DirectX12/DX12FrameBuffer.h"
-#include "External/ImGuiBuild.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_win32.h"
-#include "imgui/imgui_impl_dx12.h"
+#include "GUI.h"
+#include "External/Classes/ImGuiBuild.h"
+#include "External/imgui/imgui.h"
+#include "External/imgui/imgui_impl_win32.h"
+#include "External/imgui/imgui_impl_dx12.h"
 
 #ifdef _PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsJWindow.h"
@@ -20,19 +21,13 @@ PDX12JGGui::PDX12JGGui()
 
 PDX12JGGui::~PDX12JGGui()
 {
-	_srvDescriptorHeap.Reset(); _srvDescriptorHeap = nullptr;
-	_commandList.Reset(); _commandList = nullptr;
-	_commandAlloc.Reset(); _commandAlloc = nullptr;
-	ImGui_ImplDX12_Shutdown();
 
-#ifdef _PLATFORM_WINDOWS
-	ImGui_ImplWin32_Shutdown();
-#endif
-	ImGui::DestroyContext();
 }
 
-void PDX12JGGui::Construct()
+void PDX12JGGui::Create()
 {
+	GGUIGlobalSystem::GetInstance().SetGUIBuild(Allocate<PImGuiBuild>());
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -77,19 +72,24 @@ void PDX12JGGui::Construct()
 
 	frameBuffer->OnUpdate.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnUpdate));
 	frameBuffer->OnPresent.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND(PDX12JGGui::OnPresent));
+}
 
-	_imGuiBuild = Allocate<PImGuiBuild>();
-	globalValues.GUIBuild = _imGuiBuild.GetRawPointer();
+void PDX12JGGui::Destroy()
+{
+	_srvDescriptorHeap.Reset(); _srvDescriptorHeap = nullptr;
+	_commandList.Reset(); _commandList = nullptr;
+	_commandAlloc.Reset(); _commandAlloc = nullptr;
+	ImGui_ImplDX12_Shutdown();
+
+#ifdef _PLATFORM_WINDOWS
+	ImGui_ImplWin32_Shutdown();
+#endif
+	ImGui::DestroyContext();
 }
 
 uint64 PDX12JGGui::GPUAllocate(TextureID textureID)
 {
 	return (uint64)ConvertImGuiTextureID(textureID);
-}
-
-IGUIBuild* PDX12JGGui::GetGUIBuild() const
-{
-	return _imGuiBuild.GetRawPointer();
 }
 
 ImTextureID PDX12JGGui::ConvertImGuiTextureID(TextureID id)
@@ -113,7 +113,6 @@ void PDX12JGGui::NewFrame()
 	ImGui_ImplWin32_NewFrame();
 #endif
 	ImGui::NewFrame();
-
 
 	ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
 	ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
@@ -140,9 +139,6 @@ void PDX12JGGui::NewFrame()
 	}
 
 	ImGui::End();
-
-	_imGuiBuild->Build();
-	_imGuiBuild->Reset();
 }
 
 void PDX12JGGui::OnUpdate(HDX12CommandList* cmdList, HDX12Resource* backBuffer, D3D12_CPU_DESCRIPTOR_HANDLE rtv, D3D12_RESOURCE_STATES& outState)
@@ -171,8 +167,6 @@ void PDX12JGGui::OnPresent()
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault(NULL, (void*)_commandList.Get());
 	}
-
-
 }
 
 void PDX12JGGui::OnResize(uint32 inWidth, uint32 inHeight)

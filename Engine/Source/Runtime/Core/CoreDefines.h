@@ -172,7 +172,6 @@ enum
 
 #define JG_MEMBER_FUNC_BIND(funcName) std::bind(this, &##funcName)
 
-
 #if _DEVELOPENGINE
 #define JG_CONFIGURATIONS_NAME "DevelopEngine"
 #elif _DEVELOPGAME

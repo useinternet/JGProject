@@ -538,7 +538,7 @@ class GMemoryGlobalSystem : public GGlobalSystemInstance<GMemoryGlobalSystem>
 	int32 _processBlockCountPerFrame;
 
 public:
-	GMemoryGlobalSystem(int32 processBlockCountPerFrame = 1000);
+	GMemoryGlobalSystem(int32 processBlockCountPerFrame = 10240);
 	virtual ~GMemoryGlobalSystem();
 
 protected:

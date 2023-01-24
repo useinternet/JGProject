@@ -1,12 +1,11 @@
 #include "PCH/PCH.h"
 #include "GUI.h"
 #include "Builder/GUIBuilder.h"
-#include "imgui/imgui.h"
 
 void GGUIGlobalSystem::Start()
 {
 	_memObject = Allocate<IMemoryObject>();
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::BuildGUI));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::Build));
 }
 
 void GGUIGlobalSystem::Destroy()
@@ -14,7 +13,17 @@ void GGUIGlobalSystem::Destroy()
 	_memObject = nullptr;
 }
 
-void GGUIGlobalSystem::BuildGUI(const PTaskArguments& args)
+void GGUIGlobalSystem::Build(const PTaskArguments& args)
+{
+	BuildGUI();
+	BuildMenu();
+	BuildContextMenu();
+
+	_guiBuild->Build();
+	_guiBuild->Reset();
+}
+
+void GGUIGlobalSystem::BuildGUI()
 {
 	HGUIBuilder guiBuilder;
 
@@ -29,5 +38,23 @@ void GGUIGlobalSystem::BuildGUI(const PTaskArguments& args)
 		guiBuilder.EndWidget();
 	}
 
-	guiBuilder.Build();
+	_guiBuild->PushData(guiBuilder.GetCommandQueue());
+}
+
+void GGUIGlobalSystem::BuildMenu()
+{
+}
+
+void GGUIGlobalSystem::BuildContextMenu()
+{
+}
+
+void GGUIGlobalSystem::SetGUIBuild(PSharedPtr<IGUIBuild> guiBuild)
+{
+	_guiBuild = guiBuild;
+}
+
+PSharedPtr<IGUIBuild> GGUIGlobalSystem::GetGUIBuild() const
+{
+	return _guiBuild;
 }

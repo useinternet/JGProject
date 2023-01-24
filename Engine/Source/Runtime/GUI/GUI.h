@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Widget.h"
 
+class IGUIBuild;
 class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 {
 	PSharedPtr<IMemoryObject> _memObject;
@@ -9,14 +10,22 @@ class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 	HHashMap<HGuid, PSharedPtr<WWidget>> _widgetPool;
 	HHashMap<PName,  HGuid> _widgetGuidRedirectByName;
 	HHashMap<JGType, HGuid> _widgetGuidRedirectByType;
-
 	HHashMap<HGuid, PSharedPtr<WWidget>> _openWidgets;
+
+	PSharedPtr<IGUIBuild> _guiBuild;
+
 protected:
 	virtual void Start() override;
 	virtual void Destroy() override;
+	void Build(const PTaskArguments& args);
+	void BuildGUI();
+	void BuildMenu();
+	void BuildContextMenu();
 
-	void BuildGUI(const PTaskArguments& args);
 public:
+	void SetGUIBuild(PSharedPtr<IGUIBuild> guiBuild);
+	PSharedPtr<IGUIBuild> GetGUIBuild() const;
+
 	template<class T>
 	PSharedPtr<T> OpenWidget(PName widgetKeyName = NAME_NONE)
 	{

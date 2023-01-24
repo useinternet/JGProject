@@ -14,7 +14,9 @@
     "ThirdPartyDirectory": "../../Source/ThirdParty",
     "BuildScriptTemplatePath": "../../Source/Programs/JGBuildTool/Template/BuildTemplate.lua",
     "Defines": [
-       "_PLATFORM_WINDOWS", "_DIRECTX12"
+      "_PLATFORM_WINDOWS",
+      "_DIRECTX12",
+      "_JGPROJECT"
     ],
     "DevelopEngine": {
       "Defines": [ "_DEVELOPENGINE" ]

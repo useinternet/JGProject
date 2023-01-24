@@ -99,7 +99,7 @@ PSharedPtr<PCommandList> PCommandQueue::RequestCommandList(ECommandListType comm
 	commandID = 16777619U * (uint64)commandListType ^ commandID;
 
 	PSharedPtr<PCommandList> result = nullptr;
-	if (_excuteCmdLists.find(commandID) == _excuteCmdLists.end())
+	if (_excuteCmdLists[priority].find(commandID) == _excuteCmdLists[priority].end())
 	{
 		_excuteCmdLists[priority][commandID] = CreateCommandList(commandListType);
 		_excutePendingCmdLists[priority][commandID] = CreateCommandList(commandListType);

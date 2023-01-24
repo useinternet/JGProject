@@ -19,7 +19,7 @@ public:
 	bool operator!=(const HGuid& inGuid) const;
 
 	const PString& ToString() const;
-
+	uint64 GetHashCode() const;
 	static HGuid New();
 };
 

@@ -10,12 +10,6 @@
 #include "DirectX12/DX12Texture.h"
 #include "DirectX12/DX12JGGui.h"
 
-PDirectX12API::~PDirectX12API()
-{
-	_commandQueue->Flush();
-	_gui.Reset();
-}
-
 void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 {
 	JG_LOG(Graphics, ELogLevel::Trace, "DirectX12 Init Start");
@@ -66,9 +60,17 @@ void PDirectX12API::Initialize(const HJGGraphicsArguments& args)
 	_frameBuffer->Initialize(frameBufferInfo);
 	
 	_gui = Allocate<PDX12JGGui>();
+	_gui->Create();
 
 	GCoreSystem::GetGlobalValues().GraphicsAPI = this;
 	JG_LOG(Graphics, ELogLevel::Trace, "DirectX12 Init End");
+}
+
+void PDirectX12API::Destroy()
+{
+	_commandQueue->Flush();
+	_gui->Destroy();
+	_gui.Reset();
 }
 
 void PDirectX12API::BeginFrame()

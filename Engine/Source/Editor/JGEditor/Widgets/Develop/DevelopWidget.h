@@ -2,10 +2,10 @@
 #include "Widget.h"
 
 
-
+class WText;
 class WDevelopWidget : public WWidget
 {
-
+	PSharedPtr<WText> TestText;
 public:
 	WDevelopWidget() = default;
 	virtual ~WDevelopWidget() = default;

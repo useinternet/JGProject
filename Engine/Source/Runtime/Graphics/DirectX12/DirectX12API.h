@@ -42,10 +42,11 @@ class PDirectX12API : public PJGGraphicsAPI
 	HJGGraphicsArguments _arguments;
 	bool _bIsSupportedRayTracing;
 public:
-	virtual ~PDirectX12API();
+	virtual ~PDirectX12API() = default;
 
 protected:
 	virtual void Initialize(const HJGGraphicsArguments& args) override;
+	virtual void Destroy() override;
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 public:

@@ -98,9 +98,6 @@ public:
 		BeginWidget,
 		EndWidget,
 		PushWidgetComponent,
-		Separator,
-		Text,
-		Button,
 	};
 
 	class PCommandValue : public IMemoryObject
@@ -115,10 +112,10 @@ public:
 		PSharedPtr<PCommandValue> CommandValue;
 	};
 
-	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PTextCommandValue, PString, Text);
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetCommandValue, PSharedPtr<WWidget>, Widget);
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PWidgetComponentCommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent);
-	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PButtonCommandValue, PString, Label, HVector2, Size);
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PHorizontalCommandValue, int32, FixedWidth);
+	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PVerticalCommandValue, int32, FixedHeight);
 
 public:
 	void BeginHorizontal(int32 fixedWidth = INDEX_NONE);
@@ -128,15 +125,13 @@ public:
 	void EndVertical();
 
 	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
-	void Text(const PString& inText);
-	void Button(const PString& inLabel, const HVector2& inSize = HVector2());
 private:
 	void BeginWidget(PSharedPtr<WWidget> inWidget);
 	void EndWidget();
 
 private:
 	friend class GGUIGlobalSystem;
-	void Build();
+	const HQueue<HCommandData>& GetCommandQueue() const;
 
 private:
 	HQueue<HCommandData> _commandQueue;

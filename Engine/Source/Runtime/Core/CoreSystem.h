@@ -35,7 +35,6 @@ struct HCoreSystemGlobalValues
 {
 	PJGGraphicsAPI* GraphicsAPI;
 	PJWindow*		MainWindow;
-	IGUIBuild*		GUIBuild;
 	HSTLSharedPtr<HWindowCallBacks> WindowCallBacks;
 	
 	HCoreSystemGlobalValues();

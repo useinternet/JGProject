@@ -74,16 +74,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGBuildTool/", {"_JGBUILDTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "JGConsole"
@@ -92,16 +92,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGConsole/", {"_JGCONSOLE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "JGHeaderTool"
@@ -110,16 +110,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGHeaderTool/", {"_JGHEADERTOOL", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "JGLauncher"
@@ -128,35 +128,35 @@ workspace "JGEngine"
 				SetCPPProjectConfig("ConsoleApp", "Source/Programs/JGLauncher/", {"_JGLAUNCHER", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 		group "Engine/Editor"
 			project "JGEditor"
-				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/ThirdParty/imgui/", "Source/Runtime/GUI/", }
-				links{ "Core", "GameFrameWorks", "Graphics", "imgui", "GUI", }
+				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
+				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }
 				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 		group "Engine/Runtime"
@@ -166,16 +166,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "Core"
@@ -184,16 +184,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/Core/", {"_CORE", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "Game"
@@ -202,16 +202,16 @@ workspace "JGEngine"
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/Game/", {"_GAME", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "GameFrameWorks"
@@ -220,71 +220,52 @@ workspace "JGEngine"
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/GameFrameWorks/", {"_GAMEFRAMEWORKS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "Graphics"
-				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", "Source/Runtime/GUI/", }
-				links{ "Core", "imgui", "GUI", }
+				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GUI/", }
+				links{ "Core", "GUI", }
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 			project "GUI"
-				includedirs{ "Source/Runtime/GUI/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/ThirdParty/imgui/", }
-				links{ "Core", "imgui", }
+				includedirs{ "Source/Runtime/GUI/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
+				links{ "Core", }
 				SetCPPProjectConfig("StaticLib", "Source/Runtime/GUI/", {})
 				filter "configurations:DevelopEngine"
 					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
-
-
-		group "Engine/ThirdParty"
-			project "imgui"
-				includedirs{ "Source/ThirdParty/imgui/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
-				links{ "Core", }
-				SetCPPProjectConfig("StaticLib", "Source/ThirdParty/imgui/", {"_IMGUI", })
-				filter "configurations:DevelopEngine"
-					DebugConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPENGINE", }
-				filter "configurations:DevelopGame"
-					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_DEVELOPGAME", }
-				filter "configurations:ConfirmGame"
-					ConfirmConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_CONFIRMGAME", }
-				filter "configurations:ReleaseGame"
-					ReleaseConfig()
-					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_RELEASEGAME", }
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
 
 
 

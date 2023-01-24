@@ -31,10 +31,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameFrameWorks", "Temp\Proj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "Temp\ProjectFiles\Graphics.vcxproj", "{1653CE33-0220-293F-2B39-17E717655ECD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{FCECD00F-6824-19A7-712E-7DCADDE43FA0}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "Temp\ProjectFiles\imgui.vcxproj", "{0098A80F-6CAC-D0C0-352E-7420A101CDF1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ConfirmGame|x64 = ConfirmGame|x64
@@ -131,14 +127,6 @@ Global
 		{1653CE33-0220-293F-2B39-17E717655ECD}.DevelopGame|x64.Build.0 = DevelopGame|x64
 		{1653CE33-0220-293F-2B39-17E717655ECD}.ReleaseGame|x64.ActiveCfg = ReleaseGame|x64
 		{1653CE33-0220-293F-2B39-17E717655ECD}.ReleaseGame|x64.Build.0 = ReleaseGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.ConfirmGame|x64.ActiveCfg = ConfirmGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.ConfirmGame|x64.Build.0 = ConfirmGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.DevelopEngine|x64.ActiveCfg = DevelopEngine|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.DevelopEngine|x64.Build.0 = DevelopEngine|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.DevelopGame|x64.ActiveCfg = DevelopGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.DevelopGame|x64.Build.0 = DevelopGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.ReleaseGame|x64.ActiveCfg = ReleaseGame|x64
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1}.ReleaseGame|x64.Build.0 = ReleaseGame|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,7 +146,5 @@ Global
 		{7FA9857C-6BE0-860D-14CD-6C1000E3020F} = {B5B85984-A147-E34D-4A66-F74836D4F3F3}
 		{C089343B-AC57-2841-95EB-9867815804A6} = {B5B85984-A147-E34D-4A66-F74836D4F3F3}
 		{1653CE33-0220-293F-2B39-17E717655ECD} = {B5B85984-A147-E34D-4A66-F74836D4F3F3}
-		{FCECD00F-6824-19A7-712E-7DCADDE43FA0} = {8249BEE1-6EAC-4D86-1732-863C03741909}
-		{0098A80F-6CAC-D0C0-352E-7420A101CDF1} = {FCECD00F-6824-19A7-712E-7DCADDE43FA0}
 	EndGlobalSection
 EndGlobal

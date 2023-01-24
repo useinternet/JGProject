@@ -85,6 +85,11 @@ const PString& HGuid::ToString() const
 	return _dataStr;
 }
 
+uint64 HGuid::GetHashCode() const
+{
+	return HPlatform::GuidHash(*this);
+}
+
 HGuid HGuid::New()
 {
 	return HPlatform::NewGuid();

@@ -1,33 +1,21 @@
-[:27552:][info][Core]: Active Thread: [2957538677]
-[:27552:][info][Core]: Active Thread: [2128092547]
-[:27552:][info][Core]: Active Thread: [3107805762]
-[:27552:][info][Core]: Active Thread: [585163098]
-[:27552:][info][Core]: Active Thread: [3938636666]
-[:27552:][info][Core]: Active Thread: [3638128583]
-[:27552:][info][Core]: Active Thread: [2098696955]
-[:27552:][info][Core]: Active Thread: [1321828977]
-[:27552:][info][Core]: Active Thread: [92827144]
-[:27552:][info][Core]: Active Thread: [197146501]
-[:27552:][info][Core]: Active Thread: [378637431]
-[:27552:][info][Core]: Active Thread: [3461963727]
-[:27552:][info][Core]: Active Thread: [2009884091]
-[:27552:][info][Core]: Active Thread: [44529423]
-[:27552:][info][Core]: Active Thread: [2172159848]
-[:27552:][info][Core]: Active Thread: [458600313]
-[:27552:][info][Core]: Active Thread: [3888721551]
-[:27552:][info][Core]: Active Thread: [2421944119]
-[:27552:][info][Core]: Active Thread: [1802312781]
-[:27552:][info][Core]: Active Thread: [2351483394]
-[:27552:][info][Core]: Active Thread Totoal Count: 20 
-[:27552:][trace][Graphics]: DirectX12 Init Start
-[:27552:][trace][Graphics]: Success Create D3D12Device
-[:27552:][info][Graphics]: Description : NVIDIA GeForce RTX 3080
-[:27552:][info][Graphics]: VideoMemory : 10078  MB
-[:27552:][trace][Graphics]: Create DescriptorAllocator...
-[:27552:][trace][Graphics]: Create CommandQueue...
-[:27552:][trace][Graphics]: Create FrameBuffer...
-[:27552:][trace][Graphics]: DirectX12 Init End
-[:27552:][trace][Graphics]: Startup Graphics Module...
-[:27552:][trace][JGEditor]: Startup JGEditor Module...
-[:27552:][trace][JGEditor]: Shutdown JGEditor Module...
-[:27552:][trace][Graphics]: Shutdown Graphics Module...
+[:18520:][info][Core]: Active Thread: [1180751005]
+[:18520:][info][Core]: Active Thread: [995579645]
+[:18520:][info][Core]: Active Thread: [22522941]
+[:18520:][info][Core]: Active Thread: [2440452780]
+[:18520:][info][Core]: Active Thread: [2363492066]
+[:18520:][info][Core]: Active Thread: [3603380830]
+[:18520:][info][Core]: Active Thread: [2683893584]
+[:18520:][info][Core]: Active Thread: [2336785598]
+[:18520:][info][Core]: Active Thread Totoal Count: 8 
+[:18520:][trace][Graphics]: DirectX12 Init Start
+[:18520:][trace][Graphics]: Success Create D3D12Device
+[:18520:][info][Graphics]: Description : Intel(R) Iris(R) Xe Graphics
+[:18520:][info][Graphics]: VideoMemory : 128  MB
+[:18520:][trace][Graphics]: Create DescriptorAllocator...
+[:18520:][trace][Graphics]: Create CommandQueue...
+[:18520:][trace][Graphics]: Create FrameBuffer...
+[:18520:][trace][Graphics]: DirectX12 Init End
+[:18520:][trace][Graphics]: Startup Graphics Module...
+[:18520:][trace][JGEditor]: Startup JGEditor Module...
+[:18520:][trace][Graphics]: Shutdown Graphics Module...
+[:18520:][trace][JGEditor]: Shutdown JGEditor Module...

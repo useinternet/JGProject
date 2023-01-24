@@ -1,7 +1,7 @@
 {
   "ModuleInfo": {
     "ModuleFormat": "SharedLib",
-    "ModuleDependencies": [ "Core","imgui", "GUI" ],
+    "ModuleDependencies": [ "Core", "GUI" ],
     "ModuleName": "Graphics",
     "ModulePath": "Source/Runtime/Graphics/",
     "Defines": [

@@ -49,6 +49,7 @@ void HJGGraphicsModule::StartupModule()
 
 void HJGGraphicsModule::ShutdownModule()
 {
+	_graphicsAPI->Destroy();
 	_graphicsAPI = nullptr;
 
 	JG_LOG(Graphics, ELogLevel::Trace, "Shutdown Graphics Module...");
