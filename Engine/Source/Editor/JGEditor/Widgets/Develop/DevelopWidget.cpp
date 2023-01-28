@@ -1,20 +1,24 @@
 #include "PCH/PCH.h"
 #include "DevelopWidget.h"
 #include "WidgetComponents/Text.h"
+#include "WidgetComponents/InputText.h"
+#include "WidgetComponents/InputScalar.h"
+#include "WidgetComponents/Button.h"
 
 void WDevelopWidget::OnOpen()
 {
 	TestText = Allocate<WText>();
-	TestText->Text.SetValue(PString("TestTest1234566"));
+	TestText->Text.SetValue(PString("Test Element"));
 }
 
 void WDevelopWidget::OnClose()
 {
+
 }
 
 void WDevelopWidget::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushWidgetComponent(TestText);
+
 }
 
 void WDevelopWidget::OnMenuBuild(HMenuBuilder& inBuilder)

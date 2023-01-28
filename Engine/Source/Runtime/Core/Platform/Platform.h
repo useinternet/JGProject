@@ -4,6 +4,8 @@
 #include "String/String.h"
 
 
+enum class EKeyCode;
+
 template<class ReturnType, class ...Args>
 class HPlatformFunction
 {
@@ -69,4 +71,7 @@ public:
 	static PSharedPtr<PJWindow> CreateJWindow(const HJWindowArguments& args);
 	static HGuid  NewGuid();
 	static uint64 GuidHash(const HGuid& hash);
+
+	static int32    GetSystemKeyCode(EKeyCode inKeyCode);
+	static EKeyCode GetKeyCode(int32 inSystemKeyCode)
 };

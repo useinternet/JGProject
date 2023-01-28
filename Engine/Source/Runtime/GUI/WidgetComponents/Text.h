@@ -3,7 +3,6 @@
 
 class WText : public WWidgetComponent
 {
-
 public:
 	HAttribute<PString> Text;
 

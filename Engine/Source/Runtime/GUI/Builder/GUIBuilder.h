@@ -125,13 +125,12 @@ public:
 	void EndVertical();
 
 	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
-private:
-	void BeginWidget(PSharedPtr<WWidget> inWidget);
-	void EndWidget();
 
+	const HQueue<HCommandData>& GetCommandQueue() const;
 private:
 	friend class GGUIGlobalSystem;
-	const HQueue<HCommandData>& GetCommandQueue() const;
+	void BeginWidget(PSharedPtr<WWidget> inWidget);
+	void EndWidget();
 
 private:
 	HQueue<HCommandData> _commandQueue;

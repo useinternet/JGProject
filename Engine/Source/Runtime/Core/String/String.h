@@ -126,6 +126,7 @@ public:
 	void Resize(uint64 size);
 public:
 	char GetChar(uint64 index) const;
+	char* GetCStr();
 	const char* GetCStr() const;
 	const HRawString& GetRawString() const;
 	HRawWString GetRawWString() const;

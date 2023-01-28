@@ -352,9 +352,14 @@ void PString::Resize(uint64 size)
 	updateHashCode();
 }
 
+char* PString::GetCStr()
+{
+	return _rawString.data();
+}
+
 const char* PString::GetCStr() const
 {
-	return GetRawString().c_str();
+	return _rawString.c_str();
 }
 
 const HRawString& PString::GetRawString() const
