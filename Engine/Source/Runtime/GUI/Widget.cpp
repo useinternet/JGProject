@@ -16,6 +16,27 @@ const HGuid& WWidget::GetGuid() const
 	return _widgetGuid;
 }
 
+void WWidget::SetWidgetFlags(EWidgetFlags flags)
+{
+
+}
+
+void WWidget::AddWidgetFlags(EWidgetFlags flags)
+{
+
+}
+
+void WWidget::RemoveWidgetFlags(EWidgetFlags flags)
+{
+
+}
+
+EWidgetFlags WWidget::GetWidgetFlags() const
+{
+
+}
+
+
 void WWidget::Construct()
 {
 	_bIsOpen    = false;

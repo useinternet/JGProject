@@ -18,7 +18,7 @@ void WDevelopWidget::OnClose()
 
 void WDevelopWidget::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-
+	inBuilder.PushWidgetComponent(TestText);
 }
 
 void WDevelopWidget::OnMenuBuild(HMenuBuilder& inBuilder)

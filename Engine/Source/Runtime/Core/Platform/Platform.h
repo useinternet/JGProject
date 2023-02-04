@@ -73,5 +73,4 @@ public:
 	static uint64 GuidHash(const HGuid& hash);
 
 	static int32    GetSystemKeyCode(EKeyCode inKeyCode);
-	static EKeyCode GetKeyCode(int32 inSystemKeyCode)
 };

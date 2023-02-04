@@ -1,4 +1,12 @@
 #pragma once
+#include "CoreDefines.h"
+
+JG_ENUM_FLAG(EWidgetFlags)
+enum class EWidgetFlags
+{
+	None,
+	ChildWidget,
+};
 
 enum class EWidgetVisibility
 {
@@ -6,28 +14,45 @@ enum class EWidgetVisibility
 	Hide,
 };
 
-enum class EReply
+enum class EGUIEvent
 {
-	Handled,
-	UnHandled,
+	None,
+	MouseMove,
+	MouseHover,
+	MouseEnter,
+	MouseLeave,
+	MouseLButtonDown,
+	MouseRButtonDown,
+	MouseMButtonDown,
+	MouseLButtonUp,
+	MouseRButtonUp,
+	MouseMButtonUp,
+	MouseLButtonClick,
+	MouseRButtonClick,
+	MouseMButtonClick,
+	MouseLDoubleClick,
+	MouseRDoubleClick,
+	MouseMDoubleClick,
+	Count,
 };
 
 class IGUIEventReceiver
 {
 public:
-	virtual EReply OnMouseMove() = 0;
-	virtual EReply OnMouseHover() = 0;
-	virtual EReply OnMouseLeave() = 0;
-	virtual EReply OnMouseLButtonDown() = 0;
-	virtual EReply OnMouseRButtonDown() = 0;
-	virtual EReply OnMouseMButtonDown() = 0;
-	virtual EReply OnMouseLButtonUp() = 0;
-	virtual EReply OnMouseRButtonUp() = 0;
-	virtual EReply OnMouseMButtonUp() = 0;
-	virtual EReply OnMouseLButtonClick() = 0;
-	virtual EReply OnMouseRButtonClick() = 0;
-	virtual EReply OnMouseMButtonClick() = 0;
-	virtual EReply OnMouseLButtonDoubleClick() = 0;
-	virtual EReply OnMouseRButtonDoubleClick() = 0;
-	virtual EReply OnMouseMButtonDoubleClick() = 0;
+	virtual void OnMouseMove() = 0;
+	virtual void OnMouseHover() = 0;
+	virtual void OnMouseEnter() = 0;
+	virtual void OnMouseLeave() = 0;
+	virtual void OnMouseLButtonDown() = 0;
+	virtual void OnMouseRButtonDown() = 0;
+	virtual void OnMouseMButtonDown() = 0;
+	virtual void OnMouseLButtonUp() = 0;
+	virtual void OnMouseRButtonUp() = 0;
+	virtual void OnMouseMButtonUp() = 0;
+	virtual void OnMouseLButtonClick() = 0;
+	virtual void OnMouseRButtonClick() = 0;
+	virtual void OnMouseMButtonClick() = 0;
+	virtual void OnMouseLButtonDoubleClick() = 0;
+	virtual void OnMouseRButtonDoubleClick() = 0;
+	virtual void OnMouseMButtonDoubleClick() = 0;
 };

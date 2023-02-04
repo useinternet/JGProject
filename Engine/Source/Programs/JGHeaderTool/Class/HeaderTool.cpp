@@ -739,14 +739,14 @@ bool PHeaderTool::generateCodeGenFiles()
 
 	for (const HHeaderInfo& headerInfo : _engineHeaderInfos)
 	{
-		if (headerInfo.Classes.empty() == true)
+		if (headerInfo.Classes.empty() == true && headerInfo.Enums.empty() == true)
 		{
 			continue;
 		}
 
 		if (headerInfo.Classes.size() > 1)
 		{
-			// Error Log
+			JG_LOG(HeaderTool, ELogLevel::Error, "Exceed Class 1 Count in HeaderFile");
 			continue;
 		}
 
@@ -791,7 +791,11 @@ bool PHeaderTool::generateCodeGenFiles()
 			continue;
 		}
 
-		collectedClassQueue.push(&(headerInfo.Classes[0]));
+		for (const HClass& Class : headerInfo.Classes)
+		{
+			collectedClassQueue.push(&Class);
+		}
+		
 		for (const HEnum& Enum : headerInfo.Enums)
 		{
 			collectedEnumQueue.push(&Enum);
@@ -834,7 +838,7 @@ bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo,
 
 	if (headerInfo.Classes.empty())
 	{
-		return false;
+		return true;
 	}
 
 	const HClass& targetClass = headerInfo.Classes[0];
@@ -911,6 +915,10 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 	}
 
 	outCode->Reset();
+	outCode->AppendLine("#include \"PCH/PCH.h\"");
+	outCode->AppendLine("#include \"Core.h\"");
+	outCode->AppendLine(PString::Format("#include \"%s\"", headerInfo.LocalRelativePath));
+	outCode->AppendLine("").AppendLine("");
 
 	for (const HClass& Class : headerInfo.Classes)
 	{
@@ -1045,8 +1053,6 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 			funcCode.AppendLine(propertyCode).AppendLine("");
 		}
 
-
-
 		for (const HFunction& function : Class.Functions)
 		{
 			funcCode.AppendLine(PString::Format("\tif(Class->HasFunction(PName(\"%s\")) == true)", function.Name));
@@ -1083,24 +1089,20 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 		funcCode.AppendLine("\treturn Class;");
 
-		outCode->AppendLine("#include \"PCH/PCH.h\"");
-		outCode->AppendLine("#include \"Core.h\"");
-		outCode->AppendLine(PString::Format("#include \"%s\"", Class.OwnerHeaderInfo->LocalRelativePath)).AppendLine("");
-		outCode->AppendLine("");
 		outCode->AppendLine(codeGenStaticCreateFuncName).AppendLine("{").AppendLine(staticFuncCode).AppendLine("}\n");
 		outCode->AppendLine(codeGenCreateFuncName).AppendLine("{").AppendLine(funcCode).AppendLine("}\n");
+	}
 
+	for (const HEnum& Enum : headerInfo.Enums)
+	{
+		PString codeGenStaticCreateFuncName;
+		Enum.GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
 
-		for (const HEnum& Enum : headerInfo.Enums)
-		{
-			PString codeGenStaticCreateFuncName;
-			Enum.GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
-
-			uint64 elementCnt = Enum.Elements.size();
-			PString staticFuncCode;
-			staticFuncCode.AppendLine(codeGenStaticCreateFuncName);
-			staticFuncCode.AppendLine("{");
-			staticFuncCode.AppendLine(PString::Format(R"(
+		uint64 elementCnt = Enum.Elements.size();
+		PString staticFuncCode;
+		staticFuncCode.AppendLine(codeGenStaticCreateFuncName);
+		staticFuncCode.AppendLine("{");
+		staticFuncCode.AppendLine(PString::Format(R"(
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
 
@@ -1108,42 +1110,38 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 	MetaList.resize(%d);
 	EnumStringList.resize(%d);
 )", elementCnt, elementCnt));
-			
-			for (uint64 i = 0; i < elementCnt; ++i)
+
+		for (uint64 i = 0; i < elementCnt; ++i)
+		{
+
+			staticFuncCode.AppendLine(PString::Format("    EnumStringList[%d] = \"%s\";", i, Enum.Elements[i].Name));
+
+
+			PString metaElementStr;
+			for (const HPair<PString, HHashSet<PString>>& pair : Enum.Elements[i].MetaData.Metas)
 			{
-
-				staticFuncCode.AppendLine(PString::Format("    EnumStringList[%d] = \"%s\";", i, Enum.Elements[i].Name));
-				
-
-				PString metaElementStr;
-				for (const HPair<PString, HHashSet<PString>>& pair : Enum.Elements[i].MetaData.Metas)
+				PString keyStr = PString::Format("\"%s\"", pair.first);
+				PString valueStr = "{";
+				for (const PString& value : pair.second)
 				{
-					PString keyStr = PString::Format("\"%s\"", pair.first);
-					PString valueStr = "{";
-					for (const PString& value : pair.second)
-					{
-						valueStr.Append("PName(\"").Append(value).Append("\"),");
-					}
-					valueStr.Append("}");
-
-					metaElementStr.AppendLine(PString::Format("            HPair<PName, HHashSet<PName>>(%s, %s),", keyStr, valueStr));
+					valueStr.Append("PName(\"").Append(value).Append("\"),");
 				}
-				PString metaStr = PString::Format(R"(
+				valueStr.Append("}");
+
+				metaElementStr.AppendLine(PString::Format("            HPair<PName, HHashSet<PName>>(%s, %s),", keyStr, valueStr));
+			}
+			PString metaStr = PString::Format(R"(
 
 	MetaList[%d] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
 	{
 %s
 	});
 )", i, metaElementStr);
-				staticFuncCode.AppendLine(metaStr);
-			}
-			staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(%s), \"%s\", EnumStringList ,MetaList);", Enum.Name, Enum.Name));
-			staticFuncCode.AppendLine("}");
-			outCode->AppendLine(staticFuncCode).AppendLine("");
+			staticFuncCode.AppendLine(metaStr);
 		}
-
-
-		return true;
+		staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(%s), \"%s\", EnumStringList ,MetaList);", Enum.Name, Enum.Name));
+		staticFuncCode.AppendLine("}");
+		outCode->AppendLine(staticFuncCode).AppendLine("");
 	}
 
 	return true;
@@ -1214,8 +1212,6 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 		PString onlyCodeGenStaticFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, "PSharedPtr<JGEnum> ", "");
 		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGEnum(%s);", onlyCodeGenStaticFuncName));
 	}
-
-
 
 	outCode->AppendLine(newCodeIncludeBody).AppendLine("");
 	outCode->AppendLine("CODEGEN_API bool Engine_CodeGenerate(GObjectGlobalSystem* objectGlobalSystem)");

@@ -96,71 +96,114 @@ int32 HPlatform::GetSystemKeyCode(EKeyCode keyCode)
 {
 	switch (keyCode)
 	{
-		
+	case EKeyCode::A:	return 0x41;
+	case EKeyCode::B:	return 0x42;
+	case EKeyCode::C:	return 0x43;
+	case EKeyCode::D:	return 0x44;
+	case EKeyCode::E:	return 0x45;
+	case EKeyCode::F:	return 0x46;
+	case EKeyCode::G:	return 0x47;
+	case EKeyCode::H:	return 0x48;
+	case EKeyCode::I:	return 0x49;
+	case EKeyCode::J:   return 0x4A;
+	case EKeyCode::K:	return 0x4B;
+	case EKeyCode::L:	return 0x4C;
+	case EKeyCode::M:	return 0x4D;
+	case EKeyCode::N:	return 0x4E;
+	case EKeyCode::O:	return 0x4F;
+	case EKeyCode::P:	return 0x50;
+	case EKeyCode::Q:	return 0x51;
+	case EKeyCode::R:	return 0x52;
+	case EKeyCode::S:	return 0x53;
+	case EKeyCode::T:	return 0x54;
+	case EKeyCode::U:	return 0x55;
+	case EKeyCode::V:	return 0x56;
+	case EKeyCode::W:	return 0x57;
+	case EKeyCode::X:	return 0x58;
+	case EKeyCode::Y:	return 0x59;
+	case EKeyCode::Z:	return 0x5A;
+	case EKeyCode::Num0: return 0x30;
+	case EKeyCode::Num1: return 0x31;
+	case EKeyCode::Num2: return 0x32;
+	case EKeyCode::Num3: return 0x33;
+	case EKeyCode::Num4: return 0x34;
+	case EKeyCode::Num5: return 0x35;
+	case EKeyCode::Num6: return 0x36;
+	case EKeyCode::Num7: return 0x37;
+	case EKeyCode::Num8: return 0x38;
+	case EKeyCode::Num9: return 0x39;
+	case EKeyCode::NumPad0: return 0x60;
+	case EKeyCode::NumPad1: return 0x61;
+	case EKeyCode::NumPad2:	return 0x62;
+	case EKeyCode::NumPad3:	return 0x63;
+	case EKeyCode::NumPad4:	return 0x64;
+	case EKeyCode::NumPad5:	return 0x65;
+	case EKeyCode::NumPad6:	return 0x66;
+	case EKeyCode::NumPad7:	return 0x67;
+	case EKeyCode::NumPad8:	return 0x68;
+	case EKeyCode::NumPad9:	return 0x69;
+
+	case EKeyCode::NumPadAdd:		return VK_ADD;
+	case EKeyCode::NumPadMultiply:	return VK_MULTIPLY;
+	case EKeyCode::NumPadSubtract:	return VK_SUBTRACT;
+	case EKeyCode::NumPadDemical:	return VK_DECIMAL;
+	case EKeyCode::NumPadDivide:	return VK_DIVIDE;
+	case EKeyCode::NumLock:			return VK_NUMLOCK;
+
+	case EKeyCode::F1:  return 0x70;
+	case EKeyCode::F2:  return 0x71;
+	case EKeyCode::F3:  return 0x72;
+	case EKeyCode::F4:  return 0x73;
+	case EKeyCode::F5:  return 0x74;
+	case EKeyCode::F6:  return 0x75;
+	case EKeyCode::F7:  return 0x76;
+	case EKeyCode::F8:  return 0x77;
+	case EKeyCode::F9:  return 0x78;
+	case EKeyCode::F10: return 0x79;
+	case EKeyCode::F11: return 0x7A;
+	case EKeyCode::F12: return 0x7B;
+
+	case EKeyCode::Left:  return VK_LEFT;
+	case EKeyCode::Right: return VK_RIGHT;
+	case EKeyCode::Up:	  return VK_UP;
+	case EKeyCode::Down:  return VK_DOWN;
+
+	case EKeyCode::LeftBracket:		return VK_OEM_4;
+	case EKeyCode::RightBracket:	return VK_OEM_6;
+	case EKeyCode::Semicolon:		return VK_OEM_1;
+	case EKeyCode::QuotationMark:	return VK_OEM_7;
+	case EKeyCode::Comma:			return VK_OEM_COMMA;
+	case EKeyCode::Period:			return VK_OEM_PERIOD;
+	case EKeyCode::Slash:			return VK_OEM_2;
+
+	case EKeyCode::Del:				return VK_DELETE;
+	case EKeyCode::PgUp:			return VK_PRIOR;
+	case EKeyCode::PgDown:			return VK_NEXT;
+	case EKeyCode::End:				return VK_END;
+	case EKeyCode::Home:			return VK_HOME;
+	case EKeyCode::Insert:			return VK_INSERT;
+
+	case EKeyCode::Esc:				return VK_ESCAPE;
+	case EKeyCode::GraveAccent:		return VK_OEM_3;
+	case EKeyCode::Tab:				return VK_TAB;
+	case EKeyCode::CapsLock:		return VK_CAPITAL;
+
+	case EKeyCode::Plus:			return VK_OEM_PLUS;
+	case EKeyCode::Minus:			return VK_OEM_MINUS;
+	case EKeyCode::BackSpace:		return VK_BACK;
+	case EKeyCode::BackSlash:		return VK_OEM_5;
+	case EKeyCode::Enter:			return VK_RETURN;
+
+	case EKeyCode::Pause:			return VK_PAUSE;
+	case EKeyCode::ScrollLock:		return VK_SCROLL;
+	case EKeyCode::PrintScreen:		return VK_SNAPSHOT;
+
+	case EKeyCode::Space:			return VK_SPACE;
+
+	case EKeyCode::MouseLeftButton:	return VK_LBUTTON;
+	case EKeyCode::MouseRightButton:return VK_RBUTTON;
+	case EKeyCode::MouseMidButton:	return VK_MBUTTON;
 	}
-
+	
 	return 0;
-}
-
-EKeyCode HPlatform::GetKeyCode(int32 inSystemKeyCode)
-{
-	return EKeyCode::Unknown;
-
-
-	/*
-	* /*
-/*
-	enum class EKeyCode
-	{
-		Unknown = 0,
-		Num0 = 0x30, Num1 = 0x31, Num2 = 0x32, Num3 = 0x33, Num4 = 0x34,
-		Num5 = 0x35, Num6 = 0x36, Num7 = 0x37, Num8 = 0x38, Num9 = 0x39,
-		// 숫자 패드 키코드
-		NumPad0 = 0x60, NumPad1 = 0x61, NumPad2 = 0x62, NumPad3  = 0x63, NumPad4 = 0x64,
-		NumPad5 = 0x65, NumPad6 = 0x66, NumPad7 = 0x67, NumPad8 = 0x68, NumPad9 = 0x69,
-		// F 숫자 키코드
-		F1  = 0x70, F2  = 0x71, F3  = 0x72, F4  = 0x73, F5  = 0x74, F6  = 0x75,
-		F7  = 0x76, F8  = 0x77, F9  = 0x78, F10 = 0x79, F11 = 0x7A, F12 = 0x7B,
-		// 영어 키코드
-		A = 0x41, B = 0x42, C = 0x43, D = 0x44, E = 0x45,
-		F = 0x46, G = 0x47, H = 0x48, I = 0x49, J = 0x4A,
-		K = 0x4B, L = 0x4C, N = 0x4E, M = 0x4D, O = 0x4F,
-		P = 0x50, Q = 0x51, R = 0x52, S = 0x53, T = 0x54,
-		U = 0x55, V = 0x56, W = 0x57, X = 0x58, Y = 0x59,
-		Z = 0x5A,
-
-		BackSpace		= VK_BACK,      Tab				= VK_TAB,
-		Clear			= VK_CLEAR,     Enter			= VK_RETURN,
-		Shift			= VK_SHIFT,		Ctrl			= VK_CONTROL,
-		Alt				= VK_MENU,		Pause			= VK_PAUSE,
-		CapsLock		= VK_CAPITAL,	Esc				= VK_ESCAPE,
-		Space			= VK_SPACE,		PgUp			= VK_PRIOR,
-		PgDown			= VK_NEXT,		End				= VK_END,
-		Home			= VK_HOME,		Left			= VK_LEFT,
-		Up				= VK_UP,		Right			= VK_RIGHT,
-		Down            = VK_DOWN,		Select			= VK_SELECT,
-		Print			= VK_PRINT,		Execute			= VK_EXECUTE,
-		PrintScreen		= VK_SNAPSHOT,	Insert			= VK_INSERT,
-		Help			= VK_HELP,		NumPadAdd		= VK_ADD,
-		NumPadMultiply  = VK_MULTIPLY,	NumPadSubtract  = VK_SUBTRACT,
-		NumPadDemical   = VK_DECIMAL,	NumPadDivide	= VK_DIVIDE,
-		NumLock			= VK_NUMLOCK,	ScrollLock		= VK_SCROLL,
-		LeftShift	    = VK_LSHIFT,	RightShift		= VK_RSHIFT,
-		LeftCtrl		= VK_LCONTROL,	RightCtrl		= VK_RCONTROL,
-		LeftAlt			= VK_LMENU,		RightAlt		= VK_RMENU,
-		LeftBracket		= VK_OEM_4,		RightBracket	= VK_OEM_6,
-		BackSlash		= VK_OEM_5,		QuotationMark	= VK_OEM_7,
-		Semicolon		= VK_OEM_1,		Plus			= VK_OEM_PLUS,
-		Comma			= VK_OEM_COMMA,	Minus			= VK_OEM_MINUS,
-		Period			= VK_OEM_PERIOD,Slash			= VK_OEM_2,
-		GraveAccent		= VK_OEM_3,
-		Del = VK_DELETE,
-		MouseLeftButton  = VK_LBUTTON,
-		MouseRightButton = VK_RBUTTON,
-		MouseMidButton	 = VK_MBUTTON,
-		Mouse_X = 0x100,
-		Mouse_Y = 0x101,
-	};
-*/
-
 }

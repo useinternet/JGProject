@@ -9,6 +9,8 @@ class WWidget : public IMemoryObject
 	PName _widgetName;
 	HGuid _widgetGuid;
 
+	EWidgetFlags _widgetFlags;
+
 	bool _bIsOpen;
 public:
 	WWidget() = default;
@@ -16,7 +18,14 @@ public:
 
 	void  SetName(PName inName);
 	PName GetName() const;
+
 	const HGuid& GetGuid() const;
+
+	void SetWidgetFlags(EWidgetFlags flags);
+	void AddWidgetFlags(EWidgetFlags flags);
+	void RemoveWidgetFlags(EWidgetFlags flags);
+	EWidgetFlags GetWidgetFlags() const;
+
 protected:
 	friend class GGUIGlobalSystem;
 	virtual void Construct() override;

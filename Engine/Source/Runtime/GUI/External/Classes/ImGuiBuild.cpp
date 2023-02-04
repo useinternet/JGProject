@@ -16,12 +16,30 @@ void PImGuiBuild::PushData(const HQueue<HGUIBuilder::HCommandData>& inCommandQue
 void PImGuiBuild::Build()
 {
 	HBuildContext buildContext;
-
+	buildContext.CacheData         = &_buildCacheData;
 	buildContext.CurrentWidget     = nullptr;
 	buildContext.bOpenWidget       = true;
 	buildContext.bLastCompInLayout = false;
 	buildContext.FixedWidth = INDEX_NONE;
 	buildContext.FixedHeight = INDEX_NONE;
+
+	for (int32 i = 0; i < (int32)EGUIEvent::Count; ++i)
+	{
+		buildContext.bIsHandledGUIEvents[i] = false;
+	}
+
+	ImVec2 CurrentMousePos = ImGui::GetMousePos();
+	if (_buildCacheData.CursorPos.x != CurrentMousePos.x ||
+		_buildCacheData.CursorPos.y != CurrentMousePos.y)
+	{
+		buildContext.bIsDirtyMousePos = true;
+	}
+	else
+	{
+		buildContext.bIsDirtyMousePos = false;
+	}
+
+	_buildCacheData.CursorPos = HVector2(CurrentMousePos.x, CurrentMousePos.y);
 
 	OnBuild(buildContext);
 }
@@ -29,10 +47,26 @@ void PImGuiBuild::Build()
 void PImGuiBuild::Reset()
 {
 	_commandQueues.clear();
+
+	HHashMap<HGuid, HWidgetComponentCacheData> tempWidgetCompCahceDatas = _buildCacheData.WidgetCompCahceDatas;
+	for (const HPair<HGuid, HWidgetComponentCacheData>& pair : tempWidgetCompCahceDatas)
+	{
+		HGuid guid = pair.first;
+		if (pair.second.bAttendance == false)
+		{
+			_buildCacheData.WidgetCompCahceDatas.erase(guid);
+		}
+		else
+		{
+			_buildCacheData.WidgetCompCahceDatas[guid].bAttendance = false;
+		}
+	}
 }
 
 void PImGuiBuild::OnBuild(HBuildContext& inBuildContext)
 {
+	ImGui::EndChild();
+
 	for (HQueue<HGUIBuilder::HCommandData>& commandQueue : _commandQueues)
 	{
 		while (commandQueue.empty() == false)
@@ -180,7 +214,9 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 		return false;
 	}
 
-	HGuid guid = inCV->WidgetComponent->GetGuid();
+	HGuid guid  = inCV->WidgetComponent->GetGuid();
+	inBuildContext.CacheData->WidgetCompCahceDatas[guid].bAttendance = true;
+
 	ImGui::PushID((int32)guid.GetHashCode());
 	ImGui::BeginGroup();
 	IImGuiWidgetComponentGenerator* imGuiWidgetGenerater = inCV->WidgetComponent.GetRawPointer();
@@ -207,49 +243,8 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 	//	ImGui::EndPopup();
 	//}
 
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-	{
-		guiEventReceiver->OnMouseLButtonDown();
-	}
-	else if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
-	{
-		guiEventReceiver->OnMouseRButtonDown();
-	}
-	else if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
-	{
-		guiEventReceiver->OnMouseMButtonDown();
-	}
-	else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-	{
-		guiEventReceiver->OnMouseLButtonDown();
-	}
-	else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
-	{
-		guiEventReceiver->OnMouseRButtonDown();
-	}
-	else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
-	{
-		guiEventReceiver->OnMouseMButtonDown();
-	}
-	else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-	{
-		guiEventReceiver->OnMouseLButtonClick();
-	}
-	else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-	{
-		guiEventReceiver->OnMouseRButtonClick();
-	}
-	else if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
-	{
-		guiEventReceiver->OnMouseMButtonClick();
-	}
-	else if (ImGui::IsItemHovered())
-	{
-		guiEventReceiver->OnMouseHover();
-		// mouse pos 캐싱해두었다가 조금이라도 움직이면 onmousemove
-		// hover가 false가되면 leave
-	}
-
+	OnGUIEvent(inBuildContext, guid, guiEventReceiver);
+	ImGui::EndGroup();
 	ImGui::PopID();
 
 	if (inBuildContext.bLastCompInLayout == false && inBuildContext.CurrentBuildHistory() == EBuildHistory::Horizontal)
@@ -258,4 +253,67 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 	}
 
 	return true;
+}
+
+void PImGuiBuild::OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, IGUIEventReceiver* inEventReceiver)
+{
+	if (ImGui::IsItemHovered())
+	{
+		if (inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover == false)
+		{
+			inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover = true;
+			inEventReceiver->OnMouseEnter();
+		}
+
+		inEventReceiver->OnMouseHover();
+
+		if (inBuildContext.bIsDirtyMousePos)
+		{
+			inEventReceiver->OnMouseMove();
+		}
+
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+		{
+			inEventReceiver->OnMouseLButtonDown();
+		}
+		else if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+		{
+			inEventReceiver->OnMouseRButtonDown();
+		}
+		else if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+		{
+			inEventReceiver->OnMouseMButtonDown();
+		}
+
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		{
+			inEventReceiver->OnMouseLButtonUp();
+		}
+		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+		{
+			inEventReceiver->OnMouseRButtonUp();
+		}
+		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
+		{
+			inEventReceiver->OnMouseMButtonUp();
+		}
+
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			inEventReceiver->OnMouseLButtonClick();
+		}
+		else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		{
+			inEventReceiver->OnMouseRButtonClick();
+		}
+		else if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+		{
+			inEventReceiver->OnMouseMButtonClick();
+		}
+	}
+	else if (inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover)
+	{
+		inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover = false;
+		inEventReceiver->OnMouseLeave();
+	}
 }

@@ -1,9 +1,6 @@
 #pragma once
 #include "Builder/GUIBuilder.h"
 
-
-// 이거 GUI로 옮기기
-// 
 struct ImGuiContext;
 class PImGuiBuild final : public IMemoryObject, public IGUIBuild
 {
@@ -15,19 +12,30 @@ class PImGuiBuild final : public IMemoryObject, public IGUIBuild
 		Widget
 	};
 
+	struct HWidgetComponentCacheData
+	{
+		bool bAttendance = false;
+		bool bHover = false;
+	};
+
 	struct HBuildCacheData
 	{
-
+		HVector2 CursorPos;
+		HHashMap<HGuid, HWidgetComponentCacheData> WidgetCompCahceDatas;
 	};
 
 	struct HBuildContext
 	{
 		HStack<EBuildHistory> HistoryStack;
 		PSharedPtr<WWidget>   CurrentWidget;
+		HBuildCacheData*	  CacheData;
+		bool bIsHandledGUIEvents[(int32)EGUIEvent::Count];
+
 		int32 FixedWidth;
 		int32 FixedHeight;
-		HVector2 CursorPos;
+		
 		bool bOpenWidget;
+		bool bIsDirtyMousePos;
 		bool bLastCompInLayout;
 
 		void PushBuildHistroy(EBuildHistory history)
@@ -56,8 +64,6 @@ class PImGuiBuild final : public IMemoryObject, public IGUIBuild
 		}
 	};
 
-
-
 	HList<HQueue<HGUIBuilder::HCommandData>> _commandQueues;
 	HBuildCacheData _buildCacheData;
 public:
@@ -81,4 +87,6 @@ private:
 	bool OnBuildEndWidget(HBuildContext& inBuildContext);
 
 	bool OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuilder::PWidgetComponentCommandValue* inCV);
+
+	void OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, IGUIEventReceiver* inEventReceiver);
 };
