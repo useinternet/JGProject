@@ -8,5 +8,4 @@ public:
 	virtual ~WBorder() = default;
 
 protected:
-	virtual void GenerateImGuiWidgetComponent(const HWidgetContext& inWidgetContext) override;
 };

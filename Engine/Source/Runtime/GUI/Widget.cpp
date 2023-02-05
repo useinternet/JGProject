@@ -18,22 +18,22 @@ const HGuid& WWidget::GetGuid() const
 
 void WWidget::SetWidgetFlags(EWidgetFlags flags)
 {
-
+	_widgetFlags = flags;
 }
 
 void WWidget::AddWidgetFlags(EWidgetFlags flags)
 {
-
+	_widgetFlags = _widgetFlags | flags;
 }
 
 void WWidget::RemoveWidgetFlags(EWidgetFlags flags)
 {
-
+	_widgetFlags = (EWidgetFlags)(_widgetFlags & (~flags));
 }
 
 EWidgetFlags WWidget::GetWidgetFlags() const
 {
-
+	return _widgetFlags;
 }
 
 

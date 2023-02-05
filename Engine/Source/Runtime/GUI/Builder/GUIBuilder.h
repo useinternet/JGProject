@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
+#include "WidgetContext.h"
 
 #define DEFINE_GUIBUILD_COMMAND_ONEVALUE(ClassName, type1, name1)\
 class ClassName : public PCommandValue \
@@ -82,6 +83,9 @@ name5 = in##name5; \
 virtual ~##ClassName() = default; \
 }; \
 
+
+JG_DECLARE_DELEGATE_ONEPARAM(POnGenerateNativeGUI, const HWidgetContext&);
+
 class WWidgetComponent;
 class WWidget;
 class IGUIBuild;
@@ -98,6 +102,7 @@ public:
 		BeginWidget,
 		EndWidget,
 		PushWidgetComponent,
+		PushGenerateNatvieGUI
 	};
 
 	class PCommandValue : public IMemoryObject
@@ -117,6 +122,7 @@ public:
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PHorizontalCommandValue, int32, FixedWidth);
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PVerticalCommandValue, int32, FixedHeight);
 
+	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PGenerateNativeGUICommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent, POnGenerateNativeGUI, OnGenerateGUI);
 public:
 	void BeginHorizontal(int32 fixedWidth = INDEX_NONE);
 	void EndHorizontal();
@@ -125,6 +131,7 @@ public:
 	void EndVertical();
 
 	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
+	void PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const POnGenerateNativeGUI& OnGenerateGUI);
 
 	const HQueue<HCommandData>& GetCommandQueue() const;
 private:

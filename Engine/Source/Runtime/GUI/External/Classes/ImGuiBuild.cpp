@@ -65,8 +65,6 @@ void PImGuiBuild::Reset()
 
 void PImGuiBuild::OnBuild(HBuildContext& inBuildContext)
 {
-	ImGui::EndChild();
-
 	for (HQueue<HGUIBuilder::HCommandData>& commandQueue : _commandQueues)
 	{
 		while (commandQueue.empty() == false)
@@ -106,6 +104,8 @@ bool PImGuiBuild::OnBuild(HBuildContext& inBuildContext, const HGUIBuilder::HCom
 		return OnBuildEndWidget(inBuildContext);
 	case HGUIBuilder::ECommand::PushWidgetComponent:
 		return OnBuildWidgetComponent(inBuildContext, ON_BUILD_COMMAND_ARG(HGUIBuilder::PWidgetComponentCommandValue)));
+	case HGUIBuilder::ECommand::PushGenerateNatvieGUI:
+		return OnBuildGenerateNativeGUI(inBuildContext, ON_BUILD_COMMAND_ARG(HGUIBuilder::PGenerateNativeGUICommandValue)));
 	}
 
 	return false;
@@ -219,20 +219,15 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 
 	ImGui::PushID((int32)guid.GetHashCode());
 	ImGui::BeginGroup();
-	IImGuiWidgetComponentGenerator* imGuiWidgetGenerater = inCV->WidgetComponent.GetRawPointer();
 	IGUIEventReceiver* guiEventReceiver = inCV->WidgetComponent.GetRawPointer();
 
 	HGUIBuilder guiBuilder;
-	imGuiWidgetGenerater->OnGUIBuild(guiBuilder);
-	if (guiBuilder.GetCommandQueue().empty())
-	{
-		imGuiWidgetGenerater->GenerateImGuiWidgetComponent(HWidgetContext());
-	}
-	else
+	inCV->WidgetComponent->OnGUIBuild(guiBuilder);
+	if (guiBuilder.GetCommandQueue().empty() == false)
 	{
 		PImGuiBuild imGuiBuild;
 		imGuiBuild.ImGuiContext = ImGuiContext;
-		
+
 		imGuiBuild.PushData(guiBuilder.GetCommandQueue());
 		imGuiBuild.OnBuild(inBuildContext);
 	}
@@ -251,6 +246,28 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 	{
 		ImGui::SameLine();
 	}
+
+	return true;
+}
+
+bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBuilder::PGenerateNativeGUICommandValue* inCV)
+{
+	if (inCV == nullptr || inCV->WidgetComponent == nullptr)
+	{
+		return false;
+	}
+
+	HGuid guid = inCV->WidgetComponent->GetGuid();
+	inBuildContext.CacheData->WidgetCompCahceDatas[guid].bAttendance = true;
+
+	ImGui::PushID((int32)guid.GetHashCode());
+	ImGui::BeginGroup();
+
+	inCV->OnGenerateGUI.ExecuteIfBound(HWidgetContext());
+
+	OnGUIEvent(inBuildContext, guid, inCV->WidgetComponent.GetRawPointer());
+	ImGui::EndGroup();
+	ImGui::PopID();
 
 	return true;
 }

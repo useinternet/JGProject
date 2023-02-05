@@ -87,6 +87,8 @@ private:
 	bool OnBuildEndWidget(HBuildContext& inBuildContext);
 
 	bool OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuilder::PWidgetComponentCommandValue* inCV);
+	bool OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBuilder::PGenerateNativeGUICommandValue* inCV);
+
 
 	void OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, IGUIEventReceiver* inEventReceiver);
 };

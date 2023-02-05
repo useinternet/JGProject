@@ -5,6 +5,6 @@ class HGUIBuilder;
 class IImGuiWidgetComponentGenerator
 {
 public:
-	virtual void OnGUIBuild(HGUIBuilder& inBuilder) = 0;
+//	virtual void OnGUIBuild(HGUIBuilder& inBuilder) = 0;
 	virtual void GenerateImGuiWidgetComponent(const HWidgetContext& widgetContext) = 0;
 };

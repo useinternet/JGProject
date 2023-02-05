@@ -7,7 +7,6 @@ class HGUIBuilder;
 class WWidgetComponent
 	: public IMemoryObject
 	, public IGUIEventReceiver
-	, public IImGuiWidgetComponentGenerator
 {
 private:
 	HGuid _guid;
@@ -106,9 +105,6 @@ protected:
 		//JG_LOG(GUI, ELogLevel::Info, "[ %s ]: OnMouseMButtonDoubleClick", _guid.ToString());
 	}
 
-	// Begin IImGuiWidgetComponentGenerator
-protected:
+public:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) {}
-	virtual void GenerateImGuiWidgetComponent(const HWidgetContext& inWidgetContext) override {}
-	// End   IImGuiWidgetComponentGenerator
 };

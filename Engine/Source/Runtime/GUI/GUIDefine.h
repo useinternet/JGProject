@@ -2,7 +2,7 @@
 #include "CoreDefines.h"
 
 JG_ENUM_FLAG(EWidgetFlags)
-enum class EWidgetFlags
+enum class EWidgetFlags : int32
 {
 	None,
 	ChildWidget,

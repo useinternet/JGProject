@@ -16,5 +16,5 @@ public:
 	virtual ~WButton() = default;
 
 protected:
-	virtual void GenerateImGuiWidgetComponent(const HWidgetContext& inWidgetContext) override;
+	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 };

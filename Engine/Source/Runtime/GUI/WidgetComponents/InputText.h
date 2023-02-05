@@ -16,7 +16,6 @@ public:
 public:
 	const PString& GetInputText() const;
 
-
 protected:
-	virtual void GenerateImGuiWidgetComponent(const HWidgetContext& inWidgetContext) override;
+	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 };

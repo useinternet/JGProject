@@ -65,3 +65,12 @@ void HGUIBuilder::PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom)
 
 	_commandQueue.push(commandData);
 }
+
+void HGUIBuilder::PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const POnGenerateNativeGUI& OnGenerateGUI)
+{
+	HCommandData commandData;
+	commandData.Command = ECommand::PushGenerateNatvieGUI;
+	commandData.CommandValue = Allocate<PGenerateNativeGUICommandValue>(inWidgetCom, OnGenerateGUI);
+
+	_commandQueue.push(commandData);
+}

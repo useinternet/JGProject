@@ -57,9 +57,9 @@ inline enumName operator|(enumName c1, enumName c2) \
 { \
 	return (enumName)((int32)c1 | (int32)c2); \
 } \
-inline bool operator&(enumName c1, enumName c2) \
+inline int32 operator&(enumName c1, enumName c2) \
 { \
-	return (bool)((int32)c1 & (int32)c2); \
+	return (int32)((int32)c1 & (int32)c2); \
 } \
 inline enumName operator~(enumName flags)\
 {\
