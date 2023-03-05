@@ -175,12 +175,23 @@ bool PImGuiBuild::OnBuildBeginWidget(HBuildContext& inBuildContext, HGUIBuilder:
 		return false;
 	}
 
+	EWidgetFlags widgetFlags = widget->GetWidgetFlags();
+
 	PString titleName = widget->GetName().ToString();
 	titleName += PString("##") + widget->GetGuid().ToString();
 
 	inBuildContext.bOpenWidget = true;
 	inBuildContext.PushBuildHistroy(EBuildHistory::Widget);
-	ImGui::Begin(titleName.GetCStr(), &inBuildContext.bOpenWidget);
+
+	if (widgetFlags & EWidgetFlags::ChildWidget)
+	{
+		bool bBorder = widgetFlags & EWidgetFlags::ChildWidget_Border;
+		ImGui::BeginChild(widget->GetGuid().GetHashCode(), ImVec2(0,0), bBorder);
+	}
+	else 
+	{
+		ImGui::Begin(titleName.GetCStr(), &inBuildContext.bOpenWidget);
+	}
 
 	inBuildContext.CurrentWidget = widget;
 	return true;
@@ -196,12 +207,21 @@ bool PImGuiBuild::OnBuildEndWidget(HBuildContext& inBuildContext)
 
 	inBuildContext.PopBuildHistory();
 
-	ImGui::End();
-	
-	if (inBuildContext.bOpenWidget == false)
+	EWidgetFlags widgetFlags = inBuildContext.CurrentWidget->GetWidgetFlags();
+
+	if (widgetFlags & EWidgetFlags::ChildWidget)
 	{
-		GGUIGlobalSystem::GetInstance().CloseWidget(inBuildContext.CurrentWidget->GetGuid());
-		inBuildContext.bOpenWidget = true;
+		ImGui::EndChild();
+	}
+	else
+	{
+		ImGui::End();
+
+		if (inBuildContext.bOpenWidget == false)
+		{
+			GGUIGlobalSystem::GetInstance().CloseWidget(inBuildContext.CurrentWidget->GetGuid());
+			inBuildContext.bOpenWidget = true;
+		}
 	}
 
 	return true;
