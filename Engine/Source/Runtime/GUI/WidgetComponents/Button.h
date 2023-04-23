@@ -17,4 +17,5 @@ public:
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
+	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override;
 };

@@ -27,6 +27,15 @@ void HGUIBuilder::BeginVertical(int32 fixedHeight)
 	_commandQueue.push(commandData);
 }
 
+void HGUIBuilder::PushChildWidget(PSharedPtr<WWidget> inWidget, const HPushChildWidgetArguments& inArgs)
+{
+	HCommandData commandData;
+	commandData.Command = ECommand::PushChildWidget;
+	commandData.CommandValue = Allocate<PChildWidgetCommandValue>(inWidget, inArgs);
+
+	_commandQueue.push(commandData);
+}
+
 void HGUIBuilder::EndVertical()
 {
 	HCommandData commandData;
@@ -66,7 +75,7 @@ void HGUIBuilder::PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom)
 	_commandQueue.push(commandData);
 }
 
-void HGUIBuilder::PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const POnGenerateNativeGUI& OnGenerateGUI)
+void HGUIBuilder::PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const HOnGenerateNativeGUI& OnGenerateGUI)
 {
 	HCommandData commandData;
 	commandData.Command = ECommand::PushGenerateNatvieGUI;

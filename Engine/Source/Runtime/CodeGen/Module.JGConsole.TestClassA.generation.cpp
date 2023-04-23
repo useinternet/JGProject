@@ -122,12 +122,13 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
-
+	HHashMap<int32, int32> EnumRedirectMap;
 
 	MetaList.resize(6);
 	EnumStringList.resize(6);
 
     EnumStringList[0] = "AAA";
+    EnumRedirectMap[0] = 0;
 
 
 	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -138,6 +139,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 	});
 
     EnumStringList[1] = "BBB";
+    EnumRedirectMap[10] = 1;
 
 
 	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -148,6 +150,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 	});
 
     EnumStringList[2] = "CCC";
+    EnumRedirectMap[11] = 2;
 
 
 	MetaList[2] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -156,6 +159,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 	});
 
     EnumStringList[3] = "DDD";
+    EnumRedirectMap[12] = 3;
 
 
 	MetaList[3] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -166,6 +170,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 	});
 
     EnumStringList[4] = "EEE";
+    EnumRedirectMap[30] = 4;
 
 
 	MetaList[4] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -176,6 +181,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 	});
 
     EnumStringList[5] = "MMM";
+    EnumRedirectMap[31] = 5;
 
 
 	MetaList[5] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -184,7 +190,7 @@ PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnum
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETestEnumA), "ETestEnumA", EnumStringList ,MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETestEnumA), "ETestEnumA", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 

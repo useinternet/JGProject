@@ -163,6 +163,14 @@ PString& PString::Remove(uint64 startPos, uint64 len)
 	return *this;
 }
 
+PString& PString::PopBack()
+{
+	_rawString.pop_back();
+	updateHashCode();
+
+	return *this;
+}
+
 PString& PString::Trim()
 {
 	static const char* WHITE_SPACE = " \t\n\r\f\v";
@@ -182,7 +190,7 @@ void PString::SubString(PString* outString, uint64 startPos, uint64 length) cons
 	{
 		return;
 	}
-
+	
 	if (outString != this)
 	{
 		outString->Reset();
@@ -255,7 +263,6 @@ HList<PString> PString::Split(char delimiter) const
 {
 	HList<PString> result;
 	std::stringstream ss(_rawString);
-
 
 	HRawString tmp;
 

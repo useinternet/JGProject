@@ -1,22 +1,25 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
-#include "External/Classes/ImGuiWidgetComponentGenerator.h"
+#include "Builder/MenuBuilder.h"
+#include "Builder/ContextMenuBuilder.h"
 
 class HGUIBuilder;
+class HContextMenuBuilder;
 class WWidgetComponent
 	: public IMemoryObject
 	, public IGUIEventReceiver
 {
 private:
+	static HGuid _classGuid;
 	HGuid _guid;
 
 public:
-	JG_DECLARE_DELEGATE_RETVAL(EWidgetVisibility, PIsVisibility);
-	JG_DECLARE_DELEGATE_RETVAL(bool, PIsEnable);
+	JG_DECLARE_DELEGATE_RETVAL(EWidgetVisibility, HIsVisibility);
+	JG_DECLARE_DELEGATE_RETVAL(bool, HIsEnable);
 
-	PIsVisibility IsVisiblity;
-	PIsEnable	  IsEnable;
+	HIsVisibility IsVisiblity;
+	HIsEnable	  IsEnable;
 
 public:
 	WWidgetComponent();
@@ -107,4 +110,5 @@ protected:
 
 public:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) {}
+	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) {}
 };

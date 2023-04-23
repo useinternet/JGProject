@@ -2,6 +2,7 @@
 #include "ImGuiBuild.h"
 #include "Widget.h"
 #include "WidgetComponents/WidgetComponent.h"
+#include "ImGuiContextMenuBuild.h"
 #include "GUI.h"
 #include "External/imgui/imgui.h"
 #include "External/imgui/imgui_internal.h"
@@ -17,8 +18,9 @@ void PImGuiBuild::Build()
 {
 	HBuildContext buildContext;
 	buildContext.CacheData         = &_buildCacheData;
-	buildContext.CurrentWidget     = nullptr;
-	buildContext.bOpenWidget       = true;
+	//buildContext.CurrentWidget     = nullptr;
+	//buildContext.bOpenRootWidget   = true;
+	buildContext.bOpenContextMenu  = false;
 	buildContext.bLastCompInLayout = false;
 	buildContext.FixedWidth = INDEX_NONE;
 	buildContext.FixedHeight = INDEX_NONE;
@@ -61,6 +63,21 @@ void PImGuiBuild::Reset()
 			_buildCacheData.WidgetCompCahceDatas[guid].bAttendance = false;
 		}
 	}
+
+	HHashMap<HGuid, HWidgetCacheData> tempWidgetCahceDatas = _buildCacheData.WidgetCacheDatas;
+	for (const HPair<HGuid, HWidgetCacheData>& pair : tempWidgetCahceDatas)
+	{
+		HGuid guid = pair.first;
+		if (pair.second.bAttendance == false)
+		{
+			_buildCacheData.WidgetCacheDatas.erase(guid);
+		}
+		else
+		{
+			_buildCacheData.WidgetCacheDatas[guid].bAttendance = false;
+		}
+	}
+
 }
 
 void PImGuiBuild::OnBuild(HBuildContext& inBuildContext)
@@ -98,6 +115,8 @@ bool PImGuiBuild::OnBuild(HBuildContext& inBuildContext, const HGUIBuilder::HCom
 		return OnBuildEndHorizontal(inBuildContext);
 	case HGUIBuilder::ECommand::EndVertical:
 		return OnBuildEndVertical(inBuildContext);
+	case HGUIBuilder::ECommand::PushChildWidget:
+		return OnBuildPushChildWidget(inBuildContext, ON_BUILD_COMMAND_ARG(HGUIBuilder::PChildWidgetCommandValue)));
 	case HGUIBuilder::ECommand::BeginWidget:
 		return OnBuildBeginWidget(inBuildContext, ON_BUILD_COMMAND_ARG(HGUIBuilder::PWidgetCommandValue)));
 	case HGUIBuilder::ECommand::EndWidget:
@@ -113,14 +132,15 @@ bool PImGuiBuild::OnBuild(HBuildContext& inBuildContext, const HGUIBuilder::HCom
 
 bool PImGuiBuild::OnBuildBeginHorizontal(HBuildContext& inBuildContext, HGUIBuilder::PHorizontalCommandValue* inCV)
 {
-	inBuildContext.PushBuildHistroy(EBuildHistory::Horizontal);
+	inBuildContext.PushBuildHistroy(HBuildHistory(EBuildHistory::Horizontal, nullptr));
 	ImGui::BeginGroup();
+
 	return true;
 }
 
 bool PImGuiBuild::OnBuildEndHorizontal(HBuildContext& inBuildContext)
 {
-	if (inBuildContext.CurrentBuildHistory() != EBuildHistory::Horizontal)
+	if (inBuildContext.CurrentBuildHistory().BuildHistroy != EBuildHistory::Horizontal)
 	{
 		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Mismatch Begin/End Horizontal");
 		return false;
@@ -133,7 +153,7 @@ bool PImGuiBuild::OnBuildEndHorizontal(HBuildContext& inBuildContext)
 
 bool PImGuiBuild::OnBuildBeginVertical(HBuildContext& inBuildContext, HGUIBuilder::PVerticalCommandValue* inCV)
 {
-	inBuildContext.PushBuildHistroy(EBuildHistory::Vertical);
+	inBuildContext.PushBuildHistroy(HBuildHistory(EBuildHistory::Vertical, nullptr));
 	inBuildContext.FixedHeight = inCV->FixedHeight;
 	ImGui::BeginGroup();
 	return true;
@@ -141,7 +161,7 @@ bool PImGuiBuild::OnBuildBeginVertical(HBuildContext& inBuildContext, HGUIBuilde
 
 bool PImGuiBuild::OnBuildEndVertical(HBuildContext& inBuildContext)
 {
-	if (inBuildContext.CurrentBuildHistory() != EBuildHistory::Vertical)
+	if (inBuildContext.CurrentBuildHistory().BuildHistroy != EBuildHistory::Vertical)
 	{
 		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Mismatch Begin/End Vertical");
 		return false;
@@ -153,11 +173,39 @@ bool PImGuiBuild::OnBuildEndVertical(HBuildContext& inBuildContext)
 	ImGuiWindow* window = ImGuiContext->CurrentWindow;
 	if (window != nullptr)
 	{
-		if (inBuildContext.CurrentBuildHistory() == EBuildHistory::Horizontal)
+		if (inBuildContext.CurrentBuildHistory().BuildHistroy == EBuildHistory::Horizontal)
 		{
 			ImGui::SameLine();
 		}
 	}
+	return true;
+}
+
+bool PImGuiBuild::OnBuildPushChildWidget(HBuildContext& inBuildContext, HGUIBuilder::PChildWidgetCommandValue* inCV)
+{
+	if (inCV == nullptr)
+	{
+		return false;
+	}
+
+	PSharedPtr<WWidget> widget = inCV->Widget;
+	if (widget == nullptr)
+	{
+		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Widget is null");
+		return false;
+	}
+
+	PImGuiBuild guiBuild;
+	HGUIBuilder guiBuilder;
+
+	OnBuildBeginChildWidget(inBuildContext, inCV);
+
+	widget->OnGUIBuild(guiBuilder);
+	guiBuild.PushData(guiBuilder.GetCommandQueue());
+	guiBuild.OnBuild(inBuildContext);
+
+	OnBuildEndChildWidget(inBuildContext);
+
 	return true;
 }
 
@@ -180,48 +228,139 @@ bool PImGuiBuild::OnBuildBeginWidget(HBuildContext& inBuildContext, HGUIBuilder:
 	PString titleName = widget->GetName().ToString();
 	titleName += PString("##") + widget->GetGuid().ToString();
 
-	inBuildContext.bOpenWidget = true;
-	inBuildContext.PushBuildHistroy(EBuildHistory::Widget);
+	inBuildContext.PushBuildHistroy(HBuildHistory(EBuildHistory::Widget, widget));
 
-	if (widgetFlags & EWidgetFlags::ChildWidget)
-	{
-		bool bBorder = widgetFlags & EWidgetFlags::ChildWidget_Border;
-		ImGui::BeginChild(widget->GetGuid().GetHashCode(), ImVec2(0,0), bBorder);
-	}
-	else 
-	{
-		ImGui::Begin(titleName.GetCStr(), &inBuildContext.bOpenWidget);
-	}
+	HWidgetCacheData& widgetCachaData = inBuildContext.CacheData->WidgetCacheDatas[widget->GetGuid()];
 
-	inBuildContext.CurrentWidget = widget;
+	widgetCachaData.bAttendance = true;
+	widgetCachaData.bOpenedWidget = true;
+
+	ImGui::Begin(titleName.GetCStr(), &(inBuildContext.CacheData->WidgetCacheDatas[widget->GetGuid()].bOpenedWidget));
+
+	ImVec2 WindowContentRegionMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 WindowContentRegionMax = ImGui::GetWindowContentRegionMax();
+
+	widgetCachaData.ContentRegionSize = HVector2(WindowContentRegionMax.x, WindowContentRegionMax.y) - HVector2(WindowContentRegionMin.x, WindowContentRegionMin.y);
+
+	inBuildContext.ParentWidget = widget;
 	return true;
 }
 
 bool PImGuiBuild::OnBuildEndWidget(HBuildContext& inBuildContext)
 {
-	if (inBuildContext.CurrentBuildHistory() != EBuildHistory::Widget)
+	HBuildHistory& currentBuildHistory = inBuildContext.CurrentBuildHistory();
+
+	if (currentBuildHistory.BuildHistroy != EBuildHistory::Widget)
 	{
 		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Mismatch Begin/End Widget");
 		return false;
 	}
 
-	inBuildContext.PopBuildHistory();
+	OnContextMenu(inBuildContext, currentBuildHistory.Widget);
 
-	EWidgetFlags widgetFlags = inBuildContext.CurrentWidget->GetWidgetFlags();
+	ImGui::End();
 
-	if (widgetFlags & EWidgetFlags::ChildWidget)
+	if (currentBuildHistory.Widget != nullptr)
 	{
-		ImGui::EndChild();
-	}
-	else
-	{
-		ImGui::End();
-
-		if (inBuildContext.bOpenWidget == false)
+		HGuid widgetGuid = currentBuildHistory.Widget->GetGuid();
+		if (inBuildContext.CacheData->WidgetCacheDatas[widgetGuid].bOpenedWidget == false)
 		{
-			GGUIGlobalSystem::GetInstance().CloseWidget(inBuildContext.CurrentWidget->GetGuid());
-			inBuildContext.bOpenWidget = true;
+			GGUIGlobalSystem::GetInstance().CloseWidget(currentBuildHistory.Widget->GetGuid());
 		}
+	}
+
+	inBuildContext.PopBuildHistory();
+	inBuildContext.ParentWidget = nullptr;
+	return true;
+}
+
+bool PImGuiBuild::OnBuildBeginChildWidget(HBuildContext& inBuildContext, HGUIBuilder::PChildWidgetCommandValue* inCV)
+{
+	if (inCV == nullptr)
+	{
+		return false;
+	}
+
+	PSharedPtr<WWidget> widget = inCV->Widget;
+	if (widget == nullptr)
+	{
+		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Widget is null");
+		return false;
+	}
+
+	EWidgetFlags widgetFlags = widget->GetWidgetFlags();
+
+	PString titleName = widget->GetName().ToString();
+	titleName += PString("##") + widget->GetGuid().ToString();
+
+	inBuildContext.PushBuildHistroy(HBuildHistory(EBuildHistory::Widget, widget));
+
+	HWidgetCacheData& widgetCachaData = inBuildContext.CacheData->WidgetCacheDatas[widget->GetGuid()];
+	widgetCachaData.bAttendance   = true;
+	widgetCachaData.bOpenedWidget = true;
+	widgetCachaData.ParentWidget  = inBuildContext.ParentWidget;
+
+	float32 widgetWidth  = 0.0f;
+	float32 widgetHeight = 0.0f;
+	if (widgetCachaData.ParentWidget != nullptr)
+	{
+		HWidgetCacheData& parentWidgetCacheData = inBuildContext.CacheData->WidgetCacheDatas[widgetCachaData.ParentWidget->GetGuid()];
+
+		if (inCV->Args.WidthRatio > 0.0F)
+		{
+			widgetWidth = parentWidgetCacheData.ContentRegionSize.x * inCV->Args.WidthRatio;
+		}
+
+		if (inCV->Args.HeightRatio > 0.0F)
+		{
+			widgetHeight = parentWidgetCacheData.ContentRegionSize.y * inCV->Args.HeightRatio;
+		}
+
+		if (inCV->Args.FixedWidth > 0)
+		{
+			widgetWidth = (float32)inCV->Args.FixedWidth;
+		}
+
+		if (inCV->Args.FixedHeight > 0)
+		{
+			widgetHeight = (float32)inCV->Args.FixedHeight;
+		}
+	}
+
+	bool bBorder = widgetFlags & EWidgetFlags::ChildWidget_Border;
+	//
+	ImGui::BeginChild((ImGuiID)widget->GetGuid().GetHashCode(), ImVec2(widgetWidth, widgetHeight), bBorder);
+
+	inBuildContext.ParentWidget = widget;
+	return true;
+}
+
+bool PImGuiBuild::OnBuildEndChildWidget(HBuildContext& inBuildContext)
+{
+	HBuildHistory& currentBuildHistory = inBuildContext.CurrentBuildHistory();
+	PSharedPtr<WWidget> currentWidget  = currentBuildHistory.Widget;
+
+	if (currentBuildHistory.BuildHistroy != EBuildHistory::Widget)
+	{
+		JG_LOG(GUI, ELogLevel::Error, "Fail GUI Build: Mismatch Begin/End Widget");
+		return false;
+	}
+
+	OnContextMenu(inBuildContext, currentBuildHistory.Widget);
+	ImGui::EndChild();
+
+	inBuildContext.PopBuildHistory();
+	currentBuildHistory = inBuildContext.CurrentBuildHistory();
+
+	if (inBuildContext.bLastCompInLayout == false && currentBuildHistory.BuildHistroy == EBuildHistory::Horizontal)
+	{
+		ImGui::SameLine();
+	}
+
+	if (currentWidget != nullptr)
+	{
+		HWidgetCacheData& widgetCachaData = inBuildContext.CacheData->WidgetCacheDatas[currentWidget->GetGuid()];
+		inBuildContext.ParentWidget = widgetCachaData.ParentWidget;
 	}
 
 	return true;
@@ -252,17 +391,13 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 		imGuiBuild.OnBuild(inBuildContext);
 	}
 
-	//ImGui::OpenPopupEx(0, ImGuiPopupFlags_MouseButtonRight);
-	//if (ImGui::BeginPopupContextWindow() == true)
-	//{
-	//	ImGui::EndPopup();
-	//}
+	OnContextMenu(inBuildContext, inCV->WidgetComponent);
 
 	OnGUIEvent(inBuildContext, guid, guiEventReceiver);
 	ImGui::EndGroup();
 	ImGui::PopID();
 
-	if (inBuildContext.bLastCompInLayout == false && inBuildContext.CurrentBuildHistory() == EBuildHistory::Horizontal)
+	if (inBuildContext.bLastCompInLayout == false && inBuildContext.CurrentBuildHistory().BuildHistroy == EBuildHistory::Horizontal)
 	{
 		ImGui::SameLine();
 	}
@@ -285,6 +420,8 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 
 	inCV->OnGenerateGUI.ExecuteIfBound(HWidgetContext());
 
+	OnContextMenu(inBuildContext, inCV->WidgetComponent);
+	
 	OnGUIEvent(inBuildContext, guid, inCV->WidgetComponent.GetRawPointer());
 	ImGui::EndGroup();
 	ImGui::PopID();
@@ -352,5 +489,61 @@ void PImGuiBuild::OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, I
 	{
 		inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover = false;
 		inEventReceiver->OnMouseLeave();
+	}
+}
+
+void PImGuiBuild::OnContextMenu(HBuildContext& inBuildContext, PSharedPtr<WWidget> inWidget)
+{
+	if (inWidget.IsValid() == false)
+	{
+		return;
+	}
+
+	HGuid guid = inWidget->GetGuid();
+	HWidgetCacheData& cacheData = inBuildContext.CacheData->WidgetCacheDatas[guid];
+	if (cacheData.ContextMenuBuild.IsValid() == false)
+	{
+		cacheData.ContextMenuBuild = Allocate<PImGuiContextMenuBuild>();
+
+		HContextMenuBuilder contextMenuBuilder;
+		inWidget->OnContextMenuBuild(contextMenuBuilder);
+
+		cacheData.ContextMenuBuild->PushData(contextMenuBuilder.GetMenuTrees());
+	}
+	if (inBuildContext.bOpenContextMenu == false)
+	{
+		if (cacheData.ContextMenuBuild->Build(guid))
+		{
+			inBuildContext.bOpenContextMenu = true;
+		}
+	}
+}
+
+void PImGuiBuild::OnContextMenu(HBuildContext& inBuildContext, PSharedPtr<WWidgetComponent> inWidgetComponent)
+{
+	if (inWidgetComponent.IsValid() == false)
+	{
+		return;
+	}
+
+	HGuid guid = inWidgetComponent->GetGuid();
+
+	HWidgetComponentCacheData& cacheData = inBuildContext.CacheData->WidgetCompCahceDatas[guid];
+	if (cacheData.ContextMenuBuild.IsValid() == false)
+	{
+		cacheData.ContextMenuBuild = Allocate<PImGuiContextMenuBuild>();
+
+		HContextMenuBuilder contextMenuBuilder;
+		inWidgetComponent->OnContextMenuBuild(contextMenuBuilder);
+
+		cacheData.ContextMenuBuild->PushData(contextMenuBuilder.GetMenuTrees());
+	}
+
+	if (inBuildContext.bOpenContextMenu == false)
+	{
+		if (cacheData.ContextMenuBuild->Build(guid) == true)
+		{
+			inBuildContext.bOpenContextMenu = true;
+		}
 	}
 }

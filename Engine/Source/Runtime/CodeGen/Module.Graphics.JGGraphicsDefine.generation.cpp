@@ -8,12 +8,13 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
-
+	HHashMap<int32, int32> EnumRedirectMap;
 
 	MetaList.resize(16);
 	EnumStringList.resize(16);
 
     EnumStringList[0] = "None";
+    EnumRedirectMap[0] = 0;
 
 
 	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -23,6 +24,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[1] = "R8_Unorm";
+    EnumRedirectMap[1] = 1;
 
 
 	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -32,6 +34,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[2] = "R16_Float";
+    EnumRedirectMap[2] = 2;
 
 
 	MetaList[2] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -41,6 +44,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[3] = "R32_Float";
+    EnumRedirectMap[3] = 3;
 
 
 	MetaList[3] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -50,6 +54,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[4] = "R16G16_Float";
+    EnumRedirectMap[4] = 4;
 
 
 	MetaList[4] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -59,6 +64,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[5] = "R8G8B8A8_Unorm";
+    EnumRedirectMap[5] = 5;
 
 
 	MetaList[5] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -68,6 +74,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[6] = "R16G16B16A16_Unorm";
+    EnumRedirectMap[6] = 6;
 
 
 	MetaList[6] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -77,6 +84,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[7] = "R11G11B10_Float";
+    EnumRedirectMap[7] = 7;
 
 
 	MetaList[7] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -86,6 +94,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[8] = "R16G16B16A16_Float";
+    EnumRedirectMap[8] = 8;
 
 
 	MetaList[8] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -95,6 +104,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[9] = "R32G32B32A32_Float";
+    EnumRedirectMap[9] = 9;
 
 
 	MetaList[9] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -104,6 +114,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[10] = "R16G16B16A16_Uint";
+    EnumRedirectMap[10] = 10;
 
 
 	MetaList[10] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -113,6 +124,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[11] = "R8_Uint";
+    EnumRedirectMap[11] = 11;
 
 
 	MetaList[11] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -122,6 +134,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[12] = "R16_Uint";
+    EnumRedirectMap[12] = 12;
 
 
 	MetaList[12] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -131,6 +144,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[13] = "R32_Uint";
+    EnumRedirectMap[13] = 13;
 
 
 	MetaList[13] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -140,6 +154,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[14] = "R24G8_TYPELESS";
+    EnumRedirectMap[14] = 14;
 
 
 	MetaList[14] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -149,6 +164,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 	});
 
     EnumStringList[15] = "D24_Unorm_S8_Uint";
+    EnumRedirectMap[15] = 15;
 
 
 	MetaList[15] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -157,7 +173,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETextureFormat), "ETextureFormat", EnumStringList ,MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETextureFormat), "ETextureFormat", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 
@@ -166,12 +182,13 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
-
+	HHashMap<int32, int32> EnumRedirectMap;
 
 	MetaList.resize(13);
 	EnumStringList.resize(13);
 
     EnumStringList[0] = "Common";
+    EnumRedirectMap[0] = 0;
 
 
 	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -180,6 +197,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[1] = "VertexAndConstantBuffer";
+    EnumRedirectMap[1] = 1;
 
 
 	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -188,6 +206,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[2] = "IndexBuffer";
+    EnumRedirectMap[2] = 2;
 
 
 	MetaList[2] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -196,6 +215,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[3] = "RenderTarget";
+    EnumRedirectMap[3] = 3;
 
 
 	MetaList[3] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -204,6 +224,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[4] = "UnorderedAccess";
+    EnumRedirectMap[4] = 4;
 
 
 	MetaList[4] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -212,6 +233,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[5] = "DepthWrite";
+    EnumRedirectMap[5] = 5;
 
 
 	MetaList[5] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -220,6 +242,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[6] = "DepthRead";
+    EnumRedirectMap[6] = 6;
 
 
 	MetaList[6] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -228,6 +251,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[7] = "NonePixelShaderResource";
+    EnumRedirectMap[7] = 7;
 
 
 	MetaList[7] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -236,6 +260,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[8] = "PixelShaderResource";
+    EnumRedirectMap[8] = 8;
 
 
 	MetaList[8] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -244,6 +269,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[9] = "CopyDest";
+    EnumRedirectMap[9] = 9;
 
 
 	MetaList[9] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -252,6 +278,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[10] = "CopySource";
+    EnumRedirectMap[10] = 10;
 
 
 	MetaList[10] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -260,6 +287,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[11] = "RayTracingAccelerationStructure";
+    EnumRedirectMap[11] = 11;
 
 
 	MetaList[11] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -268,6 +296,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 	});
 
     EnumStringList[12] = "GenericRead";
+    EnumRedirectMap[12] = 12;
 
 
 	MetaList[12] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -275,7 +304,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(EResourceState), "EResourceState", EnumStringList ,MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(EResourceState), "EResourceState", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 
@@ -284,12 +313,13 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
-
+	HHashMap<int32, int32> EnumRedirectMap;
 
 	MetaList.resize(19);
 	EnumStringList.resize(19);
 
     EnumStringList[0] = "Unknown";
+    EnumRedirectMap[0] = 0;
 
 
 	MetaList[0] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -300,6 +330,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[1] = "Bool";
+    EnumRedirectMap[1] = 1;
 
 
 	MetaList[1] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -310,6 +341,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[2] = "Int";
+    EnumRedirectMap[2] = 2;
 
 
 	MetaList[2] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -320,6 +352,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[3] = "Int2";
+    EnumRedirectMap[3] = 3;
 
 
 	MetaList[3] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -330,6 +363,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[4] = "Int3";
+    EnumRedirectMap[4] = 4;
 
 
 	MetaList[4] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -340,6 +374,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[5] = "Int4";
+    EnumRedirectMap[5] = 5;
 
 
 	MetaList[5] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -350,6 +385,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[6] = "Uint";
+    EnumRedirectMap[6] = 6;
 
 
 	MetaList[6] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -360,6 +396,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[7] = "Uint2";
+    EnumRedirectMap[7] = 7;
 
 
 	MetaList[7] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -370,6 +407,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[8] = "Uint3";
+    EnumRedirectMap[8] = 8;
 
 
 	MetaList[8] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -380,6 +418,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[9] = "Uint4";
+    EnumRedirectMap[9] = 9;
 
 
 	MetaList[9] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -390,6 +429,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[10] = "Float";
+    EnumRedirectMap[10] = 10;
 
 
 	MetaList[10] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -400,6 +440,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[11] = "Float2";
+    EnumRedirectMap[11] = 11;
 
 
 	MetaList[11] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -410,6 +451,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[12] = "Float3";
+    EnumRedirectMap[12] = 12;
 
 
 	MetaList[12] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -420,6 +462,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[13] = "Float4";
+    EnumRedirectMap[13] = 13;
 
 
 	MetaList[13] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -430,6 +473,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[14] = "Float3x3";
+    EnumRedirectMap[14] = 14;
 
 
 	MetaList[14] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -440,6 +484,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[15] = "Float4x4";
+    EnumRedirectMap[15] = 15;
 
 
 	MetaList[15] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -450,6 +495,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[16] = "Texture2D";
+    EnumRedirectMap[16] = 16;
 
 
 	MetaList[16] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -460,6 +506,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[17] = "TextureCube";
+    EnumRedirectMap[17] = 17;
 
 
 	MetaList[17] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -470,6 +517,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 	});
 
     EnumStringList[18] = "RWTexture2D";
+    EnumRedirectMap[18] = 18;
 
 
 	MetaList[18] = PObjectGlobalsPrivateUtils::MakeStaticMeta(
@@ -479,7 +527,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ECommandQueueType), "ECommandQueueType", EnumStringList ,MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ECommandQueueType), "ECommandQueueType", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 

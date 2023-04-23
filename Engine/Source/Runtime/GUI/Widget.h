@@ -3,6 +3,7 @@
 #include "GUIDefine.h"
 #include "Builder/GUIBuilder.h"
 #include "Builder/MenuBuilder.h"
+#include "Builder/ContextMenuBuilder.h"
 
 class WWidget : public IMemoryObject 
 {
@@ -12,8 +13,12 @@ class WWidget : public IMemoryObject
 	EWidgetFlags _widgetFlags;
 
 	bool _bIsOpen;
+
+protected:
+	bool _bAllowUpdate;
+
 public:
-	WWidget() = default;
+	WWidget();
 	virtual ~WWidget() = default;
 
 	void  SetName(PName inName);
@@ -30,8 +35,11 @@ protected:
 	friend class GGUIGlobalSystem;
 	virtual void Construct() override;
 	virtual void OnConstruct() {}
+	virtual void OnUpdate() {}
 	virtual void OnOpen()  {}
 	virtual void OnClose() {}
+public:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) {}
 	virtual void OnMenuBuild(HMenuBuilder& inBuilder) {}
+	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) {}
 };

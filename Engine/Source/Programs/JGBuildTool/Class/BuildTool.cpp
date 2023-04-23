@@ -130,7 +130,7 @@ bool PBuildTool::collectionModuleInfos(const PString& workDir, const HHashSet<PS
 void PBuildTool::collectionModuleInfosInternal(const PString& categoryName, const PString& inCategoryPath, HHashMap<PString, HList<PModuleInfo>>& outModuleInfoMap)
 {
 	HList<PString> modulePathList;
-	HFileHelper::FileListInDirectory(inCategoryPath, &modulePathList);
+	HFileHelper::FileListInDirectory(inCategoryPath, &modulePathList, true);
 
 	PString moduleInfoFileName;
 	PString moduleName;
@@ -141,20 +141,17 @@ void PBuildTool::collectionModuleInfosInternal(const PString& categoryName, cons
 
 		if (HFileHelper::Exists(modulePath) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Critical, "module(%s) doesn't exist.", moduleName);
 			continue;
 		}
 
 		if (HFileHelper::IsDirectory(modulePath) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Critical, "module(%s) must directory file", moduleName);
 			continue;
 		}
 
 		PModuleInfo moduleInfo;
 		if (findModuleInfo(modulePath, &moduleInfo) == false)
 		{
-			JG_LOG(BuildTool, ELogLevel::Warning, "module(%s) can't find module info", moduleName);
 			continue;
 		}
 		

@@ -28,11 +28,15 @@ public:
 	HAttribute<T>& operator=(const T& inData)
 	{
 		SetValue(inData);
+
+		return *this;
 	}
 
 	HAttribute<T>& operator=(const POnProvideData& inDelegate)
 	{
 		Bind(inDelegate);
+
+		return *this;
 	}
 
 	void Bind(const POnProvideData& inDelegate)

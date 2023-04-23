@@ -116,7 +116,9 @@ void PName::set(const PString& str)
 	reset();
 
 	GStringTable::GetInstance().RegisterString(str, &_id, &_weakRefCount);
-
+#ifdef _DEBUG
+	_str = str.GetRawString();
+#endif
 	addRefCount();
 }
 
@@ -126,7 +128,9 @@ void PName::copy(const PName& name)
 
 	_id = name._id;
 	_weakRefCount = name._weakRefCount;
-
+#ifdef _DEBUG
+	_str = name._str;
+#endif
 	addRefCount();
 }
 
@@ -136,7 +140,9 @@ void PName::move(PName&& name)
 
 	_id        = name._id;
 	_weakRefCount = name._weakRefCount;
-
+#ifdef _DEBUG
+	_str = std::move(name._str);
+#endif
 	name._id = NAME_NONE;
 	name._weakRefCount.reset();
 }

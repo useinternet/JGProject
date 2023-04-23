@@ -4,6 +4,7 @@
 #include "JGEditorDefine.h"
 
 class PJWindow;
+class HMenuBuilder;
 class JGEDITOR_API HJGEditorModule : public IModuleInterface
 {
 	PSharedPtr<PJWindow> _window;
@@ -16,5 +17,7 @@ protected:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+public:
+	void BuildMainMenu(HMenuBuilder& inMenuBuilder);
 };
 

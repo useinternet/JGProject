@@ -1,17 +1,27 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
+#include "MenuTrees.h"
 
-
-// UICommand는 따로 만들고있고,
-// Path, HotKey, 만들어 두고,
-
-// Context는 크게
-// Item, ContextMenuBuilder로 등록
-// Widget중 ChildWidget이 있는데, 이거는 Open할수없는 Widget이고, Widget 에 붙힐수있다., 
-
-
+class WWidget;
 class HMenuBuilder
 {
-	// Comamnd 등록할때 함수도 바인딩
+public:
+	void AddSection(const PName& inSectionName, int32 inPriority);
+	void AddMenuPath(const PName& inSectionName, const PName& inMenuPath, int32 inPriority = 0);
+	void AddMainMenu(const PName& inSectionName, const PName& inMenuPath, const HMenuCommand& inMenuCommand, const HMenuAction& inBindAction, const HIsVisibleMenu& inIsVisibleMenu, const HIsEnableMenu& inIsEnableMenu, int32 inPriority = 0);
+	void AddMenu(const PName& inSectionName, PWeakPtr<WWidget> inWidget, const HMenuCommand& inMenuCommand, const HMenuAction& inBindAction);
+
+	const HMenuTrees& GetMenuTrees() const;
+private:
+	HMenuTrees _mainMenuTrees;
 };
+
+class IMenuBuild
+{
+public:
+	virtual void PushData(const HMenuTrees& inMenuTrees) = 0;
+	virtual void Build() = 0;
+	virtual void Reset() = 0;
+};
+

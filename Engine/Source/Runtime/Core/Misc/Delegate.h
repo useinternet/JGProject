@@ -171,8 +171,7 @@ public:
 	}
 			
 public:
-	template<class T>
-	static PDelegate<RetType, Args...> Create(PWeakPtr<T> ptr, const std::function<RetType(Args...)>& func)\
+	static PDelegate<RetType, Args...> Create(PWeakPtr<IMemoryObject> ptr, const std::function<RetType(Args...)>& func)\
 	{
 		PDelegate<RetType, Args...> delegate;
 		delegate.Bind(ptr, func);

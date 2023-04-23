@@ -51,14 +51,21 @@ struct HEnumElement
 {
 	HMeta MetaData;
 	PString Name;
+	int32 Value;
 };
 
 struct HEnum
 {
+	enum 
+	{
+		AUTO_REDIRECT = 0
+	};
+
 	PString Name;
 	HList<HEnumElement> Elements;
 	HMeta MetaData;
 
+	int32 LastEnumValue = 0;
 	HHeaderInfo* OwnerHeaderInfo = nullptr;
 
 	HEnum(HHeaderInfo* pOwnerHeaderInfo) : OwnerHeaderInfo(pOwnerHeaderInfo) {}

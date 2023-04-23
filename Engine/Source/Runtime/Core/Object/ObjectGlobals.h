@@ -27,7 +27,7 @@ public:
 	static PSharedPtr<JGProperty> MakeStaticProperty(const JGType& type, const PString& name, PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGFunction> MakeStaticFunction(const PString& name, const JGType& returnType, const HList<JGType>& args = HList<JGType>(), PSharedPtr<JGMeta> metaData = nullptr);
 	static PSharedPtr<JGClass>    MakeStaticClass(const JGType& type, const HList<JGType>& virtualTypeList, const HList<PSharedPtr<JGProperty>>& properties, const HList<PSharedPtr<JGFunction>>& functions, PSharedPtr<JGMeta> metaData = nullptr);
-	static PSharedPtr<JGEnum> MakeStaticEnum(const JGType& type, const PString& name, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas);
+	static PSharedPtr<JGEnum> MakeStaticEnum(const JGType& type, const PString& name, const HHashMap<int32, int32>& enumValueRedirectMap, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas);
 
 	template<class T>
 	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
@@ -225,14 +225,19 @@ protected:
 	PSharedPtr<JGType>  Type;
 	HList<PSharedPtr<JGMeta>>  ElementMetaDatas;
 	HList<PName> ElementNames;
+	HHashMap<int32, int32> EnumValueRedirectMap;
 public:
 	JGEnum();
 	virtual ~JGEnum() = default;
 
 public:
 	PName GetEnumNameByIndex(int32 index) const;
+	PName GetEnumNameByValue(int32 value) const;
 	PSharedPtr<JGMeta> GetMetaDataByIndex(int32 index) const;
+	PSharedPtr<JGMeta> GetMetaDataByValue(int32 value) const;
 	PSharedPtr<JGType> GetEnumType() const;
+
+	int32 GetIndexByValue(int32 value) const;
 };
 
 /* JGClass

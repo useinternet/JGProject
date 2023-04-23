@@ -42,6 +42,7 @@ void HJGEditorModule::StartupModule()
 
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
 
+	GGUIGlobalSystem::GetInstance().GUIEvents.OnMenuBuild.Add<PJWindow>(_window, JG_DELEGATE_FN_BIND_ONEPARAM(HJGEditorModule::BuildMainMenu));
 	GGUIGlobalSystem::GetInstance().OpenWidget<WDevelopWidget>();
 
 }
@@ -57,4 +58,16 @@ void HJGEditorModule::ShutdownModule()
 	JG_LOG(JGEditor, ELogLevel::Trace, "Shutdown JGEditor Module...");
 }
 
+void HJGEditorModule::BuildMainMenu(HMenuBuilder& inMenuBuilder)
+{
+	PName SectionName = PName("Test");
+	inMenuBuilder.AddSection(SectionName, 0);
+	inMenuBuilder.AddMenuPath(SectionName, PName("Files"));
+	inMenuBuilder.AddMenuPath(SectionName, PName("Windows"));
+	
+
+	//inMenuBuilder.AddSection(SectionName, 0);
+	//inMenuBuilder.AddMainMenu(w)
+
+}
 

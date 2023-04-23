@@ -21,11 +21,11 @@ class PDX12FrameBuffer
 	PSharedPtr<PDX12Texture>   _submittedTexture;
 	HFrameBufferInfo _frameBufferInfo;
 public:
-	JG_DECLARE_MULTI_DELEGATE(POnPresent);
-	JG_DECLARE_MULTI_DELEGATE_FOURPARAM(POnUpdate, HDX12CommandList*, HDX12Resource*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_RESOURCE_STATES&);
+	JG_DECLARE_MULTI_DELEGATE(HOnPresent);
+	JG_DECLARE_MULTI_DELEGATE_FOURPARAM(HOnUpdate, HDX12CommandList*, HDX12Resource*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_RESOURCE_STATES&);
 	
-	POnPresent OnPresent;
-	POnUpdate  OnUpdate;
+	HOnPresent OnPresent;
+	HOnUpdate  OnUpdate;
 public:
 	virtual ~PDX12FrameBuffer();
 

@@ -52,13 +52,13 @@ PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& ty
 	return result;
 }
 
-PSharedPtr<JGEnum> PObjectGlobalsPrivateUtils::MakeStaticEnum(const JGType& type, const PString& name, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas)
+PSharedPtr<JGEnum> PObjectGlobalsPrivateUtils::MakeStaticEnum(const JGType& type, const PString& name, const HHashMap<int32, int32>& enumValueRedirectMap, const HList<PName>& enumElementNames, const HList<PSharedPtr<JGMeta>>& metas)
 {
 	PSharedPtr<JGEnum> Enum = Allocate<JGEnum>();
 	Enum->Type = Allocate<JGType>(type);
 	Enum->ElementMetaDatas = metas;
 	Enum->ElementNames = enumElementNames;
-
+	Enum->EnumValueRedirectMap = enumValueRedirectMap;
 	return Enum;
 }
 
@@ -244,7 +244,7 @@ JGEnum::JGEnum() {}
 
 PName JGEnum::GetEnumNameByIndex(int32 index) const
 {
-	if (ElementNames.size() <= index)
+	if (ElementNames.size() <= index || index == INDEX_NONE)
 	{
 		return NAME_NONE;
 	}
@@ -252,9 +252,15 @@ PName JGEnum::GetEnumNameByIndex(int32 index) const
 	return ElementNames[index];
 }
 
+PName JGEnum::GetEnumNameByValue(int32 value) const
+{
+	int32 index = GetIndexByValue(value);
+	return GetEnumNameByIndex(index);
+}
+
 PSharedPtr<JGMeta> JGEnum::GetMetaDataByIndex(int32 index) const
 {
-	if (ElementNames.size() <= index)
+	if (ElementNames.size() <= index || index == INDEX_NONE)
 	{
 		return nullptr;
 	}
@@ -262,9 +268,25 @@ PSharedPtr<JGMeta> JGEnum::GetMetaDataByIndex(int32 index) const
 	return ElementMetaDatas[index];
 }
 
+PSharedPtr<JGMeta> JGEnum::GetMetaDataByValue(int32 value) const
+{
+	int32 index = GetIndexByValue(value);
+	return GetMetaDataByIndex(index);
+}
+
 PSharedPtr<JGType> JGEnum::GetEnumType() const
 {
 	return Type;
+}
+
+int32 JGEnum::GetIndexByValue(int32 value) const
+{
+	if (EnumValueRedirectMap.contains(value))
+	{
+		return EnumValueRedirectMap.at(value);
+	}
+
+	return INDEX_NONE;
 }
 
 JGClass::JGClass() {}

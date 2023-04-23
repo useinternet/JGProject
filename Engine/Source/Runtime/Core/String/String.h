@@ -98,6 +98,7 @@ public:
 	PString& AppendLine(const PString& string);
 	PString& Insert(const PString& string, uint64 pos);
 	PString& Remove(uint64 startPos, uint64 len);
+	PString& PopBack();
 	PString& Trim();
 
 	void SubString(PString* outString, uint64 startPos, uint64 length = PString::NPOS) const;

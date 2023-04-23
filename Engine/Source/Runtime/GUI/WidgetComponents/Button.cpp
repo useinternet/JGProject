@@ -5,7 +5,7 @@
 
 void WButton::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushGenerateNativeGUI(SharedWrap(this), POnGenerateNativeGUI::Create<WButton>(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
 	{
 		bool bIsClick = ImGui::Button(
 			Text.GetValue().GetCStr(),
@@ -16,4 +16,9 @@ void WButton::OnGUIBuild(HGUIBuilder& inBuilder)
 			OnClick.ExecuteIfBound();
 		}
 	}));
+}
+
+void WButton::OnContextMenuBuild(HContextMenuBuilder& inBuilder)
+{
+
 }

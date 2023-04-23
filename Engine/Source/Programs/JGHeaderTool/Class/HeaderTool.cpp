@@ -725,6 +725,28 @@ bool PHeaderTool::analysisEnumElement(const PString& line, HEnum* pEnum)
 		return false;
 	}
 
+	int32 enumValue = HEnum::AUTO_REDIRECT;
+	if (tokens[0].Contains("="))
+	{
+		tokens = tokens[0].Split('=');
+		if (tokens.size() > 1)
+		{
+			enumValue = tokens[1].Trim().ToInt(HEnum::AUTO_REDIRECT);
+		}
+	}
+
+	if (enumValue == HEnum::AUTO_REDIRECT)
+	{
+		enumElement.Value = pEnum->LastEnumValue;
+	}
+	else
+	{
+		enumElement.Value = enumValue;
+		pEnum->LastEnumValue = enumValue;
+	}
+
+	pEnum->LastEnumValue += 1;
+	
 	enumElement.Name = tokens[0].ReplaceAll("{", "").Trim();
 	pEnum->Elements.push_back(enumElement);
 
@@ -1105,7 +1127,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		staticFuncCode.AppendLine(PString::Format(R"(
 	HList<PSharedPtr<JGMeta>> MetaList;
 	HList<PName> EnumStringList;
-
+	HHashMap<int32, int32> EnumRedirectMap;
 
 	MetaList.resize(%d);
 	EnumStringList.resize(%d);
@@ -1113,9 +1135,8 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 		for (uint64 i = 0; i < elementCnt; ++i)
 		{
-
 			staticFuncCode.AppendLine(PString::Format("    EnumStringList[%d] = \"%s\";", i, Enum.Elements[i].Name));
-
+			staticFuncCode.AppendLine(PString::Format("    EnumRedirectMap[%d] = %d;", Enum.Elements[i].Value, i));
 
 			PString metaElementStr;
 			for (const HPair<PString, HHashSet<PString>>& pair : Enum.Elements[i].MetaData.Metas)
@@ -1139,7 +1160,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 )", i, metaElementStr);
 			staticFuncCode.AppendLine(metaStr);
 		}
-		staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(%s), \"%s\", EnumStringList ,MetaList);", Enum.Name, Enum.Name));
+		staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(%s), \"%s\", EnumRedirectMap, EnumStringList , MetaList);", Enum.Name, Enum.Name));
 		staticFuncCode.AppendLine("}");
 		outCode->AppendLine(staticFuncCode).AppendLine("");
 	}

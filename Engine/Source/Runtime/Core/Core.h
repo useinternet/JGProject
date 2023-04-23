@@ -31,6 +31,7 @@
 #include "Object/ObjectGlobals.h"
 #include "Object/ObjectGlobalSystem.h"
 #include "Object/JGObject.h"
+#include "Input/Key.h"
 #include "Memory/Memory.h"
 #include "Thread/Scheduler.h"
 #include "Platform/PlatformDefines.h"

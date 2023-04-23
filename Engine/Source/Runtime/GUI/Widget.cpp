@@ -1,6 +1,9 @@
 #include "PCH/PCH.h"
 #include "Widget.h"
 
+WWidget::WWidget() : _bAllowUpdate(false)
+{ }
+
 void WWidget::SetName(PName inName)
 {
 	_widgetName = inName;

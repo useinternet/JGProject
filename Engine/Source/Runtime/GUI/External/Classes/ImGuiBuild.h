@@ -2,6 +2,7 @@
 #include "Builder/GUIBuilder.h"
 
 struct ImGuiContext;
+class IContextMenuBuild;
 class PImGuiBuild final : public IMemoryObject, public IGUIBuild
 {
 	enum class EBuildHistory
@@ -15,39 +16,81 @@ class PImGuiBuild final : public IMemoryObject, public IGUIBuild
 	struct HWidgetComponentCacheData
 	{
 		bool bAttendance = false;
-		bool bHover = false;
+		bool bHover      = false;
+		PSharedPtr<IContextMenuBuild> ContextMenuBuild;
+	};
+
+	struct HWidgetCacheData
+	{
+		bool bAttendance   = false;
+		bool bOpenedWidget = false;
+
+		HVector2 ContentRegionSize;
+		PSharedPtr<WWidget> ParentWidget;
+
+		PSharedPtr<IContextMenuBuild> ContextMenuBuild;
 	};
 
 	struct HBuildCacheData
 	{
 		HVector2 CursorPos;
 		HHashMap<HGuid, HWidgetComponentCacheData> WidgetCompCahceDatas;
+		HHashMap<HGuid, HWidgetCacheData> WidgetCacheDatas;
+	};
+
+	struct HBuildHistory
+	{
+		EBuildHistory BuildHistroy;
+		PSharedPtr<WWidget> Widget;
+		
+		HBuildHistory()
+			: BuildHistroy(EBuildHistory::None)
+			, Widget(nullptr) {}
+
+		HBuildHistory(EBuildHistory inBuildHistory, PSharedPtr<WWidget> inWidget)
+			: BuildHistroy(inBuildHistory)
+			, Widget(inWidget) {}
+
 	};
 
 	struct HBuildContext
 	{
-		HStack<EBuildHistory> HistoryStack;
-		PSharedPtr<WWidget>   CurrentWidget;
+		HStack<HBuildHistory> HistoryStack;
 		HBuildCacheData*	  CacheData;
+		HVector2			  CurrentWindowRegionSize;
+		PSharedPtr<WWidget>   ParentWidget;
+
 		bool bIsHandledGUIEvents[(int32)EGUIEvent::Count];
 
 		int32 FixedWidth;
 		int32 FixedHeight;
 		
-		bool bOpenWidget;
+		bool bOpenContextMenu;
 		bool bIsDirtyMousePos;
 		bool bLastCompInLayout;
 
-		void PushBuildHistroy(EBuildHistory history)
+		void PushBuildHistroy(const HBuildHistory& inBuildHistory)
 		{
-			HistoryStack.push(history);
+			HistoryStack.push(inBuildHistory);
 		}
 
-		EBuildHistory CurrentBuildHistory() const
+		const HBuildHistory& CurrentBuildHistory() const
 		{
 			if (HistoryStack.empty())
 			{
-				return EBuildHistory::None;
+				static HBuildHistory InvalidHistroy;
+				return InvalidHistroy;
+			}
+
+			return HistoryStack.top();
+		}
+
+		HBuildHistory& CurrentBuildHistory()
+		{
+			if (HistoryStack.empty())
+			{
+				static HBuildHistory InvalidHistroy;
+				return InvalidHistroy;
 			}
 
 			return HistoryStack.top();
@@ -83,12 +126,19 @@ private:
 	bool OnBuildBeginVertical(HBuildContext& inBuildContext, HGUIBuilder::PVerticalCommandValue* inCV);
 	bool OnBuildEndVertical(HBuildContext& inBuildContext);
 
+	bool OnBuildPushChildWidget(HBuildContext& inBuildContext, HGUIBuilder::PChildWidgetCommandValue* inCV);
 	bool OnBuildBeginWidget(HBuildContext& inBuildContext, HGUIBuilder::PWidgetCommandValue* inCV);
 	bool OnBuildEndWidget(HBuildContext& inBuildContext);
+	bool OnBuildBeginChildWidget(HBuildContext& inBuildContext, HGUIBuilder::PChildWidgetCommandValue* inCV);
+	bool OnBuildEndChildWidget(HBuildContext& inBuildContext);
+
 
 	bool OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuilder::PWidgetComponentCommandValue* inCV);
 	bool OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBuilder::PGenerateNativeGUICommandValue* inCV);
 
 
 	void OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, IGUIEventReceiver* inEventReceiver);
+
+	void OnContextMenu(HBuildContext& inBuildContext, PSharedPtr<WWidget> inWidget);
+	void OnContextMenu(HBuildContext& inBuildContext, PSharedPtr<WWidgetComponent> inWidgetComponent);
 };

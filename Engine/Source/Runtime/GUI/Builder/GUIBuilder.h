@@ -84,7 +84,28 @@ virtual ~##ClassName() = default; \
 }; \
 
 
-JG_DECLARE_DELEGATE_ONEPARAM(POnGenerateNativeGUI, const HWidgetContext&);
+JG_DECLARE_DELEGATE_ONEPARAM(HOnGenerateNativeGUI, const HWidgetContext&);
+
+struct HPushChildWidgetArguments
+{
+	float32 WidthRatio  = 0.0f;
+	float32 HeightRatio = 0.0f;
+	int32 FixedWidth  = INDEX_NONE;
+	int32 FixedHeight = INDEX_NONE;
+
+	HPushChildWidgetArguments() = default;
+	HPushChildWidgetArguments(float32 inWidthRatio, float32 inHeightRatio)
+		: WidthRatio(inWidthRatio), HeightRatio(inHeightRatio) {}
+
+	HPushChildWidgetArguments(int32 inFixedWidth, float32 inHeightRatio)
+		: FixedWidth(inFixedWidth), HeightRatio(inHeightRatio) {}
+
+	HPushChildWidgetArguments(float32 inWidthRatio, int32 inFixedHeight)
+		: WidthRatio(inWidthRatio), FixedHeight(inFixedHeight) {}
+
+	HPushChildWidgetArguments(int32 inFixedWidth, int32 inFixedHeight)
+		: FixedWidth(inFixedWidth), FixedHeight(inFixedHeight) {}
+};
 
 class WWidgetComponent;
 class WWidget;
@@ -101,6 +122,7 @@ public:
 		EndVertical,
 		BeginWidget,
 		EndWidget,
+		PushChildWidget,
 		PushWidgetComponent,
 		PushGenerateNatvieGUI
 	};
@@ -122,7 +144,8 @@ public:
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PHorizontalCommandValue, int32, FixedWidth);
 	DEFINE_GUIBUILD_COMMAND_ONEVALUE(PVerticalCommandValue, int32, FixedHeight);
 
-	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PGenerateNativeGUICommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent, POnGenerateNativeGUI, OnGenerateGUI);
+	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PChildWidgetCommandValue, PSharedPtr<WWidget>, Widget, HPushChildWidgetArguments, Args);
+	DEFINE_GUIBUILD_COMMAND_TWOVALUE(PGenerateNativeGUICommandValue, PSharedPtr<WWidgetComponent>, WidgetComponent, HOnGenerateNativeGUI, OnGenerateGUI);
 public:
 	void BeginHorizontal(int32 fixedWidth = INDEX_NONE);
 	void EndHorizontal();
@@ -130,8 +153,9 @@ public:
 	void BeginVertical(int32 fixedHeight = INDEX_NONE);
 	void EndVertical();
 
+	void PushChildWidget(PSharedPtr<WWidget> inWidget, const HPushChildWidgetArguments& inArgs = HPushChildWidgetArguments());
 	void PushWidgetComponent(PSharedPtr<WWidgetComponent> inWidgetCom);
-	void PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const POnGenerateNativeGUI& OnGenerateGUI);
+	void PushGenerateNativeGUI(PSharedPtr<WWidgetComponent> inWidgetCom, const HOnGenerateNativeGUI& OnGenerateGUI);
 
 	const HQueue<HCommandData>& GetCommandQueue() const;
 private:

@@ -21,7 +21,7 @@ public:
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
-		inBuilder.PushGenerateNativeGUI<WInputScalar<T>>(SharedWrap(this), POnGenerateNativeGUI::Create<WText>(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+		inBuilder.PushGenerateNativeGUI<WInputScalar<T>>(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
 		{
 			bool bIsDirty = false;
 			T	 value = _value;

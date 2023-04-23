@@ -4,6 +4,7 @@
 #include "DirectX12/DX12FrameBuffer.h"
 #include "GUI.h"
 #include "External/Classes/ImGuiBuild.h"
+#include "External/Classes/ImGuiMenuBuild.h"
 #include "External/imgui/imgui.h"
 #include "External/imgui/imgui_impl_win32.h"
 #include "External/imgui/imgui_impl_dx12.h"
@@ -27,6 +28,7 @@ PDX12JGGui::~PDX12JGGui()
 void PDX12JGGui::Create()
 {
 	GGUIGlobalSystem::GetInstance().SetGUIBuild(Allocate<PImGuiBuild>());
+	GGUIGlobalSystem::GetInstance().SetMenuBuild(Allocate<PImGuiMenuBuild>());
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -115,7 +117,7 @@ void PDX12JGGui::NewFrame()
 	ImGui::NewFrame();
 
 	ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-	ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_NoDocking;
 	const ImGuiViewport* viewport      = ImGui::GetMainViewport();
 
 	ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -127,7 +129,7 @@ void PDX12JGGui::NewFrame()
 	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	window_flags |= ImGuiWindowFlags_NoBackground;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("UISystemLayer", nullptr, window_flags);
+	ImGui::Begin(HGUIConstants::MainWidgetID.GetCStr(), nullptr, window_flags);
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar(2);
 	// DockSpace

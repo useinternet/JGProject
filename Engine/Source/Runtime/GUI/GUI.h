@@ -3,6 +3,25 @@
 #include "Widget.h"
 
 class IGUIBuild;
+class IMenuBuild;
+class IContextMenuBuild;
+class HMenuBuilder;
+class HContextMenuBuilder;
+
+JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnMenuBuild, HMenuBuilder&)
+JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnContextBuild, HContextMenuBuilder&)
+
+struct HGUIConstants
+{
+	static const PString MainWidgetID;
+};
+
+struct HGUIEvents
+{
+	POnMenuBuild    OnMenuBuild;
+	POnContextBuild OnContextMenuBuild;
+};
+
 class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 {
 	PSharedPtr<IMemoryObject> _memObject;
@@ -12,11 +31,18 @@ class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 	HHashMap<JGType, HGuid> _widgetGuidRedirectByType;
 	HHashMap<HGuid, PSharedPtr<WWidget>> _openWidgets;
 
-	PSharedPtr<IGUIBuild> _guiBuild;
+	PSharedPtr<IGUIBuild>  _guiBuild;
+	PSharedPtr<IMenuBuild> _menuBuild;
+	PSharedPtr<IContextMenuBuild> _contextMenuBuild;
+
+	bool _bMenuDirty;
+public:
+	HGUIEvents GUIEvents;
 
 protected:
 	virtual void Start() override;
 	virtual void Destroy() override;
+	void Update(const PTaskArguments& args);
 	void Build(const PTaskArguments& args);
 	void BuildGUI();
 	void BuildMenu();
@@ -25,6 +51,12 @@ protected:
 public:
 	void SetGUIBuild(PSharedPtr<IGUIBuild> guiBuild);
 	PSharedPtr<IGUIBuild> GetGUIBuild() const;
+
+	void SetMenuBuild(PSharedPtr<IMenuBuild> inMenuBuild);
+	PSharedPtr<IMenuBuild> GetMenuBuild() const;
+
+	void SetContextMenuBuild(PSharedPtr<IContextMenuBuild> inContextMenuBuild);
+	PSharedPtr<IContextMenuBuild> GetContextMenuBuild() const;
 
 	template<class T>
 	PSharedPtr<T> OpenWidget(PName widgetKeyName = NAME_NONE)

@@ -2,9 +2,6 @@
 #include "CoreDefines.h"
 #include "Object/ObjectDefines.h"
 
-
-
-
 JGENUM()
 enum class EKeyCode
 {							    

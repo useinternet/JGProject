@@ -5,8 +5,7 @@ JG_ENUM_FLAG(EWidgetFlags)
 enum class EWidgetFlags : int32
 {
 	None,
-	ChildWidget = 0x001,
-	ChildWidget_Border = 0x002,
+	ChildWidget_Border = 0x001,
 };
 
 enum class EWidgetVisibility

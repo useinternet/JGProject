@@ -141,6 +141,24 @@ workspace "JGEngine"
 
 
 		group "Engine/Editor"
+			project "DUT_Graphics"
+				includedirs{ "Source/Editor/DevelopUnitTest/DUT_Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
+				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }
+				SetCPPProjectConfig("SharedLib", "Source/Editor/DevelopUnitTest/DUT_Graphics/", {"_DUT_GRAPHICS", })
+				filter "configurations:DevelopEngine"
+					DebugConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+				filter "configurations:DevelopGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+				filter "configurations:ConfirmGame"
+					ConfirmConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+				filter "configurations:ReleaseGame"
+					ReleaseConfig()
+					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+
+
 			project "JGEditor"
 				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
 				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }

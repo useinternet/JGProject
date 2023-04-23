@@ -5,10 +5,10 @@ JGENUM(Config = JGConfig)
 enum class ETestEnumA
 {
 	AAA, JGENUMMETA(Hidden, Category = Hidden)
-	BBB, JGENUMMETA(Display, Category = Display)
+	BBB = 10, JGENUMMETA(Display, Category = Display)
 	CCC, JGENUMMETA()
 	DDD, JGENUMMETA(Hidden, Category = Hidden)
-	EEE, JGENUMMETA(Display, Category = Display)
+	EEE = 30, JGENUMMETA(Display, Category = Display)
 	MMM, JGENUMMETA(EXEC)
 };
 

@@ -21,6 +21,8 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 
 extern PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Static_Create_Class_JGTestClassA();
 extern PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Create_Class_JGTestClassA(const JGObject* fromThis);
+extern PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_JGDevelopUnit();
+extern PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_JGDevelopUnit(const JGObject* fromThis);
 extern PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnumA();
 extern PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_EKeyCode();
 extern PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFormat();
@@ -32,6 +34,7 @@ CODEGEN_API bool Engine_CodeGenerate(GObjectGlobalSystem* objectGlobalSystem)
 {
 
     objectGlobalSystem->RegisterJGClass(Module_JGConsole_Code_Generation_Static_Create_Class_JGTestClassA(), Module_JGConsole_Code_Generation_Create_Class_JGTestClassA);
+    objectGlobalSystem->RegisterJGClass(Module_Core_Code_Generation_Static_Create_Class_JGDevelopUnit(), Module_Core_Code_Generation_Create_Class_JGDevelopUnit);
     objectGlobalSystem->RegisterJGEnum(Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnumA());
     objectGlobalSystem->RegisterJGEnum(Module_Core_Code_Generation_Static_Create_Enum_EKeyCode());
     objectGlobalSystem->RegisterJGEnum(Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFormat());
