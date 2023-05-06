@@ -1,5 +1,7 @@
 #include "PCH/PCH.h"
 #include "Json.h"
+#include "Object/ObjectGlobals.h"
+#include "Object/ObjectGlobalSystem.h"
 #include "rapidjson/prettywriter.h"
 
 PJsonData::PJsonData(PJson* ownerJson, bool bIsRoot)
@@ -36,6 +38,27 @@ void PJsonData::addMemberInternal(const PString& key, rapidjson::Value& value)
 	{
 		_value.AddMember(keyVal, value, _pOwnerJson->GetAllocator());
 	}
+}
+
+PSharedPtr<JGObject> PJsonData::getJGObject(const JGType& inType) const
+{
+	PSharedPtr<JGClass> Class = getClass(inType);
+	if (Class == nullptr)
+	{
+		return Allocate<JGObject>();
+	}
+
+	return AllocateByClass(Class);
+}
+
+PSharedPtr<JGClass> PJsonData::getClass(const JGType& inType) const
+{
+	return StaticClass(inType);
+}
+
+JGType PJsonData::getType(const PName& typeName) const
+{
+	return GObjectGlobalSystem::GetInstance().GetType(typeName);
 }
 
 bool PJsonData::FindMember(const PString& key, PJsonData* outJsonData) const

@@ -119,6 +119,8 @@ public:
 	bool EndWidth(const PString& pattern) const;
 	bool Contains(const PString& pattern) const;
 
+	uint64 ToUint64(uint64 base = 0) const;
+	uint32 ToUint32(uint32 base = 0) const;
 	int32  ToInt(int32 base = 0) const;
 	float  ToFloat() const;
 	double ToDouble() const;

@@ -19,14 +19,11 @@ JGCLASS()
 class JGDevelopUnit : public JGObject
 {
 public:
-	
-
-public:
 	virtual ~JGDevelopUnit() = default;
 
 public:
-	virtual void Startup()  = 0;
-	virtual void Update()   = 0;
-	virtual void Shutdown() = 0;
+	virtual void Startup() {};
+	virtual void Update() {};
+	virtual void Shutdown() {};
 };
 

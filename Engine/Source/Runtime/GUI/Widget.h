@@ -4,15 +4,19 @@
 #include "Builder/GUIBuilder.h"
 #include "Builder/MenuBuilder.h"
 #include "Builder/ContextMenuBuilder.h"
-
-class WWidget : public IMemoryObject 
+#include "Runtime/CodeGen/Module.GUI.Widget.generation.h"
+JGCLASS()
+class WWidget : public JGObject 
 {
-	PName _widgetName;
+	JG_GENERATED_CLASS_BODY
+
+	JGPROPERTY()
 	HGuid _widgetGuid;
 
-	EWidgetFlags _widgetFlags;
-
+	JGPROPERTY()
 	bool _bIsOpen;
+
+	EWidgetFlags _widgetFlags;
 
 protected:
 	bool _bAllowUpdate;
@@ -20,9 +24,6 @@ protected:
 public:
 	WWidget();
 	virtual ~WWidget() = default;
-
-	void  SetName(PName inName);
-	PName GetName() const;
 
 	const HGuid& GetGuid() const;
 

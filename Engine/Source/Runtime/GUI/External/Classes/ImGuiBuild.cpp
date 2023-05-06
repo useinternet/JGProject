@@ -325,11 +325,17 @@ bool PImGuiBuild::OnBuildBeginChildWidget(HBuildContext& inBuildContext, HGUIBui
 		{
 			widgetHeight = (float32)inCV->Args.FixedHeight;
 		}
+
 	}
 
 	bool bBorder = widgetFlags & EWidgetFlags::ChildWidget_Border;
 	//
 	ImGui::BeginChild((ImGuiID)widget->GetGuid().GetHashCode(), ImVec2(widgetWidth, widgetHeight), bBorder);
+
+	ImVec2 WindowContentRegionMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 WindowContentRegionMax = ImGui::GetWindowContentRegionMax();
+
+	widgetCachaData.ContentRegionSize = HVector2(WindowContentRegionMax.x, WindowContentRegionMax.y) - HVector2(WindowContentRegionMin.x, WindowContentRegionMin.y);
 
 	inBuildContext.ParentWidget = widget;
 	return true;
@@ -418,7 +424,12 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 	ImGui::PushID((int32)guid.GetHashCode());
 	ImGui::BeginGroup();
 
-	inCV->OnGenerateGUI.ExecuteIfBound(HWidgetContext());
+	HGuid widgetGuid = inBuildContext.ParentWidget->GetGuid();
+
+	HWidgetContext widgetContext;
+	widgetContext.ContentSize = inBuildContext.CacheData->WidgetCacheDatas[widgetGuid].ContentRegionSize;
+
+	inCV->OnGenerateGUI.ExecuteIfBound(widgetContext);
 
 	OnContextMenu(inBuildContext, inCV->WidgetComponent);
 	

@@ -332,9 +332,19 @@ bool PString::Contains(const PString& pattern) const
 	return true;
 }
 
+uint64 PString::ToUint64(uint64 base) const
+{
+	return std::stoull(_rawString, nullptr, (int32)base);
+}
+
+uint32 PString::ToUint32(uint32 base) const
+{
+	return std::stoul(_rawString, nullptr, (int32)base);
+}
+
 int32 PString::ToInt(int32 base) const
 {
-	return std::stoi(_rawString, nullptr, base);
+	return std::stoi(_rawString, nullptr, (int32)base);
 }
 
 float PString::ToFloat() const

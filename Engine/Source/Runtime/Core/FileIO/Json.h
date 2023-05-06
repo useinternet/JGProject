@@ -4,7 +4,9 @@
 #include "String/String.h"
 #include "String/Name.h"
 #include "Misc/Log.h"
+#include "Misc/Guid.h"
 #include "Object/JGType.h"
+#include "Object/JGObject.h"
 
 #include "Math/Vector.h"
 #include "Math/Quaternion.h"
@@ -24,16 +26,7 @@
 
 class PJson;
 class PJsonData;
-
-class IJsonable
-{
-	friend PJsonData;
-public:
-	virtual ~IJsonable() = default;
-protected:
-	virtual void WriteJson(PJsonData& json) const {}
-	virtual void ReadJson(const PJsonData& json) {}
-};
+class JGClass;
 
 class PJsonData : public IMemoryObject, public IJsonable
 {
@@ -141,6 +134,12 @@ private:
 	template<>
 	rapidjson::Value makeJsonValue(const HPlane& value);
 
+	template<>
+	rapidjson::Value makeJsonValue(const HGuid& value);
+
+	template<>
+	rapidjson::Value makeJsonValue(const JGType& value);
+
 	template<class T>
 	rapidjson::Value makeJsonValue(const HList<T>& values);
 
@@ -149,6 +148,9 @@ private:
 
 	template<class T>
 	rapidjson::Value makeJsonValue(const HQueue<T>& values);
+
+	template<class T>
+	rapidjson::Value makeJsonValue(const PSharedPtr<T>& value);
 
 	template<class KeyType, class ValueType>
 	rapidjson::Value makeJsonValue(const HHashMap<KeyType, ValueType>& values);
@@ -244,6 +246,12 @@ private:
 	template<>
 	bool readJsonValue(HPlane* value) const;
 
+	template<>
+	bool readJsonValue(HGuid* value) const;
+
+	template<>
+	bool readJsonValue(JGType* value) const;
+
 	template<class T>
 	bool readJsonValue(HList<T>* values) const;
 
@@ -252,6 +260,9 @@ private:
 
 	template<class T>
 	bool readJsonValue(HQueue<T>* values) const;
+
+	template<class T>
+	bool readJsonValue(PSharedPtr<T>* value) const;
 
 	template<class KeyType, class ValueType>
 	bool readJsonValue(HHashMap<KeyType, ValueType>* values) const;
@@ -272,6 +283,10 @@ private:
 
 	template<class VectorType>
 	bool readJsonValue_Vector(VectorType* value, int32 numVectorEelement) const;
+
+	PSharedPtr<JGObject> getJGObject(const JGType& inType) const;
+	PSharedPtr<JGClass> getClass(const JGType& inType) const;
+	JGType getType(const PName& typeName) const;
 #pragma endregion
 };
 
@@ -588,6 +603,18 @@ inline rapidjson::Value PJsonData::makeJsonValue(const HPlane& value)
 	return val;
 }
 
+template<>
+inline rapidjson::Value PJsonData::makeJsonValue(const HGuid& value)
+{
+	return  makeJsonValue(value.ToString());
+}
+
+template<>
+inline rapidjson::Value PJsonData::makeJsonValue(const JGType& value)
+{
+	return  makeJsonValue(value.GetName());
+}
+
 template<class T>
 inline rapidjson::Value PJsonData::makeJsonValue(const HList<T>& values)
 {
@@ -628,6 +655,29 @@ inline rapidjson::Value PJsonData::makeJsonValue(const HQueue<T>& values)
 	{
 		T value = tempQueue.front(); tempQueue.pop();
 		pushValueInJsonValue(valArr, value);
+	}
+
+	return valArr;
+}
+
+template<class T>
+inline rapidjson::Value PJsonData::makeJsonValue(const PSharedPtr<T>& value)
+{
+	rapidjson::Value valArr; valArr.SetArray();
+	if(std::is_base_of<JGObject, T>::value == true)
+	{
+		rapidjson::Value keyVal;
+		rapidjson::Value valueVal;
+
+		setValueInJsonValue(keyVal, value->GetType());
+		setValueInJsonValue(valueVal, *value);
+
+		valArr.PushBack(keyVal, _pOwnerJson->GetAllocator());
+		valArr.PushBack(valueVal, _pOwnerJson->GetAllocator());
+	}
+	else
+	{
+		JG_LOG(Core, ELogLevel::Error, "PSharedPtr only support JGObject Type");
 	}
 
 	return valArr;
@@ -1127,6 +1177,32 @@ inline bool PJsonData::readJsonValue(HPlane* value) const
 	return true;
 }
 
+template<>
+inline bool PJsonData::readJsonValue(HGuid* value) const
+{
+	if (_value.IsString() == false || value == nullptr)
+	{
+		return false;
+	}
+
+	*value = HGuid::FromString(_value.GetString());
+
+	return true;
+}
+
+template<>
+inline bool PJsonData::readJsonValue(JGType* value) const
+{
+	if (_value.IsString() == false || value == nullptr)
+	{
+		return false;
+	}
+
+	*value = getType(PName(_value.GetString()));
+
+	return true;
+}
+
 template<class T>
 inline bool PJsonData::readJsonValue(HList<T>* values) const
 {
@@ -1225,6 +1301,47 @@ inline bool PJsonData::readJsonValue(HQueue<T>* values) const
 	}
 
 	return bResult;
+}
+
+template<class T>
+inline bool PJsonData::readJsonValue(PSharedPtr<T>* value) const
+{
+	if (std::is_base_of<JGObject, T>::value == false)
+	{
+		JG_LOG(Core, ELogLevel::Error, "PSharedPtr only support JGObject Type");
+		return false;
+	}
+
+	if (value == nullptr && _value.IsArray() == false)
+	{
+		return false;
+	}
+
+	PJsonData keyJson;
+	if (FindMemberFromIndex(0, &keyJson) == false)
+	{
+		return false;
+	}
+
+	PJsonData valJson;
+	if (FindMemberFromIndex(1, &valJson) == false)
+	{
+		return false;
+	}
+
+	JGType classType;
+	if (getValueInJsonValue(keyJson._value, &classType) == false)
+	{
+		return false;
+	}
+
+	*value = Cast<T>(getJGObject(classType));
+	if (getValueInJsonValue(valJson._value, value->GetRawPointer()) == false)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 template<class KeyType, class ValueType>

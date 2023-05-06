@@ -14,6 +14,13 @@ enum class EWidgetVisibility
 	Hide,
 };
 
+enum class EStretchMode
+{
+	None,
+	Vertical,
+	Horizontal,
+};
+
 enum class EGUIEvent
 {
 	None,

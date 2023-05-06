@@ -2,7 +2,9 @@
   "ModuleInfo": {
     "ModuleFormat": "SharedLib",
     "ModuleDependencies": [
-      "Core"
+      "Core",
+      "GUI",
+      "JGEditor"
     ],
     "ModuleName": "CodeGen",
     "ModulePath": "Source/Runtime/CodeGen/",

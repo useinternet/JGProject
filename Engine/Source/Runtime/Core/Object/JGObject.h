@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreDefines.h"
 #include "ObjectDefines.h"
-#include "FileIO/Json.h"
+#include "FileIO/Jsonable.h"
 #include "String/Name.h"
 #include "Memory/Memory.h"
 #include "Misc/Delegate.h"

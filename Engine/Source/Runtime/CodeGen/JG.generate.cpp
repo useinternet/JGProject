@@ -19,10 +19,21 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 
 
 
+extern PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Static_Create_Class_WDevelopWidget();
+extern PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Create_Class_WDevelopWidget(const JGObject* fromThis);
+extern PSharedPtr<JGObject> Module_JGEditor_Code_Generation_Create_Object_WDevelopWidget();
 extern PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Static_Create_Class_JGTestClassA();
 extern PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Create_Class_JGTestClassA(const JGObject* fromThis);
+extern PSharedPtr<JGObject> Module_JGConsole_Code_Generation_Create_Object_JGTestClassA();
 extern PSharedPtr<JGClass> Module_Core_Code_Generation_Static_Create_Class_JGDevelopUnit();
 extern PSharedPtr<JGClass> Module_Core_Code_Generation_Create_Class_JGDevelopUnit(const JGObject* fromThis);
+extern PSharedPtr<JGObject> Module_Core_Code_Generation_Create_Object_JGDevelopUnit();
+extern PSharedPtr<JGClass> Module_GUI_Code_Generation_Static_Create_Class_JGGUIData();
+extern PSharedPtr<JGClass> Module_GUI_Code_Generation_Create_Class_JGGUIData(const JGObject* fromThis);
+extern PSharedPtr<JGObject> Module_GUI_Code_Generation_Create_Object_JGGUIData();
+extern PSharedPtr<JGClass> Module_GUI_Code_Generation_Static_Create_Class_WWidget();
+extern PSharedPtr<JGClass> Module_GUI_Code_Generation_Create_Class_WWidget(const JGObject* fromThis);
+extern PSharedPtr<JGObject> Module_GUI_Code_Generation_Create_Object_WWidget();
 extern PSharedPtr<JGEnum> Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnumA();
 extern PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_EKeyCode();
 extern PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFormat();
@@ -33,8 +44,11 @@ extern PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECo
 CODEGEN_API bool Engine_CodeGenerate(GObjectGlobalSystem* objectGlobalSystem)
 {
 
-    objectGlobalSystem->RegisterJGClass(Module_JGConsole_Code_Generation_Static_Create_Class_JGTestClassA(), Module_JGConsole_Code_Generation_Create_Class_JGTestClassA);
-    objectGlobalSystem->RegisterJGClass(Module_Core_Code_Generation_Static_Create_Class_JGDevelopUnit(), Module_Core_Code_Generation_Create_Class_JGDevelopUnit);
+    objectGlobalSystem->RegisterJGClass(Module_JGEditor_Code_Generation_Static_Create_Class_WDevelopWidget(), Module_JGEditor_Code_Generation_Create_Class_WDevelopWidget, Module_JGEditor_Code_Generation_Create_Object_WDevelopWidget);
+    objectGlobalSystem->RegisterJGClass(Module_JGConsole_Code_Generation_Static_Create_Class_JGTestClassA(), Module_JGConsole_Code_Generation_Create_Class_JGTestClassA, Module_JGConsole_Code_Generation_Create_Object_JGTestClassA);
+    objectGlobalSystem->RegisterJGClass(Module_Core_Code_Generation_Static_Create_Class_JGDevelopUnit(), Module_Core_Code_Generation_Create_Class_JGDevelopUnit, Module_Core_Code_Generation_Create_Object_JGDevelopUnit);
+    objectGlobalSystem->RegisterJGClass(Module_GUI_Code_Generation_Static_Create_Class_JGGUIData(), Module_GUI_Code_Generation_Create_Class_JGGUIData, Module_GUI_Code_Generation_Create_Object_JGGUIData);
+    objectGlobalSystem->RegisterJGClass(Module_GUI_Code_Generation_Static_Create_Class_WWidget(), Module_GUI_Code_Generation_Create_Class_WWidget, Module_GUI_Code_Generation_Create_Object_WWidget);
     objectGlobalSystem->RegisterJGEnum(Module_JGConsole_Code_Generation_Static_Create_Enum_ETestEnumA());
     objectGlobalSystem->RegisterJGEnum(Module_Core_Code_Generation_Static_Create_Enum_EKeyCode());
     objectGlobalSystem->RegisterJGEnum(Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFormat());

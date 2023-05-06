@@ -21,6 +21,7 @@ public:
 	const PString& ToString() const;
 	uint64 GetHashCode() const;
 	static HGuid New();
+	static HGuid FromString(const PString& inGuidStr);
 };
 
 namespace std {

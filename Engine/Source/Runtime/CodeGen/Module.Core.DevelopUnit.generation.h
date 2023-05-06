@@ -17,14 +17,14 @@ protected: \
 \
 \
 \
-		json.AddMember(JGTYPE(JGDevelopUnit).GetName().ToString(), dataJson);\
+		json.AddMember(JGType::GenerateType<JGDevelopUnit>().GetName().ToString(), dataJson);\
 	}\
 	virtual void ReadJson(const PJsonData& json) override\
 	{\
 		__super::ReadJson(json);\
 \
 		PJsonData dataJson;\
-		if (json.FindMember(JGTYPE(JGDevelopUnit).GetName().ToString(), &dataJson) == false)\
+		if (json.FindMember(JGType::GenerateType<JGDevelopUnit>().GetName().ToString(), &dataJson) == false)\
 		{\
 			return;\
 		}\

@@ -45,6 +45,7 @@ struct HClass
 
 	void GetCodeGenStaticCreateFuncName(PString* outName) const;
 	void GetCodeGenCreateFuncName(PString* outName) const;
+	void GetCodeGenCreateObjectFuncName(PString* outName) const;
 };
 
 struct HEnumElement

@@ -173,7 +173,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ETextureFo
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ETextureFormat), "ETextureFormat", EnumRedirectMap, EnumStringList , MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGType::GenerateType<ETextureFormat>(), "ETextureFormat", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 
@@ -304,7 +304,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_EResourceS
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(EResourceState), "EResourceState", EnumRedirectMap, EnumStringList , MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGType::GenerateType<EResourceState>(), "EResourceState", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 
@@ -527,7 +527,7 @@ PSharedPtr<JGEnum> Module_Graphics_Code_Generation_Static_Create_Enum_ECommandQu
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(ECommandQueueType), "ECommandQueueType", EnumRedirectMap, EnumStringList , MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGType::GenerateType<ECommandQueueType>(), "ECommandQueueType", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 

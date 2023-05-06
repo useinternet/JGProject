@@ -294,3 +294,28 @@ PSharedPtr<JGType> JGClass::GetClassType() const
 {
 	return Type;
 }
+
+HList<PSharedPtr<JGClass>> JGClass::GetChildClasses(bool bRecursive) const
+{
+	HList<PSharedPtr<JGClass>> result;
+
+	for (const JGType& type : VTypeSet)
+	{
+		PSharedPtr<JGClass> childClass = StaticClass(type);
+		if (childClass != nullptr)
+		{
+			if (childClass->VTypeSet.size() > 0 && bRecursive == true)
+			{
+				HList<PSharedPtr<JGClass>> childClasses = childClass->GetChildClasses(/*bRecursive*/true);
+
+				result.insert(result.end(), childClasses.begin(), childClasses.end());
+			}
+			else
+			{
+				result.push_back(childClass);
+			}
+		}
+	}
+
+	return result;
+}

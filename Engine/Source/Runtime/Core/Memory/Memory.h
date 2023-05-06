@@ -211,6 +211,11 @@ public:
 		return _ptr;
 	}
 
+	const T* GetRawConstPointer() const
+	{
+		return _ptr;
+	}
+
 	void Reset()
 	{
 		if (IsValid() == true)

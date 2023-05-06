@@ -52,7 +52,16 @@ public:
 	template<class T>
 	static JGType GenerateType()
 	{
-		static const char* type_name = typeid(T).name();
+		static PString type_name;
+		if (type_name.Empty())
+		{
+			type_name = typeid(T).name();
+			HList<PString> tokens = type_name.Split(' ');
+			if (tokens.size() > 1)
+			{
+				type_name = tokens[tokens.size() - 1];
+			}
+		}
 
 		JGType result;
 		result.ID = GenerateTypeID<T>();

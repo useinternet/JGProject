@@ -4,16 +4,6 @@
 WWidget::WWidget() : _bAllowUpdate(false)
 { }
 
-void WWidget::SetName(PName inName)
-{
-	_widgetName = inName;
-}
-
-PName WWidget::GetName() const
-{
-	return _widgetName;
-}
-
 const HGuid& WWidget::GetGuid() const
 {
 	return _widgetGuid;
@@ -38,7 +28,6 @@ EWidgetFlags WWidget::GetWidgetFlags() const
 {
 	return _widgetFlags;
 }
-
 
 void WWidget::Construct()
 {

@@ -9,7 +9,7 @@
 #endif
 
 
-#include "Widgets/Develop/DevelopWidget.h"
+#include "Widgets/Develop/WDevelopWidget.h"
 
 JG_MODULE_IMPL(HJGEditorModule, JGEDITOR_C_API)
 
@@ -43,8 +43,6 @@ void HJGEditorModule::StartupModule()
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
 
 	GGUIGlobalSystem::GetInstance().GUIEvents.OnMenuBuild.Add<PJWindow>(_window, JG_DELEGATE_FN_BIND_ONEPARAM(HJGEditorModule::BuildMainMenu));
-	GGUIGlobalSystem::GetInstance().OpenWidget<WDevelopWidget>();
-
 }
 
 void HJGEditorModule::ShutdownModule()

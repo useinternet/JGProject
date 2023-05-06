@@ -43,14 +43,42 @@ PSharedPtr<JGClass> GObjectGlobalSystem::GetClass(const JGType& type, const JGOb
 		return nullptr;
 	}
 
-	if (_createObjectFuncPool.find(type) == _createObjectFuncPool.end())
+	if (_createClassFuncPool.find(type) == _createClassFuncPool.end())
 	{
 		return nullptr;
 	}
 
-	HCreateObjectFunc Func = _createObjectFuncPool.at(type);
+	HCreateClassFunc Func = _createClassFuncPool.at(type);
 
 	return Func(object);
+}
+
+const JGType& GObjectGlobalSystem::GetType(const PName& typeName) const
+{
+	if (_typeMap.contains(typeName) == false)
+	{
+		static JGType nullType;
+		return nullType;
+	}
+
+	return _typeMap.at(typeName);
+}
+
+PSharedPtr<JGObject> GObjectGlobalSystem::NewObject(const JGType& type) const
+{
+	if (_createObjectFuncPool.contains(type) == false)
+	{
+		return nullptr;
+	}
+
+	if (_createObjectFuncPool.at(type).IsVaild() == false)
+	{
+		return nullptr;
+	}
+
+	HCreateObjectFunc func = _createObjectFuncPool.at(type);
+
+	return func();
 }
 
 bool GObjectGlobalSystem::CanCast(const JGType& destType, const JGType& srcType) const
@@ -68,7 +96,7 @@ bool GObjectGlobalSystem::CanCast(const JGType& destType, const JGType& srcType)
 	return false;
 }
 
-bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateObjectFunc& func)
+bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateClassFunc& func, const HCreateObjectFunc& createObjectFunc)
 {
 	if (classObject.IsValid() == false)
 	{
@@ -96,7 +124,9 @@ bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const
 	}
 
 	_classMap.emplace(*classType, classObject);
-	_createObjectFuncPool.emplace(*classType, func);
+	_createClassFuncPool.emplace(*classType, func);
+	_createObjectFuncPool.emplace(*classType, createObjectFunc);
+
 	return true;
 }
 

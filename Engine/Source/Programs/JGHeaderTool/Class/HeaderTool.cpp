@@ -27,6 +27,18 @@ void HClass::GetCodeGenCreateFuncName(PString* outName) const
 	*outName = PString::ReplaceAll(*outName, HHeaderToolConstants::Token::ClassName, Name);
 }
 
+void HClass::GetCodeGenCreateObjectFuncName(PString* outName) const
+{
+	if (outName == nullptr || OwnerHeaderInfo == nullptr)
+	{
+		return;
+	}
+	outName->Reset();
+
+	*outName = PString::ReplaceAll(HHeaderToolConstants::Template::CodeGenCreateObjectFunction, HHeaderToolConstants::Token::ModuleName, (OwnerHeaderInfo->ModuleName));
+	*outName = PString::ReplaceAll(*outName, HHeaderToolConstants::Token::ClassName, Name);
+}
+
 
 void HEnum::GetCodeGenStaticCreateFuncName(PString* outName) const
 {
@@ -871,7 +883,6 @@ bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo,
 	targetClass.GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
 	targetClass.GetCodeGenCreateFuncName(&codeGenCreateFuncName);
 
-
 	PString writeJsonContents;
 	PString readJsonContents;
 
@@ -908,14 +919,14 @@ bool PHeaderTool::generateCodeGenHeaderSourceCode(const HHeaderInfo& headerInfo,
 \
 %s
 \
-		json.AddMember(JGTYPE(%s).GetName().ToString(), dataJson);\
+		json.AddMember(JGType::GenerateType<%s>().GetName().ToString(), dataJson);\
 	}\
 	virtual void ReadJson(const PJsonData& json) override\
 	{\
 		__super::ReadJson(json);\
 \
 		PJsonData dataJson;\
-		if (json.FindMember(JGTYPE(%s).GetName().ToString(), &dataJson) == false)\
+		if (json.FindMember(JGType::GenerateType<%s>().GetName().ToString(), &dataJson) == false)\
 		{\
 			return;\
 		}\
@@ -946,9 +957,11 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 	{
 		PString codeGenStaticCreateFuncName;
 		PString codeGenCreateFuncName;
+		PString codeGenCreateObjectName;
 
 		Class.GetCodeGenStaticCreateFuncName(&codeGenStaticCreateFuncName);
 		Class.GetCodeGenCreateFuncName(&codeGenCreateFuncName);
+		Class.GetCodeGenCreateObjectFuncName(&codeGenCreateObjectName);
 
 		PString staticFuncCode;
 		staticFuncCode.AppendLine("\tHList<PSharedPtr<JGFunction>> FunctionMap;");
@@ -957,7 +970,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		for (const HProperty& Property : Class.Properties)
 		{
 			PString typeSourceCode;
-			typeSourceCode.Append("JGTYPE(").Append(Property.Type).Append("),");
+			typeSourceCode.Append("JGType::GenerateType<").Append(Property.Type).Append(">(),");
 
 			PString propNameSourceCode;
 			propNameSourceCode.Append("\"").Append(Property.Name).Append("\",");
@@ -996,13 +1009,13 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 			staticFuncCode.Append("\tFunctionMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticFunction(");
 			staticFuncCode.Append("\"").Append(function.Name).AppendLine("\",");
 
-			staticFuncCode.Append(PString::Format("\t\tJGTYPE(%s), ", function.Return));
+			staticFuncCode.Append(PString::Format("\t\tJGType::GenerateType<%s>(), ", function.Return));
 
 			PString propertyTypeListCode;
 
 			for (const HProperty& Property : function.Argmuments)
 			{
-				propertyTypeListCode.Append(PString::Format("JGTYPE(%s), ", Property.Type));
+				propertyTypeListCode.Append(PString::Format("JGType::GenerateType<%s>(), ", Property.Type));
 			}
 
 			staticFuncCode.AppendLine(PString::Format("{%s}, ", propertyTypeListCode));
@@ -1023,12 +1036,12 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		}
 
 		staticFuncCode
-			.Append(PString::Format("\treturn PObjectGlobalsPrivateUtils::MakeStaticClass(JGTYPE(%s),", Class.Name))
+			.Append(PString::Format("\treturn PObjectGlobalsPrivateUtils::MakeStaticClass(JGType::GenerateType<%s>(),", Class.Name))
 			.AppendLine("{");
 		
 		for (const PString& baseClass : Class.BaseClasses)
 		{
-			staticFuncCode.AppendLine(PString::Format("\t\t\tJGTYPE(%s), ", baseClass));
+			staticFuncCode.AppendLine(PString::Format("\t\t\tJGType::GenerateType<%s>(), ", baseClass));
 		}
 
 		staticFuncCode.AppendLine("\t\t},");
@@ -1056,7 +1069,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		PString funcCode;
 
 		funcCode.AppendLine(PString::Format("\t%s* noneConstThisPtr = const_cast<%s*>(static_cast<const %s*>(fromThis));", Class.Name, Class.Name, Class.Name));
-		funcCode.AppendLine(PString::Format("\tPSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGTYPE(%s)));", Class.Name));
+		funcCode.AppendLine(PString::Format("\tPSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGType::GenerateType<%s>()));", Class.Name));
 
 		for (const HProperty& property : Class.Properties)
 		{
@@ -1086,7 +1099,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 			for (uint64 i = 0; i < len; ++i)
 			{
 				funcCode.Append(function.Argmuments[i].Type);
-				argTypeListCode.Append(PString::Format("JGTYPE(%s)", function.Argmuments[i].Type));
+				argTypeListCode.Append(PString::Format("JGType::GenerateType<%s>()", function.Argmuments[i].Type));
 				if (i < len - 1)
 				{
 					funcCode.Append(",");
@@ -1113,6 +1126,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 
 		outCode->AppendLine(codeGenStaticCreateFuncName).AppendLine("{").AppendLine(staticFuncCode).AppendLine("}\n");
 		outCode->AppendLine(codeGenCreateFuncName).AppendLine("{").AppendLine(funcCode).AppendLine("}\n");
+		outCode->AppendLine(codeGenCreateObjectName).AppendLine("{").AppendLine(PString::Format("\treturn Allocate<%s>();", Class.Name)).AppendLine("}\n");
 	}
 
 	for (const HEnum& Enum : headerInfo.Enums)
@@ -1160,7 +1174,7 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 )", i, metaElementStr);
 			staticFuncCode.AppendLine(metaStr);
 		}
-		staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(%s), \"%s\", EnumRedirectMap, EnumStringList , MetaList);", Enum.Name, Enum.Name));
+		staticFuncCode.AppendLine(PString::Format("    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGType::GenerateType<%s>(), \"%s\", EnumRedirectMap, EnumStringList , MetaList);", Enum.Name, Enum.Name));
 		staticFuncCode.AppendLine("}");
 		outCode->AppendLine(staticFuncCode).AppendLine("");
 	}
@@ -1211,14 +1225,18 @@ CODEGEN_API void Link_Module(GCoreSystem* ins)
 		PString codeGenCreateFuncName;
 		targetClass->GetCodeGenCreateFuncName(&codeGenCreateFuncName);
 
+		PString codeGenCreateObjectName;
+		targetClass->GetCodeGenCreateObjectFuncName(&codeGenCreateObjectName);
 
 		PString onlyCodeGenStaticFuncName = PString::ReplaceAll(codeGenStaticCreateFuncName, "PSharedPtr<JGClass> ", "");
 		PString onlyCodeGenFuncName = PString::ReplaceAll(codeGenCreateFuncName, "PSharedPtr<JGClass> ", "").ReplaceAll("(const JGObject* fromThis)", "");
+		PString onlyCodeGenCreateObjectName = PString::ReplaceAll(codeGenCreateObjectName, "PSharedPtr<JGObject> ", "").ReplaceAll("()", "");
 
 		newCodeIncludeBody.Append("extern ").Append(codeGenStaticCreateFuncName).AppendLine(";");
 		newCodeIncludeBody.Append("extern ").Append(codeGenCreateFuncName).AppendLine(";");
+		newCodeIncludeBody.Append("extern ").Append(codeGenCreateObjectName).AppendLine(";");
 
-		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGClass(%s, %s);", onlyCodeGenStaticFuncName, onlyCodeGenFuncName));
+		newCodeGenBody.AppendLine(PString::Format("    objectGlobalSystem->RegisterJGClass(%s, %s, %s);", onlyCodeGenStaticFuncName, onlyCodeGenFuncName, onlyCodeGenCreateObjectName));
 	}
 
 	while (collectedEnumQueue.empty() == false)

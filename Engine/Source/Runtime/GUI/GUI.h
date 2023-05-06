@@ -29,6 +29,8 @@ class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 	HHashMap<HGuid, PSharedPtr<WWidget>> _widgetPool;
 	HHashMap<PName,  HGuid> _widgetGuidRedirectByName;
 	HHashMap<JGType, HGuid> _widgetGuidRedirectByType;
+
+	HHashMap<HGuid, PName> _widgetNameRedirectByGuid;
 	HHashMap<HGuid, PSharedPtr<WWidget>> _openWidgets;
 
 	PSharedPtr<IGUIBuild>  _guiBuild;
@@ -69,6 +71,7 @@ public:
 			{
 				widget = Allocate<T>();
 				_widgetGuidRedirectByName.emplace(widgetKeyName, widget->GetGuid());
+				_widgetNameRedirectByGuid.emplace(widget->GetGuid(), widgetKeyName);
 			}
 		}
 		else
@@ -186,4 +189,8 @@ public:
 
 		return widgetGuid;
 	}
+
+private:
+	void saveGUIDatas();
+	void loadGUIDatas();
 };

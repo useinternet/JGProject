@@ -59,24 +59,30 @@ HDX12ComPtr<HDX12Device>  HDirectX12Helper::CreateD3DDevice(HDX12ComPtr<HDX12Fac
 		DXGI_ADAPTER_DESC1 adapterDesc = {};
 		SIZE_T maxSize = 0;
 
-		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(Idx, &pAdapter); ++Idx)
+
+		HDX12ComPtr<IDXGIAdapter1>  pTempAdapter;
+		HDX12ComPtr<ID3D12Device5>  pTempDevice;
+
+		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(Idx, &pTempAdapter); ++Idx)
 		{
 			DXGI_ADAPTER_DESC1 desc;
-			pAdapter->GetDesc1(&desc);
+			pTempAdapter->GetDesc1(&desc);
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 				continue;
 
-			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice))))
+			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pTempAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pTempDevice))))
 			{
-				pAdapter->GetDesc1(&desc);
+				pTempAdapter->GetDesc1(&desc);
 
 				maxSize     = desc.DedicatedVideoMemory;
 				adapterDesc = desc;
 				if (IsSupportedRayTracing)
 				{
-					*IsSupportedRayTracing = IsDirectXRaytracingSupported(pAdapter.Get());
+					*IsSupportedRayTracing = IsDirectXRaytracingSupported(pTempAdapter.Get());
 				}
-				break;
+
+				pDevice  = pTempDevice;
+				pAdapter = pTempAdapter;
 			}
 		}
 
@@ -112,6 +118,7 @@ HDX12ComPtr<HDX12Device>  HDirectX12Helper::CreateD3DDevice(HDX12ComPtr<HDX12Fac
 #endif
 		return pDevice;
 	}
+	
 }
 HDX12ComPtr<HDX12SwapChain> HDirectX12Helper::CreateDXGISwapChain(HJWHandle handle, HDX12ComPtr<HDX12Factory> factory, HDX12ComPtr<HDX12CommandQueue> cmdQue, DXGI_FORMAT format, uint32_t width, uint32_t height, uint32_t bufferCount)
 {

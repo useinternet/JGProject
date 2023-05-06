@@ -142,8 +142,8 @@ workspace "JGEngine"
 
 		group "Engine/Editor"
 			project "DUT_Graphics"
-				includedirs{ "Source/Editor/DevelopUnitTest/DUT_Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
-				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }
+				includedirs{ "Source/Editor/DevelopUnitTest/DUT_Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/CodeGen/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
+				links{ "Core", "CodeGen", "GameFrameWorks", "Graphics", "GUI", }
 				SetCPPProjectConfig("SharedLib", "Source/Editor/DevelopUnitTest/DUT_Graphics/", {"_DUT_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
@@ -179,8 +179,8 @@ workspace "JGEngine"
 
 		group "Engine/Runtime"
 			project "CodeGen"
-				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", }
-				links{ "Core", }
+				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GUI/", "Source/Editor/JGEditor/", }
+				links{ "Core", "GUI", "JGEditor", }
 				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()

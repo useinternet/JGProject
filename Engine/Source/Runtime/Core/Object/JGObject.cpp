@@ -1,6 +1,7 @@
 #include "PCH/PCH.h"
 #include "JGObject.h"
 #include "ObjectGlobals.h"
+#include "FileIO/Json.h"
 
 JGType JGObject::GetType() const
 {
@@ -41,5 +42,5 @@ void JGObject::ReadJson(const PJsonData& json)
 		JG_LOG(Json, ELogLevel::Error, "Fail Read Json: JGObject");
 	}
 
-	ReadJson(json);
+	OnReadJson(json);
 }

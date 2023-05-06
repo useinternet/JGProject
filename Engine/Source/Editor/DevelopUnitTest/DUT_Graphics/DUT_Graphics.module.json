@@ -3,6 +3,7 @@
     "ModuleFormat": "SharedLib",
     "ModuleDependencies": [
       "Core",
+      "CodeGen",
       "GameFrameWorks",
       "Graphics",
       "GUI"

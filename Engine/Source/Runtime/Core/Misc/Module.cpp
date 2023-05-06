@@ -1,5 +1,6 @@
 #include "PCH/PCH.h"
 #include "Module.h"
+#include "Log.h"
 #include "Platform/Platform.h"
 
 IModuleInterface* GModuleGlobalSystem::FindModule(const JGType& type) const

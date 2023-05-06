@@ -904,7 +904,7 @@ PSharedPtr<JGEnum> Module_Core_Code_Generation_Static_Create_Enum_EKeyCode()
 
 	});
 
-    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGTYPE(EKeyCode), "EKeyCode", EnumRedirectMap, EnumStringList , MetaList);
+    return PObjectGlobalsPrivateUtils::MakeStaticEnum(JGType::GenerateType<EKeyCode>(), "EKeyCode", EnumRedirectMap, EnumStringList , MetaList);
 }
 
 

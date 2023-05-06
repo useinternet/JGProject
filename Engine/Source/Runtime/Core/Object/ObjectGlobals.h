@@ -262,6 +262,7 @@ public:
 	virtual ~JGClass() = default;
 
 	PSharedPtr<JGType> GetClassType() const;
+	HList<PSharedPtr<JGClass>> GetChildClasses(bool bRecursive = false) const;
 };
 
 template<class T>

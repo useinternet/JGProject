@@ -38,18 +38,21 @@ enum class EPropertyType
 class JGStruct;
 class JGClass;
 class JGEnum;
+class PJson;
 
 class GObjectGlobalSystem : public GGlobalSystemInstance<GObjectGlobalSystem>
 {
 	friend class GCoreSystem;
 
-	using HCreateObjectFunc = HPlatformFunction<PSharedPtr<JGClass>, const JGObject*>;
+	using HCreateClassFunc = HPlatformFunction<PSharedPtr<JGClass>, const JGObject*>;
+	using HCreateObjectFunc = HPlatformFunction<PSharedPtr<JGObject>>;
 private:
 	HHashMap<PName, JGType> _typeMap;
 
 	HHashMap<JGType, PSharedPtr<JGClass>>  _classMap;
 	HHashMap<JGType, PSharedPtr<JGEnum>>   _enumMap;
 
+	HHashMap<JGType, HCreateClassFunc>  _createClassFuncPool;
 	HHashMap<JGType, HCreateObjectFunc> _createObjectFuncPool;
 
 public:
@@ -59,10 +62,11 @@ protected:
 	virtual void Destroy() override;
 
 public:
-	PSharedPtr<JGEnum> GetStaticEnum(const JGType& type) const;
+	PSharedPtr<JGEnum>  GetStaticEnum(const JGType& type) const;
 	PSharedPtr<JGClass> GetStaticClass(const JGType& type) const;
 	PSharedPtr<JGClass> GetClass(const JGType& type, const JGObject* object) const;
-
+	const JGType& GetType(const PName& typeName) const;
+	PSharedPtr<JGObject> NewObject(const JGType& type) const;
 
 	template<class T>
 	PSharedPtr<JGEnum> GetStaticEnum() const
@@ -97,7 +101,7 @@ public:
 		return CanCast(JGTYPE(T), JGTYPE(U));
 	}
 
-	bool RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateObjectFunc& func);
+	bool RegisterJGClass(PSharedPtr<JGClass> classObject, const HCreateClassFunc& func, const HCreateObjectFunc& createObjectFunc);
 	bool RegisterJGEnum(PSharedPtr<JGEnum> enumObject);
 	bool IsRegisteredType(const JGType& type) const;
 private:
@@ -147,7 +151,7 @@ inline bool SaveObject(const PString& path, T* obj)
 	if (std::is_base_of<JGObject, T>::value == true && obj != nullptr)
 	{
 		PJson Json;
-		Json.AddMember(*obj);
+		Json.AddMember("JGObject", *obj);
 
 		PString jsonString;
 		if (PJson::ToString(Json, &jsonString) == true)
@@ -176,8 +180,10 @@ inline PSharedPtr<T> LoadObject(const PString& path)
 
 		if (PJson::ToObject(jsonString, &Json) == true)
 		{
+			PJsonData ObjectData;
+			Json.FindMember("JGObject", &ObjectData);
 			PSharedPtr<T> result = Allocate<T>();
-			if (Json.GetData(result->GetRawPointer()) == true)
+			if (ObjectData.GetData(result.GetRawPointer()) == true)
 			{
 				JG_LOG(Core, ELogLevel::Trace, PString::Format("%s: Success Load at %s", typeName, path));
 				return result;
@@ -211,5 +217,24 @@ inline PWeakPtr<T> Cast(PWeakPtr<U> ptr)
 
 	return GMemoryGlobalSystem::GetInstance().RawFastCastUnChecked<T, U>(ptr);
 }
+
+inline PSharedPtr<JGObject> AllocateByClass(PSharedPtr<JGClass> inClass)
+{
+	if (inClass == nullptr)
+	{
+		return Allocate<JGObject>();
+	}
+
+	return GObjectGlobalSystem::GetInstance().NewObject(*(inClass->GetClassType()));
+}
+
+template<class T>
+inline PSharedPtr<T> AllocateByClass(PSharedPtr<JGClass> inClass)
+{
+	return Cast<T>(AllocateByClass(inClass));
+}
+
+
+
 
 
