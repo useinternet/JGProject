@@ -46,7 +46,7 @@ PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeStaticClass(const JGType& ty
 
 	for (const JGType& type : virtualTypeList)
 	{
-		result->VTypeSet.insert(type);
+		result->ParentTypeSet.insert(type);
 	}
 
 	return result;
@@ -299,12 +299,12 @@ HList<PSharedPtr<JGClass>> JGClass::GetChildClasses(bool bRecursive) const
 {
 	HList<PSharedPtr<JGClass>> result;
 
-	for (const JGType& type : VTypeSet)
+	for (const JGType& type : ChildTypeSet)
 	{
 		PSharedPtr<JGClass> childClass = StaticClass(type);
 		if (childClass != nullptr)
 		{
-			if (childClass->VTypeSet.size() > 0 && bRecursive == true)
+			if (childClass->ChildTypeSet.size() > 0 && bRecursive == true)
 			{
 				HList<PSharedPtr<JGClass>> childClasses = childClass->GetChildClasses(/*bRecursive*/true);
 

@@ -10,7 +10,17 @@ void WList::SetItemList(const HList<PSharedPtr<IListItem>>& inItemList)
 
 void WList::SetSelectedItemIndex(int32 inIndex)
 {
+	bool bDirty = _selectedItemIndex != inIndex;
+
 	_selectedItemIndex = inIndex;
+
+	if (bDirty)
+	{
+		if (_selectedItemIndex != INDEX_NONE || _selectedItemIndex < _itemList.size())
+		{
+			_itemList[_selectedItemIndex]->OnSelected();
+		}
+	}
 }
 
 void WList::SetSelectedItem(PSharedPtr<IListItem> inItem)
@@ -20,7 +30,7 @@ void WList::SetSelectedItem(PSharedPtr<IListItem> inItem)
 	{
 		if (inItem == item)
 		{
-			_selectedItemIndex = index;
+			SetSelectedItemIndex(index);
 			break;
 		}
 
@@ -35,16 +45,9 @@ void WList::SetAllowMultiSelected(bool bInAllowMultiSelected)
 
 void WList::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	if (_selectedItemIndex != INDEX_NONE)
-	{
-		_itemList[_selectedItemIndex]->OnSelected();
-	}
-
 	for (PSharedPtr<IListItem> item : _itemList)
 	{
 		PSharedPtr<WWidgetComponent> widgetComp = item->CreateWidgetComponent();
 		inBuilder.PushWidgetComponent(widgetComp);
 	}
 }
-
-

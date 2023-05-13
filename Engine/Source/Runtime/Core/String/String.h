@@ -12,8 +12,8 @@
 class PString : public IMemoryObject
 {
 public:
-	static const uint64 NPOS = -1;
-
+	static const uint64 NPOS  = -1;
+	static const PString& None();
 private:
 	uint64	    _stringCode = NULL_ID;
 	HRawString  _rawString;

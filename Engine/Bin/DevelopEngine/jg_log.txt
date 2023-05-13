@@ -1,47 +1,62 @@
-[:17196:][info][Core]: Active Thread: [4179727477]
-[:17196:][info][Core]: Active Thread: [2950073469]
-[:17196:][info][Core]: Active Thread: [4192570933]
-[:17196:][info][Core]: Active Thread: [2277368326]
-[:17196:][info][Core]: Active Thread: [826253909]
-[:17196:][info][Core]: Active Thread: [2139762088]
-[:17196:][info][Core]: Active Thread: [4080210291]
-[:17196:][info][Core]: Active Thread: [4264729476]
-[:17196:][info][Core]: Active Thread: [760493170]
-[:17196:][info][Core]: Active Thread: [985031845]
-[:17196:][info][Core]: Active Thread: [3829304279]
-[:17196:][info][Core]: Active Thread: [1152503241]
-[:17196:][info][Core]: Active Thread: [2857864969]
-[:17196:][info][Core]: Active Thread: [678675948]
-[:17196:][info][Core]: Active Thread: [2474209227]
-[:17196:][info][Core]: Active Thread: [2883762740]
-[:17196:][info][Core]: Active Thread: [670634663]
-[:17196:][info][Core]: Active Thread: [2213877156]
-[:17196:][info][Core]: Active Thread: [2689584876]
-[:17196:][info][Core]: Active Thread: [122692302]
-[:17196:][info][Core]: Active Thread: [3190118637]
-[:17196:][info][Core]: Active Thread: [720236734]
-[:17196:][info][Core]: Active Thread: [1722036855]
-[:17196:][info][Core]: Active Thread: [3367485658]
-[:17196:][info][Core]: Active Thread: [1916371241]
-[:17196:][info][Core]: Active Thread: [323370155]
-[:17196:][info][Core]: Active Thread: [535404505]
-[:17196:][info][Core]: Active Thread: [2242124920]
-[:17196:][info][Core]: Active Thread: [3494361487]
-[:17196:][info][Core]: Active Thread: [3733597958]
-[:17196:][info][Core]: Active Thread: [973023173]
-[:17196:][info][Core]: Active Thread: [2266481395]
-[:17196:][info][Core]: Active Thread Totoal Count: 32 
-[:17196:][trace][Graphics]: DirectX12 Init Start
-[:17196:][trace][Graphics]: Success Create D3D12Device
-[:17196:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
-[:17196:][info][Graphics]: VideoMemory : 16064  MB
-[:17196:][trace][Graphics]: Create DescriptorAllocator...
-[:17196:][trace][Graphics]: Create CommandQueue...
-[:17196:][trace][Graphics]: Create FrameBuffer...
-[:17196:][trace][Graphics]: DirectX12 Init End
-[:17196:][trace][Graphics]: Startup Graphics Module...
-[:17196:][trace][JGEditor]: Startup JGEditor Module...
-[:17196:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
-[:17196:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
-[:17196:][trace][Graphics]: Shutdown Graphics Module...
-[:17196:][trace][JGEditor]: Shutdown JGEditor Module...
+[:21300:][info][Core]: Active Thread: [2898617058]
+[:21300:][info][Core]: Active Thread: [3615232980]
+[:21300:][info][Core]: Active Thread: [3129397015]
+[:21300:][info][Core]: Active Thread: [3405887754]
+[:21300:][info][Core]: Active Thread: [2494598315]
+[:21300:][info][Core]: Active Thread: [444085126]
+[:21300:][info][Core]: Active Thread: [716582391]
+[:21300:][info][Core]: Active Thread: [4055853816]
+[:21300:][info][Core]: Active Thread: [2750856488]
+[:21300:][info][Core]: Active Thread: [4133153661]
+[:21300:][info][Core]: Active Thread: [155090062]
+[:21300:][info][Core]: Active Thread: [4227136077]
+[:21300:][info][Core]: Active Thread: [1644919619]
+[:21300:][info][Core]: Active Thread: [2695589212]
+[:21300:][info][Core]: Active Thread: [4217973051]
+[:21300:][info][Core]: Active Thread: [1477448223]
+[:21300:][info][Core]: Active Thread: [290972395]
+[:21300:][info][Core]: Active Thread: [1087394677]
+[:21300:][info][Core]: Active Thread: [3943675783]
+[:21300:][info][Core]: Active Thread: [3779702208]
+[:21300:][info][Core]: Active Thread: [908410262]
+[:21300:][info][Core]: Active Thread: [1999336291]
+[:21300:][info][Core]: Active Thread: [81940213]
+[:21300:][info][Core]: Active Thread: [1164511913]
+[:21300:][info][Core]: Active Thread: [2571219898]
+[:21300:][info][Core]: Active Thread: [442937298]
+[:21300:][info][Core]: Active Thread: [345613583]
+[:21300:][info][Core]: Active Thread: [2022231894]
+[:21300:][info][Core]: Active Thread: [1130992412]
+[:21300:][info][Core]: Active Thread: [2303422619]
+[:21300:][info][Core]: Active Thread: [2369339880]
+[:21300:][info][Core]: Active Thread: [2055099220]
+[:21300:][info][Core]: Active Thread Totoal Count: 32 
+[:21300:][trace][Graphics]: DirectX12 Init Start
+[:21300:][trace][Graphics]: Success Create D3D12Device
+[:21300:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
+[:21300:][info][Graphics]: VideoMemory : 16064  MB
+[:21300:][trace][Graphics]: Create DescriptorAllocator...
+[:21300:][trace][Graphics]: Create CommandQueue...
+[:21300:][trace][Graphics]: Create FrameBuffer...
+[:21300:][trace][Graphics]: DirectX12 Init End
+[:21300:][trace][Graphics]: Startup Graphics Module...
+[:21300:][trace][JGEditor]: Startup JGEditor Module...
+[:21300:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][info][DevelopUnit]: Click
+[:21300:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
+[:21300:][trace][Graphics]: Shutdown Graphics Module...
+[:21300:][trace][JGEditor]: Shutdown JGEditor Module...

@@ -195,14 +195,14 @@ bool PImGuiBuild::OnBuildPushChildWidget(HBuildContext& inBuildContext, HGUIBuil
 		return false;
 	}
 
-	PImGuiBuild guiBuild;
+	PSharedPtr<PImGuiBuild> guiBuild = Allocate<PImGuiBuild>();
 	HGUIBuilder guiBuilder;
 
 	OnBuildBeginChildWidget(inBuildContext, inCV);
 
 	widget->OnGUIBuild(guiBuilder);
-	guiBuild.PushData(guiBuilder.GetCommandQueue());
-	guiBuild.OnBuild(inBuildContext);
+	guiBuild->PushData(guiBuilder.GetCommandQueue());
+	guiBuild->OnBuild(inBuildContext);
 
 	OnBuildEndChildWidget(inBuildContext);
 
@@ -390,11 +390,11 @@ bool PImGuiBuild::OnBuildWidgetComponent(HBuildContext& inBuildContext, HGUIBuil
 	inCV->WidgetComponent->OnGUIBuild(guiBuilder);
 	if (guiBuilder.GetCommandQueue().empty() == false)
 	{
-		PImGuiBuild imGuiBuild;
-		imGuiBuild.ImGuiContext = ImGuiContext;
+		PSharedPtr<PImGuiBuild> imGuiBuild = Allocate<PImGuiBuild>();
+		imGuiBuild->ImGuiContext = ImGuiContext;
 
-		imGuiBuild.PushData(guiBuilder.GetCommandQueue());
-		imGuiBuild.OnBuild(inBuildContext);
+		imGuiBuild->PushData(guiBuilder.GetCommandQueue());
+		imGuiBuild->OnBuild(inBuildContext);
 	}
 
 	OnContextMenu(inBuildContext, inCV->WidgetComponent);
@@ -428,6 +428,25 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 
 	HWidgetContext widgetContext;
 	widgetContext.ContentSize = inBuildContext.CacheData->WidgetCacheDatas[widgetGuid].ContentRegionSize;
+	widgetContext.PushWidgetComponent = HPushWidgetComponent::Create(SharedWrap(this), [&inBuildContext, this](PSharedPtr<WWidgetComponent> inWidgetComp)
+		{
+			if (inWidgetComp == nullptr)
+			{
+				return;
+			}
+
+			HGUIBuilder guiBuilder;
+			inWidgetComp->OnGUIBuild(guiBuilder);
+
+			if (guiBuilder.GetCommandQueue().empty() == false)
+			{
+				PSharedPtr<PImGuiBuild> imGuiBuild = Allocate<PImGuiBuild>();
+				imGuiBuild->ImGuiContext = ImGuiContext;
+
+				imGuiBuild->PushData(guiBuilder.GetCommandQueue());
+				imGuiBuild->OnBuild(inBuildContext);
+			}
+		});
 
 	inCV->OnGenerateGUI.ExecuteIfBound(widgetContext);
 

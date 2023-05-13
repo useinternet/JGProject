@@ -18,6 +18,7 @@ APIDefine void _Link_DevelopUnit_(GCoreSystem* ins) \
 JGCLASS()
 class JGDevelopUnit : public JGObject
 {
+	JG_GENERATED_CLASS_BODY
 public:
 	virtual ~JGDevelopUnit() = default;
 

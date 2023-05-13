@@ -1,5 +1,6 @@
 #include "PCH/PCH.h"
 #include "WDevelopWidget.h"
+#include "WDUTComboBox.h"
 #include "Misc/DevelopUnit.h"
 #include "WidgetComponents/WText.h"
 #include "WidgetComponents/WInputText.h"
@@ -27,7 +28,6 @@ public:
 	}
 protected:
 
-
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
 		// 프로세스 
@@ -45,6 +45,10 @@ protected:
 class WDevelopItem : public WWidgetComponent
 {
 	PSharedPtr<PDevelopUnitItem> _ownerItem;
+
+	PSharedPtr<WText> NameLabel;
+	PSharedPtr<WText> DevelopUnitNameLabel;
+	PSharedPtr<WButton> ResetButton;
 
 public:
 	WDevelopItem(PSharedPtr<PDevelopUnitItem> inItem) : _ownerItem(inItem) {}
@@ -64,7 +68,10 @@ class PDevelopUnitItem
 	PWeakPtr<WDevelopUnitList> _ownerWidget;
 public:
 	// Item 정보
+	PString Name;
+	PString DevelopUnitName;
 
+	
 
 public:
 	PDevelopUnitItem(PSharedPtr<WDevelopUnitList> OwnerWidget) : _ownerWidget(OwnerWidget) {}
@@ -92,29 +99,38 @@ class WDevelopUnitList : public WWidget
 	PSharedPtr<WList> _developUnitList;
 	HList<PSharedPtr<IListItem>> _listItems;
 
+	
+	PSharedPtr<WDUTComboBox> _dutComboBox;
+	PSharedPtr<WButton> _onAddItemButton;
 
 public:
-	WDevelopUnitList() : WWidget()
+	virtual void Construct() override 
 	{
+		WWidget::Construct();
+
 		SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
+
+		_dutComboBox = Allocate<WDUTComboBox>();
+		_onAddItemButton = Allocate<WButton>();
+
+		_dutComboBox->SetSelectedItemIndex(0);
+
+		_onAddItemButton->Text = "+";
+		_onAddItemButton->OnClick = WButton::HOnClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopUnitList::OnAddItem));
+		_onAddItemButton->StretchMode = EStretchMode::Horizontal;
 	}
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
-		PSharedPtr<WButton> OnAddItemButton = Allocate<WButton>();
-
-		OnAddItemButton->Text = "+";
-		OnAddItemButton->OnClick     = WButton::HOnClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopUnitList::OnAddItem));
-		OnAddItemButton->StretchMode = EStretchMode::Horizontal;
-
-		inBuilder.PushWidgetComponent(_developUnitList);
-		inBuilder.PushWidgetComponent(OnAddItemButton);
+		inBuilder.BeginHorizontal();
+		inBuilder.PushWidgetComponent(_dutComboBox);
+		inBuilder.PushWidgetComponent(_onAddItemButton);
+		inBuilder.EndHorizontal();
 	}
 private:
 	void OnAddItem()
 	{
-		//PDevelopUnitItem
-		// _listItems.push_back();
+		JG_LOG(DevelopUnit, ELogLevel::Info, "Click");
 	}
 };
 

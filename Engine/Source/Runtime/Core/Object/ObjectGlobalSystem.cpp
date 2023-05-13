@@ -4,6 +4,30 @@
 #include "Misc/Log.h"
 #include "Platform/Platform.h"
 
+void GObjectGlobalSystem::Start()
+{
+	for (const HPair<const JGType, PSharedPtr<JGClass>> pair : _classMap)
+	{
+		PSharedPtr<JGClass> Class = pair.second;
+		if (Class == nullptr)
+		{
+			continue;
+		}
+
+		for (JGType ParentType : Class->ParentTypeSet)
+		{
+			PSharedPtr<JGClass> ParentClass = GetStaticClass(ParentType);
+			if (ParentClass == nullptr)
+			{
+				continue;
+			}
+
+			ParentClass->ChildTypeSet.insert(pair.first);
+		}
+	}
+
+}
+
 void GObjectGlobalSystem::Destroy()
 {
 	_enumMap.clear();
@@ -115,14 +139,14 @@ bool GObjectGlobalSystem::RegisterJGClass(PSharedPtr<JGClass> classObject, const
 		return false;
 	}
 
-	for (const JGType& type : classObject->VTypeSet)
+	for (const JGType& type : classObject->ParentTypeSet)
 	{
 		if (registerType(Allocate<JGType>(type)) == false)
 		{
 			return false;
 		}
 	}
-
+	
 	_classMap.emplace(*classType, classObject);
 	_createClassFuncPool.emplace(*classType, func);
 	_createObjectFuncPool.emplace(*classType, createObjectFunc);
@@ -203,12 +227,12 @@ bool GObjectGlobalSystem::canCastInternal(const JGType& destType, const JGType& 
 		return false;
 	}
 
-	if (destClass->VTypeSet.contains(srcType) == true)
+	if (destClass->ParentTypeSet.contains(srcType) == true)
 	{
 		return true;
 	}
 
-	for (const JGType& type : destClass->VTypeSet)
+	for (const JGType& type : destClass->ParentTypeSet)
 	{
 		if (canCastInternal(type, srcType) == true)
 		{
@@ -258,7 +282,7 @@ bool GObjectGlobalSystem::auditClassMultipleInheritance() const
 		HHashSet<JGType> typeVisitor;
 
 		// 검사 타입
-		for (const JGType& type : Class->VTypeSet)
+		for (const JGType& type : Class->ParentTypeSet)
 		{
 			if (typeVisitor.contains(type) == true)
 			{
@@ -290,7 +314,7 @@ bool GObjectGlobalSystem::auditClassMultipleInheritanceInteral(const JGType& inT
 		return true;
 	}
 
-	for (const JGType& type : Class->VTypeSet)
+	for (const JGType& type : Class->ParentTypeSet)
 	{
 		if (typeVisitor.contains(type) == true)
 		{

@@ -72,9 +72,9 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 		}
 	}
 
-	for (const HPair<uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	for (GGlobalSystemInstanceBase* SystemInstance : Instance->SystemInstanceList)
 	{
-		pair.second->Start();
+		SystemInstance->Start();
 	}
 
 	Instance->bIsRunning = true;
@@ -83,9 +83,9 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 }
 bool GCoreSystem::Update()
 {
-	for (HPair<const uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
+	for (GGlobalSystemInstanceBase* SystemInstance : Instance->SystemInstanceList)
 	{
-		pair.second->Update();
+		SystemInstance->Update();
 	}
 
 	return Instance->bIsRunning;
@@ -95,6 +95,12 @@ void GCoreSystem::Destroy()
 	if (Instance == nullptr)
 	{
 		return;
+	}
+
+	int32 NumSystem = (int32)Instance->SystemInstanceList.size();
+	for (int32 i = NumSystem - 1; i >= 0; --i)
+	{
+		Instance->SystemInstanceList[i]->Destroy();
 	}
 
 	for (const HPair< uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)

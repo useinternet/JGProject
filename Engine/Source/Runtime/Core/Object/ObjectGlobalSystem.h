@@ -59,6 +59,7 @@ public:
 	virtual ~GObjectGlobalSystem() = default;
 
 protected:
+	virtual void Start() override;
 	virtual void Destroy() override;
 
 public:

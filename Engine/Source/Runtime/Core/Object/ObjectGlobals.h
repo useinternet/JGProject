@@ -255,8 +255,9 @@ protected:
 	PSharedPtr<JGType>  Type;
 	PSharedPtr<JGMeta>  MetaData;
 
-	HHashSet<JGType> VTypeSet; // 1차적으로 상속받은 타입들
-
+	HHashSet<JGType> ParentTypeSet; // 1차적으로 상속받은 타입들
+	HHashSet<JGType> ChildTypeSet;
+	//HHash
 public:
 	JGClass();
 	virtual ~JGClass() = default;

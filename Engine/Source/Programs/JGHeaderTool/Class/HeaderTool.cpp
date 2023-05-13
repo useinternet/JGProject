@@ -420,32 +420,31 @@ bool PHeaderTool::analysisBaseClass(const PString& line, HClass* outClass)
 	
 	if (tempLine.Contains("class ") == true)
 	{
-		PString tempStr;
-		uint64 pos = tempLine.Find("class ");
-		tempLine.SubString(&tempStr, pos);
-		tempStr = tempStr.ReplaceAll("class ", "");
-		tempStr.SubString(&tempStr, 0, tempStr.Find(" "));
-
+		HList<PString> tokens = tempLine.Split(':');
+		PString tempStr = tokens[0];
+		tokens  = tempStr.Split(' ');
+		tempStr = tokens.back();
 		outClass->Name = tempStr.Trim();
 	}
 
-
-	PString baseClassName = PString::ReplaceAll(line, outClass->Name, "").ReplaceAll(":", "").ReplaceAll(",", "").ReplaceAll("class ", "").Trim();
-	baseClassName.SubString(&baseClassName, 0, baseClassName.Find("//"));
-	baseClassName.Trim();
-
-	HList<PString> tokens = baseClassName.Split(' ');
-	if (tokens.empty() == false)
-	{
-		baseClassName = (tokens.size() > 1) ? tokens[1].Trim() : tokens[0].Trim();
-	}
-
-	if (baseClassName.Empty() == true)
+	HList<PString> tokens = tempLine.Split(':');
+	if (tokens.size() <= 0)
 	{
 		return false;
 	}
+	
+	PString tempStr = tokens[1].ReplaceAll(",", " ").ReplaceAll("public ", "").ReplaceAll("private ", "");
+	tokens = tempStr.Split(' ');
+	for (PString& token : tokens)
+	{
+		if (token.Trim().Empty())
+		{
+			continue;
+		}
 
-	outClass->BaseClasses.push_back(baseClassName);
+		outClass->BaseClasses.push_back(token.Trim());
+	}
+
 	return true;
 }
 

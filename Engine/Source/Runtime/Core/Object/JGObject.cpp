@@ -3,11 +3,6 @@
 #include "ObjectGlobals.h"
 #include "FileIO/Json.h"
 
-JGType JGObject::GetType() const
-{
-	return JGTYPE(JGObject);
-}
-
 void JGObject::SetName(const PName& name)
 {
 	_name = name;

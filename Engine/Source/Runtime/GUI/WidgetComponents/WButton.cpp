@@ -11,13 +11,14 @@ void WButton::OnGUIBuild(HGUIBuilder& inBuilder)
 		switch (StretchMode.GetValue())
 		{
 		case EStretchMode::Vertical:
-			buttonSize.y = widgetContext.ContentSize.y;
+			buttonSize.y = ImGui::GetContentRegionAvail().y;
 			break;
 
 		case EStretchMode::Horizontal:
-			buttonSize.x = widgetContext.ContentSize.x;
+			buttonSize.x = ImGui::GetContentRegionAvail().x;
 			break;
 		}
+	
 
 		bool bIsClick = ImGui::Button(Text.GetValue().GetCStr(), buttonSize);
 

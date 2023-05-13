@@ -9,7 +9,7 @@ void WPanel::OnGUIBuild(HGUIBuilder& inBuilder)
 		{
 			ImGui::BeginGroup();
 
-			Content.ExecuteIfBound(inBuilder);
+			widgetContext.PushWidgetComponent.ExecuteIfBound(Content.ExecuteIfBound());
 
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 			{

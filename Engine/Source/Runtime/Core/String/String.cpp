@@ -5,6 +5,11 @@
 #include "Misc/Hash.h"
 #include "Math/Math.h"
 
+const PString& PString::None()
+{
+	static PString NoneString = "None";
+	return NoneString;
+}
 
 PString PString::FromInt32(int32 num)
 {

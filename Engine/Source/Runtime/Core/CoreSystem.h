@@ -46,6 +46,7 @@ class GCoreSystem
 private:
 	static GCoreSystem* Instance;
 	HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
+	HList<GGlobalSystemInstanceBase*> SystemInstanceList;
 	HList<ThreadID> ThreadIDList;
 
 	HCoreSystemGlobalValues GlobalValues;
@@ -73,6 +74,7 @@ public:
 
 		uint64 code = getTypeHashCode<T>();
 		Instance->SystemInstancePool.emplace(code, new T(args...));
+		Instance->SystemInstanceList.push_back(Instance->SystemInstancePool[code]);
 	}
 	template<class T>
 	static void UnRegisterSystemInstance()
@@ -85,10 +87,25 @@ public:
 		uint64 code = getTypeHashCode<T>();
 		GGlobalSystemInstanceBase*& instance = Instance->SystemInstancePool[code];
 
+		int32 instanceIndex = INDEX_NONE;
+		int32 numSystem = (int32)Instance->SystemInstanceList.size();
+		for (int32 i = 0; i < numSystem; ++i)
+		{
+			if (instance == Instance->SystemInstanceList[i])
+			{
+				instanceIndex = i;
+				break;
+			}
+		}
+
 		delete instance;
 		instance = nullptr;
 
 		Instance->SystemInstancePool.erase(code);
+		if (instanceIndex != INDEX_NONE)
+		{
+			Instance->SystemInstanceList.erase(Instance->SystemInstanceList.begin() + instanceIndex);
+		}
 	}
 	template<class T>
 	static T* GetSystemInstance()
