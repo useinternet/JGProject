@@ -2,12 +2,6 @@
 #include "WList.h"
 #include "Builder/GUIBuilder.h"
 
-
-void WList::SetItemList(const HList<PSharedPtr<IListItem>>& inItemList)
-{
-	_itemList = inItemList;
-}
-
 void WList::SetSelectedItemIndex(int32 inIndex)
 {
 	bool bDirty = _selectedItemIndex != inIndex;
@@ -43,6 +37,11 @@ void WList::SetAllowMultiSelected(bool bInAllowMultiSelected)
 	_bAllowMultiSelected = bInAllowMultiSelected;
 }
 
+void WList::setItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList)
+{
+	_itemList = inItemList;
+}
+
 void WList::OnGUIBuild(HGUIBuilder& inBuilder)
 {
 	for (PSharedPtr<IListItem> item : _itemList)
@@ -51,3 +50,4 @@ void WList::OnGUIBuild(HGUIBuilder& inBuilder)
 		inBuilder.PushWidgetComponent(widgetComp);
 	}
 }
+

@@ -3,13 +3,14 @@
 
 class WPanel : public WWidgetComponent
 {
-	// OnContents
+public:
 	JG_DECLARE_DELEGATE_RETVAL(PSharedPtr<WWidgetComponent>, HOnContent);
+	HOnContent Content;
+
+protected:
 	JG_DECLARE_DELEGATE(HOnMouseLeftClick);
 	JG_DECLARE_DELEGATE(HOnMouseRightClick);
 
-
-	HOnContent Content;
 	HOnMouseLeftClick  OnMouseLeftClick;
 	HOnMouseRightClick OnMouseRightClick;
 

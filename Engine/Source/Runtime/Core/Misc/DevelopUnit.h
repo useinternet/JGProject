@@ -1,5 +1,9 @@
 #pragma once
 #include "Object/JGObject.h"
+#include "Object/ObjectGlobals.h"
+#include "FileIO/Json.h"
+#include "Runtime/CodeGen/Module.Core.DevelopUnit.generation.h"
+
 #pragma warning(disable : 4275)
 
 #define JG_REGISTER_DEVELOP_UNIT(UnitName, APIDefine) \

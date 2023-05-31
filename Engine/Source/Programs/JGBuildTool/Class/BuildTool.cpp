@@ -232,6 +232,19 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			PString links;
 			PString defines;
 
+			PString postcommands = PString::Format(R"(
+				postbuildcommands {
+					"copy $(TargetDir)%s.dll $(TargetDir)..\\",
+					"copy $(TargetDir)%s.lib $(TargetDir)..\\",
+					"copy $(TargetDir)%s.exp $(TargetDir)..\\",
+					"copy $(TargetDir)%s.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)%s.dll $(TargetDir)..\\%s_Dynamic.dll"
+})"
+, moduleInfo.ModuleName, moduleInfo.ModuleName, moduleInfo.ModuleName,
+moduleInfo.ModuleName, moduleInfo.ModuleName, moduleInfo.ModuleName);
+
+			bool bIsSharedLib = moduleInfo.ModuleFormat == "SharedLib";
+
 			for (const PString& moduleName : moduleInfo.ModuleDependencies)
 			{
 				if (_moduleInfoPool.find(moduleName) == _moduleInfoPool.end())
@@ -263,7 +276,15 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			outScript.AppendLine("}");
 			outScript.Append("\t\t\t\t");
 
-			outScript.Append("SetCPPProjectConfig(");
+			if (bIsSharedLib)
+			{
+				outScript.Append("SetDynamicCPPProjectConfig(");
+			}
+			else
+			{
+				outScript.Append("SetCPPProjectConfig(");
+			}
+
 			outScript.Append("\"").Append(moduleInfo.ModuleFormat).Append("\", ");
 			outScript.Append("\"").Append(moduleInfo.ModulePath).Append("\", ");
 
@@ -277,21 +298,37 @@ bool PBuildTool::generateBuildScriptInternal(const HHashMap<PString, HList<PModu
 			outScript.AppendLine("filter \"configurations:DevelopEngine\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::DevelopEngine].Config).AppendLine("()");
 			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::DevelopEngine));
+			if (bIsSharedLib)
+			{
+				outScript.Append("\t\t\t\t\t").AppendLine(postcommands);
+			}
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:DevelopGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::DevelopGame].Config).AppendLine("()");
 			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::DevelopGame));
+			if (bIsSharedLib)
+			{
+				outScript.Append("\t\t\t\t\t").AppendLine(postcommands);
+			}
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ConfirmGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::ConfirmGame].Config).AppendLine("()");
 			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::ConfirmGame));
+			if (bIsSharedLib)
+			{
+				outScript.Append("\t\t\t\t\t").AppendLine(postcommands);
+			}
 			outScript.Append("\t\t\t\t");
 
 			outScript.AppendLine("filter \"configurations:ReleaseGame\"");
 			outScript.Append("\t\t\t\t\t").Append(moduleInfo.ModuleFilters[(int32)EModuleFilter::ReleaseGame].Config).AppendLine("()");
 			outScript.Append("\t\t\t\t\t").AppendLine(getDefines(moduleInfo, EModuleFilter::ReleaseGame));
+			if (bIsSharedLib)
+			{
+				outScript.Append("\t\t\t\t\t").AppendLine(postcommands);
+			}
 
 			outScript.AppendLine("");
 			outScript.AppendLine("");

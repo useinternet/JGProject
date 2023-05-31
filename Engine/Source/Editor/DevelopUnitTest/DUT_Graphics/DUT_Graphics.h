@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Misc/DevelopUnit.h"
+#include "Runtime/CodeGen/Module.DevelopUnitTest.DUT_Graphics.generation.h"
 
 #ifdef _DUT_GRAPHICS
 #define DUT_GRAPHICS_API __declspec(dllexport)

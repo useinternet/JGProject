@@ -201,6 +201,8 @@ bool PImGuiBuild::OnBuildPushChildWidget(HBuildContext& inBuildContext, HGUIBuil
 	OnBuildBeginChildWidget(inBuildContext, inCV);
 
 	widget->OnGUIBuild(guiBuilder);
+
+	guiBuild->ImGuiContext = ImGuiContext;
 	guiBuild->PushData(guiBuilder.GetCommandQueue());
 	guiBuild->OnBuild(inBuildContext);
 

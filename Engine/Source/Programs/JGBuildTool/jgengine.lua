@@ -1,5 +1,6 @@
 local GEN_PROJECT_FILE_PATH = "Temp/ProjectFiles/"
 local BIN_PATH        = "Bin/%{cfg.buildcfg}/"
+local BIN_DYNAMIC_TARGET_PATH = "Bin/%{cfg.buildcfg}/DynamicDlls"
 local OBJECT_PATH     = "Temp/Obj/%{cfg.buildcfg}/"
 local PCH_HEADER      = "PCH/PCH.h"
 local PCH_HEADER_PATH = "Source/PCH/PCH.h"
@@ -56,6 +57,29 @@ workspace "JGEngine"
         if defined ~= nil then
             defines {defined}
         end
+        -- file
+        files {
+            path .. "**.h",
+            path .. "**.cpp",
+            path .. "**.c",
+            PCH_HEADER_PATH,
+            PCH_CPP_PATH,
+        }
+    end
+
+    function SetDynamicCPPProjectConfig(kind_name, path, defined)
+        location  (GEN_PROJECT_FILE_PATH)
+        kind (kind_name)
+        language "C++"
+        debugdir  (BIN_PATH)
+        targetdir (BIN_DYNAMIC_TARGET_PATH)
+        objdir(OBJECT_PATH)
+        pchheader (PCH_HEADER)
+        pchsource (PCH_CPP_PATH)
+        if defined ~= nil then
+            defines {defined}
+        end
+       
         -- file
         files {
             path .. "**.h",
@@ -144,56 +168,152 @@ workspace "JGEngine"
 			project "DUT_Graphics"
 				includedirs{ "Source/Editor/DevelopUnitTest/DUT_Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
 				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }
-				SetCPPProjectConfig("SharedLib", "Source/Editor/DevelopUnitTest/DUT_Graphics/", {"_DUT_GRAPHICS", })
+				SetDynamicCPPProjectConfig("SharedLib", "Source/Editor/DevelopUnitTest/DUT_Graphics/", {"_DUT_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\DUT_Graphics_Dynamic.dll"
+}
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\DUT_Graphics_Dynamic.dll"
+}
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\DUT_Graphics_Dynamic.dll"
+}
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)DUT_Graphics.dll $(TargetDir)..\\DUT_Graphics_Dynamic.dll"
+}
 
 
 			project "JGEditor"
 				includedirs{ "Source/Editor/JGEditor/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", "Source/Runtime/Graphics/", "Source/Runtime/GUI/", }
 				links{ "Core", "GameFrameWorks", "Graphics", "GUI", }
-				SetCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
+				SetDynamicCPPProjectConfig("SharedLib", "Source/Editor/JGEditor/", {"_JGEDITOR", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.lib $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.exp $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\JGEditor_Dynamic.dll"
+}
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.lib $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.exp $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\JGEditor_Dynamic.dll"
+}
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.lib $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.exp $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\JGEditor_Dynamic.dll"
+}
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.lib $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.exp $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)JGEditor.dll $(TargetDir)..\\JGEditor_Dynamic.dll"
+}
 
 
 		group "Engine/Runtime"
 			project "CodeGen"
 				includedirs{ "Source/Runtime/CodeGen/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GUI/", "Source/Editor/JGEditor/", "Source/Editor/DevelopUnitTest/DUT_Graphics/", }
 				links{ "Core", "GUI", "JGEditor", "DUT_Graphics", }
-				SetCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
+				SetDynamicCPPProjectConfig("SharedLib", "Source/Runtime/CodeGen/", {"_CODEGEN", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.lib $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.exp $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\CodeGen_Dynamic.dll"
+}
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.lib $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.exp $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\CodeGen_Dynamic.dll"
+}
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.lib $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.exp $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\CodeGen_Dynamic.dll"
+}
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.lib $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.exp $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)CodeGen.dll $(TargetDir)..\\CodeGen_Dynamic.dll"
+}
 
 
 			project "Core"
@@ -217,19 +337,51 @@ workspace "JGEngine"
 			project "Game"
 				includedirs{ "Source/Runtime/Game/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GameFrameWorks/", }
 				links{ "Core", "GameFrameWorks", }
-				SetCPPProjectConfig("SharedLib", "Source/Runtime/Game/", {"_GAME", })
+				SetDynamicCPPProjectConfig("SharedLib", "Source/Runtime/Game/", {"_GAME", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Game.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Game.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Game.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\Game_Dynamic.dll"
+}
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Game.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Game.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Game.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\Game_Dynamic.dll"
+}
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Game.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Game.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Game.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\Game_Dynamic.dll"
+}
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Game.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Game.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Game.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Game.dll $(TargetDir)..\\Game_Dynamic.dll"
+}
 
 
 			project "GameFrameWorks"
@@ -253,19 +405,51 @@ workspace "JGEngine"
 			project "Graphics"
 				includedirs{ "Source/Runtime/Graphics/", "Source/ThirdParty", "Source/", "Source/Runtime/Core/", "Source/Runtime/GUI/", }
 				links{ "Core", "GUI", }
-				SetCPPProjectConfig("SharedLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
+				SetDynamicCPPProjectConfig("SharedLib", "Source/Runtime/Graphics/", {"_GRAPHICS", })
 				filter "configurations:DevelopEngine"
 					DebugConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPENGINE", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\Graphics_Dynamic.dll"
+}
 				filter "configurations:DevelopGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_DEVELOPGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\Graphics_Dynamic.dll"
+}
 				filter "configurations:ConfirmGame"
 					ConfirmConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_CONFIRMGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\Graphics_Dynamic.dll"
+}
 				filter "configurations:ReleaseGame"
 					ReleaseConfig()
 					defines{"_PLATFORM_WINDOWS", "_DIRECTX12", "_JGPROJECT", "_RELEASEGAME", }
+					
+				postbuildcommands {
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.lib $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.exp $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.pdb $(TargetDir)..\\",
+					"copy $(TargetDir)Graphics.dll $(TargetDir)..\\Graphics_Dynamic.dll"
+}
 
 
 			project "GUI"

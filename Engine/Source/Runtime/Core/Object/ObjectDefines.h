@@ -23,6 +23,10 @@ public:  \
 private: \
 \
 
+#ifdef JG_GENERATED_CLASS_BODY
+#undef JG_GENERATED_CLASS_BODY
+#endif
+
 #define JG_GENERATED_CLASS_BODY \
 	friend class PObjectGlobalsPrivateUtils; \
 	JG_GENERATED_SIMPLE_BODY \

@@ -22,24 +22,25 @@ public:
 	WList() : WWidgetComponent() {}
 	virtual ~WList() = default;
 
-
 public:
 	template<class ListItemType>
 	void SetItemList(const HList<PSharedPtr<ListItemType>>& inItemList)
 	{
 		HList<PSharedPtr<IListItem>> itemList;
-		for (const ListItemType& item : inItemList)
+		for (const PSharedPtr<ListItemType>& item : inItemList)
 		{
 			itemList.push_back(item);
 		}
 
-		SetItemList(inItemList);
+		setItemListInternal(itemList);
 	}
 
-	void SetItemList(const HList<PSharedPtr<IListItem>>& inItemList);
 	void SetSelectedItemIndex(int32 inIndex);
 	void SetSelectedItem(PSharedPtr<IListItem> inItem);
 	void SetAllowMultiSelected(bool bInAllowMultiSelected);
+
+private:
+	void setItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList);
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;

@@ -1,95 +1,95 @@
-[:13908:][info][Core]: Active Thread: [719271515]
-[:13908:][info][Core]: Active Thread: [384980898]
-[:13908:][info][Core]: Active Thread: [2057449213]
-[:13908:][info][Core]: Active Thread: [602863062]
-[:13908:][info][Core]: Active Thread: [2494911359]
-[:13908:][info][Core]: Active Thread: [42729420]
-[:13908:][info][Core]: Active Thread: [1568767602]
-[:13908:][info][Core]: Active Thread: [3641782926]
-[:13908:][info][Core]: Active Thread: [2230116248]
-[:13908:][info][Core]: Active Thread: [883897265]
-[:13908:][info][Core]: Active Thread: [3519213615]
-[:13908:][info][Core]: Active Thread: [720236734]
-[:13908:][info][Core]: Active Thread: [2301724801]
-[:13908:][info][Core]: Active Thread: [491154595]
-[:13908:][info][Core]: Active Thread: [849149512]
-[:13908:][info][Core]: Active Thread: [493348066]
-[:13908:][info][Core]: Active Thread: [697184609]
-[:13908:][info][Core]: Active Thread: [17979477]
-[:13908:][info][Core]: Active Thread: [2430950623]
-[:13908:][info][Core]: Active Thread: [3272274990]
-[:13908:][info][Core]: Active Thread: [825445212]
-[:13908:][info][Core]: Active Thread: [2145296858]
-[:13908:][info][Core]: Active Thread: [1969784177]
-[:13908:][info][Core]: Active Thread: [122535780]
-[:13908:][info][Core]: Active Thread: [2803799858]
-[:13908:][info][Core]: Active Thread: [2036434037]
-[:13908:][info][Core]: Active Thread: [1478100398]
-[:13908:][info][Core]: Active Thread: [60272862]
-[:13908:][info][Core]: Active Thread: [2566024259]
-[:13908:][info][Core]: Active Thread: [676169433]
-[:13908:][info][Core]: Active Thread: [3861858561]
-[:13908:][info][Core]: Active Thread: [3968032258]
-[:13908:][info][Core]: Active Thread Totoal Count: 32 
-[:13908:][info][BuildTool]: Step 1. Engine Collection Module Infos..
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: Programs Category Module List
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: JGBuildTool
-[:13908:][trace][BuildTool]: JGConsole
-[:13908:][trace][BuildTool]: JGHeaderTool
-[:13908:][trace][BuildTool]: JGLauncher
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: Editor Category Module List
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: DUT_Graphics
-[:13908:][trace][BuildTool]: JGEditor
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: Runtime Category Module List
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: CodeGen
-[:13908:][trace][BuildTool]: Core
-[:13908:][trace][BuildTool]: Game
-[:13908:][trace][BuildTool]: GameFrameWorks
-[:13908:][trace][BuildTool]: Graphics
-[:13908:][trace][BuildTool]: GUI
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][trace][BuildTool]: Editor: 2
-[:13908:][trace][BuildTool]: Programs: 4
-[:13908:][trace][BuildTool]: Runtime: 6
-[:13908:][trace][BuildTool]: Total: 12
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][info][BuildTool]: Step 2. User Collection Module Infos..
-[:13908:][trace][BuildTool]: Total: 0
-[:13908:][trace][BuildTool]: ----------------------------------------------------
-[:13908:][info][BuildTool]: Step 3. Generate Build Script..
-[:13908:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGLauncher: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGLauncher: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: DUT_Graphics: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: DUT_Graphics: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGEditor: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: JGEditor: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: CodeGen: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: CodeGen: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: Core: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: Game: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: Game: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: GameFrameWorks: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: GameFrameWorks: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: Graphics: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: Graphics: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Module: GUI: Start Generate Build Script
-[:13908:][trace][BuildTool]: Module: GUI: Compelete Generate Build Script
-[:13908:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
-[:13908:][info][BuildTool]: Step 4. Insert Include PCH..
-[:13908:][info][BuildTool]: Step 5. Make Project Files..
-[:13908:][info][BuildTool]: Compelete Build Tool Run..
+[:29684:][info][Core]: Active Thread: [746134505]
+[:29684:][info][Core]: Active Thread: [2430141926]
+[:29684:][info][Core]: Active Thread: [3571478723]
+[:29684:][info][Core]: Active Thread: [2584219876]
+[:29684:][info][Core]: Active Thread: [3015990730]
+[:29684:][info][Core]: Active Thread: [2609126341]
+[:29684:][info][Core]: Active Thread: [1237661762]
+[:29684:][info][Core]: Active Thread: [2665228401]
+[:29684:][info][Core]: Active Thread: [4014293030]
+[:29684:][info][Core]: Active Thread: [1458050441]
+[:29684:][info][Core]: Active Thread: [195842151]
+[:29684:][info][Core]: Active Thread: [4154168837]
+[:29684:][info][Core]: Active Thread: [3699895848]
+[:29684:][info][Core]: Active Thread: [2103736072]
+[:29684:][info][Core]: Active Thread: [370126580]
+[:29684:][info][Core]: Active Thread: [1055336048]
+[:29684:][info][Core]: Active Thread: [244215970]
+[:29684:][info][Core]: Active Thread: [4208314372]
+[:29684:][info][Core]: Active Thread: [883401612]
+[:29684:][info][Core]: Active Thread: [1877812623]
+[:29684:][info][Core]: Active Thread: [2454159270]
+[:29684:][info][Core]: Active Thread: [3083292765]
+[:29684:][info][Core]: Active Thread: [28370755]
+[:29684:][info][Core]: Active Thread: [3906578037]
+[:29684:][info][Core]: Active Thread: [3700548023]
+[:29684:][info][Core]: Active Thread: [778193134]
+[:29684:][info][Core]: Active Thread: [1992027605]
+[:29684:][info][Core]: Active Thread: [2721147852]
+[:29684:][info][Core]: Active Thread: [793047452]
+[:29684:][info][Core]: Active Thread: [2298879155]
+[:29684:][info][Core]: Active Thread: [2687391405]
+[:29684:][info][Core]: Active Thread: [3059744987]
+[:29684:][info][Core]: Active Thread Totoal Count: 32 
+[:29684:][info][BuildTool]: Step 1. Engine Collection Module Infos..
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: Programs Category Module List
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: JGBuildTool
+[:29684:][trace][BuildTool]: JGConsole
+[:29684:][trace][BuildTool]: JGHeaderTool
+[:29684:][trace][BuildTool]: JGLauncher
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: Editor Category Module List
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: DUT_Graphics
+[:29684:][trace][BuildTool]: JGEditor
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: Runtime Category Module List
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: CodeGen
+[:29684:][trace][BuildTool]: Core
+[:29684:][trace][BuildTool]: Game
+[:29684:][trace][BuildTool]: GameFrameWorks
+[:29684:][trace][BuildTool]: Graphics
+[:29684:][trace][BuildTool]: GUI
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][trace][BuildTool]: Editor: 2
+[:29684:][trace][BuildTool]: Programs: 4
+[:29684:][trace][BuildTool]: Runtime: 6
+[:29684:][trace][BuildTool]: Total: 12
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][info][BuildTool]: Step 2. User Collection Module Infos..
+[:29684:][trace][BuildTool]: Total: 0
+[:29684:][trace][BuildTool]: ----------------------------------------------------
+[:29684:][info][BuildTool]: Step 3. Generate Build Script..
+[:29684:][trace][BuildTool]: Module: JGBuildTool: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGBuildTool: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGConsole: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGConsole: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGHeaderTool: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGHeaderTool: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGLauncher: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGLauncher: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: DUT_Graphics: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: DUT_Graphics: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGEditor: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: JGEditor: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: CodeGen: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: CodeGen: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: Core: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: Core: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: Game: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: Game: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: GameFrameWorks: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: GameFrameWorks: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: Graphics: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: Graphics: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Module: GUI: Start Generate Build Script
+[:29684:][trace][BuildTool]: Module: GUI: Compelete Generate Build Script
+[:29684:][trace][BuildTool]: Generate Build Script: ../../Source/Programs/JGBuildTool/jgengine.lua
+[:29684:][info][BuildTool]: Step 4. Insert Include PCH..
+[:29684:][info][BuildTool]: Step 5. Make Project Files..
+[:29684:][info][BuildTool]: Compelete Build Tool Run..
