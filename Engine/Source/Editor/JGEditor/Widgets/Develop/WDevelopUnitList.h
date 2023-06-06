@@ -2,10 +2,12 @@
 #include "Widget.h"
 #include "JGEditorDefine.h"
 #include "WidgetComponents/WList.h"
+#include "WidgetComponents/WSelectable.h"
 
 class JGDevelopUnit;
 class WDUTComboBox;
 class WButton;
+class WDevelopItem;
 class WText;
 
 class PDevelopUnitItem
@@ -14,6 +16,7 @@ class PDevelopUnitItem
 {
 	PWeakPtr<WList> _ownerList;
 	JGDevelopUnit*  _developUnit;
+	PSharedPtr<WDevelopItem> _cacheWidget;
 
 public:
 	PString Name;
@@ -28,9 +31,16 @@ protected:
 	void OnSelected() override;
 };
 
-class WDevelopItem : public WWidgetComponent
+class WDevelopItem : public WSelectable
 {
 	PSharedPtr<PDevelopUnitItem> _ownerItem;
+
+
+	struct HArguments
+	{
+		PSharedPtr<PDevelopUnitItem> Item;
+
+	};
 
 	PSharedPtr<WText> NameLabel;
 	PSharedPtr<WText> DevelopUnitNameLabel;
@@ -42,9 +52,9 @@ public:
 	virtual ~WDevelopItem() = default;
 protected:
 	virtual void Construct() override;
-
+	virtual void OnContent(HGUIBuilder& inBuilder) override;
 private:
-	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
+	//virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 };
 
 class WDevelopUnitList : public WWidget

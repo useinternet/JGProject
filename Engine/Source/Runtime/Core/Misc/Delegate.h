@@ -118,7 +118,7 @@ public:
 template<class RetType, class ... Args>
 class PDelegate
 {
-	PSharedPtr<IDelegateInstance<RetType, Args...>> Instance;
+	PSharedPtr<IDelegateInstance<RetType, Args...>> Instance = nullptr;
 
 public:
 	template<class T>
@@ -185,8 +185,7 @@ class PMultiDelegate
 	HList<PDelegate<void, Args...>> _delegates;
 	HList<void*> _delegateKeys;
 public:
-	template<class T>
-	void Add(PWeakPtr<T> ptr, const std::function<void(Args...)>& func)\
+	void Add(PWeakPtr<IMemoryObject> ptr, const std::function<void(Args...)>& func)\
 	{
 		_delegates.push_back(PDelegate<void, Args...>::Create(ptr, func));
 		_delegateKeys.push_back((void*)(ptr.Pin().GetRawPointer()));

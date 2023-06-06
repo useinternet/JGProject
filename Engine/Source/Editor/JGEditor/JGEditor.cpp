@@ -42,7 +42,7 @@ void HJGEditorModule::StartupModule()
 
 	JG_LOG(JGEditor, ELogLevel::Trace, "Startup JGEditor Module...");
 
-	GGUIGlobalSystem::GetInstance().GUIEvents.OnMenuBuild.Add<PJWindow>(_window, JG_DELEGATE_FN_BIND_ONEPARAM(HJGEditorModule::BuildMainMenu));
+	GGUIGlobalSystem::GetInstance().GUIEvents.OnMenuBuild.Add(_window, JG_DELEGATE_FN_BIND_ONEPARAM(HJGEditorModule::BuildMainMenu));
 }
 
 void HJGEditorModule::ShutdownModule()

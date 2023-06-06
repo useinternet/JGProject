@@ -49,8 +49,8 @@ void PDX12JGGui::Create()
 
 	HCoreSystemGlobalValues& globalValues = GCoreSystem::GetGlobalValues();
 #ifdef _PLATFORM_WINDOWS
-	globalValues.WindowCallBacks->WndProc.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnWndProc));
-	globalValues.WindowCallBacks->OnResize.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_TWOPARAM(PDX12JGGui::OnResize));
+	globalValues.WindowCallBacks->WndProc.Add(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnWndProc));
+	globalValues.WindowCallBacks->OnResize.Add(SharedWrap(this), JG_DELEGATE_FN_BIND_TWOPARAM(PDX12JGGui::OnResize));
 
 	ImGui_ImplWin32_Init((void*)globalValues.MainWindow->GetHandle());
 #endif
@@ -72,8 +72,8 @@ void PDX12JGGui::Create()
 
 	PSharedPtr<PDX12FrameBuffer> frameBuffer = HDirectXAPI::GetFrameBuffer();
 
-	frameBuffer->OnUpdate.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnUpdate));
-	frameBuffer->OnPresent.Add<PDX12JGGui>(SharedWrap(this), JG_DELEGATE_FN_BIND(PDX12JGGui::OnPresent));
+	frameBuffer->OnUpdate.Add(SharedWrap(this), JG_DELEGATE_FN_BIND_FOURPARAM(PDX12JGGui::OnUpdate));
+	frameBuffer->OnPresent.Add(SharedWrap(this), JG_DELEGATE_FN_BIND(PDX12JGGui::OnPresent));
 }
 
 void PDX12JGGui::Destroy()

@@ -25,6 +25,16 @@ public:
 		this->left = min.x; this->right = max.x; this->top = min.y; this->bottom = max.y;
 	}
 
+	HVector2 Min() const noexcept
+	{
+		return HVector2(left, top);
+	}
+
+	HVector2 Max() const noexcept
+	{
+		return HVector2(right, bottom);
+	}
+
 	HVector2 Center() const noexcept 
 	{
 		return { Width() * 0.5f + left, Height() * 0.5f + top };

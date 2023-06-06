@@ -2,6 +2,7 @@
 #include "GUIBuilder.h"
 #include "GUI.h"
 #include "Widget.h"
+#include "WidgetContext.h"
 
 void HGUIBuilder::BeginHorizontal(int32 fixedWidth)
 {

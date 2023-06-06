@@ -1,5 +1,6 @@
 #include "PCH/PCH.h"
 #include "ImGuiBuild.h"
+#include "WidgetContext.h"
 #include "Widget.h"
 #include "WidgetComponents/WidgetComponent.h"
 #include "ImGuiContextMenuBuild.h"
@@ -430,22 +431,14 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 
 	HWidgetContext widgetContext;
 	widgetContext.ContentSize = inBuildContext.CacheData->WidgetCacheDatas[widgetGuid].ContentRegionSize;
-	widgetContext.PushWidgetComponent = HPushWidgetComponent::Create(SharedWrap(this), [&inBuildContext, this](PSharedPtr<WWidgetComponent> inWidgetComp)
+	widgetContext.OnPostGUIContent.Add(SharedWrap(this), [&inBuildContext, this](HGUIBuilder& inBuilder)
 		{
-			if (inWidgetComp == nullptr)
-			{
-				return;
-			}
-
-			HGUIBuilder guiBuilder;
-			inWidgetComp->OnGUIBuild(guiBuilder);
-
-			if (guiBuilder.GetCommandQueue().empty() == false)
+			if (inBuilder.GetCommandQueue().empty() == false)
 			{
 				PSharedPtr<PImGuiBuild> imGuiBuild = Allocate<PImGuiBuild>();
 				imGuiBuild->ImGuiContext = ImGuiContext;
 
-				imGuiBuild->PushData(guiBuilder.GetCommandQueue());
+				imGuiBuild->PushData(inBuilder.GetCommandQueue());
 				imGuiBuild->OnBuild(inBuildContext);
 			}
 		});

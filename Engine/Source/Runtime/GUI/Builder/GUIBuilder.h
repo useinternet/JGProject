@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
-#include "WidgetContext.h"
 
 #define DEFINE_GUIBUILD_COMMAND_ONEVALUE(ClassName, type1, name1)\
 class ClassName : public PCommandValue \
@@ -83,6 +82,7 @@ name5 = in##name5; \
 virtual ~##ClassName() = default; \
 }; \
 
+class HWidgetContext;
 
 JG_DECLARE_DELEGATE_ONEPARAM(HOnGenerateNativeGUI, const HWidgetContext&);
 

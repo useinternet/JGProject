@@ -75,3 +75,18 @@ inline ImGuiKey ToImGuiKey(EKeyCode inKeyCode)
 	return ImGuiKey_None;
 }
 
+inline ImVec4 LinearColorToImVec4(const HLinearColor& inColor)
+{
+	return ImVec4(inColor.R, inColor.G, inColor.B, inColor.A);
+}
+
+inline ImU32 LinearColorToImU32(const HLinearColor& inColor)
+{
+	return ImGui::ColorConvertFloat4ToU32(LinearColorToImVec4(inColor));
+}
+
+inline ImVec2 Vector2ToImVec2(const HVector2& inVec)
+{
+	return ImVec2(inVec.x, inVec.y);
+}
+

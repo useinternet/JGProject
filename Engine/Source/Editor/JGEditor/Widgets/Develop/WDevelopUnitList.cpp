@@ -14,7 +14,12 @@ PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, JGDevelopUnit* D
 
 PSharedPtr<WWidgetComponent> PDevelopUnitItem::CreateWidgetComponent()
 {
-	return Allocate<WDevelopItem>(SharedWrap(this));
+	if (_cacheWidget == nullptr)
+	{
+		_cacheWidget = Allocate<WDevelopItem>(SharedWrap(this));
+	}
+
+	return _cacheWidget;
 }
 
 PDevelopUnitItem::~PDevelopUnitItem()
@@ -38,9 +43,14 @@ void WDevelopItem::Construct()
 
 	ResetButton->Text  = "Reset";
 	DeleteButton->Text = "Delete";
+
+	WSelectable::HArguments args;
+	args.StretchMode = EStretchMode::Horizontal;
+
+	WSelectable::Construct(args);
 }
 
-void WDevelopItem::OnGUIBuild(HGUIBuilder& inBuilder)
+void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
 {
 	if (_ownerItem == nullptr)
 	{
@@ -64,6 +74,31 @@ void WDevelopItem::OnGUIBuild(HGUIBuilder& inBuilder)
 	}
 	inBuilder.EndVertical();
 }
+
+//void WDevelopItem::OnGUIBuild(HGUIBuilder& inBuilder)
+//{
+//	if (_ownerItem == nullptr)
+//	{
+//		return;
+//	}
+//
+//	NameLabel->Text = PString("Name : ") + _ownerItem->Name;
+//	DevelopUnitNameLabel->Text = PString("DevelopUnit : ") + _ownerItem->DevelopUnitName;
+//
+//	inBuilder.BeginVertical();
+//	{
+//		inBuilder.PushWidgetComponent(NameLabel);
+//		inBuilder.PushWidgetComponent(DevelopUnitNameLabel);
+//
+//		inBuilder.BeginHorizontal();
+//		{
+//			inBuilder.PushWidgetComponent(ResetButton);
+//			inBuilder.PushWidgetComponent(DeleteButton);
+//		}
+//		inBuilder.EndHorizontal();
+//	}
+//	inBuilder.EndVertical();
+//}
 
 void WDevelopUnitList::Construct()
 {

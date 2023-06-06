@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "GUIDefine.h"
+#include "WidgetContext.h"
 #include "Builder/MenuBuilder.h"
 #include "Builder/ContextMenuBuilder.h"
 
