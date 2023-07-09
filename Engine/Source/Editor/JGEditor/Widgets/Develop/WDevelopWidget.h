@@ -9,6 +9,7 @@ class JGDevelopUnit;
 class WDevelopUnitExecuter;
 class WDevelopUnitList;
 class WDevelopUnitContent;
+class PDevelopUnitItem;
 
 JGCLASS()
 class JGEDITOR_API WDevelopWidget : public WWidget
@@ -18,6 +19,8 @@ class JGEDITOR_API WDevelopWidget : public WWidget
 	PSharedPtr<WDevelopUnitExecuter> _developUnitExecuter;
 	PSharedPtr<WDevelopUnitList>     _developUnitList;
 	PSharedPtr<WDevelopUnitContent>  _developUnitContent;
+
+	PWeakPtr<PDevelopUnitItem> _selectedDevelopUnit;
 public:
 	WDevelopWidget() = default;
 	virtual ~WDevelopWidget() = default;
@@ -28,4 +31,12 @@ public:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 	virtual void OnMenuBuild(HMenuBuilder& inBuilder) override;
 	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override;
+
+private:
+
+
+
+
+
+
 };

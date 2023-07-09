@@ -6,6 +6,12 @@
 template<class T>
 class WInputScalar : public WWidgetComponent
 {
+public:
+	struct HArguments
+	{
+
+	};
+
 private:
 	T _value;
 	T _step;
@@ -13,6 +19,11 @@ private:
 public:
 	WInputScalar() : WWidgetComponent() {}
 	virtual ~WInputScalar() = default;
+
+	void Construct(const HArguments& inArgs)
+	{
+
+	}
 
 	const T& GetInputValue() const 
 	{

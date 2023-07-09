@@ -13,16 +13,26 @@ public:
 
 class WList : public WWidgetComponent
 {
+	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelectItem, PSharedPtr<IListItem>)
+
+public:
+	struct HArguments
+	{
+		HOnSelectItem OnSelectItem;
+	};
+
 private:
 	HList<PSharedPtr<IListItem>> _itemList;
 	HSet<int32> _selectedItemIndexes;
 
 	bool  _bAllowMultiSelected  = false;
-	
 
+	HOnSelectItem _onSelectItem;
 public:
 	WList() : WWidgetComponent() {}
 	virtual ~WList() = default;
+
+	void Construct(const HArguments& inArgs);
 
 public:
 	template<class ListItemType>

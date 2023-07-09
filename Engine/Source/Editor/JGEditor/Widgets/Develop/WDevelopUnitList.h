@@ -53,10 +53,11 @@ private:
 	PSharedPtr<WButton> _resetButton;
 	PSharedPtr<WButton> _deleteButton;
 public:
-	WDevelopItem(const HArguments& inArgs);
 	virtual ~WDevelopItem() = default;
-protected:
+
 	void Construct(const HArguments& inArgs);
+
+protected:
 	virtual void OnContent(HGUIBuilder& inBuilder) override;
 
 	void OnSelected();
@@ -64,21 +65,25 @@ protected:
 
 class WDevelopUnitList : public WWidget
 {
+public:
+	struct HArguments : public WList::HArguments
+	{
+
+	};
+
+private:
 	PSharedPtr<WList> _developUnitList;
 	HList<PSharedPtr<PDevelopUnitItem>> _listItems;
 
 	PSharedPtr<WDUTComboBox> _dutComboBox;
 	PSharedPtr<WButton> _onAddItemButton;
 public:
+	WDevelopUnitList() = default;
 	virtual ~WDevelopUnitList() = default;
 
+	void Construct(const HArguments& InArgs);
+
 protected:
-// IMemoryObject
-	virtual void Construct() override;
-// ~// IMemoryObject
-
-
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 	void OnAddItem();
-	void OnItemSelected();
 };

@@ -19,6 +19,8 @@ APIDefine void _Link_DevelopUnit_(GCoreSystem* ins) \
 #define JG_CREATE_DEVELOPUNIT_FUNCTION_NAME "_Create_DevelopUnit_"
 #define JG_LINK_DEVELOPUNIT_FUNCTION_NAME   "_Link_DevelopUnit_"
 
+class WWidgetComponent;
+
 JGCLASS()
 class JGDevelopUnit : public JGObject
 {
@@ -30,5 +32,8 @@ public:
 	virtual void Startup() {};
 	virtual void Update() {};
 	virtual void Shutdown() {};
+
+	// À§Á¬
+	virtual PSharedPtr<WWidgetComponent> CreateContentWidgetComponent() { return nullptr; }
 };
 

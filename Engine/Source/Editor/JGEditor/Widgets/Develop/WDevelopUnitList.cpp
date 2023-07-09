@@ -18,7 +18,9 @@ PSharedPtr<WWidgetComponent> PDevelopUnitItem::CreateWidgetComponent()
 	{
 		WDevelopItem::HArguments args;
 		args.Item = SharedWrap(this);
-		_cacheWidget = Allocate<WDevelopItem>(args);
+		args.OwnerList = _ownerList;
+
+		_cacheWidget = NewWidgetComponent<WDevelopItem>(args);
 	}
 
 	return _cacheWidget;
@@ -49,23 +51,23 @@ PDevelopUnitItem::~PDevelopUnitItem()
 	HPlatform::Deallocate(_developUnit);
 }
 
-WDevelopItem::WDevelopItem(const WDevelopItem::HArguments& inArgs)
-{
-	Construct(inArgs);
-}
-
 void WDevelopItem::Construct(const WDevelopItem::HArguments& inArgs)
 {
 	_ownerList = inArgs.OwnerList;
 	_ownerItem = inArgs.Item;
 
-	_nameLabel = Allocate<WText>();
-	_developUnitNameLabel = Allocate<WText>();
-	_resetButton  = Allocate<WButton>();
-	_deleteButton = Allocate<WButton>();
+	_nameLabel = NewWidgetComponent<WText>();
+	_developUnitNameLabel = NewWidgetComponent<WText>();
 
-	_resetButton->Text  = "Reset";
-	_deleteButton->Text = "Delete";
+
+	WButton::HArguments buttonArgs;
+	buttonArgs.Text = "Reset";
+
+	_resetButton = NewWidgetComponent<WButton>(buttonArgs);
+
+	buttonArgs.Text = "Delete";
+	_deleteButton = NewWidgetComponent<WButton>(buttonArgs);
+
 
 	WSelectable::HArguments args;
 	args.StretchMode = EStretchMode::Horizontal;
@@ -81,8 +83,8 @@ void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
 		return;
 	}
 
-	_nameLabel->Text = PString("Name : ") + _ownerItem->Name;
-	_developUnitNameLabel->Text = PString("DevelopUnit : ") + _ownerItem->DevelopUnitName;
+	_nameLabel->SetText(PString("Name : ") + _ownerItem->Name);
+	_developUnitNameLabel->SetText(PString("DevelopUnit : ") + _ownerItem->DevelopUnitName);
 
 	inBuilder.BeginVertical();
 	{
@@ -109,21 +111,21 @@ void WDevelopItem::OnSelected()
 	_ownerList.Pin()->SelectItem(_ownerItem);
 }
 
-void WDevelopUnitList::Construct()
+void WDevelopUnitList::Construct(const WDevelopUnitList::HArguments& InArgs)
 {
-	WWidget::Construct();
-
 	SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
 
-	_dutComboBox = Allocate<WDUTComboBox>();
-	_developUnitList = Allocate<WList>();
-	_onAddItemButton = Allocate<WButton>();
-
+	_dutComboBox     = NewWidgetComponent<WDUTComboBox>();
 	_dutComboBox->SetSelectedItemIndex(0);
 
-	_onAddItemButton->Text = "Create";
-	_onAddItemButton->OnClick = WButton::HOnClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopUnitList::OnAddItem));
-	_onAddItemButton->StretchMode = EStretchMode::Horizontal;
+	_developUnitList = NewWidgetComponent<WList>(InArgs);
+
+	WButton::HArguments buttonArgs;
+	buttonArgs.Text = "Create";
+	buttonArgs.OnClick = WButton::HOnClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopUnitList::OnAddItem));
+	buttonArgs.StretchMode = EStretchMode::Horizontal;
+
+	_onAddItemButton = NewWidgetComponent<WButton>(buttonArgs);
 }
 
 void WDevelopUnitList::OnGUIBuild(HGUIBuilder& inBuilder)
@@ -199,4 +201,3 @@ void WDevelopUnitList::OnAddItem()
 
 	developUnit->Startup();
 }
-

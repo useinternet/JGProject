@@ -2,37 +2,36 @@
 #include "WList.h"
 #include "Builder/GUIBuilder.h"
 
+void WList::Construct(const HArguments& inArgs)
+{
+	_onSelectItem = inArgs.OnSelectItem;
+}
+
 void WList::SelectItemIndex(int32 inIndex)
 {
 	bool bDirty = _selectedItemIndexes.contains(inIndex) == false;
+	if (bDirty == false)
+	{
+		return;
+	}
 
 	if (_bAllowMultiSelected == false)
 	{
+		HSet<int32> TempSelectedItemIndexes = _selectedItemIndexes;
+		for (int32 ItemIndex : TempSelectedItemIndexes)
+		{
+			DeselectItemIndex(ItemIndex);
+		}
+
 		_selectedItemIndexes.clear();
 	}
 
 	_selectedItemIndexes.insert(inIndex);
 
-	if (bDirty)
+	if (inIndex != INDEX_NONE || inIndex < _itemList.size())
 	{
-		if (inIndex != INDEX_NONE || inIndex < _itemList.size())
-		{
-			_itemList[inIndex]->OnSelected();
-		}
-
-		if (_bAllowMultiSelected == false)
-		{
-			HSet<int32> TempSelectedItemIndexes = _selectedItemIndexes;
-			for (int32 ItemIndex : TempSelectedItemIndexes)
-			{
-				if (ItemIndex == inIndex)
-				{
-					continue;
-				}
-
-				DeselectItemIndex(ItemIndex);
-			}
-		}
+		_onSelectItem.ExecuteIfBound(_itemList[inIndex]);
+		_itemList[inIndex]->OnSelected();
 	}
 }
 

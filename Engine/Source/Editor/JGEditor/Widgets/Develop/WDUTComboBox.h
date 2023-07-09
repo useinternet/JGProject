@@ -21,12 +21,18 @@ public:
 
 class WDUTComboBox : public WComboBox
 {
+public:
+	struct HArguments : public WComboBox::HArguments
+	{
+
+	};
+
+private:
 	HList<PSharedPtr<PDUTComboItem>> _dUTItemList;
 
 public:
 	virtual ~WDUTComboBox() = default;
 
-	virtual void Construct() override;
-
+	void Construct(const HArguments& inArgs);
 	PSharedPtr<JGClass> GetSelectedClass() const;
 };

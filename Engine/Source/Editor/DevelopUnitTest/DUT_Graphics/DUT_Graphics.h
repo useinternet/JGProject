@@ -25,4 +25,6 @@ public:
 	virtual void Startup() override;
 	virtual void Update() override;
 	virtual void Shutdown() override;
+
+	virtual PSharedPtr<WWidgetComponent> CreateContentWidgetComponent() override;
 };

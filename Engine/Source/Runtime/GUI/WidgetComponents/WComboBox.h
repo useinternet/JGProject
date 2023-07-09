@@ -12,19 +12,26 @@ public:
 
 class WComboBox : public WWidgetComponent
 {
+public:
+	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelectChanged, PSharedPtr<IComboItem>)
+
+	struct HArguments
+	{
+		HOnSelectChanged OnSelectChanged;
+	};
+
 private:
 	HList<PSharedPtr<IComboItem>> _itemList;
 	int32 _selectedItemIndex = INDEX_NONE;
 	bool _bOpenCombo        = false;
 	bool _bRequestOpenCombo = false;
 
-public:
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelectChanged, PSharedPtr<IComboItem>)
-
-	HOnSelectChanged OnSelectChanged;
+	HOnSelectChanged _onSelectChanged;
 public:
 	WComboBox() : WWidgetComponent() {}
 	virtual ~WComboBox() = default;
+
+	void Construct(const HArguments& inArgs);
 
 public:
 	template<class ComboItemType>

@@ -5,6 +5,15 @@
 #include "Builder/MenuBuilder.h"
 #include "Builder/ContextMenuBuilder.h"
 
+template<class T, class U = T::HArguments>
+inline PSharedPtr<T> NewWidgetComponent(const U& InArgs = U())
+{
+	PSharedPtr<T> Result = Allocate<T>();
+	Result->Construct(InArgs);
+
+	return Result;
+}
+
 class HGUIBuilder;
 class HContextMenuBuilder;
 class WWidgetComponent

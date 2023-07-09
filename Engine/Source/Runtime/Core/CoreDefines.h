@@ -184,6 +184,6 @@ enum
 
 #define TT(text) L##text
 
-#pragma warning (disable : 4275 4251)
+#pragma warning (disable : 4275 4251 4005)
 
 

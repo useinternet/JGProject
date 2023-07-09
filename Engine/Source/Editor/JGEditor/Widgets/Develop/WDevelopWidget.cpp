@@ -9,17 +9,19 @@
 #include "WidgetComponents/WButton.h"
 #include "WidgetComponents/WList.h"
 
-/* DeveopUnitTest 기능
-* 테스트 환경 
-* 저장/로드
-* 
-*/
-
 class WDevelopUnitExecuter : public WWidget
 {
-	PSharedPtr<WInputText> _inputText;
 public:
-	WDevelopUnitExecuter() : WWidget()
+	struct HArguments
+	{
+
+	};
+
+private:
+	PSharedPtr<WInputText> _inputText;
+
+public:
+	void Construct(const HArguments& InArgs) 
 	{
 		SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
 	}
@@ -28,9 +30,9 @@ protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
 		// 프로세스 
-		PSharedPtr<WText> Text = Allocate<WText>();
-		Text->Text = "WDevelopUnitExecuter";
-		inBuilder.PushWidgetComponent(Text);
+		//PSharedPtr<WText> Text = Allocate<WText>();
+		//Text->Text = "WDevelopUnitExecuter";
+		//inBuilder.PushWidgetComponent(Text);
 	}
 
 	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override
@@ -42,16 +44,23 @@ protected:
 class WDevelopUnitContent : public WWidget
 {
 public:
-	WDevelopUnitContent() : WWidget()
+	struct HArguments
+	{
+
+	};
+
+public:
+	void Construct(const HArguments& InArgs)
 	{
 		SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
 	}
+
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
-		PSharedPtr<WText> Text = Allocate<WText>();
-		Text->Text = "WDevelopUnitContent";
-		inBuilder.PushWidgetComponent(Text);
+		//PSharedPtr<WText> Text = Allocate<WText>();
+		//Text->Text = "WDevelopUnitContent";
+		//inBuilder.PushWidgetComponent(Text);
 	}
 
 	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override
@@ -60,22 +69,21 @@ protected:
 	}
 };
 
-
 void WDevelopWidget::OnOpen()
 {
 	if (_developUnitExecuter == nullptr)
 	{
-		_developUnitExecuter = Allocate<WDevelopUnitExecuter>();
+		_developUnitExecuter = NewWidgetComponent<WDevelopUnitExecuter>();
 	}
 
 	if (_developUnitList == nullptr)
 	{
-		_developUnitList = Allocate<WDevelopUnitList>();
+		_developUnitList = NewWidgetComponent<WDevelopUnitList>();
 	}
 
 	if (_developUnitContent == nullptr)
 	{
-		_developUnitContent = Allocate<WDevelopUnitContent>();
+		_developUnitContent = NewWidgetComponent<WDevelopUnitContent>();
 	}
 }
 
@@ -115,7 +123,6 @@ void WDevelopWidget::OnGUIBuild(HGUIBuilder& inBuilder)
 		inBuilder.EndHorizontal();
 	}
 	inBuilder.EndVertical();
-
 }
 
 void WDevelopWidget::OnMenuBuild(HMenuBuilder& inBuilder)
@@ -127,55 +134,3 @@ void WDevelopWidget::OnContextMenuBuild(HContextMenuBuilder& inBuilder)
 {
 
 }
-
-//void WDevelopWidget::SetDevelopUnit(const PString& inDevelopUnitName)
-//{
-//	Reset();
-//	CreateDevelopUnit(inDevelopUnitName);
-//}
-//
-//void WDevelopWidget::CreateDevelopUnit(const PString& inDevelopUnitName)
-//{
-//	if (_developUnit != nullptr)
-//	{
-//		return;
-//	}
-//
-//	PString dllName = inDevelopUnitName + ".dll";
-//
-//	_dllInstance = HPlatform::LoadDll(dllName);
-//
-//	if (_dllInstance == nullptr)
-//	{
-//		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", inDevelopUnitName);
-//		return;
-//	}
-//
-//	//HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(_dllInstance, JG_LINK_DEVELOPUNIT_FUNCTION_NAME);
-//
-//	HPlatformFunction<JGDevelopUnit*> createDevelopUnit = HPlatform::LoadFuncInDll<JGDevelopUnit*>(_dllInstance, JG_CREATE_DEVELOPUNIT_FUNCTION_NAME);
-//	if(createDevelopUnit.IsVaild() == false)
-//	{
-//		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", inDevelopUnitName);
-//		return;
-//	}
-//
-//	_developUnit = createDevelopUnit();
-//	_developUnit->Startup();
-//
-//	OnCreateDevelopUnit();
-//}
-//
-//void WDevelopWidget::Reset()
-//{
-//	if (_developUnit == nullptr)
-//	{
-//		return;
-//	}
-//
-//	OnDestoryDevelopUnit();
-//
-//	_developUnit->Shutdown();
-//
-//	HPlatform::Deallocate(_developUnit);
-//}

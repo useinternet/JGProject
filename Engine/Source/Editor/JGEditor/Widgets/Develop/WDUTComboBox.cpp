@@ -42,8 +42,7 @@ PSharedPtr<JGClass> PDUTComboItem::GetClass() const
 	return _class;
 }
 
-
-void WDUTComboBox::Construct()
+void WDUTComboBox::Construct(const HArguments& inArgs)
 {
 	PSharedPtr<JGClass> Class = StaticClass<JGDevelopUnit>();
 	if (Class == nullptr)
@@ -65,6 +64,7 @@ void WDUTComboBox::Construct()
 	}
 
 	SetItemList(_dUTItemList);
+	WComboBox::Construct(inArgs);
 }
 
 PSharedPtr<JGClass> WDUTComboBox::GetSelectedClass() const

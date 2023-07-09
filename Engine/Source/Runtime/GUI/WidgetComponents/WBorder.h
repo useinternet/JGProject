@@ -39,7 +39,6 @@ public:
 
 	};
 public:
-	WBorder(const HArguments& args);
 	WBorder() : WWidgetComponent() {}
 	virtual ~WBorder() = default;
 

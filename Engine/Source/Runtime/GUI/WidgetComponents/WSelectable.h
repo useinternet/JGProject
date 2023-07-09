@@ -25,15 +25,13 @@ public:
 	};
 
 public:
-	WSelectable(const HArguments& Args);
 	WSelectable() : WBorder() {}
 	virtual ~WSelectable() = default;
 
+	void Construct(const HArguments& Args);
+
 	void SetSelected(bool bSelect);
 	bool IsSelected() const;
-protected:
-	void Construct(const HArguments& Args);
-	
 private:
 	EState GetState() const;
 	EState GetPrevState() const;

@@ -4,16 +4,26 @@
 #include "GUIStyles/GenericGUIStyle.h"
 #include "External/imgui/imgui.h"
 
-
-WSelectable::WSelectable(const WSelectable::HArguments& InArgs)
+void WSelectable::Construct(const WSelectable::HArguments& InArgs)
 {
-	Construct(InArgs);
+	_state     = EState::Default;
+	_prevState = EState::Default;
+
+	_onSelected = InArgs.OnSelected;
+
+	WBorder::HArguments Args;
+	Args.OnMouseLeftClick = WBorder::HOnMouseLeftClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnLeftMouseClick));
+	Args.OnMouseHovered = WBorder::HOnMouseHovered::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseHovered));
+	Args.OnMouseLeave = WBorder::HOnMouseLeave::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseLeave));
+	Args.StretchMode = InArgs.StretchMode;
+	Args.BackGroundColor = HAttribute<HLinearColor>::POnProvideData::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::GetBorderBackgroundColor));
+
+	WBorder::Construct(Args);
 }
 
 void WSelectable::SetSelected(bool bSelect)
 {
 	EState State     = GetState();
-	EState PrevState = GetPrevState();
 	if (State == EState::Disable)
 	{
 		return;
@@ -22,11 +32,6 @@ void WSelectable::SetSelected(bool bSelect)
 	if (bSelect)
 	{
 		SetState(EState::Selected);
-
-		if (State != PrevState)
-		{
-			_onSelected.ExecuteIfBound();
-		}
 	}
 	else
 	{
@@ -37,21 +42,6 @@ void WSelectable::SetSelected(bool bSelect)
 bool WSelectable::IsSelected() const
 {
 	return _state == EState::Selected;
-}
-
-void WSelectable::Construct(const WSelectable::HArguments& InArgs)
-{
-	_state     = EState::Default;
-	_prevState = EState::Default;
-
-	WBorder::HArguments Args;
-	Args.OnMouseLeftClick = WBorder::HOnMouseLeftClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnLeftMouseClick));
-	Args.OnMouseHovered   = WBorder::HOnMouseHovered::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseHovered));
-	Args.OnMouseLeave	  = WBorder::HOnMouseLeave::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseLeave));
-	Args.StretchMode	  = InArgs.StretchMode;
-	Args.BackGroundColor  = HAttribute<HLinearColor>::POnProvideData::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::GetBorderBackgroundColor));
-
-	WBorder::Construct(Args);
 }
 
 WSelectable::EState WSelectable::GetState() const
@@ -68,6 +58,14 @@ void WSelectable::SetState(WSelectable::EState inState)
 {
 	_prevState = _state;
 	_state = inState;
+
+	if (_prevState != _state)
+	{
+		if (_state == EState::Selected)
+		{
+			_onSelected.ExecuteIfBound();
+		}
+	}
 }
 
 HLinearColor WSelectable::GetBorderBackgroundColor() const

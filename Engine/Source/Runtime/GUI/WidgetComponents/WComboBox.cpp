@@ -4,6 +4,12 @@
 #include "External/imgui/imgui.h"
 #include "External/imgui/imgui_internal.h"
 
+
+void WComboBox::Construct(const HArguments& inArgs)
+{
+	_onSelectChanged = inArgs.OnSelectChanged;
+}
+
 void WComboBox::SetSelectedItemIndex(int32 inIndex)
 {
 	bool bDirty = _selectedItemIndex != inIndex;
@@ -15,7 +21,7 @@ void WComboBox::SetSelectedItemIndex(int32 inIndex)
 		if (_selectedItemIndex != INDEX_NONE || _selectedItemIndex < _itemList.size())
 		{
 			_itemList[_selectedItemIndex]->OnSelected();
-			OnSelectChanged.ExecuteIfBound(_itemList[_selectedItemIndex]);
+			_onSelectChanged.ExecuteIfBound(_itemList[_selectedItemIndex]);
 		}
 	}
 }

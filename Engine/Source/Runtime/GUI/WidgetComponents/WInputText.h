@@ -3,15 +3,21 @@
 
 class WInputText : public WWidgetComponent
 {
+public:
+	struct HArguments
+	{
+
+	};
+
 private:
 	PString _inputText;
-
-public:
-	int32 MaxBufferSize = 256;
+	int32   _maxBufferSize = 256;
 
 public:
 	WInputText() : WWidgetComponent() {}
 	virtual ~WInputText() = default;
+
+	void Construct(const HArguments& inArgs);
 
 public:
 	const PString& GetInputText() const;

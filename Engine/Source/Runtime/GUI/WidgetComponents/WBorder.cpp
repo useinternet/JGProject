@@ -11,11 +11,6 @@ WBorder::HArguments::HArguments()
 	BackGroundColor.SetValue(JGGenericGUIStyle::Get().GetStyleColor(JGGenericGUIStyle::Border));
 }
 
-WBorder::WBorder(const WBorder::HArguments& args)
-{
-	Construct(args);
-}
-
 void WBorder::Construct(const HArguments& args)
 {
 	_bHover = false;
