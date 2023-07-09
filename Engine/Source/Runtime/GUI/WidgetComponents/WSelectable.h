@@ -4,15 +4,21 @@
 
 class WSelectable : public WBorder
 {
-	JG_DECLARE_DELEGATE(HOnSelected);
-
-	HOnSelected OnSelect;
-	bool bSelect = false;
 
 public:
+	JG_DECLARE_DELEGATE(HOnSelected);
+
+	enum class EState
+	{
+		Default,
+		Hover,
+		Selected,
+		Disable
+	};
+
 	struct HArguments
 	{
-		HOnSelected  OnSelect;
+		HOnSelected  OnSelected;
 		EStretchMode StretchMode;
 
 		HArguments() : StretchMode(EStretchMode::None) {}
@@ -23,10 +29,24 @@ public:
 	WSelectable() : WBorder() {}
 	virtual ~WSelectable() = default;
 
+	void SetSelected(bool bSelect);
+	bool IsSelected() const;
 protected:
 	void Construct(const HArguments& Args);
+	
+private:
+	EState GetState() const;
+	EState GetPrevState() const;
+	void SetState(EState inState);
 
+	HLinearColor GetBorderBackgroundColor() const;
+
+	void OnLeftMouseClick();
+	void OnMouseHovered();
+	void OnMouseLeave();
 
 private:
-	void OnLeftMouseClick();
+	HOnSelected _onSelected;
+	EState _state;
+	EState _prevState;
 };

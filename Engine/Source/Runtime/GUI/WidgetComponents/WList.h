@@ -8,15 +8,17 @@ class IListItem
 public:
 	virtual PSharedPtr<WWidgetComponent> CreateWidgetComponent() = 0;
 	virtual void OnSelected() = 0;
+	virtual void OnDeselected() = 0;
 };
 
 class WList : public WWidgetComponent
 {
 private:
 	HList<PSharedPtr<IListItem>> _itemList;
+	HSet<int32> _selectedItemIndexes;
 
 	bool  _bAllowMultiSelected  = false;
-	int32 _selectedItemIndex    = INDEX_NONE;
+	
 
 public:
 	WList() : WWidgetComponent() {}
@@ -35,8 +37,11 @@ public:
 		setItemListInternal(itemList);
 	}
 
-	void SetSelectedItemIndex(int32 inIndex);
-	void SetSelectedItem(PSharedPtr<IListItem> inItem);
+	void SelectItemIndex(int32 inIndex);
+	void SelectItem(PSharedPtr<IListItem> inItem);
+
+	void DeselectItemIndex(int32 inIndex);
+	void DeselectItem(PSharedPtr<IListItem> inItem);
 	void SetAllowMultiSelected(bool bInAllowMultiSelected);
 
 private:

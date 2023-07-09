@@ -1,8 +1,15 @@
 #include "PCH/PCH.h"
 #include "WBorder.h"
 #include "Builder/GUIBuilder.h"
+#include "GUIStyles/GenericGUIStyle.h"
 #include "External/Classes/ImGuiBuildUtility.h"
 #include "External/imgui/imgui.h"
+
+WBorder::HArguments::HArguments()
+{
+	StretchMode = EStretchMode::None;
+	BackGroundColor.SetValue(JGGenericGUIStyle::Get().GetStyleColor(JGGenericGUIStyle::Border));
+}
 
 WBorder::WBorder(const WBorder::HArguments& args)
 {
@@ -11,8 +18,12 @@ WBorder::WBorder(const WBorder::HArguments& args)
 
 void WBorder::Construct(const HArguments& args)
 {
+	_bHover = false;
 	_onMouseLeftClick  = args.OnMouseLeftClick;
 	_onMouseRightClick = args.OnMouseRightClick;
+	_onMouseHovered	   = args.OnMouseHovered;
+	_onMouseEnter = args.OnMouseEnter;
+	_onMouseLeave = args.OnMouseLeave;
 	_backGroundColor   = args.BackGroundColor;
 	_stretchMode = args.StretchMode;
 }
@@ -31,22 +42,18 @@ void WBorder::OnGUIBuild(HGUIBuilder& inBuilder)
 {
 	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
 		{
-			//ImGui::PushStyleColor(ImGuiCol_ChildBg, LinearColorToImVec4(_backGroundColor.GetValue()));
-			//    colors[ImGuiCol_Header]                 = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-			//    colors[ImGuiCol_HeaderActive]           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 			ImGui::BeginGroup();
 
 			ImGui::RenderFrame(
 				Vector2ToImVec2(_cacheBorderRect.Min()),
 				Vector2ToImVec2(_cacheBorderRect.Max()),
 				LinearColorToImU32(_backGroundColor.GetValue()));
-			//	ImGui::push
 
 			widgetContext.PushContent(HOnGUIContent::Create(SharedWrap(this), [this](HGUIBuilder& inBuilder)
 				{
 					OnContent(inBuilder);
 				}));
-			
+
 			switch (_stretchMode)
 			{
 			case EStretchMode::Horizontal:
@@ -57,16 +64,11 @@ void WBorder::OnGUIBuild(HGUIBuilder& inBuilder)
 				ImGui::SameLine(); ImGui::Dummy(ImVec2(0.0f, widgetContext.ContentSize.y));
 				break;
 			}
-			
+
 			ImGui::EndGroup();
-			auto test1 = ImGui::GetItemRectMin();
-			auto test2 = ImGui::GetItemRectMax();
-			_cacheBorderRect = HRect(HVector2(test1.x, test1.y), HVector2(test2.x, test2.y));
-
-			//_cacheBorderRect;
-		//	ImGui::PopStyleColor()
-
-			
+			ImVec2 ItemRectMin = ImGui::GetItemRectMin();
+			ImVec2 ItemRectMax = ImGui::GetItemRectMax();
+			_cacheBorderRect = HRect(HVector2(ItemRectMin.x, ItemRectMin.y), HVector2(ItemRectMax.x, ItemRectMax.y));
 
 			if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 			{
@@ -78,6 +80,25 @@ void WBorder::OnGUIBuild(HGUIBuilder& inBuilder)
 			{
 				JG_LOG(GUI, ELogLevel::Info, "Right Click (%d)", GetGuid().GetHashCode());
 				_onMouseRightClick.ExecuteIfBound();
+			}
+		
+			if (ImGui::IsItemHovered())
+			{
+				if (_bHover == false)
+				{
+					_bHover = true;
+					_onMouseEnter.ExecuteIfBound();
+				}
+
+				_onMouseHovered.ExecuteIfBound();
+			}
+			else
+			{
+				if (_bHover)
+				{
+					_bHover = false;
+					_onMouseLeave.ExecuteIfBound();
+				}
 			}
 
 		}));

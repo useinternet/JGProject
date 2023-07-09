@@ -3,6 +3,7 @@
 #include "Builder/GUIBuilder.h"
 #include "Builder/ContextMenuBuilder.h"
 #include "Builder/MenuBuilder.h"
+#include "GUIStyles/GUIStyle.h"
 #include "Datas/GUIData.h"
 
 
@@ -16,12 +17,13 @@ void GGUIGlobalSystem::Start()
 	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::Update));
 	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::Build));
 
-	loadGUIDatas();
+	LoadGUIDatas();
+	CollectGUIStyles();
 }
 
 void GGUIGlobalSystem::Destroy()
 {
-	saveGUIDatas();
+	SaveGUIDatas();
 	_memObject = nullptr;
 }
 
@@ -140,7 +142,7 @@ PSharedPtr<IContextMenuBuild> GGUIGlobalSystem::GetContextMenuBuild() const
 	return _contextMenuBuild;
 }
 
-void GGUIGlobalSystem::saveGUIDatas()
+void GGUIGlobalSystem::SaveGUIDatas()
 {
 	static PString savePath = HFileHelper::EngineTempDirectory() / "jg_gui.json";
 
@@ -166,7 +168,7 @@ void GGUIGlobalSystem::saveGUIDatas()
 	SaveObject(savePath, &guiData);
 }
 
-void GGUIGlobalSystem::loadGUIDatas()
+void GGUIGlobalSystem::LoadGUIDatas()
 {
 	static PString loadPath = HFileHelper::EngineTempDirectory() / "jg_gui.json";
 
@@ -203,4 +205,23 @@ void GGUIGlobalSystem::loadGUIDatas()
 			widget->OnOpen();
 		}
 	}
+}
+
+void GGUIGlobalSystem::CollectGUIStyles()
+{
+	JG_LOG(GUI, ELogLevel::Info, "Start Collect GUI Styles...");
+
+	PSharedPtr<JGClass>		   GUIStyleClass   = StaticClass<JGGUIStyle>();
+	HList<PSharedPtr<JGClass>> GUIStyleClasses = GUIStyleClass->GetChildClasses(true);
+
+	for (PSharedPtr<JGClass> Class : GUIStyleClasses)
+	{
+		PSharedPtr<JGType> ClassType = Class->GetClassType();
+		
+		_guiStylePool.emplace(*ClassType, AllocateByClass<JGGUIStyle>(Class));
+
+		JG_LOG(GUI, ELogLevel::Debug, "- %s ", Class->GetClassType()->GetName().ToString());
+	}
+
+	JG_LOG(GUI, ELogLevel::Info, "End Collect GUI Styles...");
 }

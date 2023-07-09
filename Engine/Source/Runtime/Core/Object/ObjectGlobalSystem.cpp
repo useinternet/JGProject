@@ -6,6 +6,7 @@
 
 void GObjectGlobalSystem::Start()
 {
+	JG_LOG(Core, ELogLevel::Info, "Recognized Class List...");
 	for (const HPair<const JGType, PSharedPtr<JGClass>> pair : _classMap)
 	{
 		PSharedPtr<JGClass> Class = pair.second;
@@ -24,8 +25,9 @@ void GObjectGlobalSystem::Start()
 
 			ParentClass->ChildTypeSet.insert(pair.first);
 		}
-	}
 
+		JG_LOG(Core, ELogLevel::Debug, "- %s", pair.first.GetName().ToString());
+	}
 }
 
 void GObjectGlobalSystem::Destroy()

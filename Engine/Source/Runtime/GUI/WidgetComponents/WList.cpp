@@ -2,29 +2,80 @@
 #include "WList.h"
 #include "Builder/GUIBuilder.h"
 
-void WList::SetSelectedItemIndex(int32 inIndex)
+void WList::SelectItemIndex(int32 inIndex)
 {
-	bool bDirty = _selectedItemIndex != inIndex;
+	bool bDirty = _selectedItemIndexes.contains(inIndex) == false;
 
-	_selectedItemIndex = inIndex;
+	if (_bAllowMultiSelected == false)
+	{
+		_selectedItemIndexes.clear();
+	}
+
+	_selectedItemIndexes.insert(inIndex);
 
 	if (bDirty)
 	{
-		if (_selectedItemIndex != INDEX_NONE || _selectedItemIndex < _itemList.size())
+		if (inIndex != INDEX_NONE || inIndex < _itemList.size())
 		{
-			_itemList[_selectedItemIndex]->OnSelected();
+			_itemList[inIndex]->OnSelected();
+		}
+
+		if (_bAllowMultiSelected == false)
+		{
+			HSet<int32> TempSelectedItemIndexes = _selectedItemIndexes;
+			for (int32 ItemIndex : TempSelectedItemIndexes)
+			{
+				if (ItemIndex == inIndex)
+				{
+					continue;
+				}
+
+				DeselectItemIndex(ItemIndex);
+			}
 		}
 	}
 }
 
-void WList::SetSelectedItem(PSharedPtr<IListItem> inItem)
+void WList::SelectItem(PSharedPtr<IListItem> inItem)
 {
 	int32 index = 0;
 	for (PSharedPtr<IListItem> item : _itemList)
 	{
 		if (inItem == item)
 		{
-			SetSelectedItemIndex(index);
+			SelectItemIndex(index);
+			break;
+		}
+
+		++index;
+	}
+}
+
+void WList::DeselectItemIndex(int32 inIndex)
+{
+	if (inIndex == INDEX_NONE || inIndex >= _itemList.size())
+	{
+		return;
+	}
+
+	if (_selectedItemIndexes.contains(inIndex) == false)
+	{
+		return;
+	}
+
+
+	_selectedItemIndexes.erase(inIndex);
+	_itemList[inIndex]->OnDeselected();
+}
+
+void WList::DeselectItem(PSharedPtr<IListItem> inItem)
+{
+	int32 index = 0;
+	for (PSharedPtr<IListItem> item : _itemList)
+	{
+		if (inItem == item)
+		{
+			DeselectItemIndex(index);
 			break;
 		}
 

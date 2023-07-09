@@ -7,6 +7,7 @@ class IMenuBuild;
 class IContextMenuBuild;
 class HMenuBuilder;
 class HContextMenuBuilder;
+class JGGUIStyle;
 
 JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnMenuBuild, HMenuBuilder&)
 JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnContextBuild, HContextMenuBuilder&)
@@ -25,6 +26,8 @@ struct HGUIEvents
 class GGUIGlobalSystem : public GGlobalSystemInstance<GGUIGlobalSystem>
 {
 	PSharedPtr<IMemoryObject> _memObject;
+
+	HHashMap<JGType, PSharedPtr<JGGUIStyle>> _guiStylePool;
 
 	HHashMap<HGuid, PSharedPtr<WWidget>> _widgetPool;
 	HHashMap<PName,  HGuid> _widgetGuidRedirectByName;
@@ -190,7 +193,34 @@ public:
 		return widgetGuid;
 	}
 
+	template<class T>
+	T& GetGUIStyle() const
+	{
+		static T NullGUIStyle;
+
+		JGType GuiStyleType = JGTYPE(T);
+		if (_guiStylePool.contains(GuiStyleType) == false)
+		{
+			return NullGUIStyle;
+		}
+
+		PSharedPtr<JGGUIStyle> GuiStyle = _guiStylePool.at(GuiStyleType);
+		if (GuiStyle == nullptr)
+		{
+			return NullGUIStyle;
+		}
+		
+		PSharedPtr<T> Result = Cast<T>(GuiStyle);
+		if (Result == nullptr)
+		{
+			return NullGUIStyle;
+		}
+
+		return (*Result);
+	}
+
 private:
-	void saveGUIDatas();
-	void loadGUIDatas();
+	void SaveGUIDatas();
+	void LoadGUIDatas();
+	void CollectGUIStyles();
 };

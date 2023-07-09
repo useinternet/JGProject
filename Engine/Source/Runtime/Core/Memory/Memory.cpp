@@ -34,6 +34,10 @@ void GMemoryGlobalSystem::garbageCollection(int32 level)
 
 			if (deleteCount <= 0)
 			{
+				if (_allocatedMemoryBlocks.size() > 0)
+				{
+					garbageCollectionInternal((int32)_allocatedMemoryBlocks.size(), true);
+				}
 				break;
 			}
 		}
@@ -51,7 +55,7 @@ void GMemoryGlobalSystem::garbageCollection(int32 level)
 
 }
 
-int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
+int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame, bool bForce)
 {
 	int32 deleteCount = 0;
 	int32 tempCnt     = 0;
@@ -72,11 +76,12 @@ int32 GMemoryGlobalSystem::garbageCollectionInternal(int32 countPerFrame)
 		int32 refCount  = memoryBlock.RefCount->load();
 		int32 weakCount = memoryBlock.WeakCount->load();
 		_allocatedMemoryBlockQueue.pop();
-		if (refCount == 0)
+		if (refCount == 0 || bForce)
 		{
 			_allocatedMemoryBlocks.erase(ptr);
 			if (bIsClass == true)
 			{
+				((IMemoryObject*)ptr)->Destruction();
 				delete (IMemoryObject*)ptr;
 			}
 			else

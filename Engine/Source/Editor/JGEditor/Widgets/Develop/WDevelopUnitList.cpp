@@ -16,10 +16,32 @@ PSharedPtr<WWidgetComponent> PDevelopUnitItem::CreateWidgetComponent()
 {
 	if (_cacheWidget == nullptr)
 	{
-		_cacheWidget = Allocate<WDevelopItem>(SharedWrap(this));
+		WDevelopItem::HArguments args;
+		args.Item = SharedWrap(this);
+		_cacheWidget = Allocate<WDevelopItem>(args);
 	}
 
 	return _cacheWidget;
+}
+
+void PDevelopUnitItem::OnSelected()
+{
+	if (_cacheWidget == nullptr)
+	{
+		return;
+	}
+
+	_cacheWidget->SetSelected(true);
+}
+
+void PDevelopUnitItem::OnDeselected()
+{
+	if (_cacheWidget == nullptr)
+	{
+		return;
+	}
+
+	_cacheWidget->SetSelected(false);
 }
 
 PDevelopUnitItem::~PDevelopUnitItem()
@@ -27,25 +49,27 @@ PDevelopUnitItem::~PDevelopUnitItem()
 	HPlatform::Deallocate(_developUnit);
 }
 
-void PDevelopUnitItem::OnSelected()
+WDevelopItem::WDevelopItem(const WDevelopItem::HArguments& inArgs)
 {
-	JG_LOG(TEST, ELogLevel::Info, "Click Item : %s", Name);
+	Construct(inArgs);
 }
 
-void WDevelopItem::Construct()
+void WDevelopItem::Construct(const WDevelopItem::HArguments& inArgs)
 {
-	WWidgetComponent::Construct();
+	_ownerList = inArgs.OwnerList;
+	_ownerItem = inArgs.Item;
 
-	NameLabel = Allocate<WText>();
-	DevelopUnitNameLabel = Allocate<WText>();
-	ResetButton  = Allocate<WButton>();
-	DeleteButton = Allocate<WButton>();
+	_nameLabel = Allocate<WText>();
+	_developUnitNameLabel = Allocate<WText>();
+	_resetButton  = Allocate<WButton>();
+	_deleteButton = Allocate<WButton>();
 
-	ResetButton->Text  = "Reset";
-	DeleteButton->Text = "Delete";
+	_resetButton->Text  = "Reset";
+	_deleteButton->Text = "Delete";
 
 	WSelectable::HArguments args;
 	args.StretchMode = EStretchMode::Horizontal;
+	args.OnSelected = WSelectable::HOnSelected::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopItem::OnSelected));
 
 	WSelectable::Construct(args);
 }
@@ -57,48 +81,33 @@ void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
 		return;
 	}
 
-	NameLabel->Text = PString("Name : ") + _ownerItem->Name;
-	DevelopUnitNameLabel->Text = PString("DevelopUnit : ") + _ownerItem->DevelopUnitName;
+	_nameLabel->Text = PString("Name : ") + _ownerItem->Name;
+	_developUnitNameLabel->Text = PString("DevelopUnit : ") + _ownerItem->DevelopUnitName;
 
 	inBuilder.BeginVertical();
 	{
-		inBuilder.PushWidgetComponent(NameLabel);
-		inBuilder.PushWidgetComponent(DevelopUnitNameLabel);
+		inBuilder.PushWidgetComponent(_nameLabel);
+		inBuilder.PushWidgetComponent(_developUnitNameLabel);
 
 		inBuilder.BeginHorizontal();
 		{
-			inBuilder.PushWidgetComponent(ResetButton);
-			inBuilder.PushWidgetComponent(DeleteButton);
+			inBuilder.PushWidgetComponent(_resetButton);
+			inBuilder.PushWidgetComponent(_deleteButton);
 		}
 		inBuilder.EndHorizontal();
 	}
 	inBuilder.EndVertical();
 }
 
-//void WDevelopItem::OnGUIBuild(HGUIBuilder& inBuilder)
-//{
-//	if (_ownerItem == nullptr)
-//	{
-//		return;
-//	}
-//
-//	NameLabel->Text = PString("Name : ") + _ownerItem->Name;
-//	DevelopUnitNameLabel->Text = PString("DevelopUnit : ") + _ownerItem->DevelopUnitName;
-//
-//	inBuilder.BeginVertical();
-//	{
-//		inBuilder.PushWidgetComponent(NameLabel);
-//		inBuilder.PushWidgetComponent(DevelopUnitNameLabel);
-//
-//		inBuilder.BeginHorizontal();
-//		{
-//			inBuilder.PushWidgetComponent(ResetButton);
-//			inBuilder.PushWidgetComponent(DeleteButton);
-//		}
-//		inBuilder.EndHorizontal();
-//	}
-//	inBuilder.EndVertical();
-//}
+void WDevelopItem::OnSelected()
+{
+	if (_ownerList.IsValid() == false)
+	{
+		return;
+	}
+
+	_ownerList.Pin()->SelectItem(_ownerItem);
+}
 
 void WDevelopUnitList::Construct()
 {

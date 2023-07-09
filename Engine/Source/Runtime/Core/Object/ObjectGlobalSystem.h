@@ -93,7 +93,6 @@ public:
 		return nullptr;
 	}
 
-
 	bool CanCast(const JGType& destType, const JGType& srcType) const;
 
 	template<class T, class U>

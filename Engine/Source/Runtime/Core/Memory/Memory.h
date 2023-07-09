@@ -13,6 +13,7 @@ public:
 protected:
 	friend class GMemoryGlobalSystem;
 	virtual void Construct() {}
+	virtual void Destruction() {}
 };
 
 class PMemoryObject : public IMemoryObject
@@ -73,6 +74,14 @@ namespace PMemoryPrivate
 		virtual ~PTemporaryOwner() = default;
 	};
 };
+
+template<class T>
+class TRawPtr
+{
+public:
+
+};
+
 
 template<class T>
 class PSharedPtr : public IMemoryObject
@@ -722,7 +731,7 @@ public:
 	void Flush();
 private:
 	void garbageCollection(int32 level);
-	int32 garbageCollectionInternal(int32 countPerFrame);
+	int32 garbageCollectionInternal(int32 countPerFrame, bool bForce = false);
 };
 
 

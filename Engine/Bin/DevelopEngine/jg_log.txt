@@ -1,50 +1,74 @@
-[:4004:][info][Core]: Active Thread: [1033329566]
-[:4004:][info][Core]: Active Thread: [734934530]
-[:4004:][info][Core]: Active Thread: [2912010504]
-[:4004:][info][Core]: Active Thread: [1340181116]
-[:4004:][info][Core]: Active Thread: [3112662270]
-[:4004:][info][Core]: Active Thread: [4023795187]
-[:4004:][info][Core]: Active Thread: [1927571216]
-[:4004:][info][Core]: Active Thread: [967175359]
-[:4004:][info][Core]: Active Thread: [3145216552]
-[:4004:][info][Core]: Active Thread: [1507000337]
-[:4004:][info][Core]: Active Thread: [3391189958]
-[:4004:][info][Core]: Active Thread: [3419200776]
-[:4004:][info][Core]: Active Thread: [2146262077]
-[:4004:][info][Core]: Active Thread: [2336942120]
-[:4004:][info][Core]: Active Thread: [2130442540]
-[:4004:][info][Core]: Active Thread: [1808160595]
-[:4004:][info][Core]: Active Thread: [31685967]
-[:4004:][info][Core]: Active Thread: [1005081802]
-[:4004:][info][Core]: Active Thread: [511543683]
-[:4004:][info][Core]: Active Thread: [304522363]
-[:4004:][info][Core]: Active Thread: [564304444]
-[:4004:][info][Core]: Active Thread: [695723737]
-[:4004:][info][Core]: Active Thread: [2440113649]
-[:4004:][info][Core]: Active Thread: [3061781936]
-[:4004:][info][Core]: Active Thread: [3876373748]
-[:4004:][info][Core]: Active Thread: [3039851552]
-[:4004:][info][Core]: Active Thread: [739634516]
-[:4004:][info][Core]: Active Thread: [1078231651]
-[:4004:][info][Core]: Active Thread: [104992338]
-[:4004:][info][Core]: Active Thread: [2639017586]
-[:4004:][info][Core]: Active Thread: [1013279609]
-[:4004:][info][Core]: Active Thread: [3106814456]
-[:4004:][info][Core]: Active Thread Totoal Count: 32 
-[:4004:][trace][Graphics]: DirectX12 Init Start
-[:4004:][trace][Graphics]: Success Create D3D12Device
-[:4004:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
-[:4004:][info][Graphics]: VideoMemory : 16064  MB
-[:4004:][trace][Graphics]: Create DescriptorAllocator...
-[:4004:][trace][Graphics]: Create CommandQueue...
-[:4004:][trace][Graphics]: Create FrameBuffer...
-[:4004:][trace][Graphics]: DirectX12 Init End
-[:4004:][trace][Graphics]: Startup Graphics Module...
-[:4004:][trace][JGEditor]: Startup JGEditor Module...
-[:4004:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
-[:4004:][info][DUT_Graphics]: Start up
-[:4004:][info][GUI]: Left Click (6)
-[:4004:][info][GUI]: Click Select (6)
-[:4004:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
-[:4004:][trace][Graphics]: Shutdown Graphics Module...
-[:4004:][trace][JGEditor]: Shutdown JGEditor Module...
+[:28244:][info][Core]: Active Thread: [2418133254]
+[:28244:][info][Core]: Active Thread: [3641287273]
+[:28244:][info][Core]: Active Thread: [1948769001]
+[:28244:][info][Core]: Active Thread: [1574458894]
+[:28244:][info][Core]: Active Thread: [2798108566]
+[:28244:][info][Core]: Active Thread: [2522765655]
+[:28244:][info][Core]: Active Thread: [2062488330]
+[:28244:][info][Core]: Active Thread: [2913471376]
+[:28244:][info][Core]: Active Thread: [1102744648]
+[:28244:][info][Core]: Active Thread: [2543128656]
+[:28244:][info][Core]: Active Thread: [586860916]
+[:28244:][info][Core]: Active Thread: [1493450369]
+[:28244:][info][Core]: Active Thread: [481991569]
+[:28244:][info][Core]: Active Thread: [3150255669]
+[:28244:][info][Core]: Active Thread: [1519504662]
+[:28244:][info][Core]: Active Thread: [848653859]
+[:28244:][info][Core]: Active Thread: [3160410001]
+[:28244:][info][Core]: Active Thread: [2886921430]
+[:28244:][info][Core]: Active Thread: [3594374326]
+[:28244:][info][Core]: Active Thread: [681182463]
+[:28244:][info][Core]: Active Thread: [2821499822]
+[:28244:][info][Core]: Active Thread: [1587771916]
+[:28244:][info][Core]: Active Thread: [2386700713]
+[:28244:][info][Core]: Active Thread: [475648102]
+[:28244:][info][Core]: Active Thread: [2978084287]
+[:28244:][info][Core]: Active Thread: [1318670287]
+[:28244:][info][Core]: Active Thread: [3903732391]
+[:28244:][info][Core]: Active Thread: [2023040591]
+[:28244:][info][Core]: Active Thread: [187800866]
+[:28244:][info][Core]: Active Thread: [3345085708]
+[:28244:][info][Core]: Active Thread: [3234029416]
+[:28244:][info][Core]: Active Thread: [3540961390]
+[:28244:][info][Core]: Active Thread Totoal Count: 32 
+[:28244:][trace][Graphics]: DirectX12 Init Start
+[:28244:][trace][Graphics]: Success Create D3D12Device
+[:28244:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
+[:28244:][info][Graphics]: VideoMemory : 16064  MB
+[:28244:][trace][Graphics]: Create DescriptorAllocator...
+[:28244:][trace][Graphics]: Create CommandQueue...
+[:28244:][trace][Graphics]: Create FrameBuffer...
+[:28244:][trace][Graphics]: DirectX12 Init End
+[:28244:][trace][Graphics]: Startup Graphics Module...
+[:28244:][trace][JGEditor]: Startup JGEditor Module...
+[:28244:][info][Core]: Recognized Class List...
+[:28244:][debug][Core]: - JGDevelopUnit
+[:28244:][debug][Core]: - JGDUT_Graphics
+[:28244:][debug][Core]: - WDevelopWidget
+[:28244:][debug][Core]: - JGTestClassA
+[:28244:][debug][Core]: - JGGUIStyle
+[:28244:][debug][Core]: - JGObject
+[:28244:][debug][Core]: - JGGUIData
+[:28244:][debug][Core]: - JGGenericGUIStyle
+[:28244:][debug][Core]: - WWidget
+[:28244:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
+[:28244:][info][GUI]: Start Collect GUI Styles...
+[:28244:][debug][GUI]: - JGGenericGUIStyle 
+[:28244:][info][GUI]: End Collect GUI Styles...
+[:28244:][info][DUT_Graphics]: Start up
+[:28244:][info][GUI]: Left Click (9342)
+[:28244:][info][GUI]: Click Select (9342)
+[:28244:][info][GUI]: Left Click (9342)
+[:28244:][info][GUI]: Click Select (9342)
+[:28244:][info][DUT_Graphics]: Start up
+[:28244:][info][GUI]: Left Click (57045)
+[:28244:][info][GUI]: Click Select (57045)
+[:28244:][info][GUI]: Left Click (9342)
+[:28244:][info][GUI]: Click Select (9342)
+[:28244:][info][GUI]: Left Click (57045)
+[:28244:][info][GUI]: Click Select (57045)
+[:28244:][info][GUI]: Left Click (9342)
+[:28244:][info][GUI]: Click Select (9342)
+[:28244:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
+[:28244:][trace][Graphics]: Shutdown Graphics Module...
+[:28244:][trace][JGEditor]: Shutdown JGEditor Module...

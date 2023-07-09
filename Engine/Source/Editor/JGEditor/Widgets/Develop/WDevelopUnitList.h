@@ -28,42 +28,44 @@ public:
 
 protected:
 	PSharedPtr<WWidgetComponent> CreateWidgetComponent() override;
-	void OnSelected() override;
+	virtual void OnSelected() override;
+	virtual void OnDeselected() override;
 };
 
 class WDevelopItem : public WSelectable
 {
-	PSharedPtr<PDevelopUnitItem> _ownerItem;
-
+public:
+	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelected, PSharedPtr<WDevelopItem>);
 
 	struct HArguments
 	{
+		PWeakPtr<WList> OwnerList;
 		PSharedPtr<PDevelopUnitItem> Item;
-
 	};
 
-	PSharedPtr<WText> NameLabel;
-	PSharedPtr<WText> DevelopUnitNameLabel;
-	PSharedPtr<WButton> ResetButton;
-	PSharedPtr<WButton> DeleteButton;
 
+private:
+	PWeakPtr<WList> _ownerList;
+	PSharedPtr<PDevelopUnitItem> _ownerItem;
+
+	PSharedPtr<WText> _nameLabel;
+	PSharedPtr<WText> _developUnitNameLabel;
+	PSharedPtr<WButton> _resetButton;
+	PSharedPtr<WButton> _deleteButton;
 public:
-	WDevelopItem(PSharedPtr<PDevelopUnitItem> inItem) : _ownerItem(inItem) {}
+	WDevelopItem(const HArguments& inArgs);
 	virtual ~WDevelopItem() = default;
 protected:
-	virtual void Construct() override;
+	void Construct(const HArguments& inArgs);
 	virtual void OnContent(HGUIBuilder& inBuilder) override;
-private:
-	//virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
+
+	void OnSelected();
 };
 
 class WDevelopUnitList : public WWidget
 {
-	// 테스트 프로세스 추가
-	// 테스트 프로세스 관리
 	PSharedPtr<WList> _developUnitList;
 	HList<PSharedPtr<PDevelopUnitItem>> _listItems;
-
 
 	PSharedPtr<WDUTComboBox> _dutComboBox;
 	PSharedPtr<WButton> _onAddItemButton;
@@ -71,7 +73,12 @@ public:
 	virtual ~WDevelopUnitList() = default;
 
 protected:
+// IMemoryObject
 	virtual void Construct() override;
+// ~// IMemoryObject
+
+
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 	void OnAddItem();
+	void OnItemSelected();
 };

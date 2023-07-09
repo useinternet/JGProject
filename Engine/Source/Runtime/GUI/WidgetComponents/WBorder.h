@@ -6,27 +6,37 @@ class WBorder : public WWidgetComponent
 protected:
 	JG_DECLARE_DELEGATE(HOnMouseLeftClick);
 	JG_DECLARE_DELEGATE(HOnMouseRightClick);
+	JG_DECLARE_DELEGATE(HOnMouseHovered);
+	JG_DECLARE_DELEGATE(HOnMouseEnter);
+	JG_DECLARE_DELEGATE(HOnMouseLeave);
+
 
 	HOnMouseLeftClick  _onMouseLeftClick;
 	HOnMouseRightClick _onMouseRightClick;
+	HOnMouseHovered	   _onMouseHovered;
+	HOnMouseEnter _onMouseEnter;
+	HOnMouseLeave _onMouseLeave;
 
 	HAttribute<HLinearColor> _backGroundColor;
 	EStretchMode _stretchMode = EStretchMode::None;
 
 	HRect _cacheBorderRect;
+
+	bool _bHover;
 public:
 	struct HArguments
 	{
 		HOnMouseLeftClick  OnMouseLeftClick;
 		HOnMouseRightClick OnMouseRightClick;
+		HOnMouseHovered	   OnMouseHovered;
+		HOnMouseEnter	   OnMouseEnter;
+		HOnMouseLeave	   OnMouseLeave;
+
 		HAttribute<HLinearColor> BackGroundColor;
 		EStretchMode StretchMode;
 
-		HArguments()
-		{
-			StretchMode = EStretchMode::None;
-			BackGroundColor.SetValue(HLinearColor(0.26f, 0.59f, 0.98f, 0.31f));
-		}
+		HArguments();
+
 	};
 public:
 	WBorder(const HArguments& args);
