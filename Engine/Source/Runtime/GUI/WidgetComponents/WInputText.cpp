@@ -15,7 +15,7 @@ const PString& WInputText::GetInputText() const
 
 void WInputText::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::CreateLambda([&](const HWidgetContext& widgetContext)
 	{
 		PString buff; 	buff.Resize(_maxBufferSize);
 

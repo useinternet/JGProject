@@ -2,9 +2,9 @@
 #include "Core.h"
 #include "Builder/GUIBuilder.h"
 
-JG_DECLARE_DELEGATE_ONEPARAM(HOnGUIContent, HGUIBuilder&)
-JG_DECLARE_MULTI_DELEGATE_ONEPARAM(HOnPreGUIContent, HGUIBuilder&)
-JG_DECLARE_MULTI_DELEGATE_ONEPARAM(HOnPostGUIContent, HGUIBuilder&)
+JG_DECLARE_DELEGATE(HOnGUIContent, HGUIBuilder&)
+JG_DECLARE_MULTICAST_DELEGATE(HOnPreGUIContent, HGUIBuilder&)
+JG_DECLARE_MULTICAST_DELEGATE(HOnPostGUIContent, HGUIBuilder&)
 class HWidgetContext
 {
 public:

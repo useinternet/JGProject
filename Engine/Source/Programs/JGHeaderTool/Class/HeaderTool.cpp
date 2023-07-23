@@ -1091,10 +1091,14 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 		{
 			funcCode.AppendLine(PString::Format("\tif(Class->HasFunction(PName(\"%s\")) == true)", function.Name));
 			funcCode.AppendLine("\t{");
-			funcCode.Append("\t\tstd::function<").Append(function.Return).Append("(");
+			funcCode.Append("\t\tHDelegate<").Append(function.Return);
 
 			PString argTypeListCode;
 			uint64 len = function.Argmuments.size();
+			if (len > 0)
+			{
+				funcCode.Append(",");
+			}
 			for (uint64 i = 0; i < len; ++i)
 			{
 				funcCode.Append(function.Argmuments[i].Type);
@@ -1105,15 +1109,8 @@ bool PHeaderTool::generateCodeGenCPPSoucreCode(const HHeaderInfo& headerInfo, PS
 					argTypeListCode.Append(",");
 				}
 			}
-			funcCode.Append(")> functionRef = std::bind(&").Append(Class.Name).Append("::").Append(function.Name).Append(", noneConstThisPtr");
-		
-			for (uint64 i = 0; i < len; ++i)
-			{
-				funcCode.Append(PString::Format(", std::placeholders::_%d", i+ 1));
-			}
-
-			funcCode.AppendLine(");");
-			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName(\"%s\")), functionRef, {%s}) == false)", function.Name, argTypeListCode));
+			funcCode.Append("> funcDelegate; funcDelegate.BindRaw(noneConstThisPtr, &").Append(Class.Name).Append("::").Append(function.Name).AppendLine(");");
+			funcCode.AppendLine(PString::Format("\t\tif (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName(\"%s\")), funcDelegate, {%s}) == false)", function.Name, argTypeListCode));
 			funcCode.AppendLine("\t\t{");
 			funcCode.AppendLine(PString::Format("\t\t\tJG_LOG(CodeGen, ELogLevel::Error, \"%s: Fail Bind Function : %s\");", Class.Name, function.Name));
 			funcCode.AppendLine("\t\t}");

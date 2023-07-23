@@ -9,41 +9,60 @@
 #include "WidgetComponents/WList.h"
 
 
-PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, JGDevelopUnit* DevelopUnit)
-	: _ownerList(OwnerList), _developUnit(DevelopUnit) {}
+PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDevelopUnitListData> InDevelopUnitListData, JGDevelopUnit* DevelopUnit)
+	: _ownerList(OwnerList), _developUnitListData(InDevelopUnitListData), _developUnit(DevelopUnit) {}
 
-PSharedPtr<WWidgetComponent> PDevelopUnitItem::CreateWidgetComponent()
+void PDevelopUnitItem::Reload()
 {
-	if (_cacheWidget == nullptr)
+	if (_developUnit)
 	{
-		WDevelopItem::HArguments args;
-		args.Item = SharedWrap(this);
-		args.OwnerList = _ownerList;
-
-		_cacheWidget = NewWidgetComponent<WDevelopItem>(args);
+		HPlatform::Deallocate(_developUnit);
 	}
 
-	return _cacheWidget;
-}
+	HGuid   dutGuid = HGuid::New();
+	PString newDllName = OrgDllName + "_" + dutGuid.ToString();
 
-void PDevelopUnitItem::OnSelected()
-{
-	if (_cacheWidget == nullptr)
+	if (false == HFileHelper::CopyFileOrDirectory(OrgDllName, newDllName))
 	{
 		return;
 	}
 
-	_cacheWidget->SetSelected(true);
-}
+	DllName = newDllName;
 
-void PDevelopUnitItem::OnDeselected()
-{
-	if (_cacheWidget == nullptr)
+	HJInstance dllInstance = HPlatform::LoadDll(DllName);
+	if (dllInstance == nullptr)
 	{
+		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
 		return;
 	}
 
-	_cacheWidget->SetSelected(false);
+	HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(dllInstance, JG_LINK_DEVELOPUNIT_FUNCTION_NAME);
+	if (linkModuleFunc.IsVaild() == false)
+	{
+		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
+		return;
+	}
+
+	linkModuleFunc(&GCoreSystem::GetInstance());
+
+	HPlatformFunction<JGDevelopUnit*> createDevelopUnit = HPlatform::LoadFuncInDll<JGDevelopUnit*>(dllInstance, JG_CREATE_DEVELOPUNIT_FUNCTION_NAME);
+	if (createDevelopUnit.IsVaild() == false)
+	{
+		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
+		return;
+	}
+
+	_developUnit = createDevelopUnit();
+}
+
+JGDevelopUnit* PDevelopUnitItem::GetDevelopUnit() const
+{
+	return _developUnit;
+}
+
+PSharedPtr<JGDevelopUnitListData> PDevelopUnitItem::GetDevelopUnitListData() const
+{
+	return _developUnitListData;
 }
 
 PDevelopUnitItem::~PDevelopUnitItem()
@@ -61,22 +80,15 @@ void WDevelopItem::Construct(const WDevelopItem::HArguments& inArgs)
 
 
 	WButton::HArguments buttonArgs;
-	buttonArgs.Text = "Reset";
-
-	_resetButton = NewWidgetComponent<WButton>(buttonArgs);
+	buttonArgs.Text = "Reload";
+	buttonArgs.OnClick = WButton::HOnClick::CreateSP(SharedWrap(this), &WDevelopItem::OnClickedReload);
+	_reloadButton = NewWidgetComponent<WButton>(buttonArgs);
 
 	buttonArgs.Text = "Delete";
 	_deleteButton = NewWidgetComponent<WButton>(buttonArgs);
-
-
-	WSelectable::HArguments args;
-	args.StretchMode = EStretchMode::Horizontal;
-	args.OnSelected = WSelectable::HOnSelected::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopItem::OnSelected));
-
-	WSelectable::Construct(args);
 }
 
-void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
+void WDevelopItem::OnGUIBuild(HGUIBuilder& inBuilder)
 {
 	if (_ownerItem == nullptr)
 	{
@@ -93,7 +105,7 @@ void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
 
 		inBuilder.BeginHorizontal();
 		{
-			inBuilder.PushWidgetComponent(_resetButton);
+			inBuilder.PushWidgetComponent(_reloadButton);
 			inBuilder.PushWidgetComponent(_deleteButton);
 		}
 		inBuilder.EndHorizontal();
@@ -101,31 +113,55 @@ void WDevelopItem::OnContent(HGUIBuilder& inBuilder)
 	inBuilder.EndVertical();
 }
 
-void WDevelopItem::OnSelected()
+void WDevelopItem::OnClickedReload()
 {
-	if (_ownerList.IsValid() == false)
+	if (_ownerItem != nullptr)
 	{
-		return;
+		_ownerItem->Reload();
 	}
+	// Dll 제거 후 다시 연결
+}
 
-	_ownerList.Pin()->SelectItem(_ownerItem);
+void WDevelopItem::OnClickedDelete()
+{
+	// 말그대로 제거
 }
 
 void WDevelopUnitList::Construct(const WDevelopUnitList::HArguments& InArgs)
 {
 	SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
 
+	_developUnitListData = InArgs.DevelopUnitListData;
+	_onSelectChanged = InArgs.OnSelectChanged;
 	_dutComboBox     = NewWidgetComponent<WDUTComboBox>();
 	_dutComboBox->SetSelectedItemIndex(0);
 
-	_developUnitList = NewWidgetComponent<WList>(InArgs);
+	WList::HArguments args;
+	args.OnSelectChanged = WList::HOnSelectChanged::CreateSP(SharedWrap(this), &WDevelopUnitList::OnSelectedItemChanged);
+	args.OnGenerateWidgetComponent = WList::HOnGenerateWidgetComponent::CreateSP(SharedWrap(this), &WDevelopUnitList::OnGenerateWidgetComponent);
+
+	_developUnitList = NewWidgetComponent<WList>(args);
 
 	WButton::HArguments buttonArgs;
 	buttonArgs.Text = "Create";
-	buttonArgs.OnClick = WButton::HOnClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WDevelopUnitList::OnAddItem));
+	buttonArgs.OnClick = WButton::HOnClick::CreateSP(SharedWrap(this), &WDevelopUnitList::OnAddItem);
 	buttonArgs.StretchMode = EStretchMode::Horizontal;
 
 	_onAddItemButton = NewWidgetComponent<WButton>(buttonArgs);
+}
+
+void WDevelopUnitList::OnSelectedItemChanged(PSharedPtr<IListItem> inItem, bool inSelected)
+{
+	_onSelectChanged.ExecuteIfBound(inItem, inSelected);
+}
+
+PSharedPtr<WWidgetComponent> WDevelopUnitList::OnGenerateWidgetComponent(PSharedPtr<IListItem> inItem)
+{
+	WDevelopItem::HArguments args;
+	args.Item = Cast<PDevelopUnitItem>(inItem);
+	args.OwnerList = _developUnitList;
+
+	return NewWidgetComponent<WDevelopItem>(args);;
 }
 
 void WDevelopUnitList::OnGUIBuild(HGUIBuilder& inBuilder)
@@ -151,6 +187,8 @@ void WDevelopUnitList::OnAddItem()
 	{
 		dllName.Remove(0, 2);
 	}
+
+	PString orgDllName = dllName;
 
 	HGuid dutGuid = HGuid::New();
 	PString newDllName = dllName + "_" + dutGuid.ToString();
@@ -191,9 +229,11 @@ void WDevelopUnitList::OnAddItem()
 		return;
 	}
 
-	PSharedPtr<PDevelopUnitItem> Item = Allocate<PDevelopUnitItem>(_developUnitList, developUnit);
+	PSharedPtr<PDevelopUnitItem> Item = Allocate<PDevelopUnitItem>(_developUnitList, _developUnitListData, developUnit);
 	Item->Name = developUnit->GetName().ToString();
 	Item->DevelopUnitName = className;
+	Item->OrgDllName = orgDllName;
+	Item->DllName = dllName;
 
 	_listItems.push_back(Item);
 

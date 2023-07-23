@@ -7,11 +7,11 @@ template<class T>
 class HAttribute
 {
 public:
-	JG_DECLARE_DELEGATE_RETVAL(T, POnProvideData);
+	JG_DECLARE_DELEGATE_RET(HOnProvideData, T);
 
 private:
 	T _data;
-	POnProvideData _provideData;
+	HOnProvideData _provideData;
 
 public:
 	HAttribute() = default;
@@ -20,7 +20,7 @@ public:
 		SetValue(inData);
 	}
 
-	HAttribute(const POnProvideData& inDelegate)
+	HAttribute(const HOnProvideData& inDelegate)
 	{
 		Bind(inDelegate);
 	}
@@ -32,21 +32,21 @@ public:
 		return *this;
 	}
 
-	HAttribute<T>& operator=(const POnProvideData& inDelegate)
+	HAttribute<T>& operator=(const HOnProvideData& inDelegate)
 	{
 		Bind(inDelegate);
 
 		return *this;
 	}
 
-	void Bind(const POnProvideData& inDelegate)
+	void Bind(const HOnProvideData& inDelegate)
 	{
 		_provideData = inDelegate;
 	}
 
 	void UnBind()
 	{
-		_provideData.Reset();
+		_provideData.Clear();
 	}
 
 	T GetValue() const

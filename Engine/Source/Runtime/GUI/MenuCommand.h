@@ -3,8 +3,8 @@
 
 
 JG_DECLARE_DELEGATE(HMenuAction)
-JG_DECLARE_DELEGATE_RETVAL(bool, HIsVisibleMenu);
-JG_DECLARE_DELEGATE_RETVAL(bool, HIsEnableMenu);
+JG_DECLARE_DELEGATE_RET(HIsVisibleMenu, bool);
+JG_DECLARE_DELEGATE_RET(HIsEnableMenu, bool);
 
 struct HMenuShortcut
 {

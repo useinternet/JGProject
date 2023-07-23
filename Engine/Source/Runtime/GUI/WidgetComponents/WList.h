@@ -6,28 +6,31 @@
 class IListItem
 {
 public:
-	virtual PSharedPtr<WWidgetComponent> CreateWidgetComponent() = 0;
-	virtual void OnSelected() = 0;
-	virtual void OnDeselected() = 0;
+	virtual ~IListItem() = default;
 };
 
+class WSelectable;
 class WList : public WWidgetComponent
 {
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelectItem, PSharedPtr<IListItem>)
-
 public:
+	JG_DECLARE_DELEGATE(HOnSelectChanged, PSharedPtr<IListItem>, bool)
+	JG_DECLARE_DELEGATE_RET(HOnGenerateWidgetComponent, PSharedPtr<WWidgetComponent>, PSharedPtr<IListItem>)
+
 	struct HArguments
 	{
-		HOnSelectItem OnSelectItem;
+		HOnSelectChanged OnSelectChanged;
+		HOnGenerateWidgetComponent OnGenerateWidgetComponent;
 	};
 
 private:
-	HList<PSharedPtr<IListItem>> _itemList;
+	HList<PSharedPtr<IListItem>>   _itemList;
+	HList<PSharedPtr<WSelectable>> _widgetList;
 	HSet<int32> _selectedItemIndexes;
 
 	bool  _bAllowMultiSelected  = false;
 
-	HOnSelectItem _onSelectItem;
+	HOnSelectChanged _onSelectChanged;
+	HOnGenerateWidgetComponent _onGenerateWidgetComponent;
 public:
 	WList() : WWidgetComponent() {}
 	virtual ~WList() = default;
@@ -44,7 +47,7 @@ public:
 			itemList.push_back(item);
 		}
 
-		setItemListInternal(itemList);
+		SetItemListInternal(itemList);
 	}
 
 	void SelectItemIndex(int32 inIndex);
@@ -54,8 +57,15 @@ public:
 	void DeselectItem(PSharedPtr<IListItem> inItem);
 	void SetAllowMultiSelected(bool bInAllowMultiSelected);
 
+	bool IsSelectedItem(PSharedPtr<IListItem> inItem) const;
+	HList<PSharedPtr<IListItem>> GetSelectedItems() const;
+	HList<int32> GetSelectedItemIndexes() const;
+	int32 GetItemIndex(PSharedPtr<IListItem> inItem) const;
+
 private:
-	void setItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList);
+	void SetItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList);
+	void OnItemSelected(int32 inSelectIndex);
+	PSharedPtr<WWidgetComponent> OnItemContent(int32 inSelectIndex);
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;

@@ -124,6 +124,9 @@ using HLockGuard = std::lock_guard<T>;
 template<class First, class Second>
 using HPair = std::pair<First, Second>;
 
+template<class... T>
+using HTuple = std::tuple<T...>;
+
 using HRawString = std::string;
 using HRawWString = std::wstring;
 

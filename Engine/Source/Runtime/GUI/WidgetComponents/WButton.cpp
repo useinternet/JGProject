@@ -13,7 +13,7 @@ void WButton::Construct(const HArguments& inArgs)
 
 void WButton::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::CreateLambda([&](const HWidgetContext& widgetContext)
 	{
 		HVector2 buttonSize = _size.GetValue();
 		switch (_stretchMode.GetValue())
@@ -29,11 +29,14 @@ void WButton::OnGUIBuild(HGUIBuilder& inBuilder)
 	
 
 		bool bIsClick = ImGui::Button(_text.GetValue().GetCStr(), buttonSize);
-
-		if (bIsClick == true)
+		if (ImGui::IsMouseClicked(0) && ImGui::IsItemHovered())
 		{
 			_onClick.ExecuteIfBound();
 		}
+		//if (bIsClick == true)
+		//{
+		//	_onClick.ExecuteIfBound();
+		//}
 	}));
 }
 

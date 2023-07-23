@@ -147,7 +147,7 @@ JGFunction::JGFunction() {}
 
 bool JGFunction::IsBound() const
 {
-	if (FunctionReference == nullptr || FunctionReference->IsBound() == false)
+	if (FunctionReference.IsBound() == false)
 	{
 		return false;
 	}

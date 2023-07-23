@@ -1,12 +1,11 @@
 #pragma once
 #include "WidgetComponents/WBorder.h"
 
-
 class WSelectable : public WBorder
 {
-
 public:
 	JG_DECLARE_DELEGATE(HOnSelected);
+	using HOnContent = WBorder::HOnContent;
 
 	enum class EState
 	{
@@ -19,6 +18,7 @@ public:
 	struct HArguments
 	{
 		HOnSelected  OnSelected;
+		HOnContent   OnContent;
 		EStretchMode StretchMode;
 
 		HArguments() : StretchMode(EStretchMode::None) {}

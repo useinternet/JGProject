@@ -14,8 +14,8 @@ void GGUIGlobalSystem::Start()
 	_memObject  = Allocate<IMemoryObject>();
 	_bMenuDirty = true;
 
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::Update));
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_memObject, EMainThreadExecutionOrder::Update, SCHEDULE_FN_BIND(GGUIGlobalSystem::Build));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::Update, PTaskDelegate::CreateRaw(this, &GGUIGlobalSystem::Update));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::Update, PTaskDelegate::CreateRaw(this, &GGUIGlobalSystem::Build));
 
 	LoadGUIDatas();
 	CollectGUIStyles();
@@ -27,7 +27,7 @@ void GGUIGlobalSystem::Destroy()
 	_memObject = nullptr;
 }
 
-void GGUIGlobalSystem::Update(const PTaskArguments& args)
+void GGUIGlobalSystem::Update()
 {
 	for (const HPair<HGuid, PSharedPtr<WWidget>>& pair : _openWidgets)
 	{
@@ -41,7 +41,7 @@ void GGUIGlobalSystem::Update(const PTaskArguments& args)
 	}
 }
 
-void GGUIGlobalSystem::Build(const PTaskArguments& args)
+void GGUIGlobalSystem::Build()
 {
 	BuildGUI();
 

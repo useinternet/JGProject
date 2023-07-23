@@ -25,8 +25,8 @@ private:
 	HGuid _guid;
 
 public:
-	JG_DECLARE_DELEGATE_RETVAL(EWidgetVisibility, HIsVisibility);
-	JG_DECLARE_DELEGATE_RETVAL(bool, HIsEnable);
+	JG_DECLARE_DELEGATE_RET(HIsVisibility, EWidgetVisibility);
+	JG_DECLARE_DELEGATE_RET(HIsEnable, bool);
 
 	HIsVisibility IsVisiblity;
 	HIsEnable	  IsEnable;

@@ -91,24 +91,24 @@ PSharedPtr<JGClass> Module_JGConsole_Code_Generation_Create_Class_JGTestClassA(c
 
 	if(Class->HasFunction(PName("GetTestFunc")) == true)
 	{
-		std::function<float()> functionRef = std::bind(&JGTestClassA::GetTestFunc, noneConstThisPtr);
-		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("GetTestFunc")), functionRef, {}) == false)
+		HDelegate<float> funcDelegate; funcDelegate.BindRaw(noneConstThisPtr, &JGTestClassA::GetTestFunc);
+		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("GetTestFunc")), funcDelegate, {}) == false)
 		{
 			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Function : GetTestFunc");
 		}
 	}
 	if(Class->HasFunction(PName("TestFuncFunc")) == true)
 	{
-		std::function<void(float,float,int32)> functionRef = std::bind(&JGTestClassA::TestFuncFunc, noneConstThisPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("TestFuncFunc")), functionRef, {JGType::GenerateType<float>(),JGType::GenerateType<float>(),JGType::GenerateType<int32>()}) == false)
+		HDelegate<void,float,float,int32> funcDelegate; funcDelegate.BindRaw(noneConstThisPtr, &JGTestClassA::TestFuncFunc);
+		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("TestFuncFunc")), funcDelegate, {JGType::GenerateType<float>(),JGType::GenerateType<float>(),JGType::GenerateType<int32>()}) == false)
 		{
 			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Function : TestFuncFunc");
 		}
 	}
 	if(Class->HasFunction(PName("ExeFunc")) == true)
 	{
-		std::function<void()> functionRef = std::bind(&JGTestClassA::ExeFunc, noneConstThisPtr);
-		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("ExeFunc")), functionRef, {}) == false)
+		HDelegate<void> funcDelegate; funcDelegate.BindRaw(noneConstThisPtr, &JGTestClassA::ExeFunc);
+		if (PObjectGlobalsPrivateUtils::BindFunction(noneConstThisPtr, Class->FindFunction(PName("ExeFunc")), funcDelegate, {}) == false)
 		{
 			JG_LOG(CodeGen, ELogLevel::Error, "JGTestClassA: Fail Bind Function : ExeFunc");
 		}

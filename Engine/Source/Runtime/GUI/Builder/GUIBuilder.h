@@ -84,7 +84,7 @@ virtual ~##ClassName() = default; \
 
 class HWidgetContext;
 
-JG_DECLARE_DELEGATE_ONEPARAM(HOnGenerateNativeGUI, const HWidgetContext&);
+JG_DECLARE_DELEGATE(HOnGenerateNativeGUI, const HWidgetContext&);
 
 struct HPushChildWidgetArguments
 {

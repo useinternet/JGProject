@@ -74,7 +74,7 @@ PSharedPtr<IComboItem> WComboBox::GetSelectedItem() const
 
 void WComboBox::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::CreateLambda([&](const HWidgetContext& widgetContext)
 		{
 			PSharedPtr<IComboItem> SelectedItem = GetSelectedItem();
 

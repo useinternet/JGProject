@@ -12,11 +12,12 @@ void WSelectable::Construct(const WSelectable::HArguments& InArgs)
 	_onSelected = InArgs.OnSelected;
 
 	WBorder::HArguments Args;
-	Args.OnMouseLeftClick = WBorder::HOnMouseLeftClick::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnLeftMouseClick));
-	Args.OnMouseHovered = WBorder::HOnMouseHovered::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseHovered));
-	Args.OnMouseLeave = WBorder::HOnMouseLeave::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::OnMouseLeave));
+	Args.OnMouseLeftClick = WBorder::HOnMouseLeftClick::CreateSP(SharedWrap(this), &WSelectable::OnLeftMouseClick);
+	Args.OnMouseHovered = WBorder::HOnMouseHovered::CreateSP(SharedWrap(this), &WSelectable::OnMouseHovered);
+	Args.OnMouseLeave = WBorder::HOnMouseLeave::CreateSP(SharedWrap(this), &WSelectable::OnMouseLeave);
 	Args.StretchMode = InArgs.StretchMode;
-	Args.BackGroundColor = HAttribute<HLinearColor>::POnProvideData::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(WSelectable::GetBorderBackgroundColor));
+	Args.BackGroundColor = HAttribute<HLinearColor>::HOnProvideData::CreateSP(SharedWrap(this), &WSelectable::GetBorderBackgroundColor);
+	Args.OnContent = InArgs.OnContent;
 
 	WBorder::Construct(Args);
 }

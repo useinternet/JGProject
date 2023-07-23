@@ -9,8 +9,8 @@ class HMenuBuilder;
 class HContextMenuBuilder;
 class JGGUIStyle;
 
-JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnMenuBuild, HMenuBuilder&)
-JG_DECLARE_MULTI_DELEGATE_ONEPARAM(POnContextBuild, HContextMenuBuilder&)
+JG_DECLARE_MULTICAST_DELEGATE(POnMenuBuild, HMenuBuilder&)
+JG_DECLARE_MULTICAST_DELEGATE(POnContextBuild, HContextMenuBuilder&)
 
 struct HGUIConstants
 {
@@ -47,8 +47,8 @@ public:
 protected:
 	virtual void Start() override;
 	virtual void Destroy() override;
-	void Update(const PTaskArguments& args);
-	void Build(const PTaskArguments& args);
+	void Update();
+	void Build();
 	void BuildGUI();
 	void BuildMenu();
 	void BuildContextMenu();

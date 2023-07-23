@@ -14,11 +14,11 @@ void PImGuiMenuBuild::Build()
 	if (bTreeDirty)
 	{
 		HMenuTrees::HEvents bindEvents;
-		bindEvents.OnBeginMainMenu	= HMenuTrees::HOnBeginMainMenu::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiMenuBuild::onBeginMainMenu));
-		bindEvents.OnEndMainMenu	= HMenuTrees::HOnEndMainMenu::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(PImGuiMenuBuild::onEndMainMenu));
-		bindEvents.OnMainMenuItem	= HMenuTrees::HOnMainMenuItem::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiMenuBuild::onMainMenuItem));
-		bindEvents.OnMainMenuAction = HMenuTrees::HOnMainMenuAction::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiMenuBuild::onMainMenuAction));
-		bindEvents.OnMenuAction		= HMenuTrees::HOnMenuAction::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiMenuBuild::onMenuAction));
+		bindEvents.OnBeginMainMenu	= HMenuTrees::HOnBeginMainMenu::CreateSP(SharedWrap(this), &PImGuiMenuBuild::onBeginMainMenu);
+		bindEvents.OnEndMainMenu	= HMenuTrees::HOnEndMainMenu::CreateSP(SharedWrap(this), &PImGuiMenuBuild::onEndMainMenu);
+		bindEvents.OnMainMenuItem	= HMenuTrees::HOnMainMenuItem::CreateSP(SharedWrap(this), &PImGuiMenuBuild::onMainMenuItem);
+		bindEvents.OnMainMenuAction = HMenuTrees::HOnMainMenuAction::CreateSP(SharedWrap(this), &PImGuiMenuBuild::onMainMenuAction);
+		bindEvents.OnMenuAction		= HMenuTrees::HOnMenuAction::CreateSP(SharedWrap(this), &PImGuiMenuBuild::onMenuAction);
 
 		_menuTrees.BindEvents(bindEvents);
 		bTreeDirty = false;

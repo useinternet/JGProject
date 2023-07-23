@@ -33,7 +33,7 @@ public:
 	static PSharedPtr<JGClass> MakeClass(const T* fromThis, PSharedPtr<JGClass> staticClass);
 
 	template<class T, class Ret, class ... Args>
-	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func, const HList<JGType>& funArgTypes);
+	static bool BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, HDelegate<Ret, Args...> inDelegate, const HList<JGType>& funArgTypes);
 
 	template<class T, class U>
 	static bool BindProperty(const T* fromThis, PSharedPtr<JGProperty> inProperty, U* value);
@@ -129,7 +129,7 @@ protected:
 	HList<JGType> Arguments;
 
 	PWeakPtr<JGObject> OwnerObject;
-	PSharedPtr<IDelegateInstanceBase> FunctionReference;
+	HDelegateBase FunctionReference;
 
 public:
 	JGFunction();
@@ -140,23 +140,8 @@ public:
 	template<class Ret, class ... Args>
 	Ret Invoke(Args ... args)
 	{
-		if (FunctionReference == nullptr)
-		{
-			return Ret();
-		}
-
-		if (FunctionReference->GetDelegateInstanceType() != JGType::GenerateType<IDelegateInstance<Ret, Args...>>())
-		{
-			return Ret();
-		}
-
-		IDelegateInstance<Ret, Args...>* pFuncRef = static_cast<IDelegateInstance<Ret, Args...>*>(FunctionReference.GetRawPointer());
-		if (pFuncRef->IsBound() == false)
-		{
-			return Ret();
-		}
-
-		return pFuncRef->Execute(args...);
+		HDelegate<Ret, Args...> Delegate = (HDelegate<Ret, Args...>)FunctionReference;
+		return Delegate.ExecuteIfBound(args...);
 	}
 
 private:
@@ -297,8 +282,8 @@ inline PSharedPtr<JGClass> PObjectGlobalsPrivateUtils::MakeClass(const T* fromTh
 	return staticClass;
 }
 
-template<class T, class Ret, class ...Args>
-inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, const std::function<Ret(Args...)>& func, const HList<JGType>& funArgTypes)
+template<class T, class Ret, class ... Args>
+inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedPtr<JGFunction> function, HDelegate<Ret, Args...> inDelegate, const HList<JGType>& funArgTypes)
 {
 	if (fromThis == nullptr || function == nullptr)
 	{
@@ -315,7 +300,7 @@ inline bool PObjectGlobalsPrivateUtils::BindFunction(const T* fromThis, PSharedP
 		return false;
 	}
 
-	function->FunctionReference = Allocate(PDelegateInstance<T, Ret, Args...>::Create(fromThis, func));
+	function->FunctionReference = inDelegate;
 
 	return true;
 }

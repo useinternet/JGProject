@@ -9,6 +9,7 @@ class WDUTComboBox;
 class WButton;
 class WDevelopItem;
 class WText;
+class JGDevelopUnitListData;
 
 class PDevelopUnitItem
 	: public IMemoryObject
@@ -16,26 +17,28 @@ class PDevelopUnitItem
 {
 	PWeakPtr<WList> _ownerList;
 	JGDevelopUnit*  _developUnit;
+	PSharedPtr<JGDevelopUnitListData> _developUnitListData;
+
 	PSharedPtr<WDevelopItem> _cacheWidget;
 
 public:
 	PString Name;
 	PString DevelopUnitName;
-
+	PString OrgDllName;
+	PString DllName;
 public:
-	PDevelopUnitItem(PSharedPtr<WList> OwnerList, JGDevelopUnit* DevelopUnit);
+	PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDevelopUnitListData> InDevelopUnitListData, JGDevelopUnit* DevelopUnit);
 	virtual ~PDevelopUnitItem();
 
-protected:
-	PSharedPtr<WWidgetComponent> CreateWidgetComponent() override;
-	virtual void OnSelected() override;
-	virtual void OnDeselected() override;
+	void Reload();
+	JGDevelopUnit* GetDevelopUnit() const;
+	PSharedPtr<JGDevelopUnitListData> GetDevelopUnitListData() const;
 };
 
-class WDevelopItem : public WSelectable
+class WDevelopItem : public WWidgetComponent
 {
 public:
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelected, PSharedPtr<WDevelopItem>);
+	JG_DECLARE_DELEGATE(HOnSelected, PSharedPtr<WDevelopItem>);
 
 	struct HArguments
 	{
@@ -50,7 +53,7 @@ private:
 
 	PSharedPtr<WText> _nameLabel;
 	PSharedPtr<WText> _developUnitNameLabel;
-	PSharedPtr<WButton> _resetButton;
+	PSharedPtr<WButton> _reloadButton;
 	PSharedPtr<WButton> _deleteButton;
 public:
 	virtual ~WDevelopItem() = default;
@@ -58,30 +61,38 @@ public:
 	void Construct(const HArguments& inArgs);
 
 protected:
-	virtual void OnContent(HGUIBuilder& inBuilder) override;
+	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 
-	void OnSelected();
+	void OnClickedReload();
+	void OnClickedDelete();
 };
 
 class WDevelopUnitList : public WWidget
 {
 public:
-	struct HArguments : public WList::HArguments
+	struct HArguments
 	{
-
+		PSharedPtr<JGDevelopUnitListData> DevelopUnitListData;
+		WList::HOnSelectChanged OnSelectChanged;
 	};
 
 private:
+	PSharedPtr<JGDevelopUnitListData> _developUnitListData;
+
 	PSharedPtr<WList> _developUnitList;
 	HList<PSharedPtr<PDevelopUnitItem>> _listItems;
 
 	PSharedPtr<WDUTComboBox> _dutComboBox;
 	PSharedPtr<WButton> _onAddItemButton;
+
+	WList::HOnSelectChanged _onSelectChanged;
 public:
 	WDevelopUnitList() = default;
 	virtual ~WDevelopUnitList() = default;
 
-	void Construct(const HArguments& InArgs);
+	void Construct(const HArguments& inArgs);
+	void OnSelectedItemChanged(PSharedPtr<IListItem> inItem, bool inSelected);
+	PSharedPtr<WWidgetComponent> OnGenerateWidgetComponent(PSharedPtr<IListItem> inItem);
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;

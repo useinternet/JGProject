@@ -1,8 +1,10 @@
 #include "PCH/PCH.h"
 #include "WDevelopWidget.h"
 #include "WDUTComboBox.h"
-#include "Misc/DevelopUnit.h"
 #include "WDevelopUnitList.h"
+
+#include "Misc/DevelopUnit.h"
+
 #include "WidgetComponents/WText.h"
 #include "WidgetComponents/WInputText.h"
 #include "WidgetComponents/WInputScalar.h"
@@ -29,10 +31,7 @@ protected:
 
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
-		// 프로세스 
-		//PSharedPtr<WText> Text = Allocate<WText>();
-		//Text->Text = "WDevelopUnitExecuter";
-		//inBuilder.PushWidgetComponent(Text);
+
 	}
 
 	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override
@@ -46,21 +45,35 @@ class WDevelopUnitContent : public WWidget
 public:
 	struct HArguments
 	{
-
+		PWeakPtr<WDevelopWidget> OwnerWidget;
 	};
+
+private:
+	PWeakPtr<WDevelopWidget> _ownerWidget;
 
 public:
 	void Construct(const HArguments& InArgs)
 	{
 		SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
+
+		_ownerWidget = InArgs.OwnerWidget;
 	}
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
 	{
-		//PSharedPtr<WText> Text = Allocate<WText>();
-		//Text->Text = "WDevelopUnitContent";
-		//inBuilder.PushWidgetComponent(Text);
+		if (_ownerWidget.IsValid())
+		{
+			PSharedPtr<PDevelopUnitItem> selectedItem = _ownerWidget.Pin()->GetSelectedDevelopUnit();
+			if (selectedItem != nullptr)
+			{
+				JGDevelopUnit* developUnit = selectedItem->GetDevelopUnit();
+				if (developUnit != nullptr)
+				{
+					inBuilder.PushWidgetComponent(developUnit->CreateContentWidgetComponent());
+				}
+			}
+		}
 	}
 
 	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override
@@ -71,6 +84,8 @@ protected:
 
 void WDevelopWidget::OnOpen()
 {
+	_selectedDevelopUnit = nullptr;
+
 	if (_developUnitExecuter == nullptr)
 	{
 		_developUnitExecuter = NewWidgetComponent<WDevelopUnitExecuter>();
@@ -78,12 +93,17 @@ void WDevelopWidget::OnOpen()
 
 	if (_developUnitList == nullptr)
 	{
-		_developUnitList = NewWidgetComponent<WDevelopUnitList>();
+		WDevelopUnitList::HArguments args;
+		args.OnSelectChanged = WList::HOnSelectChanged::CreateSP(SharedWrap(this), &WDevelopWidget::OnSelectedDevelopUnit);
+		_developUnitList = NewWidgetComponent<WDevelopUnitList>(args);
 	}
 
 	if (_developUnitContent == nullptr)
 	{
-		_developUnitContent = NewWidgetComponent<WDevelopUnitContent>();
+		WDevelopUnitContent::HArguments args;
+		args.OwnerWidget = SharedWrap(this);
+
+		_developUnitContent = NewWidgetComponent<WDevelopUnitContent>(args);
 	}
 }
 
@@ -133,4 +153,34 @@ void WDevelopWidget::OnMenuBuild(HMenuBuilder& inBuilder)
 void WDevelopWidget::OnContextMenuBuild(HContextMenuBuilder& inBuilder)
 {
 
+}
+
+PSharedPtr<PDevelopUnitItem> WDevelopWidget::GetSelectedDevelopUnit() const
+{
+	if (_selectedDevelopUnit.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return _selectedDevelopUnit.Pin();
+}
+
+void WDevelopWidget::OnSelectedDevelopUnit(PSharedPtr<IListItem> inDevelopUnit, bool inSelected)
+{
+	if (inSelected == false)
+	{
+		return;
+	}
+
+	if (_selectedDevelopUnit.IsValid() == false)
+	{
+		_selectedDevelopUnit = nullptr;
+	}
+
+	if (_selectedDevelopUnit.Pin() == inDevelopUnit)
+	{
+		return;
+	}
+
+	_selectedDevelopUnit = Cast<PDevelopUnitItem>(inDevelopUnit);
 }

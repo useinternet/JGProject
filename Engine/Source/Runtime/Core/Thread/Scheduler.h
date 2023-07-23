@@ -78,42 +78,36 @@ protected:
 
 public:
 
-	template<class ... Args>
-	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleOnceByFrame(int32 delayFrame, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return ScheduleByFrame(refObject, delayFrame, 0, INDEX_NONE, order, func, args...);
+		return ScheduleByFrame(delayFrame, 0, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleOnceByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleOnceByFrame(EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return ScheduleByFrame(refObject, 0, 0, INDEX_NONE, order, func, args...);
+		return ScheduleByFrame(0, 0, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleByFrame(EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return ScheduleByFrame(refObject, 0, 0, INDEX_NONE, order, func, args...);
+		return ScheduleByFrame(0, 0, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleByFrame(int32 delayFrame, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return ScheduleByFrame(refObject, delayFrame, 0, INDEX_NONE, order, func, args...);
+		return ScheduleByFrame(delayFrame, 0, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, int32 frameCycle, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleByFrame(int32 delayFrame, int32 frameCycle, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return ScheduleByFrame(refObject, delayFrame, frameCycle, INDEX_NONE, order, func, args...);
+		return ScheduleByFrame(delayFrame, frameCycle, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleByFrame(PWeakPtr<IMemoryObject> refObject, int32 delayFrame, int32 frameCycle, int32 repeat, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleByFrame(int32 delayFrame, int32 frameCycle, int32 repeat, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
 		PSharedPtr<PSyncTaskByFrame> syncTask = Allocate<PSyncTaskByFrame>();
 
-		syncTask->Task = PTask::Create(refObject, func, args...);
+		syncTask->Task = PTask::Create(inTaskDelegate);
 		syncTask->ID   = _idGenerator->NewID();
 		syncTask->Priority   = (int32)order;
 		syncTask->Delay      = delayFrame;
@@ -134,42 +128,36 @@ public:
 		return syncTask->ID;
 	}
 
-	template<class ... Args>
-	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleOnce(float32 delay, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return Schedule(refObject, delay, 0.0f, INDEX_NONE, order, func, args...);
+		return Schedule(delay, 0.0f, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 ScheduleOnce(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 ScheduleOnce(EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return Schedule(refObject, 0.0f, 0.0f, INDEX_NONE, order, func, args...);
+		return Schedule(0.0f, 0.0f, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 Schedule(EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return Schedule(refObject, 0.0f, 0.0f, INDEX_NONE, order, func, args...);
+		return Schedule(0.0f, 0.0f, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 Schedule(float32 delay, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return Schedule(refObject, delay, 0.0f, INDEX_NONE, order, func, args...);
+		return Schedule(delay, 0.0f, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, float32 tickCycle, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 Schedule(float32 delay, float32 tickCycle, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
-		return Schedule(refObject, delay, tickCycle, INDEX_NONE, order, func, args...);
+		return Schedule(delay, tickCycle, INDEX_NONE, order, inTaskDelegate);
 	}
 
-	template<class ... Args>
-	uint64 Schedule(PWeakPtr<IMemoryObject> refObject, float32 delay, float32 tickCycle, int32 repeat, EMainThreadExecutionOrder order, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	uint64 Schedule(float32 delay, float32 tickCycle, int32 repeat, EMainThreadExecutionOrder order, const PTaskDelegate& inTaskDelegate)
 	{
 		PSharedPtr<PSyncTaskByTick> syncTask = Allocate<PSyncTaskByTick>();
 
-		syncTask->Task = PTask::Create(refObject, func, args...);
+		syncTask->Task = PTask::Create(inTaskDelegate);
 		syncTask->ID   = _idGenerator->NewID();
 		syncTask->Priority  = (int32)order;
 		syncTask->Delay     = delay;
@@ -190,14 +178,13 @@ public:
 		return syncTask->ID;
 	}
 
-	template<class ... Args>
-	HTaskHandle ScheduleAsync(ENamedThread namedThread, PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	HTaskHandle ScheduleAsync(ENamedThread namedThread, const PTaskDelegate& inTaskDelegate)
 	{
 		int32 fixedThreadIndex = getRecommandThreadIndex(namedThread);
 
 		PSharedPtr<PThread> thread = _threads[fixedThreadIndex];
 
-		return thread->PushTask(refObject, func, args...);
+		return thread->PushTask(inTaskDelegate);
 	}
 	
 private:

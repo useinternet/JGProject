@@ -1,10 +1,13 @@
 #include "PCH/PCH.h"
 #include "WList.h"
+#include "WSelectable.h"
 #include "Builder/GUIBuilder.h"
 
 void WList::Construct(const HArguments& inArgs)
 {
-	_onSelectItem = inArgs.OnSelectItem;
+	//_onSelectItem = inArgs.OnSelectItem;
+	_onSelectChanged = inArgs.OnSelectChanged;
+	_onGenerateWidgetComponent = inArgs.OnGenerateWidgetComponent;
 }
 
 void WList::SelectItemIndex(int32 inIndex)
@@ -30,8 +33,7 @@ void WList::SelectItemIndex(int32 inIndex)
 
 	if (inIndex != INDEX_NONE || inIndex < _itemList.size())
 	{
-		_onSelectItem.ExecuteIfBound(_itemList[inIndex]);
-		_itemList[inIndex]->OnSelected();
+		_onSelectChanged.ExecuteIfBound(_itemList[inIndex], true);
 	}
 }
 
@@ -62,9 +64,9 @@ void WList::DeselectItemIndex(int32 inIndex)
 		return;
 	}
 
-
+	_onSelectChanged.ExecuteIfBound(_itemList[inIndex], false);
 	_selectedItemIndexes.erase(inIndex);
-	_itemList[inIndex]->OnDeselected();
+	//_itemList[inIndex]->OnDeselected();
 }
 
 void WList::DeselectItem(PSharedPtr<IListItem> inItem)
@@ -87,17 +89,94 @@ void WList::SetAllowMultiSelected(bool bInAllowMultiSelected)
 	_bAllowMultiSelected = bInAllowMultiSelected;
 }
 
-void WList::setItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList)
+bool WList::IsSelectedItem(PSharedPtr<IListItem> inItem) const
+{
+	for (int32 Index : _selectedItemIndexes)
+	{
+		if (inItem == _itemList[Index])
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+HList<PSharedPtr<IListItem>> WList::GetSelectedItems() const
+{
+	HList<PSharedPtr<IListItem>> results;
+	for (int32 Index : _selectedItemIndexes)
+	{
+		results.push_back(_itemList[Index]);
+	}
+
+	return results;
+}
+
+HList<int32> WList::GetSelectedItemIndexes() const
+{
+	HList<int32> results;
+	for (int32 Index : _selectedItemIndexes)
+	{
+		results.push_back(Index);
+	}
+
+	return results;
+}
+
+int32 WList::GetItemIndex(PSharedPtr<IListItem> inItem) const
+{
+	int32 index = INDEX_NONE;
+	for (PSharedPtr<IListItem> Item : _itemList)
+	{
+		++index;
+
+		if (Item == inItem)
+		{
+			return index;
+		}
+	}
+
+	return INDEX_NONE;
+}
+
+void WList::SetItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList)
 {
 	_itemList = inItemList;
+	_widgetList.clear();
+	_widgetList.resize(_itemList.size());
+
+	int32 numItem = (int32)_itemList.size();
+	for (int32 i = 0; i < numItem; ++i)
+	{
+		WSelectable::HArguments args;
+		args.OnSelected = WSelectable::HOnSelected::CreateSP(SharedWrap(this), &WList::OnItemSelected, i);
+		args.OnContent  = WSelectable::HOnContent::CreateSP(SharedWrap(this), &WList::OnItemContent, i);
+
+		_widgetList[i] = NewWidgetComponent<WSelectable>(args);
+	}
+}
+
+void WList::OnItemSelected(int32 inSelectIndex)
+{
+	SelectItemIndex(inSelectIndex);
+}
+
+PSharedPtr<WWidgetComponent> WList::OnItemContent(int32 inSelectIndex)
+{
+	return _onGenerateWidgetComponent.ExecuteIfBound(_itemList[inSelectIndex]);
 }
 
 void WList::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	for (PSharedPtr<IListItem> item : _itemList)
+	int32 numItem = (int32)_itemList.size();
+	for (int32 i = 0; i < numItem; ++i)
 	{
-		PSharedPtr<WWidgetComponent> widgetComp = item->CreateWidgetComponent();
-		inBuilder.PushWidgetComponent(widgetComp);
+		if (_widgetList[i] == nullptr)
+		{
+			continue;
+		}
+
+		inBuilder.PushWidgetComponent(_widgetList[i]);
 	}
 }
-

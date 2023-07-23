@@ -15,7 +15,7 @@ void WText::SetText(const PString& inText)
 
 void WText::OnGUIBuild(HGUIBuilder& inBuilder)
 {
-	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::Create(SharedWrap(this), [&](const HWidgetContext& widgetContext)
+	inBuilder.PushGenerateNativeGUI(SharedWrap(this), HOnGenerateNativeGUI::CreateLambda([&](const HWidgetContext& widgetContext)
 	{
 		PString Value;
 		_text.GetValue(Value);

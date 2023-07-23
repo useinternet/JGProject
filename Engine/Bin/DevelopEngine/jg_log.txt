@@ -1,90 +1,62 @@
-[:31256:][info][Core]: Active Thread: [4294125068]
-[:31256:][info][Core]: Active Thread: [2208029342]
-[:31256:][info][Core]: Active Thread: [2100890426]
-[:31256:][info][Core]: Active Thread: [496350234]
-[:31256:][info][Core]: Active Thread: [111648849]
-[:31256:][info][Core]: Active Thread: [3912582373]
-[:31256:][info][Core]: Active Thread: [1110942455]
-[:31256:][info][Core]: Active Thread: [2798604219]
-[:31256:][info][Core]: Active Thread: [1049644756]
-[:31256:][info][Core]: Active Thread: [1264524752]
-[:31256:][info][Core]: Active Thread: [3859169437]
-[:31256:][info][Core]: Active Thread: [1430378754]
-[:31256:][info][Core]: Active Thread: [246096397]
-[:31256:][info][Core]: Active Thread: [64735902]
-[:31256:][info][Core]: Active Thread: [2465202723]
-[:31256:][info][Core]: Active Thread: [2942188706]
-[:31256:][info][Core]: Active Thread: [2175005494]
-[:31256:][info][Core]: Active Thread: [2211057597]
-[:31256:][info][Core]: Active Thread: [3177614312]
-[:31256:][info][Core]: Active Thread: [620223895]
-[:31256:][info][Core]: Active Thread: [2660841459]
-[:31256:][info][Core]: Active Thread: [255102901]
-[:31256:][info][Core]: Active Thread: [1004586149]
-[:31256:][info][Core]: Active Thread: [1848756162]
-[:31256:][info][Core]: Active Thread: [3503524513]
-[:31256:][info][Core]: Active Thread: [520706709]
-[:31256:][info][Core]: Active Thread: [2363648588]
-[:31256:][info][Core]: Active Thread: [1457241744]
-[:31256:][info][Core]: Active Thread: [1978477637]
-[:31256:][info][Core]: Active Thread: [2620821969]
-[:31256:][info][Core]: Active Thread: [228213824]
-[:31256:][info][Core]: Active Thread: [2307572615]
-[:31256:][info][Core]: Active Thread Totoal Count: 32 
-[:31256:][trace][Graphics]: DirectX12 Init Start
-[:31256:][trace][Graphics]: Success Create D3D12Device
-[:31256:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
-[:31256:][info][Graphics]: VideoMemory : 16064  MB
-[:31256:][trace][Graphics]: Create DescriptorAllocator...
-[:31256:][trace][Graphics]: Create CommandQueue...
-[:31256:][trace][Graphics]: Create FrameBuffer...
-[:31256:][trace][Graphics]: DirectX12 Init End
-[:31256:][trace][Graphics]: Startup Graphics Module...
-[:31256:][trace][JGEditor]: Startup JGEditor Module...
-[:31256:][info][Core]: Recognized Class List...
-[:31256:][debug][Core]: - JGDevelopUnit
-[:31256:][debug][Core]: - JGDUT_Graphics
-[:31256:][debug][Core]: - WDevelopWidget
-[:31256:][debug][Core]: - JGTestClassA
-[:31256:][debug][Core]: - JGGUIStyle
-[:31256:][debug][Core]: - JGObject
-[:31256:][debug][Core]: - JGGUIData
-[:31256:][debug][Core]: - JGGenericGUIStyle
-[:31256:][debug][Core]: - WWidget
-[:31256:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
-[:31256:][info][GUI]: Start Collect GUI Styles...
-[:31256:][debug][GUI]: - JGGenericGUIStyle 
-[:31256:][info][GUI]: End Collect GUI Styles...
-[:31256:][info][DUT_Graphics]: Start up
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Right Click (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][info][GUI]: Left Click (40702)
-[:31256:][info][GUI]: Click Select (40702)
-[:31256:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
-[:31256:][trace][Graphics]: Shutdown Graphics Module...
-[:31256:][trace][JGEditor]: Shutdown JGEditor Module...
+[:6060:][info][Core]: Active Thread: [2195707626]
+[:6060:][info][Core]: Active Thread: [1761091126]
+[:6060:][info][Core]: Active Thread: [1405602724]
+[:6060:][info][Core]: Active Thread: [2909973555]
+[:6060:][info][Core]: Active Thread: [2625285009]
+[:6060:][info][Core]: Active Thread: [4270081637]
+[:6060:][info][Core]: Active Thread: [3621732969]
+[:6060:][info][Core]: Active Thread: [690684620]
+[:6060:][info][Core]: Active Thread: [3128012241]
+[:6060:][info][Core]: Active Thread: [3069403666]
+[:6060:][info][Core]: Active Thread: [845495169]
+[:6060:][info][Core]: Active Thread: [901258098]
+[:6060:][info][Core]: Active Thread: [1868806119]
+[:6060:][info][Core]: Active Thread: [2980590802]
+[:6060:][info][Core]: Active Thread: [2105353466]
+[:6060:][info][Core]: Active Thread: [416230830]
+[:6060:][info][Core]: Active Thread: [1977981984]
+[:6060:][info][Core]: Active Thread: [628421702]
+[:6060:][info][Core]: Active Thread: [2844708469]
+[:6060:][info][Core]: Active Thread: [3009986394]
+[:6060:][info][Core]: Active Thread: [2489063545]
+[:6060:][info][Core]: Active Thread: [2873764930]
+[:6060:][info][Core]: Active Thread: [1742895509]
+[:6060:][info][Core]: Active Thread: [517704541]
+[:6060:][info][Core]: Active Thread: [3588526512]
+[:6060:][info][Core]: Active Thread: [3906082384]
+[:6060:][info][Core]: Active Thread: [3553622237]
+[:6060:][info][Core]: Active Thread: [2192861980]
+[:6060:][info][Core]: Active Thread: [1981636327]
+[:6060:][info][Core]: Active Thread: [1264524752]
+[:6060:][info][Core]: Active Thread: [1398789691]
+[:6060:][info][Core]: Active Thread: [2721643505]
+[:6060:][info][Core]: Active Thread Totoal Count: 32 
+[:6060:][trace][Graphics]: DirectX12 Init Start
+[:6060:][trace][Graphics]: Success Create D3D12Device
+[:6060:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
+[:6060:][info][Graphics]: VideoMemory : 16064  MB
+[:6060:][trace][Graphics]: Create DescriptorAllocator...
+[:6060:][trace][Graphics]: Create CommandQueue...
+[:6060:][trace][Graphics]: Create FrameBuffer...
+[:6060:][trace][Graphics]: DirectX12 Init End
+[:6060:][trace][Graphics]: Startup Graphics Module...
+[:6060:][trace][JGEditor]: Startup JGEditor Module...
+[:6060:][info][Core]: Recognized Class List...
+[:6060:][debug][Core]: - JGDevelopUnit
+[:6060:][debug][Core]: - JGDUT_Graphics
+[:6060:][debug][Core]: - JGDevelopUnitListData
+[:6060:][debug][Core]: - JGDevelopUnitData
+[:6060:][debug][Core]: - WDevelopWidget
+[:6060:][debug][Core]: - JGTestClassA
+[:6060:][debug][Core]: - JGObject
+[:6060:][debug][Core]: - JGGUIData
+[:6060:][debug][Core]: - JGGenericGUIStyle
+[:6060:][debug][Core]: - JGGUIStyle
+[:6060:][debug][Core]: - WWidget
+[:6060:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
+[:6060:][info][GUI]: Start Collect GUI Styles...
+[:6060:][debug][GUI]: - JGGenericGUIStyle 
+[:6060:][info][GUI]: End Collect GUI Styles...
+[:6060:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
+[:6060:][trace][Graphics]: Shutdown Graphics Module...
+[:6060:][trace][JGEditor]: Shutdown JGEditor Module...

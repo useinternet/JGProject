@@ -12,11 +12,11 @@ public:
 	struct HMainMenuData;
 	struct HMenuData;
 
-	JG_DECLARE_DELEGATE_ONEPARAM_RETVAL(bool, HOnBeginMainMenu, const PName&);
+	JG_DECLARE_DELEGATE_RET(HOnBeginMainMenu, bool, const PName&);
 	JG_DECLARE_DELEGATE(HOnEndMainMenu);
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnMainMenuItem, const HMainMenuData&);
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnMainMenuAction, const HMainMenuData&);
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnMenuAction, const HMenuData&);
+	JG_DECLARE_DELEGATE(HOnMainMenuItem, const HMainMenuData&);
+	JG_DECLARE_DELEGATE(HOnMainMenuAction, const HMainMenuData&);
+	JG_DECLARE_DELEGATE(HOnMenuAction, const HMenuData&);
 
 	struct HEvents
 	{
@@ -99,10 +99,10 @@ class HContextMenuTrees
 public:
 	struct HMenuData;
 
-	JG_DECLARE_DELEGATE_ONEPARAM_RETVAL(bool, HOnBeginContextMenu, const PName&);
+	JG_DECLARE_DELEGATE_RET(HOnBeginContextMenu, bool, const PName&);
 	JG_DECLARE_DELEGATE(HOnEndContextMenu);
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnContextMenuItem, const HMenuData&);
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnContextMenuAction, const HMenuData&);
+	JG_DECLARE_DELEGATE(HOnContextMenuItem, const HMenuData&);
+	JG_DECLARE_DELEGATE(HOnContextMenuAction, const HMenuData&);
 
 	struct HEvents
 	{

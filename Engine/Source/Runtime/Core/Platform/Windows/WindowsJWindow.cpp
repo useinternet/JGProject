@@ -63,11 +63,11 @@ bool PWindowsJWindow::ConstructWindow()
 	ShowWindow(_handle, SW_NORMAL);
 	UpdateWindow(_handle);
 
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(SharedWrap(this), EMainThreadExecutionOrder::UpdateWindow, SCHEDULE_FN_BIND(PWindowsJWindow::Update));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::UpdateWindow, PTaskDelegate::CreateRaw(this, &PWindowsJWindow::Update));
 
 	return true;
 }
-void PWindowsJWindow::Update(const PTaskArguments& args)
+void PWindowsJWindow::Update()
 {
 	MSG msg;
 	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

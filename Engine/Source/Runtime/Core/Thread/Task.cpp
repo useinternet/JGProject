@@ -25,7 +25,7 @@ void PTask::DoTask()
 {
 	_bIsRunning = true;
 
-	_taskDelegate.ExecuteIfBound(_taskArguments);
+	_taskDelegate.ExecuteIfBound();
 
 	_bIsRunning = false;
 }

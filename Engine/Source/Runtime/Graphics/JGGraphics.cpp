@@ -41,8 +41,8 @@ void HJGGraphicsModule::StartupModule()
 
 	_graphicsAPI->Initialize(arguments);
 
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_graphicsAPI, EMainThreadExecutionOrder::GraphicsBegin, SCHEDULE_FN_BIND(HJGGraphicsModule::BeginFrame));
-	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(_graphicsAPI, EMainThreadExecutionOrder::GraphicsEnd, SCHEDULE_FN_BIND(HJGGraphicsModule::EndFrame));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::GraphicsBegin, PTaskDelegate::CreateRaw(this, &HJGGraphicsModule::BeginFrame));
+	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::GraphicsEnd, PTaskDelegate::CreateRaw(this, &HJGGraphicsModule::EndFrame));
 
 	JG_LOG(Graphics, ELogLevel::Trace, "Startup Graphics Module...");
 }
@@ -55,7 +55,7 @@ void HJGGraphicsModule::ShutdownModule()
 	JG_LOG(Graphics, ELogLevel::Trace, "Shutdown Graphics Module...");
 }
 
-void HJGGraphicsModule::BeginFrame(const PTaskArguments& args)
+void HJGGraphicsModule::BeginFrame()
 {
 	if (_graphicsAPI == nullptr)
 	{
@@ -65,7 +65,7 @@ void HJGGraphicsModule::BeginFrame(const PTaskArguments& args)
 	_graphicsAPI->BeginFrame();
 }
 
-void HJGGraphicsModule::EndFrame(const PTaskArguments& args)
+void HJGGraphicsModule::EndFrame()
 {
 	if (_graphicsAPI == nullptr)
 	{

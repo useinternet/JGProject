@@ -20,7 +20,7 @@ protected:
 	virtual bool ConstructWindow() override;
 
 private:
-	void Update(const PTaskArguments& args);
+	void Update();
 };
 
 

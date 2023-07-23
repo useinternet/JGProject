@@ -15,6 +15,7 @@ protected: \
  \
 		PJsonData dataJson = json.CreateJsonData(); \
 \
+    dataJson.AddMember("_developUnitListData", _developUnitListData); \
 \
 \
 		json.AddMember(JGType::GenerateType<WDevelopWidget>().GetName().ToString(), dataJson);\
@@ -28,6 +29,12 @@ protected: \
 		{\
 			return;\
 		}\
+\
+		if (dataJson.GetData("_developUnitListData", &_developUnitListData) == false)\
+		{\
+			\
+		}\
+\
 \
 \
 	}\

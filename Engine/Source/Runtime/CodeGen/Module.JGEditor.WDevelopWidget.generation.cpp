@@ -7,6 +7,7 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Static_Create_Class_WDevelop
 {
 	HList<PSharedPtr<JGFunction>> FunctionMap;
 	HList<PSharedPtr<JGProperty>> PropertyMap;
+	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<JGDevelopUnitListData>(),"_developUnitListData",nullptr));
 	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGType::GenerateType<WDevelopWidget>(),{
 			JGType::GenerateType<WWidget>(), 
 		},
@@ -17,6 +18,16 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Create_Class_WDevelopWidget(
 {
 	WDevelopWidget* noneConstThisPtr = const_cast<WDevelopWidget*>(static_cast<const WDevelopWidget*>(fromThis));
 	PSharedPtr<JGClass> Class =  PObjectGlobalsPrivateUtils::MakeClass(noneConstThisPtr, GObjectGlobalSystem::GetInstance().GetStaticClass(JGType::GenerateType<WDevelopWidget>()));
+
+	if (Class->HasProperty(PName("_developUnitListData")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("_developUnitListData")), &(noneConstThisPtr->_developUnitListData)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "WDevelopWidget: Fail Bind Property : _developUnitListData");
+		}
+	}
+
+
 	return Class;
 
 }

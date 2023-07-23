@@ -15,10 +15,10 @@ bool PImGuiContextMenuBuild::Build(const HGuid& inWidgetID)
 	if (bTreeDirty)
 	{
 		HContextMenuTrees::HEvents bindEvents;
-		bindEvents.OnBeginContextMenu  = HContextMenuTrees::HOnBeginContextMenu::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiContextMenuBuild::onBeginContextMenu));
-		bindEvents.OnEndContextMenu    = HContextMenuTrees::HOnEndContextMenu::Create(SharedWrap(this), JG_DELEGATE_FN_BIND(PImGuiContextMenuBuild::onEndContextMenu));
-		bindEvents.OnContextMenuItem   = HContextMenuTrees::HOnContextMenuItem::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiContextMenuBuild::onContextMenuItem));
-		bindEvents.OnContextMenuAction = HContextMenuTrees::HOnContextMenuAction::Create(SharedWrap(this), JG_DELEGATE_FN_BIND_ONEPARAM(PImGuiContextMenuBuild::onContextMenuAction));
+		bindEvents.OnBeginContextMenu  = HContextMenuTrees::HOnBeginContextMenu::CreateSP(SharedWrap(this), &PImGuiContextMenuBuild::onBeginContextMenu);
+		bindEvents.OnEndContextMenu    = HContextMenuTrees::HOnEndContextMenu::CreateSP(SharedWrap(this), &PImGuiContextMenuBuild::onEndContextMenu);
+		bindEvents.OnContextMenuItem   = HContextMenuTrees::HOnContextMenuItem::CreateSP(SharedWrap(this), &PImGuiContextMenuBuild::onContextMenuItem);
+		bindEvents.OnContextMenuAction = HContextMenuTrees::HOnContextMenuAction::CreateSP(SharedWrap(this), &PImGuiContextMenuBuild::onContextMenuAction);
 
 		_menuTrees.BindEvents(bindEvents);
 		bTreeDirty = false;

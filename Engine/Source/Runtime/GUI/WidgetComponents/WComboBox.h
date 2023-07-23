@@ -13,7 +13,7 @@ public:
 class WComboBox : public WWidgetComponent
 {
 public:
-	JG_DECLARE_DELEGATE_ONEPARAM(HOnSelectChanged, PSharedPtr<IComboItem>)
+	JG_DECLARE_DELEGATE(HOnSelectChanged, PSharedPtr<IComboItem>)
 
 	struct HArguments
 	{

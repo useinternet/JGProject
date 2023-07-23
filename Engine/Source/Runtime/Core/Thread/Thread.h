@@ -35,10 +35,9 @@ public:
 	virtual ~PThread();
 
 public:
-	template<class ... Args>
-	HTaskHandle PushTask(PWeakPtr<IMemoryObject> refObject, const std::function<void(const PTaskArguments&)>& func, const Args& ... args)
+	HTaskHandle PushTask(const PTaskDelegate& inTaskDelegate)
 	{
-		PSharedPtr<PTask> task = PTask::Create(refObject, func, args...);
+		PSharedPtr<PTask> task = PTask::Create(inTaskDelegate);
 
 		HLockGuard<HMutex> lock(_mutex);
 		_taskQueue.push(task);

@@ -431,7 +431,7 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 
 	HWidgetContext widgetContext;
 	widgetContext.ContentSize = inBuildContext.CacheData->WidgetCacheDatas[widgetGuid].ContentRegionSize;
-	widgetContext.OnPostGUIContent.Add(SharedWrap(this), [&inBuildContext, this](HGUIBuilder& inBuilder)
+	widgetContext.OnPostGUIContent.AddLambda([&inBuildContext, this](HGUIBuilder& inBuilder)
 		{
 			if (inBuilder.GetCommandQueue().empty() == false)
 			{
@@ -454,68 +454,6 @@ bool PImGuiBuild::OnBuildGenerateNativeGUI(HBuildContext& inBuildContext, HGUIBu
 	return true;
 }
 
-//void PImGuiBuild::OnGUIEvent(HBuildContext& inBuildContext, const HGuid& guid, IGUIEventReceiver* inEventReceiver)
-//{
-//	if (ImGui::IsItemHovered())
-//	{
-//		if (inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover == false)
-//		{
-//			inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover = true;
-//			inEventReceiver->OnMouseEnter();
-//		}
-//
-//		inEventReceiver->OnMouseHover();
-//
-//		if (inBuildContext.bIsDirtyMousePos)
-//		{
-//			inEventReceiver->OnMouseMove();
-//		}
-//
-//		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-//		{
-//			inEventReceiver->OnMouseLButtonDown();
-//		}
-//		else if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
-//		{
-//			inEventReceiver->OnMouseRButtonDown();
-//		}
-//		else if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
-//		{
-//			inEventReceiver->OnMouseMButtonDown();
-//		}
-//
-//		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-//		{
-//			inEventReceiver->OnMouseLButtonUp();
-//		}
-//		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
-//		{
-//			inEventReceiver->OnMouseRButtonUp();
-//		}
-//		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
-//		{
-//			inEventReceiver->OnMouseMButtonUp();
-//		}
-//
-//		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-//		{
-//			inEventReceiver->OnMouseLButtonClick();
-//		}
-//		else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-//		{
-//			inEventReceiver->OnMouseRButtonClick();
-//		}
-//		else if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
-//		{
-//			inEventReceiver->OnMouseMButtonClick();
-//		}
-//	}
-//	else if (inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover)
-//	{
-//		inBuildContext.CacheData->WidgetCompCahceDatas[guid].bHover = false;
-//		inEventReceiver->OnMouseLeave();
-//	}
-//}
 
 void PImGuiBuild::OnContextMenu(HBuildContext& inBuildContext, PSharedPtr<WWidget> inWidget)
 {
