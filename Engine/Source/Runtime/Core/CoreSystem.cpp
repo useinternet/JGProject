@@ -49,12 +49,12 @@ bool GCoreSystem::Create(const HCoreSystemArguments& args)
 	collectionThreadIDs();
 
 	GCoreSystem::RegisterSystemInstance<GLogGlobalSystem>();
-	GCoreSystem::RegisterSystemInstance<GStringTable>();
 	GCoreSystem::RegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GTimerGlobalSystem>();
 	GCoreSystem::RegisterSystemInstance<GScheduleGlobalSystem>();
-	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GStringTable>();
 	GCoreSystem::RegisterSystemInstance<GModuleGlobalSystem>();
+	GCoreSystem::RegisterSystemInstance<GObjectGlobalSystem>();
 
 	if ((args.Flags & ECoreSystemFlags::No_CodeGen) == false)
 	{
@@ -97,29 +97,30 @@ void GCoreSystem::Destroy()
 		return;
 	}
 
+	Instance->GlobalValues.MainWindow = nullptr;
+	Instance->GlobalValues.GraphicsAPI = nullptr;
+	Instance->GlobalValues.WindowCallBacks = nullptr;
+
 	int32 NumSystem = (int32)Instance->SystemInstanceList.size();
 	for (int32 i = NumSystem - 1; i >= 0; --i)
 	{
 		Instance->SystemInstanceList[i]->Destroy();
 	}
 
-	for (const HPair< uint64, GGlobalSystemInstanceBase*>& pair : Instance->SystemInstancePool)
-	{
-		pair.second->Destroy();
-	}
-
-	Instance->GlobalValues.MainWindow = nullptr;
-	Instance->GlobalValues.GraphicsAPI = nullptr;
-	Instance->GlobalValues.WindowCallBacks = nullptr;
-
-	GCoreSystem::UnRegisterSystemInstance<GModuleGlobalSystem>();
-	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GStringTable>();
+	GCoreSystem::UnRegisterSystemInstance<GObjectGlobalSystem>();
+	GCoreSystem::UnRegisterSystemInstance<GModuleGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GScheduleGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GTimerGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GMemoryGlobalSystem>();
 	GCoreSystem::UnRegisterSystemInstance<GLogGlobalSystem>();
 
+	for (HJInstance dllIns : Instance->DllInstances)
+	{
+		HPlatform::UnLoadDll(dllIns);
+	}
+
+	Instance->DllInstances.clear();
 	Instance->SystemInstancePool.clear();
 	Instance->ThreadIDList.clear();
 
@@ -141,6 +142,15 @@ GCoreSystem& GCoreSystem::GetInstance()
 	return *Instance;
 }
 
+void GCoreSystem::RegisterDll(HJInstance InInstance)
+{
+	Instance->DllInstances.insert(InInstance);
+}
+
+void GCoreSystem::UnregisterDll(HJInstance InInstance)
+{
+	Instance->DllInstances.erase(InInstance);
+}
 
 uint32 GCoreSystem::GetThreadCount()
 {

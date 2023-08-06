@@ -13,11 +13,6 @@ public:
 	HGuid UnitGuid;
 
 
-
-
-
-
-
 public:
 	virtual ~JGDevelopUnitData() = default;
 };

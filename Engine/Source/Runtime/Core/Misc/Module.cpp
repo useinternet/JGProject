@@ -88,8 +88,7 @@ bool GModuleGlobalSystem::ConnectModule(const PString& moduleName)
 	}
 
 	moduleIf->StartupModule();
-
-	HPlatform::UnLoadDll(dllIns);
+	GCoreSystem::RegisterDll(dllIns);
 	return true;
 }
 

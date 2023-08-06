@@ -7,6 +7,7 @@
 #include "Misc/Delegate.h"
 
 class JGType;
+class JGClass;
 class ITypeable
 {
 public:
@@ -27,6 +28,7 @@ public:
 	void SetName(const PName& name);
 	const PName& GetName() const;
 
+	PSharedPtr<JGClass> GetClass() const;
 protected:
 	virtual void OnWriteJson(PJsonData& json) const {}
 	virtual void OnReadJson(const PJsonData& json) {}

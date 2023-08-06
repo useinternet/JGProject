@@ -15,6 +15,7 @@ protected: \
  \
 		PJsonData dataJson = json.CreateJsonData(); \
 \
+    dataJson.AddMember("DevelopUnitDatas", DevelopUnitDatas); \
 \
 \
 		json.AddMember(JGType::GenerateType<JGDevelopUnitListData>().GetName().ToString(), dataJson);\
@@ -28,6 +29,12 @@ protected: \
 		{\
 			return;\
 		}\
+\
+		if (dataJson.GetData("DevelopUnitDatas", &DevelopUnitDatas) == false)\
+		{\
+			\
+		}\
+\
 \
 \
 	}\

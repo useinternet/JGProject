@@ -47,8 +47,8 @@ private:
 	static GCoreSystem* Instance;
 	HHashMap<uint64, GGlobalSystemInstanceBase*> SystemInstancePool;
 	HList<GGlobalSystemInstanceBase*> SystemInstanceList;
-	HList<ThreadID> ThreadIDList;
-
+	HList<ThreadID>   ThreadIDList;
+	HHashSet<HJInstance> DllInstances;
 	HCoreSystemGlobalValues GlobalValues;
 public:
 	bool bIsRunning;
@@ -125,6 +125,9 @@ public:
 
 		return Instance->SystemInstancePool.find(code) != Instance->SystemInstancePool.end();
 	}
+
+	static void RegisterDll(HJInstance InInstance);
+	static void UnregisterDll(HJInstance InInstance);
 
 	static uint32 GetThreadCount();
 	static HList<ThreadID> GetAllThreadIDs();

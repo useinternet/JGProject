@@ -1,5 +1,6 @@
 #pragma once
 #include "Object/JGObject.h"
+#include "String/Name.h"
 #include "Object/ObjectGlobals.h"
 #include "FileIO/Json.h"
 #include "Runtime/CodeGen/Module.Core.DevelopUnit.generation.h"
@@ -35,5 +36,13 @@ public:
 
 	// À§Á¬
 	virtual PSharedPtr<WWidgetComponent> CreateContentWidgetComponent() { return nullptr; }
+
+	static JGDevelopUnit* LoadDevelopUnit(PSharedPtr<JGClass> inClass, const HGuid& inGuid = HGuid());
+	static bool ReloadDevelopUnit(JGDevelopUnit*& inDevelopUnit);
+	static void UnloadDevelopUnit(JGDevelopUnit*& outDevelopUnit, bool bRevemoDll = false);
+private:
+	PName _dllName;
+	HGuid _guid;
+	HJInstance _dllInstance;
 };
 

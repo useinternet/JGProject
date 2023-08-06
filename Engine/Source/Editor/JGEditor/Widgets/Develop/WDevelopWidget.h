@@ -20,17 +20,7 @@ class JGEDITOR_API WDevelopWidget : public WWidget
 	JG_GENERATED_CLASS_BODY
 
 	JGPROPERTY()
-	JGDevelopUnitListData _developUnitListData;
-
-
-	/*
-	프로세스
-	
-	생성
-
-	오류 나면, 작동 금지 
-	컴파일하고 Reset();
-	*/
+	PSharedPtr<JGDevelopUnitListData> _developUnitListData;
 
 	PSharedPtr<WDevelopUnitExecuter> _developUnitExecuter;
 	PSharedPtr<WDevelopUnitList>     _developUnitList;
@@ -38,7 +28,7 @@ class JGEDITOR_API WDevelopWidget : public WWidget
 
 	PWeakPtr<PDevelopUnitItem> _selectedDevelopUnit;
 public:
-	WDevelopWidget() = default;
+	WDevelopWidget();
 	virtual ~WDevelopWidget() = default;
 
 	virtual void OnOpen() override;

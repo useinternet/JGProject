@@ -7,7 +7,7 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Static_Create_Class_WDevelop
 {
 	HList<PSharedPtr<JGFunction>> FunctionMap;
 	HList<PSharedPtr<JGProperty>> PropertyMap;
-	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<JGDevelopUnitListData>(),"_developUnitListData",nullptr));
+	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<PSharedPtr<JGDevelopUnitListData>>(),"_developUnitListData",nullptr));
 	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGType::GenerateType<WDevelopWidget>(),{
 			JGType::GenerateType<WWidget>(), 
 		},

@@ -39,6 +39,7 @@ protected:
 	virtual void OnUpdate() {}
 	virtual void OnOpen()  {}
 	virtual void OnClose() {}
+	virtual void OnDestroy() {}
 public:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) {}
 	virtual void OnMenuBuild(HMenuBuilder& inBuilder) {}

@@ -1,6 +1,7 @@
 #include "PCH/PCH.h"
 #include "JGObject.h"
 #include "ObjectGlobals.h"
+#include "ObjectGlobalSystem.h"
 #include "FileIO/Json.h"
 
 void JGObject::SetName(const PName& name)
@@ -16,6 +17,11 @@ const PName& JGObject::GetName() const
 	}
 
 	return _name;
+}
+
+PSharedPtr<JGClass> JGObject::GetClass() const
+{
+	return GObjectGlobalSystem::GetInstance().GetClass(GetType(), this);
 }
 
 void JGObject::WriteJson(PJsonData& json) const

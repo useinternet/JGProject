@@ -14,45 +14,12 @@ PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDev
 
 void PDevelopUnitItem::Reload()
 {
-	if (_developUnit)
-	{
-		HPlatform::Deallocate(_developUnit);
-	}
+	JGDevelopUnit::ReloadDevelopUnit(_developUnit);
+}
 
-	HGuid   dutGuid = HGuid::New();
-	PString newDllName = OrgDllName + "_" + dutGuid.ToString();
-
-	if (false == HFileHelper::CopyFileOrDirectory(OrgDllName, newDllName))
-	{
-		return;
-	}
-
-	DllName = newDllName;
-
-	HJInstance dllInstance = HPlatform::LoadDll(DllName);
-	if (dllInstance == nullptr)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
-		return;
-	}
-
-	HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(dllInstance, JG_LINK_DEVELOPUNIT_FUNCTION_NAME);
-	if (linkModuleFunc.IsVaild() == false)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
-		return;
-	}
-
-	linkModuleFunc(&GCoreSystem::GetInstance());
-
-	HPlatformFunction<JGDevelopUnit*> createDevelopUnit = HPlatform::LoadFuncInDll<JGDevelopUnit*>(dllInstance, JG_CREATE_DEVELOPUNIT_FUNCTION_NAME);
-	if (createDevelopUnit.IsVaild() == false)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", DllName);
-		return;
-	}
-
-	_developUnit = createDevelopUnit();
+void PDevelopUnitItem::Remove()
+{
+	JGDevelopUnit::UnloadDevelopUnit(_developUnit, true);
 }
 
 JGDevelopUnit* PDevelopUnitItem::GetDevelopUnit() const
@@ -74,6 +41,7 @@ void WDevelopItem::Construct(const WDevelopItem::HArguments& inArgs)
 {
 	_ownerList = inArgs.OwnerList;
 	_ownerItem = inArgs.Item;
+	_onRemove  = inArgs.OnRemove;
 
 	_nameLabel = NewWidgetComponent<WText>();
 	_developUnitNameLabel = NewWidgetComponent<WText>();
@@ -84,7 +52,8 @@ void WDevelopItem::Construct(const WDevelopItem::HArguments& inArgs)
 	buttonArgs.OnClick = WButton::HOnClick::CreateSP(SharedWrap(this), &WDevelopItem::OnClickedReload);
 	_reloadButton = NewWidgetComponent<WButton>(buttonArgs);
 
-	buttonArgs.Text = "Delete";
+	buttonArgs.Text = "Remove";
+	buttonArgs.OnClick = WButton::HOnClick::CreateSP(SharedWrap(this), &WDevelopItem::OnClickedRemove);
 	_deleteButton = NewWidgetComponent<WButton>(buttonArgs);
 }
 
@@ -122,9 +91,13 @@ void WDevelopItem::OnClickedReload()
 	// Dll 제거 후 다시 연결
 }
 
-void WDevelopItem::OnClickedDelete()
+void WDevelopItem::OnClickedRemove()
 {
-	// 말그대로 제거
+	if (_ownerItem != nullptr)
+	{
+		_onRemove.ExecuteIfBound(_ownerItem);
+		_ownerItem->Remove();
+	}
 }
 
 void WDevelopUnitList::Construct(const WDevelopUnitList::HArguments& InArgs)
@@ -160,6 +133,7 @@ PSharedPtr<WWidgetComponent> WDevelopUnitList::OnGenerateWidgetComponent(PShared
 	WDevelopItem::HArguments args;
 	args.Item = Cast<PDevelopUnitItem>(inItem);
 	args.OwnerList = _developUnitList;
+	args.OnRemove = WDevelopItem::HOnRemove::CreateSP(SharedWrap(this), &WDevelopUnitList::OnRemoveItem);
 
 	return NewWidgetComponent<WDevelopItem>(args);;
 }
@@ -180,64 +154,33 @@ void WDevelopUnitList::OnAddItem()
 	{
 		return;
 	}
-	//DUT_Graphics_Dynamic
-	PString className = Class->GetClassType()->GetName().ToString();
-	PString dllName   = className + "_Dynamic.dll";
-	if (dllName.StartWidth("JG"))
-	{
-		dllName.Remove(0, 2);
-	}
 
-	PString orgDllName = dllName;
-
-	HGuid dutGuid = HGuid::New();
-	PString newDllName = dllName + "_" + dutGuid.ToString();
-
-	if (false == HFileHelper::CopyFileOrDirectory(dllName, newDllName))
-	{
-		return;
-	}
-
-	dllName = newDllName;
-
-	HJInstance dllInstance = HPlatform::LoadDll(dllName);
-	if (dllInstance == nullptr)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", dllName);
-		return;
-	}
-
-	HPlatformFunction<void, GCoreSystem*> linkModuleFunc = HPlatform::LoadFuncInDll<void, GCoreSystem*>(dllInstance, JG_LINK_DEVELOPUNIT_FUNCTION_NAME);
-	if (linkModuleFunc.IsVaild() == false)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", dllName);
-		return;
-	}
-
-	linkModuleFunc(&GCoreSystem::GetInstance());
-
-	HPlatformFunction<JGDevelopUnit*> createDevelopUnit  = HPlatform::LoadFuncInDll<JGDevelopUnit*>(dllInstance, JG_CREATE_DEVELOPUNIT_FUNCTION_NAME);
-	if(createDevelopUnit.IsVaild() == false)
-	{
-		JG_LOG(JGEditor, ELogLevel::Error, "Fail Load DevelopUnit(%s)", dllName);
-		return;
-	}
-
-	JGDevelopUnit* developUnit = createDevelopUnit();
-	if (nullptr == developUnit)
+	JGDevelopUnit* developUnit = JGDevelopUnit::LoadDevelopUnit(Class);
+	if (developUnit == nullptr)
 	{
 		return;
 	}
 
 	PSharedPtr<PDevelopUnitItem> Item = Allocate<PDevelopUnitItem>(_developUnitList, _developUnitListData, developUnit);
 	Item->Name = developUnit->GetName().ToString();
-	Item->DevelopUnitName = className;
-	Item->OrgDllName = orgDllName;
-	Item->DllName = dllName;
+	Item->DevelopUnitName = Class->GetClassType()->GetName().ToString();
 
 	_listItems.push_back(Item);
 
 	_developUnitList->SetItemList(_listItems);
 
 	developUnit->Startup();
+}
+
+void WDevelopUnitList::OnRemoveItem(PSharedPtr<PDevelopUnitItem> inItem)
+{
+	int32 numItem = (int32)_listItems.size();
+	for (int32 i = 0; i < numItem; ++i)
+	{
+		if (_listItems[i] == inItem)
+		{
+			_listItems.erase(_listItems.begin() + i);
+			break;
+		}
+	}
 }

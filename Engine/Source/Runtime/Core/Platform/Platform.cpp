@@ -20,7 +20,7 @@ HJInstance HPlatform::LoadDll(const PString& dllPath)
 
 void HPlatform::UnLoadDll(HJInstance instanceID)
 {
-	if (instanceID == nullptr)
+	if (instanceID != nullptr)
 	{
 #ifdef _PLATFORM_WINDOWS
 		::FreeLibrary(instanceID);

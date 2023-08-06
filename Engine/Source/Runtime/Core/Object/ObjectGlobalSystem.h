@@ -54,7 +54,6 @@ private:
 
 	HHashMap<JGType, HCreateClassFunc>  _createClassFuncPool;
 	HHashMap<JGType, HCreateObjectFunc> _createObjectFuncPool;
-
 public:
 	virtual ~GObjectGlobalSystem() = default;
 
@@ -79,18 +78,6 @@ public:
 	PSharedPtr<JGClass> GetStaticClass() const
 	{
 		return GetStaticClass(JGTYPE(T));
-	}
-
-	template<class T>
-	PSharedPtr<JGClass> GetClass(const JGObject* object) const
-	{
-		return GetClass(JGTYPE(T), object);
-	}
-
-	template<class T>
-	PSharedPtr<JGClass> GetClass(const JGType& type, T* fromThis)
-	{
-		return nullptr;
 	}
 
 	bool CanCast(const JGType& destType, const JGType& srcType) const;
@@ -123,17 +110,6 @@ inline PSharedPtr<JGClass> StaticClass()
 inline PSharedPtr<JGClass> StaticClass(const JGType& type)
 {
 	return GObjectGlobalSystem::GetInstance().GetStaticClass(type);
-}
-
-template<class T>
-inline PSharedPtr<JGClass> BindedClass(const JGObject* obj)
-{
-	return GObjectGlobalSystem::GetInstance().GetClass<T>(obj);
-}
-
-inline PSharedPtr<JGClass> BindedClass(const JGType& type, const JGObject* obj)
-{
-	return GObjectGlobalSystem::GetInstance().GetClass(type, obj);
 }
 
 template<class T>

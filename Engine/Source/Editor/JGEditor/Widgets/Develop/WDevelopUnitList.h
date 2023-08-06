@@ -26,11 +26,13 @@ public:
 	PString DevelopUnitName;
 	PString OrgDllName;
 	PString DllName;
+
 public:
 	PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDevelopUnitListData> InDevelopUnitListData, JGDevelopUnit* DevelopUnit);
 	virtual ~PDevelopUnitItem();
 
 	void Reload();
+	void Remove();
 	JGDevelopUnit* GetDevelopUnit() const;
 	PSharedPtr<JGDevelopUnitListData> GetDevelopUnitListData() const;
 };
@@ -38,14 +40,14 @@ public:
 class WDevelopItem : public WWidgetComponent
 {
 public:
-	JG_DECLARE_DELEGATE(HOnSelected, PSharedPtr<WDevelopItem>);
+	JG_DECLARE_DELEGATE(HOnRemove, PSharedPtr<PDevelopUnitItem>);
 
 	struct HArguments
 	{
 		PWeakPtr<WList> OwnerList;
 		PSharedPtr<PDevelopUnitItem> Item;
+		HOnRemove OnRemove;
 	};
-
 
 private:
 	PWeakPtr<WList> _ownerList;
@@ -55,6 +57,8 @@ private:
 	PSharedPtr<WText> _developUnitNameLabel;
 	PSharedPtr<WButton> _reloadButton;
 	PSharedPtr<WButton> _deleteButton;
+
+	HOnRemove _onRemove;
 public:
 	virtual ~WDevelopItem() = default;
 
@@ -64,7 +68,7 @@ protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 
 	void OnClickedReload();
-	void OnClickedDelete();
+	void OnClickedRemove();
 };
 
 class WDevelopUnitList : public WWidget
@@ -97,4 +101,5 @@ public:
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
 	void OnAddItem();
+	void OnRemoveItem(PSharedPtr<PDevelopUnitItem> inItem);
 };

@@ -10,11 +10,8 @@ class JGDevelopUnitListData : public JGObject
 {
 	JG_GENERATED_CLASS_BODY
 public:
-
+	JGPROPERTY()
 	HList<JGDevelopUnitData> DevelopUnitDatas;
-
-
-
 
 public:
 	virtual ~JGDevelopUnitListData() = default;

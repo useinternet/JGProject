@@ -2,6 +2,7 @@
 #include "WDevelopWidget.h"
 #include "WDUTComboBox.h"
 #include "WDevelopUnitList.h"
+#include "WDevelopUnitContent.h"
 
 #include "Misc/DevelopUnit.h"
 
@@ -40,47 +41,10 @@ protected:
 	}
 };
 
-class WDevelopUnitContent : public WWidget
+WDevelopWidget::WDevelopWidget()
 {
-public:
-	struct HArguments
-	{
-		PWeakPtr<WDevelopWidget> OwnerWidget;
-	};
-
-private:
-	PWeakPtr<WDevelopWidget> _ownerWidget;
-
-public:
-	void Construct(const HArguments& InArgs)
-	{
-		SetWidgetFlags(EWidgetFlags::ChildWidget_Border);
-
-		_ownerWidget = InArgs.OwnerWidget;
-	}
-
-protected:
-	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override
-	{
-		if (_ownerWidget.IsValid())
-		{
-			PSharedPtr<PDevelopUnitItem> selectedItem = _ownerWidget.Pin()->GetSelectedDevelopUnit();
-			if (selectedItem != nullptr)
-			{
-				JGDevelopUnit* developUnit = selectedItem->GetDevelopUnit();
-				if (developUnit != nullptr)
-				{
-					inBuilder.PushWidgetComponent(developUnit->CreateContentWidgetComponent());
-				}
-			}
-		}
-	}
-
-	virtual void OnContextMenuBuild(HContextMenuBuilder& inBuilder) override
-	{
-
-	}
-};
+	_developUnitListData = Allocate<JGDevelopUnitListData>();
+}
 
 void WDevelopWidget::OnOpen()
 {
@@ -94,6 +58,7 @@ void WDevelopWidget::OnOpen()
 	if (_developUnitList == nullptr)
 	{
 		WDevelopUnitList::HArguments args;
+		args.DevelopUnitListData = _developUnitListData;
 		args.OnSelectChanged = WList::HOnSelectChanged::CreateSP(SharedWrap(this), &WDevelopWidget::OnSelectedDevelopUnit);
 		_developUnitList = NewWidgetComponent<WDevelopUnitList>(args);
 	}
@@ -114,19 +79,7 @@ void WDevelopWidget::OnClose()
 
 void WDevelopWidget::OnUpdate()
 {
-	//// dll
 
-	//try
-	//{
-	//	if (_developUnit != nullptr)
-	//	{
-	//		_developUnit->Update();
-	//	}
-	//}
-	//catch (...)
-	//{
-	//	Reset();
-	//}
 }
 
 void WDevelopWidget::OnGUIBuild(HGUIBuilder& inBuilder)
