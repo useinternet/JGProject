@@ -869,7 +869,6 @@ public:
 		return false;
 	}
 
-	//Remove all the functions bound to the delegate
 	void RemoveAll()
 	{
 		if (IsLocked())

@@ -74,12 +74,27 @@ void WDevelopWidget::OnOpen()
 
 void WDevelopWidget::OnClose()
 {
-	//Reset();
+
 }
 
 void WDevelopWidget::OnUpdate()
 {
+	if (_selectedDevelopUnit.IsValid())
+	{
+		JGDevelopUnit* devUnit = _selectedDevelopUnit.Pin()->GetDevelopUnit();
+		if (devUnit != nullptr)
+		{
+			try
+			{
+				devUnit->Update();
+			}
+			catch (std::exception e)
+			{
 
+			}
+			
+		}
+	}
 }
 
 void WDevelopWidget::OnGUIBuild(HGUIBuilder& inBuilder)

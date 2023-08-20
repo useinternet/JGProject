@@ -16,6 +16,7 @@ protected: \
 		PJsonData dataJson = json.CreateJsonData(); \
 \
     dataJson.AddMember("UnitGuid", UnitGuid); \
+    dataJson.AddMember("UnitType", UnitType); \
 \
 \
 		json.AddMember(JGType::GenerateType<JGDevelopUnitData>().GetName().ToString(), dataJson);\
@@ -31,6 +32,12 @@ protected: \
 		}\
 \
 		if (dataJson.GetData("UnitGuid", &UnitGuid) == false)\
+		{\
+			\
+		}\
+\
+\
+		if (dataJson.GetData("UnitType", &UnitType) == false)\
 		{\
 			\
 		}\

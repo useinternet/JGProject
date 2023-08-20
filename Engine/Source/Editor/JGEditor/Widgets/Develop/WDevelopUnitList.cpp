@@ -8,9 +8,12 @@
 #include "WidgetComponents/WButton.h"
 #include "WidgetComponents/WList.h"
 
+#include "Datas/DevelopUnitData.h"
+#include "Datas/DevelopUnitListData.h"
 
-PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDevelopUnitListData> InDevelopUnitListData, JGDevelopUnit* DevelopUnit)
-	: _ownerList(OwnerList), _developUnitListData(InDevelopUnitListData), _developUnit(DevelopUnit) {}
+
+PDevelopUnitItem::PDevelopUnitItem(PSharedPtr<WList> OwnerList, JGDevelopUnit* DevelopUnit)
+	: _ownerList(OwnerList), _developUnit(DevelopUnit) {}
 
 void PDevelopUnitItem::Reload()
 {
@@ -25,11 +28,6 @@ void PDevelopUnitItem::Remove()
 JGDevelopUnit* PDevelopUnitItem::GetDevelopUnit() const
 {
 	return _developUnit;
-}
-
-PSharedPtr<JGDevelopUnitListData> PDevelopUnitItem::GetDevelopUnitListData() const
-{
-	return _developUnitListData;
 }
 
 PDevelopUnitItem::~PDevelopUnitItem()
@@ -121,6 +119,18 @@ void WDevelopUnitList::Construct(const WDevelopUnitList::HArguments& InArgs)
 	buttonArgs.StretchMode = EStretchMode::Horizontal;
 
 	_onAddItemButton = NewWidgetComponent<WButton>(buttonArgs);
+
+	for (PSharedPtr<JGDevelopUnitData> unitData : _developUnitListData->DevelopUnitDatas)
+	{
+		PSharedPtr<JGClass> unitClass = StaticClass(unitData->UnitType);
+		if (unitClass == nullptr)
+		{
+			continue;
+		}
+
+		JGDevelopUnit* devUnit = JGDevelopUnit::LoadDevelopUnit(unitClass, unitData->UnitGuid);
+		CreateItem(devUnit);
+	}
 }
 
 void WDevelopUnitList::OnSelectedItemChanged(PSharedPtr<IListItem> inItem, bool inSelected)
@@ -147,6 +157,24 @@ void WDevelopUnitList::OnGUIBuild(HGUIBuilder& inBuilder)
 	inBuilder.EndHorizontal();
 }
 
+void WDevelopUnitList::CreateItem(JGDevelopUnit* inDevelopUnit)
+{
+	if (inDevelopUnit == nullptr)
+	{
+		return;
+	}
+
+	PSharedPtr<JGClass> Class = inDevelopUnit->GetClass();
+
+	PSharedPtr<PDevelopUnitItem> Item = Allocate<PDevelopUnitItem>(_developUnitList, inDevelopUnit);
+	Item->Name = inDevelopUnit->GetName().ToString();
+	Item->DevelopUnitName = Class->GetClassType()->GetName().ToString();
+
+	_listItems.push_back(Item);
+	_developUnitList->SetItemList(_listItems);
+	_developUnitListData->AddUnitData(inDevelopUnit);
+}
+
 void WDevelopUnitList::OnAddItem()
 {
 	PSharedPtr<JGClass> Class = _dutComboBox->GetSelectedClass();
@@ -161,15 +189,7 @@ void WDevelopUnitList::OnAddItem()
 		return;
 	}
 
-	PSharedPtr<PDevelopUnitItem> Item = Allocate<PDevelopUnitItem>(_developUnitList, _developUnitListData, developUnit);
-	Item->Name = developUnit->GetName().ToString();
-	Item->DevelopUnitName = Class->GetClassType()->GetName().ToString();
-
-	_listItems.push_back(Item);
-
-	_developUnitList->SetItemList(_listItems);
-
-	developUnit->Startup();
+	CreateItem(developUnit);
 }
 
 void WDevelopUnitList::OnRemoveItem(PSharedPtr<PDevelopUnitItem> inItem)
@@ -179,6 +199,7 @@ void WDevelopUnitList::OnRemoveItem(PSharedPtr<PDevelopUnitItem> inItem)
 	{
 		if (_listItems[i] == inItem)
 		{
+			_developUnitListData->RemoveUnitData(inItem->GetDevelopUnit());
 			_listItems.erase(_listItems.begin() + i);
 			break;
 		}

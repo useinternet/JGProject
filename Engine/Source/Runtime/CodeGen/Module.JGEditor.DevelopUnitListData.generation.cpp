@@ -7,7 +7,7 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Static_Create_Class_JGDevelo
 {
 	HList<PSharedPtr<JGFunction>> FunctionMap;
 	HList<PSharedPtr<JGProperty>> PropertyMap;
-	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<HList<JGDevelopUnitData>>(),"DevelopUnitDatas",nullptr));
+	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<HList<PSharedPtr<JGDevelopUnitData>>>(),"DevelopUnitDatas",nullptr));
 	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGType::GenerateType<JGDevelopUnitListData>(),{
 			JGType::GenerateType<JGObject>(), 
 		},

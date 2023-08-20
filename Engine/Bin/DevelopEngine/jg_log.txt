@@ -1,55 +1,66 @@
-[:27656:][info][Core]: Active Thread: [1564067616]
-[:27656:][info][Core]: Active Thread: [3489165848]
-[:27656:][info][Core]: Active Thread: [2994479901]
-[:27656:][info][Core]: Active Thread: [3118197040]
-[:27656:][info][Core]: Active Thread: [3489818023]
-[:27656:][info][Core]: Active Thread: [4272927283]
-[:27656:][info][Core]: Active Thread: [705538938]
-[:27656:][info][Core]: Active Thread: [2797952044]
-[:27656:][info][Core]: Active Thread: [1377435384]
-[:27656:][info][Core]: Active Thread: [2907623562]
-[:27656:][info][Core]: Active Thread: [1903710394]
-[:27656:][info][Core]: Active Thread: [1804349730]
-[:27656:][info][Core]: Active Thread: [2789910759]
-[:27656:][info][Core]: Active Thread: [4069010316]
-[:27656:][info][Core]: Active Thread: [2430950623]
-[:27656:][info][Core]: Active Thread: [503006745]
-[:27656:][info][Core]: Active Thread: [3474807183]
-[:27656:][info][Core]: Active Thread: [1983177623]
-[:27656:][info][Core]: Active Thread: [177985665]
-[:27656:][info][Core]: Active Thread: [1819047526]
-[:27656:][info][Core]: Active Thread: [3641939448]
-[:27656:][info][Core]: Active Thread: [3413352962]
-[:27656:][info][Core]: Active Thread: [2022884069]
-[:27656:][info][Core]: Active Thread: [3206670773]
-[:27656:][info][Core]: Active Thread: [2224764087]
-[:27656:][info][Core]: Active Thread: [4192075280]
-[:27656:][info][Core]: Active Thread: [2723993498]
-[:27656:][info][Core]: Active Thread: [1460087390]
-[:27656:][info][Core]: Active Thread: [3566283084]
-[:27656:][info][Core]: Active Thread: [3646978565]
-[:27656:][info][Core]: Active Thread: [3190118637]
-[:27656:][info][Core]: Active Thread: [2476898351]
-[:27656:][info][Core]: Active Thread Totoal Count: 32 
-[:27656:][trace][Graphics]: DirectX12 Init Start
-[:27656:][trace][Graphics]: Success Create D3D12Device
-[:27656:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
-[:27656:][info][Graphics]: VideoMemory : 16064  MB
-[:27656:][trace][Graphics]: Create DescriptorAllocator...
-[:27656:][trace][Graphics]: Create CommandQueue...
-[:27656:][trace][Graphics]: Create FrameBuffer...
-[:27656:][trace][Graphics]: DirectX12 Init End
-[:27656:][trace][Graphics]: Startup Graphics Module...
-[:27656:][trace][JGEditor]: Startup JGEditor Module...
-[:27656:][info][Core]: Recognized Class List...
-[:27656:][debug][Core]: - JGDevelopUnit
-[:27656:][debug][Core]: - JGDUT_Graphics
-[:27656:][debug][Core]: - JGDevelopUnitListData
-[:27656:][debug][Core]: - JGDevelopUnitData
-[:27656:][debug][Core]: - WDevelopWidget
-[:27656:][debug][Core]: - JGTestClassA
-[:27656:][debug][Core]: - JGObject
-[:27656:][debug][Core]: - JGGUIData
-[:27656:][debug][Core]: - JGGenericGUIStyle
-[:27656:][debug][Core]: - JGGUIStyle
-[:27656:][debug][Core]: - WWidget
+[:3704:][info][Core]: Active Thread: [3062747155]
+[:3704:][info][Core]: Active Thread: [2060294859]
+[:3704:][info][Core]: Active Thread: [837610406]
+[:3704:][info][Core]: Active Thread: [2387196366]
+[:3704:][info][Core]: Active Thread: [3914775844]
+[:3704:][info][Core]: Active Thread: [3568972208]
+[:3704:][info][Core]: Active Thread: [3674337208]
+[:3704:][info][Core]: Active Thread: [3424057284]
+[:3704:][info][Core]: Active Thread: [3530570112]
+[:3704:][info][Core]: Active Thread: [3354092212]
+[:3704:][info][Core]: Active Thread: [878362495]
+[:3704:][info][Core]: Active Thread: [3688695873]
+[:3704:][info][Core]: Active Thread: [2057449213]
+[:3704:][info][Core]: Active Thread: [1177905359]
+[:3704:][info][Core]: Active Thread: [2263322705]
+[:3704:][info][Core]: Active Thread: [4247525165]
+[:3704:][info][Core]: Active Thread: [3277288020]
+[:3704:][info][Core]: Active Thread: [575660941]
+[:3704:][info][Core]: Active Thread: [226855137]
+[:3704:][info][Core]: Active Thread: [3733597958]
+[:3704:][info][Core]: Active Thread: [3446952887]
+[:3704:][info][Core]: Active Thread: [3967223561]
+[:3704:][info][Core]: Active Thread: [2065986151]
+[:3704:][info][Core]: Active Thread: [747099724]
+[:3704:][info][Core]: Active Thread: [2733991308]
+[:3704:][info][Core]: Active Thread: [4236481712]
+[:3704:][info][Core]: Active Thread: [1255674770]
+[:3704:][info][Core]: Active Thread: [1319322462]
+[:3704:][info][Core]: Active Thread: [2172316370]
+[:3704:][info][Core]: Active Thread: [1518852487]
+[:3704:][info][Core]: Active Thread: [1211268338]
+[:3704:][info][Core]: Active Thread: [3080447119]
+[:3704:][info][Core]: Active Thread Totoal Count: 32 
+[:3704:][trace][Graphics]: DirectX12 Init Start
+[:3704:][trace][Graphics]: Success Create D3D12Device
+[:3704:][info][Graphics]: Description : NVIDIA GeForce RTX 4090 Laptop GPU
+[:3704:][info][Graphics]: VideoMemory : 16064  MB
+[:3704:][trace][Graphics]: Create DescriptorAllocator...
+[:3704:][trace][Graphics]: Create CommandQueue...
+[:3704:][trace][Graphics]: Create FrameBuffer...
+[:3704:][trace][Graphics]: DirectX12 Init End
+[:3704:][trace][Graphics]: Startup Graphics Module...
+[:3704:][trace][JGEditor]: Startup JGEditor Module...
+[:3704:][info][Core]: Recognized Class List...
+[:3704:][debug][Core]: - JGDevelopUnit
+[:3704:][debug][Core]: - JGDUT_Graphics
+[:3704:][debug][Core]: - JGDevelopUnitListData
+[:3704:][debug][Core]: - JGDevelopUnitData
+[:3704:][debug][Core]: - WDevelopWidget
+[:3704:][debug][Core]: - JGTestClassA
+[:3704:][debug][Core]: - JGObject
+[:3704:][debug][Core]: - JGGUIData
+[:3704:][debug][Core]: - JGGenericGUIStyle
+[:3704:][debug][Core]: - JGGUIStyle
+[:3704:][debug][Core]: - WWidget
+[:3704:][info][GUI]: Start Collect GUI Styles...
+[:3704:][debug][GUI]: - JGGenericGUIStyle 
+[:3704:][info][GUI]: End Collect GUI Styles...
+[:3704:][trace][Core]: JGGUIData: Success Load at ../../Temp/jg_gui.json
+[:3704:][info][Core]: Load DevelopUnit : DUT_Graphics_Dynamic_1090756562-31696-18724-141-239-102-127-17-134-18-233.dll
+[:3704:][info][DUT_Graphics]: Start up
+[:3704:][info][GUI]: Left Click (7184)
+[:3704:][info][GUI]: Click Select (7184)
+[:3704:][trace][Core]: JGGUIData: Success Save at ../../Temp/jg_gui.json
+[:3704:][trace][Graphics]: Shutdown Graphics Module...
+[:3704:][trace][JGEditor]: Shutdown JGEditor Module...

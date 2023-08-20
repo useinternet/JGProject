@@ -3,7 +3,7 @@
 
 class WBorder : public WWidgetComponent
 {
-protected:
+public:
 	JG_DECLARE_DELEGATE(HOnMouseLeftClick);
 	JG_DECLARE_DELEGATE(HOnMouseRightClick);
 	JG_DECLARE_DELEGATE(HOnMouseHovered);

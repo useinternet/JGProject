@@ -18,7 +18,7 @@ void WComboBox::SetSelectedItemIndex(int32 inIndex)
 
 	if (bDirty)
 	{
-		if (_selectedItemIndex != INDEX_NONE || _selectedItemIndex < _itemList.size())
+		if (_selectedItemIndex != INDEX_NONE && _selectedItemIndex < _itemList.size())
 		{
 			_itemList[_selectedItemIndex]->OnSelected();
 			_onSelectChanged.ExecuteIfBound(_itemList[_selectedItemIndex]);
@@ -64,7 +64,7 @@ int32 WComboBox::GetItemIndex(PSharedPtr<IComboItem> inItem) const
 
 PSharedPtr<IComboItem> WComboBox::GetSelectedItem() const
 {
-	if (_selectedItemIndex != INDEX_NONE || _selectedItemIndex < _itemList.size())
+	if (_selectedItemIndex != INDEX_NONE && _selectedItemIndex < _itemList.size())
 	{
 		return _itemList[_selectedItemIndex];
 	}

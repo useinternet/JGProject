@@ -152,7 +152,7 @@ void WList::SetItemListInternal(const HList<PSharedPtr<IListItem>>& inItemList)
 		WSelectable::HArguments args;
 		args.OnSelected = WSelectable::HOnSelected::CreateSP(SharedWrap(this), &WList::OnItemSelected, i);
 		args.OnContent  = WSelectable::HOnContent::CreateSP(SharedWrap(this), &WList::OnItemContent, i);
-
+		args.StretchMode = EStretchMode::Horizontal;
 		_widgetList[i] = NewWidgetComponent<WSelectable>(args);
 	}
 }

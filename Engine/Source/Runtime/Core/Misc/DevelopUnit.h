@@ -36,6 +36,7 @@ public:
 
 	// À§Á¬
 	virtual PSharedPtr<WWidgetComponent> CreateContentWidgetComponent() { return nullptr; }
+	const HGuid& GetGuid() const { return _guid; }
 
 	static JGDevelopUnit* LoadDevelopUnit(PSharedPtr<JGClass> inClass, const HGuid& inGuid = HGuid());
 	static bool ReloadDevelopUnit(JGDevelopUnit*& inDevelopUnit);

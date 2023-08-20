@@ -16,9 +16,8 @@ void GGUIGlobalSystem::Start()
 
 	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::Update, PTaskDelegate::CreateRaw(this, &GGUIGlobalSystem::Update));
 	GScheduleGlobalSystem::GetInstance().ScheduleByFrame(EMainThreadExecutionOrder::Update, PTaskDelegate::CreateRaw(this, &GGUIGlobalSystem::Build));
-
-	LoadGUIDatas();
 	CollectGUIStyles();
+	LoadGUIDatas();
 }
 
 void GGUIGlobalSystem::Destroy()

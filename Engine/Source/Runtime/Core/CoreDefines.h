@@ -51,6 +51,8 @@ namespace fs = std::filesystem;
 #define JG_ASSERT(expression) assert(expression)
 #define JG_ASSERT_IF(condition, expression) assert(condition && expression)
 
+#define JG_SUPER __super
+
 #define JG_ENUM_FLAG(enumName) \
 enum class enumName; \
 inline enumName operator|(enumName c1, enumName c2) \

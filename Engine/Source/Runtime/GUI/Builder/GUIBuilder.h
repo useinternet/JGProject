@@ -107,6 +107,8 @@ struct HPushChildWidgetArguments
 		: FixedWidth(inFixedWidth), FixedHeight(inFixedHeight) {}
 };
 
+using HPushWidgetComponentArguments = HPushChildWidgetArguments;
+
 class WWidgetComponent;
 class WWidget;
 class IGUIBuild;

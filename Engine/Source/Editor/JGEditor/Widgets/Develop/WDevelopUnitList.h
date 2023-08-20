@@ -17,8 +17,6 @@ class PDevelopUnitItem
 {
 	PWeakPtr<WList> _ownerList;
 	JGDevelopUnit*  _developUnit;
-	PSharedPtr<JGDevelopUnitListData> _developUnitListData;
-
 	PSharedPtr<WDevelopItem> _cacheWidget;
 
 public:
@@ -28,13 +26,12 @@ public:
 	PString DllName;
 
 public:
-	PDevelopUnitItem(PSharedPtr<WList> OwnerList, PSharedPtr<JGDevelopUnitListData> InDevelopUnitListData, JGDevelopUnit* DevelopUnit);
+	PDevelopUnitItem(PSharedPtr<WList> OwnerList, JGDevelopUnit* DevelopUnit);
 	virtual ~PDevelopUnitItem();
 
 	void Reload();
 	void Remove();
 	JGDevelopUnit* GetDevelopUnit() const;
-	PSharedPtr<JGDevelopUnitListData> GetDevelopUnitListData() const;
 };
 
 class WDevelopItem : public WWidgetComponent
@@ -100,6 +97,7 @@ public:
 
 protected:
 	virtual void OnGUIBuild(HGUIBuilder& inBuilder) override;
+	void CreateItem(JGDevelopUnit* inDevelopUnit);
 	void OnAddItem();
 	void OnRemoveItem(PSharedPtr<PDevelopUnitItem> inItem);
 };

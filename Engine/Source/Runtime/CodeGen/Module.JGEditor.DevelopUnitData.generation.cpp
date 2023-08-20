@@ -8,6 +8,7 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Static_Create_Class_JGDevelo
 	HList<PSharedPtr<JGFunction>> FunctionMap;
 	HList<PSharedPtr<JGProperty>> PropertyMap;
 	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<HGuid>(),"UnitGuid",nullptr));
+	PropertyMap.push_back(PObjectGlobalsPrivateUtils::MakeStaticProperty(JGType::GenerateType<JGType>(),"UnitType",nullptr));
 	return PObjectGlobalsPrivateUtils::MakeStaticClass(JGType::GenerateType<JGDevelopUnitData>(),{
 			JGType::GenerateType<JGObject>(), 
 		},
@@ -24,6 +25,16 @@ PSharedPtr<JGClass> Module_JGEditor_Code_Generation_Create_Class_JGDevelopUnitDa
 		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("UnitGuid")), &(noneConstThisPtr->UnitGuid)) == false)
 		{
 			JG_LOG(CodeGen, ELogLevel::Error, "JGDevelopUnitData: Fail Bind Property : UnitGuid");
+		}
+	}
+
+
+
+	if (Class->HasProperty(PName("UnitType")) == true)
+	{
+		if (PObjectGlobalsPrivateUtils::BindProperty(noneConstThisPtr, Class->FindProperty(PName("UnitType")), &(noneConstThisPtr->UnitType)) == false)
+		{
+			JG_LOG(CodeGen, ELogLevel::Error, "JGDevelopUnitData: Fail Bind Property : UnitType");
 		}
 	}
 

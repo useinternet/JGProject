@@ -12,6 +12,8 @@ public:
 	JGPROPERTY()
 	HGuid UnitGuid;
 
+	JGPROPERTY()
+	JGType UnitType;
 
 public:
 	virtual ~JGDevelopUnitData() = default;

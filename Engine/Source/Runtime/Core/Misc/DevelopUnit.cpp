@@ -80,6 +80,7 @@ JGDevelopUnit* JGDevelopUnit::LoadDevelopUnit(PSharedPtr<JGClass> inClass, const
 	developUnit->_guid = guid;
 
 	JG_LOG(Core, ELogLevel::Info, "Load DevelopUnit : %s", dllName);
+	developUnit->Startup();
     return developUnit;
 }
 
@@ -110,6 +111,8 @@ void JGDevelopUnit::UnloadDevelopUnit(JGDevelopUnit*& outDevelopUnit, bool bReve
 		return;
 	}
 
+	outDevelopUnit->Shutdown();
+
 	if (bRevemoDll)
 	{
 		PString dllName = outDevelopUnit->_dllName.ToString();
@@ -123,6 +126,4 @@ void JGDevelopUnit::UnloadDevelopUnit(JGDevelopUnit*& outDevelopUnit, bool bReve
 			HFileHelper::RemoveFileOrDirectory(dllName);
 		}
 	}
-	
-	
 }
